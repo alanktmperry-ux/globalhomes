@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, Bell, LogOut,
+  LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, Bell, LogOut, Building2, UserPlus,
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -16,6 +16,7 @@ const NAV = [
   { title: 'Voice Leads', url: '/dashboard/leads', icon: Mic, badge: '4' },
   { title: 'Analytics', url: '/dashboard/analytics', icon: BarChart3 },
   { title: 'Off-Market Network', url: '/dashboard/network', icon: Users },
+  { title: 'Team', url: '/dashboard/team', icon: UserPlus },
   { title: 'Settings', url: '/dashboard/settings', icon: Settings },
 ];
 

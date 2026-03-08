@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Mic, Phone, Send, Calendar, Flame, Thermometer, Snowflake, Sparkles, Eye, MessageSquare, TrendingUp, Zap } from 'lucide-react';
+import { Mic, Phone, Send, Calendar, Flame, Thermometer, Snowflake, Sparkles, Eye, MessageSquare, TrendingUp, Zap, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import DashboardHeader from './DashboardHeader';

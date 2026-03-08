@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, MapPin, Sparkles } from 'lucide-react';
+import { ArrowRight, MapPin, Sparkles, Loader2, Zap } from 'lucide-react';
 import { SearchBar } from '@/components/SearchBar';
 import { PropertyCard } from '@/components/PropertyCard';
 import { PropertyCardSkeleton } from '@/components/PropertyCardSkeleton';
@@ -13,31 +13,47 @@ import { useSavedProperties } from '@/hooks/useSavedProperties';
 import { manusSearch } from '@/lib/ManusSearchService';
 import { Property } from '@/lib/types';
 import { mockProperties } from '@/lib/mock-data';
+import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
   const { t } = useI18n();
   const { addSearch, lastSearch } = useSearchHistory();
   const { isSaved, toggleSaved } = useSavedProperties();
+  const { toast } = useToast();
 
   const [results, setResults] = useState<Property[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [manusStatus, setManusStatus] = useState<string | null>(null);
 
   const handleSearch = useCallback(async (query: string) => {
     setIsSearching(true);
     setHasSearched(true);
+    setManusStatus(null);
     addSearch(query);
+    manusSearch.cancelPolling();
 
     try {
-      const result = await manusSearch.search({ query });
+      const result = await manusSearch.search({ query }, (update) => {
+        setManusStatus(update.status);
+        if (update.status === 'completed' && update.properties && update.properties.length > 0) {
+          setResults(update.properties);
+          toast({
+            title: '🔍 Live results ready',
+            description: `Found ${update.properties.length} properties from real estate sites`,
+          });
+        } else if (update.status === 'failed') {
+          setManusStatus(null);
+        }
+      });
       setResults(result.properties);
     } catch {
       setResults([]);
     } finally {
       setIsSearching(false);
     }
-  }, [addSearch]);
+  }, [addSearch, toast]);
 
   // Recommended properties (just show a subset for now)
   const recommended = mockProperties.slice(0, 3);

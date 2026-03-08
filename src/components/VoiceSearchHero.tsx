@@ -92,17 +92,25 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
     if (onLocationSelect) {
       try {
         const { geocode } = await import('@/lib/googleMapsService');
-        // Try the extracted location first, then the full query
         const locationQuery = filters.location || text;
-        let location = await geocode(locationQuery);
+        console.log('[GeoDebug] Geocoding:', locationQuery);
+        const location = await geocode(locationQuery);
+        console.log('[GeoDebug] Result:', location);
         if (!location && filters.location && filters.location !== text) {
-          location = await geocode(text);
+          const fallback = await geocode(text);
+          console.log('[GeoDebug] Fallback result:', fallback);
+          if (fallback) {
+            onLocationSelect({ lat: fallback.lat, lng: fallback.lng, address: text });
+            return;
+          }
         }
         if (location) {
           onLocationSelect({ lat: location.lat, lng: location.lng, address: locationQuery });
+        } else {
+          console.log('[GeoDebug] No geocode result found');
         }
-      } catch {
-        // Geocoding failed silently
+      } catch (err) {
+        console.error('[GeoDebug] Geocode error:', err);
       }
     }
   }, [onSearch, onLocationSelect]);

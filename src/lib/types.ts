@@ -1,3 +1,5 @@
+export type PropertyStatus = 'new' | 'off-market' | 'coming-soon' | 'listed';
+
 export interface Property {
   id: string;
   title: string;
@@ -23,6 +25,7 @@ export interface Property {
   contactClicks: number;
   lat?: number;
   lng?: number;
+  status?: PropertyStatus;
 }
 
 export interface Agent {

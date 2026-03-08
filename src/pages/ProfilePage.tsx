@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User, ChevronRight, Shield, LogIn, LogOut, Settings, Mail, Check, Loader2 } from 'lucide-react';
+import { User, ChevronRight, Shield, LogIn, LogOut, Settings, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { BottomNav } from '@/components/BottomNav';
 import { useI18n } from '@/lib/i18n';
 import { useNavigate } from 'react-router-dom';

@@ -91,15 +91,22 @@ const Index = () => {
   const displayProperties = hasSearched ? results : mockProperties.slice(0, 6);
 
   const filteredProperties = useMemo(() => {
-    if (!areaSearch) return displayProperties;
-    return displayProperties.filter((p) => {
-      if (!p.lat || !p.lng) return false;
-      if (areaSearch.type === 'circle') {
-        return haversineDistance(p.lat, p.lng, areaSearch.center[0], areaSearch.center[1]) <= areaSearch.radius;
-      }
-      return isInsidePolygon(p.lat, p.lng, areaSearch.coordinates);
-    });
-  }, [displayProperties, areaSearch]);
+    let props = displayProperties;
+    if (areaSearch) {
+      props = props.filter((p) => {
+        if (!p.lat || !p.lng) return false;
+        if (areaSearch.type === 'circle') {
+          return haversineDistance(p.lat, p.lng, areaSearch.center[0], areaSearch.center[1]) <= areaSearch.radius;
+        }
+        return isInsidePolygon(p.lat, p.lng, areaSearch.coordinates);
+      });
+    }
+    if (sortBy === 'price-asc') return [...props].sort((a, b) => a.price - b.price);
+    if (sortBy === 'price-desc') return [...props].sort((a, b) => b.price - a.price);
+    if (sortBy === 'newest') return [...props].sort((a, b) => new Date(b.listedDate).getTime() - new Date(a.listedDate).getTime());
+    if (sortBy === 'beds') return [...props].sort((a, b) => b.beds - a.beds);
+    return props;
+  }, [displayProperties, areaSearch, sortBy]);
 
   const handleAreaSearch = useCallback((area: AreaSearch | null) => {
     setAreaSearch(area || null);

@@ -370,7 +370,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   onClick={() => removeChip(chip.key)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-voice-surface text-voice-text text-xs font-medium hover:bg-primary/20 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-foreground text-xs font-medium hover:bg-primary/20 transition-colors"
                 >
                   {chip.label}
                   <X size={12} className="text-voice-muted" />

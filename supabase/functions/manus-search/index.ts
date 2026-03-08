@@ -37,15 +37,15 @@ Deno.serve(async (req) => {
     console.log("Sending task to Manus API:", { query, goal: goal.substring(0, 100) + "..." });
 
     // Create Manus task
-    const manusResponse = await fetch("https://open.manus.im/v1/tasks", {
+    const manusResponse = await fetch("https://api.manus.ai/v1/tasks", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${manusApiKey}`,
+        "API_KEY": manusApiKey,
+        "accept": "application/json",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        goal,
-        use_browser: true,
+        prompt: goal,
       }),
     });
 

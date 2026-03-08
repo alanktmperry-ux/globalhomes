@@ -14,9 +14,134 @@ export type Database = {
   }
   public: {
     Tables: {
+      agencies: {
+        Row: {
+          address: string | null
+          created_at: string
+          description: string | null
+          email: string | null
+          id: string
+          logo_url: string | null
+          name: string
+          owner_user_id: string
+          phone: string | null
+          slug: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          name: string
+          owner_user_id: string
+          phone?: string | null
+          slug: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+          owner_user_id?: string
+          phone?: string | null
+          slug?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      agency_invite_codes: {
+        Row: {
+          agency_id: string
+          code: string
+          created_at: string
+          created_by: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          max_uses: number | null
+          role: Database["public"]["Enums"]["agency_member_role"]
+          uses: number
+        }
+        Insert: {
+          agency_id: string
+          code: string
+          created_at?: string
+          created_by: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          role?: Database["public"]["Enums"]["agency_member_role"]
+          uses?: number
+        }
+        Update: {
+          agency_id?: string
+          code?: string
+          created_at?: string
+          created_by?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          role?: Database["public"]["Enums"]["agency_member_role"]
+          uses?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agency_invite_codes_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agency_members: {
+        Row: {
+          agency_id: string
+          id: string
+          joined_at: string
+          role: Database["public"]["Enums"]["agency_member_role"]
+          user_id: string
+        }
+        Insert: {
+          agency_id: string
+          id?: string
+          joined_at?: string
+          role?: Database["public"]["Enums"]["agency_member_role"]
+          user_id: string
+        }
+        Update: {
+          agency_id?: string
+          id?: string
+          joined_at?: string
+          role?: Database["public"]["Enums"]["agency_member_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agency_members_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agents: {
         Row: {
           agency: string | null
+          agency_id: string | null
           avatar_url: string | null
           created_at: string
           email: string | null
@@ -32,6 +157,7 @@ export type Database = {
         }
         Insert: {
           agency?: string | null
+          agency_id?: string | null
           avatar_url?: string | null
           created_at?: string
           email?: string | null
@@ -47,6 +173,7 @@ export type Database = {
         }
         Update: {
           agency?: string | null
+          agency_id?: string | null
           avatar_url?: string | null
           created_at?: string
           email?: string | null
@@ -60,7 +187,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "agents_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lead_events: {
         Row: {
@@ -434,6 +569,7 @@ export type Database = {
       }
     }
     Enums: {
+      agency_member_role: "owner" | "admin" | "agent"
       app_role: "user" | "agent" | "admin"
     }
     CompositeTypes: {
@@ -562,6 +698,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      agency_member_role: ["owner", "admin", "agent"],
       app_role: ["user", "agent", "admin"],
     },
   },

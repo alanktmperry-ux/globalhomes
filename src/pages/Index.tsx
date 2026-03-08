@@ -133,29 +133,26 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="max-w-7xl mx-auto px-4 pt-4 pb-3">
-          <div className="flex items-center justify-between mb-3">
-            <h1 className="font-display text-xl font-bold text-foreground tracking-tight">
-              {t('app.name')}
-            </h1>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setShowMap(!showMap)}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-secondary text-foreground text-sm font-medium transition-colors hover:bg-accent"
-              >
-                {showMap ? <List size={16} /> : <Map size={16} />}
-                <span className="hidden sm:inline">{showMap ? 'List only' : 'Show map'}</span>
-              </button>
-              <LanguageSwitcher />
-            </div>
-          </div>
-          <SearchBar onSearch={handleSearch} onLocationSelect={(loc) => {
-            setMapCenter({ lat: loc.lat, lng: loc.lng });
-          }} />
+      {/* Voice Search Hero */}
+      <VoiceSearchHero
+        onSearch={handleSearch}
+        onLocationSelect={(loc) => setMapCenter({ lat: loc.lat, lng: loc.lng })}
+        resultCount={hasSearched ? filteredProperties.length : undefined}
+        isSearching={isSearching}
+      />
+
+      {/* Map/List toggle */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50 px-4 py-2">
+        <div className="max-w-7xl mx-auto flex items-center justify-end">
+          <button
+            onClick={() => setShowMap(!showMap)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-secondary text-foreground text-sm font-medium transition-colors hover:bg-accent"
+          >
+            {showMap ? <List size={16} /> : <Map size={16} />}
+            <span className="hidden sm:inline">{showMap ? 'List only' : 'Show map'}</span>
+          </button>
         </div>
-      </header>
+      </div>
 
       <main className="max-w-7xl mx-auto px-4 py-4">
         {/* Resume search */}

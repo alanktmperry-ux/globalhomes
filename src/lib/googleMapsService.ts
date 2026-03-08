@@ -46,7 +46,7 @@ let loadPromise: Promise<void> | null = null;
 
 export function loadGoogleMapsScript(): Promise<void> {
   if (loadPromise) return loadPromise;
-  if (window.google?.maps) return Promise.resolve();
+  if ((window as any).google?.maps) return Promise.resolve();
 
   loadPromise = getGoogleMapsApiKey().then((key) => {
     return new Promise<void>((resolve, reject) => {

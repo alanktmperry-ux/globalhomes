@@ -45,6 +45,7 @@ const TeamPage = () => {
 
   const [agencyId, setAgencyId] = useState<string | null>(null);
   const [agencyName, setAgencyName] = useState('');
+  const [agencyLogo, setAgencyLogo] = useState<string | null>(null);
   const [myRole, setMyRole] = useState<string | null>(null);
   const [members, setMembers] = useState<AgencyMember[]>([]);
   const [inviteCodes, setInviteCodes] = useState<InviteCode[]>([]);
@@ -53,6 +54,8 @@ const TeamPage = () => {
   const [newInviteRole, setNewInviteRole] = useState<string>('agent');
   const [newInviteMaxUses, setNewInviteMaxUses] = useState('10');
   const [creating, setCreating] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isOwnerOrAdmin = myRole === 'owner' || myRole === 'admin';
 

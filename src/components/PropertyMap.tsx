@@ -221,7 +221,7 @@ export function PropertyMap({
       const content = document.createElement('div');
       content.className = 'property-marker';
       content.innerHTML = `<div style="
-        background: ${isSelected ? typeColor : '#0f172a'};
+        background: ${isSelected ? typeColor : '#ffffff'};
         color: ${isSelected ? 'white' : typeColor};
         border: 2px solid ${typeColor};
         border-radius: 8px;
@@ -230,11 +230,11 @@ export function PropertyMap({
         font-weight: 700;
         font-family: 'Plus Jakarta Sans', sans-serif;
         white-space: nowrap;
-        box-shadow: 0 2px 12px ${typeColor}40;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
         cursor: pointer;
         transform: translateY(-100%);
         transition: all 0.2s ease;
-        ${isSelected ? `box-shadow: 0 0 20px ${typeColor}80; transform: translateY(-100%) scale(1.15);` : ''}
+        ${isSelected ? `box-shadow: 0 0 16px ${typeColor}60; transform: translateY(-100%) scale(1.15);` : ''}
       ">${property.priceFormatted}</div>`;
 
       const marker = new google.maps.marker.AdvancedMarkerElement({

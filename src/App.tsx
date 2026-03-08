@@ -12,6 +12,13 @@ import ProfilePage from "./pages/ProfilePage";
 import AgentPortalPage from "./pages/AgentPortalPage";
 import AgentLandingPage from "./pages/AgentLandingPage";
 import PocketListingPage from "./pages/PocketListingPage";
+import AgentDashboardLayout from "./pages/AgentDashboardLayout";
+import DashboardOverview from "./components/agent-dashboard/DashboardOverview";
+import ListingsPage from "./components/agent-dashboard/ListingsPage";
+import VoiceLeadsPage from "./components/agent-dashboard/VoiceLeadsPage";
+import AnalyticsPage from "./components/agent-dashboard/AnalyticsPage";
+import NetworkPage from "./components/agent-dashboard/NetworkPage";
+import SettingsPage from "./components/agent-dashboard/SettingsPage";
 import AuthPage from "./pages/AuthPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -35,6 +42,14 @@ const App = () => (
               <Route path="/agent-portal" element={<AgentPortalPage />} />
               <Route path="/agents" element={<AgentLandingPage />} />
               <Route path="/pocket-listing" element={<PocketListingPage />} />
+              <Route path="/dashboard" element={<AgentDashboardLayout />}>
+                <Route index element={<DashboardOverview />} />
+                <Route path="listings" element={<ListingsPage />} />
+                <Route path="leads" element={<VoiceLeadsPage />} />
+                <Route path="analytics" element={<AnalyticsPage />} />
+                <Route path="network" element={<NetworkPage />} />
+                <Route path="settings" element={<SettingsPage />} />
+              </Route>
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />

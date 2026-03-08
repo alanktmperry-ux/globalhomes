@@ -384,7 +384,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
         <div className="relative mb-4">
           <button
             onClick={() => setShowLangDropdown(!showLangDropdown)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-voice-surface text-voice-muted text-xs hover:text-voice-text transition-colors"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary text-muted-foreground text-xs hover:text-foreground transition-colors"
           >
             <span>{selectedLangObj.flag} {selectedLangObj.label}</span>
             <ChevronDown size={12} />

@@ -49,6 +49,7 @@ const App = () => (
               <Route path="/agents/login" element={<AgentAuthPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Route path="/agency/:slug" element={<AgencyProfilePage />} />
 
               {/* Authenticated */}
               <Route path="/saved" element={<ProtectedRoute><SavedPage /></ProtectedRoute>} />

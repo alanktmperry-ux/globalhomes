@@ -4,16 +4,14 @@ import AgentDashboardSidebar from '@/components/agent-dashboard/AgentDashboardSi
 
 const AgentDashboardLayout = () => {
   return (
-    <div className="dark">
-      <SidebarProvider>
-        <div className="min-h-screen flex w-full bg-background text-foreground">
-          <AgentDashboardSidebar />
-          <main className="flex-1 flex flex-col min-h-screen overflow-x-hidden">
-            <Outlet />
-          </main>
-        </div>
-      </SidebarProvider>
-    </div>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-background text-foreground">
+        <AgentDashboardSidebar />
+        <main className="flex-1 flex flex-col min-h-screen overflow-x-hidden">
+          <Outlet />
+        </main>
+      </div>
+    </SidebarProvider>
   );
 };
 

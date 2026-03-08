@@ -185,14 +185,13 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
   );
 
   return (
-    <div className="relative overflow-hidden bg-voice-hero">
-      {/* Gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-voice-dark to-voice-darker" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(var(--primary)/0.15)_0%,_transparent_70%)]" />
+    <div className="relative overflow-hidden bg-background">
+      {/* Subtle gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-background" />
 
       <div className="relative z-10 max-w-2xl mx-auto px-4 py-8 flex flex-col items-center text-center">
         {/* App title */}
-        <h1 className="font-display text-2xl font-bold text-voice-text mb-6 tracking-tight">
+        <h1 className="font-display text-2xl font-bold text-foreground mb-6 tracking-tight">
           GlobalHome
         </h1>
 

@@ -57,6 +57,14 @@ export default {
         },
         "surface-warm": "hsl(var(--surface-warm))",
         "surface-elevated": "hsl(var(--surface-elevated))",
+        voice: {
+          dark: "hsl(var(--voice-dark))",
+          darker: "hsl(var(--voice-darker))",
+          text: "hsl(var(--voice-text))",
+          muted: "hsl(var(--voice-muted))",
+          surface: "hsl(var(--voice-surface))",
+          hero: "hsl(var(--voice-dark))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

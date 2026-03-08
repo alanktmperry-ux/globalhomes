@@ -48,6 +48,8 @@
     --success: 152 69% 40%;
     --success-foreground: 0 0% 100%;
 
+    --cyan-accent: 187 85% 53%;
+
     --voice-dark: 222 47% 11%;
     --voice-darker: 217 33% 17%;
     --voice-text: 0 0% 100%;
@@ -92,6 +94,17 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217 91% 59.8%;
+
+    --surface-warm: 220 14% 12%;
+    --surface-elevated: 220 18% 12%;
+    --shadow-card: 0 1px 3px 0 hsl(0 0% 0% / 0.2), 0 4px 16px 0 hsl(0 0% 0% / 0.15);
+    --shadow-elevated: 0 4px 24px 0 hsl(0 0% 0% / 0.25), 0 8px 48px 0 hsl(0 0% 0% / 0.2);
+    --shadow-drawer: 0 -4px 32px 0 hsl(0 0% 0% / 0.3);
+
+    --success: 152 69% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --cyan-accent: 187 85% 53%;
 
     --voice-dark: 222 47% 11%;
     --voice-darker: 217 33% 17%;

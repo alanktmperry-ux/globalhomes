@@ -23,7 +23,7 @@ const SeekerAuthPage = () => {
 
     try {
       if (mode === 'signup') {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -32,10 +32,21 @@ const SeekerAuthPage = () => {
           },
         });
         if (error) throw error;
-        toast({ title: 'Account created!', description: 'Check your email to confirm your account.' });
+        // If email confirmation is required, user won't have a session
+        if (data.user && !data.session) {
+          toast({ title: 'Check your email', description: 'We sent you a confirmation link. Please verify your email before signing in.' });
+        } else {
+          toast({ title: 'Account created!' });
+          navigate('/');
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        if (error) {
+          if (error.message.includes('Email not confirmed')) {
+            throw new Error('Please check your email and click the confirmation link before signing in.');
+          }
+          throw error;
+        }
         toast({ title: 'Welcome back!' });
         navigate('/');
       }

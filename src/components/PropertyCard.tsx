@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Bed, Bath, Car, Heart, BadgeCheck, Star } from 'lucide-react';
 import { Property, PropertyStatus } from '@/lib/types';
 import { useI18n } from '@/lib/i18n';
+import { useCurrency } from '@/lib/CurrencyContext';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { AgentContactModal } from './AgentContactModal';
 

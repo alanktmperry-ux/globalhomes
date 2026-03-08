@@ -49,6 +49,7 @@ const Index = () => {
   const { isSaved, toggleSaved } = useSavedProperties();
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const { formatPrice } = useCurrency();
 
   const [results, setResults] = useState<Property[]>([]);
   const [isSearching, setIsSearching] = useState(false);

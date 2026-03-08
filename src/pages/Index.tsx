@@ -101,7 +101,29 @@ const Index = () => {
         {/* Search results */}
         {hasSearched && (
           <div className="mb-6">
-            <h2 className="font-display font-semibold text-foreground mb-3">{t('search.results')}</h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-display font-semibold text-foreground">{t('search.results')}</h2>
+            {manusStatus && (manusStatus === 'running' || manusStatus === 'pending') && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex items-center gap-1.5 text-xs text-primary font-medium"
+              >
+                <Loader2 size={12} className="animate-spin" />
+                <span>Searching live sites…</span>
+              </motion.div>
+            )}
+            {manusStatus === 'completed' && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex items-center gap-1 text-xs text-emerald-600 font-medium"
+              >
+                <Zap size={12} />
+                <span>Live results</span>
+              </motion.div>
+            )}
+          </div>
             {isSearching ? (
               <div className="space-y-4">
                 {[0, 1, 2].map(i => <PropertyCardSkeleton key={i} />)}

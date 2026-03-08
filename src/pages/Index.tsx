@@ -369,9 +369,19 @@ const Index = () => {
             <div className="p-4 overflow-y-auto h-full pb-24">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-medium text-foreground">{filteredProperties.length} properties</span>
-                <button onClick={() => setMobileView('map')} className="flex items-center gap-1.5 text-xs text-primary font-medium">
-                  <Map size={14} /> Show map
-                </button>
+                <div className="flex items-center gap-2">
+                  <FilterSidebar
+                    filters={filters}
+                    onChange={setFilters}
+                    isOpen={filtersOpen}
+                    onToggle={() => setFiltersOpen(o => !o)}
+                    totalCount={displayProperties.length}
+                    filteredCount={filteredProperties.length}
+                  />
+                  <button onClick={() => setMobileView('map')} className="flex items-center gap-1.5 text-xs text-primary font-medium">
+                    <Map size={14} /> Show map
+                  </button>
+                </div>
               </div>
               {propertyList}
             </div>

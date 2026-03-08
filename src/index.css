@@ -92,6 +92,12 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217 91% 59.8%;
+
+    --voice-dark: 222 47% 11%;
+    --voice-darker: 217 33% 17%;
+    --voice-text: 0 0% 100%;
+    --voice-muted: 0 0% 100% / 0.6;
+    --voice-surface: 0 0% 100% / 0.08;
   }
 }
 

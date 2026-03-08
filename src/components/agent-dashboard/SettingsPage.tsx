@@ -1,11 +1,156 @@
-import { User, Mail, Phone, Shield, Bell, Globe } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { User, Mail, Phone, Shield, Bell, Globe, Camera, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/lib/AuthProvider';
 import DashboardHeader from './DashboardHeader';
 
+interface AgentProfile {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  agency: string;
+  avatar_url: string | null;
+  user_id: string;
+}
+
 const SettingsPage = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [agentData, setAgentData] = useState<AgentProfile | null>(null);
+  
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    agency: ''
+  });
+
+  useEffect(() => {
+    if (user) {
+      loadAgentData();
+    }
+  }, [user]);
+
+  const loadAgentData = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from('agents')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (error) throw error;
+      
+      setAgentData(data);
+      setFormData({
+        name: data.name || '',
+        email: data.email || '',
+        phone: data.phone || '',
+        agency: data.agency || ''
+      });
+    } catch (err) {
+      console.error('Error loading agent data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !agentData) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({ title: 'Invalid file', description: 'Please upload an image file.', variant: 'destructive' });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: 'File too large', description: 'Max file size is 5MB.', variant: 'destructive' });
+      return;
+    }
+
+    setUploadingAvatar(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const filePath = `${agentData.user_id}/avatar.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from('agents')
+        .update({ avatar_url: publicUrl })
+        .eq('id', agentData.id);
+      if (updateError) throw updateError;
+
+      setAgentData(prev => prev ? { ...prev, avatar_url: publicUrl } : null);
+      toast({ title: 'Avatar updated', description: 'Your profile photo has been uploaded.' });
+    } catch (err: any) {
+      toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
+    } finally {
+      setUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleSave = async () => {
+    if (!agentData) return;
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from('agents')
+        .update({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          agency: formData.agency
+        })
+        .eq('id', agentData.id);
+      
+      if (error) throw error;
+      
+      toast({ title: 'Profile updated', description: 'Your changes have been saved.' });
+      await loadAgentData(); // Refresh data
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="animate-spin text-primary" size={24} />
+      </div>
+    );
+  }
+
+  if (!agentData) {
+    return (
+      <div className="text-center py-20">
+        <p className="text-muted-foreground">Agent profile not found</p>
+      </div>
+    );
+  }
+
   return (
     <div>
       <DashboardHeader title="Settings" subtitle="Manage your agent profile and preferences" />
@@ -14,22 +159,74 @@ const SettingsPage = () => {
         {/* Profile */}
         <div className="bg-card border border-border rounded-xl p-5 space-y-4">
           <h3 className="font-display text-sm font-bold flex items-center gap-1.5"><User size={14} /> Agent Profile</h3>
+          
+          {/* Avatar Upload */}
+          <div className="flex items-center gap-4">
+            <div className="relative group">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarUpload}
+              />
+              <div className="w-16 h-16 rounded-full overflow-hidden bg-primary/10 flex items-center justify-center border border-border">
+                {agentData.avatar_url ? (
+                  <img src={agentData.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <User size={24} className="text-primary" />
+                )}
+              </div>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingAvatar}
+                className="absolute inset-0 rounded-full bg-foreground/0 group-hover:bg-foreground/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+              >
+                {uploadingAvatar ? (
+                  <Loader2 size={18} className="text-background animate-spin" />
+                ) : (
+                  <Camera size={18} className="text-background" />
+                )}
+              </button>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-foreground">Profile Photo</p>
+              <p className="text-xs text-muted-foreground">Click to upload a new avatar</p>
+            </div>
+          </div>
+
           <div className="grid sm:grid-cols-2 gap-3">
             <div>
               <Label className="text-xs">Full Name</Label>
-              <Input defaultValue="Jane Smith" className="bg-secondary border-border" />
+              <Input 
+                value={formData.name}
+                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                className="bg-secondary border-border" 
+              />
             </div>
             <div>
               <Label className="text-xs">Agency</Label>
-              <Input defaultValue="Ray White" className="bg-secondary border-border" />
+              <Input 
+                value={formData.agency}
+                onChange={(e) => setFormData(prev => ({ ...prev, agency: e.target.value }))}
+                className="bg-secondary border-border" 
+              />
             </div>
             <div>
               <Label className="text-xs">Email</Label>
-              <Input defaultValue="jane@raywhite.com" className="bg-secondary border-border" />
+              <Input 
+                value={formData.email}
+                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                className="bg-secondary border-border" 
+              />
             </div>
             <div>
               <Label className="text-xs">Phone</Label>
-              <Input defaultValue="+61 412 345 678" className="bg-secondary border-border" />
+              <Input 
+                value={formData.phone}
+                onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                className="bg-secondary border-border" 
+              />
             </div>
           </div>
         </div>
@@ -65,7 +262,9 @@ const SettingsPage = () => {
           <Button variant="outline" size="sm" className="text-xs">Edit Suburbs</Button>
         </div>
 
-        <Button className="w-full">Save Changes</Button>
+        <Button onClick={handleSave} disabled={saving} className="w-full">
+          {saving ? <><Loader2 size={16} className="animate-spin mr-2" /> Saving...</> : 'Save Changes'}
+        </Button>
       </div>
     </div>
   );

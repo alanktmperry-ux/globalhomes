@@ -210,6 +210,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SiteHeader />
       {/* Voice Search Hero */}
       <VoiceSearchHero
         onSearch={handleSearch}

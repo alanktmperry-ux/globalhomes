@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User, ChevronRight, Shield, LogIn, LogOut, Settings, Mail, Check, Loader2 } from 'lucide-react';
+import { User, ChevronRight, Shield, LogIn, LogOut, Settings, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { BottomNav } from '@/components/BottomNav';
 import { useI18n } from '@/lib/i18n';
 import { useNavigate } from 'react-router-dom';
@@ -25,6 +25,12 @@ const ProfilePage = () => {
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [emailLoading, setEmailLoading] = useState(false);
+
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordLoading, setPasswordLoading] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
@@ -100,6 +106,21 @@ const ProfilePage = () => {
                 <ChevronRight size={18} className="text-muted-foreground" />
               </button>
 
+              {/* Change Password */}
+              <button
+                onClick={() => setPasswordDialogOpen(true)}
+                className="w-full flex items-center gap-3 p-4 rounded-2xl bg-card border border-border text-left transition-colors active:bg-secondary"
+              >
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Lock size={18} className="text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium text-foreground text-sm">Change Password</p>
+                  <p className="text-xs text-muted-foreground">Update your account password</p>
+                </div>
+                <ChevronRight size={18} className="text-muted-foreground" />
+              </button>
+
               {isAgent && (
                 <button
                   onClick={() => navigate('/agent-portal')}
@@ -170,6 +191,71 @@ const ProfilePage = () => {
                       <><Loader2 size={16} className="animate-spin mr-2" /> Sending…</>
                     ) : (
                       'Update Email'
+                    )}
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+
+            {/* Change Password Dialog */}
+            <Dialog open={passwordDialogOpen} onOpenChange={(open) => { setPasswordDialogOpen(open); if (!open) { setNewPassword(''); setConfirmPassword(''); setShowPassword(false); } }}>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Change Password</DialogTitle>
+                  <DialogDescription>
+                    Enter a new password for your account. Must be at least 8 characters.
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (newPassword.length < 8) {
+                    toast({ title: 'Too short', description: 'Password must be at least 8 characters.', variant: 'destructive' });
+                    return;
+                  }
+                  if (newPassword !== confirmPassword) {
+                    toast({ title: 'Mismatch', description: 'Passwords do not match.', variant: 'destructive' });
+                    return;
+                  }
+                  setPasswordLoading(true);
+                  try {
+                    const { error } = await supabase.auth.updateUser({ password: newPassword });
+                    if (error) throw error;
+                    toast({ title: 'Password updated', description: 'Your password has been changed successfully.' });
+                    setPasswordDialogOpen(false);
+                    setNewPassword('');
+                    setConfirmPassword('');
+                  } catch (err: any) {
+                    toast({ title: 'Error', description: err.message, variant: 'destructive' });
+                  } finally {
+                    setPasswordLoading(false);
+                  }
+                }} className="space-y-4 mt-2">
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="New password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                      minLength={8}
+                    />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                  <Input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Confirm new password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    minLength={8}
+                  />
+                  <Button type="submit" className="w-full" disabled={passwordLoading || newPassword.length < 8 || newPassword !== confirmPassword}>
+                    {passwordLoading ? (
+                      <><Loader2 size={16} className="animate-spin mr-2" /> Updating…</>
+                    ) : (
+                      'Update Password'
                     )}
                   </Button>
                 </form>

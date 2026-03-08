@@ -151,7 +151,10 @@ const Index = () => {
               <LanguageSwitcher />
             </div>
           </div>
-          <SearchBar onSearch={handleSearch} />
+          <SearchBar onSearch={handleSearch} onLocationSelect={(loc) => {
+            // Could be used to center map in future
+            console.log('Location selected:', loc);
+          }} />
         </div>
       </header>
 

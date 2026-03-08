@@ -212,7 +212,7 @@ export function PropertyMap({ properties, onPropertySelect, selectedPropertyId, 
         google.maps.event.removeListener(listener);
       });
     }
-  }, [properties, selectedPropertyId, onPropertySelect]);
+  }, [properties, selectedPropertyId, onPropertySelect, centerOn]);
 
   if (error) {
     return (

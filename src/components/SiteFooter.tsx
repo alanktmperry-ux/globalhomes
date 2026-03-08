@@ -31,7 +31,7 @@ export function SiteFooter() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 mb-8">
           {/* Brand */}
           <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-cyan-400 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-cyan-accent flex items-center justify-center">
               <Globe size={20} className="text-primary-foreground" />
             </div>
             <span className="font-display text-lg font-bold text-foreground tracking-tight">

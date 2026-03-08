@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useI18n } from '@/lib/i18n';
 import { useVoiceSearch } from '@/hooks/useVoiceSearch';
 import { autocomplete } from '@/lib/googleMapsService';
+import { useToast } from '@/hooks/use-toast';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;

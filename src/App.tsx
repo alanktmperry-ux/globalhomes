@@ -63,6 +63,7 @@ const App = () => (
                 <Route path="leads" element={<VoiceLeadsPage />} />
                 <Route path="analytics" element={<AnalyticsPage />} />
                 <Route path="network" element={<NetworkPage />} />
+                <Route path="team" element={<TeamPage />} />
                 <Route path="settings" element={<SettingsPage />} />
               </Route>
 

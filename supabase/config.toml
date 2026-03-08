@@ -8,3 +8,9 @@ verify_jwt = false
 
 [functions.manus-task-status]
 verify_jwt = false
+
+[functions.voice-search]
+verify_jwt = false
+
+[functions.capture-lead]
+verify_jwt = false

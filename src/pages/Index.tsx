@@ -59,6 +59,7 @@ const Index = () => {
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key: number } | null>(null);
   const [splitPercent, setSplitPercent] = useState(55);
   const [bottomSheetExpanded, setBottomSheetExpanded] = useState(false);
+  const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'newest' | 'beds'>('default');
   const isDragging = useRef(false);
   const cardRefs = useRef<globalThis.Map<string, HTMLDivElement>>(new globalThis.Map());
 

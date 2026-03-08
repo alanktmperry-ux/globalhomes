@@ -32,6 +32,7 @@ const App = () => (
               <Route path="/messages" element={<MessagesPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/agent-portal" element={<AgentPortalPage />} />
+              <Route path="/agents" element={<AgentLandingPage />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />

@@ -1,3 +1,4 @@
+/// <reference types="google.maps" />
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { Property } from '@/lib/types';
 import { loadGoogleMapsScript } from '@/lib/googleMapsService';

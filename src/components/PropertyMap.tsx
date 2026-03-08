@@ -2,24 +2,55 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { Property } from '@/lib/types';
 import { loadGoogleMapsScript } from '@/lib/googleMapsService';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Locate, Search } from 'lucide-react';
+import { MarkerClusterer } from '@googlemaps/markerclusterer';
+
+const TYPE_COLORS: Record<string, string> = {
+  house: '#06b6d4',
+  apartment: '#8b5cf6',
+  townhouse: '#10b981',
+  land: '#f97316',
+  villa: '#06b6d4',
+  unit: '#8b5cf6',
+};
+
+const DARK_MAP_STYLE: google.maps.MapTypeStyle[] = [
+  { elementType: 'geometry', stylers: [{ color: '#1a1a2e' }] },
+  { elementType: 'labels.text.stroke', stylers: [{ color: '#1a1a2e' }] },
+  { elementType: 'labels.text.fill', stylers: [{ color: '#8a8a9a' }] },
+  { featureType: 'administrative', elementType: 'geometry.stroke', stylers: [{ color: '#2a2a3e' }] },
+  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#2a2a3e' }] },
+  { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#6a6a7a' }] },
+  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0e1a2b' }] },
+  { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#222238' }] },
+  { featureType: 'transit', elementType: 'geometry', stylers: [{ color: '#1e1e30' }] },
+];
 
 interface PropertyMapProps {
   properties: Property[];
   onPropertySelect: (property: Property) => void;
   selectedPropertyId?: string;
-  onAreaSearch?: (bounds: { type: 'circle'; center: [number, number]; radius: number } | { type: 'polygon'; coordinates: [number, number][] }) => void;
+  onAreaSearch?: (bounds: { type: 'circle'; center: [number, number]; radius: number } | { type: 'polygon'; coordinates: [number, number][] } | null) => void;
   centerOn?: { lat: number; lng: number } | null;
+  onMapMoved?: (bounds: { north: number; south: number; east: number; west: number }) => void;
+  onScrollToProperty?: (propertyId: string) => void;
 }
 
-export function PropertyMap({ properties, onPropertySelect, selectedPropertyId, onAreaSearch, centerOn }: PropertyMapProps) {
+export function PropertyMap({
+  properties, onPropertySelect, selectedPropertyId, onAreaSearch, centerOn, onMapMoved, onScrollToProperty,
+}: PropertyMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
+  const clustererRef = useRef<MarkerClusterer | null>(null);
   const drawingManagerRef = useRef<google.maps.drawing.DrawingManager | null>(null);
   const drawnOverlayRef = useRef<google.maps.Circle | google.maps.Polygon | null>(null);
+  const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showSearchArea, setShowSearchArea] = useState(false);
+  const [locating, setLocating] = useState(false);
+  const userMovedRef = useRef(false);
 
   const clearDrawnOverlay = useCallback(() => {
     if (drawnOverlayRef.current) {
@@ -46,12 +77,13 @@ export function PropertyMap({ properties, onPropertySelect, selectedPropertyId, 
           center: { lat: -37.85, lng: 145.35 },
           zoom: 11,
           mapId: 'property-map',
-          disableDefaultUI: false,
+          disableDefaultUI: true,
           zoomControl: true,
-          zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_TOP },
+          zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
           streetViewControl: false,
           fullscreenControl: false,
           mapTypeControl: false,
+          styles: DARK_MAP_STYLE,
         });
 
         const drawingManager = new google.maps.drawing.DrawingManager({
@@ -65,17 +97,17 @@ export function PropertyMap({ properties, onPropertySelect, selectedPropertyId, 
             ],
           },
           circleOptions: {
-            fillColor: 'hsl(217, 91%, 53%)',
-            fillOpacity: 0.1,
-            strokeColor: 'hsl(217, 91%, 53%)',
+            fillColor: '#06b6d4',
+            fillOpacity: 0.08,
+            strokeColor: '#06b6d4',
             strokeWeight: 2,
             editable: true,
             draggable: true,
           },
           polygonOptions: {
-            fillColor: 'hsl(217, 91%, 53%)',
-            fillOpacity: 0.1,
-            strokeColor: 'hsl(217, 91%, 53%)',
+            fillColor: '#06b6d4',
+            fillOpacity: 0.08,
+            strokeColor: '#06b6d4',
             strokeWeight: 2,
             editable: true,
             draggable: true,
@@ -85,6 +117,16 @@ export function PropertyMap({ properties, onPropertySelect, selectedPropertyId, 
         drawingManager.setMap(map);
         drawingManagerRef.current = drawingManager;
         mapInstanceRef.current = map;
+
+        // Track user interaction for "Search this area"
+        map.addListener('dragend', () => {
+          userMovedRef.current = true;
+          setShowSearchArea(true);
+        });
+        map.addListener('zoom_changed', () => {
+          if (userMovedRef.current) setShowSearchArea(true);
+        });
+
         setIsLoading(false);
       } catch (err) {
         if (!cancelled) {
@@ -95,15 +137,15 @@ export function PropertyMap({ properties, onPropertySelect, selectedPropertyId, 
     }
 
     init();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
-  // Center map when location is selected from search
+  // Center map when location is selected
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map || !centerOn) return;
+    userMovedRef.current = false;
+    setShowSearchArea(false);
     map.panTo({ lat: centerOn.lat, lng: centerOn.lng });
     map.setZoom(15);
   }, [centerOn]);
@@ -121,11 +163,7 @@ export function PropertyMap({ properties, onPropertySelect, selectedPropertyId, 
         const circle = e.overlay as google.maps.Circle;
         drawnOverlayRef.current = circle;
         const center = circle.getCenter()!;
-        onAreaSearch({
-          type: 'circle',
-          center: [center.lat(), center.lng()],
-          radius: circle.getRadius(),
-        });
+        onAreaSearch({ type: 'circle', center: [center.lat(), center.lng()], radius: circle.getRadius() });
 
         google.maps.event.addListener(circle, 'radius_changed', () => {
           const c = circle.getCenter()!;
@@ -153,42 +191,53 @@ export function PropertyMap({ properties, onPropertySelect, selectedPropertyId, 
       }
     });
 
-    return () => {
-      google.maps.event.removeListener(listener);
-    };
+    return () => { google.maps.event.removeListener(listener); };
   }, [onAreaSearch, clearDrawnOverlay]);
 
-  // Update markers
+  // Update markers with clustering
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
 
-    // Clear existing markers
+    // Clear existing
     markersRef.current.forEach((m) => (m.map = null));
     markersRef.current = [];
+    if (clustererRef.current) {
+      clustererRef.current.clearMarkers();
+      clustererRef.current = null;
+    }
+    if (infoWindowRef.current) {
+      infoWindowRef.current.close();
+    }
 
     const propsWithCoords = properties.filter((p) => p.lat && p.lng);
     if (propsWithCoords.length === 0) return;
 
     const bounds = new google.maps.LatLngBounds();
+    const infoWindow = new google.maps.InfoWindow();
+    infoWindowRef.current = infoWindow;
 
-    propsWithCoords.forEach((property) => {
+    const markers = propsWithCoords.map((property) => {
       const isSelected = property.id === selectedPropertyId;
-      
+      const typeColor = TYPE_COLORS[property.propertyType?.toLowerCase() || 'house'] || '#06b6d4';
+
       const content = document.createElement('div');
+      content.className = 'property-marker';
       content.innerHTML = `<div style="
-        background: ${isSelected ? 'hsl(217, 91%, 53%)' : 'white'};
-        color: ${isSelected ? 'white' : 'hsl(220, 20%, 10%)'};
-        border: 2px solid hsl(217, 91%, 53%);
+        background: ${isSelected ? typeColor : '#0f172a'};
+        color: ${isSelected ? 'white' : typeColor};
+        border: 2px solid ${typeColor};
         border-radius: 8px;
-        padding: 4px 8px;
+        padding: 4px 10px;
         font-size: 12px;
         font-weight: 700;
         font-family: 'Plus Jakarta Sans', sans-serif;
         white-space: nowrap;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        box-shadow: 0 2px 12px ${typeColor}40;
         cursor: pointer;
         transform: translateY(-100%);
+        transition: all 0.2s ease;
+        ${isSelected ? `box-shadow: 0 0 20px ${typeColor}80; transform: translateY(-100%) scale(1.15);` : ''}
       ">${property.priceFormatted}</div>`;
 
       const marker = new google.maps.marker.AdvancedMarkerElement({
@@ -197,22 +246,116 @@ export function PropertyMap({ properties, onPropertySelect, selectedPropertyId, 
         content: content.firstElementChild as HTMLElement,
       });
 
-      marker.addListener('click', () => onPropertySelect(property));
-      markersRef.current.push(marker);
+      // Hover preview
+      const markerEl = marker.element;
+      if (markerEl) {
+        markerEl.addEventListener('mouseenter', () => {
+          infoWindow.setContent(`
+            <div style="font-family: 'DM Sans', sans-serif; min-width: 200px; padding: 2px;">
+              <img src="${property.imageUrl}" alt="" style="width: 100%; height: 100px; object-fit: cover; border-radius: 6px; margin-bottom: 6px;" />
+              <div style="font-weight: 700; font-size: 14px; color: #0f172a;">${property.priceFormatted}</div>
+              <div style="font-size: 12px; color: #64748b; margin-top: 2px;">${property.title}</div>
+              <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">🛏 ${property.beds} · 🛁 ${property.baths} · 🚗 ${property.parking}</div>
+            </div>
+          `);
+          infoWindow.open(map, marker);
+        });
+        markerEl.addEventListener('mouseleave', () => {
+          infoWindow.close();
+        });
+      }
 
+      marker.addListener('click', () => {
+        onPropertySelect(property);
+        onScrollToProperty?.(property.id);
+        // Bounce animation
+        const el = marker.content as HTMLElement;
+        if (el) {
+          el.style.transition = 'transform 0.15s ease';
+          el.style.transform = 'translateY(-100%) scale(1.2)';
+          setTimeout(() => { el.style.transform = 'translateY(-100%) scale(1)'; }, 150);
+          setTimeout(() => { el.style.transform = 'translateY(-100%) scale(1.1)'; }, 300);
+          setTimeout(() => { el.style.transform = 'translateY(-100%) scale(1)'; }, 450);
+        }
+      });
+
+      markersRef.current.push(marker);
       bounds.extend({ lat: property.lat!, lng: property.lng! });
+      return marker;
+    });
+
+    // Clustering
+    clustererRef.current = new MarkerClusterer({
+      map,
+      markers,
+      renderer: {
+        render: ({ count, position }) => {
+          const el = document.createElement('div');
+          el.innerHTML = `<div style="
+            background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+            color: white;
+            border-radius: 50%;
+            width: ${36 + Math.min(count, 50)}px;
+            height: ${36 + Math.min(count, 50)}px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            box-shadow: 0 2px 12px rgba(6, 182, 212, 0.4);
+            border: 2px solid rgba(255,255,255,0.3);
+          ">${count}</div>`;
+          return new google.maps.marker.AdvancedMarkerElement({
+            position,
+            content: el.firstElementChild as HTMLElement,
+          });
+        },
+      },
     });
 
     if (!centerOn) {
       map.fitBounds(bounds, { top: 40, right: 40, bottom: 40, left: 40 });
-      
       const listener = google.maps.event.addListener(map, 'idle', () => {
         const zoom = map.getZoom();
         if (zoom && zoom > 14) map.setZoom(14);
         google.maps.event.removeListener(listener);
       });
     }
-  }, [properties, selectedPropertyId, onPropertySelect, centerOn]);
+  }, [properties, selectedPropertyId, onPropertySelect, centerOn, onScrollToProperty]);
+
+  const handleGeolocate = () => {
+    if (!navigator.geolocation) return;
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const map = mapInstanceRef.current;
+        if (map) {
+          map.panTo({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+          map.setZoom(14);
+        }
+        setLocating(false);
+      },
+      () => setLocating(false),
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  };
+
+  const handleSearchThisArea = () => {
+    const map = mapInstanceRef.current;
+    if (!map || !onMapMoved) return;
+    const b = map.getBounds();
+    if (b) {
+      onMapMoved({
+        north: b.getNorthEast().lat(),
+        south: b.getSouthWest().lat(),
+        east: b.getNorthEast().lng(),
+        west: b.getSouthWest().lng(),
+      });
+    }
+    setShowSearchArea(false);
+    userMovedRef.current = false;
+  };
 
   if (error) {
     return (
@@ -225,11 +368,36 @@ export function PropertyMap({ properties, onPropertySelect, selectedPropertyId, 
   return (
     <div className="relative w-full h-full rounded-xl overflow-hidden border border-border">
       {isLoading && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-secondary">
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-voice-darker gap-2">
           <Loader2 className="animate-spin text-primary" size={24} />
+          <span className="text-xs text-muted-foreground">Mapping properties…</span>
         </div>
       )}
       <div ref={mapRef} className="w-full h-full" />
+
+      {/* Search this area button */}
+      {showSearchArea && (
+        <button
+          onClick={handleSearchThisArea}
+          className="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-4 py-2 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated text-sm font-medium text-foreground hover:bg-card transition-colors"
+        >
+          <Search size={14} className="text-primary" />
+          Search this area
+        </button>
+      )}
+
+      {/* Geolocation button */}
+      <button
+        onClick={handleGeolocate}
+        className="absolute bottom-4 left-4 z-20 w-10 h-10 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated flex items-center justify-center hover:bg-card transition-colors"
+        aria-label="Find properties near me"
+      >
+        {locating ? (
+          <Loader2 size={16} className="animate-spin text-primary" />
+        ) : (
+          <Locate size={16} className="text-foreground" />
+        )}
+      </button>
     </div>
   );
 }

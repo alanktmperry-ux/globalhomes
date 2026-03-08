@@ -8,6 +8,7 @@ import { PropertyDrawer } from '@/components/PropertyDrawer';
 import { PropertyMap } from '@/components/PropertyMap';
 import { BottomNav } from '@/components/BottomNav';
 import { useI18n } from '@/lib/i18n';
+import { SiteFooter } from '@/components/SiteFooter';
 import { useSearchHistory } from '@/hooks/useSearchHistory';
 import { useSavedProperties } from '@/hooks/useSavedProperties';
 import { useIsMobile } from '@/hooks/use-mobile';

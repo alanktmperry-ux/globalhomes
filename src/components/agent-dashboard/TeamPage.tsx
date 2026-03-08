@@ -179,6 +179,49 @@ const TeamPage = () => {
     toast({ title: 'Copied!', description: `${code} copied to clipboard` });
   };
 
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !agencyId) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({ title: 'Invalid file', description: 'Please upload an image file.', variant: 'destructive' });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: 'File too large', description: 'Max file size is 5MB.', variant: 'destructive' });
+      return;
+    }
+
+    setUploadingLogo(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const filePath = `${agencyId}/logo.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('agency-logos')
+        .upload(filePath, file, { upsert: true });
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('agency-logos')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from('agencies')
+        .update({ logo_url: publicUrl })
+        .eq('id', agencyId);
+      if (updateError) throw updateError;
+
+      setAgencyLogo(publicUrl);
+      toast({ title: 'Logo updated', description: 'Your agency logo has been uploaded.' });
+    } catch (err: any) {
+      toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
+    } finally {
+      setUploadingLogo(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">

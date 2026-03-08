@@ -447,14 +447,14 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
           onSubmit={handleTextSubmit}
           className="w-full max-w-md"
         >
-          <div className="flex items-center gap-2 rounded-xl bg-voice-surface border border-border/30 px-4 py-3">
-            <Search size={16} className="text-voice-muted shrink-0" />
+          <div className="flex items-center gap-2 rounded-xl bg-secondary border border-border px-4 py-3">
+            <Search size={16} className="text-muted-foreground shrink-0" />
             <input
               type="text"
               value={textQuery}
               onChange={e => setTextQuery(e.target.value)}
               placeholder='Try "3 bed house in Berwick under $800k"'
-              className="flex-1 bg-transparent text-voice-text text-sm placeholder:text-voice-muted focus:outline-none"
+              className="flex-1 bg-transparent text-foreground text-sm placeholder:text-muted-foreground focus:outline-none"
             />
             {textQuery.trim() && (
               <button type="submit" className="text-primary hover:text-primary/80">

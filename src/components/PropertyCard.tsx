@@ -18,6 +18,15 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
   const { t } = useI18n();
   const [contactOpen, setContactOpen] = useState(false);
 
+  const statusConfig: Record<PropertyStatus, { label: string; className: string } | null> = {
+    'off-market': { label: 'Off-Market', className: 'bg-amber-500/90 text-white' },
+    'coming-soon': { label: 'Coming Soon', className: 'bg-blue-500/90 text-white' },
+    'new': { label: 'New', className: 'bg-emerald-500/90 text-white' },
+    'listed': null,
+  };
+
+  const badge = property.status ? statusConfig[property.status] : null;
+
   return (
     <>
       <motion.div

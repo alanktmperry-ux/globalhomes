@@ -80,7 +80,7 @@ export function PropertyMap({
           streetViewControl: false,
           fullscreenControl: false,
           mapTypeControl: false,
-          styles: DARK_MAP_STYLE,
+          styles: LIGHT_MAP_STYLE,
         });
 
         const drawingManager = new google.maps.drawing.DrawingManager({

@@ -80,40 +80,38 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
     }
   }, [isSearching, resultCount, voiceState]);
 
-  const processTranscript = useCallback(async (text: string) => {
+  const geocodeLocation = useCallback(async (text: string) => {
+    if (!onLocationSelect) return;
+    try {
+      const { geocode } = await import('@/lib/googleMapsService');
+      const filters = parsePropertyQuery(text);
+      const locationQuery = filters.location || text;
+      console.log('[GeoDebug] Geocoding:', locationQuery);
+      const location = await geocode(locationQuery);
+      console.log('[GeoDebug] Result:', location);
+      if (location) {
+        onLocationSelect({ lat: location.lat, lng: location.lng, address: locationQuery });
+      } else if (filters.location && filters.location !== text) {
+        const fallback = await geocode(text);
+        if (fallback) {
+          onLocationSelect({ lat: fallback.lat, lng: fallback.lng, address: text });
+        }
+      }
+    } catch (err) {
+      console.error('[GeoDebug] Geocode error:', err);
+    }
+  }, [onLocationSelect]);
+
+  const processTranscript = useCallback((text: string) => {
     const filters = parsePropertyQuery(text);
     const chips = filtersToChips(filters);
     setFilterChips(chips);
     setEditableTranscript(text);
     setVoiceState('processing');
     onSearch(text);
-
-    // Try to geocode the location to pan the map
-    if (onLocationSelect) {
-      try {
-        const { geocode } = await import('@/lib/googleMapsService');
-        const locationQuery = filters.location || text;
-        console.log('[GeoDebug] Geocoding:', locationQuery);
-        const location = await geocode(locationQuery);
-        console.log('[GeoDebug] Result:', location);
-        if (!location && filters.location && filters.location !== text) {
-          const fallback = await geocode(text);
-          console.log('[GeoDebug] Fallback result:', fallback);
-          if (fallback) {
-            onLocationSelect({ lat: fallback.lat, lng: fallback.lng, address: text });
-            return;
-          }
-        }
-        if (location) {
-          onLocationSelect({ lat: location.lat, lng: location.lng, address: locationQuery });
-        } else {
-          console.log('[GeoDebug] No geocode result found');
-        }
-      } catch (err) {
-        console.error('[GeoDebug] Geocode error:', err);
-      }
-    }
-  }, [onSearch, onLocationSelect]);
+    // Fire geocode separately so it's not affected by re-renders from onSearch
+    geocodeLocation(text);
+  }, [onSearch, geocodeLocation]);
 
   const startListening = useCallback(() => {
     if (!isSupported) {

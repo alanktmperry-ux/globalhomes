@@ -17,6 +17,7 @@ interface PropertyDrawerProps {
 
 export function PropertyDrawer({ property, onClose, isSaved, onToggleSave }: PropertyDrawerProps) {
   const { t } = useI18n();
+  const { formatPrice, currency } = useCurrency();
   const [imageIndex, setImageIndex] = useState(0);
   const [contactOpen, setContactOpen] = useState(false);
 

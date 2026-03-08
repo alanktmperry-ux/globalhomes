@@ -185,6 +185,7 @@ export const mockProperties: Property[] = [
       isSubscribed: true,
     },
     listedDate: '2026-01-28',
+    status: 'listed',
     views: 1204,
     contactClicks: 89,
     lat: -37.8400,

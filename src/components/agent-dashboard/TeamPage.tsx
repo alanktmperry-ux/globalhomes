@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Copy, Plus, Trash2, UserPlus, Building2, Shield, Users, RefreshCw, Loader2 } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Copy, Plus, Trash2, UserPlus, Building2, Shield, Users, RefreshCw, Loader2, Camera, Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/AuthProvider';
 import { useToast } from '@/hooks/use-toast';
@@ -45,6 +45,7 @@ const TeamPage = () => {
 
   const [agencyId, setAgencyId] = useState<string | null>(null);
   const [agencyName, setAgencyName] = useState('');
+  const [agencyLogo, setAgencyLogo] = useState<string | null>(null);
   const [myRole, setMyRole] = useState<string | null>(null);
   const [members, setMembers] = useState<AgencyMember[]>([]);
   const [inviteCodes, setInviteCodes] = useState<InviteCode[]>([]);
@@ -53,6 +54,8 @@ const TeamPage = () => {
   const [newInviteRole, setNewInviteRole] = useState<string>('agent');
   const [newInviteMaxUses, setNewInviteMaxUses] = useState('10');
   const [creating, setCreating] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isOwnerOrAdmin = myRole === 'owner' || myRole === 'admin';
 
@@ -78,10 +81,13 @@ const TeamPage = () => {
       // Get agency info
       const { data: agency } = await supabase
         .from('agencies')
-        .select('name')
+        .select('name, logo_url')
         .eq('id', membership.agency_id)
         .single();
-      if (agency) setAgencyName(agency.name);
+      if (agency) {
+        setAgencyName(agency.name);
+        setAgencyLogo(agency.logo_url);
+      }
 
       // Get members with their profile info
       const { data: membersData } = await supabase
@@ -173,6 +179,49 @@ const TeamPage = () => {
     toast({ title: 'Copied!', description: `${code} copied to clipboard` });
   };
 
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !agencyId) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({ title: 'Invalid file', description: 'Please upload an image file.', variant: 'destructive' });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: 'File too large', description: 'Max file size is 5MB.', variant: 'destructive' });
+      return;
+    }
+
+    setUploadingLogo(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const filePath = `${agencyId}/logo.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('agency-logos')
+        .upload(filePath, file, { upsert: true });
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('agency-logos')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from('agencies')
+        .update({ logo_url: publicUrl })
+        .eq('id', agencyId);
+      if (updateError) throw updateError;
+
+      setAgencyLogo(publicUrl);
+      toast({ title: 'Logo updated', description: 'Your agency logo has been uploaded.' });
+    } catch (err: any) {
+      toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
+    } finally {
+      setUploadingLogo(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -194,14 +243,46 @@ const TeamPage = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-2xl font-bold text-foreground">{agencyName}</h1>
-          <p className="text-sm text-muted-foreground mt-1">{members.length} team member{members.length !== 1 ? 's' : ''}</p>
+    <div className="max-w-4xl mx-auto space-y-8 p-4 sm:p-6">
+      {/* Header with Logo */}
+      <div className="flex items-center gap-5">
+        {/* Logo upload */}
+        <div className="relative group shrink-0">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleLogoUpload}
+            disabled={!isOwnerOrAdmin}
+          />
+          {agencyLogo ? (
+            <img src={agencyLogo} alt={agencyName} className="w-16 h-16 rounded-2xl object-cover border border-border shadow-sm" />
+          ) : (
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center border border-border">
+              <Building2 size={24} className="text-primary" />
+            </div>
+          )}
+          {isOwnerOrAdmin && (
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingLogo}
+              className="absolute inset-0 rounded-2xl bg-foreground/0 group-hover:bg-foreground/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+            >
+              {uploadingLogo ? (
+                <Loader2 size={18} className="text-background animate-spin" />
+              ) : (
+                <Camera size={18} className="text-background" />
+              )}
+            </button>
+          )}
         </div>
-        <div className="flex items-center gap-2">
+
+        <div className="flex-1 min-w-0">
+          <h1 className="font-display text-2xl font-bold text-foreground truncate">{agencyName}</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">{members.length} team member{members.length !== 1 ? 's' : ''}</p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
           <Button variant="outline" size="sm" onClick={loadData}>
             <RefreshCw size={14} className="mr-1.5" /> Refresh
           </Button>

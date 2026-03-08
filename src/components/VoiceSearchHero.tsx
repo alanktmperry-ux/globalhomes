@@ -185,14 +185,13 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
   );
 
   return (
-    <div className="relative overflow-hidden bg-voice-hero">
-      {/* Gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-voice-dark to-voice-darker" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(var(--primary)/0.15)_0%,_transparent_70%)]" />
+    <div className="relative overflow-hidden bg-background">
+      {/* Subtle gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-background" />
 
       <div className="relative z-10 max-w-2xl mx-auto px-4 py-8 flex flex-col items-center text-center">
         {/* App title */}
-        <h1 className="font-display text-2xl font-bold text-voice-text mb-6 tracking-tight">
+        <h1 className="font-display text-2xl font-bold text-foreground mb-6 tracking-tight">
           GlobalHome
         </h1>
 
@@ -204,7 +203,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="text-voice-text text-lg font-medium mb-4 min-h-[28px]"
+              className="text-foreground text-lg font-medium mb-4 min-h-[28px]"
             >
               "{transcript}"
             </motion.p>
@@ -216,13 +215,13 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
               animate={{ opacity: 1, y: 0 }}
               className="w-full mb-4"
             >
-              <div className="flex items-center gap-2 bg-voice-surface rounded-xl px-4 py-2">
+              <div className="flex items-center gap-2 bg-secondary rounded-xl px-4 py-2">
                 <input
                   type="text"
                   value={editableTranscript}
                   onChange={e => setEditableTranscript(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleEditSubmit()}
-                  className="flex-1 bg-transparent text-voice-text text-sm focus:outline-none"
+                  className="flex-1 bg-transparent text-foreground text-sm focus:outline-none"
                 />
                 <button onClick={handleEditSubmit} className="text-primary hover:text-primary/80">
                   <Search size={16} />
@@ -231,7 +230,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
               {confidence !== null && (
                 <div className="flex items-center justify-center gap-2 mt-2">
                   <div className={`w-2 h-2 rounded-full ${confidence >= 80 ? 'bg-emerald-400' : confidence >= 50 ? 'bg-yellow-400' : 'bg-destructive'}`} />
-                  <span className="text-xs text-voice-muted">{confidence}% confidence</span>
+                  <span className="text-xs text-muted-foreground">{confidence}% confidence</span>
                 </div>
               )}
             </motion.div>
@@ -276,7 +275,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
           <div className="p-[3px] rounded-full bg-gradient-to-br from-primary via-purple-500 to-primary">
             <motion.button
               onClick={voiceState === 'listening' ? stopListening : startListening}
-              className="relative w-20 h-20 rounded-full bg-voice-text flex items-center justify-center shadow-[0_0_30px_hsl(var(--primary)/0.4)] transition-shadow"
+              className="relative w-20 h-20 rounded-full bg-card flex items-center justify-center shadow-elevated transition-shadow"
               whileTap={{ scale: 0.95 }}
               animate={voiceState === 'listening' ? { scale: [1, 1.05, 1] } : {}}
               transition={voiceState === 'listening' ? { duration: 0.5, repeat: Infinity } : {}}
@@ -315,7 +314,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-voice-text text-sm font-medium mb-2"
+              className="text-foreground text-sm font-medium mb-2"
             >
               Tap and describe your dream home in any language
             </motion.p>
@@ -337,7 +336,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-voice-muted text-sm font-medium mb-2 flex items-center gap-2"
+              className="text-muted-foreground text-sm font-medium mb-2 flex items-center gap-2"
             >
               <Loader2 size={14} className="animate-spin" />
               Searching across Australia…
@@ -348,7 +347,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
               key="results"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="text-emerald-400 text-sm font-medium mb-2"
+              className="text-emerald-600 text-sm font-medium mb-2"
             >
               Found {resultCount} properties matching your voice search
             </motion.p>
@@ -371,10 +370,10 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   onClick={() => removeChip(chip.key)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-voice-surface text-voice-text text-xs font-medium hover:bg-primary/20 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-foreground text-xs font-medium hover:bg-primary/20 transition-colors"
                 >
                   {chip.label}
-                  <X size={12} className="text-voice-muted" />
+                  <X size={12} className="text-muted-foreground" />
                 </motion.button>
               ))}
             </motion.div>
@@ -385,7 +384,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
         <div className="relative mb-4">
           <button
             onClick={() => setShowLangDropdown(!showLangDropdown)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-voice-surface text-voice-muted text-xs hover:text-voice-text transition-colors"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary text-muted-foreground text-xs hover:text-foreground transition-colors"
           >
             <span>{selectedLangObj.flag} {selectedLangObj.label}</span>
             <ChevronDown size={12} />
@@ -404,7 +403,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
                   initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -4 }}
-                  className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 w-56 max-h-64 overflow-y-auto bg-voice-darker border border-border/30 rounded-xl shadow-elevated"
+                  className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 w-56 max-h-64 overflow-y-auto bg-popover border border-border rounded-xl shadow-elevated"
                 >
                   {VOICE_LANGUAGES.map(lang => (
                     <button
@@ -413,7 +412,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
                       className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
                         lang.code === selectedLang
                           ? 'bg-primary/20 text-primary'
-                          : 'text-voice-muted hover:text-voice-text hover:bg-voice-surface'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                       }`}
                     >
                       {lang.flag} {lang.label}
@@ -426,7 +425,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
         </div>
 
         {/* Rotating language indicators */}
-        <div className="flex items-center gap-3 text-xs text-voice-muted overflow-hidden h-5 mb-4">
+        <div className="flex items-center gap-3 text-xs text-muted-foreground overflow-hidden h-5 mb-4">
           <AnimatePresence mode="popLayout">
             {visibleLanguages.map((lang, i) => (
               <motion.span
@@ -448,14 +447,14 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
           onSubmit={handleTextSubmit}
           className="w-full max-w-md"
         >
-          <div className="flex items-center gap-2 rounded-xl bg-voice-surface border border-border/30 px-4 py-3">
-            <Search size={16} className="text-voice-muted shrink-0" />
+          <div className="flex items-center gap-2 rounded-xl bg-secondary border border-border px-4 py-3">
+            <Search size={16} className="text-muted-foreground shrink-0" />
             <input
               type="text"
               value={textQuery}
               onChange={e => setTextQuery(e.target.value)}
               placeholder='Try "3 bed house in Berwick under $800k"'
-              className="flex-1 bg-transparent text-voice-text text-sm placeholder:text-voice-muted focus:outline-none"
+              className="flex-1 bg-transparent text-foreground text-sm placeholder:text-muted-foreground focus:outline-none"
             />
             {textQuery.trim() && (
               <button type="submit" className="text-primary hover:text-primary/80">
@@ -487,10 +486,10 @@ function VoiceSearchHistory({ onRerun }: { onRerun: (q: string) => void }) {
   return (
     <div className="mt-4 w-full">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs text-voice-muted">Recent searches</span>
+        <span className="text-xs text-muted-foreground">Recent searches</span>
         <button
           onClick={() => { localStorage.removeItem('gh-search-history'); setHistory([]); }}
-          className="text-xs text-voice-muted hover:text-voice-text transition-colors"
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
           Clear
         </button>
@@ -500,7 +499,7 @@ function VoiceSearchHistory({ onRerun }: { onRerun: (q: string) => void }) {
           <button
             key={i}
             onClick={() => onRerun(q)}
-            className="px-3 py-1.5 rounded-full bg-voice-surface text-voice-muted text-xs hover:text-voice-text hover:bg-primary/10 transition-colors truncate max-w-[200px]"
+            className="px-3 py-1.5 rounded-full bg-secondary text-muted-foreground text-xs hover:text-foreground hover:bg-primary/10 transition-colors truncate max-w-[200px]"
           >
             🔍 {q}
           </button>

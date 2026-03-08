@@ -18,6 +18,7 @@ import { Property } from '@/lib/types';
 import { mockProperties } from '@/lib/mock-data';
 import { useToast } from '@/hooks/use-toast';
 import { useCurrency } from '@/lib/CurrencyContext';
+import { FilterSidebar, Filters, defaultFilters } from '@/components/FilterSidebar';
 
 type AreaSearch =
   | { type: 'circle'; center: [number, number]; radius: number }
@@ -62,6 +63,8 @@ const Index = () => {
   const [splitPercent, setSplitPercent] = useState(55);
   const [bottomSheetExpanded, setBottomSheetExpanded] = useState(false);
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'newest' | 'beds'>('default');
+  const [filters, setFilters] = useState<Filters>(defaultFilters);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const isDragging = useRef(false);
   const cardRefs = useRef<globalThis.Map<string, HTMLDivElement>>(new globalThis.Map());
 
@@ -94,6 +97,7 @@ const Index = () => {
 
   const filteredProperties = useMemo(() => {
     let props = displayProperties;
+    // Area filter
     if (areaSearch) {
       props = props.filter((p) => {
         if (!p.lat || !p.lng) return false;
@@ -103,12 +107,23 @@ const Index = () => {
         return isInsidePolygon(p.lat, p.lng, areaSearch.coordinates);
       });
     }
+    // Advanced filters
+    props = props.filter(p => {
+      if (p.price < filters.priceRange[0] || p.price > filters.priceRange[1]) return false;
+      if (filters.propertyTypes.length > 0 && !filters.propertyTypes.includes(p.propertyType)) return false;
+      if (p.beds < filters.minBeds) return false;
+      if (p.baths < filters.minBaths) return false;
+      if (p.parking < filters.minParking) return false;
+      if (filters.features.length > 0 && !filters.features.every(f => p.features.some(pf => pf.toLowerCase().includes(f.toLowerCase())))) return false;
+      return true;
+    });
+    // Sort
     if (sortBy === 'price-asc') return [...props].sort((a, b) => a.price - b.price);
     if (sortBy === 'price-desc') return [...props].sort((a, b) => b.price - a.price);
     if (sortBy === 'newest') return [...props].sort((a, b) => new Date(b.listedDate).getTime() - new Date(a.listedDate).getTime());
     if (sortBy === 'beds') return [...props].sort((a, b) => b.beds - a.beds);
     return props;
-  }, [displayProperties, areaSearch, sortBy]);
+  }, [displayProperties, areaSearch, sortBy, filters]);
 
   const handleAreaSearch = useCallback((area: AreaSearch | null) => {
     setAreaSearch(area || null);
@@ -186,18 +201,30 @@ const Index = () => {
         )}
       </div>
 
-      {/* Sort dropdown */}
-      <div className="relative shrink-0">
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-          className="appearance-none pl-7 pr-3 py-1.5 rounded-lg bg-secondary border border-border text-xs font-medium text-foreground cursor-pointer focus:outline-none focus:ring-1 focus:ring-ring"
-        >
-          {sortOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
-        <ArrowUpDown size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+      <div className="flex items-center gap-2 shrink-0">
+        {/* Filter button */}
+        <FilterSidebar
+          filters={filters}
+          onChange={setFilters}
+          isOpen={filtersOpen}
+          onToggle={() => setFiltersOpen(o => !o)}
+          totalCount={displayProperties.length}
+          filteredCount={filteredProperties.length}
+        />
+
+        {/* Sort dropdown */}
+        <div className="relative">
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+            className="appearance-none pl-7 pr-3 py-1.5 rounded-lg bg-secondary border border-border text-xs font-medium text-foreground cursor-pointer focus:outline-none focus:ring-1 focus:ring-ring"
+          >
+            {sortOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+          <ArrowUpDown size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+        </div>
       </div>
     </div>
   );

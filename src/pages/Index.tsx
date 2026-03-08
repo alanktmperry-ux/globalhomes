@@ -310,6 +310,7 @@ const Index = () => {
         isSaved={selectedProperty ? isSaved(selectedProperty.id) : false}
         onToggleSave={toggleSaved}
       />
+      <SiteFooter />
       <BottomNav />
     </div>
   );

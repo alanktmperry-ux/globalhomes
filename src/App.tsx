@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { I18nProvider } from "@/lib/i18n";
 import { AuthProvider } from "@/lib/AuthProvider";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import SavedPage from "./pages/SavedPage";
 import MessagesPage from "./pages/MessagesPage";
@@ -19,7 +20,9 @@ import VoiceLeadsPage from "./components/agent-dashboard/VoiceLeadsPage";
 import AnalyticsPage from "./components/agent-dashboard/AnalyticsPage";
 import NetworkPage from "./components/agent-dashboard/NetworkPage";
 import SettingsPage from "./components/agent-dashboard/SettingsPage";
-import AuthPage from "./pages/AuthPage";
+import SeekerAuthPage from "./pages/SeekerAuthPage";
+import AgentAuthPage from "./pages/AgentAuthPage";
+import AdminDashboard from "./pages/AdminDashboard";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import NotFound from "./pages/NotFound";
@@ -35,14 +38,23 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
+              {/* Public */}
               <Route path="/" element={<Index />} />
-              <Route path="/saved" element={<SavedPage />} />
-              <Route path="/messages" element={<MessagesPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/agent-portal" element={<AgentPortalPage />} />
               <Route path="/agents" element={<AgentLandingPage />} />
-              <Route path="/pocket-listing" element={<PocketListingPage />} />
-              <Route path="/dashboard" element={<AgentDashboardLayout />}>
+              <Route path="/login" element={<SeekerAuthPage />} />
+              <Route path="/agents/login" element={<AgentAuthPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+              {/* Authenticated */}
+              <Route path="/saved" element={<ProtectedRoute><SavedPage /></ProtectedRoute>} />
+              <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+
+              {/* Agent-only */}
+              <Route path="/agent-portal" element={<ProtectedRoute requireAgent><AgentPortalPage /></ProtectedRoute>} />
+              <Route path="/pocket-listing" element={<ProtectedRoute requireAgent><PocketListingPage /></ProtectedRoute>} />
+              <Route path="/dashboard" element={<ProtectedRoute requireAgent><AgentDashboardLayout /></ProtectedRoute>}>
                 <Route index element={<DashboardOverview />} />
                 <Route path="listings" element={<ListingsPage />} />
                 <Route path="leads" element={<VoiceLeadsPage />} />
@@ -50,9 +62,10 @@ const App = () => (
                 <Route path="network" element={<NetworkPage />} />
                 <Route path="settings" element={<SettingsPage />} />
               </Route>
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+              {/* Admin-only */}
+              <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
+
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

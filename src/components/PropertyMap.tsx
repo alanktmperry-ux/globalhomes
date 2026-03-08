@@ -12,7 +12,7 @@ interface PropertyMapProps {
   centerOn?: { lat: number; lng: number } | null;
 }
 
-export function PropertyMap({ properties, onPropertySelect, selectedPropertyId, onAreaSearch }: PropertyMapProps) {
+export function PropertyMap({ properties, onPropertySelect, selectedPropertyId, onAreaSearch, centerOn }: PropertyMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);

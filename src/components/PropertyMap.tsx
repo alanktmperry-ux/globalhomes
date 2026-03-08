@@ -320,7 +320,7 @@ export function PropertyMap({
         google.maps.event.removeListener(listener);
       });
     }
-  }, [properties, selectedPropertyId, onPropertySelect, centerOn, onScrollToProperty]);
+  }, [properties, selectedPropertyId, onPropertySelect, centerOn, onScrollToProperty, formatPrice]);
 
   const handleGeolocate = () => {
     if (!navigator.geolocation) return;

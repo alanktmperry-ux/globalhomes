@@ -54,7 +54,7 @@ const Index = () => {
   const [manusStatus, setManusStatus] = useState<string | null>(null);
   const [mobileView, setMobileView] = useState<'map' | 'list'>('map');
   const [areaSearch, setAreaSearch] = useState<AreaSearch | null>(null);
-  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key: number } | null>(null);
   const [splitPercent, setSplitPercent] = useState(55);
   const [bottomSheetExpanded, setBottomSheetExpanded] = useState(false);
   const isDragging = useRef(false);

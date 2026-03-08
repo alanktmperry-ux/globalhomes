@@ -443,45 +443,27 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
           </AnimatePresence>
         </div>
 
-        {/* Text input toggle */}
-        {!showTextInput ? (
-          <button
-            onClick={() => setShowTextInput(true)}
-            className="text-voice-muted text-xs hover:text-voice-text transition-colors flex items-center gap-1.5"
-          >
-            <Keyboard size={14} />
-            {!isSupported ? 'Voice not supported — type instead' : 'Type instead'}
-          </button>
-        ) : (
-          <motion.form
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            onSubmit={handleTextSubmit}
-            className="w-full max-w-md"
-          >
-            <div className="flex items-center gap-2 rounded-xl bg-voice-surface border border-border/30 px-4 py-3">
-              <Search size={16} className="text-voice-muted shrink-0" />
-              <input
-                type="text"
-                value={textQuery}
-                onChange={e => setTextQuery(e.target.value)}
-                placeholder='Try "3 bed house in Berwick under $800k"'
-                className="flex-1 bg-transparent text-voice-text text-sm placeholder:text-voice-muted focus:outline-none"
-                autoFocus
-              />
+        {/* Always-visible text search input */}
+        <form
+          onSubmit={handleTextSubmit}
+          className="w-full max-w-md"
+        >
+          <div className="flex items-center gap-2 rounded-xl bg-voice-surface border border-border/30 px-4 py-3">
+            <Search size={16} className="text-voice-muted shrink-0" />
+            <input
+              type="text"
+              value={textQuery}
+              onChange={e => setTextQuery(e.target.value)}
+              placeholder='Try "3 bed house in Berwick under $800k"'
+              className="flex-1 bg-transparent text-voice-text text-sm placeholder:text-voice-muted focus:outline-none"
+            />
+            {textQuery.trim() && (
               <button type="submit" className="text-primary hover:text-primary/80">
                 <Search size={18} />
               </button>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowTextInput(false)}
-              className="mt-2 text-voice-muted text-xs hover:text-voice-text transition-colors flex items-center gap-1 mx-auto"
-            >
-              <Mic size={12} /> Switch to voice
-            </button>
-          </motion.form>
-        )}
+            )}
+          </div>
+        </form>
 
         {/* Search history pills */}
         <VoiceSearchHistory onRerun={onSearch} />

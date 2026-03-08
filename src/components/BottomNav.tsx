@@ -36,6 +36,17 @@ export function BottomNav() {
             </button>
           );
         })}
+        {user && isAdmin && (
+          <button
+            onClick={() => navigate('/admin')}
+            className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-colors ${
+              location.pathname === '/admin' ? 'text-primary' : 'text-muted-foreground'
+            }`}
+          >
+            <Shield size={22} strokeWidth={location.pathname === '/admin' ? 2.5 : 1.8} />
+            <span className="text-[10px] font-medium">Admin</span>
+          </button>
+        )}
         {!user && (
           <button
             onClick={() => navigate('/login')}

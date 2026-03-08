@@ -9,6 +9,7 @@ import { PropertyMap } from '@/components/PropertyMap';
 import { BottomNav } from '@/components/BottomNav';
 import { useI18n } from '@/lib/i18n';
 import { SiteFooter } from '@/components/SiteFooter';
+import { SiteHeader } from '@/components/SiteHeader';
 import { useSearchHistory } from '@/hooks/useSearchHistory';
 import { useSavedProperties } from '@/hooks/useSavedProperties';
 import { useIsMobile } from '@/hooks/use-mobile';

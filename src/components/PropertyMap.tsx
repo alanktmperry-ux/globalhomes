@@ -31,6 +31,7 @@ interface PropertyMapProps {
   centerOn?: { lat: number; lng: number; key?: number } | null;
   onMapMoved?: (bounds: { north: number; south: number; east: number; west: number }) => void;
   onScrollToProperty?: (propertyId: string) => void;
+  formatPrice?: (audPrice: number) => string;
 }
 
 export function PropertyMap({

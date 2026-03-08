@@ -76,10 +76,6 @@ const Index = () => {
           });
         } else if (update.status === 'failed') {
           setManusStatus(null);
-          toast({
-            title: '📋 Showing sample listings',
-            description: 'Live search is temporarily unavailable. Displaying sample properties.',
-          });
         }
       });
       console.log('[Search] Mock result:', result.properties.length, 'properties');

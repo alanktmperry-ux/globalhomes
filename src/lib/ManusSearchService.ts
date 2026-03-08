@@ -28,8 +28,8 @@ export interface ManusSearchResult {
 
 type StatusCallback = (update: { status: string; properties?: Property[] }) => void;
 
-const POLL_INTERVAL = 3000;
-const MAX_POLL_TIME = 120000; // 2 minutes
+const POLL_INTERVAL = 4000;
+const MAX_POLL_TIME = 60000; // 1 minute — Manus tasks can take a while
 
 class ManusSearchService {
   private activePolls = new Map<string, boolean>();
@@ -127,6 +127,8 @@ class ManusSearchService {
     }
 
     this.activePolls.delete(taskId);
+    // If we exited due to timeout, notify as failed
+    onUpdate?.({ status: 'failed' });
   }
 
   /** Stop all active polls (e.g., when user starts a new search) */
@@ -229,28 +231,46 @@ class ManusSearchService {
     const query = params.query.toLowerCase();
     let filtered = mockProperties;
 
-    const locations = ['berwick', 'officer', 'south yarra', 'daylesford', 'victoria', 'melbourne'];
-    const matchedLocation = locations.find((loc) => query.includes(loc));
-    if (matchedLocation) {
-      filtered = filtered.filter(
-        (p) =>
-          p.suburb.toLowerCase().includes(matchedLocation) ||
-          p.state.toLowerCase().includes(matchedLocation) ||
-          p.address.toLowerCase().includes(matchedLocation)
-      );
-    }
+    // Broad keyword matching against all text fields
+    const words = query.split(/\s+/).filter((w) => w.length > 2 && !/^(find|me|a|an|the|in|for|around|that|price|with|and|or)$/i.test(w));
 
-    const bedMatch = query.match(/(\d+)\s*(?:bed|bedroom|br|room)/i);
-    if (bedMatch) {
-      const beds = parseInt(bedMatch[1]);
-      filtered = filtered.filter((p) => p.beds >= beds);
-    }
+    if (words.length > 0) {
+      const scored = mockProperties.map((p) => {
+        const text = `${p.title} ${p.address} ${p.suburb} ${p.state} ${p.country} ${p.propertyType} ${p.description} ${p.features?.join(' ')}`.toLowerCase();
+        let score = 0;
+        for (const word of words) {
+          if (text.includes(word)) score += 2;
+          // Partial match
+          else if (text.split(/\s+/).some((t) => t.startsWith(word) || word.startsWith(t))) score += 1;
+        }
+        return { property: p, score };
+      });
 
-    const priceMatch = query.match(/\$?([\d,]+)k?/i);
-    if (priceMatch) {
-      let price = parseInt(priceMatch[1].replace(/,/g, ''));
-      if (price < 10000) price *= 1000;
-      filtered = filtered.filter((p) => p.price <= price * 1.15);
+      // Bed filter
+      const bedMatch = query.match(/(\d+)\s*(?:bed|bedroom|br|room)/i);
+      if (bedMatch) {
+        const beds = parseInt(bedMatch[1]);
+        scored.forEach((s) => {
+          if (s.property.beds >= beds) s.score += 3;
+          else s.score -= 2;
+        });
+      }
+
+      // Price filter
+      const priceMatch = query.match(/\$?([\d,.]+)\s*(million|m|k)?/i);
+      if (priceMatch) {
+        let price = parseFloat(priceMatch[1].replace(/,/g, ''));
+        const unit = priceMatch[2]?.toLowerCase();
+        if (unit === 'million' || unit === 'm') price *= 1_000_000;
+        else if (unit === 'k') price *= 1000;
+        else if (price < 10000) price *= 1000;
+        scored.forEach((s) => {
+          if (s.property.price <= price * 1.2) s.score += 2;
+        });
+      }
+
+      scored.sort((a, b) => b.score - a.score);
+      filtered = scored.filter((s) => s.score > 0).map((s) => s.property);
     }
 
     if (filtered.length === 0) filtered = mockProperties;

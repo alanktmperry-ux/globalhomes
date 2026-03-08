@@ -336,7 +336,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-voice-muted text-sm font-medium mb-2 flex items-center gap-2"
+              className="text-muted-foreground text-sm font-medium mb-2 flex items-center gap-2"
             >
               <Loader2 size={14} className="animate-spin" />
               Searching across Australia…

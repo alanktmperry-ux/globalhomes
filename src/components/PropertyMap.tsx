@@ -365,7 +365,7 @@ export function PropertyMap({
   return (
     <div className="relative w-full h-full rounded-xl overflow-hidden border border-border">
       {isLoading && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-voice-darker gap-2">
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background gap-2">
           <Loader2 className="animate-spin text-primary" size={24} />
           <span className="text-xs text-muted-foreground">Mapping properties…</span>
         </div>

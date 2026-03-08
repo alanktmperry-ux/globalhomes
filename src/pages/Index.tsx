@@ -240,6 +240,7 @@ const Index = () => {
       onAreaSearch={handleAreaSearch}
       centerOn={mapCenter}
       onScrollToProperty={scrollToProperty}
+      formatPrice={formatPrice}
     />
   );
 

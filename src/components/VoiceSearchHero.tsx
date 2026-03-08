@@ -425,7 +425,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
         </div>
 
         {/* Rotating language indicators */}
-        <div className="flex items-center gap-3 text-xs text-voice-muted overflow-hidden h-5 mb-4">
+        <div className="flex items-center gap-3 text-xs text-muted-foreground overflow-hidden h-5 mb-4">
           <AnimatePresence mode="popLayout">
             {visibleLanguages.map((lang, i) => (
               <motion.span

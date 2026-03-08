@@ -196,6 +196,71 @@ const ProfilePage = () => {
                 </form>
               </DialogContent>
             </Dialog>
+
+            {/* Change Password Dialog */}
+            <Dialog open={passwordDialogOpen} onOpenChange={(open) => { setPasswordDialogOpen(open); if (!open) { setNewPassword(''); setConfirmPassword(''); setShowPassword(false); } }}>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Change Password</DialogTitle>
+                  <DialogDescription>
+                    Enter a new password for your account. Must be at least 8 characters.
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (newPassword.length < 8) {
+                    toast({ title: 'Too short', description: 'Password must be at least 8 characters.', variant: 'destructive' });
+                    return;
+                  }
+                  if (newPassword !== confirmPassword) {
+                    toast({ title: 'Mismatch', description: 'Passwords do not match.', variant: 'destructive' });
+                    return;
+                  }
+                  setPasswordLoading(true);
+                  try {
+                    const { error } = await supabase.auth.updateUser({ password: newPassword });
+                    if (error) throw error;
+                    toast({ title: 'Password updated', description: 'Your password has been changed successfully.' });
+                    setPasswordDialogOpen(false);
+                    setNewPassword('');
+                    setConfirmPassword('');
+                  } catch (err: any) {
+                    toast({ title: 'Error', description: err.message, variant: 'destructive' });
+                  } finally {
+                    setPasswordLoading(false);
+                  }
+                }} className="space-y-4 mt-2">
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="New password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                      minLength={8}
+                    />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                  <Input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Confirm new password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    minLength={8}
+                  />
+                  <Button type="submit" className="w-full" disabled={passwordLoading || newPassword.length < 8 || newPassword !== confirmPassword}>
+                    {passwordLoading ? (
+                      <><Loader2 size={16} className="animate-spin mr-2" /> Updating…</>
+                    ) : (
+                      'Update Password'
+                    )}
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
           </>
         ) : (
           <>

@@ -230,7 +230,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
               {confidence !== null && (
                 <div className="flex items-center justify-center gap-2 mt-2">
                   <div className={`w-2 h-2 rounded-full ${confidence >= 80 ? 'bg-emerald-400' : confidence >= 50 ? 'bg-yellow-400' : 'bg-destructive'}`} />
-                  <span className="text-xs text-voice-muted">{confidence}% confidence</span>
+                  <span className="text-xs text-muted-foreground">{confidence}% confidence</span>
                 </div>
               )}
             </motion.div>

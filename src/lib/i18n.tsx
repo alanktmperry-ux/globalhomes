@@ -1,0 +1,253 @@
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+
+export type Language = 'en' | 'zh' | 'es' | 'ar' | 'hi' | 'fr';
+
+const translations: Record<Language, Record<string, string>> = {
+  en: {
+    'app.name': 'GlobalHome',
+    'search.placeholder': 'Search "4 bed house in Berwick for $850k"',
+    'search.voice.listening': 'Listening...',
+    'search.resume': 'Resume Your Search',
+    'search.recommended': 'Recommended for You',
+    'search.results': 'Search Results',
+    'nav.search': 'Search',
+    'nav.saved': 'Saved',
+    'nav.messages': 'Messages',
+    'nav.profile': 'Profile',
+    'property.beds': 'Beds',
+    'property.baths': 'Baths',
+    'property.parking': 'Parking',
+    'property.details': 'Property Details',
+    'property.description': 'Description',
+    'property.estimated': 'Estimated Market Value',
+    'property.agent': 'Agent Information',
+    'property.contact': 'Contact Agent',
+    'property.save': 'Save',
+    'property.share': 'Share',
+    'property.subscribeUnlock': 'Subscribe to Unlock Leads',
+    'agent.portal': 'Agent Portal',
+    'agent.dashboard': 'Lead Dashboard',
+    'agent.views': 'Listing Views',
+    'agent.clicks': 'Contact Clicks',
+    'agent.subscribe': 'Subscribe Now',
+    'agent.subscribed': 'Pro Agent',
+    'saved.title': 'Saved Properties',
+    'saved.empty': 'No saved properties yet',
+    'profile.title': 'Profile',
+    'lang.switch': 'Language',
+  },
+  zh: {
+    'app.name': 'GlobalHome',
+    'search.placeholder': '搜索 "墨尔本4卧室房屋 85万"',
+    'search.voice.listening': '正在聆听...',
+    'search.resume': '继续上次搜索',
+    'search.recommended': '为您推荐',
+    'search.results': '搜索结果',
+    'nav.search': '搜索',
+    'nav.saved': '收藏',
+    'nav.messages': '消息',
+    'nav.profile': '我的',
+    'property.beds': '卧室',
+    'property.baths': '浴室',
+    'property.parking': '停车',
+    'property.details': '房产详情',
+    'property.description': '描述',
+    'property.estimated': '估计市场价值',
+    'property.agent': '经纪人信息',
+    'property.contact': '联系经纪人',
+    'property.save': '收藏',
+    'property.share': '分享',
+    'property.subscribeUnlock': '订阅解锁潜在客户',
+    'agent.portal': '经纪人入口',
+    'agent.dashboard': '潜在客户面板',
+    'agent.views': '房源浏览量',
+    'agent.clicks': '联系点击量',
+    'agent.subscribe': '立即订阅',
+    'agent.subscribed': '专业经纪人',
+    'saved.title': '已收藏房产',
+    'saved.empty': '暂无收藏房产',
+    'profile.title': '个人主页',
+    'lang.switch': '语言',
+  },
+  es: {
+    'app.name': 'GlobalHome',
+    'search.placeholder': 'Buscar "casa de 4 hab en Madrid por €850k"',
+    'search.voice.listening': 'Escuchando...',
+    'search.resume': 'Reanudar búsqueda',
+    'search.recommended': 'Recomendado para ti',
+    'search.results': 'Resultados',
+    'nav.search': 'Buscar',
+    'nav.saved': 'Guardados',
+    'nav.messages': 'Mensajes',
+    'nav.profile': 'Perfil',
+    'property.beds': 'Hab.',
+    'property.baths': 'Baños',
+    'property.parking': 'Parking',
+    'property.details': 'Detalles',
+    'property.description': 'Descripción',
+    'property.estimated': 'Valor estimado',
+    'property.agent': 'Información del agente',
+    'property.contact': 'Contactar agente',
+    'property.save': 'Guardar',
+    'property.share': 'Compartir',
+    'property.subscribeUnlock': 'Suscríbete para desbloquear',
+    'agent.portal': 'Portal de agentes',
+    'agent.dashboard': 'Panel de leads',
+    'agent.views': 'Vistas',
+    'agent.clicks': 'Clics',
+    'agent.subscribe': 'Suscríbete',
+    'agent.subscribed': 'Agente Pro',
+    'saved.title': 'Propiedades guardadas',
+    'saved.empty': 'Sin propiedades guardadas',
+    'profile.title': 'Perfil',
+    'lang.switch': 'Idioma',
+  },
+  ar: {
+    'app.name': 'GlobalHome',
+    'search.placeholder': 'ابحث "منزل 4 غرف نوم في دبي"',
+    'search.voice.listening': 'جارِ الاستماع...',
+    'search.resume': 'استئناف البحث',
+    'search.recommended': 'موصى به لك',
+    'search.results': 'نتائج البحث',
+    'nav.search': 'بحث',
+    'nav.saved': 'المحفوظة',
+    'nav.messages': 'الرسائل',
+    'nav.profile': 'الملف',
+    'property.beds': 'غرف',
+    'property.baths': 'حمامات',
+    'property.parking': 'موقف',
+    'property.details': 'تفاصيل العقار',
+    'property.description': 'الوصف',
+    'property.estimated': 'القيمة السوقية المقدرة',
+    'property.agent': 'معلومات الوكيل',
+    'property.contact': 'اتصل بالوكيل',
+    'property.save': 'حفظ',
+    'property.share': 'مشاركة',
+    'property.subscribeUnlock': 'اشترك لفتح العملاء المحتملين',
+    'agent.portal': 'بوابة الوكيل',
+    'agent.dashboard': 'لوحة العملاء',
+    'agent.views': 'المشاهدات',
+    'agent.clicks': 'النقرات',
+    'agent.subscribe': 'اشترك الآن',
+    'agent.subscribed': 'وكيل محترف',
+    'saved.title': 'العقارات المحفوظة',
+    'saved.empty': 'لا توجد عقارات محفوظة',
+    'profile.title': 'الملف الشخصي',
+    'lang.switch': 'اللغة',
+  },
+  hi: {
+    'app.name': 'GlobalHome',
+    'search.placeholder': 'खोजें "मुंबई में 4 बेडरूम का घर"',
+    'search.voice.listening': 'सुन रहा है...',
+    'search.resume': 'खोज जारी रखें',
+    'search.recommended': 'आपके लिए अनुशंसित',
+    'search.results': 'खोज परिणाम',
+    'nav.search': 'खोज',
+    'nav.saved': 'सहेजा',
+    'nav.messages': 'संदेश',
+    'nav.profile': 'प्रोफाइल',
+    'property.beds': 'बेड',
+    'property.baths': 'बाथ',
+    'property.parking': 'पार्किंग',
+    'property.details': 'संपत्ति विवरण',
+    'property.description': 'विवरण',
+    'property.estimated': 'अनुमानित बाजार मूल्य',
+    'property.agent': 'एजेंट जानकारी',
+    'property.contact': 'एजेंट से संपर्क करें',
+    'property.save': 'सहेजें',
+    'property.share': 'शेयर',
+    'property.subscribeUnlock': 'लीड अनलॉक करने के लिए सदस्यता लें',
+    'agent.portal': 'एजेंट पोर्टल',
+    'agent.dashboard': 'लीड डैशबोर्ड',
+    'agent.views': 'लिस्टिंग व्यू',
+    'agent.clicks': 'संपर्क क्लिक',
+    'agent.subscribe': 'अभी सदस्यता लें',
+    'agent.subscribed': 'प्रो एजेंट',
+    'saved.title': 'सहेजी गई संपत्तियाँ',
+    'saved.empty': 'कोई सहेजी गई संपत्ति नहीं',
+    'profile.title': 'प्रोफाइल',
+    'lang.switch': 'भाषा',
+  },
+  fr: {
+    'app.name': 'GlobalHome',
+    'search.placeholder': 'Chercher "maison 4 chambres à Paris à 850k€"',
+    'search.voice.listening': 'Écoute en cours...',
+    'search.resume': 'Reprendre la recherche',
+    'search.recommended': 'Recommandé pour vous',
+    'search.results': 'Résultats',
+    'nav.search': 'Recherche',
+    'nav.saved': 'Enregistrés',
+    'nav.messages': 'Messages',
+    'nav.profile': 'Profil',
+    'property.beds': 'Ch.',
+    'property.baths': 'SdB',
+    'property.parking': 'Parking',
+    'property.details': 'Détails du bien',
+    'property.description': 'Description',
+    'property.estimated': 'Valeur estimée',
+    'property.agent': "Informations de l'agent",
+    'property.contact': "Contacter l'agent",
+    'property.save': 'Enregistrer',
+    'property.share': 'Partager',
+    'property.subscribeUnlock': "S'abonner pour débloquer",
+    'agent.portal': 'Portail agent',
+    'agent.dashboard': 'Tableau de bord',
+    'agent.views': 'Vues',
+    'agent.clicks': 'Clics',
+    'agent.subscribe': "S'abonner",
+    'agent.subscribed': 'Agent Pro',
+    'saved.title': 'Biens enregistrés',
+    'saved.empty': 'Aucun bien enregistré',
+    'profile.title': 'Profil',
+    'lang.switch': 'Langue',
+  },
+};
+
+export const languageNames: Record<Language, string> = {
+  en: 'English',
+  zh: '中文',
+  es: 'Español',
+  ar: 'العربية',
+  hi: 'हिन्दी',
+  fr: 'Français',
+};
+
+interface I18nContextType {
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: (key: string) => string;
+}
+
+const I18nContext = createContext<I18nContextType | undefined>(undefined);
+
+function detectBrowserLanguage(): Language {
+  const browserLang = navigator.language.slice(0, 2);
+  if (browserLang in translations) return browserLang as Language;
+  return 'en';
+}
+
+export function I18nProvider({ children }: { children: ReactNode }) {
+  const [language, setLanguage] = useState<Language>(() => {
+    const saved = localStorage.getItem('gh-lang');
+    if (saved && saved in translations) return saved as Language;
+    return detectBrowserLanguage();
+  });
+
+  useEffect(() => {
+    localStorage.setItem('gh-lang', language);
+  }, [language]);
+
+  const t = (key: string) => translations[language]?.[key] || translations.en[key] || key;
+
+  return (
+    <I18nContext.Provider value={{ language, setLanguage, t }}>
+      {children}
+    </I18nContext.Provider>
+  );
+}
+
+export function useI18n() {
+  const ctx = useContext(I18nContext);
+  if (!ctx) throw new Error('useI18n must be used within I18nProvider');
+  return ctx;
+}

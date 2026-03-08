@@ -104,6 +104,75 @@ export type Database = {
           },
         ]
       }
+      leads: {
+        Row: {
+          agent_id: string
+          created_at: string
+          id: string
+          message: string | null
+          pre_approval_status: string | null
+          preferred_contact: string | null
+          property_id: string
+          score: number | null
+          search_context: Json | null
+          status: string | null
+          urgency: string | null
+          user_email: string
+          user_id: string | null
+          user_name: string
+          user_phone: string | null
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          pre_approval_status?: string | null
+          preferred_contact?: string | null
+          property_id: string
+          score?: number | null
+          search_context?: Json | null
+          status?: string | null
+          urgency?: string | null
+          user_email: string
+          user_id?: string | null
+          user_name: string
+          user_phone?: string | null
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          pre_approval_status?: string | null
+          preferred_contact?: string | null
+          property_id?: string
+          score?: number | null
+          search_context?: Json | null
+          status?: string | null
+          urgency?: string | null
+          user_email?: string
+          user_id?: string | null
+          user_name?: string
+          user_phone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -309,6 +378,45 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      voice_searches: {
+        Row: {
+          audio_duration: number | null
+          created_at: string
+          detected_language: string | null
+          id: string
+          parsed_query: Json | null
+          session_id: string | null
+          status: string | null
+          transcript: string
+          user_id: string | null
+          user_location: Json | null
+        }
+        Insert: {
+          audio_duration?: number | null
+          created_at?: string
+          detected_language?: string | null
+          id?: string
+          parsed_query?: Json | null
+          session_id?: string | null
+          status?: string | null
+          transcript: string
+          user_id?: string | null
+          user_location?: Json | null
+        }
+        Update: {
+          audio_duration?: number | null
+          created_at?: string
+          detected_language?: string | null
+          id?: string
+          parsed_query?: Json | null
+          session_id?: string | null
+          status?: string | null
+          transcript?: string
+          user_id?: string | null
+          user_location?: Json | null
         }
         Relationships: []
       }

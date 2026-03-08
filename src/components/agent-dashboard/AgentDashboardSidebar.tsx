@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, Bell, LogOut,
+  LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, Bell, LogOut, Building2, UserPlus,
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {

@@ -1,12 +1,13 @@
-import { Search, Heart, MessageCircle, User } from 'lucide-react';
+import { Search, Heart, MessageCircle, User, LogIn } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/lib/AuthProvider';
 
 const navItems = [
   { key: 'nav.search', icon: Search, path: '/' },
-  { key: 'nav.saved', icon: Heart, path: '/saved' },
-  { key: 'nav.messages', icon: MessageCircle, path: '/messages' },
-  { key: 'nav.profile', icon: User, path: '/profile' },
+  { key: 'nav.saved', icon: Heart, path: '/saved', auth: true },
+  { key: 'nav.messages', icon: MessageCircle, path: '/messages', auth: true },
+  { key: 'nav.profile', icon: User, path: '/profile', auth: true },
 ];
 
 export function BottomNav() {

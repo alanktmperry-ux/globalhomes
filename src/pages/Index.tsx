@@ -55,6 +55,7 @@ const Index = () => {
   const [manusStatus, setManusStatus] = useState<string | null>(null);
   const [showMap, setShowMap] = useState(true);
   const [areaSearch, setAreaSearch] = useState<AreaSearch | null>(null);
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
 
   const handleSearch = useCallback(async (query: string) => {
     setIsSearching(true);

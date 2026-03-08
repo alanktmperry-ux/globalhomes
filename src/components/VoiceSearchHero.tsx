@@ -314,7 +314,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-voice-text text-sm font-medium mb-2"
+              className="text-foreground text-sm font-medium mb-2"
             >
               Tap and describe your dream home in any language
             </motion.p>

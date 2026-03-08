@@ -9,9 +9,10 @@ interface PropertyMapProps {
   onPropertySelect: (property: Property) => void;
   selectedPropertyId?: string;
   onAreaSearch?: (bounds: { type: 'circle'; center: [number, number]; radius: number } | { type: 'polygon'; coordinates: [number, number][] }) => void;
+  centerOn?: { lat: number; lng: number } | null;
 }
 
-export function PropertyMap({ properties, onPropertySelect, selectedPropertyId, onAreaSearch }: PropertyMapProps) {
+export function PropertyMap({ properties, onPropertySelect, selectedPropertyId, onAreaSearch, centerOn }: PropertyMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
@@ -98,6 +99,14 @@ export function PropertyMap({ properties, onPropertySelect, selectedPropertyId, 
       cancelled = true;
     };
   }, []);
+
+  // Center map when location is selected from search
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || !centerOn) return;
+    map.panTo({ lat: centerOn.lat, lng: centerOn.lng });
+    map.setZoom(13);
+  }, [centerOn]);
 
   // Drawing events
   useEffect(() => {

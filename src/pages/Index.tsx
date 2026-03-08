@@ -55,6 +55,7 @@ const Index = () => {
   const [manusStatus, setManusStatus] = useState<string | null>(null);
   const [showMap, setShowMap] = useState(true);
   const [areaSearch, setAreaSearch] = useState<AreaSearch | null>(null);
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
 
   const handleSearch = useCallback(async (query: string) => {
     setIsSearching(true);
@@ -152,8 +153,7 @@ const Index = () => {
             </div>
           </div>
           <SearchBar onSearch={handleSearch} onLocationSelect={(loc) => {
-            // Could be used to center map in future
-            console.log('Location selected:', loc);
+            setMapCenter({ lat: loc.lat, lng: loc.lng });
           }} />
         </div>
       </header>
@@ -234,6 +234,7 @@ const Index = () => {
                 onPropertySelect={setSelectedProperty}
                 selectedPropertyId={selectedProperty?.id}
                 onAreaSearch={handleAreaSearch}
+                centerOn={mapCenter}
               />
             </div>
           </div>
@@ -245,6 +246,7 @@ const Index = () => {
                 onPropertySelect={setSelectedProperty}
                 selectedPropertyId={selectedProperty?.id}
                 onAreaSearch={handleAreaSearch}
+                centerOn={mapCenter}
               />
             </div>
             {propertyList}

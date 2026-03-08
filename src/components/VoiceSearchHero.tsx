@@ -403,7 +403,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
                   initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -4 }}
-                  className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 w-56 max-h-64 overflow-y-auto bg-voice-darker border border-border/30 rounded-xl shadow-elevated"
+                  className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 w-56 max-h-64 overflow-y-auto bg-popover border border-border rounded-xl shadow-elevated"
                 >
                   {VOICE_LANGUAGES.map(lang => (
                     <button

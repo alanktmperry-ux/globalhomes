@@ -17,6 +17,7 @@ interface PropertyCardProps {
 
 export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index }: PropertyCardProps) {
   const { t } = useI18n();
+  const { formatPrice, currency } = useCurrency();
   const [contactOpen, setContactOpen] = useState(false);
 
   const statusConfig: Record<PropertyStatus, { label: string; className: string } | null> = {

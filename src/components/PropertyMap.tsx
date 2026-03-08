@@ -105,7 +105,7 @@ export function PropertyMap({ properties, onPropertySelect, selectedPropertyId, 
     const map = mapInstanceRef.current;
     if (!map || !centerOn) return;
     map.panTo({ lat: centerOn.lat, lng: centerOn.lng });
-    map.setZoom(13);
+    map.setZoom(15);
   }, [centerOn]);
 
   // Drawing events

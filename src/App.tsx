@@ -10,6 +10,7 @@ import SavedPage from "./pages/SavedPage";
 import MessagesPage from "./pages/MessagesPage";
 import ProfilePage from "./pages/ProfilePage";
 import AgentPortalPage from "./pages/AgentPortalPage";
+import AgentLandingPage from "./pages/AgentLandingPage";
 import AuthPage from "./pages/AuthPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";

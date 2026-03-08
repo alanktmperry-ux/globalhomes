@@ -56,9 +56,6 @@ export default {
           foreground: "hsl(var(--success-foreground))",
         },
         "cyan-accent": "hsl(var(--cyan-accent))",
-          DEFAULT: "hsl(var(--success))",
-          foreground: "hsl(var(--success-foreground))",
-        },
         "surface-warm": "hsl(var(--surface-warm))",
         "surface-elevated": "hsl(var(--surface-elevated))",
         voice: {

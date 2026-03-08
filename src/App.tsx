@@ -42,6 +42,14 @@ const App = () => (
               <Route path="/agent-portal" element={<AgentPortalPage />} />
               <Route path="/agents" element={<AgentLandingPage />} />
               <Route path="/pocket-listing" element={<PocketListingPage />} />
+              <Route path="/dashboard" element={<AgentDashboardLayout />}>
+                <Route index element={<DashboardOverview />} />
+                <Route path="listings" element={<ListingsPage />} />
+                <Route path="leads" element={<VoiceLeadsPage />} />
+                <Route path="analytics" element={<AnalyticsPage />} />
+                <Route path="network" element={<NetworkPage />} />
+                <Route path="settings" element={<SettingsPage />} />
+              </Route>
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />

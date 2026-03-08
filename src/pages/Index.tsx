@@ -330,12 +330,22 @@ const Index = () => {
                   <span className="text-sm font-medium text-foreground">
                     {filteredProperties.length} properties
                   </span>
-                  <button
-                    onClick={() => setMobileView('list')}
-                    className="text-xs text-primary font-medium"
-                  >
-                    View list
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <FilterSidebar
+                      filters={filters}
+                      onChange={setFilters}
+                      isOpen={filtersOpen}
+                      onToggle={() => setFiltersOpen(o => !o)}
+                      totalCount={displayProperties.length}
+                      filteredCount={filteredProperties.length}
+                    />
+                    <button
+                      onClick={() => setMobileView('list')}
+                      className="text-xs text-primary font-medium"
+                    >
+                      View list
+                    </button>
+                  </div>
                 </div>
 
                 <div className="overflow-y-auto px-4 pb-20" style={{ maxHeight: bottomSheetExpanded ? 'calc(100% - 60px)' : '40px' }}>

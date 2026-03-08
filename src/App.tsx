@@ -21,6 +21,7 @@ import VoiceLeadsPage from "./components/agent-dashboard/VoiceLeadsPage";
 import AnalyticsPage from "./components/agent-dashboard/AnalyticsPage";
 import NetworkPage from "./components/agent-dashboard/NetworkPage";
 import SettingsPage from "./components/agent-dashboard/SettingsPage";
+import TeamPage from "./components/agent-dashboard/TeamPage";
 import SeekerAuthPage from "./pages/SeekerAuthPage";
 import AgentAuthPage from "./pages/AgentAuthPage";
 import AdminDashboard from "./pages/AdminDashboard";

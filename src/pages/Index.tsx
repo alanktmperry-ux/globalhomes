@@ -54,7 +54,7 @@ const Index = () => {
   const [manusStatus, setManusStatus] = useState<string | null>(null);
   const [mobileView, setMobileView] = useState<'map' | 'list'>('map');
   const [areaSearch, setAreaSearch] = useState<AreaSearch | null>(null);
-  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key: number } | null>(null);
   const [splitPercent, setSplitPercent] = useState(55);
   const [bottomSheetExpanded, setBottomSheetExpanded] = useState(false);
   const isDragging = useRef(false);
@@ -177,7 +177,7 @@ const Index = () => {
                 property={property}
                 onSelect={(p) => {
                   setSelectedProperty(p);
-                  setMapCenter(p.lat && p.lng ? { lat: p.lat, lng: p.lng } : null);
+                  if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: Date.now() });
                 }}
                 isSaved={isSaved(property.id)}
                 onToggleSave={toggleSaved}
@@ -211,7 +211,7 @@ const Index = () => {
       {/* Voice Search Hero */}
       <VoiceSearchHero
         onSearch={handleSearch}
-        onLocationSelect={(loc) => setMapCenter({ lat: loc.lat, lng: loc.lng })}
+        onLocationSelect={(loc) => setMapCenter({ lat: loc.lat, lng: loc.lng, key: Date.now() })}
         resultCount={hasSearched ? filteredProperties.length : undefined}
         isSearching={isSearching}
       />

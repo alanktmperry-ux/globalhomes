@@ -88,16 +88,21 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
     setVoiceState('processing');
     onSearch(text);
 
-    // Geocode location from the query to pan the map
+    // Try to geocode the location to pan the map
     if (onLocationSelect) {
       try {
         const { geocode } = await import('@/lib/googleMapsService');
-        const location = await geocode(text);
+        // Try the extracted location first, then the full query
+        const locationQuery = filters.location || text;
+        let location = await geocode(locationQuery);
+        if (!location && filters.location && filters.location !== text) {
+          location = await geocode(text);
+        }
         if (location) {
-          onLocationSelect({ lat: location.lat, lng: location.lng, address: text });
+          onLocationSelect({ lat: location.lat, lng: location.lng, address: locationQuery });
         }
       } catch {
-        // Geocoding failed silently — search still works
+        // Geocoding failed silently
       }
     }
   }, [onSearch, onLocationSelect]);

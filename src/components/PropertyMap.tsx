@@ -28,7 +28,7 @@ interface PropertyMapProps {
   onPropertySelect: (property: Property) => void;
   selectedPropertyId?: string;
   onAreaSearch?: (bounds: { type: 'circle'; center: [number, number]; radius: number } | { type: 'polygon'; coordinates: [number, number][] } | null) => void;
-  centerOn?: { lat: number; lng: number } | null;
+  centerOn?: { lat: number; lng: number; key?: number } | null;
   onMapMoved?: (bounds: { north: number; south: number; east: number; west: number }) => void;
   onScrollToProperty?: (propertyId: string) => void;
 }

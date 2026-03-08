@@ -61,7 +61,10 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
             />
           </button>
           <div className="absolute bottom-3 left-3 px-3 py-1.5 rounded-lg bg-card/90 backdrop-blur-sm">
-            <span className="font-display font-bold text-lg text-foreground">{property.priceFormatted}</span>
+            <span className="font-display font-bold text-lg text-foreground">{formatPrice(property.price)}</span>
+            {currency.code !== 'AUD' && (
+              <span className="block text-[10px] text-muted-foreground">{property.priceFormatted} AUD</span>
+            )}
           </div>
         </div>
 

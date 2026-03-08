@@ -14,16 +14,319 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      agents: {
+        Row: {
+          agency: string | null
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          id: string
+          is_subscribed: boolean
+          name: string
+          phone: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscription_expires_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          agency?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_subscribed?: boolean
+          name: string
+          phone?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_expires_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          agency?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_subscribed?: boolean
+          name?: string
+          phone?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_expires_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      lead_events: {
+        Row: {
+          agent_id: string
+          created_at: string
+          event_type: string
+          id: string
+          property_id: string
+          user_id: string | null
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          event_type: string
+          id?: string
+          property_id: string
+          user_id?: string | null
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          property_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_events_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_events_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          preferred_language: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          preferred_language?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          preferred_language?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      properties: {
+        Row: {
+          address: string
+          agent_id: string | null
+          baths: number
+          beds: number
+          contact_clicks: number
+          country: string
+          created_at: string
+          description: string | null
+          estimated_value: string | null
+          features: string[] | null
+          id: string
+          image_url: string | null
+          images: string[] | null
+          is_active: boolean
+          listed_date: string | null
+          parking: number
+          price: number
+          price_formatted: string
+          property_type: string | null
+          sqm: number
+          state: string
+          suburb: string
+          title: string
+          updated_at: string
+          views: number
+        }
+        Insert: {
+          address: string
+          agent_id?: string | null
+          baths?: number
+          beds?: number
+          contact_clicks?: number
+          country?: string
+          created_at?: string
+          description?: string | null
+          estimated_value?: string | null
+          features?: string[] | null
+          id?: string
+          image_url?: string | null
+          images?: string[] | null
+          is_active?: boolean
+          listed_date?: string | null
+          parking?: number
+          price: number
+          price_formatted: string
+          property_type?: string | null
+          sqm?: number
+          state: string
+          suburb: string
+          title: string
+          updated_at?: string
+          views?: number
+        }
+        Update: {
+          address?: string
+          agent_id?: string | null
+          baths?: number
+          beds?: number
+          contact_clicks?: number
+          country?: string
+          created_at?: string
+          description?: string | null
+          estimated_value?: string | null
+          features?: string[] | null
+          id?: string
+          image_url?: string | null
+          images?: string[] | null
+          is_active?: boolean
+          listed_date?: string | null
+          parking?: number
+          price?: number
+          price_formatted?: string
+          property_type?: string | null
+          sqm?: number
+          state?: string
+          suburb?: string
+          title?: string
+          updated_at?: string
+          views?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_properties_agent"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saved_properties: {
+        Row: {
+          created_at: string
+          id: string
+          property_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          property_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          property_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_properties_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_preferences: {
+        Row: {
+          budget_max: number | null
+          budget_min: number | null
+          created_at: string
+          id: string
+          preferred_baths: number | null
+          preferred_beds: number | null
+          preferred_locations: string[] | null
+          search_history: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          budget_max?: number | null
+          budget_min?: number | null
+          created_at?: string
+          id?: string
+          preferred_baths?: number | null
+          preferred_beds?: number | null
+          preferred_locations?: string[] | null
+          search_history?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          budget_max?: number | null
+          budget_min?: number | null
+          created_at?: string
+          id?: string
+          preferred_baths?: number | null
+          preferred_beds?: number | null
+          preferred_locations?: string[] | null
+          search_history?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "user" | "agent" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +453,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["user", "agent", "admin"],
+    },
   },
 } as const

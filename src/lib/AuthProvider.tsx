@@ -7,6 +7,8 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   isAgent: boolean;
+  isAdmin: boolean;
+  userRole: 'user' | 'agent' | 'admin' | null;
   signOut: () => Promise<void>;
 }
 
@@ -15,6 +17,8 @@ const AuthContext = createContext<AuthContextType>({
   session: null,
   loading: true,
   isAgent: false,
+  isAdmin: false,
+  userRole: null,
   signOut: async () => {},
 });
 
@@ -25,34 +29,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAgent, setIsAgent] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [userRole, setUserRole] = useState<'user' | 'agent' | 'admin' | null>(null);
+
+  const fetchRoles = async (userId: string) => {
+    const { data } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId);
+
+    const roles = data?.map((r) => r.role) || [];
+    setIsAdmin(roles.includes('admin'));
+    setIsAgent(roles.includes('agent') || roles.includes('admin'));
+    setUserRole(
+      roles.includes('admin') ? 'admin' : roles.includes('agent') ? 'agent' : 'user'
+    );
+  };
 
   useEffect(() => {
-    // Listen for auth changes FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          // Check if user has agent role (use setTimeout to avoid Supabase deadlock)
-          setTimeout(async () => {
-            const { data } = await supabase
-              .from('user_roles')
-              .select('role')
-              .eq('user_id', session.user.id)
-              .eq('role', 'agent')
-              .maybeSingle();
-            setIsAgent(!!data);
-          }, 0);
+          setTimeout(() => fetchRoles(session.user.id), 0);
         } else {
           setIsAgent(false);
+          setIsAdmin(false);
+          setUserRole(null);
         }
 
         setLoading(false);
       }
     );
 
-    // THEN check existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -67,7 +78,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, isAgent, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, isAgent, isAdmin, userRole, signOut }}>
       {children}
     </AuthContext.Provider>
   );

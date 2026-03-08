@@ -106,6 +106,21 @@ const ProfilePage = () => {
                 <ChevronRight size={18} className="text-muted-foreground" />
               </button>
 
+              {/* Change Password */}
+              <button
+                onClick={() => setPasswordDialogOpen(true)}
+                className="w-full flex items-center gap-3 p-4 rounded-2xl bg-card border border-border text-left transition-colors active:bg-secondary"
+              >
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Lock size={18} className="text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium text-foreground text-sm">Change Password</p>
+                  <p className="text-xs text-muted-foreground">Update your account password</p>
+                </div>
+                <ChevronRight size={18} className="text-muted-foreground" />
+              </button>
+
               {isAgent && (
                 <button
                   onClick={() => navigate('/agent-portal')}

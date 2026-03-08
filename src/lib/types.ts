@@ -21,6 +21,8 @@ export interface Property {
   listedDate: string;
   views: number;
   contactClicks: number;
+  lat?: number;
+  lng?: number;
 }
 
 export interface Agent {

@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Copy, Plus, Trash2, UserPlus, Building2, Shield, Users, RefreshCw, Loader2 } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Copy, Plus, Trash2, UserPlus, Building2, Shield, Users, RefreshCw, Loader2, Camera, Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/AuthProvider';
 import { useToast } from '@/hooks/use-toast';

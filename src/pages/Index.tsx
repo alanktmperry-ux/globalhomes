@@ -18,6 +18,7 @@ import { Property } from '@/lib/types';
 import { mockProperties } from '@/lib/mock-data';
 import { useToast } from '@/hooks/use-toast';
 import { useCurrency } from '@/lib/CurrencyContext';
+import { FilterSidebar, Filters, defaultFilters } from '@/components/FilterSidebar';
 
 type AreaSearch =
   | { type: 'circle'; center: [number, number]; radius: number }

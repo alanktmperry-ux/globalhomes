@@ -31,10 +31,11 @@ interface PropertyMapProps {
   centerOn?: { lat: number; lng: number; key?: number } | null;
   onMapMoved?: (bounds: { north: number; south: number; east: number; west: number }) => void;
   onScrollToProperty?: (propertyId: string) => void;
+  formatPrice?: (audPrice: number) => string;
 }
 
 export function PropertyMap({
-  properties, onPropertySelect, selectedPropertyId, onAreaSearch, centerOn, onMapMoved, onScrollToProperty,
+  properties, onPropertySelect, selectedPropertyId, onAreaSearch, centerOn, onMapMoved, onScrollToProperty, formatPrice,
 }: PropertyMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
@@ -235,7 +236,7 @@ export function PropertyMap({
         transform: translateY(-100%);
         transition: all 0.2s ease;
         ${isSelected ? `box-shadow: 0 0 16px ${typeColor}60; transform: translateY(-100%) scale(1.15);` : ''}
-      ">${property.priceFormatted}</div>`;
+      ">${formatPrice ? formatPrice(property.price) : property.priceFormatted}</div>`;
 
       const marker = new google.maps.marker.AdvancedMarkerElement({
         map,
@@ -250,7 +251,7 @@ export function PropertyMap({
           infoWindow.setContent(`
             <div style="font-family: 'DM Sans', sans-serif; min-width: 200px; padding: 2px;">
               <img src="${property.imageUrl}" alt="" style="width: 100%; height: 100px; object-fit: cover; border-radius: 6px; margin-bottom: 6px;" />
-              <div style="font-weight: 700; font-size: 14px; color: #0f172a;">${property.priceFormatted}</div>
+              <div style="font-weight: 700; font-size: 14px; color: #0f172a;">${formatPrice ? formatPrice(property.price) : property.priceFormatted}</div>
               <div style="font-size: 12px; color: #64748b; margin-top: 2px;">${property.title}</div>
               <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">🛏 ${property.beds} · 🛁 ${property.baths} · 🚗 ${property.parking}</div>
             </div>
@@ -319,7 +320,7 @@ export function PropertyMap({
         google.maps.event.removeListener(listener);
       });
     }
-  }, [properties, selectedPropertyId, onPropertySelect, centerOn, onScrollToProperty]);
+  }, [properties, selectedPropertyId, onPropertySelect, centerOn, onScrollToProperty, formatPrice]);
 
   const handleGeolocate = () => {
     if (!navigator.geolocation) return;

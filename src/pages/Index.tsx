@@ -17,6 +17,7 @@ import { manusSearch } from '@/lib/ManusSearchService';
 import { Property } from '@/lib/types';
 import { mockProperties } from '@/lib/mock-data';
 import { useToast } from '@/hooks/use-toast';
+import { useCurrency } from '@/lib/CurrencyContext';
 
 type AreaSearch =
   | { type: 'circle'; center: [number, number]; radius: number }
@@ -48,6 +49,7 @@ const Index = () => {
   const { isSaved, toggleSaved } = useSavedProperties();
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const { formatPrice } = useCurrency();
 
   const [results, setResults] = useState<Property[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -238,6 +240,7 @@ const Index = () => {
       onAreaSearch={handleAreaSearch}
       centerOn={mapCenter}
       onScrollToProperty={scrollToProperty}
+      formatPrice={formatPrice}
     />
   );
 

@@ -100,6 +100,14 @@ export function PropertyMap({ properties, onPropertySelect, selectedPropertyId, 
     };
   }, []);
 
+  // Center map when location is selected from search
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || !centerOn) return;
+    map.panTo({ lat: centerOn.lat, lng: centerOn.lng });
+    map.setZoom(13);
+  }, [centerOn]);
+
   // Drawing events
   useEffect(() => {
     const dm = drawingManagerRef.current;

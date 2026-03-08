@@ -153,8 +153,7 @@ const Index = () => {
             </div>
           </div>
           <SearchBar onSearch={handleSearch} onLocationSelect={(loc) => {
-            // Could be used to center map in future
-            console.log('Location selected:', loc);
+            setMapCenter({ lat: loc.lat, lng: loc.lng });
           }} />
         </div>
       </header>

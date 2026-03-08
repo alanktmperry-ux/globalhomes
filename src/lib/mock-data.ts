@@ -222,6 +222,7 @@ export const mockProperties: Property[] = [
       isSubscribed: false,
     },
     listedDate: '2026-02-10',
+    status: 'off-market',
     views: 267,
     contactClicks: 19,
     lat: -37.3480,

@@ -236,7 +236,7 @@ export function PropertyMap({
         transform: translateY(-100%);
         transition: all 0.2s ease;
         ${isSelected ? `box-shadow: 0 0 16px ${typeColor}60; transform: translateY(-100%) scale(1.15);` : ''}
-      ">${property.priceFormatted}</div>`;
+      ">${formatPrice ? formatPrice(property.price) : property.priceFormatted}</div>`;
 
       const marker = new google.maps.marker.AdvancedMarkerElement({
         map,

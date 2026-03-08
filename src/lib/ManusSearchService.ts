@@ -127,6 +127,8 @@ class ManusSearchService {
     }
 
     this.activePolls.delete(taskId);
+    // If we exited due to timeout, notify as failed
+    onUpdate?.({ status: 'failed' });
   }
 
   /** Stop all active polls (e.g., when user starts a new search) */

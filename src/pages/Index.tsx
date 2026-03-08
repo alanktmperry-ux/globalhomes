@@ -97,6 +97,7 @@ const Index = () => {
 
   const filteredProperties = useMemo(() => {
     let props = displayProperties;
+    // Area filter
     if (areaSearch) {
       props = props.filter((p) => {
         if (!p.lat || !p.lng) return false;
@@ -106,12 +107,23 @@ const Index = () => {
         return isInsidePolygon(p.lat, p.lng, areaSearch.coordinates);
       });
     }
+    // Advanced filters
+    props = props.filter(p => {
+      if (p.price < filters.priceRange[0] || p.price > filters.priceRange[1]) return false;
+      if (filters.propertyTypes.length > 0 && !filters.propertyTypes.includes(p.propertyType)) return false;
+      if (p.beds < filters.minBeds) return false;
+      if (p.baths < filters.minBaths) return false;
+      if (p.parking < filters.minParking) return false;
+      if (filters.features.length > 0 && !filters.features.every(f => p.features.some(pf => pf.toLowerCase().includes(f.toLowerCase())))) return false;
+      return true;
+    });
+    // Sort
     if (sortBy === 'price-asc') return [...props].sort((a, b) => a.price - b.price);
     if (sortBy === 'price-desc') return [...props].sort((a, b) => b.price - a.price);
     if (sortBy === 'newest') return [...props].sort((a, b) => new Date(b.listedDate).getTime() - new Date(a.listedDate).getTime());
     if (sortBy === 'beds') return [...props].sort((a, b) => b.beds - a.beds);
     return props;
-  }, [displayProperties, areaSearch, sortBy]);
+  }, [displayProperties, areaSearch, sortBy, filters]);
 
   const handleAreaSearch = useCallback((area: AreaSearch | null) => {
     setAreaSearch(area || null);

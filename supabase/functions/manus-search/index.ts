@@ -54,11 +54,12 @@ Deno.serve(async (req) => {
       console.error("Manus API error:", manusResponse.status, errorText);
       return new Response(
         JSON.stringify({ 
-          error: "Manus API request failed", 
+          source: "fallback",
+          error: "Manus API unavailable", 
           status: manusResponse.status,
-          details: errorText 
+          query,
         }),
-        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 

@@ -28,7 +28,7 @@ export function LanguageSwitcher() {
               onClick={() => setOpen(false)}
             />
             <motion.div
-              className="absolute right-0 top-full mt-2 z-50 w-40 bg-card rounded-xl shadow-elevated border border-border overflow-hidden"
+              className="absolute right-0 top-full mt-2 z-50 w-40 bg-card rounded-xl shadow-elevated border border-border overflow-y-auto max-h-72"
               initial={{ opacity: 0, scale: 0.95, y: -4 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -4 }}

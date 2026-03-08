@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Bed, Bath, Car, Heart, BadgeCheck, Star } from 'lucide-react';
 import { Property, PropertyStatus } from '@/lib/types';
 import { useI18n } from '@/lib/i18n';
+import { useCurrency } from '@/lib/CurrencyContext';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { AgentContactModal } from './AgentContactModal';
 
@@ -16,6 +17,7 @@ interface PropertyCardProps {
 
 export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index }: PropertyCardProps) {
   const { t } = useI18n();
+  const { formatPrice, currency } = useCurrency();
   const [contactOpen, setContactOpen] = useState(false);
 
   const statusConfig: Record<PropertyStatus, { label: string; className: string } | null> = {
@@ -59,7 +61,10 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
             />
           </button>
           <div className="absolute bottom-3 left-3 px-3 py-1.5 rounded-lg bg-card/90 backdrop-blur-sm">
-            <span className="font-display font-bold text-lg text-foreground">{property.priceFormatted}</span>
+            <span className="font-display font-bold text-lg text-foreground">{formatPrice(property.price)}</span>
+            {currency.code !== 'AUD' && (
+              <span className="block text-[10px] text-muted-foreground">{property.priceFormatted} AUD</span>
+            )}
           </div>
         </div>
 

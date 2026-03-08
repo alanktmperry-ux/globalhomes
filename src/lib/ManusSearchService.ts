@@ -28,8 +28,8 @@ export interface ManusSearchResult {
 
 type StatusCallback = (update: { status: string; properties?: Property[] }) => void;
 
-const POLL_INTERVAL = 3000;
-const MAX_POLL_TIME = 120000; // 2 minutes
+const POLL_INTERVAL = 4000;
+const MAX_POLL_TIME = 60000; // 1 minute — Manus tasks can take a while
 
 class ManusSearchService {
   private activePolls = new Map<string, boolean>();

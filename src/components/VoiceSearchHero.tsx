@@ -373,7 +373,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-foreground text-xs font-medium hover:bg-primary/20 transition-colors"
                 >
                   {chip.label}
-                  <X size={12} className="text-voice-muted" />
+                  <X size={12} className="text-muted-foreground" />
                 </motion.button>
               ))}
             </motion.div>

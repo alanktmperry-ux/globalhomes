@@ -58,7 +58,7 @@ const Index = () => {
   const [splitPercent, setSplitPercent] = useState(55);
   const [bottomSheetExpanded, setBottomSheetExpanded] = useState(false);
   const isDragging = useRef(false);
-  const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const cardRefs = useRef<globalThis.Map<string, HTMLDivElement>>(new globalThis.Map());
 
   const handleSearch = useCallback(async (query: string) => {
     setIsSearching(true);

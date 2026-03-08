@@ -11,6 +11,7 @@ import MessagesPage from "./pages/MessagesPage";
 import ProfilePage from "./pages/ProfilePage";
 import AgentPortalPage from "./pages/AgentPortalPage";
 import AgentLandingPage from "./pages/AgentLandingPage";
+import PocketListingPage from "./pages/PocketListingPage";
 import AuthPage from "./pages/AuthPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -33,6 +34,7 @@ const App = () => (
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/agent-portal" element={<AgentPortalPage />} />
               <Route path="/agents" element={<AgentLandingPage />} />
+              <Route path="/pocket-listing" element={<PocketListingPage />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />

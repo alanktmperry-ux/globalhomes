@@ -221,7 +221,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
                   value={editableTranscript}
                   onChange={e => setEditableTranscript(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleEditSubmit()}
-                  className="flex-1 bg-transparent text-voice-text text-sm focus:outline-none"
+                  className="flex-1 bg-transparent text-foreground text-sm focus:outline-none"
                 />
                 <button onClick={handleEditSubmit} className="text-primary hover:text-primary/80">
                   <Search size={16} />

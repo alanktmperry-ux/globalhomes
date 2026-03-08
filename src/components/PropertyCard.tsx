@@ -43,6 +43,11 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
           />
+          {badge && (
+            <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase shadow-sm ${badge.className}`}>
+              {badge.label}
+            </span>
+          )}
           <button
             onClick={e => { e.stopPropagation(); onToggleSave(property.id); }}
             className="absolute top-3 right-3 w-9 h-9 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center transition-transform active:scale-90"

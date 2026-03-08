@@ -19,13 +19,18 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { t } = useI18n();
+  const { toast } = useToast();
 
   const handleVoiceResult = useCallback((text: string) => {
     setQuery(text);
     onSearch(text);
   }, [onSearch]);
 
-  const { isListening, startListening, stopListening, isSupported } = useVoiceSearch(handleVoiceResult);
+  const handleVoiceError = useCallback((message: string) => {
+    toast({ title: '🎙️ Voice Search', description: message, variant: 'destructive' });
+  }, [toast]);
+
+  const { isListening, startListening, stopListening, isSupported } = useVoiceSearch(handleVoiceResult, handleVoiceError);
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);

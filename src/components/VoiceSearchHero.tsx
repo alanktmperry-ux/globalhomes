@@ -486,10 +486,10 @@ function VoiceSearchHistory({ onRerun }: { onRerun: (q: string) => void }) {
   return (
     <div className="mt-4 w-full">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs text-voice-muted">Recent searches</span>
+        <span className="text-xs text-muted-foreground">Recent searches</span>
         <button
           onClick={() => { localStorage.removeItem('gh-search-history'); setHistory([]); }}
-          className="text-xs text-voice-muted hover:text-voice-text transition-colors"
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
           Clear
         </button>
@@ -499,7 +499,7 @@ function VoiceSearchHistory({ onRerun }: { onRerun: (q: string) => void }) {
           <button
             key={i}
             onClick={() => onRerun(q)}
-            className="px-3 py-1.5 rounded-full bg-voice-surface text-voice-muted text-xs hover:text-voice-text hover:bg-primary/10 transition-colors truncate max-w-[200px]"
+            className="px-3 py-1.5 rounded-full bg-secondary text-muted-foreground text-xs hover:text-foreground hover:bg-primary/10 transition-colors truncate max-w-[200px]"
           >
             🔍 {q}
           </button>

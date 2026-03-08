@@ -14,16 +14,13 @@ const TYPE_COLORS: Record<string, string> = {
   unit: '#8b5cf6',
 };
 
-const DARK_MAP_STYLE: google.maps.MapTypeStyle[] = [
-  { elementType: 'geometry', stylers: [{ color: '#1a1a2e' }] },
-  { elementType: 'labels.text.stroke', stylers: [{ color: '#1a1a2e' }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: '#8a8a9a' }] },
-  { featureType: 'administrative', elementType: 'geometry.stroke', stylers: [{ color: '#2a2a3e' }] },
-  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#2a2a3e' }] },
-  { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#6a6a7a' }] },
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0e1a2b' }] },
-  { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#222238' }] },
-  { featureType: 'transit', elementType: 'geometry', stylers: [{ color: '#1e1e30' }] },
+const LIGHT_MAP_STYLE: google.maps.MapTypeStyle[] = [
+  { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] },
+  { featureType: 'transit', stylers: [{ visibility: 'off' }] },
+  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#dbeafe' }] },
+  { featureType: 'landscape', elementType: 'geometry', stylers: [{ color: '#f8fafc' }] },
+  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#e2e8f0' }] },
+  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#cbd5e1' }] },
 ];
 
 interface PropertyMapProps {

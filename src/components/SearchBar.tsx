@@ -114,7 +114,7 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
-            className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-xl shadow-elevated overflow-hidden"
+            className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-xl shadow-elevated overflow-y-auto max-h-60"
           >
             {suggestions.map((s) => (
               <li key={s.place_id}>

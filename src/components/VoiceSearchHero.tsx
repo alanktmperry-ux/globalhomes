@@ -215,7 +215,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
               animate={{ opacity: 1, y: 0 }}
               className="w-full mb-4"
             >
-              <div className="flex items-center gap-2 bg-voice-surface rounded-xl px-4 py-2">
+              <div className="flex items-center gap-2 bg-secondary rounded-xl px-4 py-2">
                 <input
                   type="text"
                   value={editableTranscript}

@@ -243,14 +243,46 @@ const TeamPage = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-2xl font-bold text-foreground">{agencyName}</h1>
-          <p className="text-sm text-muted-foreground mt-1">{members.length} team member{members.length !== 1 ? 's' : ''}</p>
+    <div className="max-w-4xl mx-auto space-y-8 p-4 sm:p-6">
+      {/* Header with Logo */}
+      <div className="flex items-center gap-5">
+        {/* Logo upload */}
+        <div className="relative group shrink-0">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleLogoUpload}
+            disabled={!isOwnerOrAdmin}
+          />
+          {agencyLogo ? (
+            <img src={agencyLogo} alt={agencyName} className="w-16 h-16 rounded-2xl object-cover border border-border shadow-sm" />
+          ) : (
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center border border-border">
+              <Building2 size={24} className="text-primary" />
+            </div>
+          )}
+          {isOwnerOrAdmin && (
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingLogo}
+              className="absolute inset-0 rounded-2xl bg-foreground/0 group-hover:bg-foreground/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+            >
+              {uploadingLogo ? (
+                <Loader2 size={18} className="text-background animate-spin" />
+              ) : (
+                <Camera size={18} className="text-background" />
+              )}
+            </button>
+          )}
         </div>
-        <div className="flex items-center gap-2">
+
+        <div className="flex-1 min-w-0">
+          <h1 className="font-display text-2xl font-bold text-foreground truncate">{agencyName}</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">{members.length} team member{members.length !== 1 ? 's' : ''}</p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
           <Button variant="outline" size="sm" onClick={loadData}>
             <RefreshCw size={14} className="mr-1.5" /> Refresh
           </Button>

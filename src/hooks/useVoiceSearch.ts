@@ -9,7 +9,7 @@ interface SpeechRecognitionErrorEvent {
   error: string;
 }
 
-export function useVoiceSearch(onResult: (text: string) => void) {
+export function useVoiceSearch(onResult: (text: string) => void, onError?: (message: string) => void) {
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
 
@@ -17,33 +17,55 @@ export function useVoiceSearch(onResult: (text: string) => void) {
     ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
   const startListening = useCallback(() => {
-    if (!isSupported) return;
+    if (!isSupported) {
+      onError?.('Voice search is not supported in this browser.');
+      return;
+    }
 
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
+    try {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
 
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = navigator.language || 'en-US';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = navigator.language || 'en-US';
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
-      const transcript = event.results[0][0].transcript;
-      onResult(transcript);
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        const transcript = event.results[0][0].transcript;
+        onResult(transcript);
+        setIsListening(false);
+      };
+
+      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+        console.warn('[VoiceSearch] Error:', event.error);
+        setIsListening(false);
+        
+        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+          onError?.('Microphone access denied. Please allow microphone permissions and try again.');
+        } else if (event.error === 'no-speech') {
+          onError?.('No speech detected. Please try again and speak clearly.');
+        } else if (event.error === 'network') {
+          onError?.('Network error. Voice search requires an internet connection.');
+        } else if (event.error === 'aborted') {
+          // User or system aborted, no error needed
+        } else {
+          onError?.('Voice search failed. Try typing your search instead.');
+        }
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+      setIsListening(true);
+    } catch (err) {
+      console.error('[VoiceSearch] Failed to start:', err);
       setIsListening(false);
-    };
-
-    recognition.onerror = (_event: SpeechRecognitionErrorEvent) => {
-      setIsListening(false);
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-    };
-
-    recognitionRef.current = recognition;
-    recognition.start();
-    setIsListening(true);
-  }, [isSupported, onResult]);
+      onError?.('Voice search is not available. Try typing your search instead.');
+    }
+  }, [isSupported, onResult, onError]);
 
   const stopListening = useCallback(() => {
     if (recognitionRef.current) {

@@ -36,6 +36,8 @@ export const mockProperties: Property[] = [
     listedDate: '2026-02-15',
     views: 342,
     contactClicks: 28,
+    lat: -38.0410,
+    lng: 145.3540,
   },
   {
     id: '2',
@@ -71,6 +73,8 @@ export const mockProperties: Property[] = [
     listedDate: '2026-02-20',
     views: 189,
     contactClicks: 14,
+    lat: -38.0350,
+    lng: 145.3480,
   },
   {
     id: '3',
@@ -106,6 +110,8 @@ export const mockProperties: Property[] = [
     listedDate: '2026-03-01',
     views: 456,
     contactClicks: 31,
+    lat: -38.0470,
+    lng: 145.3610,
   },
   {
     id: '4',
@@ -140,6 +146,8 @@ export const mockProperties: Property[] = [
     listedDate: '2026-03-05',
     views: 98,
     contactClicks: 6,
+    lat: -38.0590,
+    lng: 145.4120,
   },
   {
     id: '5',
@@ -175,6 +183,8 @@ export const mockProperties: Property[] = [
     listedDate: '2026-01-28',
     views: 1204,
     contactClicks: 89,
+    lat: -37.8400,
+    lng: 144.9830,
   },
   {
     id: '6',
@@ -209,5 +219,7 @@ export const mockProperties: Property[] = [
     listedDate: '2026-02-10',
     views: 267,
     contactClicks: 19,
+    lat: -37.3480,
+    lng: 144.1530,
   },
 ];

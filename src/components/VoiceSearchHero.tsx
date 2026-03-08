@@ -80,14 +80,27 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
     }
   }, [isSearching, resultCount, voiceState]);
 
-  const processTranscript = useCallback((text: string) => {
+  const processTranscript = useCallback(async (text: string) => {
     const filters = parsePropertyQuery(text);
     const chips = filtersToChips(filters);
     setFilterChips(chips);
     setEditableTranscript(text);
     setVoiceState('processing');
     onSearch(text);
-  }, [onSearch]);
+
+    // Geocode location from the query to pan the map
+    if (onLocationSelect) {
+      try {
+        const { geocode } = await import('@/lib/googleMapsService');
+        const location = await geocode(text);
+        if (location) {
+          onLocationSelect({ lat: location.lat, lng: location.lng, address: text });
+        }
+      } catch {
+        // Geocoding failed silently — search still works
+      }
+    }
+  }, [onSearch, onLocationSelect]);
 
   const startListening = useCallback(() => {
     if (!isSupported) {

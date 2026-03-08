@@ -9,6 +9,7 @@ interface PropertyMapProps {
   onPropertySelect: (property: Property) => void;
   selectedPropertyId?: string;
   onAreaSearch?: (bounds: { type: 'circle'; center: [number, number]; radius: number } | { type: 'polygon'; coordinates: [number, number][] }) => void;
+  centerOn?: { lat: number; lng: number } | null;
 }
 
 export function PropertyMap({ properties, onPropertySelect, selectedPropertyId, onAreaSearch }: PropertyMapProps) {

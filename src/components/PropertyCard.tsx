@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Bed, Bath, Car, Heart, BadgeCheck, Star } from 'lucide-react';
-import { Property } from '@/lib/types';
+import { Property, PropertyStatus } from '@/lib/types';
 import { useI18n } from '@/lib/i18n';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { AgentContactModal } from './AgentContactModal';
@@ -17,6 +17,15 @@ interface PropertyCardProps {
 export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index }: PropertyCardProps) {
   const { t } = useI18n();
   const [contactOpen, setContactOpen] = useState(false);
+
+  const statusConfig: Record<PropertyStatus, { label: string; className: string } | null> = {
+    'off-market': { label: 'Off-Market', className: 'bg-amber-500/90 text-white' },
+    'coming-soon': { label: 'Coming Soon', className: 'bg-blue-500/90 text-white' },
+    'new': { label: 'New', className: 'bg-emerald-500/90 text-white' },
+    'listed': null,
+  };
+
+  const badge = property.status ? statusConfig[property.status] : null;
 
   return (
     <>
@@ -34,6 +43,11 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
           />
+          {badge && (
+            <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase shadow-sm ${badge.className}`}>
+              {badge.label}
+            </span>
+          )}
           <button
             onClick={e => { e.stopPropagation(); onToggleSave(property.id); }}
             className="absolute top-3 right-3 w-9 h-9 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center transition-transform active:scale-90"

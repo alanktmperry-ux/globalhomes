@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, MapPin, Sparkles, Loader2, Zap, Map, List, Mic, GripVertical } from 'lucide-react';
+import { ArrowRight, MapPin, Sparkles, Loader2, Zap, Map, List, Mic, GripVertical, ArrowUpDown } from 'lucide-react';
 import { VoiceSearchHero } from '@/components/VoiceSearchHero';
 import { PropertyCard } from '@/components/PropertyCard';
 import { PropertyCardSkeleton } from '@/components/PropertyCardSkeleton';
@@ -59,6 +59,7 @@ const Index = () => {
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key: number } | null>(null);
   const [splitPercent, setSplitPercent] = useState(55);
   const [bottomSheetExpanded, setBottomSheetExpanded] = useState(false);
+  const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'newest' | 'beds'>('default');
   const isDragging = useRef(false);
   const cardRefs = useRef<globalThis.Map<string, HTMLDivElement>>(new globalThis.Map());
 
@@ -90,15 +91,22 @@ const Index = () => {
   const displayProperties = hasSearched ? results : mockProperties.slice(0, 6);
 
   const filteredProperties = useMemo(() => {
-    if (!areaSearch) return displayProperties;
-    return displayProperties.filter((p) => {
-      if (!p.lat || !p.lng) return false;
-      if (areaSearch.type === 'circle') {
-        return haversineDistance(p.lat, p.lng, areaSearch.center[0], areaSearch.center[1]) <= areaSearch.radius;
-      }
-      return isInsidePolygon(p.lat, p.lng, areaSearch.coordinates);
-    });
-  }, [displayProperties, areaSearch]);
+    let props = displayProperties;
+    if (areaSearch) {
+      props = props.filter((p) => {
+        if (!p.lat || !p.lng) return false;
+        if (areaSearch.type === 'circle') {
+          return haversineDistance(p.lat, p.lng, areaSearch.center[0], areaSearch.center[1]) <= areaSearch.radius;
+        }
+        return isInsidePolygon(p.lat, p.lng, areaSearch.coordinates);
+      });
+    }
+    if (sortBy === 'price-asc') return [...props].sort((a, b) => a.price - b.price);
+    if (sortBy === 'price-desc') return [...props].sort((a, b) => b.price - a.price);
+    if (sortBy === 'newest') return [...props].sort((a, b) => new Date(b.listedDate).getTime() - new Date(a.listedDate).getTime());
+    if (sortBy === 'beds') return [...props].sort((a, b) => b.beds - a.beds);
+    return props;
+  }, [displayProperties, areaSearch, sortBy]);
 
   const handleAreaSearch = useCallback((area: AreaSearch | null) => {
     setAreaSearch(area || null);
@@ -135,35 +143,60 @@ const Index = () => {
     };
   }, []);
 
+  const sortOptions = [
+    { value: 'default', label: 'Default' },
+    { value: 'price-asc', label: 'Price: Low–High' },
+    { value: 'price-desc', label: 'Price: High–Low' },
+    { value: 'newest', label: 'Newest' },
+    { value: 'beds', label: 'Bedrooms' },
+  ] as const;
+
   const statusBar = (
-    <div className="flex items-center justify-between mb-3">
-      <div className="flex items-center gap-2">
-        {hasSearched ? (
-          <h2 className="font-display font-semibold text-foreground">{t('search.results')}</h2>
-        ) : (
-          <>
-            <Sparkles size={16} className="text-primary" />
-            <h2 className="font-display font-semibold text-foreground">{t('search.recommended')}</h2>
-          </>
+    <div className="flex items-center justify-between mb-3 gap-2">
+      <div className="flex items-center gap-2 min-w-0">
+        <span className="text-sm font-medium text-foreground shrink-0">
+          {filteredProperties.length} properties
+        </span>
+        {hasSearched && (
+          <span className="text-xs text-muted-foreground truncate">{t('search.results')}</span>
+        )}
+        {!hasSearched && (
+          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Sparkles size={12} className="text-primary" /> Recommended
+          </span>
         )}
         {areaSearch && (
-          <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
+          <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium shrink-0">
             {areaSearch.type === 'circle' ? `${Math.round(areaSearch.radius / 1000)}km` : 'Custom area'}
           </span>
         )}
+        {manusStatus && (manusStatus === 'running' || manusStatus === 'pending') && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-1 text-xs text-primary font-medium shrink-0">
+            <Loader2 size={12} className="animate-spin" />
+            <span>Searching…</span>
+          </motion.div>
+        )}
+        {manusStatus === 'completed' && (
+          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-1 text-xs text-success font-medium shrink-0">
+            <Zap size={12} />
+            <span>Live</span>
+          </motion.div>
+        )}
       </div>
-      {manusStatus && (manusStatus === 'running' || manusStatus === 'pending') && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-1.5 text-xs text-primary font-medium">
-          <Loader2 size={12} className="animate-spin" />
-          <span>Searching…</span>
-        </motion.div>
-      )}
-      {manusStatus === 'completed' && (
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-1 text-xs text-success font-medium">
-          <Zap size={12} />
-          <span>Live results</span>
-        </motion.div>
-      )}
+
+      {/* Sort dropdown */}
+      <div className="relative shrink-0">
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+          className="appearance-none pl-7 pr-3 py-1.5 rounded-lg bg-secondary border border-border text-xs font-medium text-foreground cursor-pointer focus:outline-none focus:ring-1 focus:ring-ring"
+        >
+          {sortOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+        <ArrowUpDown size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+      </div>
     </div>
   );
 

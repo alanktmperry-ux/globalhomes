@@ -81,10 +81,13 @@ const TeamPage = () => {
       // Get agency info
       const { data: agency } = await supabase
         .from('agencies')
-        .select('name')
+        .select('name, logo_url')
         .eq('id', membership.agency_id)
         .single();
-      if (agency) setAgencyName(agency.name);
+      if (agency) {
+        setAgencyName(agency.name);
+        setAgencyLogo(agency.logo_url);
+      }
 
       // Get members with their profile info
       const { data: membersData } = await supabase

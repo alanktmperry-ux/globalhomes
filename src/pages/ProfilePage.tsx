@@ -1,17 +1,56 @@
-import { User, ChevronRight, Shield, LogIn, LogOut, Settings } from 'lucide-react';
+import { useState } from 'react';
+import { User, ChevronRight, Shield, LogIn, LogOut, Settings, Mail, Check, Loader2 } from 'lucide-react';
 import { BottomNav } from '@/components/BottomNav';
 import { useI18n } from '@/lib/i18n';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthProvider';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 
 const ProfilePage = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
   const { user, isAgent, signOut, loading } = useAuth();
+  const { toast } = useToast();
+
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  const [emailLoading, setEmailLoading] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
+  };
+
+  const handleChangeEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newEmail.trim()) return;
+    setEmailLoading(true);
+    try {
+      const { error } = await supabase.auth.updateUser({
+        email: newEmail,
+      });
+      if (error) throw error;
+      toast({
+        title: 'Confirmation sent',
+        description: 'Check both your old and new email inboxes to confirm the change.',
+      });
+      setEmailDialogOpen(false);
+      setNewEmail('');
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    } finally {
+      setEmailLoading(false);
+    }
   };
 
   return (
@@ -46,6 +85,21 @@ const ProfilePage = () => {
             </div>
 
             <div className="space-y-2">
+              {/* Change Email */}
+              <button
+                onClick={() => setEmailDialogOpen(true)}
+                className="w-full flex items-center gap-3 p-4 rounded-2xl bg-card border border-border text-left transition-colors active:bg-secondary"
+              >
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Mail size={18} className="text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium text-foreground text-sm">Change Email</p>
+                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                </div>
+                <ChevronRight size={18} className="text-muted-foreground" />
+              </button>
+
               {isAgent && (
                 <button
                   onClick={() => navigate('/agent-portal')}
@@ -89,6 +143,38 @@ const ProfilePage = () => {
                 <ChevronRight size={18} className="text-muted-foreground" />
               </button>
             </div>
+
+            {/* Change Email Dialog */}
+            <Dialog open={emailDialogOpen} onOpenChange={setEmailDialogOpen}>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Change Email Address</DialogTitle>
+                  <DialogDescription>
+                    Enter your new email address. You'll need to confirm from both your old and new email.
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleChangeEmail} className="space-y-4 mt-2">
+                  <div className="space-y-2">
+                    <p className="text-xs text-muted-foreground">Current email</p>
+                    <p className="text-sm font-medium text-foreground">{user.email}</p>
+                  </div>
+                  <Input
+                    type="email"
+                    placeholder="New email address"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    required
+                  />
+                  <Button type="submit" className="w-full" disabled={emailLoading || !newEmail.trim()}>
+                    {emailLoading ? (
+                      <><Loader2 size={16} className="animate-spin mr-2" /> Sending…</>
+                    ) : (
+                      'Update Email'
+                    )}
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
           </>
         ) : (
           <>

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Property } from '@/lib/types';
 import { useI18n } from '@/lib/i18n';
+import { useCurrency } from '@/lib/CurrencyContext';
 import { AgentContactModal } from './AgentContactModal';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { BadgeCheck, Star } from 'lucide-react';

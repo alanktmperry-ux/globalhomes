@@ -1,6 +1,6 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, MapPin, Sparkles, Loader2, Zap, Map, List } from 'lucide-react';
+import { ArrowRight, MapPin, Sparkles, Loader2, Zap, Map, List, Mic, GripVertical } from 'lucide-react';
 import { VoiceSearchHero } from '@/components/VoiceSearchHero';
 import { PropertyCard } from '@/components/PropertyCard';
 import { PropertyCardSkeleton } from '@/components/PropertyCardSkeleton';
@@ -52,9 +52,13 @@ const Index = () => {
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [manusStatus, setManusStatus] = useState<string | null>(null);
-  const [showMap, setShowMap] = useState(true);
+  const [mobileView, setMobileView] = useState<'map' | 'list'>('map');
   const [areaSearch, setAreaSearch] = useState<AreaSearch | null>(null);
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
+  const [splitPercent, setSplitPercent] = useState(55);
+  const [bottomSheetExpanded, setBottomSheetExpanded] = useState(false);
+  const isDragging = useRef(false);
+  const cardRefs = useRef<globalThis.Map<string, HTMLDivElement>>(new globalThis.Map());
 
   const handleSearch = useCallback(async (query: string) => {
     setIsSearching(true);
@@ -64,24 +68,17 @@ const Index = () => {
     manusSearch.cancelPolling();
 
     try {
-      console.log('[Search] Starting search for:', query);
       const result = await manusSearch.search({ query }, (update) => {
-        console.log('[Search] Update:', update.status, 'properties:', update.properties?.length);
         setManusStatus(update.status);
         if (update.status === 'completed' && update.properties && update.properties.length > 0) {
           setResults(update.properties);
-          toast({
-            title: '🔍 Live results ready',
-            description: `Found ${update.properties.length} properties from real estate sites`,
-          });
+          toast({ title: '🔍 Live results ready', description: `Found ${update.properties.length} properties` });
         } else if (update.status === 'failed') {
           setManusStatus(null);
         }
       });
-      console.log('[Search] Mock result:', result.properties.length, 'properties');
       setResults(result.properties);
-    } catch (err) {
-      console.error('[Search] Error:', err);
+    } catch {
       setResults([]);
     } finally {
       setIsSearching(false);
@@ -105,25 +102,92 @@ const Index = () => {
     setAreaSearch(area || null);
   }, []);
 
+  const scrollToProperty = useCallback((propertyId: string) => {
+    const el = cardRefs.current.get(propertyId);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, []);
+
+  // Draggable split handle
+  const handleMouseDown = useCallback(() => {
+    isDragging.current = true;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  }, []);
+
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      if (!isDragging.current) return;
+      const pct = (e.clientX / window.innerWidth) * 100;
+      setSplitPercent(Math.max(30, Math.min(70, pct)));
+    };
+    const onUp = () => {
+      isDragging.current = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+  }, []);
+
+  const statusBar = (
+    <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center gap-2">
+        {hasSearched ? (
+          <h2 className="font-display font-semibold text-foreground">{t('search.results')}</h2>
+        ) : (
+          <>
+            <Sparkles size={16} className="text-primary" />
+            <h2 className="font-display font-semibold text-foreground">{t('search.recommended')}</h2>
+          </>
+        )}
+        {areaSearch && (
+          <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
+            {areaSearch.type === 'circle' ? `${Math.round(areaSearch.radius / 1000)}km` : 'Custom area'}
+          </span>
+        )}
+      </div>
+      {manusStatus && (manusStatus === 'running' || manusStatus === 'pending') && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-1.5 text-xs text-primary font-medium">
+          <Loader2 size={12} className="animate-spin" />
+          <span>Searching…</span>
+        </motion.div>
+      )}
+      {manusStatus === 'completed' && (
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-1 text-xs text-success font-medium">
+          <Zap size={12} />
+          <span>Live results</span>
+        </motion.div>
+      )}
+    </div>
+  );
+
   const propertyList = (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {isSearching ? (
         [0, 1, 2].map(i => <PropertyCardSkeleton key={i} />)
       ) : (
         <>
           {filteredProperties.map((property, i) => (
-            <PropertyCard
-              key={property.id}
-              property={property}
-              onSelect={setSelectedProperty}
-              isSaved={isSaved(property.id)}
-              onToggleSave={toggleSaved}
-              index={i}
-            />
+            <div key={property.id} ref={el => { if (el) cardRefs.current.set(property.id, el); }}>
+              <PropertyCard
+                property={property}
+                onSelect={(p) => {
+                  setSelectedProperty(p);
+                  setMapCenter(p.lat && p.lng ? { lat: p.lat, lng: p.lng } : null);
+                }}
+                isSaved={isSaved(property.id)}
+                onToggleSave={toggleSaved}
+                index={i}
+              />
+            </div>
           ))}
           {filteredProperties.length === 0 && (
             <p className="text-center text-muted-foreground py-8 text-sm">
-              {areaSearch ? 'No properties in this area. Try adjusting your search boundary.' : 'No properties found. Try a different search.'}
+              {areaSearch ? 'No properties in this area.' : 'No properties found.'}
             </p>
           )}
         </>
@@ -131,8 +195,19 @@ const Index = () => {
     </div>
   );
 
+  const mapComponent = (
+    <PropertyMap
+      properties={filteredProperties}
+      onPropertySelect={setSelectedProperty}
+      selectedPropertyId={selectedProperty?.id}
+      onAreaSearch={handleAreaSearch}
+      centerOn={mapCenter}
+      onScrollToProperty={scrollToProperty}
+    />
+  );
+
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Voice Search Hero */}
       <VoiceSearchHero
         onSearch={handleSearch}
@@ -141,118 +216,92 @@ const Index = () => {
         isSearching={isSearching}
       />
 
-      {/* Map/List toggle */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50 px-4 py-2">
-        <div className="max-w-7xl mx-auto flex items-center justify-end">
-          <button
-            onClick={() => setShowMap(!showMap)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-secondary text-foreground text-sm font-medium transition-colors hover:bg-accent"
-          >
-            {showMap ? <List size={16} /> : <Map size={16} />}
-            <span className="hidden sm:inline">{showMap ? 'List only' : 'Show map'}</span>
-          </button>
-        </div>
-      </div>
-
-      <main className="max-w-7xl mx-auto px-4 py-4">
-        {/* Resume search */}
-        <AnimatePresence>
-          {lastSearch && !hasSearched && (
-            <motion.button
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              onClick={() => handleSearch(lastSearch.text)}
-              className="w-full flex items-center gap-3 p-4 mb-5 rounded-2xl bg-primary/5 border border-primary/10 text-left transition-colors active:bg-primary/10"
-            >
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                <MapPin size={18} className="text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs text-primary font-medium uppercase tracking-wider">{t('search.resume')}</p>
-                <p className="text-sm text-foreground font-medium truncate mt-0.5">
-                  {lastSearch.location ? `Back to ${lastSearch.location}` : lastSearch.text}
-                </p>
-              </div>
-              <ArrowRight size={18} className="text-primary shrink-0" />
-            </motion.button>
-          )}
-        </AnimatePresence>
-
-        {/* Status bar */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            {hasSearched ? (
-              <h2 className="font-display font-semibold text-foreground">{t('search.results')}</h2>
-            ) : (
-              <>
-                <Sparkles size={16} className="text-primary" />
-                <h2 className="font-display font-semibold text-foreground">{t('search.recommended')}</h2>
-              </>
-            )}
-            {areaSearch && (
-              <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
-                {areaSearch.type === 'circle' ? `${Math.round(areaSearch.radius / 1000)}km radius` : 'Custom area'}
-              </span>
-            )}
+      {/* Desktop: Split view */}
+      {!isMobile ? (
+        <div className="flex-1 flex" style={{ height: 'calc(100vh - 300px)' }}>
+          {/* Map panel */}
+          <div style={{ width: `${splitPercent}%` }} className="relative">
+            {mapComponent}
           </div>
-          {manusStatus && (manusStatus === 'running' || manusStatus === 'pending') && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex items-center gap-1.5 text-xs text-primary font-medium"
-            >
-              <Loader2 size={12} className="animate-spin" />
-              <span>Searching live sites…</span>
-            </motion.div>
-          )}
-          {manusStatus === 'completed' && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex items-center gap-1 text-xs text-emerald-600 font-medium"
-            >
-              <Zap size={12} />
-              <span>Live results</span>
-            </motion.div>
-          )}
-        </div>
 
-        {/* Split view */}
-        {showMap && !isMobile ? (
-          <div className="flex gap-4" style={{ height: 'calc(100vh - 220px)' }}>
-            <div className="w-[420px] shrink-0 overflow-y-auto pr-2 scrollbar-thin">
+          {/* Resize handle */}
+          <div
+            onMouseDown={handleMouseDown}
+            className="w-[6px] shrink-0 cursor-col-resize bg-border hover:bg-primary/30 transition-colors flex items-center justify-center group"
+          >
+            <GripVertical size={12} className="text-muted-foreground group-hover:text-primary transition-colors" />
+          </div>
+
+          {/* List panel */}
+          <div style={{ width: `${100 - splitPercent}%` }} className="overflow-y-auto p-4">
+            {statusBar}
+            {propertyList}
+          </div>
+        </div>
+      ) : (
+        /* Mobile: Map with bottom sheet */
+        <div className="flex-1 relative" style={{ height: 'calc(100vh - 250px)' }}>
+          {mobileView === 'map' ? (
+            <>
+              {/* Full-screen map */}
+              <div className="absolute inset-0">{mapComponent}</div>
+
+              {/* Bottom sheet */}
+              <motion.div
+                className="absolute bottom-0 left-0 right-0 z-20 bg-background rounded-t-2xl shadow-drawer border-t border-border"
+                animate={{ height: bottomSheetExpanded ? '60%' : 120 }}
+                transition={{ type: 'spring', damping: 25 }}
+              >
+                {/* Drag handle */}
+                <button
+                  onClick={() => setBottomSheetExpanded(!bottomSheetExpanded)}
+                  className="w-full flex justify-center py-2"
+                >
+                  <div className="w-10 h-1.5 rounded-full bg-muted" />
+                </button>
+
+                <div className="px-4 pb-2 flex items-center justify-between">
+                  <span className="text-sm font-medium text-foreground">
+                    {filteredProperties.length} properties
+                  </span>
+                  <button
+                    onClick={() => setMobileView('list')}
+                    className="text-xs text-primary font-medium"
+                  >
+                    View list
+                  </button>
+                </div>
+
+                <div className="overflow-y-auto px-4 pb-20" style={{ maxHeight: bottomSheetExpanded ? 'calc(100% - 60px)' : '40px' }}>
+                  {propertyList}
+                </div>
+              </motion.div>
+
+              {/* FAB for voice search */}
+              <button
+                onClick={() => {
+                  const hero = document.querySelector('[aria-label="Start voice search"]') as HTMLButtonElement;
+                  if (hero) { window.scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(() => hero.click(), 500); }
+                }}
+                className="absolute bottom-[140px] right-4 z-20 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-elevated flex items-center justify-center"
+              >
+                <Mic size={22} />
+              </button>
+            </>
+          ) : (
+            /* List-only mobile */
+            <div className="p-4 overflow-y-auto h-full pb-24">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium text-foreground">{filteredProperties.length} properties</span>
+                <button onClick={() => setMobileView('map')} className="flex items-center gap-1.5 text-xs text-primary font-medium">
+                  <Map size={14} /> Show map
+                </button>
+              </div>
               {propertyList}
             </div>
-            <div className="flex-1 min-w-0">
-              <PropertyMap
-                properties={filteredProperties}
-                onPropertySelect={setSelectedProperty}
-                selectedPropertyId={selectedProperty?.id}
-                onAreaSearch={handleAreaSearch}
-                centerOn={mapCenter}
-              />
-            </div>
-          </div>
-        ) : showMap && isMobile ? (
-          <div className="space-y-4">
-            <div className="h-[300px]">
-              <PropertyMap
-                properties={filteredProperties}
-                onPropertySelect={setSelectedProperty}
-                selectedPropertyId={selectedProperty?.id}
-                onAreaSearch={handleAreaSearch}
-                centerOn={mapCenter}
-              />
-            </div>
-            {propertyList}
-          </div>
-        ) : (
-          <div className="max-w-lg mx-auto">
-            {propertyList}
-          </div>
-        )}
-      </main>
+          )}
+        </div>
+      )}
 
       <PropertyDrawer
         property={selectedProperty}

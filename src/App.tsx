@@ -27,6 +27,7 @@ import AgentAuthPage from "./pages/AgentAuthPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import AgencyProfilePage from "./pages/AgencyProfilePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +49,7 @@ const App = () => (
               <Route path="/agents/login" element={<AgentAuthPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Route path="/agency/:slug" element={<AgencyProfilePage />} />
 
               {/* Authenticated */}
               <Route path="/saved" element={<ProtectedRoute><SavedPage /></ProtectedRoute>} />

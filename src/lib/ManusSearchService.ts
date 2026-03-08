@@ -1,12 +1,11 @@
 /**
- * ManusSearchService — Connects to the Manus API via a secure edge function.
+ * ManusSearchService — Connects to the Manus API via secure edge functions.
  * 
  * Flow:
- * 1. Frontend sends natural language query to the manus-search edge function
- * 2. Edge function forwards to POST https://open.manus.im/v1/tasks
- * 3. Results are parsed and normalized into Property objects
- * 
- * Falls back to filtered mock data if the API call fails.
+ * 1. Frontend sends query → manus-search edge function → Manus creates task
+ * 2. Frontend polls manus-task-status until completed/failed
+ * 3. Results are parsed into Property objects
+ * 4. Falls back to mock data if API unavailable or task fails
  */
 
 import { Property } from './types';
@@ -23,62 +22,169 @@ export interface ManusSearchResult {
   query: string;
   totalResults: number;
   source: 'mock' | 'manus';
+  taskId?: string;
+  status?: 'pending' | 'running' | 'completed' | 'failed' | 'mock';
 }
 
+type StatusCallback = (update: { status: string; properties?: Property[] }) => void;
+
+const POLL_INTERVAL = 3000;
+const MAX_POLL_TIME = 120000; // 2 minutes
+
 class ManusSearchService {
-  async search(params: ManusSearchParams): Promise<ManusSearchResult> {
+  private activePolls = new Map<string, boolean>();
+
+  /**
+   * Start a search. Returns mock results immediately, then polls Manus for live data.
+   * Call onUpdate to receive live results when Manus completes.
+   */
+  async search(
+    params: ManusSearchParams,
+    onUpdate?: StatusCallback
+  ): Promise<ManusSearchResult> {
+    // Get mock results for immediate display
+    const mockResult = await this.mockSearch(params);
+
+    // Fire off Manus task in background
+    this.startManusSearch(params, onUpdate).catch((err) =>
+      console.warn('Manus background search failed:', err)
+    );
+
+    return {
+      ...mockResult,
+      status: 'pending',
+    };
+  }
+
+  private async startManusSearch(
+    params: ManusSearchParams,
+    onUpdate?: StatusCallback
+  ) {
     try {
-      // Call the edge function
       const { data, error } = await supabase.functions.invoke('manus-search', {
         body: { query: params.query, language: params.language },
       });
 
-      if (error) {
-        console.warn('Manus edge function error, falling back to mock:', error);
-        return this.mockSearch(params);
+      if (error || !data?.taskId) {
+        console.warn('Manus task creation failed:', error || 'No taskId');
+        return;
       }
 
-      console.log('Manus API response:', data);
+      const taskId = data.taskId;
+      console.log('Manus task created:', taskId);
+      onUpdate?.({ status: 'running' });
 
-      // If Manus returned property data, try to parse it
-      if (data?.data && data.source === 'manus') {
-        const properties = this.parseManusResponse(data.data);
-        if (properties.length > 0) {
-          return {
-            properties,
-            query: params.query,
-            totalResults: properties.length,
-            source: 'manus',
-          };
-        }
-      }
-
-      // Fallback to mock if no usable results
-      return this.mockSearch(params);
+      // Start polling
+      await this.pollTaskStatus(taskId, onUpdate);
     } catch (err) {
-      console.warn('Search failed, using mock data:', err);
-      return this.mockSearch(params);
+      console.warn('Manus search error:', err);
     }
   }
 
-  private parseManusResponse(manusData: any): Property[] {
-    try {
-      // Manus may return data in various formats — try to extract properties
-      let rawProperties: any[] = [];
+  private async pollTaskStatus(taskId: string, onUpdate?: StatusCallback) {
+    // Cancel any existing poll for this query
+    this.activePolls.set(taskId, true);
 
-      if (Array.isArray(manusData)) {
-        rawProperties = manusData;
-      } else if (manusData.properties && Array.isArray(manusData.properties)) {
-        rawProperties = manusData.properties;
-      } else if (manusData.result) {
-        // Try to parse result as JSON if it's a string
-        const parsed = typeof manusData.result === 'string' 
-          ? JSON.parse(manusData.result) 
-          : manusData.result;
-        rawProperties = Array.isArray(parsed) ? parsed : [];
+    const startTime = Date.now();
+
+    while (this.activePolls.get(taskId) && Date.now() - startTime < MAX_POLL_TIME) {
+      await new Promise((r) => setTimeout(r, POLL_INTERVAL));
+
+      if (!this.activePolls.get(taskId)) break;
+
+      try {
+        const { data, error } = await supabase.functions.invoke('manus-task-status', {
+          body: { taskId },
+        });
+
+        if (error) {
+          console.warn('Poll error:', error);
+          continue;
+        }
+
+        console.log('Manus task poll:', data?.status);
+
+        if (data?.status === 'completed') {
+          this.activePolls.delete(taskId);
+          const properties = this.parseManusOutput(data.output);
+          onUpdate?.({ status: 'completed', properties });
+          return;
+        }
+
+        if (data?.status === 'failed') {
+          this.activePolls.delete(taskId);
+          console.warn('Manus task failed:', data.error);
+          onUpdate?.({ status: 'failed' });
+          return;
+        }
+
+        // Still pending/running
+        onUpdate?.({ status: data?.status || 'running' });
+      } catch (err) {
+        console.warn('Poll iteration error:', err);
+      }
+    }
+
+    this.activePolls.delete(taskId);
+  }
+
+  /** Stop all active polls (e.g., when user starts a new search) */
+  cancelPolling() {
+    this.activePolls.clear();
+  }
+
+  private parseManusOutput(output: any): Property[] {
+    try {
+      if (!output) return [];
+
+      // Manus output can be messages array or direct data
+      let rawData: any = output;
+
+      // If output is an array of messages, find the one with JSON content
+      if (Array.isArray(output)) {
+        for (const msg of output) {
+          const content = msg.content || msg.text || msg;
+          if (typeof content === 'string') {
+            // Try to extract JSON from the message
+            const jsonMatch = content.match(/\[[\s\S]*\]/);
+            if (jsonMatch) {
+              try {
+                rawData = JSON.parse(jsonMatch[0]);
+                break;
+              } catch { /* continue */ }
+            }
+            // Try parsing entire content as JSON
+            try {
+              rawData = JSON.parse(content);
+              break;
+            } catch { /* continue */ }
+          } else if (typeof content === 'object') {
+            rawData = content;
+            break;
+          }
+        }
       }
 
-      return rawProperties.map((p: any, i: number) => ({
+      // If it's a string, try to parse
+      if (typeof rawData === 'string') {
+        const jsonMatch = rawData.match(/\[[\s\S]*\]/);
+        rawData = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(rawData);
+      }
+
+      // Extract properties array
+      let properties: any[] = [];
+      if (Array.isArray(rawData)) {
+        properties = rawData;
+      } else if (rawData?.properties && Array.isArray(rawData.properties)) {
+        properties = rawData.properties;
+      } else if (rawData?.result) {
+        const parsed = typeof rawData.result === 'string'
+          ? JSON.parse(rawData.result)
+          : rawData.result;
+        properties = Array.isArray(parsed) ? parsed : [];
+      }
+
+      return properties.map((p: any, i: number) => ({
         id: p.id || `manus-${i}-${Date.now()}`,
         title: p.title || p.address || 'Property',
         address: p.address || '',
@@ -111,42 +217,39 @@ class ManusSearchService {
         contactClicks: 0,
       }));
     } catch (err) {
-      console.warn('Failed to parse Manus response:', err);
+      console.warn('Failed to parse Manus output:', err);
       return [];
     }
   }
 
   private async mockSearch(params: ManusSearchParams): Promise<ManusSearchResult> {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 700));
+    await new Promise((resolve) => setTimeout(resolve, 600 + Math.random() * 400));
 
     const query = params.query.toLowerCase();
     let filtered = mockProperties;
 
-    // Filter by location
     const locations = ['berwick', 'officer', 'south yarra', 'daylesford', 'victoria', 'melbourne'];
-    const matchedLocation = locations.find(loc => query.includes(loc));
+    const matchedLocation = locations.find((loc) => query.includes(loc));
     if (matchedLocation) {
-      filtered = filtered.filter(p =>
-        p.suburb.toLowerCase().includes(matchedLocation) ||
-        p.state.toLowerCase().includes(matchedLocation) ||
-        p.address.toLowerCase().includes(matchedLocation)
+      filtered = filtered.filter(
+        (p) =>
+          p.suburb.toLowerCase().includes(matchedLocation) ||
+          p.state.toLowerCase().includes(matchedLocation) ||
+          p.address.toLowerCase().includes(matchedLocation)
       );
     }
 
-    // Filter by bedrooms
     const bedMatch = query.match(/(\d+)\s*(?:bed|bedroom|br|room)/i);
     if (bedMatch) {
       const beds = parseInt(bedMatch[1]);
-      filtered = filtered.filter(p => p.beds >= beds);
+      filtered = filtered.filter((p) => p.beds >= beds);
     }
 
-    // Filter by price
     const priceMatch = query.match(/\$?([\d,]+)k?/i);
     if (priceMatch) {
       let price = parseInt(priceMatch[1].replace(/,/g, ''));
       if (price < 10000) price *= 1000;
-      filtered = filtered.filter(p => p.price <= price * 1.15);
+      filtered = filtered.filter((p) => p.price <= price * 1.15);
     }
 
     if (filtered.length === 0) filtered = mockProperties;

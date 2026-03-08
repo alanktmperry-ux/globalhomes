@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, MapPin, Sparkles } from 'lucide-react';
+import { ArrowRight, MapPin, Sparkles, Loader2, Zap } from 'lucide-react';
 import { SearchBar } from '@/components/SearchBar';
 import { PropertyCard } from '@/components/PropertyCard';
 import { PropertyCardSkeleton } from '@/components/PropertyCardSkeleton';
@@ -13,31 +13,47 @@ import { useSavedProperties } from '@/hooks/useSavedProperties';
 import { manusSearch } from '@/lib/ManusSearchService';
 import { Property } from '@/lib/types';
 import { mockProperties } from '@/lib/mock-data';
+import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
   const { t } = useI18n();
   const { addSearch, lastSearch } = useSearchHistory();
   const { isSaved, toggleSaved } = useSavedProperties();
+  const { toast } = useToast();
 
   const [results, setResults] = useState<Property[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [manusStatus, setManusStatus] = useState<string | null>(null);
 
   const handleSearch = useCallback(async (query: string) => {
     setIsSearching(true);
     setHasSearched(true);
+    setManusStatus(null);
     addSearch(query);
+    manusSearch.cancelPolling();
 
     try {
-      const result = await manusSearch.search({ query });
+      const result = await manusSearch.search({ query }, (update) => {
+        setManusStatus(update.status);
+        if (update.status === 'completed' && update.properties && update.properties.length > 0) {
+          setResults(update.properties);
+          toast({
+            title: '🔍 Live results ready',
+            description: `Found ${update.properties.length} properties from real estate sites`,
+          });
+        } else if (update.status === 'failed') {
+          setManusStatus(null);
+        }
+      });
       setResults(result.properties);
     } catch {
       setResults([]);
     } finally {
       setIsSearching(false);
     }
-  }, [addSearch]);
+  }, [addSearch, toast]);
 
   // Recommended properties (just show a subset for now)
   const recommended = mockProperties.slice(0, 3);
@@ -85,7 +101,29 @@ const Index = () => {
         {/* Search results */}
         {hasSearched && (
           <div className="mb-6">
-            <h2 className="font-display font-semibold text-foreground mb-3">{t('search.results')}</h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-display font-semibold text-foreground">{t('search.results')}</h2>
+            {manusStatus && (manusStatus === 'running' || manusStatus === 'pending') && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex items-center gap-1.5 text-xs text-primary font-medium"
+              >
+                <Loader2 size={12} className="animate-spin" />
+                <span>Searching live sites…</span>
+              </motion.div>
+            )}
+            {manusStatus === 'completed' && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex items-center gap-1 text-xs text-emerald-600 font-medium"
+              >
+                <Zap size={12} />
+                <span>Live results</span>
+              </motion.div>
+            )}
+          </div>
             {isSearching ? (
               <div className="space-y-4">
                 {[0, 1, 2].map(i => <PropertyCardSkeleton key={i} />)}

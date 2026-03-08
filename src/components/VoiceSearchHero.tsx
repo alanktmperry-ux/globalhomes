@@ -412,7 +412,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
                       className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
                         lang.code === selectedLang
                           ? 'bg-primary/20 text-primary'
-                          : 'text-voice-muted hover:text-voice-text hover:bg-voice-surface'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                       }`}
                     >
                       {lang.flag} {lang.label}

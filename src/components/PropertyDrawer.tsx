@@ -120,7 +120,10 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave }: Pro
               <div className="p-5 space-y-5">
                 {/* Price and title */}
                 <div>
-                  <p className="font-display text-2xl font-bold text-foreground">{property.priceFormatted}</p>
+                  <p className="font-display text-2xl font-bold text-foreground">{formatPrice(property.price)}</p>
+                  {currency.code !== 'AUD' && (
+                    <p className="text-xs text-muted-foreground">{property.priceFormatted} AUD</p>
+                  )}
                   <h2 className="font-display text-lg font-semibold text-foreground mt-1">{property.title}</h2>
                   <p className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
                     <MapPin size={14} />

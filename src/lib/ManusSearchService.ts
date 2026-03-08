@@ -66,7 +66,8 @@ class ManusSearchService {
       });
 
       if (error || !data?.taskId) {
-        console.warn('Manus task creation failed:', error || 'No taskId');
+        console.warn('Manus task creation failed, using sample data:', error || data?.error || 'No taskId');
+        onUpdate?.({ status: 'failed' });
         return;
       }
 

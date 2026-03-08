@@ -234,6 +234,7 @@ const Index = () => {
                 onPropertySelect={setSelectedProperty}
                 selectedPropertyId={selectedProperty?.id}
                 onAreaSearch={handleAreaSearch}
+                centerOn={mapCenter}
               />
             </div>
           </div>

@@ -64,7 +64,9 @@ const Index = () => {
     manusSearch.cancelPolling();
 
     try {
+      console.log('[Search] Starting search for:', query);
       const result = await manusSearch.search({ query }, (update) => {
+        console.log('[Search] Update:', update.status, 'properties:', update.properties?.length);
         setManusStatus(update.status);
         if (update.status === 'completed' && update.properties && update.properties.length > 0) {
           setResults(update.properties);
@@ -80,8 +82,10 @@ const Index = () => {
           });
         }
       });
+      console.log('[Search] Mock result:', result.properties.length, 'properties');
       setResults(result.properties);
-    } catch {
+    } catch (err) {
+      console.error('[Search] Error:', err);
       setResults([]);
     } finally {
       setIsSearching(false);

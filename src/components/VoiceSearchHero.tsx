@@ -347,7 +347,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
               key="results"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="text-emerald-400 text-sm font-medium mb-2"
+              className="text-emerald-600 text-sm font-medium mb-2"
             >
               Found {resultCount} properties matching your voice search
             </motion.p>

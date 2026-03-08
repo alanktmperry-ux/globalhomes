@@ -63,6 +63,8 @@ const Index = () => {
   const [splitPercent, setSplitPercent] = useState(55);
   const [bottomSheetExpanded, setBottomSheetExpanded] = useState(false);
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'newest' | 'beds'>('default');
+  const [filters, setFilters] = useState<Filters>(defaultFilters);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const isDragging = useRef(false);
   const cardRefs = useRef<globalThis.Map<string, HTMLDivElement>>(new globalThis.Map());
 

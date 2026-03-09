@@ -16,7 +16,11 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const { userId, email, fullName, phone, mode, agencyName, agencyEmail, inviteCode } = await req.json();
+    const {
+      userId, email, fullName, phone, mode,
+      agencyName, agencyEmail, inviteCode,
+      licenseNumber, officeAddress, yearsExperience, specialization,
+    } = await req.json();
 
     if (!userId || !email || !mode) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {
@@ -30,6 +34,13 @@ Deno.serve(async (req) => {
       .from("user_roles")
       .insert({ user_id: userId, role: "agent" });
     if (roleError && !roleError.message.includes("duplicate")) throw roleError;
+
+    const agentExtras = {
+      license_number: licenseNumber || null,
+      office_address: officeAddress || null,
+      years_experience: yearsExperience ? parseInt(yearsExperience, 10) : null,
+      specialization: specialization || "Residential",
+    };
 
     if (mode === "create-agency") {
       if (!agencyName?.trim()) throw new Error("Agency name is required");
@@ -63,6 +74,7 @@ Deno.serve(async (req) => {
           email,
           phone: phone || null,
           agency_id: agency.id,
+          ...agentExtras,
         });
       if (agentError) throw agentError;
 
@@ -102,6 +114,7 @@ Deno.serve(async (req) => {
           email,
           phone: phone || null,
           agency_id: invite.agency_id,
+          ...agentExtras,
         });
       if (agentError) throw agentError;
 

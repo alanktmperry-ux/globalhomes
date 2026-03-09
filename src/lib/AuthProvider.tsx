@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          setTimeout(() => fetchRoles(session.user.id), 0);
+          await fetchRoles(session.user.id);
         } else {
           setIsAgent(false);
           setIsAdmin(false);
@@ -64,10 +64,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      if (!session) setLoading(false);
+      if (session?.user) {
+        await fetchRoles(session.user.id);
+      }
+      setLoading(false);
     });
 
     return () => subscription.unsubscribe();

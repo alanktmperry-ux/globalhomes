@@ -95,6 +95,19 @@ Deno.serve(async (req) => {
       });
     }
 
+    if (action === "reset_password") {
+      const { email } = await req.json();
+      const { data, error } = await supabase.auth.admin.generateLink({
+        type: "recovery",
+        email,
+        options: { redirectTo: "https://world-property-pulse.lovable.app/reset-password" },
+      });
+      if (error) throw error;
+      return new Response(JSON.stringify({ success: true, message: `Recovery link generated for ${email}` }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (action === "table_stats") {
       const tables = ['profiles', 'properties', 'agents', 'leads', 'voice_searches', 'saved_properties', 'user_roles', 'lead_events'];
       const stats: Record<string, number> = {};

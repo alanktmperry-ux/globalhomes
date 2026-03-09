@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Lock } from 'lucide-react';
+import { Lock, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -11,47 +11,46 @@ const ResetPasswordPage = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
+  const [expired, setExpired] = useState(false);
 
   useEffect(() => {
     let mounted = true;
 
-    // Listen for auth events — PASSWORD_RECOVERY or INITIAL_SESSION after recovery
+    // Check hash for errors (token already consumed by email client prefetch)
+    const hash = window.location.hash;
+    if (hash.includes('error=') || hash.includes('error_code=')) {
+      setExpired(true);
+      return;
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return;
       if (event === 'PASSWORD_RECOVERY') {
         setReady(true);
       }
-      // INITIAL_SESSION fires after the client processes the hash fragment
-      if (event === 'INITIAL_SESSION' && session) {
-        setReady(true);
-      }
-      // SIGNED_IN can also fire when recovery token is exchanged
-      if (event === 'SIGNED_IN' && session) {
+      if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && session) {
         setReady(true);
       }
     });
 
-    // Check hash as fallback
-    if (window.location.hash.includes('type=recovery')) {
+    if (hash.includes('type=recovery')) {
       setReady(true);
     }
 
-    // Poll for session as final fallback (handles case where events already fired)
-    const checkSession = () => {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (mounted && session) {
-          setReady(true);
-        }
-      });
-    };
-    // Check immediately and after a delay to catch async hash processing
-    checkSession();
-    const timer = setTimeout(checkSession, 1500);
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (mounted && session) setReady(true);
+    });
+
+    // Timeout: if nothing works after 5s, show expired message
+    const timeout = setTimeout(() => {
+      if (mounted && !ready) setExpired(true);
+    }, 5000);
 
     return () => {
       mounted = false;
       subscription.unsubscribe();
-      clearTimeout(timer);
+      clearTimeout(timeout);
     };
   }, []);
 
@@ -69,6 +68,26 @@ const ResetPasswordPage = () => {
       setLoading(false);
     }
   };
+
+  if (expired) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-sm w-full text-center space-y-4">
+          <AlertTriangle size={40} className="mx-auto text-destructive" />
+          <h1 className="font-display text-xl font-bold text-foreground">Reset link expired</h1>
+          <p className="text-sm text-muted-foreground">
+            This password reset link has expired or was already used. Some email clients pre-scan links which can invalidate them.
+          </p>
+          <button
+            onClick={() => navigate('/forgot-password')}
+            className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm"
+          >
+            Request a new reset link
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
 
   if (!ready) {
     return (

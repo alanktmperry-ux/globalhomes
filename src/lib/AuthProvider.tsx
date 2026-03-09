@@ -63,29 +63,48 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
+    let initialSessionHandled = false;
+
     // Set up auth listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
+        console.log('[Auth] onAuthStateChange event:', _event, 'user:', session?.user?.id ?? 'none');
         setSession(session);
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          await fetchRoles(session.user.id);
+          try {
+            await fetchRoles(session.user.id);
+          } catch (err) {
+            console.error('[Auth] fetchRoles error in listener:', err);
+          }
         } else {
           clearRoles();
         }
 
         setLoading(false);
+        initialSessionHandled = true;
       }
     );
 
     // Then get initial session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        await fetchRoles(session.user.id);
+      console.log('[Auth] getSession result, user:', session?.user?.id ?? 'none');
+      // Only handle if onAuthStateChange hasn't fired yet
+      if (!initialSessionHandled) {
+        setSession(session);
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          try {
+            await fetchRoles(session.user.id);
+          } catch (err) {
+            console.error('[Auth] fetchRoles error in getSession:', err);
+          }
+        }
+        setLoading(false);
       }
+    }).catch((err) => {
+      console.error('[Auth] getSession failed:', err);
       setLoading(false);
     });
 

@@ -426,19 +426,12 @@ const ProfilePage = () => {
               <h3 className="font-display text-sm font-bold flex items-center gap-1.5">
                 <MapPin size={14} /> Service Areas
               </h3>
-              <div className="flex flex-wrap gap-2">
-                {serviceAreas.map(a => (
-                  <Badge key={a} className="bg-primary/10 text-primary border-primary/20 gap-1">
-                    {a}
-                    <button onClick={() => setServiceAreas(prev => prev.filter(x => x !== a))} className="ml-0.5 hover:text-destructive">×</button>
-                  </Badge>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <Input value={newArea} onChange={e => setNewArea(e.target.value)} placeholder="Add suburb or city" className="max-w-xs"
-                  onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addArea())} />
-                <Button variant="outline" size="sm" onClick={addArea}><Plus size={14} /></Button>
-              </div>
+              <p className="text-xs text-muted-foreground">Search or click on the map to add your service areas.</p>
+              <ServiceAreaMapPicker
+                serviceAreas={serviceAreas}
+                onAreasChange={setServiceAreas}
+                maxAreas={10}
+              />
             </div>
 
             {/* Social Links */}

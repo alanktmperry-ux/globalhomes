@@ -197,7 +197,13 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
       setTranscript('');
       setConfidence(null);
       setFilterChips([]);
-    } catch {
+    } catch (err) {
+      console.error('[VoiceSearch] Failed to start:', err);
+      toast({
+        title: '🎙️ Voice Unavailable',
+        description: 'Voice search requires microphone access. Please use the published site in Chrome, or type your search below.',
+        variant: 'destructive',
+      });
       setShowTextInput(true);
     }
   }, [isSupported, selectedLang, processTranscript, toast, voiceState, transcript]);

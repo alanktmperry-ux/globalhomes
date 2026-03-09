@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
           name: agencyName,
           slug,
           owner_user_id: userId,
-          email: agencyEmail || null,
+          email: agencyEmail || email || null,
         })
         .select()
         .single();

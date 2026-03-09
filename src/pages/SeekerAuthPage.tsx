@@ -247,11 +247,16 @@ const SeekerAuthPage = () => {
           )}
 
           {/* Agent link — visually distinct */}
-          <div className="mt-8 pt-6 border-t border-border text-center">
-            <p className="text-xs text-muted-foreground">
-              Are you a real estate agent?{' '}
-              <Link to="/agents/login" className="text-primary font-semibold underline underline-offset-2">Agent sign in →</Link>
-            </p>
+          <div className="mt-8 pt-6 border-t border-border">
+            <Link to="/agents/login" className="flex items-center gap-3 p-4 rounded-2xl border border-border hover:border-primary/50 transition-colors group">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                <Building2 size={18} className="text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">Are you a real estate agent?</p>
+                <p className="text-xs text-muted-foreground">Sign in to your Agent Portal →</p>
+              </div>
+            </Link>
           </div>
         </motion.div>
       </main>

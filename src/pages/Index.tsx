@@ -62,7 +62,7 @@ const Index = () => {
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key: number } | null>(null);
   const [splitPercent, setSplitPercent] = useState(50);
   const [mapFullscreen, setMapFullscreen] = useState(false);
-  const [mapCollapsed, setMapCollapsed] = useState(false);
+  const [mapCollapsed, setMapCollapsed] = useState(true); // Collapsed by default to maximize property space
   const [bottomSheetExpanded, setBottomSheetExpanded] = useState(false);
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'newest' | 'beds'>('default');
   const [filters, setFilters] = useState<Filters>(defaultFilters);

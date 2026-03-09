@@ -95,6 +95,18 @@ Deno.serve(async (req) => {
       });
     }
 
+    if (action === "reset_password") {
+      const { email } = await req.json();
+      // Use anon client to trigger the standard recovery email flow
+      const { error } = await anonClient.auth.resetPasswordForEmail(email, {
+        redirectTo: "https://world-property-pulse.lovable.app/reset-password",
+      });
+      if (error) throw error;
+      return new Response(JSON.stringify({ success: true, message: `Recovery email sent to ${email}` }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (action === "table_stats") {
       const tables = ['profiles', 'properties', 'agents', 'leads', 'voice_searches', 'saved_properties', 'user_roles', 'lead_events'];
       const stats: Record<string, number> = {};

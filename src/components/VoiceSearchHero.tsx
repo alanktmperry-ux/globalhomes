@@ -78,6 +78,29 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
     return () => clearInterval(interval);
   }, []);
 
+  // Autocomplete for text input
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (textQuery.length < 2) { setSuggestions([]); return; }
+    debounceRef.current = setTimeout(async () => {
+      const results = await autocomplete(textQuery);
+      setSuggestions(results);
+      setShowSuggestions(results.length > 0);
+    }, 300);
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, [textQuery]);
+
+  // Close suggestions on click outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   // Update state when external search completes
   useEffect(() => {
     if (!isSearching && voiceState === 'processing') {

@@ -13,27 +13,46 @@ const ResetPasswordPage = () => {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // Always listen for PASSWORD_RECOVERY event (primary method)
+    let mounted = true;
+
+    // Listen for auth events — PASSWORD_RECOVERY or INITIAL_SESSION after recovery
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!mounted) return;
       if (event === 'PASSWORD_RECOVERY') {
         setReady(true);
       }
-    });
-
-    // Also check hash as fallback
-    const hash = window.location.hash;
-    if (hash.includes('type=recovery')) {
-      setReady(true);
-    }
-
-    // Check if user already has a session (recovery link was already processed)
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session && window.location.pathname === '/reset-password') {
+      // INITIAL_SESSION fires after the client processes the hash fragment
+      if (event === 'INITIAL_SESSION' && session) {
+        setReady(true);
+      }
+      // SIGNED_IN can also fire when recovery token is exchanged
+      if (event === 'SIGNED_IN' && session) {
         setReady(true);
       }
     });
 
-    return () => subscription.unsubscribe();
+    // Check hash as fallback
+    if (window.location.hash.includes('type=recovery')) {
+      setReady(true);
+    }
+
+    // Poll for session as final fallback (handles case where events already fired)
+    const checkSession = () => {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (mounted && session) {
+          setReady(true);
+        }
+      });
+    };
+    // Check immediately and after a delay to catch async hash processing
+    checkSession();
+    const timer = setTimeout(checkSession, 1500);
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+      clearTimeout(timer);
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {

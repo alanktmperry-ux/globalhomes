@@ -24,6 +24,7 @@ import SettingsPage from "./components/agent-dashboard/SettingsPage";
 import TeamPage from "./components/agent-dashboard/TeamPage";
 import SeekerAuthPage from "./pages/SeekerAuthPage";
 import AgentAuthPage from "./pages/AgentAuthPage";
+import AuthLandingPage from "./pages/AuthLandingPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";

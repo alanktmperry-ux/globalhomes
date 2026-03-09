@@ -135,14 +135,14 @@ const SeekerAuthPage = () => {
           </form>
 
           <p className="text-center text-sm text-muted-foreground mt-6">
-            {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
+            {mode === 'login' ? "Start your property search — " : 'Already have an account? '}
             <button onClick={() => setMode(mode === 'login' ? 'signup' : 'login')} className="text-primary font-medium">
-              {mode === 'login' ? 'Sign up' : 'Sign in'}
+              {mode === 'login' ? 'Sign up free' : 'Sign in'}
             </button>
           </p>
 
           <p className="text-center text-sm text-muted-foreground mt-3">
-            Are you an agent? <Link to="/agents/login" className="text-primary font-medium">Sign in here</Link>
+            List & sell properties — <Link to="/agents/login" className="text-primary font-medium">Agent sign in</Link>
           </p>
         </motion.div>
       </main>

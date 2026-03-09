@@ -147,13 +147,17 @@ export type Database = {
           email: string | null
           id: string
           is_subscribed: boolean
+          license_number: string | null
           name: string
+          office_address: string | null
           phone: string | null
+          specialization: string | null
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           subscription_expires_at: string | null
           updated_at: string
           user_id: string
+          years_experience: number | null
         }
         Insert: {
           agency?: string | null
@@ -163,13 +167,17 @@ export type Database = {
           email?: string | null
           id?: string
           is_subscribed?: boolean
+          license_number?: string | null
           name: string
+          office_address?: string | null
           phone?: string | null
+          specialization?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscription_expires_at?: string | null
           updated_at?: string
           user_id: string
+          years_experience?: number | null
         }
         Update: {
           agency?: string | null
@@ -179,13 +187,17 @@ export type Database = {
           email?: string | null
           id?: string
           is_subscribed?: boolean
+          license_number?: string | null
           name?: string
+          office_address?: string | null
           phone?: string | null
+          specialization?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscription_expires_at?: string | null
           updated_at?: string
           user_id?: string
+          years_experience?: number | null
         }
         Relationships: [
           {

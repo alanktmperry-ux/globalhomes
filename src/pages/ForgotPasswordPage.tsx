@@ -16,8 +16,13 @@ const ForgotPasswordPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
+      // Always use the published URL so the reset link doesn't hit the preview auth gate
+      const publishedOrigin = 'https://world-property-pulse.lovable.app';
+      const origin = window.location.hostname.includes('lovable.app') && window.location.hostname.includes('preview')
+        ? publishedOrigin
+        : window.location.origin;
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `${origin}/reset-password`,
       });
       if (error) throw error;
       setSent(true);

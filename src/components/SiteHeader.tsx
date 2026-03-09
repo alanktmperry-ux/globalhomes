@@ -103,14 +103,17 @@ export function SiteHeader() {
             </AnimatePresence>
           </div>
 
-          {/* Role badge */}
+          {/* Role badge — links to dashboard for agents */}
           {user && userRole && (
-            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary">
+            <button
+              onClick={() => navigate(isAgent ? '/dashboard' : '/saved')}
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors cursor-pointer"
+            >
               {isAgent ? <Building2 size={13} /> : <Home size={13} />}
               <span className="text-[11px] font-semibold uppercase tracking-wide">
-                {isAgent ? 'Agent' : 'Buyer'}
+                {isAgent ? 'Dashboard' : 'Buyer'}
               </span>
-            </div>
+            </button>
           )}
 
           {/* User button */}

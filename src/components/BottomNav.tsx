@@ -1,4 +1,4 @@
-import { Search, Heart, MessageCircle, User, LogIn, Shield } from 'lucide-react';
+import { Search, Heart, MessageCircle, User, LogIn, Shield, Building2 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthProvider';

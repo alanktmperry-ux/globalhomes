@@ -176,6 +176,53 @@ export type Database = {
           },
         ]
       }
+      agent_locations: {
+        Row: {
+          address: string
+          agent_id: string
+          created_at: string
+          email: string | null
+          id: string
+          lat: number
+          lng: number
+          name: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          agent_id: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          lat: number
+          lng: number
+          name: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          agent_id?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          lat?: number
+          lng?: number
+          name?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_locations_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agent_subscriptions: {
         Row: {
           agent_id: string

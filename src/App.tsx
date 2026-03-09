@@ -26,6 +26,7 @@ import AgentProfilePage from "./components/agent-dashboard/ProfilePage";
 import DocumentsPage from "./components/agent-dashboard/DocumentsPage";
 import BillingPage from "./components/agent-dashboard/BillingPage";
 import ReviewsPage from "./components/agent-dashboard/ReviewsPage";
+import TerritoryPage from "./components/agent-dashboard/TerritoryPage";
 import SeekerAuthPage from "./pages/SeekerAuthPage";
 import AgentAuthPage from "./pages/AgentAuthPage";
 import AuthLandingPage from "./pages/AuthLandingPage";
@@ -68,6 +69,7 @@ const App = () => (
               <Route path="/dashboard" element={<ProtectedRoute requireAgent><AgentDashboardLayout /></ProtectedRoute>}>
                 <Route index element={<DashboardOverview />} />
                 <Route path="profile" element={<AgentProfilePage />} />
+                <Route path="territory" element={<TerritoryPage />} />
                 <Route path="listings" element={<ListingsPage />} />
                 <Route path="leads" element={<VoiceLeadsPage />} />
                 <Route path="analytics" element={<AnalyticsPage />} />

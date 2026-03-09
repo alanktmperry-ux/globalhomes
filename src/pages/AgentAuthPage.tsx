@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Lock, User, Building2, Phone, KeyRound, Plus } from 'lucide-react';
+import PhoneInput from '@/components/PhoneInput';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
@@ -236,7 +237,7 @@ const AgentAuthPage = () => {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Phone Number</label>
-                  <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputClass} />
+                  <PhoneInput value={phone} onChange={setPhone} />
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Password<span className="text-destructive">*</span></label>
@@ -271,7 +272,7 @@ const AgentAuthPage = () => {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Phone Number</label>
-                  <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputClass} />
+                  <PhoneInput value={phone} onChange={setPhone} />
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Password<span className="text-destructive">*</span></label>

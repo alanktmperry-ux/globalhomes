@@ -1,14 +1,66 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Eye, MousePointerClick, TrendingUp, Crown } from 'lucide-react';
+import { ArrowLeft, Eye, MousePointerClick, TrendingUp, Crown, Loader2, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useI18n } from '@/lib/i18n';
 import { mockProperties } from '@/lib/mock-data';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/lib/AuthProvider';
+import { useToast } from '@/hooks/use-toast';
 
 const AgentPortalPage = () => {
   const { t } = useI18n();
+  const { user } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const [tab, setTab] = useState<'dashboard' | 'subscribe'>('dashboard');
+  const [subscribing, setSubscribing] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
+  useEffect(() => {
+    if (user) checkSubscription();
+  }, [user]);
+
+  const checkSubscription = async () => {
+    if (!user) return;
+    const { data: agent } = await supabase.from('agents').select('id, is_subscribed').eq('user_id', user.id).maybeSingle();
+    if (agent?.is_subscribed) setIsSubscribed(true);
+  };
+
+  const handleSubscribe = async () => {
+    if (!user) { toast({ title: 'Please log in first' }); return; }
+    setSubscribing(true);
+    try {
+      // Get or create agent record
+      let { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
+      if (!agent) {
+        const { data: newAgent, error } = await supabase.from('agents').insert({ user_id: user.id, name: user.email || 'Agent', email: user.email }).select('id').single();
+        if (error) throw error;
+        agent = newAgent;
+      }
+
+      // Create subscription
+      const subEnd = new Date();
+      subEnd.setMonth(subEnd.getMonth() + 1);
+      await supabase.from('agent_subscriptions').upsert({
+        agent_id: agent!.id,
+        plan_type: 'pro',
+        listing_limit: 50,
+        subscription_end: subEnd.toISOString(),
+        auto_renew: true,
+      }, { onConflict: 'agent_id' });
+
+      // Mark agent as subscribed
+      await supabase.from('agents').update({ is_subscribed: true, subscription_expires_at: subEnd.toISOString() }).eq('id', agent!.id);
+
+      setIsSubscribed(true);
+      toast({ title: 'Subscribed!', description: 'You now have Pro Agent access.' });
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    } finally {
+      setSubscribing(false);
+    }
+  };
 
   // Mock agent data
   const agentListings = mockProperties.filter(p => p.agent.id === 'a1');
@@ -102,8 +154,12 @@ const AgentPortalPage = () => {
               </p>
               <p className="font-display text-3xl font-bold text-foreground mb-1">$49<span className="text-base font-normal text-muted-foreground">/mo</span></p>
               <p className="text-xs text-muted-foreground mb-5">Cancel anytime</p>
-              <button className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm transition-transform active:scale-[0.98]">
-                {t('agent.subscribe')}
+              <button
+                onClick={handleSubscribe}
+                disabled={subscribing || isSubscribed}
+                className={`w-full py-3 rounded-xl font-semibold text-sm transition-transform active:scale-[0.98] flex items-center justify-center gap-2 ${isSubscribed ? 'bg-success text-white' : 'bg-primary text-primary-foreground'}`}
+              >
+                {subscribing ? <><Loader2 size={16} className="animate-spin" /> Processing...</> : isSubscribed ? <><Check size={16} /> Subscribed</> : t('agent.subscribe')}
               </button>
               <ul className="mt-5 space-y-2 text-sm text-left">
                 {[

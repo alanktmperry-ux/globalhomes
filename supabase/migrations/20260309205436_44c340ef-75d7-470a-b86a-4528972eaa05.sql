@@ -1,0 +1,1 @@
+ALTER TABLE public.agent_subscriptions ADD CONSTRAINT agent_subscriptions_agent_id_unique UNIQUE (agent_id);

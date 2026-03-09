@@ -279,7 +279,7 @@ const Index = () => {
       {/* Voice Search Hero */}
       <VoiceSearchHero
         onSearch={handleSearch}
-        onLocationSelect={(loc) => setMapCenter({ lat: loc.lat, lng: loc.lng, key: Date.now() })}
+        onLocationSelect={(loc) => { setMapCenter({ lat: loc.lat, lng: loc.lng, key: Date.now() }); setMapCollapsed(false); }}
         resultCount={hasSearched ? filteredProperties.length : undefined}
         isSearching={isSearching}
       />

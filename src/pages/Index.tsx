@@ -60,7 +60,7 @@ const Index = () => {
   const [mobileView, setMobileView] = useState<'map' | 'list'>('map');
   const [areaSearch, setAreaSearch] = useState<AreaSearch | null>(null);
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key: number } | null>(null);
-  const [splitPercent, setSplitPercent] = useState(55);
+  const [splitPercent, setSplitPercent] = useState(40);
   const [bottomSheetExpanded, setBottomSheetExpanded] = useState(false);
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'newest' | 'beds'>('default');
   const [filters, setFilters] = useState<Filters>(defaultFilters);

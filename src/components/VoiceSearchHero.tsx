@@ -213,9 +213,21 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
 
   const handleTextSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setShowSuggestions(false);
     if (textQuery.trim()) {
       setTranscript(textQuery.trim());
       processTranscript(textQuery.trim());
+    }
+  };
+
+  const handleSelectSuggestion = async (suggestion: { description: string; place_id: string }) => {
+    setTextQuery(suggestion.description);
+    setShowSuggestions(false);
+    setTranscript(suggestion.description);
+    processTranscript(suggestion.description);
+    if (onLocationSelect) {
+      const details = await getPlaceDetails(suggestion.place_id);
+      if (details) onLocationSelect(details);
     }
   };
 

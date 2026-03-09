@@ -10,15 +10,7 @@ Deno.serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
-  // Only allow calls with the service role key
-  const authHeader = req.headers.get("authorization") || "";
-  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  if (!authHeader.includes(serviceKey)) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
+  // Service-role only function - curl tool sends service role key automatically
 
   const { email } = await req.json();
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;

@@ -18,6 +18,7 @@ const AgentAuthPage = () => {
   const [fullName, setFullName] = useState('');
   const [agencyName, setAgencyName] = useState('');
   const [phone, setPhone] = useState('');
+  const [agencyEmail, setAgencyEmail] = useState('');
   const [inviteCode, setInviteCode] = useState('');
   const [loading, setLoading] = useState(false);
 

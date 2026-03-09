@@ -68,7 +68,7 @@ const AgentAuthPage = () => {
       if (step === 'create-agency') {
         if (!agencyName.trim()) throw new Error('Agency name is required');
         const { data: agency, error: agencyError } = await supabase
-          .from('agencies').insert({ name: agencyName, slug: generateSlug(agencyName), owner_user_id: userId, email: agencyEmail || null }).select().single();
+          .from('agencies').insert({ name: agencyName, slug: generateSlug(agencyName), owner_user_id: userId, email: agencyEmail || null, email: agencyEmail || null }).select().single();
         if (agencyError) throw agencyError;
         await supabase.from('agency_members').insert({ agency_id: agency.id, user_id: userId, role: 'owner' as any });
         await supabase.from('agents').insert({ user_id: userId, name: fullName || email, agency: agencyName, email, phone: phone || null, agency_id: agency.id });
@@ -238,7 +238,7 @@ const AgentAuthPage = () => {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Agency Email</label>
-                  <input type="email" placeholder="info@youragency.com" className={inputClass} />
+                  <input type="email" placehvalue={agencyEmail} onChange={(e) => setAgencyEmail(e.target.value)} older="info@youragency.com" className={inputClass} />
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Phone Number</label>

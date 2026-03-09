@@ -41,7 +41,9 @@ const AgentAuthPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      console.log('[AgentAuth] Attempting sign in for:', email);
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      console.log('[AgentAuth] Sign in result:', { user: data?.user?.id, error: error?.message });
       if (error) {
         if (error.message.includes('Email not confirmed')) {
           throw new Error('Please check your email and click the confirmation link before signing in.');

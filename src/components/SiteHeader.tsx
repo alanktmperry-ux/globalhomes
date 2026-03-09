@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Globe, ChevronDown, User, LogIn } from 'lucide-react';
+import { Globe, ChevronDown, User, LogIn, Home, Building2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCurrency, CURRENCIES, CurrencyCode } from '@/lib/CurrencyContext';

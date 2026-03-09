@@ -18,18 +18,18 @@ const PLANS = [
   },
   {
     name: 'Pro',
-    price: '$29/mo',
+    price: '$499/mo',
     icon: Crown,
     popular: true,
-    features: ['50 active listings', 'Featured placement', 'Verified badge', 'Advanced analytics', 'Priority support', 'Lead scoring'],
-    listingLimit: 50,
+    features: ['10 active listings', 'Featured placement', 'Verified badge', 'Advanced analytics', 'Priority support', 'Lead scoring'],
+    listingLimit: 10,
   },
   {
     name: 'Agency',
-    price: '$99/mo',
+    price: '$999/mo',
     icon: Building2,
-    features: ['200 active listings', 'Up to 5 agents', 'All Pro features', 'Team analytics', 'White-label options', 'API access'],
-    listingLimit: 200,
+    features: ['50 active listings', 'Up to 5 agents', 'All Pro features', 'Team analytics', 'White-label options', 'API access'],
+    listingLimit: 50,
   },
 ];
 

@@ -64,30 +64,39 @@ const AgentAuthPage = () => {
       if (!data.user) throw new Error('Signup failed');
       const userId = data.user.id;
 
-      await supabase.from('user_roles').insert({ user_id: userId, role: 'agent' as any });
+      // Use edge function with service role to set up agent data (bypasses RLS when no active session)
+      const { data: setupResult, error: setupError } = await supabase.functions.invoke('setup-agent', {
+        body: {
+          userId,
+          email,
+          fullName,
+          phone,
+          mode: step,
+          agencyName,
+          agencyEmail,
+          inviteCode,
+        },
+      });
 
-      if (step === 'create-agency') {
-        if (!agencyName.trim()) throw new Error('Agency name is required');
-        const { data: agency, error: agencyError } = await supabase
-          .from('agencies').insert({ name: agencyName, slug: generateSlug(agencyName), owner_user_id: userId, email: agencyEmail || null }).select().single();
-        if (agencyError) throw agencyError;
-        await supabase.from('agency_members').insert({ agency_id: agency.id, user_id: userId, role: 'owner' as any });
-        await supabase.from('agents').insert({ user_id: userId, name: fullName || email, agency: agencyName, email, phone: phone || null, agency_id: agency.id });
-        toast({ title: 'Agency created!', description: `"${agencyName}" is ready.` });
+      if (setupError) throw new Error(setupError.message || 'Setup failed');
+      if (setupResult?.error) throw new Error(setupResult.error);
+
+      // Check if session is active (auto-confirm) or needs email verification
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (sessionData?.session) {
+        if (step === 'create-agency') {
+          toast({ title: 'Agency created!', description: `"${agencyName}" is ready.` });
+        } else {
+          toast({ title: 'Welcome to the team!', description: `You've joined ${setupResult?.agencyName || 'the agency'}.` });
+        }
+        navigate('/dashboard');
       } else {
-        if (!inviteCode.trim()) throw new Error('Invite code is required');
-        const { data: invite, error: inviteError } = await supabase
-          .from('agency_invite_codes').select('*, agencies(name)').eq('code', inviteCode.trim().toUpperCase()).eq('is_active', true).single();
-        if (inviteError || !invite) throw new Error('Invalid or expired invite code');
-        if (invite.max_uses && invite.uses >= invite.max_uses) throw new Error('This invite code has reached its usage limit');
-        if (invite.expires_at && new Date(invite.expires_at) < new Date()) throw new Error('This invite code has expired');
-        await supabase.from('agency_members').insert({ agency_id: invite.agency_id, user_id: userId, role: invite.role as any });
-        await supabase.from('agency_invite_codes').update({ uses: invite.uses + 1 }).eq('id', invite.id);
-        const agencyData = invite.agencies as any;
-        await supabase.from('agents').insert({ user_id: userId, name: fullName || email, agency: agencyData?.name || null, email, phone: phone || null, agency_id: invite.agency_id });
-        toast({ title: 'Welcome to the team!', description: `You've joined ${agencyData?.name || 'the agency'}.` });
+        toast({
+          title: 'Check your email',
+          description: 'We sent you a confirmation link. Please verify your email to sign in.',
+        });
+        setStep('email');
       }
-      navigate('/dashboard');
     } catch (err: any) {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
     } finally {

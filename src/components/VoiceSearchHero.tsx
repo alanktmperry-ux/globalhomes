@@ -522,7 +522,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
                 value={textQuery}
                 onChange={e => setTextQuery(e.target.value)}
                 onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
-                placeholder='Try "3 bed house in Berwick under $800k"'
+                placeholder="Type your property search here..."
                 className="flex-1 bg-transparent text-foreground text-sm placeholder:text-muted-foreground focus:outline-none"
               />
               {textQuery.trim() && (

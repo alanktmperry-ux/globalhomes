@@ -5,10 +5,6 @@ import {
   Instagram, Linkedin, Facebook, Twitter, FileText, Award,
 } from 'lucide-react';
 import ServiceAreaMapPicker from './ServiceAreaMapPicker';
-  User, Building2, Mail, Phone, Globe, Camera, Loader2, Shield, Star,
-  CheckCircle2, Clock, Upload, Trash2, Plus, Briefcase, MapPin, Languages,
-  Instagram, Linkedin, Facebook, Twitter, FileText, Award,
-} from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';

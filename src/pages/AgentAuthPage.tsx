@@ -80,6 +80,10 @@ const AgentAuthPage = () => {
           agencyName,
           agencyEmail,
           inviteCode,
+          licenseNumber,
+          officeAddress,
+          yearsExperience,
+          specialization,
         },
       });
 

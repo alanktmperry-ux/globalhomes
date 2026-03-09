@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, Bell, LogOut, Building2, UserPlus,
-  User, FileText, CreditCard, Star,
+  User, FileText, CreditCard, Star, MapPinned,
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {

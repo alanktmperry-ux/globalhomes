@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Building2, KeyRound, Plus } from 'lucide-react';
+import { Building2, KeyRound, Plus, BarChart3, Users, Megaphone } from 'lucide-react';
 import PhoneInput from '@/components/PhoneInput';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -109,26 +109,53 @@ const AgentAuthPage = () => {
 
   const inputClass = "w-full px-4 py-3.5 rounded-full border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40";
 
+  const features = [
+    { icon: Building2, text: 'Manage all your property listings' },
+    { icon: BarChart3, text: 'Track views, leads & analytics' },
+    { icon: Users, text: 'Build your team & grow your network' },
+    { icon: Megaphone, text: 'Capture voice-search leads automatically' },
+  ];
+
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Left hero panel — hidden on mobile */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-muted">
+    <div className="min-h-screen flex">
+      {/* Left hero panel — dark professional theme, hidden on mobile */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         <img src={agentHero} alt="Real estate professional" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
-        <div className="relative z-10 flex flex-col justify-end p-12 text-white">
-          <div className="flex items-center gap-2 mb-4">
-            <Building2 size={18} />
-            <span className="text-sm font-semibold uppercase tracking-wider">Agent Portal</span>
+        <div className="absolute inset-0 bg-gradient-to-t from-[hsl(222,47%,8%)]/95 via-[hsl(222,47%,11%)]/70 to-[hsl(222,47%,11%)]/30" />
+        <div className="relative z-10 flex flex-col justify-between p-12 text-white h-full">
+          {/* Top badge */}
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center">
+              <Building2 size={20} />
+            </div>
+            <div>
+              <span className="text-sm font-bold uppercase tracking-wider">Agent Portal</span>
+              <p className="text-white/50 text-[10px] uppercase tracking-widest">For Real Estate Professionals</p>
+            </div>
           </div>
-          <h2 className="font-display text-4xl font-bold leading-tight mb-3">Grow your real estate business</h2>
-          <p className="text-white/80 text-lg max-w-md">Manage listings, capture leads, and connect with buyers — all from one dashboard.</p>
+
+          {/* Bottom content */}
+          <div>
+            <h2 className="font-display text-4xl font-bold leading-tight mb-4">Grow your<br />business</h2>
+            <p className="text-white/70 text-base mb-6 max-w-sm">The complete platform for real estate agents and agencies.</p>
+            <div className="space-y-3">
+              {features.map((f, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+                    <f.icon size={15} />
+                  </div>
+                  <span className="text-white/80 text-sm">{f.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Right form panel */}
-      <main className="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full px-6 py-12 lg:max-w-md lg:px-12">
+      <main className="flex-1 bg-background flex flex-col justify-center max-w-sm mx-auto w-full px-6 py-12 lg:max-w-md lg:px-12">
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-          {/* Brand + badge */}
+          {/* Brand */}
           <div className="mb-2">
             <Link to="/" className="inline-flex items-center gap-2">
               <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center">
@@ -137,18 +164,27 @@ const AgentAuthPage = () => {
               <span className="font-display text-lg font-bold text-foreground">World Property Pulse</span>
             </Link>
           </div>
-          <div className="flex items-center gap-2 mb-6 lg:hidden">
+
+          {/* Role badge */}
+          <div className="flex items-center gap-2 mb-6">
             <Building2 size={14} className="text-primary" />
             <span className="text-xs font-semibold text-primary uppercase tracking-wider">Agent Portal</span>
           </div>
 
-          <h1 className="font-display text-2xl font-bold text-foreground mb-6">
+          <h1 className="font-display text-2xl font-bold text-foreground mb-1">
             {step === 'email' && 'Agent Sign In'}
-            {step === 'password' && 'Welcome back'}
-            {step === 'choose' && 'Get Started'}
+            {step === 'password' && 'Welcome back, Agent'}
+            {step === 'choose' && 'Register as Agent'}
             {step === 'create-agency' && 'Create Your Agency'}
             {step === 'join-agency' && 'Join an Agency'}
           </h1>
+          <p className="text-sm text-muted-foreground mb-6">
+            {step === 'email' && 'Access your dashboard, listings, and leads.'}
+            {step === 'password' && email}
+            {step === 'choose' && 'Choose how you want to get started.'}
+            {step === 'create-agency' && 'Set up your agency and start listing.'}
+            {step === 'join-agency' && 'Enter your invite code to join a team.'}
+          </p>
 
           {/* Step: Email */}
           {step === 'email' && (
@@ -193,7 +229,6 @@ const AgentAuthPage = () => {
           {/* Step: Password */}
           {step === 'password' && (
             <>
-              <p className="text-sm text-muted-foreground -mt-4 mb-5">{email}</p>
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Password</label>
@@ -242,7 +277,6 @@ const AgentAuthPage = () => {
           {/* Step: Create agency */}
           {step === 'create-agency' && (
             <>
-              <p className="text-sm text-muted-foreground -mt-4 mb-5">{email}</p>
               <form onSubmit={handleSignup} className="space-y-4">
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Your Full Name<span className="text-destructive">*</span></label>
@@ -268,9 +302,7 @@ const AgentAuthPage = () => {
                   {loading ? 'Please wait...' : 'Create Agency & Account'}
                 </button>
               </form>
-              <button onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">
-                ← Back to options
-              </button>
+              <button onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">← Back to options</button>
               <p className="text-xs text-muted-foreground mt-6 text-center leading-relaxed">
                 By submitting, I accept World Property Pulse's{' '}
                 <a href="#" className="text-primary underline underline-offset-2">terms of use</a>
@@ -281,7 +313,6 @@ const AgentAuthPage = () => {
           {/* Step: Join agency */}
           {step === 'join-agency' && (
             <>
-              <p className="text-sm text-muted-foreground -mt-4 mb-5">{email}</p>
               <form onSubmit={handleSignup} className="space-y-4">
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Your Full Name<span className="text-destructive">*</span></label>
@@ -303,9 +334,7 @@ const AgentAuthPage = () => {
                   {loading ? 'Please wait...' : 'Join Agency'}
                 </button>
               </form>
-              <button onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">
-                ← Back to options
-              </button>
+              <button onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">← Back to options</button>
               <p className="text-xs text-muted-foreground mt-6 text-center leading-relaxed">
                 By submitting, I accept World Property Pulse's{' '}
                 <a href="#" className="text-primary underline underline-offset-2">terms of use</a>
@@ -313,10 +342,13 @@ const AgentAuthPage = () => {
             </>
           )}
 
-          {/* Buyer link */}
-          <p className="text-xs text-muted-foreground mt-6 text-center">
-            Looking for a property? <Link to="/login" className="text-primary font-semibold underline underline-offset-2">Sign in as buyer</Link>
-          </p>
+          {/* Buyer link — visually distinct */}
+          <div className="mt-8 pt-6 border-t border-border text-center">
+            <p className="text-xs text-muted-foreground">
+              Looking to buy a property?{' '}
+              <Link to="/login" className="text-primary font-semibold underline underline-offset-2">Buyer sign in →</Link>
+            </p>
+          </div>
         </motion.div>
       </main>
     </div>

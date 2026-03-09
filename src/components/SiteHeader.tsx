@@ -107,7 +107,7 @@ export function SiteHeader() {
           {user && userRole && (
             <button
               onClick={() => navigate(isAgent ? '/dashboard' : '/saved')}
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors cursor-pointer"
             >
               {isAgent ? <Building2 size={13} /> : <Home size={13} />}
               <span className="text-[11px] font-semibold uppercase tracking-wide">

@@ -62,6 +62,7 @@ const Index = () => {
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key: number } | null>(null);
   const [splitPercent, setSplitPercent] = useState(50);
   const [mapFullscreen, setMapFullscreen] = useState(false);
+  const [mapCollapsed, setMapCollapsed] = useState(false);
   const [bottomSheetExpanded, setBottomSheetExpanded] = useState(false);
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'newest' | 'beds'>('default');
   const [filters, setFilters] = useState<Filters>(defaultFilters);
@@ -286,29 +287,54 @@ const Index = () => {
       {/* Desktop layout: compact map on top, then property list */}
       {!isMobile ? (
         <div className="flex-1 flex flex-col px-4 py-4 gap-4 max-w-7xl mx-auto w-full">
-          {/* Compact map card - same height as a property card */}
-          <div className="relative rounded-xl overflow-hidden border border-border shadow-sm" style={{ height: mapFullscreen ? '100vh' : '220px' }}>
-            {mapComponent}
-            {/* Expand to fullscreen */}
+          {/* Collapsible map card */}
+          <div className="relative">
+            {/* Map header with collapse toggle */}
             <button
-              onClick={() => setMapFullscreen(f => !f)}
-              className="absolute top-3 right-3 z-10 px-3 py-1.5 rounded-lg bg-background/90 backdrop-blur-sm border border-border shadow-md text-xs font-medium text-foreground hover:bg-accent transition-colors flex items-center gap-1.5"
+              onClick={() => setMapCollapsed(c => !c)}
+              className="w-full flex items-center justify-between px-4 py-2 rounded-t-xl bg-secondary border border-border border-b-0 text-sm font-medium text-foreground hover:bg-accent transition-colors"
             >
-              {mapFullscreen ? (
-                <>✕ Exit fullscreen</>
-              ) : (
-                <><Map size={14} /> Expand map</>
-              )}
+              <span className="flex items-center gap-2">
+                <Map size={16} className="text-muted-foreground" />
+                Map view
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {mapCollapsed ? 'Show' : 'Hide'}
+              </span>
             </button>
+            
+            {/* Map container */}
+            <AnimatePresence>
+              {!mapCollapsed && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: mapFullscreen ? '70vh' : 180, opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="relative rounded-b-xl overflow-hidden border border-border border-t-0 shadow-sm"
+                >
+                  {mapComponent}
+                  {/* Expand to fullscreen */}
+                  <button
+                    onClick={() => setMapFullscreen(f => !f)}
+                    className="absolute top-3 right-3 z-10 px-3 py-1.5 rounded-lg bg-background/90 backdrop-blur-sm border border-border shadow-md text-xs font-medium text-foreground hover:bg-accent transition-colors flex items-center gap-1.5"
+                  >
+                    {mapFullscreen ? (
+                      <>✕ Minimize</>
+                    ) : (
+                      <><ArrowRight size={14} className="rotate-90" /> Expand</>
+                    )}
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Property list */}
-          {!mapFullscreen && (
-            <div>
-              {statusBar}
-              {propertyList}
-            </div>
-          )}
+          <div>
+            {statusBar}
+            {propertyList}
+          </div>
         </div>
       ) : (
         /* Mobile: Map with bottom sheet */

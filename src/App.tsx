@@ -67,11 +67,15 @@ const App = () => (
               <Route path="/pocket-listing" element={<ProtectedRoute requireAgent><PocketListingPage /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute requireAgent><AgentDashboardLayout /></ProtectedRoute>}>
                 <Route index element={<DashboardOverview />} />
+                <Route path="profile" element={<AgentProfilePage />} />
                 <Route path="listings" element={<ListingsPage />} />
                 <Route path="leads" element={<VoiceLeadsPage />} />
                 <Route path="analytics" element={<AnalyticsPage />} />
                 <Route path="network" element={<NetworkPage />} />
                 <Route path="team" element={<TeamPage />} />
+                <Route path="documents" element={<DocumentsPage />} />
+                <Route path="billing" element={<BillingPage />} />
+                <Route path="reviews" element={<ReviewsPage />} />
                 <Route path="settings" element={<SettingsPage />} />
               </Route>
 

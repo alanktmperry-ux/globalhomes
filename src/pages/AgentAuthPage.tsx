@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User, Building2, Phone, KeyRound, Plus } from 'lucide-react';
+import { Building2, KeyRound, Plus } from 'lucide-react';
 import PhoneInput from '@/components/PhoneInput';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
 import { useToast } from '@/hooks/use-toast';
+import agentHero from '@/assets/agent-auth-hero.jpg';
 
 type Step = 'email' | 'password' | 'choose' | 'create-agency' | 'join-agency';
 
@@ -109,8 +110,23 @@ const AgentAuthPage = () => {
   const inputClass = "w-full px-4 py-3.5 rounded-full border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40";
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <main className="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full px-6 py-12">
+    <div className="min-h-screen bg-background flex">
+      {/* Left hero panel — hidden on mobile */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-muted">
+        <img src={agentHero} alt="Real estate professional" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
+        <div className="relative z-10 flex flex-col justify-end p-12 text-white">
+          <div className="flex items-center gap-2 mb-4">
+            <Building2 size={18} />
+            <span className="text-sm font-semibold uppercase tracking-wider">Agent Portal</span>
+          </div>
+          <h2 className="font-display text-4xl font-bold leading-tight mb-3">Grow your real estate business</h2>
+          <p className="text-white/80 text-lg max-w-md">Manage listings, capture leads, and connect with buyers — all from one dashboard.</p>
+        </div>
+      </div>
+
+      {/* Right form panel */}
+      <main className="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full px-6 py-12 lg:max-w-md lg:px-12">
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
           {/* Brand + badge */}
           <div className="mb-2">
@@ -121,7 +137,7 @@ const AgentAuthPage = () => {
               <span className="font-display text-lg font-bold text-foreground">World Property Pulse</span>
             </Link>
           </div>
-          <div className="flex items-center gap-2 mb-6">
+          <div className="flex items-center gap-2 mb-6 lg:hidden">
             <Building2 size={14} className="text-primary" />
             <span className="text-xs font-semibold text-primary uppercase tracking-wider">Agent Portal</span>
           </div>

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
 import { useToast } from '@/hooks/use-toast';
+import seekerHero from '@/assets/seeker-auth-hero.jpg';
 
 type Step = 'email' | 'password' | 'create';
 
@@ -90,8 +90,19 @@ const SeekerAuthPage = () => {
   const inputClass = "w-full px-4 py-3.5 rounded-full border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40";
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <main className="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full px-6 py-12">
+    <div className="min-h-screen bg-background flex">
+      {/* Left hero panel — hidden on mobile */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+        <img src={seekerHero} alt="Find your dream home" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+        <div className="relative z-10 flex flex-col justify-end p-12 text-white">
+          <h2 className="font-display text-4xl font-bold leading-tight mb-3">Find your dream home</h2>
+          <p className="text-white/80 text-lg max-w-md">Search thousands of properties worldwide with voice-powered AI search.</p>
+        </div>
+      </div>
+
+      {/* Right form panel */}
+      <main className="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full px-6 py-12 lg:max-w-md lg:px-12">
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
           {/* Brand */}
           <div className="mb-6">

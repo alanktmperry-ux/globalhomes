@@ -57,7 +57,7 @@ const Index = () => {
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [manusStatus, setManusStatus] = useState<string | null>(null);
-  const [mobileView, setMobileView] = useState<'map' | 'list'>('map');
+  const [mobileView, setMobileView] = useState<'map' | 'list'>('list');
   const [areaSearch, setAreaSearch] = useState<AreaSearch | null>(null);
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key: number } | null>(null);
   const [splitPercent, setSplitPercent] = useState(50);

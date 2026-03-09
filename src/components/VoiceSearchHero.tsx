@@ -1,9 +1,10 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, MicOff, Search, Loader2, X, Keyboard, ChevronDown } from 'lucide-react';
+import { Mic, MicOff, Search, Loader2, X, Keyboard, ChevronDown, MapPin } from 'lucide-react';
 import { SoundWaveVisualizer } from './SoundWaveVisualizer';
 import { parsePropertyQuery, filtersToChips } from '@/lib/parsePropertyQuery';
 import { useToast } from '@/hooks/use-toast';
+import { autocomplete, getPlaceDetails } from '@/lib/googleMapsService';
 
 type VoiceState = 'idle' | 'listening' | 'processing' | 'results';
 

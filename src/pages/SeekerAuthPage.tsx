@@ -141,7 +141,7 @@ const SeekerAuthPage = () => {
             </button>
           </p>
 
-          <p className="text-center text-xs text-muted-foreground mt-3">
+          <p className="text-center text-sm text-muted-foreground mt-3">
             Are you an agent? <Link to="/agents/login" className="text-primary font-medium">Sign in here</Link>
           </p>
         </motion.div>

@@ -7,7 +7,7 @@ import { useAuth } from '@/lib/AuthProvider';
 
 export function SiteHeader() {
   const { currency, setCurrencyCode, listingMode, setListingMode } = useCurrency();
-  const { user } = useAuth();
+  const { user, userRole, isAgent } = useAuth();
   const navigate = useNavigate();
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);

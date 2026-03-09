@@ -103,9 +103,19 @@ export function SiteHeader() {
             </AnimatePresence>
           </div>
 
+          {/* Role badge */}
+          {user && userRole && (
+            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary">
+              {isAgent ? <Building2 size={13} /> : <Home size={13} />}
+              <span className="text-[11px] font-semibold uppercase tracking-wide">
+                {isAgent ? 'Agent' : 'Buyer'}
+              </span>
+            </div>
+          )}
+
           {/* User button */}
           <button
-            onClick={() => navigate(user ? '/profile' : '/login')}
+            onClick={() => navigate(user ? '/profile' : '/auth')}
             className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
             aria-label={user ? 'Profile' : 'Sign in'}
           >

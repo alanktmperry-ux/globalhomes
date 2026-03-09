@@ -46,6 +46,7 @@ const App = () => (
               {/* Public */}
               <Route path="/" element={<Index />} />
               <Route path="/agents" element={<AgentLandingPage />} />
+              <Route path="/auth" element={<AuthLandingPage />} />
               <Route path="/login" element={<SeekerAuthPage />} />
               <Route path="/agents/login" element={<AgentAuthPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />

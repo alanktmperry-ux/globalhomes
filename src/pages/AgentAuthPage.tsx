@@ -309,22 +309,50 @@ const AgentAuthPage = () => {
                   <input type="text" required value={agencyName} onChange={(e) => setAgencyName(e.target.value)} className={inputClass} />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">Phone Number</label>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Phone Number<span className="text-destructive">*</span></label>
                   <PhoneInput value={phone} onChange={setPhone} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Office Address</label>
+                  <input type="text" value={officeAddress} onChange={(e) => setOfficeAddress(e.target.value)} placeholder="e.g. 123 Main St, Sydney" className={inputClass} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">License / Registration Number</label>
+                  <input type="text" value={licenseNumber} onChange={(e) => setLicenseNumber(e.target.value)} placeholder="Optional but encouraged" className={inputClass} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Years of Experience</label>
+                    <input type="number" min="0" max="60" value={yearsExperience} onChange={(e) => setYearsExperience(e.target.value)} placeholder="e.g. 5" className={inputClass} />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Specialization</label>
+                    <select value={specialization} onChange={(e) => setSpecialization(e.target.value)} className={inputClass + ' appearance-none'}>
+                      <option value="Residential">Residential</option>
+                      <option value="Commercial">Commercial</option>
+                      <option value="Luxury">Luxury</option>
+                      <option value="Land">Land</option>
+                      <option value="Industrial">Industrial</option>
+                    </select>
+                  </div>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Password<span className="text-destructive">*</span></label>
                   <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
                 </div>
-                <button type="submit" disabled={loading} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
+                <label className="flex items-start gap-2.5 cursor-pointer">
+                  <input type="checkbox" checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)} className="mt-1 accent-primary" />
+                  <span className="text-xs text-muted-foreground leading-relaxed">
+                    I agree to the{' '}
+                    <a href="#" className="text-primary underline underline-offset-2">terms of service</a>{' '}
+                    and confirm the information provided is accurate.
+                  </span>
+                </label>
+                <button type="submit" disabled={loading || !agreedToTerms} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
                   {loading ? 'Please wait...' : 'Create Agency & Account'}
                 </button>
               </form>
               <button onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">← Back to options</button>
-              <p className="text-xs text-muted-foreground mt-6 text-center leading-relaxed">
-                By submitting, I accept World Property Pulse's{' '}
-                <a href="#" className="text-primary underline underline-offset-2">terms of use</a>
-              </p>
             </>
           )}
 

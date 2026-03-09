@@ -138,65 +138,180 @@ export type Database = {
           },
         ]
       }
+      agent_credentials: {
+        Row: {
+          agent_id: string
+          document_type: string
+          document_url: string
+          id: string
+          uploaded_at: string
+          verified_at: string | null
+          verified_status: string
+        }
+        Insert: {
+          agent_id: string
+          document_type: string
+          document_url: string
+          id?: string
+          uploaded_at?: string
+          verified_at?: string | null
+          verified_status?: string
+        }
+        Update: {
+          agent_id?: string
+          document_type?: string
+          document_url?: string
+          id?: string
+          uploaded_at?: string
+          verified_at?: string | null
+          verified_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_credentials_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_subscriptions: {
+        Row: {
+          agent_id: string
+          auto_renew: boolean | null
+          created_at: string
+          featured_remaining: number
+          id: string
+          listing_limit: number
+          payment_method: Json | null
+          plan_type: string
+          subscription_end: string | null
+          subscription_start: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          auto_renew?: boolean | null
+          created_at?: string
+          featured_remaining?: number
+          id?: string
+          listing_limit?: number
+          payment_method?: Json | null
+          plan_type?: string
+          subscription_end?: string | null
+          subscription_start?: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          auto_renew?: boolean | null
+          created_at?: string
+          featured_remaining?: number
+          id?: string
+          listing_limit?: number
+          payment_method?: Json | null
+          plan_type?: string
+          subscription_end?: string | null
+          subscription_start?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_subscriptions_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agents: {
         Row: {
           agency: string | null
           agency_id: string | null
           avatar_url: string | null
+          bio: string | null
           created_at: string
           email: string | null
           id: string
+          is_approved: boolean | null
           is_subscribed: boolean
+          languages_spoken: string[] | null
           license_number: string | null
           name: string
           office_address: string | null
           phone: string | null
+          profile_photo_url: string | null
+          service_areas: string[] | null
+          social_links: Json | null
           specialization: string | null
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           subscription_expires_at: string | null
+          title_position: string | null
           updated_at: string
           user_id: string
+          verification_badge_level: string | null
+          website_url: string | null
           years_experience: number | null
         }
         Insert: {
           agency?: string | null
           agency_id?: string | null
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string
           email?: string | null
           id?: string
+          is_approved?: boolean | null
           is_subscribed?: boolean
+          languages_spoken?: string[] | null
           license_number?: string | null
           name: string
           office_address?: string | null
           phone?: string | null
+          profile_photo_url?: string | null
+          service_areas?: string[] | null
+          social_links?: Json | null
           specialization?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscription_expires_at?: string | null
+          title_position?: string | null
           updated_at?: string
           user_id: string
+          verification_badge_level?: string | null
+          website_url?: string | null
           years_experience?: number | null
         }
         Update: {
           agency?: string | null
           agency_id?: string | null
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string
           email?: string | null
           id?: string
+          is_approved?: boolean | null
           is_subscribed?: boolean
+          languages_spoken?: string[] | null
           license_number?: string | null
           name?: string
           office_address?: string | null
           phone?: string | null
+          profile_photo_url?: string | null
+          service_areas?: string[] | null
+          social_links?: Json | null
           specialization?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscription_expires_at?: string | null
+          title_position?: string | null
           updated_at?: string
           user_id?: string
+          verification_badge_level?: string | null
+          website_url?: string | null
           years_experience?: number | null
         }
         Relationships: [
@@ -208,6 +323,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      buyer_profiles: {
+        Row: {
+          budget_max: number | null
+          budget_min: number | null
+          created_at: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          preferred_countries: string[] | null
+          preferred_property_types: string[] | null
+          saved_searches: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          budget_max?: number | null
+          budget_min?: number | null
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          preferred_countries?: string[] | null
+          preferred_property_types?: string[] | null
+          saved_searches?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          budget_max?: number | null
+          budget_min?: number | null
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          preferred_countries?: string[] | null
+          preferred_property_types?: string[] | null
+          saved_searches?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       lead_events: {
         Row: {

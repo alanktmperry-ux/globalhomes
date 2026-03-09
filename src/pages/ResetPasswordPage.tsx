@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Lock, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +12,12 @@ const ResetPasswordPage = () => {
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
   const [expired, setExpired] = useState(false);
+  const readyRef = useRef(false);
+
+  const markReady = () => {
+    readyRef.current = true;
+    setReady(true);
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -26,26 +32,26 @@ const ResetPasswordPage = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return;
       if (event === 'PASSWORD_RECOVERY') {
-        setReady(true);
+        markReady();
       }
       if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && session) {
-        setReady(true);
+        markReady();
       }
     });
 
     if (hash.includes('type=recovery')) {
-      setReady(true);
+      markReady();
     }
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (mounted && session) setReady(true);
+      if (mounted && session) markReady();
     });
 
-    // Timeout: if nothing works after 5s, show expired message
+    // Timeout: if nothing works after 8s, show expired message
     const timeout = setTimeout(() => {
-      if (mounted && !ready) setExpired(true);
-    }, 5000);
+      if (mounted && !readyRef.current) setExpired(true);
+    }, 8000);
 
     return () => {
       mounted = false;

@@ -68,7 +68,8 @@ const AgentAuthPage = () => {
       if (step === 'create-agency') {
         if (!agencyName.trim()) throw new Error('Agency name is required');
         const { data: agency, error: agencyError } = await supabase
-          .from('agencies').insert({ name: agencyName, slug: generateSlug(agencyName), owner_user_id: userId, email: agencyEmail || null   if (agencyError) throw agencyError;
+          .from('agencies').insert({ name: agencyName, slug: generateSlug(agencyName), owner_user_id: userId, email: agencyEmail || null }).select().single();
+        if (agencyError) throw agencyError;
         await supabase.from('agency_members').insert({ agency_id: agency.id, user_id: userId, role: 'owner' as any });
         await supabase.from('agents').insert({ user_id: userId, name: fullName || email, agency: agencyName, email, phone: phone || null, agency_id: agency.id });
         toast({ title: 'Agency created!', description: `"${agencyName}" is ready.` });

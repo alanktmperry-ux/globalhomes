@@ -232,7 +232,7 @@ const Index = () => {
   );
 
   const propertyList = (
-    <div className="space-y-3">
+    <div className={isMobile ? "space-y-3" : "grid grid-cols-2 gap-4"}>
       {isSearching ? (
         [0, 1, 2].map(i => <PropertyCardSkeleton key={i} />)
       ) : (
@@ -252,7 +252,7 @@ const Index = () => {
             </div>
           ))}
           {filteredProperties.length === 0 && (
-            <p className="text-center text-muted-foreground py-8 text-sm">
+            <p className="text-center text-muted-foreground py-8 text-sm col-span-2">
               {areaSearch ? 'No properties in this area.' : 'No properties found.'}
             </p>
           )}

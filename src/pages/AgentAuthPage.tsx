@@ -21,6 +21,11 @@ const AgentAuthPage = () => {
   const [phone, setPhone] = useState('');
   const [agencyEmail, setAgencyEmail] = useState('');
   const [inviteCode, setInviteCode] = useState('');
+  const [licenseNumber, setLicenseNumber] = useState('');
+  const [officeAddress, setOfficeAddress] = useState('');
+  const [yearsExperience, setYearsExperience] = useState('');
+  const [specialization, setSpecialization] = useState('Residential');
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const generateSlug = (name: string) =>

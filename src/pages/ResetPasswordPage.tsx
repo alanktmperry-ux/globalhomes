@@ -22,34 +22,46 @@ const ResetPasswordPage = () => {
   useEffect(() => {
     let mounted = true;
 
-    // Check hash for errors (token already consumed by email client prefetch)
     const hash = window.location.hash;
+    const fullUrl = window.location.href;
+    console.log('[ResetPassword] Page loaded');
+    console.log('[ResetPassword] Hash:', hash);
+    console.log('[ResetPassword] Full URL:', fullUrl);
+
+    // Check hash for errors (token already consumed by email client prefetch)
     if (hash.includes('error=') || hash.includes('error_code=')) {
+      console.log('[ResetPassword] Error detected in hash, marking expired');
       setExpired(true);
       return;
     }
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('[ResetPassword] Auth event:', event, 'Session:', !!session);
       if (!mounted) return;
       if (event === 'PASSWORD_RECOVERY') {
+        console.log('[ResetPassword] PASSWORD_RECOVERY event - marking ready');
         markReady();
       }
       if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && session) {
+        console.log('[ResetPassword] Session detected via', event, '- marking ready');
         markReady();
       }
     });
 
     if (hash.includes('type=recovery')) {
+      console.log('[ResetPassword] Hash contains type=recovery - marking ready');
       markReady();
     }
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('[ResetPassword] getSession result:', !!session);
       if (mounted && session) markReady();
     });
 
     // Timeout: if nothing works after 8s, show expired message
     const timeout = setTimeout(() => {
+      console.log('[ResetPassword] Timeout reached, readyRef:', readyRef.current);
       if (mounted && !readyRef.current) setExpired(true);
     }, 8000);
 

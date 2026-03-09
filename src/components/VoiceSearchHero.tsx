@@ -60,7 +60,11 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
   const [filterChips, setFilterChips] = useState<{ label: string; key: string }[]>([]);
   const [rotatingIndex, setRotatingIndex] = useState(0);
   const [confidence, setConfidence] = useState<number | null>(null);
+  const [suggestions, setSuggestions] = useState<{ description: string; place_id: string }[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const recognitionRef = useRef<any>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   const isSupported = typeof window !== 'undefined' &&

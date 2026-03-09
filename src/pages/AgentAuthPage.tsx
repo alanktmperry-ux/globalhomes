@@ -18,6 +18,7 @@ const AgentAuthPage = () => {
   const [fullName, setFullName] = useState('');
   const [agencyName, setAgencyName] = useState('');
   const [phone, setPhone] = useState('');
+  const [agencyEmail, setAgencyEmail] = useState('');
   const [inviteCode, setInviteCode] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -67,7 +68,7 @@ const AgentAuthPage = () => {
       if (step === 'create-agency') {
         if (!agencyName.trim()) throw new Error('Agency name is required');
         const { data: agency, error: agencyError } = await supabase
-          .from('agencies').insert({ name: agencyName, slug: generateSlug(agencyName), owner_user_id: userId }).select().single();
+          .from('agencies').insert({ name: agencyName, slug: generateSlug(agencyName), owner_user_id: userId, email: agencyEmail || null }).select().single();
         if (agencyError) throw agencyError;
         await supabase.from('agency_members').insert({ agency_id: agency.id, user_id: userId, role: 'owner' as any });
         await supabase.from('agents').insert({ user_id: userId, name: fullName || email, agency: agencyName, email, phone: phone || null, agency_id: agency.id });
@@ -234,6 +235,10 @@ const AgentAuthPage = () => {
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Agency / Company Name<span className="text-destructive">*</span></label>
                   <input type="text" required value={agencyName} onChange={(e) => setAgencyName(e.target.value)} className={inputClass} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Agency Email</label>
+                  <input type="email" placeholder="info@youragency.com" value={agencyEmail} onChange={(e) => setAgencyEmail(e.target.value)} className={inputClass} />
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Phone Number</label>

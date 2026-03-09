@@ -283,48 +283,31 @@ const Index = () => {
         isSearching={isSearching}
       />
 
-      {/* Desktop: Split view */}
+      {/* Desktop layout: compact map on top, then property list */}
       {!isMobile ? (
-        <div className="flex-1 flex" style={{ height: mapFullscreen ? '100vh' : 'calc(100vh - 380px)' }}>
-          {/* Map panel */}
-          <div style={{ width: mapFullscreen ? '100%' : `${splitPercent}%` }} className="relative transition-all duration-300">
+        <div className="flex-1 flex flex-col px-4 py-4 gap-4 max-w-7xl mx-auto w-full">
+          {/* Compact map card - same height as a property card */}
+          <div className="relative rounded-xl overflow-hidden border border-border shadow-sm" style={{ height: mapFullscreen ? '100vh' : '220px' }}>
             {mapComponent}
-            {/* Fullscreen toggle overlay */}
+            {/* Expand to fullscreen */}
             <button
               onClick={() => setMapFullscreen(f => !f)}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm border border-border shadow-md flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity group"
-              title={mapFullscreen ? 'Exit fullscreen' : 'Expand map'}
+              className="absolute top-3 right-3 z-10 px-3 py-1.5 rounded-lg bg-background/90 backdrop-blur-sm border border-border shadow-md text-xs font-medium text-foreground hover:bg-accent transition-colors flex items-center gap-1.5"
             >
               {mapFullscreen ? (
-                <ArrowUpDown size={16} className="text-foreground rotate-45" />
+                <>✕ Exit fullscreen</>
               ) : (
-                <ArrowRight size={16} className="text-foreground -rotate-45 group-hover:scale-110 transition-transform" />
+                <><Map size={14} /> Expand map</>
               )}
             </button>
-            {mapFullscreen && (
-              <button
-                onClick={() => setMapFullscreen(false)}
-                className="absolute top-4 right-4 z-10 px-3 py-1.5 rounded-lg bg-background/90 backdrop-blur-sm border border-border shadow-md text-xs font-medium text-foreground hover:bg-accent transition-colors"
-              >
-                ✕ Exit fullscreen
-              </button>
-            )}
           </div>
 
-          {/* Resize handle & List panel - hidden in fullscreen */}
+          {/* Property list */}
           {!mapFullscreen && (
-            <>
-              <div
-                onMouseDown={handleMouseDown}
-                className="w-[6px] shrink-0 cursor-col-resize bg-border hover:bg-primary/30 transition-colors flex items-center justify-center group"
-              >
-                <GripVertical size={12} className="text-muted-foreground group-hover:text-primary transition-colors" />
-              </div>
-              <div style={{ width: `${100 - splitPercent}%` }} className="overflow-y-auto p-4">
-                {statusBar}
-                {propertyList}
-              </div>
-            </>
+            <div>
+              {statusBar}
+              {propertyList}
+            </div>
           )}
         </div>
       ) : (

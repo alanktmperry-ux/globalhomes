@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 const NAV = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
   { title: 'Profile', url: '/dashboard/profile', icon: User },
+  { title: 'Territory', url: '/dashboard/territory', icon: MapPinned },
   { title: 'My Listings', url: '/dashboard/listings', icon: List, badge: '12' },
   { title: 'Voice Leads', url: '/dashboard/leads', icon: Mic, badge: '4' },
   { title: 'Analytics', url: '/dashboard/analytics', icon: BarChart3 },

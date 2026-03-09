@@ -69,6 +69,7 @@ const App = () => (
               <Route path="/dashboard" element={<ProtectedRoute requireAgent><AgentDashboardLayout /></ProtectedRoute>}>
                 <Route index element={<DashboardOverview />} />
                 <Route path="profile" element={<AgentProfilePage />} />
+                <Route path="territory" element={<TerritoryPage />} />
                 <Route path="listings" element={<ListingsPage />} />
                 <Route path="leads" element={<VoiceLeadsPage />} />
                 <Route path="analytics" element={<AnalyticsPage />} />

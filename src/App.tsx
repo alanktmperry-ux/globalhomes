@@ -26,6 +26,7 @@ import AgentProfilePage from "./components/agent-dashboard/ProfilePage";
 import DocumentsPage from "./components/agent-dashboard/DocumentsPage";
 import BillingPage from "./components/agent-dashboard/BillingPage";
 import ReviewsPage from "./components/agent-dashboard/ReviewsPage";
+import TerritoryPage from "./components/agent-dashboard/TerritoryPage";
 import SeekerAuthPage from "./pages/SeekerAuthPage";
 import AgentAuthPage from "./pages/AgentAuthPage";
 import AuthLandingPage from "./pages/AuthLandingPage";

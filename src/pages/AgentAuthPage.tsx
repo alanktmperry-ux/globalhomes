@@ -300,10 +300,6 @@ const AgentAuthPage = () => {
                   <input type="text" required value={agencyName} onChange={(e) => setAgencyName(e.target.value)} className={inputClass} />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">Agency Email</label>
-                  <input type="email" placeholder="info@youragency.com" value={agencyEmail} onChange={(e) => setAgencyEmail(e.target.value)} className={inputClass} />
-                </div>
-                <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Phone Number</label>
                   <PhoneInput value={phone} onChange={setPhone} />
                 </div>

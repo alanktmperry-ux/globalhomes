@@ -154,8 +154,12 @@ const AgentPortalPage = () => {
               </p>
               <p className="font-display text-3xl font-bold text-foreground mb-1">$49<span className="text-base font-normal text-muted-foreground">/mo</span></p>
               <p className="text-xs text-muted-foreground mb-5">Cancel anytime</p>
-              <button className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm transition-transform active:scale-[0.98]">
-                {t('agent.subscribe')}
+              <button
+                onClick={handleSubscribe}
+                disabled={subscribing || isSubscribed}
+                className={`w-full py-3 rounded-xl font-semibold text-sm transition-transform active:scale-[0.98] flex items-center justify-center gap-2 ${isSubscribed ? 'bg-success text-white' : 'bg-primary text-primary-foreground'}`}
+              >
+                {subscribing ? <><Loader2 size={16} className="animate-spin" /> Processing...</> : isSubscribed ? <><Check size={16} /> Subscribed</> : t('agent.subscribe')}
               </button>
               <ul className="mt-5 space-y-2 text-sm text-left">
                 {[

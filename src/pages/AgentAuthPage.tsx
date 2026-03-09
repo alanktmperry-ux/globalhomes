@@ -328,8 +328,12 @@ const AgentAuthPage = () => {
             <>
               <form onSubmit={handleSignup} className="space-y-4">
                 <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Email Address<span className="text-destructive">*</span></label>
+                  <input type="email" required autoFocus value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} />
+                </div>
+                <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Your Full Name<span className="text-destructive">*</span></label>
-                  <input type="text" required autoFocus value={fullName} onChange={(e) => setFullName(e.target.value)} className={inputClass} />
+                  <input type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)} className={inputClass} />
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Invite Code<span className="text-destructive">*</span></label>

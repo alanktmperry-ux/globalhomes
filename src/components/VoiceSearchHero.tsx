@@ -507,26 +507,50 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
         </div>
 
         {/* Always-visible text search input */}
-        <form
-          onSubmit={handleTextSubmit}
-          className="w-full max-w-md"
-        >
-          <div className="flex items-center gap-2 rounded-xl bg-secondary border border-border px-4 py-3">
-            <Search size={16} className="text-muted-foreground shrink-0" />
-            <input
-              type="text"
-              value={textQuery}
-              onChange={e => setTextQuery(e.target.value)}
-              placeholder='Try "3 bed house in Berwick under $800k"'
-              className="flex-1 bg-transparent text-foreground text-sm placeholder:text-muted-foreground focus:outline-none"
-            />
-            {textQuery.trim() && (
-              <button type="submit" className="text-primary hover:text-primary/80">
-                <Search size={18} />
-              </button>
+        <div ref={wrapperRef} className="relative w-full max-w-md">
+          <form onSubmit={handleTextSubmit}>
+            <div className="flex items-center gap-2 rounded-xl bg-secondary border border-border px-4 py-3">
+              <Search size={16} className="text-muted-foreground shrink-0" />
+              <input
+                type="text"
+                value={textQuery}
+                onChange={e => setTextQuery(e.target.value)}
+                onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                placeholder='Try "3 bed house in Berwick under $800k"'
+                className="flex-1 bg-transparent text-foreground text-sm placeholder:text-muted-foreground focus:outline-none"
+              />
+              {textQuery.trim() && (
+                <button type="submit" className="text-primary hover:text-primary/80">
+                  <Search size={18} />
+                </button>
+              )}
+            </div>
+          </form>
+
+          <AnimatePresence>
+            {showSuggestions && suggestions.length > 0 && (
+              <motion.ul
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-xl shadow-elevated overflow-y-auto max-h-60"
+              >
+                {suggestions.map((s) => (
+                  <li key={s.place_id}>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectSuggestion(s)}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-left text-sm text-foreground hover:bg-accent transition-colors"
+                    >
+                      <MapPin size={16} className="text-muted-foreground shrink-0" />
+                      <span className="truncate">{s.description}</span>
+                    </button>
+                  </li>
+                ))}
+              </motion.ul>
             )}
-          </div>
-        </form>
+          </AnimatePresence>
+        </div>
 
         {/* Search history pills */}
         <VoiceSearchHistory onRerun={onSearch} />

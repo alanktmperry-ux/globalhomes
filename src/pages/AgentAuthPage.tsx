@@ -120,7 +120,6 @@ const AgentAuthPage = () => {
       }
     } catch (err: any) {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
-    } finally {
       setLoading(false);
     }
   };

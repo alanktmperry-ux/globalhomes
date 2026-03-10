@@ -171,6 +171,45 @@ const ProfilePage = () => {
     }
   };
 
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !agent) return;
+    if (!file.type.startsWith('image/')) {
+      toast({ title: 'Invalid file', description: 'Please upload an image file.', variant: 'destructive' });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: 'File too large', description: 'Max 5MB.', variant: 'destructive' });
+      return;
+    }
+
+    setUploadingLogo(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const filePath = `${agent.user_id}/company-logo.${ext}`;
+      const { error: upErr } = await supabase.storage.from('agency-logos').upload(filePath, file, { upsert: true });
+      if (upErr) throw upErr;
+      const { data: { publicUrl } } = supabase.storage.from('agency-logos').getPublicUrl(filePath);
+      await supabase.from('agents').update({ company_logo_url: publicUrl } as any).eq('id', agent.id);
+      setAgent(prev => prev ? { ...prev, company_logo_url: publicUrl } : null);
+      toast({ title: 'Company logo updated' });
+    } catch (err: any) {
+      toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  const removeLogo = async () => {
+    if (!agent) return;
+    try {
+      await supabase.from('agents').update({ company_logo_url: null } as any).eq('id', agent.id);
+      setAgent(prev => prev ? { ...prev, company_logo_url: null } : null);
+      toast({ title: 'Logo removed' });
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    }
+
   const handleDocUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !agent || !user) return;

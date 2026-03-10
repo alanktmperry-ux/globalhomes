@@ -38,10 +38,10 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave }: Pro
               onClick={onClose}
             />
             <motion.div
-              className="fixed inset-x-0 bottom-0 z-50 max-h-[97vh] bg-card rounded-t-3xl shadow-drawer overflow-y-auto md:inset-x-auto md:left-1/2 md:top-1/2 md:bottom-auto md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-4xl md:rounded-2xl md:max-h-[92vh]"
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
+              className="fixed inset-x-0 bottom-0 z-50 max-h-[97vh] bg-card rounded-t-3xl shadow-drawer overflow-y-auto md:inset-x-auto md:left-1/2 md:top-[3vh] md:bottom-auto md:-translate-x-1/2 md:w-full md:max-w-4xl md:rounded-2xl md:max-h-[94vh]"
+              initial={{ y: '100%', opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: '100%', opacity: 0 }}
               transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             >
               {/* Drag indicator */}

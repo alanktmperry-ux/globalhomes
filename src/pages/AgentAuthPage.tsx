@@ -50,14 +50,14 @@ const AgentAuthPage = () => {
   }, [pendingRedirect, user, isAgent, authLoading, navigate]);
 
   // Safety: if pending redirect but auth settles without agent role, reset
+  // Give roles up to 5 seconds to load before showing error
   useEffect(() => {
     if (pendingRedirect === 'dashboard' && user && !authLoading && !isAgent) {
-      // User signed in but doesn't have agent role
       const timeout = setTimeout(() => {
         setPendingRedirect(null);
         setLoading(false);
         toast({ title: 'Error', description: 'This account does not have agent access.', variant: 'destructive' });
-      }, 2000);
+      }, 5000);
       return () => clearTimeout(timeout);
     }
   }, [pendingRedirect, user, authLoading, isAgent, toast]);

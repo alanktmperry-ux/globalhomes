@@ -8,6 +8,8 @@ import DashboardHeader from './DashboardHeader';
 import { useAgentListings, type AgentListing } from '@/hooks/useAgentListings';
 import { PropertyDrawer } from '@/components/PropertyDrawer';
 import { Property } from '@/lib/types';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const STATUS_CONFIG: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
   whisper: { icon: <EyeOff size={12} />, label: 'Whisper', color: 'bg-foreground/10 text-foreground' },
@@ -41,8 +43,28 @@ function getListingThumb(l: AgentListing): string {
 const ListingsPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('all');
-  const { listings, loading, isMockData } = useAgentListings();
+  const { listings, loading, isMockData, refetch } = useAgentListings();
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const handleBoost = async (l: AgentListing) => {
+    if (l._source !== 'db') { toast({ title: 'Demo listing', description: 'Create a real listing first.' }); return; }
+    setActionLoading(l.id);
+    const { error } = await supabase.from('properties').update({ is_active: true }).eq('id', l.id);
+    if (error) { toast({ title: 'Failed to boost', variant: 'destructive' }); }
+    else { toast({ title: 'Listing boosted!', description: 'Your listing is now public.' }); refetch(); }
+    setActionLoading(null);
+  };
+
+  const handleMarkSold = async (l: AgentListing) => {
+    if (l._source !== 'db') { toast({ title: 'Demo listing', description: 'Create a real listing first.' }); return; }
+    setActionLoading(l.id);
+    const { error } = await supabase.from('properties').update({ is_active: false }).eq('id', l.id);
+    if (error) { toast({ title: 'Failed to update', variant: 'destructive' }); }
+    else { toast({ title: 'Marked as sold!', description: 'Listing has been marked as sold.' }); refetch(); }
+    setActionLoading(null);
+  };
 
   const toProperty = (l: AgentListing): Property => ({
     id: l.id,
@@ -147,25 +169,27 @@ const ListingsPage = () => {
                       <p className="text-xs text-muted-foreground truncate">{l.address}</p>
                       <p className="text-sm font-display font-bold text-primary mt-1">{l.price_formatted}</p>
                     </div>
-                    <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-1 shrink-0">
-                      <span className="text-xs text-muted-foreground flex items-center gap-1"><Eye size={10} /> {l.views}</span>
-                      <span className="text-xs text-muted-foreground flex items-center gap-1"><Sparkles size={10} /> {leads} leads</span>
-                      <div className="flex gap-1 mt-1">
-                        <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5" onClick={() => {
-                          if (l._source === 'db') navigate(`/pocket-listing?edit=${l.id}`);
-                        }}>
-                          <Pencil size={10} /> Edit
-                        </Button>
-                        {l._status !== 'public' && l._status !== 'sold' && (
-                          <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5">
-                            <Rocket size={10} /> Boost
+                      <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-1 shrink-0">
+                        <span className="text-xs text-muted-foreground flex items-center gap-1"><Eye size={10} /> {l.views}</span>
+                        <span className="text-xs text-muted-foreground flex items-center gap-1"><Sparkles size={10} /> {leads} leads</span>
+                        <div className="flex gap-1 mt-1">
+                          <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5" disabled={actionLoading === l.id} onClick={() => {
+                            if (l._source === 'db') navigate(`/pocket-listing?edit=${l.id}`);
+                          }}>
+                            <Pencil size={10} /> Edit
                           </Button>
-                        )}
-                        {l._status !== 'sold' && (
-                          <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 text-success">Mark Sold</Button>
-                        )}
+                          {l._status !== 'public' && l._status !== 'sold' && (
+                            <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5" disabled={actionLoading === l.id} onClick={() => handleBoost(l)}>
+                              {actionLoading === l.id ? <Loader2 size={10} className="animate-spin" /> : <Rocket size={10} />} Boost
+                            </Button>
+                          )}
+                          {l._status !== 'sold' && (
+                            <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 text-success" disabled={actionLoading === l.id} onClick={() => handleMarkSold(l)}>
+                              {actionLoading === l.id ? <Loader2 size={10} className="animate-spin" /> : null} Mark Sold
+                            </Button>
+                          )}
+                        </div>
                       </div>
-                    </div>
                   </div>
                 );
               })}

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Bed, Bath, Car, Heart, BadgeCheck, Star } from 'lucide-react';
 import { Property, PropertyStatus } from '@/lib/types';

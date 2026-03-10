@@ -174,7 +174,21 @@ const TeamPage = () => {
     loadData();
   };
 
-  const copyCode = (code: string) => {
+  const handleChangeRole = async (memberId: string, newRole: string) => {
+    try {
+      const { error } = await supabase
+        .from('agency_members')
+        .update({ role: newRole as any })
+        .eq('id', memberId);
+      if (error) throw error;
+      toast({ title: 'Role updated', description: `Member role changed to ${newRole}` });
+      loadData();
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    }
+  };
+
+
     navigator.clipboard.writeText(code);
     toast({ title: 'Copied!', description: `${code} copied to clipboard` });
   };

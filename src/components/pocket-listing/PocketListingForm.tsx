@@ -72,6 +72,8 @@ interface Props {
   onCancel: () => void;
   /** When provided, the form loads this property for editing */
   editPropertyId?: string | null;
+  /** When provided, the form loads this property's data but creates a new listing */
+  duplicatePropertyId?: string | null;
 }
 
 const formatPriceForDB = (draft: ListingDraft): string => {

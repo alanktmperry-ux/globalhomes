@@ -149,7 +149,14 @@ const Index = () => {
     }
   }, [addSearch, toast]);
 
-  const displayProperties = hasSearched ? results : mockProperties.slice(0, 6);
+  // Merge DB properties with mock, DB first, dedup by id
+  const allProperties = useMemo(() => {
+    const dbIds = new Set(dbProperties.map(p => p.id));
+    const mockFiltered = mockProperties.slice(0, 6).filter(p => !dbIds.has(p.id));
+    return [...dbProperties, ...mockFiltered];
+  }, [dbProperties]);
+
+  const displayProperties = hasSearched ? results : allProperties;
 
   const filteredProperties = useMemo(() => {
     let props = displayProperties;

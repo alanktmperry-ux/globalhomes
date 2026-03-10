@@ -170,4 +170,17 @@ const ListingsPage = () => {
   );
 };
 
+  return (
+    <>
+      {content}
+      <PropertyDrawer
+        property={selectedProperty}
+        onClose={() => setSelectedProperty(null)}
+        isSaved={false}
+        onToggleSave={() => {}}
+      />
+    </>
+  );
+};
+
 export default ListingsPage;

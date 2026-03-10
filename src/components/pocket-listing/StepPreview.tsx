@@ -118,12 +118,12 @@ const StepPreview = ({ draft, onPublish, publishing, isEdit }: Props) => {
         >
           {publishing ? (
             <>
-              <Loader2 size={18} className="mr-2 animate-spin" /> Saving to database…
+              <Loader2 size={18} className="mr-2 animate-spin" /> {isEdit ? 'Saving changes…' : 'Saving to database…'}
             </>
           ) : (
             <>
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-success rounded-full animate-pulse shadow-lg" />
-              Publish Off-Market Listing
+              {isEdit ? 'Save Changes' : 'Publish Off-Market Listing'}
             </>
           )}
         </Button>

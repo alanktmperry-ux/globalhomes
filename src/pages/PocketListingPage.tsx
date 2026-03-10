@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PocketListingForm from '@/components/pocket-listing/PocketListingForm';
 import ListingSuccess from '@/components/pocket-listing/ListingSuccess';
+import { useAgentListings } from '@/hooks/useAgentListings';
 
 const PocketListingPage = () => {
   const navigate = useNavigate();
@@ -14,11 +15,15 @@ const PocketListingPage = () => {
   const [showForm, setShowForm] = useState(!!editId);
   const [showSuccess, setShowSuccess] = useState(false);
   const [listingTitle, setListingTitle] = useState('');
+  const { listings } = useAgentListings();
+
+  const activeCount = listings.filter(l => ('_mock_status' in l ? l._mock_status !== 'sold' : l.is_active)).length;
+  const totalLeads = listings.reduce((sum, l) => sum + ('_mock_leads' in l ? l._mock_leads : l.contact_clicks), 0);
 
   const stats = [
-    { label: 'Active', value: '12', icon: <Zap size={16} /> },
-    { label: 'Matched', value: '4', icon: <MessageSquare size={16} /> },
-    { label: 'Offers Pending', value: '2', icon: <TrendingUp size={16} /> },
+    { label: 'Active', value: String(activeCount), icon: <Zap size={16} /> },
+    { label: 'Matched', value: String(totalLeads), icon: <MessageSquare size={16} /> },
+    { label: 'Offers Pending', value: '0', icon: <TrendingUp size={16} /> },
   ];
 
   const handlePublish = (title: string) => {

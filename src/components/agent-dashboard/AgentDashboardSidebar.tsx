@@ -11,13 +11,14 @@ import {
 } from '@/components/ui/sidebar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useAgentListings } from '@/hooks/useAgentListings';
 
-const NAV = [
+const BASE_NAV = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
   { title: 'Profile', url: '/dashboard/profile', icon: User },
   { title: 'Territory', url: '/dashboard/territory', icon: MapPinned },
-  { title: 'My Listings', url: '/dashboard/listings', icon: List, badge: '12' },
-  { title: 'Voice Leads', url: '/dashboard/leads', icon: Mic, badge: '4' },
+  { title: 'My Listings', url: '/dashboard/listings', icon: List, badgeKey: 'listings' },
+  { title: 'Voice Leads', url: '/dashboard/leads', icon: Mic, badgeKey: 'leads' },
   { title: 'Analytics', url: '/dashboard/analytics', icon: BarChart3 },
   { title: 'Off-Market Network', url: '/dashboard/network', icon: Users },
   { title: 'Team', url: '/dashboard/team', icon: UserPlus },

@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
-import { Upload, Star, X, ImagePlus, Sparkles, GripVertical } from 'lucide-react';
+import { Upload, Star, X, ImagePlus, Sparkles, GripVertical, Loader2 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
+import { supabase } from '@/integrations/supabase/client';
 import type { ListingDraft } from './PocketListingForm';
 
 interface Props {
@@ -19,11 +20,29 @@ const StepPhotos = ({ draft, update }: Props) => {
   const [dragOver, setDragOver] = useState(false);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [overIdx, setOverIdx] = useState<number | null>(null);
+  const [uploading, setUploading] = useState(false);
 
-  const addPhotos = (files: FileList | null) => {
-    if (!files) return;
-    const urls = Array.from(files).map((f) => URL.createObjectURL(f));
-    update({ photos: [...draft.photos, ...urls].slice(0, 10) });
+  const addPhotos = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    const uploadedUrls: string[] = [];
+
+    for (const file of Array.from(files)) {
+      const ext = file.name.split('.').pop() || 'jpg';
+      const filePath = `${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage
+        .from('property-photos')
+        .upload(filePath, file);
+      if (!error) {
+        const { data: { publicUrl } } = supabase.storage
+          .from('property-photos')
+          .getPublicUrl(filePath);
+        uploadedUrls.push(publicUrl);
+      }
+    }
+
+    update({ photos: [...draft.photos, ...uploadedUrls].slice(0, 10) });
+    setUploading(false);
   };
 
   const removePhoto = (i: number) => {
@@ -93,9 +112,13 @@ const StepPhotos = ({ draft, update }: Props) => {
           dragOver ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40'
         }`}
       >
-        <Upload size={32} className="mx-auto text-muted-foreground mb-3" />
-        <p className="text-sm font-medium">Drop 3-10 photos here</p>
-        <p className="text-xs text-muted-foreground mt-1">or click to browse</p>
+        {uploading ? (
+          <Loader2 size={32} className="mx-auto text-primary mb-3 animate-spin" />
+        ) : (
+          <Upload size={32} className="mx-auto text-muted-foreground mb-3" />
+        )}
+        <p className="text-sm font-medium">{uploading ? 'Uploading…' : 'Drop 3-10 photos here'}</p>
+        <p className="text-xs text-muted-foreground mt-1">{uploading ? '' : 'or click to browse'}</p>
         <input
           ref={fileRef}
           type="file"

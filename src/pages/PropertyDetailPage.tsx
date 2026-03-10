@@ -331,8 +331,6 @@ export default function PropertyDetailPage() {
                   <span className="text-xs text-primary font-medium mt-1 inline-block">View profile →</span>
                 </div>
               </Link>
-                </div>
-              </div>
 
               {property.agent.isSubscribed && (
                 <span className="inline-block px-3 py-1 rounded-md bg-success text-success-foreground text-xs font-medium mb-4">

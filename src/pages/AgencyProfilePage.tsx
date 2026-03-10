@@ -68,7 +68,7 @@ const AgencyProfilePage = () => {
         .from('properties')
         .select('*')
         .in('agent_id', agentIds)
-        .eq('is_active', true)
+        .eq('status', 'public')
         .order('created_at', { ascending: false })
         .limit(12);
       if (error) throw error;

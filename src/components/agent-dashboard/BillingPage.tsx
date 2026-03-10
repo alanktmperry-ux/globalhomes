@@ -57,7 +57,7 @@ const BillingPage = () => {
         setListingLimit((sub as any).listing_limit);
       }
 
-      const { count } = await supabase.from('properties').select('id', { count: 'exact', head: true }).eq('agent_id', agent.id).eq('is_active', true);
+      const { count } = await supabase.from('properties').select('id', { count: 'exact', head: true }).eq('agent_id', agent.id).neq('status', 'sold');
       setListingsUsed(count || 0);
     } catch (err) {
       console.error(err);

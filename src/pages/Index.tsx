@@ -78,7 +78,7 @@ const Index = () => {
       const { data } = await supabase
         .from('properties')
         .select('*, agents(name, agency, phone, email, avatar_url, is_subscribed)')
-        .eq('is_active', true)
+        .eq('status', 'public')
         .order('created_at', { ascending: false })
         .limit(50);
 

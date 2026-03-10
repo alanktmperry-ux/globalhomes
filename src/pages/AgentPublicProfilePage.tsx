@@ -80,7 +80,7 @@ export default function AgentPublicProfilePage() {
           .from('properties')
           .select('*')
           .eq('agent_id', data.id)
-          .eq('is_active', true)
+          .eq('status', 'public')
           .order('created_at', { ascending: false });
 
         if (props) {

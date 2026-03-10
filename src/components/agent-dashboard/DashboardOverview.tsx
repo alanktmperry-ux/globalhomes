@@ -3,6 +3,7 @@ import { Mic, Phone, Send, Calendar, Flame, Thermometer, Snowflake, Sparkles, Ey
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import DashboardHeader from './DashboardHeader';
+import { useAgentListings } from '@/hooks/useAgentListings';
 
 const URGENCY_CONFIG = {
   hot: { icon: <Flame size={12} />, color: 'bg-destructive/15 text-destructive', label: 'Hot' },
@@ -49,10 +50,14 @@ const MOCK_NETWORK = [
 ];
 
 const DashboardOverview = () => {
+  const { listings, isMockData } = useAgentListings();
+  const activeCount = listings.filter(l => ('_mock_status' in l ? l._mock_status !== 'sold' : l.is_active)).length;
+  const totalLeads = listings.reduce((sum, l) => sum + ('_mock_leads' in l ? l._mock_leads : l.contact_clicks), 0);
+
   const stats = [
-    { label: 'Active Listings', value: '12', icon: <Zap size={16} />, color: 'text-primary' },
+    { label: 'Active Listings', value: String(activeCount), icon: <Zap size={16} />, color: 'text-primary' },
     { label: 'Voice Matches Today', value: '7', icon: <Mic size={16} />, color: 'text-success' },
-    { label: 'Qualified Leads', value: '14', icon: <MessageSquare size={16} />, color: 'text-primary' },
+    { label: 'Qualified Leads', value: String(totalLeads), icon: <MessageSquare size={16} />, color: 'text-primary' },
     { label: 'Offers Pending', value: '2', icon: <TrendingUp size={16} />, color: 'text-destructive' },
   ];
 

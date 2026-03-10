@@ -1,0 +1,408 @@
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Calendar, Eye, Home, BadgeCheck, Star, X } from 'lucide-react';
+import { Property } from '@/lib/types';
+import { useI18n } from '@/lib/i18n';
+import { useCurrency } from '@/lib/CurrencyContext';
+import { AgentContactModal } from '@/components/AgentContactModal';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { SiteHeader } from '@/components/SiteHeader';
+import { SiteFooter } from '@/components/SiteFooter';
+import { BottomNav } from '@/components/BottomNav';
+import { useSavedProperties } from '@/hooks/useSavedProperties';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { mockProperties } from '@/lib/mock-data';
+import { supabase } from '@/integrations/supabase/client';
+
+export default function PropertyDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { t } = useI18n();
+  const { formatPrice, currency } = useCurrency();
+  const { isSaved, toggleSaved } = useSavedProperties();
+  const isMobile = useIsMobile();
+
+  const [property, setProperty] = useState<Property | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [imageIndex, setImageIndex] = useState(0);
+  const [contactOpen, setContactOpen] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchProperty = async () => {
+      setLoading(true);
+      // Try DB first
+      const { data } = await supabase
+        .from('properties')
+        .select('*, agents(id, name, agency, phone, email, avatar_url, is_subscribed)')
+        .eq('id', id || '')
+        .single();
+
+      if (data) {
+        const p: any = data;
+        setProperty({
+          id: p.id,
+          title: p.title,
+          address: p.address,
+          suburb: p.suburb,
+          state: p.state,
+          country: p.country,
+          price: p.price,
+          priceFormatted: p.price_formatted,
+          beds: p.beds,
+          baths: p.baths,
+          parking: p.parking,
+          sqm: p.sqm,
+          imageUrl: p.image_url || p.images?.[0] || '',
+          images: p.images || (p.image_url ? [p.image_url] : []),
+          description: p.description || '',
+          estimatedValue: p.estimated_value || '',
+          propertyType: p.property_type || 'House',
+          features: p.features || [],
+          agent: p.agents ? {
+            id: p.agents.id || p.agent_id || '',
+            name: p.agents.name || 'Agent',
+            agency: p.agents.agency || '',
+            phone: p.agents.phone || '',
+            email: p.agents.email || '',
+            avatarUrl: p.agents.avatar_url || '',
+            isSubscribed: p.agents.is_subscribed || false,
+          } : { id: '', name: 'Private Seller', agency: '', phone: '', email: '', avatarUrl: '', isSubscribed: false },
+          listedDate: p.listed_date || p.created_at,
+          views: p.views,
+          contactClicks: p.contact_clicks,
+          status: 'listed',
+        });
+      } else {
+        // Fallback to mock
+        const mock = mockProperties.find(p => p.id === id);
+        setProperty(mock || null);
+      }
+      setLoading(false);
+    };
+    fetchProperty();
+  }, [id]);
+
+  const prevImage = () => setImageIndex(i => (i > 0 ? i - 1 : (property?.images.length || 1) - 1));
+  const nextImage = () => setImageIndex(i => (i < (property?.images.length || 1) - 1 ? i + 1 : 0));
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <SiteHeader />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!property) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <SiteHeader />
+        <div className="flex-1 flex flex-col items-center justify-center gap-4">
+          <Home size={48} className="text-muted-foreground" />
+          <h1 className="font-display text-xl font-bold text-foreground">Property not found</h1>
+          <button onClick={() => navigate('/')} className="px-6 py-2 rounded-xl bg-primary text-primary-foreground font-medium text-sm">
+            Back to search
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const saved = isSaved(property.id);
+  const images = property.images.length > 0 ? property.images : [property.imageUrl];
+
+  const statusConfig: Record<string, { label: string; className: string }> = {
+    'off-market': { label: 'Off-Market', className: 'bg-amber-500/90 text-white' },
+    'coming-soon': { label: 'Coming Soon', className: 'bg-blue-500/90 text-white' },
+    'new': { label: 'New', className: 'bg-emerald-500/90 text-white' },
+  };
+  const badge = property.status && property.status !== 'listed' ? statusConfig[property.status] : null;
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      <SiteHeader />
+
+      {/* Back button */}
+      <div className="max-w-6xl mx-auto w-full px-4 pt-4">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
+        >
+          <ArrowLeft size={16} />
+          Back to results
+        </button>
+      </div>
+
+      <main className="flex-1 max-w-6xl mx-auto w-full px-4 pb-24 md:pb-12">
+        {/* Hero image gallery */}
+        <div className="relative rounded-2xl overflow-hidden aspect-[16/9] md:aspect-[2.4/1] mb-4">
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={imageIndex}
+              src={images[imageIndex]}
+              alt={`${property.title} - Photo ${imageIndex + 1}`}
+              className="w-full h-full object-cover cursor-pointer"
+              onClick={() => setLightboxOpen(true)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            />
+          </AnimatePresence>
+
+          {images.length > 1 && (
+            <>
+              <button onClick={prevImage} className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors shadow-md">
+                <ChevronLeft size={20} />
+              </button>
+              <button onClick={nextImage} className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors shadow-md">
+                <ChevronRight size={20} />
+              </button>
+            </>
+          )}
+
+          <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-full bg-card/80 backdrop-blur-sm text-xs font-medium text-foreground">
+            {imageIndex + 1}/{images.length}
+          </div>
+
+          {/* Badges */}
+          <div className="absolute top-4 left-4 flex gap-2">
+            {badge && (
+              <span className={`px-3 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase shadow-sm ${badge.className}`}>
+                {badge.label}
+              </span>
+            )}
+            <span className="px-3 py-1.5 rounded-full bg-card/80 backdrop-blur-sm text-xs font-bold tracking-wide uppercase text-foreground">
+              {property.propertyType}
+            </span>
+          </div>
+
+          {/* Action buttons */}
+          <div className="absolute top-4 right-4 flex gap-2">
+            <button
+              onClick={() => toggleSaved(property.id)}
+              className="w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center transition-transform active:scale-90 shadow-md"
+            >
+              <Heart size={18} className={saved ? 'fill-destructive text-destructive' : 'text-foreground/70'} />
+            </button>
+            <button className="w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center shadow-md">
+              <Share2 size={18} className="text-foreground/70" />
+            </button>
+          </div>
+        </div>
+
+        {/* Thumbnail strip */}
+        {images.length > 1 && (
+          <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
+            {images.map((img, i) => (
+              <button
+                key={i}
+                onClick={() => setImageIndex(i)}
+                className={`shrink-0 w-20 h-14 rounded-lg overflow-hidden border-2 transition-all ${
+                  i === imageIndex ? 'border-primary shadow-md' : 'border-transparent opacity-60 hover:opacity-100'
+                }`}
+              >
+                <img src={img} alt="" className="w-full h-full object-cover" />
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Content grid */}
+        <div className="grid md:grid-cols-3 gap-6">
+          {/* Main content - 2 cols */}
+          <div className="md:col-span-2 space-y-6">
+            {/* Price + title */}
+            <div>
+              <p className="font-display text-3xl md:text-4xl font-bold text-foreground">{formatPrice(property.price)}</p>
+              {currency.code !== 'AUD' && (
+                <p className="text-sm text-muted-foreground mt-0.5">{property.priceFormatted} AUD</p>
+              )}
+              <h1 className="font-display text-xl md:text-2xl font-semibold text-foreground mt-2">{property.title}</h1>
+              <p className="flex items-center gap-1.5 text-muted-foreground mt-1.5">
+                <MapPin size={16} />
+                {property.address}, {property.suburb}, {property.state}
+                {property.country && property.country !== 'Australia' ? `, ${property.country}` : ''}
+              </p>
+            </div>
+
+            {/* Key stats */}
+            <div className="grid grid-cols-4 gap-3">
+              {[
+                { icon: Bed, value: property.beds, label: t('property.beds') },
+                { icon: Bath, value: property.baths, label: t('property.baths') },
+                { icon: Car, value: property.parking, label: t('property.parking') },
+                { icon: Ruler, value: `${property.sqm}m²`, label: 'Size' },
+              ].map(stat => (
+                <div key={stat.label} className="flex flex-col items-center p-4 rounded-xl bg-secondary">
+                  <stat.icon size={20} className="text-primary mb-1.5" />
+                  <span className="font-display font-bold text-foreground">{stat.value}</span>
+                  <span className="text-xs text-muted-foreground">{stat.label}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Detail chips */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {property.estimatedValue && (
+                <div className="col-span-2 sm:col-span-3 p-4 rounded-xl bg-primary/5 border border-primary/10">
+                  <p className="text-xs text-primary font-medium uppercase tracking-wider">{t('property.estimated')}</p>
+                  <p className="font-display font-bold text-foreground text-lg mt-1">{property.estimatedValue}</p>
+                </div>
+              )}
+              {property.listedDate && (
+                <div className="p-3 rounded-xl bg-secondary flex items-center gap-3">
+                  <Calendar size={16} className="text-muted-foreground shrink-0" />
+                  <div>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Listed</p>
+                    <p className="text-sm font-semibold text-foreground">{new Date(property.listedDate).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                  </div>
+                </div>
+              )}
+              {property.views > 0 && (
+                <div className="p-3 rounded-xl bg-secondary flex items-center gap-3">
+                  <Eye size={16} className="text-muted-foreground shrink-0" />
+                  <div>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Views</p>
+                    <p className="text-sm font-semibold text-foreground">{property.views.toLocaleString()}</p>
+                  </div>
+                </div>
+              )}
+              <div className="p-3 rounded-xl bg-secondary flex items-center gap-3">
+                <Home size={16} className="text-muted-foreground shrink-0" />
+                <div>
+                  <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Type</p>
+                  <p className="text-sm font-semibold text-foreground">{property.propertyType}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Description */}
+            {property.description && (
+              <div>
+                <h2 className="font-display text-lg font-semibold text-foreground mb-3">Description</h2>
+                <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{property.description}</p>
+              </div>
+            )}
+
+            {/* Features */}
+            {property.features.length > 0 && (
+              <div>
+                <h2 className="font-display text-lg font-semibold text-foreground mb-3">Features</h2>
+                <div className="flex flex-wrap gap-2">
+                  {property.features.map(f => (
+                    <span key={f} className="px-3 py-1.5 rounded-full bg-secondary text-sm font-medium text-secondary-foreground">
+                      {f}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Sidebar - agent card */}
+          <div className="space-y-4">
+            <div className="p-5 rounded-2xl bg-card border border-border shadow-card sticky top-4">
+              <h3 className="font-display font-semibold text-foreground mb-4">{t('property.agent')}</h3>
+              <div className="flex items-center gap-3 mb-5">
+                <div className="relative">
+                  <Avatar className="w-16 h-16 border-2 border-primary">
+                    <AvatarImage src={property.agent.avatarUrl} alt={property.agent.name} className="object-cover" />
+                    <AvatarFallback className="text-lg font-bold">{property.agent.name[0]}</AvatarFallback>
+                  </Avatar>
+                  {property.agent.isSubscribed && (
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                      <BadgeCheck size={14} className="text-primary-foreground" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className="font-display font-semibold text-foreground text-lg">{property.agent.name}</p>
+                  <p className="text-sm text-muted-foreground">{property.agent.agency}</p>
+                  <div className="flex items-center gap-1 mt-1">
+                    <Star size={14} className="fill-yellow-400 text-yellow-400" />
+                    <span className="text-sm font-medium text-foreground">4.8</span>
+                  </div>
+                </div>
+              </div>
+
+              {property.agent.isSubscribed && (
+                <span className="inline-block px-3 py-1 rounded-md bg-success text-success-foreground text-xs font-medium mb-4">
+                  {t('agent.subscribed')}
+                </span>
+              )}
+
+              <button
+                onClick={() => setContactOpen(true)}
+                className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors"
+              >
+                {t('property.contact')}
+              </button>
+
+              {property.agent.phone && (
+                <a
+                  href={`tel:${property.agent.phone}`}
+                  className="w-full mt-3 py-3 rounded-xl border border-border bg-secondary text-foreground font-medium text-sm flex items-center justify-center gap-2 hover:bg-accent transition-colors"
+                >
+                  📞 {property.agent.phone}
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Mobile sticky CTA */}
+      {isMobile && (
+        <div className="fixed bottom-16 left-0 right-0 p-4 bg-card/95 backdrop-blur-sm border-t border-border z-30">
+          <button
+            onClick={() => setContactOpen(true)}
+            className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm"
+          >
+            {t('property.contact')}
+          </button>
+        </div>
+      )}
+
+      {/* Lightbox */}
+      <AnimatePresence>
+        {lightboxOpen && (
+          <motion.div
+            className="fixed inset-0 z-[60] bg-black/95 flex items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <button onClick={() => setLightboxOpen(false)} className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white z-10">
+              <X size={20} />
+            </button>
+            <button onClick={prevImage} className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white">
+              <ChevronLeft size={24} />
+            </button>
+            <button onClick={nextImage} className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white">
+              <ChevronRight size={24} />
+            </button>
+            <img src={images[imageIndex]} alt="" className="max-w-[90vw] max-h-[85vh] object-contain rounded-lg" />
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/80 text-sm font-medium">
+              {imageIndex + 1} / {images.length}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <SiteFooter />
+      <BottomNav />
+
+      <AgentContactModal
+        property={property}
+        open={contactOpen}
+        onClose={() => setContactOpen(false)}
+      />
+    </div>
+  );
+}

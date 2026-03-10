@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Bed, Bath, Car, Heart, BadgeCheck, Star } from 'lucide-react';
 import { Property, PropertyStatus } from '@/lib/types';
@@ -19,6 +20,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
   const { t } = useI18n();
   const { formatPrice, currency } = useCurrency();
   const [contactOpen, setContactOpen] = useState(false);
+  const navigate = useNavigate();
 
   const statusConfig: Record<PropertyStatus, { label: string; className: string } | null> = {
     'off-market': { label: 'Off-Market', className: 'bg-amber-500/90 text-white' },
@@ -38,7 +40,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
         className="group cursor-pointer rounded-2xl bg-card shadow-card overflow-hidden border border-border/50 transition-all duration-300 hover:shadow-elevated hover:scale-[1.03]"
       >
         {/* Image */}
-        <div className="relative aspect-[4/3] overflow-hidden" onClick={() => onSelect(property)}>
+        <div className="relative aspect-[4/3] overflow-hidden" onClick={() => { onSelect(property); navigate(`/property/${property.id}`); }}>
           <img
             src={property.imageUrl}
             alt={property.title}
@@ -69,7 +71,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
         </div>
 
         {/* Property info */}
-        <div className="p-4" onClick={() => onSelect(property)}>
+        <div className="p-4" onClick={() => { onSelect(property); navigate(`/property/${property.id}`); }}>
           <h3 className="font-display font-semibold text-foreground text-base leading-tight mb-1 line-clamp-1">
             {property.title}
           </h3>

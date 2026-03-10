@@ -21,8 +21,7 @@ const STATUS_CONFIG: Record<string, { icon: React.ReactNode; label: string; colo
 
 function getListingStatus(l: AgentListing): string {
   if ('_mock_status' in l) return l._mock_status;
-  if (!l.is_active) return 'sold';
-  return 'public';
+  return (l as any).status || 'public';
 }
 
 function getListingLeads(l: AgentListing): number {

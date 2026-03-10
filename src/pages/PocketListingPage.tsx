@@ -7,15 +7,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PocketListingForm from '@/components/pocket-listing/PocketListingForm';
 import ListingSuccess from '@/components/pocket-listing/ListingSuccess';
 import { useAgentListings } from '@/hooks/useAgentListings';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/lib/AuthProvider';
 
 const PocketListingPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const editId = searchParams.get('edit');
-  const [showForm, setShowForm] = useState(!!editId);
+  const duplicateId = searchParams.get('duplicate');
+  const [showForm, setShowForm] = useState(!!editId || !!duplicateId);
   const [showSuccess, setShowSuccess] = useState(false);
   const [listingTitle, setListingTitle] = useState('');
-  const { listings } = useAgentListings();
+  const { listings, agentId } = useAgentListings();
+  const { toast } = useToast();
 
   const activeCount = listings.filter(l => ('_mock_status' in l ? l._mock_status !== 'sold' : l.is_active)).length;
   const totalLeads = listings.reduce((sum, l) => sum + ('_mock_leads' in l ? l._mock_leads : l.contact_clicks), 0);
@@ -49,7 +54,17 @@ const PocketListingPage = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="hidden sm:flex gap-1.5 text-xs">
+              <Button variant="outline" size="sm" className="hidden sm:flex gap-1.5 text-xs" onClick={() => {
+                // Find most recent real (db) listing
+                const realListing = listings.find(l => '_source' in l && l._source === 'db');
+                if (realListing) {
+                  navigate(`/pocket-listing?duplicate=${realListing.id}`);
+                  setShowForm(true);
+                  setShowSuccess(false);
+                } else {
+                  toast({ title: 'No previous listing to duplicate', description: 'Create your first listing first.', variant: 'destructive' });
+                }
+              }}>
                 <Copy size={14} /> Duplicate Previous
               </Button>
               <Button
@@ -94,8 +109,9 @@ const PocketListingPage = () => {
               >
                 <PocketListingForm
                   onPublish={handlePublish}
-                  onCancel={() => { setShowForm(false); if (editId) navigate('/pocket-listing'); }}
+                  onCancel={() => { setShowForm(false); if (editId || duplicateId) navigate('/pocket-listing'); }}
                   editPropertyId={editId}
+                  duplicatePropertyId={duplicateId}
                 />
               </motion.div>
             ) : (

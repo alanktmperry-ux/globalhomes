@@ -72,6 +72,8 @@ interface Props {
   onCancel: () => void;
   /** When provided, the form loads this property for editing */
   editPropertyId?: string | null;
+  /** When provided, the form loads this property's data but creates a new listing */
+  duplicatePropertyId?: string | null;
 }
 
 const formatPriceForDB = (draft: ListingDraft): string => {
@@ -84,11 +86,12 @@ const formatPriceForDB = (draft: ListingDraft): string => {
   }
 };
 
-const PocketListingForm = ({ onPublish, onCancel, editPropertyId }: Props) => {
+const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePropertyId }: Props) => {
+  const loadPropertyId = editPropertyId || duplicatePropertyId;
   const [step, setStep] = useState(0);
   const [draft, setDraft] = useState<ListingDraft>(DEFAULT_DRAFT);
   const [publishing, setPublishing] = useState(false);
-  const [loadingEdit, setLoadingEdit] = useState(!!editPropertyId);
+  const [loadingEdit, setLoadingEdit] = useState(!!loadPropertyId);
   const autoSaveRef = useRef<ReturnType<typeof setInterval>>();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -98,13 +101,13 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId }: Props) => {
 
   // Load existing property for editing
   useEffect(() => {
-    if (!editPropertyId) return;
+    if (!loadPropertyId) return;
     const loadProperty = async () => {
       setLoadingEdit(true);
       const { data: prop, error } = await supabase
         .from('properties')
         .select('*')
-        .eq('id', editPropertyId)
+        .eq('id', loadPropertyId)
         .maybeSingle();
 
       if (error || !prop) {
@@ -113,21 +116,19 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId }: Props) => {
         return;
       }
 
-      // Detect price display from formatted string
       let priceDisplay: ListingDraft['priceDisplay'] = 'exact';
       if (prop.price_formatted.includes('–')) priceDisplay = 'range';
       else if (prop.price_formatted.toLowerCase().includes('expression')) priceDisplay = 'eoi';
       else if (prop.price_formatted.toLowerCase().includes('contact')) priceDisplay = 'contact';
 
-      // Parse description back into transcript + bullets
       const descLines = (prop.description || '').split('\n').filter(Boolean);
       const bulletLines = descLines.filter(l => l.startsWith('•')).map(l => l.replace(/^•\s*/, ''));
       const transcriptLines = descLines.filter(l => !l.startsWith('•') && l !== 'Key Features:');
 
       setDraft({
-        address: prop.address,
-        suburb: prop.suburb,
-        state: prop.state,
+        address: duplicatePropertyId ? '' : prop.address,
+        suburb: duplicatePropertyId ? '' : prop.suburb,
+        state: duplicatePropertyId ? '' : prop.state,
         priceMin: Math.round(prop.price * 0.9),
         priceMax: prop.price,
         priceDisplay,
@@ -135,10 +136,10 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId }: Props) => {
         beds: prop.beds,
         baths: prop.baths,
         cars: prop.parking,
-        photos: prop.images || (prop.image_url ? [prop.image_url] : []),
+        photos: duplicatePropertyId ? [] : (prop.images || (prop.image_url ? [prop.image_url] : [])),
         primaryPhoto: 0,
         voiceTranscript: transcriptLines.join('\n'),
-        generatedTitle: prop.title,
+        generatedTitle: duplicatePropertyId ? '' : prop.title,
         generatedBullets: bulletLines,
         features: prop.features || [],
         visibility: prop.is_active ? 'public' : 'whisper',
@@ -152,7 +153,7 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId }: Props) => {
       setLoadingEdit(false);
     };
     loadProperty();
-  }, [editPropertyId]);
+  }, [loadPropertyId]);
 
   // Auto-save every 10 seconds (only for new listings)
   useEffect(() => {
@@ -281,7 +282,7 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId }: Props) => {
       <div className="px-4 pt-4 pb-2">
         <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
           <span>Step {step + 1} of {STEPS.length}: <strong className="text-foreground">{STEPS[step]}</strong></span>
-          {!editPropertyId && (
+           {!editPropertyId && !duplicatePropertyId && (
             <span className="flex items-center gap-1 text-success">
               <Save size={12} /> Auto-saved
             </span>
@@ -289,6 +290,11 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId }: Props) => {
           {editPropertyId && (
             <span className="flex items-center gap-1 text-primary">
               <Save size={12} /> Editing
+            </span>
+          )}
+          {duplicatePropertyId && (
+            <span className="flex items-center gap-1 text-primary">
+              <Save size={12} /> Duplicating
             </span>
           )}
         </div>

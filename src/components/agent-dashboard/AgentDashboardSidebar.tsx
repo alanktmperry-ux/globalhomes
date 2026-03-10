@@ -32,6 +32,12 @@ const AgentDashboardSidebar = () => {
   const collapsed = state === 'collapsed';
   const location = useLocation();
   const navigate = useNavigate();
+  const { signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   const isActive = (path: string) =>
     path === '/dashboard'

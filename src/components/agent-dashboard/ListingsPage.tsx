@@ -59,7 +59,7 @@ const ListingsPage = () => {
   const handleMarkSold = async (l: AgentListing) => {
     if (l._source !== 'db') { toast({ title: 'Demo listing', description: 'Create a real listing first.' }); return; }
     setActionLoading(l.id);
-    const { error } = await supabase.from('properties').update({ is_active: false }).eq('id', l.id);
+    const { error } = await supabase.from('properties').update({ status: 'sold', is_active: false } as any).eq('id', l.id);
     if (error) { toast({ title: 'Failed to update', variant: 'destructive' }); }
     else { toast({ title: 'Marked as sold!', description: 'Listing has been marked as sold.' }); refetch(); }
     setActionLoading(null);

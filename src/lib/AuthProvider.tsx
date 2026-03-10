@@ -46,10 +46,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!force && lastFetchedUserId.current === userId) return;
     lastFetchedUserId.current = userId;
 
-    const { data } = await supabase
+    console.log('[Auth] fetchRoles called for:', userId, 'force:', force);
+
+    const { data, error } = await supabase
       .from('user_roles')
       .select('role')
       .eq('user_id', userId);
+
+    console.log('[Auth] fetchRoles result:', { data, error });
 
     const roles = data?.map((r) => r.role) || [];
     applyRoles(roles);

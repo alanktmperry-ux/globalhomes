@@ -40,27 +40,27 @@ const AgentAuthPage = () => {
     setStep('password');
   };
 
-  // Navigate once AuthProvider confirms the user is an agent
+  // Navigate once AuthProvider confirms the user is an agent or admin
   useEffect(() => {
-    if (pendingRedirect === 'dashboard' && user && isAgent && !authLoading) {
+    if (pendingRedirect === 'dashboard' && user && (isAgent || isAdmin) && !authLoading) {
       setPendingRedirect(null);
       setLoading(false);
       navigate('/dashboard');
     }
-  }, [pendingRedirect, user, isAgent, authLoading, navigate]);
+  }, [pendingRedirect, user, isAgent, isAdmin, authLoading, navigate]);
 
-  // Safety: if pending redirect but auth settles without agent role, reset
-  // Give roles up to 5 seconds to load before showing error
+  // Safety: if pending redirect but auth settles without agent/admin role, reset
+  // Wait up to 8 seconds for roles to load before showing error
   useEffect(() => {
-    if (pendingRedirect === 'dashboard' && user && !authLoading && !isAgent) {
+    if (pendingRedirect === 'dashboard' && user && !authLoading && !isAgent && !isAdmin) {
       const timeout = setTimeout(() => {
         setPendingRedirect(null);
         setLoading(false);
-        toast({ title: 'Error', description: 'This account does not have agent access.', variant: 'destructive' });
-      }, 5000);
+        toast({ title: 'Error', description: 'This account does not have agent access. Please contact support if you believe this is an error.', variant: 'destructive' });
+      }, 8000);
       return () => clearTimeout(timeout);
     }
-  }, [pendingRedirect, user, authLoading, isAgent, toast]);
+  }, [pendingRedirect, user, authLoading, isAgent, isAdmin, toast]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();

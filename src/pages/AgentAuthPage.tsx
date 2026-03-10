@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Building2, KeyRound, Plus, BarChart3, Users, Megaphone } from 'lucide-react';
 import PhoneInput from '@/components/PhoneInput';
@@ -6,6 +6,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/lib/AuthProvider';
 import agentHero from '@/assets/agent-auth-hero.jpg';
 
 type Step = 'email' | 'password' | 'choose' | 'create-agency' | 'join-agency';
@@ -13,6 +14,8 @@ type Step = 'email' | 'password' | 'choose' | 'create-agency' | 'join-agency';
 const AgentAuthPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, isAgent, loading: authLoading } = useAuth();
+  const [pendingRedirect, setPendingRedirect] = useState<'dashboard' | null>(null);
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -37,6 +40,28 @@ const AgentAuthPage = () => {
     setStep('password');
   };
 
+  // Navigate once AuthProvider confirms the user is an agent
+  useEffect(() => {
+    if (pendingRedirect === 'dashboard' && user && isAgent && !authLoading) {
+      setPendingRedirect(null);
+      setLoading(false);
+      navigate('/dashboard');
+    }
+  }, [pendingRedirect, user, isAgent, authLoading, navigate]);
+
+  // Safety: if pending redirect but auth settles without agent role, reset
+  useEffect(() => {
+    if (pendingRedirect === 'dashboard' && user && !authLoading && !isAgent) {
+      // User signed in but doesn't have agent role
+      const timeout = setTimeout(() => {
+        setPendingRedirect(null);
+        setLoading(false);
+        toast({ title: 'Error', description: 'This account does not have agent access.', variant: 'destructive' });
+      }, 2000);
+      return () => clearTimeout(timeout);
+    }
+  }, [pendingRedirect, user, authLoading, isAgent, toast]);
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -51,10 +76,9 @@ const AgentAuthPage = () => {
         throw error;
       }
       toast({ title: 'Welcome back, Agent!' });
-      navigate('/dashboard');
+      setPendingRedirect('dashboard');
     } catch (err: any) {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
-    } finally {
       setLoading(false);
     }
   };
@@ -100,17 +124,17 @@ const AgentAuthPage = () => {
         } else {
           toast({ title: 'Welcome to the team!', description: `You've joined ${setupResult?.agencyName || 'the agency'}.` });
         }
-        navigate('/dashboard');
+        setPendingRedirect('dashboard');
       } else {
         toast({
           title: 'Check your email',
           description: 'We sent you a confirmation link. Please verify your email to sign in.',
         });
         setStep('email');
+        setLoading(false);
       }
     } catch (err: any) {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
-    } finally {
       setLoading(false);
     }
   };

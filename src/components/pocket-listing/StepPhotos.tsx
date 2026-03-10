@@ -112,9 +112,13 @@ const StepPhotos = ({ draft, update }: Props) => {
           dragOver ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40'
         }`}
       >
-        <Upload size={32} className="mx-auto text-muted-foreground mb-3" />
-        <p className="text-sm font-medium">Drop 3-10 photos here</p>
-        <p className="text-xs text-muted-foreground mt-1">or click to browse</p>
+        {uploading ? (
+          <Loader2 size={32} className="mx-auto text-primary mb-3 animate-spin" />
+        ) : (
+          <Upload size={32} className="mx-auto text-muted-foreground mb-3" />
+        )}
+        <p className="text-sm font-medium">{uploading ? 'Uploading…' : 'Drop 3-10 photos here'}</p>
+        <p className="text-xs text-muted-foreground mt-1">{uploading ? '' : 'or click to browse'}</p>
         <input
           ref={fileRef}
           type="file"

@@ -282,7 +282,7 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePrope
       <div className="px-4 pt-4 pb-2">
         <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
           <span>Step {step + 1} of {STEPS.length}: <strong className="text-foreground">{STEPS[step]}</strong></span>
-          {!editPropertyId && (
+           {!editPropertyId && !duplicatePropertyId && (
             <span className="flex items-center gap-1 text-success">
               <Save size={12} /> Auto-saved
             </span>
@@ -290,6 +290,11 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePrope
           {editPropertyId && (
             <span className="flex items-center gap-1 text-primary">
               <Save size={12} /> Editing
+            </span>
+          )}
+          {duplicatePropertyId && (
+            <span className="flex items-center gap-1 text-primary">
+              <Save size={12} /> Duplicating
             </span>
           )}
         </div>

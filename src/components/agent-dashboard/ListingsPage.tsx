@@ -126,7 +126,12 @@ const ListingsPage = () => {
               const daysColor = days < 7 ? 'text-success' : days < 15 ? 'text-primary' : 'text-destructive';
               return (
                 <div key={l.id} className="bg-card border border-border rounded-xl p-4 flex flex-col sm:flex-row gap-4">
-                  <img src={getListingThumb(l)} alt="" className="w-full sm:w-28 h-20 rounded-lg object-cover shrink-0" />
+                  <img
+                    src={getListingThumb(l)}
+                    alt=""
+                    className="w-full sm:w-28 h-20 rounded-lg object-cover shrink-0 cursor-pointer transition-transform duration-200 hover:scale-105"
+                    onClick={() => setSelectedProperty(toProperty(l))}
+                  />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <Badge className={`${s.color} text-[10px] gap-0.5 border-0`}>{s.icon} {s.label}</Badge>

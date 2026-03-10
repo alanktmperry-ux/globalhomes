@@ -209,6 +209,7 @@ const ProfilePage = () => {
     } catch (err: any) {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
     }
+  };
 
   const handleDocUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

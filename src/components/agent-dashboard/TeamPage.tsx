@@ -174,6 +174,20 @@ const TeamPage = () => {
     loadData();
   };
 
+  const handleChangeRole = async (memberId: string, newRole: string) => {
+    try {
+      const { error } = await supabase
+        .from('agency_members')
+        .update({ role: newRole as any })
+        .eq('id', memberId);
+      if (error) throw error;
+      toast({ title: 'Role updated', description: `Member role changed to ${newRole}` });
+      loadData();
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    }
+  };
+
   const copyCode = (code: string) => {
     navigator.clipboard.writeText(code);
     toast({ title: 'Copied!', description: `${code} copied to clipboard` });
@@ -310,9 +324,24 @@ const TeamPage = () => {
                 </p>
                 <p className="text-xs text-muted-foreground truncate">{m.agents?.email || ''}</p>
               </div>
-              <Badge variant="outline" className={`text-[10px] ${roleBadgeClass[m.role] || ''}`}>
-                {m.role}
-              </Badge>
+              {isOwnerOrAdmin && m.user_id !== user?.id && m.role !== 'owner' ? (
+                <Select
+                  value={m.role}
+                  onValueChange={(newRole) => handleChangeRole(m.id, newRole)}
+                >
+                  <SelectTrigger className="w-[110px] h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="agent">Agent</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Badge variant="outline" className={`text-[10px] ${roleBadgeClass[m.role] || ''}`}>
+                  {m.role}
+                </Badge>
+              )}
               {isOwnerOrAdmin && m.user_id !== user?.id && m.role !== 'owner' && (
                 <button
                   onClick={() => handleRemoveMember(m.id, m.user_id)}

@@ -19,6 +19,7 @@ import { mockProperties } from '@/lib/mock-data';
 import { useToast } from '@/hooks/use-toast';
 import { useCurrency } from '@/lib/CurrencyContext';
 import { FilterSidebar, Filters, defaultFilters } from '@/components/FilterSidebar';
+import { supabase } from '@/integrations/supabase/client';
 
 type AreaSearch =
   | { type: 'circle'; center: [number, number]; radius: number }
@@ -53,6 +54,7 @@ const Index = () => {
   const { formatPrice } = useCurrency();
 
   const [results, setResults] = useState<Property[]>([]);
+  const [dbProperties, setDbProperties] = useState<Property[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
@@ -62,13 +64,65 @@ const Index = () => {
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key: number } | null>(null);
   const [splitPercent, setSplitPercent] = useState(50);
   const [mapFullscreen, setMapFullscreen] = useState(false);
-  const [mapCollapsed, setMapCollapsed] = useState(true); // Collapsed by default to maximize property space
+  const [mapCollapsed, setMapCollapsed] = useState(true);
   const [bottomSheetExpanded, setBottomSheetExpanded] = useState(false);
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'newest' | 'beds'>('default');
   const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const isDragging = useRef(false);
   const cardRefs = useRef<globalThis.Map<string, HTMLDivElement>>(new globalThis.Map());
+
+  // Fetch active properties from the database
+  useEffect(() => {
+    const fetchDbProperties = async () => {
+      const { data } = await supabase
+        .from('properties')
+        .select('*, agents(name, agency, phone, email, avatar_url, is_subscribed)')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (data && data.length > 0) {
+        const mapped: Property[] = data.map((p: any) => ({
+          id: p.id,
+          title: p.title,
+          address: p.address,
+          suburb: p.suburb,
+          state: p.state,
+          country: p.country,
+          price: p.price,
+          priceFormatted: p.price_formatted,
+          beds: p.beds,
+          baths: p.baths,
+          parking: p.parking,
+          sqm: p.sqm,
+          imageUrl: p.image_url || p.images?.[0] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80',
+          images: p.images || (p.image_url ? [p.image_url] : []),
+          description: p.description || '',
+          estimatedValue: p.estimated_value || '',
+          propertyType: p.property_type || 'House',
+          features: p.features || [],
+          agent: p.agents ? {
+            id: p.agent_id || '',
+            name: p.agents.name || 'Agent',
+            agency: p.agents.agency || '',
+            phone: p.agents.phone || '',
+            email: p.agents.email || '',
+            avatarUrl: p.agents.avatar_url || '',
+            isSubscribed: p.agents.is_subscribed || false,
+          } : {
+            id: '', name: 'Private Seller', agency: '', phone: '', email: '', avatarUrl: '', isSubscribed: false,
+          },
+          listedDate: p.listed_date || p.created_at,
+          views: p.views,
+          contactClicks: p.contact_clicks,
+          status: 'listed' as const,
+        }));
+        setDbProperties(mapped);
+      }
+    };
+    fetchDbProperties();
+  }, []);
 
   const handleSearch = useCallback(async (query: string) => {
     setIsSearching(true);
@@ -95,7 +149,14 @@ const Index = () => {
     }
   }, [addSearch, toast]);
 
-  const displayProperties = hasSearched ? results : mockProperties.slice(0, 6);
+  // Merge DB properties with mock, DB first, dedup by id
+  const allProperties = useMemo(() => {
+    const dbIds = new Set(dbProperties.map(p => p.id));
+    const mockFiltered = mockProperties.slice(0, 6).filter(p => !dbIds.has(p.id));
+    return [...dbProperties, ...mockFiltered];
+  }, [dbProperties]);
+
+  const displayProperties = hasSearched ? results : allProperties;
 
   const filteredProperties = useMemo(() => {
     let props = displayProperties;

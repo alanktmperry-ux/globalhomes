@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Plus, Zap, Eye, MessageSquare, TrendingUp, Copy, Sparkles } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PocketListingForm from '@/components/pocket-listing/PocketListingForm';
@@ -9,7 +9,9 @@ import ListingSuccess from '@/components/pocket-listing/ListingSuccess';
 
 const PocketListingPage = () => {
   const navigate = useNavigate();
-  const [showForm, setShowForm] = useState(false);
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get('edit');
+  const [showForm, setShowForm] = useState(!!editId);
   const [showSuccess, setShowSuccess] = useState(false);
   const [listingTitle, setListingTitle] = useState('');
 
@@ -87,7 +89,8 @@ const PocketListingPage = () => {
               >
                 <PocketListingForm
                   onPublish={handlePublish}
-                  onCancel={() => setShowForm(false)}
+                  onCancel={() => { setShowForm(false); if (editId) navigate('/pocket-listing'); }}
+                  editPropertyId={editId}
                 />
               </motion.div>
             ) : (

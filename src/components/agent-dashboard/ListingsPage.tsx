@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Eye, EyeOff, Zap, CheckCircle2, Clock, Sparkles, TrendingUp, Rocket, Info, Loader2 } from 'lucide-react';
+import { Plus, Eye, EyeOff, Zap, CheckCircle2, Clock, Sparkles, TrendingUp, Rocket, Info, Loader2, Pencil } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import DashboardHeader from './DashboardHeader';
 import { useAgentListings, type AgentListing } from '@/hooks/useAgentListings';
@@ -111,7 +111,11 @@ const ListingsPage = () => {
                     <span className="text-xs text-muted-foreground flex items-center gap-1"><Eye size={10} /> {l.views}</span>
                     <span className="text-xs text-muted-foreground flex items-center gap-1"><Sparkles size={10} /> {leads} leads</span>
                     <div className="flex gap-1 mt-1">
-                      <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2">Edit</Button>
+                      <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5" onClick={() => {
+                        if (l._source === 'db') navigate(`/pocket-listing?edit=${l.id}`);
+                      }}>
+                        <Pencil size={10} /> Edit
+                      </Button>
                       {l._status !== 'public' && l._status !== 'sold' && (
                         <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5">
                           <Rocket size={10} /> Boost

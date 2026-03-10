@@ -70,6 +70,8 @@ const STEPS = ['Address', 'Basics', 'Photos', 'Voice', 'Settings', 'Preview'];
 interface Props {
   onPublish: (title: string) => void;
   onCancel: () => void;
+  /** When provided, the form loads this property for editing */
+  editPropertyId?: string | null;
 }
 
 const formatPriceForDB = (draft: ListingDraft): string => {
@@ -82,10 +84,11 @@ const formatPriceForDB = (draft: ListingDraft): string => {
   }
 };
 
-const PocketListingForm = ({ onPublish, onCancel }: Props) => {
+const PocketListingForm = ({ onPublish, onCancel, editPropertyId }: Props) => {
   const [step, setStep] = useState(0);
   const [draft, setDraft] = useState<ListingDraft>(DEFAULT_DRAFT);
   const [publishing, setPublishing] = useState(false);
+  const [loadingEdit, setLoadingEdit] = useState(!!editPropertyId);
   const autoSaveRef = useRef<ReturnType<typeof setInterval>>();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -93,21 +96,81 @@ const PocketListingForm = ({ onPublish, onCancel }: Props) => {
   const update = (partial: Partial<ListingDraft>) =>
     setDraft((d) => ({ ...d, ...partial }));
 
-  // Auto-save every 10 seconds
+  // Load existing property for editing
   useEffect(() => {
+    if (!editPropertyId) return;
+    const loadProperty = async () => {
+      setLoadingEdit(true);
+      const { data: prop, error } = await supabase
+        .from('properties')
+        .select('*')
+        .eq('id', editPropertyId)
+        .maybeSingle();
+
+      if (error || !prop) {
+        toast({ title: 'Could not load listing', variant: 'destructive' });
+        setLoadingEdit(false);
+        return;
+      }
+
+      // Detect price display from formatted string
+      let priceDisplay: ListingDraft['priceDisplay'] = 'exact';
+      if (prop.price_formatted.includes('–')) priceDisplay = 'range';
+      else if (prop.price_formatted.toLowerCase().includes('expression')) priceDisplay = 'eoi';
+      else if (prop.price_formatted.toLowerCase().includes('contact')) priceDisplay = 'contact';
+
+      // Parse description back into transcript + bullets
+      const descLines = (prop.description || '').split('\n').filter(Boolean);
+      const bulletLines = descLines.filter(l => l.startsWith('•')).map(l => l.replace(/^•\s*/, ''));
+      const transcriptLines = descLines.filter(l => !l.startsWith('•') && l !== 'Key Features:');
+
+      setDraft({
+        address: prop.address,
+        suburb: prop.suburb,
+        state: prop.state,
+        priceMin: Math.round(prop.price * 0.9),
+        priceMax: prop.price,
+        priceDisplay,
+        propertyType: prop.property_type || 'House',
+        beds: prop.beds,
+        baths: prop.baths,
+        cars: prop.parking,
+        photos: prop.images || (prop.image_url ? [prop.image_url] : []),
+        primaryPhoto: 0,
+        voiceTranscript: transcriptLines.join('\n'),
+        generatedTitle: prop.title,
+        generatedBullets: bulletLines,
+        features: prop.features || [],
+        visibility: prop.is_active ? 'public' : 'whisper',
+        exclusiveDays: 14,
+        buyerRequirements: 'none',
+        showContact: true,
+        allowCoBroke: true,
+        autoDeclineBelow: 0,
+        scheduledAt: null,
+      });
+      setLoadingEdit(false);
+    };
+    loadProperty();
+  }, [editPropertyId]);
+
+  // Auto-save every 10 seconds (only for new listings)
+  useEffect(() => {
+    if (editPropertyId) return;
     autoSaveRef.current = setInterval(() => {
       localStorage.setItem('pocket-listing-draft', JSON.stringify(draft));
     }, 10000);
     return () => clearInterval(autoSaveRef.current);
-  }, [draft]);
+  }, [draft, editPropertyId]);
 
-  // Load draft on mount
+  // Load draft on mount (only for new listings)
   useEffect(() => {
+    if (editPropertyId) return;
     const saved = localStorage.getItem('pocket-listing-draft');
     if (saved) {
       try { setDraft(JSON.parse(saved)); } catch {}
     }
-  }, []);
+  }, [editPropertyId]);
 
   const progress = ((step + 1) / STEPS.length) * 100;
 
@@ -121,7 +184,6 @@ const PocketListingForm = ({ onPublish, onCancel }: Props) => {
     setPublishing(true);
 
     try {
-      // Look up the agent record for the current user
       let agentId: string | null = null;
       if (user) {
         const { data: agent } = await supabase
@@ -140,7 +202,7 @@ const PocketListingForm = ({ onPublish, onCancel }: Props) => {
 
       const mainPhoto = draft.photos[draft.primaryPhoto] || draft.photos[0] || null;
 
-      const { error } = await supabase.from('properties').insert({
+      const payload = {
         title,
         address: draft.address,
         suburb: draft.suburb || 'Unknown',
@@ -157,19 +219,33 @@ const PocketListingForm = ({ onPublish, onCancel }: Props) => {
         features: draft.features,
         image_url: mainPhoto,
         images: draft.photos.length > 0 ? draft.photos : [],
-        agent_id: agentId,
         is_active: draft.visibility === 'public',
-      });
+      };
 
-      if (error) throw error;
+      if (editPropertyId) {
+        // UPDATE existing listing
+        const { error } = await supabase
+          .from('properties')
+          .update(payload)
+          .eq('id', editPropertyId);
+        if (error) throw error;
+        toast({ title: 'Listing updated!', description: 'Your changes have been saved.' });
+      } else {
+        // INSERT new listing
+        const { error } = await supabase.from('properties').insert({
+          ...payload,
+          agent_id: agentId,
+        });
+        if (error) throw error;
+        localStorage.removeItem('pocket-listing-draft');
+        toast({ title: 'Listing published!', description: 'Your property has been saved to the database.' });
+      }
 
-      localStorage.removeItem('pocket-listing-draft');
-      toast({ title: 'Listing published!', description: 'Your property has been saved to the database.' });
       onPublish(title);
     } catch (err: any) {
       console.error('Publish error:', err);
       toast({
-        title: 'Failed to publish',
+        title: editPropertyId ? 'Failed to update' : 'Failed to publish',
         description: err.message || 'Please try again.',
         variant: 'destructive',
       });
@@ -178,6 +254,15 @@ const PocketListingForm = ({ onPublish, onCancel }: Props) => {
     }
   };
 
+  if (loadingEdit) {
+    return (
+      <div className="bg-card border border-border rounded-2xl p-12 flex items-center justify-center">
+        <Loader2 className="animate-spin text-primary mr-2" size={20} />
+        <span className="text-sm text-muted-foreground">Loading listing...</span>
+      </div>
+    );
+  }
+
   const stepContent = () => {
     switch (step) {
       case 0: return <StepAddress draft={draft} update={update} />;
@@ -185,7 +270,7 @@ const PocketListingForm = ({ onPublish, onCancel }: Props) => {
       case 2: return <StepPhotos draft={draft} update={update} />;
       case 3: return <StepVoice draft={draft} update={update} />;
       case 4: return <StepSettings draft={draft} update={update} />;
-      case 5: return <StepPreview draft={draft} onPublish={handlePublish} publishing={publishing} />;
+      case 5: return <StepPreview draft={draft} onPublish={handlePublish} publishing={publishing} isEdit={!!editPropertyId} />;
       default: return null;
     }
   };
@@ -196,9 +281,16 @@ const PocketListingForm = ({ onPublish, onCancel }: Props) => {
       <div className="px-4 pt-4 pb-2">
         <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
           <span>Step {step + 1} of {STEPS.length}: <strong className="text-foreground">{STEPS[step]}</strong></span>
-          <span className="flex items-center gap-1 text-success">
-            <Save size={12} /> Auto-saved
-          </span>
+          {!editPropertyId && (
+            <span className="flex items-center gap-1 text-success">
+              <Save size={12} /> Auto-saved
+            </span>
+          )}
+          {editPropertyId && (
+            <span className="flex items-center gap-1 text-primary">
+              <Save size={12} /> Editing
+            </span>
+          )}
         </div>
         <Progress value={progress} className="h-1.5" />
       </div>

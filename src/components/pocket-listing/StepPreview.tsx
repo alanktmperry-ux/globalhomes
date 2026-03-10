@@ -7,6 +7,7 @@ interface Props {
   draft: ListingDraft;
   onPublish: () => void;
   publishing?: boolean;
+  isEdit?: boolean;
 }
 
 const formatPrice = (d: ListingDraft) => {
@@ -19,7 +20,7 @@ const formatPrice = (d: ListingDraft) => {
   }
 };
 
-const StepPreview = ({ draft, onPublish, publishing }: Props) => {
+const StepPreview = ({ draft, onPublish, publishing, isEdit }: Props) => {
   const [view, setView] = useState<'mobile' | 'desktop'>('mobile');
   const mainPhoto = draft.photos[draft.primaryPhoto] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=400&fit=crop';
 
@@ -117,12 +118,12 @@ const StepPreview = ({ draft, onPublish, publishing }: Props) => {
         >
           {publishing ? (
             <>
-              <Loader2 size={18} className="mr-2 animate-spin" /> Saving to database…
+              <Loader2 size={18} className="mr-2 animate-spin" /> {isEdit ? 'Saving changes…' : 'Saving to database…'}
             </>
           ) : (
             <>
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-success rounded-full animate-pulse shadow-lg" />
-              Publish Off-Market Listing
+              {isEdit ? 'Save Changes' : 'Publish Off-Market Listing'}
             </>
           )}
         </Button>

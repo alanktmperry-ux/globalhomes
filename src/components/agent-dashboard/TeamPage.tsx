@@ -60,6 +60,17 @@ const TeamPage = () => {
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Create agency form
+  const [newAgencyName, setNewAgencyName] = useState('');
+  const [newAgencyEmail, setNewAgencyEmail] = useState('');
+  const [newAgencyPhone, setNewAgencyPhone] = useState('');
+  const [newAgencyDescription, setNewAgencyDescription] = useState('');
+  const [creatingAgency, setCreatingAgency] = useState(false);
+
+  // Join agency form
+  const [joinCode, setJoinCode] = useState('');
+  const [joiningAgency, setJoiningAgency] = useState(false);
+
   const isOwnerOrAdmin = myRole === 'owner' || myRole === 'admin';
 
   const loadData = useCallback(async () => {

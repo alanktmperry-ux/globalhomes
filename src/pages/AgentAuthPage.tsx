@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Building2, KeyRound, Plus, BarChart3, Users, Megaphone } from 'lucide-react';
 import PhoneInput from '@/components/PhoneInput';
@@ -6,6 +6,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/lib/AuthProvider';
 import agentHero from '@/assets/agent-auth-hero.jpg';
 
 type Step = 'email' | 'password' | 'choose' | 'create-agency' | 'join-agency';

@@ -34,6 +34,20 @@ const AgentDashboardSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut } = useAuth();
+  const { listings } = useAgentListings();
+
+  const activeCount = listings.filter(l => ('_mock_status' in l ? l._mock_status !== 'sold' : l.is_active)).length;
+  const totalLeads = listings.reduce((sum, l) => sum + ('_mock_leads' in l ? l._mock_leads : l.contact_clicks), 0);
+
+  const badgeValues: Record<string, string> = {
+    listings: String(activeCount),
+    leads: String(totalLeads),
+  };
+
+  const NAV = BASE_NAV.map(item => ({
+    ...item,
+    badge: item.badgeKey ? badgeValues[item.badgeKey] : undefined,
+  }));
 
   const handleSignOut = async () => {
     await signOut();

@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
-import { Upload, Star, X, ImagePlus, Sparkles, GripVertical } from 'lucide-react';
+import { Upload, Star, X, ImagePlus, Sparkles, GripVertical, Loader2 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
+import { supabase } from '@/integrations/supabase/client';
 import type { ListingDraft } from './PocketListingForm';
 
 interface Props {

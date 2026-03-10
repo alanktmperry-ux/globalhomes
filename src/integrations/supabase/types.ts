@@ -527,6 +527,64 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          agent_id: string
+          created_at: string
+          id: string
+          is_read: boolean
+          lead_id: string | null
+          message: string | null
+          property_id: string | null
+          title: string
+          type: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          lead_id?: string | null
+          message?: string | null
+          property_id?: string | null
+          title: string
+          type?: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          lead_id?: string | null
+          message?: string | null
+          property_id?: string | null
+          title?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

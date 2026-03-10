@@ -50,6 +50,11 @@ const formatPrice = (v: number) =>
   v >= 1000000 ? `$${(v / 1000000).toFixed(1)}M` : `$${(v / 1000).toFixed(0)}K`;
 
 const StepBasics = ({ draft, update }: Props) => {
+  const isLand = draft.propertyType === 'Land';
+  const isCommercial = draft.propertyType === 'Commercial';
+  const showBedsBaths = !isLand;
+  const showCars = !isLand;
+
   return (
     <div className="space-y-6">
       {/* Property Type */}
@@ -73,6 +78,15 @@ const StepBasics = ({ draft, update }: Props) => {
           ))}
         </div>
       </div>
+
+      {/* Property type hint */}
+      <p className="text-xs text-muted-foreground -mt-3">
+        {draft.propertyType === 'House' && 'Standalone residential dwelling'}
+        {draft.propertyType === 'Apartment' && 'Unit, flat, or apartment in a complex'}
+        {draft.propertyType === 'Townhouse' && 'Multi-level attached dwelling'}
+        {draft.propertyType === 'Land' && 'Vacant land or development site'}
+        {draft.propertyType === 'Commercial' && 'Office, retail, warehouse, or mixed-use'}
+      </p>
 
       {/* Price */}
       <div>
@@ -105,11 +119,22 @@ const StepBasics = ({ draft, update }: Props) => {
         </div>
       </div>
 
-      {/* Counters */}
+      {/* Counters — contextual based on property type */}
       <div className="space-y-2">
-        <Counter label="Bedrooms" value={draft.beds} onChange={(v) => update({ beds: v })} />
-        <Counter label="Bathrooms" value={draft.baths} onChange={(v) => update({ baths: v })} />
-        <Counter label="Car Spaces" value={draft.cars} onChange={(v) => update({ cars: v })} />
+        {showBedsBaths && (
+          <>
+            <Counter label={isCommercial ? 'Offices / Rooms' : 'Bedrooms'} value={draft.beds} onChange={(v) => update({ beds: v })} />
+            <Counter label={isCommercial ? 'Washrooms' : 'Bathrooms'} value={draft.baths} onChange={(v) => update({ baths: v })} />
+          </>
+        )}
+        {showCars && (
+          <Counter label="Car Spaces" value={draft.cars} onChange={(v) => update({ cars: v })} />
+        )}
+        {isLand && (
+          <div className="bg-secondary rounded-xl px-4 py-3">
+            <span className="text-sm text-muted-foreground">Land listings use area (sqm) and zoning — set these in the description step.</span>
+          </div>
+        )}
       </div>
     </div>
   );

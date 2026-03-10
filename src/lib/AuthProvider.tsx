@@ -31,9 +31,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAgent, setIsAgent] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [userRole, setUserRole] = useState<'user' | 'agent' | 'admin' | null>(null);
+  const [rolesFetched, setRolesFetched] = useState(false);
   const lastFetchedUserId = useRef<string | null>(null);
 
   const applyRoles = useCallback((roles: string[]) => {
+    console.log('[Auth] applyRoles:', roles);
     setIsAdmin(roles.includes('admin'));
     setIsAgent(roles.includes('agent') || roles.includes('admin'));
     setUserRole(
@@ -41,89 +43,92 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
   }, []);
 
-  const fetchRoles = useCallback(async (userId: string, force = false) => {
-    // Skip if we already fetched for this user
-    if (!force && lastFetchedUserId.current === userId) return;
-    lastFetchedUserId.current = userId;
-
-    console.log('[Auth] fetchRoles called for:', userId, 'force:', force);
-
-    const { data, error } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', userId);
-
-    console.log('[Auth] fetchRoles result:', { data, error });
-
-    const roles = data?.map((r) => r.role) || [];
-    applyRoles(roles);
-  }, [applyRoles]);
-
   const clearRoles = useCallback(() => {
     lastFetchedUserId.current = null;
     setIsAgent(false);
     setIsAdmin(false);
     setUserRole(null);
+    setRolesFetched(false);
   }, []);
 
+  // Fetch roles in a SEPARATE effect, not inside onAuthStateChange
+  // This avoids the Supabase deadlock where async DB calls inside the auth callback hang
   useEffect(() => {
-    let initialSessionHandled = false;
+    if (!user) {
+      if (rolesFetched) clearRoles();
+      return;
+    }
 
-    // Safety timeout: if auth never resolves, stop loading after 5 seconds
-    const timeout = setTimeout(() => {
-      if (loading) {
-        console.warn('[Auth] Timed out waiting for auth state, forcing loading=false');
-        setLoading(false);
+    // Skip if already fetched for this user
+    if (lastFetchedUserId.current === user.id) return;
+
+    let cancelled = false;
+
+    const doFetch = async () => {
+      lastFetchedUserId.current = user.id;
+      console.log('[Auth] fetchRoles for:', user.id);
+
+      try {
+        const { data, error } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id);
+
+        if (cancelled) return;
+        console.log('[Auth] fetchRoles result:', { data, error });
+
+        const roles = data?.map((r) => r.role) || [];
+        applyRoles(roles);
+      } catch (err) {
+        console.error('[Auth] fetchRoles error:', err);
+      } finally {
+        if (!cancelled) {
+          setRolesFetched(true);
+          setLoading(false);
+        }
       }
+    };
+
+    doFetch();
+    return () => { cancelled = true; };
+  }, [user, applyRoles, clearRoles, rolesFetched]);
+
+  // Auth listener — only sets user/session state, NO async DB calls
+  useEffect(() => {
+    // Safety timeout
+    const timeout = setTimeout(() => {
+      setLoading((prev) => {
+        if (prev) console.warn('[Auth] Timed out, forcing loading=false');
+        return false;
+      });
     }, 5000);
 
-    // Set up auth listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
         console.log('[Auth] onAuthStateChange event:', _event, 'user:', session?.user?.id ?? 'none');
-        
-        // On new sign-in, set loading=true so ProtectedRoute waits for roles
+
         if (_event === 'SIGNED_IN' && session?.user) {
+          // Reset so the role-fetch effect runs for this user
+          lastFetchedUserId.current = null;
+          setRolesFetched(false);
           setLoading(true);
         }
-        
+
         setSession(session);
         setUser(session?.user ?? null);
 
-        if (session?.user) {
-          try {
-            // Force re-fetch roles on SIGNED_IN to avoid stale ref
-            const forceRefresh = _event === 'SIGNED_IN';
-            // Defer fetchRoles slightly so Supabase client's internal auth token is propagated
-            // (onAuthStateChange can fire before the client updates its headers)
-            await new Promise(resolve => setTimeout(resolve, 100));
-            await fetchRoles(session.user.id, forceRefresh);
-          } catch (err) {
-            console.error('[Auth] fetchRoles error in listener:', err);
-          }
-        } else {
-          clearRoles();
+        if (!session?.user) {
+          setLoading(false);
         }
-
-        setLoading(false);
-        initialSessionHandled = true;
       }
     );
 
-    // Then get initial session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    // Initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
       console.log('[Auth] getSession result, user:', session?.user?.id ?? 'none');
-      // Only handle if onAuthStateChange hasn't fired yet
-      if (!initialSessionHandled) {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          try {
-            await fetchRoles(session.user.id);
-          } catch (err) {
-            console.error('[Auth] fetchRoles error in getSession:', err);
-          }
-        }
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (!session?.user) {
         setLoading(false);
       }
     }).catch((err) => {
@@ -135,35 +140,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       clearTimeout(timeout);
       subscription.unsubscribe();
     };
-  }, [fetchRoles, clearRoles]);
+  }, []);
 
   const signOut = async () => {
-    // Always clear local state first for instant UI feedback
     clearRoles();
     setUser(null);
     setSession(null);
-    
+
     try {
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('[Auth] signOut error:', error);
-        // If signOut fails, force-clear localStorage to prevent zombie sessions
         try {
           const storageKey = `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID || 'ngrkbohpmkzjonaofgbb'}-auth-token`;
           localStorage.removeItem(storageKey);
-        } catch (storageErr) {
-          console.error('[Auth] localStorage cleanup failed:', storageErr);
-        }
+        } catch (e) { /* ignore */ }
       }
     } catch (err) {
       console.error('[Auth] signOut failed:', err);
-      // Force-clear localStorage to prevent zombie sessions
       try {
         const storageKey = `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID || 'ngrkbohpmkzjonaofgbb'}-auth-token`;
         localStorage.removeItem(storageKey);
-      } catch (storageErr) {
-        console.error('[Auth] localStorage cleanup failed:', storageErr);
-      }
+      } catch (e) { /* ignore */ }
     }
   };
 

@@ -86,11 +86,12 @@ const formatPriceForDB = (draft: ListingDraft): string => {
   }
 };
 
-const PocketListingForm = ({ onPublish, onCancel, editPropertyId }: Props) => {
+const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePropertyId }: Props) => {
+  const loadPropertyId = editPropertyId || duplicatePropertyId;
   const [step, setStep] = useState(0);
   const [draft, setDraft] = useState<ListingDraft>(DEFAULT_DRAFT);
   const [publishing, setPublishing] = useState(false);
-  const [loadingEdit, setLoadingEdit] = useState(!!editPropertyId);
+  const [loadingEdit, setLoadingEdit] = useState(!!loadPropertyId);
   const autoSaveRef = useRef<ReturnType<typeof setInterval>>();
   const { user } = useAuth();
   const { toast } = useToast();

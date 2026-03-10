@@ -188,7 +188,7 @@ const TeamPage = () => {
     }
   };
 
-
+  const copyCode = (code: string) => {
     navigator.clipboard.writeText(code);
     toast({ title: 'Copied!', description: `${code} copied to clipboard` });
   };

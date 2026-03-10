@@ -14,6 +14,8 @@ type Step = 'email' | 'password' | 'choose' | 'create-agency' | 'join-agency';
 const AgentAuthPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, isAgent, loading: authLoading } = useAuth();
+  const [pendingRedirect, setPendingRedirect] = useState<'dashboard' | null>(null);
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

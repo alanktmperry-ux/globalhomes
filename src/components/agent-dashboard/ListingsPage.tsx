@@ -50,7 +50,7 @@ const ListingsPage = () => {
   const handleBoost = async (l: AgentListing) => {
     if (l._source !== 'db') { toast({ title: 'Demo listing', description: 'Create a real listing first.' }); return; }
     setActionLoading(l.id);
-    const { error } = await supabase.from('properties').update({ is_active: true }).eq('id', l.id);
+    const { error } = await supabase.from('properties').update({ status: 'public', is_active: true } as any).eq('id', l.id);
     if (error) { toast({ title: 'Failed to boost', variant: 'destructive' }); }
     else { toast({ title: 'Listing boosted!', description: 'Your listing is now public.' }); refetch(); }
     setActionLoading(null);

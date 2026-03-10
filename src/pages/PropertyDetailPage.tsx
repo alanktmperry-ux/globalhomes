@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Calendar, Eye, Home, BadgeCheck, Star, X } from 'lucide-react';
 import { Property } from '@/lib/types';
@@ -309,9 +309,9 @@ export default function PropertyDetailPage() {
           <div className="space-y-4">
             <div className="p-5 rounded-2xl bg-card border border-border shadow-card sticky top-4">
               <h3 className="font-display font-semibold text-foreground mb-4">{t('property.agent')}</h3>
-              <div className="flex items-center gap-3 mb-5">
+              <Link to={property.agent.id ? `/agent/${property.agent.id}` : '#'} className="flex items-center gap-3 mb-5 group/agent cursor-pointer">
                 <div className="relative">
-                  <Avatar className="w-16 h-16 border-2 border-primary">
+                  <Avatar className="w-16 h-16 border-2 border-primary transition-transform group-hover/agent:scale-105">
                     <AvatarImage src={property.agent.avatarUrl} alt={property.agent.name} className="object-cover" />
                     <AvatarFallback className="text-lg font-bold">{property.agent.name[0]}</AvatarFallback>
                   </Avatar>
@@ -322,14 +322,15 @@ export default function PropertyDetailPage() {
                   )}
                 </div>
                 <div className="flex-1">
-                  <p className="font-display font-semibold text-foreground text-lg">{property.agent.name}</p>
+                  <p className="font-display font-semibold text-foreground text-lg group-hover/agent:text-primary transition-colors">{property.agent.name}</p>
                   <p className="text-sm text-muted-foreground">{property.agent.agency}</p>
                   <div className="flex items-center gap-1 mt-1">
                     <Star size={14} className="fill-yellow-400 text-yellow-400" />
                     <span className="text-sm font-medium text-foreground">4.8</span>
                   </div>
+                  <span className="text-xs text-primary font-medium mt-1 inline-block">View profile →</span>
                 </div>
-              </div>
+              </Link>
 
               {property.agent.isSubscribed && (
                 <span className="inline-block px-3 py-1 rounded-md bg-success text-success-foreground text-xs font-medium mb-4">

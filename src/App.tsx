@@ -35,6 +35,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import AgencyProfilePage from "./pages/AgencyProfilePage";
 import PropertyDetailPage from "./pages/PropertyDetailPage";
+import AgentPublicProfilePage from "./pages/AgentPublicProfilePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,7 @@ const App = () => (
               {/* Public */}
               <Route path="/" element={<Index />} />
               <Route path="/property/:id" element={<PropertyDetailPage />} />
+              <Route path="/agent/:id" element={<AgentPublicProfilePage />} />
               <Route path="/agents" element={<AgentLandingPage />} />
               <Route path="/auth" element={<AuthLandingPage />} />
               <Route path="/login" element={<SeekerAuthPage />} />

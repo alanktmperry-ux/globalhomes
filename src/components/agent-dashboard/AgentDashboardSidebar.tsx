@@ -3,6 +3,7 @@ import {
   User, FileText, CreditCard, Star, MapPinned,
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/lib/AuthProvider';
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter,
@@ -31,6 +32,12 @@ const AgentDashboardSidebar = () => {
   const collapsed = state === 'collapsed';
   const location = useLocation();
   const navigate = useNavigate();
+  const { signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   const isActive = (path: string) =>
     path === '/dashboard'
@@ -114,7 +121,7 @@ const AgentDashboardSidebar = () => {
         <div className="flex items-center gap-2">
           <SidebarTrigger className="shrink-0" />
           {!collapsed && (
-            <button className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+            <button onClick={handleSignOut} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
               <LogOut size={14} /> Sign out
             </button>
           )}

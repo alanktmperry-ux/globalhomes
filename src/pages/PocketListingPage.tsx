@@ -54,7 +54,17 @@ const PocketListingPage = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="hidden sm:flex gap-1.5 text-xs">
+              <Button variant="outline" size="sm" className="hidden sm:flex gap-1.5 text-xs" onClick={() => {
+                // Find most recent real (db) listing
+                const realListing = listings.find(l => '_source' in l && l._source === 'db');
+                if (realListing) {
+                  navigate(`/pocket-listing?duplicate=${realListing.id}`);
+                  setShowForm(true);
+                  setShowSuccess(false);
+                } else {
+                  toast({ title: 'No previous listing to duplicate', description: 'Create your first listing first.', variant: 'destructive' });
+                }
+              }}>
                 <Copy size={14} /> Duplicate Previous
               </Button>
               <Button

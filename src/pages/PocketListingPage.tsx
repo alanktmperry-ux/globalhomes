@@ -7,15 +7,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PocketListingForm from '@/components/pocket-listing/PocketListingForm';
 import ListingSuccess from '@/components/pocket-listing/ListingSuccess';
 import { useAgentListings } from '@/hooks/useAgentListings';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/lib/AuthProvider';
 
 const PocketListingPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const editId = searchParams.get('edit');
-  const [showForm, setShowForm] = useState(!!editId);
+  const duplicateId = searchParams.get('duplicate');
+  const [showForm, setShowForm] = useState(!!editId || !!duplicateId);
   const [showSuccess, setShowSuccess] = useState(false);
   const [listingTitle, setListingTitle] = useState('');
-  const { listings } = useAgentListings();
+  const { listings, agentId } = useAgentListings();
+  const { toast } = useToast();
 
   const activeCount = listings.filter(l => ('_mock_status' in l ? l._mock_status !== 'sold' : l.is_active)).length;
   const totalLeads = listings.reduce((sum, l) => sum + ('_mock_leads' in l ? l._mock_leads : l.contact_clicks), 0);

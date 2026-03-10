@@ -81,9 +81,14 @@ const ListingsPage = () => {
         <DashboardHeader
           title="My Listings"
           actions={
-            <Button size="sm" onClick={() => navigate('/pocket-listing')} className="gap-1.5 text-xs">
-              <Plus size={14} /> New Listing
-            </Button>
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" onClick={() => navigate('/')} className="gap-1.5 text-xs">
+                <Globe size={14} /> Browse Market
+              </Button>
+              <Button size="sm" onClick={() => navigate('/pocket-listing')} className="gap-1.5 text-xs">
+                <Plus size={14} /> New Listing
+              </Button>
+            </div>
           }
         />
 

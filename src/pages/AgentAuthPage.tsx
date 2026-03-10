@@ -40,6 +40,14 @@ const AgentAuthPage = () => {
     setStep('password');
   };
 
+  // Navigate once AuthProvider confirms the user is an agent
+  useEffect(() => {
+    if (pendingRedirect === 'dashboard' && user && isAgent && !authLoading) {
+      setPendingRedirect(null);
+      navigate('/dashboard');
+    }
+  }, [pendingRedirect, user, isAgent, authLoading, navigate]);
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -54,10 +62,9 @@ const AgentAuthPage = () => {
         throw error;
       }
       toast({ title: 'Welcome back, Agent!' });
-      navigate('/dashboard');
+      setPendingRedirect('dashboard');
     } catch (err: any) {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
-    } finally {
       setLoading(false);
     }
   };

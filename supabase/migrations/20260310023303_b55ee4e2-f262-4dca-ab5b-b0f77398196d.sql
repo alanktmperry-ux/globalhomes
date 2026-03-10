@@ -1,0 +1,1 @@
+ALTER TABLE public.agents ADD COLUMN IF NOT EXISTS company_logo_url text DEFAULT NULL;

@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Eye, EyeOff, Zap, CheckCircle2, Clock, Sparkles, TrendingUp, Rocket, Info, Loader2, Pencil, Globe } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useNavigate } from 'react-router-dom';
 import DashboardHeader from './DashboardHeader';
 import { useAgentListings, type AgentListing } from '@/hooks/useAgentListings';
@@ -123,20 +124,29 @@ const ListingsPage = () => {
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="bg-secondary mb-4 flex-wrap h-auto gap-1 p-1">
+              <TooltipProvider delayDuration={300}>
               {[
-                { key: 'all', label: 'All' },
-                { key: 'whisper', label: 'Whisper' },
-                { key: 'coming-soon', label: 'Coming Soon' },
-                { key: 'public', label: 'Public' },
-                { key: 'sold', label: 'Sold' },
+                { key: 'all', label: 'All', tip: 'View all your listings' },
+                { key: 'whisper', label: 'Whisper', tip: 'Private — only visible to you and your network' },
+                { key: 'coming-soon', label: 'Coming Soon', tip: 'Teaser — not yet searchable by buyers' },
+                { key: 'public', label: 'Public', tip: 'Live — visible in search results to everyone' },
+                { key: 'sold', label: 'Sold', tip: 'Archived — hidden from public search' },
               ].map((t) => (
-                <TabsTrigger key={t.key} value={t.key} className="text-xs gap-1">
-                  {t.label}
-                  {t.key !== 'all' && counts[t.key] && (
-                    <Badge variant="secondary" className="text-[9px] px-1 h-4 ml-0.5">{counts[t.key]}</Badge>
-                  )}
-                </TabsTrigger>
+                <Tooltip key={t.key}>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value={t.key} className="text-xs gap-1">
+                      {t.label}
+                      {t.key !== 'all' && counts[t.key] && (
+                        <Badge variant="secondary" className="text-[9px] px-1 h-4 ml-0.5">{counts[t.key]}</Badge>
+                      )}
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="text-xs max-w-[200px]">
+                    {t.tip}
+                  </TooltipContent>
+                </Tooltip>
               ))}
+              </TooltipProvider>
             </TabsList>
           </Tabs>
 

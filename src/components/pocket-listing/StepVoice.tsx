@@ -18,18 +18,26 @@ const StepVoice = ({ draft, update }: Props) => {
   const [countdown, setCountdown] = useState(30);
   const [generating, setGenerating] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
+  const wasListeningRef = useRef(false);
 
   const onVoiceResult = useCallback((text: string) => {
     update({ voiceTranscript: text });
-    clearInterval(timerRef.current);
-    setCountdown(30);
-    // Auto-generate after voice capture
-    generateFromTranscript(text);
-  }, []);
+  }, [update]);
 
   const { isListening, startListening, stopListening, isSupported } = useVoiceSearch(onVoiceResult);
 
+  // When recording stops, auto-generate from transcript
+  useEffect(() => {
+    if (wasListeningRef.current && !isListening && draft.voiceTranscript) {
+      clearInterval(timerRef.current);
+      setCountdown(30);
+      generateFromTranscript(draft.voiceTranscript);
+    }
+    wasListeningRef.current = isListening;
+  }, [isListening]);
+
   const handleStartRecording = () => {
+    update({ voiceTranscript: '', generatedTitle: '', generatedBullets: [] });
     startListening();
     setCountdown(30);
     timerRef.current = setInterval(() => {

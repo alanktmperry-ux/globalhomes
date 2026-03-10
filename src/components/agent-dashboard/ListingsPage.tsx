@@ -42,6 +42,33 @@ const ListingsPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('all');
   const { listings, loading, isMockData } = useAgentListings();
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+
+  const toProperty = (l: AgentListing): Property => ({
+    id: l.id,
+    title: l.title,
+    address: l.address,
+    suburb: l.suburb,
+    state: l.state,
+    country: l.country,
+    price: l.price,
+    priceFormatted: l.price_formatted,
+    beds: l.beds,
+    baths: l.baths,
+    parking: l.parking,
+    sqm: l.sqm,
+    imageUrl: l.image_url || l.images?.[0] || '',
+    images: l.images || (l.image_url ? [l.image_url] : []),
+    description: l.description || '',
+    estimatedValue: l.estimated_value || '',
+    propertyType: l.property_type || 'House',
+    features: l.features || [],
+    agent: { id: '', name: '', agency: '', phone: '', email: '', avatarUrl: '', isSubscribed: false },
+    listedDate: l.listed_date || '',
+    views: l.views,
+    contactClicks: l.contact_clicks,
+    status: 'listed',
+  });
 
   const withStatus = listings.map(l => ({ ...l, _status: getListingStatus(l) }));
   const filtered = activeTab === 'all' ? withStatus : withStatus.filter(l => l._status === activeTab);

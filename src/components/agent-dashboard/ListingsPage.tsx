@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Eye, EyeOff, Zap, CheckCircle2, Clock, Sparkles, TrendingUp, Rocket, Info, Loader2, Pencil } from 'lucide-react';
+import { Plus, Eye, EyeOff, Zap, CheckCircle2, Clock, Sparkles, TrendingUp, Rocket, Info, Loader2, Pencil, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import DashboardHeader from './DashboardHeader';
 import { useAgentListings, type AgentListing } from '@/hooks/useAgentListings';
@@ -81,9 +81,14 @@ const ListingsPage = () => {
         <DashboardHeader
           title="My Listings"
           actions={
-            <Button size="sm" onClick={() => navigate('/pocket-listing')} className="gap-1.5 text-xs">
-              <Plus size={14} /> New Listing
-            </Button>
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" onClick={() => navigate('/')} className="gap-1.5 text-xs">
+                <Globe size={14} /> Browse Market
+              </Button>
+              <Button size="sm" onClick={() => navigate('/pocket-listing')} className="gap-1.5 text-xs">
+                <Plus size={14} /> New Listing
+              </Button>
+            </div>
           }
         />
 

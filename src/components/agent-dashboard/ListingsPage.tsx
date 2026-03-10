@@ -2,16 +2,10 @@ import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Eye, EyeOff, Zap, CheckCircle2, Clock, Sparkles, TrendingUp, Rocket } from 'lucide-react';
+import { Plus, Eye, EyeOff, Zap, CheckCircle2, Clock, Sparkles, TrendingUp, Rocket, Info, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import DashboardHeader from './DashboardHeader';
-
-const LISTINGS = [
-  { id: '1', title: 'Modern Family Oasis', address: '42 Panorama Drive, Berwick', price: '$850K – $920K', status: 'whisper', views: 24, leads: 3, days: 4, thumb: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&h=150&fit=crop' },
-  { id: '2', title: 'Station Side Living', address: '15 Station St, Narre Warren', price: '$620K – $680K', status: 'coming-soon', views: 67, leads: 5, days: 11, thumb: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=200&h=150&fit=crop' },
-  { id: '3', title: 'Coastal Elegance', address: '8 Ocean View Rd, Brighton', price: '$1.8M – $2.0M', status: 'public', views: 142, leads: 7, days: 18, thumb: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=200&h=150&fit=crop' },
-  { id: '4', title: 'Investor Special', address: '22 Market St, CBD', price: '$540K', status: 'sold', views: 89, leads: 12, days: 6, thumb: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=200&h=150&fit=crop' },
-];
+import { useAgentListings, type AgentListing } from '@/hooks/useAgentListings';
 
 const STATUS_CONFIG: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
   whisper: { icon: <EyeOff size={12} />, label: 'Whisper', color: 'bg-foreground/10 text-foreground' },
@@ -21,13 +15,36 @@ const STATUS_CONFIG: Record<string, { icon: React.ReactNode; label: string; colo
   expired: { icon: <Clock size={12} />, label: 'Expired', color: 'bg-destructive/15 text-destructive' },
 };
 
+function getListingStatus(l: AgentListing): string {
+  if ('_mock_status' in l) return l._mock_status;
+  if (!l.is_active) return 'sold';
+  return 'public';
+}
+
+function getListingLeads(l: AgentListing): number {
+  if ('_mock_leads' in l) return l._mock_leads;
+  return l.contact_clicks;
+}
+
+function getListingDays(l: AgentListing): number {
+  if ('_mock_days' in l) return l._mock_days;
+  if (!l.listed_date) return 0;
+  return Math.max(0, Math.floor((Date.now() - new Date(l.listed_date).getTime()) / 86400000));
+}
+
+function getListingThumb(l: AgentListing): string {
+  return l.image_url || l.images?.[0] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&h=150&fit=crop';
+}
+
 const ListingsPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('all');
+  const { listings, loading, isMockData } = useAgentListings();
 
-  const filtered = activeTab === 'all' ? LISTINGS : LISTINGS.filter((l) => l.status === activeTab);
+  const withStatus = listings.map(l => ({ ...l, _status: getListingStatus(l) }));
+  const filtered = activeTab === 'all' ? withStatus : withStatus.filter(l => l._status === activeTab);
   const counts: Record<string, number> = {};
-  LISTINGS.forEach((l) => { counts[l.status] = (counts[l.status] || 0) + 1; });
+  withStatus.forEach(l => { counts[l._status] = (counts[l._status] || 0) + 1; });
 
   return (
     <div>
@@ -41,6 +58,13 @@ const ListingsPage = () => {
       />
 
       <div className="p-4 sm:p-6 max-w-5xl">
+        {isMockData && (
+          <div className="flex items-center gap-2 mb-4 p-3 rounded-xl bg-primary/5 border border-primary/10 text-xs text-muted-foreground">
+            <Info size={14} className="text-primary shrink-0" />
+            <span>Showing demo listings. Create your first listing to see real data here.</span>
+          </div>
+        )}
+
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="bg-secondary mb-4 flex-wrap h-auto gap-1 p-1">
             {[
@@ -60,41 +84,49 @@ const ListingsPage = () => {
           </TabsList>
         </Tabs>
 
-        <div className="space-y-3">
-          {filtered.map((l) => {
-            const s = STATUS_CONFIG[l.status];
-            const daysColor = l.days < 7 ? 'text-success' : l.days < 15 ? 'text-primary' : 'text-destructive';
-            return (
-              <div key={l.id} className="bg-card border border-border rounded-xl p-4 flex flex-col sm:flex-row gap-4">
-                <img src={l.thumb} alt="" className="w-full sm:w-28 h-20 rounded-lg object-cover shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Badge className={`${s.color} text-[10px] gap-0.5 border-0`}>{s.icon} {s.label}</Badge>
-                    <span className={`text-xs font-bold ${daysColor}`}>{l.days}d</span>
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="animate-spin text-primary" size={24} />
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {filtered.map((l) => {
+              const s = STATUS_CONFIG[l._status] || STATUS_CONFIG.public;
+              const days = getListingDays(l);
+              const leads = getListingLeads(l);
+              const daysColor = days < 7 ? 'text-success' : days < 15 ? 'text-primary' : 'text-destructive';
+              return (
+                <div key={l.id} className="bg-card border border-border rounded-xl p-4 flex flex-col sm:flex-row gap-4">
+                  <img src={getListingThumb(l)} alt="" className="w-full sm:w-28 h-20 rounded-lg object-cover shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge className={`${s.color} text-[10px] gap-0.5 border-0`}>{s.icon} {s.label}</Badge>
+                      <span className={`text-xs font-bold ${daysColor}`}>{days}d</span>
+                    </div>
+                    <h3 className="font-display text-sm font-bold truncate">{l.title}</h3>
+                    <p className="text-xs text-muted-foreground truncate">{l.address}</p>
+                    <p className="text-sm font-display font-bold text-primary mt-1">{l.price_formatted}</p>
                   </div>
-                  <h3 className="font-display text-sm font-bold truncate">{l.title}</h3>
-                  <p className="text-xs text-muted-foreground truncate">{l.address}</p>
-                  <p className="text-sm font-display font-bold text-primary mt-1">{l.price}</p>
-                </div>
-                <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-1 shrink-0">
-                  <span className="text-xs text-muted-foreground flex items-center gap-1"><Eye size={10} /> {l.views}</span>
-                  <span className="text-xs text-muted-foreground flex items-center gap-1"><Sparkles size={10} /> {l.leads} leads</span>
-                  <div className="flex gap-1 mt-1">
-                    <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2">Edit</Button>
-                    {l.status !== 'public' && l.status !== 'sold' && (
-                      <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5">
-                        <Rocket size={10} /> Boost
-                      </Button>
-                    )}
-                    {l.status !== 'sold' && (
-                      <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 text-success">Mark Sold</Button>
-                    )}
+                  <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-1 shrink-0">
+                    <span className="text-xs text-muted-foreground flex items-center gap-1"><Eye size={10} /> {l.views}</span>
+                    <span className="text-xs text-muted-foreground flex items-center gap-1"><Sparkles size={10} /> {leads} leads</span>
+                    <div className="flex gap-1 mt-1">
+                      <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2">Edit</Button>
+                      {l._status !== 'public' && l._status !== 'sold' && (
+                        <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5">
+                          <Rocket size={10} /> Boost
+                        </Button>
+                      )}
+                      {l._status !== 'sold' && (
+                        <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 text-success">Mark Sold</Button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

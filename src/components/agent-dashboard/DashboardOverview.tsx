@@ -3,6 +3,7 @@ import { Mic, Phone, Send, Calendar, Flame, Thermometer, Snowflake, Sparkles, Ey
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import DashboardHeader from './DashboardHeader';
+import { useAgentListings } from '@/hooks/useAgentListings';
 
 const URGENCY_CONFIG = {
   hot: { icon: <Flame size={12} />, color: 'bg-destructive/15 text-destructive', label: 'Hot' },

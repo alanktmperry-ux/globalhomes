@@ -56,13 +56,15 @@ export function useAgentListings() {
   const [listings, setListings] = useState<AgentListing[]>([]);
   const [loading, setLoading] = useState(true);
   const [agentId, setAgentId] = useState<string | null>(null);
+  const [fetchKey, setFetchKey] = useState(0);
+
+  const refetch = () => setFetchKey(k => k + 1);
 
   useEffect(() => {
     if (!user) { setListings(MOCK_LISTINGS); setLoading(false); return; }
 
     const fetch = async () => {
       setLoading(true);
-      // Get agent record
       const { data: agent } = await supabase
         .from('agents')
         .select('id')
@@ -85,16 +87,15 @@ export function useAgentListings() {
 
       const dbListings: ListingWithMeta[] = (props || []).map(p => ({ ...p, _source: 'db' as const }));
 
-      // If real listings exist, show them. Otherwise fall back to mock.
       setListings(dbListings.length > 0 ? dbListings : MOCK_LISTINGS);
       setLoading(false);
     };
 
     fetch();
-  }, [user]);
+  }, [user, fetchKey]);
 
   const realCount = listings.filter(l => '_source' in l && l._source === 'db').length;
   const isMockData = listings.length > 0 && listings.every(l => '_source' in l && l._source === 'mock');
 
-  return { listings, loading, agentId, realCount, isMockData };
+  return { listings, loading, agentId, realCount, isMockData, refetch };
 }

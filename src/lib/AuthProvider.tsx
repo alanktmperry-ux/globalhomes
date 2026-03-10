@@ -46,10 +46,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!force && lastFetchedUserId.current === userId) return;
     lastFetchedUserId.current = userId;
 
-    const { data } = await supabase
+    console.log('[Auth] fetchRoles called for:', userId, 'force:', force);
+
+    const { data, error } = await supabase
       .from('user_roles')
       .select('role')
       .eq('user_id', userId);
+
+    console.log('[Auth] fetchRoles result:', { data, error });
 
     const roles = data?.map((r) => r.role) || [];
     applyRoles(roles);
@@ -90,6 +94,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           try {
             // Force re-fetch roles on SIGNED_IN to avoid stale ref
             const forceRefresh = _event === 'SIGNED_IN';
+            // Defer fetchRoles slightly so Supabase client's internal auth token is propagated
+            // (onAuthStateChange can fire before the client updates its headers)
+            await new Promise(resolve => setTimeout(resolve, 100));
             await fetchRoles(session.user.id, forceRefresh);
           } catch (err) {
             console.error('[Auth] fetchRoles error in listener:', err);

@@ -1,6 +1,5 @@
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { Bell } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { NotificationBell } from './NotificationBell';
 
 interface Props {
   title: string;
@@ -20,10 +19,7 @@ const DashboardHeader = ({ title, subtitle, actions }: Props) => (
       </div>
       <div className="flex items-center gap-2">
         {actions}
-        <button className="relative w-9 h-9 rounded-xl bg-secondary flex items-center justify-center hover:bg-accent transition-colors">
-          <Bell size={16} />
-          <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-destructive rounded-full border-2 border-background" />
-        </button>
+        <NotificationBell />
       </div>
     </div>
   </header>

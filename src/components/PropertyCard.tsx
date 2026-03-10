@@ -20,6 +20,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
   const { t } = useI18n();
   const { formatPrice, currency } = useCurrency();
   const [contactOpen, setContactOpen] = useState(false);
+  const navigate = useNavigate();
 
   const statusConfig: Record<PropertyStatus, { label: string; className: string } | null> = {
     'off-market': { label: 'Off-Market', className: 'bg-amber-500/90 text-white' },

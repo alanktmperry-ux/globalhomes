@@ -129,7 +129,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [fetchRoles, clearRoles]);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      clearRoles();
+      setUser(null);
+      setSession(null);
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('[Auth] signOut error:', error);
+        throw error;
+      }
+    } catch (err) {
+      console.error('[Auth] signOut failed:', err);
+      // Force clear state even on error
+      clearRoles();
+      setUser(null);
+      setSession(null);
+    }
   };
 
   return (

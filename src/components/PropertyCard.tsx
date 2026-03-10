@@ -71,7 +71,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
         </div>
 
         {/* Property info */}
-        <div className="p-4" onClick={() => onSelect(property)}>
+        <div className="p-4" onClick={() => { onSelect(property); navigate(`/property/${property.id}`); }}>
           <h3 className="font-display font-semibold text-foreground text-base leading-tight mb-1 line-clamp-1">
             {property.title}
           </h3>

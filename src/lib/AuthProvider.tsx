@@ -88,7 +88,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         if (session?.user) {
           try {
-            await fetchRoles(session.user.id);
+            // Force re-fetch roles on SIGNED_IN to avoid stale ref
+            const forceRefresh = _event === 'SIGNED_IN';
+            await fetchRoles(session.user.id, forceRefresh);
           } catch (err) {
             console.error('[Auth] fetchRoles error in listener:', err);
           }

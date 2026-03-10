@@ -33,8 +33,16 @@ const ProfilePage = () => {
   const [passwordLoading, setPasswordLoading] = useState(false);
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
+    try {
+      await signOut();
+      toast({ title: 'Signed out', description: 'You have been logged out successfully.' });
+      navigate('/');
+    } catch (err: any) {
+      console.error('Sign out error:', err);
+      toast({ title: 'Error signing out', description: err?.message || 'Please try again.', variant: 'destructive' });
+      // Navigate anyway since state was cleared
+      navigate('/');
+    }
   };
 
   const handleChangeEmail = async (e: React.FormEvent) => {

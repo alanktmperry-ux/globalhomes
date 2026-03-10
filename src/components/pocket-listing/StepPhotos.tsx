@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Upload, Star, X, ImagePlus, Sparkles } from 'lucide-react';
+import { Upload, Star, X, ImagePlus, Sparkles, GripVertical } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import type { ListingDraft } from './PocketListingForm';
 
@@ -8,7 +8,6 @@ interface Props {
   update: (p: Partial<ListingDraft>) => void;
 }
 
-// Demo placeholder images
 const DEMO_PHOTOS = [
   'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=300&fit=crop',
   'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&fit=crop',
@@ -18,6 +17,8 @@ const DEMO_PHOTOS = [
 const StepPhotos = ({ draft, update }: Props) => {
   const fileRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const [overIdx, setOverIdx] = useState<number | null>(null);
 
   const addPhotos = (files: FileList | null) => {
     if (!files) return;
@@ -37,9 +38,50 @@ const StepPhotos = ({ draft, update }: Props) => {
     update({ photos: DEMO_PHOTOS, features: ['Pool', 'Renovated Kitchen', 'Garden'] });
   };
 
+  const handleDragStart = (e: React.DragEvent, idx: number) => {
+    setDragIdx(idx);
+    e.dataTransfer.effectAllowed = 'move';
+    const img = new Image();
+    img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+    e.dataTransfer.setDragImage(img, 0, 0);
+  };
+
+  const handleDragOver = (e: React.DragEvent, idx: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setOverIdx(idx);
+  };
+
+  const handleDrop = (e: React.DragEvent, targetIdx: number) => {
+    e.preventDefault();
+    if (dragIdx === null || dragIdx === targetIdx) {
+      setDragIdx(null);
+      setOverIdx(null);
+      return;
+    }
+    const newPhotos = [...draft.photos];
+    const [moved] = newPhotos.splice(dragIdx, 1);
+    newPhotos.splice(targetIdx, 0, moved);
+
+    update({ photos: newPhotos, primaryPhoto: 0 });
+    setDragIdx(null);
+    setOverIdx(null);
+  };
+
+  const moveToFirst = (idx: number) => {
+    if (idx === 0) return;
+    const newPhotos = [...draft.photos];
+    const [moved] = newPhotos.splice(idx, 1);
+    newPhotos.unshift(moved);
+    update({ photos: newPhotos, primaryPhoto: 0 });
+  };
+
   return (
     <div className="space-y-4">
       <Label className="text-sm font-semibold block">Property Photos (3-10)</Label>
+      <p className="text-xs text-muted-foreground -mt-2">
+        Drag to reorder — first photo becomes the feature image
+      </p>
 
       {/* Drop zone */}
       <div
@@ -75,35 +117,59 @@ const StepPhotos = ({ draft, update }: Props) => {
         </button>
       )}
 
-      {/* Photo grid */}
+      {/* Photo grid — draggable */}
       {draft.photos.length > 0 && (
         <div className="grid grid-cols-3 gap-2">
           {draft.photos.map((url, i) => (
-            <div key={i} className="relative group rounded-xl overflow-hidden aspect-[4/3]">
+            <div
+              key={`${url}-${i}`}
+              draggable
+              onDragStart={(e) => handleDragStart(e, i)}
+              onDragOver={(e) => handleDragOver(e, i)}
+              onDragEnd={() => { setDragIdx(null); setOverIdx(null); }}
+              onDrop={(e) => handleDrop(e, i)}
+              className={`relative group rounded-xl overflow-hidden aspect-[4/3] cursor-grab active:cursor-grabbing transition-all ${
+                dragIdx === i ? 'opacity-40 scale-95' : ''
+              } ${overIdx === i && dragIdx !== i ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}`}
+            >
               <img src={url} alt={`Photo ${i + 1}`} className="w-full h-full object-cover" />
+
+              {/* Drag handle */}
+              <div className="absolute top-1.5 right-1.5 w-6 h-6 rounded-md bg-background/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <GripVertical size={12} className="text-foreground" />
+              </div>
+
+              {/* Hover actions */}
               <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/40 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                {i !== 0 && (
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); moveToFirst(i); }}
+                    title="Make feature photo"
+                    className="w-7 h-7 rounded-full bg-card/80 text-foreground flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
+                  >
+                    <Star size={14} />
+                  </button>
+                )}
                 <button
                   type="button"
-                  onClick={() => update({ primaryPhoto: i })}
-                  className={`w-7 h-7 rounded-full flex items-center justify-center ${
-                    draft.primaryPhoto === i ? 'bg-primary text-primary-foreground' : 'bg-card/80 text-foreground'
-                  }`}
-                >
-                  <Star size={14} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => removePhoto(i)}
+                  onClick={(e) => { e.stopPropagation(); removePhoto(i); }}
                   className="w-7 h-7 rounded-full bg-destructive/80 text-destructive-foreground flex items-center justify-center"
                 >
                   <X size={14} />
                 </button>
               </div>
-              {draft.primaryPhoto === i && (
-                <div className="absolute top-1.5 left-1.5 px-2 py-0.5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full">
-                  Primary
+
+              {/* Feature badge */}
+              {i === 0 && (
+                <div className="absolute top-1.5 left-1.5 px-2 py-0.5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center gap-1">
+                  <Star size={8} /> Feature
                 </div>
               )}
+              {/* Position number */}
+              <div className="absolute bottom-1.5 left-1.5 w-5 h-5 rounded-full bg-background/70 text-foreground text-[10px] font-bold flex items-center justify-center">
+                {i + 1}
+              </div>
             </div>
           ))}
         </div>

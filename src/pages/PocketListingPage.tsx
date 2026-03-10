@@ -89,7 +89,8 @@ const PocketListingPage = () => {
               >
                 <PocketListingForm
                   onPublish={handlePublish}
-                  onCancel={() => setShowForm(false)}
+                  onCancel={() => { setShowForm(false); if (editId) navigate('/pocket-listing'); }}
+                  editPropertyId={editId}
                 />
               </motion.div>
             ) : (

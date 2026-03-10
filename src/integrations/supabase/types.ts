@@ -638,6 +638,7 @@ export type Database = {
           property_type: string | null
           sqm: number
           state: string
+          status: string
           suburb: string
           title: string
           updated_at: string
@@ -665,6 +666,7 @@ export type Database = {
           property_type?: string | null
           sqm?: number
           state: string
+          status?: string
           suburb: string
           title: string
           updated_at?: string
@@ -692,6 +694,7 @@ export type Database = {
           property_type?: string | null
           sqm?: number
           state?: string
+          status?: string
           suburb?: string
           title?: string
           updated_at?: string

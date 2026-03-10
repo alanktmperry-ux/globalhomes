@@ -21,8 +21,7 @@ const STATUS_CONFIG: Record<string, { icon: React.ReactNode; label: string; colo
 
 function getListingStatus(l: AgentListing): string {
   if ('_mock_status' in l) return l._mock_status;
-  if (!l.is_active) return 'sold';
-  return 'public';
+  return (l as any).status || 'public';
 }
 
 function getListingLeads(l: AgentListing): number {
@@ -51,7 +50,7 @@ const ListingsPage = () => {
   const handleBoost = async (l: AgentListing) => {
     if (l._source !== 'db') { toast({ title: 'Demo listing', description: 'Create a real listing first.' }); return; }
     setActionLoading(l.id);
-    const { error } = await supabase.from('properties').update({ is_active: true }).eq('id', l.id);
+    const { error } = await supabase.from('properties').update({ status: 'public', is_active: true } as any).eq('id', l.id);
     if (error) { toast({ title: 'Failed to boost', variant: 'destructive' }); }
     else { toast({ title: 'Listing boosted!', description: 'Your listing is now public.' }); refetch(); }
     setActionLoading(null);
@@ -60,7 +59,7 @@ const ListingsPage = () => {
   const handleMarkSold = async (l: AgentListing) => {
     if (l._source !== 'db') { toast({ title: 'Demo listing', description: 'Create a real listing first.' }); return; }
     setActionLoading(l.id);
-    const { error } = await supabase.from('properties').update({ is_active: false }).eq('id', l.id);
+    const { error } = await supabase.from('properties').update({ status: 'sold', is_active: false } as any).eq('id', l.id);
     if (error) { toast({ title: 'Failed to update', variant: 'destructive' }); }
     else { toast({ title: 'Marked as sold!', description: 'Listing has been marked as sold.' }); refetch(); }
     setActionLoading(null);

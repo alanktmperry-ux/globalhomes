@@ -20,11 +20,29 @@ const StepPhotos = ({ draft, update }: Props) => {
   const [dragOver, setDragOver] = useState(false);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [overIdx, setOverIdx] = useState<number | null>(null);
+  const [uploading, setUploading] = useState(false);
 
-  const addPhotos = (files: FileList | null) => {
-    if (!files) return;
-    const urls = Array.from(files).map((f) => URL.createObjectURL(f));
-    update({ photos: [...draft.photos, ...urls].slice(0, 10) });
+  const addPhotos = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    const uploadedUrls: string[] = [];
+
+    for (const file of Array.from(files)) {
+      const ext = file.name.split('.').pop() || 'jpg';
+      const filePath = `${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage
+        .from('property-photos')
+        .upload(filePath, file);
+      if (!error) {
+        const { data: { publicUrl } } = supabase.storage
+          .from('property-photos')
+          .getPublicUrl(filePath);
+        uploadedUrls.push(publicUrl);
+      }
+    }
+
+    update({ photos: [...draft.photos, ...uploadedUrls].slice(0, 10) });
+    setUploading(false);
   };
 
   const removePhoto = (i: number) => {

@@ -142,7 +142,7 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePrope
         generatedTitle: duplicatePropertyId ? '' : prop.title,
         generatedBullets: bulletLines,
         features: prop.features || [],
-        visibility: prop.is_active ? 'public' : 'whisper',
+        visibility: ((prop as any).status === 'whisper' || (prop as any).status === 'coming-soon') ? (prop as any).status : (prop as any).status === 'sold' ? 'whisper' : 'public',
         exclusiveDays: 14,
         buyerRequirements: 'none',
         showContact: true,

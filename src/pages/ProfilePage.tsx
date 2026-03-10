@@ -150,6 +150,22 @@ const ProfilePage = () => {
                 </button>
               )}
 
+              {isAdmin && (
+                <button
+                  onClick={() => navigate('/admin')}
+                  className="w-full flex items-center gap-3 p-4 rounded-2xl bg-card border border-border text-left transition-colors active:bg-secondary"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
+                    <ShieldCheck size={18} className="text-destructive" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-foreground text-sm">Admin Dashboard</p>
+                    <p className="text-xs text-muted-foreground">Manage users, listings & platform</p>
+                  </div>
+                  <ChevronRight size={18} className="text-muted-foreground" />
+                </button>
+              )}
+
               <button
                 onClick={() => navigate('/dashboard/settings')}
                 className="w-full flex items-center gap-3 p-4 rounded-2xl bg-card border border-border text-left transition-colors active:bg-secondary"

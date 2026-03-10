@@ -101,13 +101,13 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePrope
 
   // Load existing property for editing
   useEffect(() => {
-    if (!editPropertyId) return;
+    if (!loadPropertyId) return;
     const loadProperty = async () => {
       setLoadingEdit(true);
       const { data: prop, error } = await supabase
         .from('properties')
         .select('*')
-        .eq('id', editPropertyId)
+        .eq('id', loadPropertyId)
         .maybeSingle();
 
       if (error || !prop) {
@@ -116,21 +116,19 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePrope
         return;
       }
 
-      // Detect price display from formatted string
       let priceDisplay: ListingDraft['priceDisplay'] = 'exact';
       if (prop.price_formatted.includes('–')) priceDisplay = 'range';
       else if (prop.price_formatted.toLowerCase().includes('expression')) priceDisplay = 'eoi';
       else if (prop.price_formatted.toLowerCase().includes('contact')) priceDisplay = 'contact';
 
-      // Parse description back into transcript + bullets
       const descLines = (prop.description || '').split('\n').filter(Boolean);
       const bulletLines = descLines.filter(l => l.startsWith('•')).map(l => l.replace(/^•\s*/, ''));
       const transcriptLines = descLines.filter(l => !l.startsWith('•') && l !== 'Key Features:');
 
       setDraft({
-        address: prop.address,
-        suburb: prop.suburb,
-        state: prop.state,
+        address: duplicatePropertyId ? '' : prop.address,
+        suburb: duplicatePropertyId ? '' : prop.suburb,
+        state: duplicatePropertyId ? '' : prop.state,
         priceMin: Math.round(prop.price * 0.9),
         priceMax: prop.price,
         priceDisplay,
@@ -138,10 +136,10 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePrope
         beds: prop.beds,
         baths: prop.baths,
         cars: prop.parking,
-        photos: prop.images || (prop.image_url ? [prop.image_url] : []),
+        photos: duplicatePropertyId ? [] : (prop.images || (prop.image_url ? [prop.image_url] : [])),
         primaryPhoto: 0,
         voiceTranscript: transcriptLines.join('\n'),
-        generatedTitle: prop.title,
+        generatedTitle: duplicatePropertyId ? '' : prop.title,
         generatedBullets: bulletLines,
         features: prop.features || [],
         visibility: prop.is_active ? 'public' : 'whisper',
@@ -155,7 +153,7 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePrope
       setLoadingEdit(false);
     };
     loadProperty();
-  }, [editPropertyId]);
+  }, [loadPropertyId]);
 
   // Auto-save every 10 seconds (only for new listings)
   useEffect(() => {

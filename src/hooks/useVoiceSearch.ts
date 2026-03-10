@@ -12,6 +12,7 @@ interface SpeechRecognitionErrorEvent {
 export function useVoiceSearch(onResult: (text: string) => void, onError?: (message: string) => void) {
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
+  const finalTranscriptRef = useRef('');
 
   const isSupported = typeof window !== 'undefined' && 
     ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
@@ -26,14 +27,34 @@ export function useVoiceSearch(onResult: (text: string) => void, onError?: (mess
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       const recognition = new SpeechRecognition();
 
-      recognition.continuous = false;
-      recognition.interimResults = false;
+      recognition.continuous = true;
+      recognition.interimResults = true;
       recognition.lang = navigator.language || 'en-US';
 
+      finalTranscriptRef.current = '';
+
       recognition.onresult = (event: SpeechRecognitionEvent) => {
-        const transcript = event.results[0][0].transcript;
-        onResult(transcript);
-        setIsListening(false);
+        let finalTranscript = '';
+        let interimTranscript = '';
+
+        for (let i = 0; i < event.results.length; i++) {
+          const result = event.results[i];
+          if (result.isFinal) {
+            finalTranscript += result[0].transcript + ' ';
+          } else {
+            interimTranscript += result[0].transcript;
+          }
+        }
+
+        if (finalTranscript) {
+          finalTranscriptRef.current = finalTranscript.trim();
+        }
+
+        // Send the combined transcript (final + interim) for live preview
+        const combined = (finalTranscriptRef.current + ' ' + interimTranscript).trim();
+        if (combined) {
+          onResult(combined);
+        }
       };
 
       recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
@@ -55,6 +76,10 @@ export function useVoiceSearch(onResult: (text: string) => void, onError?: (mess
 
       recognition.onend = () => {
         setIsListening(false);
+        // Deliver final transcript when recognition ends
+        if (finalTranscriptRef.current) {
+          onResult(finalTranscriptRef.current);
+        }
       };
 
       recognitionRef.current = recognition;

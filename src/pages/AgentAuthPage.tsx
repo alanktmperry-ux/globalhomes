@@ -117,6 +117,7 @@ const AgentAuthPage = () => {
           description: 'We sent you a confirmation link. Please verify your email to sign in.',
         });
         setStep('email');
+        setLoading(false);
       }
     } catch (err: any) {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });

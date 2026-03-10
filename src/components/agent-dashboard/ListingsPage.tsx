@@ -8,6 +8,8 @@ import DashboardHeader from './DashboardHeader';
 import { useAgentListings, type AgentListing } from '@/hooks/useAgentListings';
 import { PropertyDrawer } from '@/components/PropertyDrawer';
 import { Property } from '@/lib/types';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const STATUS_CONFIG: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
   whisper: { icon: <EyeOff size={12} />, label: 'Whisper', color: 'bg-foreground/10 text-foreground' },

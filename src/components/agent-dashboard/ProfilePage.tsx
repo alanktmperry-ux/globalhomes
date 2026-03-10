@@ -41,6 +41,7 @@ interface AgentData {
   is_approved: boolean | null;
   is_subscribed: boolean;
   created_at: string;
+  company_logo_url: string | null;
 }
 
 interface Credential {

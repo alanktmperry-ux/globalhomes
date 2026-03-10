@@ -20,7 +20,7 @@ const formatPrice = (d: ListingDraft) => {
   }
 };
 
-const StepPreview = ({ draft, onPublish, publishing }: Props) => {
+const StepPreview = ({ draft, onPublish, publishing, isEdit }: Props) => {
   const [view, setView] = useState<'mobile' | 'desktop'>('mobile');
   const mainPhoto = draft.photos[draft.primaryPhoto] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=400&fit=crop';
 

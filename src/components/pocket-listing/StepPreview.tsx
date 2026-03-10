@@ -1,4 +1,4 @@
-import { Smartphone, Monitor, Bed, Bath, Car, MapPin, CheckCircle2, Sparkles } from 'lucide-react';
+import { Smartphone, Monitor, Bed, Bath, Car, MapPin, CheckCircle2, Sparkles, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import type { ListingDraft } from './PocketListingForm';
@@ -6,6 +6,7 @@ import type { ListingDraft } from './PocketListingForm';
 interface Props {
   draft: ListingDraft;
   onPublish: () => void;
+  publishing?: boolean;
 }
 
 const formatPrice = (d: ListingDraft) => {
@@ -18,7 +19,7 @@ const formatPrice = (d: ListingDraft) => {
   }
 };
 
-const StepPreview = ({ draft, onPublish }: Props) => {
+const StepPreview = ({ draft, onPublish, publishing }: Props) => {
   const [view, setView] = useState<'mobile' | 'desktop'>('mobile');
   const mainPhoto = draft.photos[draft.primaryPhoto] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=400&fit=crop';
 
@@ -111,10 +112,19 @@ const StepPreview = ({ draft, onPublish }: Props) => {
         <Button
           size="lg"
           onClick={onPublish}
+          disabled={publishing}
           className="w-full py-5 rounded-xl text-base font-bold bg-success hover:bg-success/90 text-success-foreground relative"
         >
-          <span className="absolute -top-1 -right-1 w-3 h-3 bg-success rounded-full animate-pulse shadow-lg" />
-          Publish Off-Market Listing
+          {publishing ? (
+            <>
+              <Loader2 size={18} className="mr-2 animate-spin" /> Saving to database…
+            </>
+          ) : (
+            <>
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-success rounded-full animate-pulse shadow-lg" />
+              Publish Off-Market Listing
+            </>
+          )}
         </Button>
       </div>
     </div>

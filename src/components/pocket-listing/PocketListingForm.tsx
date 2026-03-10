@@ -1,8 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Save } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Save, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/lib/AuthProvider';
+import { useToast } from '@/hooks/use-toast';
 import StepAddress from './StepAddress';
 import StepBasics from './StepBasics';
 import StepPhotos from './StepPhotos';
@@ -69,10 +72,23 @@ interface Props {
   onCancel: () => void;
 }
 
+const formatPriceForDB = (draft: ListingDraft): string => {
+  const fmt = (v: number) => v >= 1000000 ? `$${(v / 1000000).toFixed(1)}M` : `$${(v / 1000).toFixed(0)}K`;
+  switch (draft.priceDisplay) {
+    case 'exact': return fmt(draft.priceMax);
+    case 'range': return `${fmt(draft.priceMin)} – ${fmt(draft.priceMax)}`;
+    case 'eoi': return 'Expressions of Interest';
+    case 'contact': return 'Contact Agent';
+  }
+};
+
 const PocketListingForm = ({ onPublish, onCancel }: Props) => {
   const [step, setStep] = useState(0);
   const [draft, setDraft] = useState<ListingDraft>(DEFAULT_DRAFT);
+  const [publishing, setPublishing] = useState(false);
   const autoSaveRef = useRef<ReturnType<typeof setInterval>>();
+  const { user } = useAuth();
+  const { toast } = useToast();
 
   const update = (partial: Partial<ListingDraft>) =>
     setDraft((d) => ({ ...d, ...partial }));
@@ -100,9 +116,66 @@ const PocketListingForm = ({ onPublish, onCancel }: Props) => {
     return true;
   };
 
-  const handlePublish = () => {
-    localStorage.removeItem('pocket-listing-draft');
-    onPublish(draft.generatedTitle || draft.address);
+  const handlePublish = async () => {
+    if (publishing) return;
+    setPublishing(true);
+
+    try {
+      // Look up the agent record for the current user
+      let agentId: string | null = null;
+      if (user) {
+        const { data: agent } = await supabase
+          .from('agents')
+          .select('id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        agentId = agent?.id ?? null;
+      }
+
+      const title = draft.generatedTitle || `${draft.propertyType} in ${draft.suburb || 'Location'}`;
+      const description = [
+        draft.voiceTranscript,
+        ...(draft.generatedBullets.length > 0 ? ['', 'Key Features:', ...draft.generatedBullets.map(b => `• ${b}`)] : []),
+      ].filter(Boolean).join('\n') || null;
+
+      const mainPhoto = draft.photos[draft.primaryPhoto] || draft.photos[0] || null;
+
+      const { error } = await supabase.from('properties').insert({
+        title,
+        address: draft.address,
+        suburb: draft.suburb || 'Unknown',
+        state: draft.state || 'Unknown',
+        country: 'Australia',
+        price: draft.priceMax,
+        price_formatted: formatPriceForDB(draft),
+        beds: draft.beds,
+        baths: draft.baths,
+        parking: draft.cars,
+        sqm: 0,
+        property_type: draft.propertyType,
+        description,
+        features: draft.features,
+        image_url: mainPhoto,
+        images: draft.photos.length > 0 ? draft.photos : [],
+        agent_id: agentId,
+        is_active: draft.visibility === 'public',
+      });
+
+      if (error) throw error;
+
+      localStorage.removeItem('pocket-listing-draft');
+      toast({ title: 'Listing published!', description: 'Your property has been saved to the database.' });
+      onPublish(title);
+    } catch (err: any) {
+      console.error('Publish error:', err);
+      toast({
+        title: 'Failed to publish',
+        description: err.message || 'Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setPublishing(false);
+    }
   };
 
   const stepContent = () => {
@@ -112,7 +185,7 @@ const PocketListingForm = ({ onPublish, onCancel }: Props) => {
       case 2: return <StepPhotos draft={draft} update={update} />;
       case 3: return <StepVoice draft={draft} update={update} />;
       case 4: return <StepSettings draft={draft} update={update} />;
-      case 5: return <StepPreview draft={draft} onPublish={handlePublish} />;
+      case 5: return <StepPreview draft={draft} onPublish={handlePublish} publishing={publishing} />;
       default: return null;
     }
   };
@@ -148,6 +221,7 @@ const PocketListingForm = ({ onPublish, onCancel }: Props) => {
           variant="ghost"
           size="sm"
           onClick={() => (step === 0 ? onCancel() : setStep(step - 1))}
+          disabled={publishing}
         >
           <ArrowLeft size={14} className="mr-1" /> {step === 0 ? 'Cancel' : 'Back'}
         </Button>

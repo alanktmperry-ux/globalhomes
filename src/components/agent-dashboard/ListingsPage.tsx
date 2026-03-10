@@ -169,25 +169,27 @@ const ListingsPage = () => {
                       <p className="text-xs text-muted-foreground truncate">{l.address}</p>
                       <p className="text-sm font-display font-bold text-primary mt-1">{l.price_formatted}</p>
                     </div>
-                    <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-1 shrink-0">
-                      <span className="text-xs text-muted-foreground flex items-center gap-1"><Eye size={10} /> {l.views}</span>
-                      <span className="text-xs text-muted-foreground flex items-center gap-1"><Sparkles size={10} /> {leads} leads</span>
-                      <div className="flex gap-1 mt-1">
-                        <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5" onClick={() => {
-                          if (l._source === 'db') navigate(`/pocket-listing?edit=${l.id}`);
-                        }}>
-                          <Pencil size={10} /> Edit
-                        </Button>
-                        {l._status !== 'public' && l._status !== 'sold' && (
-                          <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5">
-                            <Rocket size={10} /> Boost
+                      <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-1 shrink-0">
+                        <span className="text-xs text-muted-foreground flex items-center gap-1"><Eye size={10} /> {l.views}</span>
+                        <span className="text-xs text-muted-foreground flex items-center gap-1"><Sparkles size={10} /> {leads} leads</span>
+                        <div className="flex gap-1 mt-1">
+                          <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5" disabled={actionLoading === l.id} onClick={() => {
+                            if (l._source === 'db') navigate(`/pocket-listing?edit=${l.id}`);
+                          }}>
+                            <Pencil size={10} /> Edit
                           </Button>
-                        )}
-                        {l._status !== 'sold' && (
-                          <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 text-success">Mark Sold</Button>
-                        )}
+                          {l._status !== 'public' && l._status !== 'sold' && (
+                            <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5" disabled={actionLoading === l.id} onClick={() => handleBoost(l)}>
+                              {actionLoading === l.id ? <Loader2 size={10} className="animate-spin" /> : <Rocket size={10} />} Boost
+                            </Button>
+                          )}
+                          {l._status !== 'sold' && (
+                            <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 text-success" disabled={actionLoading === l.id} onClick={() => handleMarkSold(l)}>
+                              {actionLoading === l.id ? <Loader2 size={10} className="animate-spin" /> : null} Mark Sold
+                            </Button>
+                          )}
+                        </div>
                       </div>
-                    </div>
                   </div>
                 );
               })}

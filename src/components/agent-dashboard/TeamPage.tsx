@@ -1,11 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Copy, Plus, Trash2, UserPlus, Building2, Shield, Users, RefreshCw, Loader2, Camera, Upload } from 'lucide-react';
+import { Copy, Plus, Trash2, UserPlus, Building2, Shield, Users, RefreshCw, Loader2, Camera, Upload, LogIn, ArrowRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/AuthProvider';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from '@/components/ui/dialog';
@@ -56,6 +59,17 @@ const TeamPage = () => {
   const [creating, setCreating] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Create agency form
+  const [newAgencyName, setNewAgencyName] = useState('');
+  const [newAgencyEmail, setNewAgencyEmail] = useState('');
+  const [newAgencyPhone, setNewAgencyPhone] = useState('');
+  const [newAgencyDescription, setNewAgencyDescription] = useState('');
+  const [creatingAgency, setCreatingAgency] = useState(false);
+
+  // Join agency form
+  const [joinCode, setJoinCode] = useState('');
+  const [joiningAgency, setJoiningAgency] = useState(false);
 
   const isOwnerOrAdmin = myRole === 'owner' || myRole === 'admin';
 
@@ -244,14 +258,254 @@ const TeamPage = () => {
     );
   }
 
+  const generateSlug = (name: string) =>
+    name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Math.random().toString(36).slice(2, 6);
+
+  const handleCreateAgency = async () => {
+    if (!user || !newAgencyName.trim()) return;
+    setCreatingAgency(true);
+    try {
+      const slug = generateSlug(newAgencyName);
+      const { data: agency, error: agencyError } = await supabase
+        .from('agencies')
+        .insert({
+          name: newAgencyName.trim(),
+          slug,
+          owner_user_id: user.id,
+          email: newAgencyEmail || null,
+          phone: newAgencyPhone || null,
+          description: newAgencyDescription || null,
+        })
+        .select('id')
+        .single();
+      if (agencyError) throw agencyError;
+
+      // Add self as owner member
+      const { error: memberError } = await supabase
+        .from('agency_members')
+        .insert({
+          agency_id: agency.id,
+          user_id: user.id,
+          role: 'owner' as any,
+        });
+      if (memberError) throw memberError;
+
+      // Link agent record to agency
+      const { data: agentRecord } = await supabase
+        .from('agents')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (agentRecord) {
+        await supabase
+          .from('agents')
+          .update({ agency_id: agency.id, agency: newAgencyName.trim() })
+          .eq('id', agentRecord.id);
+      }
+
+      toast({ title: 'Agency created!', description: `${newAgencyName} is ready. Invite your team!` });
+      loadData();
+    } catch (err: any) {
+      toast({ title: 'Error creating agency', description: err.message, variant: 'destructive' });
+    } finally {
+      setCreatingAgency(false);
+    }
+  };
+
+  const handleJoinAgency = async () => {
+    if (!user || !joinCode.trim()) return;
+    setJoiningAgency(true);
+    try {
+      // Look up the invite code
+      const { data: invite, error: inviteError } = await supabase
+        .from('agency_invite_codes')
+        .select('*')
+        .eq('code', joinCode.trim().toUpperCase())
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (inviteError) throw inviteError;
+      if (!invite) {
+        toast({ title: 'Invalid code', description: 'This invite code is invalid or has been deactivated.', variant: 'destructive' });
+        setJoiningAgency(false);
+        return;
+      }
+
+      if (invite.max_uses && invite.uses >= invite.max_uses) {
+        toast({ title: 'Code expired', description: 'This invite code has reached its max usage.', variant: 'destructive' });
+        setJoiningAgency(false);
+        return;
+      }
+
+      // Check if already a member
+      const { data: existing } = await supabase
+        .from('agency_members')
+        .select('id')
+        .eq('agency_id', invite.agency_id)
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (existing) {
+        toast({ title: 'Already a member', description: 'You are already part of this agency.', variant: 'destructive' });
+        setJoiningAgency(false);
+        return;
+      }
+
+      // Join
+      const { error: joinError } = await supabase
+        .from('agency_members')
+        .insert({
+          agency_id: invite.agency_id,
+          user_id: user.id,
+          role: invite.role as any,
+        });
+      if (joinError) throw joinError;
+
+      // Increment uses
+      await supabase
+        .from('agency_invite_codes')
+        .update({ uses: invite.uses + 1 })
+        .eq('id', invite.id);
+
+      // Link agent record
+      const { data: agentRecord } = await supabase
+        .from('agents')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (agentRecord) {
+        const { data: agencyData } = await supabase
+          .from('agencies')
+          .select('id, name')
+          .eq('id', invite.agency_id)
+          .single();
+        if (agencyData) {
+          await supabase
+            .from('agents')
+            .update({ agency_id: agencyData.id, agency: agencyData.name })
+            .eq('id', agentRecord.id);
+        }
+      }
+
+      toast({ title: 'Joined agency!', description: `Welcome to the team as ${invite.role}.` });
+      loadData();
+    } catch (err: any) {
+      toast({ title: 'Error joining', description: err.message, variant: 'destructive' });
+    } finally {
+      setJoiningAgency(false);
+    }
+  };
+
   if (!agencyId) {
     return (
-      <div className="max-w-lg mx-auto text-center py-20 px-4">
-        <Building2 size={48} className="text-muted-foreground mx-auto mb-4" />
-        <h2 className="font-display text-xl font-bold mb-2">No Agency Found</h2>
-        <p className="text-sm text-muted-foreground">
-          You're not part of an agency yet. Create one from your agent settings or join using an invite code.
-        </p>
+      <div className="max-w-lg mx-auto py-12 px-4">
+        <div className="text-center mb-8">
+          <Building2 size={48} className="text-primary mx-auto mb-4" />
+          <h2 className="font-display text-2xl font-bold mb-2">Set Up Your Agency</h2>
+          <p className="text-sm text-muted-foreground">
+            Create a new agency to manage your team, or join an existing one with an invite code.
+          </p>
+        </div>
+
+        <Tabs defaultValue="create" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="create" className="text-xs gap-1.5">
+              <Plus size={14} /> Create Agency
+            </TabsTrigger>
+            <TabsTrigger value="join" className="text-xs gap-1.5">
+              <LogIn size={14} /> Join with Code
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="create">
+            <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
+              <div>
+                <Label className="text-xs font-medium">Agency Name *</Label>
+                <Input
+                  placeholder="e.g. Elite Property Group"
+                  value={newAgencyName}
+                  onChange={(e) => setNewAgencyName(e.target.value)}
+                  className="mt-1.5"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-xs font-medium">Email</Label>
+                  <Input
+                    type="email"
+                    placeholder="office@agency.com"
+                    value={newAgencyEmail}
+                    onChange={(e) => setNewAgencyEmail(e.target.value)}
+                    className="mt-1.5"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs font-medium">Phone</Label>
+                  <Input
+                    placeholder="+61 4xx xxx xxx"
+                    value={newAgencyPhone}
+                    onChange={(e) => setNewAgencyPhone(e.target.value)}
+                    className="mt-1.5"
+                  />
+                </div>
+              </div>
+              <div>
+                <Label className="text-xs font-medium">Description</Label>
+                <Textarea
+                  placeholder="Tell clients about your agency..."
+                  value={newAgencyDescription}
+                  onChange={(e) => setNewAgencyDescription(e.target.value)}
+                  className="mt-1.5 resize-none"
+                  rows={3}
+                />
+              </div>
+              <Button
+                onClick={handleCreateAgency}
+                disabled={creatingAgency || !newAgencyName.trim()}
+                className="w-full"
+              >
+                {creatingAgency ? (
+                  <><Loader2 size={14} className="animate-spin mr-2" /> Creating...</>
+                ) : (
+                  <><Building2 size={14} className="mr-2" /> Create Agency</>
+                )}
+              </Button>
+              <p className="text-[11px] text-muted-foreground text-center">
+                You'll be set as the owner and can invite team members after creation.
+              </p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="join">
+            <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
+              <div>
+                <Label className="text-xs font-medium">Invite Code</Label>
+                <Input
+                  placeholder="e.g. ABCD1234"
+                  value={joinCode}
+                  onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                  className="mt-1.5 font-mono tracking-widest text-center text-lg"
+                  maxLength={8}
+                />
+                <p className="text-[11px] text-muted-foreground mt-1.5">
+                  Ask your agency owner or admin for an invite code.
+                </p>
+              </div>
+              <Button
+                onClick={handleJoinAgency}
+                disabled={joiningAgency || joinCode.trim().length < 4}
+                className="w-full"
+              >
+                {joiningAgency ? (
+                  <><Loader2 size={14} className="animate-spin mr-2" /> Joining...</>
+                ) : (
+                  <><ArrowRight size={14} className="mr-2" /> Join Agency</>
+                )}
+              </Button>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     );
   }

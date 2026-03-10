@@ -129,21 +129,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [fetchRoles, clearRoles]);
 
   const signOut = async () => {
+    // Always clear local state first for instant UI feedback
+    clearRoles();
+    setUser(null);
+    setSession(null);
+    
     try {
-      clearRoles();
-      setUser(null);
-      setSession(null);
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('[Auth] signOut error:', error);
-        throw error;
+        // If signOut fails, force-clear localStorage to prevent zombie sessions
+        try {
+          const storageKey = `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID || 'ngrkbohpmkzjonaofgbb'}-auth-token`;
+          localStorage.removeItem(storageKey);
+        } catch (storageErr) {
+          console.error('[Auth] localStorage cleanup failed:', storageErr);
+        }
       }
     } catch (err) {
       console.error('[Auth] signOut failed:', err);
-      // Force clear state even on error
-      clearRoles();
-      setUser(null);
-      setSession(null);
+      // Force-clear localStorage to prevent zombie sessions
+      try {
+        const storageKey = `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID || 'ngrkbohpmkzjonaofgbb'}-auth-token`;
+        localStorage.removeItem(storageKey);
+      } catch (storageErr) {
+        console.error('[Auth] localStorage cleanup failed:', storageErr);
+      }
     }
   };
 

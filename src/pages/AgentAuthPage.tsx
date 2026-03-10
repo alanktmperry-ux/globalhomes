@@ -44,9 +44,23 @@ const AgentAuthPage = () => {
   useEffect(() => {
     if (pendingRedirect === 'dashboard' && user && isAgent && !authLoading) {
       setPendingRedirect(null);
+      setLoading(false);
       navigate('/dashboard');
     }
   }, [pendingRedirect, user, isAgent, authLoading, navigate]);
+
+  // Safety: if pending redirect but auth settles without agent role, reset
+  useEffect(() => {
+    if (pendingRedirect === 'dashboard' && user && !authLoading && !isAgent) {
+      // User signed in but doesn't have agent role
+      const timeout = setTimeout(() => {
+        setPendingRedirect(null);
+        setLoading(false);
+        toast({ title: 'Error', description: 'This account does not have agent access.', variant: 'destructive' });
+      }, 2000);
+      return () => clearTimeout(timeout);
+    }
+  }, [pendingRedirect, user, authLoading, isAgent, toast]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();

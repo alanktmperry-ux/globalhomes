@@ -62,6 +62,7 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingDoc, setUploadingDoc] = useState(false);
   const [agent, setAgent] = useState<AgentData | null>(null);
   const [credentials, setCredentials] = useState<Credential[]>([]);

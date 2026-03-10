@@ -14,3 +14,12 @@ verify_jwt = false
 
 [functions.capture-lead]
 verify_jwt = false
+
+[functions.send-notification-email]
+verify_jwt = false
+
+[functions.setup-agent]
+verify_jwt = false
+
+[functions.admin-users]
+verify_jwt = false

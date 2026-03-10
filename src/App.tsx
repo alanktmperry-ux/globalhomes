@@ -35,6 +35,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import AgencyProfilePage from "./pages/AgencyProfilePage";
 import PropertyDetailPage from "./pages/PropertyDetailPage";
+import AgentPublicProfilePage from "./pages/AgentPublicProfilePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

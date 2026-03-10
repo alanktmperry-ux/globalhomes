@@ -121,7 +121,7 @@ const AgentDashboardSidebar = () => {
         <div className="flex items-center gap-2">
           <SidebarTrigger className="shrink-0" />
           {!collapsed && (
-            <button className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+            <button onClick={handleSignOut} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
               <LogOut size={14} /> Sign out
             </button>
           )}

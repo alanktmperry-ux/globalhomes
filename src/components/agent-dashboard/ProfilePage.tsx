@@ -56,6 +56,7 @@ const ProfilePage = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const avatarInputRef = useRef<HTMLInputElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
   const docInputRef = useRef<HTMLInputElement>(null);
 
   const [loading, setLoading] = useState(true);

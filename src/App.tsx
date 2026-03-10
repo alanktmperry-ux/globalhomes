@@ -53,6 +53,7 @@ const App = () => (
               {/* Public */}
               <Route path="/" element={<Index />} />
               <Route path="/property/:id" element={<PropertyDetailPage />} />
+              <Route path="/agent/:id" element={<AgentPublicProfilePage />} />
               <Route path="/agents" element={<AgentLandingPage />} />
               <Route path="/auth" element={<AuthLandingPage />} />
               <Route path="/login" element={<SeekerAuthPage />} />

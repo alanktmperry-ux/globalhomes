@@ -110,7 +110,7 @@ const AgentAuthPage = () => {
         } else {
           toast({ title: 'Welcome to the team!', description: `You've joined ${setupResult?.agencyName || 'the agency'}.` });
         }
-        navigate('/dashboard');
+        setPendingRedirect('dashboard');
       } else {
         toast({
           title: 'Check your email',

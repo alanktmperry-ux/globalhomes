@@ -77,6 +77,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         console.log('[Auth] onAuthStateChange event:', _event, 'user:', session?.user?.id ?? 'none');
+        
+        // On new sign-in, set loading=true so ProtectedRoute waits for roles
+        if (_event === 'SIGNED_IN' && session?.user) {
+          setLoading(true);
+        }
+        
         setSession(session);
         setUser(session?.user ?? null);
 

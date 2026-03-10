@@ -41,6 +41,7 @@ interface AgentData {
   is_approved: boolean | null;
   is_subscribed: boolean;
   created_at: string;
+  company_logo_url: string | null;
 }
 
 interface Credential {
@@ -56,11 +57,13 @@ const ProfilePage = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const avatarInputRef = useRef<HTMLInputElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
   const docInputRef = useRef<HTMLInputElement>(null);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingDoc, setUploadingDoc] = useState(false);
   const [agent, setAgent] = useState<AgentData | null>(null);
   const [credentials, setCredentials] = useState<Credential[]>([]);
@@ -165,6 +168,46 @@ const ProfilePage = () => {
       toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
     } finally {
       setUploadingAvatar(false);
+    }
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !agent) return;
+    if (!file.type.startsWith('image/')) {
+      toast({ title: 'Invalid file', description: 'Please upload an image file.', variant: 'destructive' });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: 'File too large', description: 'Max 5MB.', variant: 'destructive' });
+      return;
+    }
+
+    setUploadingLogo(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const filePath = `${agent.user_id}/company-logo.${ext}`;
+      const { error: upErr } = await supabase.storage.from('agency-logos').upload(filePath, file, { upsert: true });
+      if (upErr) throw upErr;
+      const { data: { publicUrl } } = supabase.storage.from('agency-logos').getPublicUrl(filePath);
+      await supabase.from('agents').update({ company_logo_url: publicUrl } as any).eq('id', agent.id);
+      setAgent(prev => prev ? { ...prev, company_logo_url: publicUrl } : null);
+      toast({ title: 'Company logo updated' });
+    } catch (err: any) {
+      toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  const removeLogo = async () => {
+    if (!agent) return;
+    try {
+      await supabase.from('agents').update({ company_logo_url: null } as any).eq('id', agent.id);
+      setAgent(prev => prev ? { ...prev, company_logo_url: null } : null);
+      toast({ title: 'Logo removed' });
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
     }
   };
 
@@ -361,6 +404,48 @@ const ProfilePage = () => {
               <h3 className="font-display text-sm font-bold flex items-center gap-1.5">
                 <Building2 size={14} /> Agency Information
               </h3>
+
+              {/* Company Logo */}
+              <div>
+                <Label className="text-xs mb-2 block">Company Logo</Label>
+                <div className="flex items-center gap-4">
+                  <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+                  <div className="relative group">
+                    <div className="w-24 h-24 rounded-xl overflow-hidden bg-secondary border-2 border-dashed border-border flex items-center justify-center">
+                      {agent.company_logo_url ? (
+                        <img src={agent.company_logo_url} alt="Company Logo" className="w-full h-full object-contain p-1" />
+                      ) : (
+                        <div className="text-center">
+                          <Upload size={20} className="mx-auto text-muted-foreground mb-1" />
+                          <span className="text-[10px] text-muted-foreground">Upload</span>
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => logoInputRef.current?.click()}
+                      disabled={uploadingLogo}
+                      className="absolute inset-0 rounded-xl bg-foreground/0 group-hover:bg-foreground/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                    >
+                      {uploadingLogo ? <Loader2 size={18} className="text-background animate-spin" /> : <Camera size={18} className="text-background" />}
+                    </button>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-muted-foreground mb-2">Upload your company or agency logo. PNG or JPG, max 5MB.</p>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" className="text-xs" onClick={() => logoInputRef.current?.click()} disabled={uploadingLogo}>
+                        {uploadingLogo ? <><Loader2 size={12} className="mr-1 animate-spin" /> Uploading…</> : <><Upload size={12} className="mr-1" /> {agent.company_logo_url ? 'Replace' : 'Upload'}</>}
+                      </Button>
+                      {agent.company_logo_url && (
+                        <Button variant="ghost" size="sm" className="text-xs text-destructive" onClick={removeLogo}>
+                          <Trash2 size={12} className="mr-1" /> Remove
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <Label className="text-xs">Agency Name</Label>

@@ -279,6 +279,7 @@ export type Database = {
           agency_id: string | null
           avatar_url: string | null
           bio: string | null
+          company_logo_url: string | null
           created_at: string
           email: string | null
           id: string
@@ -308,6 +309,7 @@ export type Database = {
           agency_id?: string | null
           avatar_url?: string | null
           bio?: string | null
+          company_logo_url?: string | null
           created_at?: string
           email?: string | null
           id?: string
@@ -337,6 +339,7 @@ export type Database = {
           agency_id?: string | null
           avatar_url?: string | null
           bio?: string | null
+          company_logo_url?: string | null
           created_at?: string
           email?: string | null
           id?: string

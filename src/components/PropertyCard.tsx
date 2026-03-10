@@ -35,7 +35,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.08, duration: 0.4 }}
-        className="group cursor-pointer rounded-2xl bg-card shadow-card overflow-hidden border border-border/50 transition-shadow hover:shadow-elevated"
+        className="group cursor-pointer rounded-2xl bg-card shadow-card overflow-hidden border border-border/50 transition-all duration-300 hover:shadow-elevated hover:scale-[1.03]"
       >
         {/* Image */}
         <div className="relative aspect-[4/3] overflow-hidden" onClick={() => onSelect(property)}>

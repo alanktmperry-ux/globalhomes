@@ -221,7 +221,8 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePrope
         image_url: mainPhoto,
         images: draft.photos.length > 0 ? draft.photos : [],
         is_active: draft.visibility === 'public',
-      };
+        status: draft.visibility === 'public' ? 'public' : draft.visibility,
+      } as any;
 
       if (editPropertyId) {
         // UPDATE existing listing

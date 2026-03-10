@@ -22,7 +22,7 @@ const PocketListingPage = () => {
   const { listings, agentId } = useAgentListings();
   const { toast } = useToast();
 
-  const activeCount = listings.filter(l => ('_mock_status' in l ? l._mock_status !== 'sold' : l.is_active)).length;
+  const activeCount = listings.filter(l => ('_mock_status' in l ? l._mock_status !== 'sold' : (l as any).status !== 'sold')).length;
   const totalLeads = listings.reduce((sum, l) => sum + ('_mock_leads' in l ? l._mock_leads : l.contact_clicks), 0);
 
   const stats = [

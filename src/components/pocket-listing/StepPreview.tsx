@@ -7,6 +7,7 @@ interface Props {
   draft: ListingDraft;
   onPublish: () => void;
   publishing?: boolean;
+  isEdit?: boolean;
 }
 
 const formatPrice = (d: ListingDraft) => {

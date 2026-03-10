@@ -40,7 +40,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
         className="group cursor-pointer rounded-2xl bg-card shadow-card overflow-hidden border border-border/50 transition-all duration-300 hover:shadow-elevated hover:scale-[1.03]"
       >
         {/* Image */}
-        <div className="relative aspect-[4/3] overflow-hidden" onClick={() => onSelect(property)}>
+        <div className="relative aspect-[4/3] overflow-hidden" onClick={() => { onSelect(property); navigate(`/property/${property.id}`); }}>
           <img
             src={property.imageUrl}
             alt={property.title}

@@ -19,6 +19,7 @@ import { mockProperties } from '@/lib/mock-data';
 import { useToast } from '@/hooks/use-toast';
 import { useCurrency } from '@/lib/CurrencyContext';
 import { FilterSidebar, Filters, defaultFilters } from '@/components/FilterSidebar';
+import { supabase } from '@/integrations/supabase/client';
 
 type AreaSearch =
   | { type: 'circle'; center: [number, number]; radius: number }

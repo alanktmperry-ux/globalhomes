@@ -43,8 +43,28 @@ function getListingThumb(l: AgentListing): string {
 const ListingsPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('all');
-  const { listings, loading, isMockData } = useAgentListings();
+  const { listings, loading, isMockData, refetch } = useAgentListings();
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const handleBoost = async (l: AgentListing) => {
+    if (l._source !== 'db') { toast({ title: 'Demo listing', description: 'Create a real listing first.' }); return; }
+    setActionLoading(l.id);
+    const { error } = await supabase.from('properties').update({ is_active: true }).eq('id', l.id);
+    if (error) { toast({ title: 'Failed to boost', variant: 'destructive' }); }
+    else { toast({ title: 'Listing boosted!', description: 'Your listing is now public.' }); refetch(); }
+    setActionLoading(null);
+  };
+
+  const handleMarkSold = async (l: AgentListing) => {
+    if (l._source !== 'db') { toast({ title: 'Demo listing', description: 'Create a real listing first.' }); return; }
+    setActionLoading(l.id);
+    const { error } = await supabase.from('properties').update({ is_active: false }).eq('id', l.id);
+    if (error) { toast({ title: 'Failed to update', variant: 'destructive' }); }
+    else { toast({ title: 'Marked as sold!', description: 'Listing has been marked as sold.' }); refetch(); }
+    setActionLoading(null);
+  };
 
   const toProperty = (l: AgentListing): Property => ({
     id: l.id,

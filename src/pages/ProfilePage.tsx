@@ -19,7 +19,7 @@ import {
 const ProfilePage = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
-  const { user, isAgent, signOut, loading } = useAuth();
+  const { user, isAgent, isAdmin, signOut, loading } = useAuth();
   const { toast } = useToast();
 
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);

@@ -96,6 +96,11 @@ const ProfilePage = () => {
                   Agent Account
                 </span>
               )}
+              {isAdmin && (
+                <span className="mt-2 px-3 py-1 rounded-full bg-destructive/10 text-destructive text-xs font-medium">
+                  Admin
+                </span>
+              )}
             </div>
 
             <div className="space-y-2">

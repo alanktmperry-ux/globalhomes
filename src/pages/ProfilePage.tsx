@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User, ChevronRight, Shield, LogIn, LogOut, Settings, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { User, ChevronRight, Shield, LogIn, LogOut, Settings, Mail, Lock, Eye, EyeOff, Loader2, ShieldCheck } from 'lucide-react';
 import { BottomNav } from '@/components/BottomNav';
 import { useI18n } from '@/lib/i18n';
 import { useNavigate } from 'react-router-dom';
@@ -19,7 +19,7 @@ import {
 const ProfilePage = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
-  const { user, isAgent, signOut, loading } = useAuth();
+  const { user, isAgent, isAdmin, signOut, loading } = useAuth();
   const { toast } = useToast();
 
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
@@ -96,6 +96,11 @@ const ProfilePage = () => {
                   Agent Account
                 </span>
               )}
+              {isAdmin && (
+                <span className="mt-2 px-3 py-1 rounded-full bg-destructive/10 text-destructive text-xs font-medium">
+                  Admin
+                </span>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -140,6 +145,22 @@ const ProfilePage = () => {
                   <div className="flex-1">
                     <p className="font-medium text-foreground text-sm">{t('agent.portal')}</p>
                     <p className="text-xs text-muted-foreground">Manage listings & leads</p>
+                  </div>
+                  <ChevronRight size={18} className="text-muted-foreground" />
+                </button>
+              )}
+
+              {isAdmin && (
+                <button
+                  onClick={() => navigate('/admin')}
+                  className="w-full flex items-center gap-3 p-4 rounded-2xl bg-card border border-border text-left transition-colors active:bg-secondary"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
+                    <ShieldCheck size={18} className="text-destructive" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-foreground text-sm">Admin Dashboard</p>
+                    <p className="text-xs text-muted-foreground">Manage users, listings & platform</p>
                   </div>
                   <ChevronRight size={18} className="text-muted-foreground" />
                 </button>

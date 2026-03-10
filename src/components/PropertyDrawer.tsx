@@ -118,6 +118,22 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave }: Pro
               )}
 
               <div className="p-5 space-y-5">
+                {/* Status badge + Property type */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  {property.status && property.status !== 'listed' && (
+                    <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase ${
+                      property.status === 'off-market' ? 'bg-amber-500/90 text-white' :
+                      property.status === 'coming-soon' ? 'bg-blue-500/90 text-white' :
+                      property.status === 'new' ? 'bg-emerald-500/90 text-white' : 'bg-secondary text-secondary-foreground'
+                    }`}>
+                      {property.status === 'off-market' ? 'Off-Market' : property.status === 'coming-soon' ? 'Coming Soon' : 'New'}
+                    </span>
+                  )}
+                  <span className="px-2.5 py-1 rounded-full bg-secondary text-secondary-foreground text-[11px] font-bold tracking-wide uppercase">
+                    {property.propertyType}
+                  </span>
+                </div>
+
                 {/* Price and title */}
                 <div>
                   <p className="font-display text-2xl font-bold text-foreground">{formatPrice(property.price)}</p>
@@ -127,7 +143,7 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave }: Pro
                   <h2 className="font-display text-lg font-semibold text-foreground mt-1">{property.title}</h2>
                   <p className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
                     <MapPin size={14} />
-                    {property.address}, {property.suburb}, {property.state}
+                    {property.address}, {property.suburb}, {property.state} {property.country && property.country !== 'Australia' ? `, ${property.country}` : ''}
                   </p>
                 </div>
 
@@ -148,25 +164,50 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave }: Pro
                 </div>
 
                 {/* Estimated value */}
-                <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
-                  <p className="text-xs text-primary font-medium uppercase tracking-wider">{t('property.estimated')}</p>
-                  <p className="font-display font-bold text-foreground text-lg mt-1">{property.estimatedValue}</p>
+                {property.estimatedValue && (
+                  <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
+                    <p className="text-xs text-primary font-medium uppercase tracking-wider">{t('property.estimated')}</p>
+                    <p className="font-display font-bold text-foreground text-lg mt-1">{property.estimatedValue}</p>
+                  </div>
+                )}
+
+                {/* Property details grid */}
+                <div className="grid grid-cols-2 gap-3">
+                  {property.listedDate && (
+                    <div className="p-3 rounded-xl bg-secondary">
+                      <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Listed</p>
+                      <p className="text-sm font-semibold text-foreground mt-0.5">{new Date(property.listedDate).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                    </div>
+                  )}
+                  {property.views > 0 && (
+                    <div className="p-3 rounded-xl bg-secondary">
+                      <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Views</p>
+                      <p className="text-sm font-semibold text-foreground mt-0.5">{property.views.toLocaleString()}</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Description */}
-                <div>
-                  <h3 className="font-display font-semibold text-foreground mb-2">{t('property.description')}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{property.description}</p>
-                </div>
+                {property.description && (
+                  <div>
+                    <h3 className="font-display font-semibold text-foreground mb-2">{t('property.description')}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{property.description}</p>
+                  </div>
+                )}
 
                 {/* Features */}
-                <div className="flex flex-wrap gap-2">
-                  {property.features.map(f => (
-                    <span key={f} className="px-3 py-1 rounded-full bg-secondary text-xs font-medium text-secondary-foreground">
-                      {f}
-                    </span>
-                  ))}
-                </div>
+                {property.features.length > 0 && (
+                  <div>
+                    <h3 className="font-display font-semibold text-foreground mb-2">Features</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {property.features.map(f => (
+                        <span key={f} className="px-3 py-1 rounded-full bg-secondary text-xs font-medium text-secondary-foreground">
+                          {f}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Agent section */}
                 <div className="p-4 rounded-2xl bg-secondary/50 border border-border">

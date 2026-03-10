@@ -43,11 +43,7 @@ const ServiceAreaMapPicker = ({ serviceAreas, onAreasChange, maxAreas = 10 }: Se
           mapId: 'service-area-picker',
           disableDefaultUI: true,
           zoomControl: true,
-          gestureHandling: 'greedy',
-          styles: [
-            { featureType: 'poi', stylers: [{ visibility: 'off' }] },
-            { featureType: 'transit', stylers: [{ visibility: 'off' }] },
-          ],
+          gestureHandling: 'cooperative',
         });
 
         // Click to add area

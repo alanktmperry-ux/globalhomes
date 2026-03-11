@@ -101,7 +101,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (prev) console.warn('[Auth] Timed out, forcing loading=false');
         return false;
       });
-    }, 5000);
+    }, 8000);
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {

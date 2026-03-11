@@ -37,6 +37,8 @@ export interface ListingDraft {
   allowCoBroke: boolean;
   autoDeclineBelow: number;
   scheduledAt: string | null;
+  lat?: number;
+  lng?: number;
 }
 
 const DEFAULT_DRAFT: ListingDraft = {
@@ -222,6 +224,8 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePrope
         images: draft.photos.length > 0 ? draft.photos : [],
         is_active: draft.visibility === 'public',
         status: draft.visibility === 'public' ? 'public' : draft.visibility,
+        lat: draft.lat || null,
+        lng: draft.lng || null,
       } as any;
 
       if (editPropertyId) {

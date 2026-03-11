@@ -637,7 +637,9 @@ export type Database = {
           image_url: string | null
           images: string[] | null
           is_active: boolean
+          lat: number | null
           listed_date: string | null
+          lng: number | null
           parking: number
           price: number
           price_formatted: string
@@ -665,7 +667,9 @@ export type Database = {
           image_url?: string | null
           images?: string[] | null
           is_active?: boolean
+          lat?: number | null
           listed_date?: string | null
+          lng?: number | null
           parking?: number
           price: number
           price_formatted: string
@@ -693,7 +697,9 @@ export type Database = {
           image_url?: string | null
           images?: string[] | null
           is_active?: boolean
+          lat?: number | null
           listed_date?: string | null
+          lng?: number | null
           parking?: number
           price?: number
           price_formatted?: string

@@ -119,6 +119,8 @@ const Index = () => {
           listedDate: p.listed_date || p.created_at,
           views: p.views,
           contactClicks: p.contact_clicks,
+          lat: p.lat || undefined,
+          lng: p.lng || undefined,
           status: 'listed' as const,
         }));
         setDbProperties(mapped);

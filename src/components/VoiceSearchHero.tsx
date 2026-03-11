@@ -45,11 +45,13 @@ const ROTATING_LANGUAGES = [
 interface VoiceSearchHeroProps {
   onSearch: (query: string) => void;
   onLocationSelect?: (location: { lat: number; lng: number; address: string }) => void;
+  onRadiusChange?: (radiusKm: number | null) => void;
+  selectedRadius?: number | null;
   resultCount?: number;
   isSearching?: boolean;
 }
 
-export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSearching }: VoiceSearchHeroProps) {
+export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, selectedRadius, resultCount, isSearching }: VoiceSearchHeroProps) {
   const [voiceState, setVoiceState] = useState<VoiceState>('idle');
   const [transcript, setTranscript] = useState('');
   const [editableTranscript, setEditableTranscript] = useState('');
@@ -532,6 +534,35 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
               )}
             </div>
           </form>
+
+          {/* Radius picker - shown below the search input */}
+          <div className="flex items-center justify-center gap-2 mt-3">
+            <MapPin size={14} className="text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">Radius:</span>
+            <div className="flex items-center gap-1">
+              {[
+                { label: 'Any', value: null },
+                { label: '5 km', value: 5 },
+                { label: '10 km', value: 10 },
+                { label: '25 km', value: 25 },
+                { label: '50 km', value: 50 },
+                { label: '100 km', value: 100 },
+              ].map((opt) => (
+                <button
+                  key={opt.label}
+                  type="button"
+                  onClick={() => onRadiusChange?.(opt.value)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                    selectedRadius === opt.value
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-accent'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <AnimatePresence>
             {showSuggestions && suggestions.length > 0 && (

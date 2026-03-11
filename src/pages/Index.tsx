@@ -62,6 +62,8 @@ const Index = () => {
   const [mobileView, setMobileView] = useState<'map' | 'list'>('list');
   const [areaSearch, setAreaSearch] = useState<AreaSearch | null>(null);
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key: number } | null>(null);
+  const [searchRadius, setSearchRadius] = useState<number | null>(null);
+  const [searchCenter, setSearchCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [splitPercent, setSplitPercent] = useState(50);
   const [mapFullscreen, setMapFullscreen] = useState(false);
   const [mapCollapsed, setMapCollapsed] = useState(true);
@@ -177,7 +179,20 @@ const Index = () => {
 
   const filteredProperties = useMemo(() => {
     let props = displayProperties;
-    // Area filter
+
+    // Radius filter based on search center + selected radius
+    if (searchCenter && searchRadius) {
+      const radiusMeters = searchRadius * 1000;
+      props = props.filter((p) => {
+        if (!p.lat || !p.lng) {
+          // For properties without coordinates, do text-based matching (keep them)
+          return true;
+        }
+        return haversineDistance(p.lat, p.lng, searchCenter.lat, searchCenter.lng) <= radiusMeters;
+      });
+    }
+
+    // Area filter (from map drawing)
     if (areaSearch) {
       props = props.filter((p) => {
         if (!p.lat || !p.lng) return false;
@@ -203,7 +218,7 @@ const Index = () => {
     if (sortBy === 'newest') return [...props].sort((a, b) => new Date(b.listedDate).getTime() - new Date(a.listedDate).getTime());
     if (sortBy === 'beds') return [...props].sort((a, b) => b.beds - a.beds);
     return props;
-  }, [displayProperties, areaSearch, sortBy, filters]);
+  }, [displayProperties, areaSearch, sortBy, filters, searchCenter, searchRadius]);
 
   const handleAreaSearch = useCallback((area: AreaSearch | null) => {
     setAreaSearch(area || null);
@@ -261,6 +276,14 @@ const Index = () => {
           <span className="flex items-center gap-1 text-xs text-muted-foreground">
             <Sparkles size={12} className="text-primary" /> Recommended
           </span>
+        )}
+        {searchRadius && (
+          <button
+            onClick={() => setSearchRadius(null)}
+            className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium shrink-0 hover:bg-primary/20 transition-colors"
+          >
+            Within {searchRadius} km ✕
+          </button>
         )}
         {areaSearch && (
           <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium shrink-0">
@@ -357,7 +380,13 @@ const Index = () => {
       {/* Voice Search Hero */}
       <VoiceSearchHero
         onSearch={handleSearch}
-        onLocationSelect={(loc) => { setMapCenter({ lat: loc.lat, lng: loc.lng, key: Date.now() }); setMapCollapsed(false); }}
+        onLocationSelect={(loc) => {
+          setMapCenter({ lat: loc.lat, lng: loc.lng, key: Date.now() });
+          setSearchCenter({ lat: loc.lat, lng: loc.lng });
+          setMapCollapsed(false);
+        }}
+        onRadiusChange={setSearchRadius}
+        selectedRadius={searchRadius}
         resultCount={hasSearched ? filteredProperties.length : undefined}
         isSearching={isSearching}
       />

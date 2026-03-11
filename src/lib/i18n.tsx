@@ -235,7 +235,7 @@ const translations: Record<Language, Record<string, string>> = {
     'lang.switch': 'Idioma',
   },
   bn: {
-    'app.name': 'GlobalHome',
+    'app.name': 'Global Homes',
     'search.placeholder': 'খুঁজুন "ঢাকায় ৪ বেডরুমের বাড়ি"',
     'search.voice.listening': 'শুনছি...',
     'search.resume': 'অনুসন্ধান পুনরায় শুরু করুন',

@@ -731,11 +731,11 @@ const TeamPage = () => {
               <Badge variant="outline" className={roleBadgeClass['principal']}>Principal</Badge>
             )}
           </div>
-          <div className="flex items-center gap-3 text-sm text-muted-foreground mt-0.5">
+          <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mt-0.5">
             <span>{members.length} member{members.length !== 1 ? 's' : ''}</span>
             {agencyAddress && (
-              <span className="flex items-center gap-1 truncate">
-                <MapPin size={12} /> {agencyAddress}
+              <span className="flex items-center gap-1">
+                <MapPin size={12} className="shrink-0" /> {agencyAddress}
               </span>
             )}
           </div>

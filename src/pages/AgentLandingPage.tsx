@@ -305,8 +305,8 @@ const AgentLandingPage = () => {
       {/* ─── FOOTER ─── */}
       <footer className="bg-card border-t border-border py-8">
         <div className="container mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-          <span className="font-display font-bold text-foreground">World Property Pulse</span>
-          <span>© {new Date().getFullYear()} World Property Pulse Agent Network. All rights reserved.</span>
+          <span className="font-display font-bold text-foreground">Global Homes</span>
+          <span>© {new Date().getFullYear()} Global Homes Agent Network. All rights reserved.</span>
         </div>
       </footer>
 

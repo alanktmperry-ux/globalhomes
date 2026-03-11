@@ -412,7 +412,7 @@ const AgentAuthPage = () => {
               </form>
               <button onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">← Back to options</button>
               <p className="text-xs text-muted-foreground mt-6 text-center leading-relaxed">
-                By submitting, I accept World Property Pulse's{' '}
+                By submitting, I accept Global Homes'{' '}
                 <a href="#" className="text-primary underline underline-offset-2">terms of use</a>
               </p>
             </>

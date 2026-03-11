@@ -216,7 +216,7 @@ function buildEmailHtml(params: {
 
     <!-- Footer -->
     <div style="border-top:1px solid #eee;padding-top:20px;margin-top:32px;text-align:center;">
-      <p style="font-size:11px;color:#aaa;margin:0;">You're receiving this because you're a registered agent on World Property Pulse.</p>
+      <p style="font-size:11px;color:#aaa;margin:0;">You're receiving this because you're a registered agent on Global Homes.</p>
       <p style="font-size:11px;color:#aaa;margin:4px 0 0;">Manage notification preferences in your <a href="https://world-property-pulse.lovable.app/dashboard/settings" style="color:#888;">dashboard settings</a>.</p>
     </div>
   </div>

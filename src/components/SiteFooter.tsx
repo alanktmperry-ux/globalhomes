@@ -105,7 +105,7 @@ export function SiteFooter() {
         {/* Divider */}
         <div className="border-t border-border pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground">
-            World Property Pulse © {new Date().getFullYear()}
+            Global Homes © {new Date().getFullYear()}
           </p>
           <p className="text-xs text-muted-foreground flex items-center gap-1">
             Made with <Heart size={12} className="text-destructive fill-destructive" /> for global property seekers

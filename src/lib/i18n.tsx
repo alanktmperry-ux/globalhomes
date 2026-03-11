@@ -4,7 +4,7 @@ export type Language = 'en' | 'zh' | 'es' | 'ar' | 'hi' | 'fr' | 'pt' | 'bn' | '
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
-    'app.name': 'GlobalHome',
+    'app.name': 'Global Homes',
     'search.placeholder': 'Search "4 bed house in Berwick for $850k"',
     'search.voice.listening': 'Listening...',
     'search.resume': 'Resume Your Search',
@@ -37,7 +37,7 @@ const translations: Record<Language, Record<string, string>> = {
     'lang.switch': 'Language',
   },
   zh: {
-    'app.name': 'GlobalHome',
+    'app.name': 'Global Homes',
     'search.placeholder': '搜索 "墨尔本4卧室房屋 85万"',
     'search.voice.listening': '正在聆听...',
     'search.resume': '继续上次搜索',
@@ -70,7 +70,7 @@ const translations: Record<Language, Record<string, string>> = {
     'lang.switch': '语言',
   },
   es: {
-    'app.name': 'GlobalHome',
+    'app.name': 'Global Homes',
     'search.placeholder': 'Buscar "casa de 4 hab en Madrid por €850k"',
     'search.voice.listening': 'Escuchando...',
     'search.resume': 'Reanudar búsqueda',
@@ -103,7 +103,7 @@ const translations: Record<Language, Record<string, string>> = {
     'lang.switch': 'Idioma',
   },
   ar: {
-    'app.name': 'GlobalHome',
+    'app.name': 'Global Homes',
     'search.placeholder': 'ابحث "منزل 4 غرف نوم في دبي"',
     'search.voice.listening': 'جارِ الاستماع...',
     'search.resume': 'استئناف البحث',
@@ -136,7 +136,7 @@ const translations: Record<Language, Record<string, string>> = {
     'lang.switch': 'اللغة',
   },
   hi: {
-    'app.name': 'GlobalHome',
+    'app.name': 'Global Homes',
     'search.placeholder': 'खोजें "मुंबई में 4 बेडरूम का घर"',
     'search.voice.listening': 'सुन रहा है...',
     'search.resume': 'खोज जारी रखें',
@@ -169,7 +169,7 @@ const translations: Record<Language, Record<string, string>> = {
     'lang.switch': 'भाषा',
   },
   fr: {
-    'app.name': 'GlobalHome',
+    'app.name': 'Global Homes',
     'search.placeholder': 'Chercher "maison 4 chambres à Paris à 850k€"',
     'search.voice.listening': 'Écoute en cours...',
     'search.resume': 'Reprendre la recherche',
@@ -202,7 +202,7 @@ const translations: Record<Language, Record<string, string>> = {
     'lang.switch': 'Langue',
   },
   pt: {
-    'app.name': 'GlobalHome',
+    'app.name': 'Global Homes',
     'search.placeholder': 'Pesquisar "casa 4 quartos em Lisboa por €850k"',
     'search.voice.listening': 'Ouvindo...',
     'search.resume': 'Retomar pesquisa',
@@ -235,7 +235,7 @@ const translations: Record<Language, Record<string, string>> = {
     'lang.switch': 'Idioma',
   },
   bn: {
-    'app.name': 'GlobalHome',
+    'app.name': 'Global Homes',
     'search.placeholder': 'খুঁজুন "ঢাকায় ৪ বেডরুমের বাড়ি"',
     'search.voice.listening': 'শুনছি...',
     'search.resume': 'অনুসন্ধান পুনরায় শুরু করুন',
@@ -268,7 +268,7 @@ const translations: Record<Language, Record<string, string>> = {
     'lang.switch': 'ভাষা',
   },
   ru: {
-    'app.name': 'GlobalHome',
+    'app.name': 'Global Homes',
     'search.placeholder': 'Поиск "4-комн. дом в Москве за ₽85 млн"',
     'search.voice.listening': 'Слушаю...',
     'search.resume': 'Продолжить поиск',
@@ -301,7 +301,7 @@ const translations: Record<Language, Record<string, string>> = {
     'lang.switch': 'Язык',
   },
   ja: {
-    'app.name': 'GlobalHome',
+    'app.name': 'Global Homes',
     'search.placeholder': '検索 "東京の4LDK 8500万円"',
     'search.voice.listening': '聞いています...',
     'search.resume': '検索を再開',

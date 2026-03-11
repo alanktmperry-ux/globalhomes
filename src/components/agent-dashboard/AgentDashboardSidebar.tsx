@@ -71,7 +71,7 @@ const AgentDashboardSidebar = () => {
               <span className="text-primary-foreground font-bold text-sm">W</span>
             </div>
             <div>
-              <p className="font-display text-sm font-bold leading-none">WPP Agent</p>
+              <p className="font-display text-sm font-bold leading-none">Global Homes</p>
               <p className="text-[10px] text-muted-foreground">Dashboard</p>
             </div>
           </div>

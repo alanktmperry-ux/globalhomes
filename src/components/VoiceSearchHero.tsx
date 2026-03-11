@@ -45,6 +45,8 @@ const ROTATING_LANGUAGES = [
 interface VoiceSearchHeroProps {
   onSearch: (query: string) => void;
   onLocationSelect?: (location: { lat: number; lng: number; address: string }) => void;
+  onRadiusChange?: (radiusKm: number | null) => void;
+  selectedRadius?: number | null;
   resultCount?: number;
   isSearching?: boolean;
 }

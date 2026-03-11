@@ -48,6 +48,10 @@ const SeekerAuthPage = () => {
 
   const handleCreateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!phone.trim()) {
+      toast({ title: 'Phone required', description: 'Please enter your mobile number.', variant: 'destructive' });
+      return;
+    }
     setLoading(true);
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -59,8 +63,15 @@ const SeekerAuthPage = () => {
         },
       });
       if (error) throw error;
+
+      // Save phone to profile
+      if (data.user) {
+        await supabase.from('profiles').update({ phone }).eq('user_id', data.user.id);
+      }
+
       if (data.user && !data.session) {
         toast({ title: 'Check your email', description: 'We sent you a confirmation link. Please verify your email before signing in.' });
+        setStep('email');
       } else {
         toast({ title: 'Account created!' });
         navigate('/');

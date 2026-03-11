@@ -89,7 +89,7 @@ const AgentAuthPage = () => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email, password,
-        options: { emailRedirectTo: window.location.origin, data: { display_name: fullName || email } },
+        options: { emailRedirectTo: window.location.origin, data: { display_name: fullName || email, phone } },
       });
       if (error) throw error;
       if (!data.user) throw new Error('Signup failed');

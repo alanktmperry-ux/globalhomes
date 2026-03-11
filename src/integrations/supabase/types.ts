@@ -463,6 +463,167 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_activities: {
+        Row: {
+          activity_type: string
+          contact_id: string
+          created_at: string
+          description: string | null
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          contact_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          contact_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_activities_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contacts: {
+        Row: {
+          address: string | null
+          agency_id: string | null
+          assigned_agent_id: string | null
+          avatar_url: string | null
+          budget_max: number | null
+          budget_min: number | null
+          buyer_pipeline_stage: string | null
+          contact_type: string
+          country: string | null
+          created_at: string
+          created_by: string
+          email: string | null
+          estimated_value: number | null
+          first_name: string
+          id: string
+          last_name: string | null
+          mobile: string | null
+          notes: string | null
+          phone: string | null
+          postcode: string | null
+          preferred_baths: number | null
+          preferred_beds: number | null
+          preferred_property_types: string[] | null
+          preferred_suburbs: string[] | null
+          property_address: string | null
+          property_type: string | null
+          ranking: string
+          seller_pipeline_stage: string | null
+          source: string | null
+          state: string | null
+          suburb: string | null
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          agency_id?: string | null
+          assigned_agent_id?: string | null
+          avatar_url?: string | null
+          budget_max?: number | null
+          budget_min?: number | null
+          buyer_pipeline_stage?: string | null
+          contact_type?: string
+          country?: string | null
+          created_at?: string
+          created_by: string
+          email?: string | null
+          estimated_value?: number | null
+          first_name: string
+          id?: string
+          last_name?: string | null
+          mobile?: string | null
+          notes?: string | null
+          phone?: string | null
+          postcode?: string | null
+          preferred_baths?: number | null
+          preferred_beds?: number | null
+          preferred_property_types?: string[] | null
+          preferred_suburbs?: string[] | null
+          property_address?: string | null
+          property_type?: string | null
+          ranking?: string
+          seller_pipeline_stage?: string | null
+          source?: string | null
+          state?: string | null
+          suburb?: string | null
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          agency_id?: string | null
+          assigned_agent_id?: string | null
+          avatar_url?: string | null
+          budget_max?: number | null
+          budget_min?: number | null
+          buyer_pipeline_stage?: string | null
+          contact_type?: string
+          country?: string | null
+          created_at?: string
+          created_by?: string
+          email?: string | null
+          estimated_value?: number | null
+          first_name?: string
+          id?: string
+          last_name?: string | null
+          mobile?: string | null
+          notes?: string | null
+          phone?: string | null
+          postcode?: string | null
+          preferred_baths?: number | null
+          preferred_beds?: number | null
+          preferred_property_types?: string[] | null
+          preferred_suburbs?: string[] | null
+          property_address?: string | null
+          property_type?: string | null
+          ranking?: string
+          seller_pipeline_stage?: string | null
+          source?: string | null
+          state?: string | null
+          suburb?: string | null
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contacts_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contacts_assigned_agent_id_fkey"
+            columns: ["assigned_agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lead_events: {
         Row: {
           agent_id: string

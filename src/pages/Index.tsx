@@ -187,8 +187,8 @@ const Index = () => {
       const radiusMeters = searchRadius * 1000;
       props = props.filter((p) => {
         if (!p.lat || !p.lng) {
-          // For properties without coordinates, do text-based matching (keep them)
-          return true;
+          // Properties without coordinates can't be distance-filtered, exclude them
+          return false;
         }
         return haversineDistance(p.lat, p.lng, searchCenter.lat, searchCenter.lng) <= radiusMeters;
       });

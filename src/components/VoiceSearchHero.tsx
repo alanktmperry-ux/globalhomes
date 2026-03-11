@@ -51,7 +51,7 @@ interface VoiceSearchHeroProps {
   isSearching?: boolean;
 }
 
-export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSearching }: VoiceSearchHeroProps) {
+export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, selectedRadius, resultCount, isSearching }: VoiceSearchHeroProps) {
   const [voiceState, setVoiceState] = useState<VoiceState>('idle');
   const [transcript, setTranscript] = useState('');
   const [editableTranscript, setEditableTranscript] = useState('');

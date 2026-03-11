@@ -137,6 +137,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
     const chips = filtersToChips(filters);
     setFilterChips(chips);
     setEditableTranscript(text);
+    setTextQuery(text);
     setVoiceState('processing');
     onSearch(text);
     // Fire geocode separately so it's not affected by re-renders from onSearch
@@ -280,31 +281,17 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
               "{transcript}"
             </motion.p>
           )}
-          {voiceState === 'results' && (
+          {voiceState === 'results' && confidence !== null && (
             <motion.div
-              key="editable"
+              key="confidence"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="w-full mb-4"
+              className="mb-4"
             >
-              <div className="flex items-center gap-2 bg-secondary rounded-xl px-4 py-2">
-                <input
-                  type="text"
-                  value={editableTranscript}
-                  onChange={e => setEditableTranscript(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && handleEditSubmit()}
-                  className="flex-1 bg-transparent text-foreground text-sm focus:outline-none"
-                />
-                <button onClick={handleEditSubmit} className="text-primary hover:text-primary/80">
-                  <Search size={16} />
-                </button>
+              <div className="flex items-center justify-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${confidence >= 80 ? 'bg-emerald-400' : confidence >= 50 ? 'bg-yellow-400' : 'bg-destructive'}`} />
+                <span className="text-xs text-muted-foreground">{confidence}% confidence</span>
               </div>
-              {confidence !== null && (
-                <div className="flex items-center justify-center gap-2 mt-2">
-                  <div className={`w-2 h-2 rounded-full ${confidence >= 80 ? 'bg-emerald-400' : confidence >= 50 ? 'bg-yellow-400' : 'bg-destructive'}`} />
-                  <span className="text-xs text-muted-foreground">{confidence}% confidence</span>
-                </div>
-              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -563,7 +550,9 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
               ))}
             </div>
           </div>
-
+          
+          {/* Bottom spacer for breathing room before map */}
+          <div className="h-4" />
           <AnimatePresence>
             {showSuggestions && suggestions.length > 0 && (
               <motion.ul

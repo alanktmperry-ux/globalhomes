@@ -182,6 +182,11 @@ const ListingsPage = () => {
                         <span className="text-xs text-muted-foreground flex items-center gap-1"><Eye size={10} /> {l.views}</span>
                         <span className="text-xs text-muted-foreground flex items-center gap-1"><Sparkles size={10} /> {leads} leads</span>
                         <div className="flex gap-1 mt-1">
+                          {l._source === 'db' && (
+                            <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5" onClick={() => navigate(`/dashboard/listings/${l.id}`)}>
+                              <Eye size={10} /> Manage
+                            </Button>
+                          )}
                           <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5" disabled={actionLoading === l.id} onClick={() => {
                             if (l._source === 'db') navigate(`/pocket-listing?edit=${l.id}`);
                           }}>

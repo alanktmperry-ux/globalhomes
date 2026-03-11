@@ -264,7 +264,7 @@ const AgentAuthPage = () => {
               </div>
 
               <p className="text-xs text-muted-foreground mt-8 text-center leading-relaxed">
-                By submitting, I accept World Property Pulse's{' '}
+                By submitting, I accept Global Homes'{' '}
                 <a href="#" className="text-primary underline underline-offset-2">terms of use</a>
               </p>
             </>

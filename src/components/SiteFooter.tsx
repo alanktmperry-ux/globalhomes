@@ -35,7 +35,7 @@ export function SiteFooter() {
               <Globe size={20} className="text-primary-foreground" />
             </div>
             <span className="font-display text-lg font-bold text-foreground tracking-tight">
-              World Property Pulse
+              Global Homes
             </span>
           </div>
 

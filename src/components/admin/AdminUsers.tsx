@@ -25,12 +25,6 @@ const AdminUsers = () => {
   const fetchUsers = async () => {
     setLoading(true);
     const { data: { session } } = await supabase.auth.getSession();
-    const res = await supabase.functions.invoke('admin-users', {
-      body: null,
-      headers: { Authorization: `Bearer ${session?.access_token}` },
-    });
-
-    // Use fetch directly for GET with query params
     const response = await fetch(
       `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=list_users`,
       { headers: { Authorization: `Bearer ${session?.access_token}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY } }

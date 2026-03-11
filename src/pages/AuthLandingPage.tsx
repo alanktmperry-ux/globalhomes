@@ -25,7 +25,7 @@ const AuthLandingPage = () => {
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-cyan-accent flex items-center justify-center">
             <span className="text-primary-foreground text-sm font-bold">W</span>
           </div>
-          <span className="font-display text-xl font-bold text-foreground">World Property Pulse</span>
+          <span className="font-display text-xl font-bold text-foreground">Global Homes</span>
         </Link>
       </header>
 

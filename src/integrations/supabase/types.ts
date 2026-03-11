@@ -858,6 +858,10 @@ export type Database = {
         Args: { _agency_id: string; _user_id: string }
         Returns: boolean
       }
+      is_agency_principal: {
+        Args: { _agency_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       agency_member_role: "owner" | "admin" | "agent" | "principal"

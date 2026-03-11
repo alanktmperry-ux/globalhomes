@@ -37,6 +37,8 @@ export interface ListingDraft {
   allowCoBroke: boolean;
   autoDeclineBelow: number;
   scheduledAt: string | null;
+  lat?: number;
+  lng?: number;
 }
 
 const DEFAULT_DRAFT: ListingDraft = {

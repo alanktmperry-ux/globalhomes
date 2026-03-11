@@ -880,7 +880,7 @@ const TeamPage = () => {
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="agent">Agent</SelectItem>
-                  <SelectItem value="admin">Admin (can manage staff)</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
                 </SelectContent>
               </Select>
             </div>

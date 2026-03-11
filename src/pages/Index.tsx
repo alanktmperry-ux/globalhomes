@@ -185,12 +185,17 @@ const Index = () => {
     // Radius filter based on search center + selected radius
     if (searchCenter && searchRadius) {
       const radiusMeters = searchRadius * 1000;
+      const queryWords = currentQuery.toLowerCase().split(/\s+/).filter(w => w.length > 2);
       props = props.filter((p) => {
-        if (!p.lat || !p.lng) {
-          // Properties without coordinates can't be distance-filtered, exclude them
-          return false;
+        if (p.lat && p.lng) {
+          return haversineDistance(p.lat, p.lng, searchCenter.lat, searchCenter.lng) <= radiusMeters;
         }
-        return haversineDistance(p.lat, p.lng, searchCenter.lat, searchCenter.lng) <= radiusMeters;
+        // Properties without coordinates: keep if they text-match the search query location
+        if (queryWords.length > 0) {
+          const searchable = `${p.suburb} ${p.state} ${p.address} ${p.country}`.toLowerCase();
+          return queryWords.some(word => searchable.includes(word));
+        }
+        return false;
       });
     }
 

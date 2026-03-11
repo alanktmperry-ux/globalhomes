@@ -30,6 +30,7 @@ Deno.serve(async (req) => {
     if (userError || !user) throw new Error("Not authenticated");
 
     const { agencyId, email, role, accessLevel } = await req.json();
+    console.log(`[invite-team-member] Inviting ${email} to agency ${agencyId} as ${role}`);
 
     if (!agencyId || !email || !role) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {
@@ -58,6 +59,8 @@ Deno.serve(async (req) => {
     const existingUser = existingUsers?.users?.find(u => u.email === email.toLowerCase());
 
     if (existingUser) {
+      console.log(`[invite-team-member] User ${email} already exists (${existingUser.id}), adding directly`);
+      
       // Check if already a member
       const { data: existingMember } = await supabaseAdmin
         .from("agency_members")
@@ -121,6 +124,7 @@ Deno.serve(async (req) => {
           });
       }
 
+      console.log(`[invite-team-member] Existing user ${email} added to agency successfully`);
       return new Response(JSON.stringify({ 
         success: true, 
         message: "Existing user added to agency",
@@ -130,24 +134,68 @@ Deno.serve(async (req) => {
       });
     }
 
-    // User doesn't exist - send invite via Supabase Auth
-    const { data: inviteData, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
-      data: {
-        invited_to_agency: agencyId,
-        invited_role: role,
-        invited_access_level: accessLevel || "full",
-      },
-    });
-    if (inviteError) throw inviteError;
+    // User doesn't exist — generate an invite code they can use to sign up
+    console.log(`[invite-team-member] User ${email} not found, creating invite code`);
+
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let inviteCode = "";
+    for (let i = 0; i < 8; i++) inviteCode += chars[Math.floor(Math.random() * chars.length)];
+
+    const { error: codeError } = await supabaseAdmin
+      .from("agency_invite_codes")
+      .insert({
+        agency_id: agencyId,
+        code: inviteCode,
+        created_by: user.id,
+        role: role,
+        max_uses: 1,
+        is_active: true,
+      });
+    if (codeError) throw codeError;
+
+    // Also try sending the invite email via Supabase Auth (best effort)
+    let emailSent = false;
+    try {
+      const { error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
+        data: {
+          invited_to_agency: agencyId,
+          invited_role: role,
+          invited_access_level: accessLevel || "full",
+        },
+      });
+      if (!inviteError) {
+        emailSent = true;
+        console.log(`[invite-team-member] Auth invite email sent to ${email}`);
+      } else {
+        console.warn(`[invite-team-member] Auth invite email failed: ${inviteError.message}`);
+      }
+    } catch (emailErr: any) {
+      console.warn(`[invite-team-member] Auth invite email error: ${emailErr.message}`);
+    }
+
+    // Get agency name for response
+    const { data: agencyInfo } = await supabaseAdmin
+      .from("agencies")
+      .select("name")
+      .eq("id", agencyId)
+      .single();
+
+    console.log(`[invite-team-member] Invite code ${inviteCode} created for ${email}. Email sent: ${emailSent}`);
 
     return new Response(JSON.stringify({ 
       success: true, 
-      message: "Invitation email sent",
-      isExisting: false 
+      message: emailSent 
+        ? "Invitation email sent. An invite code has also been generated as a backup."
+        : "An invite code has been generated. Share it with the person to join your agency.",
+      isExisting: false,
+      inviteCode,
+      emailSent,
+      agencyName: agencyInfo?.name || null,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err: any) {
+    console.error(`[invite-team-member] Error: ${err.message}`);
     return new Response(JSON.stringify({ error: err.message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

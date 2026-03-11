@@ -192,11 +192,7 @@ const Index = () => {
         if (p.lat && p.lng) {
           return haversineDistance(p.lat, p.lng, searchCenter.lat, searchCenter.lng) <= radiusMeters;
         }
-        // Properties without coordinates: keep if they text-match the search query location
-        if (queryWords.length > 0) {
-          const searchable = `${p.suburb} ${p.state} ${p.address} ${p.country}`.toLowerCase();
-          return queryWords.some(word => searchable.includes(word));
-        }
+        // Properties without coordinates are excluded from radius filtering
         return false;
       });
     }

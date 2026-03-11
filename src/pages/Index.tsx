@@ -277,6 +277,14 @@ const Index = () => {
             <Sparkles size={12} className="text-primary" /> Recommended
           </span>
         )}
+        {searchRadius && (
+          <button
+            onClick={() => setSearchRadius(null)}
+            className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium shrink-0 hover:bg-primary/20 transition-colors"
+          >
+            Within {searchRadius} km ✕
+          </button>
+        )}
         {areaSearch && (
           <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium shrink-0">
             {areaSearch.type === 'circle' ? `${Math.round(areaSearch.radius / 1000)}km` : 'Custom area'}

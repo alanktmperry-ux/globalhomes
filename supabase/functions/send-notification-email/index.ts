@@ -169,7 +169,7 @@ function buildEmailHtml(params: {
     
     <!-- Header -->
     <div style="text-align:center;margin-bottom:32px;">
-      <div style="font-size:24px;font-weight:700;color:#1a1a2e;">World Property Pulse</div>
+      <div style="font-size:24px;font-weight:700;color:#1a1a2e;">Global Homes</div>
       <div style="font-size:12px;color:#888;margin-top:4px;">Agent Notification</div>
     </div>
 

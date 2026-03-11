@@ -68,6 +68,7 @@ const App = () => (
               <Route path="/saved" element={<ProtectedRoute><SavedPage /></ProtectedRoute>} />
               <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/settings" element={<ProtectedRoute><BuyerSettingsPage /></ProtectedRoute>} />
 
               {/* Agent-only */}
               <Route path="/agent-portal" element={<ProtectedRoute requireAgent><AgentPortalPage /></ProtectedRoute>} />

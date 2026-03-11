@@ -156,7 +156,24 @@ const Index = () => {
     return [...dbProperties, ...mockFiltered];
   }, [dbProperties]);
 
-  const displayProperties = hasSearched ? results : allProperties;
+  // When searching, merge DB properties that match the query with mock/Manus results
+  const displayProperties = useMemo(() => {
+    if (!hasSearched) return allProperties;
+
+    const lastQuery = lastSearch?.text?.toLowerCase() || '';
+    const queryWords = lastQuery.split(/\s+/).filter(w => w.length > 2);
+
+    // Filter DB properties that match the search query by location fields
+    const matchingDbProps = dbProperties.filter(p => {
+      const searchable = `${p.title} ${p.address} ${p.suburb} ${p.state} ${p.country} ${p.propertyType} ${p.description}`.toLowerCase();
+      return queryWords.some(word => searchable.includes(word));
+    });
+
+    // Merge: DB matches first, then mock/Manus results, dedup by id
+    const seenIds = new Set(matchingDbProps.map(p => p.id));
+    const uniqueMockResults = results.filter(p => !seenIds.has(p.id));
+    return [...matchingDbProps, ...uniqueMockResults];
+  }, [hasSearched, allProperties, results, dbProperties, lastSearch]);
 
   const filteredProperties = useMemo(() => {
     let props = displayProperties;

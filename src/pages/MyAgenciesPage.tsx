@@ -144,50 +144,81 @@ const MyAgenciesPage = () => {
       ) : (
         <div className="space-y-3">
           {agencies.map((agency) => (
-            <button
+            <div
               key={agency.id}
-              onClick={() => navigate('/dashboard/team', { state: { selectedAgencyId: agency.id } })}
-              className="w-full flex items-center gap-4 p-5 rounded-2xl bg-card border border-border hover:border-primary/30 hover:shadow-md transition-all text-left group"
+              className="flex items-center gap-4 p-5 rounded-2xl bg-card border border-border hover:border-primary/30 hover:shadow-md transition-all group"
             >
-              {agency.logo_url ? (
-                <img
-                  src={agency.logo_url}
-                  alt={agency.name}
-                  className="w-14 h-14 rounded-xl object-cover border border-border"
-                />
-              ) : (
-                <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center border border-border">
-                  <Building2 size={22} className="text-primary" />
+              <button
+                onClick={() => navigate('/dashboard/team', { state: { selectedAgencyId: agency.id } })}
+                className="flex items-center gap-4 flex-1 min-w-0 text-left"
+              >
+                {agency.logo_url ? (
+                  <img
+                    src={agency.logo_url}
+                    alt={agency.name}
+                    className="w-14 h-14 rounded-xl object-cover border border-border"
+                  />
+                ) : (
+                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center border border-border">
+                    <Building2 size={22} className="text-primary" />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-semibold text-foreground truncate">{agency.name}</h3>
+                    <Badge variant="outline" className={`text-[10px] shrink-0 ${roleBadgeClass[agency.myRole] || ''}`}>
+                      {agency.myRole === 'principal' ? 'Principal' : agency.myRole}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <Users size={12} /> {agency.memberCount} member{agency.memberCount !== 1 ? 's' : ''}
+                    </span>
+                    {agency.address && (
+                      <span className="flex items-center gap-1 truncate">
+                        <MapPin size={12} /> {agency.address}
+                      </span>
+                    )}
+                    {agency.email && (
+                      <span className="flex items-center gap-1 truncate">
+                        <Mail size={12} /> {agency.email}
+                      </span>
+                    )}
+                  </div>
                 </div>
+                <ChevronRight size={18} className="text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+              </button>
+              {(agency.myRole === 'principal' || agency.myRole === 'owner') && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); setDeleteTarget(agency); }}
+                  className="w-9 h-9 rounded-xl bg-destructive/10 hover:bg-destructive/20 flex items-center justify-center text-destructive transition-colors shrink-0"
+                  title="Delete agency"
+                >
+                  <Trash2 size={16} />
+                </button>
               )}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-semibold text-foreground truncate">{agency.name}</h3>
-                  <Badge variant="outline" className={`text-[10px] shrink-0 ${roleBadgeClass[agency.myRole] || ''}`}>
-                    {agency.myRole === 'principal' ? 'Principal' : agency.myRole}
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <Users size={12} /> {agency.memberCount} member{agency.memberCount !== 1 ? 's' : ''}
-                  </span>
-                  {agency.address && (
-                    <span className="flex items-center gap-1 truncate">
-                      <MapPin size={12} /> {agency.address}
-                    </span>
-                  )}
-                  {agency.email && (
-                    <span className="flex items-center gap-1 truncate">
-                      <Mail size={12} /> {agency.email}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <ChevronRight size={18} className="text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
-            </button>
+            </div>
           ))}
         </div>
       )}
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete {deleteTarget?.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently remove the agency, all members, and invite codes. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteAgency} disabled={deleting} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {deleting ? <Loader2 size={14} className="animate-spin mr-1.5" /> : <Trash2 size={14} className="mr-1.5" />}
+              Delete Agency
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

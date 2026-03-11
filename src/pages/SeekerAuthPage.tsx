@@ -59,15 +59,10 @@ const SeekerAuthPage = () => {
         password,
         options: {
           emailRedirectTo: window.location.origin,
-          data: { display_name: displayName || email },
+          data: { display_name: displayName || email, phone },
         },
       });
       if (error) throw error;
-
-      // Save phone to profile
-      if (data.user) {
-        await supabase.from('profiles').update({ phone }).eq('user_id', data.user.id);
-      }
 
       if (data.user && !data.session) {
         toast({ title: 'Check your email', description: 'We sent you a confirmation link. Please verify your email before signing in.' });

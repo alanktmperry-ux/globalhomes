@@ -28,6 +28,7 @@ import MyAgenciesPage from "./pages/MyAgenciesPage";
 import BillingPage from "./components/agent-dashboard/BillingPage";
 import ReviewsPage from "./components/agent-dashboard/ReviewsPage";
 import TerritoryPage from "./components/agent-dashboard/TerritoryPage";
+import ContactsPage from "./components/agent-dashboard/ContactsPage";
 import SeekerAuthPage from "./pages/SeekerAuthPage";
 import AgentAuthPage from "./pages/AgentAuthPage";
 import AuthLandingPage from "./pages/AuthLandingPage";
@@ -78,6 +79,7 @@ const App = () => (
                 <Route path="profile" element={<AgentProfilePage />} />
                 <Route path="territory" element={<TerritoryPage />} />
                 <Route path="listings" element={<ListingsPage />} />
+                <Route path="contacts" element={<ContactsPage />} />
                 <Route path="leads" element={<VoiceLeadsPage />} />
                 <Route path="analytics" element={<AnalyticsPage />} />
                 <Route path="network" element={<NetworkPage />} />

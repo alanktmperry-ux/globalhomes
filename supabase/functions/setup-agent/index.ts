@@ -62,7 +62,7 @@ Deno.serve(async (req) => {
 
       const { error: memberError } = await supabaseAdmin
         .from("agency_members")
-        .insert({ agency_id: agency.id, user_id: userId, role: "owner" });
+        .insert({ agency_id: agency.id, user_id: userId, role: "principal" });
       if (memberError) throw memberError;
 
       const { error: agentError } = await supabaseAdmin

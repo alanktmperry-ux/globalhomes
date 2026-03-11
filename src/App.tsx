@@ -24,6 +24,7 @@ import SettingsPage from "./components/agent-dashboard/SettingsPage";
 import TeamPage from "./components/agent-dashboard/TeamPage";
 import AgentProfilePage from "./components/agent-dashboard/ProfilePage";
 import DocumentsPage from "./components/agent-dashboard/DocumentsPage";
+import MyAgenciesPage from "./pages/MyAgenciesPage";
 import BillingPage from "./components/agent-dashboard/BillingPage";
 import ReviewsPage from "./components/agent-dashboard/ReviewsPage";
 import TerritoryPage from "./components/agent-dashboard/TerritoryPage";
@@ -79,6 +80,7 @@ const App = () => (
                 <Route path="analytics" element={<AnalyticsPage />} />
                 <Route path="network" element={<NetworkPage />} />
                 <Route path="team" element={<TeamPage />} />
+                <Route path="agencies" element={<MyAgenciesPage />} />
                 <Route path="documents" element={<DocumentsPage />} />
                 <Route path="billing" element={<BillingPage />} />
                 <Route path="reviews" element={<ReviewsPage />} />

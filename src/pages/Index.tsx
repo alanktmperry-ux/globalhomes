@@ -62,6 +62,8 @@ const Index = () => {
   const [mobileView, setMobileView] = useState<'map' | 'list'>('list');
   const [areaSearch, setAreaSearch] = useState<AreaSearch | null>(null);
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key: number } | null>(null);
+  const [searchRadius, setSearchRadius] = useState<number | null>(null);
+  const [searchCenter, setSearchCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [splitPercent, setSplitPercent] = useState(50);
   const [mapFullscreen, setMapFullscreen] = useState(false);
   const [mapCollapsed, setMapCollapsed] = useState(true);

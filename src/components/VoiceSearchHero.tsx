@@ -262,7 +262,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, resultCount, isSea
       <div className="relative z-10 max-w-2xl mx-auto px-4 py-8 flex flex-col items-center text-center">
         {/* App title */}
         <h1 className="font-display text-2xl font-bold text-foreground mb-6 tracking-tight">
-          GlobalHome
+          Global Homes
         </h1>
 
         {/* Transcript display area */}

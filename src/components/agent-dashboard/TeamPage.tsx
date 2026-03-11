@@ -214,12 +214,28 @@ const TeamPage = () => {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       
-      toast({
-        title: data.isExisting ? 'Member added' : 'Invitation sent',
-        description: data.isExisting
-          ? `${inviteEmail} has been added to your agency.`
-          : `An invite has been sent to ${inviteEmail}.`,
-      });
+      if (data.isExisting) {
+        toast({
+          title: 'Member added',
+          description: `${inviteEmail} has been added to your agency.`,
+        });
+      } else if (data.inviteCode) {
+        // Show invite code prominently — email may not have been delivered
+        toast({
+          title: data.emailSent ? 'Invite sent + code generated' : 'Invite code generated',
+          description: data.emailSent
+            ? `Email sent to ${inviteEmail}. Backup code: ${data.inviteCode}`
+            : `Share this code with ${inviteEmail} to join: ${data.inviteCode}`,
+          duration: 15000,
+        });
+        // Copy code to clipboard for easy sharing
+        try { await navigator.clipboard.writeText(data.inviteCode); } catch {}
+      } else {
+        toast({
+          title: 'Invitation sent',
+          description: `An invite has been sent to ${inviteEmail}.`,
+        });
+      }
       setEmailInviteDialogOpen(false);
       setInviteEmail('');
       setInviteRole('agent');

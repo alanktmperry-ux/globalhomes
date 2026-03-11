@@ -64,11 +64,10 @@ const AgentDashboardSidebar = () => {
   const { listings } = useAgentListings();
 
   const activeCount = listings.filter(l => ('_mock_status' in l ? l._mock_status !== 'sold' : (l as any).status !== 'sold')).length;
-  const totalLeads = listings.reduce((sum, l) => sum + ('_mock_leads' in l ? l._mock_leads : l.contact_clicks), 0);
 
   const badgeValues: Record<string, string> = {
     listings: String(activeCount),
-    leads: String(totalLeads),
+    leads: '3',
   };
 
   const ADMIN_NAV: NavItem[] = isAdmin ? [{ title: 'Admin Panel', url: '/admin', icon: Shield }] : [];

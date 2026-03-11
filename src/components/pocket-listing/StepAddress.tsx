@@ -104,10 +104,11 @@ const StepAddress = ({ draft, update }: Props) => {
       state,
     });
 
-    // Geocode for map
+    // Geocode for map and save coordinates
     const coords = await geocode(suggestion.description);
     if (coords) {
       showOnMap(coords.lat, coords.lng);
+      update({ lat: coords.lat, lng: coords.lng });
     }
     setMapLoading(false);
   };

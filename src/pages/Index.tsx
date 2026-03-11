@@ -164,7 +164,7 @@ const Index = () => {
   const displayProperties = useMemo(() => {
     if (!hasSearched) return allProperties;
 
-    const lastQuery = lastSearch?.text?.toLowerCase() || '';
+    const lastQuery = currentQuery.toLowerCase();
     const queryWords = lastQuery.split(/\s+/).filter(w => w.length > 2);
 
     // Filter DB properties that match the search query by location fields
@@ -177,7 +177,7 @@ const Index = () => {
     const seenIds = new Set(matchingDbProps.map(p => p.id));
     const uniqueMockResults = results.filter(p => !seenIds.has(p.id));
     return [...matchingDbProps, ...uniqueMockResults];
-  }, [hasSearched, allProperties, results, dbProperties, lastSearch]);
+  }, [hasSearched, allProperties, results, dbProperties, currentQuery]);
 
   const filteredProperties = useMemo(() => {
     let props = displayProperties;

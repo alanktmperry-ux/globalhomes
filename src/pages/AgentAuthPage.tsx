@@ -205,7 +205,7 @@ const AgentAuthPage = () => {
               <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground text-xs font-bold">W</span>
               </div>
-              <span className="font-display text-lg font-bold text-foreground">World Property Pulse</span>
+              <span className="font-display text-lg font-bold text-foreground">Global Homes</span>
             </Link>
           </div>
 

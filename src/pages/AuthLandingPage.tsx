@@ -25,7 +25,7 @@ const AuthLandingPage = () => {
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-cyan-accent flex items-center justify-center">
             <span className="text-primary-foreground text-sm font-bold">W</span>
           </div>
-          <span className="font-display text-xl font-bold text-foreground">World Property Pulse</span>
+          <span className="font-display text-xl font-bold text-foreground">Global Homes</span>
         </Link>
       </header>
 
@@ -37,7 +37,7 @@ const AuthLandingPage = () => {
           className="text-center mb-10"
         >
           <h1 className="font-display text-3xl sm:text-4xl font-bold text-foreground mb-2">
-            Welcome to World Property Pulse
+            Welcome to Global Homes
           </h1>
           <p className="text-muted-foreground text-base max-w-md mx-auto">
             How would you like to get started?

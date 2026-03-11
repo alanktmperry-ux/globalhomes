@@ -34,7 +34,7 @@ export function SiteHeader() {
             <Globe size={18} className="text-primary-foreground" />
           </div>
           <span className="font-display text-base font-bold text-foreground tracking-tight hidden sm:inline">
-            World Property Pulse
+            Global Homes
           </span>
         </button>
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User, ChevronRight, Shield, LogIn, LogOut, Settings, Mail, Lock, Eye, EyeOff, Loader2, ShieldCheck } from 'lucide-react';
+import { User, ChevronRight, Shield, LogIn, LogOut, Settings, Mail, Lock, Eye, EyeOff, Loader2, ShieldCheck, Search, LayoutDashboard } from 'lucide-react';
 import { BottomNav } from '@/components/BottomNav';
 import { useI18n } from '@/lib/i18n';
 import { useNavigate } from 'react-router-dom';
@@ -100,6 +100,26 @@ const ProfilePage = () => {
                 <span className="mt-2 px-3 py-1 rounded-full bg-destructive/10 text-destructive text-xs font-medium">
                   Admin
                 </span>
+              )}
+            </div>
+
+            {/* Quick navigation */}
+            <div className="flex gap-2 mb-4">
+              <button
+                onClick={() => navigate('/')}
+                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-primary text-primary-foreground font-semibold text-sm transition-colors active:opacity-80"
+              >
+                <Search size={16} />
+                Search Properties
+              </button>
+              {isAgent && (
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-accent text-foreground font-semibold text-sm border border-border transition-colors active:opacity-80"
+                >
+                  <LayoutDashboard size={16} />
+                  Dashboard
+                </button>
               )}
             </div>
 

@@ -136,7 +136,7 @@ const translations: Record<Language, Record<string, string>> = {
     'lang.switch': 'اللغة',
   },
   hi: {
-    'app.name': 'GlobalHome',
+    'app.name': 'Global Homes',
     'search.placeholder': 'खोजें "मुंबई में 4 बेडरूम का घर"',
     'search.voice.listening': 'सुन रहा है...',
     'search.resume': 'खोज जारी रखें',

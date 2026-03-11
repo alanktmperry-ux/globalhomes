@@ -169,7 +169,7 @@ const translations: Record<Language, Record<string, string>> = {
     'lang.switch': 'भाषा',
   },
   fr: {
-    'app.name': 'GlobalHome',
+    'app.name': 'Global Homes',
     'search.placeholder': 'Chercher "maison 4 chambres à Paris à 850k€"',
     'search.voice.listening': 'Écoute en cours...',
     'search.resume': 'Reprendre la recherche',

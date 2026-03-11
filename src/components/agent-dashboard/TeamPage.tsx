@@ -413,7 +413,7 @@ const TeamPage = () => {
         });
       if (memberError) throw memberError;
 
-      // Link agent record to agency
+      // Link or create agent record
       const { data: agentRecord } = await supabase
         .from('agents')
         .select('id')
@@ -424,6 +424,22 @@ const TeamPage = () => {
           .from('agents')
           .update({ agency_id: agency.id, agency: newAgencyName.trim() })
           .eq('id', agentRecord.id);
+      } else {
+        // Create agent record if it doesn't exist (e.g. admin user creating agency)
+        await supabase
+          .from('agents')
+          .insert({
+            user_id: user.id,
+            name: user.email || 'Principal',
+            email: user.email || newAgencyEmail || null,
+            agency_id: agency.id,
+            agency: newAgencyName.trim(),
+          });
+        // Ensure agent role exists
+        await supabase
+          .from('user_roles')
+          .insert({ user_id: user.id, role: 'agent' as any })
+          .then(() => {});
       }
 
       toast({ title: 'Agency created!', description: `${newAgencyName} is ready. You are the Principal.` });

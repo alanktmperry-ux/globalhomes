@@ -30,6 +30,7 @@ import ReviewsPage from "./components/agent-dashboard/ReviewsPage";
 import TerritoryPage from "./components/agent-dashboard/TerritoryPage";
 import ContactsPage from "./components/agent-dashboard/ContactsPage";
 import ListingDetailPage from "./components/agent-dashboard/ListingDetailPage";
+import TrustAccountingPage from "./components/agent-dashboard/TrustAccountingPage";
 import SeekerAuthPage from "./pages/SeekerAuthPage";
 import AgentAuthPage from "./pages/AgentAuthPage";
 import AuthLandingPage from "./pages/AuthLandingPage";

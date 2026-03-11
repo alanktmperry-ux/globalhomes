@@ -37,7 +37,7 @@ const translations: Record<Language, Record<string, string>> = {
     'lang.switch': 'Language',
   },
   zh: {
-    'app.name': 'GlobalHome',
+    'app.name': 'Global Homes',
     'search.placeholder': '搜索 "墨尔本4卧室房屋 85万"',
     'search.voice.listening': '正在聆听...',
     'search.resume': '继续上次搜索',

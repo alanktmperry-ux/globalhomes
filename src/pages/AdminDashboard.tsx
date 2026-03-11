@@ -139,7 +139,7 @@ const AdminDashboard = () => {
       <header className="sticky top-0 z-30 bg-card/80 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={() => navigate('/')} className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center">
+            <button onClick={() => navigate('/dashboard')} className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center" title="Back to Dashboard">
               <ArrowLeft size={18} />
             </button>
             <div>

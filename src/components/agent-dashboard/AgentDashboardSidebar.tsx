@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, Bell, LogOut, Building2, UserPlus,
-  User, FileText, CreditCard, Star, MapPinned,
+  User, FileText, CreditCard, Star, MapPinned, Shield,
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthProvider';
@@ -34,7 +34,7 @@ const AgentDashboardSidebar = () => {
   const collapsed = state === 'collapsed';
   const location = useLocation();
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, isAdmin } = useAuth();
   const { listings } = useAgentListings();
 
   const activeCount = listings.filter(l => ('_mock_status' in l ? l._mock_status !== 'sold' : (l as any).status !== 'sold')).length;
@@ -45,9 +45,11 @@ const AgentDashboardSidebar = () => {
     leads: String(totalLeads),
   };
 
-  const NAV = BASE_NAV.map(item => ({
+  const ADMIN_NAV = isAdmin ? [{ title: 'Admin Panel', url: '/admin', icon: Shield }] : [];
+
+  const NAV = [...BASE_NAV, ...ADMIN_NAV].map(item => ({
     ...item,
-    badge: item.badgeKey ? badgeValues[item.badgeKey] : undefined,
+    badge: (item as any).badgeKey ? badgeValues[(item as any).badgeKey] : undefined,
   }));
 
   const handleSignOut = async () => {

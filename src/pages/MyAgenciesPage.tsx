@@ -27,8 +27,11 @@ interface AgencyWithStats {
 const MyAgenciesPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [agencies, setAgencies] = useState<AgencyWithStats[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteTarget, setDeleteTarget] = useState<AgencyWithStats | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!user) return;

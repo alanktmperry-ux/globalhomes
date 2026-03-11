@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Home, Search, Heart, Mic, Building2 } from 'lucide-react';
+import PhoneInput from '@/components/PhoneInput';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
@@ -16,6 +17,7 @@ const SeekerAuthPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
+  const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleEmailContinue = (e: React.FormEvent) => {
@@ -46,6 +48,10 @@ const SeekerAuthPage = () => {
 
   const handleCreateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!phone.trim()) {
+      toast({ title: 'Phone required', description: 'Please enter your mobile number.', variant: 'destructive' });
+      return;
+    }
     setLoading(true);
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -57,8 +63,15 @@ const SeekerAuthPage = () => {
         },
       });
       if (error) throw error;
+
+      // Save phone to profile
+      if (data.user) {
+        await supabase.from('profiles').update({ phone }).eq('user_id', data.user.id);
+      }
+
       if (data.user && !data.session) {
         toast({ title: 'Check your email', description: 'We sent you a confirmation link. Please verify your email before signing in.' });
+        setStep('email');
       } else {
         toast({ title: 'Account created!' });
         navigate('/');
@@ -229,6 +242,10 @@ const SeekerAuthPage = () => {
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Display name</label>
                   <input type="text" autoFocus value={displayName} onChange={(e) => setDisplayName(e.target.value)} className={inputClass} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Mobile Phone<span className="text-destructive">*</span></label>
+                  <PhoneInput value={phone} onChange={setPhone} />
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Password<span className="text-destructive">*</span></label>

@@ -103,7 +103,7 @@ const translations: Record<Language, Record<string, string>> = {
     'lang.switch': 'Idioma',
   },
   ar: {
-    'app.name': 'GlobalHome',
+    'app.name': 'Global Homes',
     'search.placeholder': 'ابحث "منزل 4 غرف نوم في دبي"',
     'search.voice.listening': 'جارِ الاستماع...',
     'search.resume': 'استئناف البحث',

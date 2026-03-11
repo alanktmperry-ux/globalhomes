@@ -179,7 +179,20 @@ const Index = () => {
 
   const filteredProperties = useMemo(() => {
     let props = displayProperties;
-    // Area filter
+
+    // Radius filter based on search center + selected radius
+    if (searchCenter && searchRadius) {
+      const radiusMeters = searchRadius * 1000;
+      props = props.filter((p) => {
+        if (!p.lat || !p.lng) {
+          // For properties without coordinates, do text-based matching (keep them)
+          return true;
+        }
+        return haversineDistance(p.lat, p.lng, searchCenter.lat, searchCenter.lng) <= radiusMeters;
+      });
+    }
+
+    // Area filter (from map drawing)
     if (areaSearch) {
       props = props.filter((p) => {
         if (!p.lat || !p.lng) return false;
@@ -205,7 +218,7 @@ const Index = () => {
     if (sortBy === 'newest') return [...props].sort((a, b) => new Date(b.listedDate).getTime() - new Date(a.listedDate).getTime());
     if (sortBy === 'beds') return [...props].sort((a, b) => b.beds - a.beds);
     return props;
-  }, [displayProperties, areaSearch, sortBy, filters]);
+  }, [displayProperties, areaSearch, sortBy, filters, searchCenter, searchRadius]);
 
   const handleAreaSearch = useCallback((area: AreaSearch | null) => {
     setAreaSearch(area || null);

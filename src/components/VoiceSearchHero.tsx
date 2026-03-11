@@ -137,6 +137,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
     const chips = filtersToChips(filters);
     setFilterChips(chips);
     setEditableTranscript(text);
+    setTextQuery(text);
     setVoiceState('processing');
     onSearch(text);
     // Fire geocode separately so it's not affected by re-renders from onSearch

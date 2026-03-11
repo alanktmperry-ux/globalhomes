@@ -143,9 +143,9 @@ const AdminDashboard = () => {
               <ArrowLeft size={18} />
             </button>
             <div>
-              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
+              <button onClick={() => navigate('/')} className="text-lg font-bold text-foreground flex items-center gap-2 hover:text-primary transition-colors">
                 <Shield size={18} className="text-primary" /> Admin Dashboard
-              </h1>
+              </button>
               <p className="text-xs text-muted-foreground">Platform management & analytics</p>
             </div>
           </div>

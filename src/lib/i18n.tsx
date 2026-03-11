@@ -301,7 +301,7 @@ const translations: Record<Language, Record<string, string>> = {
     'lang.switch': 'Язык',
   },
   ja: {
-    'app.name': 'GlobalHome',
+    'app.name': 'Global Homes',
     'search.placeholder': '検索 "東京の4LDK 8500万円"',
     'search.voice.listening': '聞いています...',
     'search.resume': '検索を再開',

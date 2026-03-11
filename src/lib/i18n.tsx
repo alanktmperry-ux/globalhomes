@@ -70,7 +70,7 @@ const translations: Record<Language, Record<string, string>> = {
     'lang.switch': '语言',
   },
   es: {
-    'app.name': 'GlobalHome',
+    'app.name': 'Global Homes',
     'search.placeholder': 'Buscar "casa de 4 hab en Madrid por €850k"',
     'search.voice.listening': 'Escuchando...',
     'search.resume': 'Reanudar búsqueda',

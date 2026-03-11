@@ -108,6 +108,7 @@ export type Database = {
       }
       agency_members: {
         Row: {
+          access_level: string
           agency_id: string
           id: string
           joined_at: string
@@ -115,6 +116,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          access_level?: string
           agency_id: string
           id?: string
           joined_at?: string
@@ -122,6 +124,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          access_level?: string
           agency_id?: string
           id?: string
           joined_at?: string
@@ -857,7 +860,7 @@ export type Database = {
       }
     }
     Enums: {
-      agency_member_role: "owner" | "admin" | "agent"
+      agency_member_role: "owner" | "admin" | "agent" | "principal"
       app_role: "user" | "agent" | "admin"
     }
     CompositeTypes: {
@@ -986,7 +989,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      agency_member_role: ["owner", "admin", "agent"],
+      agency_member_role: ["owner", "admin", "agent", "principal"],
       app_role: ["user", "agent", "admin"],
     },
   },

@@ -244,6 +244,10 @@ const SeekerAuthPage = () => {
                   <input type="text" autoFocus value={displayName} onChange={(e) => setDisplayName(e.target.value)} className={inputClass} />
                 </div>
                 <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Mobile Phone<span className="text-destructive">*</span></label>
+                  <PhoneInput value={phone} onChange={setPhone} />
+                </div>
+                <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Password<span className="text-destructive">*</span></label>
                   <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
                 </div>

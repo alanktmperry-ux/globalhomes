@@ -4,7 +4,7 @@ export type Language = 'en' | 'zh' | 'es' | 'ar' | 'hi' | 'fr' | 'pt' | 'bn' | '
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
-    'app.name': 'GlobalHome',
+    'app.name': 'Global Homes',
     'search.placeholder': 'Search "4 bed house in Berwick for $850k"',
     'search.voice.listening': 'Listening...',
     'search.resume': 'Resume Your Search',

@@ -1165,6 +1165,166 @@ export type Database = {
           },
         ]
       }
+      trust_accounts: {
+        Row: {
+          account_name: string
+          account_number: string | null
+          account_type: string
+          agency_id: string | null
+          agent_id: string | null
+          balance: number
+          bank_name: string | null
+          bsb: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          updated_at: string
+        }
+        Insert: {
+          account_name: string
+          account_number?: string | null
+          account_type?: string
+          agency_id?: string | null
+          agent_id?: string | null
+          balance?: number
+          bank_name?: string | null
+          bsb?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+        }
+        Update: {
+          account_name?: string
+          account_number?: string | null
+          account_type?: string
+          agency_id?: string | null
+          agent_id?: string | null
+          balance?: number
+          bank_name?: string | null
+          bsb?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trust_accounts_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_accounts_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trust_transactions: {
+        Row: {
+          aba_exported: boolean
+          aba_exported_at: string | null
+          amount: number
+          category: string
+          contact_id: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          due_date: string | null
+          gst_amount: number
+          id: string
+          invoice_number: string | null
+          payee_name: string | null
+          property_id: string | null
+          receipt_number: string | null
+          reconciled_at: string | null
+          reconciled_by: string | null
+          reference: string | null
+          status: string
+          transaction_date: string
+          transaction_type: string
+          trust_account_id: string
+          updated_at: string
+        }
+        Insert: {
+          aba_exported?: boolean
+          aba_exported_at?: string | null
+          amount?: number
+          category?: string
+          contact_id?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          due_date?: string | null
+          gst_amount?: number
+          id?: string
+          invoice_number?: string | null
+          payee_name?: string | null
+          property_id?: string | null
+          receipt_number?: string | null
+          reconciled_at?: string | null
+          reconciled_by?: string | null
+          reference?: string | null
+          status?: string
+          transaction_date?: string
+          transaction_type?: string
+          trust_account_id: string
+          updated_at?: string
+        }
+        Update: {
+          aba_exported?: boolean
+          aba_exported_at?: string | null
+          amount?: number
+          category?: string
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          due_date?: string | null
+          gst_amount?: number
+          id?: string
+          invoice_number?: string | null
+          payee_name?: string | null
+          property_id?: string | null
+          receipt_number?: string | null
+          reconciled_at?: string | null
+          reconciled_by?: string | null
+          reference?: string | null
+          status?: string
+          transaction_date?: string
+          transaction_type?: string
+          trust_account_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trust_transactions_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_transactions_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_transactions_trust_account_id_fkey"
+            columns: ["trust_account_id"]
+            isOneToOne: false
+            referencedRelation: "trust_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_preferences: {
         Row: {
           budget_max: number | null

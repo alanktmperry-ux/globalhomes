@@ -735,6 +735,65 @@ export type Database = {
           },
         ]
       }
+      listing_documents: {
+        Row: {
+          category: string
+          created_at: string
+          esign_sent_at: string | null
+          esign_signed_at: string | null
+          esign_status: string | null
+          file_name: string
+          file_size: number | null
+          file_url: string
+          id: string
+          mime_type: string | null
+          notes: string | null
+          property_id: string
+          updated_at: string
+          uploaded_by: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          esign_sent_at?: string | null
+          esign_signed_at?: string | null
+          esign_status?: string | null
+          file_name: string
+          file_size?: number | null
+          file_url: string
+          id?: string
+          mime_type?: string | null
+          notes?: string | null
+          property_id: string
+          updated_at?: string
+          uploaded_by: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          esign_sent_at?: string | null
+          esign_signed_at?: string | null
+          esign_status?: string | null
+          file_name?: string
+          file_size?: number | null
+          file_url?: string
+          id?: string
+          mime_type?: string | null
+          notes?: string | null
+          property_id?: string
+          updated_at?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_documents_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           agent_id: string
@@ -829,9 +888,12 @@ export type Database = {
       properties: {
         Row: {
           address: string
+          agency_authority: string | null
           agent_id: string | null
+          agent_split_percent: number | null
           baths: number
           beds: number
+          commission_rate: number | null
           contact_clicks: number
           country: string
           created_at: string
@@ -842,9 +904,11 @@ export type Database = {
           image_url: string | null
           images: string[] | null
           is_active: boolean
+          land_size: number | null
           lat: number | null
           listed_date: string | null
           lng: number | null
+          marketing_budget: number | null
           parking: number
           price: number
           price_formatted: string
@@ -859,9 +923,12 @@ export type Database = {
         }
         Insert: {
           address: string
+          agency_authority?: string | null
           agent_id?: string | null
+          agent_split_percent?: number | null
           baths?: number
           beds?: number
+          commission_rate?: number | null
           contact_clicks?: number
           country?: string
           created_at?: string
@@ -872,9 +939,11 @@ export type Database = {
           image_url?: string | null
           images?: string[] | null
           is_active?: boolean
+          land_size?: number | null
           lat?: number | null
           listed_date?: string | null
           lng?: number | null
+          marketing_budget?: number | null
           parking?: number
           price: number
           price_formatted: string
@@ -889,9 +958,12 @@ export type Database = {
         }
         Update: {
           address?: string
+          agency_authority?: string | null
           agent_id?: string | null
+          agent_split_percent?: number | null
           baths?: number
           beds?: number
+          commission_rate?: number | null
           contact_clicks?: number
           country?: string
           created_at?: string
@@ -902,9 +974,11 @@ export type Database = {
           image_url?: string | null
           images?: string[] | null
           is_active?: boolean
+          land_size?: number | null
           lat?: number | null
           listed_date?: string | null
           lng?: number | null
+          marketing_budget?: number | null
           parking?: number
           price?: number
           price_formatted?: string

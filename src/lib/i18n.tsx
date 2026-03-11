@@ -202,7 +202,7 @@ const translations: Record<Language, Record<string, string>> = {
     'lang.switch': 'Langue',
   },
   pt: {
-    'app.name': 'GlobalHome',
+    'app.name': 'Global Homes',
     'search.placeholder': 'Pesquisar "casa 4 quartos em Lisboa por €850k"',
     'search.voice.listening': 'Ouvindo...',
     'search.resume': 'Retomar pesquisa',

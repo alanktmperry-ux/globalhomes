@@ -272,7 +272,7 @@ const ProfilePage = () => {
               )}
 
               <button
-                onClick={() => navigate('/dashboard/settings')}
+                onClick={() => navigate('/settings')}
                 className="w-full flex items-center gap-3 p-4 rounded-2xl bg-card border border-border text-left transition-colors active:bg-secondary"
               >
                 <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center">

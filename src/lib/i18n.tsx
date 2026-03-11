@@ -268,7 +268,7 @@ const translations: Record<Language, Record<string, string>> = {
     'lang.switch': 'ভাষা',
   },
   ru: {
-    'app.name': 'GlobalHome',
+    'app.name': 'Global Homes',
     'search.placeholder': 'Поиск "4-комн. дом в Москве за ₽85 млн"',
     'search.voice.listening': 'Слушаю...',
     'search.resume': 'Продолжить поиск',

@@ -91,6 +91,25 @@ const MyAgenciesPage = () => {
     agent: 'bg-secondary text-foreground border-border',
   };
 
+  const handleDeleteAgency = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      // Delete members first, then the agency
+      await supabase.from('agency_invite_codes').delete().eq('agency_id', deleteTarget.id);
+      await supabase.from('agency_members').delete().eq('agency_id', deleteTarget.id);
+      const { error } = await supabase.from('agencies').delete().eq('id', deleteTarget.id);
+      if (error) throw error;
+      setAgencies(prev => prev.filter(a => a.id !== deleteTarget.id));
+      toast({ title: 'Agency deleted', description: `${deleteTarget.name} has been removed.` });
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">

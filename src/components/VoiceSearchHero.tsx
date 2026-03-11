@@ -550,7 +550,9 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
               ))}
             </div>
           </div>
-
+          
+          {/* Bottom spacer for breathing room before map */}
+          <div className="h-4" />
           <AnimatePresence>
             {showSuggestions && suggestions.length > 0 && (
               <motion.ul

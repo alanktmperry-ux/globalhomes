@@ -131,6 +131,7 @@ const Index = () => {
     setIsSearching(true);
     setHasSearched(true);
     setManusStatus(null);
+    setCurrentQuery(query);
     addSearch(query);
     manusSearch.cancelPolling();
 

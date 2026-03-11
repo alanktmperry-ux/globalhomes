@@ -29,6 +29,7 @@ import BillingPage from "./components/agent-dashboard/BillingPage";
 import ReviewsPage from "./components/agent-dashboard/ReviewsPage";
 import TerritoryPage from "./components/agent-dashboard/TerritoryPage";
 import ContactsPage from "./components/agent-dashboard/ContactsPage";
+import ListingDetailPage from "./components/agent-dashboard/ListingDetailPage";
 import SeekerAuthPage from "./pages/SeekerAuthPage";
 import AgentAuthPage from "./pages/AgentAuthPage";
 import AuthLandingPage from "./pages/AuthLandingPage";
@@ -79,6 +80,7 @@ const App = () => (
                 <Route path="profile" element={<AgentProfilePage />} />
                 <Route path="territory" element={<TerritoryPage />} />
                 <Route path="listings" element={<ListingsPage />} />
+                <Route path="listings/:listingId" element={<ListingDetailPage />} />
                 <Route path="contacts" element={<ContactsPage />} />
                 <Route path="leads" element={<VoiceLeadsPage />} />
                 <Route path="analytics" element={<AnalyticsPage />} />

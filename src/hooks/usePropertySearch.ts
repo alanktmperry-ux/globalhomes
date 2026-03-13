@@ -80,6 +80,8 @@ export interface PropertySearchState {
   isSearching: boolean;
   hasSearched: boolean;
   manusStatus: string | null;
+  /** Whether AI search failed and we're showing DB-only results */
+  manusFailed: boolean;
   currentQuery: string;
   searchCenter: { lat: number; lng: number } | null;
   searchRadius: number | null;

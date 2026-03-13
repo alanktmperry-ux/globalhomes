@@ -26,6 +26,10 @@ export interface Property {
   lat?: number;
   lng?: number;
   status?: PropertyStatus;
+  /** AI-generated one-line summary, e.g. "High-yield STR candidate near beach" */
+  aiSummary?: string;
+  /** AI-generated highlight tags, e.g. ["Near top schools", "Walk to station"] */
+  aiHighlights?: string[];
 }
 
 export interface Agent {

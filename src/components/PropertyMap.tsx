@@ -48,6 +48,7 @@ export function PropertyMap({
   const [error, setError] = useState<string | null>(null);
   const [showSearchArea, setShowSearchArea] = useState(false);
   const [locating, setLocating] = useState(false);
+  const [hasDrawnArea, setHasDrawnArea] = useState(false);
   const userMovedRef = useRef(false);
 
   const clearDrawnOverlay = useCallback(() => {
@@ -55,6 +56,7 @@ export function PropertyMap({
       drawnOverlayRef.current.setMap(null);
       drawnOverlayRef.current = null;
     }
+    setHasDrawnArea(false);
   }, []);
 
   // Initialize map

@@ -389,7 +389,7 @@ export function PropertyMap({
       )}
 
       {/* Clear drawn area button */}
-      {drawnOverlayRef.current && onAreaSearch && (
+      {hasDrawnArea && onAreaSearch && (
         <button
           onClick={() => { clearDrawnOverlay(); onAreaSearch(null); }}
           className="absolute top-3 right-3 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated text-xs font-medium text-foreground hover:bg-card transition-colors"

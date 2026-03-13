@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, MapPin, Sparkles, Loader2, Zap, Map, List, Mic, GripVertical, ArrowUpDown } from 'lucide-react';
 import { VoiceSearchHero } from '@/components/VoiceSearchHero';
@@ -13,237 +13,52 @@ import { SiteHeader } from '@/components/SiteHeader';
 import { useSearchHistory } from '@/hooks/useSearchHistory';
 import { useSavedProperties } from '@/hooks/useSavedProperties';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { manusSearch } from '@/lib/ManusSearchService';
 import { Property } from '@/lib/types';
-import { mockProperties } from '@/lib/mock-data';
-import { useToast } from '@/hooks/use-toast';
 import { useCurrency } from '@/lib/CurrencyContext';
 import { FilterSidebar, Filters, defaultFilters } from '@/components/FilterSidebar';
-import { supabase } from '@/integrations/supabase/client';
-
-type AreaSearch =
-  | { type: 'circle'; center: [number, number]; radius: number }
-  | { type: 'polygon'; coordinates: [number, number][] };
-
-function isInsidePolygon(lat: number, lng: number, polygon: [number, number][]): boolean {
-  let inside = false;
-  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    const xi = polygon[i][0], yi = polygon[i][1];
-    const xj = polygon[j][0], yj = polygon[j][1];
-    const intersect = yi > lng !== yj > lng && lat < ((xj - xi) * (lng - yi)) / (yj - yi) + xi;
-    if (intersect) inside = !inside;
-  }
-  return inside;
-}
-
-function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371e3;
-  const toRad = (d: number) => (d * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLng = toRad(lng2 - lng1);
-  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
+import { usePropertySearch } from '@/hooks/usePropertySearch';
 
 const Index = () => {
   const { t } = useI18n();
   const { addSearch, lastSearch } = useSearchHistory();
   const { isSaved, toggleSaved } = useSavedProperties();
-  const { toast } = useToast();
   const isMobile = useIsMobile();
   const { formatPrice } = useCurrency();
 
-  const [results, setResults] = useState<Property[]>([]);
-  const [dbProperties, setDbProperties] = useState<Property[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
-  const [manusStatus, setManusStatus] = useState<string | null>(null);
   const [mobileView, setMobileView] = useState<'map' | 'list'>('list');
-  const [areaSearch, setAreaSearch] = useState<AreaSearch | null>(null);
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key: number } | null>(null);
-  const [searchRadius, setSearchRadius] = useState<number | null>(null);
-  const [searchCenter, setSearchCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [splitPercent, setSplitPercent] = useState(50);
   const [mapFullscreen, setMapFullscreen] = useState(false);
   const [mapCollapsed, setMapCollapsed] = useState(true);
   const [bottomSheetExpanded, setBottomSheetExpanded] = useState(false);
-  const [currentQuery, setCurrentQuery] = useState('');
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'newest' | 'beds'>('default');
   const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const isDragging = useRef(false);
   const cardRefs = useRef<globalThis.Map<string, HTMLDivElement>>(new globalThis.Map());
 
-  const [dbLoading, setDbLoading] = useState(true);
-  const [dbError, setDbError] = useState<string | null>(null);
+  // ── Search hook ──────────────────────────────────────────────
+  const {
+    displayProperties,
+    filteredProperties,
+    handleSearch,
+    handleAreaSearch,
+    setSearchCenter,
+    setSearchRadius,
+    clearSearchRadius,
+    searchState,
+  } = usePropertySearch({ filters, sortBy, addSearch });
 
-  // Fetch active properties from the database
-  useEffect(() => {
-    const fetchDbProperties = async () => {
-      setDbLoading(true);
-      setDbError(null);
-      const { data, error } = await supabase
-        .from('properties')
-        .select('*, agents(name, agency, phone, email, avatar_url, is_subscribed)')
-        .eq('status', 'public')
-        .order('created_at', { ascending: false })
-        .limit(50);
+  const { isSearching, hasSearched, manusStatus, searchRadius, areaSearch } = searchState;
 
-      if (error) {
-        setDbError(error.message);
-        setDbProperties([]);
-      } else if (data && data.length > 0) {
-        const mapped: Property[] = data.map((p: any) => ({
-          id: p.id,
-          title: p.title,
-          address: p.address,
-          suburb: p.suburb,
-          state: p.state,
-          country: p.country,
-          price: p.price,
-          priceFormatted: p.price_formatted,
-          beds: p.beds,
-          baths: p.baths,
-          parking: p.parking,
-          sqm: p.sqm,
-          imageUrl: p.image_url || p.images?.[0] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80',
-          images: p.images || (p.image_url ? [p.image_url] : []),
-          description: p.description || '',
-          estimatedValue: p.estimated_value || '',
-          propertyType: p.property_type || 'House',
-          features: p.features || [],
-          agent: p.agents ? {
-            id: p.agent_id || '',
-            name: p.agents.name || 'Agent',
-            agency: p.agents.agency || '',
-            phone: p.agents.phone || '',
-            email: p.agents.email || '',
-            avatarUrl: p.agents.avatar_url || '',
-            isSubscribed: p.agents.is_subscribed || false,
-          } : {
-            id: '', name: 'Private Seller', agency: '', phone: '', email: '', avatarUrl: '', isSubscribed: false,
-          },
-          listedDate: p.listed_date || p.created_at,
-          views: p.views,
-          contactClicks: p.contact_clicks,
-          lat: p.lat || undefined,
-          lng: p.lng || undefined,
-          status: 'listed' as const,
-        }));
-        setDbProperties(mapped);
-      }
-      setDbLoading(false);
-    };
-    fetchDbProperties();
-  }, []);
-
-  const handleSearch = useCallback(async (query: string) => {
-    setIsSearching(true);
-    setHasSearched(true);
-    setManusStatus(null);
-    setCurrentQuery(query);
-    addSearch(query);
-    manusSearch.cancelPolling();
-
-    try {
-      const result = await manusSearch.search({ query }, (update) => {
-        setManusStatus(update.status);
-        if (update.status === 'completed' && update.properties && update.properties.length > 0) {
-          setResults(update.properties);
-          toast({ title: '🔍 Live results ready', description: `Found ${update.properties.length} properties` });
-        } else if (update.status === 'failed') {
-          setManusStatus(null);
-        }
-      });
-      setResults(result.properties);
-    } catch {
-      setResults([]);
-    } finally {
-      setIsSearching(false);
-    }
-  }, [addSearch, toast]);
-
-  // Merge DB properties with mock, DB first, dedup by id
-  const allProperties = useMemo(() => {
-    const dbIds = new Set(dbProperties.map(p => p.id));
-    const mockFiltered = mockProperties.slice(0, 6).filter(p => !dbIds.has(p.id));
-    return [...dbProperties, ...mockFiltered];
-  }, [dbProperties]);
-
-  // When searching, merge DB properties that match the query with mock/Manus results
-  const displayProperties = useMemo(() => {
-    if (!hasSearched) return allProperties;
-
-    const lastQuery = currentQuery.toLowerCase();
-    const queryWords = lastQuery.split(/\s+/).filter(w => w.length > 2);
-
-    // Filter DB properties that match the search query by location fields
-    const matchingDbProps = dbProperties.filter(p => {
-      const searchable = `${p.title} ${p.address} ${p.suburb} ${p.state} ${p.country} ${p.propertyType} ${p.description}`.toLowerCase();
-      return queryWords.some(word => searchable.includes(word));
-    });
-
-    // Merge: DB matches first, then mock/Manus results, dedup by id
-    const seenIds = new Set(matchingDbProps.map(p => p.id));
-    const uniqueMockResults = results.filter(p => !seenIds.has(p.id));
-    return [...matchingDbProps, ...uniqueMockResults];
-  }, [hasSearched, allProperties, results, dbProperties, currentQuery]);
-
-  const filteredProperties = useMemo(() => {
-    let props = displayProperties;
-
-    // Radius filter based on search center + selected radius
-    if (searchCenter && searchRadius) {
-      const radiusMeters = searchRadius * 1000;
-      const queryWords = currentQuery.toLowerCase().split(/\s+/).filter(w => w.length > 2);
-      props = props.filter((p) => {
-        if (p.lat && p.lng) {
-          return haversineDistance(p.lat, p.lng, searchCenter.lat, searchCenter.lng) <= radiusMeters;
-        }
-        // Properties without coordinates are excluded from radius filtering
-        return false;
-      });
-    }
-
-    // Area filter (from map drawing)
-    if (areaSearch) {
-      props = props.filter((p) => {
-        if (!p.lat || !p.lng) return false;
-        if (areaSearch.type === 'circle') {
-          return haversineDistance(p.lat, p.lng, areaSearch.center[0], areaSearch.center[1]) <= areaSearch.radius;
-        }
-        return isInsidePolygon(p.lat, p.lng, areaSearch.coordinates);
-      });
-    }
-    // Advanced filters
-    props = props.filter(p => {
-      if (p.price < filters.priceRange[0] || p.price > filters.priceRange[1]) return false;
-      if (filters.propertyTypes.length > 0 && !filters.propertyTypes.includes(p.propertyType)) return false;
-      if (p.beds < filters.minBeds) return false;
-      if (p.baths < filters.minBaths) return false;
-      if (p.parking < filters.minParking) return false;
-      if (filters.features.length > 0 && !filters.features.every(f => p.features.some(pf => pf.toLowerCase().includes(f.toLowerCase())))) return false;
-      return true;
-    });
-    // Sort
-    if (sortBy === 'price-asc') return [...props].sort((a, b) => a.price - b.price);
-    if (sortBy === 'price-desc') return [...props].sort((a, b) => b.price - a.price);
-    if (sortBy === 'newest') return [...props].sort((a, b) => new Date(b.listedDate).getTime() - new Date(a.listedDate).getTime());
-    if (sortBy === 'beds') return [...props].sort((a, b) => b.beds - a.beds);
-    return props;
-  }, [displayProperties, areaSearch, sortBy, filters, searchCenter, searchRadius]);
-
-  const handleAreaSearch = useCallback((area: AreaSearch | null) => {
-    setAreaSearch(area || null);
-  }, []);
-
+  // ── Scroll to card on map click ──────────────────────────────
   const scrollToProperty = useCallback((propertyId: string) => {
     const el = cardRefs.current.get(propertyId);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, []);
 
-  // Draggable split handle
+  // ── Draggable split handle ───────────────────────────────────
   const handleMouseDown = useCallback(() => {
     isDragging.current = true;
     document.body.style.cursor = 'col-resize';
@@ -269,6 +84,7 @@ const Index = () => {
     };
   }, []);
 
+  // ── Rendering helpers ────────────────────────────────────────
   const sortOptions = [
     { value: 'default', label: 'Default' },
     { value: 'price-asc', label: 'Price: Low–High' },
@@ -293,7 +109,7 @@ const Index = () => {
         )}
         {searchRadius && (
           <button
-            onClick={() => setSearchRadius(null)}
+            onClick={clearSearchRadius}
             className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium shrink-0 hover:bg-primary/20 transition-colors"
           >
             Within {searchRadius} km ✕
@@ -319,7 +135,6 @@ const Index = () => {
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
-        {/* Filter button */}
         <FilterSidebar
           filters={filters}
           onChange={setFilters}
@@ -328,8 +143,6 @@ const Index = () => {
           totalCount={displayProperties.length}
           filteredCount={filteredProperties.length}
         />
-
-        {/* Sort dropdown */}
         <div className="relative">
           <select
             value={sortBy}
@@ -391,7 +204,6 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SiteHeader />
-      {/* Voice Search Hero */}
       <VoiceSearchHero
         onSearch={handleSearch}
         onLocationSelect={(loc) => {
@@ -405,12 +217,11 @@ const Index = () => {
         isSearching={isSearching}
       />
 
-      {/* Desktop layout: compact map on top, then property list */}
+      {/* Desktop layout */}
       {!isMobile ? (
         <div className="flex-1 flex flex-col px-4 py-4 gap-4 max-w-7xl mx-auto w-full">
           {/* Collapsible map card */}
           <div className="relative">
-            {/* Map header with collapse toggle */}
             <button
               onClick={() => setMapCollapsed(c => !c)}
               className="w-full flex items-center justify-between px-4 py-2 rounded-t-xl bg-secondary border border-border border-b-0 text-sm font-medium text-foreground hover:bg-accent transition-colors"
@@ -423,8 +234,6 @@ const Index = () => {
                 {mapCollapsed ? 'Show' : 'Hide'}
               </span>
             </button>
-            
-            {/* Map container */}
             <AnimatePresence>
               {!mapCollapsed && (
                 <motion.div
@@ -435,7 +244,6 @@ const Index = () => {
                   className="relative rounded-b-xl overflow-hidden border border-border border-t-0 shadow-sm"
                 >
                   {mapComponent}
-                  {/* Expand to fullscreen */}
                   <button
                     onClick={() => setMapFullscreen(f => !f)}
                     className="absolute top-3 right-3 z-10 px-3 py-1.5 rounded-lg bg-background/90 backdrop-blur-sm border border-border shadow-md text-xs font-medium text-foreground hover:bg-accent transition-colors flex items-center gap-1.5"
@@ -462,23 +270,18 @@ const Index = () => {
         <div className="flex-1 relative" style={{ height: 'calc(100vh - 250px)' }}>
           {mobileView === 'map' ? (
             <>
-              {/* Full-screen map */}
               <div className="absolute inset-0">{mapComponent}</div>
-
-              {/* Bottom sheet */}
               <motion.div
                 className="absolute bottom-0 left-0 right-0 z-20 bg-background rounded-t-2xl shadow-drawer border-t border-border"
                 animate={{ height: bottomSheetExpanded ? '60%' : 120 }}
                 transition={{ type: 'spring', damping: 25 }}
               >
-                {/* Drag handle */}
                 <button
                   onClick={() => setBottomSheetExpanded(!bottomSheetExpanded)}
                   className="w-full flex justify-center py-2"
                 >
                   <div className="w-10 h-1.5 rounded-full bg-muted" />
                 </button>
-
                 <div className="px-4 pb-2 flex items-center justify-between">
                   <span className="text-sm font-medium text-foreground">
                     {filteredProperties.length} properties
@@ -500,13 +303,10 @@ const Index = () => {
                     </button>
                   </div>
                 </div>
-
                 <div className="overflow-y-auto px-4 pb-20" style={{ maxHeight: bottomSheetExpanded ? 'calc(100% - 60px)' : '40px' }}>
                   {propertyList}
                 </div>
               </motion.div>
-
-              {/* FAB for voice search */}
               <button
                 onClick={() => {
                   const hero = document.querySelector('[aria-label="Start voice search"]') as HTMLButtonElement;
@@ -518,7 +318,6 @@ const Index = () => {
               </button>
             </>
           ) : (
-            /* List-only mobile */
             <div className="p-4 overflow-y-auto h-full pb-24">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-medium text-foreground">{filteredProperties.length} properties</span>

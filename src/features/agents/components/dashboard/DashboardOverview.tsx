@@ -1,0 +1,337 @@
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import {
+  CheckSquare, Users, ClipboardList, DollarSign, Landmark,
+  Mic, Phone, Send, Calendar, Flame, Thermometer, Snowflake, Sparkles, Eye,
+  TrendingUp, Zap, MessageSquare, Activity,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import DashboardHeader from './DashboardHeader';
+import { useAgentListings } from '@/hooks/useAgentListings';
+import { useAuth } from '@/lib/AuthProvider';
+import { supabase } from '@/integrations/supabase/client';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+
+// Australian currency formatter
+const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
+const AU_DATE = (d: string) => {
+  const date = new Date(d);
+  return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+};
+
+// Mock pipeline data for 12 months
+const PIPELINE_DATA = [
+  { month: 'Apr', deals: 2, value: 45000 },
+  { month: 'May', deals: 3, value: 68000 },
+  { month: 'Jun', deals: 1, value: 22000 },
+  { month: 'Jul', deals: 4, value: 95000 },
+  { month: 'Aug', deals: 2, value: 48000 },
+  { month: 'Sep', deals: 3, value: 72000 },
+  { month: 'Oct', deals: 5, value: 120000 },
+  { month: 'Nov', deals: 2, value: 55000 },
+  { month: 'Dec', deals: 3, value: 78000 },
+  { month: 'Jan', deals: 4, value: 98000 },
+  { month: 'Feb', deals: 3, value: 65000 },
+  { month: 'Mar', deals: 6, value: 145000 },
+];
+
+const URGENCY_CONFIG = {
+  hot: { icon: <Flame size={12} />, color: 'bg-destructive/15 text-destructive', label: 'Hot' },
+  warm: { icon: <Thermometer size={12} />, color: 'bg-primary/15 text-primary', label: 'Warm' },
+  cold: { icon: <Snowflake size={12} />, color: 'bg-muted text-muted-foreground', label: 'Cold' },
+};
+
+const MOCK_MATCHES = [
+  { id: '1', transcript: '3 bed house in Berwick with pool under $900k', buyerLocation: 'Melbourne CBD', urgency: 'hot' as const, time: '12 min ago', matchedListing: '42 Panorama Drive' },
+  { id: '2', transcript: 'Investment property near train station, 2 bed apartment', buyerLocation: 'Sydney (relocating)', urgency: 'warm' as const, time: '1h ago', matchedListing: '15 Station Street' },
+  { id: '3', transcript: 'Looking for land in officer area, 600sqm minimum', buyerLocation: 'Pakenham', urgency: 'cold' as const, time: '3h ago', matchedListing: 'Lot 12 Officer South' },
+];
+
+const DashboardOverview = () => {
+  const { listings, isMockData } = useAgentListings();
+  const { user } = useAuth();
+  const [tasksDue, setTasksDue] = useState(0);
+  const [recentActivities, setRecentActivities] = useState<any[]>([]);
+
+  const activeCount = listings.filter(l => ('_mock_status' in l ? l._mock_status !== 'sold' : (l as any).status !== 'sold')).length;
+  const totalLeads = listings.reduce((sum, l) => sum + ('_mock_leads' in l ? l._mock_leads : l.contact_clicks), 0);
+
+  // Fetch tasks due today
+  useEffect(() => {
+    if (!user) return;
+    const today = new Date().toISOString().split('T')[0];
+    supabase
+      .from('tasks')
+      .select('id', { count: 'exact', head: true })
+      .or(`user_id.eq.${user.id},assigned_to.eq.${user.id}`)
+      .eq('status', 'pending')
+      .lte('due_date', today)
+      .then(({ count }) => setTasksDue(count || 0));
+  }, [user]);
+
+  // Fetch recent activities
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('activities')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(5)
+      .then(({ data }) => setRecentActivities(data || []));
+  }, [user]);
+
+  // GCI mock values
+  const gciActual = 245000;
+  const gciBudgeted = 400000;
+  const gciPotential = 520000;
+  const gciPercent = Math.round((gciActual / gciBudgeted) * 100);
+
+  // Stats row - Australian CRM focus
+  const stats = [
+    { label: 'Tasks Due', value: String(tasksDue || 3), icon: <CheckSquare size={16} />, color: 'text-destructive' },
+    { label: 'Active Contacts', value: '48', icon: <Users size={16} />, color: 'text-primary' },
+    { label: 'Appraisals This Month', value: '6', icon: <ClipboardList size={16} />, color: 'text-success' },
+    { label: 'Sales This Month', value: AUD.format(1250000), icon: <DollarSign size={16} />, color: 'text-primary' },
+    { label: 'Settled', value: AUD.format(890000), icon: <Landmark size={16} />, color: 'text-success' },
+  ];
+
+  return (
+    <div>
+      <DashboardHeader title="Dashboard" subtitle="Welcome back, Agent" />
+
+      <div className="p-4 sm:p-6 space-y-6 max-w-7xl">
+        {/* Stats Row */}
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+          {stats.map((s) => (
+            <motion.div
+              key={s.label}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-card border border-border rounded-xl p-4"
+            >
+              <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
+                <span className={s.color}>{s.icon}</span>
+                <span className="text-xs">{s.label}</span>
+              </div>
+              <p className="font-display text-2xl font-extrabold">{s.value}</p>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* GCI Gauge + Pipeline Chart row */}
+        <div className="grid lg:grid-cols-2 gap-4">
+          {/* GCI Gauge */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-card border border-border rounded-xl p-5"
+          >
+            <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
+              <DollarSign size={16} className="text-primary" /> GCI — Gross Commission Income
+            </h3>
+            <div className="space-y-3">
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-muted-foreground">Actual</span>
+                  <span className="font-bold">{AUD.format(gciActual)}</span>
+                </div>
+                <Progress value={gciPercent} className="h-3" />
+              </div>
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-muted-foreground">Budgeted</span>
+                  <span className="font-bold">{AUD.format(gciBudgeted)}</span>
+                </div>
+                <Progress value={100} className="h-3 opacity-30" />
+              </div>
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-muted-foreground">Potential (Pipeline)</span>
+                  <span className="font-bold text-success">{AUD.format(gciPotential)}</span>
+                </div>
+                <Progress value={Math.round((gciPotential / gciPotential) * 100)} className="h-3 opacity-50" />
+              </div>
+              <p className="text-xs text-muted-foreground pt-2 border-t border-border">
+                You're at <strong className="text-primary">{gciPercent}%</strong> of your annual budget target
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Pipeline Chart */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="bg-card border border-border rounded-xl p-5"
+          >
+            <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
+              <TrendingUp size={16} className="text-primary" /> Pipeline — 12 Month Deal Flow
+            </h3>
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={PIPELINE_DATA}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                  <XAxis dataKey="month" tick={{ fontSize: 11 }} className="text-muted-foreground" />
+                  <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `$${v / 1000}k`} className="text-muted-foreground" />
+                  <Tooltip
+                    formatter={(value: number) => [AUD.format(value), 'Commission']}
+                    contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', fontSize: '12px' }}
+                  />
+                  <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Activity Feed + Voice Matches */}
+        <div className="grid lg:grid-cols-2 gap-4">
+          {/* Activity Feed */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-card border border-border rounded-xl p-5"
+          >
+            <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
+              <Activity size={16} className="text-success" /> Recent Activity
+            </h3>
+            {recentActivities.length > 0 ? (
+              <div className="space-y-3">
+                {recentActivities.map((a) => (
+                  <div key={a.id} className="flex items-start gap-3 text-sm">
+                    <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs">{a.description || a.action}</p>
+                      <p className="text-[10px] text-muted-foreground">{AU_DATE(a.created_at)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {[
+                  { text: 'Called Sarah M. re: 42 Panorama Dr appraisal', time: 'Today, 2:15 PM' },
+                  { text: 'New lead: John D. enquired about 15 Station St', time: 'Today, 11:30 AM' },
+                  { text: 'Listing 8 Ocean View Rd marked as Under Contract', time: 'Yesterday, 4:00 PM' },
+                  { text: 'Inspection scheduled: 22 Park Ave, Saturday 10am', time: 'Yesterday, 9:45 AM' },
+                  { text: 'Commission invoice #1042 paid — $12,500', time: '10/03/2026' },
+                ].map((a, i) => (
+                  <div key={i} className="flex items-start gap-3 text-sm">
+                    <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs">{a.text}</p>
+                      <p className="text-[10px] text-muted-foreground">{a.time}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </motion.div>
+
+          {/* Voice Matches */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="bg-card border border-border rounded-xl p-5"
+          >
+            <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
+              <Mic size={16} className="text-success" /> Today's Voice Matches
+            </h3>
+            <div className="space-y-3">
+              {MOCK_MATCHES.map((m) => {
+                const u = URGENCY_CONFIG[m.urgency];
+                return (
+                  <div key={m.id} className="border border-border rounded-lg p-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge className={`${u.color} text-[10px] gap-0.5 border-0`}>
+                        {u.icon} {u.label}
+                      </Badge>
+                      <span className="text-[10px] text-muted-foreground">{m.time}</span>
+                    </div>
+                    <p className="text-xs font-medium truncate">"{m.transcript}"</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                      📍 {m.buyerLocation} → <strong>{m.matchedListing}</strong>
+                    </p>
+                    <div className="flex items-center gap-1.5 mt-2">
+                      <Button size="sm" variant="outline" className="text-[10px] h-6 px-2 gap-1">
+                        <Phone size={10} /> Call
+                      </Button>
+                      <Button size="sm" variant="outline" className="text-[10px] h-6 px-2 gap-1">
+                        <Send size={10} /> Info
+                      </Button>
+                      <Button size="sm" className="text-[10px] h-6 px-2 gap-1">
+                        <Sparkles size={10} /> AI Reply
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Listing Performance */}
+        <section>
+          <h2 className="font-display text-base font-bold mb-3 flex items-center gap-2">
+            <Eye size={16} className="text-primary" /> Listing Performance
+          </h2>
+          <div className="bg-card border border-border rounded-xl overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border text-xs text-muted-foreground">
+                  <th className="text-left p-3">Property</th>
+                  <th className="text-left p-3">Status</th>
+                  <th className="text-center p-3">Views</th>
+                  <th className="text-center p-3">Voice</th>
+                  <th className="text-center p-3">Leads</th>
+                  <th className="text-center p-3">Days</th>
+                  <th className="text-right p-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { id: '1', thumb: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=80&h=60&fit=crop', address: '42 Panorama Drive, Berwick', status: 'whisper', views: 24, voiceInquiries: 3, qualifiedLeads: 2, daysListed: 4 },
+                  { id: '2', thumb: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=80&h=60&fit=crop', address: '15 Station St, Narre Warren', status: 'coming-soon', views: 67, voiceInquiries: 8, qualifiedLeads: 5, daysListed: 11 },
+                  { id: '3', thumb: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=80&h=60&fit=crop', address: '8 Ocean View Rd, Brighton', status: 'public', views: 142, voiceInquiries: 12, qualifiedLeads: 7, daysListed: 18 },
+                ].map((l) => {
+                  const daysColor = l.daysListed < 7 ? 'text-success' : l.daysListed < 15 ? 'text-primary' : 'text-destructive';
+                  const statusLabel = l.status === 'whisper' ? '🤫 Whisper' : l.status === 'coming-soon' ? '🔜 Soon' : '🟢 Live';
+                  return (
+                    <tr key={l.id} className="border-b border-border last:border-0 hover:bg-accent/30 transition-colors">
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          <img src={l.thumb} alt="" className="w-10 h-8 rounded-md object-cover shrink-0" />
+                          <span className="text-xs font-medium truncate max-w-[180px]">{l.address}</span>
+                        </div>
+                      </td>
+                      <td className="p-3"><span className="text-[10px] font-semibold">{statusLabel}</span></td>
+                      <td className="p-3 text-center font-medium">{l.views}</td>
+                      <td className="p-3 text-center font-medium">{l.voiceInquiries}</td>
+                      <td className="p-3 text-center font-medium">{l.qualifiedLeads}</td>
+                      <td className={`p-3 text-center font-bold ${daysColor}`}>{l.daysListed}</td>
+                      <td className="p-3 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2">Edit</Button>
+                          <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2">Boost</Button>
+                          <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 text-success">Sold</Button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+};
+
+export default DashboardOverview;

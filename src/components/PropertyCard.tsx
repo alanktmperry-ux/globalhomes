@@ -107,8 +107,6 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
               <span className="line-clamp-1">{property.aiSummary}</span>
             </p>
           )}
-            </span>
-          </div>
         </div>
 
         {/* Agent section */}

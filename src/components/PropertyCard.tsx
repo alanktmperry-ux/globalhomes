@@ -30,6 +30,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
   };
 
   const badge = property.status ? statusConfig[property.status] : null;
+  const isFeatured = property.agent.isSubscribed;
 
   return (
     <>

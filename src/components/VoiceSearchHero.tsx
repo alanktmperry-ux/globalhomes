@@ -522,44 +522,14 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
             </div>
           </form>
 
-          {/* Radius picker - shown below the search input */}
-          <div className="flex items-center justify-center gap-2 mt-3">
-            <MapPin size={14} className="text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">Radius:</span>
-            <div className="flex items-center gap-1">
-              {[
-                { label: 'Any', value: null },
-                { label: '5 km', value: 5 },
-                { label: '10 km', value: 10 },
-                { label: '25 km', value: 25 },
-                { label: '50 km', value: 50 },
-                { label: '100 km', value: 100 },
-              ].map((opt) => (
-                <button
-                  key={opt.label}
-                  type="button"
-                  onClick={() => onRadiusChange?.(opt.value)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-                    selectedRadius === opt.value
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-accent'
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
-          
-          {/* Bottom spacer for breathing room before map */}
-          <div className="h-4" />
+          {/* Autocomplete suggestions - directly below input */}
           <AnimatePresence>
             {showSuggestions && suggestions.length > 0 && (
               <motion.ul
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
-                className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-xl shadow-elevated overflow-y-auto max-h-60"
+                className="absolute left-0 right-0 top-full z-50 mt-1 bg-popover border border-border rounded-xl shadow-elevated overflow-y-auto max-h-60"
               >
                 {suggestions.map((s) => (
                   <li key={s.place_id}>
@@ -577,6 +547,38 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
             )}
           </AnimatePresence>
         </div>
+
+        {/* Radius picker - shown below the search wrapper */}
+        <div className="flex items-center justify-center gap-2 mt-3 w-full max-w-md">
+          <MapPin size={14} className="text-muted-foreground" />
+          <span className="text-xs text-muted-foreground">Radius:</span>
+          <div className="flex items-center gap-1">
+            {[
+              { label: 'Any', value: null },
+              { label: '5 km', value: 5 },
+              { label: '10 km', value: 10 },
+              { label: '25 km', value: 25 },
+              { label: '50 km', value: 50 },
+              { label: '100 km', value: 100 },
+            ].map((opt) => (
+              <button
+                key={opt.label}
+                type="button"
+                onClick={() => onRadiusChange?.(opt.value)}
+                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                  selectedRadius === opt.value
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-accent'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Bottom spacer */}
+        <div className="h-4" />
 
         {/* Search history pills */}
         <VoiceSearchHistory onRerun={onSearch} />

@@ -153,19 +153,19 @@ const ContactFormModal = ({ onClose, onSave, initialData }: Props) => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label className="text-xs">Budget Min ($)</Label>
-                  <Input type="number" value={form.budget_min} onChange={e => setForm(f => ({...f, budget_min: e.target.value}))} className="h-9" />
+                  <Input type="number" min="0" value={form.budget_min} onChange={e => setForm(f => ({...f, budget_min: e.target.value}))} className="h-9" />
                 </div>
                 <div>
                   <Label className="text-xs">Budget Max ($)</Label>
-                  <Input type="number" value={form.budget_max} onChange={e => setForm(f => ({...f, budget_max: e.target.value}))} className="h-9" />
+                  <Input type="number" min="0" value={form.budget_max} onChange={e => setForm(f => ({...f, budget_max: e.target.value}))} className="h-9" />
                 </div>
                 <div>
                   <Label className="text-xs">Bedrooms</Label>
-                  <Input type="number" value={form.preferred_beds} onChange={e => setForm(f => ({...f, preferred_beds: e.target.value}))} className="h-9" />
+                  <Input type="number" min="0" max="20" value={form.preferred_beds} onChange={e => setForm(f => ({...f, preferred_beds: e.target.value}))} className="h-9" />
                 </div>
                 <div>
                   <Label className="text-xs">Bathrooms</Label>
-                  <Input type="number" value={form.preferred_baths} onChange={e => setForm(f => ({...f, preferred_baths: e.target.value}))} className="h-9" />
+                  <Input type="number" min="0" max="20" value={form.preferred_baths} onChange={e => setForm(f => ({...f, preferred_baths: e.target.value}))} className="h-9" />
                 </div>
               </div>
             </div>

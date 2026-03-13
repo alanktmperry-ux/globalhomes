@@ -164,13 +164,20 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
   );
 
   // ── Derived: all properties (DB + mock fallback) ─────────────
+  // This serves as the "Global recommendations / featured" feed shown
+  // before any search is performed. Future enhancement: personalise this
+  // with location-based suggestions, trending listings, or user-preference
+  // matching (budget, beds, saved suburbs, etc.).
   const allProperties = useMemo(() => {
     const dbIds = new Set(dbProperties.map((p) => p.id));
     const mockFiltered = mockProperties.slice(0, 6).filter((p) => !dbIds.has(p.id));
     return [...dbProperties, ...mockFiltered];
   }, [dbProperties]);
 
-  // ── Derived: display properties (search‑aware) ───────────────
+  // ── Derived: display properties ───────────────────────────────
+  // When `hasSearched` is false → show the global recommendations feed above.
+  // When `hasSearched` is true  → show DB matches for `currentQuery` merged
+  //   with external (Manus) results, DB-first, deduplicated by id.
   const displayProperties = useMemo(() => {
     if (!hasSearched) return allProperties;
 

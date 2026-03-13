@@ -93,14 +93,9 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
                   <Mail size={14} /> {contact.email}
                 </a>
               )}
-              {contact.phone && (
-                <a href={`tel:${contact.phone}`} className="flex items-center gap-2 hover:underline">
-                  <Phone size={14} /> {contact.phone}
-                </a>
-              )}
-              {contact.mobile && (
-                <a href={`tel:${contact.mobile}`} className="flex items-center gap-2 hover:underline">
-                  <Phone size={14} /> {contact.mobile}
+              {(contact.mobile || contact.phone) && (
+                <a href={`tel:${contact.mobile || contact.phone}`} className="flex items-center gap-2 hover:underline">
+                  <Phone size={14} /> {contact.mobile || contact.phone}
                 </a>
               )}
             </div>

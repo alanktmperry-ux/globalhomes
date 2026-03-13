@@ -38,7 +38,7 @@ const ContactsList = ({ contacts, loading, onSelect, onDelete }: Props) => {
       c.first_name.toLowerCase().includes(q) ||
       (c.last_name || '').toLowerCase().includes(q) ||
       (c.email || '').toLowerCase().includes(q) ||
-      (c.phone || '').includes(q) ||
+      (c.mobile || c.phone || '').includes(q) ||
       (c.suburb || '').toLowerCase().includes(q);
     const matchRanking = !filterRanking || c.ranking === filterRanking;
     const matchType = !filterType || c.contact_type === filterType;

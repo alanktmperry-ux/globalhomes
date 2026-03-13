@@ -369,6 +369,7 @@ export function PropertyMap({
   }
 
   return (
+    <TooltipProvider delayDuration={300}>
     <div className="relative w-full h-full rounded-xl overflow-hidden border border-border">
       {isLoading && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background gap-2">
@@ -380,38 +381,69 @@ export function PropertyMap({
 
       {/* Search this area button */}
       {showSearchArea && (
-        <button
-          onClick={handleSearchThisArea}
-          className="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-4 py-2 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated text-sm font-medium text-foreground hover:bg-card transition-colors"
-        >
-          <Search size={14} className="text-primary" />
-          Search this area
-        </button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={handleSearchThisArea}
+              className="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-4 py-2 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated text-sm font-medium text-foreground hover:bg-card transition-colors"
+            >
+              <Search size={14} className="text-primary" />
+              Search this area
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Search for properties visible in this map area</TooltipContent>
+        </Tooltip>
       )}
 
       {/* Clear drawn area button */}
       {hasDrawnArea && onAreaSearch && (
-        <button
-          onClick={() => { clearDrawnOverlay(); onAreaSearch(null); }}
-          className="absolute top-3 right-3 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated text-xs font-medium text-foreground hover:bg-card transition-colors"
-        >
-          <X size={12} />
-          Clear area
-        </button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={() => { clearDrawnOverlay(); onAreaSearch(null); }}
+              className="absolute top-3 right-3 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated text-xs font-medium text-foreground hover:bg-card transition-colors"
+            >
+              <X size={12} />
+              Clear area
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Remove the drawn area filter and show all properties</TooltipContent>
+        </Tooltip>
       )}
 
+      {/* Drawing tools legend */}
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            className="absolute top-14 left-3 z-20 w-8 h-8 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated flex items-center justify-center hover:bg-card transition-colors"
+          >
+            <HelpCircle size={14} className="text-muted-foreground" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="right" className="max-w-[220px]">
+          <p className="font-medium mb-1">Map drawing tools</p>
+          <p className="text-xs">Use the icons above to draw a <strong>circle</strong> or <strong>polygon</strong> on the map to filter properties within that area. Click and drag to draw.</p>
+        </TooltipContent>
+      </Tooltip>
+
       {/* Geolocation button */}
-      <button
-        onClick={handleGeolocate}
-        className="absolute bottom-4 left-4 z-20 w-10 h-10 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated flex items-center justify-center hover:bg-card transition-colors"
-        aria-label="Find properties near me"
-      >
-        {locating ? (
-          <Loader2 size={16} className="animate-spin text-primary" />
-        ) : (
-          <Locate size={16} className="text-foreground" />
-        )}
-      </button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            onClick={handleGeolocate}
+            className="absolute bottom-4 left-4 z-20 w-10 h-10 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated flex items-center justify-center hover:bg-card transition-colors"
+            aria-label="Find properties near me"
+          >
+            {locating ? (
+              <Loader2 size={16} className="animate-spin text-primary" />
+            ) : (
+              <Locate size={16} className="text-foreground" />
+            )}
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>Use your current location to find nearby properties</TooltipContent>
+      </Tooltip>
     </div>
+    </TooltipProvider>
   );
 }

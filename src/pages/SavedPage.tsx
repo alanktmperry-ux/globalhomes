@@ -14,18 +14,25 @@ const SavedPage = () => {
   const { savedIds, isSaved, toggleSaved } = useSavedProperties();
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [dbProperties, setDbProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [dbLoading, setDbLoading] = useState(true);
+  const [dbError, setDbError] = useState<string | null>(null);
 
   // Fetch DB properties once
   useEffect(() => {
     const fetchDbProperties = async () => {
-      const { data } = await supabase
+      setDbLoading(true);
+      setDbError(null);
+      const { data, error } = await supabase
         .from('properties')
         .select('*, agents(name, agency, phone, email, avatar_url, is_subscribed)')
         .eq('status', 'public')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(50);
 
-      if (data && data.length > 0) {
+      if (error) {
+        setDbError(error.message);
+        setDbProperties([]);
+      } else if (data && data.length > 0) {
         const mapped: Property[] = data.map((p: any) => ({
           id: p.id,
           title: p.title,
@@ -65,7 +72,7 @@ const SavedPage = () => {
         }));
         setDbProperties(mapped);
       }
-      setLoading(false);
+      setDbLoading(false);
     };
     fetchDbProperties();
   }, []);
@@ -85,7 +92,7 @@ const SavedPage = () => {
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-4">
-        {loading ? (
+        {dbLoading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 size={24} className="animate-spin text-primary" />
           </div>

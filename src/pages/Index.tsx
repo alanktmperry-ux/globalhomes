@@ -36,6 +36,7 @@ const Index = () => {
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'newest' | 'beds'>('default');
   const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [radiusSliderOpen, setRadiusSliderOpen] = useState(false);
   const isDragging = useRef(false);
   const cardRefs = useRef<globalThis.Map<string, HTMLDivElement>>(new globalThis.Map());
 

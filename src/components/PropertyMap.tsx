@@ -162,6 +162,7 @@ export function PropertyMap({
       if (e.type === google.maps.drawing.OverlayType.CIRCLE) {
         const circle = e.overlay as google.maps.Circle;
         drawnOverlayRef.current = circle;
+        setHasDrawnArea(true);
         const center = circle.getCenter()!;
         onAreaSearch({ type: 'circle', center: [center.lat(), center.lng()], radius: circle.getRadius() });
 

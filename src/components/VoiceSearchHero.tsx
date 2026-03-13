@@ -596,6 +596,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
         {/* Search history pills */}
         <VoiceSearchHistory onRerun={onSearch} />
       </div>
+      </TooltipProvider>
     </div>
   );
 }

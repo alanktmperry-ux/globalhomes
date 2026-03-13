@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, MapPin, Sparkles, Loader2, Zap, Map, List, Mic, GripVertical, ArrowUpDown } from 'lucide-react';
+import { ArrowRight, MapPin, Sparkles, Loader2, Zap, Map, List, Mic, GripVertical, ArrowUpDown, X } from 'lucide-react';
 import { VoiceSearchHero } from '@/components/VoiceSearchHero';
 import { PropertyCard } from '@/components/PropertyCard';
 import { PropertyCardSkeleton } from '@/components/PropertyCardSkeleton';
@@ -17,6 +17,7 @@ import { Property } from '@/lib/types';
 import { useCurrency } from '@/lib/CurrencyContext';
 import { FilterSidebar, Filters, defaultFilters } from '@/components/FilterSidebar';
 import { usePropertySearch } from '@/hooks/usePropertySearch';
+import { Slider } from '@/components/ui/slider';
 
 const Index = () => {
   const { t } = useI18n();
@@ -35,6 +36,7 @@ const Index = () => {
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'newest' | 'beds'>('default');
   const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [radiusSliderOpen, setRadiusSliderOpen] = useState(false);
   const isDragging = useRef(false);
   const cardRefs = useRef<globalThis.Map<string, HTMLDivElement>>(new globalThis.Map());
 
@@ -108,17 +110,53 @@ const Index = () => {
           </span>
         )}
         {searchRadius && (
-          <button
-            onClick={clearSearchRadius}
-            className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium shrink-0 hover:bg-primary/20 transition-colors"
-          >
-            Within {searchRadius} km ✕
-          </button>
+          <div className="relative shrink-0">
+            <button
+              onClick={() => setRadiusSliderOpen(o => !o)}
+              className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium hover:bg-primary/20 transition-colors inline-flex items-center gap-1"
+            >
+              Within {searchRadius} km
+              <X size={10} className="opacity-60 hover:opacity-100" onClick={(e) => { e.stopPropagation(); clearSearchRadius(); setRadiusSliderOpen(false); }} />
+            </button>
+            <AnimatePresence>
+              {radiusSliderOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  className="absolute top-full left-0 mt-2 z-30 bg-card border border-border rounded-xl shadow-elevated p-3 w-56"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium text-foreground">Radius: {searchRadius} km</span>
+                    <button onClick={() => setRadiusSliderOpen(false)} className="text-muted-foreground hover:text-foreground">
+                      <X size={14} />
+                    </button>
+                  </div>
+                  <Slider
+                    value={[searchRadius]}
+                    onValueChange={([v]) => setSearchRadius(v)}
+                    min={5}
+                    max={100}
+                    step={5}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between mt-1 text-[10px] text-muted-foreground">
+                    <span>5 km</span>
+                    <span>100 km</span>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         )}
         {areaSearch && (
-          <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium shrink-0">
-            {areaSearch.type === 'circle' ? `${Math.round(areaSearch.radius / 1000)}km` : 'Custom area'}
-          </span>
+          <button
+            onClick={() => handleAreaSearch(null)}
+            className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium shrink-0 hover:bg-primary/20 transition-colors inline-flex items-center gap-1"
+          >
+            {areaSearch.type === 'circle' ? `${Math.round(areaSearch.radius / 1000)}km circle` : 'Custom area'}
+            <X size={10} className="opacity-60" />
+          </button>
         )}
         {manusStatus && (manusStatus === 'running' || manusStatus === 'pending') && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-1 text-xs text-primary font-medium shrink-0">

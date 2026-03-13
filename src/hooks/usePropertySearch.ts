@@ -142,6 +142,7 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
       setIsSearching(true);
       setHasSearched(true);
       setManusStatus(null);
+      setManusFailed(false);
       setCurrentQuery(query);
       addSearch(query);
       manusSearch.cancelPolling();
@@ -154,11 +155,13 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
             toast({ title: '🔍 Live results ready', description: `Found ${update.properties.length} properties` });
           } else if (update.status === 'failed') {
             setManusStatus(null);
+            setManusFailed(true);
           }
         });
         setResults(result.properties);
       } catch {
         setResults([]);
+        setManusFailed(true);
       } finally {
         setIsSearching(false);
       }

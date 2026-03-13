@@ -264,6 +264,17 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
     setAreaSearch(area || null);
   }, []);
 
+  const handleSetSearchRadius = useCallback((radius: number | null) => {
+    setSearchRadius(radius);
+    if (radius && !searchCenter) {
+      console.warn('[RadiusFilter] Radius set but no search center. Select a location first.');
+      toast({
+        title: '📍 Select a location first',
+        description: 'Pick a location from the suggestions so the radius filter knows where to search from.',
+      });
+    }
+  }, [searchCenter, toast]);
+
   const clearSearchRadius = useCallback(() => setSearchRadius(null), []);
 
   // ── Derived: unique agents from DB listings ───────────────────

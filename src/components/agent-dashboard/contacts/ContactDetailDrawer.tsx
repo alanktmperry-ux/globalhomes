@@ -111,8 +111,8 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
             <section className="space-y-2 border-t border-border pt-4">
               <h4 className="text-xs font-semibold text-muted-foreground uppercase">Buyer Preferences</h4>
               <div className="grid grid-cols-2 gap-2 text-sm">
-                {contact.budget_min != null && contact.budget_max != null && (
-                  <p>💰 {AUD.format(contact.budget_min)} — {AUD.format(contact.budget_max)}</p>
+                {(contact.budget_min != null || contact.budget_max != null) && (
+                  <p>💰 {contact.budget_min != null ? AUD.format(contact.budget_min) : '—'} — {contact.budget_max != null ? AUD.format(contact.budget_max) : '—'}</p>
                 )}
                 {contact.preferred_beds && <p>🛏️ {contact.preferred_beds}+ beds</p>}
                 {contact.preferred_baths && <p>🚿 {contact.preferred_baths}+ baths</p>}

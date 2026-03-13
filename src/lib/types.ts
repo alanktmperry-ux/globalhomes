@@ -40,6 +40,11 @@ export interface Agent {
   email: string;
   avatarUrl: string;
   isSubscribed: boolean;
+  verificationLevel?: string;
+  specialization?: string;
+  yearsExperience?: number;
+  rating?: number;
+  reviewCount?: number;
 }
 
 export interface SearchQuery {

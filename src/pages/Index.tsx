@@ -17,6 +17,7 @@ import { Property } from '@/lib/types';
 import { useCurrency } from '@/lib/CurrencyContext';
 import { FilterSidebar, Filters, defaultFilters } from '@/components/FilterSidebar';
 import { usePropertySearch } from '@/hooks/usePropertySearch';
+import { Slider } from '@/components/ui/slider';
 
 const Index = () => {
   const { t } = useI18n();

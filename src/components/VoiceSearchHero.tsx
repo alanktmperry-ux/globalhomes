@@ -550,33 +550,44 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
         </div>
 
         {/* Radius picker - shown below the search wrapper */}
+        <TooltipProvider delayDuration={300}>
         <div className="flex items-center justify-center gap-2 mt-3 w-full max-w-md">
-          <MapPin size={14} className="text-muted-foreground" />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <MapPin size={14} className="text-muted-foreground cursor-help" />
+            </TooltipTrigger>
+            <TooltipContent>Set a search radius around your chosen location</TooltipContent>
+          </Tooltip>
           <span className="text-xs text-muted-foreground">Radius:</span>
           <div className="flex items-center gap-1">
             {[
-              { label: 'Any', value: null },
-              { label: '5 km', value: 5 },
-              { label: '10 km', value: 10 },
-              { label: '25 km', value: 25 },
-              { label: '50 km', value: 50 },
-              { label: '100 km', value: 100 },
+              { label: 'Any', value: null, tip: 'Show all properties regardless of distance' },
+              { label: '5 km', value: 5, tip: 'Only show properties within 5 km of the selected location' },
+              { label: '10 km', value: 10, tip: 'Only show properties within 10 km' },
+              { label: '25 km', value: 25, tip: 'Only show properties within 25 km' },
+              { label: '50 km', value: 50, tip: 'Only show properties within 50 km' },
+              { label: '100 km', value: 100, tip: 'Only show properties within 100 km' },
             ].map((opt) => (
-              <button
-                key={opt.label}
-                type="button"
-                onClick={() => onRadiusChange?.(opt.value)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-                  selectedRadius === opt.value
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-accent'
-                }`}
-              >
-                {opt.label}
-              </button>
+              <Tooltip key={opt.label}>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={() => onRadiusChange?.(opt.value)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                      selectedRadius === opt.value
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-accent'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>{opt.tip}</TooltipContent>
+              </Tooltip>
             ))}
           </div>
         </div>
+        </TooltipProvider>
 
         {/* Bottom spacer */}
         <div className="h-4" />

@@ -26,6 +26,7 @@ const Index = () => {
   const { isSaved, toggleSaved } = useSavedProperties();
   const isMobile = useIsMobile();
   const { formatPrice } = useCurrency();
+  const { savedSearches, saveSearch, removeSearch } = useSavedSearches();
 
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [mobileView, setMobileView] = useState<'map' | 'list'>('list');

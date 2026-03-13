@@ -125,7 +125,7 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
       setDbError(null);
       const { data, error } = await supabase
         .from('properties')
-        .select('*, agents(name, agency, phone, email, avatar_url, is_subscribed)')
+        .select('*, agents(name, agency, phone, email, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count)')
         .eq('status', 'public')
         .order('created_at', { ascending: false })
         .limit(50);

@@ -50,7 +50,7 @@ const Index = () => {
     searchState,
   } = usePropertySearch({ filters, sortBy, addSearch });
 
-  const { isSearching, hasSearched, manusStatus, searchRadius, areaSearch } = searchState;
+  const { isSearching, hasSearched, manusStatus, manusFailed, currentQuery, searchRadius, areaSearch } = searchState;
 
   // ── Scroll to card on map click ──────────────────────────────
   const scrollToProperty = useCallback((propertyId: string) => {

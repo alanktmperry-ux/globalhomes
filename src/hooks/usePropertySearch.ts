@@ -80,6 +80,8 @@ export interface PropertySearchState {
   isSearching: boolean;
   hasSearched: boolean;
   manusStatus: string | null;
+  /** Whether AI search failed and we're showing DB-only results */
+  manusFailed: boolean;
   currentQuery: string;
   searchCenter: { lat: number; lng: number } | null;
   searchRadius: number | null;
@@ -103,6 +105,7 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [manusStatus, setManusStatus] = useState<string | null>(null);
+  const [manusFailed, setManusFailed] = useState(false);
   const [currentQuery, setCurrentQuery] = useState('');
   const [searchCenter, setSearchCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [searchRadius, setSearchRadius] = useState<number | null>(null);
@@ -139,6 +142,7 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
       setIsSearching(true);
       setHasSearched(true);
       setManusStatus(null);
+      setManusFailed(false);
       setCurrentQuery(query);
       addSearch(query);
       manusSearch.cancelPolling();
@@ -151,11 +155,13 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
             toast({ title: '🔍 Live results ready', description: `Found ${update.properties.length} properties` });
           } else if (update.status === 'failed') {
             setManusStatus(null);
+            setManusFailed(true);
           }
         });
         setResults(result.properties);
       } catch {
         setResults([]);
+        setManusFailed(true);
       } finally {
         setIsSearching(false);
       }
@@ -285,6 +291,7 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
       isSearching,
       hasSearched,
       manusStatus,
+      manusFailed,
       currentQuery,
       searchCenter,
       searchRadius,

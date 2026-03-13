@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Bed, Bath, Car, Heart, BadgeCheck, Star } from 'lucide-react';
+import { Bed, Bath, Car, Heart, BadgeCheck, Star, Sparkles } from 'lucide-react';
 import { Property, PropertyStatus } from '@/lib/types';
 import { useI18n } from '@/lib/i18n';
 import { useCurrency } from '@/lib/CurrencyContext';
@@ -99,6 +99,14 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
               {property.propertyType}
             </span>
           </div>
+
+          {/* AI annotation */}
+          {property.aiSummary && (
+            <p className="mt-2 flex items-start gap-1.5 text-xs text-primary/80 leading-snug">
+              <Sparkles size={12} className="shrink-0 mt-0.5" />
+              <span className="line-clamp-1">{property.aiSummary}</span>
+            </p>
+          )}
         </div>
 
         {/* Agent section */}

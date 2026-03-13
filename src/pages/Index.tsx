@@ -50,7 +50,7 @@ const Index = () => {
     searchState,
   } = usePropertySearch({ filters, sortBy, addSearch });
 
-  const { isSearching, hasSearched, manusStatus, searchRadius, areaSearch } = searchState;
+  const { isSearching, hasSearched, manusStatus, manusFailed, currentQuery, searchRadius, areaSearch } = searchState;
 
   // ── Scroll to card on map click ──────────────────────────────
   const scrollToProperty = useCallback((propertyId: string) => {
@@ -123,13 +123,20 @@ const Index = () => {
         {manusStatus && (manusStatus === 'running' || manusStatus === 'pending') && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-1 text-xs text-primary font-medium shrink-0">
             <Loader2 size={12} className="animate-spin" />
-            <span>Searching…</span>
+            <span className="truncate max-w-[200px]">
+              Searching: {currentQuery.length > 40 ? currentQuery.slice(0, 40) + '…' : currentQuery}
+            </span>
           </motion.div>
         )}
         {manusStatus === 'completed' && (
           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-1 text-xs text-success font-medium shrink-0">
             <Zap size={12} />
-            <span>Live</span>
+            <span>AI results live</span>
+          </motion.div>
+        )}
+        {manusFailed && !isSearching && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-1 text-xs text-muted-foreground font-medium shrink-0">
+            <span>AI search unavailable — showing database results</span>
           </motion.div>
         )}
       </div>

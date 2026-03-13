@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, Search, Loader2, X, Keyboard, ChevronDown, MapPin } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { SoundWaveVisualizer } from './SoundWaveVisualizer';
 import { parsePropertyQuery, filtersToChips } from '@/lib/parsePropertyQuery';
 import { useToast } from '@/hooks/use-toast';

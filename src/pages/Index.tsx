@@ -75,17 +75,25 @@ const Index = () => {
   const isDragging = useRef(false);
   const cardRefs = useRef<globalThis.Map<string, HTMLDivElement>>(new globalThis.Map());
 
+  const [dbLoading, setDbLoading] = useState(true);
+  const [dbError, setDbError] = useState<string | null>(null);
+
   // Fetch active properties from the database
   useEffect(() => {
     const fetchDbProperties = async () => {
-      const { data } = await supabase
+      setDbLoading(true);
+      setDbError(null);
+      const { data, error } = await supabase
         .from('properties')
         .select('*, agents(name, agency, phone, email, avatar_url, is_subscribed)')
         .eq('status', 'public')
         .order('created_at', { ascending: false })
         .limit(50);
 
-      if (data && data.length > 0) {
+      if (error) {
+        setDbError(error.message);
+        setDbProperties([]);
+      } else if (data && data.length > 0) {
         const mapped: Property[] = data.map((p: any) => ({
           id: p.id,
           title: p.title,
@@ -125,6 +133,7 @@ const Index = () => {
         }));
         setDbProperties(mapped);
       }
+      setDbLoading(false);
     };
     fetchDbProperties();
   }, []);

@@ -81,13 +81,30 @@ export function useContacts() {
   }, [fetchContacts]);
 
   const createContact = async (contact: Partial<Contact>) => {
-    if (!user) return null;
+    if (!user) throw new Error('You must be logged in to create a contact.');
+
+    // Verify we have an active Supabase session (JWT token)
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      // Try refreshing the session
+      const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+      if (refreshError || !refreshData.session) {
+        throw new Error('Your session has expired. Please log out and log back in.');
+      }
+    }
+
     const { data, error } = await supabase
       .from('contacts')
       .insert({ ...contact, created_by: user.id } as any)
       .select()
       .single();
-    if (error) throw error;
+    if (error) {
+      console.error('[useContacts] Insert error:', error);
+      if (error.code === '42501') {
+        throw new Error('Permission denied. Your session may have expired — please log out and log back in.');
+      }
+      throw error;
+    }
     return data;
   };
 

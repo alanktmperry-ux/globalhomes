@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
 import type { Contact } from '@/hooks/useContacts';
 
 interface Props {
@@ -15,6 +16,7 @@ interface Props {
 
 const ContactFormModal = ({ onClose, onSave, initialData }: Props) => {
   const [saving, setSaving] = useState(false);
+  const { toast } = useToast();
   const [form, setForm] = useState({
     first_name: initialData?.first_name || '',
     last_name: initialData?.last_name || '',
@@ -42,12 +44,20 @@ const ContactFormModal = ({ onClose, onSave, initialData }: Props) => {
     try {
       await onSave({
         ...form,
-        budget_min: form.budget_min ? Number(form.budget_min) : null,
-        budget_max: form.budget_max ? Number(form.budget_max) : null,
-        preferred_beds: form.preferred_beds ? Number(form.preferred_beds) : null,
-        preferred_baths: form.preferred_baths ? Number(form.preferred_baths) : null,
-        estimated_value: form.estimated_value ? Number(form.estimated_value) : null,
+        budget_min: form.budget_min ? Math.max(0, Number(form.budget_min)) : null,
+        budget_max: form.budget_max ? Math.max(0, Number(form.budget_max)) : null,
+        preferred_beds: form.preferred_beds ? Math.max(0, Number(form.preferred_beds)) : null,
+        preferred_baths: form.preferred_baths ? Math.max(0, Number(form.preferred_baths)) : null,
+        estimated_value: form.estimated_value ? Math.max(0, Number(form.estimated_value)) : null,
       } as any);
+      toast({ title: '✅ Contact saved', description: `${form.first_name} ${form.last_name}`.trim() });
+      onClose();
+    } catch (err: any) {
+      toast({
+        title: '❌ Failed to save contact',
+        description: err?.message || 'An unexpected error occurred. Please try again.',
+        variant: 'destructive',
+      });
     } finally {
       setSaving(false);
     }
@@ -143,19 +153,19 @@ const ContactFormModal = ({ onClose, onSave, initialData }: Props) => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label className="text-xs">Budget Min ($)</Label>
-                  <Input type="number" value={form.budget_min} onChange={e => setForm(f => ({...f, budget_min: e.target.value}))} className="h-9" />
+                  <Input type="number" min="0" value={form.budget_min} onChange={e => setForm(f => ({...f, budget_min: e.target.value}))} className="h-9" />
                 </div>
                 <div>
                   <Label className="text-xs">Budget Max ($)</Label>
-                  <Input type="number" value={form.budget_max} onChange={e => setForm(f => ({...f, budget_max: e.target.value}))} className="h-9" />
+                  <Input type="number" min="0" value={form.budget_max} onChange={e => setForm(f => ({...f, budget_max: e.target.value}))} className="h-9" />
                 </div>
                 <div>
                   <Label className="text-xs">Bedrooms</Label>
-                  <Input type="number" value={form.preferred_beds} onChange={e => setForm(f => ({...f, preferred_beds: e.target.value}))} className="h-9" />
+                  <Input type="number" min="0" max="20" value={form.preferred_beds} onChange={e => setForm(f => ({...f, preferred_beds: e.target.value}))} className="h-9" />
                 </div>
                 <div>
                   <Label className="text-xs">Bathrooms</Label>
-                  <Input type="number" value={form.preferred_baths} onChange={e => setForm(f => ({...f, preferred_baths: e.target.value}))} className="h-9" />
+                  <Input type="number" min="0" max="20" value={form.preferred_baths} onChange={e => setForm(f => ({...f, preferred_baths: e.target.value}))} className="h-9" />
                 </div>
               </div>
             </div>

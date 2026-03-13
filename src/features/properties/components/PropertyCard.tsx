@@ -6,7 +6,7 @@ import { Property, PropertyStatus } from '@/lib/types';
 import { useI18n } from '@/lib/i18n';
 import { useCurrency } from '@/lib/CurrencyContext';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { AgentContactModal } from './AgentContactModal';
+import { AgentContactModal } from '@/components/AgentContactModal';
 
 function VerificationBadge({ level }: { level?: string }) {
   if (!level || level === 'email') return null;

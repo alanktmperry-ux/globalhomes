@@ -8,7 +8,7 @@
  * 4. Falls back to mock data if API unavailable or task fails
  */
 
-import { Property } from './types';
+import { Property } from '@/lib/types';
 import { mockProperties } from './mock-data';
 import { supabase } from '@/integrations/supabase/client';
 

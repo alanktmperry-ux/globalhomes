@@ -99,6 +99,16 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
               {property.propertyType}
             </span>
           </div>
+
+          {/* AI annotation */}
+          {property.aiSummary && (
+            <p className="mt-2 flex items-start gap-1.5 text-xs text-primary/80 leading-snug">
+              <Sparkles size={12} className="shrink-0 mt-0.5" />
+              <span className="line-clamp-1">{property.aiSummary}</span>
+            </p>
+          )}
+            </span>
+          </div>
         </div>
 
         {/* Agent section */}

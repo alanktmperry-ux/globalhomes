@@ -174,7 +174,10 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
     return [...dbProperties, ...mockFiltered];
   }, [dbProperties]);
 
-  // ── Derived: display properties (search‑aware) ───────────────
+  // ── Derived: display properties ───────────────────────────────
+  // When `hasSearched` is false → show the global recommendations feed above.
+  // When `hasSearched` is true  → show DB matches for `currentQuery` merged
+  //   with external (Manus) results, DB-first, deduplicated by id.
   const displayProperties = useMemo(() => {
     if (!hasSearched) return allProperties;
 

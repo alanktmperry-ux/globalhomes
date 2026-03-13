@@ -63,6 +63,11 @@ function mapDbProperty(p: any): Property {
           email: p.agents.email || '',
           avatarUrl: p.agents.avatar_url || '',
           isSubscribed: p.agents.is_subscribed || false,
+          verificationLevel: p.agents.verification_badge_level || 'email',
+          specialization: p.agents.specialization || undefined,
+          yearsExperience: p.agents.years_experience || undefined,
+          rating: p.agents.rating || 0,
+          reviewCount: p.agents.review_count || 0,
         }
       : { id: '', name: 'Private Seller', agency: '', phone: '', email: '', avatarUrl: '', isSubscribed: false },
     listedDate: p.listed_date || p.created_at,

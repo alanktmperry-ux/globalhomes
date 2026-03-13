@@ -233,12 +233,19 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
       return true;
     });
 
-    // Sort
-    if (sortBy === 'price-asc') return [...props].sort((a, b) => a.price - b.price);
-    if (sortBy === 'price-desc') return [...props].sort((a, b) => b.price - a.price);
-    if (sortBy === 'newest') return [...props].sort((a, b) => new Date(b.listedDate).getTime() - new Date(a.listedDate).getTime());
-    if (sortBy === 'beds') return [...props].sort((a, b) => b.beds - a.beds);
-    return props;
+    // Sort — subscribed agents get a subtle boost (tie-breaker: featured first)
+    const subscriptionBoost = (p: Property) => (p.agent.isSubscribed ? 0 : 1);
+
+    const withBoost = (compareFn: (a: Property, b: Property) => number) =>
+      [...props].sort((a, b) => compareFn(a, b) || subscriptionBoost(a) - subscriptionBoost(b));
+
+    if (sortBy === 'price-asc') return withBoost((a, b) => a.price - b.price);
+    if (sortBy === 'price-desc') return withBoost((a, b) => b.price - a.price);
+    if (sortBy === 'newest') return withBoost((a, b) => new Date(b.listedDate).getTime() - new Date(a.listedDate).getTime());
+    if (sortBy === 'beds') return withBoost((a, b) => b.beds - a.beds);
+
+    // Default sort: subscribed agents' listings float to top
+    return [...props].sort((a, b) => subscriptionBoost(a) - subscriptionBoost(b));
   }, [displayProperties, areaSearch, sortBy, filters, searchCenter, searchRadius]);
 
   // ── Setters exposed to the page ──────────────────────────────

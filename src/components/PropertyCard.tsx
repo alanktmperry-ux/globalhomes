@@ -30,6 +30,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
   };
 
   const badge = property.status ? statusConfig[property.status] : null;
+  const isFeatured = property.agent.isSubscribed;
 
   return (
     <>
@@ -50,6 +51,11 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
           {badge && (
             <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase shadow-sm ${badge.className}`}>
               {badge.label}
+            </span>
+          )}
+          {isFeatured && (
+            <span className="absolute top-3 left-3 mt-0 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase shadow-sm bg-primary/90 text-primary-foreground" style={badge ? { marginTop: 28 } : undefined}>
+              ★ Featured
             </span>
           )}
           <button

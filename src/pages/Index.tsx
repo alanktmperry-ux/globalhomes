@@ -98,6 +98,7 @@ const Index = () => {
   ] as const;
 
   const statusBar = (
+    <>
     <div className="flex items-center justify-between mb-3 gap-2">
       <div className="flex items-center gap-2 min-w-0">
         <span className="text-sm font-medium text-foreground shrink-0">

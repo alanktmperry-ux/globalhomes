@@ -143,8 +143,8 @@ const ContactsList = ({ contacts, loading, onSelect, onDelete }: Props) => {
                       </td>
                       <td className="p-3">
                         <div className="flex items-center gap-2">
-                          {c.phone && (
-                            <a href={`tel:${c.phone}`} onClick={(e) => e.stopPropagation()} className="text-muted-foreground hover:text-foreground">
+                          {(c.mobile || c.phone) && (
+                            <a href={`tel:${c.mobile || c.phone}`} onClick={(e) => e.stopPropagation()} className="text-muted-foreground hover:text-foreground">
                               <Phone size={14} />
                             </a>
                           )}

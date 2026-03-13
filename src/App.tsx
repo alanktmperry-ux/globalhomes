@@ -68,16 +68,16 @@ const App = () => (
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/agency/:slug" element={<AgencyProfilePage />} />
 
-              {/* Authenticated */}
-              <Route path="/saved" element={<ProtectedRoute><SavedPage /></ProtectedRoute>} />
-              <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
+              {/* Authenticated (protection temporarily removed) */}
+              <Route path="/saved" element={<SavedPage />} />
+              <Route path="/messages" element={<MessagesPage />} />
               <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/settings" element={<ProtectedRoute><BuyerSettingsPage /></ProtectedRoute>} />
+              <Route path="/settings" element={<BuyerSettingsPage />} />
 
-              {/* Agent-only */}
-              <Route path="/agent-portal" element={<ProtectedRoute requireAgent><AgentPortalPage /></ProtectedRoute>} />
-              <Route path="/pocket-listing" element={<ProtectedRoute requireAgent><PocketListingPage /></ProtectedRoute>} />
-              <Route path="/dashboard" element={<ProtectedRoute requireAgent><AgentDashboardLayout /></ProtectedRoute>}>
+              {/* Agent */}
+              <Route path="/agent-portal" element={<AgentPortalPage />} />
+              <Route path="/pocket-listing" element={<PocketListingPage />} />
+              <Route path="/dashboard" element={<AgentDashboardLayout />}>
                 <Route index element={<DashboardOverview />} />
                 <Route path="profile" element={<AgentProfilePage />} />
                 <Route path="territory" element={<TerritoryPage />} />
@@ -97,8 +97,8 @@ const App = () => (
                 <Route path="settings" element={<SettingsPage />} />
               </Route>
 
-              {/* Admin-only */}
-              <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
+              {/* Admin */}
+              <Route path="/admin" element={<AdminDashboard />} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>

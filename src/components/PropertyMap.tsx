@@ -2,7 +2,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { Property } from '@/lib/types';
 import { loadGoogleMapsScript } from '@/lib/googleMapsService';
-import { Loader2, Locate, Search } from 'lucide-react';
+import { Loader2, Locate, Search, X } from 'lucide-react';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 
 const TYPE_COLORS: Record<string, string> = {

@@ -38,7 +38,7 @@ export function useSavedSearches() {
           try {
             // search_history stores saved searches as JSON array
             const parsed = Array.isArray(data.search_history) ? data.search_history : [];
-            setSavedSearches(parsed as SavedSearch[]);
+            setSavedSearches(parsed as unknown as SavedSearch[]);
           } catch {
             setSavedSearches([]);
           }

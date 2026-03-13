@@ -182,6 +182,21 @@ const Index = () => {
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
+        {/* Save this search */}
+        {hasSearched && (
+          <button
+            onClick={() => saveSearch({
+              query: currentQuery,
+              filters,
+              radius: searchRadius ?? undefined,
+              center: searchState.searchCenter ?? undefined,
+            })}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-secondary border border-border text-xs font-medium text-foreground hover:bg-accent transition-colors"
+          >
+            <Bookmark size={12} />
+            Save
+          </button>
+        )}
         <FilterSidebar
           filters={filters}
           onChange={setFilters}
@@ -204,6 +219,29 @@ const Index = () => {
         </div>
       </div>
     </div>
+
+    {/* Saved searches chips */}
+    {savedSearches.length > 0 && (
+      <div className="flex items-center gap-2 mb-3 overflow-x-auto pb-1 scrollbar-hide">
+        <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider shrink-0">Saved:</span>
+        {savedSearches.map((s) => (
+          <button
+            key={s.id}
+            onClick={() => handleSearch(s.query)}
+            className="group flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary border border-border text-xs font-medium text-foreground hover:bg-accent transition-colors shrink-0"
+          >
+            <Bookmark size={10} className="text-primary" />
+            <span className="max-w-[120px] truncate">{s.label}</span>
+            <X
+              size={10}
+              className="opacity-0 group-hover:opacity-60 transition-opacity"
+              onClick={(e) => { e.stopPropagation(); removeSearch(s.id); }}
+            />
+          </button>
+        ))}
+      </div>
+    )}
+  </>
   );
 
   const propertyList = (

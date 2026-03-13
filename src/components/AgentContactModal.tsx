@@ -16,6 +16,9 @@ const leadSchema = z.object({
   phone: z.string().trim().min(6, 'Phone is required').max(20),
   message: z.string().trim().max(1000).optional(),
   interests: z.array(z.string()),
+  timeframe: z.string(),
+  budgetRange: z.string().optional(),
+  buyingPurpose: z.string(),
 });
 
 interface AgentContactModalProps {
@@ -24,12 +27,19 @@ interface AgentContactModalProps {
   onClose: () => void;
 }
 
+const TIMEFRAMES = ['This week', '1–3 months', '3–6 months', 'Flexible'];
+const PURPOSES = ['Home', 'Investment', 'Short-term rental', 'Other'];
+const INTERESTS = ['Viewing', 'More photos', 'Price info', 'Similar properties'];
+
 export function AgentContactModal({ property, open, onClose }: AgentContactModalProps) {
   const { agent } = property;
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', message: '',
     interests: [] as string[],
+    timeframe: 'Flexible',
+    budgetRange: '',
+    buyingPurpose: 'Home',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -71,6 +81,22 @@ export function AgentContactModal({ property, open, onClose }: AgentContactModal
     try {
       const { data: { user } } = await supabase.auth.getUser();
 
+      // Insert into leads table with buyer intent fields
+      await supabase.from('leads').insert({
+        agent_id: agent.id,
+        property_id: property.id,
+        user_name: formData.name,
+        user_email: formData.email,
+        user_phone: formData.phone,
+        message: formData.message || null,
+        user_id: user?.id || null,
+        timeframe: formData.timeframe,
+        budget_range: formData.budgetRange || null,
+        buying_purpose: formData.buyingPurpose,
+        interests: formData.interests,
+      });
+
+      // Also track as lead event
       await supabase.from('lead_events').insert({
         agent_id: agent.id,
         property_id: property.id,
@@ -99,8 +125,6 @@ export function AgentContactModal({ property, open, onClose }: AgentContactModal
     } catch { /* silent */ }
   };
 
-  const INTERESTS = ['Viewing', 'More photos', 'Price info', 'Similar properties'];
-
   return (
     <AnimatePresence>
       {open && (
@@ -125,7 +149,6 @@ export function AgentContactModal({ property, open, onClose }: AgentContactModal
             </div>
 
             <div className="p-5 space-y-5">
-              {/* Close button */}
               <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-secondary flex items-center justify-center hover:bg-accent transition-colors">
                 <X size={16} />
               </button>
@@ -263,6 +286,59 @@ export function AgentContactModal({ property, open, onClose }: AgentContactModal
                       className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
                     />
                     {errors.phone && <p className="text-xs text-destructive mt-1">{errors.phone}</p>}
+                  </div>
+
+                  {/* Buyer intent: Timeframe */}
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground mb-1.5">When are you looking to buy?</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {TIMEFRAMES.map(tf => (
+                        <button
+                          key={tf}
+                          type="button"
+                          onClick={() => setFormData(p => ({ ...p, timeframe: tf }))}
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                            formData.timeframe === tf
+                              ? 'bg-primary text-primary-foreground'
+                              : 'bg-secondary text-muted-foreground hover:text-foreground'
+                          }`}
+                        >
+                          {tf}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Buyer intent: Purpose */}
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground mb-1.5">Buying for</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {PURPOSES.map(p => (
+                        <button
+                          key={p}
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, buyingPurpose: p }))}
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                            formData.buyingPurpose === p
+                              ? 'bg-primary text-primary-foreground'
+                              : 'bg-secondary text-muted-foreground hover:text-foreground'
+                          }`}
+                        >
+                          {p}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Budget range (optional) */}
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Budget range, e.g. $500K – $800K (optional)"
+                      value={formData.budgetRange}
+                      onChange={e => setFormData(p => ({ ...p, budgetRange: e.target.value }))}
+                      className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
+                    />
                   </div>
 
                   {/* Interest checkboxes */}

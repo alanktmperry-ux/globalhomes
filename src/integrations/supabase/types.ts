@@ -669,8 +669,11 @@ export type Database = {
       leads: {
         Row: {
           agent_id: string
+          budget_range: string | null
+          buying_purpose: string | null
           created_at: string
           id: string
+          interests: string[] | null
           message: string | null
           pre_approval_status: string | null
           preferred_contact: string | null
@@ -678,6 +681,7 @@ export type Database = {
           score: number | null
           search_context: Json | null
           status: string | null
+          timeframe: string | null
           urgency: string | null
           user_email: string
           user_id: string | null
@@ -686,8 +690,11 @@ export type Database = {
         }
         Insert: {
           agent_id: string
+          budget_range?: string | null
+          buying_purpose?: string | null
           created_at?: string
           id?: string
+          interests?: string[] | null
           message?: string | null
           pre_approval_status?: string | null
           preferred_contact?: string | null
@@ -695,6 +702,7 @@ export type Database = {
           score?: number | null
           search_context?: Json | null
           status?: string | null
+          timeframe?: string | null
           urgency?: string | null
           user_email: string
           user_id?: string | null
@@ -703,8 +711,11 @@ export type Database = {
         }
         Update: {
           agent_id?: string
+          budget_range?: string | null
+          buying_purpose?: string | null
           created_at?: string
           id?: string
+          interests?: string[] | null
           message?: string | null
           pre_approval_status?: string | null
           preferred_contact?: string | null
@@ -712,6 +723,7 @@ export type Database = {
           score?: number | null
           search_context?: Json | null
           status?: string | null
+          timeframe?: string | null
           urgency?: string | null
           user_email?: string
           user_id?: string | null

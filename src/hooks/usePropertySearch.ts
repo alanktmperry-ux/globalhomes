@@ -299,7 +299,7 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
     handleSearch,
     handleAreaSearch,
     setSearchCenter,
-    setSearchRadius,
+    setSearchRadius: handleSetSearchRadius,
     clearSearchRadius,
 
     // State

@@ -333,24 +333,31 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
           )}
 
           {/* Gradient border */}
-          <div className="p-[3px] rounded-full bg-gradient-to-br from-primary via-purple-500 to-primary">
-            <motion.button
-              onClick={voiceState === 'listening' ? stopListening : startListening}
-              className="relative w-20 h-20 rounded-full bg-card flex items-center justify-center shadow-elevated transition-shadow"
-              whileTap={{ scale: 0.95 }}
-              animate={voiceState === 'listening' ? { scale: [1, 1.05, 1] } : {}}
-              transition={voiceState === 'listening' ? { duration: 0.5, repeat: Infinity } : {}}
-              aria-label={voiceState === 'listening' ? 'Stop listening' : 'Start voice search'}
-            >
-              {voiceState === 'processing' || isSearching ? (
-                <Loader2 size={28} className="animate-spin text-primary" />
-              ) : voiceState === 'listening' ? (
-                <MicOff size={28} className="text-destructive" />
-              ) : (
-                <Mic size={28} className="text-primary" />
-              )}
-            </motion.button>
-          </div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="p-[3px] rounded-full bg-gradient-to-br from-primary via-purple-500 to-primary">
+                <motion.button
+                  onClick={voiceState === 'listening' ? stopListening : startListening}
+                  className="relative w-20 h-20 rounded-full bg-card flex items-center justify-center shadow-elevated transition-shadow"
+                  whileTap={{ scale: 0.95 }}
+                  animate={voiceState === 'listening' ? { scale: [1, 1.05, 1] } : {}}
+                  transition={voiceState === 'listening' ? { duration: 0.5, repeat: Infinity } : {}}
+                  aria-label={voiceState === 'listening' ? 'Stop listening' : 'Start voice search'}
+                >
+                  {voiceState === 'processing' || isSearching ? (
+                    <Loader2 size={28} className="animate-spin text-primary" />
+                  ) : voiceState === 'listening' ? (
+                    <MicOff size={28} className="text-destructive" />
+                  ) : (
+                    <Mic size={28} className="text-primary" />
+                  )}
+                </motion.button>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              {voiceState === 'listening' ? 'Click to stop listening' : 'Tap to search by voice — describe your dream home in any language'}
+            </TooltipContent>
+          </Tooltip>
         </div>
 
         {/* Sound wave visualization */}

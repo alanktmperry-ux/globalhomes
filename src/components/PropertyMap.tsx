@@ -2,8 +2,9 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { Property } from '@/lib/types';
 import { loadGoogleMapsScript } from '@/lib/googleMapsService';
-import { Loader2, Locate, Search, X } from 'lucide-react';
+import { Loader2, Locate, Search, X, HelpCircle } from 'lucide-react';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
 const TYPE_COLORS: Record<string, string> = {
   house: '#06b6d4',

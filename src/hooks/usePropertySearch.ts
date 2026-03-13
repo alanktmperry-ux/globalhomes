@@ -214,12 +214,17 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
     // Radius filter
     if (searchCenter && searchRadius) {
       const radiusMeters = searchRadius * 1000;
+      console.log(`[RadiusFilter] Center: ${searchCenter.lat},${searchCenter.lng} | Radius: ${searchRadius}km | Props before: ${props.length}`);
       props = props.filter((p) => {
         if (p.lat && p.lng) {
-          return haversineDistance(p.lat, p.lng, searchCenter.lat, searchCenter.lng) <= radiusMeters;
+          const dist = haversineDistance(p.lat, p.lng, searchCenter.lat, searchCenter.lng);
+          return dist <= radiusMeters;
         }
         return false;
       });
+      console.log(`[RadiusFilter] Props after: ${props.length}`);
+    } else if (searchRadius && !searchCenter) {
+      console.warn('[RadiusFilter] Radius is set but no searchCenter — skipping radius filter');
     }
 
     // Area filter (map drawing)

@@ -105,6 +105,7 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [manusStatus, setManusStatus] = useState<string | null>(null);
+  const [manusFailed, setManusFailed] = useState(false);
   const [currentQuery, setCurrentQuery] = useState('');
   const [searchCenter, setSearchCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [searchRadius, setSearchRadius] = useState<number | null>(null);

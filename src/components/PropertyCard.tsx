@@ -1,12 +1,27 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Bed, Bath, Car, Heart, BadgeCheck, Star, Sparkles } from 'lucide-react';
+import { Bed, Bath, Car, Heart, BadgeCheck, Star, Sparkles, Shield, ShieldCheck } from 'lucide-react';
 import { Property, PropertyStatus } from '@/lib/types';
 import { useI18n } from '@/lib/i18n';
 import { useCurrency } from '@/lib/CurrencyContext';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { AgentContactModal } from './AgentContactModal';
+
+function VerificationBadge({ level }: { level?: string }) {
+  if (!level || level === 'email') return null;
+  const config: Record<string, { icon: typeof Shield; className: string; label: string }> = {
+    phone: { icon: Shield, className: 'bg-blue-500', label: 'Phone Verified' },
+    license: { icon: ShieldCheck, className: 'bg-emerald-500', label: 'Licensed' },
+    top_performer: { icon: ShieldCheck, className: 'bg-amber-500', label: 'Top Performer' },
+  };
+  const c = config[level] || config.phone;
+  return (
+    <div className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full ${c.className} flex items-center justify-center`} title={c.label}>
+      <c.icon size={10} className="text-white" />
+    </div>
+  );
+}
 
 interface PropertyCardProps {
   property: Property;
@@ -31,6 +46,8 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
 
   const badge = property.status ? statusConfig[property.status] : null;
   const isFeatured = property.agent.isSubscribed;
+  const agentRating = property.agent.rating && property.agent.rating > 0 ? property.agent.rating : null;
+  const reviewCount = property.agent.reviewCount || 0;
 
   return (
     <>
@@ -118,7 +135,8 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
                   <AvatarImage src={property.agent.avatarUrl} alt={property.agent.name} className="object-cover" />
                   <AvatarFallback className="text-xs font-bold">{property.agent.name[0]}</AvatarFallback>
                 </Avatar>
-                {property.agent.isSubscribed && (
+                <VerificationBadge level={property.agent.verificationLevel} />
+                {!property.agent.verificationLevel && property.agent.isSubscribed && (
                   <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
                     <BadgeCheck size={10} className="text-primary-foreground" />
                   </div>
@@ -128,10 +146,13 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
                 <p className="font-display font-semibold text-foreground text-sm truncate">{property.agent.name}</p>
                 <p className="text-xs text-muted-foreground truncate">{property.agent.agency}</p>
               </div>
-              <div className="flex items-center gap-1 mr-2">
-                <Star size={12} className="fill-yellow-400 text-yellow-400" />
-                <span className="text-xs font-medium text-foreground">4.8</span>
-              </div>
+              {agentRating ? (
+                <div className="flex items-center gap-1 mr-2">
+                  <Star size={12} className="fill-yellow-400 text-yellow-400" />
+                  <span className="text-xs font-medium text-foreground">{agentRating.toFixed(1)}</span>
+                  {reviewCount > 0 && <span className="text-[10px] text-muted-foreground">({reviewCount})</span>}
+                </div>
+              ) : null}
               <button
                 onClick={(e) => { e.stopPropagation(); setContactOpen(true); }}
                 className="px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors whitespace-nowrap"

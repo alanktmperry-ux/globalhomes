@@ -1,12 +1,38 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Phone, MessageCircle, Mail, Shield, ShieldCheck } from 'lucide-react';
 import { Property } from '@/lib/types';
 import { useI18n } from '@/lib/i18n';
 import { useCurrency } from '@/lib/CurrencyContext';
 import { AgentContactModal } from './AgentContactModal';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { BadgeCheck, Star } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+
+function VerificationTier({ level }: { level?: string }) {
+  const tiers: { key: string; label: string; icon: typeof Shield; active: boolean }[] = [
+    { key: 'email', label: 'Email', icon: Shield, active: true },
+    { key: 'phone', label: 'Phone', icon: Shield, active: ['phone', 'license', 'top_performer'].includes(level || '') },
+    { key: 'license', label: 'Licensed', icon: ShieldCheck, active: ['license', 'top_performer'].includes(level || '') },
+  ];
+
+  return (
+    <div className="flex items-center gap-1.5">
+      {tiers.map(t => (
+        <div
+          key={t.key}
+          className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${
+            t.active ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground/50'
+          }`}
+          title={t.label}
+        >
+          <t.icon size={10} />
+          {t.label}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 interface PropertyDrawerProps {
   property: Property | null;
@@ -21,9 +47,23 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave }: Pro
   const [imageIndex, setImageIndex] = useState(0);
   const [contactOpen, setContactOpen] = useState(false);
 
-  // Reset image index when property changes
   const prevImage = () => setImageIndex(i => (i > 0 ? i - 1 : (property?.images.length || 1) - 1));
   const nextImage = () => setImageIndex(i => (i < (property?.images.length || 1) - 1 ? i + 1 : 0));
+
+  const trackLeadEvent = async (eventType: string) => {
+    if (!property?.agent.id) return;
+    try {
+      await supabase.from('lead_events').insert({
+        agent_id: property.agent.id,
+        property_id: property.id,
+        event_type: eventType,
+        user_id: (await supabase.auth.getUser()).data.user?.id || null,
+      });
+    } catch { /* silent */ }
+  };
+
+  const agentRating = property?.agent.rating && property.agent.rating > 0 ? property.agent.rating : null;
+  const reviewCount = property?.agent.reviewCount || 0;
 
   return (
     <>
@@ -64,7 +104,6 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave }: Pro
                   />
                 </AnimatePresence>
 
-                {/* Gallery controls */}
                 {property.images.length > 1 && (
                   <>
                     <button onClick={prevImage} className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors">
@@ -76,12 +115,10 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave }: Pro
                   </>
                 )}
 
-                {/* Image counter */}
                 <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full bg-card/80 backdrop-blur-sm text-xs font-medium text-foreground">
                   {imageIndex + 1}/{property.images.length || 1}
                 </div>
 
-                {/* Close + actions */}
                 <button onClick={onClose} className="absolute top-4 right-4 w-9 h-9 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center">
                   <X size={18} />
                 </button>
@@ -212,7 +249,7 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave }: Pro
                 {/* Agent section */}
                 <div className="p-4 rounded-2xl bg-secondary/50 border border-border">
                   <h3 className="font-display font-semibold text-foreground mb-3">{t('property.agent')}</h3>
-                  <div className="flex items-center gap-3 mb-4">
+                  <div className="flex items-center gap-3 mb-3">
                     <div className="relative">
                       <Avatar className="w-14 h-14 border-2 border-primary">
                         <AvatarImage src={property.agent.avatarUrl} alt={property.agent.name} className="object-cover" />
@@ -227,16 +264,34 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave }: Pro
                     <div className="flex-1">
                       <p className="font-display font-semibold text-foreground">{property.agent.name}</p>
                       <p className="text-sm text-muted-foreground">{property.agent.agency}</p>
-                      <div className="flex items-center gap-1 mt-0.5">
-                        <Star size={12} className="fill-yellow-400 text-yellow-400" />
-                        <span className="text-xs font-medium text-foreground">4.8</span>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        {agentRating ? (
+                          <span className="flex items-center gap-1">
+                            <Star size={12} className="fill-yellow-400 text-yellow-400" />
+                            <span className="text-xs font-medium text-foreground">{agentRating.toFixed(1)}</span>
+                            {reviewCount > 0 && <span className="text-[10px] text-muted-foreground">({reviewCount})</span>}
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-muted-foreground">No reviews yet</span>
+                        )}
+                        {property.agent.specialization && (
+                          <span className="text-[10px] text-muted-foreground">· {property.agent.specialization}</span>
+                        )}
+                        {property.agent.yearsExperience && property.agent.yearsExperience > 0 && (
+                          <span className="text-[10px] text-muted-foreground">· {property.agent.yearsExperience}yr exp</span>
+                        )}
                       </div>
                     </div>
                     {property.agent.isSubscribed && (
-                      <span className="px-2 py-0.5 rounded-md bg-success text-success-foreground text-xs font-medium">
+                      <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary text-xs font-medium">
                         {t('agent.subscribed')}
                       </span>
                     )}
+                  </div>
+
+                  {/* Verification tiers */}
+                  <div className="mb-4">
+                    <VerificationTier level={property.agent.verificationLevel} />
                   </div>
 
                   <button
@@ -248,14 +303,39 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave }: Pro
                 </div>
               </div>
 
-              {/* Sticky bottom bar */}
+              {/* Quick-action sticky bar */}
               <div className="sticky bottom-0 p-4 bg-card border-t border-border">
-                <button
-                  onClick={() => setContactOpen(true)}
-                  className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-colors"
-                >
-                  {t('property.contact')}
-                </button>
+                <div className="flex items-center gap-2">
+                  {property.agent.phone && (
+                    <a
+                      href={`tel:${property.agent.phone}`}
+                      onClick={() => trackLeadEvent('phone_click')}
+                      className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-border bg-secondary text-foreground font-medium text-sm hover:bg-secondary/80 transition-colors"
+                    >
+                      <Phone size={16} />
+                      Call
+                    </a>
+                  )}
+                  {property.agent.phone && (
+                    <a
+                      href={`https://wa.me/${property.agent.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi, I'm interested in ${property.title} at ${property.address}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackLeadEvent('whatsapp_click')}
+                      className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-border bg-secondary text-foreground font-medium text-sm hover:bg-secondary/80 transition-colors"
+                    >
+                      <MessageCircle size={16} />
+                      WhatsApp
+                    </a>
+                  )}
+                  <button
+                    onClick={() => { setContactOpen(true); trackLeadEvent('contact_click'); }}
+                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-colors"
+                  >
+                    <Mail size={16} />
+                    Enquire
+                  </button>
+                </div>
               </div>
             </motion.div>
           </>

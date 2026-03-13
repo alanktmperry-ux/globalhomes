@@ -177,6 +177,7 @@ export function PropertyMap({
       } else if (e.type === google.maps.drawing.OverlayType.POLYGON) {
         const polygon = e.overlay as google.maps.Polygon;
         drawnOverlayRef.current = polygon;
+        setHasDrawnArea(true);
         const path = polygon.getPath();
         const coords = path.getArray().map((ll) => [ll.lat(), ll.lng()] as [number, number]);
         onAreaSearch({ type: 'polygon', coordinates: coords });

@@ -248,9 +248,21 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
 
   const clearSearchRadius = useCallback(() => setSearchRadius(null), []);
 
+  // ── Derived: unique agents from DB listings ───────────────────
+  const agents = useMemo(() => {
+    const byId = new Map<string, Property['agent']>();
+    dbProperties.forEach(p => {
+      if (p.agent.id && !byId.has(p.agent.id)) {
+        byId.set(p.agent.id, p.agent);
+      }
+    });
+    return Array.from(byId.values());
+  }, [dbProperties]);
+
   // ── Return ───────────────────────────────────────────────────
   return {
     // Data
+    agents,
     displayProperties,
     filteredProperties,
 

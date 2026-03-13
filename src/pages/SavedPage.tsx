@@ -92,7 +92,7 @@ const SavedPage = () => {
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-4">
-        {loading ? (
+        {dbLoading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 size={24} className="animate-spin text-primary" />
           </div>

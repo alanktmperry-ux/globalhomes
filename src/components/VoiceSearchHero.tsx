@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, Search, Loader2, X, Keyboard, ChevronDown, MapPin } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { SoundWaveVisualizer } from './SoundWaveVisualizer';
 import { parsePropertyQuery, filtersToChips } from '@/lib/parsePropertyQuery';
 import { useToast } from '@/hooks/use-toast';
@@ -259,6 +260,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
   return (
     <div className="relative overflow-hidden bg-background">
+      <TooltipProvider delayDuration={400}>
       {/* Subtle gradient background */}
       <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-background" />
 
@@ -331,24 +333,31 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
           )}
 
           {/* Gradient border */}
-          <div className="p-[3px] rounded-full bg-gradient-to-br from-primary via-purple-500 to-primary">
-            <motion.button
-              onClick={voiceState === 'listening' ? stopListening : startListening}
-              className="relative w-20 h-20 rounded-full bg-card flex items-center justify-center shadow-elevated transition-shadow"
-              whileTap={{ scale: 0.95 }}
-              animate={voiceState === 'listening' ? { scale: [1, 1.05, 1] } : {}}
-              transition={voiceState === 'listening' ? { duration: 0.5, repeat: Infinity } : {}}
-              aria-label={voiceState === 'listening' ? 'Stop listening' : 'Start voice search'}
-            >
-              {voiceState === 'processing' || isSearching ? (
-                <Loader2 size={28} className="animate-spin text-primary" />
-              ) : voiceState === 'listening' ? (
-                <MicOff size={28} className="text-destructive" />
-              ) : (
-                <Mic size={28} className="text-primary" />
-              )}
-            </motion.button>
-          </div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="p-[3px] rounded-full bg-gradient-to-br from-primary via-purple-500 to-primary">
+                <motion.button
+                  onClick={voiceState === 'listening' ? stopListening : startListening}
+                  className="relative w-20 h-20 rounded-full bg-card flex items-center justify-center shadow-elevated transition-shadow"
+                  whileTap={{ scale: 0.95 }}
+                  animate={voiceState === 'listening' ? { scale: [1, 1.05, 1] } : {}}
+                  transition={voiceState === 'listening' ? { duration: 0.5, repeat: Infinity } : {}}
+                  aria-label={voiceState === 'listening' ? 'Stop listening' : 'Start voice search'}
+                >
+                  {voiceState === 'processing' || isSearching ? (
+                    <Loader2 size={28} className="animate-spin text-primary" />
+                  ) : voiceState === 'listening' ? (
+                    <MicOff size={28} className="text-destructive" />
+                  ) : (
+                    <Mic size={28} className="text-primary" />
+                  )}
+                </motion.button>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              {voiceState === 'listening' ? 'Click to stop listening' : 'Tap to search by voice — describe your dream home in any language'}
+            </TooltipContent>
+          </Tooltip>
         </div>
 
         {/* Sound wave visualization */}
@@ -549,33 +558,44 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
         </div>
 
         {/* Radius picker - shown below the search wrapper */}
+        <TooltipProvider delayDuration={300}>
         <div className="flex items-center justify-center gap-2 mt-3 w-full max-w-md">
-          <MapPin size={14} className="text-muted-foreground" />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <MapPin size={14} className="text-muted-foreground cursor-help" />
+            </TooltipTrigger>
+            <TooltipContent>Set a search radius around your chosen location</TooltipContent>
+          </Tooltip>
           <span className="text-xs text-muted-foreground">Radius:</span>
           <div className="flex items-center gap-1">
             {[
-              { label: 'Any', value: null },
-              { label: '5 km', value: 5 },
-              { label: '10 km', value: 10 },
-              { label: '25 km', value: 25 },
-              { label: '50 km', value: 50 },
-              { label: '100 km', value: 100 },
+              { label: 'Any', value: null, tip: 'Show all properties regardless of distance' },
+              { label: '5 km', value: 5, tip: 'Only show properties within 5 km of the selected location' },
+              { label: '10 km', value: 10, tip: 'Only show properties within 10 km' },
+              { label: '25 km', value: 25, tip: 'Only show properties within 25 km' },
+              { label: '50 km', value: 50, tip: 'Only show properties within 50 km' },
+              { label: '100 km', value: 100, tip: 'Only show properties within 100 km' },
             ].map((opt) => (
-              <button
-                key={opt.label}
-                type="button"
-                onClick={() => onRadiusChange?.(opt.value)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-                  selectedRadius === opt.value
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-accent'
-                }`}
-              >
-                {opt.label}
-              </button>
+              <Tooltip key={opt.label}>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={() => onRadiusChange?.(opt.value)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                      selectedRadius === opt.value
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-accent'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>{opt.tip}</TooltipContent>
+              </Tooltip>
             ))}
           </div>
         </div>
+        </TooltipProvider>
 
         {/* Bottom spacer */}
         <div className="h-4" />
@@ -583,6 +603,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
         {/* Search history pills */}
         <VoiceSearchHistory onRerun={onSearch} />
       </div>
+      </TooltipProvider>
     </div>
   );
 }

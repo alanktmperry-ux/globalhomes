@@ -308,6 +308,7 @@ const Index = () => {
       <VoiceSearchHero
         onSearch={handleSearch}
         onLocationSelect={(loc) => {
+          console.log('[Index] Location selected:', loc);
           setMapCenter({ lat: loc.lat, lng: loc.lng, key: Date.now() });
           setSearchCenter({ lat: loc.lat, lng: loc.lng });
           setMapCollapsed(false);

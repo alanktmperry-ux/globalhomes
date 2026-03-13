@@ -291,6 +291,7 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
       isSearching,
       hasSearched,
       manusStatus,
+      manusFailed,
       currentQuery,
       searchCenter,
       searchRadius,

@@ -225,9 +225,24 @@ const Index = () => {
             </div>
           ))}
           {filteredProperties.length === 0 && (
-            <p className="text-center text-muted-foreground py-8 text-sm col-span-2">
-              {areaSearch ? 'No properties in this area.' : 'No properties found.'}
-            </p>
+            <div className="text-center py-8 col-span-2">
+              <p className="text-sm text-muted-foreground">
+                {areaSearch ? 'No properties in this area.' : 'No properties found.'}
+              </p>
+              {(areaSearch || searchRadius) && (
+                <p className="text-xs text-muted-foreground/70 mt-1">
+                  Some properties may be hidden because they don't have map coordinates yet.
+                </p>
+              )}
+              {areaSearch && (
+                <button
+                  onClick={() => handleAreaSearch(null)}
+                  className="mt-3 text-xs text-primary font-medium hover:underline"
+                >
+                  Clear area filter
+                </button>
+              )}
+            </div>
           )}
         </>
       )}

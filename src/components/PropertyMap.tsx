@@ -2,7 +2,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { Property } from '@/lib/types';
 import { loadGoogleMapsScript } from '@/lib/googleMapsService';
-import { Loader2, Locate, Search } from 'lucide-react';
+import { Loader2, Locate, Search, X } from 'lucide-react';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 
 const TYPE_COLORS: Record<string, string> = {
@@ -48,6 +48,7 @@ export function PropertyMap({
   const [error, setError] = useState<string | null>(null);
   const [showSearchArea, setShowSearchArea] = useState(false);
   const [locating, setLocating] = useState(false);
+  const [hasDrawnArea, setHasDrawnArea] = useState(false);
   const userMovedRef = useRef(false);
 
   const clearDrawnOverlay = useCallback(() => {
@@ -55,6 +56,7 @@ export function PropertyMap({
       drawnOverlayRef.current.setMap(null);
       drawnOverlayRef.current = null;
     }
+    setHasDrawnArea(false);
   }, []);
 
   // Initialize map
@@ -160,6 +162,7 @@ export function PropertyMap({
       if (e.type === google.maps.drawing.OverlayType.CIRCLE) {
         const circle = e.overlay as google.maps.Circle;
         drawnOverlayRef.current = circle;
+        setHasDrawnArea(true);
         const center = circle.getCenter()!;
         onAreaSearch({ type: 'circle', center: [center.lat(), center.lng()], radius: circle.getRadius() });
 
@@ -174,6 +177,7 @@ export function PropertyMap({
       } else if (e.type === google.maps.drawing.OverlayType.POLYGON) {
         const polygon = e.overlay as google.maps.Polygon;
         drawnOverlayRef.current = polygon;
+        setHasDrawnArea(true);
         const path = polygon.getPath();
         const coords = path.getArray().map((ll) => [ll.lat(), ll.lng()] as [number, number]);
         onAreaSearch({ type: 'polygon', coordinates: coords });
@@ -381,6 +385,17 @@ export function PropertyMap({
         >
           <Search size={14} className="text-primary" />
           Search this area
+        </button>
+      )}
+
+      {/* Clear drawn area button */}
+      {hasDrawnArea && onAreaSearch && (
+        <button
+          onClick={() => { clearDrawnOverlay(); onAreaSearch(null); }}
+          className="absolute top-3 right-3 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated text-xs font-medium text-foreground hover:bg-card transition-colors"
+        >
+          <X size={12} />
+          Clear area
         </button>
       )}
 

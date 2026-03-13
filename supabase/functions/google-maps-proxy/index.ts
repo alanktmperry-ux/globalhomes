@@ -46,7 +46,7 @@ serve(async (req) => {
     }
 
     if (action === 'place_details') {
-      const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(input)}&fields=geometry,formatted_address&key=${apiKey}`;
+      const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(input)}&fields=geometry,formatted_address,address_components&key=${apiKey}`;
       const res = await fetch(url);
       const data = await res.json();
       return new Response(JSON.stringify(data), {

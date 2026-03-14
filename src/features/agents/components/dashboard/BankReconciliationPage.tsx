@@ -89,10 +89,11 @@ const BankReconciliationPage = () => {
     if (!user) return;
     setLoading(true);
 
-    const [{ data: recon }, { data: recs }, { data: pays }] = await Promise.all([
+    const [{ data: recon }, { data: recs }, { data: pays }, { data: balData }] = await Promise.all([
       supabase.from('trust_reconciliations').select('*').order('bank_date', { ascending: false }),
       supabase.from('trust_receipts').select('id, receipt_number, client_name, amount, date_received, payment_method'),
       supabase.from('trust_payments').select('id, payment_number, client_name, amount, date_paid, payment_method'),
+      supabase.from('trust_account_balances').select('current_balance').limit(1).single(),
     ]);
 
     if (recon) setItems(recon as unknown as Reconciliation[]);
@@ -104,11 +105,161 @@ const BankReconciliationPage = () => {
       id: p.id, type: 'payment' as const, number: p.payment_number,
       client: p.client_name, amount: p.amount, date: p.date_paid, method: p.payment_method,
     })));
+    if (balData) setCurrentBalance((balData as any).current_balance ?? null);
 
     setLoading(false);
   }, [user]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
+
+  // ── Auto-match logic ──
+  const runAutoMatch = async (reconItems: Reconciliation[]) => {
+    if (!user) return;
+    setAutoMatchRunning(true);
+    let matchCount = 0;
+
+    const unmatchedItems = reconItems.filter(i => i.status === 'unmatched');
+    const usedReceiptIds = new Set(reconItems.filter(i => i.matched_receipt_id).map(i => i.matched_receipt_id!));
+    const usedPaymentIds = new Set(reconItems.filter(i => i.matched_payment_id).map(i => i.matched_payment_id!));
+
+    for (const item of unmatchedItems) {
+      const isCredit = item.amount > 0;
+      const targetAmt = Math.abs(item.amount);
+      const desc = (item.description || '').toLowerCase();
+
+      if (isCredit) {
+        // Try match to receipt by amount, then by client name similarity
+        const candidate = receipts.find(r =>
+          !usedReceiptIds.has(r.id) &&
+          Math.abs(r.amount - targetAmt) < 0.01 &&
+          (desc.includes(r.client.toLowerCase().slice(0, 5)) || true) // amount match is primary
+        );
+        if (candidate) {
+          const { error } = await supabase
+            .from('trust_reconciliations')
+            .update({ status: 'matched', matched_receipt_id: candidate.id } as any)
+            .eq('id', item.id);
+          if (!error) { usedReceiptIds.add(candidate.id); matchCount++; }
+        }
+      } else {
+        const candidate = payments.find(p =>
+          !usedPaymentIds.has(p.id) &&
+          Math.abs(p.amount - targetAmt) < 0.01
+        );
+        if (candidate) {
+          const { error } = await supabase
+            .from('trust_reconciliations')
+            .update({ status: 'matched', matched_payment_id: candidate.id } as any)
+            .eq('id', item.id);
+          if (!error) { usedPaymentIds.add(candidate.id); matchCount++; }
+        }
+      }
+    }
+
+    setAutoMatchRunning(false);
+    await fetchData();
+    const pct = unmatchedItems.length > 0 ? Math.round((matchCount / unmatchedItems.length) * 100) : 0;
+    toast.success(`Auto-matched ${matchCount} of ${unmatchedItems.length} entries (${pct}%)`);
+  };
+
+  // ── Reconcile All ──
+  const handleReconcileAll = async () => {
+    if (!user) return;
+    setReconcileAllRunning(true);
+    try {
+      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
+      if (!agent) { toast.error('Agent profile not found'); return; }
+
+      // Get latest bank balance from most recent entry
+      const latestItem = items.length > 0
+        ? items.reduce((a, b) => new Date(a.bank_date) > new Date(b.bank_date) ? a : b)
+        : null;
+      const bankBalance = latestItem?.bank_balance ?? 0;
+
+      // Upsert trust_account_balances
+      const { data: existing } = await supabase
+        .from('trust_account_balances')
+        .select('id')
+        .eq('agent_id', agent.id)
+        .single();
+
+      if (existing) {
+        await supabase.from('trust_account_balances')
+          .update({ current_balance: bankBalance, last_reconciled_date: new Date().toISOString().split('T')[0] } as any)
+          .eq('id', existing.id);
+      } else {
+        await supabase.from('trust_account_balances')
+          .insert({ agent_id: agent.id, current_balance: bankBalance, opening_balance: bankBalance, last_reconciled_date: new Date().toISOString().split('T')[0] } as any);
+      }
+
+      // Mark all matched as reconciled (keep manual as-is)
+      const matchedIds = items.filter(i => i.status === 'matched').map(i => i.id);
+      if (matchedIds.length > 0) {
+        await supabase.from('trust_reconciliations')
+          .update({ status: 'manual' } as any) // finalized
+          .in('id', matchedIds);
+      }
+
+      setCurrentBalance(bankBalance);
+      toast.success(`Reconciliation complete. Balance: ${AUD.format(bankBalance)}`);
+      await fetchData();
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setReconcileAllRunning(false);
+    }
+  };
+
+  // ── CSV file handler (drag-drop & file input) ──
+  const parseCsvFile = async (file: File) => {
+    if (!user) return;
+    const text = await file.text();
+    const lines = text.trim().split('\n').slice(1);
+    const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
+    if (!agent) { toast.error('Agent profile not found'); return; }
+
+    const entries = lines.map(line => {
+      const cols = line.split(',').map(c => c.replace(/^"|"$/g, '').trim());
+      return {
+        agent_id: agent.id,
+        bank_date: cols[0] || new Date().toISOString().split('T')[0],
+        description: cols[1] || null,
+        amount: parseFloat(cols[2]) || 0,
+        bank_balance: parseFloat(cols[3]) || 0,
+        status: 'unmatched',
+      };
+    }).filter(e => e.amount !== 0);
+
+    if (entries.length === 0) { toast.error('No valid entries found'); return; }
+
+    const { error, data: inserted } = await supabase.from('trust_reconciliations').insert(entries as any).select();
+    if (error) { toast.error(error.message); return; }
+
+    toast.success(`${entries.length} entries imported. Running auto-match…`);
+    // Refresh then auto-match
+    const { data: allRecon } = await supabase.from('trust_reconciliations').select('*').order('bank_date', { ascending: false });
+    if (allRecon) {
+      setItems(allRecon as unknown as Reconciliation[]);
+      await runAutoMatch(allRecon as unknown as Reconciliation[]);
+    }
+  };
+
+  const handleFileDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file && (file.name.endsWith('.csv') || file.type === 'text/csv')) {
+      parseCsvFile(file);
+    } else {
+      toast.error('Please drop a CSV file');
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) parseCsvFile(file);
+    e.target.value = '';
+  };
 
   // Already-matched IDs
   const matchedReceiptIds = useMemo(() => new Set(items.filter(i => i.matched_receipt_id).map(i => i.matched_receipt_id!)), [items]);

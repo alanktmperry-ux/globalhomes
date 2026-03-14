@@ -483,9 +483,37 @@ const ProfilePage = () => {
                   <Label className="text-xs">License Number</Label>
                   <Input value={form.license_number} onChange={e => setForm(f => ({ ...f, license_number: e.target.value }))} />
                 </div>
-                <div>
+                <div className="relative">
                   <Label className="text-xs">Office Address</Label>
-                  <Input value={form.office_address} onChange={e => setForm(f => ({ ...f, office_address: e.target.value }))} />
+                  <div className="relative">
+                    <MapPin size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      value={form.office_address}
+                      onChange={e => handleOfficeAddressChange(e.target.value)}
+                      onFocus={() => addressSuggestions.length > 0 && setShowAddressSuggestions(true)}
+                      onBlur={() => setTimeout(() => setShowAddressSuggestions(false), 200)}
+                      placeholder="Start typing an address..."
+                      className="pl-9"
+                    />
+                    {addressSearching && (
+                      <Loader2 size={14} className="absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-muted-foreground" />
+                    )}
+                  </div>
+                  {showAddressSuggestions && addressSuggestions.length > 0 && (
+                    <div className="absolute z-20 mt-1 w-full border border-border rounded-lg bg-card overflow-hidden shadow-lg">
+                      {addressSuggestions.map((s) => (
+                        <button
+                          key={s.place_id}
+                          type="button"
+                          onClick={() => selectOfficeAddress(s.description)}
+                          className="w-full text-left px-3 py-2.5 hover:bg-accent transition-colors flex items-center gap-2 text-sm"
+                        >
+                          <MapPin size={12} className="text-primary shrink-0" />
+                          <span className="truncate">{s.description}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div>
                   <Label className="text-xs">Years of Experience</Label>

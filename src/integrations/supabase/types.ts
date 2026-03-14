@@ -870,6 +870,77 @@ export type Database = {
           },
         ]
       }
+      off_market_shares: {
+        Row: {
+          contacted_at: string | null
+          created_at: string
+          id: string
+          is_network_wide: boolean
+          property_id: string
+          referral_split_pct: number
+          shared_with_agent_id: string | null
+          sharing_agent_id: string
+          status: string
+          trust_entry_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          contacted_at?: string | null
+          created_at?: string
+          id?: string
+          is_network_wide?: boolean
+          property_id: string
+          referral_split_pct?: number
+          shared_with_agent_id?: string | null
+          sharing_agent_id: string
+          status?: string
+          trust_entry_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          contacted_at?: string | null
+          created_at?: string
+          id?: string
+          is_network_wide?: boolean
+          property_id?: string
+          referral_split_pct?: number
+          shared_with_agent_id?: string | null
+          sharing_agent_id?: string
+          status?: string
+          trust_entry_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "off_market_shares_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "off_market_shares_shared_with_agent_id_fkey"
+            columns: ["shared_with_agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "off_market_shares_sharing_agent_id_fkey"
+            columns: ["sharing_agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "off_market_shares_trust_entry_id_fkey"
+            columns: ["trust_entry_id"]
+            isOneToOne: false
+            referencedRelation: "trust_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

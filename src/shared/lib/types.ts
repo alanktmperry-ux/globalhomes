@@ -30,6 +30,14 @@ export interface Property {
   aiSummary?: string;
   /** AI-generated highlight tags, e.g. ["Near top schools", "Walk to station"] */
   aiHighlights?: string[];
+  // Investment fields
+  rentalYieldPct?: number | null;
+  strPermitted?: boolean | null;
+  yearBuilt?: number | null;
+  councilRatesAnnual?: number | null;
+  strataFeesQuarterly?: number | null;
+  rentalWeekly?: number | null;
+  currencyCode?: string | null;
 }
 
 export interface Agent {

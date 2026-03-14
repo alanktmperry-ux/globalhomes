@@ -414,6 +414,12 @@ const TrustLedgerPage = () => {
         onOpenChange={setShowNewReceipt}
         onCreated={fetchData}
       />
+
+      {/* Monthly Statement Modal */}
+      <TrustStatementModal
+        open={showStatement}
+        onOpenChange={setShowStatement}
+      />
     </div>
   );
 };

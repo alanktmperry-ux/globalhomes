@@ -147,9 +147,14 @@ const PocketListingPage = () => {
                     <TabsContent key={tab} value={tab}>
                       <div className="border border-dashed border-border rounded-2xl p-12 text-center">
                         <p className="text-muted-foreground text-sm mb-3">No {tab} listings yet</p>
-                        <Button size="sm" onClick={() => setShowForm(true)}>
-                          <Plus size={14} className="mr-1" /> Create Your First
-                        </Button>
+                        <div className="flex items-center justify-center gap-2">
+                          <Button size="sm" onClick={() => { setCreateListingType('sale'); setShowForm(true); }}>
+                            <Plus size={14} className="mr-1" /> Create Sale
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => { setCreateListingType('rent'); setShowForm(true); }}>
+                            <Key size={14} className="mr-1" /> Create Rental
+                          </Button>
+                        </div>
                       </div>
                     </TabsContent>
                   ))}

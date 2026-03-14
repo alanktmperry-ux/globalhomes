@@ -193,9 +193,16 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
     if (editPropertyId) return;
     const saved = localStorage.getItem('pocket-listing-draft');
     if (saved) {
-      try { setDraft(JSON.parse(saved)); } catch {}
+      try {
+        const parsed = JSON.parse(saved) as Partial<ListingDraft>;
+        setDraft({
+          ...DEFAULT_DRAFT,
+          ...parsed,
+          listingType: initialListingType ?? parsed.listingType ?? DEFAULT_DRAFT.listingType,
+        });
+      } catch {}
     }
-  }, [editPropertyId]);
+  }, [editPropertyId, initialListingType]);
 
   const progress = ((step + 1) / STEPS.length) * 100;
 

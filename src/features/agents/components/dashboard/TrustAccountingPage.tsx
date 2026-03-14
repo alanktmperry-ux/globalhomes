@@ -14,6 +14,7 @@ import {
   AlertTriangle, CalendarIcon, Home, Users,
 } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
+import TrustReceiptModal from './TrustReceiptModal';
 import { useTrustAccounting, TrustTransaction } from '@/hooks/useTrustAccounting';
 import { useAuth } from '@/lib/AuthProvider';
 import { toast } from 'sonner';

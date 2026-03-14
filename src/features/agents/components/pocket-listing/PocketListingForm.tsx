@@ -17,6 +17,7 @@ export interface ListingDraft {
   address: string;
   suburb: string;
   state: string;
+  listingType: 'sale' | 'rent';
   priceMin: number;
   priceMax: number;
   priceDisplay: 'exact' | 'range' | 'eoi' | 'contact';
@@ -41,6 +42,9 @@ export interface ListingDraft {
   landSize: number;
   lat?: number;
   lng?: number;
+  estimatedRentalWeekly: number;
+  rentalWeekly: number;
+  rentalBondWeeks: number;
 }
 
 const DEFAULT_DRAFT: ListingDraft = {

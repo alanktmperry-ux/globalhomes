@@ -154,6 +154,8 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePrope
         showContact: true,
         allowCoBroke: true,
         autoDeclineBelow: 0,
+        sqm: prop.sqm || 0,
+        landSize: (prop as any).land_size || 0,
         scheduledAt: null,
       });
       setLoadingEdit(false);

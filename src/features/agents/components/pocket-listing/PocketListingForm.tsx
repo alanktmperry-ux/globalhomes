@@ -17,6 +17,7 @@ export interface ListingDraft {
   address: string;
   suburb: string;
   state: string;
+  listingType: 'sale' | 'rent';
   priceMin: number;
   priceMax: number;
   priceDisplay: 'exact' | 'range' | 'eoi' | 'contact';
@@ -41,12 +42,16 @@ export interface ListingDraft {
   landSize: number;
   lat?: number;
   lng?: number;
+  estimatedRentalWeekly: number;
+  rentalWeekly: number;
+  rentalBondWeeks: number;
 }
 
 const DEFAULT_DRAFT: ListingDraft = {
   address: '',
   suburb: '',
   state: '',
+  listingType: 'sale',
   priceMin: 500000,
   priceMax: 800000,
   priceDisplay: 'range',
@@ -69,6 +74,9 @@ const DEFAULT_DRAFT: ListingDraft = {
   allowCoBroke: true,
   autoDeclineBelow: 0,
   scheduledAt: null,
+  estimatedRentalWeekly: 0,
+  rentalWeekly: 0,
+  rentalBondWeeks: 4,
 };
 
 const STEPS = ['Address', 'Basics', 'Photos', 'Voice', 'Settings', 'Preview'];
@@ -135,6 +143,7 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePrope
         address: duplicatePropertyId ? '' : prop.address,
         suburb: duplicatePropertyId ? '' : prop.suburb,
         state: duplicatePropertyId ? '' : prop.state,
+        listingType: prop.listing_type === 'rent' ? 'rent' : 'sale',
         priceMin: Math.round(prop.price * 0.9),
         priceMax: prop.price,
         priceDisplay,
@@ -157,6 +166,9 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePrope
         sqm: prop.sqm || 0,
         landSize: (prop as any).land_size || 0,
         scheduledAt: null,
+        estimatedRentalWeekly: prop.rental_weekly || 0,
+        rentalWeekly: prop.listing_type === 'rent' ? (prop.rental_weekly || 0) : 0,
+        rentalBondWeeks: 4,
       });
       setLoadingEdit(false);
     };
@@ -225,6 +237,7 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePrope
         sqm: draft.sqm || 0,
         land_size: draft.landSize || null,
         property_type: draft.propertyType,
+        listing_type: draft.listingType,
         description,
         features: draft.features,
         image_url: mainPhoto,
@@ -233,6 +246,7 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePrope
         status: draft.visibility === 'public' ? 'public' : draft.visibility,
         lat: draft.lat || null,
         lng: draft.lng || null,
+        rental_weekly: draft.listingType === 'rent' ? (draft.rentalWeekly || null) : (draft.estimatedRentalWeekly || null),
       } as any;
 
       if (editPropertyId) {

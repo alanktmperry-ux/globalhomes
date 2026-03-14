@@ -6,6 +6,7 @@ import { Filters, defaultFilters } from '@/components/FilterSidebar';
 import { useToast } from '@/hooks/use-toast';
 import { isInsidePolygon, haversineDistance } from '@/shared/lib/geoUtils';
 import { fetchPublicProperties } from '@/features/properties/api/fetchPublicProperties';
+import { useCurrency } from '@/shared/lib/CurrencyContext';
 
 // ── Types ────────────────────────────────────────────────────
 
@@ -21,6 +22,7 @@ export interface UsePropertySearchOptions {
 
 export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
   const { toast } = useToast();
+  const { listingMode } = useCurrency();
 
   // ── Filters & sort (internalized) ────────────────────────────
   const [filters, setFilters] = useState<Filters>(defaultFilters);
@@ -40,11 +42,11 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
   const [dbLoading, setDbLoading] = useState(true);
   const [dbError, setDbError] = useState<string | null>(null);
 
-  // ── Fetch DB properties ──────────────────────────────────────
+  // ── Fetch DB properties (re-fetches when listingMode changes) ─
   useEffect(() => {
     setDbLoading(true);
     setDbError(null);
-    fetchPublicProperties()
+    fetchPublicProperties(50, listingMode)
       .then((props) => {
         setDbProperties(props);
       })
@@ -53,7 +55,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
         setDbProperties([]);
       })
       .finally(() => setDbLoading(false));
-  }, []);
+  }, [listingMode]);
 
   // ── Search handler ───────────────────────────────────────────
   const handleSearch = useCallback(

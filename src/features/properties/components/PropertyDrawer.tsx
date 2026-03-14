@@ -8,6 +8,7 @@ import { AgentContactModal } from '@/components/AgentContactModal';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { BadgeCheck, Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { InvestmentInsightsCard } from './InvestmentInsightsCard';
 
 function VerificationTier({ level }: { level?: string }) {
   const tiers: { key: string; label: string; icon: typeof Shield; active: boolean }[] = [

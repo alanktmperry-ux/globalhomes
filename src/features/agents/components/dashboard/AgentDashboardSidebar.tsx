@@ -1,7 +1,7 @@
 import {
   LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, LogOut, Building2, UserPlus,
   User, FileText, CreditCard, Star, MapPinned, Shield, Contact, Kanban, Scale, Landmark,
-  ClipboardCheck, CalendarDays, Search, TrendingUp,
+  ClipboardCheck, CalendarDays, Search, TrendingUp, Receipt,
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthProvider';
@@ -38,6 +38,7 @@ const CRM_NAV: NavItem[] = [
 const BUSINESS_NAV: NavItem[] = [
   { title: 'Investments', url: '/dashboard/investments', icon: TrendingUp },
   { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
+  { title: 'Trust Ledger', url: '/dashboard/trust-ledger', icon: Receipt },
   { title: 'Compliance', url: '/dashboard/compliance', icon: ClipboardCheck, comingSoon: true },
   { title: 'Analytics', url: '/dashboard/analytics', icon: BarChart3 },
   { title: 'Reports', url: '/dashboard/reports', icon: FileText },

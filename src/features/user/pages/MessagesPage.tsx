@@ -1,123 +1,354 @@
-import { useState, useEffect, useCallback } from 'react';
-import { MessageCircle, ArrowLeft, Clock, User, Mail, Phone, Building2 } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { MessageCircle, ArrowLeft, Send, User, Building2 } from 'lucide-react';
 import { BottomNav } from '@/components/BottomNav';
 import { useI18n } from '@/lib/i18n';
 import { useAuth } from '@/lib/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, format, isToday, isYesterday } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 
-interface LeadMessage {
+interface Conversation {
   id: string;
-  user_name: string;
-  user_email: string;
-  user_phone: string | null;
-  message: string | null;
-  status: string | null;
+  participant_1: string;
+  participant_2: string;
+  property_id: string | null;
+  last_message_at: string;
   created_at: string;
-  property_id: string;
-  agent_id: string;
-  user_id: string | null;
-  property?: {
-    title: string;
-    address: string;
-    suburb: string;
-    image_url: string | null;
-  };
-  agent?: {
-    name: string;
-    avatar_url: string | null;
-    agency: string | null;
-  };
+  other_user_name: string;
+  other_user_avatar: string | null;
+  other_user_id: string;
+  property_title?: string;
+  property_address?: string;
+  property_image?: string | null;
+  last_message_text?: string;
+  unread_count: number;
+}
+
+interface Message {
+  id: string;
+  conversation_id: string;
+  sender_id: string;
+  content: string;
+  is_read: boolean;
+  created_at: string;
 }
 
 const MessagesPage = () => {
   const { t } = useI18n();
   const { user } = useAuth();
-  const [leads, setLeads] = useState<LeadMessage[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [selectedConvo, setSelectedConvo] = useState<Conversation | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
-  const [selectedLead, setSelectedLead] = useState<LeadMessage | null>(null);
-  const [isAgent, setIsAgent] = useState(false);
-  const [agentId, setAgentId] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Determine if user is agent
-  useEffect(() => {
-    if (!user) return;
-    supabase
-      .from('agents')
-      .select('id')
-      .eq('user_id', user.id)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data) {
-          setIsAgent(true);
-          setAgentId(data.id);
-        }
-      });
-  }, [user]);
-
-  const fetchMessages = useCallback(async () => {
+  // Fetch conversations
+  const fetchConversations = useCallback(async () => {
     if (!user) { setLoading(false); return; }
     setLoading(true);
 
-    if (isAgent && agentId) {
-      // Agent view: show leads/enquiries received
-      const { data } = await supabase
+    const { data: convos } = await supabase
+      .from('conversations')
+      .select('*')
+      .or(`participant_1.eq.${user.id},participant_2.eq.${user.id}`)
+      .order('last_message_at', { ascending: false });
+
+    if (!convos || convos.length === 0) {
+      // Also check for legacy leads to show as conversations
+      await fetchLegacyLeads();
+      setLoading(false);
+      return;
+    }
+
+    // Enrich conversations with user info and last message
+    const enriched: Conversation[] = [];
+    for (const c of convos) {
+      const otherId = c.participant_1 === user.id ? c.participant_2 : c.participant_1;
+
+      // Get other user's display info (check agents first, then profiles)
+      let otherName = 'User';
+      let otherAvatar: string | null = null;
+
+      const { data: agentData } = await supabase
+        .from('agents')
+        .select('name, avatar_url')
+        .eq('user_id', otherId)
+        .maybeSingle();
+
+      if (agentData) {
+        otherName = agentData.name;
+        otherAvatar = agentData.avatar_url;
+      } else {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('display_name, avatar_url')
+          .eq('user_id', otherId)
+          .maybeSingle();
+        if (profileData) {
+          otherName = profileData.display_name || 'User';
+          otherAvatar = profileData.avatar_url;
+        }
+      }
+
+      // Get property info if linked
+      let propTitle, propAddress, propImage;
+      if (c.property_id) {
+        const { data: prop } = await supabase
+          .from('properties')
+          .select('title, address, image_url')
+          .eq('id', c.property_id)
+          .maybeSingle();
+        if (prop) {
+          propTitle = prop.title;
+          propAddress = prop.address;
+          propImage = prop.image_url;
+        }
+      }
+
+      // Get last message
+      const { data: lastMsg } = await supabase
+        .from('messages')
+        .select('content')
+        .eq('conversation_id', c.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      // Get unread count
+      const { count } = await supabase
+        .from('messages')
+        .select('id', { count: 'exact', head: true })
+        .eq('conversation_id', c.id)
+        .eq('is_read', false)
+        .neq('sender_id', user.id);
+
+      enriched.push({
+        ...c,
+        other_user_name: otherName,
+        other_user_avatar: otherAvatar,
+        other_user_id: otherId,
+        property_title: propTitle,
+        property_address: propAddress,
+        property_image: propImage,
+        last_message_text: lastMsg?.content,
+        unread_count: count || 0,
+      });
+    }
+
+    setConversations(enriched);
+    setLoading(false);
+  }, [user]);
+
+  // Fetch legacy leads as pseudo-conversations for agents
+  const fetchLegacyLeads = async () => {
+    if (!user) return;
+
+    // Check if user is agent
+    const { data: agent } = await supabase
+      .from('agents')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (agent) {
+      const { data: leads } = await supabase
         .from('leads')
-        .select('*, properties:property_id(title, address, suburb, image_url)')
-        .eq('agent_id', agentId)
+        .select('*, properties:property_id(title, address, image_url)')
+        .eq('agent_id', agent.id)
         .order('created_at', { ascending: false })
         .limit(50);
 
-      if (data) {
-        setLeads(data.map((d: any) => ({
-          ...d,
-          property: d.properties,
-        })));
+      if (leads && leads.length > 0) {
+        const legacyConvos: Conversation[] = leads.map((l: any) => ({
+          id: `lead-${l.id}`,
+          participant_1: user.id,
+          participant_2: l.user_id || '',
+          property_id: l.property_id,
+          last_message_at: l.created_at,
+          created_at: l.created_at,
+          other_user_name: l.user_name,
+          other_user_avatar: null,
+          other_user_id: l.user_id || '',
+          property_title: l.properties?.title,
+          property_address: l.properties?.address,
+          property_image: l.properties?.image_url,
+          last_message_text: l.message || 'New enquiry',
+          unread_count: l.status === 'new' ? 1 : 0,
+        }));
+        setConversations(legacyConvos);
       }
     } else {
-      // Buyer view: show enquiries sent
-      const { data } = await supabase
+      // Buyer: show leads they sent
+      const { data: leads } = await supabase
         .from('leads')
-        .select('*, properties:property_id(title, address, suburb, image_url), agents:agent_id(name, avatar_url, agency)')
+        .select('*, properties:property_id(title, address, image_url), agents:agent_id(name, avatar_url)')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(50);
 
-      if (data) {
-        setLeads(data.map((d: any) => ({
-          ...d,
-          property: d.properties,
-          agent: d.agents,
-        })));
+      if (leads && leads.length > 0) {
+        const legacyConvos: Conversation[] = leads.map((l: any) => ({
+          id: `lead-${l.id}`,
+          participant_1: user.id,
+          participant_2: '',
+          property_id: l.property_id,
+          last_message_at: l.created_at,
+          created_at: l.created_at,
+          other_user_name: l.agents?.name || 'Agent',
+          other_user_avatar: l.agents?.avatar_url,
+          other_user_id: '',
+          property_title: l.properties?.title,
+          property_address: l.properties?.address,
+          property_image: l.properties?.image_url,
+          last_message_text: l.message || 'Your enquiry',
+          unread_count: 0,
+        }));
+        setConversations(legacyConvos);
       }
     }
-    setLoading(false);
-  }, [user, isAgent, agentId]);
+  };
 
   useEffect(() => {
-    fetchMessages();
-  }, [fetchMessages]);
+    fetchConversations();
+  }, [fetchConversations]);
 
-  // Realtime updates
+  // Realtime for new conversations
   useEffect(() => {
     if (!user) return;
-    const filter = isAgent && agentId
-      ? `agent_id=eq.${agentId}`
-      : `user_id=eq.${user.id}`;
-
     const channel = supabase
-      .channel('messages-leads')
+      .channel('conversations-realtime')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'conversations',
+      }, () => fetchConversations())
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user, fetchConversations]);
+
+  // Fetch messages for selected conversation
+  const fetchMessages = useCallback(async () => {
+    if (!selectedConvo || selectedConvo.id.startsWith('lead-')) return;
+
+    const { data } = await supabase
+      .from('messages')
+      .select('*')
+      .eq('conversation_id', selectedConvo.id)
+      .order('created_at', { ascending: true });
+
+    if (data) {
+      setMessages(data as Message[]);
+      // Mark unread as read
+      const unreadIds = data
+        .filter((m: any) => !m.is_read && m.sender_id !== user?.id)
+        .map((m: any) => m.id);
+      if (unreadIds.length > 0) {
+        await supabase
+          .from('messages')
+          .update({ is_read: true })
+          .in('id', unreadIds);
+      }
+    }
+  }, [selectedConvo, user]);
+
+  useEffect(() => {
+    if (selectedConvo && !selectedConvo.id.startsWith('lead-')) {
+      fetchMessages();
+    }
+  }, [fetchMessages, selectedConvo]);
+
+  // Realtime for new messages in selected conversation
+  useEffect(() => {
+    if (!selectedConvo || selectedConvo.id.startsWith('lead-')) return;
+    const channel = supabase
+      .channel(`messages-${selectedConvo.id}`)
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
-        table: 'leads',
-        filter,
-      }, () => fetchMessages())
+        table: 'messages',
+        filter: `conversation_id=eq.${selectedConvo.id}`,
+      }, (payload) => {
+        const newMsg = payload.new as Message;
+        setMessages(prev => [...prev, newMsg]);
+        // Mark as read if from other user
+        if (newMsg.sender_id !== user?.id) {
+          supabase.from('messages').update({ is_read: true }).eq('id', newMsg.id);
+        }
+      })
       .subscribe();
-
     return () => { supabase.removeChannel(channel); };
-  }, [user, isAgent, agentId, fetchMessages]);
+  }, [selectedConvo, user]);
+
+  // Auto-scroll to bottom
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Send message
+  const handleSend = async () => {
+    if (!newMessage.trim() || !user || !selectedConvo || sending) return;
+    
+    // For legacy lead conversations, create a real conversation first
+    let convoId = selectedConvo.id;
+    
+    if (convoId.startsWith('lead-')) {
+      if (!selectedConvo.other_user_id) return;
+      
+      // Create real conversation
+      const { data: newConvo, error } = await supabase
+        .from('conversations')
+        .insert({
+          participant_1: user.id,
+          participant_2: selectedConvo.other_user_id,
+          property_id: selectedConvo.property_id,
+        })
+        .select()
+        .single();
+
+      if (error || !newConvo) return;
+      convoId = newConvo.id;
+
+      // Update selected convo
+      setSelectedConvo(prev => prev ? { ...prev, id: convoId } : null);
+    }
+
+    setSending(true);
+    const content = newMessage.trim();
+    setNewMessage('');
+
+    await supabase.from('messages').insert({
+      conversation_id: convoId,
+      sender_id: user.id,
+      content,
+    });
+
+    // Update last_message_at
+    await supabase
+      .from('conversations')
+      .update({ last_message_at: new Date().toISOString() })
+      .eq('id', convoId);
+
+    setSending(false);
+    inputRef.current?.focus();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  // Helper to format message time
+  const formatMsgTime = (dateStr: string) => {
+    const d = new Date(dateStr);
+    if (isToday(d)) return format(d, 'h:mm a');
+    if (isYesterday(d)) return 'Yesterday ' + format(d, 'h:mm a');
+    return format(d, 'MMM d, h:mm a');
+  };
 
   if (!user) {
     return (
@@ -139,38 +370,110 @@ const MessagesPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-20 flex flex-col">
       <header className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
         <div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-3">
-          {selectedLead ? (
-            <button onClick={() => setSelectedLead(null)} className="w-8 h-8 rounded-lg hover:bg-secondary flex items-center justify-center">
+          {selectedConvo ? (
+            <button onClick={() => { setSelectedConvo(null); setMessages([]); fetchConversations(); }} className="w-8 h-8 rounded-lg hover:bg-secondary flex items-center justify-center">
               <ArrowLeft size={18} />
             </button>
           ) : null}
-          <h1 className="font-display text-xl font-bold text-foreground">
-            {selectedLead
-              ? (isAgent ? selectedLead.user_name : selectedLead.agent?.name || 'Agent')
-              : t('nav.messages')}
+          <h1 className="font-display text-xl font-bold text-foreground truncate">
+            {selectedConvo ? selectedConvo.other_user_name : t('nav.messages')}
           </h1>
-          {!selectedLead && leads.length > 0 && (
+          {!selectedConvo && conversations.length > 0 && (
             <span className="ml-auto text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">
-              {leads.length} conversation{leads.length !== 1 ? 's' : ''}
+              {conversations.length}
             </span>
           )}
         </div>
       </header>
 
-      <main className="max-w-lg mx-auto px-4 py-2">
+      <main className="max-w-lg mx-auto w-full flex-1 flex flex-col">
         <AnimatePresence mode="wait">
-          {selectedLead ? (
+          {selectedConvo ? (
             <motion.div
-              key="detail"
+              key="thread"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.15 }}
+              className="flex-1 flex flex-col"
             >
-              <MessageDetail lead={selectedLead} isAgent={isAgent} />
+              {/* Property context */}
+              {selectedConvo.property_title && (
+                <div className="flex items-center gap-3 px-4 py-2 bg-secondary/50 border-b border-border/30">
+                  {selectedConvo.property_image ? (
+                    <img src={selectedConvo.property_image} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+                      <Building2 size={16} className="text-muted-foreground" />
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-xs font-medium text-foreground truncate">{selectedConvo.property_title}</p>
+                    <p className="text-[10px] text-muted-foreground truncate">{selectedConvo.property_address}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2" style={{ maxHeight: 'calc(100vh - 240px)' }}>
+                {selectedConvo.id.startsWith('lead-') && messages.length === 0 ? (
+                  <div className="bg-secondary/50 rounded-2xl p-4 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      This conversation started from an enquiry. Send a message to start chatting.
+                    </p>
+                    {selectedConvo.last_message_text && (
+                      <div className="mt-3 p-3 bg-primary/5 rounded-xl text-left">
+                        <p className="text-[10px] text-muted-foreground uppercase mb-1">Original enquiry</p>
+                        <p className="text-sm text-foreground">{selectedConvo.last_message_text}</p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  messages.map((msg) => {
+                    const isMe = msg.sender_id === user.id;
+                    return (
+                      <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl ${
+                          isMe
+                            ? 'bg-primary text-primary-foreground rounded-br-md'
+                            : 'bg-secondary text-foreground rounded-bl-md'
+                        }`}>
+                          <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                          <p className={`text-[10px] mt-1 ${isMe ? 'text-primary-foreground/60' : 'text-muted-foreground'}`}>
+                            {formatMsgTime(msg.created_at)}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Input */}
+              <div className="px-4 py-3 border-t border-border/50 bg-background">
+                <div className="flex items-end gap-2">
+                  <textarea
+                    ref={inputRef}
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Type a message..."
+                    rows={1}
+                    className="flex-1 resize-none rounded-2xl border border-border bg-secondary/50 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring max-h-24"
+                  />
+                  <button
+                    onClick={handleSend}
+                    disabled={!newMessage.trim() || sending}
+                    className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0 disabled:opacity-40 hover:opacity-90 transition-opacity"
+                  >
+                    <Send size={16} />
+                  </button>
+                </div>
+              </div>
             </motion.div>
           ) : (
             <motion.div
@@ -179,6 +482,7 @@ const MessagesPage = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
+              className="px-4"
             >
               {loading ? (
                 <div className="space-y-3 py-4">
@@ -186,23 +490,47 @@ const MessagesPage = () => {
                     <div key={i} className="h-20 bg-secondary/50 rounded-2xl animate-pulse" />
                   ))}
                 </div>
-              ) : leads.length === 0 ? (
+              ) : conversations.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
                   <MessageCircle size={40} strokeWidth={1.2} className="mb-3" />
                   <p className="text-sm">No messages yet</p>
-                  <p className="text-xs mt-1">
-                    {isAgent ? 'Enquiries from buyers will appear here' : 'Contact an agent to start a conversation'}
-                  </p>
+                  <p className="text-xs mt-1">Contact an agent on a listing to start a conversation</p>
                 </div>
               ) : (
                 <div className="space-y-1 py-2">
-                  {leads.map(lead => (
-                    <MessageRow
-                      key={lead.id}
-                      lead={lead}
-                      isAgent={isAgent}
-                      onClick={() => setSelectedLead(lead)}
-                    />
+                  {conversations.map(c => (
+                    <button
+                      key={c.id}
+                      onClick={() => setSelectedConvo(c)}
+                      className={`w-full text-left px-4 py-3 rounded-2xl hover:bg-secondary/70 transition-colors flex items-start gap-3 ${
+                        c.unread_count > 0 ? 'bg-primary/5' : ''
+                      }`}
+                    >
+                      <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center shrink-0 mt-0.5 overflow-hidden">
+                        {c.other_user_avatar ? (
+                          <img src={c.other_user_avatar} alt="" className="w-10 h-10 rounded-full object-cover" />
+                        ) : (
+                          <span className="text-sm font-bold text-foreground">
+                            {c.other_user_name.charAt(0).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className={`text-sm font-medium truncate ${c.unread_count > 0 ? 'text-foreground' : 'text-foreground/80'}`}>
+                            {c.other_user_name}
+                          </span>
+                          {c.unread_count > 0 && <span className="w-2 h-2 rounded-full bg-primary shrink-0" />}
+                          <span className="ml-auto text-[10px] text-muted-foreground shrink-0">
+                            {formatDistanceToNow(new Date(c.last_message_at), { addSuffix: true })}
+                          </span>
+                        </div>
+                        {c.property_title && (
+                          <p className="text-xs text-muted-foreground truncate">{c.property_title}</p>
+                        )}
+                        <p className="text-xs text-muted-foreground/70 truncate mt-0.5">{c.last_message_text || 'No messages yet'}</p>
+                      </div>
+                    </button>
                   ))}
                 </div>
               )}
@@ -215,132 +543,5 @@ const MessagesPage = () => {
     </div>
   );
 };
-
-function MessageRow({ lead, isAgent, onClick }: { lead: LeadMessage; isAgent: boolean; onClick: () => void }) {
-  const displayName = isAgent ? lead.user_name : (lead.agent?.name || 'Agent');
-  const subtitle = lead.property?.title || lead.property?.address || 'Property enquiry';
-  const preview = lead.message || 'No message';
-  const isNew = lead.status === 'new';
-
-  return (
-    <button
-      onClick={onClick}
-      className={`w-full text-left px-4 py-3 rounded-2xl hover:bg-secondary/70 transition-colors flex items-start gap-3 ${
-        isNew ? 'bg-primary/5' : ''
-      }`}
-    >
-      <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center shrink-0 mt-0.5">
-        {isAgent && lead.user_name ? (
-          <span className="text-sm font-bold text-foreground">
-            {lead.user_name.charAt(0).toUpperCase()}
-          </span>
-        ) : lead.agent?.avatar_url ? (
-          <img src={lead.agent.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover" />
-        ) : (
-          <User size={16} className="text-muted-foreground" />
-        )}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span className={`text-sm font-medium truncate ${isNew ? 'text-foreground' : 'text-foreground/80'}`}>
-            {displayName}
-          </span>
-          {isNew && <span className="w-2 h-2 rounded-full bg-primary shrink-0" />}
-          <span className="ml-auto text-[10px] text-muted-foreground shrink-0">
-            {formatDistanceToNow(new Date(lead.created_at), { addSuffix: true })}
-          </span>
-        </div>
-        <p className="text-xs text-muted-foreground truncate">{subtitle}</p>
-        <p className="text-xs text-muted-foreground/70 truncate mt-0.5">{preview}</p>
-      </div>
-    </button>
-  );
-}
-
-function MessageDetail({ lead, isAgent }: { lead: LeadMessage; isAgent: boolean }) {
-  return (
-    <div className="space-y-4 py-2">
-      {/* Property card */}
-      {lead.property && (
-        <div className="flex items-center gap-3 p-3 bg-secondary/50 rounded-2xl">
-          {lead.property.image_url ? (
-            <img src={lead.property.image_url} alt="" className="w-14 h-14 rounded-xl object-cover shrink-0" />
-          ) : (
-            <div className="w-14 h-14 rounded-xl bg-secondary flex items-center justify-center shrink-0">
-              <Building2 size={20} className="text-muted-foreground" />
-            </div>
-          )}
-          <div className="min-w-0">
-            <p className="text-sm font-medium text-foreground truncate">{lead.property.title}</p>
-            <p className="text-xs text-muted-foreground truncate">{lead.property.address}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Contact info */}
-      {isAgent && (
-        <div className="space-y-2 p-3 bg-secondary/30 rounded-2xl">
-          <p className="text-[11px] text-muted-foreground uppercase tracking-wide font-medium">Contact Details</p>
-          <div className="flex items-center gap-2 text-sm">
-            <User size={14} className="text-muted-foreground shrink-0" />
-            <span className="text-foreground">{lead.user_name}</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <Mail size={14} className="text-muted-foreground shrink-0" />
-            <a href={`mailto:${lead.user_email}`} className="text-primary hover:underline truncate">{lead.user_email}</a>
-          </div>
-          {lead.user_phone && (
-            <div className="flex items-center gap-2 text-sm">
-              <Phone size={14} className="text-muted-foreground shrink-0" />
-              <a href={`tel:${lead.user_phone}`} className="text-primary hover:underline">{lead.user_phone}</a>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Agent info for buyers */}
-      {!isAgent && lead.agent && (
-        <div className="space-y-2 p-3 bg-secondary/30 rounded-2xl">
-          <p className="text-[11px] text-muted-foreground uppercase tracking-wide font-medium">Agent</p>
-          <div className="flex items-center gap-2 text-sm">
-            <User size={14} className="text-muted-foreground shrink-0" />
-            <span className="text-foreground">{lead.agent.name}</span>
-          </div>
-          {lead.agent.agency && (
-            <div className="flex items-center gap-2 text-sm">
-              <Building2 size={14} className="text-muted-foreground shrink-0" />
-              <span className="text-muted-foreground">{lead.agent.agency}</span>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Message bubble */}
-      <div className="space-y-2">
-        <p className="text-[11px] text-muted-foreground uppercase tracking-wide font-medium px-1">Message</p>
-        <div className={`p-4 rounded-2xl ${isAgent ? 'bg-secondary' : 'bg-primary/10'}`}>
-          <p className="text-sm text-foreground leading-relaxed">
-            {lead.message || 'No message was included with this enquiry.'}
-          </p>
-          <div className="flex items-center gap-1 mt-3 text-[10px] text-muted-foreground">
-            <Clock size={10} />
-            <span>{formatDistanceToNow(new Date(lead.created_at), { addSuffix: true })}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Status badge */}
-      <div className="flex items-center gap-2 px-1">
-        <span className={`text-[10px] font-medium px-2 py-1 rounded-full ${
-          lead.status === 'new' ? 'bg-primary/10 text-primary' :
-          lead.status === 'contacted' ? 'bg-green-500/10 text-green-600' :
-          'bg-secondary text-muted-foreground'
-        }`}>
-          {lead.status === 'new' ? '● New' : lead.status === 'contacted' ? '✓ Contacted' : lead.status || 'Pending'}
-        </span>
-      </div>
-    </div>
-  );
-}
 
 export default MessagesPage;

@@ -11,7 +11,6 @@ import {
   FileDown, DollarSign, Clock, CheckCircle2, XCircle, Filter,
   FileText, ChevronLeft, ChevronRight, Download, ShieldCheck,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import DashboardHeader from './DashboardHeader';
 import TrustReceiptModal from './TrustReceiptModal';

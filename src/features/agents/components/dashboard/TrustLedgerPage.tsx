@@ -87,6 +87,7 @@ const TrustLedgerPage = () => {
   const [filterDateFrom, setFilterDateFrom] = useState('');
   const [filterDateTo, setFilterDateTo] = useState('');
   const [showNewReceipt, setShowNewReceipt] = useState(false);
+  const [showStatement, setShowStatement] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!user) return;

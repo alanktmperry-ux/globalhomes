@@ -75,6 +75,8 @@ export default function AgentPublicProfilePage() {
           serviceAreas: data.service_areas || [],
           verificationBadgeLevel: data.verification_badge_level,
           agencyId: data.agency_id,
+          investmentNiche: data.investment_niche,
+          handlesTrustAccounting: data.handles_trust_accounting || false,
         });
 
         // Fetch agent's listings

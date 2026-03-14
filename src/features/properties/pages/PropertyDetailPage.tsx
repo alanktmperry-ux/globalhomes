@@ -313,8 +313,11 @@ export default function PropertyDetailPage() {
             )}
           </div>
 
-          {/* Sidebar - agent card */}
+          {/* Sidebar */}
           <div className="space-y-4">
+            {/* Investment Insights */}
+            <InvestmentInsightsCard property={property} />
+
             <div className="p-5 rounded-2xl bg-card border border-border shadow-card sticky top-4">
               <h3 className="font-display font-semibold text-foreground mb-4">{t('property.agent')}</h3>
               <Link to={property.agent.id ? `/agent/${property.agent.id}` : '#'} className="flex items-center gap-3 mb-5 group/agent cursor-pointer">

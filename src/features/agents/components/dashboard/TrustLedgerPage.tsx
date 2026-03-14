@@ -178,22 +178,105 @@ const TrustLedgerPage = () => {
   const netPosition = totalReceipts - totalPayments;
   const pendingCount = ledgerEntries.filter(e => e.status === 'pending' || e.status === 'received').length;
 
-  // CSV export
+  // 5yr compliant CSV export
   const exportCsv = () => {
-    const headers = ['Date', 'Type', 'Number', 'Client', 'Property', 'Method', 'Purpose', 'Amount', 'Status'];
-    const rows = filtered.map(e => [
-      e.date, e.type === 'receipt' ? 'IN' : 'OUT', e.number, e.client,
-      e.property, e.method, e.purpose,
-      (e.type === 'receipt' ? '+' : '-') + e.amount.toFixed(2), e.status,
+    const headers = ['Date', 'Receipt#', 'Payment#', 'Client', 'Property', 'Purpose', 'Method', 'In', 'Out', 'Balance', 'Status'];
+    const rows = entriesWithBalance.map(e => [
+      e.date,
+      e.type === 'receipt' ? e.number : '',
+      e.type === 'payment' ? e.number : '',
+      e.client, e.property, e.purpose, e.method,
+      e.type === 'receipt' ? e.amount.toFixed(2) : '',
+      e.type === 'payment' ? e.amount.toFixed(2) : '',
+      e.balance.toFixed(2),
+      e.status,
     ]);
-    const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${c}"`).join(','))].join('\n');
+    const csv = [
+      `Trust Ledger - ${monthNames[viewMonth]} ${viewYear}`,
+      `Generated: ${new Date().toISOString()}`,
+      `Retention: 5 years per Agents Financial Administration Act 2014`,
+      '',
+      headers.join(','),
+      ...rows.map(r => r.map(c => `"${c}"`).join(',')),
+      '',
+      `Total In:,"${AUD.format(filtered.filter(e => e.type === 'receipt').reduce((s, e) => s + e.amount, 0))}"`,
+      `Total Out:,"${AUD.format(filtered.filter(e => e.type === 'payment').reduce((s, e) => s + e.amount, 0))}"`,
+      `Closing Balance:,"${AUD.format(entriesWithBalance.length > 0 ? entriesWithBalance[entriesWithBalance.length - 1].balance : 0)}"`,
+    ].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `trust_ledger_${new Date().toISOString().split('T')[0]}.csv`;
+    a.href = url; a.download = `trust_ledger_${viewYear}_${String(viewMonth + 1).padStart(2, '0')}_5yr_compliant.csv`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success('Ledger exported');
+    toast.success('5yr compliant ledger exported');
+  };
+
+  // Audit PDF export
+  const exportAuditPdf = () => {
+    const closingBalance = entriesWithBalance.length > 0 ? entriesWithBalance[entriesWithBalance.length - 1].balance : 0;
+    const totalIn = filtered.filter(e => e.type === 'receipt').reduce((s, e) => s + e.amount, 0);
+    const totalOut = filtered.filter(e => e.type === 'payment').reduce((s, e) => s + e.amount, 0);
+
+    const rows = entriesWithBalance.map(e => `
+      <tr>
+        <td>${new Date(e.date + 'T00:00:00').toLocaleDateString('en-AU', { day: '2-digit', month: '2-digit' })}</td>
+        <td class="mono">${e.type === 'receipt' ? e.number : ''}</td>
+        <td class="mono">${e.type === 'payment' ? e.number : ''}</td>
+        <td>${e.client}</td>
+        <td class="truncate">${e.property}</td>
+        <td class="right ${e.type === 'receipt' ? 'green' : ''}">${e.type === 'receipt' ? '+' + AUD.format(e.amount) : ''}</td>
+        <td class="right ${e.type === 'payment' ? 'red' : ''}">${e.type === 'payment' ? '-' + AUD.format(e.amount) : ''}</td>
+        <td class="right bold">${AUD.format(e.balance)}</td>
+      </tr>`).join('');
+
+    const html = `<!DOCTYPE html><html><head><title>Trust Ledger - ${monthNames[viewMonth]} ${viewYear}</title>
+    <style>
+      @page { size: A4 landscape; margin: 15mm; }
+      body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10px; color: #1a1a1a; }
+      .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #1a1a1a; padding-bottom: 10px; }
+      .header h1 { font-size: 18px; margin: 0; }
+      .header .act { font-size: 9px; color: #666; margin-top: 4px; }
+      .header .period { font-size: 13px; font-weight: bold; margin-top: 6px; }
+      table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+      th { background: #f5f5f5; border: 1px solid #ddd; padding: 6px 8px; text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; }
+      td { border: 1px solid #eee; padding: 5px 8px; font-size: 10px; }
+      tr:nth-child(even) { background: #fafafa; }
+      .right { text-align: right; }
+      .bold { font-weight: bold; }
+      .mono { font-family: 'Courier New', monospace; font-size: 10px; }
+      .green { color: #16a34a; }
+      .red { color: #dc2626; }
+      .truncate { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .summary { margin-top: 16px; display: flex; gap: 30px; justify-content: flex-end; }
+      .summary div { text-align: right; }
+      .summary .label { font-size: 9px; color: #666; text-transform: uppercase; }
+      .summary .value { font-size: 14px; font-weight: bold; }
+      .footer { margin-top: 24px; padding-top: 10px; border-top: 1px solid #ddd; font-size: 8px; color: #999; text-align: center; }
+    </style></head><body>
+    <div class="header">
+      <p class="act">Agents Financial Administration Act 2014</p>
+      <h1>Trust Account Ledger</h1>
+      <p class="period">${monthNames[viewMonth]} ${viewYear}</p>
+    </div>
+    <table>
+      <thead><tr>
+        <th>Date</th><th>Receipt #</th><th>Payment #</th><th>Client</th><th>Property</th><th class="right">In</th><th class="right">Out</th><th class="right">Balance</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="summary">
+      <div><span class="label">Total In</span><br/><span class="value green">${AUD.format(totalIn)}</span></div>
+      <div><span class="label">Total Out</span><br/><span class="value red">${AUD.format(totalOut)}</span></div>
+      <div><span class="label">Closing Balance</span><br/><span class="value">${AUD.format(closingBalance)}</span></div>
+    </div>
+    <div class="footer">
+      Generated ${new Date().toLocaleDateString('en-AU')} — Retain for minimum 5 years per AFAA 2014 s.84
+    </div>
+    </body></html>`;
+
+    const w = window.open('', '_blank', 'width=1100,height=700');
+    if (w) { w.document.write(html); w.document.close(); w.print(); }
   };
 
   if (loading) {

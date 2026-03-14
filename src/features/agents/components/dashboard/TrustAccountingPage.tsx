@@ -626,7 +626,7 @@ const TrustAccountingPage = () => {
 
         {/* ── Bulk Payments Section ── */}
         {pendingPayments.length > 0 && (
-          <Card className="mb-6">
+          <Card className="mb-6" id="bulk-payments-section">
             <CardContent className="p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">

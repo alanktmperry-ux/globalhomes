@@ -84,6 +84,7 @@ const STEPS = ['Address', 'Basics', 'Photos', 'Voice', 'Settings', 'Preview'];
 interface Props {
   onPublish: (title: string) => void;
   onCancel: () => void;
+  initialListingType?: ListingDraft['listingType'];
   /** When provided, the form loads this property for editing */
   editPropertyId?: string | null;
   /** When provided, the form loads this property's data but creates a new listing */

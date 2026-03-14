@@ -45,106 +45,14 @@ const MessagesPage = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Fetch conversations
-  const fetchConversations = useCallback(async () => {
-    if (!user) { setLoading(false); return; }
-    setLoading(true);
+  const getConversationKey = (otherUserId: string, propertyId: string | null) => {
+    if (!otherUserId) return null;
+    return `${otherUserId}:${propertyId || 'none'}`;
+  };
 
-    const { data: convos } = await supabase
-      .from('conversations')
-      .select('*')
-      .or(`participant_1.eq.${user.id},participant_2.eq.${user.id}`)
-      .order('last_message_at', { ascending: false });
-
-    if (!convos || convos.length === 0) {
-      // Also check for legacy leads to show as conversations
-      await fetchLegacyLeads();
-      setLoading(false);
-      return;
-    }
-
-    // Enrich conversations with user info and last message
-    const enriched: Conversation[] = [];
-    for (const c of convos) {
-      const otherId = c.participant_1 === user.id ? c.participant_2 : c.participant_1;
-
-      // Get other user's display info (check agents first, then profiles)
-      let otherName = 'User';
-      let otherAvatar: string | null = null;
-
-      const { data: agentData } = await supabase
-        .from('agents')
-        .select('name, avatar_url')
-        .eq('user_id', otherId)
-        .maybeSingle();
-
-      if (agentData) {
-        otherName = agentData.name;
-        otherAvatar = agentData.avatar_url;
-      } else {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('display_name, avatar_url')
-          .eq('user_id', otherId)
-          .maybeSingle();
-        if (profileData) {
-          otherName = profileData.display_name || 'User';
-          otherAvatar = profileData.avatar_url;
-        }
-      }
-
-      // Get property info if linked
-      let propTitle, propAddress, propImage;
-      if (c.property_id) {
-        const { data: prop } = await supabase
-          .from('properties')
-          .select('title, address, image_url')
-          .eq('id', c.property_id)
-          .maybeSingle();
-        if (prop) {
-          propTitle = prop.title;
-          propAddress = prop.address;
-          propImage = prop.image_url;
-        }
-      }
-
-      // Get last message
-      const { data: lastMsg } = await supabase
-        .from('messages')
-        .select('content')
-        .eq('conversation_id', c.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      // Get unread count
-      const { count } = await supabase
-        .from('messages')
-        .select('id', { count: 'exact', head: true })
-        .eq('conversation_id', c.id)
-        .eq('is_read', false)
-        .neq('sender_id', user.id);
-
-      enriched.push({
-        ...c,
-        other_user_name: otherName,
-        other_user_avatar: otherAvatar,
-        other_user_id: otherId,
-        property_title: propTitle,
-        property_address: propAddress,
-        property_image: propImage,
-        last_message_text: lastMsg?.content,
-        unread_count: count || 0,
-      });
-    }
-
-    setConversations(enriched);
-    setLoading(false);
-  }, [user]);
-
-  // Fetch legacy leads as pseudo-conversations for agents
-  const fetchLegacyLeads = async () => {
-    if (!user) return;
+  // Fetch legacy leads as pseudo-conversations for agents/buyers
+  const fetchLegacyLeads = useCallback(async (): Promise<Conversation[]> => {
+    if (!user) return [];
 
     // Check if user is agent
     const { data: agent } = await supabase
@@ -161,55 +69,167 @@ const MessagesPage = () => {
         .order('created_at', { ascending: false })
         .limit(50);
 
-      if (leads && leads.length > 0) {
-        const legacyConvos: Conversation[] = leads.map((l: any) => ({
-          id: `lead-${l.id}`,
-          participant_1: user.id,
-          participant_2: l.user_id || '',
-          property_id: l.property_id,
-          last_message_at: l.created_at,
-          created_at: l.created_at,
-          other_user_name: l.user_name,
-          other_user_avatar: null,
-          other_user_id: l.user_id || '',
-          property_title: l.properties?.title,
-          property_address: l.properties?.address,
-          property_image: l.properties?.image_url,
-          last_message_text: l.message || 'New enquiry',
-          unread_count: l.status === 'new' ? 1 : 0,
-        }));
-        setConversations(legacyConvos);
-      }
-    } else {
-      // Buyer: show leads they sent
-      const { data: leads } = await supabase
-        .from('leads')
-        .select('*, properties:property_id(title, address, image_url), agents:agent_id(name, avatar_url)')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(50);
+      if (!leads || leads.length === 0) return [];
 
-      if (leads && leads.length > 0) {
-        const legacyConvos: Conversation[] = leads.map((l: any) => ({
-          id: `lead-${l.id}`,
-          participant_1: user.id,
-          participant_2: '',
-          property_id: l.property_id,
-          last_message_at: l.created_at,
-          created_at: l.created_at,
-          other_user_name: l.agents?.name || 'Agent',
-          other_user_avatar: l.agents?.avatar_url,
-          other_user_id: '',
-          property_title: l.properties?.title,
-          property_address: l.properties?.address,
-          property_image: l.properties?.image_url,
-          last_message_text: l.message || 'Your enquiry',
-          unread_count: 0,
-        }));
-        setConversations(legacyConvos);
+      return leads.map((l: any) => ({
+        id: `lead-${l.id}`,
+        participant_1: user.id,
+        participant_2: l.user_id || '',
+        property_id: l.property_id,
+        last_message_at: l.created_at,
+        created_at: l.created_at,
+        other_user_name: l.user_name,
+        other_user_avatar: null,
+        other_user_id: l.user_id || '',
+        property_title: l.properties?.title,
+        property_address: l.properties?.address,
+        property_image: l.properties?.image_url,
+        last_message_text: l.message || 'New enquiry',
+        unread_count: l.status === 'new' ? 1 : 0,
+      }));
+    }
+
+    // Buyer: show leads they sent
+    const { data: leads } = await supabase
+      .from('leads')
+      .select('*, properties:property_id(title, address, image_url), agents:agent_id(name, avatar_url, user_id)')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    if (!leads || leads.length === 0) return [];
+
+    return leads.map((l: any) => ({
+      id: `lead-${l.id}`,
+      participant_1: user.id,
+      participant_2: l.agents?.user_id || '',
+      property_id: l.property_id,
+      last_message_at: l.created_at,
+      created_at: l.created_at,
+      other_user_name: l.agents?.name || 'Agent',
+      other_user_avatar: l.agents?.avatar_url,
+      other_user_id: l.agents?.user_id || '',
+      property_title: l.properties?.title,
+      property_address: l.properties?.address,
+      property_image: l.properties?.image_url,
+      last_message_text: l.message || 'Your enquiry',
+      unread_count: 0,
+    }));
+  }, [user]);
+
+  // Fetch conversations
+  const fetchConversations = useCallback(async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+
+    const { data: convos } = await supabase
+      .from('conversations')
+      .select('*')
+      .or(`participant_1.eq.${user.id},participant_2.eq.${user.id}`)
+      .order('last_message_at', { ascending: false });
+
+    const convoRows = convos ?? [];
+
+    const enriched = await Promise.all(
+      convoRows.map(async (c: any) => {
+        const otherId = c.participant_1 === user.id ? c.participant_2 : c.participant_1;
+
+        // Get other user's display info (check agents first, then profiles)
+        let otherName = 'User';
+        let otherAvatar: string | null = null;
+
+        const { data: agentData } = await supabase
+          .from('agents')
+          .select('name, avatar_url')
+          .eq('user_id', otherId)
+          .maybeSingle();
+
+        if (agentData) {
+          otherName = agentData.name;
+          otherAvatar = agentData.avatar_url;
+        } else {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('display_name, avatar_url')
+            .eq('user_id', otherId)
+            .maybeSingle();
+          if (profileData) {
+            otherName = profileData.display_name || 'User';
+            otherAvatar = profileData.avatar_url;
+          }
+        }
+
+        // Get property info if linked
+        let propTitle: string | undefined;
+        let propAddress: string | undefined;
+        let propImage: string | null | undefined;
+        if (c.property_id) {
+          const { data: prop } = await supabase
+            .from('properties')
+            .select('title, address, image_url')
+            .eq('id', c.property_id)
+            .maybeSingle();
+          if (prop) {
+            propTitle = prop.title;
+            propAddress = prop.address;
+            propImage = prop.image_url;
+          }
+        }
+
+        // Get last message
+        const { data: lastMsg } = await supabase
+          .from('messages')
+          .select('content')
+          .eq('conversation_id', c.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        // Get unread count
+        const { count } = await supabase
+          .from('messages')
+          .select('id', { count: 'exact', head: true })
+          .eq('conversation_id', c.id)
+          .eq('is_read', false)
+          .neq('sender_id', user.id);
+
+        return {
+          ...c,
+          other_user_name: otherName,
+          other_user_avatar: otherAvatar,
+          other_user_id: otherId,
+          property_title: propTitle,
+          property_address: propAddress,
+          property_image: propImage,
+          last_message_text: lastMsg?.content,
+          unread_count: count || 0,
+        } as Conversation;
+      })
+    );
+
+    const legacyConversations = await fetchLegacyLeads();
+    const realConversationKeys = new Set(
+      enriched
+        .map((c) => getConversationKey(c.other_user_id, c.property_id))
+        .filter((key): key is string => Boolean(key))
+    );
+
+    const merged = [...enriched];
+    for (const legacy of legacyConversations) {
+      const legacyKey = getConversationKey(legacy.other_user_id, legacy.property_id);
+      if (!legacyKey || !realConversationKeys.has(legacyKey)) {
+        merged.push(legacy);
       }
     }
-  };
+
+    merged.sort((a, b) => new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime());
+    setConversations(merged);
+    setLoading(false);
+  }, [fetchLegacyLeads, user]);
 
   useEffect(() => {
     fetchConversations();
@@ -290,49 +310,69 @@ const MessagesPage = () => {
   // Send message
   const handleSend = async () => {
     if (!newMessage.trim() || !user || !selectedConvo || sending) return;
-    
-    // For legacy lead conversations, create a real conversation first
+
+    // For legacy lead conversations, create/find a real conversation first
     let convoId = selectedConvo.id;
-    
+
     if (convoId.startsWith('lead-')) {
       if (!selectedConvo.other_user_id) return;
-      
-      // Create real conversation
+
+      const participant_1 = user.id < selectedConvo.other_user_id ? user.id : selectedConvo.other_user_id;
+      const participant_2 = user.id < selectedConvo.other_user_id ? selectedConvo.other_user_id : user.id;
+
       const { data: newConvo, error } = await supabase
         .from('conversations')
-        .insert({
-          participant_1: user.id,
-          participant_2: selectedConvo.other_user_id,
-          property_id: selectedConvo.property_id,
-        })
-        .select()
+        .upsert(
+          {
+            participant_1,
+            participant_2,
+            property_id: selectedConvo.property_id,
+          },
+          { onConflict: 'participant_1,participant_2,property_id' }
+        )
+        .select('id')
         .single();
 
       if (error || !newConvo) return;
-      convoId = newConvo.id;
 
-      // Update selected convo
-      setSelectedConvo(prev => prev ? { ...prev, id: convoId } : null);
+      convoId = newConvo.id;
+      setSelectedConvo((prev) =>
+        prev
+          ? {
+              ...prev,
+              id: convoId,
+              participant_1,
+              participant_2,
+            }
+          : null
+      );
     }
 
     setSending(true);
     const content = newMessage.trim();
     setNewMessage('');
 
-    await supabase.from('messages').insert({
-      conversation_id: convoId,
-      sender_id: user.id,
-      content,
-    });
+    try {
+      const { error: sendError } = await supabase.from('messages').insert({
+        conversation_id: convoId,
+        sender_id: user.id,
+        content,
+      });
 
-    // Update last_message_at
-    await supabase
-      .from('conversations')
-      .update({ last_message_at: new Date().toISOString() })
-      .eq('id', convoId);
+      if (sendError) {
+        setNewMessage(content);
+        return;
+      }
 
-    setSending(false);
-    inputRef.current?.focus();
+      // Update last_message_at
+      await supabase
+        .from('conversations')
+        .update({ last_message_at: new Date().toISOString() })
+        .eq('id', convoId);
+    } finally {
+      setSending(false);
+      inputRef.current?.focus();
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -349,6 +389,10 @@ const MessagesPage = () => {
     if (isYesterday(d)) return 'Yesterday ' + format(d, 'h:mm a');
     return format(d, 'MMM d, h:mm a');
   };
+
+  const isLegacyReadOnly = Boolean(
+    selectedConvo?.id.startsWith('lead-') && !selectedConvo?.other_user_id
+  );
 
   if (!user) {
     return (
@@ -422,7 +466,9 @@ const MessagesPage = () => {
                 {selectedConvo.id.startsWith('lead-') && messages.length === 0 ? (
                   <div className="bg-secondary/50 rounded-2xl p-4 text-center">
                     <p className="text-sm text-muted-foreground">
-                      This conversation started from an enquiry. Send a message to start chatting.
+                      {isLegacyReadOnly
+                        ? 'This enquiry was submitted without a platform account, so in-app chat is unavailable.'
+                        : 'This conversation started from an enquiry. Send a message to start chatting.'}
                     </p>
                     {selectedConvo.last_message_text && (
                       <div className="mt-3 p-3 bg-primary/5 rounded-xl text-left">
@@ -461,13 +507,14 @@ const MessagesPage = () => {
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Type a message..."
+                    placeholder={isLegacyReadOnly ? 'In-app messaging unavailable for this enquiry' : 'Type a message...'}
                     rows={1}
-                    className="flex-1 resize-none rounded-2xl border border-border bg-secondary/50 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring max-h-24"
+                    disabled={isLegacyReadOnly}
+                    className="flex-1 resize-none rounded-2xl border border-border bg-secondary/50 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring max-h-24 disabled:cursor-not-allowed disabled:opacity-60"
                   />
                   <button
                     onClick={handleSend}
-                    disabled={!newMessage.trim() || sending}
+                    disabled={isLegacyReadOnly || !newMessage.trim() || sending}
                     className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0 disabled:opacity-40 hover:opacity-90 transition-opacity"
                   >
                     <Send size={16} />

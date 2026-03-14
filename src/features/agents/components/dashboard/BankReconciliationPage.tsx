@@ -78,6 +78,12 @@ const BankReconciliationPage = () => {
   const [showImport, setShowImport] = useState(false);
   const [csvText, setCsvText] = useState('');
   const [importSaving, setImportSaving] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [autoMatchRunning, setAutoMatchRunning] = useState(false);
+  const [reconcileAllRunning, setReconcileAllRunning] = useState(false);
+  const [currentBalance, setCurrentBalance] = useState<number | null>(null);
+  const fileInputRef = useCallback((node: HTMLInputElement | null) => { /* stored for click */ }, []);
+  const [fileInputEl, setFileInputEl] = useState<HTMLInputElement | null>(null);
 
   const fetchData = useCallback(async () => {
     if (!user) return;

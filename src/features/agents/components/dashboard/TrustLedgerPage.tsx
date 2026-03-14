@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
 import TrustReceiptModal from './TrustReceiptModal';
+import TrustStatementModal from './TrustStatementModal';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/AuthProvider';
 import { toast } from 'sonner';
@@ -86,6 +87,7 @@ const TrustLedgerPage = () => {
   const [filterDateFrom, setFilterDateFrom] = useState('');
   const [filterDateTo, setFilterDateTo] = useState('');
   const [showNewReceipt, setShowNewReceipt] = useState(false);
+  const [showStatement, setShowStatement] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!user) return;
@@ -191,6 +193,9 @@ const TrustLedgerPage = () => {
         subtitle="Receipts & payments register — Agents Financial Administration Act 2014"
         actions={
           <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={() => setShowStatement(true)} className="gap-1.5 text-xs">
+              <FileDown size={13} /> Monthly Statement
+            </Button>
             <Button size="sm" variant="outline" onClick={exportCsv} className="gap-1.5 text-xs">
               <FileDown size={13} /> Export CSV
             </Button>
@@ -408,6 +413,12 @@ const TrustLedgerPage = () => {
         open={showNewReceipt}
         onOpenChange={setShowNewReceipt}
         onCreated={fetchData}
+      />
+
+      {/* Monthly Statement Modal */}
+      <TrustStatementModal
+        open={showStatement}
+        onOpenChange={setShowStatement}
       />
     </div>
   );

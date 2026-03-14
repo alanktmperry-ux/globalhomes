@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import {
   Landmark, Plus, ArrowDownCircle, CheckCircle2, DollarSign,
   TrendingUp, TrendingDown, FileDown, Trash2, Pencil, Clock,
-  AlertTriangle, CalendarIcon, Home, Users,
+  AlertTriangle, CalendarIcon, Home, Users, Receipt,
 } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
 import TrustReceiptModal from './TrustReceiptModal';

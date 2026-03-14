@@ -28,6 +28,8 @@ const AgentAuthPage = () => {
   const [officeAddress, setOfficeAddress] = useState('');
   const [yearsExperience, setYearsExperience] = useState('');
   const [specialization, setSpecialization] = useState('Residential');
+  const [investmentNiche, setInvestmentNiche] = useState('');
+  const [handlesTrustAccounting, setHandlesTrustAccounting] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
 

@@ -31,6 +31,8 @@ interface AgentProfile {
   serviceAreas: string[];
   verificationBadgeLevel: string | null;
   agencyId: string | null;
+  investmentNiche: string | null;
+  handlesTrustAccounting: boolean;
 }
 
 export default function AgentPublicProfilePage() {

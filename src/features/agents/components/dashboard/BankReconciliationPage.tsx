@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import {
   Scale, Plus, CheckCircle2, XCircle, Link2, Unlink, ArrowDownCircle, ArrowUpCircle,
   CalendarIcon, Search, FileDown, DollarSign, Clock, AlertTriangle, Upload,
+  RefreshCw, FileText, Check,
 } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
 import { supabase } from '@/integrations/supabase/client';

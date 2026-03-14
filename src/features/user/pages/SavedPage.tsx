@@ -7,7 +7,7 @@ import { useI18n } from '@/lib/i18n';
 import { useSavedProperties } from '@/hooks/useSavedProperties';
 import { mockProperties } from '@/lib/mock-data';
 import { Property } from '@/lib/types';
-import { supabase } from '@/integrations/supabase/client';
+import { fetchPublicProperties } from '@/features/properties/api/fetchPublicProperties';
 
 const SavedPage = () => {
   const { t } = useI18n();
@@ -15,66 +15,12 @@ const SavedPage = () => {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [dbProperties, setDbProperties] = useState<Property[]>([]);
   const [dbLoading, setDbLoading] = useState(true);
-  const [dbError, setDbError] = useState<string | null>(null);
 
-  // Fetch DB properties once
   useEffect(() => {
-    const fetchDbProperties = async () => {
-      setDbLoading(true);
-      setDbError(null);
-      const { data, error } = await supabase
-        .from('properties')
-        .select('*, agents(name, agency, phone, email, avatar_url, is_subscribed)')
-        .eq('status', 'public')
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      if (error) {
-        setDbError(error.message);
-        setDbProperties([]);
-      } else if (data && data.length > 0) {
-        const mapped: Property[] = data.map((p: any) => ({
-          id: p.id,
-          title: p.title,
-          address: p.address,
-          suburb: p.suburb,
-          state: p.state,
-          country: p.country,
-          price: p.price,
-          priceFormatted: p.price_formatted,
-          beds: p.beds,
-          baths: p.baths,
-          parking: p.parking,
-          sqm: p.sqm,
-          imageUrl: p.image_url || p.images?.[0] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80',
-          images: p.images || (p.image_url ? [p.image_url] : []),
-          description: p.description || '',
-          estimatedValue: p.estimated_value || '',
-          propertyType: p.property_type || 'House',
-          features: p.features || [],
-          agent: p.agents ? {
-            id: p.agent_id || '',
-            name: p.agents.name || 'Agent',
-            agency: p.agents.agency || '',
-            phone: p.agents.phone || '',
-            email: p.agents.email || '',
-            avatarUrl: p.agents.avatar_url || '',
-            isSubscribed: p.agents.is_subscribed || false,
-          } : {
-            id: '', name: 'Private Seller', agency: '', phone: '', email: '', avatarUrl: '', isSubscribed: false,
-          },
-          listedDate: p.listed_date || p.created_at,
-          views: p.views,
-          contactClicks: p.contact_clicks,
-          lat: p.lat || undefined,
-          lng: p.lng || undefined,
-          status: 'listed' as const,
-        }));
-        setDbProperties(mapped);
-      }
+    fetchPublicProperties().then((props) => {
+      setDbProperties(props);
       setDbLoading(false);
-    };
-    fetchDbProperties();
+    });
   }, []);
 
   // Combine mock + DB properties, deduplicate by ID, then filter to saved

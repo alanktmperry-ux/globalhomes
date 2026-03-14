@@ -37,6 +37,8 @@ export interface ListingDraft {
   allowCoBroke: boolean;
   autoDeclineBelow: number;
   scheduledAt: string | null;
+  sqm: number;
+  landSize: number;
   lat?: number;
   lng?: number;
 }

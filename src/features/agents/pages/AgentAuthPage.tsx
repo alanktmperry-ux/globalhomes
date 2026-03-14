@@ -112,6 +112,8 @@ const AgentAuthPage = () => {
           officeAddress,
           yearsExperience,
           specialization,
+          investmentNiche: investmentNiche || null,
+          handlesTrustAccounting,
         },
       });
 

@@ -41,6 +41,8 @@ Deno.serve(async (req) => {
       office_address: officeAddress || null,
       years_experience: yearsExperience ? parseInt(yearsExperience, 10) : null,
       specialization: specialization || "Residential",
+      investment_niche: investmentNiche || null,
+      handles_trust_accounting: handlesTrustAccounting === true,
     };
 
     if (mode === "create-agency") {

@@ -1,5 +1,6 @@
 import { Home, Building2, Warehouse, Mountain, Store, Minus, Plus } from 'lucide-react';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import type { ListingDraft } from './PocketListingForm';
 
@@ -130,11 +131,33 @@ const StepBasics = ({ draft, update }: Props) => {
         {showCars && (
           <Counter label="Car Spaces" value={draft.cars} onChange={(v) => update({ cars: v })} />
         )}
-        {isLand && (
-          <div className="bg-secondary rounded-xl px-4 py-3">
-            <span className="text-sm text-muted-foreground">Land listings use area (sqm) and zoning — set these in the description step.</span>
+        {/* Floor Area & Land Size */}
+        <div className="grid grid-cols-2 gap-3">
+          {!isLand && (
+            <div>
+              <Label className="text-xs text-muted-foreground mb-1 block">Floor Area (sqm)</Label>
+              <Input
+                type="number"
+                min={0}
+                value={draft.sqm || ''}
+                onChange={(e) => update({ sqm: Number(e.target.value) || 0 })}
+                placeholder="e.g. 180"
+                className="h-9"
+              />
+            </div>
+          )}
+          <div className={isLand ? 'col-span-2' : ''}>
+            <Label className="text-xs text-muted-foreground mb-1 block">Land Size (sqm)</Label>
+            <Input
+              type="number"
+              min={0}
+              value={draft.landSize || ''}
+              onChange={(e) => update({ landSize: Number(e.target.value) || 0 })}
+              placeholder="e.g. 650"
+              className="h-9"
+            />
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

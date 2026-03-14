@@ -37,6 +37,8 @@ export interface ListingDraft {
   allowCoBroke: boolean;
   autoDeclineBelow: number;
   scheduledAt: string | null;
+  sqm: number;
+  landSize: number;
   lat?: number;
   lng?: number;
 }
@@ -52,6 +54,8 @@ const DEFAULT_DRAFT: ListingDraft = {
   beds: 3,
   baths: 2,
   cars: 2,
+  sqm: 0,
+  landSize: 0,
   photos: [],
   primaryPhoto: 0,
   voiceTranscript: '',
@@ -150,6 +154,8 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePrope
         showContact: true,
         allowCoBroke: true,
         autoDeclineBelow: 0,
+        sqm: prop.sqm || 0,
+        landSize: (prop as any).land_size || 0,
         scheduledAt: null,
       });
       setLoadingEdit(false);
@@ -216,7 +222,8 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePrope
         beds: draft.beds,
         baths: draft.baths,
         parking: draft.cars,
-        sqm: 0,
+        sqm: draft.sqm || 0,
+        land_size: draft.landSize || null,
         property_type: draft.propertyType,
         description,
         features: draft.features,

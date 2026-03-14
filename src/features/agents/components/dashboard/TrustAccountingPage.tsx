@@ -12,7 +12,7 @@ import {
   Landmark, Plus, ArrowDownCircle, CheckCircle2, DollarSign,
   TrendingUp, TrendingDown, FileDown, Trash2, Pencil, Clock,
   AlertTriangle, CalendarIcon, Home, Users, Receipt, Upload,
-  CreditCard, CheckSquare,
+  CreditCard, CheckSquare, ShieldCheck, FileText, BarChart3,
 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
@@ -79,7 +79,12 @@ const TrustAccountingPage = () => {
   const [selectedPaymentIds, setSelectedPaymentIds] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
 
-  // Fetch pending payments
+  // Fetch pending payments + receipts stats
+  const [newReceiptsCount, setNewReceiptsCount] = useState(0);
+  const [lastReceiptNumber, setLastReceiptNumber] = useState('—');
+  const [lastReconciledDate, setLastReconciledDate] = useState<string | null>(null);
+  const [unmatchedCount, setUnmatchedCount] = useState(0);
+
   const fetchPendingPayments = useCallback(async () => {
     if (!user) return;
     const { data } = await supabase
@@ -90,7 +95,41 @@ const TrustAccountingPage = () => {
     if (data) setPendingPayments(data as PendingPayment[]);
   }, [user]);
 
-  useEffect(() => { fetchPendingPayments(); }, [fetchPendingPayments]);
+  const fetchDashboardStats = useCallback(async () => {
+    if (!user) return;
+    // New receipts (received status)
+    const { count: rCount } = await supabase
+      .from('trust_receipts')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'received');
+    setNewReceiptsCount(rCount || 0);
+
+    // Last receipt number
+    const { data: lastR } = await supabase
+      .from('trust_receipts')
+      .select('receipt_number')
+      .order('created_at', { ascending: false })
+      .limit(1);
+    if (lastR?.[0]) setLastReceiptNumber(`#${lastR[0].receipt_number}`);
+
+    // Last reconciled date
+    const { data: lastRecon } = await supabase
+      .from('trust_reconciliations')
+      .select('bank_date')
+      .eq('status', 'matched')
+      .order('bank_date', { ascending: false })
+      .limit(1);
+    if (lastRecon?.[0]) setLastReconciledDate(lastRecon[0].bank_date);
+
+    // Unmatched reconciliation items
+    const { count: uCount } = await supabase
+      .from('trust_reconciliations')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'unmatched');
+    setUnmatchedCount(uCount || 0);
+  }, [user]);
+
+  useEffect(() => { fetchPendingPayments(); fetchDashboardStats(); }, [fetchPendingPayments, fetchDashboardStats]);
 
   // New tx form
   const [txCategory, setTxCategory] = useState('deposit');
@@ -485,49 +524,101 @@ const TrustAccountingPage = () => {
         }
       />
       <div className="p-4 sm:p-6 max-w-[1600px]">
-        {/* ── Summary Cards ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <DollarSign size={18} className="text-primary" />
+        {/* ── 3-Panel Dashboard Cards ── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          {/* Receipts Card */}
+          <Card className="border-l-4 border-l-primary">
+            <CardContent className="p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Receipt size={16} className="text-primary" />
+                  <h3 className="text-sm font-bold">Receipts</h3>
+                  {newReceiptsCount > 0 && (
+                    <Badge className="text-[10px]">{newReceiptsCount} New</Badge>
+                  )}
+                </div>
+                <Button size="sm" className="h-7 text-xs gap-1.5" onClick={() => setShowNewReceipt(true)}>
+                  <Plus size={12} /> New Receipt
+                </Button>
               </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Total In Trust</p>
-                <p className="text-lg font-bold truncate">{AUD.format(totalInTrust)}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0">
-                <Clock size={18} className="text-orange-500" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Pending</p>
-                <p className="text-lg font-bold truncate">{AUD.format(pendingTotal)}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0">
-                <CheckCircle2 size={18} className="text-green-500" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Cleared This Month</p>
-                <p className="text-lg font-bold truncate">{AUD.format(clearedThisMonth)}</p>
+              <div className="space-y-1.5 pt-1 border-t border-border">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Balance:</span>
+                  <span className="text-sm font-bold">{AUD.format(totalInTrust)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Last receipt:</span>
+                  <span className="text-xs font-semibold font-mono">{lastReceiptNumber}</span>
+                </div>
               </div>
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
-                <Landmark size={18} className="text-blue-500" />
+
+          {/* Payments Card */}
+          <Card className="border-l-4 border-l-orange-500">
+            <CardContent className="p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CreditCard size={16} className="text-orange-500" />
+                  <h3 className="text-sm font-bold">Payments</h3>
+                  {pendingPayments.length > 0 && (
+                    <Badge variant="outline" className="text-[10px]">{pendingPayments.length} Ready</Badge>
+                  )}
+                </div>
+                <Button size="sm" variant="outline" className="h-7 text-xs gap-1.5"
+                  disabled={pendingPayments.length === 0}
+                  onClick={() => {
+                    setSelectedPaymentIds(new Set(pendingPayments.map(p => p.id)));
+                    document.getElementById('bulk-payments-section')?.scrollIntoView({ behavior: 'smooth' });
+                  }}>
+                  <FileDown size={12} /> Download ABA
+                </Button>
               </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Last Entry</p>
-                <p className="text-xs font-medium truncate" title={lastEntryText}>{lastEntryText}</p>
+              <div className="space-y-1.5 pt-1 border-t border-border">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Unpaid:</span>
+                  <span className="text-sm font-bold">{AUD.format(pendingPayments.reduce((s, p) => s + p.amount, 0))}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Next ABA:</span>
+                  <span className="text-xs font-semibold">
+                    {pendingPayments.length > 0
+                      ? new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: '2-digit' }).format(new Date(Date.now() + 86400000))
+                      : '—'}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Reconciliation Card */}
+          <Card className="border-l-4 border-l-green-500">
+            <CardContent className="p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <BarChart3 size={16} className="text-green-500" />
+                  <h3 className="text-sm font-bold">Reconciliation</h3>
+                  {unmatchedCount > 0 && (
+                    <Badge variant="destructive" className="text-[10px]">{unmatchedCount}</Badge>
+                  )}
+                </div>
+                <Button size="sm" variant="outline" className="h-7 text-xs gap-1.5"
+                  onClick={() => window.location.hash = '#/dashboard/reconciliation'}>
+                  <Upload size={12} /> Upload CSV
+                </Button>
+              </div>
+              <div className="space-y-1.5 pt-1 border-t border-border">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Last reconciled:</span>
+                  <span className="text-xs font-semibold flex items-center gap-1">
+                    {lastReconciledDate
+                      ? <>
+                          {new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: '2-digit' }).format(new Date(lastReconciledDate))}
+                          <CheckCircle2 size={12} className="text-green-500" />
+                        </>
+                      : '—'}
+                  </span>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -535,7 +626,7 @@ const TrustAccountingPage = () => {
 
         {/* ── Bulk Payments Section ── */}
         {pendingPayments.length > 0 && (
-          <Card className="mb-6">
+          <Card className="mb-6" id="bulk-payments-section">
             <CardContent className="p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -838,6 +929,14 @@ const TrustAccountingPage = () => {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* ── AFA Compliance Footer ── */}
+        <div className="mt-6 py-3 px-4 rounded-lg bg-muted/50 border border-border flex items-center justify-center gap-3">
+          <ShieldCheck size={14} className="text-primary shrink-0" />
+          <p className="text-[11px] text-muted-foreground text-center">
+            AFA 2014 compliant &bull; Audit-ready exports &bull; 5-year retention &bull; Voided entries preserved
+          </p>
         </div>
       </div>
 

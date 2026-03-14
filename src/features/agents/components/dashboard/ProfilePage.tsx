@@ -71,6 +71,10 @@ const ProfilePage = () => {
   const [newArea, setNewArea] = useState('');
   const [newLang, setNewLang] = useState('');
   const [docType, setDocType] = useState('license');
+  const [addressSuggestions, setAddressSuggestions] = useState<{ description: string; place_id: string }[]>([]);
+  const [showAddressSuggestions, setShowAddressSuggestions] = useState(false);
+  const [addressSearching, setAddressSearching] = useState(false);
+  const addressTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [form, setForm] = useState({
     name: '',

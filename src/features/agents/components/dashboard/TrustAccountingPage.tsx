@@ -367,19 +367,38 @@ const TrustAccountingPage = () => {
     );
   }
 
+  if (showImportWizard) {
+    return (
+      <div>
+        <DashboardHeader title="Trust Dashboard" subtitle="Import existing trust account" />
+        <div className="p-4 sm:p-6">
+          <TrustImportWizard
+            onComplete={() => { setShowImportWizard(false); fetchAccounts(); fetchTransactions(); }}
+            onCancel={() => setShowImportWizard(false)}
+          />
+        </div>
+      </div>
+    );
+  }
+
   if (accounts.length === 0) {
     return (
       <div>
         <DashboardHeader title="Trust Dashboard" subtitle="Australian trust account management" />
-        <div className="p-4 sm:p-6 max-w-3xl mx-auto">
+        <div className="p-4 sm:p-6 max-w-3xl mx-auto space-y-4">
           <Card>
             <CardContent className="p-10 text-center space-y-4">
               <Landmark size={40} className="mx-auto text-muted-foreground/40" />
               <h2 className="text-lg font-bold">Set Up Your Trust Account</h2>
-              <p className="text-sm text-muted-foreground">Create a trust or operating account to start tracking deposits, rent payments and fees.</p>
-              <Button onClick={() => setShowNewAccount(true)} className="gap-2">
-                <Plus size={14} /> Create Account
-              </Button>
+              <p className="text-sm text-muted-foreground">Create a new trust account or import from your existing system.</p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button onClick={() => setShowNewAccount(true)} className="gap-2">
+                  <Plus size={14} /> Create New Account
+                </Button>
+                <Button variant="outline" onClick={() => setShowImportWizard(true)} className="gap-2">
+                  <Upload size={14} /> Import Existing Account
+                </Button>
+              </div>
             </CardContent>
           </Card>
           {renderNewAccountDialog()}

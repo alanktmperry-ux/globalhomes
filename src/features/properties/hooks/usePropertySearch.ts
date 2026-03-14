@@ -42,25 +42,17 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
 
   // ── Fetch DB properties ──────────────────────────────────────
   useEffect(() => {
-    const fetchDbProperties = async () => {
-      setDbLoading(true);
-      setDbError(null);
-      const { data, error } = await supabase
-        .from('properties')
-        .select('*, agents(name, agency, phone, email, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count)')
-        .eq('status', 'public')
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      if (error) {
-        setDbError(error.message);
+    setDbLoading(true);
+    setDbError(null);
+    fetchPublicProperties()
+      .then((props) => {
+        setDbProperties(props);
+      })
+      .catch((err) => {
+        setDbError(err.message ?? 'Failed to fetch');
         setDbProperties([]);
-      } else if (data && data.length > 0) {
-        setDbProperties(data.map(mapDbProperty));
-      }
-      setDbLoading(false);
-    };
-    fetchDbProperties();
+      })
+      .finally(() => setDbLoading(false));
   }, []);
 
   // ── Search handler ───────────────────────────────────────────

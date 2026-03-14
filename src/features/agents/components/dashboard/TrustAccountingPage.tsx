@@ -634,6 +634,10 @@ const TrustAccountingPage = () => {
           <div className="w-full lg:w-[220px] shrink-0 space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Quick Actions</h3>
             <Button className="w-full justify-start gap-2 text-sm" size="sm"
+              onClick={() => setShowNewReceipt(true)}>
+              <Receipt size={14} /> New Trust Receipt
+            </Button>
+            <Button className="w-full justify-start gap-2 text-sm" variant="secondary" size="sm"
               onClick={() => openNewTx('deposit')}>
               <ArrowDownCircle size={14} /> New Deposit
             </Button>

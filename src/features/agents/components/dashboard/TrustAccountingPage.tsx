@@ -64,6 +64,34 @@ const TrustAccountingPage = () => {
   const [editingTx, setEditingTx] = useState<TrustTransaction | null>(null);
   const [deletingTxId, setDeletingTxId] = useState<string | null>(null);
 
+  // Bulk payments
+  interface PendingPayment {
+    id: string;
+    client_name: string;
+    property_address: string;
+    amount: number;
+    bsb: string | null;
+    account_number: string | null;
+    reference: string | null;
+    payment_number: string;
+  }
+  const [pendingPayments, setPendingPayments] = useState<PendingPayment[]>([]);
+  const [selectedPaymentIds, setSelectedPaymentIds] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
+
+  // Fetch pending payments
+  const fetchPendingPayments = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('trust_payments')
+      .select('id, client_name, property_address, amount, bsb, account_number, reference, payment_number')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false });
+    if (data) setPendingPayments(data as PendingPayment[]);
+  }, [user]);
+
+  useEffect(() => { fetchPendingPayments(); }, [fetchPendingPayments]);
+
   // New tx form
   const [txCategory, setTxCategory] = useState('deposit');
   const [txAmount, setTxAmount] = useState('');

@@ -6,6 +6,7 @@ import { Property } from '@/lib/types';
 import { useI18n } from '@/lib/i18n';
 import { useCurrency } from '@/lib/CurrencyContext';
 import { AgentContactModal } from '@/components/AgentContactModal';
+import { InvestmentInsightsCard } from '@/features/properties/components/InvestmentInsightsCard';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { SiteHeader } from '@/components/SiteHeader';
 import { SiteFooter } from '@/components/SiteFooter';

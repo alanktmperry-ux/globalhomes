@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Receipt, ArrowUpCircle, ArrowDownCircle, CalendarIcon, Search,
   FileDown, DollarSign, Clock, CheckCircle2, XCircle, Filter,
+  FileText, ChevronLeft, ChevronRight,
 } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
 import TrustReceiptModal from './TrustReceiptModal';

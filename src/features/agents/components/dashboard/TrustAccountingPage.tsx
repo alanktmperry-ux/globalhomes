@@ -561,7 +561,7 @@ const TrustAccountingPage = () => {
                 <div className="flex items-center gap-2">
                   <CreditCard size={16} className="text-orange-500" />
                   <h3 className="text-sm font-bold">Payments</h3>
-        {pendingPayments.length > 0 && (<div id="bulk-payments-section">
+                  {pendingPayments.length > 0 && (
                     <Badge variant="outline" className="text-[10px]">{pendingPayments.length} Ready</Badge>
                   )}
                 </div>

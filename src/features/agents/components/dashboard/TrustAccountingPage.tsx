@@ -722,6 +722,16 @@ const TrustAccountingPage = () => {
       </Dialog>
 
       {renderNewAccountDialog()}
+
+      {/* ── New Trust Receipt Modal ── */}
+      <TrustReceiptModal
+        open={showNewReceipt}
+        onOpenChange={setShowNewReceipt}
+        onCreated={() => {
+          fetchAccounts();
+          fetchTransactions();
+        }}
+      />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { Home, Building2, Warehouse, Mountain, Store, Minus, Plus } from 'lucide-react';
+import { Home, Building2, Warehouse, Mountain, Store, Minus, Plus, DollarSign, Key } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
@@ -15,6 +15,11 @@ const TYPES = [
   { key: 'Townhouse', icon: <Warehouse size={20} />, label: 'Town' },
   { key: 'Land', icon: <Mountain size={20} />, label: 'Land' },
   { key: 'Commercial', icon: <Store size={20} />, label: 'Comm' },
+];
+
+const LISTING_TYPES = [
+  { key: 'sale' as const, icon: <DollarSign size={16} />, label: 'For Sale' },
+  { key: 'rent' as const, icon: <Key size={16} />, label: 'For Rent' },
 ];
 
 const PRICE_DISPLAYS = [
@@ -53,11 +58,34 @@ const formatPrice = (v: number) =>
 const StepBasics = ({ draft, update }: Props) => {
   const isLand = draft.propertyType === 'Land';
   const isCommercial = draft.propertyType === 'Commercial';
+  const isRental = draft.listingType === 'rent';
   const showBedsBaths = !isLand;
   const showCars = !isLand;
 
   return (
     <div className="space-y-6">
+      {/* Listing Type — Sale or Rent */}
+      <div>
+        <Label className="text-sm font-semibold mb-3 block">Listing Type</Label>
+        <div className="grid grid-cols-2 gap-2">
+          {LISTING_TYPES.map((lt) => (
+            <button
+              key={lt.key}
+              type="button"
+              onClick={() => update({ listingType: lt.key })}
+              className={`flex items-center justify-center gap-2 py-3 rounded-xl border transition-all text-sm font-medium ${
+                draft.listingType === lt.key
+                  ? 'bg-primary/15 border-primary text-primary'
+                  : 'bg-secondary border-border text-muted-foreground hover:border-primary/40'
+              }`}
+            >
+              {lt.icon}
+              {lt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Property Type */}
       <div>
         <Label className="text-sm font-semibold mb-3 block">Property Type</Label>
@@ -89,36 +117,85 @@ const StepBasics = ({ draft, update }: Props) => {
         {draft.propertyType === 'Commercial' && 'Office, retail, warehouse, or mixed-use'}
       </p>
 
-      {/* Price */}
+      {/* Price — contextual label */}
       <div>
         <Label className="text-sm font-semibold mb-3 block">
-          Price Guide: {formatPrice(draft.priceMin)} – {formatPrice(draft.priceMax)}
+          {isRental ? 'Rent per Week' : 'Price Guide'}: {formatPrice(draft.priceMin)} – {formatPrice(draft.priceMax)}
         </Label>
         <Slider
-          min={100000}
-          max={10000000}
-          step={50000}
+          min={isRental ? 100 : 100000}
+          max={isRental ? 5000 : 10000000}
+          step={isRental ? 25 : 50000}
           value={[draft.priceMin, draft.priceMax]}
           onValueChange={([min, max]) => update({ priceMin: min, priceMax: max })}
           className="mb-3"
         />
-        <div className="flex gap-1.5">
-          {PRICE_DISPLAYS.map((p) => (
-            <button
-              key={p.key}
-              type="button"
-              onClick={() => update({ priceDisplay: p.key as ListingDraft['priceDisplay'] })}
-              className={`flex-1 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                draft.priceDisplay === p.key
-                  ? 'bg-primary text-primary-foreground border-primary'
-                  : 'bg-secondary text-muted-foreground border-border'
-              }`}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
+        {!isRental && (
+          <div className="flex gap-1.5">
+            {PRICE_DISPLAYS.map((p) => (
+              <button
+                key={p.key}
+                type="button"
+                onClick={() => update({ priceDisplay: p.key as ListingDraft['priceDisplay'] })}
+                className={`flex-1 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                  draft.priceDisplay === p.key
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-secondary text-muted-foreground border-border'
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
+
+      {/* Rental-specific fields */}
+      {isRental && (
+        <div className="bg-secondary/50 rounded-xl p-4 space-y-3">
+          <Label className="text-sm font-semibold block">Rental Details</Label>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label className="text-xs text-muted-foreground mb-1 block">Weekly Rent ($)</Label>
+              <Input
+                type="number"
+                min={0}
+                value={draft.rentalWeekly || ''}
+                onChange={(e) => update({ rentalWeekly: Number(e.target.value) || 0 })}
+                placeholder="e.g. 650"
+                className="h-9"
+              />
+            </div>
+            <div>
+              <Label className="text-xs text-muted-foreground mb-1 block">Bond (weeks)</Label>
+              <Input
+                type="number"
+                min={1}
+                max={8}
+                value={draft.rentalBondWeeks || 4}
+                onChange={(e) => update({ rentalBondWeeks: Number(e.target.value) || 4 })}
+                placeholder="4"
+                className="h-9"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Estimated rental for sale listings */}
+      {!isRental && (
+        <div>
+          <Label className="text-xs text-muted-foreground mb-1 block">Estimated Rental ($/week)</Label>
+          <Input
+            type="number"
+            min={0}
+            value={draft.estimatedRentalWeekly || ''}
+            onChange={(e) => update({ estimatedRentalWeekly: Number(e.target.value) || 0 })}
+            placeholder="e.g. 650 — helps investors assess yield"
+            className="h-9"
+          />
+        </div>
+      )}
 
       {/* Counters — contextual based on property type */}
       <div className="space-y-2">

@@ -11,9 +11,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import {
   Landmark, Plus, ArrowDownCircle, CheckCircle2, DollarSign,
   TrendingUp, TrendingDown, FileDown, Trash2, Pencil, Clock,
-  AlertTriangle, CalendarIcon, Home, Users,
+  AlertTriangle, CalendarIcon, Home, Users, Receipt,
 } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
+import TrustReceiptModal from './TrustReceiptModal';
 import { useTrustAccounting, TrustTransaction } from '@/hooks/useTrustAccounting';
 import { useAuth } from '@/lib/AuthProvider';
 import { toast } from 'sonner';
@@ -39,6 +40,7 @@ const TrustAccountingPage = () => {
   const { user } = useAuth();
   const {
     accounts, transactions, contacts, properties, loading,
+    fetchAccounts, fetchTransactions,
     createAccount, createTransaction, updateTransaction,
     deleteTransaction, markAsCleared, bulkMarkCleared,
   } = useTrustAccounting();
@@ -55,6 +57,7 @@ const TrustAccountingPage = () => {
   const [showEditTx, setShowEditTx] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showNewAccount, setShowNewAccount] = useState(false);
+  const [showNewReceipt, setShowNewReceipt] = useState(false);
   const [editingTx, setEditingTx] = useState<TrustTransaction | null>(null);
   const [deletingTxId, setDeletingTxId] = useState<string | null>(null);
 
@@ -632,6 +635,10 @@ const TrustAccountingPage = () => {
           <div className="w-full lg:w-[220px] shrink-0 space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Quick Actions</h3>
             <Button className="w-full justify-start gap-2 text-sm" size="sm"
+              onClick={() => setShowNewReceipt(true)}>
+              <Receipt size={14} /> New Trust Receipt
+            </Button>
+            <Button className="w-full justify-start gap-2 text-sm" variant="secondary" size="sm"
               onClick={() => openNewTx('deposit')}>
               <ArrowDownCircle size={14} /> New Deposit
             </Button>
@@ -716,6 +723,16 @@ const TrustAccountingPage = () => {
       </Dialog>
 
       {renderNewAccountDialog()}
+
+      {/* ── New Trust Receipt Modal ── */}
+      <TrustReceiptModal
+        open={showNewReceipt}
+        onOpenChange={setShowNewReceipt}
+        onCreated={() => {
+          fetchAccounts();
+          fetchTransactions();
+        }}
+      />
     </div>
   );
 };

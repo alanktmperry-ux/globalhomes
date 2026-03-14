@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, Phone, Mail, MessageCircle, Calendar, CheckCircle2, BadgeCheck,
-  Trophy, Zap, MapPin, Star, Loader2
+  Trophy, Zap, MapPin, Star, Loader2, ArrowRight, ArrowLeft, Shield,
+  DollarSign, TrendingUp
 } from 'lucide-react';
 import { Property } from '@/lib/types';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -10,7 +11,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
 
-const leadSchema = z.object({
+/* ── Validation ─────────────────────────────────────────────── */
+
+const step1Schema = z.object({
   name: z.string().trim().min(1, 'Name is required').max(100),
   email: z.string().trim().email('Invalid email').max(255),
   phone: z.string().trim().min(6, 'Phone is required').max(20),
@@ -19,7 +22,49 @@ const leadSchema = z.object({
   timeframe: z.string(),
   budgetRange: z.string().optional(),
   buyingPurpose: z.string(),
+  preApproval: z.string(),
 });
+
+/* ── Scoring ────────────────────────────────────────────────── */
+
+function calcLeadScore(data: {
+  timeframe: string;
+  preApproval: string;
+  buyingPurpose: string;
+  budgetRange: string;
+  message: string;
+  interests: string[];
+}): number {
+  let score = 30; // base
+  // Urgency
+  if (data.timeframe === 'This week') score += 30;
+  else if (data.timeframe === '1–3 months') score += 20;
+  else if (data.timeframe === '3–6 months') score += 10;
+  // Pre-approval
+  if (data.preApproval === 'approved') score += 25;
+  else if (data.preApproval === 'in_progress') score += 15;
+  // Purpose
+  if (data.buyingPurpose === 'Investment' || data.buyingPurpose === 'Short-term rental') score += 5;
+  // Engagement signals
+  if (data.budgetRange) score += 5;
+  if (data.message && data.message.length > 20) score += 5;
+  if (data.interests.length >= 2) score += 5;
+  return Math.min(score, 100);
+}
+
+/* ── Constants ──────────────────────────────────────────────── */
+
+const TIMEFRAMES = ['This week', '1–3 months', '3–6 months', 'Flexible'];
+const PURPOSES = ['Home', 'Investment', 'Short-term rental', 'Other'];
+const INTERESTS = ['Viewing', 'More photos', 'Price info', 'Similar properties'];
+const PRE_APPROVALS = [
+  { value: 'approved', label: 'Pre-approved' },
+  { value: 'in_progress', label: 'In progress' },
+  { value: 'not_started', label: 'Not started' },
+];
+const DEPOSIT_AMOUNTS = [1000, 2500, 5000, 10000];
+
+/* ── Component ──────────────────────────────────────────────── */
 
 interface AgentContactModalProps {
   property: Property;
@@ -27,32 +72,40 @@ interface AgentContactModalProps {
   onClose: () => void;
 }
 
-const TIMEFRAMES = ['This week', '1–3 months', '3–6 months', 'Flexible'];
-const PURPOSES = ['Home', 'Investment', 'Short-term rental', 'Other'];
-const INTERESTS = ['Viewing', 'More photos', 'Price info', 'Similar properties'];
-
 export function AgentContactModal({ property, open, onClose }: AgentContactModalProps) {
   const { agent } = property;
   const { toast } = useToast();
+
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', message: '',
     interests: [] as string[],
     timeframe: 'Flexible',
     budgetRange: '',
     buyingPurpose: 'Home',
+    preApproval: 'not_started',
   });
+  const [depositAmount, setDepositAmount] = useState<number | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [leadScore, setLeadScore] = useState(30);
 
-  const whatsappMessage = encodeURIComponent(
-    `Hi ${agent.name}, I'm interested in the property at ${property.address}, ${property.suburb}. ${property.priceFormatted}. Could you provide more information?`
-  );
-  const whatsappUrl = `https://wa.me/${agent.phone?.replace(/\D/g, '')}?text=${whatsappMessage}`;
-  const emailSubject = encodeURIComponent(`Inquiry: ${property.title} - ${property.priceFormatted}`);
-  const emailBody = encodeURIComponent(
-    `Hi ${agent.name},\n\nI'm interested in the property at ${property.address}, ${property.suburb} (${property.priceFormatted}).\n\nCould you please provide more information?\n\nThank you.`
-  );
+  // Recalculate score on form changes
+  useEffect(() => {
+    setLeadScore(calcLeadScore(formData));
+  }, [formData]);
+
+  // Reset on close
+  useEffect(() => {
+    if (!open) {
+      setTimeout(() => {
+        setStep(1);
+        setDepositAmount(null);
+        setErrors({});
+        setSubmitting(false);
+      }, 300);
+    }
+  }, [open]);
 
   const toggleInterest = (interest: string) => {
     setFormData(prev => ({
@@ -63,11 +116,10 @@ export function AgentContactModal({ property, open, onClose }: AgentContactModal
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  /* ── Step 1 → Step 2 ─────────────────────────────────────── */
+  const handleStep1Next = () => {
     setErrors({});
-
-    const result = leadSchema.safeParse(formData);
+    const result = step1Schema.safeParse(formData);
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
       result.error.issues.forEach(issue => {
@@ -76,13 +128,18 @@ export function AgentContactModal({ property, open, onClose }: AgentContactModal
       setErrors(fieldErrors);
       return;
     }
+    setStep(2);
+  };
 
+  /* ── Step 2 → Step 3 (submit everything) ─────────────────── */
+  const handleSubmitAll = async () => {
     setSubmitting(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
+      const score = calcLeadScore(formData);
 
-      // Insert into leads table with buyer intent fields
-      await supabase.from('leads').insert({
+      // 1. Insert lead
+      const { data: leadRow } = await supabase.from('leads').insert({
         agent_id: agent.id,
         property_id: property.id,
         user_name: formData.name,
@@ -94,20 +151,60 @@ export function AgentContactModal({ property, open, onClose }: AgentContactModal
         budget_range: formData.budgetRange || null,
         buying_purpose: formData.buyingPurpose,
         interests: formData.interests,
-      });
+        pre_approval_status: formData.preApproval,
+        score,
+      }).select('id').single();
 
-      // Also track as lead event
+      // 2. Track event
       await supabase.from('lead_events').insert({
         agent_id: agent.id,
         property_id: property.id,
-        event_type: 'inquiry',
+        event_type: 'qualified_inquiry',
         user_id: user?.id || null,
       });
 
-      setSubmitted(true);
-      toast({ title: '✅ Inquiry Sent', description: `${agent.name} will contact you within 2 hours.` });
-    } catch {
-      toast({ title: 'Error', description: 'Failed to send inquiry. Please try again.', variant: 'destructive' });
+      // 3. If deposit selected, create trust entry
+      if (depositAmount && depositAmount > 0) {
+        // Find or create agent's trust account
+        let trustAccountId: string | null = null;
+        const { data: existingAccounts } = await supabase
+          .from('trust_accounts')
+          .select('id')
+          .eq('agent_id', agent.id)
+          .eq('is_active', true)
+          .limit(1);
+
+        if (existingAccounts && existingAccounts.length > 0) {
+          trustAccountId = existingAccounts[0].id;
+        }
+
+        if (trustAccountId && user) {
+          await supabase.from('trust_transactions').insert({
+            trust_account_id: trustAccountId,
+            transaction_type: 'deposit',
+            category: 'holding_deposit',
+            amount: depositAmount,
+            gst_amount: Math.round(depositAmount / 11 * 100) / 100,
+            description: `Holding deposit – ${property.title} – ${formData.name}`,
+            status: 'pending',
+            property_id: property.id,
+            payee_name: formData.name,
+            reference: leadRow?.id ? `LEAD-${leadRow.id.slice(0, 8).toUpperCase()}` : null,
+            created_by: user.id,
+          });
+        }
+      }
+
+      setStep(3);
+      toast({
+        title: '✅ Qualified Lead Submitted',
+        description: depositAmount
+          ? `Lead score: ${score}/100. Holding deposit of $${depositAmount.toLocaleString()} recorded.`
+          : `Lead score: ${score}/100. ${agent.name} will contact you soon.`,
+      });
+    } catch (err) {
+      console.error('Lead submission error:', err);
+      toast({ title: 'Error', description: 'Failed to submit. Please try again.', variant: 'destructive' });
     } finally {
       setSubmitting(false);
     }
@@ -124,6 +221,13 @@ export function AgentContactModal({ property, open, onClose }: AgentContactModal
       });
     } catch { /* silent */ }
   };
+
+  const whatsappMessage = encodeURIComponent(
+    `Hi ${agent.name}, I'm interested in the property at ${property.address}, ${property.suburb}. ${property.priceFormatted}. Could you provide more information?`
+  );
+  const whatsappUrl = `https://wa.me/${agent.phone?.replace(/\D/g, '')}?text=${whatsappMessage}`;
+
+  const scoreColor = leadScore >= 70 ? 'text-emerald-500' : leadScore >= 40 ? 'text-amber-500' : 'text-muted-foreground';
 
   return (
     <AnimatePresence>
@@ -153,251 +257,247 @@ export function AgentContactModal({ property, open, onClose }: AgentContactModal
                 <X size={16} />
               </button>
 
-              {/* Agent header */}
-              <div className="flex items-center gap-4">
-                <div className="relative">
-                  <Avatar className="w-20 h-20 border-2 border-primary">
-                    <AvatarImage src={agent.avatarUrl} alt={agent.name} className="object-cover" />
-                    <AvatarFallback className="text-lg font-bold">{agent.name[0]}</AvatarFallback>
-                  </Avatar>
-                  {agent.isSubscribed && (
-                    <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                      <BadgeCheck size={14} className="text-primary-foreground" />
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-display font-bold text-foreground text-lg">{agent.name}</h3>
-                  <p className="text-sm text-muted-foreground">{agent.agency}</p>
-                  <div className="flex items-center gap-1 mt-1">
-                    <Star size={14} className="fill-yellow-400 text-yellow-400" />
-                    <span className="text-sm font-medium text-foreground">4.8</span>
-                    <span className="text-xs text-muted-foreground">(24 reviews)</span>
+              {/* Step indicator */}
+              <div className="flex items-center gap-2">
+                {[1, 2, 3].map(s => (
+                  <div key={s} className="flex items-center gap-2 flex-1">
+                    <div className={`w-full h-1.5 rounded-full transition-colors ${
+                      s <= step ? 'bg-primary' : 'bg-border'
+                    }`} />
                   </div>
+                ))}
+              </div>
+
+              {/* Agent header (compact) */}
+              <div className="flex items-center gap-3">
+                <Avatar className="w-12 h-12 border-2 border-primary">
+                  <AvatarImage src={agent.avatarUrl} alt={agent.name} className="object-cover" />
+                  <AvatarFallback className="font-bold">{agent.name[0]}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="font-display font-semibold text-foreground text-sm truncate">{agent.name}</p>
+                  <p className="text-xs text-muted-foreground truncate">{property.title} · {property.priceFormatted}</p>
+                </div>
+                <div className="flex flex-col items-center">
+                  <TrendingUp size={14} className={scoreColor} />
+                  <span className={`text-xs font-bold ${scoreColor}`}>{leadScore}</span>
                 </div>
               </div>
 
-              {/* Badges */}
-              <div className="flex flex-wrap gap-2">
-                {agent.isSubscribed && (
-                  <>
-                    <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-                      <BadgeCheck size={12} /> Verified Agent
-                    </span>
-                    <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-yellow-500/10 text-yellow-600 text-xs font-medium">
-                      <Trophy size={12} /> Top Performer
-                    </span>
-                  </>
-                )}
-                <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 text-xs font-medium">
-                  <Zap size={12} /> Responds &lt; 1 hour
-                </span>
-                <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-600 text-xs font-medium">
-                  <MapPin size={12} /> Local Expert
-                </span>
-              </div>
-
-              {/* Property reference */}
-              <div className="p-3 rounded-xl bg-secondary/50 border border-border">
-                <p className="text-xs text-muted-foreground">Regarding</p>
-                <p className="text-sm font-medium text-foreground truncate">{property.title}</p>
-                <p className="text-xs text-muted-foreground">{property.address}, {property.suburb} · {property.priceFormatted}</p>
-              </div>
-
-              {/* Contact methods */}
-              {agent.isSubscribed ? (
-                <div className="grid grid-cols-2 gap-2">
-                  <a
-                    href={`tel:${agent.phone}`}
-                    onClick={() => trackEvent('call_click')}
-                    className="flex flex-col items-center gap-2 p-4 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                  >
-                    <Phone size={20} />
-                    <span className="text-sm font-medium">Call</span>
+              {/* Quick contact (always visible) */}
+              {agent.isSubscribed && step < 3 && (
+                <div className="flex gap-2">
+                  <a href={`tel:${agent.phone}`} onClick={() => trackEvent('call_click')} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-secondary text-foreground text-xs font-medium hover:bg-accent transition-colors">
+                    <Phone size={14} /> Call
                   </a>
-                  <a
-                    href={whatsappUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => trackEvent('whatsapp_click')}
-                    className="flex flex-col items-center gap-2 p-4 rounded-xl bg-emerald-600 text-primary-foreground hover:bg-emerald-700 transition-colors"
-                  >
-                    <MessageCircle size={20} />
-                    <span className="text-sm font-medium">WhatsApp</span>
+                  <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('whatsapp_click')} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-secondary text-foreground text-xs font-medium hover:bg-accent transition-colors">
+                    <MessageCircle size={14} /> WhatsApp
                   </a>
-                  <a
-                    href={`mailto:${agent.email}?subject=${emailSubject}&body=${emailBody}`}
-                    onClick={() => trackEvent('email_click')}
-                    className="flex flex-col items-center gap-2 p-4 rounded-xl bg-secondary text-foreground hover:bg-accent transition-colors"
-                  >
-                    <Mail size={20} />
-                    <span className="text-sm font-medium">Email</span>
-                  </a>
-                  <button
-                    onClick={() => {
-                      trackEvent('booking_click');
-                      toast({ title: '📅 Coming Soon', description: 'Inspection booking will be available soon.' });
-                    }}
-                    className="flex flex-col items-center gap-2 p-4 rounded-xl bg-secondary text-foreground hover:bg-accent transition-colors"
-                  >
-                    <Calendar size={20} />
-                    <span className="text-sm font-medium">Book Inspection</span>
-                  </button>
-                </div>
-              ) : (
-                <div className="p-4 rounded-xl bg-muted text-center">
-                  <p className="text-sm text-muted-foreground mb-2">Agent contact details are available for Pro Agents</p>
                 </div>
               )}
 
-              {/* Lead capture form */}
-              {!submitted ? (
-                <form onSubmit={handleSubmit} className="space-y-3">
-                  <h4 className="font-display font-semibold text-foreground text-sm">Get more information</h4>
+              {/* ─── STEP 1: Buyer Intent ─────────────────────── */}
+              <AnimatePresence mode="wait">
+                {step === 1 && (
+                  <motion.div key="step1" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-3">
+                    <h4 className="font-display font-semibold text-foreground text-sm">Step 1 · Buyer Intent</h4>
 
-                  <div>
-                    <input
-                      type="text"
-                      placeholder="Your name *"
-                      value={formData.name}
-                      onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
-                      className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
-                    />
-                    {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
-                  </div>
-
-                  <div>
-                    <input
-                      type="email"
-                      placeholder="Email address *"
-                      value={formData.email}
-                      onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
-                      className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
-                    />
-                    {errors.email && <p className="text-xs text-destructive mt-1">{errors.email}</p>}
-                  </div>
-
-                  <div>
-                    <input
-                      type="tel"
-                      placeholder="Phone number *"
-                      value={formData.phone}
-                      onChange={e => setFormData(p => ({ ...p, phone: e.target.value }))}
-                      className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
-                    />
-                    {errors.phone && <p className="text-xs text-destructive mt-1">{errors.phone}</p>}
-                  </div>
-
-                  {/* Buyer intent: Timeframe */}
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1.5">When are you looking to buy?</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {TIMEFRAMES.map(tf => (
-                        <button
-                          key={tf}
-                          type="button"
-                          onClick={() => setFormData(p => ({ ...p, timeframe: tf }))}
-                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                            formData.timeframe === tf
-                              ? 'bg-primary text-primary-foreground'
-                              : 'bg-secondary text-muted-foreground hover:text-foreground'
-                          }`}
-                        >
-                          {tf}
-                        </button>
-                      ))}
+                    <div>
+                      <input type="text" placeholder="Your name *" value={formData.name}
+                        onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
+                        className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" />
+                      {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
                     </div>
-                  </div>
-
-                  {/* Buyer intent: Purpose */}
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1.5">Buying for</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {PURPOSES.map(p => (
-                        <button
-                          key={p}
-                          type="button"
-                          onClick={() => setFormData(prev => ({ ...prev, buyingPurpose: p }))}
-                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                            formData.buyingPurpose === p
-                              ? 'bg-primary text-primary-foreground'
-                              : 'bg-secondary text-muted-foreground hover:text-foreground'
-                          }`}
-                        >
-                          {p}
-                        </button>
-                      ))}
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <input type="email" placeholder="Email *" value={formData.email}
+                          onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
+                          className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" />
+                        {errors.email && <p className="text-xs text-destructive mt-1">{errors.email}</p>}
+                      </div>
+                      <div>
+                        <input type="tel" placeholder="Phone *" value={formData.phone}
+                          onChange={e => setFormData(p => ({ ...p, phone: e.target.value }))}
+                          className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" />
+                        {errors.phone && <p className="text-xs text-destructive mt-1">{errors.phone}</p>}
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Budget range (optional) */}
-                  <div>
-                    <input
-                      type="text"
-                      placeholder="Budget range, e.g. $500K – $800K (optional)"
-                      value={formData.budgetRange}
+                    {/* Timeframe */}
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-1.5">When are you looking to buy?</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {TIMEFRAMES.map(tf => (
+                          <button key={tf} type="button" onClick={() => setFormData(p => ({ ...p, timeframe: tf }))}
+                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${formData.timeframe === tf ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:text-foreground'}`}>
+                            {tf}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Purpose */}
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-1.5">Buying for</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {PURPOSES.map(p => (
+                          <button key={p} type="button" onClick={() => setFormData(prev => ({ ...prev, buyingPurpose: p }))}
+                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${formData.buyingPurpose === p ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:text-foreground'}`}>
+                            {p}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Pre-approval */}
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-1.5">Mortgage pre-approval</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {PRE_APPROVALS.map(pa => (
+                          <button key={pa.value} type="button" onClick={() => setFormData(p => ({ ...p, preApproval: pa.value }))}
+                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${formData.preApproval === pa.value ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:text-foreground'}`}>
+                            {pa.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Budget */}
+                    <input type="text" placeholder="Budget range, e.g. $500K – $800K (optional)" value={formData.budgetRange}
                       onChange={e => setFormData(p => ({ ...p, budgetRange: e.target.value }))}
-                      className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
-                    />
-                  </div>
+                      className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" />
 
-                  {/* Interest checkboxes */}
-                  <div className="flex flex-wrap gap-2">
-                    {INTERESTS.map(interest => (
-                      <button
-                        key={interest}
-                        type="button"
-                        onClick={() => toggleInterest(interest)}
-                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                          formData.interests.includes(interest)
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-secondary text-muted-foreground hover:text-foreground'
-                        }`}
-                      >
-                        {interest}
-                      </button>
-                    ))}
-                  </div>
+                    {/* Interests */}
+                    <div className="flex flex-wrap gap-1.5">
+                      {INTERESTS.map(interest => (
+                        <button key={interest} type="button" onClick={() => toggleInterest(interest)}
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${formData.interests.includes(interest) ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:text-foreground'}`}>
+                          {interest}
+                        </button>
+                      ))}
+                    </div>
 
-                  <textarea
-                    placeholder="Message (optional)"
-                    value={formData.message}
-                    onChange={e => setFormData(p => ({ ...p, message: e.target.value }))}
-                    rows={3}
-                    className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 resize-none"
-                  />
+                    <textarea placeholder="Message (optional)" value={formData.message}
+                      onChange={e => setFormData(p => ({ ...p, message: e.target.value }))} rows={2}
+                      className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 resize-none" />
 
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors disabled:opacity-50"
-                  >
-                    {submitting ? (
-                      <><Loader2 size={16} className="animate-spin" /> Sending…</>
-                    ) : (
-                      'Send to Agent'
-                    )}
-                  </button>
-                </form>
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="flex flex-col items-center py-6 text-center"
-                >
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: 'spring', damping: 10, delay: 0.1 }}
-                  >
-                    <CheckCircle2 size={48} className="text-success mb-3" />
+                    <button onClick={handleStep1Next}
+                      className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors">
+                      Continue to Deposit <ArrowRight size={16} />
+                    </button>
                   </motion.div>
-                  <h4 className="font-display font-bold text-foreground text-lg">Inquiry Sent!</h4>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {agent.name} will contact you within 2 hours
-                  </p>
-                </motion.div>
-              )}
+                )}
+
+                {/* ─── STEP 2: Trust Deposit ────────────────────── */}
+                {step === 2 && (
+                  <motion.div key="step2" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-4">
+                    <h4 className="font-display font-semibold text-foreground text-sm">Step 2 · Holding Deposit</h4>
+                    <p className="text-xs text-muted-foreground">
+                      Secure your interest with a holding deposit. This creates a pending trust entry and signals serious intent to the agent.
+                    </p>
+
+                    <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Shield size={16} className="text-primary" />
+                        <p className="text-xs font-medium text-primary">Trust Account Protected</p>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground">
+                        Deposits are held in the agent's regulated trust account and fully refundable until contracts are exchanged.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      {DEPOSIT_AMOUNTS.map(amt => (
+                        <button key={amt} onClick={() => setDepositAmount(depositAmount === amt ? null : amt)}
+                          className={`p-3 rounded-xl border text-center transition-colors ${
+                            depositAmount === amt
+                              ? 'border-primary bg-primary/10 text-primary'
+                              : 'border-border bg-secondary text-foreground hover:border-primary/30'
+                          }`}>
+                          <DollarSign size={16} className="mx-auto mb-1" />
+                          <span className="text-sm font-semibold">${amt.toLocaleString()}</span>
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Lead score preview */}
+                    <div className="p-3 rounded-xl bg-secondary flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-muted-foreground">Your Lead Score</p>
+                        <p className={`text-lg font-bold ${scoreColor}`}>{leadScore}/100</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-muted-foreground">Priority</p>
+                        <p className="text-sm font-semibold text-foreground">
+                          {leadScore >= 70 ? '🔥 High' : leadScore >= 40 ? '⚡ Medium' : '📋 Standard'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button onClick={() => setStep(1)}
+                        className="flex-1 py-3 rounded-xl border border-border text-foreground font-medium text-sm flex items-center justify-center gap-2 hover:bg-secondary transition-colors">
+                        <ArrowLeft size={16} /> Back
+                      </button>
+                      <button onClick={handleSubmitAll} disabled={submitting}
+                        className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors disabled:opacity-50">
+                        {submitting ? (
+                          <><Loader2 size={16} className="animate-spin" /> Submitting…</>
+                        ) : depositAmount ? (
+                          <>Submit & Deposit</>
+                        ) : (
+                          <>Submit Without Deposit</>
+                        )}
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* ─── STEP 3: Confirmation ─────────────────────── */}
+                {step === 3 && (
+                  <motion.div key="step3" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+                    className="flex flex-col items-center py-6 text-center space-y-4">
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', damping: 10, delay: 0.1 }}>
+                      <CheckCircle2 size={56} className="text-primary" />
+                    </motion.div>
+                    <div>
+                      <h4 className="font-display font-bold text-foreground text-lg">Qualified Lead Submitted!</h4>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {agent.name} has been notified and will prioritize your inquiry.
+                      </p>
+                    </div>
+
+                    <div className="w-full grid grid-cols-2 gap-3">
+                      <div className="p-3 rounded-xl bg-secondary text-center">
+                        <p className="text-[11px] text-muted-foreground uppercase tracking-wider">Lead Score</p>
+                        <p className={`text-xl font-bold ${scoreColor}`}>{leadScore}/100</p>
+                      </div>
+                      <div className="p-3 rounded-xl bg-secondary text-center">
+                        <p className="text-[11px] text-muted-foreground uppercase tracking-wider">Deposit</p>
+                        <p className="text-xl font-bold text-foreground">
+                          {depositAmount ? `$${depositAmount.toLocaleString()}` : 'None'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {depositAmount && (
+                      <div className="w-full p-3 rounded-xl bg-primary/5 border border-primary/10">
+                        <p className="text-xs text-primary font-medium">
+                          ✅ Pending trust entry created for ${depositAmount.toLocaleString()}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">
+                          The agent will confirm receipt and process the holding deposit.
+                        </p>
+                      </div>
+                    )}
+
+                    <button onClick={onClose}
+                      className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-colors">
+                      Done
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
         </>

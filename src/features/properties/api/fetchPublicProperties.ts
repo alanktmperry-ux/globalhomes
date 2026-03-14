@@ -57,6 +57,13 @@ export function mapDbProperty(p: any): Property {
     lat: p.lat || undefined,
     lng: p.lng || undefined,
     status: 'listed' as const,
+    rentalYieldPct: p.rental_yield_pct,
+    strPermitted: p.str_permitted,
+    yearBuilt: p.year_built,
+    councilRatesAnnual: p.council_rates_annual,
+    strataFeesQuarterly: p.strata_fees_quarterly,
+    rentalWeekly: p.rental_weekly,
+    currencyCode: p.currency_code,
   };
 }
 

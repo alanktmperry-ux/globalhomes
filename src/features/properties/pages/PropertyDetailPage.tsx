@@ -6,6 +6,7 @@ import { Property } from '@/lib/types';
 import { useI18n } from '@/lib/i18n';
 import { useCurrency } from '@/lib/CurrencyContext';
 import { AgentContactModal } from '@/components/AgentContactModal';
+import { InvestmentInsightsCard } from '@/features/properties/components/InvestmentInsightsCard';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { SiteHeader } from '@/components/SiteHeader';
 import { SiteFooter } from '@/components/SiteFooter';
@@ -73,6 +74,13 @@ export default function PropertyDetailPage() {
           views: p.views,
           contactClicks: p.contact_clicks,
           status: 'listed',
+          rentalYieldPct: p.rental_yield_pct,
+          strPermitted: p.str_permitted,
+          yearBuilt: p.year_built,
+          councilRatesAnnual: p.council_rates_annual,
+          strataFeesQuarterly: p.strata_fees_quarterly,
+          rentalWeekly: p.rental_weekly,
+          currencyCode: p.currency_code,
         });
       } else {
         // Fallback to mock
@@ -305,8 +313,11 @@ export default function PropertyDetailPage() {
             )}
           </div>
 
-          {/* Sidebar - agent card */}
+          {/* Sidebar */}
           <div className="space-y-4">
+            {/* Investment Insights */}
+            <InvestmentInsightsCard property={property} />
+
             <div className="p-5 rounded-2xl bg-card border border-border shadow-card sticky top-4">
               <h3 className="font-display font-semibold text-foreground mb-4">{t('property.agent')}</h3>
               <Link to={property.agent.id ? `/agent/${property.agent.id}` : '#'} className="flex items-center gap-3 mb-5 group/agent cursor-pointer">

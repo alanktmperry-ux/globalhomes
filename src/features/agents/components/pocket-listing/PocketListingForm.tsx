@@ -54,6 +54,8 @@ const DEFAULT_DRAFT: ListingDraft = {
   beds: 3,
   baths: 2,
   cars: 2,
+  sqm: 0,
+  landSize: 0,
   photos: [],
   primaryPhoto: 0,
   voiceTranscript: '',

@@ -139,14 +139,17 @@ const TrustLedgerPage = () => {
     return [...rEntries, ...pEntries].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [receipts, payments]);
 
-  // Filter
+  // Filter by month + tab + status + search
   const filtered = useMemo(() => {
-    let items = ledgerEntries;
+    const monthStart = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-01`;
+    const nextM = viewMonth === 11 ? 0 : viewMonth + 1;
+    const nextY = viewMonth === 11 ? viewYear + 1 : viewYear;
+    const monthEnd = `${nextY}-${String(nextM + 1).padStart(2, '0')}-01`;
+
+    let items = ledgerEntries.filter(e => e.date >= monthStart && e.date < monthEnd);
     if (activeTab === 'receipts') items = items.filter(e => e.type === 'receipt');
     if (activeTab === 'payments') items = items.filter(e => e.type === 'payment');
     if (filterStatus !== 'all') items = items.filter(e => e.status === filterStatus);
-    if (filterDateFrom) items = items.filter(e => e.date >= filterDateFrom);
-    if (filterDateTo) items = items.filter(e => e.date <= filterDateTo);
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       items = items.filter(e =>
@@ -156,8 +159,18 @@ const TrustLedgerPage = () => {
         (e.reference && e.reference.toLowerCase().includes(q))
       );
     }
-    return items;
-  }, [ledgerEntries, activeTab, filterStatus, filterDateFrom, filterDateTo, searchQuery]);
+    // Sort chronologically ascending for running balance
+    return items.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }, [ledgerEntries, activeTab, filterStatus, searchQuery, viewMonth, viewYear]);
+
+  // Running balance
+  const entriesWithBalance = useMemo(() => {
+    let balance = 0;
+    return filtered.map(e => {
+      balance += e.type === 'receipt' ? e.amount : -e.amount;
+      return { ...e, balance };
+    });
+  }, [filtered]);
 
   // Stats
   const totalReceipts = receipts.reduce((s, r) => s + r.amount, 0);

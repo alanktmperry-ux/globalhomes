@@ -300,7 +300,28 @@ const ProfilePage = () => {
     }
   };
 
-  const addLanguage = () => {
+  const handleOfficeAddressChange = useCallback((value: string) => {
+    setForm(f => ({ ...f, office_address: value }));
+    if (addressTimeoutRef.current) clearTimeout(addressTimeoutRef.current);
+    if (value.length < 3) {
+      setAddressSuggestions([]);
+      setShowAddressSuggestions(false);
+      return;
+    }
+    addressTimeoutRef.current = setTimeout(async () => {
+      setAddressSearching(true);
+      const results = await autocomplete(value);
+      setAddressSuggestions(results.slice(0, 5));
+      setShowAddressSuggestions(true);
+      setAddressSearching(false);
+    }, 300);
+  }, []);
+
+  const selectOfficeAddress = (description: string) => {
+    setForm(f => ({ ...f, office_address: description }));
+    setAddressSuggestions([]);
+    setShowAddressSuggestions(false);
+  };
     if (newLang.trim() && !languages.includes(newLang.trim())) {
       setLanguages(prev => [...prev, newLang.trim()]);
       setNewLang('');

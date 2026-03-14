@@ -193,6 +193,9 @@ const TrustLedgerPage = () => {
         subtitle="Receipts & payments register — Agents Financial Administration Act 2014"
         actions={
           <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={() => setShowStatement(true)} className="gap-1.5 text-xs">
+              <FileDown size={13} /> Monthly Statement
+            </Button>
             <Button size="sm" variant="outline" onClick={exportCsv} className="gap-1.5 text-xs">
               <FileDown size={13} /> Export CSV
             </Button>

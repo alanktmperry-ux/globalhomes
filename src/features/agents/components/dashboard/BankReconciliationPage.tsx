@@ -628,8 +628,9 @@ const BankReconciliationPage = () => {
                 <TableHead className="text-xs text-right">Amount</TableHead>
                 <TableHead className="text-xs text-right">Bank Balance</TableHead>
                 <TableHead className="text-xs">Status</TableHead>
-                <TableHead className="text-xs">Matched To</TableHead>
-                <TableHead className="text-xs w-[160px]"></TableHead>
+                <TableHead className="text-xs">Match To</TableHead>
+                <TableHead className="text-xs">Action</TableHead>
+                <TableHead className="text-xs w-[120px]"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

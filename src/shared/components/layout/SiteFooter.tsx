@@ -1,4 +1,4 @@
-import { Globe, Instagram, Linkedin, Twitter, Heart } from 'lucide-react';
+import { Globe, Instagram, Linkedin, Twitter, ShieldCheck, Scale, FileCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { DarkModeToggle } from './DarkModeToggle';
 
@@ -11,8 +11,8 @@ const footerLinks = [
 
 const legalLinks = [
   { label: 'About', to: '#' },
-  { label: 'Privacy', to: '#' },
-  { label: 'Terms', to: '#' },
+  { label: 'Privacy Policy', to: '#' },
+  { label: 'Terms of Service', to: '#' },
   { label: 'Agent Login', to: '/agents/login' },
   { label: 'Contact', to: '#' },
 ];
@@ -23,13 +23,49 @@ const socialLinks = [
   { icon: Twitter, href: '#', label: 'Twitter' },
 ];
 
+const complianceBadges = [
+  {
+    icon: ShieldCheck,
+    title: 'Trust Account Compliant',
+    description: 'All deposits held in auditable trust accounts per state regulations.',
+  },
+  {
+    icon: Scale,
+    title: 'Licensed Agents Only',
+    description: 'Every agent is licence-verified before listing on the platform.',
+  },
+  {
+    icon: FileCheck,
+    title: 'Digital Audit Trail',
+    description: 'Full compliance trail from lead capture through to settlement.',
+  },
+];
+
 export function SiteFooter() {
   return (
     <footer className="bg-card border-t border-border pb-20 md:pb-0">
+      {/* Compliance banner */}
+      <div className="border-b border-border bg-secondary/30">
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {complianceBadges.map((badge) => (
+              <div key={badge.title} className="flex items-start gap-3">
+                <div className="mt-0.5 w-9 h-9 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <badge.icon size={18} className="text-primary" />
+                </div>
+                <div>
+                  <p className="font-display text-sm font-semibold text-foreground">{badge.title}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed mt-0.5">{badge.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <div className="max-w-6xl mx-auto px-4 py-10">
         {/* Top row */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 mb-8">
-          {/* Brand */}
           <div className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-cyan-accent flex items-center justify-center">
               <Globe size={20} className="text-primary-foreground" />
@@ -38,8 +74,6 @@ export function SiteFooter() {
               Global Homes
             </span>
           </div>
-
-          {/* Dark mode toggle */}
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground">Theme</span>
             <DarkModeToggle />
@@ -48,41 +82,30 @@ export function SiteFooter() {
 
         {/* Links grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
-          {/* Navigation */}
           <div>
             <h4 className="font-display text-sm font-semibold text-foreground mb-3">Navigate</h4>
             <ul className="space-y-2">
               {footerLinks.map((link) => (
                 <li key={link.label}>
-                  <Link
-                    to={link.to}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
+                  <Link to={link.to} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     {link.label}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
-
-          {/* Legal */}
           <div>
-            <h4 className="font-display text-sm font-semibold text-foreground mb-3">Legal</h4>
+            <h4 className="font-display text-sm font-semibold text-foreground mb-3">Legal &amp; Compliance</h4>
             <ul className="space-y-2">
               {legalLinks.map((link) => (
                 <li key={link.label}>
-                  <Link
-                    to={link.to}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
+                  <Link to={link.to} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     {link.label}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
-
-          {/* Social */}
           <div className="col-span-2 md:col-span-1">
             <h4 className="font-display text-sm font-semibold text-foreground mb-3">Connect</h4>
             <div className="flex items-center gap-3">
@@ -102,13 +125,13 @@ export function SiteFooter() {
           </div>
         </div>
 
-        {/* Divider */}
+        {/* Divider + compliance fine print */}
         <div className="border-t border-border pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground">
-            Global Homes © {new Date().getFullYear()}
+            Global Homes © {new Date().getFullYear()} · ABN 00 000 000 000
           </p>
-          <p className="text-xs text-muted-foreground flex items-center gap-1">
-            Made with <Heart size={12} className="text-destructive fill-destructive" /> for global property seekers
+          <p className="text-xs text-muted-foreground text-center md:text-right max-w-md leading-relaxed">
+            Global Homes operates under Australian property law. All trust funds are held in compliance with state fair trading regulations.
           </p>
         </div>
       </div>

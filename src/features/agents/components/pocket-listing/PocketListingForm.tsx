@@ -143,6 +143,7 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePrope
         address: duplicatePropertyId ? '' : prop.address,
         suburb: duplicatePropertyId ? '' : prop.suburb,
         state: duplicatePropertyId ? '' : prop.state,
+        listingType: prop.listing_type === 'rent' ? 'rent' : 'sale',
         priceMin: Math.round(prop.price * 0.9),
         priceMax: prop.price,
         priceDisplay,
@@ -165,6 +166,9 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePrope
         sqm: prop.sqm || 0,
         landSize: (prop as any).land_size || 0,
         scheduledAt: null,
+        estimatedRentalWeekly: prop.rental_weekly || 0,
+        rentalWeekly: prop.listing_type === 'rent' ? (prop.rental_weekly || 0) : 0,
+        rentalBondWeeks: 4,
       });
       setLoadingEdit(false);
     };

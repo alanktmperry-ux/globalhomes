@@ -213,6 +213,97 @@ const TrustLedgerPage = () => {
     toast.success('5yr compliant ledger exported');
   };
 
+  // Generate individual receipt PDF on demand
+  const generateReceiptPdf = async (entry: LedgerEntry & { balance: number }) => {
+    if (entry.type !== 'receipt') return;
+    // Fetch full receipt data
+    const { data: receipt } = await supabase
+      .from('trust_receipts')
+      .select('*')
+      .eq('receipt_number', entry.number)
+      .single();
+    if (!receipt) { toast.error('Receipt not found'); return; }
+
+    // Fetch agent info
+    const { data: agent } = await supabase
+      .from('agents')
+      .select('name, agency, license_number')
+      .eq('id', receipt.agent_id)
+      .single();
+
+    const dateRecFmt = receipt.date_received ? DATE_FMT.format(new Date(receipt.date_received + 'T00:00:00')) : '—';
+    const dateDepFmt = receipt.date_deposited ? DATE_FMT.format(new Date(receipt.date_deposited + 'T00:00:00')) : 'Pending';
+
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>Trust Receipt ${receipt.receipt_number}</title>
+<style>
+  @media print { @page { margin: 20mm; } }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 11px; color: #1a1a1a; padding: 40px; }
+  .receipt { max-width: 600px; margin: 0 auto; border: 2px solid #1a1a1a; padding: 30px; }
+  .header { text-align: center; margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 15px; }
+  .header .act { font-size: 8px; text-transform: uppercase; letter-spacing: 3px; color: #666; margin-bottom: 6px; }
+  .header h1 { font-size: 18px; margin-bottom: 4px; }
+  .header .num { font-size: 14px; font-family: 'Courier New', monospace; font-weight: bold; color: #333; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; margin: 15px 0; }
+  .grid .label { font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+  .grid .value { font-size: 11px; font-weight: 600; margin-bottom: 6px; }
+  .amount-box { text-align: center; background: #f8f8f8; border: 1px solid #ddd; border-radius: 6px; padding: 15px; margin: 15px 0; }
+  .amount-box .amt { font-size: 24px; font-weight: bold; }
+  .amount-box .gst { font-size: 9px; color: #666; margin-top: 4px; }
+  .sig { margin-top: 25px; display: flex; justify-content: space-between; }
+  .sig div { width: 45%; }
+  .sig .line { border-top: 1px solid #999; margin-top: 30px; padding-top: 4px; font-size: 9px; color: #666; }
+  .footer { border-top: 1px dashed #ccc; padding-top: 12px; margin-top: 15px; text-align: center; }
+  .footer p { font-size: 8px; color: #888; margin-bottom: 3px; }
+  .duplicate { text-align: center; margin-top: 50px; border-top: 2px dashed #ccc; padding-top: 10px; }
+  .duplicate p { font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 2px; }
+</style></head><body>
+<div class="receipt">
+  <div class="header">
+    <p class="act">Agents Financial Administration Act 2014</p>
+    <h1>Trust Account Receipt</h1>
+    <p class="num">${receipt.receipt_number}</p>
+  </div>
+  <div class="grid">
+    <div><p class="label">Date Received</p><p class="value">${dateRecFmt}</p></div>
+    <div><p class="label">Date Deposited</p><p class="value">${dateDepFmt} ${receipt.date_deposited ? '✓' : ''}</p></div>
+    <div><p class="label">Client</p><p class="value">${receipt.client_name}</p></div>
+    <div><p class="label">Property</p><p class="value">${receipt.property_address}</p></div>
+    <div><p class="label">Payment Method</p><p class="value">${receipt.payment_method}</p></div>
+    <div><p class="label">Purpose</p><p class="value">${receipt.purpose}</p></div>
+  </div>
+  <div class="amount-box">
+    <p style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:1px;">Amount Received</p>
+    <p class="amt">${AUD.format(receipt.amount)}</p>
+    <p class="gst">GST Component (1/11th): ${AUD.format(receipt.amount / 11)}</p>
+  </div>
+  <div class="sig">
+    <div><p class="line">Signature of Recipient</p></div>
+    <div><p class="line">Agent: ${agent?.name || '—'}${agent?.license_number ? ` (Lic. ${agent.license_number})` : ''}</p></div>
+  </div>
+  <div class="footer">
+    ${agent?.agency ? `<p><strong>${agent.agency}</strong></p>` : ''}
+    <p>This receipt forms part of the trust account audit trail</p>
+    <p>Retain for minimum 5 years per legislative requirements</p>
+  </div>
+</div>
+<div class="duplicate"><p>— Duplicate Copy for Records —</p></div>
+<script>window.onload = () => window.print();</script>
+</body></html>`;
+
+    const w = window.open('', '_blank', 'width=700,height=900');
+    if (w) { w.document.write(html); w.document.close(); }
+    else {
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `Trust_Receipt_${receipt.receipt_number}.html`; a.click();
+      URL.revokeObjectURL(url);
+    }
+    toast.success(`Receipt ${receipt.receipt_number} PDF generated`);
+  };
+
   // Audit PDF export
   const exportAuditPdf = () => {
     const closingBalance = entriesWithBalance.length > 0 ? entriesWithBalance[entriesWithBalance.length - 1].balance : 0;

@@ -163,36 +163,37 @@ export function AgentContactModal({ property, open, onClose }: AgentContactModal
         user_id: user?.id || null,
       });
 
-      // 3. If deposit selected, create trust entry
-      if (depositAmount && depositAmount > 0) {
-        // Find or create agent's trust account
-        let trustAccountId: string | null = null;
-        const { data: existingAccounts } = await supabase
-          .from('trust_accounts')
-          .select('id')
-          .eq('agent_id', agent.id)
-          .eq('is_active', true)
-          .limit(1);
+      // 3. Always create auditable trust record for every qualified lead
+      let trustAccountId: string | null = null;
+      const { data: existingAccounts } = await supabase
+        .from('trust_accounts')
+        .select('id')
+        .eq('agent_id', agent.id)
+        .eq('is_active', true)
+        .limit(1);
 
-        if (existingAccounts && existingAccounts.length > 0) {
-          trustAccountId = existingAccounts[0].id;
-        }
+      if (existingAccounts && existingAccounts.length > 0) {
+        trustAccountId = existingAccounts[0].id;
+      }
 
-        if (trustAccountId && user) {
-          await supabase.from('trust_transactions').insert({
-            trust_account_id: trustAccountId,
-            transaction_type: 'deposit',
-            category: 'holding_deposit',
-            amount: depositAmount,
-            gst_amount: Math.round(depositAmount / 11 * 100) / 100,
-            description: `Holding deposit – ${property.title} – ${formData.name}`,
-            status: 'pending',
-            property_id: property.id,
-            payee_name: formData.name,
-            reference: leadRow?.id ? `LEAD-${leadRow.id.slice(0, 8).toUpperCase()}` : null,
-            created_by: user.id,
-          });
-        }
+      if (trustAccountId && user) {
+        const amount = depositAmount && depositAmount > 0 ? depositAmount : 0;
+        const isDeposit = amount > 0;
+        await supabase.from('trust_transactions').insert({
+          trust_account_id: trustAccountId,
+          transaction_type: isDeposit ? 'deposit' : 'journal',
+          category: isDeposit ? 'holding_deposit' : 'lead_audit',
+          amount,
+          gst_amount: isDeposit ? Math.round(amount / 11 * 100) / 100 : 0,
+          description: isDeposit
+            ? `Holding deposit – ${property.title} – ${formData.name}`
+            : `Qualified lead audit – ${property.title} – ${formData.name} (score: ${score})`,
+          status: 'pending',
+          property_id: property.id,
+          payee_name: formData.name,
+          reference: leadRow?.id ? `LEAD-${leadRow.id.slice(0, 8).toUpperCase()}` : null,
+          created_by: user.id,
+        });
       }
 
       setStep(3);

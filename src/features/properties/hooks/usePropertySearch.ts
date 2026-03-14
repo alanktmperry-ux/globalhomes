@@ -6,6 +6,7 @@ import { Filters, defaultFilters } from '@/components/FilterSidebar';
 import { useToast } from '@/hooks/use-toast';
 import { isInsidePolygon, haversineDistance } from '@/shared/lib/geoUtils';
 import { fetchPublicProperties } from '@/features/properties/api/fetchPublicProperties';
+import { useCurrency } from '@/shared/lib/CurrencyContext';
 
 // ── Types ────────────────────────────────────────────────────
 

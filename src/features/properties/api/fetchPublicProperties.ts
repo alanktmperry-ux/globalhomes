@@ -70,8 +70,8 @@ export function mapDbProperty(p: any): Property {
 /**
  * Fetches public (status = 'public') properties with agent data joined.
  */
-export async function fetchPublicProperties(limit = 50): Promise<Property[]> {
-  const { data, error } = await supabase
+export async function fetchPublicProperties(limit = 50, listingType?: 'sale' | 'rent'): Promise<Property[]> {
+  let query = supabase
     .from('properties')
     .select(
       '*, agents(name, agency, phone, email, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count)'
@@ -79,6 +79,10 @@ export async function fetchPublicProperties(limit = 50): Promise<Property[]> {
     .eq('status', 'public')
     .order('created_at', { ascending: false })
     .limit(limit);
+
+  if (listingType) {
+    query = query.eq('listing_type', listingType);
+  }
 
   if (error) {
     console.error('[fetchPublicProperties]', error.message);

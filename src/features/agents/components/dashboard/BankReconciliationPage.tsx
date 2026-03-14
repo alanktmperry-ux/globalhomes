@@ -706,14 +706,53 @@ const BankReconciliationPage = () => {
           </Table>
         </Card>
 
+        {/* ── Reconcile All + Balance ── */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-lg border border-border bg-card">
+          <div className="flex items-center gap-4">
+            <div>
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Current Balance</p>
+              <p className="text-xl font-bold tabular-nums">
+                {currentBalance !== null ? AUD.format(currentBalance) : '—'}
+              </p>
+            </div>
+            {items.length > 0 && (
+              <div className="flex items-center gap-2">
+                {unmatchedCount === 0 ? (
+                  <Badge className="gap-1 bg-green-600 text-white text-xs">
+                    <Check size={11} /> Matches bank
+                  </Badge>
+                ) : (
+                  <Badge variant="destructive" className="gap-1 text-xs">
+                    <AlertTriangle size={11} /> {unmatchedCount} unmatched
+                  </Badge>
+                )}
+                <span className="text-xs text-muted-foreground">
+                  Rate: {items.length > 0 ? Math.round(((matchedCount + manualCount) / items.length) * 100) : 0}%
+                </span>
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {unmatchedCount > 0 && (
+              <Button size="sm" variant="outline" className="gap-1.5 text-xs"
+                disabled={autoMatchRunning}
+                onClick={() => runAutoMatch(items)}>
+                <RefreshCw size={12} className={autoMatchRunning ? 'animate-spin' : ''} />
+                Auto-Match
+              </Button>
+            )}
+            <Button size="sm" className="gap-1.5 text-xs"
+              disabled={reconcileAllRunning || (matchedCount + manualCount === 0)}
+              onClick={handleReconcileAll}>
+              <CheckCircle2 size={12} />
+              {reconcileAllRunning ? 'Reconciling…' : 'Reconcile All'}
+            </Button>
+          </div>
+        </div>
+
         {filtered.length > 0 && (
           <div className="flex items-center justify-between px-2 text-xs text-muted-foreground">
             <span>{filtered.length} entr{filtered.length === 1 ? 'y' : 'ies'} shown</span>
-            <span>
-              Reconciliation rate: <strong className={matchedCount + manualCount === items.length && items.length > 0 ? 'text-green-600' : 'text-foreground'}>
-                {items.length > 0 ? Math.round(((matchedCount + manualCount) / items.length) * 100) : 0}%
-              </strong>
-            </span>
           </div>
         )}
       </div>

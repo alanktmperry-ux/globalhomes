@@ -28,6 +28,8 @@ const AgentAuthPage = () => {
   const [officeAddress, setOfficeAddress] = useState('');
   const [yearsExperience, setYearsExperience] = useState('');
   const [specialization, setSpecialization] = useState('Residential');
+  const [investmentNiche, setInvestmentNiche] = useState('');
+  const [handlesTrustAccounting, setHandlesTrustAccounting] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -110,6 +112,8 @@ const AgentAuthPage = () => {
           officeAddress,
           yearsExperience,
           specialization,
+          investmentNiche: investmentNiche || null,
+          handlesTrustAccounting,
         },
       });
 
@@ -362,6 +366,40 @@ const AgentAuthPage = () => {
                     </select>
                   </div>
                 </div>
+
+                {/* Investment Niche */}
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">What's your investment niche?</label>
+                  <div className="grid grid-cols-2 gap-2 mt-1">
+                    {[
+                      { value: 'family_homes', label: 'Family Homes' },
+                      { value: 'first_home_buyers', label: 'First Home Buyers' },
+                      { value: 'coastal_str', label: 'Coastal STR' },
+                      { value: 'new_builds', label: 'New Builds/Off-Plan' },
+                      { value: 'foreign_investors', label: 'Foreign Investors' },
+                      { value: 'commercial', label: 'Commercial' },
+                    ].map(n => (
+                      <button key={n.value} type="button" onClick={() => setInvestmentNiche(investmentNiche === n.value ? '' : n.value)}
+                        className={`px-3 py-2 rounded-xl border text-xs font-medium text-left transition-colors ${
+                          investmentNiche === n.value
+                            ? 'border-primary bg-primary/10 text-primary'
+                            : 'border-border bg-background text-foreground hover:border-primary/30'
+                        }`}>
+                        {investmentNiche === n.value ? '✅ ' : '☐ '}{n.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Trust Accounting */}
+                <label className="flex items-start gap-2.5 cursor-pointer p-3 rounded-xl border border-border hover:border-primary/30 transition-colors">
+                  <input type="checkbox" checked={handlesTrustAccounting} onChange={(e) => setHandlesTrustAccounting(e.target.checked)} className="mt-0.5 accent-primary" />
+                  <div>
+                    <span className="text-sm font-medium text-foreground">Do you handle trust accounting?</span>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">Yes, I need compliance-ready reporting</p>
+                  </div>
+                </label>
+
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Password<span className="text-destructive">*</span></label>
                   <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />

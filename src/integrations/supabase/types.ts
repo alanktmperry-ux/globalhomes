@@ -329,7 +329,9 @@ export type Database = {
           company_logo_url: string | null
           created_at: string
           email: string | null
+          handles_trust_accounting: boolean | null
           id: string
+          investment_niche: string | null
           is_approved: boolean | null
           is_subscribed: boolean
           languages_spoken: string[] | null
@@ -361,7 +363,9 @@ export type Database = {
           company_logo_url?: string | null
           created_at?: string
           email?: string | null
+          handles_trust_accounting?: boolean | null
           id?: string
+          investment_niche?: string | null
           is_approved?: boolean | null
           is_subscribed?: boolean
           languages_spoken?: string[] | null
@@ -393,7 +397,9 @@ export type Database = {
           company_logo_url?: string | null
           created_at?: string
           email?: string | null
+          handles_trust_accounting?: boolean | null
           id?: string
+          investment_niche?: string | null
           is_approved?: boolean | null
           is_subscribed?: boolean
           languages_spoken?: string[] | null

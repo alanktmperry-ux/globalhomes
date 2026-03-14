@@ -31,6 +31,8 @@ interface AgentProfile {
   serviceAreas: string[];
   verificationBadgeLevel: string | null;
   agencyId: string | null;
+  investmentNiche: string | null;
+  handlesTrustAccounting: boolean;
 }
 
 export default function AgentPublicProfilePage() {
@@ -73,6 +75,8 @@ export default function AgentPublicProfilePage() {
           serviceAreas: data.service_areas || [],
           verificationBadgeLevel: data.verification_badge_level,
           agencyId: data.agency_id,
+          investmentNiche: data.investment_niche,
+          handlesTrustAccounting: data.handles_trust_accounting || false,
         });
 
         // Fetch agent's listings
@@ -200,6 +204,22 @@ export default function AgentPublicProfilePage() {
 
               {/* Quick info chips */}
               <div className="flex flex-wrap gap-2 mt-4">
+                {agent.investmentNiche && (
+                  <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold border border-primary/20">
+                    ✓ {agent.investmentNiche === 'coastal_str' ? 'Coastal STR' :
+                       agent.investmentNiche === 'family_homes' ? 'Family Homes' :
+                       agent.investmentNiche === 'first_home_buyers' ? 'First Home Buyers' :
+                       agent.investmentNiche === 'new_builds' ? 'New Builds/Off-Plan' :
+                       agent.investmentNiche === 'foreign_investors' ? 'Foreign Investors' :
+                       agent.investmentNiche === 'commercial' ? 'Commercial' :
+                       agent.investmentNiche} Specialist
+                  </span>
+                )}
+                {agent.handlesTrustAccounting && (
+                  <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 text-sm font-medium">
+                    🛡️ Trust Compliant
+                  </span>
+                )}
                 {agent.specialization && (
                   <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary text-sm text-secondary-foreground">
                     <Award size={14} /> {agent.specialization}

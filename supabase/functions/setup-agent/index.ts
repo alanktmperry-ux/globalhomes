@@ -20,6 +20,7 @@ Deno.serve(async (req) => {
       userId, email, fullName, phone, mode,
       agencyName, agencyEmail, inviteCode,
       licenseNumber, officeAddress, yearsExperience, specialization,
+      investmentNiche, handlesTrustAccounting,
     } = await req.json();
 
     if (!userId || !email || !mode) {
@@ -40,6 +41,8 @@ Deno.serve(async (req) => {
       office_address: officeAddress || null,
       years_experience: yearsExperience ? parseInt(yearsExperience, 10) : null,
       specialization: specialization || "Residential",
+      investment_niche: investmentNiche || null,
+      handles_trust_accounting: handlesTrustAccounting === true,
     };
 
     if (mode === "create-agency") {

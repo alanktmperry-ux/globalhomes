@@ -51,6 +51,7 @@ const DEFAULT_DRAFT: ListingDraft = {
   address: '',
   suburb: '',
   state: '',
+  listingType: 'sale',
   priceMin: 500000,
   priceMax: 800000,
   priceDisplay: 'range',
@@ -73,6 +74,9 @@ const DEFAULT_DRAFT: ListingDraft = {
   allowCoBroke: true,
   autoDeclineBelow: 0,
   scheduledAt: null,
+  estimatedRentalWeekly: 0,
+  rentalWeekly: 0,
+  rentalBondWeeks: 4,
 };
 
 const STEPS = ['Address', 'Basics', 'Photos', 'Voice', 'Settings', 'Preview'];

@@ -930,6 +930,14 @@ const TrustAccountingPage = () => {
             </div>
           </div>
         </div>
+
+        {/* ── AFA Compliance Footer ── */}
+        <div className="mt-6 py-3 px-4 rounded-lg bg-muted/50 border border-border flex items-center justify-center gap-3">
+          <ShieldCheck size={14} className="text-primary shrink-0" />
+          <p className="text-[11px] text-muted-foreground text-center">
+            AFA 2014 compliant &bull; Audit-ready exports &bull; 5-year retention &bull; Voided entries preserved
+          </p>
+        </div>
       </div>
 
       {/* ── New Transaction Dialog ── */}

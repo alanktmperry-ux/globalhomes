@@ -513,6 +513,21 @@ const TrustLedgerPage = () => {
                           <TableCell className="text-xs text-right tabular-nums font-bold">
                             {AUD.format(entry.balance)}
                           </TableCell>
+                          <TableCell className="text-xs">
+                            {entry.type === 'receipt' && (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button size="icon" variant="ghost" className="h-7 w-7"
+                                      onClick={() => generateReceiptPdf(entry)}>
+                                      <Download size={12} />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent><p className="text-xs">Download Receipt PDF</p></TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            )}
+                          </TableCell>
                         </TableRow>
                       );
                     })

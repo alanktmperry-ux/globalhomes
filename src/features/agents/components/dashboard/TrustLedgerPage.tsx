@@ -482,7 +482,7 @@ const TrustLedgerPage = () => {
                 <TableBody>
                   {entriesWithBalance.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center text-muted-foreground py-12 text-sm">
+                      <TableCell colSpan={9} className="text-center text-muted-foreground py-12 text-sm">
                         {searchQuery || filterStatus !== 'all'
                           ? 'No entries match your filters.'
                           : `No trust entries for ${monthNames[viewMonth]} ${viewYear}.`}

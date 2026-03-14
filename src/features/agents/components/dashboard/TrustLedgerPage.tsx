@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
 import TrustReceiptModal from './TrustReceiptModal';
+import TrustStatementModal from './TrustStatementModal';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/AuthProvider';
 import { toast } from 'sonner';

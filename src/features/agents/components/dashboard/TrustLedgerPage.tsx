@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Receipt, ArrowUpCircle, ArrowDownCircle, CalendarIcon, Search,
   FileDown, DollarSign, Clock, CheckCircle2, XCircle, Filter,
+  FileText, ChevronLeft, ChevronRight,
 } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
 import TrustReceiptModal from './TrustReceiptModal';
@@ -84,10 +85,15 @@ const TrustLedgerPage = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [filterDateFrom, setFilterDateFrom] = useState('');
-  const [filterDateTo, setFilterDateTo] = useState('');
   const [showNewReceipt, setShowNewReceipt] = useState(false);
   const [showStatement, setShowStatement] = useState(false);
+
+  // Month navigation
+  const [viewMonth, setViewMonth] = useState(new Date().getMonth());
+  const [viewYear, setViewYear] = useState(new Date().getFullYear());
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const prevMonth = () => { if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); } else setViewMonth(m => m - 1); };
+  const nextMonth = () => { if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); } else setViewMonth(m => m + 1); };
 
   const fetchData = useCallback(async () => {
     if (!user) return;
@@ -133,14 +139,17 @@ const TrustLedgerPage = () => {
     return [...rEntries, ...pEntries].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [receipts, payments]);
 
-  // Filter
+  // Filter by month + tab + status + search
   const filtered = useMemo(() => {
-    let items = ledgerEntries;
+    const monthStart = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-01`;
+    const nextM = viewMonth === 11 ? 0 : viewMonth + 1;
+    const nextY = viewMonth === 11 ? viewYear + 1 : viewYear;
+    const monthEnd = `${nextY}-${String(nextM + 1).padStart(2, '0')}-01`;
+
+    let items = ledgerEntries.filter(e => e.date >= monthStart && e.date < monthEnd);
     if (activeTab === 'receipts') items = items.filter(e => e.type === 'receipt');
     if (activeTab === 'payments') items = items.filter(e => e.type === 'payment');
     if (filterStatus !== 'all') items = items.filter(e => e.status === filterStatus);
-    if (filterDateFrom) items = items.filter(e => e.date >= filterDateFrom);
-    if (filterDateTo) items = items.filter(e => e.date <= filterDateTo);
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       items = items.filter(e =>
@@ -150,8 +159,18 @@ const TrustLedgerPage = () => {
         (e.reference && e.reference.toLowerCase().includes(q))
       );
     }
-    return items;
-  }, [ledgerEntries, activeTab, filterStatus, filterDateFrom, filterDateTo, searchQuery]);
+    // Sort chronologically ascending for running balance
+    return items.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }, [ledgerEntries, activeTab, filterStatus, searchQuery, viewMonth, viewYear]);
+
+  // Running balance
+  const entriesWithBalance = useMemo(() => {
+    let balance = 0;
+    return filtered.map(e => {
+      balance += e.type === 'receipt' ? e.amount : -e.amount;
+      return { ...e, balance };
+    });
+  }, [filtered]);
 
   // Stats
   const totalReceipts = receipts.reduce((s, r) => s + r.amount, 0);
@@ -159,22 +178,105 @@ const TrustLedgerPage = () => {
   const netPosition = totalReceipts - totalPayments;
   const pendingCount = ledgerEntries.filter(e => e.status === 'pending' || e.status === 'received').length;
 
-  // CSV export
+  // 5yr compliant CSV export
   const exportCsv = () => {
-    const headers = ['Date', 'Type', 'Number', 'Client', 'Property', 'Method', 'Purpose', 'Amount', 'Status'];
-    const rows = filtered.map(e => [
-      e.date, e.type === 'receipt' ? 'IN' : 'OUT', e.number, e.client,
-      e.property, e.method, e.purpose,
-      (e.type === 'receipt' ? '+' : '-') + e.amount.toFixed(2), e.status,
+    const headers = ['Date', 'Receipt#', 'Payment#', 'Client', 'Property', 'Purpose', 'Method', 'In', 'Out', 'Balance', 'Status'];
+    const rows = entriesWithBalance.map(e => [
+      e.date,
+      e.type === 'receipt' ? e.number : '',
+      e.type === 'payment' ? e.number : '',
+      e.client, e.property, e.purpose, e.method,
+      e.type === 'receipt' ? e.amount.toFixed(2) : '',
+      e.type === 'payment' ? e.amount.toFixed(2) : '',
+      e.balance.toFixed(2),
+      e.status,
     ]);
-    const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${c}"`).join(','))].join('\n');
+    const csv = [
+      `Trust Ledger - ${monthNames[viewMonth]} ${viewYear}`,
+      `Generated: ${new Date().toISOString()}`,
+      `Retention: 5 years per Agents Financial Administration Act 2014`,
+      '',
+      headers.join(','),
+      ...rows.map(r => r.map(c => `"${c}"`).join(',')),
+      '',
+      `Total In:,"${AUD.format(filtered.filter(e => e.type === 'receipt').reduce((s, e) => s + e.amount, 0))}"`,
+      `Total Out:,"${AUD.format(filtered.filter(e => e.type === 'payment').reduce((s, e) => s + e.amount, 0))}"`,
+      `Closing Balance:,"${AUD.format(entriesWithBalance.length > 0 ? entriesWithBalance[entriesWithBalance.length - 1].balance : 0)}"`,
+    ].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `trust_ledger_${new Date().toISOString().split('T')[0]}.csv`;
+    a.href = url; a.download = `trust_ledger_${viewYear}_${String(viewMonth + 1).padStart(2, '0')}_5yr_compliant.csv`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success('Ledger exported');
+    toast.success('5yr compliant ledger exported');
+  };
+
+  // Audit PDF export
+  const exportAuditPdf = () => {
+    const closingBalance = entriesWithBalance.length > 0 ? entriesWithBalance[entriesWithBalance.length - 1].balance : 0;
+    const totalIn = filtered.filter(e => e.type === 'receipt').reduce((s, e) => s + e.amount, 0);
+    const totalOut = filtered.filter(e => e.type === 'payment').reduce((s, e) => s + e.amount, 0);
+
+    const rows = entriesWithBalance.map(e => `
+      <tr>
+        <td>${new Date(e.date + 'T00:00:00').toLocaleDateString('en-AU', { day: '2-digit', month: '2-digit' })}</td>
+        <td class="mono">${e.type === 'receipt' ? e.number : ''}</td>
+        <td class="mono">${e.type === 'payment' ? e.number : ''}</td>
+        <td>${e.client}</td>
+        <td class="truncate">${e.property}</td>
+        <td class="right ${e.type === 'receipt' ? 'green' : ''}">${e.type === 'receipt' ? '+' + AUD.format(e.amount) : ''}</td>
+        <td class="right ${e.type === 'payment' ? 'red' : ''}">${e.type === 'payment' ? '-' + AUD.format(e.amount) : ''}</td>
+        <td class="right bold">${AUD.format(e.balance)}</td>
+      </tr>`).join('');
+
+    const html = `<!DOCTYPE html><html><head><title>Trust Ledger - ${monthNames[viewMonth]} ${viewYear}</title>
+    <style>
+      @page { size: A4 landscape; margin: 15mm; }
+      body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10px; color: #1a1a1a; }
+      .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #1a1a1a; padding-bottom: 10px; }
+      .header h1 { font-size: 18px; margin: 0; }
+      .header .act { font-size: 9px; color: #666; margin-top: 4px; }
+      .header .period { font-size: 13px; font-weight: bold; margin-top: 6px; }
+      table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+      th { background: #f5f5f5; border: 1px solid #ddd; padding: 6px 8px; text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; }
+      td { border: 1px solid #eee; padding: 5px 8px; font-size: 10px; }
+      tr:nth-child(even) { background: #fafafa; }
+      .right { text-align: right; }
+      .bold { font-weight: bold; }
+      .mono { font-family: 'Courier New', monospace; font-size: 10px; }
+      .green { color: #16a34a; }
+      .red { color: #dc2626; }
+      .truncate { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .summary { margin-top: 16px; display: flex; gap: 30px; justify-content: flex-end; }
+      .summary div { text-align: right; }
+      .summary .label { font-size: 9px; color: #666; text-transform: uppercase; }
+      .summary .value { font-size: 14px; font-weight: bold; }
+      .footer { margin-top: 24px; padding-top: 10px; border-top: 1px solid #ddd; font-size: 8px; color: #999; text-align: center; }
+    </style></head><body>
+    <div class="header">
+      <p class="act">Agents Financial Administration Act 2014</p>
+      <h1>Trust Account Ledger</h1>
+      <p class="period">${monthNames[viewMonth]} ${viewYear}</p>
+    </div>
+    <table>
+      <thead><tr>
+        <th>Date</th><th>Receipt #</th><th>Payment #</th><th>Client</th><th>Property</th><th class="right">In</th><th class="right">Out</th><th class="right">Balance</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="summary">
+      <div><span class="label">Total In</span><br/><span class="value green">${AUD.format(totalIn)}</span></div>
+      <div><span class="label">Total Out</span><br/><span class="value red">${AUD.format(totalOut)}</span></div>
+      <div><span class="label">Closing Balance</span><br/><span class="value">${AUD.format(closingBalance)}</span></div>
+    </div>
+    <div class="footer">
+      Generated ${new Date().toLocaleDateString('en-AU')} — Retain for minimum 5 years per AFAA 2014 s.84
+    </div>
+    </body></html>`;
+
+    const w = window.open('', '_blank', 'width=1100,height=700');
+    if (w) { w.document.write(html); w.document.close(); w.print(); }
   };
 
   if (loading) {
@@ -186,6 +288,10 @@ const TrustLedgerPage = () => {
     );
   }
 
+  const closingBalance = entriesWithBalance.length > 0 ? entriesWithBalance[entriesWithBalance.length - 1].balance : 0;
+  const monthTotalIn = filtered.filter(e => e.type === 'receipt').reduce((s, e) => s + e.amount, 0);
+  const monthTotalOut = filtered.filter(e => e.type === 'payment').reduce((s, e) => s + e.amount, 0);
+
   return (
     <div>
       <DashboardHeader
@@ -193,11 +299,11 @@ const TrustLedgerPage = () => {
         subtitle="Receipts & payments register — Agents Financial Administration Act 2014"
         actions={
           <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => setShowStatement(true)} className="gap-1.5 text-xs">
-              <FileDown size={13} /> Monthly Statement
+            <Button size="sm" variant="outline" onClick={exportAuditPdf} className="gap-1.5 text-xs">
+              <FileText size={13} /> Download Audit PDF
             </Button>
             <Button size="sm" variant="outline" onClick={exportCsv} className="gap-1.5 text-xs">
-              <FileDown size={13} /> Export CSV
+              <FileDown size={13} /> Export CSV 5yr
             </Button>
             <Button size="sm" onClick={() => setShowNewReceipt(true)} className="gap-1.5 text-xs">
               <Receipt size={13} /> New Receipt
@@ -207,57 +313,24 @@ const TrustLedgerPage = () => {
       />
 
       <div className="p-4 sm:p-6 max-w-[1600px] space-y-5">
-        {/* Summary Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0">
-                <ArrowDownCircle size={18} className="text-green-600" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Total Received</p>
-                <p className="text-lg font-bold text-green-600 truncate">{AUD.format(totalReceipts)}</p>
-                <p className="text-[10px] text-muted-foreground">{receipts.length} receipt{receipts.length !== 1 && 's'}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-destructive/10 flex items-center justify-center shrink-0">
-                <ArrowUpCircle size={18} className="text-destructive" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Total Paid Out</p>
-                <p className="text-lg font-bold text-destructive truncate">{AUD.format(totalPayments)}</p>
-                <p className="text-[10px] text-muted-foreground">{payments.length} payment{payments.length !== 1 && 's'}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <DollarSign size={18} className="text-primary" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Net Position</p>
-                <p className={`text-lg font-bold truncate ${netPosition >= 0 ? 'text-green-600' : 'text-destructive'}`}>
-                  {AUD.format(netPosition)}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0">
-                <Clock size={18} className="text-orange-500" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Pending Items</p>
-                <p className="text-lg font-bold truncate">{pendingCount}</p>
-                <p className="text-[10px] text-muted-foreground">awaiting processing</p>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Month Navigator + Summary */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Button size="icon" variant="outline" className="h-8 w-8" onClick={prevMonth}>
+              <ChevronLeft size={14} />
+            </Button>
+            <h2 className="text-lg font-bold min-w-[180px] text-center">
+              {monthNames[viewMonth]} {viewYear}
+            </h2>
+            <Button size="icon" variant="outline" className="h-8 w-8" onClick={nextMonth}>
+              <ChevronRight size={14} />
+            </Button>
+          </div>
+          <div className="flex items-center gap-4 text-xs">
+            <span>In: <strong className="text-green-600">{AUD.format(monthTotalIn)}</strong></span>
+            <span>Out: <strong className="text-destructive">{AUD.format(monthTotalOut)}</strong></span>
+            <span className="border-l border-border pl-4">Balance: <strong className="text-base">{AUD.format(closingBalance)}</strong></span>
+          </div>
         </div>
 
         {/* Tabs + Filters */}
@@ -265,36 +338,21 @@ const TrustLedgerPage = () => {
           <div className="flex flex-wrap items-center gap-3 mb-3">
             <TabsList>
               <TabsTrigger value="all" className="text-xs gap-1.5">
-                All <Badge variant="secondary" className="text-[9px] px-1 h-4 ml-1">{ledgerEntries.length}</Badge>
+                All <Badge variant="secondary" className="text-[9px] px-1 h-4 ml-1">{filtered.length}</Badge>
               </TabsTrigger>
               <TabsTrigger value="receipts" className="text-xs gap-1.5">
-                <ArrowDownCircle size={12} /> Receipts <Badge variant="secondary" className="text-[9px] px-1 h-4 ml-1">{receipts.length}</Badge>
+                <ArrowDownCircle size={12} /> Receipts
               </TabsTrigger>
               <TabsTrigger value="payments" className="text-xs gap-1.5">
-                <ArrowUpCircle size={12} /> Payments <Badge variant="secondary" className="text-[9px] px-1 h-4 ml-1">{payments.length}</Badge>
+                <ArrowUpCircle size={12} /> Payments
               </TabsTrigger>
             </TabsList>
-
             <div className="flex-1" />
-
-            {/* Filters */}
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-2">
               <div className="relative">
                 <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  placeholder="Search client, property, ref…"
-                  className="h-8 pl-8 w-[200px] text-xs"
-                />
-              </div>
-              <div className="flex items-center gap-1">
-                <CalendarIcon size={13} className="text-muted-foreground" />
-                <Input type="date" value={filterDateFrom} onChange={e => setFilterDateFrom(e.target.value)}
-                  className="h-8 w-[125px] text-xs" />
-                <span className="text-xs text-muted-foreground">to</span>
-                <Input type="date" value={filterDateTo} onChange={e => setFilterDateTo(e.target.value)}
-                  className="h-8 w-[125px] text-xs" />
+                <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+                  placeholder="Search client, property, ref…" className="h-8 pl-8 w-[200px] text-xs" />
               </div>
               <Select value={filterStatus} onValueChange={setFilterStatus}>
                 <SelectTrigger className="w-[120px] h-8 text-xs">
@@ -312,71 +370,55 @@ const TrustLedgerPage = () => {
             </div>
           </div>
 
-          {/* Unified Ledger Table */}
+          {/* Ledger Table */}
           <TabsContent value={activeTab} className="mt-0">
             <Card>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-xs w-[50px]">Type</TableHead>
-                    <TableHead className="text-xs">Number</TableHead>
                     <TableHead className="text-xs">Date</TableHead>
+                    <TableHead className="text-xs">Receipt #</TableHead>
+                    <TableHead className="text-xs">Payment #</TableHead>
                     <TableHead className="text-xs">Client</TableHead>
                     <TableHead className="text-xs">Property</TableHead>
-                    <TableHead className="text-xs">Method</TableHead>
-                    <TableHead className="text-xs">Purpose</TableHead>
-                    <TableHead className="text-xs text-right">Amount</TableHead>
-                    <TableHead className="text-xs">Status</TableHead>
+                    <TableHead className="text-xs text-right">In</TableHead>
+                    <TableHead className="text-xs text-right">Out</TableHead>
+                    <TableHead className="text-xs text-right">Balance</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filtered.length === 0 ? (
+                  {entriesWithBalance.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="text-center text-muted-foreground py-12 text-sm">
-                        {searchQuery || filterStatus !== 'all' || filterDateFrom
+                      <TableCell colSpan={8} className="text-center text-muted-foreground py-12 text-sm">
+                        {searchQuery || filterStatus !== 'all'
                           ? 'No entries match your filters.'
-                          : 'No trust receipts or payments recorded yet.'}
+                          : `No trust entries for ${monthNames[viewMonth]} ${viewYear}.`}
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filtered.map(entry => {
+                    entriesWithBalance.map(entry => {
                       const isReceipt = entry.type === 'receipt';
-                      const statusCfg = STATUS_CONFIG[entry.status] || STATUS_CONFIG.pending;
-                      const StatusIcon = statusCfg.icon;
                       return (
-                        <TableRow key={entry.id} className="group">
-                          <TableCell>
-                            <div className={`h-7 w-7 rounded-md flex items-center justify-center ${
-                              isReceipt ? 'bg-green-500/10' : 'bg-destructive/10'
-                            }`}>
-                              {isReceipt
-                                ? <ArrowDownCircle size={14} className="text-green-600" />
-                                : <ArrowUpCircle size={14} className="text-destructive" />
-                              }
-                            </div>
+                        <TableRow key={entry.id}>
+                          <TableCell className="text-xs whitespace-nowrap tabular-nums">
+                            {new Date(entry.date + 'T00:00:00').toLocaleDateString('en-AU', { day: '2-digit', month: '2-digit' })}
                           </TableCell>
-                          <TableCell className="text-xs font-mono font-semibold">{entry.number}</TableCell>
-                          <TableCell className="text-xs whitespace-nowrap">
-                            {DATE_FMT.format(new Date(entry.date + 'T00:00:00'))}
+                          <TableCell className="text-xs font-mono">
+                            {isReceipt ? entry.number : ''}
+                          </TableCell>
+                          <TableCell className="text-xs font-mono">
+                            {!isReceipt ? entry.number : ''}
                           </TableCell>
                           <TableCell className="text-xs font-medium">{entry.client}</TableCell>
-                          <TableCell className="text-xs max-w-[180px] truncate text-muted-foreground">{entry.property}</TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="text-[10px] capitalize">{entry.method}</Badge>
+                          <TableCell className="text-xs max-w-[160px] truncate text-muted-foreground">{entry.property}</TableCell>
+                          <TableCell className="text-xs text-right tabular-nums font-semibold text-green-600">
+                            {isReceipt ? `+${AUD.format(entry.amount)}` : ''}
                           </TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="text-[10px] capitalize">{entry.purpose}</Badge>
+                          <TableCell className="text-xs text-right tabular-nums font-semibold text-destructive">
+                            {!isReceipt ? `-${AUD.format(entry.amount)}` : ''}
                           </TableCell>
-                          <TableCell className={`text-xs text-right font-semibold tabular-nums ${
-                            isReceipt ? 'text-green-600' : 'text-destructive'
-                          }`}>
-                            {isReceipt ? '+' : '-'}{AUD.format(entry.amount)}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant={statusCfg.variant} className="text-[10px] gap-1">
-                              <StatusIcon size={10} />
-                              {statusCfg.label}
-                            </Badge>
+                          <TableCell className="text-xs text-right tabular-nums font-bold">
+                            {AUD.format(entry.balance)}
                           </TableCell>
                         </TableRow>
                       );
@@ -386,21 +428,16 @@ const TrustLedgerPage = () => {
               </Table>
             </Card>
 
-            {/* Running totals footer */}
-            {filtered.length > 0 && (
-              <div className="flex items-center justify-between mt-3 px-2 text-xs text-muted-foreground">
-                <span>{filtered.length} entr{filtered.length === 1 ? 'y' : 'ies'} shown</span>
-                <div className="flex gap-4">
-                  <span>
-                    In: <strong className="text-green-600">
-                      {AUD.format(filtered.filter(e => e.type === 'receipt').reduce((s, e) => s + e.amount, 0))}
-                    </strong>
-                  </span>
-                  <span>
-                    Out: <strong className="text-destructive">
-                      {AUD.format(filtered.filter(e => e.type === 'payment').reduce((s, e) => s + e.amount, 0))}
-                    </strong>
-                  </span>
+            {/* Footer */}
+            {entriesWithBalance.length > 0 && (
+              <div className="flex items-center justify-between mt-3 px-2">
+                <span className="text-xs text-muted-foreground">
+                  {entriesWithBalance.length} entr{entriesWithBalance.length === 1 ? 'y' : 'ies'}
+                </span>
+                <div className="flex items-center gap-2">
+                  <Button size="sm" variant="outline" className="h-7 text-[10px] gap-1" onClick={() => setShowStatement(true)}>
+                    <FileDown size={11} /> Monthly Statement
+                  </Button>
                 </div>
               </div>
             )}
@@ -408,18 +445,8 @@ const TrustLedgerPage = () => {
         </Tabs>
       </div>
 
-      {/* New Receipt Modal */}
-      <TrustReceiptModal
-        open={showNewReceipt}
-        onOpenChange={setShowNewReceipt}
-        onCreated={fetchData}
-      />
-
-      {/* Monthly Statement Modal */}
-      <TrustStatementModal
-        open={showStatement}
-        onOpenChange={setShowStatement}
-      />
+      <TrustReceiptModal open={showNewReceipt} onOpenChange={setShowNewReceipt} onCreated={fetchData} />
+      <TrustStatementModal open={showStatement} onOpenChange={setShowStatement} />
     </div>
   );
 };

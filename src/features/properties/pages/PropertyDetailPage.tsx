@@ -74,6 +74,13 @@ export default function PropertyDetailPage() {
           views: p.views,
           contactClicks: p.contact_clicks,
           status: 'listed',
+          rentalYieldPct: p.rental_yield_pct,
+          strPermitted: p.str_permitted,
+          yearBuilt: p.year_built,
+          councilRatesAnnual: p.council_rates_annual,
+          strataFeesQuarterly: p.strata_fees_quarterly,
+          rentalWeekly: p.rental_weekly,
+          currencyCode: p.currency_code,
         });
       } else {
         // Fallback to mock

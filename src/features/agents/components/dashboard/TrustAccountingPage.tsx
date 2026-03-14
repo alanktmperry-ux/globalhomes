@@ -79,7 +79,12 @@ const TrustAccountingPage = () => {
   const [selectedPaymentIds, setSelectedPaymentIds] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
 
-  // Fetch pending payments
+  // Fetch pending payments + receipts stats
+  const [newReceiptsCount, setNewReceiptsCount] = useState(0);
+  const [lastReceiptNumber, setLastReceiptNumber] = useState('—');
+  const [lastReconciledDate, setLastReconciledDate] = useState<string | null>(null);
+  const [unmatchedCount, setUnmatchedCount] = useState(0);
+
   const fetchPendingPayments = useCallback(async () => {
     if (!user) return;
     const { data } = await supabase
@@ -90,7 +95,41 @@ const TrustAccountingPage = () => {
     if (data) setPendingPayments(data as PendingPayment[]);
   }, [user]);
 
-  useEffect(() => { fetchPendingPayments(); }, [fetchPendingPayments]);
+  const fetchDashboardStats = useCallback(async () => {
+    if (!user) return;
+    // New receipts (received status)
+    const { count: rCount } = await supabase
+      .from('trust_receipts')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'received');
+    setNewReceiptsCount(rCount || 0);
+
+    // Last receipt number
+    const { data: lastR } = await supabase
+      .from('trust_receipts')
+      .select('receipt_number')
+      .order('created_at', { ascending: false })
+      .limit(1);
+    if (lastR?.[0]) setLastReceiptNumber(`#${lastR[0].receipt_number}`);
+
+    // Last reconciled date
+    const { data: lastRecon } = await supabase
+      .from('trust_reconciliations')
+      .select('bank_date')
+      .eq('status', 'matched')
+      .order('bank_date', { ascending: false })
+      .limit(1);
+    if (lastRecon?.[0]) setLastReconciledDate(lastRecon[0].bank_date);
+
+    // Unmatched reconciliation items
+    const { count: uCount } = await supabase
+      .from('trust_reconciliations')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'unmatched');
+    setUnmatchedCount(uCount || 0);
+  }, [user]);
+
+  useEffect(() => { fetchPendingPayments(); fetchDashboardStats(); }, [fetchPendingPayments, fetchDashboardStats]);
 
   // New tx form
   const [txCategory, setTxCategory] = useState('deposit');

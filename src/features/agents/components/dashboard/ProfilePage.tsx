@@ -322,6 +322,8 @@ const ProfilePage = () => {
     setAddressSuggestions([]);
     setShowAddressSuggestions(false);
   };
+
+  const addLanguage = () => {
     if (newLang.trim() && !languages.includes(newLang.trim())) {
       setLanguages(prev => [...prev, newLang.trim()]);
       setNewLang('');

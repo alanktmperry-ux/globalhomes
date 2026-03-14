@@ -41,12 +41,29 @@ export interface TrustTransaction {
   aba_exported_at: string | null;
   created_at: string;
   updated_at: string;
+  // joined data
+  contact?: { first_name: string; last_name: string | null } | null;
+  property?: { title: string; address: string } | null;
+}
+
+export interface ContactOption {
+  id: string;
+  first_name: string;
+  last_name: string | null;
+}
+
+export interface PropertyOption {
+  id: string;
+  title: string;
+  address: string;
 }
 
 export function useTrustAccounting() {
   const { user } = useAuth();
   const [accounts, setAccounts] = useState<TrustAccount[]>([]);
   const [transactions, setTransactions] = useState<TrustTransaction[]>([]);
+  const [contacts, setContacts] = useState<ContactOption[]>([]);
+  const [properties, setProperties] = useState<PropertyOption[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchAccounts = useCallback(async () => {
@@ -62,22 +79,45 @@ export function useTrustAccounting() {
     if (!user) return;
     let query = supabase
       .from('trust_transactions')
-      .select('*')
+      .select('*, contacts(first_name, last_name), properties(title, address)')
       .order('transaction_date', { ascending: false });
     if (accountId) query = query.eq('trust_account_id', accountId);
     const { data } = await query;
-    if (data) setTransactions(data as unknown as TrustTransaction[]);
+    if (data) {
+      setTransactions(data.map((t: any) => ({
+        ...t,
+        contact: t.contacts || null,
+        property: t.properties || null,
+      })) as TrustTransaction[]);
+    }
+  }, [user]);
+
+  const fetchContacts = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('contacts')
+      .select('id, first_name, last_name')
+      .order('first_name');
+    if (data) setContacts(data as ContactOption[]);
+  }, [user]);
+
+  const fetchProperties = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('properties')
+      .select('id, title, address')
+      .order('title');
+    if (data) setProperties(data as PropertyOption[]);
   }, [user]);
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      await fetchAccounts();
-      await fetchTransactions();
+      await Promise.all([fetchAccounts(), fetchTransactions(), fetchContacts(), fetchProperties()]);
       setLoading(false);
     };
     load();
-  }, [fetchAccounts, fetchTransactions]);
+  }, [fetchAccounts, fetchTransactions, fetchContacts, fetchProperties]);
 
   const createAccount = async (account: Partial<TrustAccount>) => {
     const { data, error } = await supabase
@@ -98,7 +138,6 @@ export function useTrustAccounting() {
       .select()
       .single();
     if (error) throw error;
-    // Update account balance
     if (tx.trust_account_id && tx.status === 'completed') {
       const account = accounts.find(a => a.id === tx.trust_account_id);
       if (account) {
@@ -123,6 +162,35 @@ export function useTrustAccounting() {
     await fetchTransactions();
   };
 
+  const deleteTransaction = async (id: string) => {
+    // We void instead of hard-delete (audit trail)
+    const { error } = await supabase
+      .from('trust_transactions')
+      .update({ status: 'voided' } as any)
+      .eq('id', id);
+    if (error) throw error;
+    await fetchTransactions();
+  };
+
+  const markAsCleared = async (id: string) => {
+    if (!user) return;
+    await updateTransaction(id, {
+      status: 'completed',
+    } as any);
+  };
+
+  const bulkMarkCleared = async () => {
+    if (!user) return;
+    const pendingIds = transactions.filter(t => t.status === 'pending').map(t => t.id);
+    if (pendingIds.length === 0) return;
+    const { error } = await supabase
+      .from('trust_transactions')
+      .update({ status: 'completed' } as any)
+      .in('id', pendingIds);
+    if (error) throw error;
+    await Promise.all([fetchTransactions(), fetchAccounts()]);
+  };
+
   const reconcileTransaction = async (id: string) => {
     if (!user) return;
     await updateTransaction(id, {
@@ -133,8 +201,9 @@ export function useTrustAccounting() {
   };
 
   return {
-    accounts, transactions, loading,
+    accounts, transactions, contacts, properties, loading,
     fetchAccounts, fetchTransactions,
-    createAccount, createTransaction, updateTransaction, reconcileTransaction,
+    createAccount, createTransaction, updateTransaction,
+    deleteTransaction, markAsCleared, bulkMarkCleared, reconcileTransaction,
   };
 }

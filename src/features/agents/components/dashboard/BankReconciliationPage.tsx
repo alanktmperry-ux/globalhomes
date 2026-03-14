@@ -636,7 +636,7 @@ const BankReconciliationPage = () => {
             <TableBody>
               {filtered.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-muted-foreground py-12 text-sm">
+                  <TableCell colSpan={8} className="text-center text-muted-foreground py-12 text-sm">
                     {items.length === 0
                       ? 'No bank statement entries yet. Add entries manually or import a CSV.'
                       : 'No entries match your filters.'}

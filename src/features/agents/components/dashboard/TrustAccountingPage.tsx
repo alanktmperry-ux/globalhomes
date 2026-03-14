@@ -11,8 +11,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import {
   Landmark, Plus, ArrowDownCircle, CheckCircle2, DollarSign,
   TrendingUp, TrendingDown, FileDown, Trash2, Pencil, Clock,
-  AlertTriangle, CalendarIcon, Home, Users, Receipt,
+  AlertTriangle, CalendarIcon, Home, Users, Receipt, Upload,
+  CreditCard, CheckSquare,
 } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { supabase } from '@/integrations/supabase/client';
 import DashboardHeader from './DashboardHeader';
 import TrustReceiptModal from './TrustReceiptModal';
 import { useTrustAccounting, TrustTransaction } from '@/hooks/useTrustAccounting';

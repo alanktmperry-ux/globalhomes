@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Plus, Zap, Eye, MessageSquare, TrendingUp, Copy, Sparkles } from 'lucide-react';
+import { ArrowLeft, Plus, Zap, Eye, MessageSquare, TrendingUp, Copy, Sparkles, Key } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -18,6 +18,7 @@ const PocketListingPage = () => {
   const duplicateId = searchParams.get('duplicate');
   const [showForm, setShowForm] = useState(!!editId || !!duplicateId);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [createListingType, setCreateListingType] = useState<'sale' | 'rent'>('sale');
   const [listingTitle, setListingTitle] = useState('');
   const { listings, agentId } = useAgentListings();
   const { toast } = useToast();
@@ -69,11 +70,19 @@ const PocketListingPage = () => {
               </Button>
               <Button
                 size="sm"
-                onClick={() => { setShowForm(true); setShowSuccess(false); }}
+                variant="outline"
+                onClick={() => { setCreateListingType('rent'); setShowForm(true); setShowSuccess(false); }}
+                className="gap-1.5 text-xs font-bold"
+              >
+                <Key size={14} /> Create Rental Listing
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => { setCreateListingType('sale'); setShowForm(true); setShowSuccess(false); }}
                 className="gap-1.5 relative text-xs font-bold"
               >
                 <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-success rounded-full animate-pulse" />
-                <Plus size={14} /> Create Pocket Listing
+                <Plus size={14} /> Create Sale Listing
               </Button>
             </div>
           </div>
@@ -112,6 +121,7 @@ const PocketListingPage = () => {
                   onCancel={() => { setShowForm(false); if (editId || duplicateId) navigate('/pocket-listing'); }}
                   editPropertyId={editId}
                   duplicatePropertyId={duplicateId}
+                  initialListingType={createListingType}
                 />
               </motion.div>
             ) : (
@@ -137,9 +147,14 @@ const PocketListingPage = () => {
                     <TabsContent key={tab} value={tab}>
                       <div className="border border-dashed border-border rounded-2xl p-12 text-center">
                         <p className="text-muted-foreground text-sm mb-3">No {tab} listings yet</p>
-                        <Button size="sm" onClick={() => setShowForm(true)}>
-                          <Plus size={14} className="mr-1" /> Create Your First
-                        </Button>
+                        <div className="flex items-center justify-center gap-2">
+                          <Button size="sm" onClick={() => { setCreateListingType('sale'); setShowForm(true); }}>
+                            <Plus size={14} className="mr-1" /> Create Sale
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => { setCreateListingType('rent'); setShowForm(true); }}>
+                            <Key size={14} className="mr-1" /> Create Rental
+                          </Button>
+                        </div>
                       </div>
                     </TabsContent>
                   ))}

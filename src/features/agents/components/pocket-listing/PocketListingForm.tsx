@@ -84,6 +84,7 @@ const STEPS = ['Address', 'Basics', 'Photos', 'Voice', 'Settings', 'Preview'];
 interface Props {
   onPublish: (title: string) => void;
   onCancel: () => void;
+  initialListingType?: ListingDraft['listingType'];
   /** When provided, the form loads this property for editing */
   editPropertyId?: string | null;
   /** When provided, the form loads this property's data but creates a new listing */
@@ -100,10 +101,13 @@ const formatPriceForDB = (draft: ListingDraft): string => {
   }
 };
 
-const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePropertyId }: Props) => {
+const PocketListingForm = ({ onPublish, onCancel, initialListingType, editPropertyId, duplicatePropertyId }: Props) => {
   const loadPropertyId = editPropertyId || duplicatePropertyId;
   const [step, setStep] = useState(0);
-  const [draft, setDraft] = useState<ListingDraft>(DEFAULT_DRAFT);
+  const [draft, setDraft] = useState<ListingDraft>(() => ({
+    ...DEFAULT_DRAFT,
+    listingType: initialListingType ?? DEFAULT_DRAFT.listingType,
+  }));
   const [publishing, setPublishing] = useState(false);
   const [loadingEdit, setLoadingEdit] = useState(!!loadPropertyId);
   const autoSaveRef = useRef<ReturnType<typeof setInterval>>();
@@ -189,9 +193,16 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePrope
     if (editPropertyId) return;
     const saved = localStorage.getItem('pocket-listing-draft');
     if (saved) {
-      try { setDraft(JSON.parse(saved)); } catch {}
+      try {
+        const parsed = JSON.parse(saved) as Partial<ListingDraft>;
+        setDraft({
+          ...DEFAULT_DRAFT,
+          ...parsed,
+          listingType: initialListingType ?? parsed.listingType ?? DEFAULT_DRAFT.listingType,
+        });
+      } catch {}
     }
-  }, [editPropertyId]);
+  }, [editPropertyId, initialListingType]);
 
   const progress = ((step + 1) / STEPS.length) * 100;
 

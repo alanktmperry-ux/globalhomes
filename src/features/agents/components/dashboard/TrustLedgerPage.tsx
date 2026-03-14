@@ -476,6 +476,7 @@ const TrustLedgerPage = () => {
                     <TableHead className="text-xs text-right">In</TableHead>
                     <TableHead className="text-xs text-right">Out</TableHead>
                     <TableHead className="text-xs text-right">Balance</TableHead>
+                    <TableHead className="text-xs w-[40px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

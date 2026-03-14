@@ -466,7 +466,9 @@ const MessagesPage = () => {
                 {selectedConvo.id.startsWith('lead-') && messages.length === 0 ? (
                   <div className="bg-secondary/50 rounded-2xl p-4 text-center">
                     <p className="text-sm text-muted-foreground">
-                      This conversation started from an enquiry. Send a message to start chatting.
+                      {isLegacyReadOnly
+                        ? 'This enquiry was submitted without a platform account, so in-app chat is unavailable.'
+                        : 'This conversation started from an enquiry. Send a message to start chatting.'}
                     </p>
                     {selectedConvo.last_message_text && (
                       <div className="mt-3 p-3 bg-primary/5 rounded-xl text-left">

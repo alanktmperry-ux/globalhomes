@@ -533,6 +533,142 @@ const TrustAccountingPage = () => {
           </Card>
         </div>
 
+        {/* ── Bulk Payments Section ── */}
+        {pendingPayments.length > 0 && (
+          <Card className="mb-6">
+            <CardContent className="p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CreditCard size={16} className="text-primary" />
+                  <h3 className="text-sm font-bold">Bulk Payments Ready</h3>
+                  <Badge variant="outline" className="text-[10px]">{pendingPayments.length} Pending</Badge>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5"
+                    onClick={() => {
+                      if (selectedPaymentIds.size === pendingPayments.length) {
+                        setSelectedPaymentIds(new Set());
+                      } else {
+                        setSelectedPaymentIds(new Set(pendingPayments.map(p => p.id)));
+                      }
+                    }}>
+                    <CheckSquare size={12} />
+                    {selectedPaymentIds.size === pendingPayments.length ? 'Deselect All' : 'Select All'}
+                  </Button>
+                  <Button size="sm" className="h-8 text-xs gap-1.5"
+                    disabled={selectedPaymentIds.size === 0 || bulkLoading}
+                    onClick={async () => {
+                      const selected = pendingPayments.filter(p => selectedPaymentIds.has(p.id));
+                      if (selected.length === 0) return;
+
+                      // Generate ABA file
+                      const today = new Date();
+                      const dateStr = today.toISOString().slice(2, 10).replace(/-/g, '');
+                      const firstAcc = accounts[0];
+                      const bsb = (firstAcc?.bsb || '000-000').replace('-', '');
+                      const accNum = (firstAcc?.account_number || '00000000').padEnd(9, ' ');
+                      const bankName = (firstAcc?.bank_name || 'NAB').slice(0, 3).toUpperCase().padEnd(3, ' ');
+
+                      // Header record (Type 0)
+                      const header = `0                 01${bankName}       ${(firstAcc?.account_name || 'Trust Account').slice(0, 26).padEnd(26, ' ')}${bsb.padEnd(7, ' ')}                    ${dateStr}                                        `;
+
+                      // Detail records (Type 1)
+                      const details = selected.map(p => {
+                        const pBsb = (p.bsb || '000-000').replace('-', '');
+                        const pAcc = (p.account_number || '00000000').padEnd(9, ' ');
+                        const amountCents = Math.round(p.amount * 100).toString().padStart(10, '0');
+                        const name = (p.client_name || '').slice(0, 32).padEnd(32, ' ');
+                        const ref = (p.reference || p.payment_number || '').slice(0, 18).padEnd(18, ' ');
+                        const srcBsb = bsb;
+                        const srcAcc = accNum;
+                        return `1${pBsb}${pAcc} 530${amountCents}${name}${ref}${srcBsb}${srcAcc}        00000000`;
+                      });
+
+                      // Total record (Type 7)
+                      const totalAmount = selected.reduce((s, p) => s + p.amount, 0);
+                      const totalCents = Math.round(totalAmount * 100).toString().padStart(10, '0');
+                      const countStr = selected.length.toString().padStart(6, '0');
+                      const footer = `7999-999            ${totalCents}${totalCents}                        ${countStr}                                        `;
+
+                      const abaContent = [header, ...details, footer].join('\r\n');
+                      const blob = new Blob([abaContent], { type: 'text/plain' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `trust_bulk_payment_${today.toISOString().split('T')[0]}.aba`;
+                      a.click();
+                      URL.revokeObjectURL(url);
+
+                      // Mark selected as cleared
+                      setBulkLoading(true);
+                      try {
+                        const { error } = await supabase
+                          .from('trust_payments')
+                          .update({ status: 'cleared' } as any)
+                          .in('id', Array.from(selectedPaymentIds));
+                        if (error) throw error;
+                        toast.success(`ABA file downloaded with ${selected.length} payments. Marked as cleared.`);
+                        setSelectedPaymentIds(new Set());
+                        await fetchPendingPayments();
+                      } catch (e: any) {
+                        toast.error(e.message);
+                      } finally {
+                        setBulkLoading(false);
+                      }
+                    }}>
+                    <FileDown size={12} /> Download ABA File
+                  </Button>
+                </div>
+              </div>
+
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[40px]"></TableHead>
+                    <TableHead className="text-xs">Client</TableHead>
+                    <TableHead className="text-xs">Property</TableHead>
+                    <TableHead className="text-xs text-right">Amount</TableHead>
+                    <TableHead className="text-xs">BSB / Account</TableHead>
+                    <TableHead className="text-xs">Ref</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pendingPayments.map(p => (
+                    <TableRow key={p.id}>
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedPaymentIds.has(p.id)}
+                          onCheckedChange={(checked) => {
+                            const next = new Set(selectedPaymentIds);
+                            if (checked) next.add(p.id); else next.delete(p.id);
+                            setSelectedPaymentIds(next);
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell className="text-xs font-medium">{p.client_name}</TableCell>
+                      <TableCell className="text-xs max-w-[180px] truncate">{p.property_address}</TableCell>
+                      <TableCell className="text-xs text-right font-semibold">{AUD.format(p.amount)}</TableCell>
+                      <TableCell className="text-xs font-mono text-muted-foreground">
+                        {p.bsb || '—'} {p.account_number || ''}
+                      </TableCell>
+                      <TableCell className="text-xs font-mono">{p.reference || p.payment_number}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+
+              <div className="flex items-center justify-between pt-1 border-t border-border">
+                <p className="text-xs text-muted-foreground">
+                  {selectedPaymentIds.size} of {pendingPayments.length} selected
+                </p>
+                <p className="text-sm font-bold">
+                  Total: {AUD.format(pendingPayments.filter(p => selectedPaymentIds.has(p.id)).reduce((s, p) => s + p.amount, 0))}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <div className="flex flex-col lg:flex-row gap-4">
           {/* ── Main Table (80%) ── */}
           <div className="flex-1 min-w-0 space-y-3">

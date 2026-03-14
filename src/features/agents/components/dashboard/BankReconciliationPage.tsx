@@ -560,7 +560,40 @@ const BankReconciliationPage = () => {
           </Card>
         </div>
 
-        {/* Filters */}
+        {/* ── Drag-Drop CSV Upload ── */}
+        <div
+          onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={handleFileDrop}
+          className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+            dragging ? 'border-primary bg-primary/5' : 'border-border bg-muted/30'
+          }`}
+        >
+          <input
+            type="file"
+            accept=".csv"
+            ref={setFileInputEl}
+            onChange={handleFileSelect}
+            className="hidden"
+          />
+          <Upload size={24} className={`mx-auto mb-2 ${dragging ? 'text-primary' : 'text-muted-foreground/50'}`} />
+          <p className="text-sm font-medium">Upload Bank Statement CSV</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Drag CSV here or{' '}
+            <button onClick={() => fileInputEl?.click()} className="text-primary underline underline-offset-2 hover:text-primary/80">
+              Choose File
+            </button>
+            {' '}→ Auto-match transactions
+          </p>
+          {autoMatchRunning && (
+            <div className="mt-3 flex items-center justify-center gap-2 text-xs text-primary">
+              <RefreshCw size={12} className="animate-spin" />
+              Auto-matching transactions…
+            </div>
+          )}
+        </div>
+
+        {/* ── Unmatched Transactions Header ── */}
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative">
             <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />

@@ -20,6 +20,7 @@ Deno.serve(async (req) => {
       userId, email, fullName, phone, mode,
       agencyName, agencyEmail, inviteCode,
       licenseNumber, officeAddress, yearsExperience, specialization,
+      investmentNiche, handlesTrustAccounting,
     } = await req.json();
 
     if (!userId || !email || !mode) {

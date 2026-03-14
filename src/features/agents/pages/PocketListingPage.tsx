@@ -18,6 +18,7 @@ const PocketListingPage = () => {
   const duplicateId = searchParams.get('duplicate');
   const [showForm, setShowForm] = useState(!!editId || !!duplicateId);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [createListingType, setCreateListingType] = useState<'sale' | 'rent'>('sale');
   const [listingTitle, setListingTitle] = useState('');
   const { listings, agentId } = useAgentListings();
   const { toast } = useToast();

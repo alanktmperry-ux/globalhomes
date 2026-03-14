@@ -310,6 +310,22 @@ const TrustLedgerPage = () => {
     const totalIn = filtered.filter(e => e.type === 'receipt').reduce((s, e) => s + e.amount, 0);
     const totalOut = filtered.filter(e => e.type === 'payment').reduce((s, e) => s + e.amount, 0);
 
+    // Build client ledger breakdown
+    const clientMap = new Map<string, { receipts: number; payments: number; net: number }>();
+    entriesWithBalance.forEach(e => {
+      const existing = clientMap.get(e.client) || { receipts: 0, payments: 0, net: 0 };
+      if (e.type === 'receipt') { existing.receipts += e.amount; existing.net += e.amount; }
+      else { existing.payments += e.amount; existing.net -= e.amount; }
+      clientMap.set(e.client, existing);
+    });
+    const clientRows = Array.from(clientMap.entries()).map(([name, data]) => `
+      <tr>
+        <td>${name}</td>
+        <td class="right green">${AUD.format(data.receipts)}</td>
+        <td class="right red">${AUD.format(data.payments)}</td>
+        <td class="right bold">${AUD.format(data.net)}</td>
+      </tr>`).join('');
+
     const rows = entriesWithBalance.map(e => `
       <tr>
         <td>${new Date(e.date + 'T00:00:00').toLocaleDateString('en-AU', { day: '2-digit', month: '2-digit' })}</td>
@@ -322,7 +338,9 @@ const TrustLedgerPage = () => {
         <td class="right bold">${AUD.format(e.balance)}</td>
       </tr>`).join('');
 
-    const html = `<!DOCTYPE html><html><head><title>Trust Ledger - ${monthNames[viewMonth]} ${viewYear}</title>
+    const generatedDate = new Date().toLocaleDateString('en-AU', { day: '2-digit', month: 'long', year: 'numeric' });
+
+    const html = `<!DOCTYPE html><html><head><title>Monthly Trust Ledger - ${monthNames[viewMonth]} ${viewYear}</title>
     <style>
       @page { size: A4 landscape; margin: 15mm; }
       body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10px; color: #1a1a1a; }
@@ -330,6 +348,7 @@ const TrustLedgerPage = () => {
       .header h1 { font-size: 18px; margin: 0; }
       .header .act { font-size: 9px; color: #666; margin-top: 4px; }
       .header .period { font-size: 13px; font-weight: bold; margin-top: 6px; }
+      .section-title { font-size: 13px; font-weight: bold; margin: 24px 0 8px; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
       table { width: 100%; border-collapse: collapse; margin-top: 10px; }
       th { background: #f5f5f5; border: 1px solid #ddd; padding: 6px 8px; text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; }
       td { border: 1px solid #eee; padding: 5px 8px; font-size: 10px; }
@@ -344,13 +363,26 @@ const TrustLedgerPage = () => {
       .summary div { text-align: right; }
       .summary .label { font-size: 9px; color: #666; text-transform: uppercase; }
       .summary .value { font-size: 14px; font-weight: bold; }
+      .certification { margin-top: 30px; border: 2px solid #1a1a1a; padding: 20px; page-break-inside: avoid; }
+      .certification h2 { font-size: 14px; margin-bottom: 12px; text-align: center; }
+      .cert-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px; margin: 12px 0; }
+      .cert-grid .label { font-size: 9px; color: #666; }
+      .cert-grid .value { font-size: 11px; font-weight: bold; }
+      .sig-row { display: flex; justify-content: space-between; margin-top: 30px; }
+      .sig-row div { width: 40%; }
+      .sig-line { border-top: 1px solid #999; margin-top: 40px; padding-top: 4px; font-size: 9px; color: #666; }
       .footer { margin-top: 24px; padding-top: 10px; border-top: 1px solid #ddd; font-size: 8px; color: #999; text-align: center; }
+      .page-break { page-break-before: always; }
     </style></head><body>
     <div class="header">
       <p class="act">Agents Financial Administration Act 2014</p>
-      <h1>Trust Account Ledger</h1>
+      <h1>Monthly Trust Account Ledger</h1>
       <p class="period">${monthNames[viewMonth]} ${viewYear}</p>
+      <p style="font-size:9px;color:#666;margin-top:4px;">Auditor-ready report — Generated ${generatedDate}</p>
     </div>
+
+    <!-- Transaction Ledger -->
+    <p class="section-title">Transaction Ledger</p>
     <table>
       <thead><tr>
         <th>Date</th><th>Receipt #</th><th>Payment #</th><th>Client</th><th>Property</th><th class="right">In</th><th class="right">Out</th><th class="right">Balance</th>
@@ -358,12 +390,58 @@ const TrustLedgerPage = () => {
       <tbody>${rows}</tbody>
     </table>
     <div class="summary">
-      <div><span class="label">Total In</span><br/><span class="value green">${AUD.format(totalIn)}</span></div>
-      <div><span class="label">Total Out</span><br/><span class="value red">${AUD.format(totalOut)}</span></div>
+      <div><span class="label">Total Receipts</span><br/><span class="value green">${AUD.format(totalIn)}</span></div>
+      <div><span class="label">Total Payments</span><br/><span class="value red">${AUD.format(totalOut)}</span></div>
       <div><span class="label">Closing Balance</span><br/><span class="value">${AUD.format(closingBalance)}</span></div>
     </div>
+
+    <!-- Client Ledger Breakdown -->
+    <p class="section-title page-break">Client Ledger Breakdown</p>
+    <table>
+      <thead><tr>
+        <th>Client</th><th class="right">Receipts</th><th class="right">Payments</th><th class="right">Net Position</th>
+      </tr></thead>
+      <tbody>${clientRows}</tbody>
+    </table>
+
+    <!-- Reconciliation Summary -->
+    <p class="section-title">Reconciliation Summary</p>
+    <table>
+      <thead><tr><th>Item</th><th class="right">Amount</th></tr></thead>
+      <tbody>
+        <tr><td>Opening Balance (1 ${monthNames[viewMonth]})</td><td class="right bold">${AUD.format(0)}</td></tr>
+        <tr><td>Add: Total Receipts</td><td class="right green">${AUD.format(totalIn)}</td></tr>
+        <tr><td>Less: Total Payments</td><td class="right red">(${AUD.format(totalOut)})</td></tr>
+        <tr style="background:#f0f0f0;"><td class="bold">Closing Trust Balance</td><td class="right bold" style="font-size:12px;">${AUD.format(closingBalance)}</td></tr>
+      </tbody>
+    </table>
+
+    <!-- Balance Certification -->
+    <div class="certification">
+      <h2>Balance Certification</h2>
+      <p style="font-size:10px;text-align:center;color:#666;margin-bottom:16px;">
+        Agents Financial Administration Act 2014 — Section 84
+      </p>
+      <div class="cert-grid">
+        <div><p class="label">Period</p><p class="value">${monthNames[viewMonth]} ${viewYear}</p></div>
+        <div><p class="label">Date Certified</p><p class="value">${generatedDate}</p></div>
+        <div><p class="label">Total Receipts</p><p class="value green">${AUD.format(totalIn)}</p></div>
+        <div><p class="label">Total Payments</p><p class="value red">${AUD.format(totalOut)}</p></div>
+        <div><p class="label">Closing Trust Balance</p><p class="value">${AUD.format(closingBalance)}</p></div>
+        <div><p class="label">Number of Transactions</p><p class="value">${entriesWithBalance.length}</p></div>
+      </div>
+      <p style="font-size:10px;margin:16px 0 4px;text-align:center;">
+        I certify that this trust account ledger is a true and correct record of all monies received and disbursed
+        for the period stated above, in accordance with the Agents Financial Administration Act 2014.
+      </p>
+      <div class="sig-row">
+        <div><p class="sig-line">Licensee / Principal Signature</p></div>
+        <div><p class="sig-line">Date</p></div>
+      </div>
+    </div>
+
     <div class="footer">
-      Generated ${new Date().toLocaleDateString('en-AU')} — Retain for minimum 5 years per AFAA 2014 s.84
+      Generated ${generatedDate} — Retain for minimum 5 years per AFAA 2014 s.84 — This document is auditor-ready
     </div>
     </body></html>`;
 

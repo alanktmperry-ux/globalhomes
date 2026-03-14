@@ -524,49 +524,101 @@ const TrustAccountingPage = () => {
         }
       />
       <div className="p-4 sm:p-6 max-w-[1600px]">
-        {/* ── Summary Cards ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <DollarSign size={18} className="text-primary" />
+        {/* ── 3-Panel Dashboard Cards ── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          {/* Receipts Card */}
+          <Card className="border-l-4 border-l-primary">
+            <CardContent className="p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Receipt size={16} className="text-primary" />
+                  <h3 className="text-sm font-bold">Receipts</h3>
+                  {newReceiptsCount > 0 && (
+                    <Badge className="text-[10px]">{newReceiptsCount} New</Badge>
+                  )}
+                </div>
+                <Button size="sm" className="h-7 text-xs gap-1.5" onClick={() => setShowNewReceipt(true)}>
+                  <Plus size={12} /> New Receipt
+                </Button>
               </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Total In Trust</p>
-                <p className="text-lg font-bold truncate">{AUD.format(totalInTrust)}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0">
-                <Clock size={18} className="text-orange-500" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Pending</p>
-                <p className="text-lg font-bold truncate">{AUD.format(pendingTotal)}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0">
-                <CheckCircle2 size={18} className="text-green-500" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Cleared This Month</p>
-                <p className="text-lg font-bold truncate">{AUD.format(clearedThisMonth)}</p>
+              <div className="space-y-1.5 pt-1 border-t border-border">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Balance:</span>
+                  <span className="text-sm font-bold">{AUD.format(totalInTrust)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Last receipt:</span>
+                  <span className="text-xs font-semibold font-mono">{lastReceiptNumber}</span>
+                </div>
               </div>
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
-                <Landmark size={18} className="text-blue-500" />
+
+          {/* Payments Card */}
+          <Card className="border-l-4 border-l-orange-500">
+            <CardContent className="p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CreditCard size={16} className="text-orange-500" />
+                  <h3 className="text-sm font-bold">Payments</h3>
+                  {pendingPayments.length > 0 && (
+                    <Badge variant="outline" className="text-[10px]">{pendingPayments.length} Ready</Badge>
+                  )}
+                </div>
+                <Button size="sm" variant="outline" className="h-7 text-xs gap-1.5"
+                  disabled={pendingPayments.length === 0}
+                  onClick={() => {
+                    setSelectedPaymentIds(new Set(pendingPayments.map(p => p.id)));
+                    document.getElementById('bulk-payments-section')?.scrollIntoView({ behavior: 'smooth' });
+                  }}>
+                  <FileDown size={12} /> Download ABA
+                </Button>
               </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Last Entry</p>
-                <p className="text-xs font-medium truncate" title={lastEntryText}>{lastEntryText}</p>
+              <div className="space-y-1.5 pt-1 border-t border-border">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Unpaid:</span>
+                  <span className="text-sm font-bold">{AUD.format(pendingPayments.reduce((s, p) => s + p.amount, 0))}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Next ABA:</span>
+                  <span className="text-xs font-semibold">
+                    {pendingPayments.length > 0
+                      ? new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: '2-digit' }).format(new Date(Date.now() + 86400000))
+                      : '—'}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Reconciliation Card */}
+          <Card className="border-l-4 border-l-green-500">
+            <CardContent className="p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <BarChart3 size={16} className="text-green-500" />
+                  <h3 className="text-sm font-bold">Reconciliation</h3>
+                  {unmatchedCount > 0 && (
+                    <Badge variant="destructive" className="text-[10px]">{unmatchedCount}</Badge>
+                  )}
+                </div>
+                <Button size="sm" variant="outline" className="h-7 text-xs gap-1.5"
+                  onClick={() => window.location.hash = '#/dashboard/reconciliation'}>
+                  <Upload size={12} /> Upload CSV
+                </Button>
+              </div>
+              <div className="space-y-1.5 pt-1 border-t border-border">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Last reconciled:</span>
+                  <span className="text-xs font-semibold flex items-center gap-1">
+                    {lastReconciledDate
+                      ? <>
+                          {new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: '2-digit' }).format(new Date(lastReconciledDate))}
+                          <CheckCircle2 size={12} className="text-green-500" />
+                        </>
+                      : '—'}
+                  </span>
+                </div>
               </div>
             </CardContent>
           </Card>

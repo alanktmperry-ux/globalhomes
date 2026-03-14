@@ -24,6 +24,7 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
 };
 
 export function NotificationBell() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);

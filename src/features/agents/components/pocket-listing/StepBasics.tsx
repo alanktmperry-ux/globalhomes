@@ -1,5 +1,6 @@
 import { Home, Building2, Warehouse, Mountain, Store, Minus, Plus } from 'lucide-react';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import type { ListingDraft } from './PocketListingForm';
 

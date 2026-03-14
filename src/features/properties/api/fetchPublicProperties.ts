@@ -80,9 +80,7 @@ export async function fetchPublicProperties(limit = 50, listingType?: 'sale' | '
     .order('created_at', { ascending: false })
     .limit(limit);
 
-  if (listingType) {
-    query = query.eq('listing_type', listingType);
-  }
+  const { data, error } = await query;
 
   if (error) {
     console.error('[fetchPublicProperties]', error.message);

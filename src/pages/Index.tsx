@@ -15,7 +15,7 @@ import { useSavedProperties } from '@/hooks/useSavedProperties';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Property } from '@/lib/types';
 import { useCurrency } from '@/lib/CurrencyContext';
-import { FilterSidebar, Filters, defaultFilters } from '@/components/FilterSidebar';
+import { FilterSidebar } from '@/components/FilterSidebar';
 import { usePropertySearch } from '@/hooks/usePropertySearch';
 import { Slider } from '@/components/ui/slider';
 import { useSavedSearches } from '@/hooks/useSavedSearches';
@@ -35,26 +35,33 @@ const Index = () => {
   const [mapFullscreen, setMapFullscreen] = useState(false);
   const [mapCollapsed, setMapCollapsed] = useState(true);
   const [bottomSheetExpanded, setBottomSheetExpanded] = useState(false);
-  const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'newest' | 'beds'>('default');
-  const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [radiusSliderOpen, setRadiusSliderOpen] = useState(false);
   const isDragging = useRef(false);
   const cardRefs = useRef<globalThis.Map<string, HTMLDivElement>>(new globalThis.Map());
 
-  // ── Search hook ──────────────────────────────────────────────
+  // ── Search hook (filters & sort internalized) ────────────────
   const {
-    displayProperties,
     filteredProperties,
+    displayProperties,
     handleSearch,
     handleAreaSearch,
     setSearchCenter,
     setSearchRadius,
     clearSearchRadius,
-    searchState,
-  } = usePropertySearch({ filters, sortBy, addSearch });
-
-  const { isSearching, hasSearched, manusStatus, manusFailed, currentQuery, searchRadius, areaSearch } = searchState;
+    isSearching,
+    hasSearched,
+    manusStatus,
+    manusFailed,
+    currentQuery,
+    searchRadius,
+    searchCenter,
+    areaSearch,
+    sortBy,
+    setSortBy,
+    filters,
+    setFilters,
+  } = usePropertySearch({ addSearch });
 
   // ── Scroll to card on map click ──────────────────────────────
   const scrollToProperty = useCallback((propertyId: string) => {
@@ -190,7 +197,7 @@ const Index = () => {
               query: currentQuery,
               filters,
               radius: searchRadius ?? undefined,
-              center: searchState.searchCenter ?? undefined,
+              center: searchCenter ?? undefined,
             })}
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-secondary border border-border text-xs font-medium text-foreground hover:bg-accent transition-colors"
           >

@@ -3,34 +3,15 @@ import { Property } from '@/lib/types';
 import { mockProperties } from '@/lib/mock-data';
 import { manusSearch } from '@/lib/ManusSearchService';
 import { supabase } from '@/integrations/supabase/client';
-import { Filters } from '@/components/FilterSidebar';
+import { Filters, defaultFilters } from '@/components/FilterSidebar';
 import { useToast } from '@/hooks/use-toast';
+import { isInsidePolygon, haversineDistance } from '@/shared/lib/geoUtils';
 
-// ── Geo helpers ──────────────────────────────────────────────
+// ── Types ────────────────────────────────────────────────────
 
 export type AreaSearch =
   | { type: 'circle'; center: [number, number]; radius: number }
   | { type: 'polygon'; coordinates: [number, number][] };
-
-function isInsidePolygon(lat: number, lng: number, polygon: [number, number][]): boolean {
-  let inside = false;
-  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    const xi = polygon[i][0], yi = polygon[i][1];
-    const xj = polygon[j][0], yj = polygon[j][1];
-    const intersect = yi > lng !== yj > lng && lat < ((xj - xi) * (lng - yi)) / (yj - yi) + xi;
-    if (intersect) inside = !inside;
-  }
-  return inside;
-}
-
-function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371e3;
-  const toRad = (d: number) => (d * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLng = toRad(lng2 - lng1);
-  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
 
 // ── Map DB row → Property ────────────────────────────────────
 
@@ -79,30 +60,18 @@ function mapDbProperty(p: any): Property {
   };
 }
 
-// ── Hook options ─────────────────────────────────────────────
-
-export interface PropertySearchState {
-  isSearching: boolean;
-  hasSearched: boolean;
-  manusStatus: string | null;
-  /** Whether AI search failed and we're showing DB-only results */
-  manusFailed: boolean;
-  currentQuery: string;
-  searchCenter: { lat: number; lng: number } | null;
-  searchRadius: number | null;
-  areaSearch: AreaSearch | null;
-  dbLoading: boolean;
-  dbError: string | null;
-}
+// ── Hook ─────────────────────────────────────────────────────
 
 export interface UsePropertySearchOptions {
-  filters: Filters;
-  sortBy: 'default' | 'price-asc' | 'price-desc' | 'newest' | 'beds';
   addSearch: (q: string) => void;
 }
 
-export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySearchOptions) {
+export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
   const { toast } = useToast();
+
+  // ── Filters & sort (internalized) ────────────────────────────
+  const [filters, setFilters] = useState<Filters>(defaultFilters);
+  const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'newest' | 'beds'>('default');
 
   // ── Internal state ───────────────────────────────────────────
   const [results, setResults] = useState<Property[]>([]);
@@ -175,10 +144,6 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
   );
 
   // ── Derived: all properties (DB + mock fallback) ─────────────
-  // This serves as the "Global recommendations / featured" feed shown
-  // before any search is performed. Future enhancement: personalise this
-  // with location-based suggestions, trending listings, or user-preference
-  // matching (budget, beds, saved suburbs, etc.).
   const allProperties = useMemo(() => {
     const dbIds = new Set(dbProperties.map((p) => p.id));
     const mockFiltered = mockProperties.slice(0, 6).filter((p) => !dbIds.has(p.id));
@@ -186,9 +151,6 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
   }, [dbProperties]);
 
   // ── Derived: display properties ───────────────────────────────
-  // When `hasSearched` is false → show the global recommendations feed above.
-  // When `hasSearched` is true  → show DB matches for `currentQuery` merged
-  //   with external (Manus) results, DB-first, deduplicated by id.
   const displayProperties = useMemo(() => {
     if (!hasSearched) return allProperties;
 
@@ -211,14 +173,13 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
   const filteredProperties = useMemo(() => {
     let props = displayProperties;
 
-    // Radius filter
+    // Radius filter (haversineDistance returns km)
     if (searchCenter && searchRadius) {
-      const radiusMeters = searchRadius * 1000;
       console.log(`[RadiusFilter] Center: ${searchCenter.lat},${searchCenter.lng} | Radius: ${searchRadius}km | Props before: ${props.length}`);
       props = props.filter((p) => {
         if (p.lat && p.lng) {
           const dist = haversineDistance(p.lat, p.lng, searchCenter.lat, searchCenter.lng);
-          return dist <= radiusMeters;
+          return dist <= searchRadius;
         }
         return false;
       });
@@ -232,7 +193,7 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
       props = props.filter((p) => {
         if (!p.lat || !p.lng) return false;
         if (areaSearch.type === 'circle') {
-          return haversineDistance(p.lat, p.lng, areaSearch.center[0], areaSearch.center[1]) <= areaSearch.radius;
+          return haversineDistance(p.lat, p.lng, areaSearch.center[0], areaSearch.center[1]) <= areaSearch.radius / 1000;
         }
         return isInsidePolygon(p.lat, p.lng, areaSearch.coordinates);
       });
@@ -249,9 +210,8 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
       return true;
     });
 
-    // Sort — subscribed agents get a subtle boost (tie-breaker: featured first)
+    // Sort — subscribed agents get a subtle boost
     const subscriptionBoost = (p: Property) => (p.agent.isSubscribed ? 0 : 1);
-
     const withBoost = (compareFn: (a: Property, b: Property) => number) =>
       [...props].sort((a, b) => compareFn(a, b) || subscriptionBoost(a) - subscriptionBoost(b));
 
@@ -260,11 +220,10 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
     if (sortBy === 'newest') return withBoost((a, b) => new Date(b.listedDate).getTime() - new Date(a.listedDate).getTime());
     if (sortBy === 'beds') return withBoost((a, b) => b.beds - a.beds);
 
-    // Default sort: subscribed agents' listings float to top
     return [...props].sort((a, b) => subscriptionBoost(a) - subscriptionBoost(b));
   }, [displayProperties, areaSearch, sortBy, filters, searchCenter, searchRadius]);
 
-  // ── Setters exposed to the page ──────────────────────────────
+  // ── Setters ──────────────────────────────────────────────────
   const handleAreaSearch = useCallback((area: AreaSearch | null) => {
     setAreaSearch(area || null);
   }, []);
@@ -272,7 +231,7 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
   const handleSetSearchRadius = useCallback((radius: number | null) => {
     setSearchRadius(radius);
     if (radius && !searchCenter) {
-      console.warn('[RadiusFilter] Radius set but no search center. Select a location first.');
+      console.warn('[RadiusFilter] Radius set but no search center.');
       toast({
         title: '📍 Select a location first',
         description: 'Pick a location from the suggestions so the radius filter knows where to search from.',
@@ -293,7 +252,7 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
     return Array.from(byId.values());
   }, [dbProperties]);
 
-  // ── Return ───────────────────────────────────────────────────
+  // ── Return (flat) ────────────────────────────────────────────
   return {
     // Data
     agents,
@@ -307,18 +266,22 @@ export function usePropertySearch({ filters, sortBy, addSearch }: UsePropertySea
     setSearchRadius: handleSetSearchRadius,
     clearSearchRadius,
 
-    // State
-    searchState: {
-      isSearching,
-      hasSearched,
-      manusStatus,
-      manusFailed,
-      currentQuery,
-      searchCenter,
-      searchRadius,
-      areaSearch,
-      dbLoading,
-      dbError,
-    } satisfies PropertySearchState,
+    // Flat state
+    isSearching,
+    hasSearched,
+    manusStatus,
+    manusFailed,
+    currentQuery,
+    searchCenter,
+    searchRadius,
+    areaSearch,
+    dbLoading,
+    dbError,
+
+    // Internalized filters & sort
+    filters,
+    setFilters,
+    sortBy,
+    setSortBy,
   };
 }

@@ -390,6 +390,10 @@ const MessagesPage = () => {
     return format(d, 'MMM d, h:mm a');
   };
 
+  const isLegacyReadOnly = Boolean(
+    selectedConvo?.id.startsWith('lead-') && !selectedConvo?.other_user_id
+  );
+
   if (!user) {
     return (
       <div className="min-h-screen bg-background pb-20">

@@ -9,8 +9,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Receipt, ArrowUpCircle, ArrowDownCircle, CalendarIcon, Search,
   FileDown, DollarSign, Clock, CheckCircle2, XCircle, Filter,
-  FileText, ChevronLeft, ChevronRight,
+  FileText, ChevronLeft, ChevronRight, Download, ShieldCheck,
 } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import DashboardHeader from './DashboardHeader';
 import TrustReceiptModal from './TrustReceiptModal';
 import TrustStatementModal from './TrustStatementModal';
@@ -212,11 +213,118 @@ const TrustLedgerPage = () => {
     toast.success('5yr compliant ledger exported');
   };
 
+  // Generate individual receipt PDF on demand
+  const generateReceiptPdf = async (entry: LedgerEntry & { balance: number }) => {
+    if (entry.type !== 'receipt') return;
+    // Fetch full receipt data
+    const { data: receipt } = await supabase
+      .from('trust_receipts')
+      .select('*')
+      .eq('receipt_number', entry.number)
+      .single();
+    if (!receipt) { toast.error('Receipt not found'); return; }
+
+    // Fetch agent info
+    const { data: agent } = await supabase
+      .from('agents')
+      .select('name, agency, license_number')
+      .eq('id', receipt.agent_id)
+      .single();
+
+    const dateRecFmt = receipt.date_received ? DATE_FMT.format(new Date(receipt.date_received + 'T00:00:00')) : '—';
+    const dateDepFmt = receipt.date_deposited ? DATE_FMT.format(new Date(receipt.date_deposited + 'T00:00:00')) : 'Pending';
+
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>Trust Receipt ${receipt.receipt_number}</title>
+<style>
+  @media print { @page { margin: 20mm; } }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 11px; color: #1a1a1a; padding: 40px; }
+  .receipt { max-width: 600px; margin: 0 auto; border: 2px solid #1a1a1a; padding: 30px; }
+  .header { text-align: center; margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 15px; }
+  .header .act { font-size: 8px; text-transform: uppercase; letter-spacing: 3px; color: #666; margin-bottom: 6px; }
+  .header h1 { font-size: 18px; margin-bottom: 4px; }
+  .header .num { font-size: 14px; font-family: 'Courier New', monospace; font-weight: bold; color: #333; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; margin: 15px 0; }
+  .grid .label { font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+  .grid .value { font-size: 11px; font-weight: 600; margin-bottom: 6px; }
+  .amount-box { text-align: center; background: #f8f8f8; border: 1px solid #ddd; border-radius: 6px; padding: 15px; margin: 15px 0; }
+  .amount-box .amt { font-size: 24px; font-weight: bold; }
+  .amount-box .gst { font-size: 9px; color: #666; margin-top: 4px; }
+  .sig { margin-top: 25px; display: flex; justify-content: space-between; }
+  .sig div { width: 45%; }
+  .sig .line { border-top: 1px solid #999; margin-top: 30px; padding-top: 4px; font-size: 9px; color: #666; }
+  .footer { border-top: 1px dashed #ccc; padding-top: 12px; margin-top: 15px; text-align: center; }
+  .footer p { font-size: 8px; color: #888; margin-bottom: 3px; }
+  .duplicate { text-align: center; margin-top: 50px; border-top: 2px dashed #ccc; padding-top: 10px; }
+  .duplicate p { font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 2px; }
+</style></head><body>
+<div class="receipt">
+  <div class="header">
+    <p class="act">Agents Financial Administration Act 2014</p>
+    <h1>Trust Account Receipt</h1>
+    <p class="num">${receipt.receipt_number}</p>
+  </div>
+  <div class="grid">
+    <div><p class="label">Date Received</p><p class="value">${dateRecFmt}</p></div>
+    <div><p class="label">Date Deposited</p><p class="value">${dateDepFmt} ${receipt.date_deposited ? '✓' : ''}</p></div>
+    <div><p class="label">Client</p><p class="value">${receipt.client_name}</p></div>
+    <div><p class="label">Property</p><p class="value">${receipt.property_address}</p></div>
+    <div><p class="label">Payment Method</p><p class="value">${receipt.payment_method}</p></div>
+    <div><p class="label">Purpose</p><p class="value">${receipt.purpose}</p></div>
+  </div>
+  <div class="amount-box">
+    <p style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:1px;">Amount Received</p>
+    <p class="amt">${AUD.format(receipt.amount)}</p>
+    <p class="gst">GST Component (1/11th): ${AUD.format(receipt.amount / 11)}</p>
+  </div>
+  <div class="sig">
+    <div><p class="line">Signature of Recipient</p></div>
+    <div><p class="line">Agent: ${agent?.name || '—'}${agent?.license_number ? ` (Lic. ${agent.license_number})` : ''}</p></div>
+  </div>
+  <div class="footer">
+    ${agent?.agency ? `<p><strong>${agent.agency}</strong></p>` : ''}
+    <p>This receipt forms part of the trust account audit trail</p>
+    <p>Retain for minimum 5 years per legislative requirements</p>
+  </div>
+</div>
+<div class="duplicate"><p>— Duplicate Copy for Records —</p></div>
+<script>window.onload = () => window.print();</script>
+</body></html>`;
+
+    const w = window.open('', '_blank', 'width=700,height=900');
+    if (w) { w.document.write(html); w.document.close(); }
+    else {
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `Trust_Receipt_${receipt.receipt_number}.html`; a.click();
+      URL.revokeObjectURL(url);
+    }
+    toast.success(`Receipt ${receipt.receipt_number} PDF generated`);
+  };
+
   // Audit PDF export
   const exportAuditPdf = () => {
     const closingBalance = entriesWithBalance.length > 0 ? entriesWithBalance[entriesWithBalance.length - 1].balance : 0;
     const totalIn = filtered.filter(e => e.type === 'receipt').reduce((s, e) => s + e.amount, 0);
     const totalOut = filtered.filter(e => e.type === 'payment').reduce((s, e) => s + e.amount, 0);
+
+    // Build client ledger breakdown
+    const clientMap = new Map<string, { receipts: number; payments: number; net: number }>();
+    entriesWithBalance.forEach(e => {
+      const existing = clientMap.get(e.client) || { receipts: 0, payments: 0, net: 0 };
+      if (e.type === 'receipt') { existing.receipts += e.amount; existing.net += e.amount; }
+      else { existing.payments += e.amount; existing.net -= e.amount; }
+      clientMap.set(e.client, existing);
+    });
+    const clientRows = Array.from(clientMap.entries()).map(([name, data]) => `
+      <tr>
+        <td>${name}</td>
+        <td class="right green">${AUD.format(data.receipts)}</td>
+        <td class="right red">${AUD.format(data.payments)}</td>
+        <td class="right bold">${AUD.format(data.net)}</td>
+      </tr>`).join('');
 
     const rows = entriesWithBalance.map(e => `
       <tr>
@@ -230,7 +338,9 @@ const TrustLedgerPage = () => {
         <td class="right bold">${AUD.format(e.balance)}</td>
       </tr>`).join('');
 
-    const html = `<!DOCTYPE html><html><head><title>Trust Ledger - ${monthNames[viewMonth]} ${viewYear}</title>
+    const generatedDate = new Date().toLocaleDateString('en-AU', { day: '2-digit', month: 'long', year: 'numeric' });
+
+    const html = `<!DOCTYPE html><html><head><title>Monthly Trust Ledger - ${monthNames[viewMonth]} ${viewYear}</title>
     <style>
       @page { size: A4 landscape; margin: 15mm; }
       body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10px; color: #1a1a1a; }
@@ -238,6 +348,7 @@ const TrustLedgerPage = () => {
       .header h1 { font-size: 18px; margin: 0; }
       .header .act { font-size: 9px; color: #666; margin-top: 4px; }
       .header .period { font-size: 13px; font-weight: bold; margin-top: 6px; }
+      .section-title { font-size: 13px; font-weight: bold; margin: 24px 0 8px; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
       table { width: 100%; border-collapse: collapse; margin-top: 10px; }
       th { background: #f5f5f5; border: 1px solid #ddd; padding: 6px 8px; text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; }
       td { border: 1px solid #eee; padding: 5px 8px; font-size: 10px; }
@@ -252,13 +363,26 @@ const TrustLedgerPage = () => {
       .summary div { text-align: right; }
       .summary .label { font-size: 9px; color: #666; text-transform: uppercase; }
       .summary .value { font-size: 14px; font-weight: bold; }
+      .certification { margin-top: 30px; border: 2px solid #1a1a1a; padding: 20px; page-break-inside: avoid; }
+      .certification h2 { font-size: 14px; margin-bottom: 12px; text-align: center; }
+      .cert-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px; margin: 12px 0; }
+      .cert-grid .label { font-size: 9px; color: #666; }
+      .cert-grid .value { font-size: 11px; font-weight: bold; }
+      .sig-row { display: flex; justify-content: space-between; margin-top: 30px; }
+      .sig-row div { width: 40%; }
+      .sig-line { border-top: 1px solid #999; margin-top: 40px; padding-top: 4px; font-size: 9px; color: #666; }
       .footer { margin-top: 24px; padding-top: 10px; border-top: 1px solid #ddd; font-size: 8px; color: #999; text-align: center; }
+      .page-break { page-break-before: always; }
     </style></head><body>
     <div class="header">
       <p class="act">Agents Financial Administration Act 2014</p>
-      <h1>Trust Account Ledger</h1>
+      <h1>Monthly Trust Account Ledger</h1>
       <p class="period">${monthNames[viewMonth]} ${viewYear}</p>
+      <p style="font-size:9px;color:#666;margin-top:4px;">Auditor-ready report — Generated ${generatedDate}</p>
     </div>
+
+    <!-- Transaction Ledger -->
+    <p class="section-title">Transaction Ledger</p>
     <table>
       <thead><tr>
         <th>Date</th><th>Receipt #</th><th>Payment #</th><th>Client</th><th>Property</th><th class="right">In</th><th class="right">Out</th><th class="right">Balance</th>
@@ -266,12 +390,58 @@ const TrustLedgerPage = () => {
       <tbody>${rows}</tbody>
     </table>
     <div class="summary">
-      <div><span class="label">Total In</span><br/><span class="value green">${AUD.format(totalIn)}</span></div>
-      <div><span class="label">Total Out</span><br/><span class="value red">${AUD.format(totalOut)}</span></div>
+      <div><span class="label">Total Receipts</span><br/><span class="value green">${AUD.format(totalIn)}</span></div>
+      <div><span class="label">Total Payments</span><br/><span class="value red">${AUD.format(totalOut)}</span></div>
       <div><span class="label">Closing Balance</span><br/><span class="value">${AUD.format(closingBalance)}</span></div>
     </div>
+
+    <!-- Client Ledger Breakdown -->
+    <p class="section-title page-break">Client Ledger Breakdown</p>
+    <table>
+      <thead><tr>
+        <th>Client</th><th class="right">Receipts</th><th class="right">Payments</th><th class="right">Net Position</th>
+      </tr></thead>
+      <tbody>${clientRows}</tbody>
+    </table>
+
+    <!-- Reconciliation Summary -->
+    <p class="section-title">Reconciliation Summary</p>
+    <table>
+      <thead><tr><th>Item</th><th class="right">Amount</th></tr></thead>
+      <tbody>
+        <tr><td>Opening Balance (1 ${monthNames[viewMonth]})</td><td class="right bold">${AUD.format(0)}</td></tr>
+        <tr><td>Add: Total Receipts</td><td class="right green">${AUD.format(totalIn)}</td></tr>
+        <tr><td>Less: Total Payments</td><td class="right red">(${AUD.format(totalOut)})</td></tr>
+        <tr style="background:#f0f0f0;"><td class="bold">Closing Trust Balance</td><td class="right bold" style="font-size:12px;">${AUD.format(closingBalance)}</td></tr>
+      </tbody>
+    </table>
+
+    <!-- Balance Certification -->
+    <div class="certification">
+      <h2>Balance Certification</h2>
+      <p style="font-size:10px;text-align:center;color:#666;margin-bottom:16px;">
+        Agents Financial Administration Act 2014 — Section 84
+      </p>
+      <div class="cert-grid">
+        <div><p class="label">Period</p><p class="value">${monthNames[viewMonth]} ${viewYear}</p></div>
+        <div><p class="label">Date Certified</p><p class="value">${generatedDate}</p></div>
+        <div><p class="label">Total Receipts</p><p class="value green">${AUD.format(totalIn)}</p></div>
+        <div><p class="label">Total Payments</p><p class="value red">${AUD.format(totalOut)}</p></div>
+        <div><p class="label">Closing Trust Balance</p><p class="value">${AUD.format(closingBalance)}</p></div>
+        <div><p class="label">Number of Transactions</p><p class="value">${entriesWithBalance.length}</p></div>
+      </div>
+      <p style="font-size:10px;margin:16px 0 4px;text-align:center;">
+        I certify that this trust account ledger is a true and correct record of all monies received and disbursed
+        for the period stated above, in accordance with the Agents Financial Administration Act 2014.
+      </p>
+      <div class="sig-row">
+        <div><p class="sig-line">Licensee / Principal Signature</p></div>
+        <div><p class="sig-line">Date</p></div>
+      </div>
+    </div>
+
     <div class="footer">
-      Generated ${new Date().toLocaleDateString('en-AU')} — Retain for minimum 5 years per AFAA 2014 s.84
+      Generated ${generatedDate} — Retain for minimum 5 years per AFAA 2014 s.84 — This document is auditor-ready
     </div>
     </body></html>`;
 
@@ -384,12 +554,13 @@ const TrustLedgerPage = () => {
                     <TableHead className="text-xs text-right">In</TableHead>
                     <TableHead className="text-xs text-right">Out</TableHead>
                     <TableHead className="text-xs text-right">Balance</TableHead>
+                    <TableHead className="text-xs w-[40px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {entriesWithBalance.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center text-muted-foreground py-12 text-sm">
+                      <TableCell colSpan={9} className="text-center text-muted-foreground py-12 text-sm">
                         {searchQuery || filterStatus !== 'all'
                           ? 'No entries match your filters.'
                           : `No trust entries for ${monthNames[viewMonth]} ${viewYear}.`}
@@ -419,6 +590,21 @@ const TrustLedgerPage = () => {
                           </TableCell>
                           <TableCell className="text-xs text-right tabular-nums font-bold">
                             {AUD.format(entry.balance)}
+                          </TableCell>
+                          <TableCell className="text-xs">
+                            {entry.type === 'receipt' && (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button size="icon" variant="ghost" className="h-7 w-7"
+                                      onClick={() => generateReceiptPdf(entry)}>
+                                      <Download size={12} />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent><p className="text-xs">Download Receipt PDF</p></TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            )}
                           </TableCell>
                         </TableRow>
                       );

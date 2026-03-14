@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import {
   Scale, Plus, CheckCircle2, XCircle, Link2, Unlink, ArrowDownCircle, ArrowUpCircle,
   CalendarIcon, Search, FileDown, DollarSign, Clock, AlertTriangle, Upload,
+  RefreshCw, FileText, Check,
 } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
 import { supabase } from '@/integrations/supabase/client';
@@ -77,15 +78,22 @@ const BankReconciliationPage = () => {
   const [showImport, setShowImport] = useState(false);
   const [csvText, setCsvText] = useState('');
   const [importSaving, setImportSaving] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [autoMatchRunning, setAutoMatchRunning] = useState(false);
+  const [reconcileAllRunning, setReconcileAllRunning] = useState(false);
+  const [currentBalance, setCurrentBalance] = useState<number | null>(null);
+  const fileInputRef = useCallback((node: HTMLInputElement | null) => { /* stored for click */ }, []);
+  const [fileInputEl, setFileInputEl] = useState<HTMLInputElement | null>(null);
 
   const fetchData = useCallback(async () => {
     if (!user) return;
     setLoading(true);
 
-    const [{ data: recon }, { data: recs }, { data: pays }] = await Promise.all([
+    const [{ data: recon }, { data: recs }, { data: pays }, { data: balData }] = await Promise.all([
       supabase.from('trust_reconciliations').select('*').order('bank_date', { ascending: false }),
       supabase.from('trust_receipts').select('id, receipt_number, client_name, amount, date_received, payment_method'),
       supabase.from('trust_payments').select('id, payment_number, client_name, amount, date_paid, payment_method'),
+      supabase.from('trust_account_balances').select('current_balance').limit(1).single(),
     ]);
 
     if (recon) setItems(recon as unknown as Reconciliation[]);
@@ -97,11 +105,161 @@ const BankReconciliationPage = () => {
       id: p.id, type: 'payment' as const, number: p.payment_number,
       client: p.client_name, amount: p.amount, date: p.date_paid, method: p.payment_method,
     })));
+    if (balData) setCurrentBalance((balData as any).current_balance ?? null);
 
     setLoading(false);
   }, [user]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
+
+  // ── Auto-match logic ──
+  const runAutoMatch = async (reconItems: Reconciliation[]) => {
+    if (!user) return;
+    setAutoMatchRunning(true);
+    let matchCount = 0;
+
+    const unmatchedItems = reconItems.filter(i => i.status === 'unmatched');
+    const usedReceiptIds = new Set(reconItems.filter(i => i.matched_receipt_id).map(i => i.matched_receipt_id!));
+    const usedPaymentIds = new Set(reconItems.filter(i => i.matched_payment_id).map(i => i.matched_payment_id!));
+
+    for (const item of unmatchedItems) {
+      const isCredit = item.amount > 0;
+      const targetAmt = Math.abs(item.amount);
+      const desc = (item.description || '').toLowerCase();
+
+      if (isCredit) {
+        // Try match to receipt by amount, then by client name similarity
+        const candidate = receipts.find(r =>
+          !usedReceiptIds.has(r.id) &&
+          Math.abs(r.amount - targetAmt) < 0.01 &&
+          (desc.includes(r.client.toLowerCase().slice(0, 5)) || true) // amount match is primary
+        );
+        if (candidate) {
+          const { error } = await supabase
+            .from('trust_reconciliations')
+            .update({ status: 'matched', matched_receipt_id: candidate.id } as any)
+            .eq('id', item.id);
+          if (!error) { usedReceiptIds.add(candidate.id); matchCount++; }
+        }
+      } else {
+        const candidate = payments.find(p =>
+          !usedPaymentIds.has(p.id) &&
+          Math.abs(p.amount - targetAmt) < 0.01
+        );
+        if (candidate) {
+          const { error } = await supabase
+            .from('trust_reconciliations')
+            .update({ status: 'matched', matched_payment_id: candidate.id } as any)
+            .eq('id', item.id);
+          if (!error) { usedPaymentIds.add(candidate.id); matchCount++; }
+        }
+      }
+    }
+
+    setAutoMatchRunning(false);
+    await fetchData();
+    const pct = unmatchedItems.length > 0 ? Math.round((matchCount / unmatchedItems.length) * 100) : 0;
+    toast.success(`Auto-matched ${matchCount} of ${unmatchedItems.length} entries (${pct}%)`);
+  };
+
+  // ── Reconcile All ──
+  const handleReconcileAll = async () => {
+    if (!user) return;
+    setReconcileAllRunning(true);
+    try {
+      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
+      if (!agent) { toast.error('Agent profile not found'); return; }
+
+      // Get latest bank balance from most recent entry
+      const latestItem = items.length > 0
+        ? items.reduce((a, b) => new Date(a.bank_date) > new Date(b.bank_date) ? a : b)
+        : null;
+      const bankBalance = latestItem?.bank_balance ?? 0;
+
+      // Upsert trust_account_balances
+      const { data: existing } = await supabase
+        .from('trust_account_balances')
+        .select('id')
+        .eq('agent_id', agent.id)
+        .single();
+
+      if (existing) {
+        await supabase.from('trust_account_balances')
+          .update({ current_balance: bankBalance, last_reconciled_date: new Date().toISOString().split('T')[0] } as any)
+          .eq('id', existing.id);
+      } else {
+        await supabase.from('trust_account_balances')
+          .insert({ agent_id: agent.id, current_balance: bankBalance, opening_balance: bankBalance, last_reconciled_date: new Date().toISOString().split('T')[0] } as any);
+      }
+
+      // Mark all matched as reconciled (keep manual as-is)
+      const matchedIds = items.filter(i => i.status === 'matched').map(i => i.id);
+      if (matchedIds.length > 0) {
+        await supabase.from('trust_reconciliations')
+          .update({ status: 'manual' } as any) // finalized
+          .in('id', matchedIds);
+      }
+
+      setCurrentBalance(bankBalance);
+      toast.success(`Reconciliation complete. Balance: ${AUD.format(bankBalance)}`);
+      await fetchData();
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setReconcileAllRunning(false);
+    }
+  };
+
+  // ── CSV file handler (drag-drop & file input) ──
+  const parseCsvFile = async (file: File) => {
+    if (!user) return;
+    const text = await file.text();
+    const lines = text.trim().split('\n').slice(1);
+    const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
+    if (!agent) { toast.error('Agent profile not found'); return; }
+
+    const entries = lines.map(line => {
+      const cols = line.split(',').map(c => c.replace(/^"|"$/g, '').trim());
+      return {
+        agent_id: agent.id,
+        bank_date: cols[0] || new Date().toISOString().split('T')[0],
+        description: cols[1] || null,
+        amount: parseFloat(cols[2]) || 0,
+        bank_balance: parseFloat(cols[3]) || 0,
+        status: 'unmatched',
+      };
+    }).filter(e => e.amount !== 0);
+
+    if (entries.length === 0) { toast.error('No valid entries found'); return; }
+
+    const { error, data: inserted } = await supabase.from('trust_reconciliations').insert(entries as any).select();
+    if (error) { toast.error(error.message); return; }
+
+    toast.success(`${entries.length} entries imported. Running auto-match…`);
+    // Refresh then auto-match
+    const { data: allRecon } = await supabase.from('trust_reconciliations').select('*').order('bank_date', { ascending: false });
+    if (allRecon) {
+      setItems(allRecon as unknown as Reconciliation[]);
+      await runAutoMatch(allRecon as unknown as Reconciliation[]);
+    }
+  };
+
+  const handleFileDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file && (file.name.endsWith('.csv') || file.type === 'text/csv')) {
+      parseCsvFile(file);
+    } else {
+      toast.error('Please drop a CSV file');
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) parseCsvFile(file);
+    e.target.value = '';
+  };
 
   // Already-matched IDs
   const matchedReceiptIds = useMemo(() => new Set(items.filter(i => i.matched_receipt_id).map(i => i.matched_receipt_id!)), [items]);
@@ -402,7 +560,40 @@ const BankReconciliationPage = () => {
           </Card>
         </div>
 
-        {/* Filters */}
+        {/* ── Drag-Drop CSV Upload ── */}
+        <div
+          onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={handleFileDrop}
+          className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+            dragging ? 'border-primary bg-primary/5' : 'border-border bg-muted/30'
+          }`}
+        >
+          <input
+            type="file"
+            accept=".csv"
+            ref={setFileInputEl}
+            onChange={handleFileSelect}
+            className="hidden"
+          />
+          <Upload size={24} className={`mx-auto mb-2 ${dragging ? 'text-primary' : 'text-muted-foreground/50'}`} />
+          <p className="text-sm font-medium">Upload Bank Statement CSV</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Drag CSV here or{' '}
+            <button onClick={() => fileInputEl?.click()} className="text-primary underline underline-offset-2 hover:text-primary/80">
+              Choose File
+            </button>
+            {' '}→ Auto-match transactions
+          </p>
+          {autoMatchRunning && (
+            <div className="mt-3 flex items-center justify-center gap-2 text-xs text-primary">
+              <RefreshCw size={12} className="animate-spin" />
+              Auto-matching transactions…
+            </div>
+          )}
+        </div>
+
+        {/* ── Unmatched Transactions Header ── */}
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative">
             <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -437,14 +628,15 @@ const BankReconciliationPage = () => {
                 <TableHead className="text-xs text-right">Amount</TableHead>
                 <TableHead className="text-xs text-right">Bank Balance</TableHead>
                 <TableHead className="text-xs">Status</TableHead>
-                <TableHead className="text-xs">Matched To</TableHead>
-                <TableHead className="text-xs w-[160px]"></TableHead>
+                <TableHead className="text-xs">Match To</TableHead>
+                <TableHead className="text-xs">Action</TableHead>
+                <TableHead className="text-xs w-[120px]"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filtered.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-muted-foreground py-12 text-sm">
+                  <TableCell colSpan={8} className="text-center text-muted-foreground py-12 text-sm">
                     {items.length === 0
                       ? 'No bank statement entries yet. Add entries manually or import a CSV.'
                       : 'No entries match your filters.'}
@@ -486,6 +678,11 @@ const BankReconciliationPage = () => {
                         )}
                       </TableCell>
                       <TableCell>
+                        <Badge variant="outline" className="text-[10px]">
+                          {item.status === 'matched' ? 'Auto' : item.status === 'manual' ? 'Manual' : 'Pending'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
                         <div className="flex items-center gap-1 justify-end">
                           {item.status === 'unmatched' && (
                             <>
@@ -515,14 +712,53 @@ const BankReconciliationPage = () => {
           </Table>
         </Card>
 
+        {/* ── Reconcile All + Balance ── */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-lg border border-border bg-card">
+          <div className="flex items-center gap-4">
+            <div>
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Current Balance</p>
+              <p className="text-xl font-bold tabular-nums">
+                {currentBalance !== null ? AUD.format(currentBalance) : '—'}
+              </p>
+            </div>
+            {items.length > 0 && (
+              <div className="flex items-center gap-2">
+                {unmatchedCount === 0 ? (
+                  <Badge className="gap-1 bg-green-600 text-white text-xs">
+                    <Check size={11} /> Matches bank
+                  </Badge>
+                ) : (
+                  <Badge variant="destructive" className="gap-1 text-xs">
+                    <AlertTriangle size={11} /> {unmatchedCount} unmatched
+                  </Badge>
+                )}
+                <span className="text-xs text-muted-foreground">
+                  Rate: {items.length > 0 ? Math.round(((matchedCount + manualCount) / items.length) * 100) : 0}%
+                </span>
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {unmatchedCount > 0 && (
+              <Button size="sm" variant="outline" className="gap-1.5 text-xs"
+                disabled={autoMatchRunning}
+                onClick={() => runAutoMatch(items)}>
+                <RefreshCw size={12} className={autoMatchRunning ? 'animate-spin' : ''} />
+                Auto-Match
+              </Button>
+            )}
+            <Button size="sm" className="gap-1.5 text-xs"
+              disabled={reconcileAllRunning || (matchedCount + manualCount === 0)}
+              onClick={handleReconcileAll}>
+              <CheckCircle2 size={12} />
+              {reconcileAllRunning ? 'Reconciling…' : 'Reconcile All'}
+            </Button>
+          </div>
+        </div>
+
         {filtered.length > 0 && (
           <div className="flex items-center justify-between px-2 text-xs text-muted-foreground">
             <span>{filtered.length} entr{filtered.length === 1 ? 'y' : 'ies'} shown</span>
-            <span>
-              Reconciliation rate: <strong className={matchedCount + manualCount === items.length && items.length > 0 ? 'text-green-600' : 'text-foreground'}>
-                {items.length > 0 ? Math.round(((matchedCount + manualCount) / items.length) * 100) : 0}%
-              </strong>
-            </span>
           </div>
         )}
       </div>

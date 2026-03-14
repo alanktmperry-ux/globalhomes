@@ -4,11 +4,11 @@ import { Users, Building2, BarChart3, Shield, Database, ArrowLeft, Loader2 } fro
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/AuthProvider';
 import { useToast } from '@/hooks/use-toast';
-import AdminOverview from '@/components/admin/AdminOverview';
-import AdminUsers from '@/components/admin/AdminUsers';
-import AdminListings from '@/components/admin/AdminListings';
-import AdminRoles from '@/components/admin/AdminRoles';
-import AdminDatabase from '@/components/admin/AdminDatabase';
+import AdminOverview from '@/features/admin/components/AdminOverview';
+import AdminUsers from '@/features/admin/components/AdminUsers';
+import AdminListings from '@/features/admin/components/AdminListings';
+import AdminRoles from '@/features/admin/components/AdminRoles';
+import AdminDatabase from '@/features/admin/components/AdminDatabase';
 
 type Tab = 'overview' | 'users' | 'listings' | 'roles' | 'database';
 

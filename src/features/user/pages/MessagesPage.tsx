@@ -310,49 +310,69 @@ const MessagesPage = () => {
   // Send message
   const handleSend = async () => {
     if (!newMessage.trim() || !user || !selectedConvo || sending) return;
-    
-    // For legacy lead conversations, create a real conversation first
+
+    // For legacy lead conversations, create/find a real conversation first
     let convoId = selectedConvo.id;
-    
+
     if (convoId.startsWith('lead-')) {
       if (!selectedConvo.other_user_id) return;
-      
-      // Create real conversation
+
+      const participant_1 = user.id < selectedConvo.other_user_id ? user.id : selectedConvo.other_user_id;
+      const participant_2 = user.id < selectedConvo.other_user_id ? selectedConvo.other_user_id : user.id;
+
       const { data: newConvo, error } = await supabase
         .from('conversations')
-        .insert({
-          participant_1: user.id,
-          participant_2: selectedConvo.other_user_id,
-          property_id: selectedConvo.property_id,
-        })
-        .select()
+        .upsert(
+          {
+            participant_1,
+            participant_2,
+            property_id: selectedConvo.property_id,
+          },
+          { onConflict: 'participant_1,participant_2,property_id' }
+        )
+        .select('id')
         .single();
 
       if (error || !newConvo) return;
-      convoId = newConvo.id;
 
-      // Update selected convo
-      setSelectedConvo(prev => prev ? { ...prev, id: convoId } : null);
+      convoId = newConvo.id;
+      setSelectedConvo((prev) =>
+        prev
+          ? {
+              ...prev,
+              id: convoId,
+              participant_1,
+              participant_2,
+            }
+          : null
+      );
     }
 
     setSending(true);
     const content = newMessage.trim();
     setNewMessage('');
 
-    await supabase.from('messages').insert({
-      conversation_id: convoId,
-      sender_id: user.id,
-      content,
-    });
+    try {
+      const { error: sendError } = await supabase.from('messages').insert({
+        conversation_id: convoId,
+        sender_id: user.id,
+        content,
+      });
 
-    // Update last_message_at
-    await supabase
-      .from('conversations')
-      .update({ last_message_at: new Date().toISOString() })
-      .eq('id', convoId);
+      if (sendError) {
+        setNewMessage(content);
+        return;
+      }
 
-    setSending(false);
-    inputRef.current?.focus();
+      // Update last_message_at
+      await supabase
+        .from('conversations')
+        .update({ last_message_at: new Date().toISOString() })
+        .eq('id', convoId);
+    } finally {
+      setSending(false);
+      inputRef.current?.focus();
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

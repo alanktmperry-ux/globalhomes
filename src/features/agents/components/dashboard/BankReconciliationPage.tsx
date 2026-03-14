@@ -678,6 +678,11 @@ const BankReconciliationPage = () => {
                         )}
                       </TableCell>
                       <TableCell>
+                        <Badge variant="outline" className="text-[10px]">
+                          {item.status === 'matched' ? 'Auto' : item.status === 'manual' ? 'Manual' : 'Pending'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
                         <div className="flex items-center gap-1 justify-end">
                           {item.status === 'unmatched' && (
                             <>

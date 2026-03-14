@@ -507,13 +507,14 @@ const MessagesPage = () => {
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Type a message..."
+                    placeholder={isLegacyReadOnly ? 'In-app messaging unavailable for this enquiry' : 'Type a message...'}
                     rows={1}
-                    className="flex-1 resize-none rounded-2xl border border-border bg-secondary/50 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring max-h-24"
+                    disabled={isLegacyReadOnly}
+                    className="flex-1 resize-none rounded-2xl border border-border bg-secondary/50 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring max-h-24 disabled:cursor-not-allowed disabled:opacity-60"
                   />
                   <button
                     onClick={handleSend}
-                    disabled={!newMessage.trim() || sending}
+                    disabled={isLegacyReadOnly || !newMessage.trim() || sending}
                     className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0 disabled:opacity-40 hover:opacity-90 transition-opacity"
                   >
                     <Send size={16} />

@@ -1,116 +1,72 @@
 import { useState, useMemo } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Separator } from '@/components/ui/separator';
 import {
-  Landmark, Plus, ArrowDownCircle, ArrowUpCircle, FileDown, CheckCircle2,
-  DollarSign, TrendingUp, TrendingDown, Receipt, AlertTriangle, Building2,
+  Landmark, Plus, ArrowDownCircle, CheckCircle2, DollarSign,
+  TrendingUp, TrendingDown, FileDown, Trash2, Pencil, Clock,
+  AlertTriangle, CalendarIcon, Home, Users,
 } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
-import { useTrustAccounting, TrustAccount, TrustTransaction } from '@/hooks/useTrustAccounting';
+import { useTrustAccounting, TrustTransaction } from '@/hooks/useTrustAccounting';
 import { useAuth } from '@/lib/AuthProvider';
 import { toast } from 'sonner';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 2 });
-const DATE_FMT = new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+const DATE_FMT = new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
 
-const STATUS_BADGE: Record<string, { variant: 'default' | 'secondary' | 'outline' | 'destructive'; label: string }> = {
+const TYPE_OPTIONS = [
+  { value: 'deposit', label: 'Deposit' },
+  { value: 'rent', label: 'Rent' },
+  { value: 'refund', label: 'Refund' },
+  { value: 'fees', label: 'Fee' },
+];
+
+const STATUS_MAP: Record<string, { variant: 'default' | 'secondary' | 'outline' | 'destructive'; label: string }> = {
   pending: { variant: 'outline', label: 'Pending' },
-  completed: { variant: 'default', label: 'Completed' },
+  completed: { variant: 'default', label: 'Cleared' },
   reconciled: { variant: 'secondary', label: 'Reconciled' },
   voided: { variant: 'destructive', label: 'Voided' },
 };
 
-const CATEGORY_OPTIONS = [
-  { value: 'deposit', label: 'Deposit' },
-  { value: 'rent', label: 'Rent Collection' },
-  { value: 'commission', label: 'Commission' },
-  { value: 'disbursement', label: 'Disbursement' },
-  { value: 'refund', label: 'Refund' },
-  { value: 'fees', label: 'Fees' },
-  { value: 'general', label: 'General' },
-];
-
-// ──────────────────────────────────────────────
-// ABA File Generation (DE/EFT format)
-// ──────────────────────────────────────────────
-function generateAbaFile(transactions: TrustTransaction[], account: TrustAccount): string {
-  const pad = (s: string, len: number, char = ' ', right = false) =>
-    right ? s.slice(0, len).padEnd(len, char) : s.slice(0, len).padStart(len, char);
-
-  const today = new Date();
-  const dateStr = `${pad(String(today.getDate()), 2, '0')}${pad(String(today.getMonth() + 1), 2, '0')}${String(today.getFullYear()).slice(-2)}`;
-
-  // Type 0 - Header
-  const header = [
-    '0',                                    // Record type
-    pad('', 17),                            // Blank
-    '01',                                   // Reel sequence
-    pad(account.bank_name || 'NAB', 3, ' ', true), // Bank name
-    pad('', 7),
-    pad('Trust Account', 26, ' ', true),    // User name
-    pad('000000', 6, '0'),                  // User number
-    pad('Trust Payments', 12, ' ', true),   // Description
-    dateStr,                                // Date
-    pad('', 40),                            // Blank
-  ].join('');
-
-  // Type 1 - Detail records
-  const details = transactions.map(tx => {
-    const cents = pad(String(Math.round(tx.amount * 100)), 10, '0');
-    return [
-      '1',                                  // Record type
-      pad(account.bsb || '000-000', 7, ' ', true),
-      pad(account.account_number || '000000000', 9, ' ', true),
-      ' ',                                  // Tax indicator
-      '50',                                 // Transaction code (credit)
-      cents,
-      pad(tx.payee_name || 'Payee', 32, ' ', true),
-      pad(tx.reference || '', 18, ' ', true),
-      pad(account.bsb || '000-000', 7, ' ', true),
-      pad(account.account_number || '000000000', 9, ' ', true),
-      pad(tx.payee_name || '', 16, ' ', true),
-      pad('00', 8, '0'),
-    ].join('');
-  });
-
-  // Type 7 - Footer
-  const totalCents = pad(String(transactions.reduce((s, t) => s + Math.round(t.amount * 100), 0)), 10, '0');
-  const footer = [
-    '7',
-    '999-999',
-    pad('', 12),
-    totalCents,
-    totalCents,
-    pad('', 24, '0'),
-    pad('', 6),
-    pad(String(transactions.length), 6, '0'),
-    pad('', 40),
-  ].join('');
-
-  return [header, ...details, footer].join('\n');
-}
-
 const TrustAccountingPage = () => {
   const { user } = useAuth();
   const {
-    accounts, transactions, loading,
-    createAccount, createTransaction, reconcileTransaction,
+    accounts, transactions, contacts, properties, loading,
+    createAccount, createTransaction, updateTransaction,
+    deleteTransaction, markAsCleared, bulkMarkCleared,
   } = useTrustAccounting();
 
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [showNewAccount, setShowNewAccount] = useState(false);
+  // Filters
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterClient, setFilterClient] = useState('all');
+  const [filterProperty, setFilterProperty] = useState('all');
+  const [filterDateFrom, setFilterDateFrom] = useState('');
+  const [filterDateTo, setFilterDateTo] = useState('');
+
+  // Modals
   const [showNewTx, setShowNewTx] = useState(false);
-  const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
-  const [txFilter, setTxFilter] = useState<string>('all');
+  const [showEditTx, setShowEditTx] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showNewAccount, setShowNewAccount] = useState(false);
+  const [editingTx, setEditingTx] = useState<TrustTransaction | null>(null);
+  const [deletingTxId, setDeletingTxId] = useState<string | null>(null);
+
+  // New tx form
+  const [txCategory, setTxCategory] = useState('deposit');
+  const [txAmount, setTxAmount] = useState('');
+  const [txGst, setTxGst] = useState(true);
+  const [txDesc, setTxDesc] = useState('');
+  const [txPayee, setTxPayee] = useState('');
+  const [txAccountId, setTxAccountId] = useState('');
+  const [txContactId, setTxContactId] = useState('');
+  const [txPropertyId, setTxPropertyId] = useState('');
 
   // New account form
   const [newAccName, setNewAccName] = useState('');
@@ -119,41 +75,172 @@ const TrustAccountingPage = () => {
   const [newAccNumber, setNewAccNumber] = useState('');
   const [newAccBank, setNewAccBank] = useState('');
 
-  // New transaction form
-  const [txType, setTxType] = useState<'deposit' | 'withdrawal'>('deposit');
-  const [txCategory, setTxCategory] = useState('general');
-  const [txAmount, setTxAmount] = useState('');
-  const [txGst, setTxGst] = useState(true);
-  const [txDesc, setTxDesc] = useState('');
-  const [txRef, setTxRef] = useState('');
-  const [txPayee, setTxPayee] = useState('');
-  const [txAccountId, setTxAccountId] = useState('');
-  const [txStatus, setTxStatus] = useState('completed');
-
   // Computed
   const trustAccounts = accounts.filter(a => a.account_type === 'trust');
-  const operatingAccounts = accounts.filter(a => a.account_type === 'operating');
-  const totalTrust = trustAccounts.reduce((s, a) => s + a.balance, 0);
-  const totalOperating = operatingAccounts.reduce((s, a) => s + a.balance, 0);
+  const totalInTrust = trustAccounts.reduce((s, a) => s + a.balance, 0);
 
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+
+  const pendingTotal = useMemo(() =>
+    transactions.filter(t => t.status === 'pending').reduce((s, t) => s + t.amount, 0),
+    [transactions]);
+
+  const clearedThisMonth = useMemo(() =>
+    transactions
+      .filter(t => t.status === 'completed' && t.transaction_date >= monthStart)
+      .reduce((s, t) => s + t.amount, 0),
+    [transactions, monthStart]);
+
+  const lastEntry = useMemo(() => {
+    const sorted = [...transactions].filter(t => t.status !== 'voided').sort((a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+    return sorted[0] || null;
+  }, [transactions]);
+
+  const lastEntryText = lastEntry
+    ? `${lastEntry.category === 'deposit' ? 'Deposit' : lastEntry.category === 'rent' ? 'Rent' : lastEntry.category} from ${lastEntry.payee_name || lastEntry.contact?.first_name || 'Unknown'} — ${DATE_FMT.format(new Date(lastEntry.transaction_date))}`
+    : 'No entries yet';
+
+  // Filtered transactions
   const filteredTx = useMemo(() => {
-    let tx = transactions;
-    if (selectedAccountId) tx = tx.filter(t => t.trust_account_id === selectedAccountId);
-    if (txFilter !== 'all') tx = tx.filter(t => t.status === txFilter);
+    let tx = transactions.filter(t => t.status !== 'voided');
+    if (filterStatus !== 'all') tx = tx.filter(t => t.status === filterStatus);
+    if (filterClient !== 'all') tx = tx.filter(t => t.contact_id === filterClient);
+    if (filterProperty !== 'all') tx = tx.filter(t => t.property_id === filterProperty);
+    if (filterDateFrom) tx = tx.filter(t => t.transaction_date >= filterDateFrom);
+    if (filterDateTo) tx = tx.filter(t => t.transaction_date <= filterDateTo);
     return tx;
-  }, [transactions, selectedAccountId, txFilter]);
+  }, [transactions, filterStatus, filterClient, filterProperty, filterDateFrom, filterDateTo]);
 
-  const pendingCount = transactions.filter(t => t.status === 'pending').length;
-  const unreconciledCount = transactions.filter(t => t.status === 'completed').length;
+  // Running balance calculation
+  const txWithBalance = useMemo(() => {
+    let balance = 0;
+    const reversed = [...filteredTx].reverse();
+    const result = reversed.map(tx => {
+      const impact = tx.transaction_type === 'deposit' ? tx.amount : -tx.amount;
+      balance += impact;
+      return { ...tx, runningBalance: balance };
+    });
+    return result.reverse();
+  }, [filteredTx]);
+
+  // ── Handlers ──
+  const resetTxForm = () => {
+    setTxCategory('deposit'); setTxAmount(''); setTxGst(true);
+    setTxDesc(''); setTxPayee(''); setTxAccountId(''); setTxContactId(''); setTxPropertyId('');
+  };
+
+  const openNewTx = (category: string) => {
+    resetTxForm();
+    setTxCategory(category);
+    if (accounts.length === 1) setTxAccountId(accounts[0].id);
+    setShowNewTx(true);
+  };
+
+  const handleCreateTx = async () => {
+    if (!txAmount || !txAccountId) return;
+    const amount = parseFloat(txAmount);
+    if (isNaN(amount) || amount <= 0) { toast.error('Enter a valid amount'); return; }
+    const gstAmount = txGst ? amount * 0.1 : 0;
+    const isDeposit = txCategory === 'deposit' || txCategory === 'rent';
+
+    try {
+      await createTransaction({
+        trust_account_id: txAccountId,
+        transaction_type: isDeposit ? 'deposit' : 'withdrawal',
+        category: txCategory,
+        amount,
+        gst_amount: gstAmount,
+        description: txDesc || null,
+        payee_name: txPayee || null,
+        contact_id: txContactId || null,
+        property_id: txPropertyId || null,
+        status: 'pending',
+        transaction_date: new Date().toISOString().split('T')[0],
+      });
+      toast.success('Transaction recorded');
+      setShowNewTx(false);
+      resetTxForm();
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  };
+
+  const handleMarkCleared = async (id: string) => {
+    try {
+      await markAsCleared(id);
+      toast.success('Marked as cleared');
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  };
+
+  const handleDeleteTx = async () => {
+    if (!deletingTxId) return;
+    try {
+      await deleteTransaction(deletingTxId);
+      toast.success('Transaction voided (audit trail preserved)');
+      setShowDeleteConfirm(false);
+      setDeletingTxId(null);
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  };
+
+  const handleBulkClear = async () => {
+    try {
+      await bulkMarkCleared();
+      toast.success('All pending entries marked as cleared');
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  };
+
+  const openEdit = (tx: TrustTransaction) => {
+    setEditingTx(tx);
+    setTxCategory(tx.category);
+    setTxAmount(String(tx.amount));
+    setTxDesc(tx.description || '');
+    setTxPayee(tx.payee_name || '');
+    setTxContactId(tx.contact_id || '');
+    setTxPropertyId(tx.property_id || '');
+    setShowEditTx(true);
+  };
+
+  const handleEditTx = async () => {
+    if (!editingTx) return;
+    const amount = parseFloat(txAmount);
+    if (isNaN(amount) || amount <= 0) { toast.error('Enter a valid amount'); return; }
+    const gstAmount = txGst ? amount * 0.1 : 0;
+    const isDeposit = txCategory === 'deposit' || txCategory === 'rent';
+
+    try {
+      await updateTransaction(editingTx.id, {
+        category: txCategory,
+        transaction_type: isDeposit ? 'deposit' : 'withdrawal',
+        amount,
+        gst_amount: gstAmount,
+        description: txDesc || null,
+        payee_name: txPayee || null,
+        contact_id: txContactId || null,
+        property_id: txPropertyId || null,
+      } as any);
+      toast.success('Transaction updated');
+      setShowEditTx(false);
+      setEditingTx(null);
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  };
 
   const handleCreateAccount = async () => {
     if (!newAccName || !user) return;
     try {
-      // Get agent id
       const { data: agent } = await (await import('@/integrations/supabase/client')).supabase
         .from('agents').select('id').eq('user_id', user.id).single();
       if (!agent) { toast.error('Agent profile not found'); return; }
-
       await createAccount({
         agent_id: agent.id,
         account_name: newAccName,
@@ -170,277 +257,367 @@ const TrustAccountingPage = () => {
     }
   };
 
-  const handleCreateTx = async () => {
-    if (!txAmount || !txAccountId) return;
-    const amount = parseFloat(txAmount);
-    if (isNaN(amount) || amount <= 0) { toast.error('Enter a valid amount'); return; }
-    const gstAmount = txGst ? amount * 0.1 : 0;
-
-    try {
-      await createTransaction({
-        trust_account_id: txAccountId,
-        transaction_type: txType,
-        category: txCategory,
-        amount,
-        gst_amount: gstAmount,
-        description: txDesc || null,
-        reference: txRef || null,
-        payee_name: txPayee || null,
-        status: txStatus,
-        transaction_date: new Date().toISOString().split('T')[0],
-      });
-      toast.success('Transaction recorded');
-      setShowNewTx(false);
-      setTxAmount(''); setTxDesc(''); setTxRef(''); setTxPayee('');
-    } catch (e: any) {
-      toast.error(e.message);
-    }
-  };
-
-  const handleExportAba = () => {
-    const completedTx = filteredTx.filter(t => t.status === 'completed' && t.transaction_type === 'withdrawal' && !t.aba_exported);
-    if (completedTx.length === 0) { toast.error('No un-exported withdrawals to include'); return; }
-    const account = accounts.find(a => a.id === (selectedAccountId || completedTx[0]?.trust_account_id));
-    if (!account) return;
-
-    const aba = generateAbaFile(completedTx, account);
-    const blob = new Blob([aba], { type: 'text/plain' });
+  // CSV export
+  const exportCsv = () => {
+    const headers = ['Date', 'Client Name', 'Property Address', 'Type', 'Amount', 'GST', 'Status', 'Balance Impact', 'Description', 'Reference'];
+    const rows = txWithBalance.map(tx => [
+      tx.transaction_date,
+      tx.contact ? `${tx.contact.first_name} ${tx.contact.last_name || ''}`.trim() : tx.payee_name || '',
+      tx.property?.address || '',
+      tx.category,
+      tx.amount.toFixed(2),
+      tx.gst_amount.toFixed(2),
+      STATUS_MAP[tx.status]?.label || tx.status,
+      (tx.transaction_type === 'deposit' ? '+' : '-') + tx.amount.toFixed(2),
+      tx.description || '',
+      tx.reference || '',
+    ]);
+    const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${c}"`).join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `trust_aba_${new Date().toISOString().split('T')[0]}.aba`;
+    a.download = `trust_audit_report_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success(`ABA file exported with ${completedTx.length} transaction(s)`);
-  };
-
-  const handleReconcile = async (txId: string) => {
-    try {
-      await reconcileTransaction(txId);
-      toast.success('Transaction reconciled');
-    } catch (e: any) {
-      toast.error(e.message);
-    }
+    toast.success('Audit-ready report exported');
   };
 
   if (loading) {
     return (
       <div>
-        <DashboardHeader title="Trust Accounting" subtitle="Manage trust & operating accounts" />
+        <DashboardHeader title="Trust Dashboard" subtitle="Australian trust account management" />
         <div className="p-6 text-center text-muted-foreground">Loading…</div>
       </div>
     );
   }
 
+  if (accounts.length === 0) {
+    return (
+      <div>
+        <DashboardHeader title="Trust Dashboard" subtitle="Australian trust account management" />
+        <div className="p-4 sm:p-6 max-w-3xl mx-auto">
+          <Card>
+            <CardContent className="p-10 text-center space-y-4">
+              <Landmark size={40} className="mx-auto text-muted-foreground/40" />
+              <h2 className="text-lg font-bold">Set Up Your Trust Account</h2>
+              <p className="text-sm text-muted-foreground">Create a trust or operating account to start tracking deposits, rent payments and fees.</p>
+              <Button onClick={() => setShowNewAccount(true)} className="gap-2">
+                <Plus size={14} /> Create Account
+              </Button>
+            </CardContent>
+          </Card>
+          {renderNewAccountDialog()}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Transaction Form Fields (shared between new & edit) ──
+  function renderTxFormFields() {
+    return (
+      <div className="space-y-3">
+        {!showEditTx && (
+          <div>
+            <Label className="text-xs">Account</Label>
+            <Select value={txAccountId} onValueChange={setTxAccountId}>
+              <SelectTrigger><SelectValue placeholder="Select account" /></SelectTrigger>
+              <SelectContent>
+                {accounts.map(a => (
+                  <SelectItem key={a.id} value={a.id}>{a.account_name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+        <div>
+          <Label className="text-xs">Type</Label>
+          <Select value={txCategory} onValueChange={setTxCategory}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {TYPE_OPTIONS.map(o => (
+                <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label className="text-xs">Client</Label>
+          <Select value={txContactId || 'none'} onValueChange={v => setTxContactId(v === 'none' ? '' : v)}>
+            <SelectTrigger><SelectValue placeholder="Select client" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">— None —</SelectItem>
+              {contacts.map(c => (
+                <SelectItem key={c.id} value={c.id}>{c.first_name} {c.last_name || ''}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label className="text-xs">Property</Label>
+          <Select value={txPropertyId || 'none'} onValueChange={v => setTxPropertyId(v === 'none' ? '' : v)}>
+            <SelectTrigger><SelectValue placeholder="Select property" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">— None —</SelectItem>
+              {properties.map(p => (
+                <SelectItem key={p.id} value={p.id}>{p.title} — {p.address}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <Label className="text-xs">Amount ($AUD)</Label>
+            <Input type="number" step="0.01" value={txAmount} onChange={e => setTxAmount(e.target.value)} placeholder="0.00" />
+          </div>
+          <div>
+            <Label className="text-xs">GST (10%)</Label>
+            <div className="flex items-center gap-2 h-10 px-3 border rounded-md bg-muted/50">
+              <input type="checkbox" checked={txGst} onChange={e => setTxGst(e.target.checked)} className="rounded" />
+              <span className="text-xs text-muted-foreground">
+                {txAmount && txGst ? AUD.format(parseFloat(txAmount) * 0.1) : '$0.00'}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <Label className="text-xs">Payee / Client Name</Label>
+          <Input value={txPayee} onChange={e => setTxPayee(e.target.value)} placeholder="Name" />
+        </div>
+        <div>
+          <Label className="text-xs">Description</Label>
+          <Textarea value={txDesc} onChange={e => setTxDesc(e.target.value)} rows={2} placeholder="Optional notes" />
+        </div>
+      </div>
+    );
+  }
+
+  function renderNewAccountDialog() {
+    return (
+      <Dialog open={showNewAccount} onOpenChange={setShowNewAccount}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>New Account</DialogTitle>
+            <DialogDescription>Create a trust or operating account.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label className="text-xs">Account Name</Label>
+              <Input value={newAccName} onChange={e => setNewAccName(e.target.value)} placeholder="e.g. Main Trust Account" />
+            </div>
+            <div>
+              <Label className="text-xs">Type</Label>
+              <Select value={newAccType} onValueChange={setNewAccType}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="trust">Trust Account</SelectItem>
+                  <SelectItem value="operating">Operating Account</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label className="text-xs">BSB</Label>
+                <Input value={newAccBsb} onChange={e => setNewAccBsb(e.target.value)} placeholder="000-000" />
+              </div>
+              <div>
+                <Label className="text-xs">Account Number</Label>
+                <Input value={newAccNumber} onChange={e => setNewAccNumber(e.target.value)} placeholder="123456789" />
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs">Bank Name</Label>
+              <Input value={newAccBank} onChange={e => setNewAccBank(e.target.value)} placeholder="e.g. NAB, CBA" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowNewAccount(false)}>Cancel</Button>
+            <Button onClick={handleCreateAccount} disabled={!newAccName}>Create Account</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <div>
-      <DashboardHeader title="Trust Accounting" subtitle="Trust & operating account management" />
-      <div className="p-4 sm:p-6 max-w-7xl space-y-4">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="ledger">Ledger</TabsTrigger>
-            <TabsTrigger value="invoices">Invoices</TabsTrigger>
-            <TabsTrigger value="reconciliation">Reconciliation</TabsTrigger>
-          </TabsList>
-
-          {/* ─── DASHBOARD ─── */}
-          <TabsContent value="dashboard" className="space-y-4 mt-4">
-            {/* Summary cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              <Card>
-                <CardContent className="p-4 flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Landmark size={18} className="text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Trust Balance</p>
-                    <p className="text-lg font-bold">{AUD.format(totalTrust)}</p>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4 flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                    <Building2 size={18} className="text-blue-500" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Operating Balance</p>
-                    <p className="text-lg font-bold">{AUD.format(totalOperating)}</p>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4 flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
-                    <AlertTriangle size={18} className="text-orange-500" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Pending</p>
-                    <p className="text-lg font-bold">{pendingCount}</p>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4 flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-                    <CheckCircle2 size={18} className="text-green-500" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">To Reconcile</p>
-                    <p className="text-lg font-bold">{unreconciledCount}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Accounts list */}
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold">Accounts</h3>
-              <Button size="sm" onClick={() => setShowNewAccount(true)} className="gap-1.5">
-                <Plus size={14} /> New Account
-              </Button>
-            </div>
-
-            {accounts.length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center text-muted-foreground">
-                  <Landmark size={32} className="mx-auto mb-2 opacity-40" />
-                  <p className="text-sm">No accounts yet. Create a trust or operating account to get started.</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {accounts.map(acc => (
-                  <Card key={acc.id} className="cursor-pointer hover:shadow-sm transition-shadow"
-                    onClick={() => { setSelectedAccountId(acc.id); setActiveTab('ledger'); }}>
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <Badge variant={acc.account_type === 'trust' ? 'default' : 'secondary'} className="text-[10px]">
-                            {acc.account_type === 'trust' ? 'Trust' : 'Operating'}
-                          </Badge>
-                          <span className="text-sm font-semibold">{acc.account_name}</span>
-                        </div>
-                      </div>
-                      <p className="text-xl font-bold">{AUD.format(acc.balance)}</p>
-                      {acc.bank_name && (
-                        <p className="text-[10px] text-muted-foreground mt-1">
-                          {acc.bank_name} {acc.bsb ? `• BSB ${acc.bsb}` : ''}
-                        </p>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
+      <DashboardHeader
+        title="Trust Dashboard"
+        subtitle="Australian trust account management"
+        actions={
+          <Button size="sm" variant="outline" onClick={() => setShowNewAccount(true)} className="gap-1.5 text-xs">
+            <Plus size={13} /> New Account
+          </Button>
+        }
+      />
+      <div className="p-4 sm:p-6 max-w-[1600px]">
+        {/* ── Summary Cards ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+          <Card>
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                <DollarSign size={18} className="text-primary" />
               </div>
-            )}
+              <div className="min-w-0">
+                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Total In Trust</p>
+                <p className="text-lg font-bold truncate">{AUD.format(totalInTrust)}</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0">
+                <Clock size={18} className="text-orange-500" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Pending</p>
+                <p className="text-lg font-bold truncate">{AUD.format(pendingTotal)}</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0">
+                <CheckCircle2 size={18} className="text-green-500" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Cleared This Month</p>
+                <p className="text-lg font-bold truncate">{AUD.format(clearedThisMonth)}</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
+                <Landmark size={18} className="text-blue-500" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Last Entry</p>
+                <p className="text-xs font-medium truncate" title={lastEntryText}>{lastEntryText}</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-            {/* Quick actions */}
-            <div className="flex flex-wrap gap-2">
-              <Button size="sm" variant="outline" onClick={() => setShowNewTx(true)} className="gap-1.5">
-                <ArrowDownCircle size={14} /> Record Deposit
-              </Button>
-              <Button size="sm" variant="outline" onClick={() => { setTxType('withdrawal'); setShowNewTx(true); }} className="gap-1.5">
-                <ArrowUpCircle size={14} /> Record Withdrawal
-              </Button>
-              <Button size="sm" variant="outline" onClick={handleExportAba} className="gap-1.5">
-                <FileDown size={14} /> Export ABA
-              </Button>
-            </div>
-          </TabsContent>
-
-          {/* ─── LEDGER ─── */}
-          <TabsContent value="ledger" className="space-y-4 mt-4">
+        <div className="flex flex-col lg:flex-row gap-4">
+          {/* ── Main Table (80%) ── */}
+          <div className="flex-1 min-w-0 space-y-3">
+            {/* Filters */}
             <div className="flex flex-wrap items-center gap-2">
-              <Select value={selectedAccountId || 'all'} onValueChange={v => setSelectedAccountId(v === 'all' ? null : v)}>
-                <SelectTrigger className="w-[200px] h-8 text-xs">
-                  <SelectValue placeholder="All Accounts" />
+              <div className="flex items-center gap-1">
+                <CalendarIcon size={13} className="text-muted-foreground" />
+                <Input type="date" value={filterDateFrom} onChange={e => setFilterDateFrom(e.target.value)}
+                  className="h-8 w-[130px] text-xs" placeholder="From" />
+                <span className="text-xs text-muted-foreground">to</span>
+                <Input type="date" value={filterDateTo} onChange={e => setFilterDateTo(e.target.value)}
+                  className="h-8 w-[130px] text-xs" placeholder="To" />
+              </div>
+              <Select value={filterClient} onValueChange={setFilterClient}>
+                <SelectTrigger className="w-[150px] h-8 text-xs">
+                  <Users size={12} className="mr-1" /><SelectValue placeholder="All Clients" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Accounts</SelectItem>
-                  {accounts.map(a => (
-                    <SelectItem key={a.id} value={a.id}>{a.account_name}</SelectItem>
+                  <SelectItem value="all">All Clients</SelectItem>
+                  {contacts.map(c => (
+                    <SelectItem key={c.id} value={c.id}>{c.first_name} {c.last_name || ''}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <Select value={txFilter} onValueChange={setTxFilter}>
-                <SelectTrigger className="w-[140px] h-8 text-xs">
-                  <SelectValue />
+              <Select value={filterProperty} onValueChange={setFilterProperty}>
+                <SelectTrigger className="w-[160px] h-8 text-xs">
+                  <Home size={12} className="mr-1" /><SelectValue placeholder="All Properties" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Properties</SelectItem>
+                  {properties.map(p => (
+                    <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger className="w-[120px] h-8 text-xs">
+                  <SelectValue placeholder="All Status" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="completed">Cleared</SelectItem>
                   <SelectItem value="reconciled">Reconciled</SelectItem>
-                  <SelectItem value="voided">Voided</SelectItem>
                 </SelectContent>
               </Select>
-              <div className="ml-auto flex gap-2">
-                <Button size="sm" onClick={() => setShowNewTx(true)} className="gap-1.5">
-                  <Plus size={14} /> New Transaction
-                </Button>
-                <Button size="sm" variant="outline" onClick={handleExportAba} className="gap-1.5">
-                  <FileDown size={14} /> ABA
+              <div className="ml-auto">
+                <Button size="sm" variant="outline" onClick={exportCsv} className="gap-1.5 text-xs h-8">
+                  <FileDown size={13} /> Audit-Ready Report
                 </Button>
               </div>
             </div>
 
+            {/* Table */}
             <Card>
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="text-xs">Date</TableHead>
+                    <TableHead className="text-xs">Client Name</TableHead>
+                    <TableHead className="text-xs">Property Address</TableHead>
                     <TableHead className="text-xs">Type</TableHead>
-                    <TableHead className="text-xs">Category</TableHead>
-                    <TableHead className="text-xs">Payee</TableHead>
-                    <TableHead className="text-xs">Reference</TableHead>
                     <TableHead className="text-xs text-right">Amount</TableHead>
-                    <TableHead className="text-xs text-right">GST</TableHead>
                     <TableHead className="text-xs">Status</TableHead>
-                    <TableHead className="text-xs"></TableHead>
+                    <TableHead className="text-xs text-right">Balance Impact</TableHead>
+                    <TableHead className="text-xs w-[120px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredTx.length === 0 ? (
+                  {txWithBalance.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
-                        No transactions found
+                      <TableCell colSpan={8} className="text-center text-muted-foreground py-10 text-sm">
+                        No trust entries found. Use Quick Actions to add your first entry.
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredTx.map(tx => {
+                    txWithBalance.map(tx => {
                       const isDeposit = tx.transaction_type === 'deposit';
-                      const badge = STATUS_BADGE[tx.status] || STATUS_BADGE.pending;
+                      const badge = STATUS_MAP[tx.status] || STATUS_MAP.pending;
+                      const clientName = tx.contact
+                        ? `${tx.contact.first_name} ${tx.contact.last_name || ''}`.trim()
+                        : tx.payee_name || '—';
                       return (
                         <TableRow key={tx.id}>
-                          <TableCell className="text-xs">{DATE_FMT.format(new Date(tx.transaction_date))}</TableCell>
+                          <TableCell className="text-xs whitespace-nowrap">{DATE_FMT.format(new Date(tx.transaction_date))}</TableCell>
+                          <TableCell className="text-xs">{clientName}</TableCell>
+                          <TableCell className="text-xs max-w-[180px] truncate">{tx.property?.address || '—'}</TableCell>
                           <TableCell>
-                            <div className="flex items-center gap-1">
-                              {isDeposit ? (
-                                <TrendingUp size={12} className="text-green-500" />
-                              ) : (
-                                <TrendingDown size={12} className="text-destructive" />
-                              )}
-                              <span className="text-xs capitalize">{tx.transaction_type}</span>
-                            </div>
+                            <Badge variant="outline" className="text-[10px] capitalize">{tx.category}</Badge>
                           </TableCell>
-                          <TableCell className="text-xs capitalize">{tx.category}</TableCell>
-                          <TableCell className="text-xs">{tx.payee_name || '—'}</TableCell>
-                          <TableCell className="text-xs font-mono">{tx.reference || '—'}</TableCell>
                           <TableCell className={`text-xs text-right font-semibold ${isDeposit ? 'text-green-600' : 'text-destructive'}`}>
                             {isDeposit ? '+' : '-'}{AUD.format(tx.amount)}
                           </TableCell>
-                          <TableCell className="text-xs text-right text-muted-foreground">{AUD.format(tx.gst_amount)}</TableCell>
                           <TableCell>
                             <Badge variant={badge.variant} className="text-[10px]">{badge.label}</Badge>
                           </TableCell>
+                          <TableCell className="text-xs text-right font-mono">
+                            <span className="flex items-center justify-end gap-1">
+                              {isDeposit ? <TrendingUp size={11} className="text-green-500" /> : <TrendingDown size={11} className="text-destructive" />}
+                              {AUD.format(tx.runningBalance)}
+                            </span>
+                          </TableCell>
                           <TableCell>
-                            {tx.status === 'completed' && (
-                              <Button size="sm" variant="ghost" className="h-6 px-2 text-[10px]"
-                                onClick={() => handleReconcile(tx.id)}>
-                                <CheckCircle2 size={10} className="mr-1" /> Reconcile
+                            <div className="flex items-center gap-0.5 justify-end">
+                              {tx.status === 'pending' && (
+                                <Button size="sm" variant="ghost" className="h-7 px-1.5 text-[10px] gap-1"
+                                  onClick={() => handleMarkCleared(tx.id)} title="Mark as Cleared">
+                                  <CheckCircle2 size={12} className="text-green-500" />
+                                </Button>
+                              )}
+                              <Button size="sm" variant="ghost" className="h-7 px-1.5"
+                                onClick={() => openEdit(tx)} title="Edit">
+                                <Pencil size={12} />
                               </Button>
-                            )}
+                              <Button size="sm" variant="ghost" className="h-7 px-1.5 text-destructive"
+                                onClick={() => { setDeletingTxId(tx.id); setShowDeleteConfirm(true); }} title="Delete">
+                                <Trash2 size={12} />
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       );
@@ -449,264 +626,96 @@ const TrustAccountingPage = () => {
                 </TableBody>
               </Table>
             </Card>
-          </TabsContent>
+          </div>
 
-          {/* ─── INVOICES ─── */}
-          <TabsContent value="invoices" className="space-y-4 mt-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold">Invoices & Receipts</h3>
-              <Button size="sm" onClick={() => { setTxType('withdrawal'); setTxCategory('commission'); setShowNewTx(true); }} className="gap-1.5">
-                <Receipt size={14} /> Generate Invoice
-              </Button>
-            </div>
+          {/* ── Quick Actions Sidebar (20%) ── */}
+          <div className="w-full lg:w-[220px] shrink-0 space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Quick Actions</h3>
+            <Button className="w-full justify-start gap-2 text-sm" size="sm"
+              onClick={() => openNewTx('deposit')}>
+              <ArrowDownCircle size={14} /> New Deposit
+            </Button>
+            <Button className="w-full justify-start gap-2 text-sm" variant="secondary" size="sm"
+              onClick={() => openNewTx('rent')}>
+              <DollarSign size={14} /> New Rent Payment
+            </Button>
+            <Button className="w-full justify-start gap-2 text-sm" variant="outline" size="sm"
+              onClick={handleBulkClear}
+              disabled={transactions.filter(t => t.status === 'pending').length === 0}>
+              <CheckCircle2 size={14} /> Mark All Pending as Cleared
+            </Button>
 
-            {(() => {
-              const invoiceTx = transactions.filter(t => t.invoice_number || t.category === 'commission');
-              return invoiceTx.length === 0 ? (
-                <Card>
-                  <CardContent className="p-8 text-center text-muted-foreground">
-                    <Receipt size={32} className="mx-auto mb-2 opacity-40" />
-                    <p className="text-sm">No invoices yet. Generate one from a commission transaction.</p>
-                  </CardContent>
-                </Card>
-              ) : (
-                <Card>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="text-xs">Invoice #</TableHead>
-                        <TableHead className="text-xs">Date</TableHead>
-                        <TableHead className="text-xs">Payee</TableHead>
-                        <TableHead className="text-xs">Description</TableHead>
-                        <TableHead className="text-xs text-right">Amount</TableHead>
-                        <TableHead className="text-xs text-right">GST</TableHead>
-                        <TableHead className="text-xs text-right">Total</TableHead>
-                        <TableHead className="text-xs">Status</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {invoiceTx.map(tx => (
-                        <TableRow key={tx.id}>
-                          <TableCell className="text-xs font-mono">{tx.invoice_number || 'INV-' + tx.id.slice(0, 6).toUpperCase()}</TableCell>
-                          <TableCell className="text-xs">{DATE_FMT.format(new Date(tx.transaction_date))}</TableCell>
-                          <TableCell className="text-xs">{tx.payee_name || '—'}</TableCell>
-                          <TableCell className="text-xs">{tx.description || '—'}</TableCell>
-                          <TableCell className="text-xs text-right">{AUD.format(tx.amount)}</TableCell>
-                          <TableCell className="text-xs text-right">{AUD.format(tx.gst_amount)}</TableCell>
-                          <TableCell className="text-xs text-right font-semibold">{AUD.format(tx.amount + tx.gst_amount)}</TableCell>
-                          <TableCell>
-                            <Badge variant={STATUS_BADGE[tx.status]?.variant || 'outline'} className="text-[10px]">
-                              {STATUS_BADGE[tx.status]?.label || tx.status}
-                            </Badge>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </Card>
-              );
-            })()}
-          </TabsContent>
-
-          {/* ─── RECONCILIATION ─── */}
-          <TabsContent value="reconciliation" className="space-y-4 mt-4">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">Completed</p>
-                  <p className="text-2xl font-bold">{transactions.filter(t => t.status === 'completed').length}</p>
-                  <p className="text-[10px] text-muted-foreground">Awaiting reconciliation</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">Reconciled</p>
-                  <p className="text-2xl font-bold text-green-600">{transactions.filter(t => t.status === 'reconciled').length}</p>
-                  <p className="text-[10px] text-muted-foreground">This period</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">Pending</p>
-                  <p className="text-2xl font-bold text-orange-500">{pendingCount}</p>
-                  <p className="text-[10px] text-muted-foreground">Require action</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            <h3 className="text-sm font-bold">Unreconciled Transactions</h3>
-            <Card>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-xs">Date</TableHead>
-                    <TableHead className="text-xs">Type</TableHead>
-                    <TableHead className="text-xs">Payee</TableHead>
-                    <TableHead className="text-xs text-right">Amount</TableHead>
-                    <TableHead className="text-xs">Reference</TableHead>
-                    <TableHead className="text-xs"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {transactions.filter(t => t.status === 'completed').length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center text-muted-foreground py-8 text-sm">
-                        All transactions reconciled ✓
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    transactions.filter(t => t.status === 'completed').map(tx => (
-                      <TableRow key={tx.id}>
-                        <TableCell className="text-xs">{DATE_FMT.format(new Date(tx.transaction_date))}</TableCell>
-                        <TableCell className="text-xs capitalize">{tx.transaction_type}</TableCell>
-                        <TableCell className="text-xs">{tx.payee_name || '—'}</TableCell>
-                        <TableCell className="text-xs text-right font-semibold">{AUD.format(tx.amount)}</TableCell>
-                        <TableCell className="text-xs font-mono">{tx.reference || '—'}</TableCell>
-                        <TableCell>
-                          <Button size="sm" className="h-6 px-2 text-[10px] gap-1" onClick={() => handleReconcile(tx.id)}>
-                            <CheckCircle2 size={10} /> Reconcile
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </Card>
-          </TabsContent>
-        </Tabs>
-
-        {/* ─── New Account Dialog ─── */}
-        <Dialog open={showNewAccount} onOpenChange={setShowNewAccount}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>New Account</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-3">
-              <div>
-                <Label className="text-xs">Account Name</Label>
-                <Input value={newAccName} onChange={e => setNewAccName(e.target.value)} placeholder="e.g. Main Trust Account" />
-              </div>
-              <div>
-                <Label className="text-xs">Type</Label>
-                <Select value={newAccType} onValueChange={setNewAccType}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="trust">Trust Account</SelectItem>
-                    <SelectItem value="operating">Operating Account</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <Label className="text-xs">BSB</Label>
-                  <Input value={newAccBsb} onChange={e => setNewAccBsb(e.target.value)} placeholder="000-000" />
-                </div>
-                <div>
-                  <Label className="text-xs">Account Number</Label>
-                  <Input value={newAccNumber} onChange={e => setNewAccNumber(e.target.value)} placeholder="123456789" />
-                </div>
-              </div>
-              <div>
-                <Label className="text-xs">Bank Name</Label>
-                <Input value={newAccBank} onChange={e => setNewAccBank(e.target.value)} placeholder="e.g. NAB, CBA" />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowNewAccount(false)}>Cancel</Button>
-              <Button onClick={handleCreateAccount} disabled={!newAccName}>Create Account</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        {/* ─── New Transaction Dialog ─── */}
-        <Dialog open={showNewTx} onOpenChange={setShowNewTx}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Record {txType === 'deposit' ? 'Deposit' : 'Withdrawal'}</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-3">
-              <div>
-                <Label className="text-xs">Account</Label>
-                <Select value={txAccountId} onValueChange={setTxAccountId}>
-                  <SelectTrigger><SelectValue placeholder="Select account" /></SelectTrigger>
-                  <SelectContent>
-                    {accounts.map(a => (
-                      <SelectItem key={a.id} value={a.id}>
-                        {a.account_name} ({a.account_type})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <Label className="text-xs">Type</Label>
-                  <Select value={txType} onValueChange={v => setTxType(v as 'deposit' | 'withdrawal')}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="deposit">Deposit</SelectItem>
-                      <SelectItem value="withdrawal">Withdrawal</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label className="text-xs">Category</Label>
-                  <Select value={txCategory} onValueChange={setTxCategory}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {CATEGORY_OPTIONS.map(o => (
-                        <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <Label className="text-xs">Amount ($AUD)</Label>
-                  <Input type="number" step="0.01" value={txAmount} onChange={e => setTxAmount(e.target.value)} placeholder="0.00" />
-                </div>
-                <div>
-                  <Label className="text-xs">GST (10%)</Label>
-                  <div className="flex items-center gap-2 h-9 px-3 border rounded-md bg-muted/50">
-                    <input type="checkbox" checked={txGst} onChange={e => setTxGst(e.target.checked)} className="rounded" />
-                    <span className="text-xs text-muted-foreground">
-                      {txAmount && txGst ? AUD.format(parseFloat(txAmount) * 0.1) : '$0.00'}
-                    </span>
+            {/* Account summaries */}
+            <div className="pt-3 border-t border-border space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Accounts</h4>
+              {accounts.map(acc => (
+                <div key={acc.id} className="rounded-md border border-border p-2.5">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <Badge variant={acc.account_type === 'trust' ? 'default' : 'secondary'} className="text-[9px]">
+                      {acc.account_type}
+                    </Badge>
                   </div>
+                  <p className="text-xs font-semibold truncate">{acc.account_name}</p>
+                  <p className="text-sm font-bold">{AUD.format(acc.balance)}</p>
+                  {acc.bank_name && (
+                    <p className="text-[10px] text-muted-foreground">{acc.bank_name}</p>
+                  )}
                 </div>
-              </div>
-              <div>
-                <Label className="text-xs">Payee Name</Label>
-                <Input value={txPayee} onChange={e => setTxPayee(e.target.value)} placeholder="Payee or vendor name" />
-              </div>
-              <div>
-                <Label className="text-xs">Reference</Label>
-                <Input value={txRef} onChange={e => setTxRef(e.target.value)} placeholder="e.g. INV-001" />
-              </div>
-              <div>
-                <Label className="text-xs">Description</Label>
-                <Textarea value={txDesc} onChange={e => setTxDesc(e.target.value)} rows={2} placeholder="Optional notes" />
-              </div>
-              <div>
-                <Label className="text-xs">Status</Label>
-                <Select value={txStatus} onValueChange={setTxStatus}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              ))}
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowNewTx(false)}>Cancel</Button>
-              <Button onClick={handleCreateTx} disabled={!txAccountId || !txAmount}>Record</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+          </div>
+        </div>
       </div>
+
+      {/* ── New Transaction Dialog ── */}
+      <Dialog open={showNewTx} onOpenChange={setShowNewTx}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {txCategory === 'rent' ? 'New Rent Payment' : txCategory === 'deposit' ? 'New Deposit' : `New ${txCategory}`}
+            </DialogTitle>
+            <DialogDescription>Record a new trust entry.</DialogDescription>
+          </DialogHeader>
+          {renderTxFormFields()}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowNewTx(false)}>Cancel</Button>
+            <Button onClick={handleCreateTx} disabled={!txAccountId || !txAmount}>Record</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Edit Transaction Dialog ── */}
+      <Dialog open={showEditTx} onOpenChange={setShowEditTx}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Transaction</DialogTitle>
+            <DialogDescription>Update this trust entry.</DialogDescription>
+          </DialogHeader>
+          {renderTxFormFields()}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEditTx(false)}>Cancel</Button>
+            <Button onClick={handleEditTx}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Delete Confirmation ── */}
+      <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Void Transaction</DialogTitle>
+            <DialogDescription>
+              This will mark the transaction as voided. It won't be deleted — the audit trail is preserved per Australian trust accounting regulations.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>Cancel</Button>
+            <Button variant="destructive" onClick={handleDeleteTx}>Void Transaction</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {renderNewAccountDialog()}
     </div>
   );
 };

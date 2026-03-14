@@ -237,6 +237,7 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePrope
         sqm: draft.sqm || 0,
         land_size: draft.landSize || null,
         property_type: draft.propertyType,
+        listing_type: draft.listingType,
         description,
         features: draft.features,
         image_url: mainPhoto,
@@ -245,6 +246,7 @@ const PocketListingForm = ({ onPublish, onCancel, editPropertyId, duplicatePrope
         status: draft.visibility === 'public' ? 'public' : draft.visibility,
         lat: draft.lat || null,
         lng: draft.lng || null,
+        rental_weekly: draft.listingType === 'rent' ? (draft.rentalWeekly || null) : (draft.estimatedRentalWeekly || null),
       } as any;
 
       if (editPropertyId) {

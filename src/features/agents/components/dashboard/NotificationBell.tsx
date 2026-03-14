@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/AuthProvider';
 import { formatDistanceToNow } from 'date-fns';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 interface Notification {
   id: string;
@@ -23,6 +24,7 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
 };
 
 export function NotificationBell() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -151,7 +153,13 @@ export function NotificationBell() {
                       className={`px-4 py-3 border-b border-border/50 last:border-0 cursor-pointer hover:bg-secondary/50 transition-colors ${
                         !n.is_read ? 'bg-primary/5' : ''
                       }`}
-                      onClick={() => markAsRead(n.id)}
+                      onClick={() => {
+                        markAsRead(n.id);
+                        if (n.type === 'lead' || n.type === 'voice_match') {
+                          setOpen(false);
+                          navigate('/messages');
+                        }
+                      }}
                     >
                       <div className="flex items-start gap-3">
                         <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0 mt-0.5">

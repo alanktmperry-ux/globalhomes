@@ -163,6 +163,40 @@ export function AgentContactModal({ property, open, onClose }: AgentContactModal
         user_id: user?.id || null,
       });
 
+      // 2b. Create conversation so agent & buyer can chat
+      if (user?.id) {
+        // Get agent's user_id
+        const { data: agentRow } = await supabase
+          .from('agents')
+          .select('user_id')
+          .eq('id', agent.id)
+          .single();
+
+        if (agentRow?.user_id) {
+          const p1 = user.id < agentRow.user_id ? user.id : agentRow.user_id;
+          const p2 = user.id < agentRow.user_id ? agentRow.user_id : user.id;
+
+          const { data: convo } = await supabase
+            .from('conversations')
+            .upsert({
+              participant_1: p1,
+              participant_2: p2,
+              property_id: property.id,
+            }, { onConflict: 'participant_1,participant_2,property_id' })
+            .select('id')
+            .single();
+
+          if (convo) {
+            // Send the enquiry message as the first message
+            await supabase.from('messages').insert({
+              conversation_id: convo.id,
+              sender_id: user.id,
+              content: formData.message || `Hi, I'm interested in ${property.title}`,
+            });
+          }
+        }
+      }
+
       // 3. Always create auditable trust record for every qualified lead
       let trustAccountId: string | null = null;
       const { data: existingAccounts } = await supabase

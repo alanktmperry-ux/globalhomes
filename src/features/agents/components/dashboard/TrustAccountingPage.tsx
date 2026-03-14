@@ -40,6 +40,7 @@ const TrustAccountingPage = () => {
   const { user } = useAuth();
   const {
     accounts, transactions, contacts, properties, loading,
+    fetchAccounts, fetchTransactions,
     createAccount, createTransaction, updateTransaction,
     deleteTransaction, markAsCleared, bulkMarkCleared,
   } = useTrustAccounting();

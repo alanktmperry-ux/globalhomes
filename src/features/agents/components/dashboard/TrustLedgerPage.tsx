@@ -288,6 +288,10 @@ const TrustLedgerPage = () => {
     );
   }
 
+  const closingBalance = entriesWithBalance.length > 0 ? entriesWithBalance[entriesWithBalance.length - 1].balance : 0;
+  const monthTotalIn = filtered.filter(e => e.type === 'receipt').reduce((s, e) => s + e.amount, 0);
+  const monthTotalOut = filtered.filter(e => e.type === 'payment').reduce((s, e) => s + e.amount, 0);
+
   return (
     <div>
       <DashboardHeader
@@ -295,11 +299,11 @@ const TrustLedgerPage = () => {
         subtitle="Receipts & payments register — Agents Financial Administration Act 2014"
         actions={
           <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => setShowStatement(true)} className="gap-1.5 text-xs">
-              <FileDown size={13} /> Monthly Statement
+            <Button size="sm" variant="outline" onClick={exportAuditPdf} className="gap-1.5 text-xs">
+              <FileText size={13} /> Download Audit PDF
             </Button>
             <Button size="sm" variant="outline" onClick={exportCsv} className="gap-1.5 text-xs">
-              <FileDown size={13} /> Export CSV
+              <FileDown size={13} /> Export CSV 5yr
             </Button>
             <Button size="sm" onClick={() => setShowNewReceipt(true)} className="gap-1.5 text-xs">
               <Receipt size={13} /> New Receipt
@@ -309,57 +313,24 @@ const TrustLedgerPage = () => {
       />
 
       <div className="p-4 sm:p-6 max-w-[1600px] space-y-5">
-        {/* Summary Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0">
-                <ArrowDownCircle size={18} className="text-green-600" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Total Received</p>
-                <p className="text-lg font-bold text-green-600 truncate">{AUD.format(totalReceipts)}</p>
-                <p className="text-[10px] text-muted-foreground">{receipts.length} receipt{receipts.length !== 1 && 's'}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-destructive/10 flex items-center justify-center shrink-0">
-                <ArrowUpCircle size={18} className="text-destructive" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Total Paid Out</p>
-                <p className="text-lg font-bold text-destructive truncate">{AUD.format(totalPayments)}</p>
-                <p className="text-[10px] text-muted-foreground">{payments.length} payment{payments.length !== 1 && 's'}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <DollarSign size={18} className="text-primary" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Net Position</p>
-                <p className={`text-lg font-bold truncate ${netPosition >= 0 ? 'text-green-600' : 'text-destructive'}`}>
-                  {AUD.format(netPosition)}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0">
-                <Clock size={18} className="text-orange-500" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Pending Items</p>
-                <p className="text-lg font-bold truncate">{pendingCount}</p>
-                <p className="text-[10px] text-muted-foreground">awaiting processing</p>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Month Navigator + Summary */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Button size="icon" variant="outline" className="h-8 w-8" onClick={prevMonth}>
+              <ChevronLeft size={14} />
+            </Button>
+            <h2 className="text-lg font-bold min-w-[180px] text-center">
+              {monthNames[viewMonth]} {viewYear}
+            </h2>
+            <Button size="icon" variant="outline" className="h-8 w-8" onClick={nextMonth}>
+              <ChevronRight size={14} />
+            </Button>
+          </div>
+          <div className="flex items-center gap-4 text-xs">
+            <span>In: <strong className="text-green-600">{AUD.format(monthTotalIn)}</strong></span>
+            <span>Out: <strong className="text-destructive">{AUD.format(monthTotalOut)}</strong></span>
+            <span className="border-l border-border pl-4">Balance: <strong className="text-base">{AUD.format(closingBalance)}</strong></span>
+          </div>
         </div>
 
         {/* Tabs + Filters */}
@@ -367,36 +338,21 @@ const TrustLedgerPage = () => {
           <div className="flex flex-wrap items-center gap-3 mb-3">
             <TabsList>
               <TabsTrigger value="all" className="text-xs gap-1.5">
-                All <Badge variant="secondary" className="text-[9px] px-1 h-4 ml-1">{ledgerEntries.length}</Badge>
+                All <Badge variant="secondary" className="text-[9px] px-1 h-4 ml-1">{filtered.length}</Badge>
               </TabsTrigger>
               <TabsTrigger value="receipts" className="text-xs gap-1.5">
-                <ArrowDownCircle size={12} /> Receipts <Badge variant="secondary" className="text-[9px] px-1 h-4 ml-1">{receipts.length}</Badge>
+                <ArrowDownCircle size={12} /> Receipts
               </TabsTrigger>
               <TabsTrigger value="payments" className="text-xs gap-1.5">
-                <ArrowUpCircle size={12} /> Payments <Badge variant="secondary" className="text-[9px] px-1 h-4 ml-1">{payments.length}</Badge>
+                <ArrowUpCircle size={12} /> Payments
               </TabsTrigger>
             </TabsList>
-
             <div className="flex-1" />
-
-            {/* Filters */}
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-2">
               <div className="relative">
                 <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  placeholder="Search client, property, ref…"
-                  className="h-8 pl-8 w-[200px] text-xs"
-                />
-              </div>
-              <div className="flex items-center gap-1">
-                <CalendarIcon size={13} className="text-muted-foreground" />
-                <Input type="date" value={filterDateFrom} onChange={e => setFilterDateFrom(e.target.value)}
-                  className="h-8 w-[125px] text-xs" />
-                <span className="text-xs text-muted-foreground">to</span>
-                <Input type="date" value={filterDateTo} onChange={e => setFilterDateTo(e.target.value)}
-                  className="h-8 w-[125px] text-xs" />
+                <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+                  placeholder="Search client, property, ref…" className="h-8 pl-8 w-[200px] text-xs" />
               </div>
               <Select value={filterStatus} onValueChange={setFilterStatus}>
                 <SelectTrigger className="w-[120px] h-8 text-xs">
@@ -414,71 +370,55 @@ const TrustLedgerPage = () => {
             </div>
           </div>
 
-          {/* Unified Ledger Table */}
+          {/* Ledger Table */}
           <TabsContent value={activeTab} className="mt-0">
             <Card>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-xs w-[50px]">Type</TableHead>
-                    <TableHead className="text-xs">Number</TableHead>
                     <TableHead className="text-xs">Date</TableHead>
+                    <TableHead className="text-xs">Receipt #</TableHead>
+                    <TableHead className="text-xs">Payment #</TableHead>
                     <TableHead className="text-xs">Client</TableHead>
                     <TableHead className="text-xs">Property</TableHead>
-                    <TableHead className="text-xs">Method</TableHead>
-                    <TableHead className="text-xs">Purpose</TableHead>
-                    <TableHead className="text-xs text-right">Amount</TableHead>
-                    <TableHead className="text-xs">Status</TableHead>
+                    <TableHead className="text-xs text-right">In</TableHead>
+                    <TableHead className="text-xs text-right">Out</TableHead>
+                    <TableHead className="text-xs text-right">Balance</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filtered.length === 0 ? (
+                  {entriesWithBalance.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="text-center text-muted-foreground py-12 text-sm">
-                        {searchQuery || filterStatus !== 'all' || filterDateFrom
+                      <TableCell colSpan={8} className="text-center text-muted-foreground py-12 text-sm">
+                        {searchQuery || filterStatus !== 'all'
                           ? 'No entries match your filters.'
-                          : 'No trust receipts or payments recorded yet.'}
+                          : `No trust entries for ${monthNames[viewMonth]} ${viewYear}.`}
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filtered.map(entry => {
+                    entriesWithBalance.map(entry => {
                       const isReceipt = entry.type === 'receipt';
-                      const statusCfg = STATUS_CONFIG[entry.status] || STATUS_CONFIG.pending;
-                      const StatusIcon = statusCfg.icon;
                       return (
-                        <TableRow key={entry.id} className="group">
-                          <TableCell>
-                            <div className={`h-7 w-7 rounded-md flex items-center justify-center ${
-                              isReceipt ? 'bg-green-500/10' : 'bg-destructive/10'
-                            }`}>
-                              {isReceipt
-                                ? <ArrowDownCircle size={14} className="text-green-600" />
-                                : <ArrowUpCircle size={14} className="text-destructive" />
-                              }
-                            </div>
+                        <TableRow key={entry.id}>
+                          <TableCell className="text-xs whitespace-nowrap tabular-nums">
+                            {new Date(entry.date + 'T00:00:00').toLocaleDateString('en-AU', { day: '2-digit', month: '2-digit' })}
                           </TableCell>
-                          <TableCell className="text-xs font-mono font-semibold">{entry.number}</TableCell>
-                          <TableCell className="text-xs whitespace-nowrap">
-                            {DATE_FMT.format(new Date(entry.date + 'T00:00:00'))}
+                          <TableCell className="text-xs font-mono">
+                            {isReceipt ? entry.number : ''}
+                          </TableCell>
+                          <TableCell className="text-xs font-mono">
+                            {!isReceipt ? entry.number : ''}
                           </TableCell>
                           <TableCell className="text-xs font-medium">{entry.client}</TableCell>
-                          <TableCell className="text-xs max-w-[180px] truncate text-muted-foreground">{entry.property}</TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="text-[10px] capitalize">{entry.method}</Badge>
+                          <TableCell className="text-xs max-w-[160px] truncate text-muted-foreground">{entry.property}</TableCell>
+                          <TableCell className="text-xs text-right tabular-nums font-semibold text-green-600">
+                            {isReceipt ? `+${AUD.format(entry.amount)}` : ''}
                           </TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="text-[10px] capitalize">{entry.purpose}</Badge>
+                          <TableCell className="text-xs text-right tabular-nums font-semibold text-destructive">
+                            {!isReceipt ? `-${AUD.format(entry.amount)}` : ''}
                           </TableCell>
-                          <TableCell className={`text-xs text-right font-semibold tabular-nums ${
-                            isReceipt ? 'text-green-600' : 'text-destructive'
-                          }`}>
-                            {isReceipt ? '+' : '-'}{AUD.format(entry.amount)}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant={statusCfg.variant} className="text-[10px] gap-1">
-                              <StatusIcon size={10} />
-                              {statusCfg.label}
-                            </Badge>
+                          <TableCell className="text-xs text-right tabular-nums font-bold">
+                            {AUD.format(entry.balance)}
                           </TableCell>
                         </TableRow>
                       );
@@ -488,21 +428,16 @@ const TrustLedgerPage = () => {
               </Table>
             </Card>
 
-            {/* Running totals footer */}
-            {filtered.length > 0 && (
-              <div className="flex items-center justify-between mt-3 px-2 text-xs text-muted-foreground">
-                <span>{filtered.length} entr{filtered.length === 1 ? 'y' : 'ies'} shown</span>
-                <div className="flex gap-4">
-                  <span>
-                    In: <strong className="text-green-600">
-                      {AUD.format(filtered.filter(e => e.type === 'receipt').reduce((s, e) => s + e.amount, 0))}
-                    </strong>
-                  </span>
-                  <span>
-                    Out: <strong className="text-destructive">
-                      {AUD.format(filtered.filter(e => e.type === 'payment').reduce((s, e) => s + e.amount, 0))}
-                    </strong>
-                  </span>
+            {/* Footer */}
+            {entriesWithBalance.length > 0 && (
+              <div className="flex items-center justify-between mt-3 px-2">
+                <span className="text-xs text-muted-foreground">
+                  {entriesWithBalance.length} entr{entriesWithBalance.length === 1 ? 'y' : 'ies'}
+                </span>
+                <div className="flex items-center gap-2">
+                  <Button size="sm" variant="outline" className="h-7 text-[10px] gap-1" onClick={() => setShowStatement(true)}>
+                    <FileDown size={11} /> Monthly Statement
+                  </Button>
                 </div>
               </div>
             )}
@@ -510,18 +445,8 @@ const TrustLedgerPage = () => {
         </Tabs>
       </div>
 
-      {/* New Receipt Modal */}
-      <TrustReceiptModal
-        open={showNewReceipt}
-        onOpenChange={setShowNewReceipt}
-        onCreated={fetchData}
-      />
-
-      {/* Monthly Statement Modal */}
-      <TrustStatementModal
-        open={showStatement}
-        onOpenChange={setShowStatement}
-      />
+      <TrustReceiptModal open={showNewReceipt} onOpenChange={setShowNewReceipt} onCreated={fetchData} />
+      <TrustStatementModal open={showStatement} onOpenChange={setShowStatement} />
     </div>
   );
 };

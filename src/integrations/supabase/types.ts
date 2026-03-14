@@ -1293,6 +1293,44 @@ export type Database = {
           },
         ]
       }
+      trust_account_balances: {
+        Row: {
+          agent_id: string
+          created_at: string
+          current_balance: number
+          id: string
+          last_reconciled_date: string | null
+          opening_balance: number
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          current_balance?: number
+          id?: string
+          last_reconciled_date?: string | null
+          opening_balance?: number
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          current_balance?: number
+          id?: string
+          last_reconciled_date?: string | null
+          opening_balance?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trust_account_balances_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: true
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trust_accounts: {
         Row: {
           account_name: string
@@ -1349,6 +1387,185 @@ export type Database = {
             columns: ["agent_id"]
             isOneToOne: false
             referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trust_payments: {
+        Row: {
+          account_number: string | null
+          agent_id: string
+          amount: number
+          bsb: string | null
+          client_name: string
+          created_at: string
+          date_paid: string
+          id: string
+          payee_name: string | null
+          payment_method: string
+          payment_number: string
+          property_address: string
+          purpose: string
+          reference: string | null
+          status: string
+        }
+        Insert: {
+          account_number?: string | null
+          agent_id: string
+          amount?: number
+          bsb?: string | null
+          client_name: string
+          created_at?: string
+          date_paid?: string
+          id?: string
+          payee_name?: string | null
+          payment_method?: string
+          payment_number: string
+          property_address: string
+          purpose?: string
+          reference?: string | null
+          status?: string
+        }
+        Update: {
+          account_number?: string | null
+          agent_id?: string
+          amount?: number
+          bsb?: string | null
+          client_name?: string
+          created_at?: string
+          date_paid?: string
+          id?: string
+          payee_name?: string | null
+          payment_method?: string
+          payment_number?: string
+          property_address?: string
+          purpose?: string
+          reference?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trust_payments_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trust_receipts: {
+        Row: {
+          agent_id: string
+          amount: number
+          client_name: string
+          created_at: string
+          date_deposited: string | null
+          date_received: string
+          id: string
+          ledger_account: string | null
+          payment_method: string
+          property_address: string
+          purpose: string
+          receipt_number: string
+          status: string
+        }
+        Insert: {
+          agent_id: string
+          amount?: number
+          client_name: string
+          created_at?: string
+          date_deposited?: string | null
+          date_received?: string
+          id?: string
+          ledger_account?: string | null
+          payment_method?: string
+          property_address: string
+          purpose?: string
+          receipt_number: string
+          status?: string
+        }
+        Update: {
+          agent_id?: string
+          amount?: number
+          client_name?: string
+          created_at?: string
+          date_deposited?: string | null
+          date_received?: string
+          id?: string
+          ledger_account?: string | null
+          payment_method?: string
+          property_address?: string
+          purpose?: string
+          receipt_number?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trust_receipts_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trust_reconciliations: {
+        Row: {
+          agent_id: string
+          amount: number
+          bank_balance: number
+          bank_date: string
+          created_at: string
+          description: string | null
+          id: string
+          matched_payment_id: string | null
+          matched_receipt_id: string | null
+          status: string
+        }
+        Insert: {
+          agent_id: string
+          amount?: number
+          bank_balance?: number
+          bank_date: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          matched_payment_id?: string | null
+          matched_receipt_id?: string | null
+          status?: string
+        }
+        Update: {
+          agent_id?: string
+          amount?: number
+          bank_balance?: number
+          bank_date?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          matched_payment_id?: string | null
+          matched_receipt_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trust_reconciliations_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_reconciliations_matched_payment_id_fkey"
+            columns: ["matched_payment_id"]
+            isOneToOne: false
+            referencedRelation: "trust_payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_reconciliations_matched_receipt_id_fkey"
+            columns: ["matched_receipt_id"]
+            isOneToOne: false
+            referencedRelation: "trust_receipts"
             referencedColumns: ["id"]
           },
         ]

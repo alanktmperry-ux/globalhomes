@@ -1,7 +1,7 @@
 import {
   LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, LogOut, Building2, UserPlus,
   User, FileText, CreditCard, Star, MapPinned, Shield, Contact, Kanban, Scale, Landmark,
-  ClipboardCheck, CalendarDays, Search,
+  ClipboardCheck, CalendarDays, Search, TrendingUp,
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthProvider';

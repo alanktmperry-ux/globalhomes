@@ -33,6 +33,7 @@ import ListingDetailPage from "./components/agent-dashboard/ListingDetailPage";
 import TrustAccountingPage from "./components/agent-dashboard/TrustAccountingPage";
 import InvestmentDashboardPage from "./features/agents/components/dashboard/InvestmentDashboardPage";
 import TrustLedgerPage from "./features/agents/components/dashboard/TrustLedgerPage";
+import BankReconciliationPage from "./features/agents/components/dashboard/BankReconciliationPage";
 import ReportsPage from "./components/agent-dashboard/ReportsPage";
 import SeekerAuthPage from "./pages/SeekerAuthPage";
 import AgentAuthPage from "./pages/AgentAuthPage";

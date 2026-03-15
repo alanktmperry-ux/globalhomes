@@ -89,15 +89,24 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
+    let rafId: number | null = null;
     const onMove = (e: MouseEvent) => {
       if (!isDragging.current) return;
-      const pct = (e.clientX / window.innerWidth) * 100;
-      setSplitPercent(Math.max(30, Math.min(70, pct)));
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(() => {
+        const pct = (e.clientX / window.innerWidth) * 100;
+        setSplitPercent(Math.max(30, Math.min(70, pct)));
+        rafId = null;
+      });
     };
     const onUp = () => {
       isDragging.current = false;
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
     };
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup', onUp);

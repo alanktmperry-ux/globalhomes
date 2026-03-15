@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useSpring, PanInfo } from 'framer-motion';
 import { ArrowRight, MapPin, Sparkles, Loader2, Zap, Map, List, Mic, GripVertical, ArrowUpDown, X, Bookmark } from 'lucide-react';
 import { VoiceSearchHero } from '@/components/VoiceSearchHero';
 import { PropertyCard } from '@/components/PropertyCard';
@@ -34,8 +34,11 @@ const Index = () => {
   const [splitPercent, setSplitPercent] = useState(50);
   const [mapFullscreen, setMapFullscreen] = useState(false);
   const [mapCollapsed, setMapCollapsed] = useState(true);
-  const [bottomSheetExpanded, setBottomSheetExpanded] = useState(false);
   const [viewportHeight, setViewportHeight] = useState(() => window.innerHeight);
+  const SNAP_POINTS = [0.35, 0.65, 0.85];
+  const [sheetSnap, setSheetSnap] = useState(0); // index into SNAP_POINTS
+  const sheetHeightMV = useMotionValue(viewportHeight * SNAP_POINTS[0]);
+  const sheetHeightSpring = useSpring(sheetHeightMV, { stiffness: 300, damping: 30 });
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [radiusSliderOpen, setRadiusSliderOpen] = useState(false);
   const isDragging = useRef(false);
@@ -87,6 +90,35 @@ const Index = () => {
       window.visualViewport?.removeEventListener('resize', onResize);
     };
   }, []);
+
+  // Sync spring with snap point and viewport
+  useEffect(() => {
+    sheetHeightMV.set(viewportHeight * SNAP_POINTS[sheetSnap]);
+  }, [viewportHeight, sheetSnap]);
+
+  const handleSheetDragEnd = useCallback((_: any, info: PanInfo) => {
+    const velocity = info.velocity.y;
+    const currentH = sheetHeightMV.get();
+    const currentPct = currentH / viewportHeight;
+
+    // Use velocity to determine direction, then snap
+    let targetIdx = sheetSnap;
+    if (velocity < -300) {
+      // Flick up → next larger snap
+      targetIdx = Math.min(sheetSnap + 1, SNAP_POINTS.length - 1);
+    } else if (velocity > 300) {
+      // Flick down → next smaller snap
+      targetIdx = Math.max(sheetSnap - 1, 0);
+    } else {
+      // Find nearest snap point
+      let minDist = Infinity;
+      SNAP_POINTS.forEach((sp, i) => {
+        const dist = Math.abs(currentPct - sp);
+        if (dist < minDist) { minDist = dist; targetIdx = i; }
+      });
+    }
+    setSheetSnap(targetIdx);
+  }, [viewportHeight, sheetSnap]);
 
   useEffect(() => {
     let rafId: number | null = null;
@@ -400,21 +432,25 @@ const Index = () => {
         </div>
       ) : (
         /* Mobile: Map with bottom sheet */
-        <div className="flex-1 relative" style={{ height: viewportHeight - 250 }}>
+        <div className="flex-1 relative" style={{ height: `calc(${viewportHeight}px - 250px)` }}>
           {mobileView === 'map' ? (
             <>
               <div className="absolute inset-0">{mapComponent}</div>
               <motion.div
-                className="absolute bottom-0 left-0 right-0 z-20 bg-background rounded-t-2xl shadow-drawer border-t border-border pb-[env(safe-area-inset-bottom)]"
-                animate={{ height: bottomSheetExpanded ? Math.round(viewportHeight * 0.6) : Math.round(viewportHeight * 0.15) }}
-                transition={{ type: 'spring', damping: 25 }}
+                className="absolute bottom-0 left-0 right-0 z-20 bg-background rounded-t-2xl shadow-drawer border-t border-border"
+                style={{ height: sheetHeightSpring, paddingBottom: 'env(safe-area-inset-bottom)' }}
+                drag="y"
+                dragConstraints={{ top: 0, bottom: 0 }}
+                dragElastic={0.1}
+                onDrag={(_, info) => {
+                  const newH = viewportHeight * SNAP_POINTS[sheetSnap] - info.offset.y;
+                  sheetHeightMV.set(Math.max(viewportHeight * 0.15, Math.min(viewportHeight * 0.9, newH)));
+                }}
+                onDragEnd={handleSheetDragEnd}
               >
-                <button
-                  onClick={() => setBottomSheetExpanded(!bottomSheetExpanded)}
-                  className="w-full flex justify-center py-2"
-                >
+                <div className="w-full flex justify-center py-2 cursor-grab active:cursor-grabbing touch-none">
                   <div className="w-10 h-1.5 rounded-full bg-muted" />
-                </button>
+                </div>
                 <div className="px-4 pb-2 flex items-center justify-between">
                   <span className="text-sm font-medium text-foreground">
                     {filteredProperties.length} properties
@@ -436,20 +472,20 @@ const Index = () => {
                     </button>
                   </div>
                 </div>
-                <div className="overflow-y-auto px-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))]" style={{ maxHeight: bottomSheetExpanded ? 'calc(100% - 3.75rem)' : '2.5rem' }}>
+                <div className="overflow-y-auto px-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))]" style={{ maxHeight: 'calc(100% - 3.75rem)' }}>
                   {propertyList}
                 </div>
               </motion.div>
-              <button
+              <motion.button
                 onClick={() => {
                   const hero = document.querySelector('[aria-label="Start voice search"]') as HTMLButtonElement;
                   if (hero) { window.scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(() => hero.click(), 500); }
                 }}
-                style={{ bottom: Math.round(viewportHeight * 0.15) + 20 }}
+                style={{ bottom: sheetHeightSpring, marginBottom: 20, paddingBottom: 'env(safe-area-inset-bottom)' }}
                 className="absolute right-4 z-20 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-elevated flex items-center justify-center"
               >
                 <Mic size={22} />
-              </button>
+              </motion.button>
             </>
           ) : (
             <div className="p-4 overflow-y-auto h-full pb-24">

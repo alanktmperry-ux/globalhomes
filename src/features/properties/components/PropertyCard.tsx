@@ -54,7 +54,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
     <>
       <motion.div
         role="article"
-        aria-label={`${property.title} — ${formatPrice(property.price, isRental)}`}
+        aria-label={`${property.title} — ${formatPrice(property.price, property.listingType ?? undefined)}`}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.08, duration: 0.4 }}

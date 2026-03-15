@@ -31,6 +31,8 @@ const Index = () => {
   const { savedSearches, saveSearch, removeSearch } = useSavedSearches();
 
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const viewedPropertiesRef = useRef(new Set<string>());
+  const sessionStartRef = useRef(Date.now());
   const [mobileView, setMobileView] = useState<'map' | 'list'>('list');
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key?: number | string } | null>(null);
   const [splitPercent, setSplitPercent] = useState(50);

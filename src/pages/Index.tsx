@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, PanInfo } from 'framer-motion';
 import { ArrowRight, MapPin, Sparkles, Loader2, Zap, Map, List, Mic, GripVertical, ArrowUpDown, X, Bookmark } from 'lucide-react';
 import { VoiceSearchHero } from '@/components/VoiceSearchHero';
@@ -25,12 +25,14 @@ import { useSavedSearches } from '@/hooks/useSavedSearches';
 const Index = () => {
   const { t } = useI18n();
   const { addSearch, lastSearch } = useSearchHistory();
-  const { isSaved, toggleSaved } = useSavedProperties();
+  const { savedIds, isSaved, toggleSaved } = useSavedProperties();
   const isMobile = useIsMobile();
   const { formatPrice } = useCurrency();
   const { savedSearches, saveSearch, removeSearch } = useSavedSearches();
 
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const viewedPropertiesRef = useRef(new Set<string>());
+  const sessionStartRef = useRef(Date.now());
   const [mobileView, setMobileView] = useState<'map' | 'list'>('list');
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key?: number | string } | null>(null);
   const [splitPercent, setSplitPercent] = useState(50);
@@ -166,6 +168,28 @@ const Index = () => {
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
   }, [handleSearch, setFilters, setSortBy, setSearchRadius, clearSearchRadius]);
+
+  // ── Track property views for lead scoring ─────────────────────
+  const handleSelectProperty = useCallback((p: Property | null) => {
+    if (p) viewedPropertiesRef.current.add(p.id);
+    setSelectedProperty(p);
+  }, []);
+
+  // ── Build search context for lead capture ────────────────────
+  const searchContextForLead = useMemo(() => ({
+    currentFilters: {
+      priceRange: filters.priceRange as [number, number],
+      propertyTypes: filters.propertyTypes,
+      minBeds: filters.minBeds,
+      minBaths: filters.minBaths,
+    },
+    currentQuery: currentQuery || undefined,
+    searchRadius: searchRadius || undefined,
+    savedPropertiesCount: savedIds.size,
+    viewedPropertiesCount: viewedPropertiesRef.current.size,
+    savedSearchesCount: savedSearches.length,
+    sessionDurationMinutes: Math.round((Date.now() - sessionStartRef.current) / 60000),
+  }), [filters, currentQuery, searchRadius, savedIds.size, savedSearches.length]);
 
   // ── Scroll to card on map click ──────────────────────────────
   const scrollToProperty = useCallback((propertyId: string) => {
@@ -437,7 +461,7 @@ const Index = () => {
               <PropertyCard
                 property={property}
                 onSelect={(p) => {
-                  setSelectedProperty(p);
+                  handleSelectProperty(p);
                   if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: `${p.lat}-${p.lng}` });
                 }}
                 isSaved={isSaved(property.id)}
@@ -475,7 +499,7 @@ const Index = () => {
     <MapErrorBoundary>
       <PropertyMap
         properties={filteredProperties}
-        onPropertySelect={setSelectedProperty}
+        onPropertySelect={handleSelectProperty}
         selectedPropertyId={selectedProperty?.id}
         onAreaSearch={handleAreaSearch}
         centerOn={mapCenter}
@@ -640,6 +664,7 @@ const Index = () => {
         onClose={() => setSelectedProperty(null)}
         isSaved={selectedProperty ? isSaved(selectedProperty.id) : false}
         onToggleSave={toggleSaved}
+        searchContext={searchContextForLead}
       />
       <SiteFooter />
       <BottomNav />

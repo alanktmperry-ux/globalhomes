@@ -92,6 +92,7 @@ const Index = () => {
     return () => {
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('mouseup', onUp);
+      if (isDragging.current) onUp();
     };
   }, []);
 

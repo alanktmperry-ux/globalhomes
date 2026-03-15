@@ -187,6 +187,12 @@ const Index = () => {
   const handleSelectProperty = useCallback((p: Property | null) => {
     if (p) {
       viewedPropertiesRef.current.add(p.id);
+      setViewedIds(prev => {
+        if (prev.has(p.id)) return prev;
+        const next = new Set(prev);
+        next.add(p.id);
+        return next;
+      });
       trackView(p.id);
       syncSelectedProperty(p?.id ?? null);
     }

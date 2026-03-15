@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { MapPin, Search, Loader2, CheckCircle2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { autocomplete, geocode, loadGoogleMapsScript } from '@/lib/googleMapsService';
+import { autocomplete, geocode, getPlaceDetails, loadGoogleMapsScript } from '@/lib/googleMapsService';
 import type { ListingDraft } from './PocketListingForm';
 
 interface Props {
@@ -139,15 +139,21 @@ const StepAddress = ({ draft, update }: Props) => {
       state,
     });
 
-    // Geocode for map and save coordinates
+    // Prefer Place Details (Places API) and fallback to Geocoding API
     try {
-      const coords = await geocode(suggestion.description);
-      if (coords) {
-        showOnMap(coords.lat, coords.lng);
-        update({ lat: coords.lat, lng: coords.lng });
+      const placeDetails = await getPlaceDetails(suggestion.place_id);
+      if (placeDetails) {
+        showOnMap(placeDetails.lat, placeDetails.lng);
+        update({ lat: placeDetails.lat, lng: placeDetails.lng });
+      } else {
+        const coords = await geocode(suggestion.description);
+        if (coords) {
+          showOnMap(coords.lat, coords.lng);
+          update({ lat: coords.lat, lng: coords.lng });
+        }
       }
     } catch (err) {
-      console.error('Geocode error:', err);
+      console.error('Address coordinate lookup error:', err);
     }
 
     setMapLoading(false);

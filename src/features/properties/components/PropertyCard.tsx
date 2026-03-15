@@ -146,6 +146,24 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
               <span className="line-clamp-1">{property.aiSummary}</span>
             </p>
           )}
+
+          {/* Social proof badges */}
+          <div className="mt-2.5 flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground bg-secondary/70 px-2 py-0.5 rounded-full">
+              <Eye size={11} className="animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite] text-primary" />
+              {socialProof.viewsToday} viewed today
+            </span>
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground bg-secondary/70 px-2 py-0.5 rounded-full">
+              <Users size={11} className="text-destructive/70" />
+              Saved by {socialProof.savedByCount}
+            </span>
+            {isRental && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-medium text-accent-foreground bg-accent/50 px-2 py-0.5 rounded-full">
+                <TrendingUp size={11} />
+                {socialProof.rentedNearby} similar rented this week
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Agent section */}

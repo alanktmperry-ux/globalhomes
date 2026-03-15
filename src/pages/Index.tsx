@@ -91,6 +91,35 @@ const Index = () => {
     };
   }, []);
 
+  // Sync spring with snap point and viewport
+  useEffect(() => {
+    sheetHeightMV.set(viewportHeight * SNAP_POINTS[sheetSnap]);
+  }, [viewportHeight, sheetSnap]);
+
+  const handleSheetDragEnd = useCallback((_: any, info: PanInfo) => {
+    const velocity = info.velocity.y;
+    const currentH = sheetHeightMV.get();
+    const currentPct = currentH / viewportHeight;
+
+    // Use velocity to determine direction, then snap
+    let targetIdx = sheetSnap;
+    if (velocity < -300) {
+      // Flick up → next larger snap
+      targetIdx = Math.min(sheetSnap + 1, SNAP_POINTS.length - 1);
+    } else if (velocity > 300) {
+      // Flick down → next smaller snap
+      targetIdx = Math.max(sheetSnap - 1, 0);
+    } else {
+      // Find nearest snap point
+      let minDist = Infinity;
+      SNAP_POINTS.forEach((sp, i) => {
+        const dist = Math.abs(currentPct - sp);
+        if (dist < minDist) { minDist = dist; targetIdx = i; }
+      });
+    }
+    setSheetSnap(targetIdx);
+  }, [viewportHeight, sheetSnap]);
+
   useEffect(() => {
     let rafId: number | null = null;
     const onMove = (e: MouseEvent) => {

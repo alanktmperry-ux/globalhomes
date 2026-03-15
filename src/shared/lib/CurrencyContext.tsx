@@ -22,7 +22,7 @@ interface CurrencyContextType {
   currency: CurrencyInfo;
   setCurrencyCode: (code: CurrencyCode) => void;
   convertPrice: (audPrice: number) => number;
-  formatPrice: (audPrice: number) => string;
+  formatPrice: (audPrice: number, isRental?: boolean) => string;
   listingMode: ListingMode;
   setListingMode: (mode: ListingMode) => void;
 }

@@ -377,6 +377,7 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searc
           property={property}
           open={contactOpen}
           onClose={() => setContactOpen(false)}
+          searchContext={searchContext}
         />
       )}
     </>

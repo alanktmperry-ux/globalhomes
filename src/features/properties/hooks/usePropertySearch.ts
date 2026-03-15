@@ -207,6 +207,23 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
       if (p.baths < filters.minBaths) return false;
       if (p.parking < filters.minParking) return false;
       if (filters.features.length > 0 && !filters.features.every((f) => p.features.some((pf) => pf.toLowerCase().includes(f.toLowerCase())))) return false;
+
+      // Pet friendly — match against features
+      if (filters.petFriendly && !p.features.some((f) => /pet|animal|dog|cat/i.test(f))) return false;
+
+      // Furnished — match against features
+      if (filters.furnished && !p.features.some((f) => /furnish/i.test(f))) return false;
+
+      // First home buyer — price threshold (VIC/NSW ≤ $800k)
+      if (filters.firstHomeBuyer && p.price > 800_000) return false;
+
+      // School zone — match against aiHighlights or features
+      if (filters.schoolZone) {
+        const zone = filters.schoolZone.toLowerCase().replace(/-/g, ' ');
+        const searchable = [...p.features, ...(p.aiHighlights || []), p.description || ''].join(' ').toLowerCase();
+        if (!searchable.includes(zone) && !searchable.includes('school')) return false;
+      }
+
       return true;
     });
 

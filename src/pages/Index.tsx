@@ -30,7 +30,7 @@ const Index = () => {
   const { addSearch, lastSearch } = useSearchHistory();
   const { savedIds, isSaved, toggleSaved } = useSavedProperties();
   const isMobile = useIsMobile();
-  const { formatPrice } = useCurrency();
+  const { formatPrice, listingMode } = useCurrency();
   const { savedSearches, saveSearch, removeSearch } = useSavedSearches();
   const { user } = useAuth();
   const {
@@ -434,6 +434,7 @@ const Index = () => {
           onToggle={() => setFiltersOpen(o => !o)}
           totalCount={displayProperties.length}
           filteredCount={filteredProperties.length}
+          listingMode={listingMode}
         />
         <div className="relative">
           <select

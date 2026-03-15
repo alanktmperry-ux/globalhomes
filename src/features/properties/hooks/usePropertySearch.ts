@@ -76,43 +76,73 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
     nearbyRadiusKm: searchRadius,
   });
 
-  // ── Search handler ───────────────────────────────────────────
+  // ── Search handler (with stale-while-revalidate caching) ─────
   const handleSearch = useCallback(
-    async (query: string) => {
-      setIsSearching(true);
+    async (query: string, forceRefresh = false) => {
       setHasSearched(true);
       setManusStatus(null);
       setManusFailed(false);
+      setUsingCachedAI(false);
       setCurrentQuery(query);
       addSearch(query);
       manusSearch.cancelPolling();
+
+      // Serve cached AI results immediately if available
+      const cached = !forceRefresh ? getCachedAIResults(query) : null;
+      if (cached && cached.length > 0) {
+        setResults(cached);
+        setUsingCachedAI(true);
+        // Don't show loading state — we have data
+      }
+
+      setIsSearching(!cached);
 
       try {
         const result = await manusSearch.search({ query }, (update) => {
           setManusStatus(update.status);
           if (update.status === 'completed' && update.properties && update.properties.length > 0) {
             setResults(update.properties);
+            setCachedAIResults(query, update.properties);
+            setUsingCachedAI(false);
             toast({ title: '🔍 Live results ready', description: `Found ${update.properties.length} properties` });
           } else if (update.status === 'failed') {
             setManusStatus(null);
             setManusFailed(true);
+            if (!cached) {
+              toast({
+                title: '⚠️ AI search paused',
+                description: 'Showing cached results. Try refreshing later.',
+              });
+            }
           }
         });
-        setResults(result.properties);
+        if (result.properties.length > 0) {
+          setResults(result.properties);
+          setCachedAIResults(query, result.properties);
+          setUsingCachedAI(false);
+        }
       } catch (err) {
         console.error('[handleSearch] AI search failed:', err);
-        setResults([]);
+        if (!cached || cached.length === 0) {
+          setResults([]);
+        }
         setManusFailed(true);
         toast({
-          title: '🔍 AI search unavailable',
-          description: 'Showing local database results instead. Please try again later.',
+          title: '⚠️ AI search paused',
+          description: cached ? 'Showing cached results from earlier.' : 'Showing database results instead.',
         });
+        if (cached) setUsingCachedAI(true);
       } finally {
         setIsSearching(false);
       }
     },
     [addSearch, toast],
   );
+
+  // ── Force-refresh AI results ─────────────────────────────────
+  const refreshAIResults = useCallback(() => {
+    if (currentQuery) handleSearch(currentQuery, true);
+  }, [currentQuery, handleSearch]);
 
   // ── Derived: all properties (DB + mock fallback) ─────────────
   const allProperties = useMemo(() => {

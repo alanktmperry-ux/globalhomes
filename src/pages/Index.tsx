@@ -1,18 +1,20 @@
-import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo, lazy, Suspense } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, PanInfo } from 'framer-motion';
 import { ArrowRight, MapPin, Sparkles, Loader2, Zap, Map, List, Mic, GripVertical, ArrowUpDown, X, Bookmark, Share2 } from 'lucide-react';
 import { VoiceSearchHero } from '@/components/VoiceSearchHero';
 import { AiPicksSection } from '@/features/properties/components/AiPicksSection';
-import { PropertyCard } from '@/components/PropertyCard';
-import { PropertyCardSkeleton, MapSkeleton } from '@/components/PropertyCardSkeleton';
+import { VirtualizedPropertyList } from '@/features/properties/components/VirtualizedPropertyList';
+import { MapSkeleton } from '@/components/PropertyCardSkeleton';
 import { PropertyDrawer } from '@/components/PropertyDrawer';
-import { PropertyMap } from '@/components/PropertyMap';
 import { MapErrorBoundary } from '@/features/properties/components/MapErrorBoundary';
 import { VoiceSearchErrorBoundary } from '@/features/search/components/VoiceSearchErrorBoundary';
 import { BottomNav } from '@/components/BottomNav';
 import { useI18n } from '@/lib/i18n';
 import { SiteFooter } from '@/components/SiteFooter';
 import { SiteHeader } from '@/components/SiteHeader';
+
+// Lazy-load map — only initialize when needed
+const LazyPropertyMap = lazy(() => import('@/components/PropertyMap').then(m => ({ default: m.PropertyMap })));
 import { useSearchHistory } from '@/hooks/useSearchHistory';
 import { useSavedProperties } from '@/hooks/useSavedProperties';
 import { useIsMobile } from '@/hooks/use-mobile';

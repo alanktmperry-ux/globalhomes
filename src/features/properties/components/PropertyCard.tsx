@@ -38,6 +38,15 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
   const [contactOpen, setContactOpen] = useState(false);
   const navigate = useNavigate();
 
+  // Seeded pseudo-random for consistent demo numbers per property
+  const socialProof = useMemo(() => {
+    const hash = property.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+    const viewsToday = 5 + (hash % 16); // 5–20
+    const savedByCount = 3 + (hash % 10); // 3–12
+    const rentedNearby = 1 + (hash % 5);  // 1–5
+    return { viewsToday, savedByCount, rentedNearby };
+  }, [property.id]);
+
   const statusConfig: Record<PropertyStatus, { label: string; className: string } | null> = {
     'off-market': { label: 'Off-Market', className: 'bg-amber-500/90 text-white' },
     'coming-soon': { label: 'Coming Soon', className: 'bg-blue-500/90 text-white' },

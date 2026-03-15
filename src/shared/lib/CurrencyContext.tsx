@@ -22,7 +22,7 @@ interface CurrencyContextType {
   currency: CurrencyInfo;
   setCurrencyCode: (code: CurrencyCode) => void;
   convertPrice: (audPrice: number) => number;
-  formatPrice: (audPrice: number, isRental?: boolean) => string;
+  formatPrice: (audPrice: number, listingType?: string) => string;
   listingMode: ListingMode;
   setListingMode: (mode: ListingMode) => void;
 }
@@ -39,7 +39,8 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     return Math.round(audPrice * currency.rate);
   }, [currency]);
 
-  const formatPrice = useCallback((audPrice: number, isRental?: boolean) => {
+  const formatPrice = useCallback((audPrice: number, listingType?: string) => {
+    const isRental = listingType === 'rent' || listingType === 'rental' || (!listingType && audPrice < 50000);
     const converted = convertPrice(audPrice);
     const suffix = isRental ? '/wk' : '';
     if (currency.code === 'JPY') {

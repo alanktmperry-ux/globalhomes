@@ -31,6 +31,16 @@ const Index = () => {
   const isMobile = useIsMobile();
   const { formatPrice } = useCurrency();
   const { savedSearches, saveSearch, removeSearch } = useSavedSearches();
+  const { user } = useAuth();
+  const {
+    isCollab,
+    createSession,
+    toggleReaction,
+    trackView,
+    getPropertyReactions,
+    hasPartnerViewed,
+    syncSelectedProperty,
+  } = useCollabSession();
 
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const viewedPropertiesRef = useRef(new Set<string>());

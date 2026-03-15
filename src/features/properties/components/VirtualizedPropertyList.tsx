@@ -197,7 +197,7 @@ export function VirtualizedPropertyList(props: VirtualizedPropertyListProps) {
   const rowCount = Math.ceil(properties.length / 2);
   return (
     <div ref={containerRef} role="feed" aria-label="Property listings">
-      <List
+      <FixedSizeList
         height={containerHeight}
         itemCount={rowCount}
         itemSize={CARD_HEIGHT_DESKTOP + GRID_GAP}
@@ -206,7 +206,7 @@ export function VirtualizedPropertyList(props: VirtualizedPropertyListProps) {
         overscanCount={2}
       >
         {DesktopRow}
-      </List>
+      </FixedSizeList>
     </div>
   );
 }

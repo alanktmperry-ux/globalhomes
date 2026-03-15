@@ -1,12 +1,11 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Property } from '@/lib/types';
 import { mockProperties } from '@/lib/mock-data';
 import { manusSearch } from '@/lib/ManusSearchService';
 import { Filters, defaultFilters } from '@/components/FilterSidebar';
 import { useToast } from '@/hooks/use-toast';
 import { isInsidePolygon, haversineDistance } from '@/shared/lib/geoUtils';
-import { fetchPublicProperties } from '@/features/properties/api/fetchPublicProperties';
-import { useCurrency } from '@/shared/lib/CurrencyContext';
+import { useRealtimeProperties } from './useRealtimeProperties';
 
 // ── Types ────────────────────────────────────────────────────
 
@@ -22,7 +21,6 @@ export interface UsePropertySearchOptions {
 
 export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
   const { toast } = useToast();
-  const { listingMode } = useCurrency();
 
   // ── Filters & sort (internalized) ────────────────────────────
   const [filters, setFilters] = useState<Filters>(defaultFilters);
@@ -30,7 +28,6 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
 
   // ── Internal state ───────────────────────────────────────────
   const [results, setResults] = useState<Property[]>([]);
-  const [dbProperties, setDbProperties] = useState<Property[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [manusStatus, setManusStatus] = useState<string | null>(null);
@@ -39,23 +36,17 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
   const [searchCenter, setSearchCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [searchRadius, setSearchRadius] = useState<number | null>(null);
   const [areaSearch, setAreaSearch] = useState<AreaSearch | null>(null);
-  const [dbLoading, setDbLoading] = useState(true);
-  const [dbError, setDbError] = useState<string | null>(null);
 
-  // ── Fetch DB properties (re-fetches when listingMode changes) ─
-  useEffect(() => {
-    setDbLoading(true);
-    setDbError(null);
-    fetchPublicProperties(50, listingMode)
-      .then((props) => {
-        setDbProperties(props);
-      })
-      .catch((err) => {
-        setDbError(err.message ?? 'Failed to fetch');
-        setDbProperties([]);
-      })
-      .finally(() => setDbLoading(false));
-  }, [listingMode]);
+  // ── Realtime properties with React Query caching ─────────────
+  const {
+    properties: dbProperties,
+    isLoading: dbLoading,
+    error: dbError,
+  } = useRealtimeProperties({
+    limit: 50,
+    nearbyCenter: searchCenter,
+    nearbyRadiusKm: searchRadius,
+  });
 
   // ── Search handler ───────────────────────────────────────────
   const handleSearch = useCallback(
@@ -125,9 +116,9 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
   const filteredProperties = useMemo(() => {
     let props = displayProperties;
 
-    // Radius filter (haversineDistance returns km)
+    // Radius filter — server-side RPC handles DB properties when center+radius set,
+    // but we still need client-side filtering for mock/AI results
     if (searchCenter && searchRadius) {
-      console.log(`[RadiusFilter] Center: ${searchCenter.lat},${searchCenter.lng} | Radius: ${searchRadius}km | Props before: ${props.length}`);
       props = props.filter((p) => {
         if (p.lat && p.lng) {
           const dist = haversineDistance(p.lat, p.lng, searchCenter.lat, searchCenter.lng);
@@ -135,7 +126,6 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
         }
         return false;
       });
-      console.log(`[RadiusFilter] Props after: ${props.length}`);
     } else if (searchRadius && !searchCenter) {
       console.warn('[RadiusFilter] Radius is set but no searchCenter — skipping radius filter');
     }

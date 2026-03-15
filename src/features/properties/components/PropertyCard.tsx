@@ -23,12 +23,24 @@ function VerificationBadge({ level }: { level?: string }) {
   );
 }
 
+export interface CollabReaction {
+  property_id: string;
+  user_id: string;
+  emoji: string;
+}
+
 interface PropertyCardProps {
   property: Property;
   onSelect: (property: Property) => void;
   isSaved: boolean;
   onToggleSave: (id: string) => void;
   index: number;
+  // Collab props (optional)
+  isCollab?: boolean;
+  collabReactions?: CollabReaction[];
+  onToggleReaction?: (propertyId: string, emoji: string) => void;
+  partnerViewed?: boolean;
+  currentUserId?: string;
 }
 
 export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index }: PropertyCardProps) {

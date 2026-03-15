@@ -623,6 +623,17 @@ const Index = () => {
           <div>
             {statusBar}
             {propertyList}
+            <AiPicksSection
+              viewedIds={viewedIds}
+              allProperties={displayProperties}
+              isSaved={isSaved}
+              onToggleSave={toggleSaved}
+              onSelect={(p) => {
+                handleSelectProperty(p);
+                if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: `${p.lat}-${p.lng}` });
+              }}
+              isMobile={isMobile}
+            />
           </div>
         </div>
       ) : (

@@ -1228,6 +1228,51 @@ export type Database = {
           },
         ]
       }
+      saved_search_alerts: {
+        Row: {
+          center_lat: number | null
+          center_lng: number | null
+          created_at: string
+          filters: Json
+          id: string
+          is_active: boolean
+          label: string
+          last_alerted_at: string | null
+          radius: number | null
+          search_query: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          center_lat?: number | null
+          center_lng?: number | null
+          created_at?: string
+          filters?: Json
+          id?: string
+          is_active?: boolean
+          label?: string
+          last_alerted_at?: string | null
+          radius?: number | null
+          search_query?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          center_lat?: number | null
+          center_lng?: number | null
+          created_at?: string
+          filters?: Json
+          id?: string
+          is_active?: boolean
+          label?: string
+          last_alerted_at?: string | null
+          radius?: number | null
+          search_query?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       suburb_price_history: {
         Row: {
           beds: number

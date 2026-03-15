@@ -6,6 +6,7 @@ import {
   DollarSign, TrendingUp
 } from 'lucide-react';
 import { Property } from '@/lib/types';
+import type { SearchContext } from '@/features/properties/components/PropertyDrawer';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';

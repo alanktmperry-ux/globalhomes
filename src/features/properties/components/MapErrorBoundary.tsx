@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapOff, RefreshCw } from 'lucide-react';
+import { MapPinOff, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface Props {

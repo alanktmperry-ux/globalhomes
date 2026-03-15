@@ -266,7 +266,7 @@ const Index = () => {
   );
 
   const propertyList = (
-    <div className={isMobile ? "space-y-3" : "grid grid-cols-2 gap-4"}>
+    <div role="feed" aria-label="Property listings" className={isMobile ? "space-y-3" : "grid grid-cols-2 gap-4"}>
       {isSearching ? (
         [0, 1, 2].map(i => <PropertyCardSkeleton key={i} />)
       ) : (
@@ -346,6 +346,8 @@ const Index = () => {
           <div className="relative">
             <button
               onClick={() => setMapCollapsed(c => !c)}
+              aria-expanded={!mapCollapsed}
+              aria-label="Toggle map view"
               className="w-full flex items-center justify-between px-4 py-2 rounded-t-xl bg-secondary border border-border border-b-0 text-sm font-medium text-foreground hover:bg-accent transition-colors"
             >
               <span className="flex items-center gap-2">
@@ -453,7 +455,7 @@ const Index = () => {
                     totalCount={displayProperties.length}
                     filteredCount={filteredProperties.length}
                   />
-                  <button onClick={() => setMobileView('map')} className="flex items-center gap-1.5 text-xs text-primary font-medium">
+                  <button onClick={() => setMobileView('map')} aria-label="Show map view" className="flex items-center gap-1.5 text-xs text-primary font-medium">
                     <Map size={14} /> Show map
                   </button>
                 </div>

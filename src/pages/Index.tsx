@@ -45,6 +45,7 @@ const Index = () => {
 
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const viewedPropertiesRef = useRef(new Set<string>());
+  const [viewedIds, setViewedIds] = useState<Set<string>>(new Set());
   const sessionStartRef = useRef(Date.now());
   const [mobileView, setMobileView] = useState<'map' | 'list'>('list');
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key?: number | string } | null>(null);

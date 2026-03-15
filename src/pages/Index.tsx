@@ -501,6 +501,11 @@ const Index = () => {
                 isSaved={isSaved(property.id)}
                 onToggleSave={toggleSaved}
                 index={i}
+                isCollab={isCollab}
+                collabReactions={isCollab ? getPropertyReactions(property.id) : undefined}
+                onToggleReaction={isCollab ? toggleReaction : undefined}
+                partnerViewed={isCollab ? hasPartnerViewed(property.id) : undefined}
+                currentUserId={user?.id}
               />
             </div>
           ))}

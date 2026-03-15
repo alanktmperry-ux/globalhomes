@@ -7,6 +7,33 @@ import { useToast } from '@/hooks/use-toast';
 import { isInsidePolygon, haversineDistance } from '@/shared/lib/geoUtils';
 import { useRealtimeProperties } from './useRealtimeProperties';
 
+// ── AI search cache (localStorage, 24h TTL) ──────────────────
+const AI_CACHE_PREFIX = 'ai_search_';
+const AI_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
+function getCachedAIResults(query: string): Property[] | null {
+  try {
+    const key = AI_CACHE_PREFIX + btoa(encodeURIComponent(query.toLowerCase().trim()));
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const { ts, data } = JSON.parse(raw);
+    if (Date.now() - ts > AI_CACHE_TTL) {
+      localStorage.removeItem(key);
+      return null;
+    }
+    return data as Property[];
+  } catch {
+    return null;
+  }
+}
+
+function setCachedAIResults(query: string, data: Property[]): void {
+  try {
+    const key = AI_CACHE_PREFIX + btoa(encodeURIComponent(query.toLowerCase().trim()));
+    localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data }));
+  } catch { /* quota exceeded — ignore */ }
+}
+
 // ── Types ────────────────────────────────────────────────────
 
 export type AreaSearch =

@@ -35,11 +35,28 @@ function VerificationTier({ level }: { level?: string }) {
   );
 }
 
+export interface SearchContext {
+  currentFilters?: {
+    priceRange?: [number, number];
+    propertyTypes?: string[];
+    minBeds?: number;
+    minBaths?: number;
+  };
+  currentQuery?: string;
+  searchRadius?: number;
+  savedPropertiesCount?: number;
+  viewedPropertiesCount?: number;
+  savedSearchesCount?: number;
+  sessionDurationMinutes?: number;
+  listingMode?: string;
+}
+
 interface PropertyDrawerProps {
   property: Property | null;
   onClose: () => void;
   isSaved: boolean;
   onToggleSave: (id: string) => void;
+  searchContext?: SearchContext;
 }
 
 export function PropertyDrawer({ property, onClose, isSaved, onToggleSave }: PropertyDrawerProps) {

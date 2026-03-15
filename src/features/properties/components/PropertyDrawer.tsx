@@ -186,34 +186,38 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searc
                 <div className="w-10 h-1 rounded-full bg-border" />
               </div>
 
-              {/* Image gallery */}
-              <div className="relative aspect-video overflow-hidden md:rounded-t-2xl">
-                <AnimatePresence mode="wait">
-                  <motion.img
-                    key={imageIndex}
-                    src={property.images[imageIndex] || property.imageUrl}
-                    alt={`${property.title} - Photo ${imageIndex + 1}`}
-                    className="w-full h-full object-cover"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  />
-                </AnimatePresence>
+              {/* Embla image gallery */}
+              <div className="relative aspect-video overflow-hidden md:rounded-t-2xl" ref={zoomRef}>
+                <div className="overflow-hidden h-full" ref={emblaRef}>
+                  <div className="flex h-full">
+                    {images.map((img, i) => (
+                      <div key={i} className="flex-[0_0_100%] min-w-0 h-full">
+                        <img
+                          src={img}
+                          alt={`${property.title} - Photo ${i + 1}`}
+                          className="w-full h-full object-cover transition-transform duration-200"
+                          style={{ transform: `scale(${zoomScale})` }}
+                          loading={i === 0 ? 'eager' : 'lazy'}
+                          draggable={false}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-                {property.images.length > 1 && (
+                {images.length > 1 && (
                   <>
-                    <button onClick={prevImage} className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors">
+                    <button onClick={() => emblaApi?.scrollPrev()} className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors">
                       <ChevronLeft size={16} />
                     </button>
-                    <button onClick={nextImage} className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors">
+                    <button onClick={() => emblaApi?.scrollNext()} className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors">
                       <ChevronRight size={16} />
                     </button>
                   </>
                 )}
 
-                <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full bg-card/80 backdrop-blur-sm text-xs font-medium text-foreground">
-                  {imageIndex + 1}/{property.images.length || 1}
+                <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full bg-card/80 backdrop-blur-sm text-xs font-medium text-foreground tabular-nums">
+                  {selectedIndex + 1}/{images.length}
                 </div>
 
                 <button onClick={onClose} className="absolute top-4 right-4 w-9 h-9 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center">
@@ -235,14 +239,14 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searc
               </div>
 
               {/* Thumbnail strip */}
-              {property.images.length > 1 && (
+              {images.length > 1 && (
                 <div className="flex gap-1.5 p-3 overflow-x-auto">
-                  {property.images.map((img, i) => (
+                  {images.map((img, i) => (
                     <button
                       key={i}
-                      onClick={() => setImageIndex(i)}
+                      onClick={() => emblaApi?.scrollTo(i)}
                       className={`shrink-0 w-16 h-12 rounded-lg overflow-hidden border-2 transition-colors ${
-                        i === imageIndex ? 'border-primary' : 'border-transparent opacity-60 hover:opacity-100'
+                        i === selectedIndex ? 'border-primary' : 'border-transparent opacity-60 hover:opacity-100'
                       }`}
                     >
                       <img src={img} alt="" className="w-full h-full object-cover" />

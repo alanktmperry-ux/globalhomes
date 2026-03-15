@@ -59,7 +59,7 @@ interface PropertyDrawerProps {
   searchContext?: SearchContext;
 }
 
-export function PropertyDrawer({ property, onClose, isSaved, onToggleSave }: PropertyDrawerProps) {
+export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searchContext }: PropertyDrawerProps) {
   const { t } = useI18n();
   const { formatPrice, currency } = useCurrency();
   const [imageIndex, setImageIndex] = useState(0);

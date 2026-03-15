@@ -522,15 +522,17 @@ const Index = () => {
     <MapSkeleton />
   ) : (
     <MapErrorBoundary>
-      <PropertyMap
-        properties={filteredProperties}
-        onPropertySelect={handleSelectProperty}
-        selectedPropertyId={selectedProperty?.id}
-        onAreaSearch={handleAreaSearch}
-        centerOn={mapCenter}
-        onScrollToProperty={scrollToProperty}
-        formatPrice={formatPrice}
-      />
+      <Suspense fallback={<MapSkeleton />}>
+        <LazyPropertyMap
+          properties={filteredProperties}
+          onPropertySelect={handleSelectProperty}
+          selectedPropertyId={selectedProperty?.id}
+          onAreaSearch={handleAreaSearch}
+          centerOn={mapCenter}
+          onScrollToProperty={scrollToProperty}
+          formatPrice={formatPrice}
+        />
+      </Suspense>
     </MapErrorBoundary>
   );
 

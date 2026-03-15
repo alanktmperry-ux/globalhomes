@@ -277,6 +277,9 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searc
                 {/* Investment Insights */}
                 <InvestmentInsightsCard property={property} />
 
+                {/* Market Insights (rental listings) */}
+                <MarketInsightsCard property={property} />
+
                 {/* Agent section */}
                 <div className="p-4 rounded-2xl bg-secondary/50 border border-border">
                   <h3 className="font-display font-semibold text-foreground mb-3">{t('property.agent')}</h3>

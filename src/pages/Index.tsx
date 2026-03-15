@@ -67,6 +67,102 @@ const Index = () => {
     setFilters,
   } = usePropertySearch({ addSearch });
 
+  const initializedFromUrl = useRef(false);
+
+  // ── Restore search state from URL on mount ───────────────────
+  useEffect(() => {
+    if (initializedFromUrl.current) return;
+    initializedFromUrl.current = true;
+
+    const params = new URLSearchParams(window.location.search);
+    const location = params.get('location');
+    const minPrice = params.get('minPrice');
+    const maxPrice = params.get('maxPrice');
+    const radius = params.get('radius');
+    const types = params.get('type');
+    const beds = params.get('beds');
+    const baths = params.get('baths');
+    const sort = params.get('sort');
+
+    if (minPrice || maxPrice || types || beds || baths) {
+      setFilters(prev => ({
+        ...prev,
+        priceRange: [
+          minPrice ? Number(minPrice) : prev.priceRange[0],
+          maxPrice ? Number(maxPrice) : prev.priceRange[1],
+        ],
+        propertyTypes: types ? types.split(',') : prev.propertyTypes,
+        minBeds: beds ? Number(beds) : prev.minBeds,
+        minBaths: baths ? Number(baths) : prev.minBaths,
+      }));
+    }
+    if (sort) setSortBy(sort as typeof sortBy);
+    if (radius) setSearchRadius(Number(radius));
+    if (location) {
+      handleSearch(location);
+    }
+  }, []);
+
+  // ── Push search state to URL ─────────────────────────────────
+  useEffect(() => {
+    if (!initializedFromUrl.current) return;
+
+    const params = new URLSearchParams();
+    if (currentQuery) params.set('location', currentQuery);
+    if (filters.priceRange[0] > 0) params.set('minPrice', String(filters.priceRange[0]));
+    if (filters.priceRange[1] < 5_000_000) params.set('maxPrice', String(filters.priceRange[1]));
+    if (filters.propertyTypes.length > 0) params.set('type', filters.propertyTypes.join(','));
+    if (filters.minBeds > 0) params.set('beds', String(filters.minBeds));
+    if (filters.minBaths > 0) params.set('baths', String(filters.minBaths));
+    if (searchRadius) params.set('radius', String(searchRadius));
+    if (sortBy !== 'default') params.set('sort', sortBy);
+
+    const qs = params.toString();
+    const newUrl = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
+
+    if (newUrl !== `${window.location.pathname}${window.location.search}`) {
+      window.history.pushState(null, '', newUrl);
+    }
+  }, [currentQuery, filters, searchRadius, sortBy]);
+
+  // ── Handle browser back/forward ──────────────────────────────
+  useEffect(() => {
+    const onPopState = () => {
+      initializedFromUrl.current = false;
+      // Re-trigger the mount logic
+      const params = new URLSearchParams(window.location.search);
+      const location = params.get('location');
+      const minPrice = params.get('minPrice');
+      const maxPrice = params.get('maxPrice');
+      const radius = params.get('radius');
+      const types = params.get('type');
+      const beds = params.get('beds');
+      const baths = params.get('baths');
+      const sort = params.get('sort');
+
+      setFilters(prev => ({
+        ...prev,
+        priceRange: [
+          minPrice ? Number(minPrice) : 0,
+          maxPrice ? Number(maxPrice) : 5_000_000,
+        ],
+        propertyTypes: types ? types.split(',') : [],
+        minBeds: beds ? Number(beds) : 0,
+        minBaths: baths ? Number(baths) : 0,
+      }));
+      if (sort) setSortBy(sort as typeof sortBy);
+      else setSortBy('default');
+      if (radius) setSearchRadius(Number(radius));
+      else clearSearchRadius();
+      if (location) handleSearch(location);
+
+      initializedFromUrl.current = true;
+    };
+
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, [handleSearch, setFilters, setSortBy, setSearchRadius, clearSearchRadius]);
+
   // ── Scroll to card on map click ──────────────────────────────
   const scrollToProperty = useCallback((propertyId: string) => {
     const el = cardRefs.current.get(propertyId);

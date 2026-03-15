@@ -346,6 +346,8 @@ const Index = () => {
           <div className="relative">
             <button
               onClick={() => setMapCollapsed(c => !c)}
+              aria-expanded={!mapCollapsed}
+              aria-label="Toggle map view"
               className="w-full flex items-center justify-between px-4 py-2 rounded-t-xl bg-secondary border border-border border-b-0 text-sm font-medium text-foreground hover:bg-accent transition-colors"
             >
               <span className="flex items-center gap-2">

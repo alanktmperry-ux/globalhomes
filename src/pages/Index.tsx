@@ -4,7 +4,7 @@ import { ArrowRight, MapPin, Sparkles, Loader2, Zap, Map, List, Mic, GripVertica
 import { VoiceSearchHero } from '@/components/VoiceSearchHero';
 import { AiPicksSection } from '@/features/properties/components/AiPicksSection';
 import { PropertyCard } from '@/components/PropertyCard';
-import { PropertyCardSkeleton } from '@/components/PropertyCardSkeleton';
+import { PropertyCardSkeleton, MapSkeleton } from '@/components/PropertyCardSkeleton';
 import { PropertyDrawer } from '@/components/PropertyDrawer';
 import { PropertyMap } from '@/components/PropertyMap';
 import { MapErrorBoundary } from '@/features/properties/components/MapErrorBoundary';
@@ -542,7 +542,9 @@ const Index = () => {
     </div>
   );
 
-  const mapComponent = (
+  const mapComponent = isSearching ? (
+    <MapSkeleton />
+  ) : (
     <MapErrorBoundary>
       <PropertyMap
         properties={filteredProperties}

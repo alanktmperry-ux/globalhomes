@@ -139,15 +139,21 @@ const StepAddress = ({ draft, update }: Props) => {
       state,
     });
 
-    // Geocode for map and save coordinates
+    // Prefer Place Details (Places API) and fallback to Geocoding API
     try {
-      const coords = await geocode(suggestion.description);
-      if (coords) {
-        showOnMap(coords.lat, coords.lng);
-        update({ lat: coords.lat, lng: coords.lng });
+      const placeDetails = await getPlaceDetails(suggestion.place_id);
+      if (placeDetails) {
+        showOnMap(placeDetails.lat, placeDetails.lng);
+        update({ lat: placeDetails.lat, lng: placeDetails.lng });
+      } else {
+        const coords = await geocode(suggestion.description);
+        if (coords) {
+          showOnMap(coords.lat, coords.lng);
+          update({ lat: coords.lat, lng: coords.lng });
+        }
       }
     } catch (err) {
-      console.error('Geocode error:', err);
+      console.error('Address coordinate lookup error:', err);
     }
 
     setMapLoading(false);

@@ -43,7 +43,9 @@ interface PropertyCardProps {
   currentUserId?: string;
 }
 
-export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index }: PropertyCardProps) {
+const COLLAB_EMOJIS = ['👍', '👎', '🔥'] as const;
+
+export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index, isCollab, collabReactions = [], onToggleReaction, partnerViewed, currentUserId }: PropertyCardProps) {
   const { t } = useI18n();
   const { formatPrice, currency } = useCurrency();
   const isRental = property.listingType === 'rent' || property.listingType === 'rental' || property.price < 50000;

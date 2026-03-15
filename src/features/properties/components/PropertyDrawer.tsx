@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Phone, MessageCircle, Mail, Shield, ShieldCheck } from 'lucide-react';
 import { Property } from '@/lib/types';
@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { InvestmentInsightsCard } from './InvestmentInsightsCard';
 import { MarketInsightsCard } from './MarketInsightsCard';
 import { AffordabilityCalculator } from './AffordabilityCalculator';
+import useEmblaCarousel from 'embla-carousel-react';
 
 function VerificationTier({ level }: { level?: string }) {
   const tiers: { key: string; label: string; icon: typeof Shield; active: boolean }[] = [
@@ -64,11 +65,87 @@ interface PropertyDrawerProps {
 export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searchContext }: PropertyDrawerProps) {
   const { t } = useI18n();
   const { formatPrice, currency } = useCurrency();
-  const [imageIndex, setImageIndex] = useState(0);
   const [contactOpen, setContactOpen] = useState(false);
 
-  const prevImage = () => setImageIndex(i => (i > 0 ? i - 1 : (property?.images.length || 1) - 1));
-  const nextImage = () => setImageIndex(i => (i < (property?.images.length || 1) - 1 ? i + 1 : 0));
+  const images = property?.images?.length ? property.images : property ? [property.imageUrl] : [];
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, dragFree: false });
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [zoomScale, setZoomScale] = useState(1);
+  const zoomRef = useRef<HTMLDivElement>(null);
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.on('select', onSelect);
+    onSelect();
+    return () => { emblaApi.off('select', onSelect); };
+  }, [emblaApi, onSelect]);
+
+  // Reset carousel when property changes
+  useEffect(() => {
+    if (emblaApi && property) {
+      emblaApi.scrollTo(0, true);
+      setSelectedIndex(0);
+      setZoomScale(1);
+    }
+  }, [property?.id, emblaApi]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (!property || !emblaApi) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') emblaApi.scrollPrev();
+      if (e.key === 'ArrowRight') emblaApi.scrollNext();
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [property, emblaApi, onClose]);
+
+  // Pinch-to-zoom (touch)
+  useEffect(() => {
+    const el = zoomRef.current;
+    if (!el) return;
+    let initialDistance = 0;
+    let initialScale = 1;
+
+    const getDistance = (touches: TouchList) => {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    };
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        initialDistance = getDistance(e.touches);
+        initialScale = zoomScale;
+      }
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        const dist = getDistance(e.touches);
+        const scale = Math.min(3, Math.max(1, initialScale * (dist / initialDistance)));
+        setZoomScale(scale);
+      }
+    };
+    const onTouchEnd = () => {
+      if (zoomScale < 1.1) setZoomScale(1);
+    };
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd);
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchmove', onTouchMove);
+      el.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [zoomScale]);
 
   const trackLeadEvent = async (eventType: string) => {
     if (!property?.agent.id) return;
@@ -109,34 +186,38 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searc
                 <div className="w-10 h-1 rounded-full bg-border" />
               </div>
 
-              {/* Image gallery */}
-              <div className="relative aspect-video overflow-hidden md:rounded-t-2xl">
-                <AnimatePresence mode="wait">
-                  <motion.img
-                    key={imageIndex}
-                    src={property.images[imageIndex] || property.imageUrl}
-                    alt={`${property.title} - Photo ${imageIndex + 1}`}
-                    className="w-full h-full object-cover"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  />
-                </AnimatePresence>
+              {/* Embla image gallery */}
+              <div className="relative aspect-video overflow-hidden md:rounded-t-2xl" ref={zoomRef}>
+                <div className="overflow-hidden h-full" ref={emblaRef}>
+                  <div className="flex h-full">
+                    {images.map((img, i) => (
+                      <div key={i} className="flex-[0_0_100%] min-w-0 h-full">
+                        <img
+                          src={img}
+                          alt={`${property.title} - Photo ${i + 1}`}
+                          className="w-full h-full object-cover transition-transform duration-200"
+                          style={{ transform: `scale(${zoomScale})` }}
+                          loading={i === 0 ? 'eager' : 'lazy'}
+                          draggable={false}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-                {property.images.length > 1 && (
+                {images.length > 1 && (
                   <>
-                    <button onClick={prevImage} className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors">
+                    <button onClick={() => emblaApi?.scrollPrev()} className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors">
                       <ChevronLeft size={16} />
                     </button>
-                    <button onClick={nextImage} className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors">
+                    <button onClick={() => emblaApi?.scrollNext()} className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors">
                       <ChevronRight size={16} />
                     </button>
                   </>
                 )}
 
-                <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full bg-card/80 backdrop-blur-sm text-xs font-medium text-foreground">
-                  {imageIndex + 1}/{property.images.length || 1}
+                <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full bg-card/80 backdrop-blur-sm text-xs font-medium text-foreground tabular-nums">
+                  {selectedIndex + 1}/{images.length}
                 </div>
 
                 <button onClick={onClose} className="absolute top-4 right-4 w-9 h-9 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center">
@@ -158,14 +239,14 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searc
               </div>
 
               {/* Thumbnail strip */}
-              {property.images.length > 1 && (
+              {images.length > 1 && (
                 <div className="flex gap-1.5 p-3 overflow-x-auto">
-                  {property.images.map((img, i) => (
+                  {images.map((img, i) => (
                     <button
                       key={i}
-                      onClick={() => setImageIndex(i)}
+                      onClick={() => emblaApi?.scrollTo(i)}
                       className={`shrink-0 w-16 h-12 rounded-lg overflow-hidden border-2 transition-colors ${
-                        i === imageIndex ? 'border-primary' : 'border-transparent opacity-60 hover:opacity-100'
+                        i === selectedIndex ? 'border-primary' : 'border-transparent opacity-60 hover:opacity-100'
                       }`}
                     >
                       <img src={img} alt="" className="w-full h-full object-cover" />

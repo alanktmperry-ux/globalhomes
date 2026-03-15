@@ -634,8 +634,8 @@ const Index = () => {
                 }}
                 onDragEnd={handleSheetDragEnd}
               >
-                <div className="w-full flex justify-center py-2 cursor-grab active:cursor-grabbing touch-none">
-                  <div className="w-10 h-1.5 rounded-full bg-muted" />
+                <div className="w-full flex justify-center py-2 cursor-grab active:cursor-grabbing touch-none" style={{ willChange: 'transform' }}>
+                  <div className="w-10 h-1.5 rounded-full bg-muted" style={{ willChange: 'transform' }} />
                 </div>
                 <div className="px-4 pb-2 flex items-center justify-between">
                   <span className="text-sm font-medium text-foreground">

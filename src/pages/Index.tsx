@@ -30,7 +30,7 @@ const Index = () => {
 
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [mobileView, setMobileView] = useState<'map' | 'list'>('list');
-  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key: number } | null>(null);
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key?: number | string } | null>(null);
   const [splitPercent, setSplitPercent] = useState(50);
   const [mapFullscreen, setMapFullscreen] = useState(false);
   const [mapCollapsed, setMapCollapsed] = useState(true);
@@ -264,7 +264,7 @@ const Index = () => {
                 property={property}
                 onSelect={(p) => {
                   setSelectedProperty(p);
-                  if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: Date.now() });
+                  if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: `${p.lat}-${p.lng}` });
                 }}
                 isSaved={isSaved(property.id)}
                 onToggleSave={toggleSaved}
@@ -316,7 +316,7 @@ const Index = () => {
         onSearch={handleSearch}
         onLocationSelect={(loc) => {
           console.log('[Index] Location selected:', loc);
-          setMapCenter({ lat: loc.lat, lng: loc.lng, key: Date.now() });
+          setMapCenter({ lat: loc.lat, lng: loc.lng, key: `${loc.lat}-${loc.lng}` });
           setSearchCenter({ lat: loc.lat, lng: loc.lng });
           setMapCollapsed(false);
         }}

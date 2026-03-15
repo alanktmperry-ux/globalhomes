@@ -488,19 +488,21 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SiteHeader />
-      <VoiceSearchHero
-        onSearch={handleSearch}
-        onLocationSelect={(loc) => {
-          console.log('[Index] Location selected:', loc);
-          setMapCenter({ lat: loc.lat, lng: loc.lng, key: `${loc.lat}-${loc.lng}` });
-          setSearchCenter({ lat: loc.lat, lng: loc.lng });
-          setMapCollapsed(false);
-        }}
-        onRadiusChange={setSearchRadius}
-        selectedRadius={searchRadius}
-        resultCount={hasSearched ? filteredProperties.length : undefined}
-        isSearching={isSearching}
-      />
+      <VoiceSearchErrorBoundary>
+        <VoiceSearchHero
+          onSearch={handleSearch}
+          onLocationSelect={(loc) => {
+            console.log('[Index] Location selected:', loc);
+            setMapCenter({ lat: loc.lat, lng: loc.lng, key: `${loc.lat}-${loc.lng}` });
+            setSearchCenter({ lat: loc.lat, lng: loc.lng });
+            setMapCollapsed(false);
+          }}
+          onRadiusChange={setSearchRadius}
+          selectedRadius={searchRadius}
+          resultCount={hasSearched ? filteredProperties.length : undefined}
+          isSearching={isSearching}
+        />
+      </VoiceSearchErrorBoundary>
 
       {/* Desktop layout */}
       {!isMobile ? (

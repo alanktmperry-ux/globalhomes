@@ -226,6 +226,8 @@ export function PropertyMap({
 
       const content = document.createElement('div');
       content.className = 'property-marker';
+      const isRental = property.listingType === 'rent' || property.listingType === 'rental';
+      const priceLabel = formatPrice ? formatPrice(property.price, isRental) : property.priceFormatted;
       content.innerHTML = `<div style="
         background: ${isSelected ? typeColor : '#ffffff'};
         color: ${isSelected ? 'white' : typeColor};
@@ -241,7 +243,7 @@ export function PropertyMap({
         transform: translateY(-100%);
         transition: all 0.2s ease;
         ${isSelected ? `box-shadow: 0 0 16px ${typeColor}60; transform: translateY(-100%) scale(1.15);` : ''}
-      ">${formatPrice ? formatPrice(property.price) : property.priceFormatted}</div>`;
+      ">${priceLabel}</div>`;
 
       const marker = new google.maps.marker.AdvancedMarkerElement({
         map,

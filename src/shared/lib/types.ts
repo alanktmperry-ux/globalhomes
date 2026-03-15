@@ -38,6 +38,7 @@ export interface Property {
   strataFeesQuarterly?: number | null;
   rentalWeekly?: number | null;
   currencyCode?: string | null;
+  listingType?: string | null;
 }
 
 export interface Agent {

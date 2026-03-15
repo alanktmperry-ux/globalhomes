@@ -32,7 +32,7 @@ interface PropertyMapProps {
   centerOn?: { lat: number; lng: number; key?: number | string } | null;
   onMapMoved?: (bounds: { north: number; south: number; east: number; west: number }) => void;
   onScrollToProperty?: (propertyId: string) => void;
-  formatPrice?: (audPrice: number) => string;
+  formatPrice?: (audPrice: number, isRental?: boolean) => string;
 }
 
 export function PropertyMap({
@@ -226,6 +226,8 @@ export function PropertyMap({
 
       const content = document.createElement('div');
       content.className = 'property-marker';
+      const isRental = property.listingType === 'rent' || property.listingType === 'rental';
+      const priceLabel = formatPrice ? formatPrice(property.price, isRental) : property.priceFormatted;
       content.innerHTML = `<div style="
         background: ${isSelected ? typeColor : '#ffffff'};
         color: ${isSelected ? 'white' : typeColor};
@@ -241,7 +243,7 @@ export function PropertyMap({
         transform: translateY(-100%);
         transition: all 0.2s ease;
         ${isSelected ? `box-shadow: 0 0 16px ${typeColor}60; transform: translateY(-100%) scale(1.15);` : ''}
-      ">${formatPrice ? formatPrice(property.price) : property.priceFormatted}</div>`;
+      ">${priceLabel}</div>`;
 
       const marker = new google.maps.marker.AdvancedMarkerElement({
         map,
@@ -256,7 +258,7 @@ export function PropertyMap({
           infoWindow.setContent(`
             <div style="font-family: 'DM Sans', sans-serif; min-width: 200px; padding: 2px;">
               <img src="${property.imageUrl}" alt="" style="width: 100%; height: 100px; object-fit: cover; border-radius: 6px; margin-bottom: 6px;" />
-              <div style="font-weight: 700; font-size: 14px; color: #0f172a;">${formatPrice ? formatPrice(property.price) : property.priceFormatted}</div>
+              <div style="font-weight: 700; font-size: 14px; color: #0f172a;">${formatPrice ? formatPrice(property.price, isRental) : property.priceFormatted}</div>
               <div style="font-size: 12px; color: #64748b; margin-top: 2px;">${property.title}</div>
               <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">🛏 ${property.beds} · 🛁 ${property.baths} · 🚗 ${property.parking}</div>
             </div>

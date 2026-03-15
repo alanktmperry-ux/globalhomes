@@ -64,6 +64,7 @@ export function mapDbProperty(p: any): Property {
     strataFeesQuarterly: p.strata_fees_quarterly,
     rentalWeekly: p.rental_weekly,
     currencyCode: p.currency_code,
+    listingType: p.listing_type || null,
   };
 }
 

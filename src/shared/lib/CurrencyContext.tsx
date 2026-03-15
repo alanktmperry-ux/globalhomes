@@ -39,18 +39,19 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     return Math.round(audPrice * currency.rate);
   }, [currency]);
 
-  const formatPrice = useCallback((audPrice: number) => {
+  const formatPrice = useCallback((audPrice: number, isRental?: boolean) => {
     const converted = convertPrice(audPrice);
+    const suffix = isRental ? '/wk' : '';
     if (currency.code === 'JPY') {
-      return `¥${converted.toLocaleString()}`;
+      return `¥${converted.toLocaleString()}${suffix}`;
     }
-    if (converted >= 1_000_000) {
+    if (!isRental && converted >= 1_000_000) {
       return `${currency.symbol}${(converted / 1_000_000).toFixed(1)}M`;
     }
-    if (converted >= 1_000) {
+    if (!isRental && converted >= 1_000) {
       return `${currency.symbol}${(converted / 1_000).toFixed(0)}k`;
     }
-    return `${currency.symbol}${converted.toLocaleString()}`;
+    return `${currency.symbol}${converted.toLocaleString()}${suffix}`;
   }, [convertPrice, currency]);
 
   return (

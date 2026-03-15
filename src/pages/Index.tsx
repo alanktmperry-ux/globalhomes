@@ -1,18 +1,20 @@
-import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo, lazy, Suspense } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, PanInfo } from 'framer-motion';
 import { ArrowRight, MapPin, Sparkles, Loader2, Zap, Map, List, Mic, GripVertical, ArrowUpDown, X, Bookmark, Share2 } from 'lucide-react';
 import { VoiceSearchHero } from '@/components/VoiceSearchHero';
 import { AiPicksSection } from '@/features/properties/components/AiPicksSection';
-import { PropertyCard } from '@/components/PropertyCard';
-import { PropertyCardSkeleton, MapSkeleton } from '@/components/PropertyCardSkeleton';
+import { VirtualizedPropertyList } from '@/features/properties/components/VirtualizedPropertyList';
+import { MapSkeleton } from '@/components/PropertyCardSkeleton';
 import { PropertyDrawer } from '@/components/PropertyDrawer';
-import { PropertyMap } from '@/components/PropertyMap';
 import { MapErrorBoundary } from '@/features/properties/components/MapErrorBoundary';
 import { VoiceSearchErrorBoundary } from '@/features/search/components/VoiceSearchErrorBoundary';
 import { BottomNav } from '@/components/BottomNav';
 import { useI18n } from '@/lib/i18n';
 import { SiteFooter } from '@/components/SiteFooter';
 import { SiteHeader } from '@/components/SiteHeader';
+
+// Lazy-load map — only initialize when needed
+const LazyPropertyMap = lazy(() => import('@/components/PropertyMap').then(m => ({ default: m.PropertyMap })));
 import { useSearchHistory } from '@/hooks/useSearchHistory';
 import { useSavedProperties } from '@/hooks/useSavedProperties';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -494,68 +496,43 @@ const Index = () => {
   );
 
   const propertyList = (
-    <div role="feed" aria-label="Property listings" className={isMobile ? "space-y-3" : "grid grid-cols-2 gap-4"}>
-      {isSearching ? (
-        [0, 1, 2].map(i => <PropertyCardSkeleton key={i} />)
-      ) : (
-        <>
-          {filteredProperties.map((property, i) => (
-            <div key={property.id} ref={el => { if (el) cardRefs.current.set(property.id, el); }}>
-              <PropertyCard
-                property={property}
-                onSelect={(p) => {
-                  handleSelectProperty(p);
-                  if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: `${p.lat}-${p.lng}` });
-                }}
-                isSaved={isSaved(property.id)}
-                onToggleSave={toggleSaved}
-                index={i}
-                isCollab={isCollab}
-                collabReactions={isCollab ? getPropertyReactions(property.id) : undefined}
-                onToggleReaction={isCollab ? toggleReaction : undefined}
-                partnerViewed={isCollab ? hasPartnerViewed(property.id) : undefined}
-                currentUserId={user?.id}
-              />
-            </div>
-          ))}
-          {filteredProperties.length === 0 && (
-            <div className="text-center py-8 col-span-2">
-              <p className="text-sm text-muted-foreground">
-                {areaSearch ? 'No properties in this area.' : 'No properties found.'}
-              </p>
-              {(areaSearch || searchRadius) && (
-                <p className="text-xs text-muted-foreground/70 mt-1">
-                  Some properties may be hidden because they don't have map coordinates yet.
-                </p>
-              )}
-              {areaSearch && (
-                <button
-                  onClick={() => handleAreaSearch(null)}
-                  className="mt-3 text-xs text-primary font-medium hover:underline"
-                >
-                  Clear area filter
-                </button>
-              )}
-            </div>
-          )}
-        </>
-      )}
-    </div>
+    <VirtualizedPropertyList
+      properties={filteredProperties}
+      isSearching={isSearching}
+      isMobile={isMobile}
+      isSaved={isSaved}
+      onToggleSave={toggleSaved}
+      onSelect={(p) => {
+        handleSelectProperty(p);
+        if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: `${p.lat}-${p.lng}` });
+      }}
+      cardRefs={cardRefs}
+      isCollab={isCollab}
+      getPropertyReactions={isCollab ? getPropertyReactions : undefined}
+      onToggleReaction={isCollab ? toggleReaction : undefined}
+      hasPartnerViewed={isCollab ? hasPartnerViewed : undefined}
+      currentUserId={user?.id}
+      areaSearch={areaSearch}
+      searchRadius={searchRadius}
+      onClearAreaSearch={() => handleAreaSearch(null)}
+    />
   );
 
   const mapComponent = isSearching ? (
     <MapSkeleton />
   ) : (
     <MapErrorBoundary>
-      <PropertyMap
-        properties={filteredProperties}
-        onPropertySelect={handleSelectProperty}
-        selectedPropertyId={selectedProperty?.id}
-        onAreaSearch={handleAreaSearch}
-        centerOn={mapCenter}
-        onScrollToProperty={scrollToProperty}
-        formatPrice={formatPrice}
-      />
+      <Suspense fallback={<MapSkeleton />}>
+        <LazyPropertyMap
+          properties={filteredProperties}
+          onPropertySelect={handleSelectProperty}
+          selectedPropertyId={selectedProperty?.id}
+          onAreaSearch={handleAreaSearch}
+          centerOn={mapCenter}
+          onScrollToProperty={scrollToProperty}
+          formatPrice={formatPrice}
+        />
+      </Suspense>
     </MapErrorBoundary>
   );
 
@@ -657,8 +634,8 @@ const Index = () => {
                 }}
                 onDragEnd={handleSheetDragEnd}
               >
-                <div className="w-full flex justify-center py-2 cursor-grab active:cursor-grabbing touch-none">
-                  <div className="w-10 h-1.5 rounded-full bg-muted" />
+                <div className="w-full flex justify-center py-2 cursor-grab active:cursor-grabbing touch-none" style={{ willChange: 'transform' }}>
+                  <div className="w-10 h-1.5 rounded-full bg-muted" style={{ willChange: 'transform' }} />
                 </div>
                 <div className="px-4 pb-2 flex items-center justify-between">
                   <span className="text-sm font-medium text-foreground">

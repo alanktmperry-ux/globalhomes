@@ -461,7 +461,7 @@ const Index = () => {
               <PropertyCard
                 property={property}
                 onSelect={(p) => {
-                  setSelectedProperty(p);
+                  handleSelectProperty(p);
                   if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: `${p.lat}-${p.lng}` });
                 }}
                 isSaved={isSaved(property.id)}

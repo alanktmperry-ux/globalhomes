@@ -664,6 +664,7 @@ const Index = () => {
         onClose={() => setSelectedProperty(null)}
         isSaved={selectedProperty ? isSaved(selectedProperty.id) : false}
         onToggleSave={toggleSaved}
+        searchContext={searchContextForLead}
       />
       <SiteFooter />
       <BottomNav />

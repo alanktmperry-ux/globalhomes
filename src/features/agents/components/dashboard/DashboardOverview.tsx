@@ -11,6 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import DashboardHeader from './DashboardHeader';
 import { useAgentListings } from '@/hooks/useAgentListings';
 import { useAuth } from '@/lib/AuthProvider';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 

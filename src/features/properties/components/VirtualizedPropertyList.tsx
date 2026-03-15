@@ -179,7 +179,7 @@ export function VirtualizedPropertyList(props: VirtualizedPropertyListProps) {
   if (isMobile) {
     return (
       <div ref={containerRef} role="feed" aria-label="Property listings">
-        <List
+        <FixedSizeList
           height={containerHeight}
           itemCount={properties.length}
           itemSize={CARD_HEIGHT_MOBILE}
@@ -188,7 +188,7 @@ export function VirtualizedPropertyList(props: VirtualizedPropertyListProps) {
           overscanCount={3}
         >
           {MobileRow}
-        </List>
+        </FixedSizeList>
       </div>
     );
   }

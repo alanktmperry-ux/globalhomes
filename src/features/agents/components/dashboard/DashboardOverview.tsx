@@ -112,7 +112,8 @@ const DashboardOverview = () => {
               key={s.label}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-card border border-border rounded-xl p-4"
+              onClick={() => navigate(s.link)}
+              className="bg-card border border-border rounded-xl p-4 cursor-pointer hover:border-primary/50 hover:shadow-md transition-all"
             >
               <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
                 <span className={s.color}>{s.icon}</span>

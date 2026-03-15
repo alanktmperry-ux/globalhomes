@@ -169,6 +169,28 @@ const Index = () => {
     return () => window.removeEventListener('popstate', onPopState);
   }, [handleSearch, setFilters, setSortBy, setSearchRadius, clearSearchRadius]);
 
+  // ── Track property views for lead scoring ─────────────────────
+  const handleSelectProperty = useCallback((p: Property | null) => {
+    if (p) viewedPropertiesRef.current.add(p.id);
+    setSelectedProperty(p);
+  }, []);
+
+  // ── Build search context for lead capture ────────────────────
+  const searchContextForLead = useMemo(() => ({
+    currentFilters: {
+      priceRange: filters.priceRange as [number, number],
+      propertyTypes: filters.propertyTypes,
+      minBeds: filters.minBeds,
+      minBaths: filters.minBaths,
+    },
+    currentQuery: currentQuery || undefined,
+    searchRadius: searchRadius || undefined,
+    savedPropertiesCount: isSaved ? Array.from(document.querySelectorAll('[data-saved]')).length : 0,
+    viewedPropertiesCount: viewedPropertiesRef.current.size,
+    savedSearchesCount: savedSearches.length,
+    sessionDurationMinutes: Math.round((Date.now() - sessionStartRef.current) / 60000),
+  }), [filters, currentQuery, searchRadius, savedSearches.length, isSaved]);
+
   // ── Scroll to card on map click ──────────────────────────────
   const scrollToProperty = useCallback((propertyId: string) => {
     const el = cardRefs.current.get(propertyId);

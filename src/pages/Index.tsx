@@ -472,15 +472,17 @@ const Index = () => {
   );
 
   const mapComponent = (
-    <PropertyMap
-      properties={filteredProperties}
-      onPropertySelect={setSelectedProperty}
-      selectedPropertyId={selectedProperty?.id}
-      onAreaSearch={handleAreaSearch}
-      centerOn={mapCenter}
-      onScrollToProperty={scrollToProperty}
-      formatPrice={formatPrice}
-    />
+    <MapErrorBoundary>
+      <PropertyMap
+        properties={filteredProperties}
+        onPropertySelect={setSelectedProperty}
+        selectedPropertyId={selectedProperty?.id}
+        onAreaSearch={handleAreaSearch}
+        centerOn={mapCenter}
+        onScrollToProperty={scrollToProperty}
+        formatPrice={formatPrice}
+      />
+    </MapErrorBoundary>
   );
 
   return (

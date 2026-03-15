@@ -37,12 +37,6 @@ const StepAddress = ({ draft, update }: Props) => {
       .catch((err) => console.error('[StepAddress] Google Maps load failed:', err));
   }, []);
 
-  // Show map for existing address on mount / when mapReady flips
-  useEffect(() => {
-    if (mapReady && draft.lat && draft.lng) {
-      showOnMap(draft.lat, draft.lng);
-    }
-  }, [mapReady, draft.lat, draft.lng, showOnMap]);
 
   // Autocomplete with debounce
   useEffect(() => {

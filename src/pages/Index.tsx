@@ -30,7 +30,7 @@ const Index = () => {
 
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [mobileView, setMobileView] = useState<'map' | 'list'>('list');
-  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key: number } | null>(null);
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key?: number | string } | null>(null);
   const [splitPercent, setSplitPercent] = useState(50);
   const [mapFullscreen, setMapFullscreen] = useState(false);
   const [mapCollapsed, setMapCollapsed] = useState(true);

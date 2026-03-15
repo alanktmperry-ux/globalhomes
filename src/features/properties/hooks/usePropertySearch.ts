@@ -59,6 +59,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
   const [hasSearched, setHasSearched] = useState(false);
   const [manusStatus, setManusStatus] = useState<string | null>(null);
   const [manusFailed, setManusFailed] = useState(false);
+  const [usingCachedAI, setUsingCachedAI] = useState(false);
   const [currentQuery, setCurrentQuery] = useState('');
   const [searchCenter, setSearchCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [searchRadius, setSearchRadius] = useState<number | null>(null);

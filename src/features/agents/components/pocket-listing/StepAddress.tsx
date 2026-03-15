@@ -67,31 +67,39 @@ const StepAddress = ({ draft, update }: Props) => {
     };
   }, [query, manualMode]);
 
-  const showOnMap = useCallback((lat: number, lng: number) => {
+  const showOnMap = useCallback(async (lat: number, lng: number) => {
     if (!mapReady || !mapRef.current) return;
 
-    if (!mapInstance.current) {
-      mapInstance.current = new google.maps.Map(mapRef.current, {
-        center: { lat, lng },
-        zoom: 16,
-        mapId: 'pocket-listing-preview',
-        disableDefaultUI: true,
-        zoomControl: true,
-        gestureHandling: 'cooperative',
+    try {
+      // Ensure required libraries are loaded
+      await google.maps.importLibrary('maps');
+      await google.maps.importLibrary('marker');
+
+      if (!mapInstance.current) {
+        mapInstance.current = new google.maps.Map(mapRef.current, {
+          center: { lat, lng },
+          zoom: 16,
+          mapId: 'pocket-listing-preview',
+          disableDefaultUI: true,
+          zoomControl: true,
+          gestureHandling: 'cooperative',
+        });
+      } else {
+        mapInstance.current.panTo({ lat, lng });
+        mapInstance.current.setZoom(16);
+      }
+
+      if (markerRef.current) {
+        markerRef.current.map = null;
+      }
+
+      markerRef.current = new google.maps.marker.AdvancedMarkerElement({
+        map: mapInstance.current,
+        position: { lat, lng },
       });
-    } else {
-      mapInstance.current.panTo({ lat, lng });
-      mapInstance.current.setZoom(16);
+    } catch (err) {
+      console.error('Map render error:', err);
     }
-
-    if (markerRef.current) {
-      markerRef.current.map = null;
-    }
-
-    markerRef.current = new google.maps.marker.AdvancedMarkerElement({
-      map: mapInstance.current,
-      position: { lat, lng },
-    });
   }, [mapReady]);
 
   const selectSuggestion = useCallback(async (suggestion: Suggestion) => {

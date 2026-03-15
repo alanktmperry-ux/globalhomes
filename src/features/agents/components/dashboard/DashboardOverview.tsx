@@ -11,6 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import DashboardHeader from './DashboardHeader';
 import { useAgentListings } from '@/hooks/useAgentListings';
 import { useAuth } from '@/lib/AuthProvider';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
@@ -52,6 +53,7 @@ const MOCK_MATCHES = [
 const DashboardOverview = () => {
   const { listings, isMockData } = useAgentListings();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [tasksDue, setTasksDue] = useState(0);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
 
@@ -91,11 +93,11 @@ const DashboardOverview = () => {
 
   // Stats row - Australian CRM focus
   const stats = [
-    { label: 'Tasks Due', value: String(tasksDue || 3), icon: <CheckSquare size={16} />, color: 'text-destructive' },
-    { label: 'Active Contacts', value: '48', icon: <Users size={16} />, color: 'text-primary' },
-    { label: 'Appraisals This Month', value: '6', icon: <ClipboardList size={16} />, color: 'text-success' },
-    { label: 'Sales This Month', value: AUD.format(1250000), icon: <DollarSign size={16} />, color: 'text-primary' },
-    { label: 'Settled', value: AUD.format(890000), icon: <Landmark size={16} />, color: 'text-success' },
+    { label: 'Tasks Due', value: String(tasksDue || 3), icon: <CheckSquare size={16} />, color: 'text-destructive', link: '/dashboard/contacts' },
+    { label: 'Active Contacts', value: '48', icon: <Users size={16} />, color: 'text-primary', link: '/dashboard/contacts' },
+    { label: 'Appraisals This Month', value: '6', icon: <ClipboardList size={16} />, color: 'text-success', link: '/dashboard/listings' },
+    { label: 'Sales This Month', value: AUD.format(1250000), icon: <DollarSign size={16} />, color: 'text-primary', link: '/dashboard/reports' },
+    { label: 'Settled', value: AUD.format(890000), icon: <Landmark size={16} />, color: 'text-success', link: '/dashboard/trust' },
   ];
 
   return (
@@ -110,7 +112,8 @@ const DashboardOverview = () => {
               key={s.label}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-card border border-border rounded-xl p-4"
+              onClick={() => navigate(s.link)}
+              className="bg-card border border-border rounded-xl p-4 cursor-pointer hover:border-primary/50 hover:shadow-md transition-all"
             >
               <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
                 <span className={s.color}>{s.icon}</span>

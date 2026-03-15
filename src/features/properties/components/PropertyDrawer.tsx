@@ -174,7 +174,16 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave }: Pro
 
                 {/* Price and title */}
                 <div>
-                  <p className="font-display text-2xl font-bold text-foreground">{formatPrice(property.price)}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-display text-2xl font-bold text-foreground">{formatPrice(property.price, property.listingType ?? undefined)}</p>
+                    <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide ${
+                      (property.listingType === 'rent' || property.listingType === 'rental' || property.price < 50000)
+                        ? 'bg-emerald-500/90 text-white'
+                        : 'bg-blue-500/90 text-white'
+                    }`}>
+                      {(property.listingType === 'rent' || property.listingType === 'rental' || property.price < 50000) ? 'Per Week' : 'For Sale'}
+                    </span>
+                  </div>
                   {currency.code !== 'AUD' && (
                     <p className="text-xs text-muted-foreground">{property.priceFormatted} AUD</p>
                   )}

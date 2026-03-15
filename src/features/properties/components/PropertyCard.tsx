@@ -89,11 +89,20 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
               className={isSaved ? 'fill-destructive text-destructive' : 'text-foreground/70'}
             />
           </button>
-          <div className="absolute bottom-3 left-3 px-3 py-1.5 rounded-lg bg-card/90 backdrop-blur-sm">
-            <span className="font-display font-bold text-lg text-foreground">{formatPrice(property.price, isRental)}</span>
-            {currency.code !== 'AUD' && (
-              <span className="block text-[10px] text-muted-foreground">{property.priceFormatted} AUD</span>
-            )}
+          <div className="absolute bottom-3 left-3 flex items-center gap-1.5">
+            <div className="px-3 py-1.5 rounded-lg bg-card/90 backdrop-blur-sm">
+              <span className="font-display font-bold text-lg text-foreground">{formatPrice(property.price, property.listingType ?? undefined)}</span>
+              {currency.code !== 'AUD' && (
+                <span className="block text-[10px] text-muted-foreground">{property.priceFormatted} AUD</span>
+              )}
+            </div>
+            <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide shadow-sm ${
+              isRental
+                ? 'bg-emerald-500/90 text-white'
+                : 'bg-blue-500/90 text-white'
+            }`}>
+              {isRental ? 'Per Week' : 'For Sale'}
+            </span>
           </div>
         </div>
 

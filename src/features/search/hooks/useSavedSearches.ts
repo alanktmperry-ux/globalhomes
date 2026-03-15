@@ -16,6 +16,7 @@ export interface SavedSearch {
 
 /**
  * Persist saved searches to user_preferences.saved_searches (JSON column).
+ * Also syncs to saved_search_alerts table for email notifications.
  * Falls back to localStorage for unauthenticated users.
  */
 export function useSavedSearches() {
@@ -23,6 +24,41 @@ export function useSavedSearches() {
   const { toast } = useToast();
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
   const [loaded, setLoaded] = useState(false);
+
+  // Sync a search to the alerts table for email matching
+  const syncToAlerts = useCallback(
+    async (search: SavedSearch) => {
+      if (!user) return;
+      await supabase.from('saved_search_alerts').upsert(
+        {
+          user_id: user.id,
+          label: search.label,
+          search_query: search.query,
+          filters: search.filters as any,
+          radius: search.radius ?? null,
+          center_lat: search.center?.lat ?? null,
+          center_lng: search.center?.lng ?? null,
+          is_active: true,
+        },
+        { onConflict: 'user_id,label,search_query' },
+      );
+    },
+    [user],
+  );
+
+  // Remove from alerts table
+  const removeFromAlerts = useCallback(
+    async (search: SavedSearch) => {
+      if (!user) return;
+      await supabase
+        .from('saved_search_alerts')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('label', search.label)
+        .eq('search_query', search.query);
+    },
+    [user],
+  );
 
   // Load on mount
   useEffect(() => {
@@ -36,7 +72,6 @@ export function useSavedSearches() {
 
         if (data?.search_history) {
           try {
-            // search_history stores saved searches as JSON array
             const parsed = Array.isArray(data.search_history) ? data.search_history : [];
             setSavedSearches(parsed as unknown as SavedSearch[]);
           } catch {
@@ -84,19 +119,22 @@ export function useSavedSearches() {
         center: opts.center,
         savedAt: Date.now(),
       };
-      const updated = [newSearch, ...savedSearches].slice(0, 10); // max 10
+      const updated = [newSearch, ...savedSearches].slice(0, 10);
       await persist(updated);
-      toast({ title: '🔖 Search saved', description: `"${label}" added to your saved searches.` });
+      await syncToAlerts(newSearch);
+      toast({ title: '🔖 Search saved', description: `"${label}" saved — you'll get email alerts for new matches.` });
     },
-    [savedSearches, persist, toast],
+    [savedSearches, persist, syncToAlerts, toast],
   );
 
   const removeSearch = useCallback(
     async (id: string) => {
+      const toRemove = savedSearches.find((s) => s.id === id);
       const updated = savedSearches.filter((s) => s.id !== id);
       await persist(updated);
+      if (toRemove) await removeFromAlerts(toRemove);
     },
-    [savedSearches, persist],
+    [savedSearches, persist, removeFromAlerts],
   );
 
   return { savedSearches, saveSearch, removeSearch, loaded };

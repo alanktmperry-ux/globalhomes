@@ -34,8 +34,9 @@ const StepAddress = ({ draft, update }: Props) => {
   useEffect(() => {
     loadGoogleMapsScript()
       .then(() => setMapReady(true))
-      .catch(() => {});
+      .catch((err) => console.error('[StepAddress] Google Maps load failed:', err));
   }, []);
+
 
   // Autocomplete with debounce
   useEffect(() => {
@@ -101,6 +102,13 @@ const StepAddress = ({ draft, update }: Props) => {
       console.error('Map render error:', err);
     }
   }, [mapReady]);
+
+  // Show map for existing address on mount / when mapReady flips
+  useEffect(() => {
+    if (mapReady && draft.lat && draft.lng) {
+      showOnMap(draft.lat, draft.lng);
+    }
+  }, [mapReady, draft.lat, draft.lng, showOnMap]);
 
   const selectSuggestion = useCallback(async (suggestion: Suggestion) => {
     // Prevent race conditions

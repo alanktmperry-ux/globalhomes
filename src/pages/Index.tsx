@@ -447,20 +447,38 @@ const Index = () => {
       <div className="flex items-center gap-2 mb-3 overflow-x-auto pb-1 scrollbar-hide">
         <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider shrink-0">Saved:</span>
         {savedSearches.map((s) => (
-          <button
-            key={s.id}
-            onClick={() => handleSearch(s.query)}
-            className="group flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary border border-border text-xs font-medium text-foreground hover:bg-accent transition-colors shrink-0"
-          >
-            <Bookmark size={10} className="text-primary" />
-            <span className="max-w-[120px] truncate">{s.label}</span>
-            <X
-              size={10}
-              className="opacity-0 group-hover:opacity-60 transition-opacity"
-              onClick={(e) => { e.stopPropagation(); removeSearch(s.id); }}
-            />
-          </button>
+          <div key={s.id} className="flex items-center gap-0.5 shrink-0">
+            <button
+              onClick={() => handleSearch(s.query)}
+              className="group flex items-center gap-1 px-2.5 py-1 rounded-l-full bg-secondary border border-r-0 border-border text-xs font-medium text-foreground hover:bg-accent transition-colors"
+            >
+              <Bookmark size={10} className="text-primary" />
+              <span className="max-w-[120px] truncate">{s.label}</span>
+              <X
+                size={10}
+                className="opacity-0 group-hover:opacity-60 transition-opacity"
+                onClick={(e) => { e.stopPropagation(); removeSearch(s.id); }}
+              />
+            </button>
+            <button
+              onClick={() => createSession({
+                query: s.query,
+                filters: s.filters as Record<string, any>,
+                center: s.center,
+              })}
+              className="px-1.5 py-1 rounded-r-full bg-secondary border border-l-0 border-border text-muted-foreground hover:text-primary hover:bg-accent transition-colors"
+              title="Share this search"
+            >
+              <Share2 size={10} />
+            </button>
+          </div>
         ))}
+        {isCollab && (
+          <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/30 text-[11px] font-semibold text-primary shrink-0 animate-fade-in">
+            <Share2 size={10} />
+            Collab mode
+          </span>
+        )}
       </div>
     )}
   </>

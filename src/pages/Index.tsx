@@ -185,11 +185,11 @@ const Index = () => {
     },
     currentQuery: currentQuery || undefined,
     searchRadius: searchRadius || undefined,
-    savedPropertiesCount: isSaved ? Array.from(document.querySelectorAll('[data-saved]')).length : 0,
+    savedPropertiesCount: savedIds.size,
     viewedPropertiesCount: viewedPropertiesRef.current.size,
     savedSearchesCount: savedSearches.length,
     sessionDurationMinutes: Math.round((Date.now() - sessionStartRef.current) / 60000),
-  }), [filters, currentQuery, searchRadius, savedSearches.length, isSaved]);
+  }), [filters, currentQuery, searchRadius, savedIds.size, savedSearches.length]);
 
   // ── Scroll to card on map click ──────────────────────────────
   const scrollToProperty = useCallback((propertyId: string) => {

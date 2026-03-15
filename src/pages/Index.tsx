@@ -499,7 +499,7 @@ const Index = () => {
     <MapErrorBoundary>
       <PropertyMap
         properties={filteredProperties}
-        onPropertySelect={setSelectedProperty}
+        onPropertySelect={handleSelectProperty}
         selectedPropertyId={selectedProperty?.id}
         onAreaSearch={handleAreaSearch}
         centerOn={mapCenter}

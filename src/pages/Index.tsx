@@ -264,7 +264,7 @@ const Index = () => {
                 property={property}
                 onSelect={(p) => {
                   setSelectedProperty(p);
-                  if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: Date.now() });
+                  if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: `${p.lat}-${p.lng}` });
                 }}
                 isSaved={isSaved(property.id)}
                 onToggleSave={toggleSaved}

@@ -455,7 +455,7 @@ const Index = () => {
                     totalCount={displayProperties.length}
                     filteredCount={filteredProperties.length}
                   />
-                  <button onClick={() => setMobileView('map')} className="flex items-center gap-1.5 text-xs text-primary font-medium">
+                  <button onClick={() => setMobileView('map')} aria-label="Show map view" className="flex items-center gap-1.5 text-xs text-primary font-medium">
                     <Map size={14} /> Show map
                   </button>
                 </div>

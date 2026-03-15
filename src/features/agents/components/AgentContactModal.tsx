@@ -112,8 +112,8 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
 
   // Recalculate score on form changes
   useEffect(() => {
-    setLeadScore(calcLeadScore(formData));
-  }, [formData]);
+    setLeadScore(calcLeadScore(formData, searchContext));
+  }, [formData, searchContext]);
 
   // Reset on close
   useEffect(() => {

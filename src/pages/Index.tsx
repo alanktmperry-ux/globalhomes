@@ -328,15 +328,35 @@ const Index = () => {
             </span>
           </motion.div>
         )}
-        {manusStatus === 'completed' && (
+        {manusStatus === 'completed' && !usingCachedAI && (
           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-1 text-xs text-success font-medium shrink-0">
             <Zap size={12} />
             <span>AI results live</span>
           </motion.div>
         )}
-        {manusFailed && !isSearching && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-1 text-xs text-muted-foreground font-medium shrink-0">
-            <span>AI search unavailable — showing database results</span>
+        {usingCachedAI && !isSearching && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2 shrink-0">
+            <span className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 font-medium">
+              <Zap size={12} />
+              Cached AI results
+            </span>
+            <button
+              onClick={refreshAIResults}
+              className="text-[11px] text-primary font-medium hover:underline"
+            >
+              Refresh
+            </button>
+          </motion.div>
+        )}
+        {manusFailed && !usingCachedAI && !isSearching && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2 shrink-0">
+            <span className="text-xs text-muted-foreground font-medium">AI search paused — showing database results</span>
+            <button
+              onClick={refreshAIResults}
+              className="text-[11px] text-primary font-medium hover:underline"
+            >
+              Retry
+            </button>
           </motion.div>
         )}
       </div>

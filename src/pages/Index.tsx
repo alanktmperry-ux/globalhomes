@@ -542,7 +542,9 @@ const Index = () => {
     </div>
   );
 
-  const mapComponent = (
+  const mapComponent = isSearching ? (
+    <MapSkeleton />
+  ) : (
     <MapErrorBoundary>
       <PropertyMap
         properties={filteredProperties}

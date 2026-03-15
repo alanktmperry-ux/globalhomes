@@ -80,9 +80,14 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
           }
         });
         setResults(result.properties);
-      } catch {
+      } catch (err) {
+        console.error('[handleSearch] AI search failed:', err);
         setResults([]);
         setManusFailed(true);
+        toast({
+          title: '🔍 AI search unavailable',
+          description: 'Showing local database results instead. Please try again later.',
+        });
       } finally {
         setIsSearching(false);
       }

@@ -45,6 +45,7 @@ import AgencyProfilePage from "./pages/AgencyProfilePage";
 import PropertyDetailPage from "./pages/PropertyDetailPage";
 import AgentPublicProfilePage from "./pages/AgentPublicProfilePage";
 import BuyerSettingsPage from "./pages/BuyerSettingsPage";
+import AgentPerformanceDashboard from "./features/agents/pages/AgentPerformanceDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -78,6 +79,7 @@ const App = () => (
               <Route path="/settings" element={<BuyerSettingsPage />} />
 
               {/* Agent */}
+              <Route path="/agent-dashboard" element={<AgentPerformanceDashboard />} />
               <Route path="/agent-portal" element={<AgentPortalPage />} />
               <Route path="/pocket-listing" element={<PocketListingPage />} />
               <Route path="/dashboard" element={<AgentDashboardLayout />}>

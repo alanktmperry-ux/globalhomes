@@ -434,6 +434,7 @@ const Index = () => {
           onToggle={() => setFiltersOpen(o => !o)}
           totalCount={displayProperties.length}
           filteredCount={filteredProperties.length}
+          listingMode={listingMode}
         />
         <div className="relative">
           <select

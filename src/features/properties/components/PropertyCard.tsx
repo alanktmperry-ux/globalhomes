@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Bed, Bath, Car, Heart, BadgeCheck, Star, Sparkles, Shield, ShieldCheck } from 'lucide-react';
+import { Bed, Bath, Car, Heart, BadgeCheck, Star, Sparkles, Shield, ShieldCheck, Eye, Users, TrendingUp } from 'lucide-react';
 import { Property, PropertyStatus } from '@/lib/types';
 import { useI18n } from '@/lib/i18n';
 import { useCurrency } from '@/lib/CurrencyContext';
@@ -37,6 +37,15 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
   const isRental = property.listingType === 'rent' || property.listingType === 'rental' || property.price < 50000;
   const [contactOpen, setContactOpen] = useState(false);
   const navigate = useNavigate();
+
+  // Seeded pseudo-random for consistent demo numbers per property
+  const socialProof = useMemo(() => {
+    const hash = property.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+    const viewsToday = 5 + (hash % 16); // 5–20
+    const savedByCount = 3 + (hash % 10); // 3–12
+    const rentedNearby = 1 + (hash % 5);  // 1–5
+    return { viewsToday, savedByCount, rentedNearby };
+  }, [property.id]);
 
   const statusConfig: Record<PropertyStatus, { label: string; className: string } | null> = {
     'off-market': { label: 'Off-Market', className: 'bg-amber-500/90 text-white' },
@@ -137,6 +146,24 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
               <span className="line-clamp-1">{property.aiSummary}</span>
             </p>
           )}
+
+          {/* Social proof badges */}
+          <div className="mt-2.5 flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground bg-secondary/70 px-2 py-0.5 rounded-full">
+              <Eye size={11} className="animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite] text-primary" />
+              {socialProof.viewsToday} viewed today
+            </span>
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground bg-secondary/70 px-2 py-0.5 rounded-full">
+              <Users size={11} className="text-destructive/70" />
+              Saved by {socialProof.savedByCount}
+            </span>
+            {isRental && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-medium text-accent-foreground bg-accent/50 px-2 py-0.5 rounded-full">
+                <TrendingUp size={11} />
+                {socialProof.rentedNearby} similar rented this week
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Agent section */}

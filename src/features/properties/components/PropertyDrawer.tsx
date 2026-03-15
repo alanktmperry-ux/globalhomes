@@ -65,11 +65,87 @@ interface PropertyDrawerProps {
 export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searchContext }: PropertyDrawerProps) {
   const { t } = useI18n();
   const { formatPrice, currency } = useCurrency();
-  const [imageIndex, setImageIndex] = useState(0);
   const [contactOpen, setContactOpen] = useState(false);
 
-  const prevImage = () => setImageIndex(i => (i > 0 ? i - 1 : (property?.images.length || 1) - 1));
-  const nextImage = () => setImageIndex(i => (i < (property?.images.length || 1) - 1 ? i + 1 : 0));
+  const images = property?.images?.length ? property.images : property ? [property.imageUrl] : [];
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, dragFree: false });
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [zoomScale, setZoomScale] = useState(1);
+  const zoomRef = useRef<HTMLDivElement>(null);
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.on('select', onSelect);
+    onSelect();
+    return () => { emblaApi.off('select', onSelect); };
+  }, [emblaApi, onSelect]);
+
+  // Reset carousel when property changes
+  useEffect(() => {
+    if (emblaApi && property) {
+      emblaApi.scrollTo(0, true);
+      setSelectedIndex(0);
+      setZoomScale(1);
+    }
+  }, [property?.id, emblaApi]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (!property || !emblaApi) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') emblaApi.scrollPrev();
+      if (e.key === 'ArrowRight') emblaApi.scrollNext();
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [property, emblaApi, onClose]);
+
+  // Pinch-to-zoom (touch)
+  useEffect(() => {
+    const el = zoomRef.current;
+    if (!el) return;
+    let initialDistance = 0;
+    let initialScale = 1;
+
+    const getDistance = (touches: TouchList) => {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    };
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        initialDistance = getDistance(e.touches);
+        initialScale = zoomScale;
+      }
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        const dist = getDistance(e.touches);
+        const scale = Math.min(3, Math.max(1, initialScale * (dist / initialDistance)));
+        setZoomScale(scale);
+      }
+    };
+    const onTouchEnd = () => {
+      if (zoomScale < 1.1) setZoomScale(1);
+    };
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd);
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchmove', onTouchMove);
+      el.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [zoomScale]);
 
   const trackLeadEvent = async (eventType: string) => {
     if (!property?.agent.id) return;

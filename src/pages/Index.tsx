@@ -6,6 +6,8 @@ import { PropertyCard } from '@/components/PropertyCard';
 import { PropertyCardSkeleton } from '@/components/PropertyCardSkeleton';
 import { PropertyDrawer } from '@/components/PropertyDrawer';
 import { PropertyMap } from '@/components/PropertyMap';
+import { MapErrorBoundary } from '@/features/properties/components/MapErrorBoundary';
+import { VoiceSearchErrorBoundary } from '@/features/search/components/VoiceSearchErrorBoundary';
 import { BottomNav } from '@/components/BottomNav';
 import { useI18n } from '@/lib/i18n';
 import { SiteFooter } from '@/components/SiteFooter';
@@ -470,33 +472,37 @@ const Index = () => {
   );
 
   const mapComponent = (
-    <PropertyMap
-      properties={filteredProperties}
-      onPropertySelect={setSelectedProperty}
-      selectedPropertyId={selectedProperty?.id}
-      onAreaSearch={handleAreaSearch}
-      centerOn={mapCenter}
-      onScrollToProperty={scrollToProperty}
-      formatPrice={formatPrice}
-    />
+    <MapErrorBoundary>
+      <PropertyMap
+        properties={filteredProperties}
+        onPropertySelect={setSelectedProperty}
+        selectedPropertyId={selectedProperty?.id}
+        onAreaSearch={handleAreaSearch}
+        centerOn={mapCenter}
+        onScrollToProperty={scrollToProperty}
+        formatPrice={formatPrice}
+      />
+    </MapErrorBoundary>
   );
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SiteHeader />
-      <VoiceSearchHero
-        onSearch={handleSearch}
-        onLocationSelect={(loc) => {
-          console.log('[Index] Location selected:', loc);
-          setMapCenter({ lat: loc.lat, lng: loc.lng, key: `${loc.lat}-${loc.lng}` });
-          setSearchCenter({ lat: loc.lat, lng: loc.lng });
-          setMapCollapsed(false);
-        }}
-        onRadiusChange={setSearchRadius}
-        selectedRadius={searchRadius}
-        resultCount={hasSearched ? filteredProperties.length : undefined}
-        isSearching={isSearching}
-      />
+      <VoiceSearchErrorBoundary>
+        <VoiceSearchHero
+          onSearch={handleSearch}
+          onLocationSelect={(loc) => {
+            console.log('[Index] Location selected:', loc);
+            setMapCenter({ lat: loc.lat, lng: loc.lng, key: `${loc.lat}-${loc.lng}` });
+            setSearchCenter({ lat: loc.lat, lng: loc.lng });
+            setMapCollapsed(false);
+          }}
+          onRadiusChange={setSearchRadius}
+          selectedRadius={searchRadius}
+          resultCount={hasSearched ? filteredProperties.length : undefined}
+          isSearching={isSearching}
+        />
+      </VoiceSearchErrorBoundary>
 
       {/* Desktop layout */}
       {!isMobile ? (

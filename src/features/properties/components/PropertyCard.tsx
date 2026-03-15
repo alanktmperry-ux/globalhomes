@@ -178,6 +178,38 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
               </span>
             )}
           </div>
+
+          {/* Collab: partner viewed indicator */}
+          {isCollab && partnerViewed && (
+            <div className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-primary animate-fade-in">
+              <UserCheck size={12} />
+              <span>Partner viewed this</span>
+            </div>
+          )}
+
+          {/* Collab: emoji reactions */}
+          {isCollab && onToggleReaction && (
+            <div className="mt-2 flex items-center gap-1.5 animate-fade-in">
+              {COLLAB_EMOJIS.map((emoji) => {
+                const count = collabReactions.filter(r => r.emoji === emoji).length;
+                const iMine = currentUserId ? collabReactions.some(r => r.emoji === emoji && r.user_id === currentUserId) : false;
+                return (
+                  <button
+                    key={emoji}
+                    onClick={(e) => { e.stopPropagation(); onToggleReaction(property.id, emoji); }}
+                    className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs border transition-all ${
+                      iMine
+                        ? 'border-primary bg-primary/10 text-primary font-semibold scale-105'
+                        : 'border-border bg-secondary/50 text-muted-foreground hover:bg-accent'
+                    }`}
+                  >
+                    <span>{emoji}</span>
+                    {count > 0 && <span className="text-[10px]">{count}</span>}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Agent section */}

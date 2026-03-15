@@ -77,6 +77,17 @@ const Index = () => {
     document.body.style.userSelect = 'none';
   }, []);
 
+  // Track viewport height (handles keyboard open/close on mobile)
+  useEffect(() => {
+    const onResize = () => setViewportHeight(window.innerHeight);
+    window.addEventListener('resize', onResize);
+    window.visualViewport?.addEventListener('resize', onResize);
+    return () => {
+      window.removeEventListener('resize', onResize);
+      window.visualViewport?.removeEventListener('resize', onResize);
+    };
+  }, []);
+
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
       if (!isDragging.current) return;

@@ -1860,6 +1860,66 @@ export type Database = {
         Args: { _agency_id: string; _user_id: string }
         Returns: boolean
       }
+      nearby_properties: {
+        Args: {
+          _lat: number
+          _limit?: number
+          _lng: number
+          _radius_km?: number
+        }
+        Returns: {
+          address: string
+          agency_authority: string | null
+          agent_id: string | null
+          agent_split_percent: number | null
+          baths: number
+          beds: number
+          bushfire_zone: boolean | null
+          commission_rate: number | null
+          contact_clicks: number
+          council_rates_annual: number | null
+          country: string
+          created_at: string
+          currency_code: string | null
+          description: string | null
+          estimated_value: string | null
+          features: string[] | null
+          flood_zone: boolean | null
+          id: string
+          image_url: string | null
+          images: string[] | null
+          is_active: boolean
+          land_size: number | null
+          lat: number | null
+          listed_date: string | null
+          listing_type: string | null
+          lng: number | null
+          marketing_budget: number | null
+          parking: number
+          price: number
+          price_formatted: string
+          property_type: string | null
+          rental_weekly: number | null
+          rental_yield_pct: number | null
+          sqm: number
+          state: string
+          status: string
+          str_permitted: boolean | null
+          strata_fees_quarterly: number | null
+          suburb: string
+          title: string
+          updated_at: string
+          views: number
+          year_built: number | null
+          zoning: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "properties"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
     }
     Enums: {
       agency_member_role: "owner" | "admin" | "agent" | "principal"

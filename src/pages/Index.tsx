@@ -34,11 +34,11 @@ const Index = () => {
   const [splitPercent, setSplitPercent] = useState(50);
   const [mapFullscreen, setMapFullscreen] = useState(false);
   const [mapCollapsed, setMapCollapsed] = useState(true);
+  const [viewportHeight, setViewportHeight] = useState(() => window.innerHeight);
   const SNAP_POINTS = [0.35, 0.65, 0.85];
   const [sheetSnap, setSheetSnap] = useState(0); // index into SNAP_POINTS
   const sheetHeightMV = useMotionValue(viewportHeight * SNAP_POINTS[0]);
   const sheetHeightSpring = useSpring(sheetHeightMV, { stiffness: 300, damping: 30 });
-  const [viewportHeight, setViewportHeight] = useState(() => window.innerHeight);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [radiusSliderOpen, setRadiusSliderOpen] = useState(false);
   const isDragging = useRef(false);

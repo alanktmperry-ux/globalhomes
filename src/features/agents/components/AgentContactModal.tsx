@@ -35,21 +35,39 @@ function calcLeadScore(data: {
   budgetRange: string;
   message: string;
   interests: string[];
-}): number {
+}, ctx?: SearchContext): number {
   let score = 30; // base
   // Urgency
-  if (data.timeframe === 'This week') score += 30;
-  else if (data.timeframe === '1–3 months') score += 20;
-  else if (data.timeframe === '3–6 months') score += 10;
+  if (data.timeframe === 'This week') score += 25;
+  else if (data.timeframe === '1–3 months') score += 15;
+  else if (data.timeframe === '3–6 months') score += 8;
   // Pre-approval
-  if (data.preApproval === 'approved') score += 25;
-  else if (data.preApproval === 'in_progress') score += 15;
+  if (data.preApproval === 'approved') score += 20;
+  else if (data.preApproval === 'in_progress') score += 10;
   // Purpose
   if (data.buyingPurpose === 'Investment' || data.buyingPurpose === 'Short-term rental') score += 5;
-  // Engagement signals
-  if (data.budgetRange) score += 5;
-  if (data.message && data.message.length > 20) score += 5;
-  if (data.interests.length >= 2) score += 5;
+  // Engagement signals from form
+  if (data.budgetRange) score += 3;
+  if (data.message && data.message.length > 20) score += 3;
+  if (data.interests.length >= 2) score += 3;
+  // Engagement signals from search context
+  if (ctx) {
+    // Properties viewed = high intent
+    if (ctx.viewedPropertiesCount && ctx.viewedPropertiesCount >= 10) score += 8;
+    else if (ctx.viewedPropertiesCount && ctx.viewedPropertiesCount >= 5) score += 5;
+    else if (ctx.viewedPropertiesCount && ctx.viewedPropertiesCount >= 2) score += 2;
+    // Saved properties = serious buyer
+    if (ctx.savedPropertiesCount && ctx.savedPropertiesCount >= 3) score += 6;
+    else if (ctx.savedPropertiesCount && ctx.savedPropertiesCount >= 1) score += 3;
+    // Saved searches = repeat visitor
+    if (ctx.savedSearchesCount && ctx.savedSearchesCount >= 1) score += 4;
+    // Time on site
+    if (ctx.sessionDurationMinutes && ctx.sessionDurationMinutes >= 10) score += 5;
+    else if (ctx.sessionDurationMinutes && ctx.sessionDurationMinutes >= 5) score += 3;
+    // Has active filters = knows what they want
+    if (ctx.currentFilters?.propertyTypes && ctx.currentFilters.propertyTypes.length > 0) score += 2;
+    if (ctx.searchRadius && ctx.searchRadius > 0) score += 2;
+  }
   return Math.min(score, 100);
 }
 

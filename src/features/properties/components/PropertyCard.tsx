@@ -34,6 +34,7 @@ interface PropertyCardProps {
 export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index }: PropertyCardProps) {
   const { t } = useI18n();
   const { formatPrice, currency } = useCurrency();
+  const isRental = property.listingType === 'rent' || property.listingType === 'rental';
   const [contactOpen, setContactOpen] = useState(false);
   const navigate = useNavigate();
 

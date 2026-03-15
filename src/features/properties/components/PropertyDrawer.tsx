@@ -9,6 +9,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { BadgeCheck, Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { InvestmentInsightsCard } from './InvestmentInsightsCard';
+import { MarketInsightsCard } from './MarketInsightsCard';
 
 function VerificationTier({ level }: { level?: string }) {
   const tiers: { key: string; label: string; icon: typeof Shield; active: boolean }[] = [
@@ -275,6 +276,9 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searc
 
                 {/* Investment Insights */}
                 <InvestmentInsightsCard property={property} />
+
+                {/* Market Insights (rental listings) */}
+                <MarketInsightsCard property={property} />
 
                 {/* Agent section */}
                 <div className="p-4 rounded-2xl bg-secondary/50 border border-border">

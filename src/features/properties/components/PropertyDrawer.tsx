@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Phone, MessageCircle, Mail, Shield, ShieldCheck } from 'lucide-react';
 import { Property } from '@/lib/types';
@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { InvestmentInsightsCard } from './InvestmentInsightsCard';
 import { MarketInsightsCard } from './MarketInsightsCard';
 import { AffordabilityCalculator } from './AffordabilityCalculator';
+import useEmblaCarousel from 'embla-carousel-react';
 
 function VerificationTier({ level }: { level?: string }) {
   const tiers: { key: string; label: string; icon: typeof Shield; active: boolean }[] = [

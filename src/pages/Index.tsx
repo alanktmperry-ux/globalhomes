@@ -496,53 +496,26 @@ const Index = () => {
   );
 
   const propertyList = (
-    <div role="feed" aria-label="Property listings" className={isMobile ? "space-y-3" : "grid grid-cols-2 gap-4"}>
-      {isSearching ? (
-        [0, 1, 2].map(i => <PropertyCardSkeleton key={i} />)
-      ) : (
-        <>
-          {filteredProperties.map((property, i) => (
-            <div key={property.id} ref={el => { if (el) cardRefs.current.set(property.id, el); }}>
-              <PropertyCard
-                property={property}
-                onSelect={(p) => {
-                  handleSelectProperty(p);
-                  if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: `${p.lat}-${p.lng}` });
-                }}
-                isSaved={isSaved(property.id)}
-                onToggleSave={toggleSaved}
-                index={i}
-                isCollab={isCollab}
-                collabReactions={isCollab ? getPropertyReactions(property.id) : undefined}
-                onToggleReaction={isCollab ? toggleReaction : undefined}
-                partnerViewed={isCollab ? hasPartnerViewed(property.id) : undefined}
-                currentUserId={user?.id}
-              />
-            </div>
-          ))}
-          {filteredProperties.length === 0 && (
-            <div className="text-center py-8 col-span-2">
-              <p className="text-sm text-muted-foreground">
-                {areaSearch ? 'No properties in this area.' : 'No properties found.'}
-              </p>
-              {(areaSearch || searchRadius) && (
-                <p className="text-xs text-muted-foreground/70 mt-1">
-                  Some properties may be hidden because they don't have map coordinates yet.
-                </p>
-              )}
-              {areaSearch && (
-                <button
-                  onClick={() => handleAreaSearch(null)}
-                  className="mt-3 text-xs text-primary font-medium hover:underline"
-                >
-                  Clear area filter
-                </button>
-              )}
-            </div>
-          )}
-        </>
-      )}
-    </div>
+    <VirtualizedPropertyList
+      properties={filteredProperties}
+      isSearching={isSearching}
+      isMobile={isMobile}
+      isSaved={isSaved}
+      onToggleSave={toggleSaved}
+      onSelect={(p) => {
+        handleSelectProperty(p);
+        if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: `${p.lat}-${p.lng}` });
+      }}
+      cardRefs={cardRefs}
+      isCollab={isCollab}
+      getPropertyReactions={isCollab ? getPropertyReactions : undefined}
+      onToggleReaction={isCollab ? toggleReaction : undefined}
+      hasPartnerViewed={isCollab ? hasPartnerViewed : undefined}
+      currentUserId={user?.id}
+      areaSearch={areaSearch}
+      searchRadius={searchRadius}
+      onClearAreaSearch={() => handleAreaSearch(null)}
+    />
   );
 
   const mapComponent = isSearching ? (

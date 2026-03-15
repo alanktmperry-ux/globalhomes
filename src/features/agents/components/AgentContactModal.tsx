@@ -89,9 +89,10 @@ interface AgentContactModalProps {
   property: Property;
   open: boolean;
   onClose: () => void;
+  searchContext?: SearchContext;
 }
 
-export function AgentContactModal({ property, open, onClose }: AgentContactModalProps) {
+export function AgentContactModal({ property, open, onClose, searchContext }: AgentContactModalProps) {
   const { agent } = property;
   const { toast } = useToast();
 

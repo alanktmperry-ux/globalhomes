@@ -24,7 +24,7 @@ export const defaultFilters: Filters = {
   features: [],
 };
 
-const PROPERTY_TYPES = ['House', 'Apartment', 'Townhouse', 'Villa', 'Penthouse', 'Land'];
+const PROPERTY_TYPES = ['House', 'Apartment', 'Townhouse', 'Land', 'Commercial'];
 const COMMON_FEATURES = [
   'Pool', 'Garden', 'Garage', 'Air conditioning', 'Hardwood floors',
   'Solar panels', 'Balcony', 'Fireplace', 'Study', 'Ensuite',

@@ -156,7 +156,19 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
     setSubmitting(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      const score = calcLeadScore(formData);
+      const score = calcLeadScore(formData, searchContext);
+
+      // Build search context payload
+      const contextPayload = searchContext ? {
+        currentQuery: searchContext.currentQuery,
+        filters: searchContext.currentFilters,
+        radius: searchContext.searchRadius,
+        savedPropertiesCount: searchContext.savedPropertiesCount,
+        viewedPropertiesCount: searchContext.viewedPropertiesCount,
+        savedSearchesCount: searchContext.savedSearchesCount,
+        sessionDurationMinutes: searchContext.sessionDurationMinutes,
+        listingMode: searchContext.listingMode,
+      } : null;
 
       // 1. Insert lead
       const { data: leadRow } = await supabase.from('leads').insert({
@@ -173,6 +185,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
         interests: formData.interests,
         pre_approval_status: formData.preApproval,
         score,
+        search_context: contextPayload,
       }).select('id').single();
 
       // 2. Track event

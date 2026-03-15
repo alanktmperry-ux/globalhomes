@@ -116,9 +116,9 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
   const filteredProperties = useMemo(() => {
     let props = displayProperties;
 
-    // Radius filter (haversineDistance returns km)
+    // Radius filter — server-side RPC handles DB properties when center+radius set,
+    // but we still need client-side filtering for mock/AI results
     if (searchCenter && searchRadius) {
-      console.log(`[RadiusFilter] Center: ${searchCenter.lat},${searchCenter.lng} | Radius: ${searchRadius}km | Props before: ${props.length}`);
       props = props.filter((p) => {
         if (p.lat && p.lng) {
           const dist = haversineDistance(p.lat, p.lng, searchCenter.lat, searchCenter.lng);
@@ -126,7 +126,6 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
         }
         return false;
       });
-      console.log(`[RadiusFilter] Props after: ${props.length}`);
     } else if (searchRadius && !searchCenter) {
       console.warn('[RadiusFilter] Radius is set but no searchCenter — skipping radius filter');
     }

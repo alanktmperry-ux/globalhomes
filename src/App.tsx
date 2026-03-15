@@ -79,6 +79,7 @@ const App = () => (
               <Route path="/settings" element={<BuyerSettingsPage />} />
 
               {/* Agent */}
+              <Route path="/agent-dashboard" element={<AgentPerformanceDashboard />} />
               <Route path="/agent-portal" element={<AgentPortalPage />} />
               <Route path="/pocket-listing" element={<PocketListingPage />} />
               <Route path="/dashboard" element={<AgentDashboardLayout />}>

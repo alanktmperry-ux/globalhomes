@@ -103,6 +103,13 @@ const StepAddress = ({ draft, update }: Props) => {
     }
   }, [mapReady]);
 
+  // Show map for existing address on mount / when mapReady flips
+  useEffect(() => {
+    if (mapReady && draft.lat && draft.lng) {
+      showOnMap(draft.lat, draft.lng);
+    }
+  }, [mapReady, draft.lat, draft.lng, showOnMap]);
+
   const selectSuggestion = useCallback(async (suggestion: Suggestion) => {
     // Prevent race conditions
     isSelectingRef.current = true;

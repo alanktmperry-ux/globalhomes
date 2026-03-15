@@ -183,9 +183,13 @@ const Index = () => {
 
   // ── Track property views for lead scoring ─────────────────────
   const handleSelectProperty = useCallback((p: Property | null) => {
-    if (p) viewedPropertiesRef.current.add(p.id);
+    if (p) {
+      viewedPropertiesRef.current.add(p.id);
+      trackView(p.id);
+      syncSelectedProperty(p?.id ?? null);
+    }
     setSelectedProperty(p);
-  }, []);
+  }, [trackView, syncSelectedProperty]);
 
   // ── Build search context for lead capture ────────────────────
   const searchContextForLead = useMemo(() => ({

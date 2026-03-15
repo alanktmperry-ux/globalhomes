@@ -35,6 +35,7 @@ const Index = () => {
   const [mapFullscreen, setMapFullscreen] = useState(false);
   const [mapCollapsed, setMapCollapsed] = useState(true);
   const [bottomSheetExpanded, setBottomSheetExpanded] = useState(false);
+  const [viewportHeight, setViewportHeight] = useState(() => window.innerHeight);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [radiusSliderOpen, setRadiusSliderOpen] = useState(false);
   const isDragging = useRef(false);
@@ -74,6 +75,17 @@ const Index = () => {
     isDragging.current = true;
     document.body.style.cursor = 'col-resize';
     document.body.style.userSelect = 'none';
+  }, []);
+
+  // Track viewport height (handles keyboard open/close on mobile)
+  useEffect(() => {
+    const onResize = () => setViewportHeight(window.innerHeight);
+    window.addEventListener('resize', onResize);
+    window.visualViewport?.addEventListener('resize', onResize);
+    return () => {
+      window.removeEventListener('resize', onResize);
+      window.visualViewport?.removeEventListener('resize', onResize);
+    };
   }, []);
 
   useEffect(() => {
@@ -377,13 +389,13 @@ const Index = () => {
         </div>
       ) : (
         /* Mobile: Map with bottom sheet */
-        <div className="flex-1 relative" style={{ height: 'calc(100vh - 250px)' }}>
+        <div className="flex-1 relative" style={{ height: viewportHeight - 250 }}>
           {mobileView === 'map' ? (
             <>
               <div className="absolute inset-0">{mapComponent}</div>
               <motion.div
-                className="absolute bottom-0 left-0 right-0 z-20 bg-background rounded-t-2xl shadow-drawer border-t border-border"
-                animate={{ height: bottomSheetExpanded ? '60%' : 120 }}
+                className="absolute bottom-0 left-0 right-0 z-20 bg-background rounded-t-2xl shadow-drawer border-t border-border pb-[env(safe-area-inset-bottom)]"
+                animate={{ height: bottomSheetExpanded ? Math.round(viewportHeight * 0.6) : Math.round(viewportHeight * 0.15) }}
                 transition={{ type: 'spring', damping: 25 }}
               >
                 <button
@@ -413,7 +425,7 @@ const Index = () => {
                     </button>
                   </div>
                 </div>
-                <div className="overflow-y-auto px-4 pb-20" style={{ maxHeight: bottomSheetExpanded ? 'calc(100% - 60px)' : '40px' }}>
+                <div className="overflow-y-auto px-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))]" style={{ maxHeight: bottomSheetExpanded ? 'calc(100% - 3.75rem)' : '2.5rem' }}>
                   {propertyList}
                 </div>
               </motion.div>
@@ -422,7 +434,8 @@ const Index = () => {
                   const hero = document.querySelector('[aria-label="Start voice search"]') as HTMLButtonElement;
                   if (hero) { window.scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(() => hero.click(), 500); }
                 }}
-                className="absolute bottom-[140px] right-4 z-20 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-elevated flex items-center justify-center"
+                style={{ bottom: Math.round(viewportHeight * 0.15) + 20 }}
+                className="absolute right-4 z-20 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-elevated flex items-center justify-center"
               >
                 <Mic size={22} />
               </button>

@@ -21,6 +21,8 @@ import { FilterSidebar } from '@/components/FilterSidebar';
 import { usePropertySearch } from '@/hooks/usePropertySearch';
 import { Slider } from '@/components/ui/slider';
 import { useSavedSearches } from '@/hooks/useSavedSearches';
+import { useCollabSession } from '@/features/search/hooks/useCollabSession';
+import { useAuth } from '@/lib/AuthProvider';
 
 const Index = () => {
   const { t } = useI18n();

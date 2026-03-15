@@ -1,7 +1,5 @@
 import { memo, useCallback, useRef, useEffect, useState } from 'react';
-// @ts-ignore - react-window types
-import ReactWindow from 'react-window';
-const { FixedSizeList } = ReactWindow;
+import { FixedSizeList } from 'react-window';
 import { PropertyCard, CollabReaction } from '@/features/properties/components/PropertyCard';
 import { PropertyCardSkeleton } from '@/features/properties/components/PropertyCardSkeleton';
 import { Property } from '@/lib/types';

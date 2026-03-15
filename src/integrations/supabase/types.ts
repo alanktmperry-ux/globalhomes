@@ -475,6 +475,134 @@ export type Database = {
         }
         Relationships: []
       }
+      collab_reactions: {
+        Row: {
+          created_at: string
+          emoji: string
+          id: string
+          property_id: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emoji: string
+          id?: string
+          property_id: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string
+          id?: string
+          property_id?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collab_reactions_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collab_reactions_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "collab_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collab_sessions: {
+        Row: {
+          created_at: string
+          created_by: string
+          filters: Json
+          id: string
+          map_center_lat: number | null
+          map_center_lng: number | null
+          map_zoom: number | null
+          search_query: string
+          selected_property_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          filters?: Json
+          id?: string
+          map_center_lat?: number | null
+          map_center_lng?: number | null
+          map_zoom?: number | null
+          search_query?: string
+          selected_property_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          filters?: Json
+          id?: string
+          map_center_lat?: number | null
+          map_center_lng?: number | null
+          map_zoom?: number | null
+          search_query?: string
+          selected_property_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collab_sessions_selected_property_id_fkey"
+            columns: ["selected_property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collab_views: {
+        Row: {
+          id: string
+          property_id: string
+          session_id: string
+          user_id: string
+          viewed_at: string
+        }
+        Insert: {
+          id?: string
+          property_id: string
+          session_id: string
+          user_id: string
+          viewed_at?: string
+        }
+        Update: {
+          id?: string
+          property_id?: string
+          session_id?: string
+          user_id?: string
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collab_views_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collab_views_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "collab_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contact_activities: {
         Row: {
           activity_type: string

@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, PanInfo } from 'framer-motion';
-import { ArrowRight, MapPin, Sparkles, Loader2, Zap, Map, List, Mic, GripVertical, ArrowUpDown, X, Bookmark } from 'lucide-react';
+import { ArrowRight, MapPin, Sparkles, Loader2, Zap, Map, List, Mic, GripVertical, ArrowUpDown, X, Bookmark, Share2 } from 'lucide-react';
 import { VoiceSearchHero } from '@/components/VoiceSearchHero';
 import { PropertyCard } from '@/components/PropertyCard';
 import { PropertyCardSkeleton } from '@/components/PropertyCardSkeleton';
@@ -21,6 +21,8 @@ import { FilterSidebar } from '@/components/FilterSidebar';
 import { usePropertySearch } from '@/hooks/usePropertySearch';
 import { Slider } from '@/components/ui/slider';
 import { useSavedSearches } from '@/hooks/useSavedSearches';
+import { useCollabSession } from '@/features/search/hooks/useCollabSession';
+import { useAuth } from '@/lib/AuthProvider';
 
 const Index = () => {
   const { t } = useI18n();
@@ -29,6 +31,16 @@ const Index = () => {
   const isMobile = useIsMobile();
   const { formatPrice } = useCurrency();
   const { savedSearches, saveSearch, removeSearch } = useSavedSearches();
+  const { user } = useAuth();
+  const {
+    isCollab,
+    createSession,
+    toggleReaction,
+    trackView,
+    getPropertyReactions,
+    hasPartnerViewed,
+    syncSelectedProperty,
+  } = useCollabSession();
 
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const viewedPropertiesRef = useRef(new Set<string>());
@@ -171,9 +183,13 @@ const Index = () => {
 
   // ── Track property views for lead scoring ─────────────────────
   const handleSelectProperty = useCallback((p: Property | null) => {
-    if (p) viewedPropertiesRef.current.add(p.id);
+    if (p) {
+      viewedPropertiesRef.current.add(p.id);
+      trackView(p.id);
+      syncSelectedProperty(p?.id ?? null);
+    }
     setSelectedProperty(p);
-  }, []);
+  }, [trackView, syncSelectedProperty]);
 
   // ── Build search context for lead capture ────────────────────
   const searchContextForLead = useMemo(() => ({
@@ -431,20 +447,38 @@ const Index = () => {
       <div className="flex items-center gap-2 mb-3 overflow-x-auto pb-1 scrollbar-hide">
         <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider shrink-0">Saved:</span>
         {savedSearches.map((s) => (
-          <button
-            key={s.id}
-            onClick={() => handleSearch(s.query)}
-            className="group flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary border border-border text-xs font-medium text-foreground hover:bg-accent transition-colors shrink-0"
-          >
-            <Bookmark size={10} className="text-primary" />
-            <span className="max-w-[120px] truncate">{s.label}</span>
-            <X
-              size={10}
-              className="opacity-0 group-hover:opacity-60 transition-opacity"
-              onClick={(e) => { e.stopPropagation(); removeSearch(s.id); }}
-            />
-          </button>
+          <div key={s.id} className="flex items-center gap-0.5 shrink-0">
+            <button
+              onClick={() => handleSearch(s.query)}
+              className="group flex items-center gap-1 px-2.5 py-1 rounded-l-full bg-secondary border border-r-0 border-border text-xs font-medium text-foreground hover:bg-accent transition-colors"
+            >
+              <Bookmark size={10} className="text-primary" />
+              <span className="max-w-[120px] truncate">{s.label}</span>
+              <X
+                size={10}
+                className="opacity-0 group-hover:opacity-60 transition-opacity"
+                onClick={(e) => { e.stopPropagation(); removeSearch(s.id); }}
+              />
+            </button>
+            <button
+              onClick={() => createSession({
+                query: s.query,
+                filters: s.filters as Record<string, any>,
+                center: s.center,
+              })}
+              className="px-1.5 py-1 rounded-r-full bg-secondary border border-l-0 border-border text-muted-foreground hover:text-primary hover:bg-accent transition-colors"
+              title="Share this search"
+            >
+              <Share2 size={10} />
+            </button>
+          </div>
         ))}
+        {isCollab && (
+          <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/30 text-[11px] font-semibold text-primary shrink-0 animate-fade-in">
+            <Share2 size={10} />
+            Collab mode
+          </span>
+        )}
       </div>
     )}
   </>
@@ -467,6 +501,11 @@ const Index = () => {
                 isSaved={isSaved(property.id)}
                 onToggleSave={toggleSaved}
                 index={i}
+                isCollab={isCollab}
+                collabReactions={isCollab ? getPropertyReactions(property.id) : undefined}
+                onToggleReaction={isCollab ? toggleReaction : undefined}
+                partnerViewed={isCollab ? hasPartnerViewed(property.id) : undefined}
+                currentUserId={user?.id}
               />
             </div>
           ))}

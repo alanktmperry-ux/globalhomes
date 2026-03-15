@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Bed, Bath, Car, Heart, BadgeCheck, Star, Sparkles, Shield, ShieldCheck, Eye, Users, TrendingUp } from 'lucide-react';
+import { Bed, Bath, Car, Heart, BadgeCheck, Star, Sparkles, Shield, ShieldCheck, Eye, Users, TrendingUp, UserCheck } from 'lucide-react';
 import { Property, PropertyStatus } from '@/lib/types';
 import { useI18n } from '@/lib/i18n';
 import { useCurrency } from '@/lib/CurrencyContext';
@@ -23,15 +23,29 @@ function VerificationBadge({ level }: { level?: string }) {
   );
 }
 
+export interface CollabReaction {
+  property_id: string;
+  user_id: string;
+  emoji: string;
+}
+
 interface PropertyCardProps {
   property: Property;
   onSelect: (property: Property) => void;
   isSaved: boolean;
   onToggleSave: (id: string) => void;
   index: number;
+  // Collab props (optional)
+  isCollab?: boolean;
+  collabReactions?: CollabReaction[];
+  onToggleReaction?: (propertyId: string, emoji: string) => void;
+  partnerViewed?: boolean;
+  currentUserId?: string;
 }
 
-export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index }: PropertyCardProps) {
+const COLLAB_EMOJIS = ['👍', '👎', '🔥'] as const;
+
+export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index, isCollab, collabReactions = [], onToggleReaction, partnerViewed, currentUserId }: PropertyCardProps) {
   const { t } = useI18n();
   const { formatPrice, currency } = useCurrency();
   const isRental = property.listingType === 'rent' || property.listingType === 'rental' || property.price < 50000;
@@ -164,6 +178,38 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index 
               </span>
             )}
           </div>
+
+          {/* Collab: partner viewed indicator */}
+          {isCollab && partnerViewed && (
+            <div className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-primary animate-fade-in">
+              <UserCheck size={12} />
+              <span>Partner viewed this</span>
+            </div>
+          )}
+
+          {/* Collab: emoji reactions */}
+          {isCollab && onToggleReaction && (
+            <div className="mt-2 flex items-center gap-1.5 animate-fade-in">
+              {COLLAB_EMOJIS.map((emoji) => {
+                const count = collabReactions.filter(r => r.emoji === emoji).length;
+                const iMine = currentUserId ? collabReactions.some(r => r.emoji === emoji && r.user_id === currentUserId) : false;
+                return (
+                  <button
+                    key={emoji}
+                    onClick={(e) => { e.stopPropagation(); onToggleReaction(property.id, emoji); }}
+                    className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs border transition-all ${
+                      iMine
+                        ? 'border-primary bg-primary/10 text-primary font-semibold scale-105'
+                        : 'border-border bg-secondary/50 text-muted-foreground hover:bg-accent'
+                    }`}
+                  >
+                    <span>{emoji}</span>
+                    {count > 0 && <span className="text-[10px]">{count}</span>}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Agent section */}

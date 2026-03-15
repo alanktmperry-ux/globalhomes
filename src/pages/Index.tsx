@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, PanInfo } from 'framer-motion';
 import { ArrowRight, MapPin, Sparkles, Loader2, Zap, Map, List, Mic, GripVertical, ArrowUpDown, X, Bookmark, Share2 } from 'lucide-react';
 import { VoiceSearchHero } from '@/components/VoiceSearchHero';
+import { AiPicksSection } from '@/features/properties/components/AiPicksSection';
 import { PropertyCard } from '@/components/PropertyCard';
 import { PropertyCardSkeleton } from '@/components/PropertyCardSkeleton';
 import { PropertyDrawer } from '@/components/PropertyDrawer';

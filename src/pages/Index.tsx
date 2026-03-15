@@ -266,7 +266,7 @@ const Index = () => {
   );
 
   const propertyList = (
-    <div className={isMobile ? "space-y-3" : "grid grid-cols-2 gap-4"}>
+    <div role="feed" aria-label="Property listings" className={isMobile ? "space-y-3" : "grid grid-cols-2 gap-4"}>
       {isSearching ? (
         [0, 1, 2].map(i => <PropertyCardSkeleton key={i} />)
       ) : (

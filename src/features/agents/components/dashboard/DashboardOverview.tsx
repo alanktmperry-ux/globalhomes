@@ -93,11 +93,11 @@ const DashboardOverview = () => {
 
   // Stats row - Australian CRM focus
   const stats = [
-    { label: 'Tasks Due', value: String(tasksDue || 3), icon: <CheckSquare size={16} />, color: 'text-destructive' },
-    { label: 'Active Contacts', value: '48', icon: <Users size={16} />, color: 'text-primary' },
-    { label: 'Appraisals This Month', value: '6', icon: <ClipboardList size={16} />, color: 'text-success' },
-    { label: 'Sales This Month', value: AUD.format(1250000), icon: <DollarSign size={16} />, color: 'text-primary' },
-    { label: 'Settled', value: AUD.format(890000), icon: <Landmark size={16} />, color: 'text-success' },
+    { label: 'Tasks Due', value: String(tasksDue || 3), icon: <CheckSquare size={16} />, color: 'text-destructive', link: '/dashboard/contacts' },
+    { label: 'Active Contacts', value: '48', icon: <Users size={16} />, color: 'text-primary', link: '/dashboard/contacts' },
+    { label: 'Appraisals This Month', value: '6', icon: <ClipboardList size={16} />, color: 'text-success', link: '/dashboard/listings' },
+    { label: 'Sales This Month', value: AUD.format(1250000), icon: <DollarSign size={16} />, color: 'text-primary', link: '/dashboard/reports' },
+    { label: 'Settled', value: AUD.format(890000), icon: <Landmark size={16} />, color: 'text-success', link: '/dashboard/trust' },
   ];
 
   return (

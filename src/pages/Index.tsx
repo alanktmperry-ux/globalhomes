@@ -25,7 +25,7 @@ import { useSavedSearches } from '@/hooks/useSavedSearches';
 const Index = () => {
   const { t } = useI18n();
   const { addSearch, lastSearch } = useSearchHistory();
-  const { isSaved, toggleSaved } = useSavedProperties();
+  const { savedIds, isSaved, toggleSaved } = useSavedProperties();
   const isMobile = useIsMobile();
   const { formatPrice } = useCurrency();
   const { savedSearches, saveSearch, removeSearch } = useSavedSearches();

@@ -1228,6 +1228,96 @@ export type Database = {
           },
         ]
       }
+      suburb_price_history: {
+        Row: {
+          beds: number
+          created_at: string
+          id: string
+          median_rent_weekly: number | null
+          median_sale_price: number | null
+          month: string
+          property_type: string
+          sample_size: number | null
+          state: string
+          suburb: string
+        }
+        Insert: {
+          beds?: number
+          created_at?: string
+          id?: string
+          median_rent_weekly?: number | null
+          median_sale_price?: number | null
+          month: string
+          property_type?: string
+          sample_size?: number | null
+          state: string
+          suburb: string
+        }
+        Update: {
+          beds?: number
+          created_at?: string
+          id?: string
+          median_rent_weekly?: number | null
+          median_sale_price?: number | null
+          month?: string
+          property_type?: string
+          sample_size?: number | null
+          state?: string
+          suburb?: string
+        }
+        Relationships: []
+      }
+      suburb_stats: {
+        Row: {
+          beds: number
+          created_at: string
+          id: string
+          median_rent_weekly: number | null
+          median_sale_price: number | null
+          period: string
+          property_type: string
+          recorded_at: string
+          rent_trend_pct: number | null
+          sale_trend_pct: number | null
+          sample_size: number | null
+          state: string
+          suburb: string
+          updated_at: string
+        }
+        Insert: {
+          beds?: number
+          created_at?: string
+          id?: string
+          median_rent_weekly?: number | null
+          median_sale_price?: number | null
+          period?: string
+          property_type?: string
+          recorded_at?: string
+          rent_trend_pct?: number | null
+          sale_trend_pct?: number | null
+          sample_size?: number | null
+          state: string
+          suburb: string
+          updated_at?: string
+        }
+        Update: {
+          beds?: number
+          created_at?: string
+          id?: string
+          median_rent_weekly?: number | null
+          median_sale_price?: number | null
+          period?: string
+          property_type?: string
+          recorded_at?: string
+          rent_trend_pct?: number | null
+          sale_trend_pct?: number | null
+          sample_size?: number | null
+          state?: string
+          suburb?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       tasks: {
         Row: {
           assigned_to: string | null
@@ -1841,6 +1931,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_suburb_rental_stats: {
+        Args: {
+          _beds?: number
+          _property_type?: string
+          _state: string
+          _suburb: string
+        }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

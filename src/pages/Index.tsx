@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, PanInfo } from 'framer-motion';
 import { ArrowRight, MapPin, Sparkles, Loader2, Zap, Map, List, Mic, GripVertical, ArrowUpDown, X, Bookmark, Share2 } from 'lucide-react';
 import { VoiceSearchHero } from '@/components/VoiceSearchHero';
+import { AiPicksSection } from '@/features/properties/components/AiPicksSection';
 import { PropertyCard } from '@/components/PropertyCard';
 import { PropertyCardSkeleton } from '@/components/PropertyCardSkeleton';
 import { PropertyDrawer } from '@/components/PropertyDrawer';
@@ -44,6 +45,7 @@ const Index = () => {
 
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const viewedPropertiesRef = useRef(new Set<string>());
+  const [viewedIds, setViewedIds] = useState<Set<string>>(new Set());
   const sessionStartRef = useRef(Date.now());
   const [mobileView, setMobileView] = useState<'map' | 'list'>('list');
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key?: number | string } | null>(null);
@@ -185,6 +187,12 @@ const Index = () => {
   const handleSelectProperty = useCallback((p: Property | null) => {
     if (p) {
       viewedPropertiesRef.current.add(p.id);
+      setViewedIds(prev => {
+        if (prev.has(p.id)) return prev;
+        const next = new Set(prev);
+        next.add(p.id);
+        return next;
+      });
       trackView(p.id);
       syncSelectedProperty(p?.id ?? null);
     }
@@ -615,6 +623,17 @@ const Index = () => {
           <div>
             {statusBar}
             {propertyList}
+            <AiPicksSection
+              viewedIds={viewedIds}
+              allProperties={displayProperties}
+              isSaved={isSaved}
+              onToggleSave={toggleSaved}
+              onSelect={(p) => {
+                handleSelectProperty(p);
+                if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: `${p.lat}-${p.lng}` });
+              }}
+              isMobile={isMobile}
+            />
           </div>
         </div>
       ) : (
@@ -693,6 +712,17 @@ const Index = () => {
                 </div>
               </div>
               {propertyList}
+              <AiPicksSection
+                viewedIds={viewedIds}
+                allProperties={displayProperties}
+                isSaved={isSaved}
+                onToggleSave={toggleSaved}
+                onSelect={(p) => {
+                  handleSelectProperty(p);
+                  if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: `${p.lat}-${p.lng}` });
+                }}
+                isMobile={isMobile}
+              />
             </div>
           )}
         </div>

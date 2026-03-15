@@ -258,7 +258,7 @@ export function PropertyMap({
           infoWindow.setContent(`
             <div style="font-family: 'DM Sans', sans-serif; min-width: 200px; padding: 2px;">
               <img src="${property.imageUrl}" alt="" style="width: 100%; height: 100px; object-fit: cover; border-radius: 6px; margin-bottom: 6px;" />
-              <div style="font-weight: 700; font-size: 14px; color: #0f172a;">${formatPrice ? formatPrice(property.price, isRental) : property.priceFormatted}</div>
+              <div style="font-weight: 700; font-size: 14px; color: #0f172a;">${formatPrice ? formatPrice(property.price, property.listingType ?? undefined) : property.priceFormatted}</div>
               <div style="font-size: 12px; color: #64748b; margin-top: 2px;">${property.title}</div>
               <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">🛏 ${property.beds} · 🛁 ${property.baths} · 🚗 ${property.parking}</div>
             </div>

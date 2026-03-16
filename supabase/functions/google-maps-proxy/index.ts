@@ -28,7 +28,9 @@ serve(async (req) => {
     }
 
     if (action === 'autocomplete') {
-      const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&types=address&key=${apiKey}`;
+      // Default to '(regions)' for suburb/locality search; use 'address' for street-level
+      const types = input_types || '(regions)';
+      const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&types=${encodeURIComponent(types)}&key=${apiKey}`;
       const res = await fetch(url);
       const data = await res.json();
       return new Response(JSON.stringify(data), {

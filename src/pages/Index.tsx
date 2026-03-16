@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect, useMemo, lazy, Suspense } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence, useMotionValue, useSpring, PanInfo } from 'framer-motion';
 import { ArrowRight, MapPin, Sparkles, Loader2, Zap, Map, List, Mic, GripVertical, ArrowUpDown, X, Bookmark, Share2 } from 'lucide-react';
 import { VoiceSearchHero } from '@/components/VoiceSearchHero';

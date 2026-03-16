@@ -4,6 +4,7 @@ import { mockProperties } from '@/lib/mock-data';
 import { manusSearch } from '@/lib/ManusSearchService';
 import { Filters, defaultFilters } from '@/components/FilterSidebar';
 import { firecrawlPropertySearch } from '@/features/properties/api/firecrawlPropertySearch';
+import { searchAgentListings } from '@/features/properties/api/fetchPublicProperties';
 import { useToast } from '@/hooks/use-toast';
 import { isInsidePolygon, haversineDistance } from '@/shared/lib/geoUtils';
 import { useRealtimeProperties } from './useRealtimeProperties';

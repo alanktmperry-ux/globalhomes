@@ -42,7 +42,7 @@ const StepAddress = ({ draft, update }: Props) => {
     }
     const timeout = setTimeout(async () => {
       setSearching(true);
-      const results = await autocomplete(query);
+      const results = await autocomplete(query, 'address');
       setSuggestions(results.slice(0, 5));
       setSearching(false);
       setShowSuggestions(true);

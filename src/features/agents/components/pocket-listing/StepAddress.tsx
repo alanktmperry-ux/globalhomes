@@ -50,7 +50,7 @@ const StepAddress = ({ draft, update }: Props) => {
     debounceRef.current = setTimeout(async () => {
       setSearching(true);
       try {
-        const results = await autocomplete(query);
+        const results = await autocomplete(query, 'address');
         // Don't update if user already selected while we were fetching
         if (!isSelectingRef.current) {
           setSuggestions(results.slice(0, 5));

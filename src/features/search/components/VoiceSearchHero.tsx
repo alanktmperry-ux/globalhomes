@@ -227,15 +227,21 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
   const handleTextSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    suppressAutocompleteRef.current = true;
+    setSuggestions([]);
     setShowSuggestions(false);
     if (textQuery.trim()) {
       setTranscript(textQuery.trim());
       processTranscript(textQuery.trim());
     }
+    // Re-enable autocomplete after a delay so typing new queries works
+    setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
   };
 
   const handleSelectSuggestion = async (suggestion: { description: string; place_id: string }) => {
+    suppressAutocompleteRef.current = true;
     setTextQuery(suggestion.description);
+    setSuggestions([]);
     setShowSuggestions(false);
     setTranscript(suggestion.description);
     processTranscript(suggestion.description);
@@ -243,6 +249,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       const details = await getPlaceDetails(suggestion.place_id);
       if (details) onLocationSelect(details);
     }
+    setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
   };
 
   const removeChip = (key: string) => {

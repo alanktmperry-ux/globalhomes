@@ -25,13 +25,27 @@ const AdminUsers = () => {
   const fetchUsers = async () => {
     setLoading(true);
     const { data: { session } } = await supabase.auth.getSession();
-    const response = await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=list_users`,
-      { headers: { Authorization: `Bearer ${session?.access_token}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY } }
-    );
-    const data = await response.json();
-    setUsers(data.users || []);
-    setLoading(false);
+    if (!session?.access_token) {
+      toast({ title: 'Session expired', description: 'Please sign in again.', variant: 'destructive' });
+      setLoading(false);
+      return;
+    }
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=list_users`,
+        { headers: { Authorization: `Bearer ${session.access_token}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY } }
+      );
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || `HTTP ${response.status}`);
+      }
+      const data = await response.json();
+      setUsers(data.users || []);
+    } catch (err: any) {
+      toast({ title: 'Failed to load users', description: err.message, variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { fetchUsers(); }, []);

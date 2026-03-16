@@ -68,6 +68,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   const recognitionRef = useRef<any>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const suppressAutocompleteRef = useRef(false);
   const { toast } = useToast();
 
   const isSupported = typeof window !== 'undefined' &&

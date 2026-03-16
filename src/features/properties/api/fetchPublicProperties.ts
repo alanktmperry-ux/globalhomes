@@ -68,6 +68,56 @@ export function mapDbProperty(p: any): Property {
   };
 }
 
+const PROPERTIES_WITH_AGENTS =
+  '*, agents(name, agency, phone, email, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count)';
+
+/**
+ * Searches agent listings by keyword matching against title, address, suburb, state, description.
+ * Results are ordered: subscribed agents first, then by recency.
+ */
+export async function searchAgentListings(query: string, limit = 20): Promise<Property[]> {
+  const words = query
+    .toLowerCase()
+    .split(/\s+/)
+    .filter((w) => w.length > 2);
+
+  if (words.length === 0) return [];
+
+  // Build an OR filter using ilike for each keyword across searchable columns
+  const orClauses = words
+    .flatMap((w) => [
+      `title.ilike.%${w}%`,
+      `address.ilike.%${w}%`,
+      `suburb.ilike.%${w}%`,
+      `state.ilike.%${w}%`,
+      `description.ilike.%${w}%`,
+      `property_type.ilike.%${w}%`,
+    ])
+    .join(',');
+
+  const { data, error } = await supabase
+    .from('properties')
+    .select(PROPERTIES_WITH_AGENTS)
+    .eq('is_active', true)
+    .eq('status', 'public')
+    .or(orClauses)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('[searchAgentListings]', error.message);
+    return [];
+  }
+
+  // Sort: subscribed agents first
+  const mapped = (data ?? []).map(mapDbProperty);
+  return mapped.sort((a, b) => {
+    if (a.agent.isSubscribed && !b.agent.isSubscribed) return -1;
+    if (!a.agent.isSubscribed && b.agent.isSubscribed) return 1;
+    return 0;
+  });
+}
+
 /**
  * Fetches public (status = 'public') properties with agent data joined.
  */

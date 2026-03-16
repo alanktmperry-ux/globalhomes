@@ -259,7 +259,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   );
 
   return (
-    <div className="relative overflow-hidden bg-background">
+    <div className="relative overflow-visible bg-background">
       <TooltipProvider delayDuration={400}>
       {/* Subtle gradient background */}
       <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-background" />

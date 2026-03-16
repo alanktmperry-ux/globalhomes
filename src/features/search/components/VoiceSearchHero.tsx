@@ -85,11 +85,14 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   // Autocomplete for text input
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (textQuery.length < 2) { setSuggestions([]); return; }
+    if (suppressAutocompleteRef.current || textQuery.length < 2) { setSuggestions([]); setShowSuggestions(false); return; }
     debounceRef.current = setTimeout(async () => {
+      if (suppressAutocompleteRef.current) return;
       const results = await autocomplete(textQuery);
-      setSuggestions(results);
-      setShowSuggestions(results.length > 0);
+      if (!suppressAutocompleteRef.current) {
+        setSuggestions(results);
+        setShowSuggestions(results.length > 0);
+      }
     }, 300);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [textQuery]);

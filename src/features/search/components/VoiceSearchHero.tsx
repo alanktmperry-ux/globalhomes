@@ -68,6 +68,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   const recognitionRef = useRef<any>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const suppressAutocompleteRef = useRef(false);
   const { toast } = useToast();
 
   const isSupported = typeof window !== 'undefined' &&
@@ -84,11 +85,14 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   // Autocomplete for text input
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (textQuery.length < 2) { setSuggestions([]); return; }
+    if (suppressAutocompleteRef.current || textQuery.length < 2) { setSuggestions([]); setShowSuggestions(false); return; }
     debounceRef.current = setTimeout(async () => {
+      if (suppressAutocompleteRef.current) return;
       const results = await autocomplete(textQuery);
-      setSuggestions(results);
-      setShowSuggestions(results.length > 0);
+      if (!suppressAutocompleteRef.current) {
+        setSuggestions(results);
+        setShowSuggestions(results.length > 0);
+      }
     }, 300);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [textQuery]);
@@ -223,15 +227,21 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
   const handleTextSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    suppressAutocompleteRef.current = true;
+    setSuggestions([]);
     setShowSuggestions(false);
     if (textQuery.trim()) {
       setTranscript(textQuery.trim());
       processTranscript(textQuery.trim());
     }
+    // Re-enable autocomplete after a delay so typing new queries works
+    setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
   };
 
   const handleSelectSuggestion = async (suggestion: { description: string; place_id: string }) => {
+    suppressAutocompleteRef.current = true;
     setTextQuery(suggestion.description);
+    setSuggestions([]);
     setShowSuggestions(false);
     setTranscript(suggestion.description);
     processTranscript(suggestion.description);
@@ -239,6 +249,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       const details = await getPlaceDetails(suggestion.place_id);
       if (details) onLocationSelect(details);
     }
+    setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
   };
 
   const removeChip = (key: string) => {

@@ -19,7 +19,7 @@ serve(async (req) => {
   }
 
   try {
-    const { action, input } = await req.json();
+    const { action, input, input_types } = await req.json();
 
     if (action === 'get_key') {
       return new Response(JSON.stringify({ key: apiKey }), {

@@ -309,8 +309,19 @@ const Index = () => {
     { value: 'beds', label: 'Bedrooms' },
   ] as const;
 
+  const pageTitle = `${currentQuery || 'Melbourne'} Property Search | Global Homes`;
+  const pageDescription = `Search ${currentQuery || 'Melbourne'} properties. ${filteredProperties.length} listings. Save searches. Get investor alerts.`;
+
   const statusBar = (
     <>
+    <Helmet>
+      <title>{pageTitle}</title>
+      <meta name="description" content={pageDescription} />
+      <meta property="og:title" content={pageTitle} />
+      <meta property="og:description" content={pageDescription} />
+      <meta name="twitter:title" content={pageTitle} />
+      <meta name="twitter:description" content={pageDescription} />
+    </Helmet>
     <div className="flex items-center justify-between mb-3 gap-2">
       <div className="flex items-center gap-2 min-w-0">
         <span className="text-sm font-medium text-foreground shrink-0">

@@ -118,6 +118,7 @@ const App = () => (
       </CurrencyProvider>
     </I18nProvider>
   </QueryClientProvider>
+  </HelmetProvider>
 );
 
 export default App;

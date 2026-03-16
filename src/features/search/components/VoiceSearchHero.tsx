@@ -522,7 +522,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
         </div>
 
         {/* Always-visible text search input */}
-        <div ref={wrapperRef} className={`relative w-full max-w-md ${showSuggestions && suggestions.length > 0 ? 'pb-52' : ''}`}>
+        <div ref={wrapperRef} className="relative w-full max-w-md">
           <form onSubmit={handleTextSubmit}>
             <div className="flex items-center gap-2 rounded-xl bg-secondary border border-border px-4 py-3">
               <Search size={16} className="text-muted-foreground shrink-0" />

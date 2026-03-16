@@ -34,11 +34,11 @@ export async function getGoogleMapsApiKey(): Promise<string> {
   return data.key;
 }
 
-export async function autocomplete(input: string): Promise<{ description: string; place_id: string }[]> {
+export async function autocomplete(input: string, types?: string): Promise<{ description: string; place_id: string }[]> {
   if (!input || input.length < 2) return [];
-  const { data, error } = await supabase.functions.invoke('google-maps-proxy', {
-    body: { action: 'autocomplete', input },
-  });
+  const body: Record<string, string> = { action: 'autocomplete', input };
+  if (types) body.input_types = types;
+  const { data, error } = await supabase.functions.invoke('google-maps-proxy', { body });
   if (error || !data?.predictions) return [];
   return data.predictions.map((p: any) => ({
     description: p.description,

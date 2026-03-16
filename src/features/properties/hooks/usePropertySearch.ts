@@ -3,6 +3,7 @@ import { Property } from '@/lib/types';
 import { mockProperties } from '@/lib/mock-data';
 import { manusSearch } from '@/lib/ManusSearchService';
 import { Filters, defaultFilters } from '@/components/FilterSidebar';
+import { firecrawlPropertySearch } from '@/features/properties/api/firecrawlPropertySearch';
 import { useToast } from '@/hooks/use-toast';
 import { isInsidePolygon, haversineDistance } from '@/shared/lib/geoUtils';
 import { useRealtimeProperties } from './useRealtimeProperties';
@@ -97,12 +98,23 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
 
       setIsSearching(!cached);
 
+      // Run Firecrawl + Manus searches in parallel
+      const firecrawlPromise = firecrawlPropertySearch(query, 8).catch((err) => {
+        console.warn('[handleSearch] Firecrawl search failed:', err);
+        return [] as Property[];
+      });
+
       try {
         const result = await manusSearch.search({ query }, (update) => {
           setManusStatus(update.status);
           if (update.status === 'completed' && update.properties && update.properties.length > 0) {
-            setResults(update.properties);
-            setCachedAIResults(query, update.properties);
+            setResults((prev) => {
+              const ids = new Set(prev.map((p) => p.id));
+              const unique = update.properties!.filter((p) => !ids.has(p.id));
+              const merged = [...prev, ...unique];
+              setCachedAIResults(query, merged);
+              return merged;
+            });
             setUsingCachedAI(false);
             toast({ title: '🔍 Live results ready', description: `Found ${update.properties.length} properties` });
           } else if (update.status === 'failed') {
@@ -117,24 +129,43 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
           }
         });
         if (result.properties.length > 0) {
-          setResults(result.properties);
-          setCachedAIResults(query, result.properties);
+          setResults((prev) => {
+            const ids = new Set(prev.map((p) => p.id));
+            const unique = result.properties.filter((p) => !ids.has(p.id));
+            return [...prev, ...unique];
+          });
           setUsingCachedAI(false);
         }
       } catch (err) {
         console.error('[handleSearch] AI search failed:', err);
         if (!cached || cached.length === 0) {
-          setResults([]);
+          // Keep any Firecrawl results that may have already been set
         }
         setManusFailed(true);
         toast({
           title: '⚠️ AI search paused',
-          description: cached ? 'Showing cached results from earlier.' : 'Showing database results instead.',
+          description: cached ? 'Showing cached results from earlier.' : 'Showing web results instead.',
         });
         if (cached) setUsingCachedAI(true);
-      } finally {
-        setIsSearching(false);
       }
+
+      // Merge Firecrawl results
+      const firecrawlResults = await firecrawlPromise;
+      if (firecrawlResults.length > 0) {
+        setResults((prev) => {
+          const ids = new Set(prev.map((p) => p.id));
+          const unique = firecrawlResults.filter((p) => !ids.has(p.id));
+          if (unique.length === 0) return prev;
+          const merged = [...prev, ...unique];
+          setCachedAIResults(query, merged);
+          return merged;
+        });
+        if (!cached) {
+          toast({ title: '🌐 Web results found', description: `Found ${firecrawlResults.length} listings from the web` });
+        }
+      }
+
+      setIsSearching(false);
     },
     [addSearch, toast],
   );

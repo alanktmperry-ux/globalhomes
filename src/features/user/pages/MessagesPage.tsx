@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { MessageCircle, ArrowLeft, Send, User, Building2 } from 'lucide-react';
-import { BottomNav } from '@/components/BottomNav';
-import { useI18n } from '@/lib/i18n';
-import { useAuth } from '@/lib/AuthProvider';
+import { BottomNav } from '@/shared/components/layout/BottomNav';
+import { useI18n } from '@/shared/lib/i18n';
+import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow, format, isToday, isYesterday } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';

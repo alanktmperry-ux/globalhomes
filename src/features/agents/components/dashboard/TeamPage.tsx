@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Copy, Plus, Trash2, UserPlus, Building2, Shield, Users, RefreshCw, Loader2, Camera, Upload, LogIn, ArrowRight, Mail, MapPin, Eye, Lock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/lib/AuthProvider';
-import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/features/auth/AuthProvider';
+import { useToast } from '@/shared/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';

@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/lib/AuthProvider';
+import { useAuth } from '@/features/auth/AuthProvider';
 import { Loader2 } from 'lucide-react';
 
 interface Props {

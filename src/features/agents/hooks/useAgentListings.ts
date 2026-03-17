@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/lib/AuthProvider';
+import { useAuth } from '@/features/auth/AuthProvider';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Property = Tables<'properties'>;

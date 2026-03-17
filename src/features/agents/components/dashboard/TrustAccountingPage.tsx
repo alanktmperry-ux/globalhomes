@@ -19,8 +19,8 @@ import { supabase } from '@/integrations/supabase/client';
 import DashboardHeader from './DashboardHeader';
 import TrustImportWizard from './TrustImportWizard';
 import TrustReceiptModal from './TrustReceiptModal';
-import { useTrustAccounting, TrustTransaction } from '@/hooks/useTrustAccounting';
-import { useAuth } from '@/lib/AuthProvider';
+import { useTrustAccounting, TrustTransaction } from '@/features/agents/hooks/useTrustAccounting';
+import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 2 });

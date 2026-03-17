@@ -18,7 +18,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import DashboardHeader from './DashboardHeader';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/lib/AuthProvider';
+import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });

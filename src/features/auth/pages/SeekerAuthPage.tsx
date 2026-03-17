@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Home, Search, Heart, Mic, Building2 } from 'lucide-react';
-import PhoneInput from '@/components/PhoneInput';
+import PhoneInput from '@/shared/components/PhoneInput';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/shared/hooks/use-toast';
 import seekerHero from '@/assets/seeker-auth-hero.jpg';
 
 type Step = 'email' | 'password' | 'create';

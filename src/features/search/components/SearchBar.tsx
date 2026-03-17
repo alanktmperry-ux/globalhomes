@@ -1,10 +1,10 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Search, Mic, MapPin } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useI18n } from '@/lib/i18n';
-import { useVoiceSearch } from '@/hooks/useVoiceSearch';
-import { autocomplete } from '@/lib/googleMapsService';
-import { useToast } from '@/hooks/use-toast';
+import { useI18n } from '@/shared/lib/i18n';
+import { useVoiceSearch } from '@/features/search/hooks/useVoiceSearch';
+import { autocomplete } from '@/shared/lib/googleMapsService';
+import { useToast } from '@/shared/hooks/use-toast';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;

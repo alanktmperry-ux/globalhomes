@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { User, ChevronRight, Shield, LogIn, LogOut, Settings, Mail, Lock, Eye, EyeOff, Loader2, ShieldCheck, Search, LayoutDashboard, Camera } from 'lucide-react';
-import { BottomNav } from '@/components/BottomNav';
-import { useI18n } from '@/lib/i18n';
+import { BottomNav } from '@/shared/components/layout/BottomNav';
+import { useI18n } from '@/shared/lib/i18n';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/lib/AuthProvider';
+import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/shared/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {

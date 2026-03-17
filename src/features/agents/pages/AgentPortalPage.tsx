@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Eye, MousePointerClick, TrendingUp, Crown, Loader2, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useI18n } from '@/lib/i18n';
-import { mockProperties } from '@/lib/mock-data';
+import { useI18n } from '@/shared/lib/i18n';
+import { mockProperties } from '@/features/properties/api/mock-data';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/lib/AuthProvider';
-import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/features/auth/AuthProvider';
+import { useToast } from '@/shared/hooks/use-toast';
 
 const AgentPortalPage = () => {
   const { t } = useI18n();

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { TrendingUp, TrendingDown, BarChart3, Home, ArrowDown, ArrowUp, Minus } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, YAxis, Tooltip } from 'recharts';
-import { Property } from '@/lib/types';
+import { Property } from '@/shared/lib/types';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 

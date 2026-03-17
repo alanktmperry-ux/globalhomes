@@ -2,18 +2,18 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Calendar, Eye, Home, BadgeCheck, Star, X } from 'lucide-react';
-import { Property } from '@/lib/types';
-import { useI18n } from '@/lib/i18n';
-import { useCurrency } from '@/lib/CurrencyContext';
-import { AgentContactModal } from '@/components/AgentContactModal';
+import { Property } from '@/shared/lib/types';
+import { useI18n } from '@/shared/lib/i18n';
+import { useCurrency } from '@/shared/lib/CurrencyContext';
+import { AgentContactModal } from '@/features/agents/components/AgentContactModal';
 import { InvestmentInsightsCard } from '@/features/properties/components/InvestmentInsightsCard';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { SiteHeader } from '@/components/SiteHeader';
-import { SiteFooter } from '@/components/SiteFooter';
-import { BottomNav } from '@/components/BottomNav';
-import { useSavedProperties } from '@/hooks/useSavedProperties';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { mockProperties } from '@/lib/mock-data';
+import { SiteHeader } from '@/shared/components/layout/SiteHeader';
+import { SiteFooter } from '@/shared/components/layout/SiteFooter';
+import { BottomNav } from '@/shared/components/layout/BottomNav';
+import { useSavedProperties } from '@/features/properties/hooks/useSavedProperties';
+import { useIsMobile } from '@/shared/hooks/use-mobile';
+import { mockProperties } from '@/features/properties/api/mock-data';
 import { supabase } from '@/integrations/supabase/client';
 
 export default function PropertyDetailPage() {

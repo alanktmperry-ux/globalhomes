@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Building2, KeyRound, Plus, BarChart3, Users, Megaphone, Gamepad2 } from 'lucide-react';
-import PhoneInput from '@/components/PhoneInput';
+import PhoneInput from '@/shared/components/PhoneInput';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
-import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/lib/AuthProvider';
+import { useToast } from '@/shared/hooks/use-toast';
+import { useAuth } from '@/features/auth/AuthProvider';
 import agentHero from '@/assets/agent-auth-hero.jpg';
 
 type Step = 'email' | 'password' | 'choose' | 'create-agency' | 'join-agency';

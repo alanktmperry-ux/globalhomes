@@ -2,31 +2,31 @@ import { useState, useCallback, useRef, useEffect, useMemo, lazy, Suspense } fro
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence, useMotionValue, useSpring, PanInfo } from 'framer-motion';
 import { ArrowRight, MapPin, Sparkles, Loader2, Zap, Map, List, Mic, GripVertical, ArrowUpDown, X, Bookmark, Share2 } from 'lucide-react';
-import { VoiceSearchHero } from '@/components/VoiceSearchHero';
+import { VoiceSearchHero } from '@/features/search/components/VoiceSearchHero';
 import { AiPicksSection } from '@/features/properties/components/AiPicksSection';
 import { VirtualizedPropertyList } from '@/features/properties/components/VirtualizedPropertyList';
-import { MapSkeleton } from '@/components/PropertyCardSkeleton';
-import { PropertyDrawer } from '@/components/PropertyDrawer';
+import { MapSkeleton } from '@/features/properties/components/PropertyCardSkeleton';
+import { PropertyDrawer } from '@/features/properties/components/PropertyDrawer';
 import { MapErrorBoundary } from '@/features/properties/components/MapErrorBoundary';
 import { VoiceSearchErrorBoundary } from '@/features/search/components/VoiceSearchErrorBoundary';
-import { BottomNav } from '@/components/BottomNav';
-import { useI18n } from '@/lib/i18n';
-import { SiteFooter } from '@/components/SiteFooter';
-import { SiteHeader } from '@/components/SiteHeader';
+import { BottomNav } from '@/shared/components/layout/BottomNav';
+import { useI18n } from '@/shared/lib/i18n';
+import { SiteFooter } from '@/shared/components/layout/SiteFooter';
+import { SiteHeader } from '@/shared/components/layout/SiteHeader';
 
 // Lazy-load map — only initialize when needed
-const LazyPropertyMap = lazy(() => import('@/components/PropertyMap').then(m => ({ default: m.PropertyMap })));
-import { useSearchHistory } from '@/hooks/useSearchHistory';
-import { useSavedProperties } from '@/hooks/useSavedProperties';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { Property } from '@/lib/types';
-import { useCurrency } from '@/lib/CurrencyContext';
-import { FilterSidebar } from '@/components/FilterSidebar';
-import { usePropertySearch } from '@/hooks/usePropertySearch';
+const LazyPropertyMap = lazy(() => import('@/features/properties/components/PropertyMap').then(m => ({ default: m.PropertyMap })));
+import { useSearchHistory } from '@/features/search/hooks/useSearchHistory';
+import { useSavedProperties } from '@/features/properties/hooks/useSavedProperties';
+import { useIsMobile } from '@/shared/hooks/use-mobile';
+import { Property } from '@/shared/lib/types';
+import { useCurrency } from '@/shared/lib/CurrencyContext';
+import { FilterSidebar } from '@/shared/components/FilterSidebar';
+import { usePropertySearch } from '@/features/properties/hooks/usePropertySearch';
 import { Slider } from '@/components/ui/slider';
-import { useSavedSearches } from '@/hooks/useSavedSearches';
+import { useSavedSearches } from '@/features/search/hooks/useSavedSearches';
 import { useCollabSession } from '@/features/search/hooks/useCollabSession';
-import { useAuth } from '@/lib/AuthProvider';
+import { useAuth } from '@/features/auth/AuthProvider';
 
 const Index = () => {
   const { t } = useI18n();

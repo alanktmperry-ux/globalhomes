@@ -4,7 +4,7 @@ import {
   ClipboardCheck, CalendarDays, Search, TrendingUp, Receipt,
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/lib/AuthProvider';
+import { useAuth } from '@/features/auth/AuthProvider';
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter,
@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useAgentListings } from '@/hooks/useAgentListings';
+import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
 
 interface NavItem {
   title: string;

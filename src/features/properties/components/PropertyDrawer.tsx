@@ -1,10 +1,10 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Phone, MessageCircle, Mail, Shield, ShieldCheck } from 'lucide-react';
-import { Property } from '@/lib/types';
-import { useI18n } from '@/lib/i18n';
-import { useCurrency } from '@/lib/CurrencyContext';
-import { AgentContactModal } from '@/components/AgentContactModal';
+import { Property } from '@/shared/lib/types';
+import { useI18n } from '@/shared/lib/i18n';
+import { useCurrency } from '@/shared/lib/CurrencyContext';
+import { AgentContactModal } from '@/features/agents/components/AgentContactModal';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { BadgeCheck, Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';

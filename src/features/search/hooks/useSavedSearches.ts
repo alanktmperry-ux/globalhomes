@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/lib/AuthProvider';
-import { Filters, defaultFilters } from '@/components/FilterSidebar';
-import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/features/auth/AuthProvider';
+import { Filters, defaultFilters } from '@/shared/components/FilterSidebar';
+import { useToast } from '@/shared/hooks/use-toast';
 
 export interface SavedSearch {
   id: string;

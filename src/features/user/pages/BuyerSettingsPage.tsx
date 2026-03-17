@@ -4,11 +4,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/shared/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/lib/AuthProvider';
+import { useAuth } from '@/features/auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
-import { BottomNav } from '@/components/BottomNav';
+import { BottomNav } from '@/shared/components/layout/BottomNav';
 
 const PROPERTY_TYPES = ['House', 'Apartment', 'Townhouse', 'Land', 'Villa', 'Unit'];
 

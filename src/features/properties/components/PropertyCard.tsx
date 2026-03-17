@@ -2,11 +2,11 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Bed, Bath, Car, Heart, BadgeCheck, Star, Sparkles, Shield, ShieldCheck, Eye, Users, TrendingUp, UserCheck } from 'lucide-react';
-import { Property, PropertyStatus } from '@/lib/types';
-import { useI18n } from '@/lib/i18n';
-import { useCurrency } from '@/lib/CurrencyContext';
+import { Property, PropertyStatus } from '@/shared/lib/types';
+import { useI18n } from '@/shared/lib/i18n';
+import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { AgentContactModal } from '@/components/AgentContactModal';
+import { AgentContactModal } from '@/features/agents/components/AgentContactModal';
 
 function VerificationBadge({ level }: { level?: string }) {
   if (!level || level === 'email') return null;

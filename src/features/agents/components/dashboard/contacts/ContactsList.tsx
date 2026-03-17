@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import type { Contact } from '@/hooks/useContacts';
+import type { Contact } from '@/features/agents/hooks/useContacts';
 
 const RANKING_CONFIG: Record<string, { icon: React.ReactNode; color: string; label: string }> = {
   hot: { icon: <Flame size={12} />, color: 'bg-destructive/15 text-destructive', label: 'Hot' },

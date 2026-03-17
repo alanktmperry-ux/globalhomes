@@ -1,6 +1,6 @@
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Outlet } from 'react-router-dom';
-import AgentDashboardSidebar from '@/components/agent-dashboard/AgentDashboardSidebar';
+import AgentDashboardSidebar from '@/features/agents/components/dashboard/AgentDashboardSidebar';
 import DemoModeBanner from '@/features/agents/components/dashboard/DemoModeBanner';
 
 const AgentDashboardLayout = () => {

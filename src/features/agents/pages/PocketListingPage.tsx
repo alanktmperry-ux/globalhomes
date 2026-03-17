@@ -4,12 +4,12 @@ import { ArrowLeft, Plus, Zap, Eye, MessageSquare, TrendingUp, Copy, Sparkles, K
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import PocketListingForm from '@/components/pocket-listing/PocketListingForm';
-import ListingSuccess from '@/components/pocket-listing/ListingSuccess';
-import { useAgentListings } from '@/hooks/useAgentListings';
-import { useToast } from '@/hooks/use-toast';
+import PocketListingForm from '@/features/agents/components/pocket-listing/PocketListingForm';
+import ListingSuccess from '@/features/agents/components/pocket-listing/ListingSuccess';
+import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
+import { useToast } from '@/shared/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/lib/AuthProvider';
+import { useAuth } from '@/features/auth/AuthProvider';
 
 const PocketListingPage = () => {
   const navigate = useNavigate();

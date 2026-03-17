@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Flame, Thermometer, Snowflake, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { Contact } from '@/hooks/useContacts';
+import type { Contact } from '@/features/agents/hooks/useContacts';
 
 const BUYER_STAGES = [
   { key: 'cold_lead', label: 'Cold Lead', color: 'bg-muted' },

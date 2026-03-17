@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Calculator, DollarSign, TrendingDown } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
-import { Property } from '@/lib/types';
+import { Property } from '@/shared/lib/types';
 
 interface AffordabilityCalculatorProps {
   property: Property;

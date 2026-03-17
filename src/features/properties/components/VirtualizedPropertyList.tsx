@@ -2,7 +2,7 @@ import { memo, useCallback, useRef, useEffect, useState } from 'react';
 import { FixedSizeList } from 'react-window';
 import { PropertyCard, CollabReaction } from '@/features/properties/components/PropertyCard';
 import { PropertyCardSkeleton } from '@/features/properties/components/PropertyCardSkeleton';
-import { Property } from '@/lib/types';
+import { Property } from '@/shared/lib/types';
 
 const CARD_HEIGHT_MOBILE = 520;
 const CARD_HEIGHT_DESKTOP = 540;

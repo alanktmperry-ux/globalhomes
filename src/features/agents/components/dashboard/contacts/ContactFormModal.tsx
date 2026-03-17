@@ -5,10 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/shared/hooks/use-toast';
 import { MapPin } from 'lucide-react';
-import { autocomplete, getPlaceDetails } from '@/lib/googleMapsService';
-import type { Contact } from '@/hooks/useContacts';
+import { autocomplete, getPlaceDetails } from '@/shared/lib/googleMapsService';
+import type { Contact } from '@/features/agents/hooks/useContacts';
 
 interface Props {
   onClose: () => void;

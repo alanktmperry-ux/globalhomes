@@ -34,7 +34,8 @@ export default function PropertyDetailPage() {
   const [contactOpen, setContactOpen] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [rentalEnquiryOpen, setRentalEnquiryOpen] = useState(false);
-
+  const [inspectionBookingOpen, setInspectionBookingOpen] = useState(false);
+  const [inspectionTimes, setInspectionTimes] = useState<InspectionSlot[]>([]);
   useEffect(() => {
     const fetchProperty = async () => {
       setLoading(true);

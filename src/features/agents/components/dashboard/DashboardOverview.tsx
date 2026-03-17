@@ -117,7 +117,7 @@ const DashboardOverview = () => {
 
   return (
     <div>
-      <DashboardHeader title="Dashboard" subtitle="Welcome back, Agent" />
+      <DashboardHeader title="Dashboard" subtitle={isDemoMode ? "South Yarra Demo Agency" : "Welcome back, Agent"} />
 
       <div className="p-4 sm:p-6 space-y-6 max-w-7xl">
         {/* Stats Row */}

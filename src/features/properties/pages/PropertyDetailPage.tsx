@@ -19,6 +19,7 @@ import { toast } from '@/hooks/use-toast';
 import { RentalEnquiryForm } from '@/features/properties/components/RentalEnquiryForm';
 import { InspectionBookingModal } from '@/features/properties/components/InspectionBookingModal';
 import { PriceHistoryChart } from '@/features/properties/components/PriceHistoryChart';
+import { RentalApplicationModal } from '@/features/properties/components/RentalApplicationModal';
 import { InspectionSlot } from '@/shared/lib/types';
 
 export default function PropertyDetailPage() {

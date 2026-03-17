@@ -159,6 +159,28 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
             </span>
           </div>
 
+          {/* Rental-specific row */}
+          {isRental && (
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground bg-secondary/70 px-2 py-0.5 rounded-full">
+                <CalendarDays size={11} />
+                Available Now
+              </span>
+              {isFurnished && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                  <Sofa size={11} />
+                  Furnished
+                </span>
+              )}
+              {isPetFriendly && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                  <PawPrint size={11} />
+                  Pet Friendly
+                </span>
+              )}
+            </div>
+          )}
+
           {/* AI annotation */}
           {property.aiSummary && (
             <p className="mt-2 flex items-start gap-1.5 text-xs text-primary/80 leading-snug">

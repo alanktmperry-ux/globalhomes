@@ -1,6 +1,10 @@
 import { createContext, useContext, useEffect, useState, useRef, useCallback, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+
+const DEMO_EMAIL = 'demo-agent@globalhomes.app';
+const DEMO_PASSWORD = 'DemoAgent2024!';
 
 interface AuthContextType {
   user: User | null;
@@ -10,6 +14,10 @@ interface AuthContextType {
   isAdmin: boolean;
   userRole: 'user' | 'agent' | 'admin' | null;
   signOut: () => Promise<void>;
+  isDemoMode: boolean;
+  demoSwitching: boolean;
+  switchToDemo: () => Promise<void>;
+  switchToLive: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -20,6 +28,10 @@ const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
   userRole: null,
   signOut: async () => {},
+  isDemoMode: false,
+  demoSwitching: false,
+  switchToDemo: async () => {},
+  switchToLive: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -32,7 +44,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [userRole, setUserRole] = useState<'user' | 'agent' | 'admin' | null>(null);
   const [rolesFetched, setRolesFetched] = useState(false);
+  const [demoSwitching, setDemoSwitching] = useState(false);
   const lastFetchedUserId = useRef<string | null>(null);
+
+  const isDemoMode = user?.email === DEMO_EMAIL;
 
   const applyRoles = useCallback((roles: string[]) => {
     console.log('[Auth] applyRoles:', roles);
@@ -52,31 +67,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   // Fetch roles in a SEPARATE effect, not inside onAuthStateChange
-  // This avoids the Supabase deadlock where async DB calls inside the auth callback hang
   useEffect(() => {
     if (!user) {
       if (rolesFetched) clearRoles();
       return;
     }
-
-    // Skip if already fetched for this user
     if (lastFetchedUserId.current === user.id) return;
 
     let cancelled = false;
-
     const doFetch = async () => {
       lastFetchedUserId.current = user.id;
       console.log('[Auth] fetchRoles for:', user.id);
-
       try {
         const { data, error } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', user.id);
-
         if (cancelled) return;
         console.log('[Auth] fetchRoles result:', { data, error });
-
         const roles = data?.map((r) => r.role) || [];
         applyRoles(roles);
       } catch (err) {
@@ -88,14 +96,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       }
     };
-
     doFetch();
     return () => { cancelled = true; };
   }, [user, applyRoles, clearRoles, rolesFetched]);
 
-  // Auth listener — only sets user/session state, NO async DB calls
+  // Auth listener
   useEffect(() => {
-    // Safety timeout
     const timeout = setTimeout(() => {
       setLoading((prev) => {
         if (prev) console.warn('[Auth] Timed out, forcing loading=false');
@@ -106,31 +112,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         console.log('[Auth] onAuthStateChange event:', _event, 'user:', session?.user?.id ?? 'none');
-
         if (_event === 'SIGNED_IN' && session?.user) {
-          // Reset so the role-fetch effect runs for this user
           lastFetchedUserId.current = null;
           setRolesFetched(false);
           setLoading(true);
         }
-
         setSession(session);
         setUser(session?.user ?? null);
-
-        if (!session?.user) {
-          setLoading(false);
-        }
+        if (!session?.user) setLoading(false);
       }
     );
 
-    // Initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       console.log('[Auth] getSession result, user:', session?.user?.id ?? 'none');
       setSession(session);
       setUser(session?.user ?? null);
-      if (!session?.user) {
-        setLoading(false);
-      }
+      if (!session?.user) setLoading(false);
     }).catch((err) => {
       console.error('[Auth] getSession failed:', err);
       setLoading(false);
@@ -146,7 +143,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     clearRoles();
     setUser(null);
     setSession(null);
-
     try {
       const { error } = await supabase.auth.signOut();
       if (error) {
@@ -165,8 +161,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const switchToDemo = useCallback(async () => {
+    setDemoSwitching(true);
+    try {
+      await supabase.functions.invoke('seed-demo-agent');
+      await supabase.auth.signOut();
+      const { error } = await supabase.auth.signInWithPassword({
+        email: DEMO_EMAIL,
+        password: DEMO_PASSWORD,
+      });
+      if (error) throw error;
+      toast.success('Switched to Demo Agency');
+    } catch (err: any) {
+      toast.error('Could not enter demo mode: ' + err.message);
+    } finally {
+      setDemoSwitching(false);
+    }
+  }, []);
+
+  const switchToLive = useCallback(async () => {
+    setDemoSwitching(true);
+    try {
+      await supabase.auth.signOut();
+      toast.success('Exited demo mode');
+    } catch {
+      // ignore
+    } finally {
+      setDemoSwitching(false);
+    }
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, session, loading, isAgent, isAdmin, userRole, signOut }}>
+    <AuthContext.Provider value={{
+      user, session, loading, isAgent, isAdmin, userRole, signOut,
+      isDemoMode, demoSwitching, switchToDemo, switchToLive,
+    }}>
       {children}
     </AuthContext.Provider>
   );

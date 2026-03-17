@@ -1,17 +1,15 @@
 import { ArrowUp, Loader2, Rocket, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useDemoMode } from '@/features/agents/context/DemoModeContext';
 import { useAuth } from '@/lib/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 
 const DemoModeBanner = () => {
-  const { isDemo, switching, enterDemo, exitDemo } = useDemoMode();
-  const { user } = useAuth();
+  const { user, isDemoMode, demoSwitching, switchToDemo, switchToLive } = useAuth();
   const navigate = useNavigate();
 
   if (!user) return null;
 
-  if (isDemo) {
+  if (isDemoMode) {
     return (
       <div className="bg-amber-500/15 border-b border-amber-500/30 px-4 py-2 flex items-center justify-between gap-3 text-sm">
         <div className="flex items-center gap-2 min-w-0">
@@ -29,19 +27,17 @@ const DemoModeBanner = () => {
           size="sm"
           className="h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white shrink-0"
           onClick={() => {
-            exitDemo();
-            navigate('/agents/login');
+            switchToLive().then(() => navigate('/agents/login'));
           }}
-          disabled={switching}
+          disabled={demoSwitching}
         >
-          {switching ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Rocket className="h-3 w-3 mr-1" />}
+          {demoSwitching ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Rocket className="h-3 w-3 mr-1" />}
           Upgrade to Live
         </Button>
       </div>
     );
   }
 
-  // Live mode
   return (
     <div className="bg-emerald-500/10 border-b border-emerald-500/20 px-4 py-2 flex items-center justify-between gap-3 text-sm">
       <span className="font-semibold text-emerald-700 dark:text-emerald-400">
@@ -51,10 +47,10 @@ const DemoModeBanner = () => {
         size="sm"
         variant="outline"
         className="h-7 text-xs border-emerald-500/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/15"
-        onClick={enterDemo}
-        disabled={switching}
+        onClick={() => switchToDemo().then(() => navigate('/dashboard'))}
+        disabled={demoSwitching}
       >
-        {switching ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <ArrowUp className="h-3 w-3 mr-1" />}
+        {demoSwitching ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <ArrowUp className="h-3 w-3 mr-1" />}
         Try Demo Agency
       </Button>
     </div>

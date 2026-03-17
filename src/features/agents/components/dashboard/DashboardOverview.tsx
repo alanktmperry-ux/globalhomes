@@ -191,7 +191,7 @@ const DashboardOverview = () => {
             </h3>
             <div className="h-48">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={PIPELINE_DATA}>
+                <BarChart data={isDemoMode ? DEMO_PIPELINE_DATA : PIPELINE_DATA}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} className="text-muted-foreground" />
                   <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `$${v / 1000}k`} className="text-muted-foreground" />

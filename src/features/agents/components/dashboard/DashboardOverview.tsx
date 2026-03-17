@@ -22,21 +22,16 @@ const AU_DATE = (d: string) => {
   return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
 };
 
-// Pipeline data
-const PIPELINE_DATA = [
-  { month: 'Apr', deals: 2, value: 45000 },
-  { month: 'May', deals: 3, value: 68000 },
-  { month: 'Jun', deals: 1, value: 22000 },
-  { month: 'Jul', deals: 4, value: 95000 },
-  { month: 'Aug', deals: 2, value: 48000 },
-  { month: 'Sep', deals: 3, value: 72000 },
-  { month: 'Oct', deals: 5, value: 120000 },
-  { month: 'Nov', deals: 2, value: 55000 },
-  { month: 'Dec', deals: 3, value: 78000 },
-  { month: 'Jan', deals: 4, value: 98000 },
-  { month: 'Feb', deals: 3, value: 65000 },
-  { month: 'Mar', deals: 6, value: 145000 },
-];
+// Build empty 12-month skeleton
+const buildEmptyMonths = () => {
+  const months: { month: string; deals: number; value: number }[] = [];
+  const now = new Date();
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push({ month: d.toLocaleString('en-AU', { month: 'short' }), deals: 0, value: 0 });
+  }
+  return months;
+};
 
 const DEMO_PIPELINE_DATA = [
   { month: 'Apr', deals: 3, value: 128000 },

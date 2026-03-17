@@ -39,6 +39,13 @@ export interface Property {
   rentalWeekly?: number | null;
   currencyCode?: string | null;
   listingType?: string | null;
+  inspectionTimes?: InspectionSlot[];
+}
+
+export interface InspectionSlot {
+  date: string;   // YYYY-MM-DD
+  start: string;  // HH:mm
+  end: string;    // HH:mm
 }
 
 export interface Agent {

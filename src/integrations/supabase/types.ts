@@ -1200,6 +1200,7 @@ export type Database = {
           id: string
           image_url: string | null
           images: string[] | null
+          inspection_times: Json | null
           is_active: boolean
           land_size: number | null
           lat: number | null
@@ -1246,6 +1247,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           images?: string[] | null
+          inspection_times?: Json | null
           is_active?: boolean
           land_size?: number | null
           lat?: number | null
@@ -1292,6 +1294,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           images?: string[] | null
+          inspection_times?: Json | null
           is_active?: boolean
           land_size?: number | null
           lat?: number | null
@@ -2160,6 +2163,7 @@ export type Database = {
           id: string
           image_url: string | null
           images: string[] | null
+          inspection_times: Json | null
           is_active: boolean
           land_size: number | null
           lat: number | null

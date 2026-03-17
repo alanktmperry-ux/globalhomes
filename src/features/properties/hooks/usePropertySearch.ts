@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { Property } from '@/shared/lib/types';
 import { mockProperties } from '@/features/properties/api/mock-data';
 import { manusSearch } from '@/features/properties/api/ManusSearchService';

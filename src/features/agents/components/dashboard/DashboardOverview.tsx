@@ -52,7 +52,7 @@ const MOCK_MATCHES = [
 
 const DashboardOverview = () => {
   const { listings, isMockData } = useAgentListings();
-  const { user } = useAuth();
+  const { user, isDemoMode } = useAuth();
   const navigate = useNavigate();
   const [tasksDue, setTasksDue] = useState(0);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);

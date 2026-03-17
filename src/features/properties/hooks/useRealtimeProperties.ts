@@ -100,7 +100,7 @@ export function useRealtimeProperties({
     queryKey,
     queryFn: () =>
       isNearbySearch
-        ? fetchNearbyProperties(nearbyCenter.lat, nearbyCenter.lng, nearbyRadiusKm, limit)
+        ? fetchNearbyProperties(nearbyCenter.lat, nearbyCenter.lng, nearbyRadiusKm, limit, listingType)
         : fetchProperties(limit, listingType),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000,   // 10 minutes garbage collection

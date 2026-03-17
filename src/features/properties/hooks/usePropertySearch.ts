@@ -189,8 +189,20 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
 
       setIsSearching(false);
     },
-    [addSearch, toast],
+    [addSearch, toast, listingMode],
   );
+
+  // ── Re-trigger search when listing mode changes ──────────────
+  const prevListingMode = useRef(listingMode);
+  useEffect(() => {
+    if (prevListingMode.current !== listingMode) {
+      prevListingMode.current = listingMode;
+      setResults([]);
+      if (currentQuery) {
+        handleSearch(currentQuery);
+      }
+    }
+  }, [listingMode, currentQuery, handleSearch]);
 
   // ── Force-refresh AI results ─────────────────────────────────
   const refreshAIResults = useCallback(() => {

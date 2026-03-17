@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
-import { Property } from '@/lib/types';
+import { Property } from '@/shared/lib/types';
 import { PropertyCard } from '@/features/properties/components/PropertyCard';
 
 // Adjacent suburb mapping (simple static map — extend as needed)

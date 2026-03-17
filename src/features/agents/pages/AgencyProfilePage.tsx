@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Building2, MapPin, Phone, Mail, Globe, Users, Home, Bed, Bath, Car } from 'lucide-react';
-import { useCurrency } from '@/lib/CurrencyContext';
+import { useCurrency } from '@/shared/lib/CurrencyContext';
 
 const AgencyProfilePage = () => {
   const { slug } = useParams<{ slug: string }>();

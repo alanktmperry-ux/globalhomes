@@ -2,13 +2,13 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, MapPin, Globe, Phone, Mail, Star, BadgeCheck, Briefcase, Languages, Award, Building2 } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { SiteHeader } from '@/components/SiteHeader';
-import { SiteFooter } from '@/components/SiteFooter';
-import { BottomNav } from '@/components/BottomNav';
-import { PropertyCard } from '@/components/PropertyCard';
-import { useSavedProperties } from '@/hooks/useSavedProperties';
-import { useI18n } from '@/lib/i18n';
-import { Property } from '@/lib/types';
+import { SiteHeader } from '@/shared/components/layout/SiteHeader';
+import { SiteFooter } from '@/shared/components/layout/SiteFooter';
+import { BottomNav } from '@/shared/components/layout/BottomNav';
+import { PropertyCard } from '@/features/properties/components/PropertyCard';
+import { useSavedProperties } from '@/features/properties/hooks/useSavedProperties';
+import { useI18n } from '@/shared/lib/i18n';
+import { Property } from '@/shared/lib/types';
 import { supabase } from '@/integrations/supabase/client';
 
 interface AgentProfile {

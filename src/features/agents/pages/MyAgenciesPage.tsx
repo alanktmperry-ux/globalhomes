@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Building2, Users, Plus, ChevronRight, MapPin, Loader2, Mail, Phone, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/lib/AuthProvider';
-import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/features/auth/AuthProvider';
+import { useToast } from '@/shared/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {

@@ -6,11 +6,11 @@ import {
 } from 'lucide-react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Area, AreaChart } from 'recharts';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/lib/AuthProvider';
+import { useAuth } from '@/features/auth/AuthProvider';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SiteHeader } from '@/components/SiteHeader';
+import { SiteHeader } from '@/shared/components/layout/SiteHeader';
 
 /* ── Types ──────────────────────────────────────────────────── */
 interface ListingPerf {

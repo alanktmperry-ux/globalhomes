@@ -592,6 +592,13 @@ export default function PropertyDetailPage() {
           onClose={() => setRentalEnquiryOpen(false)}
         />
       )}
+
+      <InspectionBookingModal
+        property={property}
+        inspectionTimes={inspectionTimes}
+        open={inspectionBookingOpen}
+        onClose={() => setInspectionBookingOpen(false)}
+      />
     </div>
   );
 }

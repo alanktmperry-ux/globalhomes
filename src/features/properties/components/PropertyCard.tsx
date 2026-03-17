@@ -271,7 +271,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
                 onClick={(e) => { e.stopPropagation(); setContactOpen(true); }}
                 className="px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors whitespace-nowrap"
               >
-                {t('property.contact')}
+                {isRental ? 'Enquire / Apply' : t('property.contact')}
               </button>
             </div>
           </div>

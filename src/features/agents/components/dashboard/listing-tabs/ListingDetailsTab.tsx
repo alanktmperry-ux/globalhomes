@@ -4,8 +4,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useState } from 'react';
+import { Calendar, Clock, Plus, Trash2 } from 'lucide-react';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
+
+interface InspectionSlot {
+  date: string;
+  start: string;
+  end: string;
+}
 
 interface Props {
   listing: any;
@@ -26,12 +33,34 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
     status: listing.status || 'whisper',
   });
 
+  // Inspection times management
+  const inspectionTimes: InspectionSlot[] = listing.inspection_times || [];
+  const [newSlot, setNewSlot] = useState<InspectionSlot>({ date: '', start: '10:00', end: '10:30' });
+  const [showAddSlot, setShowAddSlot] = useState(false);
+
   const handleSave = () => {
     onUpdate({
       ...form,
       land_size: form.land_size ? Number(form.land_size) : null,
     });
     setEditing(false);
+  };
+
+  const handleAddInspection = () => {
+    if (!newSlot.date || !newSlot.start || !newSlot.end) return;
+    if (newSlot.start >= newSlot.end) return;
+
+    const updated = [...inspectionTimes, { ...newSlot }].sort((a, b) =>
+      `${a.date}${a.start}`.localeCompare(`${b.date}${b.start}`)
+    );
+    onUpdate({ inspection_times: updated });
+    setNewSlot({ date: '', start: '10:00', end: '10:30' });
+    setShowAddSlot(false);
+  };
+
+  const handleRemoveInspection = (index: number) => {
+    const updated = inspectionTimes.filter((_, i) => i !== index);
+    onUpdate({ inspection_times: updated });
   };
 
   return (
@@ -133,6 +162,104 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
           ))}
         </div>
       )}
+
+      {/* Inspection Times Management */}
+      <div className="bg-card border border-border rounded-xl p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-bold flex items-center gap-2">
+            <Calendar size={16} className="text-primary" />
+            Inspection / Open Home Times
+          </h3>
+          <Button size="sm" variant="outline" onClick={() => setShowAddSlot(!showAddSlot)} className="gap-1.5 text-xs h-8">
+            <Plus size={14} />
+            Add Time
+          </Button>
+        </div>
+
+        {/* Add new slot form */}
+        {showAddSlot && (
+          <div className="mb-4 p-3 rounded-lg bg-secondary border border-border space-y-3">
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <Label className="text-[10px] uppercase text-muted-foreground">Date</Label>
+                <Input
+                  type="date"
+                  value={newSlot.date}
+                  onChange={e => setNewSlot(s => ({ ...s, date: e.target.value }))}
+                  min={new Date().toISOString().split('T')[0]}
+                  className="h-9 text-sm"
+                />
+              </div>
+              <div>
+                <Label className="text-[10px] uppercase text-muted-foreground">Start</Label>
+                <Input
+                  type="time"
+                  value={newSlot.start}
+                  onChange={e => setNewSlot(s => ({ ...s, start: e.target.value }))}
+                  className="h-9 text-sm"
+                />
+              </div>
+              <div>
+                <Label className="text-[10px] uppercase text-muted-foreground">End</Label>
+                <Input
+                  type="time"
+                  value={newSlot.end}
+                  onChange={e => setNewSlot(s => ({ ...s, end: e.target.value }))}
+                  className="h-9 text-sm"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button size="sm" className="h-8 text-xs" onClick={handleAddInspection} disabled={!newSlot.date || !newSlot.start || !newSlot.end}>
+                Save Inspection
+              </Button>
+              <Button size="sm" variant="ghost" className="h-8 text-xs" onClick={() => setShowAddSlot(false)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Existing slots */}
+        {inspectionTimes.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-2">
+            No inspection times scheduled. Add times to let buyers book viewings.
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {inspectionTimes.map((slot, i) => {
+              const dateObj = new Date(slot.date);
+              const dayStr = dateObj.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+              const isPast = new Date(`${slot.date}T${slot.end}`) < new Date();
+              return (
+                <div
+                  key={`${slot.date}-${slot.start}-${i}`}
+                  className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                    isPast ? 'border-border bg-muted/30 opacity-60' : 'border-border bg-secondary'
+                  }`}
+                >
+                  <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <Calendar size={14} className="text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground">{dayStr}</p>
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Clock size={10} /> {slot.start} – {slot.end}
+                      {isPast && <span className="ml-1 text-destructive">(Past)</span>}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleRemoveInspection(i)}
+                    className="w-8 h-8 rounded-lg hover:bg-destructive/10 flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
       {listing.description && (
         <div className="bg-card border border-border rounded-xl p-4">

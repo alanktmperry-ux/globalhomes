@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Plus, Upload, Download, LayoutList, Kanban } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
-import { useContacts } from '@/hooks/useContacts';
+import { useContacts } from '@/features/agents/hooks/useContacts';
 import ContactsList from './contacts/ContactsList';
 import ContactFormModal from './contacts/ContactFormModal';
 import ContactDetailDrawer from './contacts/ContactDetailDrawer';

@@ -126,6 +126,13 @@ const Index = () => {
     }
   }, []);
 
+  // ── Reset map center when listing mode toggled ───────────────
+  useEffect(() => {
+    const handler = () => setMapCenter(null);
+    window.addEventListener('listing-mode-changed', handler);
+    return () => window.removeEventListener('listing-mode-changed', handler);
+  }, []);
+
   // ── Push search state to URL ─────────────────────────────────
   useEffect(() => {
     if (!initializedFromUrl.current) return;

@@ -35,7 +35,8 @@ async function fetchNearbyProperties(
   lat: number,
   lng: number,
   radiusKm: number,
-  limit = 50
+  limit = 50,
+  listingType?: 'sale' | 'rent'
 ): Promise<Property[]> {
   const { data, error } = await supabase.rpc('nearby_properties', {
     _lat: lat,
@@ -53,10 +54,18 @@ async function fetchNearbyProperties(
   if (!data || data.length === 0) return [];
 
   const ids = data.map((p: any) => p.id);
-  const { data: withAgents, error: agentError } = await supabase
+  let query = supabase
     .from('properties')
     .select(PROPERTIES_QUERY)
     .in('id', ids);
+
+  if (listingType === 'rent') {
+    query = query.eq('listing_type', 'rent');
+  } else if (listingType === 'sale') {
+    query = query.or('listing_type.eq.sale,listing_type.is.null');
+  }
+
+  const { data: withAgents, error: agentError } = await query;
 
   if (agentError) {
     console.error('[useRealtimeProperties] agent join error:', agentError.message);
@@ -91,7 +100,7 @@ export function useRealtimeProperties({
     queryKey,
     queryFn: () =>
       isNearbySearch
-        ? fetchNearbyProperties(nearbyCenter.lat, nearbyCenter.lng, nearbyRadiusKm, limit)
+        ? fetchNearbyProperties(nearbyCenter.lat, nearbyCenter.lng, nearbyRadiusKm, limit, listingType)
         : fetchProperties(limit, listingType),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000,   // 10 minutes garbage collection

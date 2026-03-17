@@ -46,7 +46,10 @@ export function SiteHeader() {
         {/* Sale / Rent toggle */}
         <div className="flex items-center bg-secondary rounded-full p-0.5 shrink-0">
           <button
-            onClick={() => setListingMode('sale')}
+            onClick={() => {
+              setListingMode('sale');
+              window.dispatchEvent(new CustomEvent('listing-mode-changed'));
+            }}
             className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
               listingMode === 'sale'
                 ? 'bg-primary text-primary-foreground shadow-sm'
@@ -56,7 +59,10 @@ export function SiteHeader() {
             For Sale
           </button>
           <button
-            onClick={() => setListingMode('rent')}
+            onClick={() => {
+              setListingMode('rent');
+              window.dispatchEvent(new CustomEvent('listing-mode-changed'));
+            }}
             className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
               listingMode === 'rent'
                 ? 'bg-primary text-primary-foreground shadow-sm'

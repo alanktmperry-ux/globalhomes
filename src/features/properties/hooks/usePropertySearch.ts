@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { Property } from '@/shared/lib/types';
 import { mockProperties } from '@/features/properties/api/mock-data';
 import { manusSearch } from '@/features/properties/api/ManusSearchService';
@@ -103,7 +103,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
       setIsSearching(!cached);
 
       // Phase 1 (agent listings) + Phase 2 (Firecrawl) in parallel
-      const agentListingsPromise = searchAgentListings(query, 20).catch((err) => {
+      const agentListingsPromise = searchAgentListings(query, 20, listingMode).catch((err) => {
         console.warn('[handleSearch] Agent listings search failed:', err);
         return [] as Property[];
       });
@@ -189,8 +189,20 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
 
       setIsSearching(false);
     },
-    [addSearch, toast],
+    [addSearch, toast, listingMode],
   );
+
+  // ── Re-trigger search when listing mode changes ──────────────
+  const prevListingMode = useRef(listingMode);
+  useEffect(() => {
+    if (prevListingMode.current !== listingMode) {
+      prevListingMode.current = listingMode;
+      setResults([]);
+      if (currentQuery) {
+        handleSearch(currentQuery);
+      }
+    }
+  }, [listingMode, currentQuery, handleSearch]);
 
   // ── Force-refresh AI results ─────────────────────────────────
   const refreshAIResults = useCallback(() => {

@@ -169,7 +169,7 @@ export default function PropertyDetailPage() {
         <meta property="og:description" content={(property.description || '').slice(0, 155)} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
-        <meta property="og:image" content={property.images?.[0] || property.image_url || '/placeholder.svg'} />
+        <meta property="og:image" content={property.images?.[0] || property.imageUrl || '/placeholder.svg'} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${property.title} - ${property.suburb}, ${property.state}`} />
         <meta name="twitter:description" content={(property.description || '').slice(0, 155)} />

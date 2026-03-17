@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Bell, X, Check, CheckCheck, MessageSquare, MousePointerClick, Mic } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/lib/AuthProvider';
+import { useAuth } from '@/features/auth/AuthProvider';
 import { formatDistanceToNow } from 'date-fns';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';

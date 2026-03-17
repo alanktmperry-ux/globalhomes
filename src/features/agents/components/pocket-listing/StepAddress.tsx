@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { MapPin, Search, Loader2, CheckCircle2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { autocomplete, geocode, getPlaceDetails, loadGoogleMapsScript } from '@/lib/googleMapsService';
+import { autocomplete, geocode, getPlaceDetails, loadGoogleMapsScript } from '@/shared/lib/googleMapsService';
 import type { ListingDraft } from './PocketListingForm';
 
 interface Props {

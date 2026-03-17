@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Upload, FileText, Check, AlertCircle } from 'lucide-react';
-import type { Contact } from '@/hooks/useContacts';
+import type { Contact } from '@/features/agents/hooks/useContacts';
 
 const EXPECTED_HEADERS = ['first_name', 'last_name', 'email', 'phone', 'mobile', 'contact_type', 'ranking', 'suburb', 'state', 'postcode', 'budget_min', 'budget_max', 'source', 'notes'];
 

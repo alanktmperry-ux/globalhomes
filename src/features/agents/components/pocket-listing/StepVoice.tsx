@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { SoundWaveVisualizer } from '@/components/SoundWaveVisualizer';
-import { useVoiceSearch } from '@/hooks/useVoiceSearch';
+import { SoundWaveVisualizer } from '@/features/search/components/SoundWaveVisualizer';
+import { useVoiceSearch } from '@/features/search/hooks/useVoiceSearch';
 import type { ListingDraft } from './PocketListingForm';
 
 interface Props {

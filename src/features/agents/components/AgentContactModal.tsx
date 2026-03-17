@@ -9,7 +9,7 @@ import { Property } from '@/shared/lib/types';
 import type { SearchContext } from '@/features/properties/components/PropertyDrawer';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/shared/hooks/use-toast';
 import { z } from 'zod';
 
 /* ── Validation ─────────────────────────────────────────────── */

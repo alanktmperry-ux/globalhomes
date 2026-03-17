@@ -41,6 +41,7 @@ const MessagesPage = () => {
   const [selectedConvo, setSelectedConvo] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
+  const [newMsgDialogOpen, setNewMsgDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);

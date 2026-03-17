@@ -70,27 +70,29 @@ interface UseRealtimePropertiesOptions {
   limit?: number;
   nearbyCenter?: { lat: number; lng: number } | null;
   nearbyRadiusKm?: number | null;
+  listingType?: 'sale' | 'rent';
 }
 
 export function useRealtimeProperties({
   limit = 50,
   nearbyCenter = null,
   nearbyRadiusKm = null,
+  listingType,
 }: UseRealtimePropertiesOptions = {}) {
   const queryClient = useQueryClient();
 
   const isNearbySearch = nearbyCenter && nearbyRadiusKm && nearbyRadiusKm > 0;
 
   const queryKey = isNearbySearch
-    ? ['properties', 'nearby', nearbyCenter.lat, nearbyCenter.lng, nearbyRadiusKm, limit]
-    : ['properties', 'all', limit];
+    ? ['properties', 'nearby', nearbyCenter.lat, nearbyCenter.lng, nearbyRadiusKm, limit, listingType]
+    : ['properties', 'all', limit, listingType];
 
   const query = useQuery({
     queryKey,
     queryFn: () =>
       isNearbySearch
         ? fetchNearbyProperties(nearbyCenter.lat, nearbyCenter.lng, nearbyRadiusKm, limit)
-        : fetchProperties(limit),
+        : fetchProperties(limit, listingType),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000,   // 10 minutes garbage collection
     refetchOnWindowFocus: false,

@@ -298,7 +298,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
     if (sortBy === 'beds') return withBoost((a, b) => b.beds - a.beds);
 
     return [...props].sort((a, b) => subscriptionBoost(a) - subscriptionBoost(b));
-  }, [displayProperties, areaSearch, sortBy, filters, searchCenter, searchRadius]);
+  }, [displayProperties, areaSearch, sortBy, filters, searchCenter, searchRadius, listingMode]);
 
   // ── Setters ──────────────────────────────────────────────────
   const handleAreaSearch = useCallback((area: AreaSearch | null) => {

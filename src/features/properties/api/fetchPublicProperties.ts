@@ -139,6 +139,12 @@ export async function fetchPublicProperties(limit = 50, listingType?: 'sale' | '
     .order('created_at', { ascending: false })
     .limit(limit);
 
+  if (listingType === 'rent') {
+    query = query.eq('listing_type', 'rent');
+  } else if (listingType === 'sale') {
+    query = query.or('listing_type.eq.sale,listing_type.is.null');
+  }
+
   const { data, error } = await query;
 
   if (error) {

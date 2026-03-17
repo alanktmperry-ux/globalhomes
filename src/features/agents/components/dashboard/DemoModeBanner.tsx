@@ -1,35 +1,47 @@
-import { ArrowUp, Loader2 } from 'lucide-react';
+import { ArrowUp, Loader2, Rocket, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDemoMode } from '@/features/agents/context/DemoModeContext';
 import { useAuth } from '@/lib/AuthProvider';
+import { useNavigate } from 'react-router-dom';
 
 const DemoModeBanner = () => {
   const { isDemo, switching, enterDemo, exitDemo } = useDemoMode();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   if (!user) return null;
 
   if (isDemo) {
     return (
       <div className="bg-amber-500/15 border-b border-amber-500/30 px-4 py-2 flex items-center justify-between gap-3 text-sm">
-        <span className="font-semibold text-amber-700 dark:text-amber-400">
-          DEMO MODE: South Yarra Agency
-        </span>
+        <div className="flex items-center gap-2 min-w-0">
+          <Info className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+          <div className="min-w-0">
+            <span className="font-semibold text-amber-700 dark:text-amber-400">
+              DEMO MODE: South Yarra Agency
+            </span>
+            <p className="text-xs text-amber-600/80 dark:text-amber-400/70 hidden sm:block">
+              This is demo data. Your real agency data is safe.
+            </p>
+          </div>
+        </div>
         <Button
           size="sm"
-          variant="outline"
-          className="h-7 text-xs border-amber-500/40 text-amber-700 dark:text-amber-400 hover:bg-amber-500/20"
-          onClick={exitDemo}
+          className="h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white shrink-0"
+          onClick={() => {
+            exitDemo();
+            navigate('/agents/login');
+          }}
           disabled={switching}
         >
-          {switching ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <ArrowUp className="h-3 w-3 mr-1" />}
-          Switch to Live Data
+          {switching ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Rocket className="h-3 w-3 mr-1" />}
+          Upgrade to Live
         </Button>
       </div>
     );
   }
 
-  // Live mode — show real agency name
+  // Live mode
   return (
     <div className="bg-emerald-500/10 border-b border-emerald-500/20 px-4 py-2 flex items-center justify-between gap-3 text-sm">
       <span className="font-semibold text-emerald-700 dark:text-emerald-400">

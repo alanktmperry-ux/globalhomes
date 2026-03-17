@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Property } from '@/lib/types';
+import { Property } from '@/shared/lib/types';
 
 interface FirecrawlListing {
   title: string;

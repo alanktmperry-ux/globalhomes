@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Property } from '@/lib/types';
+import { Property } from '@/shared/lib/types';
 import { mapDbProperty } from '@/features/properties/api/fetchPublicProperties';
 
 const PROPERTIES_QUERY = '*, agents(name, agency, phone, email, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count)';

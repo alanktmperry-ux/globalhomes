@@ -2,9 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { FileText, Upload, Trash2, Loader2, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/shared/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/lib/AuthProvider';
+import { useAuth } from '@/features/auth/AuthProvider';
 import DashboardHeader from './DashboardHeader';
 
 interface Credential {

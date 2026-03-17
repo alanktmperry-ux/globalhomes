@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useAgentListings } from '@/hooks/useAgentListings';
+import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
 
 interface NavItem {
   title: string;

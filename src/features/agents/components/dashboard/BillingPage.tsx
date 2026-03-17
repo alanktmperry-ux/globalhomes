@@ -3,9 +3,9 @@ import { CreditCard, Check, Loader2, Zap, Crown, Building2 } from 'lucide-react'
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/shared/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/lib/AuthProvider';
+import { useAuth } from '@/features/auth/AuthProvider';
 import DashboardHeader from './DashboardHeader';
 
 const PLANS = [

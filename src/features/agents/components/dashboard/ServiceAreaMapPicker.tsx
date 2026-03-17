@@ -3,7 +3,7 @@ import { MapPin, Loader2, X, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { loadGoogleMapsScript, autocomplete, geocode } from '@/lib/googleMapsService';
+import { loadGoogleMapsScript, autocomplete, geocode } from '@/shared/lib/googleMapsService';
 import { supabase } from '@/integrations/supabase/client';
 
 interface ServiceAreaMapPickerProps {

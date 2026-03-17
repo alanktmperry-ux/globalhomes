@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/lib/AuthProvider';
+import { useAuth } from '@/features/auth/AuthProvider';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
 

@@ -9,7 +9,7 @@ import ContactFormModal from './contacts/ContactFormModal';
 import ContactDetailDrawer from './contacts/ContactDetailDrawer';
 import PipelineBoard from './contacts/PipelineBoard';
 import CsvImportModal from './contacts/CsvImportModal';
-import type { Contact } from '@/hooks/useContacts';
+import type { Contact } from '@/features/agents/hooks/useContacts';
 
 const ContactsPage = () => {
   const { contacts, loading, createContact, updateContact, deleteContact, addActivity, getActivities } = useContacts();

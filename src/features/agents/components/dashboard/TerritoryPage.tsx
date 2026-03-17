@@ -3,10 +3,10 @@ import { MapPin, Plus, Trash2, Loader2, Search, Phone, Mail, Building2 } from 'l
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/shared/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/lib/AuthProvider';
-import { autocomplete, getPlaceDetails, loadGoogleMapsScript } from '@/lib/googleMapsService';
+import { useAuth } from '@/features/auth/AuthProvider';
+import { autocomplete, getPlaceDetails, loadGoogleMapsScript } from '@/shared/lib/googleMapsService';
 import DashboardHeader from './DashboardHeader';
 
 interface AgentLocation {

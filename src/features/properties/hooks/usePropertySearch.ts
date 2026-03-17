@@ -1,11 +1,11 @@
 import { useState, useCallback, useMemo } from 'react';
-import { Property } from '@/lib/types';
-import { mockProperties } from '@/lib/mock-data';
-import { manusSearch } from '@/lib/ManusSearchService';
-import { Filters, defaultFilters } from '@/components/FilterSidebar';
+import { Property } from '@/shared/lib/types';
+import { mockProperties } from '@/features/properties/api/mock-data';
+import { manusSearch } from '@/features/properties/api/ManusSearchService';
+import { Filters, defaultFilters } from '@/shared/components/FilterSidebar';
 import { firecrawlPropertySearch } from '@/features/properties/api/firecrawlPropertySearch';
 import { searchAgentListings } from '@/features/properties/api/fetchPublicProperties';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/shared/hooks/use-toast';
 import { isInsidePolygon, haversineDistance } from '@/shared/lib/geoUtils';
 import { useRealtimeProperties } from './useRealtimeProperties';
 

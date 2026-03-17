@@ -6,11 +6,11 @@ import { Plus, Eye, EyeOff, Zap, CheckCircle2, Clock, Sparkles, TrendingUp, Rock
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useNavigate } from 'react-router-dom';
 import DashboardHeader from './DashboardHeader';
-import { useAgentListings, type AgentListing } from '@/hooks/useAgentListings';
-import { PropertyDrawer } from '@/components/PropertyDrawer';
-import { Property } from '@/lib/types';
+import { useAgentListings, type AgentListing } from '@/features/agents/hooks/useAgentListings';
+import { PropertyDrawer } from '@/features/properties/components/PropertyDrawer';
+import { Property } from '@/shared/lib/types';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/shared/hooks/use-toast';
 
 const STATUS_CONFIG: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
   whisper: { icon: <EyeOff size={12} />, label: 'Whisper', color: 'bg-foreground/10 text-foreground' },

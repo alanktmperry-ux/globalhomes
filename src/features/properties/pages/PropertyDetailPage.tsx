@@ -364,24 +364,58 @@ export default function PropertyDetailPage() {
               </div>
             )}
 
-            {/* Inspection Times (rental only) */}
-            {isRental && (
-              <div className="p-5 rounded-2xl bg-card border border-border shadow-card">
-                <h2 className="font-display text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-                  <Eye size={18} className="text-primary" />
-                  Inspection Times
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  No scheduled inspections. Contact agent for inspection times.
-                </p>
-                <button
-                  onClick={handleCtaClick}
-                  className="mt-3 px-5 py-2.5 rounded-xl bg-secondary text-foreground font-medium text-sm hover:bg-accent transition-colors"
-                >
-                  Request Inspection
-                </button>
-              </div>
-            )}
+            {/* Inspection Times — for all property types */}
+            <div className="p-5 rounded-2xl bg-card border border-border shadow-card">
+              <h2 className="font-display text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                <Eye size={18} className="text-primary" />
+                Inspection Times
+              </h2>
+              {(() => {
+                const upcoming = inspectionTimes.filter(s => new Date(`${s.date}T${s.start}`) > new Date());
+                if (upcoming.length === 0) {
+                  return (
+                    <>
+                      <p className="text-sm text-muted-foreground">
+                        No scheduled inspections. Contact agent for inspection times.
+                      </p>
+                      <button
+                        onClick={handleCtaClick}
+                        className="mt-3 px-5 py-2.5 rounded-xl bg-secondary text-foreground font-medium text-sm hover:bg-accent transition-colors"
+                      >
+                        Request Inspection
+                      </button>
+                    </>
+                  );
+                }
+                return (
+                  <div className="space-y-2">
+                    {upcoming.map((slot, i) => {
+                      const dayStr = new Date(slot.date).toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
+                      return (
+                        <button
+                          key={`${slot.date}-${slot.start}`}
+                          onClick={() => setInspectionBookingOpen(true)}
+                          className="w-full flex items-center gap-3 p-3 rounded-xl border border-border bg-secondary hover:border-primary/40 text-left transition-all group"
+                        >
+                          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                            <Calendar size={16} className="text-primary group-hover:text-primary-foreground" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-foreground">{dayStr}</p>
+                            <p className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Clock size={10} /> {slot.start} – {slot.end}
+                            </p>
+                          </div>
+                          <span className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                            Book
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </div>
 
             {/* Detail chips */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">

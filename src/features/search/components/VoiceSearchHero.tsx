@@ -3,9 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, Search, Loader2, X, Keyboard, ChevronDown, MapPin } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { SoundWaveVisualizer } from './SoundWaveVisualizer';
-import { parsePropertyQuery, filtersToChips } from '@/lib/parsePropertyQuery';
-import { useToast } from '@/hooks/use-toast';
-import { autocomplete, getPlaceDetails } from '@/lib/googleMapsService';
+import { parsePropertyQuery, filtersToChips } from '@/features/search/lib/parsePropertyQuery';
+import { useToast } from '@/shared/hooks/use-toast';
+import { autocomplete, getPlaceDetails } from '@/shared/lib/googleMapsService';
 
 type VoiceState = 'idle' | 'listening' | 'processing' | 'results';
 

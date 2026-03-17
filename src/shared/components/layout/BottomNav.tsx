@@ -1,7 +1,7 @@
 import { Search, Heart, MessageCircle, User, LogIn, LogOut, Shield, Building2 } from 'lucide-react';
-import { useI18n } from '@/lib/i18n';
+import { useI18n } from '@/shared/lib/i18n';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/lib/AuthProvider';
+import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 

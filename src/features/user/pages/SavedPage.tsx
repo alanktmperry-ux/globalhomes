@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Heart, Loader2 } from 'lucide-react';
-import { BottomNav } from '@/components/BottomNav';
-import { PropertyCard } from '@/components/PropertyCard';
-import { PropertyDrawer } from '@/components/PropertyDrawer';
-import { useI18n } from '@/lib/i18n';
-import { useSavedProperties } from '@/hooks/useSavedProperties';
-import { mockProperties } from '@/lib/mock-data';
-import { Property } from '@/lib/types';
+import { BottomNav } from '@/shared/components/layout/BottomNav';
+import { PropertyCard } from '@/features/properties/components/PropertyCard';
+import { PropertyDrawer } from '@/features/properties/components/PropertyDrawer';
+import { useI18n } from '@/shared/lib/i18n';
+import { useSavedProperties } from '@/features/properties/hooks/useSavedProperties';
+import { mockProperties } from '@/features/properties/api/mock-data';
+import { Property } from '@/shared/lib/types';
 import { fetchPublicProperties } from '@/features/properties/api/fetchPublicProperties';
 
 const SavedPage = () => {

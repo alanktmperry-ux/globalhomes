@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Search, Shield } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/shared/hooks/use-toast';
 
 interface UserRow {
   id: string;

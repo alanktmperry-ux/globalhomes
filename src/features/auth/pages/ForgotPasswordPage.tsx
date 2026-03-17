@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Mail, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/shared/hooks/use-toast';
 
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();

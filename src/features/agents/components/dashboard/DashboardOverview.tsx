@@ -67,8 +67,8 @@ const DashboardOverview = () => {
   const [tasksDue, setTasksDue] = useState(0);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
 
-  const activeCount = listings.filter(l => ('_mock_status' in l ? l._mock_status !== 'sold' : (l as any).status !== 'sold')).length;
-  const totalLeads = listings.reduce((sum, l) => sum + ('_mock_leads' in l ? l._mock_leads : l.contact_clicks), 0);
+  const [pipelineData, setPipelineData] = useState(buildEmptyMonths());
+  const [pipelineEmpty, setPipelineEmpty] = useState(true);
 
   // Fetch tasks due today
   useEffect(() => {

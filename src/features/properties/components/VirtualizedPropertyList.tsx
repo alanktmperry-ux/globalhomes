@@ -106,7 +106,7 @@ function MobileRow({ index, style, data }: { index: number; style: React.CSSProp
 }
 
 export function VirtualizedPropertyList(props: VirtualizedPropertyListProps) {
-  const { properties, isSearching, isMobile, areaSearch, searchRadius, onClearAreaSearch } = props;
+  const { properties, isSearching, isMobile, areaSearch, searchRadius, onClearAreaSearch, listingMode } = props;
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerHeight, setContainerHeight] = useState(600);
 

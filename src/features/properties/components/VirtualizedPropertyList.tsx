@@ -28,6 +28,7 @@ interface VirtualizedPropertyListProps {
   areaSearch?: unknown;
   searchRadius?: number | null;
   onClearAreaSearch?: () => void;
+  listingMode?: 'sale' | 'rent';
 }
 
 // Memoized card to prevent re-renders during scroll

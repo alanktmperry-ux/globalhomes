@@ -16,15 +16,41 @@ Deno.serve(async (req) => {
   const DEMO_EMAIL = "demo-agent@globalhomes.app";
   const DEMO_PASSWORD = "DemoAgent2024!";
 
+  // Support ?reset=true to delete and re-create
+  const url = new URL(req.url);
+  const forceReset = url.searchParams.get("reset") === "true";
+  let body: any = {};
+  try { body = await req.json(); } catch { /* no body */ }
+  const shouldReset = forceReset || body?.reset === true;
+
   try {
     // Check if demo user already exists
     const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
     const existing = existingUsers?.users?.find((u: any) => u.email === DEMO_EMAIL);
 
-    if (existing) {
+    if (existing && !shouldReset) {
       return new Response(JSON.stringify({ message: "Demo agent already exists", userId: existing.id }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    // Delete existing demo user (cascades to profiles, roles, etc.)
+    if (existing) {
+      // Clean up related data first
+      const { data: agentRec } = await supabaseAdmin.from("agents").select("id").eq("user_id", existing.id).maybeSingle();
+      if (agentRec) {
+        await supabaseAdmin.from("properties").delete().eq("agent_id", agentRec.id);
+        await supabaseAdmin.from("leads").delete().eq("agent_id", agentRec.id);
+        await supabaseAdmin.from("transactions").delete().eq("agent_id", agentRec.id);
+        await supabaseAdmin.from("trust_account_balances").delete().eq("agent_id", agentRec.id);
+        await supabaseAdmin.from("notifications").delete().eq("agent_id", agentRec.id);
+        await supabaseAdmin.from("agents").delete().eq("id", agentRec.id);
+      }
+      await supabaseAdmin.from("agency_members").delete().eq("user_id", existing.id);
+      await supabaseAdmin.from("agencies").delete().eq("owner_user_id", existing.id);
+      await supabaseAdmin.from("user_roles").delete().eq("user_id", existing.id);
+      await supabaseAdmin.from("profiles").delete().eq("user_id", existing.id);
+      await supabaseAdmin.auth.admin.deleteUser(existing.id);
     }
 
     // Create demo auth user (auto-confirmed)

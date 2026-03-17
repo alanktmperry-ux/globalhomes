@@ -6,14 +6,22 @@ import { mapDbProperty } from '@/features/properties/api/fetchPublicProperties';
 
 const PROPERTIES_QUERY = '*, agents(name, agency, phone, email, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count)';
 
-async function fetchProperties(limit = 50): Promise<Property[]> {
-  const { data, error } = await supabase
+async function fetchProperties(limit = 50, listingType?: 'sale' | 'rent'): Promise<Property[]> {
+  let query = supabase
     .from('properties')
     .select(PROPERTIES_QUERY)
     .eq('is_active', true)
     .eq('status', 'public')
     .order('created_at', { ascending: false })
     .limit(limit);
+
+  if (listingType === 'rent') {
+    query = query.eq('listing_type', 'rent');
+  } else if (listingType === 'sale') {
+    query = query.or('listing_type.eq.sale,listing_type.is.null');
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error('[useRealtimeProperties] fetch error:', error.message);

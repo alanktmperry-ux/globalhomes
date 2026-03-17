@@ -8,6 +8,7 @@ import { searchAgentListings } from '@/features/properties/api/fetchPublicProper
 import { useToast } from '@/shared/hooks/use-toast';
 import { isInsidePolygon, haversineDistance } from '@/shared/lib/geoUtils';
 import { useRealtimeProperties } from './useRealtimeProperties';
+import { useCurrency, ListingMode } from '@/shared/lib/CurrencyContext';
 
 // ── AI search cache (localStorage, 24h TTL) ──────────────────
 const AI_CACHE_PREFIX = 'ai_search_';
@@ -50,6 +51,7 @@ export interface UsePropertySearchOptions {
 
 export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
   const { toast } = useToast();
+  const { listingMode } = useCurrency();
 
   // ── Filters & sort (internalized) ────────────────────────────
   const [filters, setFilters] = useState<Filters>(defaultFilters);
@@ -76,6 +78,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
     limit: 50,
     nearbyCenter: searchCenter,
     nearbyRadiusKm: searchRadius,
+    listingType: listingMode,
   });
 
   // ── Search handler (with stale-while-revalidate caching) ─────
@@ -249,6 +252,13 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
       });
     }
 
+    // Listing mode filter (sale vs rent)
+    props = props.filter((p) => {
+      if (listingMode === 'rent') return p.listingType === 'rent';
+      // sale mode: show sale or unset
+      return !p.listingType || p.listingType === 'sale';
+    });
+
     // Advanced filters
     props = props.filter((p) => {
       if (p.price < filters.priceRange[0] || p.price > filters.priceRange[1]) return false;
@@ -288,7 +298,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
     if (sortBy === 'beds') return withBoost((a, b) => b.beds - a.beds);
 
     return [...props].sort((a, b) => subscriptionBoost(a) - subscriptionBoost(b));
-  }, [displayProperties, areaSearch, sortBy, filters, searchCenter, searchRadius]);
+  }, [displayProperties, areaSearch, sortBy, filters, searchCenter, searchRadius, listingMode]);
 
   // ── Setters ──────────────────────────────────────────────────
   const handleAreaSearch = useCallback((area: AreaSearch | null) => {

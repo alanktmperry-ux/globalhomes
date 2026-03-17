@@ -6,14 +6,22 @@ import { mapDbProperty } from '@/features/properties/api/fetchPublicProperties';
 
 const PROPERTIES_QUERY = '*, agents(name, agency, phone, email, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count)';
 
-async function fetchProperties(limit = 50): Promise<Property[]> {
-  const { data, error } = await supabase
+async function fetchProperties(limit = 50, listingType?: 'sale' | 'rent'): Promise<Property[]> {
+  let query = supabase
     .from('properties')
     .select(PROPERTIES_QUERY)
     .eq('is_active', true)
     .eq('status', 'public')
     .order('created_at', { ascending: false })
     .limit(limit);
+
+  if (listingType === 'rent') {
+    query = query.eq('listing_type', 'rent');
+  } else if (listingType === 'sale') {
+    query = query.or('listing_type.eq.sale,listing_type.is.null');
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error('[useRealtimeProperties] fetch error:', error.message);
@@ -62,27 +70,29 @@ interface UseRealtimePropertiesOptions {
   limit?: number;
   nearbyCenter?: { lat: number; lng: number } | null;
   nearbyRadiusKm?: number | null;
+  listingType?: 'sale' | 'rent';
 }
 
 export function useRealtimeProperties({
   limit = 50,
   nearbyCenter = null,
   nearbyRadiusKm = null,
+  listingType,
 }: UseRealtimePropertiesOptions = {}) {
   const queryClient = useQueryClient();
 
   const isNearbySearch = nearbyCenter && nearbyRadiusKm && nearbyRadiusKm > 0;
 
   const queryKey = isNearbySearch
-    ? ['properties', 'nearby', nearbyCenter.lat, nearbyCenter.lng, nearbyRadiusKm, limit]
-    : ['properties', 'all', limit];
+    ? ['properties', 'nearby', nearbyCenter.lat, nearbyCenter.lng, nearbyRadiusKm, limit, listingType]
+    : ['properties', 'all', limit, listingType];
 
   const query = useQuery({
     queryKey,
     queryFn: () =>
       isNearbySearch
         ? fetchNearbyProperties(nearbyCenter.lat, nearbyCenter.lng, nearbyRadiusKm, limit)
-        : fetchProperties(limit),
+        : fetchProperties(limit, listingType),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000,   // 10 minutes garbage collection
     refetchOnWindowFocus: false,

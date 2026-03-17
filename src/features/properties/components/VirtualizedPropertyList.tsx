@@ -1,4 +1,5 @@
 import { memo, useCallback, useRef, useEffect, useState } from 'react';
+import { Home, Building2 } from 'lucide-react';
 import { FixedSizeList } from 'react-window';
 import { PropertyCard, CollabReaction } from '@/features/properties/components/PropertyCard';
 import { PropertyCardSkeleton } from '@/features/properties/components/PropertyCardSkeleton';
@@ -27,6 +28,7 @@ interface VirtualizedPropertyListProps {
   areaSearch?: unknown;
   searchRadius?: number | null;
   onClearAreaSearch?: () => void;
+  listingMode?: 'sale' | 'rent';
 }
 
 // Memoized card to prevent re-renders during scroll
@@ -104,7 +106,7 @@ function MobileRow({ index, style, data }: { index: number; style: React.CSSProp
 }
 
 export function VirtualizedPropertyList(props: VirtualizedPropertyListProps) {
-  const { properties, isSearching, isMobile, areaSearch, searchRadius, onClearAreaSearch } = props;
+  const { properties, isSearching, isMobile, areaSearch, searchRadius, onClearAreaSearch, listingMode } = props;
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerHeight, setContainerHeight] = useState(600);
 
@@ -130,16 +132,26 @@ export function VirtualizedPropertyList(props: VirtualizedPropertyListProps) {
   }
 
   if (properties.length === 0) {
+    const isRentMode = listingMode === 'rent';
     return (
-      <div className="text-center py-8">
-        <p className="text-sm text-muted-foreground">
-          {areaSearch ? 'No properties in this area.' : 'No properties found.'}
+      <div className="text-center py-12 px-4">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-muted mb-4">
+          {isRentMode ? <Building2 size={24} className="text-muted-foreground" /> : <Home size={24} className="text-muted-foreground" />}
+        </div>
+        <p className="text-sm font-medium text-foreground mb-1">
+          {isRentMode
+            ? 'No rental listings found'
+            : areaSearch
+              ? 'No properties in this area'
+              : 'No properties found'}
         </p>
-        {(areaSearch || searchRadius) && (
-          <p className="text-xs text-muted-foreground/70 mt-1">
-            Some properties may be hidden because they don't have map coordinates yet.
-          </p>
-        )}
+        <p className="text-xs text-muted-foreground max-w-xs mx-auto">
+          {isRentMode
+            ? 'Try broadening your search or switching to "Buy" mode to see sale listings.'
+            : (areaSearch || searchRadius)
+              ? 'Some properties may be hidden because they don\'t have map coordinates yet.'
+              : 'Try adjusting your filters or search query.'}
+        </p>
         {areaSearch && onClearAreaSearch && (
           <button onClick={onClearAreaSearch} className="mt-3 text-xs text-primary font-medium hover:underline">
             Clear area filter

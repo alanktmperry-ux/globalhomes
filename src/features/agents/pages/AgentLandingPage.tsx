@@ -99,12 +99,12 @@ const AgentLandingPage = () => {
                 <Button
                   size="lg"
                   variant="outline"
-                  disabled={demoLoading}
+                  disabled={demoSwitching}
                   onClick={handleDemoLogin}
                   className="text-base px-8 py-5 rounded-xl font-bold border-primary/50 text-primary-foreground bg-primary/15 hover:bg-primary/25 backdrop-blur-sm transition-all"
                 >
                   <Gamepad2 size={18} className="mr-2" />
-                  {demoLoading ? 'Loading Demo...' : 'Try Demo Agency'}
+                  {demoSwitching ? 'Loading Demo...' : 'Try Demo Agency'}
                 </Button>
                 <Button
                   size="lg"

@@ -17,6 +17,8 @@ import { mockProperties } from '@/features/properties/api/mock-data';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { RentalEnquiryForm } from '@/features/properties/components/RentalEnquiryForm';
+import { InspectionBookingModal } from '@/features/properties/components/InspectionBookingModal';
+import { InspectionSlot } from '@/shared/lib/types';
 
 export default function PropertyDetailPage() {
   const { id } = useParams<{ id: string }>();

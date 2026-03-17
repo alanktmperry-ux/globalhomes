@@ -799,6 +799,30 @@ export type Database = {
           },
         ]
       }
+      exchange_rate_cache: {
+        Row: {
+          base_currency: string
+          created_at: string
+          fetched_at: string
+          id: string
+          rates: Json
+        }
+        Insert: {
+          base_currency?: string
+          created_at?: string
+          fetched_at?: string
+          id?: string
+          rates?: Json
+        }
+        Update: {
+          base_currency?: string
+          created_at?: string
+          fetched_at?: string
+          id?: string
+          rates?: Json
+        }
+        Relationships: []
+      }
       lead_events: {
         Row: {
           agent_id: string

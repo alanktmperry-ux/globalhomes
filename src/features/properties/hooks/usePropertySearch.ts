@@ -103,7 +103,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
       setIsSearching(!cached);
 
       // Phase 1 (agent listings) + Phase 2 (Firecrawl) in parallel
-      const agentListingsPromise = searchAgentListings(query, 20).catch((err) => {
+      const agentListingsPromise = searchAgentListings(query, 20, listingMode).catch((err) => {
         console.warn('[handleSearch] Agent listings search failed:', err);
         return [] as Property[];
       });

@@ -22,7 +22,7 @@ const AU_DATE = (d: string) => {
   return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
 };
 
-// Mock pipeline data for 12 months
+// Pipeline data
 const PIPELINE_DATA = [
   { month: 'Apr', deals: 2, value: 45000 },
   { month: 'May', deals: 3, value: 68000 },
@@ -36,6 +36,21 @@ const PIPELINE_DATA = [
   { month: 'Jan', deals: 4, value: 98000 },
   { month: 'Feb', deals: 3, value: 65000 },
   { month: 'Mar', deals: 6, value: 145000 },
+];
+
+const DEMO_PIPELINE_DATA = [
+  { month: 'Apr', deals: 3, value: 128000 },
+  { month: 'May', deals: 4, value: 156000 },
+  { month: 'Jun', deals: 2, value: 94000 },
+  { month: 'Jul', deals: 5, value: 185000 },
+  { month: 'Aug', deals: 3, value: 112000 },
+  { month: 'Sep', deals: 4, value: 148000 },
+  { month: 'Oct', deals: 6, value: 210000 },
+  { month: 'Nov', deals: 3, value: 125000 },
+  { month: 'Dec', deals: 4, value: 164000 },
+  { month: 'Jan', deals: 5, value: 192000 },
+  { month: 'Feb', deals: 4, value: 155000 },
+  { month: 'Mar', deals: 7, value: 380000 },
 ];
 
 const URGENCY_CONFIG = {

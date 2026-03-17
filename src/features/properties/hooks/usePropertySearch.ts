@@ -8,6 +8,7 @@ import { searchAgentListings } from '@/features/properties/api/fetchPublicProper
 import { useToast } from '@/shared/hooks/use-toast';
 import { isInsidePolygon, haversineDistance } from '@/shared/lib/geoUtils';
 import { useRealtimeProperties } from './useRealtimeProperties';
+import { useCurrency, ListingMode } from '@/shared/lib/CurrencyContext';
 
 // ── AI search cache (localStorage, 24h TTL) ──────────────────
 const AI_CACHE_PREFIX = 'ai_search_';

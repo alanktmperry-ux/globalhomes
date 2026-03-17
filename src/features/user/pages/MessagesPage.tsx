@@ -597,6 +597,32 @@ const MessagesPage = () => {
         </AnimatePresence>
       </main>
 
+      <NewMessageDialog
+        open={newMsgDialogOpen}
+        onOpenChange={setNewMsgDialogOpen}
+        userId={user.id}
+        onConversationCreated={(convo) => {
+          const fullConvo: Conversation = {
+            id: convo.id,
+            participant_1: user.id < convo.other_user_id ? user.id : convo.other_user_id,
+            participant_2: user.id < convo.other_user_id ? convo.other_user_id : user.id,
+            property_id: convo.property_id,
+            last_message_at: new Date().toISOString(),
+            created_at: new Date().toISOString(),
+            other_user_name: convo.other_user_name,
+            other_user_avatar: convo.other_user_avatar,
+            other_user_id: convo.other_user_id,
+            property_title: convo.property_title,
+            property_address: convo.property_address,
+            property_image: convo.property_image,
+            last_message_text: undefined,
+            unread_count: 0,
+          };
+          setSelectedConvo(fullConvo);
+          setMessages([]);
+        }}
+      />
+
       <BottomNav />
     </div>
   );

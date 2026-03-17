@@ -18,6 +18,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { RentalEnquiryForm } from '@/features/properties/components/RentalEnquiryForm';
 import { InspectionBookingModal } from '@/features/properties/components/InspectionBookingModal';
+import { PriceHistoryChart } from '@/features/properties/components/PriceHistoryChart';
 import { InspectionSlot } from '@/shared/lib/types';
 
 export default function PropertyDetailPage() {
@@ -459,6 +460,14 @@ export default function PropertyDetailPage() {
                 <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{property.description}</p>
               </div>
             )}
+
+            {/* Price History */}
+            <PriceHistoryChart
+              propertyId={property.id}
+              currentPrice={property.price}
+              listedDate={property.listedDate}
+              priceFormatted={property.priceFormatted}
+            />
 
             {/* Features */}
             {property.features.length > 0 && (

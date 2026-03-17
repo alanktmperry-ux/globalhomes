@@ -1330,6 +1330,102 @@ export type Database = {
           },
         ]
       }
+      rental_applications: {
+        Row: {
+          agent_id: string | null
+          annual_income: number | null
+          created_at: string
+          current_address: string
+          date_of_birth: string
+          email: string
+          employer_name: string | null
+          employment_length: string | null
+          employment_status: string
+          full_name: string
+          id: string
+          identity_document_type: string | null
+          identity_document_url: string | null
+          message_to_landlord: string | null
+          phone: string
+          previous_address: string | null
+          previous_landlord_contact: string | null
+          previous_landlord_name: string | null
+          property_id: string
+          reason_for_leaving: string | null
+          reference_number: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          agent_id?: string | null
+          annual_income?: number | null
+          created_at?: string
+          current_address: string
+          date_of_birth: string
+          email: string
+          employer_name?: string | null
+          employment_length?: string | null
+          employment_status: string
+          full_name: string
+          id?: string
+          identity_document_type?: string | null
+          identity_document_url?: string | null
+          message_to_landlord?: string | null
+          phone: string
+          previous_address?: string | null
+          previous_landlord_contact?: string | null
+          previous_landlord_name?: string | null
+          property_id: string
+          reason_for_leaving?: string | null
+          reference_number: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          agent_id?: string | null
+          annual_income?: number | null
+          created_at?: string
+          current_address?: string
+          date_of_birth?: string
+          email?: string
+          employer_name?: string | null
+          employment_length?: string | null
+          employment_status?: string
+          full_name?: string
+          id?: string
+          identity_document_type?: string | null
+          identity_document_url?: string | null
+          message_to_landlord?: string | null
+          phone?: string
+          previous_address?: string | null
+          previous_landlord_contact?: string | null
+          previous_landlord_name?: string | null
+          property_id?: string
+          reason_for_leaving?: string | null
+          reference_number?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rental_applications_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rental_applications_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       saved_properties: {
         Row: {
           created_at: string

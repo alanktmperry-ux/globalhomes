@@ -19,6 +19,7 @@ import { toast } from '@/hooks/use-toast';
 import { RentalEnquiryForm } from '@/features/properties/components/RentalEnquiryForm';
 import { InspectionBookingModal } from '@/features/properties/components/InspectionBookingModal';
 import { PriceHistoryChart } from '@/features/properties/components/PriceHistoryChart';
+import { RentalApplicationModal } from '@/features/properties/components/RentalApplicationModal';
 import { InspectionSlot } from '@/shared/lib/types';
 
 export default function PropertyDetailPage() {
@@ -36,6 +37,7 @@ export default function PropertyDetailPage() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [rentalEnquiryOpen, setRentalEnquiryOpen] = useState(false);
   const [inspectionBookingOpen, setInspectionBookingOpen] = useState(false);
+  const [rentalApplicationOpen, setRentalApplicationOpen] = useState(false);
   const [inspectionTimes, setInspectionTimes] = useState<InspectionSlot[]>([]);
   useEffect(() => {
     const fetchProperty = async () => {
@@ -531,8 +533,17 @@ export default function PropertyDetailPage() {
                 onClick={handleCtaClick}
                 className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors"
               >
-                {ctaLabel}
+               {ctaLabel}
               </button>
+
+              {isRental && (
+                <button
+                  onClick={() => setRentalApplicationOpen(true)}
+                  className="w-full mt-3 py-3.5 rounded-xl border-2 border-primary text-primary font-semibold text-sm hover:bg-primary hover:text-primary-foreground transition-colors"
+                >
+                  Apply Now
+                </button>
+              )}
 
               {property.agent.phone && (
                 <a
@@ -608,6 +619,14 @@ export default function PropertyDetailPage() {
         open={inspectionBookingOpen}
         onClose={() => setInspectionBookingOpen(false)}
       />
+
+      {isRental && (
+        <RentalApplicationModal
+          property={property}
+          open={rentalApplicationOpen}
+          onClose={() => setRentalApplicationOpen(false)}
+        />
+      )}
     </div>
   );
 }

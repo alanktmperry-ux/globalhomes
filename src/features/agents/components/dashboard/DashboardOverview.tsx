@@ -22,21 +22,16 @@ const AU_DATE = (d: string) => {
   return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
 };
 
-// Pipeline data
-const PIPELINE_DATA = [
-  { month: 'Apr', deals: 2, value: 45000 },
-  { month: 'May', deals: 3, value: 68000 },
-  { month: 'Jun', deals: 1, value: 22000 },
-  { month: 'Jul', deals: 4, value: 95000 },
-  { month: 'Aug', deals: 2, value: 48000 },
-  { month: 'Sep', deals: 3, value: 72000 },
-  { month: 'Oct', deals: 5, value: 120000 },
-  { month: 'Nov', deals: 2, value: 55000 },
-  { month: 'Dec', deals: 3, value: 78000 },
-  { month: 'Jan', deals: 4, value: 98000 },
-  { month: 'Feb', deals: 3, value: 65000 },
-  { month: 'Mar', deals: 6, value: 145000 },
-];
+// Build empty 12-month skeleton
+const buildEmptyMonths = () => {
+  const months: { month: string; deals: number; value: number }[] = [];
+  const now = new Date();
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push({ month: d.toLocaleString('en-AU', { month: 'short' }), deals: 0, value: 0 });
+  }
+  return months;
+};
 
 const DEMO_PIPELINE_DATA = [
   { month: 'Apr', deals: 3, value: 128000 },
@@ -72,8 +67,8 @@ const DashboardOverview = () => {
   const [tasksDue, setTasksDue] = useState(0);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
 
-  const activeCount = listings.filter(l => ('_mock_status' in l ? l._mock_status !== 'sold' : (l as any).status !== 'sold')).length;
-  const totalLeads = listings.reduce((sum, l) => sum + ('_mock_leads' in l ? l._mock_leads : l.contact_clicks), 0);
+  const [pipelineData, setPipelineData] = useState(buildEmptyMonths());
+  const [pipelineEmpty, setPipelineEmpty] = useState(true);
 
   // Fetch tasks due today
   useEffect(() => {
@@ -87,6 +82,42 @@ const DashboardOverview = () => {
       .lte('due_date', today)
       .then(({ count }) => setTasksDue(count || 0));
   }, [user]);
+
+  // Fetch pipeline data from activities (entity_type='property', action='sold')
+  useEffect(() => {
+    if (!user || isDemoMode) return;
+    const now = new Date();
+    const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1).toISOString();
+    supabase
+      .from('activities')
+      .select('created_at, metadata')
+      .eq('user_id', user.id)
+      .eq('entity_type', 'property')
+      .eq('action', 'sold')
+      .gte('created_at', twelveMonthsAgo)
+      .then(({ data }) => {
+        const months = buildEmptyMonths();
+        if (data && data.length > 0) {
+          const monthMap = new Map(months.map((m, i) => [i, m]));
+          const baseDate = new Date(now.getFullYear(), now.getMonth() - 11, 1);
+          data.forEach((row) => {
+            const d = new Date(row.created_at);
+            const idx = (d.getFullYear() - baseDate.getFullYear()) * 12 + (d.getMonth() - baseDate.getMonth());
+            if (idx >= 0 && idx < 12) {
+              const entry = monthMap.get(idx)!;
+              entry.deals += 1;
+              const val = (row.metadata as any)?.commission ?? (row.metadata as any)?.value ?? 0;
+              entry.value += Number(val) || 0;
+            }
+          });
+          setPipelineData(months);
+          setPipelineEmpty(false);
+        } else {
+          setPipelineData(months);
+          setPipelineEmpty(true);
+        }
+      });
+  }, [user, isDemoMode]);
 
   // Fetch recent activities
   useEffect(() => {
@@ -189,9 +220,14 @@ const DashboardOverview = () => {
             <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
               <TrendingUp size={16} className="text-primary" /> Pipeline — 12 Month Deal Flow
             </h3>
-            <div className="h-48">
+            <div className="h-48 relative">
+              {!isDemoMode && pipelineEmpty && (
+                <div className="absolute inset-0 flex items-center justify-center z-10">
+                  <p className="text-sm text-muted-foreground bg-card/80 backdrop-blur-sm px-3 py-1.5 rounded-lg">No completed sales yet</p>
+                </div>
+              )}
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={isDemoMode ? DEMO_PIPELINE_DATA : PIPELINE_DATA}>
+                <BarChart data={isDemoMode ? DEMO_PIPELINE_DATA : pipelineData}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} className="text-muted-foreground" />
                   <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `$${v / 1000}k`} className="text-muted-foreground" />

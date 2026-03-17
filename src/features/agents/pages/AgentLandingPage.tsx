@@ -1,7 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Ear, Mic, Globe, Camera, Cpu, ShieldCheck, ArrowRight, CheckCircle2, Star, Play } from 'lucide-react';
+import { Ear, Mic, Globe, Camera, Cpu, ShieldCheck, ArrowRight, CheckCircle2, Star, Play, Gamepad2, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import AgentRegistrationModal from '@/components/AgentRegistrationModal';
 import agentHero from '@/assets/agent-hero.jpg';
 import heatMapBg from '@/assets/heat-map-bg.jpg';

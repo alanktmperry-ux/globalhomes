@@ -15,6 +15,7 @@ import { useSavedProperties } from '@/features/properties/hooks/useSavedProperti
 import { useIsMobile } from '@/shared/hooks/use-mobile';
 import { mockProperties } from '@/features/properties/api/mock-data';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 export default function PropertyDetailPage() {
   const { id } = useParams<{ id: string }>();

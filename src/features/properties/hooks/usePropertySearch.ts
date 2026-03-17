@@ -51,6 +51,7 @@ export interface UsePropertySearchOptions {
 
 export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
   const { toast } = useToast();
+  const { listingMode } = useCurrency();
 
   // ── Filters & sort (internalized) ────────────────────────────
   const [filters, setFilters] = useState<Filters>(defaultFilters);

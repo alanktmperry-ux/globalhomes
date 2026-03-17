@@ -162,6 +162,19 @@ export default function PropertyDetailPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <Helmet>
+        <title>{`${property.title} - ${property.suburb}, ${property.state} | Global Homes`}</title>
+        <meta name="description" content={(property.description || '').slice(0, 155)} />
+        <meta property="og:title" content={`${property.title} - ${property.suburb}, ${property.state} | Global Homes`} />
+        <meta property="og:description" content={(property.description || '').slice(0, 155)} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
+        <meta property="og:image" content={property.images?.[0] || property.image_url || '/placeholder.svg'} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${property.title} - ${property.suburb}, ${property.state}`} />
+        <meta name="twitter:description" content={(property.description || '').slice(0, 155)} />
+        <link rel="canonical" href={typeof window !== 'undefined' ? window.location.origin + window.location.pathname : ''} />
+      </Helmet>
       <SiteHeader />
 
       {/* Back button */}

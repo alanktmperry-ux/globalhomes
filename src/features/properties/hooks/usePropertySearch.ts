@@ -252,6 +252,13 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
       });
     }
 
+    // Listing mode filter (sale vs rent)
+    props = props.filter((p) => {
+      if (listingMode === 'rent') return p.listingType === 'rent';
+      // sale mode: show sale or unset
+      return !p.listingType || p.listingType === 'sale';
+    });
+
     // Advanced filters
     props = props.filter((p) => {
       if (p.price < filters.priceRange[0] || p.price > filters.priceRange[1]) return false;

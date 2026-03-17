@@ -1,7 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Ear, Mic, Globe, Camera, Cpu, ShieldCheck, ArrowRight, CheckCircle2, Star, Play } from 'lucide-react';
+import { Ear, Mic, Globe, Camera, Cpu, ShieldCheck, ArrowRight, CheckCircle2, Star, Play, Gamepad2, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import AgentRegistrationModal from '@/components/AgentRegistrationModal';
 import agentHero from '@/assets/agent-hero.jpg';
 import heatMapBg from '@/assets/heat-map-bg.jpg';
@@ -15,8 +18,31 @@ const fadeUp = {
   }),
 };
 
+const DEMO_EMAIL = 'demo-agent@globalhomes.app';
+const DEMO_PASSWORD = 'DemoAgent2024!';
+
 const AgentLandingPage = () => {
   const [showModal, setShowModal] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleDemoLogin = async () => {
+    setDemoLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: DEMO_EMAIL,
+        password: DEMO_PASSWORD,
+      });
+      if (error) throw error;
+      toast({ title: '🎮 Demo mode active', description: 'Exploring as Demo Agency' });
+      navigate('/dashboard');
+    } catch (err: any) {
+      toast({ title: 'Demo unavailable', description: 'Please try logging in with your own account.', variant: 'destructive' });
+    } finally {
+      setDemoLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -83,6 +109,33 @@ const AgentLandingPage = () => {
                 >
                   <Play size={16} className="mr-1.5" /> See How It Works
                 </Button>
+              </motion.div>
+
+              {/* ─── DEMO & LOGIN CTAs ─── */}
+              <motion.div variants={fadeUp} custom={4} className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mt-4">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  disabled={demoLoading}
+                  onClick={handleDemoLogin}
+                  className="text-base px-8 py-5 rounded-xl font-bold border-primary/50 text-primary-foreground bg-primary/15 hover:bg-primary/25 backdrop-blur-sm transition-all"
+                >
+                  <Gamepad2 size={18} className="mr-2" />
+                  {demoLoading ? 'Loading Demo...' : 'Try Demo Agency'}
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={() => navigate('/agents/login')}
+                  className="text-base px-8 py-5 rounded-xl font-bold border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 transition-all"
+                >
+                  <Lock size={18} className="mr-2" />
+                  Login to Your Agency
+                </Button>
+              </motion.div>
+              <motion.div variants={fadeUp} custom={5} className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start mt-2">
+                <span className="text-xs text-primary-foreground/50 text-center">(No signup needed)</span>
+                <span className="text-xs text-primary-foreground/50 text-center">(Email + Password)</span>
               </motion.div>
             </motion.div>
           </div>

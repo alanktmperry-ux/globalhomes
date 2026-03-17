@@ -267,7 +267,26 @@ const AgentAuthPage = () => {
                 </button>
               </div>
 
-              <p className="text-xs text-muted-foreground mt-8 text-center leading-relaxed">
+              <div className="flex items-center gap-4 my-4">
+                <div className="flex-1 h-px bg-border" />
+                <span className="text-xs font-medium text-muted-foreground uppercase">Or explore first</span>
+                <div className="flex-1 h-px bg-border" />
+              </div>
+
+              <button
+                onClick={async () => {
+                  await switchToDemo();
+                  navigate('/dashboard');
+                }}
+                disabled={demoSwitching}
+                className="w-full flex items-center justify-center gap-2 py-3 px-5 rounded-full border border-primary/30 bg-primary/5 text-primary text-sm font-semibold hover:bg-primary/10 transition-colors disabled:opacity-50"
+              >
+                <Gamepad2 size={16} />
+                {demoSwitching ? 'Loading Demo...' : 'Try Demo Agency'}
+              </button>
+              <p className="text-xs text-muted-foreground text-center mt-1.5">No signup needed — explore with sample data</p>
+
+              <p className="text-xs text-muted-foreground mt-6 text-center leading-relaxed">
                 By submitting, I accept Global Homes'{' '}
                 <a href="#" className="text-primary underline underline-offset-2">terms of use</a>
               </p>

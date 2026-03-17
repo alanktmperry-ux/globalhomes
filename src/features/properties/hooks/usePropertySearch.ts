@@ -78,6 +78,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
     limit: 50,
     nearbyCenter: searchCenter,
     nearbyRadiusKm: searchRadius,
+    listingType: listingMode,
   });
 
   // ── Search handler (with stale-while-revalidate caching) ─────

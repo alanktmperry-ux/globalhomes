@@ -527,6 +527,7 @@ const Index = () => {
       areaSearch={areaSearch}
       searchRadius={searchRadius}
       onClearAreaSearch={() => handleAreaSearch(null)}
+      listingMode={listingMode}
     />
   );
 

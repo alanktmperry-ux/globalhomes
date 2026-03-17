@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { MessageCircle, ArrowLeft, Send, User, Building2 } from 'lucide-react';
+import { MessageCircle, ArrowLeft, Send, User, Building2, PenSquare } from 'lucide-react';
+import { NewMessageDialog } from '@/features/user/components/NewMessageDialog';
 import { BottomNav } from '@/shared/components/layout/BottomNav';
 import { useI18n } from '@/shared/lib/i18n';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -40,6 +41,7 @@ const MessagesPage = () => {
   const [selectedConvo, setSelectedConvo] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
+  const [newMsgDialogOpen, setNewMsgDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -430,6 +432,15 @@ const MessagesPage = () => {
               {conversations.length}
             </span>
           )}
+          {!selectedConvo && (
+            <button
+              onClick={() => setNewMsgDialogOpen(true)}
+              className="ml-auto w-9 h-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center hover:opacity-90 transition-opacity"
+              title="New message"
+            >
+              <PenSquare size={16} />
+            </button>
+          )}
         </div>
       </header>
 
@@ -585,6 +596,32 @@ const MessagesPage = () => {
           )}
         </AnimatePresence>
       </main>
+
+      <NewMessageDialog
+        open={newMsgDialogOpen}
+        onOpenChange={setNewMsgDialogOpen}
+        userId={user.id}
+        onConversationCreated={(convo) => {
+          const fullConvo: Conversation = {
+            id: convo.id,
+            participant_1: user.id < convo.other_user_id ? user.id : convo.other_user_id,
+            participant_2: user.id < convo.other_user_id ? convo.other_user_id : user.id,
+            property_id: convo.property_id,
+            last_message_at: new Date().toISOString(),
+            created_at: new Date().toISOString(),
+            other_user_name: convo.other_user_name,
+            other_user_avatar: convo.other_user_avatar,
+            other_user_id: convo.other_user_id,
+            property_title: convo.property_title,
+            property_address: convo.property_address,
+            property_image: convo.property_image,
+            last_message_text: undefined,
+            unread_count: 0,
+          };
+          setSelectedConvo(fullConvo);
+          setMessages([]);
+        }}
+      />
 
       <BottomNav />
     </div>

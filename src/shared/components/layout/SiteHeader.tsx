@@ -6,7 +6,7 @@ import { useCurrency, CURRENCIES, CurrencyCode } from '@/shared/lib/CurrencyCont
 import { useAuth } from '@/features/auth/AuthProvider';
 
 export function SiteHeader() {
-  const { currency, setCurrencyCode, listingMode, setListingMode } = useCurrency();
+  const { currency, setCurrencyCode, listingMode, setListingMode, isLiveRates } = useCurrency();
   const { user, userRole, isAgent } = useAuth();
   const navigate = useNavigate();
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);

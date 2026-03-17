@@ -47,10 +47,16 @@ const COLLAB_EMOJIS = ['👍', '👎', '🔥'] as const;
 
 export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index, isCollab, collabReactions = [], onToggleReaction, partnerViewed, currentUserId }: PropertyCardProps) {
   const { t } = useI18n();
-  const { formatPrice, currency } = useCurrency();
-  const isRental = property.listingType === 'rent' || property.listingType === 'rental' || property.price < 50000;
+  const { formatPrice, currency, listingMode } = useCurrency();
+  const isRental = listingMode === 'rent' || property.listingType === 'rent' || property.listingType === 'rental' || property.price < 50000;
   const [contactOpen, setContactOpen] = useState(false);
   const navigate = useNavigate();
+
+  // Rental-specific feature detection
+  const features = property.features || [];
+  const featuresLower = features.map(f => f.toLowerCase());
+  const isPetFriendly = featuresLower.some(f => f.includes('pet') || f.includes('dog') || f.includes('cat'));
+  const isFurnished = featuresLower.some(f => f.includes('furnished'));
 
   // Seeded pseudo-random for consistent demo numbers per property
   const socialProof = useMemo(() => {

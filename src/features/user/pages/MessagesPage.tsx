@@ -432,6 +432,15 @@ const MessagesPage = () => {
               {conversations.length}
             </span>
           )}
+          {!selectedConvo && (
+            <button
+              onClick={() => setNewMsgDialogOpen(true)}
+              className="ml-auto w-9 h-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center hover:opacity-90 transition-opacity"
+              title="New message"
+            >
+              <PenSquare size={16} />
+            </button>
+          )}
         </div>
       </header>
 

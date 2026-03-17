@@ -22,7 +22,7 @@ const AU_DATE = (d: string) => {
   return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
 };
 
-// Mock pipeline data for 12 months
+// Pipeline data
 const PIPELINE_DATA = [
   { month: 'Apr', deals: 2, value: 45000 },
   { month: 'May', deals: 3, value: 68000 },
@@ -36,6 +36,21 @@ const PIPELINE_DATA = [
   { month: 'Jan', deals: 4, value: 98000 },
   { month: 'Feb', deals: 3, value: 65000 },
   { month: 'Mar', deals: 6, value: 145000 },
+];
+
+const DEMO_PIPELINE_DATA = [
+  { month: 'Apr', deals: 3, value: 128000 },
+  { month: 'May', deals: 4, value: 156000 },
+  { month: 'Jun', deals: 2, value: 94000 },
+  { month: 'Jul', deals: 5, value: 185000 },
+  { month: 'Aug', deals: 3, value: 112000 },
+  { month: 'Sep', deals: 4, value: 148000 },
+  { month: 'Oct', deals: 6, value: 210000 },
+  { month: 'Nov', deals: 3, value: 125000 },
+  { month: 'Dec', deals: 4, value: 164000 },
+  { month: 'Jan', deals: 5, value: 192000 },
+  { month: 'Feb', deals: 4, value: 155000 },
+  { month: 'Mar', deals: 7, value: 380000 },
 ];
 
 const URGENCY_CONFIG = {
@@ -52,7 +67,7 @@ const MOCK_MATCHES = [
 
 const DashboardOverview = () => {
   const { listings, isMockData } = useAgentListings();
-  const { user } = useAuth();
+  const { user, isDemoMode } = useAuth();
   const navigate = useNavigate();
   const [tasksDue, setTasksDue] = useState(0);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
@@ -85,24 +100,24 @@ const DashboardOverview = () => {
       .then(({ data }) => setRecentActivities(data || []));
   }, [user]);
 
-  // GCI mock values
-  const gciActual = 245000;
-  const gciBudgeted = 400000;
-  const gciPotential = 520000;
+  // GCI values — demo-aware
+  const gciActual = isDemoMode ? 1250000 : 245000;
+  const gciBudgeted = isDemoMode ? 1800000 : 400000;
+  const gciPotential = isDemoMode ? 2200000 : 520000;
   const gciPercent = Math.round((gciActual / gciBudgeted) * 100);
 
   // Stats row - Australian CRM focus
   const stats = [
-    { label: 'Tasks Due', value: String(tasksDue || 3), icon: <CheckSquare size={16} />, color: 'text-destructive', link: '/dashboard/contacts' },
-    { label: 'Active Contacts', value: '48', icon: <Users size={16} />, color: 'text-primary', link: '/dashboard/contacts' },
-    { label: 'Appraisals This Month', value: '6', icon: <ClipboardList size={16} />, color: 'text-success', link: '/dashboard/listings' },
-    { label: 'Sales This Month', value: AUD.format(1250000), icon: <DollarSign size={16} />, color: 'text-primary', link: '/dashboard/reports' },
-    { label: 'Settled', value: AUD.format(890000), icon: <Landmark size={16} />, color: 'text-success', link: '/dashboard/trust' },
+    { label: 'Tasks Due', value: String(tasksDue || (isDemoMode ? 5 : 3)), icon: <CheckSquare size={16} />, color: 'text-destructive', link: '/dashboard/contacts' },
+    { label: 'Active Contacts', value: isDemoMode ? '62' : '48', icon: <Users size={16} />, color: 'text-primary', link: '/dashboard/contacts' },
+    { label: 'Appraisals This Month', value: isDemoMode ? '9' : '6', icon: <ClipboardList size={16} />, color: 'text-success', link: '/dashboard/listings' },
+    { label: 'Sales This Month', value: AUD.format(isDemoMode ? 1250000 : 1250000), icon: <DollarSign size={16} />, color: 'text-primary', link: '/dashboard/reports' },
+    { label: 'Trust Balance', value: AUD.format(isDemoMode ? 47230 : 890000), icon: <Landmark size={16} />, color: 'text-success', link: '/dashboard/trust' },
   ];
 
   return (
     <div>
-      <DashboardHeader title="Dashboard" subtitle="Welcome back, Agent" />
+      <DashboardHeader title="Dashboard" subtitle={isDemoMode ? "South Yarra Demo Agency" : "Welcome back, Agent"} />
 
       <div className="p-4 sm:p-6 space-y-6 max-w-7xl">
         {/* Stats Row */}
@@ -176,7 +191,7 @@ const DashboardOverview = () => {
             </h3>
             <div className="h-48">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={PIPELINE_DATA}>
+                <BarChart data={isDemoMode ? DEMO_PIPELINE_DATA : PIPELINE_DATA}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} className="text-muted-foreground" />
                   <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `$${v / 1000}k`} className="text-muted-foreground" />

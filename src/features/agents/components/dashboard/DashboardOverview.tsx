@@ -85,19 +85,19 @@ const DashboardOverview = () => {
       .then(({ data }) => setRecentActivities(data || []));
   }, [user]);
 
-  // GCI mock values
-  const gciActual = 245000;
-  const gciBudgeted = 400000;
-  const gciPotential = 520000;
+  // GCI values — demo-aware
+  const gciActual = isDemoMode ? 1250000 : 245000;
+  const gciBudgeted = isDemoMode ? 1800000 : 400000;
+  const gciPotential = isDemoMode ? 2200000 : 520000;
   const gciPercent = Math.round((gciActual / gciBudgeted) * 100);
 
   // Stats row - Australian CRM focus
   const stats = [
-    { label: 'Tasks Due', value: String(tasksDue || 3), icon: <CheckSquare size={16} />, color: 'text-destructive', link: '/dashboard/contacts' },
-    { label: 'Active Contacts', value: '48', icon: <Users size={16} />, color: 'text-primary', link: '/dashboard/contacts' },
-    { label: 'Appraisals This Month', value: '6', icon: <ClipboardList size={16} />, color: 'text-success', link: '/dashboard/listings' },
-    { label: 'Sales This Month', value: AUD.format(1250000), icon: <DollarSign size={16} />, color: 'text-primary', link: '/dashboard/reports' },
-    { label: 'Settled', value: AUD.format(890000), icon: <Landmark size={16} />, color: 'text-success', link: '/dashboard/trust' },
+    { label: 'Tasks Due', value: String(tasksDue || (isDemoMode ? 5 : 3)), icon: <CheckSquare size={16} />, color: 'text-destructive', link: '/dashboard/contacts' },
+    { label: 'Active Contacts', value: isDemoMode ? '62' : '48', icon: <Users size={16} />, color: 'text-primary', link: '/dashboard/contacts' },
+    { label: 'Appraisals This Month', value: isDemoMode ? '9' : '6', icon: <ClipboardList size={16} />, color: 'text-success', link: '/dashboard/listings' },
+    { label: 'Sales This Month', value: AUD.format(isDemoMode ? 1250000 : 1250000), icon: <DollarSign size={16} />, color: 'text-primary', link: '/dashboard/reports' },
+    { label: 'Trust Balance', value: AUD.format(isDemoMode ? 47230 : 890000), icon: <Landmark size={16} />, color: 'text-success', link: '/dashboard/trust' },
   ];
 
   return (

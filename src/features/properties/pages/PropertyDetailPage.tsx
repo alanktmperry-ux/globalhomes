@@ -199,7 +199,20 @@ export default function PropertyDetailPage() {
             >
               <Heart size={18} className={saved ? 'fill-destructive text-destructive' : 'text-foreground/70'} />
             </button>
-            <button className="w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center shadow-md">
+            <button
+              onClick={async () => {
+                const url = window.location.href;
+                const title = property.title;
+                const text = `${property.title} — ${property.address}, ${property.suburb}`;
+                if (navigator.share) {
+                  try { await navigator.share({ title, text, url }); } catch {}
+                } else {
+                  await navigator.clipboard.writeText(url);
+                  toast({ title: 'Link copied to clipboard!' });
+                }
+              }}
+              className="w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center shadow-md"
+            >
               <Share2 size={18} className="text-foreground/70" />
             </button>
           </div>

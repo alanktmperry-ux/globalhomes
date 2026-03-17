@@ -75,7 +75,7 @@ const PROPERTIES_WITH_AGENTS =
  * Searches agent listings by keyword matching against title, address, suburb, state, description.
  * Results are ordered: subscribed agents first, then by recency.
  */
-export async function searchAgentListings(query: string, limit = 20): Promise<Property[]> {
+export async function searchAgentListings(query: string, limit = 20, listingType?: 'sale' | 'rent'): Promise<Property[]> {
   const words = query
     .toLowerCase()
     .split(/\s+/)

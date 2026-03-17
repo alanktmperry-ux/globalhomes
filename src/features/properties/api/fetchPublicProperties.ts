@@ -95,7 +95,7 @@ export async function searchAgentListings(query: string, limit = 20, listingType
     ])
     .join(',');
 
-  const { data, error } = await supabase
+  let dbQuery = supabase
     .from('properties')
     .select(PROPERTIES_WITH_AGENTS)
     .eq('is_active', true)
@@ -103,6 +103,14 @@ export async function searchAgentListings(query: string, limit = 20, listingType
     .or(orClauses)
     .order('created_at', { ascending: false })
     .limit(limit);
+
+  if (listingType === 'rent') {
+    dbQuery = dbQuery.eq('listing_type', 'rent');
+  } else if (listingType === 'sale') {
+    dbQuery = dbQuery.or('listing_type.eq.sale,listing_type.is.null');
+  }
+
+  const { data, error } = await dbQuery;
 
   if (error) {
     console.error('[searchAgentListings]', error.message);

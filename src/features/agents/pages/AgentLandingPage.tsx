@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Ear, Mic, Globe, Camera, Cpu, ShieldCheck, ArrowRight, CheckCircle2, Star, Play, Gamepad2, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/lib/AuthProvider';
 import AgentRegistrationModal from '@/components/AgentRegistrationModal';
 import agentHero from '@/assets/agent-hero.jpg';
 import heatMapBg from '@/assets/heat-map-bg.jpg';
@@ -18,30 +17,14 @@ const fadeUp = {
   }),
 };
 
-const DEMO_EMAIL = 'demo-agent@globalhomes.app';
-const DEMO_PASSWORD = 'DemoAgent2024!';
-
 const AgentLandingPage = () => {
   const [showModal, setShowModal] = useState(false);
-  const [demoLoading, setDemoLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { switchToDemo, demoSwitching } = useAuth();
 
   const handleDemoLogin = async () => {
-    setDemoLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: DEMO_EMAIL,
-        password: DEMO_PASSWORD,
-      });
-      if (error) throw error;
-      toast({ title: '🎮 Demo mode active', description: 'Exploring as Demo Agency' });
-      navigate('/dashboard');
-    } catch (err: any) {
-      toast({ title: 'Demo unavailable', description: 'Please try logging in with your own account.', variant: 'destructive' });
-    } finally {
-      setDemoLoading(false);
-    }
+    await switchToDemo();
+    navigate('/dashboard');
   };
 
   return (
@@ -116,12 +99,12 @@ const AgentLandingPage = () => {
                 <Button
                   size="lg"
                   variant="outline"
-                  disabled={demoLoading}
+                  disabled={demoSwitching}
                   onClick={handleDemoLogin}
                   className="text-base px-8 py-5 rounded-xl font-bold border-primary/50 text-primary-foreground bg-primary/15 hover:bg-primary/25 backdrop-blur-sm transition-all"
                 >
                   <Gamepad2 size={18} className="mr-2" />
-                  {demoLoading ? 'Loading Demo...' : 'Try Demo Agency'}
+                  {demoSwitching ? 'Loading Demo...' : 'Try Demo Agency'}
                 </Button>
                 <Button
                   size="lg"

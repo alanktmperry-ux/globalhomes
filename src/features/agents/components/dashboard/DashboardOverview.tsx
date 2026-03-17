@@ -83,6 +83,42 @@ const DashboardOverview = () => {
       .then(({ count }) => setTasksDue(count || 0));
   }, [user]);
 
+  // Fetch pipeline data from activities (entity_type='property', action='sold')
+  useEffect(() => {
+    if (!user || isDemoMode) return;
+    const now = new Date();
+    const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1).toISOString();
+    supabase
+      .from('activities')
+      .select('created_at, metadata')
+      .eq('user_id', user.id)
+      .eq('entity_type', 'property')
+      .eq('action', 'sold')
+      .gte('created_at', twelveMonthsAgo)
+      .then(({ data }) => {
+        const months = buildEmptyMonths();
+        if (data && data.length > 0) {
+          const monthMap = new Map(months.map((m, i) => [i, m]));
+          const baseDate = new Date(now.getFullYear(), now.getMonth() - 11, 1);
+          data.forEach((row) => {
+            const d = new Date(row.created_at);
+            const idx = (d.getFullYear() - baseDate.getFullYear()) * 12 + (d.getMonth() - baseDate.getMonth());
+            if (idx >= 0 && idx < 12) {
+              const entry = monthMap.get(idx)!;
+              entry.deals += 1;
+              const val = (row.metadata as any)?.commission ?? (row.metadata as any)?.value ?? 0;
+              entry.value += Number(val) || 0;
+            }
+          });
+          setPipelineData(months);
+          setPipelineEmpty(false);
+        } else {
+          setPipelineData(months);
+          setPipelineEmpty(true);
+        }
+      });
+  }, [user, isDemoMode]);
+
   // Fetch recent activities
   useEffect(() => {
     if (!user) return;

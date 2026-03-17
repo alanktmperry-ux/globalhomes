@@ -75,6 +75,12 @@ export function SiteHeader() {
               onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
               className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-secondary text-sm font-medium text-foreground hover:bg-accent transition-colors"
             >
+              {isLiveRates && (
+                <span className="flex items-center gap-1 text-[10px] font-medium text-emerald-500 mr-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Live
+                </span>
+              )}
               <span>{currency.label}</span>
               <ChevronDown size={14} className="text-muted-foreground" />
             </button>

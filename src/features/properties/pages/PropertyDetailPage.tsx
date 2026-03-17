@@ -619,6 +619,14 @@ export default function PropertyDetailPage() {
         open={inspectionBookingOpen}
         onClose={() => setInspectionBookingOpen(false)}
       />
+
+      {isRental && (
+        <RentalApplicationModal
+          property={property}
+          open={rentalApplicationOpen}
+          onClose={() => setRentalApplicationOpen(false)}
+        />
+      )}
     </div>
   );
 }

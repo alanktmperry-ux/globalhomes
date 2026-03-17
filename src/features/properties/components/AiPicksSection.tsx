@@ -1,10 +1,12 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, TrendingUp } from 'lucide-react';
 import { Property } from '@/shared/lib/types';
 import { PropertyCard } from '@/features/properties/components/PropertyCard';
+import { supabase } from '@/integrations/supabase/client';
+import { mapDbProperty } from '@/features/properties/api/fetchPublicProperties';
 
-// Adjacent suburb mapping (simple static map — extend as needed)
+// Adjacent suburb mapping
 const ADJACENT_SUBURBS: Record<string, string[]> = {
   richmond: ['cremorne', 'burnley', 'abbotsford', 'collingwood', 'east melbourne'],
   cremorne: ['richmond', 'south yarra', 'prahran'],
@@ -21,40 +23,6 @@ const ADJACENT_SUBURBS: Record<string, string[]> = {
 function getAdjacentSuburbs(suburb: string): string[] {
   const key = suburb.toLowerCase().replace(/\s+/g, '_');
   return ADJACENT_SUBURBS[key] || [];
-}
-
-interface ViewedPattern {
-  suburb: string;
-  beds: number;
-  count: number;
-}
-
-/**
- * Analyze viewed properties to find patterns (suburb + bed count combos
- * the user has viewed 3+ times).
- */
-function detectPatterns(
-  viewedIds: Set<string>,
-  allProperties: Property[],
-): ViewedPattern[] {
-  const viewed = allProperties.filter(p => viewedIds.has(p.id));
-  const buckets = new Map<string, number>();
-
-  for (const p of viewed) {
-    const key = `${p.suburb.toLowerCase()}|${p.beds}`;
-    buckets.set(key, (buckets.get(key) || 0) + 1);
-  }
-
-  const patterns: ViewedPattern[] = [];
-  for (const [key, count] of buckets) {
-    if (count >= 3) {
-      const [suburb, beds] = key.split('|');
-      patterns.push({ suburb, beds: Number(beds), count });
-    }
-  }
-
-  // Sort by strongest signal first
-  return patterns.sort((a, b) => b.count - a.count);
 }
 
 interface AiPicksSectionProps {
@@ -74,70 +42,145 @@ export function AiPicksSection({
   onSelect,
   isMobile,
 }: AiPicksSectionProps) {
+  const [popularListings, setPopularListings] = useState<Property[]>([]);
+
+  // Fetch top-viewed listings for the "Popular near you" fallback
+  useEffect(() => {
+    if (viewedIds.size >= 2) return; // no need if we have enough views
+    supabase
+      .from('properties')
+      .select('*, agents(id, name, agency, phone, email, avatar_url, is_subscribed, rating, review_count)')
+      .eq('is_active', true)
+      .order('views', { ascending: false })
+      .limit(6)
+      .then(({ data }) => {
+        if (data) setPopularListings(data.map(mapDbProperty));
+      });
+  }, [viewedIds.size]);
+
   const picks = useMemo(() => {
-    if (viewedIds.size < 3) return { properties: [], reason: '' };
+    if (viewedIds.size < 2) return null;
 
-    const patterns = detectPatterns(viewedIds, allProperties);
-    if (patterns.length === 0) return { properties: [], reason: '' };
+    const viewed = allProperties.filter(p => viewedIds.has(p.id));
+    if (viewed.length < 2) return null;
 
-    const top = patterns[0];
-    const adjacent = getAdjacentSuburbs(top.suburb);
+    // Aggregate signals from all viewed properties
+    const typeCounts = new Map<string, number>();
+    let totalPrice = 0;
+    let priceCount = 0;
+    const suburbCounts = new Map<string, number>();
 
-    // Collect matching properties the user hasn't viewed
+    for (const p of viewed) {
+      const t = p.propertyType || 'House';
+      typeCounts.set(t, (typeCounts.get(t) || 0) + 1);
+      suburbCounts.set(p.suburb.toLowerCase(), (suburbCounts.get(p.suburb.toLowerCase()) || 0) + 1);
+      if (p.price > 0) {
+        totalPrice += p.price;
+        priceCount++;
+      }
+    }
+
+    // Dominant property type
+    const topType = [...typeCounts.entries()].sort((a, b) => b[1] - a[1])[0][0];
+    // Average price with ±30% range
+    const avgPrice = priceCount > 0 ? totalPrice / priceCount : 0;
+    const priceLow = avgPrice * 0.7;
+    const priceHigh = avgPrice * 1.3;
+    // Top suburb
+    const topSuburb = [...suburbCounts.entries()].sort((a, b) => b[1] - a[1])[0][0];
+    const adjacent = getAdjacentSuburbs(topSuburb);
+
     const candidates = allProperties.filter(p => {
       if (viewedIds.has(p.id)) return false;
-      if (p.beds !== top.beds) return false;
-      const pSuburb = p.suburb.toLowerCase();
-      return pSuburb === top.suburb || adjacent.includes(pSuburb);
+      // Must match property type
+      if ((p.propertyType || 'House') !== topType) return false;
+      // Must be within price range (if we have price data)
+      if (avgPrice > 0 && (p.price < priceLow || p.price > priceHigh)) return false;
+      return true;
     });
 
-    // Prioritize: same suburb first, then adjacent
-    const sorted = candidates.sort((a, b) => {
-      const aMatch = a.suburb.toLowerCase() === top.suburb ? 0 : 1;
-      const bMatch = b.suburb.toLowerCase() === top.suburb ? 0 : 1;
-      return aMatch - bMatch;
+    // Score: same suburb > adjacent suburb > other
+    const scored = candidates.map(p => {
+      const sub = p.suburb.toLowerCase();
+      const score = sub === topSuburb ? 3 : adjacent.includes(sub) ? 2 : 1;
+      return { property: p, score };
     });
+    scored.sort((a, b) => b.score - a.score);
 
-    const suburbDisplay = top.suburb.charAt(0).toUpperCase() + top.suburb.slice(1);
-    const reason = `Because you viewed ${top.count} similar ${top.beds}-bed properties in ${suburbDisplay}`;
+    const priceLabel = avgPrice > 0
+      ? ` around ${new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(avgPrice)}`
+      : '';
+    const reason = `Based on your interest in ${topType} properties${priceLabel}`;
 
     return {
-      properties: sorted.slice(0, 6),
+      properties: scored.slice(0, 6).map(s => s.property),
       reason,
     };
   }, [viewedIds, allProperties]);
 
-  if (picks.properties.length === 0) return null;
-
-  return (
-    <motion.section
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="mt-8"
-    >
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-1.5">
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10">
-          <Sparkles size={14} className="text-primary" />
-          <span className="text-sm font-display font-bold text-primary">AI Picks for You</span>
+  // Personalized picks
+  if (picks && picks.properties.length > 0) {
+    return (
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="mt-8"
+      >
+        <div className="flex items-center gap-2 mb-1.5">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10">
+            <Sparkles size={14} className="text-primary" />
+            <span className="text-sm font-display font-bold text-primary">AI Picks for You</span>
+          </div>
         </div>
-      </div>
-      <p className="text-xs text-muted-foreground mb-4 pl-1">{picks.reason}</p>
+        <p className="text-xs text-muted-foreground mb-4 pl-1">{picks.reason}</p>
+        <div className={isMobile ? 'space-y-3' : 'grid grid-cols-2 gap-4'}>
+          {picks.properties.map((property, i) => (
+            <PropertyCard
+              key={property.id}
+              property={property}
+              onSelect={onSelect}
+              isSaved={isSaved(property.id)}
+              onToggleSave={onToggleSave}
+              index={i}
+            />
+          ))}
+        </div>
+      </motion.section>
+    );
+  }
 
-      {/* Cards */}
-      <div className={isMobile ? 'space-y-3' : 'grid grid-cols-2 gap-4'}>
-        {picks.properties.map((property, i) => (
-          <PropertyCard
-            key={property.id}
-            property={property}
-            onSelect={onSelect}
-            isSaved={isSaved(property.id)}
-            onToggleSave={onToggleSave}
-            index={i}
-          />
-        ))}
-      </div>
-    </motion.section>
-  );
+  // Fallback: Popular near you (no views yet)
+  if (popularListings.length > 0 && viewedIds.size < 2) {
+    return (
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="mt-8"
+      >
+        <div className="flex items-center gap-2 mb-1.5">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent">
+            <TrendingUp size={14} className="text-foreground" />
+            <span className="text-sm font-display font-bold text-foreground">Popular Near You</span>
+          </div>
+        </div>
+        <p className="text-xs text-muted-foreground mb-4 pl-1">Top viewed listings right now</p>
+        <div className={isMobile ? 'space-y-3' : 'grid grid-cols-2 gap-4'}>
+          {popularListings.map((property, i) => (
+            <PropertyCard
+              key={property.id}
+              property={property}
+              onSelect={onSelect}
+              isSaved={isSaved(property.id)}
+              onToggleSave={onToggleSave}
+              index={i}
+            />
+          ))}
+        </div>
+      </motion.section>
+    );
+  }
+
+  return null;
 }

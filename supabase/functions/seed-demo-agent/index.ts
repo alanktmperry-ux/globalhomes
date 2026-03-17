@@ -72,8 +72,8 @@ Deno.serve(async (req) => {
 
     // Create demo agency
     const { data: agencyData } = await supabaseAdmin.from("agencies").insert({
-      name: "Ray White South Yarra (Demo)",
-      slug: "demo-ray-white-sy",
+      name: "South Yarra Demo Agency",
+      slug: "south-yarra-demo",
       owner_user_id: userId,
       email: DEMO_EMAIL,
       phone: "+61400000000",

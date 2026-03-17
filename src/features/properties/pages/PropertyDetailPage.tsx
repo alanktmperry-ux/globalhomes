@@ -335,10 +335,17 @@ export default function PropertyDetailPage() {
                 <div className="flex-1">
                   <p className="font-display font-semibold text-foreground text-lg group-hover/agent:text-primary transition-colors">{property.agent.name}</p>
                   <p className="text-sm text-muted-foreground">{property.agent.agency}</p>
-                  <div className="flex items-center gap-1 mt-1">
-                    <Star size={14} className="fill-yellow-400 text-yellow-400" />
-                    <span className="text-sm font-medium text-foreground">4.8</span>
-                  </div>
+                  {property.agent.rating ? (
+                    <div className="flex items-center gap-1 mt-1">
+                      <Star size={14} className="fill-yellow-400 text-yellow-400" />
+                      <span className="text-sm font-medium text-foreground">{property.agent.rating.toFixed(1)}</span>
+                      {property.agent.reviewCount ? (
+                        <span className="text-xs text-muted-foreground">({property.agent.reviewCount} review{property.agent.reviewCount !== 1 ? 's' : ''})</span>
+                      ) : null}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground mt-1">No reviews yet</p>
+                  )}
                   <span className="text-xs text-primary font-medium mt-1 inline-block">View profile →</span>
                 </div>
               </Link>

@@ -18,8 +18,31 @@ const fadeUp = {
   }),
 };
 
+const DEMO_EMAIL = 'demo-agent@globalhomes.app';
+const DEMO_PASSWORD = 'DemoAgent2024!';
+
 const AgentLandingPage = () => {
   const [showModal, setShowModal] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleDemoLogin = async () => {
+    setDemoLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: DEMO_EMAIL,
+        password: DEMO_PASSWORD,
+      });
+      if (error) throw error;
+      toast({ title: '🎮 Demo mode active', description: 'Exploring as Demo Agency' });
+      navigate('/dashboard');
+    } catch (err: any) {
+      toast({ title: 'Demo unavailable', description: 'Please try logging in with your own account.', variant: 'destructive' });
+    } finally {
+      setDemoLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">

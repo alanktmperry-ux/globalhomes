@@ -1,4 +1,5 @@
 import { memo, useCallback, useRef, useEffect, useState } from 'react';
+import { Home, Building2 } from 'lucide-react';
 import { FixedSizeList } from 'react-window';
 import { PropertyCard, CollabReaction } from '@/features/properties/components/PropertyCard';
 import { PropertyCardSkeleton } from '@/features/properties/components/PropertyCardSkeleton';

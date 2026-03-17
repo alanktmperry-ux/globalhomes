@@ -110,6 +110,33 @@ const AgentLandingPage = () => {
                   <Play size={16} className="mr-1.5" /> See How It Works
                 </Button>
               </motion.div>
+
+              {/* ─── DEMO & LOGIN CTAs ─── */}
+              <motion.div variants={fadeUp} custom={4} className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mt-4">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  disabled={demoLoading}
+                  onClick={handleDemoLogin}
+                  className="text-base px-8 py-5 rounded-xl font-bold border-primary/50 text-primary-foreground bg-primary/15 hover:bg-primary/25 backdrop-blur-sm transition-all"
+                >
+                  <Gamepad2 size={18} className="mr-2" />
+                  {demoLoading ? 'Loading Demo...' : 'Try Demo Agency'}
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={() => navigate('/agents/login')}
+                  className="text-base px-8 py-5 rounded-xl font-bold border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 transition-all"
+                >
+                  <Lock size={18} className="mr-2" />
+                  Login to Your Agency
+                </Button>
+              </motion.div>
+              <motion.div variants={fadeUp} custom={5} className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start mt-2">
+                <span className="text-xs text-primary-foreground/50 text-center">(No signup needed)</span>
+                <span className="text-xs text-primary-foreground/50 text-center">(Email + Password)</span>
+              </motion.div>
             </motion.div>
           </div>
         </div>

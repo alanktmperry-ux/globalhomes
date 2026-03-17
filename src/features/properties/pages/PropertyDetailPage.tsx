@@ -87,7 +87,9 @@ export default function PropertyDetailPage() {
           rentalWeekly: p.rental_weekly,
           currencyCode: p.currency_code,
           listingType: p.listing_type || null,
+          inspectionTimes: Array.isArray(p.inspection_times) ? p.inspection_times : [],
         });
+        setInspectionTimes(Array.isArray(p.inspection_times) ? p.inspection_times : []);
       } else {
         const mock = mockProperties.find(p => p.id === id);
         setProperty(mock || null);

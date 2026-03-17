@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Bed, Bath, Car, Heart, BadgeCheck, Star, Sparkles, Shield, ShieldCheck, Eye, Users, TrendingUp, UserCheck } from 'lucide-react';
+import { Bed, Bath, Car, Heart, BadgeCheck, Star, Sparkles, Shield, ShieldCheck, Eye, Users, TrendingUp, UserCheck, CalendarDays, PawPrint, Sofa } from 'lucide-react';
 import { Property, PropertyStatus } from '@/shared/lib/types';
 import { useI18n } from '@/shared/lib/i18n';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
@@ -47,10 +47,16 @@ const COLLAB_EMOJIS = ['👍', '👎', '🔥'] as const;
 
 export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index, isCollab, collabReactions = [], onToggleReaction, partnerViewed, currentUserId }: PropertyCardProps) {
   const { t } = useI18n();
-  const { formatPrice, currency } = useCurrency();
-  const isRental = property.listingType === 'rent' || property.listingType === 'rental' || property.price < 50000;
+  const { formatPrice, currency, listingMode } = useCurrency();
+  const isRental = listingMode === 'rent' || property.listingType === 'rent' || property.listingType === 'rental' || property.price < 50000;
   const [contactOpen, setContactOpen] = useState(false);
   const navigate = useNavigate();
+
+  // Rental-specific feature detection
+  const features = property.features || [];
+  const featuresLower = features.map(f => f.toLowerCase());
+  const isPetFriendly = featuresLower.some(f => f.includes('pet') || f.includes('dog') || f.includes('cat'));
+  const isFurnished = featuresLower.some(f => f.includes('furnished'));
 
   // Seeded pseudo-random for consistent demo numbers per property
   const socialProof = useMemo(() => {
@@ -153,6 +159,28 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
             </span>
           </div>
 
+          {/* Rental-specific row */}
+          {isRental && (
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground bg-secondary/70 px-2 py-0.5 rounded-full">
+                <CalendarDays size={11} />
+                Available Now
+              </span>
+              {isFurnished && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                  <Sofa size={11} />
+                  Furnished
+                </span>
+              )}
+              {isPetFriendly && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                  <PawPrint size={11} />
+                  Pet Friendly
+                </span>
+              )}
+            </div>
+          )}
+
           {/* AI annotation */}
           {property.aiSummary && (
             <p className="mt-2 flex items-start gap-1.5 text-xs text-primary/80 leading-snug">
@@ -243,7 +271,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
                 onClick={(e) => { e.stopPropagation(); setContactOpen(true); }}
                 className="px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors whitespace-nowrap"
               >
-                {t('property.contact')}
+                {isRental ? 'Enquire / Apply' : t('property.contact')}
               </button>
             </div>
           </div>

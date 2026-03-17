@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Calendar, Eye, Home, BadgeCheck, Star, X } from 'lucide-react';
+import { ArrowLeft, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Calendar, Eye, Home, BadgeCheck, Star, X, PawPrint, Sofa, Clock, FileText, Users } from 'lucide-react';
 import { Property } from '@/shared/lib/types';
 import { useI18n } from '@/shared/lib/i18n';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
@@ -16,12 +16,13 @@ import { useIsMobile } from '@/shared/hooks/use-mobile';
 import { mockProperties } from '@/features/properties/api/mock-data';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { RentalEnquiryForm } from '@/features/properties/components/RentalEnquiryForm';
 
 export default function PropertyDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useI18n();
-  const { formatPrice, currency } = useCurrency();
+  const { formatPrice, currency, listingMode } = useCurrency();
   const { isSaved, toggleSaved } = useSavedProperties();
   const isMobile = useIsMobile();
 
@@ -30,11 +31,11 @@ export default function PropertyDetailPage() {
   const [imageIndex, setImageIndex] = useState(0);
   const [contactOpen, setContactOpen] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [rentalEnquiryOpen, setRentalEnquiryOpen] = useState(false);
 
   useEffect(() => {
     const fetchProperty = async () => {
       setLoading(true);
-      // Try DB first
       const { data } = await supabase
         .from('properties')
         .select('*, agents(id, name, agency, phone, email, avatar_url, is_subscribed)')
@@ -82,9 +83,9 @@ export default function PropertyDetailPage() {
           strataFeesQuarterly: p.strata_fees_quarterly,
           rentalWeekly: p.rental_weekly,
           currencyCode: p.currency_code,
+          listingType: p.listing_type || null,
         });
       } else {
-        // Fallback to mock
         const mock = mockProperties.find(p => p.id === id);
         setProperty(mock || null);
       }
@@ -124,6 +125,14 @@ export default function PropertyDetailPage() {
 
   const saved = isSaved(property.id);
   const images = property.images.length > 0 ? property.images : [property.imageUrl];
+  const isRental = listingMode === 'rent' || property.listingType === 'rent' || property.listingType === 'rental' || property.price < 50000;
+
+  // Rental-specific derived data
+  const featuresLower = (property.features || []).map(f => f.toLowerCase());
+  const isPetFriendly = featuresLower.some(f => f.includes('pet') || f.includes('dog') || f.includes('cat'));
+  const isFurnished = featuresLower.some(f => f.includes('furnished'));
+  const weeklyRent = property.rentalWeekly || property.price;
+  const bondAmount = weeklyRent * 4;
 
   const statusConfig: Record<string, { label: string; className: string }> = {
     'off-market': { label: 'Off-Market', className: 'bg-amber-500/90 text-white' },
@@ -131,6 +140,16 @@ export default function PropertyDetailPage() {
     'new': { label: 'New', className: 'bg-emerald-500/90 text-white' },
   };
   const badge = property.status && property.status !== 'listed' ? statusConfig[property.status] : null;
+
+  const handleCtaClick = () => {
+    if (isRental) {
+      setRentalEnquiryOpen(true);
+    } else {
+      setContactOpen(true);
+    }
+  };
+
+  const ctaLabel = isRental ? 'Enquire / Apply' : t('property.contact');
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -189,6 +208,12 @@ export default function PropertyDetailPage() {
             <span className="px-3 py-1.5 rounded-full bg-card/80 backdrop-blur-sm text-xs font-bold tracking-wide uppercase text-foreground">
               {property.propertyType}
             </span>
+            {isRental && property.contactClicks > 0 && (
+              <span className="px-3 py-1.5 rounded-full bg-primary/90 text-primary-foreground text-xs font-bold tracking-wide uppercase shadow-sm flex items-center gap-1">
+                <Users size={12} />
+                {property.contactClicks} application{property.contactClicks !== 1 ? 's' : ''}
+              </span>
+            )}
           </div>
 
           {/* Action buttons */}
@@ -241,9 +266,25 @@ export default function PropertyDetailPage() {
           <div className="md:col-span-2 space-y-6">
             {/* Price + title */}
             <div>
-              <p className="font-display text-3xl md:text-4xl font-bold text-foreground">{formatPrice(property.price)}</p>
-              {currency.code !== 'AUD' && (
-                <p className="text-sm text-muted-foreground mt-0.5">{property.priceFormatted} AUD</p>
+              {isRental ? (
+                <>
+                  <div className="flex items-baseline gap-2">
+                    <p className="font-display text-3xl md:text-4xl font-bold text-foreground">
+                      {formatPrice(weeklyRent, 'rent')}
+                    </p>
+                    <span className="text-lg text-muted-foreground font-medium">per week</span>
+                  </div>
+                  {currency.code !== 'AUD' && (
+                    <p className="text-sm text-muted-foreground mt-0.5">${weeklyRent.toLocaleString()}/wk AUD</p>
+                  )}
+                </>
+              ) : (
+                <>
+                  <p className="font-display text-3xl md:text-4xl font-bold text-foreground">{formatPrice(property.price)}</p>
+                  {currency.code !== 'AUD' && (
+                    <p className="text-sm text-muted-foreground mt-0.5">{property.priceFormatted} AUD</p>
+                  )}
+                </>
               )}
               <h1 className="font-display text-xl md:text-2xl font-semibold text-foreground mt-2">{property.title}</h1>
               <p className="flex items-center gap-1.5 text-muted-foreground mt-1.5">
@@ -269,9 +310,77 @@ export default function PropertyDetailPage() {
               ))}
             </div>
 
+            {/* Rental Info Section */}
+            {isRental && (
+              <div className="p-5 rounded-2xl bg-card border border-border shadow-card">
+                <h2 className="font-display text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <FileText size={18} className="text-primary" />
+                  Rental Information
+                </h2>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 rounded-xl bg-secondary">
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Available From</p>
+                    <p className="text-sm font-semibold text-foreground mt-1 flex items-center gap-1.5">
+                      <Calendar size={14} className="text-primary" />
+                      Available Now
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-secondary">
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Lease Term</p>
+                    <p className="text-sm font-semibold text-foreground mt-1 flex items-center gap-1.5">
+                      <Clock size={14} className="text-primary" />
+                      6 – 12 months
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-secondary">
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Bond</p>
+                    <p className="text-sm font-semibold text-foreground mt-1">
+                      {formatPrice(bondAmount, 'sale')} <span className="text-xs text-muted-foreground font-normal">(4 weeks)</span>
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-secondary">
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Pet Policy</p>
+                    <p className="text-sm font-semibold mt-1 flex items-center gap-1.5">
+                      <PawPrint size={14} className={isPetFriendly ? 'text-emerald-500' : 'text-muted-foreground'} />
+                      <span className={isPetFriendly ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}>
+                        {isPetFriendly ? 'Pets Allowed' : 'On Application'}
+                      </span>
+                    </p>
+                  </div>
+                  {isFurnished && (
+                    <div className="col-span-2 p-3 rounded-xl bg-primary/5 border border-primary/10">
+                      <p className="text-sm font-semibold text-primary flex items-center gap-1.5">
+                        <Sofa size={14} />
+                        This property is furnished
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Inspection Times (rental only) */}
+            {isRental && (
+              <div className="p-5 rounded-2xl bg-card border border-border shadow-card">
+                <h2 className="font-display text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                  <Eye size={18} className="text-primary" />
+                  Inspection Times
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  No scheduled inspections. Contact agent for inspection times.
+                </p>
+                <button
+                  onClick={handleCtaClick}
+                  className="mt-3 px-5 py-2.5 rounded-xl bg-secondary text-foreground font-medium text-sm hover:bg-accent transition-colors"
+                >
+                  Request Inspection
+                </button>
+              </div>
+            )}
+
             {/* Detail chips */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {property.estimatedValue && (
+              {property.estimatedValue && !isRental && (
                 <div className="col-span-2 sm:col-span-3 p-4 rounded-xl bg-primary/5 border border-primary/10">
                   <p className="text-xs text-primary font-medium uppercase tracking-wider">{t('property.estimated')}</p>
                   <p className="font-display font-bold text-foreground text-lg mt-1">{property.estimatedValue}</p>
@@ -329,8 +438,8 @@ export default function PropertyDetailPage() {
 
           {/* Sidebar */}
           <div className="space-y-4">
-            {/* Investment Insights */}
-            <InvestmentInsightsCard property={property} />
+            {/* Investment Insights (hide for rentals) */}
+            {!isRental && <InvestmentInsightsCard property={property} />}
 
             <div className="p-5 rounded-2xl bg-card border border-border shadow-card sticky top-4">
               <h3 className="font-display font-semibold text-foreground mb-4">{t('property.agent')}</h3>
@@ -371,10 +480,10 @@ export default function PropertyDetailPage() {
               )}
 
               <button
-                onClick={() => setContactOpen(true)}
+                onClick={handleCtaClick}
                 className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors"
               >
-                {t('property.contact')}
+                {ctaLabel}
               </button>
 
               {property.agent.phone && (
@@ -394,10 +503,10 @@ export default function PropertyDetailPage() {
       {isMobile && (
         <div className="fixed bottom-16 left-0 right-0 p-4 bg-card/95 backdrop-blur-sm border-t border-border z-30">
           <button
-            onClick={() => setContactOpen(true)}
+            onClick={handleCtaClick}
             className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm"
           >
-            {t('property.contact')}
+            {ctaLabel}
           </button>
         </div>
       )}
@@ -436,6 +545,14 @@ export default function PropertyDetailPage() {
         open={contactOpen}
         onClose={() => setContactOpen(false)}
       />
+
+      {isRental && (
+        <RentalEnquiryForm
+          property={property}
+          open={rentalEnquiryOpen}
+          onClose={() => setRentalEnquiryOpen(false)}
+        />
+      )}
     </div>
   );
 }

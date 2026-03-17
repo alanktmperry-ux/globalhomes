@@ -220,9 +220,14 @@ const DashboardOverview = () => {
             <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
               <TrendingUp size={16} className="text-primary" /> Pipeline — 12 Month Deal Flow
             </h3>
-            <div className="h-48">
+            <div className="h-48 relative">
+              {!isDemoMode && pipelineEmpty && (
+                <div className="absolute inset-0 flex items-center justify-center z-10">
+                  <p className="text-sm text-muted-foreground bg-card/80 backdrop-blur-sm px-3 py-1.5 rounded-lg">No completed sales yet</p>
+                </div>
+              )}
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={isDemoMode ? DEMO_PIPELINE_DATA : PIPELINE_DATA}>
+                <BarChart data={isDemoMode ? DEMO_PIPELINE_DATA : pipelineData}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} className="text-muted-foreground" />
                   <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `$${v / 1000}k`} className="text-muted-foreground" />

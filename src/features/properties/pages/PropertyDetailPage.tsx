@@ -461,6 +461,14 @@ export default function PropertyDetailPage() {
               </div>
             )}
 
+            {/* Price History */}
+            <PriceHistoryChart
+              propertyId={property.id}
+              currentPrice={property.price}
+              listedDate={property.listedDate}
+              priceFormatted={property.priceFormatted}
+            />
+
             {/* Features */}
             {property.features.length > 0 && (
               <div>

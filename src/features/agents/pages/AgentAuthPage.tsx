@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Building2, KeyRound, Plus, BarChart3, Users, Megaphone, Gamepad2 } from 'lucide-react';
+import { Building2, KeyRound, Plus, BarChart3, Users, Megaphone, CalendarCheck } from 'lucide-react';
+import RequestDemoModal from '@/features/agents/components/RequestDemoModal';
 import PhoneInput from '@/shared/components/PhoneInput';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';

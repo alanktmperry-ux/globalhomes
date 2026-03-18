@@ -39,7 +39,7 @@ async function sendViaResend(to: string, subject: string, html: string) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: Deno.env.get('EMAIL_FROM') || 'Global Homes <onboarding@resend.dev>',
+      from: 'Global Homes <onboarding@resend.dev>',
       to: [to],
       subject,
       html,

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Building2, BarChart3, Shield, Database, ArrowLeft, Loader2 } from 'lucide-react';
+import { Users, Building2, BarChart3, Shield, Database, ArrowLeft, Loader2, Gamepad2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useToast } from '@/shared/hooks/use-toast';

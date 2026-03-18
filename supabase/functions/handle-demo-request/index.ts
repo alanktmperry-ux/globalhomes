@@ -198,11 +198,11 @@ function buildConfirmationEmailHtml(name: string) {
     </div>
     <p style="font-size:15px;color:#333;margin:0 0 16px;">Hi ${name},</p>
     <p style="font-size:15px;color:#333;margin:0 0 16px;">Thank you for your interest in Global Homes. We've received your demo request and will be in touch with you shortly.</p>
-    <p style="font-size:15px;color:#333;margin:0 0 16px;">Click the button below to confirm your email and head to the login page:</p>
+    <p style="font-size:15px;color:#333;margin:0 0 16px;">Click the button below to confirm your email and create your account password:</p>
     <div style="text-align:center;margin:24px 0;">
-      <a href="${siteUrl}/agents/login" style="display:inline-block;background:#2563eb;color:#fff;font-size:14px;font-weight:600;padding:12px 28px;border-radius:10px;text-decoration:none;">Go to Login →</a>
+      <a href="${siteUrl}/agents/demo" style="display:inline-block;background:#2563eb;color:#fff;font-size:14px;font-weight:600;padding:12px 28px;border-radius:10px;text-decoration:none;">Create Your Account →</a>
     </div>
-    <p style="font-size:13px;color:#888;margin:16px 0 0;">By clicking the link above you're confirming this email address is correct and we'll use it to send your demo access details.</p>
+    <p style="font-size:13px;color:#888;margin:16px 0 0;">By clicking the link above you're confirming this email address is correct. You'll be able to set your password and get started once your demo is approved.</p>
     <div style="border-top:1px solid #eee;padding-top:16px;margin-top:24px;text-align:center;">
       <p style="font-size:11px;color:#aaa;margin:0;">Questions? Contact us at sales@everythingeco.com.au</p>
       <p style="font-size:11px;color:#aaa;margin:4px 0 0;">© Global Homes · Melbourne, Australia</p>

@@ -42,6 +42,7 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState({ totalUsers: 0, totalAgents: 0, totalListings: 0, totalLeads: 0, totalVoiceSearches: 0 });
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [pendingDemoCount, setPendingDemoCount] = useState(0);
 
   useEffect(() => {
     if (!authLoading && (!user || !isAdmin)) {

@@ -47,6 +47,7 @@ import PropertyDetailPage from "./pages/PropertyDetailPage";
 import AgentPublicProfilePage from "./pages/AgentPublicProfilePage";
 import BuyerSettingsPage from "./pages/BuyerSettingsPage";
 import AgentPerformanceDashboard from "./features/agents/pages/AgentPerformanceDashboard";
+import DemoAccessPage from "./features/agents/pages/DemoAccessPage";
 import TermsPage from "./pages/TermsPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import NotFound from "./pages/NotFound";
@@ -72,6 +73,7 @@ const App = () => (
               <Route path="/auth" element={<AuthLandingPage />} />
               <Route path="/login" element={<SeekerAuthPage />} />
               <Route path="/agents/login" element={<AgentAuthPage />} />
+              <Route path="/agents/demo" element={<DemoAccessPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/agency/:slug" element={<AgencyProfilePage />} />

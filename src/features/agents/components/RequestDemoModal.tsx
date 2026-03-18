@@ -25,14 +25,18 @@ const RequestDemoModal = ({ open, onOpenChange }: RequestDemoModalProps) => {
     if (!fullName.trim() || !email.trim()) return;
     setSubmitting(true);
     try {
-      const { error } = await supabase.from('demo_requests' as any).insert({
-        full_name: fullName.trim(),
-        email: email.trim(),
-        phone: phone.trim() || null,
-        agency_name: agencyName.trim() || null,
-        message: message.trim() || null,
-      } as any);
+      const { data, error } = await supabase.functions.invoke('handle-demo-request', {
+        body: {
+          action: 'submit',
+          full_name: fullName.trim(),
+          email: email.trim().toLowerCase(),
+          phone: phone.trim() || null,
+          agency_name: agencyName.trim() || null,
+          message: message.trim() || null,
+        },
+      });
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
       toast.success("Thanks! We'll review your request and be in touch within 24 hours with your demo access.");
       onOpenChange(false);
       setFullName('');

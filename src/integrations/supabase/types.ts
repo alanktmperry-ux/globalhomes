@@ -803,6 +803,8 @@ export type Database = {
         Row: {
           agency_name: string | null
           created_at: string
+          demo_code: string | null
+          demo_code_expires_at: string | null
           email: string
           full_name: string
           id: string
@@ -813,6 +815,8 @@ export type Database = {
         Insert: {
           agency_name?: string | null
           created_at?: string
+          demo_code?: string | null
+          demo_code_expires_at?: string | null
           email: string
           full_name: string
           id?: string
@@ -823,6 +827,8 @@ export type Database = {
         Update: {
           agency_name?: string | null
           created_at?: string
+          demo_code?: string | null
+          demo_code_expires_at?: string | null
           email?: string
           full_name?: string
           id?: string

@@ -13,8 +13,8 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   );
 
-  const DEMO_EMAIL = "demo-agent@globalhomes.app";
-  const DEMO_PASSWORD = "DemoAgent2024!";
+  const DEFAULT_DEMO_EMAIL = "demo-agent@globalhomes.app";
+  const DEMO_PASSWORD = "DemoAccess2024!";
 
   // Support ?reset=true to delete and re-create
   const url = new URL(req.url);
@@ -22,6 +22,8 @@ Deno.serve(async (req) => {
   let body: any = {};
   try { body = await req.json(); } catch { /* no body */ }
   const shouldReset = forceReset || body?.reset === true;
+  const DEMO_EMAIL = body?.email || DEFAULT_DEMO_EMAIL;
+  const demoDisplayName = body?.display_name || "Sarah Mitchell";
 
   try {
     // Check if demo user already exists

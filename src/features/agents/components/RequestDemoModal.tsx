@@ -38,7 +38,7 @@ const RequestDemoModal = ({ open, onOpenChange }: RequestDemoModalProps) => {
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      toast.success("Thanks! We'll review your request and be in touch within 24 hours with your demo access.");
+      toast.success("Thanks! We'll be in touch with you shortly.");
       onOpenChange(false);
       setFullName('');
       setEmail('');

@@ -67,7 +67,7 @@ const AdminUsers = () => {
   };
 
   const handleDelete = async (userId: string) => {
-    if (!confirm('Are you sure you want to permanently delete this user?')) return;
+    if (!confirm('This will permanently delete this user AND all their data — properties, listings, leads, transactions, messages, and their agent/agency profile. This cannot be undone. Are you sure?')) return;
     setActionLoading(userId);
     const { data: { session } } = await supabase.auth.getSession();
     await fetch(

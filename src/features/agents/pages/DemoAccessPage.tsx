@@ -56,7 +56,7 @@ const DemoAccessPage = () => {
       navigate('/dashboard');
     } catch (err: any) {
       console.error('Demo access error:', err);
-      setError('Something went wrong. Please try again or contact us at alan@squaredevelopment.com.au');
+      setError('Something went wrong. Please try again or contact us at sales@everythingeco.com.au');
     } finally {
       setLoading(false);
     }

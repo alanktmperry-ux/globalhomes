@@ -237,7 +237,7 @@ function buildAccessCodeEmailHtml(p: { name: string; code: string; siteUrl: stri
       <a href="${p.siteUrl}/agents/demo" style="display:inline-block;background:#16a34a;color:#fff;font-size:14px;font-weight:600;padding:14px 32px;border-radius:10px;text-decoration:none;">Access Demo Now →</a>
     </div>
     <div style="border-top:1px solid #eee;padding-top:16px;margin-top:24px;text-align:center;">
-      <p style="font-size:11px;color:#aaa;margin:0;">Questions? Contact us at alan@squaredevelopment.com.au</p>
+      <p style="font-size:11px;color:#aaa;margin:0;">Questions? Contact us at sales@everythingeco.com.au</p>
       <p style="font-size:11px;color:#aaa;margin:4px 0 0;">© Global Homes · Melbourne, Australia</p>
     </div>
   </div>

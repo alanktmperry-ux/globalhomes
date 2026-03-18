@@ -42,6 +42,12 @@ export function SiteHeader() {
             Global Homes
           </span>
         </button>
+        
+        {/* Legal links - hidden on small screens */}
+        <div className="hidden md:flex items-center gap-3">
+          <Link to="/terms" className="text-[11px] text-muted-foreground hover:text-foreground transition-colors">Terms</Link>
+          <Link to="/privacy" className="text-[11px] text-muted-foreground hover:text-foreground transition-colors">Privacy</Link>
+        </div>
 
         {/* Sale / Rent toggle */}
         <div className="flex items-center bg-secondary rounded-full p-0.5 shrink-0">

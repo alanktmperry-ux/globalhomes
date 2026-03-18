@@ -142,7 +142,7 @@ Deno.serve(async (req) => {
         agentName: agent.name,
         type,
         title,
-        message,
+        message: payload.message || '',
         propertyTitle,
         propertyAddress,
         leadName: payload.lead_name,

@@ -183,7 +183,7 @@ const Index = () => {
       if (sort) setSortBy(sort as typeof sortBy);
       else setSortBy('default');
       if (radius) setSearchRadius(Number(radius));
-      else clearSearchRadius();
+      else setSearchRadius(5);
       if (location) handleSearch(location);
 
       initializedFromUrl.current = true;

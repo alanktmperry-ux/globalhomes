@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import PhoneInput from '@/shared/components/PhoneInput';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
@@ -75,7 +76,7 @@ const RequestDemoModal = ({ open, onOpenChange }: RequestDemoModalProps) => {
           </div>
           <div>
             <label className="text-sm font-medium text-foreground mb-1.5 block">Phone</label>
-            <Input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+61 4XX XXX XXX" />
+            <PhoneInput value={phone} onChange={setPhone} />
           </div>
           <div>
             <label className="text-sm font-medium text-foreground mb-1.5 block">Agency Name</label>

@@ -94,12 +94,11 @@ const AgentLandingPage = () => {
                 <Button
                   size="lg"
                   variant="outline"
-                  disabled={demoSwitching}
-                  onClick={handleDemoLogin}
+                  onClick={() => setShowDemoModal(true)}
                   className="text-base px-8 py-5 rounded-xl font-bold border-primary/50 text-primary-foreground bg-primary/15 hover:bg-primary/25 backdrop-blur-sm transition-all"
                 >
-                  <Gamepad2 size={18} className="mr-2" />
-                  {demoSwitching ? 'Loading Demo...' : 'Try Demo Agency'}
+                  <CalendarCheck size={18} className="mr-2" />
+                  Request a Demo
                 </Button>
                 <Button
                   size="lg"

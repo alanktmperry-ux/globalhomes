@@ -19,13 +19,8 @@ const fadeUp = {
 
 const AgentLandingPage = () => {
   const [showModal, setShowModal] = useState(false);
+  const [showDemoModal, setShowDemoModal] = useState(false);
   const navigate = useNavigate();
-  const { switchToDemo, demoSwitching } = useAuth();
-
-  const handleDemoLogin = async () => {
-    await switchToDemo();
-    navigate('/dashboard');
-  };
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">

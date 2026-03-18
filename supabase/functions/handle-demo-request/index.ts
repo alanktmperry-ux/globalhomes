@@ -57,8 +57,9 @@ Deno.serve(async (req) => {
       if (insertErr) throw insertErr;
 
       // Send admin notification email
+      const adminEmail = Deno.env.get("ADMIN_EMAIL") || "sales@everythingeco.com.au";
       await sendEmail(resendApiKey, {
-        to: "sales@everythingeco.com.au",
+        to: adminEmail,
         subject: "New Demo Request — Global Homes",
         html: buildAdminEmailHtml({ full_name, agency_name, email, phone, message }),
       });
@@ -139,6 +140,9 @@ Deno.serve(async (req) => {
 });
 
 async function sendEmail(apiKey: string, params: { to: string; subject: string; html: string }) {
+  const emailFrom = Deno.env.get("EMAIL_FROM") || "onboarding@resend.dev";
+  const fromAddress = `Global Homes <${emailFrom}>`;
+  console.log(`Sending email to: ${params.to}, from: ${fromAddress}, subject: ${params.subject}`);
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -146,7 +150,7 @@ async function sendEmail(apiKey: string, params: { to: string; subject: string; 
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: 'Global Homes <onboarding@resend.dev>',
+      from: fromAddress,
       to: params.to,
       subject: params.subject,
       html: params.html,
@@ -155,6 +159,9 @@ async function sendEmail(apiKey: string, params: { to: string; subject: string; 
   if (!res.ok) {
     const errText = await res.text();
     console.error(`Resend email failed [${res.status}]:`, errText);
+    console.error(`Resend error details — to: ${params.to}, from: ${fromAddress}, response: ${errText}`);
+  } else {
+    console.log(`Email sent successfully to ${params.to}`);
   }
 }
 

@@ -6,7 +6,7 @@ const corsHeaders = {
 };
 
 interface NotificationPayload {
-  agent_id: string;
+  agent_id?: string;
   type: string;
   title: string;
   message: string;
@@ -15,6 +15,10 @@ interface NotificationPayload {
   lead_email?: string;
   lead_phone?: string;
   lead_message?: string;
+  // For agent_welcome / admin_new_agent
+  agent_name?: string;
+  agent_agency?: string;
+  agent_email?: string;
 }
 
 Deno.serve(async (req) => {
@@ -28,74 +32,98 @@ Deno.serve(async (req) => {
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
     const payload: NotificationPayload = await req.json();
-    const { agent_id, type, title, message, property_id, lead_name, lead_email, lead_phone, lead_message } = payload;
+    const { type, title, message } = payload;
 
-    if (!agent_id || !title) {
-      return new Response(JSON.stringify({ error: 'Missing agent_id or title' }), {
+    if (!title || !type) {
+      return new Response(JSON.stringify({ error: 'Missing title or type' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // Get agent's email
-    const { data: agent, error: agentError } = await supabase
-      .from('agents')
-      .select('email, name')
-      .eq('id', agent_id)
-      .maybeSingle();
+    // Determine recipient email and HTML based on type
+    let recipientEmail: string | null = null;
+    let emailHtml = '';
 
-    if (agentError || !agent?.email) {
-      console.error('Could not find agent email:', agentError);
-      return new Response(JSON.stringify({ error: 'Agent email not found' }), {
-        status: 404,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    if (type === 'agent_welcome') {
+      recipientEmail = payload.agent_email || null;
+      emailHtml = buildWelcomeEmailHtml(payload.agent_name || 'Agent');
+    } else if (type === 'admin_new_agent') {
+      recipientEmail = Deno.env.get('ADMIN_EMAIL') || null;
+      if (!recipientEmail) {
+        console.log('ADMIN_EMAIL not configured — skipping admin notification');
+        return new Response(JSON.stringify({ success: false, reason: 'ADMIN_EMAIL not set' }), {
+          status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      emailHtml = buildAdminNewAgentHtml({
+        agentName: payload.agent_name || 'Unknown',
+        agentAgency: payload.agent_agency || 'Independent',
+        agentEmail: payload.agent_email || 'N/A',
+      });
+    } else {
+      // Existing lead/event notification flow
+      if (!payload.agent_id) {
+        return new Response(JSON.stringify({ error: 'Missing agent_id' }), {
+          status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      const { data: agent, error: agentError } = await supabase
+        .from('agents')
+        .select('email, name')
+        .eq('id', payload.agent_id)
+        .maybeSingle();
+
+      if (agentError || !agent?.email) {
+        console.error('Could not find agent email:', agentError);
+        return new Response(JSON.stringify({ error: 'Agent email not found' }), {
+          status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      recipientEmail = agent.email;
+
+      let propertyTitle = '';
+      let propertyAddress = '';
+      if (payload.property_id) {
+        const { data: prop } = await supabase
+          .from('properties')
+          .select('title, address, suburb, state')
+          .eq('id', payload.property_id)
+          .maybeSingle();
+        if (prop) {
+          propertyTitle = prop.title;
+          propertyAddress = `${prop.address}, ${prop.suburb}, ${prop.state}`;
+        }
+      }
+
+      emailHtml = buildLeadEventEmailHtml({
+        agentName: agent.name,
+        type,
+        title,
+        message,
+        propertyTitle,
+        propertyAddress,
+        leadName: payload.lead_name,
+        leadEmail: payload.lead_email,
+        leadPhone: payload.lead_phone,
+        leadMessage: payload.lead_message,
       });
     }
 
-    // Get property details if available
-    let propertyTitle = '';
-    let propertyAddress = '';
-    if (property_id) {
-      const { data: prop } = await supabase
-        .from('properties')
-        .select('title, address, suburb, state')
-        .eq('id', property_id)
-        .maybeSingle();
-      if (prop) {
-        propertyTitle = prop.title;
-        propertyAddress = `${prop.address}, ${prop.suburb}, ${prop.state}`;
-      }
+    if (!recipientEmail) {
+      return new Response(JSON.stringify({ success: false, reason: 'No recipient email' }), {
+        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    // Build email HTML
-    const emailHtml = buildEmailHtml({
-      agentName: agent.name,
-      type,
-      title,
-      message,
-      propertyTitle,
-      propertyAddress,
-      leadName: lead_name,
-      leadEmail: lead_email,
-      leadPhone: lead_phone,
-      leadMessage: lead_message,
-    });
-
-    // Try to send email via Lovable transactional email
-    // This will work once the email domain is configured
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
     if (!lovableApiKey) {
       console.log('LOVABLE_API_KEY not set — email not sent, notification logged only');
-      return new Response(JSON.stringify({ 
-        success: false, 
-        reason: 'Email domain not configured yet. Notification saved in-app.' 
-      }), {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      return new Response(JSON.stringify({ success: false, reason: 'Email domain not configured yet.' }), {
+        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // Send transactional email
     const emailResponse = await fetch('https://api.lovable.dev/v1/email/send', {
       method: 'POST',
       headers: {
@@ -103,7 +131,7 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        to: agent.email,
+        to: recipientEmail,
         subject: title,
         html: emailHtml,
         purpose: 'transactional',
@@ -113,113 +141,138 @@ Deno.serve(async (req) => {
     if (!emailResponse.ok) {
       const errBody = await emailResponse.text();
       console.error(`Email send failed [${emailResponse.status}]:`, errBody);
-      return new Response(JSON.stringify({ 
-        success: false, 
-        reason: 'Email delivery failed. Domain may not be configured yet.',
-        details: errBody,
-      }), {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      return new Response(JSON.stringify({ success: false, reason: 'Email delivery failed.', details: errBody }), {
+        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    console.log(`Email notification sent to ${agent.email}: ${title}`);
-
+    console.log(`Email sent to ${recipientEmail}: ${title}`);
     return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
     console.error('Error in send-notification-email:', error);
     return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 });
 
-function buildEmailHtml(params: {
-  agentName: string;
-  type: string;
-  title: string;
-  message: string;
-  propertyTitle: string;
-  propertyAddress: string;
-  leadName?: string;
-  leadEmail?: string;
-  leadPhone?: string;
-  leadMessage?: string;
+// ── Welcome email for new agent ──
+function buildWelcomeEmailHtml(agentName: string) {
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+<div style="max-width:560px;margin:0 auto;padding:32px 20px;">
+  <div style="text-align:center;margin-bottom:32px;">
+    <div style="font-size:24px;font-weight:700;color:#1a1a2e;">Global Homes</div>
+    <div style="font-size:12px;color:#888;margin-top:4px;">Agent Network</div>
+  </div>
+  <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px 16px;text-align:center;margin-bottom:24px;">
+    <span style="font-size:14px;font-weight:600;color:#16a34a;">✅ Account Created</span>
+  </div>
+  <p style="font-size:15px;color:#333;margin:0 0 16px;">Hi ${agentName},</p>
+  <p style="font-size:15px;color:#333;margin:0 0 16px;">Welcome to Global Homes! Your agent account has been created and is now <strong>pending review</strong>.</p>
+  <p style="font-size:15px;color:#333;margin:0 0 16px;">Our team will verify your credentials and approve your account within <strong>24–48 hours</strong>. Once approved, you'll have full access to:</p>
+  <ul style="font-size:14px;color:#555;line-height:1.8;margin:0 0 20px 20px;">
+    <li>Voice-qualified buyer leads for your territory</li>
+    <li>Pocket listing tools & off-market network</li>
+    <li>Trust accounting & compliance dashboards</li>
+    <li>Analytics and performance insights</li>
+  </ul>
+  <p style="font-size:15px;color:#333;margin:0 0 24px;">We'll email you as soon as your account is approved. In the meantime, feel free to explore the platform.</p>
+  <div style="text-align:center;margin:28px 0;">
+    <a href="https://globalhomes.lovable.app/agent-auth" style="display:inline-block;background:#16a34a;color:#fff;font-size:14px;font-weight:600;padding:12px 32px;border-radius:10px;text-decoration:none;">Sign In to Your Dashboard</a>
+  </div>
+  <div style="border-top:1px solid #eee;padding-top:20px;margin-top:32px;text-align:center;">
+    <p style="font-size:11px;color:#aaa;margin:0;">Questions? Reply to this email or contact our support team.</p>
+    <p style="font-size:11px;color:#aaa;margin:4px 0 0;">© Global Homes Pty Ltd · Melbourne, Victoria, Australia</p>
+  </div>
+</div>
+</body></html>`;
+}
+
+// ── Admin alert: new agent registered ──
+function buildAdminNewAgentHtml(params: { agentName: string; agentAgency: string; agentEmail: string }) {
+  const { agentName, agentAgency, agentEmail } = params;
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+<div style="max-width:560px;margin:0 auto;padding:32px 20px;">
+  <div style="text-align:center;margin-bottom:32px;">
+    <div style="font-size:24px;font-weight:700;color:#1a1a2e;">Global Homes</div>
+    <div style="font-size:12px;color:#888;margin-top:4px;">Admin Alert</div>
+  </div>
+  <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:12px 16px;text-align:center;margin-bottom:24px;">
+    <span style="font-size:14px;font-weight:600;color:#2563eb;">🆕 New Agent Registration</span>
+  </div>
+  <p style="font-size:15px;color:#333;margin:0 0 16px;">A new agent has registered and requires approval:</p>
+  <div style="background:#f8f9fa;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-bottom:24px;">
+    <table style="width:100%;border-collapse:collapse;">
+      <tr><td style="padding:6px 0;font-size:13px;color:#888;width:80px;">Name</td><td style="padding:6px 0;font-size:14px;color:#333;font-weight:500;">${agentName}</td></tr>
+      <tr><td style="padding:6px 0;font-size:13px;color:#888;">Agency</td><td style="padding:6px 0;font-size:14px;color:#333;">${agentAgency}</td></tr>
+      <tr><td style="padding:6px 0;font-size:13px;color:#888;">Email</td><td style="padding:6px 0;font-size:14px;"><a href="mailto:${agentEmail}" style="color:#2563eb;text-decoration:none;">${agentEmail}</a></td></tr>
+    </table>
+  </div>
+  <div style="text-align:center;margin:28px 0;">
+    <a href="https://globalhomes.lovable.app/admin" style="display:inline-block;background:#2563eb;color:#fff;font-size:14px;font-weight:600;padding:12px 32px;border-radius:10px;text-decoration:none;">Review in Admin Dashboard</a>
+  </div>
+  <div style="border-top:1px solid #eee;padding-top:20px;margin-top:32px;text-align:center;">
+    <p style="font-size:11px;color:#aaa;margin:0;">This is an automated notification from Global Homes.</p>
+  </div>
+</div>
+</body></html>`;
+}
+
+// ── Existing lead/event email ──
+function buildLeadEventEmailHtml(params: {
+  agentName: string; type: string; title: string; message: string;
+  propertyTitle: string; propertyAddress: string;
+  leadName?: string; leadEmail?: string; leadPhone?: string; leadMessage?: string;
 }) {
   const { agentName, type, title, message, propertyTitle, propertyAddress, leadName, leadEmail, leadPhone, leadMessage } = params;
-  
   const isLead = type === 'lead';
   const accentColor = isLead ? '#3B82F6' : '#10B981';
   const typeLabel = isLead ? '🔔 New Lead Enquiry' : '👆 Contact Interaction';
 
-  return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
 <body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-  <div style="max-width:560px;margin:0 auto;padding:32px 20px;">
-    
-    <!-- Header -->
-    <div style="text-align:center;margin-bottom:32px;">
-      <div style="font-size:24px;font-weight:700;color:#1a1a2e;">Global Homes</div>
-      <div style="font-size:12px;color:#888;margin-top:4px;">Agent Notification</div>
-    </div>
-
-    <!-- Badge -->
-    <div style="background:${accentColor}10;border:1px solid ${accentColor}30;border-radius:12px;padding:12px 16px;text-align:center;margin-bottom:24px;">
-      <span style="font-size:14px;font-weight:600;color:${accentColor};">${typeLabel}</span>
-    </div>
-
-    <!-- Greeting -->
-    <p style="font-size:15px;color:#333;margin:0 0 16px;">Hi ${agentName},</p>
-    <p style="font-size:15px;color:#333;margin:0 0 24px;">${message}</p>
-
-    ${propertyTitle ? `
-    <!-- Property Card -->
-    <div style="background:#f8f9fa;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-bottom:24px;">
-      <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Property</div>
-      <div style="font-size:15px;font-weight:600;color:#1a1a2e;">${propertyTitle}</div>
-      ${propertyAddress ? `<div style="font-size:13px;color:#666;margin-top:4px;">📍 ${propertyAddress}</div>` : ''}
-    </div>
-    ` : ''}
-
-    ${isLead && leadName ? `
-    <!-- Lead Details -->
-    <div style="background:#f0f7ff;border:1px solid #bfdbfe;border-radius:12px;padding:16px;margin-bottom:24px;">
-      <div style="font-size:11px;color:#3B82F6;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;font-weight:600;">Lead Details</div>
-      <table style="width:100%;border-collapse:collapse;">
-        <tr><td style="padding:4px 0;font-size:13px;color:#888;width:80px;">Name</td><td style="padding:4px 0;font-size:14px;color:#333;font-weight:500;">${leadName}</td></tr>
-        ${leadEmail ? `<tr><td style="padding:4px 0;font-size:13px;color:#888;">Email</td><td style="padding:4px 0;font-size:14px;"><a href="mailto:${leadEmail}" style="color:#3B82F6;text-decoration:none;">${leadEmail}</a></td></tr>` : ''}
-        ${leadPhone ? `<tr><td style="padding:4px 0;font-size:13px;color:#888;">Phone</td><td style="padding:4px 0;font-size:14px;"><a href="tel:${leadPhone}" style="color:#3B82F6;text-decoration:none;">${leadPhone}</a></td></tr>` : ''}
-      </table>
-      ${leadMessage ? `
-      <div style="margin-top:12px;padding-top:12px;border-top:1px solid #bfdbfe;">
-        <div style="font-size:11px;color:#888;margin-bottom:4px;">Message</div>
-        <div style="font-size:14px;color:#333;line-height:1.5;">"${leadMessage}"</div>
-      </div>
-      ` : ''}
-    </div>
-    ` : ''}
-
-    <!-- CTA -->
-    <div style="text-align:center;margin:28px 0;">
-      <a href="https://world-property-pulse.lovable.app/dashboard/leads" style="display:inline-block;background:${accentColor};color:#fff;font-size:14px;font-weight:600;padding:12px 32px;border-radius:10px;text-decoration:none;">View in Dashboard</a>
-    </div>
-
-    <!-- Footer -->
-    <div style="border-top:1px solid #eee;padding-top:20px;margin-top:32px;text-align:center;">
-      <p style="font-size:11px;color:#aaa;margin:0;">You're receiving this because you're a registered agent on Global Homes.</p>
-      <p style="font-size:11px;color:#aaa;margin:4px 0 0;">Manage notification preferences in your <a href="https://world-property-pulse.lovable.app/dashboard/settings" style="color:#888;">dashboard settings</a>.</p>
-    </div>
+<div style="max-width:560px;margin:0 auto;padding:32px 20px;">
+  <div style="text-align:center;margin-bottom:32px;">
+    <div style="font-size:24px;font-weight:700;color:#1a1a2e;">Global Homes</div>
+    <div style="font-size:12px;color:#888;margin-top:4px;">Agent Notification</div>
   </div>
-</body>
-</html>`;
+  <div style="background:${accentColor}10;border:1px solid ${accentColor}30;border-radius:12px;padding:12px 16px;text-align:center;margin-bottom:24px;">
+    <span style="font-size:14px;font-weight:600;color:${accentColor};">${typeLabel}</span>
+  </div>
+  <p style="font-size:15px;color:#333;margin:0 0 16px;">Hi ${agentName},</p>
+  <p style="font-size:15px;color:#333;margin:0 0 24px;">${message}</p>
+  ${propertyTitle ? `<div style="background:#f8f9fa;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-bottom:24px;">
+    <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Property</div>
+    <div style="font-size:15px;font-weight:600;color:#1a1a2e;">${propertyTitle}</div>
+    ${propertyAddress ? `<div style="font-size:13px;color:#666;margin-top:4px;">📍 ${propertyAddress}</div>` : ''}
+  </div>` : ''}
+  ${isLead && leadName ? `<div style="background:#f0f7ff;border:1px solid #bfdbfe;border-radius:12px;padding:16px;margin-bottom:24px;">
+    <div style="font-size:11px;color:#3B82F6;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;font-weight:600;">Lead Details</div>
+    <table style="width:100%;border-collapse:collapse;">
+      <tr><td style="padding:4px 0;font-size:13px;color:#888;width:80px;">Name</td><td style="padding:4px 0;font-size:14px;color:#333;font-weight:500;">${leadName}</td></tr>
+      ${leadEmail ? `<tr><td style="padding:4px 0;font-size:13px;color:#888;">Email</td><td style="padding:4px 0;font-size:14px;"><a href="mailto:${leadEmail}" style="color:#3B82F6;text-decoration:none;">${leadEmail}</a></td></tr>` : ''}
+      ${leadPhone ? `<tr><td style="padding:4px 0;font-size:13px;color:#888;">Phone</td><td style="padding:4px 0;font-size:14px;"><a href="tel:${leadPhone}" style="color:#3B82F6;text-decoration:none;">${leadPhone}</a></td></tr>` : ''}
+    </table>
+    ${leadMessage ? `<div style="margin-top:12px;padding-top:12px;border-top:1px solid #bfdbfe;">
+      <div style="font-size:11px;color:#888;margin-bottom:4px;">Message</div>
+      <div style="font-size:14px;color:#333;line-height:1.5;">"${leadMessage}"</div>
+    </div>` : ''}
+  </div>` : ''}
+  <div style="text-align:center;margin:28px 0;">
+    <a href="https://globalhomes.lovable.app/dashboard/leads" style="display:inline-block;background:${accentColor};color:#fff;font-size:14px;font-weight:600;padding:12px 32px;border-radius:10px;text-decoration:none;">View in Dashboard</a>
+  </div>
+  <div style="border-top:1px solid #eee;padding-top:20px;margin-top:32px;text-align:center;">
+    <p style="font-size:11px;color:#aaa;margin:0;">You're receiving this because you're a registered agent on Global Homes.</p>
+    <p style="font-size:11px;color:#aaa;margin:4px 0 0;">Manage notification preferences in your <a href="https://globalhomes.lovable.app/dashboard/settings" style="color:#888;">dashboard settings</a>.</p>
+  </div>
+</div>
+</body></html>`;
 }

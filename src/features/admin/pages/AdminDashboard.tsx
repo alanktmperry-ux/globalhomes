@@ -9,8 +9,9 @@ import AdminUsers from '@/features/admin/components/AdminUsers';
 import AdminListings from '@/features/admin/components/AdminListings';
 import AdminRoles from '@/features/admin/components/AdminRoles';
 import AdminDatabase from '@/features/admin/components/AdminDatabase';
+import AdminDemoRequests from '@/features/admin/components/AdminDemoRequests';
 
-type Tab = 'overview' | 'users' | 'listings' | 'roles' | 'database';
+type Tab = 'overview' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests';
 
 interface UserRow {
   id: string;

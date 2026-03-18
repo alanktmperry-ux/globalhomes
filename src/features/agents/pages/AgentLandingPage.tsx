@@ -111,7 +111,7 @@ const AgentLandingPage = () => {
                 </Button>
               </motion.div>
               <motion.div variants={fadeUp} custom={5} className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start mt-2">
-                <span className="text-xs text-primary-foreground/50 text-center">(No signup needed)</span>
+                <span className="text-xs text-primary-foreground/50 text-center">(We'll set up your access)</span>
                 <span className="text-xs text-primary-foreground/50 text-center">(Email + Password)</span>
               </motion.div>
             </motion.div>

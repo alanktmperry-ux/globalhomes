@@ -135,38 +135,15 @@ function buildConfirmationEmail(name: string, email: string) {
 }
 
 function buildAccessCodeEmail(name: string, email: string, code: string, demoUrl: string) {
-  return `<html><body><div style="font-family:'Helvetica Neue',Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;">
-    <div style="background:#0f172a;padding:24px 32px;text-align:center;">
-      <div style="color:#fff;font-size:22px;font-weight:700;letter-spacing:-0.5px;">Global Homes</div>
-      <div style="color:#94a3b8;font-size:13px;margin-top:4px;">Demo Access Approved</div>
-    </div>
-    <div style="padding:32px;">
-      <div style="background:#dcfce7;border-left:4px solid #22c55e;padding:12px 16px;border-radius:6px;margin-bottom:24px;">
-        <strong style="color:#166534;">✅ Your demo request has been approved</strong>
-      </div>
-      <div style="font-size:16px;color:#0f172a;margin-bottom:16px;">Hi ${name},</div>
-      <div style="color:#334155;font-size:14px;line-height:1.7;margin-bottom:24px;">Great news — you've been approved for a Global Homes agent demo. Use your personal access code below to log in and explore the full platform.</div>
-      <div style="background:#0f172a;border-radius:12px;padding:24px;text-align:center;margin-bottom:24px;">
-        <div style="color:#94a3b8;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Your Access Code</div>
-        <div style="color:#fff;font-size:32px;font-weight:700;letter-spacing:4px;font-family:monospace;">${code}</div>
-        <div style="color:#64748b;font-size:11px;margin-top:8px;">Valid for 7 days · Do not share this code</div>
-      </div>
-      <div style="background:#f1f5f9;padding:16px 20px;border-radius:8px;margin-bottom:24px;">
-        <div style="font-weight:600;color:#0f172a;margin-bottom:8px;">How to access your demo:</div>
-        <div style="color:#475569;font-size:14px;line-height:1.8;">
-          <div>1. Click the button below — your email is pre-filled automatically</div>
-          <div>2. Enter your access code: <strong>${code}</strong></div>
-          <div>3. Click <strong>Access My Demo</strong> — you're in!</div>
-        </div>
-      </div>
-      <div style="text-align:center;margin-bottom:16px;">
-        <a href="${demoUrl}" style="display:inline-block;background:#2563eb;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:600;font-size:15px;">Access My Demo →</a>
-      </div>
-      <div style="text-align:center;color:#94a3b8;font-size:12px;">Button not working? <a href="${demoUrl}" style="color:#2563eb;text-decoration:none;">${demoUrl}</a></div>
-    </div>
-    <div style="text-align:center;padding:20px;color:#94a3b8;font-size:12px;">
-      <div>Questions? <a href="mailto:sales@everythingeco.com.au" style="color:#2563eb;text-decoration:none;">sales@everythingeco.com.au</a> · © Global Homes · Melbourne, Australia</div>
-    </div>
-  </div>
-</div></body></html>`;
+  return `<html><body>
+<div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:40px 20px;">
+  <h2 style="color:#0f172a;">Global Homes</h2>
+  <p>Hi ${name},</p>
+  <p>Your access code is:</p>
+  <div style="font-size:40px;font-weight:900;letter-spacing:8px;font-family:monospace;background:#f1f5f9;padding:24px;border-radius:8px;text-align:center;color:#0f172a;">${code}</div>
+  <p style="color:#64748b;font-size:13px;">Valid for 7 days. Do not share.</p>
+  <p><a href="${demoUrl}" style="display:inline-block;background:#16a34a;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;">Log In to Global Homes →</a></p>
+  <p style="color:#94a3b8;font-size:12px;">Questions? <a href="mailto:sales@everythingeco.com.au" style="color:#2563eb;">sales@everythingeco.com.au</a></p>
+</div>
+</body></html>`;
 }

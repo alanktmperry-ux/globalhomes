@@ -333,6 +333,7 @@ export type Database = {
           id: string
           investment_niche: string | null
           is_approved: boolean | null
+          is_demo: boolean
           is_subscribed: boolean
           languages_spoken: string[] | null
           license_number: string | null
@@ -367,6 +368,7 @@ export type Database = {
           id?: string
           investment_niche?: string | null
           is_approved?: boolean | null
+          is_demo?: boolean
           is_subscribed?: boolean
           languages_spoken?: string[] | null
           license_number?: string | null
@@ -401,6 +403,7 @@ export type Database = {
           id?: string
           investment_niche?: string | null
           is_approved?: boolean | null
+          is_demo?: boolean
           is_subscribed?: boolean
           languages_spoken?: string[] | null
           license_number?: string | null

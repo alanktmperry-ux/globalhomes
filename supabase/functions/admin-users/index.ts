@@ -269,7 +269,7 @@ Deno.serve(async (req) => {
       const { email } = await req.json();
       // Use anon client to trigger the standard recovery email flow
       const { error } = await anonClient.auth.resetPasswordForEmail(email, {
-        redirectTo: "https://world-property-pulse.lovable.app/reset-password",
+        redirectTo: (Deno.env.get("SITE_URL") || "https://globalhomes.lovable.app") + "/reset-password",
       });
       if (error) throw error;
       return new Response(JSON.stringify({ success: true, message: `Recovery email sent to ${email}` }), {

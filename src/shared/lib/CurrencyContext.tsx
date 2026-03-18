@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-export type CurrencyCode = 'AUD' | 'USD' | 'EUR' | 'GBP' | 'JPY';
+export type CurrencyCode = 'AUD' | 'USD' | 'EUR' | 'GBP' | 'JPY' | 'SGD' | 'HKD' | 'CNY' | 'AED' | 'MYR' | 'NZD' | 'CAD' | 'INR';
 export type ListingMode = 'sale' | 'rent';
 
 interface CurrencyInfo {
@@ -11,12 +11,33 @@ interface CurrencyInfo {
   rate: number; // relative to AUD
 }
 
+export interface CurrencyRegion {
+  region: string;
+  currencies: CurrencyCode[];
+}
+
+export const CURRENCY_REGIONS: CurrencyRegion[] = [
+  { region: 'Oceania', currencies: ['AUD', 'NZD'] },
+  { region: 'Asia', currencies: ['JPY', 'SGD', 'HKD', 'CNY', 'MYR', 'INR'] },
+  { region: 'Middle East', currencies: ['AED'] },
+  { region: 'Americas', currencies: ['USD', 'CAD'] },
+  { region: 'Europe', currencies: ['EUR', 'GBP'] },
+];
+
 const FALLBACK_CURRENCIES: CurrencyInfo[] = [
   { code: 'AUD', symbol: '$', label: 'AUD $', rate: 1 },
   { code: 'USD', symbol: '$', label: 'USD $', rate: 0.65 },
   { code: 'EUR', symbol: '€', label: 'EUR €', rate: 0.60 },
   { code: 'GBP', symbol: '£', label: 'GBP £', rate: 0.52 },
   { code: 'JPY', symbol: '¥', label: 'JPY ¥', rate: 97.5 },
+  { code: 'SGD', symbol: 'S$', label: 'SGD S$', rate: 0.87 },
+  { code: 'HKD', symbol: 'HK$', label: 'HKD HK$', rate: 5.08 },
+  { code: 'CNY', symbol: '¥', label: 'CNY ¥', rate: 4.72 },
+  { code: 'AED', symbol: 'د.إ', label: 'AED د.إ', rate: 2.39 },
+  { code: 'MYR', symbol: 'RM', label: 'MYR RM', rate: 2.89 },
+  { code: 'NZD', symbol: 'NZ$', label: 'NZD NZ$', rate: 1.08 },
+  { code: 'CAD', symbol: 'C$', label: 'CAD C$', rate: 0.89 },
+  { code: 'INR', symbol: '₹', label: 'INR ₹', rate: 54.5 },
 ];
 
 export let CURRENCIES: CurrencyInfo[] = [...FALLBACK_CURRENCIES];

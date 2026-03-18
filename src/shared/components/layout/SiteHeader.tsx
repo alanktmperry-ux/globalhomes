@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Globe, ChevronDown, User, LogIn, Home, Building2, Plus, List, LayoutDashboard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useCurrency, CURRENCIES, CurrencyCode } from '@/shared/lib/CurrencyContext';
+import { useCurrency, CURRENCIES, CURRENCY_REGIONS, CurrencyCode } from '@/shared/lib/CurrencyContext';
 import { useAuth } from '@/features/auth/AuthProvider';
 
 export function SiteHeader() {
@@ -97,23 +97,34 @@ export function SiteHeader() {
                   initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -4 }}
-                  className="absolute right-0 top-full mt-1 w-36 bg-popover border border-border rounded-xl shadow-elevated overflow-hidden z-50"
+                  className="absolute right-0 top-full mt-1 w-44 bg-popover border border-border rounded-xl shadow-elevated overflow-hidden z-50 max-h-80 overflow-y-auto"
                 >
-                  {CURRENCIES.map((c) => (
-                    <button
-                      key={c.code}
-                      onClick={() => {
-                        setCurrencyCode(c.code as CurrencyCode);
-                        setShowCurrencyDropdown(false);
-                      }}
-                      className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                        c.code === currency.code
-                          ? 'bg-primary/10 text-primary font-medium'
-                          : 'text-foreground hover:bg-accent'
-                      }`}
-                    >
-                      {c.label}
-                    </button>
+                  {CURRENCY_REGIONS.map((region) => (
+                    <div key={region.region}>
+                      <div className="px-3 pt-2.5 pb-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                        {region.region}
+                      </div>
+                      {region.currencies.map((code) => {
+                        const c = CURRENCIES.find((cur) => cur.code === code);
+                        if (!c) return null;
+                        return (
+                          <button
+                            key={c.code}
+                            onClick={() => {
+                              setCurrencyCode(c.code as CurrencyCode);
+                              setShowCurrencyDropdown(false);
+                            }}
+                            className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                              c.code === currency.code
+                                ? 'bg-primary/10 text-primary font-medium'
+                                : 'text-foreground hover:bg-accent'
+                            }`}
+                          >
+                            {c.label}
+                          </button>
+                        );
+                      })}
+                    </div>
                   ))}
                 </motion.div>
               )}

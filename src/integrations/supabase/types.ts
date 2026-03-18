@@ -799,6 +799,39 @@ export type Database = {
           },
         ]
       }
+      demo_requests: {
+        Row: {
+          agency_name: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          message: string | null
+          phone: string | null
+          status: string
+        }
+        Insert: {
+          agency_name?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          message?: string | null
+          phone?: string | null
+          status?: string
+        }
+        Update: {
+          agency_name?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          message?: string | null
+          phone?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       exchange_rate_cache: {
         Row: {
           base_currency: string

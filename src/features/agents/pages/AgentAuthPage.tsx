@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Building2, KeyRound, Plus, BarChart3, Users, Megaphone, Gamepad2 } from 'lucide-react';
+import { Building2, KeyRound, Plus, BarChart3, Users, Megaphone, CalendarCheck } from 'lucide-react';
+import RequestDemoModal from '@/features/agents/components/RequestDemoModal';
 import PhoneInput from '@/shared/components/PhoneInput';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,7 +15,8 @@ type Step = 'email' | 'password' | 'choose' | 'create-agency' | 'join-agency';
 const AgentAuthPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, isAgent, isAdmin, loading: authLoading, switchToDemo, demoSwitching } = useAuth();
+  const { user, isAgent, isAdmin, loading: authLoading } = useAuth();
+  const [demoModalOpen, setDemoModalOpen] = useState(false);
   const [pendingRedirect, setPendingRedirect] = useState<'dashboard' | null>(null);
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
@@ -274,17 +276,15 @@ const AgentAuthPage = () => {
               </div>
 
               <button
-                onClick={async () => {
-                  await switchToDemo();
-                  navigate('/dashboard');
-                }}
-                disabled={demoSwitching}
-                className="w-full flex items-center justify-center gap-2 py-3 px-5 rounded-full border border-primary/30 bg-primary/5 text-primary text-sm font-semibold hover:bg-primary/10 transition-colors disabled:opacity-50"
+                onClick={() => setDemoModalOpen(true)}
+                className="w-full flex items-center justify-center gap-2 py-3 px-5 rounded-full border border-primary/30 bg-primary/5 text-primary text-sm font-semibold hover:bg-primary/10 transition-colors"
               >
-                <Gamepad2 size={16} />
-                {demoSwitching ? 'Loading Demo...' : 'Try Demo Agency'}
+                <CalendarCheck size={16} />
+                Request a Demo
               </button>
-              <p className="text-xs text-muted-foreground text-center mt-1.5">No signup needed — explore with sample data</p>
+              <p className="text-xs text-muted-foreground text-center mt-1.5">We'll set up a personalised demo for you</p>
+
+              <RequestDemoModal open={demoModalOpen} onOpenChange={setDemoModalOpen} />
 
               <p className="text-xs text-muted-foreground mt-6 text-center leading-relaxed">
                 By submitting, I accept Global Homes'{' '}

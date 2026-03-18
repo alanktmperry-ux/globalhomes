@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Building2, BarChart3, Shield, Database, ArrowLeft, Loader2 } from 'lucide-react';
+import { Users, Building2, BarChart3, Shield, Database, ArrowLeft, Loader2, Gamepad2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useToast } from '@/shared/hooks/use-toast';
@@ -9,8 +9,9 @@ import AdminUsers from '@/features/admin/components/AdminUsers';
 import AdminListings from '@/features/admin/components/AdminListings';
 import AdminRoles from '@/features/admin/components/AdminRoles';
 import AdminDatabase from '@/features/admin/components/AdminDatabase';
+import AdminDemoRequests from '@/features/admin/components/AdminDemoRequests';
 
-type Tab = 'overview' | 'users' | 'listings' | 'roles' | 'database';
+type Tab = 'overview' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests';
 
 interface UserRow {
   id: string;
@@ -41,6 +42,7 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState({ totalUsers: 0, totalAgents: 0, totalListings: 0, totalLeads: 0, totalVoiceSearches: 0 });
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [pendingDemoCount, setPendingDemoCount] = useState(0);
 
   useEffect(() => {
     if (!authLoading && (!user || !isAdmin)) {
@@ -126,12 +128,13 @@ const AdminDashboard = () => {
     );
   }
 
-  const tabs: { id: Tab; label: string; icon: any }[] = [
+  const tabs: { id: Tab; label: string; icon: any; badge?: number }[] = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'users', label: 'Users', icon: Users },
     { id: 'listings', label: 'Listings', icon: Building2 },
     { id: 'roles', label: 'Roles', icon: Shield },
     { id: 'database', label: 'Database', icon: Database },
+    { id: 'demo-requests', label: 'Demo Requests', icon: Gamepad2, badge: pendingDemoCount },
   ];
 
   return (
@@ -158,12 +161,17 @@ const AdminDashboard = () => {
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${
+              className={`relative flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${
                 tab === t.id ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:text-foreground'
               }`}
             >
               <t.icon size={16} />
               {t.label}
+              {t.badge != null && t.badge > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold px-1">
+                  {t.badge}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -179,6 +187,7 @@ const AdminDashboard = () => {
             {tab === 'listings' && <AdminListings properties={properties} onToggleActive={togglePropertyActive} />}
             {tab === 'roles' && <AdminRoles users={users} searchQuery={searchQuery} onSearchChange={setSearchQuery} onRoleChange={handleRoleChange} />}
             {tab === 'database' && <AdminDatabase />}
+            {tab === 'demo-requests' && <AdminDemoRequests onPendingCountChange={setPendingDemoCount} />}
           </>
         )}
       </div>

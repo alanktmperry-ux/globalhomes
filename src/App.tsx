@@ -47,6 +47,7 @@ import PropertyDetailPage from "./pages/PropertyDetailPage";
 import AgentPublicProfilePage from "./pages/AgentPublicProfilePage";
 import BuyerSettingsPage from "./pages/BuyerSettingsPage";
 import AgentPerformanceDashboard from "./features/agents/pages/AgentPerformanceDashboard";
+import DemoAccessPage from "./features/agents/pages/DemoAccessPage";
 import TermsPage from "./pages/TermsPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import NotFound from "./pages/NotFound";

@@ -286,7 +286,14 @@ const AgentAuthPage = () => {
 
               <RequestDemoModal open={demoModalOpen} onOpenChange={setDemoModalOpen} />
 
-              <p className="text-xs text-muted-foreground mt-6 text-center leading-relaxed">
+              <p className="text-xs text-muted-foreground mt-4 text-center">
+                Have a demo code?{' '}
+                <Link to="/agents/demo" className="text-primary font-medium underline underline-offset-2">
+                  Access demo here →
+                </Link>
+              </p>
+
+              <p className="text-xs text-muted-foreground mt-4 text-center leading-relaxed">
                 By submitting, I accept Global Homes'{' '}
                 <a href="#" className="text-primary underline underline-offset-2">terms of use</a>
               </p>

@@ -73,6 +73,7 @@ const App = () => (
               <Route path="/auth" element={<AuthLandingPage />} />
               <Route path="/login" element={<SeekerAuthPage />} />
               <Route path="/agents/login" element={<AgentAuthPage />} />
+              <Route path="/agents/demo" element={<DemoAccessPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/agency/:slug" element={<AgencyProfilePage />} />

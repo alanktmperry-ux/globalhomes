@@ -52,6 +52,7 @@ Deno.serve(async (req) => {
       const { error: e } = await supabase.from("demo_requests").insert({
         full_name, email, phone: phone || null, agency_name: agency_name || null,
         message: message || null, demo_code: code, demo_code_expires_at: expiresAt,
+        status: "approved",
       });
       if (e) throw e;
 

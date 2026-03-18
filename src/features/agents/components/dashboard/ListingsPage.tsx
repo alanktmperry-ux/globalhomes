@@ -49,6 +49,15 @@ const ListingsPage = () => {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const { toast } = useToast();
 
+  const handlePublish = async (l: AgentListing) => {
+    if (l._source !== 'db') { toast({ title: 'Demo listing', description: 'Create a real listing first.' }); return; }
+    setActionLoading(l.id);
+    const { error } = await supabase.from('properties').update({ status: 'public', is_active: true } as any).eq('id', l.id);
+    if (error) { toast({ title: 'Failed to publish', variant: 'destructive' }); }
+    else { toast({ title: 'Your listing is now live on Global Homes!' }); refetch(); }
+    setActionLoading(null);
+  };
+
   const handleBoost = async (l: AgentListing) => {
     if (l._source !== 'db') { toast({ title: 'Demo listing', description: 'Create a real listing first.' }); return; }
     setActionLoading(l.id);

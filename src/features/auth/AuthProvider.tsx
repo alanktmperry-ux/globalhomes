@@ -3,9 +3,6 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-const DEMO_EMAIL = 'demo-agent@globalhomes.app';
-const DEMO_PASSWORD = 'DemoAgent2024!';
-
 interface AuthContextType {
   user: User | null;
   session: Session | null;
@@ -15,9 +12,6 @@ interface AuthContextType {
   userRole: 'user' | 'agent' | 'admin' | null;
   signOut: () => Promise<void>;
   isDemoMode: boolean;
-  demoSwitching: boolean;
-  switchToDemo: () => Promise<void>;
-  switchToLive: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -29,9 +23,6 @@ const AuthContext = createContext<AuthContextType>({
   userRole: null,
   signOut: async () => {},
   isDemoMode: false,
-  demoSwitching: false,
-  switchToDemo: async () => {},
-  switchToLive: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -44,10 +35,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [userRole, setUserRole] = useState<'user' | 'agent' | 'admin' | null>(null);
   const [rolesFetched, setRolesFetched] = useState(false);
-  const [demoSwitching, setDemoSwitching] = useState(false);
+  const [isDemoMode, setIsDemoMode] = useState(false);
   const lastFetchedUserId = useRef<string | null>(null);
-
-  const isDemoMode = user?.email === DEMO_EMAIL;
 
   const applyRoles = useCallback((roles: string[]) => {
     console.log('[Auth] applyRoles:', roles);
@@ -64,9 +53,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsAdmin(false);
     setUserRole(null);
     setRolesFetched(false);
+    setIsDemoMode(false);
   }, []);
 
-  // Fetch roles in a SEPARATE effect, not inside onAuthStateChange
+  // Fetch roles and demo status
   useEffect(() => {
     if (!user) {
       if (rolesFetched) clearRoles();
@@ -79,14 +69,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       lastFetchedUserId.current = user.id;
       console.log('[Auth] fetchRoles for:', user.id);
       try {
-        const { data, error } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id);
+        // Fetch roles and demo status in parallel
+        const [rolesResult, agentResult] = await Promise.all([
+          supabase.from('user_roles').select('role').eq('user_id', user.id),
+          supabase.from('agents').select('is_demo').eq('user_id', user.id).maybeSingle(),
+        ]);
         if (cancelled) return;
-        console.log('[Auth] fetchRoles result:', { data, error });
-        const roles = data?.map((r) => r.role) || [];
+        
+        const roles = rolesResult.data?.map((r) => r.role) || [];
         applyRoles(roles);
+        
+        setIsDemoMode(!!(agentResult.data as any)?.is_demo);
       } catch (err) {
         console.error('[Auth] fetchRoles error:', err);
       } finally {
@@ -161,40 +154,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const switchToDemo = useCallback(async () => {
-    setDemoSwitching(true);
-    try {
-      await supabase.functions.invoke('seed-demo-agent');
-      await supabase.auth.signOut();
-      const { error } = await supabase.auth.signInWithPassword({
-        email: DEMO_EMAIL,
-        password: DEMO_PASSWORD,
-      });
-      if (error) throw error;
-      toast.success('Switched to Demo Agency');
-    } catch (err: any) {
-      toast.error('Could not enter demo mode: ' + err.message);
-    } finally {
-      setDemoSwitching(false);
-    }
-  }, []);
-
-  const switchToLive = useCallback(async () => {
-    setDemoSwitching(true);
-    try {
-      await supabase.auth.signOut();
-      toast.success('Exited demo mode');
-    } catch {
-      // ignore
-    } finally {
-      setDemoSwitching(false);
-    }
-  }, []);
-
   return (
     <AuthContext.Provider value={{
-      user, session, loading, isAgent, isAdmin, userRole, signOut,
-      isDemoMode, demoSwitching, switchToDemo, switchToLive,
+      user, session, loading, isAgent, isAdmin, userRole, signOut, isDemoMode,
     }}>
       {children}
     </AuthContext.Provider>

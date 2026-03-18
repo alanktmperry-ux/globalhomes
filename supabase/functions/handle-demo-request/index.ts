@@ -198,9 +198,9 @@ function buildConfirmationEmailHtml(name: string) {
     </div>
     <p style="font-size:15px;color:#333;margin:0 0 16px;">Hi ${name},</p>
     <p style="font-size:15px;color:#333;margin:0 0 16px;">Thank you for your interest in Global Homes. We've received your demo request and will be in touch with you shortly.</p>
-    <p style="font-size:15px;color:#333;margin:0 0 16px;">In the meantime, feel free to explore our platform:</p>
+    <p style="font-size:15px;color:#333;margin:0 0 16px;">Click the button below to confirm your email and head to the login page:</p>
     <div style="text-align:center;margin:24px 0;">
-      <a href="${siteUrl}" style="display:inline-block;background:#2563eb;color:#fff;font-size:14px;font-weight:600;padding:12px 28px;border-radius:10px;text-decoration:none;">Visit Global Homes →</a>
+      <a href="${siteUrl}/agents/login" style="display:inline-block;background:#2563eb;color:#fff;font-size:14px;font-weight:600;padding:12px 28px;border-radius:10px;text-decoration:none;">Go to Login →</a>
     </div>
     <p style="font-size:13px;color:#888;margin:16px 0 0;">By clicking the link above you're confirming this email address is correct and we'll use it to send your demo access details.</p>
     <div style="border-top:1px solid #eee;padding-top:16px;margin-top:24px;text-align:center;">

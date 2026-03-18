@@ -33,7 +33,7 @@ const DemoAccessPage = () => {
       if (queryErr) throw queryErr;
 
       if (!data) {
-        setError('This code is invalid or has expired. Please contact us at sales@everythingeco.com.au');
+        setError('This code is invalid or has expired. Please contact alan@squaredevelopment.com.au');
         setLoading(false);
         return;
       }

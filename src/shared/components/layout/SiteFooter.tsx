@@ -11,8 +11,8 @@ const footerLinks = [
 
 const legalLinks = [
   { label: 'About', to: '#' },
-  { label: 'Privacy Policy', to: '#' },
-  { label: 'Terms of Service', to: '#' },
+  { label: 'Privacy Policy', to: '/privacy' },
+  { label: 'Terms of Service', to: '/terms' },
   { label: 'Agent Login', to: '/agents/login' },
   { label: 'Contact', to: '#' },
 ];

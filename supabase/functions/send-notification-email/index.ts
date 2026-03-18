@@ -39,7 +39,7 @@ async function sendViaResend(to: string, subject: string, html: string) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'Global Homes <noreply@everythingeco.com.au>',
+      from: 'Global Homes <onboarding@resend.dev>',
       to: [to],
       subject,
       html,

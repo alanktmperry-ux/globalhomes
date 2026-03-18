@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
 
       // Send admin notification email
       await sendEmail(resendApiKey, {
-        to: "alan@squaredevelopment.com.au",
+        to: "sales@everythingeco.com.au",
         subject: "New Demo Request — Global Homes",
         html: buildAdminEmailHtml({ full_name, agency_name, email, phone, message }),
       });

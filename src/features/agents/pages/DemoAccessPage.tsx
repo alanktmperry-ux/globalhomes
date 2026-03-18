@@ -31,7 +31,7 @@ const DemoAccessPage = () => {
       const { data: demoReq, error: queryErr } = await supabase
         .from('demo_requests' as any)
         .select('*')
-        .eq('email', email.trim().toLowerCase())
+        .ilike('email', email.trim())
         .eq('demo_code', code.trim().toUpperCase())
         .eq('status', 'approved')
         .gte('demo_code_expires_at', new Date().toISOString())

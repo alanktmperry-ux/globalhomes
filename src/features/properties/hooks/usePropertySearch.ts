@@ -211,9 +211,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
 
   // ── Derived: all properties (DB + mock fallback) ─────────────
   const allProperties = useMemo(() => {
-    const dbIds = new Set(dbProperties.map((p) => p.id));
-    const mockFiltered = mockProperties.slice(0, 6).filter((p) => !dbIds.has(p.id));
-    return [...dbProperties, ...mockFiltered];
+    return [...dbProperties];
   }, [dbProperties]);
 
   // ── Derived: display properties ───────────────────────────────

@@ -78,7 +78,7 @@ const AdminUsers = () => {
         body: JSON.stringify({ user_id: userId }),
       }
     );
-    toast({ title: 'User deleted' });
+    toast({ title: 'User and all associated data permanently deleted.' });
     setActionLoading(null);
     fetchUsers();
   };

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Globe, ChevronDown, User, LogIn, Home, Building2, Plus, List, LayoutDashboard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useCurrency, CURRENCIES, CurrencyCode } from '@/shared/lib/CurrencyContext';
+import { useCurrency, CURRENCIES, CURRENCY_REGIONS, CurrencyCode } from '@/shared/lib/CurrencyContext';
 import { useAuth } from '@/features/auth/AuthProvider';
 
 export function SiteHeader() {

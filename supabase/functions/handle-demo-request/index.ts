@@ -59,7 +59,9 @@ Deno.serve(async (req) => {
       // Admin alert
       await sendEmail(apiKey, "sales@everythingeco.com.au", `New Demo Request — ${full_name}`, buildAdminEmail({ full_name, email, phone, agency_name, message }));
       // Applicant confirmation
-      await sendEmail(apiKey, email, "We've received your Global Homes demo request", buildConfirmationEmail(full_name, email));
+      // Send access code immediately to applicant
+      const demoUrl = `https://globalhomes.lovable.app/agents/demo?email=${encodeURIComponent(email)}`;
+      await sendEmail(apiKey, email, "Your Global Homes Access Code", buildAccessCodeEmail(full_name, email, code, demoUrl));
       return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
 
     } else if (body.action === "send_code") {

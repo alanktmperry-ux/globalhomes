@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Ear, Mic, Globe, Camera, Cpu, ShieldCheck, ArrowRight, CheckCircle2, Star, Play, Gamepad2, Lock } from 'lucide-react';
+import { Ear, Mic, Globe, Camera, Cpu, ShieldCheck, ArrowRight, CheckCircle2, Star, Play, CalendarCheck, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/features/auth/AuthProvider';
 import AgentRegistrationModal from '@/features/agents/components/AgentRegistrationModal';
+import RequestDemoModal from '@/features/agents/components/RequestDemoModal';
 import agentHero from '@/assets/agent-hero.jpg';
 import heatMapBg from '@/assets/heat-map-bg.jpg';
 
@@ -19,13 +19,8 @@ const fadeUp = {
 
 const AgentLandingPage = () => {
   const [showModal, setShowModal] = useState(false);
+  const [showDemoModal, setShowDemoModal] = useState(false);
   const navigate = useNavigate();
-  const { switchToDemo, demoSwitching } = useAuth();
-
-  const handleDemoLogin = async () => {
-    await switchToDemo();
-    navigate('/dashboard');
-  };
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -99,12 +94,11 @@ const AgentLandingPage = () => {
                 <Button
                   size="lg"
                   variant="outline"
-                  disabled={demoSwitching}
-                  onClick={handleDemoLogin}
+                  onClick={() => setShowDemoModal(true)}
                   className="text-base px-8 py-5 rounded-xl font-bold border-primary/50 text-primary-foreground bg-primary/15 hover:bg-primary/25 backdrop-blur-sm transition-all"
                 >
-                  <Gamepad2 size={18} className="mr-2" />
-                  {demoSwitching ? 'Loading Demo...' : 'Try Demo Agency'}
+                  <CalendarCheck size={18} className="mr-2" />
+                  Request a Demo
                 </Button>
                 <Button
                   size="lg"
@@ -117,7 +111,7 @@ const AgentLandingPage = () => {
                 </Button>
               </motion.div>
               <motion.div variants={fadeUp} custom={5} className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start mt-2">
-                <span className="text-xs text-primary-foreground/50 text-center">(No signup needed)</span>
+                <span className="text-xs text-primary-foreground/50 text-center">(We'll set up your access)</span>
                 <span className="text-xs text-primary-foreground/50 text-center">(Email + Password)</span>
               </motion.div>
             </motion.div>
@@ -309,10 +303,10 @@ const AgentLandingPage = () => {
             ))}
           </div>
           <blockquote className="font-display text-xl sm:text-2xl font-semibold italic leading-relaxed mb-4">
-            "I sold a $1.2M Toorak townhouse in 3 days without a single open home. The buyer came from a voice search — they knew exactly what they wanted."
+            "Global Homes gave us tools no other platform offers — the voice search alone brought in buyers we'd never have reached."
           </blockquote>
           <p className="text-sm text-muted-foreground">
-            <strong className="text-foreground">Sarah Mitchell</strong> · Ray White South Yarra · 14 off-market sales this quarter
+            <strong className="text-foreground">Early Access Agent</strong> · Melbourne, Australia
           </p>
         </div>
       </section>
@@ -347,6 +341,7 @@ const AgentLandingPage = () => {
       </footer>
 
       <AgentRegistrationModal open={showModal} onOpenChange={setShowModal} />
+      <RequestDemoModal open={showDemoModal} onOpenChange={setShowDemoModal} />
     </div>
   );
 };

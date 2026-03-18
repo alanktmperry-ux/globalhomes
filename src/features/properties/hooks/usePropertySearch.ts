@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { Property } from '@/shared/lib/types';
-import { mockProperties } from '@/features/properties/api/mock-data';
+
 import { manusSearch } from '@/features/properties/api/ManusSearchService';
 import { Filters, defaultFilters } from '@/shared/components/FilterSidebar';
 import { firecrawlPropertySearch } from '@/features/properties/api/firecrawlPropertySearch';
@@ -211,9 +211,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
 
   // ── Derived: all properties (DB + mock fallback) ─────────────
   const allProperties = useMemo(() => {
-    const dbIds = new Set(dbProperties.map((p) => p.id));
-    const mockFiltered = mockProperties.slice(0, 6).filter((p) => !dbIds.has(p.id));
-    return [...dbProperties, ...mockFiltered];
+    return [...dbProperties];
   }, [dbProperties]);
 
   // ── Derived: display properties ───────────────────────────────

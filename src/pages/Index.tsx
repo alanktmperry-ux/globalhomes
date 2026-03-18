@@ -519,7 +519,27 @@ const Index = () => {
   </>
   );
 
-  const propertyList = (
+  const emptyPlaceholder = (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="flex flex-col items-center justify-center py-16 px-6"
+    >
+      <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+        <MapPin size={28} className="text-primary" />
+      </div>
+      <h2 className="text-lg font-display font-bold text-foreground mb-1.5 text-center">
+        Properties coming soon
+      </h2>
+      <p className="text-sm text-muted-foreground text-center max-w-xs">
+        Agents are setting up their listings. Check back shortly!
+      </p>
+    </motion.div>
+  );
+
+  const showEmptyState = filteredProperties.length === 0 && !isSearching && !hasSearched;
+
+  const propertyList = showEmptyState ? emptyPlaceholder : (
     <VirtualizedPropertyList
       properties={filteredProperties}
       isSearching={isSearching}

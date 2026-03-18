@@ -42,6 +42,8 @@ export function AiPicksSection({
   onSelect,
   isMobile,
 }: AiPicksSectionProps) {
+  // If no properties at all, render nothing
+  if (allProperties.length === 0) return null;
   const [popularListings, setPopularListings] = useState<Property[]>([]);
 
   // Fetch top-viewed listings for the "Popular near you" fallback

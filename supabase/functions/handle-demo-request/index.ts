@@ -187,6 +187,7 @@ function buildAdminEmailHtml(p: { full_name: string; agency_name?: string; email
 }
 
 function buildConfirmationEmailHtml(name: string) {
+  const siteUrl = "https://globalhomes.lovable.app";
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
 <body style="margin:0;padding:0;background:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
@@ -196,9 +197,16 @@ function buildConfirmationEmailHtml(name: string) {
       <div style="font-size:22px;font-weight:700;color:#1a1a2e;">Global Homes</div>
     </div>
     <p style="font-size:15px;color:#333;margin:0 0 16px;">Hi ${name},</p>
-    <p style="font-size:15px;color:#333;margin:0 0 16px;">Thank you for your interest in Global Homes. Your request is being reviewed and you'll receive your access code within 24 hours.</p>
-    <p style="font-size:15px;color:#333;margin:0 0 16px;">We'll send you a unique demo access code that you can use to explore the full agent platform.</p>
-    <p style="font-size:14px;color:#888;margin:24px 0 0;">— The Global Homes Team</p>
+    <p style="font-size:15px;color:#333;margin:0 0 16px;">Thank you for your interest in Global Homes. We've received your demo request and will be in touch with you shortly.</p>
+    <p style="font-size:15px;color:#333;margin:0 0 16px;">In the meantime, feel free to explore our platform:</p>
+    <div style="text-align:center;margin:24px 0;">
+      <a href="${siteUrl}" style="display:inline-block;background:#2563eb;color:#fff;font-size:14px;font-weight:600;padding:12px 28px;border-radius:10px;text-decoration:none;">Visit Global Homes →</a>
+    </div>
+    <p style="font-size:13px;color:#888;margin:16px 0 0;">By clicking the link above you're confirming this email address is correct and we'll use it to send your demo access details.</p>
+    <div style="border-top:1px solid #eee;padding-top:16px;margin-top:24px;text-align:center;">
+      <p style="font-size:11px;color:#aaa;margin:0;">Questions? Contact us at sales@everythingeco.com.au</p>
+      <p style="font-size:11px;color:#aaa;margin:4px 0 0;">© Global Homes · Melbourne, Australia</p>
+    </div>
   </div>
 </div>
 </body></html>`;

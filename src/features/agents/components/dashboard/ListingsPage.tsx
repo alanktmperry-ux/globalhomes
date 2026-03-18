@@ -137,6 +137,7 @@ const ListingsPage = () => {
               <TooltipProvider delayDuration={300}>
               {[
                 { key: 'all', label: 'All', tip: 'View all your listings' },
+                { key: 'pending', label: 'Pending', tip: 'Awaiting publish — not yet visible to buyers' },
                 { key: 'whisper', label: 'Whisper', tip: 'Private — only visible to you and your network' },
                 { key: 'coming-soon', label: 'Coming Soon', tip: 'Teaser — not yet searchable by buyers' },
                 { key: 'public', label: 'Public', tip: 'Live — visible in search results to everyone' },

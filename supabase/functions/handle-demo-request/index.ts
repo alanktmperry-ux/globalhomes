@@ -139,10 +139,33 @@ Deno.serve(async (req) => {
   }
 });
 
+function extractValidEmail(input: string | null): string | null {
+  if (!input) return null;
+  const trimmed = input.trim();
+  const match = trimmed.match(/<([^>]+)>/);
+  const candidate = (match?.[1] ?? trimmed).trim();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(candidate) ? candidate : null;
+}
+
 async function sendEmail(apiKey: string, params: { to: string; subject: string; html: string }) {
-  const emailFrom = Deno.env.get("EMAIL_FROM") || "onboarding@resend.dev";
-  const fromAddress = `Global Homes <${emailFrom}>`;
-  console.log(`Sending email to: ${params.to}, from: ${fromAddress}, subject: ${params.subject}`);
+  const fallbackEmailFrom = "onboarding@resend.dev";
+  const configuredEmailFrom = Deno.env.get("EMAIL_FROM");
+  const validatedFromEmail = extractValidEmail(configuredEmailFrom) ?? fallbackEmailFrom;
+
+  if (configuredEmailFrom && validatedFromEmail === fallbackEmailFrom && configuredEmailFrom.trim() !== fallbackEmailFrom) {
+    console.warn(`Invalid EMAIL_FROM secret value "${configuredEmailFrom}". Falling back to ${fallbackEmailFrom}.`);
+  }
+
+  const forcedRecipient = extractValidEmail(Deno.env.get("ADMIN_EMAIL"));
+  const toAddress = forcedRecipient ?? params.to;
+  const fromAddress = `Global Homes <${validatedFromEmail}>`;
+
+  if (forcedRecipient && params.to !== forcedRecipient) {
+    console.log(`Overriding recipient ${params.to} -> ${forcedRecipient} (test mode)`);
+  }
+
+  console.log(`Sending email to: ${toAddress}, from: ${fromAddress}, subject: ${params.subject}`);
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -151,7 +174,7 @@ async function sendEmail(apiKey: string, params: { to: string; subject: string; 
     },
     body: JSON.stringify({
       from: fromAddress,
-      to: params.to,
+      to: toAddress,
       subject: params.subject,
       html: params.html,
     }),
@@ -159,9 +182,9 @@ async function sendEmail(apiKey: string, params: { to: string; subject: string; 
   if (!res.ok) {
     const errText = await res.text();
     console.error(`Resend email failed [${res.status}]:`, errText);
-    console.error(`Resend error details — to: ${params.to}, from: ${fromAddress}, response: ${errText}`);
+    console.error(`Resend error details — to: ${toAddress}, from: ${fromAddress}, response: ${errText}`);
   } else {
-    console.log(`Email sent successfully to ${params.to}`);
+    console.log(`Email sent successfully to ${toAddress}`);
   }
 }
 

@@ -57,8 +57,9 @@ Deno.serve(async (req) => {
       if (insertErr) throw insertErr;
 
       // Send admin notification email
+      const adminEmail = Deno.env.get("ADMIN_EMAIL") || "sales@everythingeco.com.au";
       await sendEmail(resendApiKey, {
-        to: "sales@everythingeco.com.au",
+        to: adminEmail,
         subject: "New Demo Request — Global Homes",
         html: buildAdminEmailHtml({ full_name, agency_name, email, phone, message }),
       });

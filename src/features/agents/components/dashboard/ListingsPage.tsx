@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/shared/hooks/use-toast';
 
 const STATUS_CONFIG: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
+  pending: { icon: <Clock size={12} />, label: 'Pending', color: 'bg-amber-500/15 text-amber-600' },
   whisper: { icon: <EyeOff size={12} />, label: 'Whisper', color: 'bg-foreground/10 text-foreground' },
   'coming-soon': { icon: <Clock size={12} />, label: 'Coming Soon', color: 'bg-primary/15 text-primary' },
   public: { icon: <Zap size={12} />, label: 'Public', color: 'bg-success/15 text-success' },
@@ -47,6 +48,15 @@ const ListingsPage = () => {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const { toast } = useToast();
+
+  const handlePublish = async (l: AgentListing) => {
+    if (l._source !== 'db') { toast({ title: 'Demo listing', description: 'Create a real listing first.' }); return; }
+    setActionLoading(l.id);
+    const { error } = await supabase.from('properties').update({ status: 'public', is_active: true } as any).eq('id', l.id);
+    if (error) { toast({ title: 'Failed to publish', variant: 'destructive' }); }
+    else { toast({ title: 'Your listing is now live on Global Homes!' }); refetch(); }
+    setActionLoading(null);
+  };
 
   const handleBoost = async (l: AgentListing) => {
     if (l._source !== 'db') { toast({ title: 'Demo listing', description: 'Create a real listing first.' }); return; }
@@ -127,6 +137,7 @@ const ListingsPage = () => {
               <TooltipProvider delayDuration={300}>
               {[
                 { key: 'all', label: 'All', tip: 'View all your listings' },
+                { key: 'pending', label: 'Pending', tip: 'Awaiting publish — not yet visible to buyers' },
                 { key: 'whisper', label: 'Whisper', tip: 'Private — only visible to you and your network' },
                 { key: 'coming-soon', label: 'Coming Soon', tip: 'Teaser — not yet searchable by buyers' },
                 { key: 'public', label: 'Public', tip: 'Live — visible in search results to everyone' },
@@ -192,7 +203,12 @@ const ListingsPage = () => {
                           }}>
                             <Pencil size={10} /> Edit
                           </Button>
-                          {l._status !== 'public' && l._status !== 'sold' && (
+                          {l._status === 'pending' && (
+                            <Button size="sm" className="text-[10px] h-6 px-2.5 gap-0.5 bg-green-600 hover:bg-green-700 text-white" disabled={actionLoading === l.id} onClick={() => handlePublish(l)}>
+                              {actionLoading === l.id ? <Loader2 size={10} className="animate-spin" /> : <Zap size={10} />} Publish Listing
+                            </Button>
+                          )}
+                          {l._status !== 'public' && l._status !== 'sold' && l._status !== 'pending' && (
                             <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5" disabled={actionLoading === l.id} onClick={() => handleBoost(l)}>
                               {actionLoading === l.id ? <Loader2 size={10} className="animate-spin" /> : <Rocket size={10} />} Boost
                             </Button>

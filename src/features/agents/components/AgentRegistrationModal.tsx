@@ -83,6 +83,27 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
           user_id: authData.user.id,
           role: 'agent' as any,
         });
+
+        // Send welcome email to agent + admin alert (fire-and-forget)
+        const sendNotification = (body: Record<string, string>) =>
+          supabase.functions.invoke('send-notification-email', { body }).catch(() => {});
+
+        sendNotification({
+          type: 'agent_welcome',
+          title: 'Welcome to Global Homes — Your Agent Account is Being Reviewed',
+          message: 'Your account is pending approval.',
+          agent_name: form.fullName,
+          agent_email: form.email,
+        });
+
+        sendNotification({
+          type: 'admin_new_agent',
+          title: 'New Agent Registration — Action Required',
+          message: `${form.fullName} has registered as a new agent.`,
+          agent_name: form.fullName,
+          agent_agency: form.agencyName || 'Independent',
+          agent_email: form.email,
+        });
       }
 
       setStep('success');

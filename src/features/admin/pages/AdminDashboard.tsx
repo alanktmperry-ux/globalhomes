@@ -128,12 +128,13 @@ const AdminDashboard = () => {
     );
   }
 
-  const tabs: { id: Tab; label: string; icon: any }[] = [
+  const tabs: { id: Tab; label: string; icon: any; badge?: number }[] = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'users', label: 'Users', icon: Users },
     { id: 'listings', label: 'Listings', icon: Building2 },
     { id: 'roles', label: 'Roles', icon: Shield },
     { id: 'database', label: 'Database', icon: Database },
+    { id: 'demo-requests', label: 'Demo Requests', icon: Gamepad2, badge: pendingDemoCount },
   ];
 
   return (

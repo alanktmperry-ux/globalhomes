@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Ear, Mic, Globe, Camera, Cpu, ShieldCheck, ArrowRight, CheckCircle2, Star, Play, Gamepad2, Lock } from 'lucide-react';
+import { Ear, Mic, Globe, Camera, Cpu, ShieldCheck, ArrowRight, CheckCircle2, Star, Play, CalendarCheck, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/features/auth/AuthProvider';
 import AgentRegistrationModal from '@/features/agents/components/AgentRegistrationModal';
+import RequestDemoModal from '@/features/agents/components/RequestDemoModal';
 import agentHero from '@/assets/agent-hero.jpg';
 import heatMapBg from '@/assets/heat-map-bg.jpg';
 

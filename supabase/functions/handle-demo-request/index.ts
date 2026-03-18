@@ -146,7 +146,7 @@ async function sendEmail(apiKey: string, params: { to: string; subject: string; 
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: Deno.env.get('EMAIL_FROM') || 'Global Homes <onboarding@resend.dev>',
+      from: 'Global Homes <onboarding@resend.dev>',
       to: params.to,
       subject: params.subject,
       html: params.html,

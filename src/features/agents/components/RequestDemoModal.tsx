@@ -76,7 +76,7 @@ const RequestDemoModal = ({ open, onOpenChange }: RequestDemoModalProps) => {
           </div>
           <div>
             <label className="text-sm font-medium text-foreground mb-1.5 block">Phone</label>
-            <Input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+61 4XX XXX XXX" />
+            <PhoneInput value={phone} onChange={setPhone} />
           </div>
           <div>
             <label className="text-sm font-medium text-foreground mb-1.5 block">Agency Name</label>

@@ -158,38 +158,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
-    if (!lovableApiKey) {
-      console.log('LOVABLE_API_KEY not set — email not sent, notification logged only');
-      return new Response(JSON.stringify({ success: false, reason: 'Email domain not configured yet.' }), {
-        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    const emailResponse = await fetch('https://api.lovable.dev/v1/email/send', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${lovableApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        to: recipientEmail,
-        subject: title,
-        html: emailHtml,
-        purpose: 'transactional',
-      }),
-    });
-
-    if (!emailResponse.ok) {
-      const errBody = await emailResponse.text();
-      console.error(`Email send failed [${emailResponse.status}]:`, errBody);
-      return new Response(JSON.stringify({ success: false, reason: 'Email delivery failed.', details: errBody }), {
-        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    console.log(`Email sent to ${recipientEmail}: ${title}`);
-    return new Response(JSON.stringify({ success: true }), {
+    const result = await sendViaResend(recipientEmail, title, emailHtml);
+    return new Response(JSON.stringify({ success: result.ok, reason: result.reason }), {
       status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 

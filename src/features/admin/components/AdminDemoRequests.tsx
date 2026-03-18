@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Check, X, Mail, Loader2 } from 'lucide-react';
+import { Check, X, Mail, Loader2, Send } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface DemoRequest {
@@ -15,6 +15,8 @@ interface DemoRequest {
   agency_name: string | null;
   message: string | null;
   status: string;
+  demo_code: string | null;
+  demo_code_expires_at: string | null;
   created_at: string;
 }
 
@@ -57,19 +59,17 @@ const AdminDemoRequests = ({ onPendingCountChange }: Props) => {
   const handleApprove = async (req: DemoRequest) => {
     setActionLoading(req.id);
     try {
-      // Update status
-      const { error: updateErr } = await supabase
-        .from('demo_requests' as any)
-        .update({ status: 'approved' } as any)
-        .eq('id', req.id);
-      if (updateErr) throw updateErr;
-
-      // Seed demo agent for this user
-      await supabase.functions.invoke('seed-demo-agent', {
-        body: { email: req.email },
+      // Call the edge function to approve, generate code, and send email
+      const { data, error } = await supabase.functions.invoke('handle-demo-request', {
+        body: {
+          action: 'send_code',
+          request_id: req.id,
+        },
       });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
-      toast.success('Demo access granted');
+      toast.success(`Demo access code sent to ${req.email}`);
       fetchRequests();
     } catch (err: any) {
       toast.error(err.message || 'Failed to approve');
@@ -123,6 +123,7 @@ const AdminDemoRequests = ({ onPendingCountChange }: Props) => {
             <TableHead className="hidden md:table-cell">Agency</TableHead>
             <TableHead className="hidden lg:table-cell">Message</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead className="hidden md:table-cell">Code</TableHead>
             <TableHead className="hidden sm:table-cell">Date</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -136,6 +137,11 @@ const AdminDemoRequests = ({ onPendingCountChange }: Props) => {
               <TableCell className="hidden md:table-cell text-sm">{req.agency_name || '—'}</TableCell>
               <TableCell className="hidden lg:table-cell text-sm text-muted-foreground max-w-[200px] truncate">{req.message || '—'}</TableCell>
               <TableCell>{statusBadge(req.status)}</TableCell>
+              <TableCell className="hidden md:table-cell">
+                {req.demo_code ? (
+                  <code className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded">{req.demo_code}</code>
+                ) : '—'}
+              </TableCell>
               <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">
                 {format(new Date(req.created_at), 'dd MMM yyyy')}
               </TableCell>
@@ -149,7 +155,7 @@ const AdminDemoRequests = ({ onPendingCountChange }: Props) => {
                         className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-500/10"
                         onClick={() => handleApprove(req)}
                         disabled={actionLoading === req.id}
-                        title="Approve"
+                        title="Approve & Send Code"
                       >
                         {actionLoading === req.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                       </Button>
@@ -164,6 +170,18 @@ const AdminDemoRequests = ({ onPendingCountChange }: Props) => {
                         <X className="h-4 w-4" />
                       </Button>
                     </>
+                  )}
+                  {req.status === 'approved' && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 w-8 p-0 text-primary hover:text-primary hover:bg-primary/10"
+                      onClick={() => handleApprove(req)}
+                      disabled={actionLoading === req.id}
+                      title="Resend Code"
+                    >
+                      {actionLoading === req.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                    </Button>
                   )}
                   <Button
                     size="sm"

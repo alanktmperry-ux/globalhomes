@@ -303,10 +303,10 @@ const AgentLandingPage = () => {
             ))}
           </div>
           <blockquote className="font-display text-xl sm:text-2xl font-semibold italic leading-relaxed mb-4">
-            "I sold a $1.2M Toorak townhouse in 3 days without a single open home. The buyer came from a voice search — they knew exactly what they wanted."
+            "Global Homes gave us tools no other platform offers — the voice search alone brought in buyers we'd never have reached."
           </blockquote>
           <p className="text-sm text-muted-foreground">
-            <strong className="text-foreground">Sarah Mitchell</strong> · Ray White South Yarra · 14 off-market sales this quarter
+            <strong className="text-foreground">Early Access Agent</strong> · Melbourne, Australia
           </p>
         </div>
       </section>

@@ -146,7 +146,7 @@ async function sendEmail(apiKey: string, params: { to: string; subject: string; 
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "Global Homes <noreply@globalhomes.lovable.app>",
+      from: "Global Homes <noreply@everythingeco.com.au>",
       to: params.to,
       subject: params.subject,
       html: params.html,

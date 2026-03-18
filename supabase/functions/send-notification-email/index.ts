@@ -5,6 +5,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
+interface DirectPayload {
+  to: string;
+  subject: string;
+  html: string;
+}
+
 interface NotificationPayload {
   agent_id?: string;
   type: string;
@@ -15,10 +21,37 @@ interface NotificationPayload {
   lead_email?: string;
   lead_phone?: string;
   lead_message?: string;
-  // For agent_welcome / admin_new_agent
   agent_name?: string;
   agent_agency?: string;
   agent_email?: string;
+}
+
+async function sendViaResend(to: string, subject: string, html: string) {
+  const resendApiKey = Deno.env.get('RESEND_API_KEY');
+  if (!resendApiKey) {
+    console.error('RESEND_API_KEY not configured');
+    return { ok: false, reason: 'RESEND_API_KEY not set' };
+  }
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${resendApiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: 'Global Homes <noreply@globalhomes.lovable.app>',
+      to: [to],
+      subject,
+      html,
+    }),
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    console.error(`Resend email failed [${res.status}]:`, errText);
+    return { ok: false, reason: errText };
+  }
+  console.log(`Email sent to ${to}: ${subject}`);
+  return { ok: true };
 }
 
 Deno.serve(async (req) => {
@@ -31,13 +64,22 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    const payload: NotificationPayload = await req.json();
-    const { type, title, message } = payload;
+    const payload = await req.json();
 
+    // Direct send mode: { to, subject, html }
+    if (payload.to && payload.subject && payload.html) {
+      const p = payload as DirectPayload;
+      const result = await sendViaResend(p.to, p.subject, p.html);
+      return new Response(JSON.stringify({ success: result.ok, reason: result.reason }), {
+        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Legacy notification mode
+    const { type, title } = payload as NotificationPayload;
     if (!title || !type) {
       return new Response(JSON.stringify({ error: 'Missing title or type' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
@@ -116,38 +158,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
-    if (!lovableApiKey) {
-      console.log('LOVABLE_API_KEY not set — email not sent, notification logged only');
-      return new Response(JSON.stringify({ success: false, reason: 'Email domain not configured yet.' }), {
-        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    const emailResponse = await fetch('https://api.lovable.dev/v1/email/send', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${lovableApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        to: recipientEmail,
-        subject: title,
-        html: emailHtml,
-        purpose: 'transactional',
-      }),
-    });
-
-    if (!emailResponse.ok) {
-      const errBody = await emailResponse.text();
-      console.error(`Email send failed [${emailResponse.status}]:`, errBody);
-      return new Response(JSON.stringify({ success: false, reason: 'Email delivery failed.', details: errBody }), {
-        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    console.log(`Email sent to ${recipientEmail}: ${title}`);
-    return new Response(JSON.stringify({ success: true }), {
+    const result = await sendViaResend(recipientEmail, title, emailHtml);
+    return new Response(JSON.stringify({ success: result.ok, reason: result.reason }), {
       status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 

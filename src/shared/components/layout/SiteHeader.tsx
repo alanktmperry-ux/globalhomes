@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Globe, ChevronDown, User, LogIn, Home, Building2, Plus, List, LayoutDashboard } from 'lucide-react';
+import { Globe, ChevronDown, User, LogIn, Home, Building2, Plus, List, LayoutDashboard, ShieldCheck } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCurrency, CURRENCIES, CURRENCY_REGIONS, CurrencyCode } from '@/shared/lib/CurrencyContext';
@@ -7,7 +7,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 
 export function SiteHeader() {
   const { currency, setCurrencyCode, listingMode, setListingMode, isLiveRates } = useCurrency();
-  const { user, userRole, isAgent } = useAuth();
+  const { user, userRole, isAgent, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const [showAgentMenu, setShowAgentMenu] = useState(false);
@@ -146,6 +146,18 @@ export function SiteHeader() {
               title="Dashboard"
             >
               <LayoutDashboard size={17} />
+            </button>
+          )}
+
+          {/* Admin shortcut – only for admins */}
+          {user && isAdmin && (
+            <button
+              onClick={() => navigate('/admin')}
+              className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary/20 transition-colors"
+              aria-label="Admin"
+              title="Admin"
+            >
+              <ShieldCheck size={17} />
             </button>
           )}
 

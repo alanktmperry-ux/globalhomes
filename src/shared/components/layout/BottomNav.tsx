@@ -1,4 +1,4 @@
-import { Search, Heart, MessageCircle, User, LogIn, LogOut, Shield, Building2 } from 'lucide-react';
+import { Search, Heart, MessageCircle, User, LogIn, LogOut, ShieldCheck, Building2 } from 'lucide-react';
 import { useI18n } from '@/shared/lib/i18n';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -58,10 +58,10 @@ export function BottomNav() {
           <button
             onClick={() => navigate('/admin')}
             className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-colors ${
-              location.pathname === '/admin' ? 'text-primary' : 'text-muted-foreground'
+              location.pathname.startsWith('/admin') ? 'text-primary' : 'text-muted-foreground'
             }`}
           >
-            <Shield size={22} strokeWidth={location.pathname === '/admin' ? 2.5 : 1.8} />
+            <ShieldCheck size={22} strokeWidth={location.pathname.startsWith('/admin') ? 2.5 : 1.8} />
             <span className="text-[10px] font-medium">Admin</span>
           </button>
         )}

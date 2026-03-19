@@ -269,14 +269,29 @@ const AdminUsers = () => {
                     ) : '—'}
                   </td>
                   <td className="p-3">
-                    {u.user_type === 'demo_request' ? (
-                      <a
-                        href={`mailto:${u.email}?subject=Your Global Homes Demo`}
-                        className="p-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors inline-block"
-                        title="Email"
-                      >
-                        <Mail size={14} />
-                      </a>
+                     {u.user_type === 'demo_request' ? (
+                      <div className="flex gap-1.5">
+                        {actionLoading === u.id ? (
+                          <Loader2 className="animate-spin text-muted-foreground" size={16} />
+                        ) : (
+                          <>
+                            <a
+                              href={`mailto:${u.email}?subject=Your Global Homes Demo`}
+                              className="p-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors inline-block"
+                              title="Email"
+                            >
+                              <Mail size={14} />
+                            </a>
+                            <button
+                              onClick={() => handleDelete(u.id)}
+                              className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
+                              title="Delete demo request"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </>
+                        )}
+                      </div>
                     ) : (
                       <div className="flex gap-1.5">
                         {actionLoading === u.id ? (

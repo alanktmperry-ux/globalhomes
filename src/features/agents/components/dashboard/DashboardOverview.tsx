@@ -84,6 +84,27 @@ const DashboardOverview = () => {
       .then(({ count }) => setTasksDue(count || 0));
   }, [user]);
 
+  // Fetch unresponded leads (status='new', older than 5 min)
+  useEffect(() => {
+    if (!user || isDemoMode) return;
+    const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    supabase
+      .from('agents')
+      .select('id')
+      .eq('user_id', user.id)
+      .single()
+      .then(({ data: agent }) => {
+        if (!agent) return;
+        supabase
+          .from('leads')
+          .select('id', { count: 'exact', head: true })
+          .eq('agent_id', agent.id)
+          .eq('status', 'new')
+          .lt('created_at', fiveMinAgo)
+          .then(({ count }) => setUnrespondedLeads(count || 0));
+      });
+  }, [user, isDemoMode]);
+
   // Fetch pipeline data from activities (entity_type='property', action='sold')
   useEffect(() => {
     if (!user || isDemoMode) return;

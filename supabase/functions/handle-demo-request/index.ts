@@ -79,6 +79,67 @@ Deno.serve(async (req) => {
       await sendEmail(apiKey, r.email, "Your Global Homes Demo Access Code", buildAccessCodeEmail(r.full_name, r.email, code, demoUrl));
       return new Response(JSON.stringify({ success: true, code }), { headers: corsHeaders });
 
+    } else if (body.action === "validate_code") {
+      const { email, code } = body;
+      if (!email || !code) return new Response(JSON.stringify({ error: "Missing email or code" }), { status: 400, headers: corsHeaders });
+
+      const { data: demoReq, error: qErr } = await supabase
+        .from("demo_requests")
+        .select("*")
+        .ilike("email", email.trim())
+        .eq("demo_code", code.trim().toUpperCase())
+        .eq("status", "approved")
+        .gte("demo_code_expires_at", new Date().toISOString())
+        .maybeSingle();
+
+      if (qErr) throw qErr;
+      if (!demoReq) {
+        return new Response(JSON.stringify({ error: "Invalid or expired code. Please check your email or contact sales@everythingeco.com.au" }), { status: 400, headers: corsHeaders });
+      }
+
+      // Ensure demo user exists
+      const demoEmail = "demo@globalhomes.app";
+      const demoPassword = "DemoAccess2024!";
+      const { data: existingUsers } = await supabase.auth.admin.listUsers({ perPage: 1 });
+      let demoUserId: string | null = null;
+
+      // Check if demo user exists
+      const { data: lookupData } = await supabase.auth.admin.listUsers({ perPage: 1000 });
+      const demoUser = lookupData?.users?.find((u: any) => u.email === demoEmail);
+
+      if (!demoUser) {
+        const { data: created, error: createErr } = await supabase.auth.admin.createUser({
+          email: demoEmail,
+          password: demoPassword,
+          email_confirm: true,
+          user_metadata: { display_name: "Demo User" },
+        });
+        if (createErr) throw createErr;
+        demoUserId = created.user.id;
+
+        // Create agent record for demo user
+        await supabase.from("agents").insert({
+          user_id: demoUserId,
+          name: "Demo Agent",
+          email: demoEmail,
+          is_demo: true,
+          is_subscribed: false,
+        });
+
+        // Assign agent role
+        await supabase.from("user_roles").insert({
+          user_id: demoUserId,
+          role: "agent",
+        });
+      } else {
+        demoUserId = demoUser.id;
+      }
+
+      // Mark as redeemed
+      await supabase.from("demo_requests").update({ status: "redeemed" }).eq("id", demoReq.id);
+
+      return new Response(JSON.stringify({ success: true, demo_email: demoEmail, demo_password: demoPassword }), { headers: corsHeaders });
+
     } else {
       return new Response(JSON.stringify({ error: "Invalid action" }), { status: 400, headers: corsHeaders });
     }

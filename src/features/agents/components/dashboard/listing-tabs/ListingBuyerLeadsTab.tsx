@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { Flame, Thermometer, Snowflake, Phone, Mail } from 'lucide-react';
+import { calcIntentScore, getIntentTier, INTENT_TOOLTIP } from '@/features/agents/lib/intentScore';
 
 const AU_DATE = (d: string) => {
   const date = new Date(d);

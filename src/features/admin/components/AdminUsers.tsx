@@ -139,12 +139,14 @@ const AdminUsers = () => {
     if (!confirm('This will permanently delete this user AND all their data — properties, listings, leads, transactions, messages, and their agent/agency profile. This cannot be undone. Are you sure?')) return;
     setActionLoading(userId);
     const { data: { session } } = await supabase.auth.getSession();
+    const action = isDemoRequest ? 'delete_demo_request' : 'delete_user';
+    const bodyId = isDemoRequest ? userId.replace('demo-', '') : userId;
     await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=delete_user`,
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=${action}`,
       {
         method: 'POST',
         headers: { Authorization: `Bearer ${session?.access_token}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId }),
+        body: JSON.stringify({ [isDemoRequest ? 'request_id' : 'user_id']: bodyId }),
       }
     );
     toast({ title: 'User and all associated data permanently deleted.' });

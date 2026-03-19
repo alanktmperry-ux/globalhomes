@@ -170,165 +170,47 @@ const DashboardOverview = () => {
           ))}
         </div>
 
-        {/* GCI Gauge + Pipeline Chart row */}
-        <div className="grid lg:grid-cols-2 gap-4">
-          {/* GCI Gauge */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-card border border-border rounded-xl p-5"
-          >
-            <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
-              <DollarSign size={16} className="text-primary" /> GCI — Gross Commission Income
-            </h3>
-            <div className="space-y-3">
-              <div>
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-muted-foreground">Actual</span>
-                  <span className="font-bold">{AUD.format(gciActual)}</span>
-                </div>
-                <Progress value={gciPercent} className="h-3" />
-              </div>
-              <div>
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-muted-foreground">Budgeted</span>
-                  <span className="font-bold">{AUD.format(gciBudgeted)}</span>
-                </div>
-                <Progress value={100} className="h-3 opacity-30" />
-              </div>
-              <div>
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-muted-foreground">Potential (Pipeline)</span>
-                  <span className="font-bold text-success">{AUD.format(gciPotential)}</span>
-                </div>
-                <Progress value={Math.round((gciPotential / gciPotential) * 100)} className="h-3 opacity-50" />
-              </div>
-              <p className="text-xs text-muted-foreground pt-2 border-t border-border">
-                You're at <strong className="text-primary">{gciPercent}%</strong> of your annual budget target
-              </p>
-            </div>
-          </motion.div>
-
-          {/* Pipeline Chart */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="bg-card border border-border rounded-xl p-5"
-          >
-            <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
-              <TrendingUp size={16} className="text-primary" /> Pipeline — 12 Month Deal Flow
-            </h3>
-            <div className="h-48 relative">
-              {!isDemoMode && pipelineEmpty && (
-                <div className="absolute inset-0 flex items-center justify-center z-10">
-                  <p className="text-sm text-muted-foreground bg-card/80 backdrop-blur-sm px-3 py-1.5 rounded-lg">No completed sales yet</p>
-                </div>
-              )}
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={isDemoMode ? DEMO_PIPELINE_DATA : pipelineData}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis dataKey="month" tick={{ fontSize: 11 }} className="text-muted-foreground" />
-                  <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `$${v / 1000}k`} className="text-muted-foreground" />
-                  <Tooltip
-                    formatter={(value: number) => [AUD.format(value), 'Commission']}
-                    contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', fontSize: '12px' }}
-                  />
-                  <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Activity Feed + Voice Matches */}
-        <div className="grid lg:grid-cols-2 gap-4">
-          {/* Activity Feed */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-card border border-border rounded-xl p-5"
-          >
-            <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
-              <Activity size={16} className="text-success" /> Recent Activity
-            </h3>
-            {recentActivities.length > 0 ? (
-              <div className="space-y-3">
-                {recentActivities.map((a) => (
-                  <div key={a.id} className="flex items-start gap-3 text-sm">
-                    <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs">{a.description || a.action}</p>
-                      <p className="text-[10px] text-muted-foreground">{AU_DATE(a.created_at)}</p>
-                    </div>
+        {/* Today's Voice Matches */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-card border border-border rounded-xl p-5"
+        >
+          <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
+            <Mic size={16} className="text-success" /> Today's Voice Matches
+          </h3>
+          <div className="space-y-3">
+            {MOCK_MATCHES.map((m) => {
+              const u = URGENCY_CONFIG[m.urgency];
+              return (
+                <div key={m.id} className="border border-border rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Badge className={`${u.color} text-[10px] gap-0.5 border-0`}>
+                      {u.icon} {u.label}
+                    </Badge>
+                    <span className="text-[10px] text-muted-foreground">{m.time}</span>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {[
-                  { text: 'Called Sarah M. re: 42 Panorama Dr appraisal', time: 'Today, 2:15 PM' },
-                  { text: 'New lead: John D. enquired about 15 Station St', time: 'Today, 11:30 AM' },
-                  { text: 'Listing 8 Ocean View Rd marked as Under Contract', time: 'Yesterday, 4:00 PM' },
-                  { text: 'Inspection scheduled: 22 Park Ave, Saturday 10am', time: 'Yesterday, 9:45 AM' },
-                  { text: 'Commission invoice #1042 paid — $12,500', time: '10/03/2026' },
-                ].map((a, i) => (
-                  <div key={i} className="flex items-start gap-3 text-sm">
-                    <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs">{a.text}</p>
-                      <p className="text-[10px] text-muted-foreground">{a.time}</p>
-                    </div>
+                  <p className="text-xs font-medium truncate">"{m.transcript}"</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">
+                    📍 {m.buyerLocation} → <strong>{m.matchedListing}</strong>
+                  </p>
+                  <div className="flex items-center gap-1.5 mt-2">
+                    <Button size="sm" variant="outline" className="text-[10px] h-6 px-2 gap-1">
+                      <Phone size={10} /> Call
+                    </Button>
+                    <Button size="sm" variant="outline" className="text-[10px] h-6 px-2 gap-1">
+                      <Send size={10} /> Info
+                    </Button>
+                    <Button size="sm" className="text-[10px] h-6 px-2 gap-1">
+                      <Sparkles size={10} /> AI Reply
+                    </Button>
                   </div>
-                ))}
-              </div>
-            )}
-          </motion.div>
-
-          {/* Voice Matches */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-            className="bg-card border border-border rounded-xl p-5"
-          >
-            <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
-              <Mic size={16} className="text-success" /> Today's Voice Matches
-            </h3>
-            <div className="space-y-3">
-              {MOCK_MATCHES.map((m) => {
-                const u = URGENCY_CONFIG[m.urgency];
-                return (
-                  <div key={m.id} className="border border-border rounded-lg p-3">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Badge className={`${u.color} text-[10px] gap-0.5 border-0`}>
-                        {u.icon} {u.label}
-                      </Badge>
-                      <span className="text-[10px] text-muted-foreground">{m.time}</span>
-                    </div>
-                    <p className="text-xs font-medium truncate">"{m.transcript}"</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">
-                      📍 {m.buyerLocation} → <strong>{m.matchedListing}</strong>
-                    </p>
-                    <div className="flex items-center gap-1.5 mt-2">
-                      <Button size="sm" variant="outline" className="text-[10px] h-6 px-2 gap-1">
-                        <Phone size={10} /> Call
-                      </Button>
-                      <Button size="sm" variant="outline" className="text-[10px] h-6 px-2 gap-1">
-                        <Send size={10} /> Info
-                      </Button>
-                      <Button size="sm" className="text-[10px] h-6 px-2 gap-1">
-                        <Sparkles size={10} /> AI Reply
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </motion.div>
-        </div>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
 
         {/* Listing Performance */}
         <section>
@@ -383,6 +265,121 @@ const DashboardOverview = () => {
             </table>
           </div>
         </section>
+
+        {/* Recent Activity */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-card border border-border rounded-xl p-5"
+        >
+          <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
+            <Activity size={16} className="text-success" /> Recent Activity
+          </h3>
+          {recentActivities.length > 0 ? (
+            <div className="space-y-3">
+              {recentActivities.map((a) => (
+                <div key={a.id} className="flex items-start gap-3 text-sm">
+                  <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs">{a.description || a.action}</p>
+                    <p className="text-[10px] text-muted-foreground">{AU_DATE(a.created_at)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {[
+                { text: 'Called Sarah M. re: 42 Panorama Dr appraisal', time: 'Today, 2:15 PM' },
+                { text: 'New lead: John D. enquired about 15 Station St', time: 'Today, 11:30 AM' },
+                { text: 'Listing 8 Ocean View Rd marked as Under Contract', time: 'Yesterday, 4:00 PM' },
+                { text: 'Inspection scheduled: 22 Park Ave, Saturday 10am', time: 'Yesterday, 9:45 AM' },
+                { text: 'Commission invoice #1042 paid — $12,500', time: '10/03/2026' },
+              ].map((a, i) => (
+                <div key={i} className="flex items-start gap-3 text-sm">
+                  <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs">{a.text}</p>
+                    <p className="text-[10px] text-muted-foreground">{a.time}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </motion.div>
+
+        {/* GCI Gauge + Pipeline Chart row */}
+        <div className="grid lg:grid-cols-2 gap-4">
+          {/* GCI Gauge */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="bg-card border border-border rounded-xl p-5"
+          >
+            <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
+              <DollarSign size={16} className="text-primary" /> GCI — Gross Commission Income
+            </h3>
+            <div className="space-y-3">
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-muted-foreground">Actual</span>
+                  <span className="font-bold">{AUD.format(gciActual)}</span>
+                </div>
+                <Progress value={gciPercent} className="h-3" />
+              </div>
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-muted-foreground">Budgeted</span>
+                  <span className="font-bold">{AUD.format(gciBudgeted)}</span>
+                </div>
+                <Progress value={100} className="h-3 opacity-30" />
+              </div>
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-muted-foreground">Potential (Pipeline)</span>
+                  <span className="font-bold text-success">{AUD.format(gciPotential)}</span>
+                </div>
+                <Progress value={Math.round((gciPotential / gciPotential) * 100)} className="h-3 opacity-50" />
+              </div>
+              <p className="text-xs text-muted-foreground pt-2 border-t border-border">
+                You're at <strong className="text-primary">{gciPercent}%</strong> of your annual budget target
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Pipeline Chart */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-card border border-border rounded-xl p-5"
+          >
+            <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
+              <TrendingUp size={16} className="text-primary" /> Pipeline — 12 Month Deal Flow
+            </h3>
+            <div className="h-48 relative">
+              {!isDemoMode && pipelineEmpty && (
+                <div className="absolute inset-0 flex items-center justify-center z-10">
+                  <p className="text-sm text-muted-foreground bg-card/80 backdrop-blur-sm px-3 py-1.5 rounded-lg">No completed sales yet</p>
+                </div>
+              )}
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={isDemoMode ? DEMO_PIPELINE_DATA : pipelineData}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                  <XAxis dataKey="month" tick={{ fontSize: 11 }} className="text-muted-foreground" />
+                  <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `$${v / 1000}k`} className="text-muted-foreground" />
+                  <Tooltip
+                    formatter={(value: number) => [AUD.format(value), 'Commission']}
+                    contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', fontSize: '12px' }}
+                  />
+                  <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </motion.div>
+        </div>
       </div>
     </div>
   );

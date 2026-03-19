@@ -15,7 +15,7 @@ const AgentAuthPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, isAgent, isAdmin, loading: authLoading } = useAuth();
-  const [demoModalOpen, setDemoModalOpen] = useState(false);
+  
   const [pendingRedirect, setPendingRedirect] = useState<'dashboard' | null>(null);
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');

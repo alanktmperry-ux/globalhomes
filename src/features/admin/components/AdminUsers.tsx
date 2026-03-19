@@ -258,7 +258,11 @@ const AdminUsers = () => {
                     )}
                   </td>
                   <td className="p-3 text-muted-foreground text-xs hidden sm:table-cell">
-                    {u.last_sign_in_at ? (
+                    {u.user_type === 'demo_request' ? (
+                      <span className="flex items-center gap-1">
+                        <Clock size={10} /> {new Date(u.created_at).toLocaleDateString()}
+                      </span>
+                    ) : u.last_sign_in_at ? (
                       <span className="flex items-center gap-1">
                         <Clock size={10} /> {new Date(u.last_sign_in_at).toLocaleDateString()}
                       </span>

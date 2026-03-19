@@ -17,7 +17,7 @@ const ForgotPasswordPage = () => {
     setLoading(true);
     try {
       // Always use the published URL so the reset link doesn't hit the preview auth gate
-      const publishedOrigin = 'https://world-property-pulse.lovable.app';
+      const publishedOrigin = 'https://globalhomes.lovable.app';
       const origin = window.location.hostname.includes('lovable.app') && window.location.hostname.includes('preview')
         ? publishedOrigin
         : window.location.origin;

@@ -65,7 +65,7 @@ const MOCK_MATCHES = [
 
 const DashboardOverview = () => {
   const { listings, isMockData } = useAgentListings();
-  const { user, effectiveDemo } = useAuth();
+  const { user, isDemoMode } = useAuth();
   const navigate = useNavigate();
   const [localDemoMode, setLocalDemoMode] = useState(false);
   const effectiveDemo = isDemoMode || localDemoMode;

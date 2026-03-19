@@ -278,7 +278,7 @@ const NetworkPage = () => {
       ...b,
       agent_name: b.agents?.name || 'Unknown',
     })));
-  }, [agentId, isDemoMode]);
+  }, [agentId]);
 
   useEffect(() => {
     if (!agentId) return;

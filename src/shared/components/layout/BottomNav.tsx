@@ -16,7 +16,7 @@ export function BottomNav() {
   const { t } = useI18n();
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, isAdmin, isAgent } = useAuth();
+  const { user, isAdmin, isAgent, loading } = useAuth();
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -28,7 +28,7 @@ export function BottomNav() {
     <nav className="fixed bottom-0 inset-x-0 z-30 bg-card/95 backdrop-blur-md border-t border-border safe-area-bottom">
       <div className="flex items-center justify-around h-16 max-w-lg mx-auto px-2">
         {navItems.map(item => {
-          if ((item as any).auth && !user) return null;
+          if ((item as any).auth && !user && !loading) return null;
           const isActive = location.pathname === item.path;
           return (
             <button

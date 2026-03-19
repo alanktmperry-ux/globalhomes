@@ -18,9 +18,9 @@ const ForgotPasswordPage = () => {
     try {
       // Always use the published URL so the reset link doesn't hit the preview auth gate
       const publishedOrigin = 'https://globalhomes.lovable.app';
-      const origin = window.location.hostname.includes('lovable.app') && window.location.hostname.includes('preview')
-        ? publishedOrigin
-        : window.location.origin;
+      const isPreview = window.location.hostname.includes('lovableproject.com') ||
+        (window.location.hostname.includes('lovable.app') && window.location.hostname.includes('preview'));
+      const origin = isPreview ? publishedOrigin : window.location.origin;
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${origin}/reset-password`,
       });

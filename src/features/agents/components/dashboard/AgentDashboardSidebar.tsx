@@ -173,7 +173,7 @@ const AgentDashboardSidebar = () => {
           )}
         </div>
 
-        {renderGroup('Core', CORE_NAV)}
+        {renderGroup('Home', CORE_NAV)}
         {renderGroup('CRM', CRM_NAV)}
         {renderGroup('Business', BUSINESS_NAV)}
         {renderGroup('Team & Network', TEAM_NAV)}

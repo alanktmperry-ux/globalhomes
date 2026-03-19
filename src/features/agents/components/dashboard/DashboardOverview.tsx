@@ -69,6 +69,8 @@ const DashboardOverview = () => {
   const navigate = useNavigate();
   const [tasksDue, setTasksDue] = useState(0);
   const [unrespondedLeads, setUnrespondedLeads] = useState(0);
+  const [activeContacts, setActiveContacts] = useState(0);
+  const [trustBalance, setTrustBalance] = useState(0);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
   const [todayInspections, setTodayInspections] = useState<{ address: string; time: string; propertyId: string }[]>([]);
   const [pipelineData, setPipelineData] = useState(buildEmptyMonths());
@@ -86,6 +88,34 @@ const DashboardOverview = () => {
       .lte('due_date', today)
       .then(({ count }) => setTasksDue(count || 0));
   }, [user]);
+
+  // Fetch active contacts count
+  useEffect(() => {
+    if (!user || isDemoMode) return;
+    supabase
+      .from('contacts')
+      .select('id', { count: 'exact', head: true })
+      .eq('created_by', user.id)
+      .then(({ count }) => setActiveContacts(count || 0));
+  }, [user, isDemoMode]);
+
+  // Fetch trust balance
+  useEffect(() => {
+    if (!user || isDemoMode) return;
+    const fetchTrust = async () => {
+      const { data: agent } = await supabase
+        .from('agents').select('id').eq('user_id', user.id).single();
+      if (!agent) return;
+      const { data } = await (supabase as any)
+        .from('trust_transactions').select('amount, transaction_type').eq('agent_id', agent.id);
+      if (!data) return;
+      const balance = (data as { amount: number; transaction_type: string }[]).reduce((sum: number, t) => {
+        return sum + (t.transaction_type === 'deposit' ? Number(t.amount) : -Number(t.amount));
+      }, 0);
+      setTrustBalance(Math.max(0, balance));
+    };
+    fetchTrust();
+  }, [user, isDemoMode]);
 
   // Fetch unresponded leads (status='new', older than 5 min)
   useEffect(() => {
@@ -185,11 +215,11 @@ const DashboardOverview = () => {
       });
   }, [user, isDemoMode]);
 
-  // GCI values — demo-aware
-  const gciActual = isDemoMode ? 1250000 : 245000;
-  const gciBudgeted = isDemoMode ? 1800000 : 400000;
-  const gciPotential = isDemoMode ? 2200000 : 520000;
-  const gciPercent = Math.round((gciActual / gciBudgeted) * 100);
+  // GCI values — demo-aware; real users start at 0
+  const gciActual = isDemoMode ? 1250000 : 0;
+  const gciBudgeted = isDemoMode ? 1800000 : 0;
+  const gciPotential = isDemoMode ? 2200000 : 0;
+  const gciPercent = gciBudgeted > 0 ? Math.round((gciActual / gciBudgeted) * 100) : 0;
 
   // Stats row - Australian CRM focus
   const unrespondedValue = isDemoMode ? 2 : unrespondedLeads;
@@ -203,11 +233,11 @@ const DashboardOverview = () => {
   const repColors = getScoreColor(repScore);
 
   const stats = [
-    { label: 'Tasks Due', value: String(tasksDue || (isDemoMode ? 5 : 3)), icon: <CheckSquare size={16} />, color: 'text-destructive', link: '/dashboard/contacts' },
-    { label: 'Active Contacts', value: isDemoMode ? '62' : '48', icon: <Users size={16} />, color: 'text-primary', link: '/dashboard/contacts' },
-    { label: 'Appraisals This Month', value: isDemoMode ? '9' : '6', icon: <ClipboardList size={16} />, color: 'text-success', link: '/dashboard/listings' },
-    { label: 'Sales This Month', value: AUD.format(isDemoMode ? 1250000 : 1250000), icon: <DollarSign size={16} />, color: 'text-primary', link: '/dashboard/reports' },
-    { label: 'Trust Balance', value: AUD.format(isDemoMode ? 47230 : 890000), icon: <Landmark size={16} />, color: 'text-success', link: '/dashboard/trust' },
+    { label: 'Tasks Due', value: String(isDemoMode ? 5 : tasksDue), icon: <CheckSquare size={16} />, color: 'text-destructive', link: '/dashboard/contacts' },
+    { label: 'Active Contacts', value: isDemoMode ? '62' : String(activeContacts), icon: <Users size={16} />, color: 'text-primary', link: '/dashboard/contacts' },
+    { label: 'Appraisals This Month', value: isDemoMode ? '9' : '0', icon: <ClipboardList size={16} />, color: 'text-success', link: '/dashboard/listings' },
+    { label: 'Sales This Month', value: AUD.format(isDemoMode ? 1250000 : 0), icon: <DollarSign size={16} />, color: 'text-primary', link: '/dashboard/reports' },
+    { label: 'Trust Balance', value: AUD.format(isDemoMode ? 47230 : trustBalance), icon: <Landmark size={16} />, color: 'text-success', link: '/dashboard/trust' },
     { label: 'Unresponded Leads', value: String(unrespondedValue), icon: <Zap size={16} />, color: unrespondedValue > 0 ? 'text-destructive' : 'text-success', link: '/dashboard/leads' },
   ];
 
@@ -309,45 +339,49 @@ const DashboardOverview = () => {
           <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
             <Mic size={16} className="text-success" /> Today's Voice Matches
           </h3>
-          <div className="space-y-3">
-            {MOCK_MATCHES.map((m) => {
-              const u = URGENCY_CONFIG[m.urgency];
-              const tier = getIntentTier(m.intentScore);
-              return (
-                <div key={m.id} className="border border-border rounded-lg p-3">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Badge className={`${u.color} text-[10px] gap-0.5 border-0`}>
-                      {u.icon} {u.label}
-                    </Badge>
-                    <TooltipProvider>
-                      <UiTooltip>
-                        <TooltipTrigger asChild>
-                          <Badge className={`${tier.className} text-[10px] gap-0.5 border-0 cursor-help`}>{tier.label} {m.intentScore}</Badge>
-                        </TooltipTrigger>
-                        <TooltipContent><p className="text-xs max-w-[200px]">{INTENT_TOOLTIP}</p></TooltipContent>
-                      </UiTooltip>
-                    </TooltipProvider>
-                    <span className="text-[10px] text-muted-foreground">{m.time}</span>
+          {isDemoMode ? (
+            <div className="space-y-3">
+              {MOCK_MATCHES.map((m) => {
+                const u = URGENCY_CONFIG[m.urgency];
+                const tier = getIntentTier(m.intentScore);
+                return (
+                  <div key={m.id} className="border border-border rounded-lg p-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge className={`${u.color} text-[10px] gap-0.5 border-0`}>
+                        {u.icon} {u.label}
+                      </Badge>
+                      <TooltipProvider>
+                        <UiTooltip>
+                          <TooltipTrigger asChild>
+                            <Badge className={`${tier.className} text-[10px] gap-0.5 border-0 cursor-help`}>{tier.label} {m.intentScore}</Badge>
+                          </TooltipTrigger>
+                          <TooltipContent><p className="text-xs max-w-[200px]">{INTENT_TOOLTIP}</p></TooltipContent>
+                        </UiTooltip>
+                      </TooltipProvider>
+                      <span className="text-[10px] text-muted-foreground">{m.time}</span>
+                    </div>
+                    <p className="text-xs font-medium truncate">"{m.transcript}"</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                      📍 {m.buyerLocation} → <strong>{m.matchedListing}</strong>
+                    </p>
+                    <div className="flex items-center gap-1.5 mt-2">
+                      <Button size="sm" variant="outline" className="text-[10px] h-6 px-2 gap-1">
+                        <Phone size={10} /> Call
+                      </Button>
+                      <Button size="sm" variant="outline" className="text-[10px] h-6 px-2 gap-1">
+                        <Send size={10} /> Info
+                      </Button>
+                      <Button size="sm" className="text-[10px] h-6 px-2 gap-1">
+                        <Sparkles size={10} /> AI Reply
+                      </Button>
+                    </div>
                   </div>
-                  <p className="text-xs font-medium truncate">"{m.transcript}"</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">
-                    📍 {m.buyerLocation} → <strong>{m.matchedListing}</strong>
-                  </p>
-                  <div className="flex items-center gap-1.5 mt-2">
-                    <Button size="sm" variant="outline" className="text-[10px] h-6 px-2 gap-1">
-                      <Phone size={10} /> Call
-                    </Button>
-                    <Button size="sm" variant="outline" className="text-[10px] h-6 px-2 gap-1">
-                      <Send size={10} /> Info
-                    </Button>
-                    <Button size="sm" className="text-[10px] h-6 px-2 gap-1">
-                      <Sparkles size={10} /> AI Reply
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground py-4 text-center">No voice matches yet</p>
+          )}
         </motion.div>
 
         {/* Listing Performance */}
@@ -369,7 +403,7 @@ const DashboardOverview = () => {
                 </tr>
               </thead>
               <tbody>
-                {[
+                {isDemoMode ? [
                   { id: '1', thumb: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=80&h=60&fit=crop', address: '42 Panorama Drive, Berwick', status: 'whisper', views: 24, voiceInquiries: 3, qualifiedLeads: 2, daysListed: 4 },
                   { id: '2', thumb: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=80&h=60&fit=crop', address: '15 Station St, Narre Warren', status: 'coming-soon', views: 67, voiceInquiries: 8, qualifiedLeads: 5, daysListed: 11 },
                   { id: '3', thumb: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=80&h=60&fit=crop', address: '8 Ocean View Rd, Brighton', status: 'public', views: 142, voiceInquiries: 12, qualifiedLeads: 7, daysListed: 18 },
@@ -398,7 +432,13 @@ const DashboardOverview = () => {
                       </td>
                     </tr>
                   );
-                })}
+                }) : (
+                  <tr>
+                    <td colSpan={7} className="p-6 text-center text-sm text-muted-foreground">
+                      No listings yet — <button onClick={() => navigate('/dashboard/listings/new')} className="text-primary underline underline-offset-2">create your first listing</button>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -426,7 +466,7 @@ const DashboardOverview = () => {
                 </div>
               ))}
             </div>
-          ) : (
+          ) : isDemoMode ? (
             <div className="space-y-3">
               {[
                 { text: 'Called Sarah M. re: 42 Panorama Dr appraisal', time: 'Today, 2:15 PM' },
@@ -444,6 +484,8 @@ const DashboardOverview = () => {
                 </div>
               ))}
             </div>
+          ) : (
+            <p className="text-sm text-muted-foreground py-4 text-center">No recent activity</p>
           )}
         </motion.div>
 

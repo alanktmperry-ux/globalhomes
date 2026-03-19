@@ -226,8 +226,8 @@ const DashboardOverview = () => {
   // Stats row - Australian CRM focus
   const unrespondedValue = effectiveDemo ? 2 : unrespondedLeads;
 
-  // Reputation score with trend
-  const repScore = DEMO_REPUTATION.total;
+  // Reputation score with trend — new users start at 0
+  const repScore = effectiveDemo ? DEMO_REPUTATION.total : 0;
   const lastMonthKey = 'gh_rep_last_month';
   const lastMonth = parseInt(localStorage.getItem(lastMonthKey) || '0', 10);
   const repTrend = lastMonth === 0 ? 'neutral' : repScore > lastMonth ? 'up' : repScore < lastMonth ? 'down' : 'neutral';

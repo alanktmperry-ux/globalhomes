@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CreditCard, Check, Loader2, Zap, Crown, Building2, Flame, Mail } from 'lucide-react';
+import { CreditCard, Check, Loader2, Zap, Crown, Building2, Flame, Mail, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -262,6 +262,27 @@ const BillingPage = () => {
                 Contact Sales
               </a>
             </Button>
+          </div>
+        </div>
+
+        {/* What's Coming Next */}
+        <div className="bg-secondary border border-border rounded-2xl p-6 mt-6">
+          <h3 className="font-bold text-lg mb-4">What's Coming Next 🚀</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {[
+              { title: 'Xero Integration', desc: 'Sync trust accounting and commission invoices to Xero automatically. No more double entry.' },
+              { title: 'AI Property Valuation', desc: 'Instant AI-powered market estimates on any address. Capture vendor leads 24/7.' },
+              { title: 'Mortgage Referral Network', desc: 'Earn $200–$800 per settled mortgage when buyers use your recommended broker.' },
+              { title: 'International Buyer Tools', desc: 'FIRB eligibility flags, Mandarin listings, and SGD/AED/CNY/MYR pricing for Asian buyers.' },
+            ].map(item => (
+              <div key={item.title} className="flex items-start gap-3 p-3 bg-background rounded-xl border border-border">
+                <Clock size={16} className="text-amber-500 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-sm font-semibold text-foreground">{item.title}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 

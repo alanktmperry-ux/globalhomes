@@ -99,6 +99,7 @@ const App = () => (
                 <Route path="listings/:listingId" element={<ListingDetailPage />} />
                 <Route path="contacts" element={<ContactsPage />} />
                 <Route path="leads" element={<VoiceLeadsPage />} />
+                <Route path="pipeline" element={<PipelinePage />} />
                 <Route path="analytics" element={<AnalyticsPage />} />
                 <Route path="network" element={<NetworkPage />} />
                 <Route path="team" element={<TeamPage />} />

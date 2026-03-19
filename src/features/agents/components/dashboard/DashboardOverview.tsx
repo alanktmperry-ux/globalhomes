@@ -199,6 +199,51 @@ const DashboardOverview = () => {
           ))}
         </div>
 
+        {/* Today's Inspections */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="bg-card border border-border rounded-xl p-5"
+        >
+          <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
+            <CalendarDays size={16} className="text-primary" /> Today's Inspections
+          </h3>
+          {(() => {
+            const DEMO_INSPECTIONS = [
+              { address: '42 Panorama Drive, Berwick', time: '10:00 AM', propertyId: '1' },
+              { address: '15 Station St, Narre Warren', time: '12:30 PM', propertyId: '2' },
+              { address: '8 Ocean View Rd, Brighton', time: '2:00 PM', propertyId: '3' },
+            ];
+            const inspections = isDemoMode ? DEMO_INSPECTIONS : todayInspections;
+            if (inspections.length === 0) {
+              return (
+                <p className="text-sm text-muted-foreground py-4 text-center">No inspections scheduled for today</p>
+              );
+            }
+            return (
+              <div className="space-y-2">
+                {inspections.map((insp, i) => (
+                  <div key={i} className="flex items-center justify-between border border-border rounded-lg p-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium truncate">{insp.address}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">🕐 {insp.time}</p>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-[10px] h-6 px-2 shrink-0 ml-2"
+                      onClick={() => navigate(`/dashboard/listings/${insp.propertyId}`)}
+                    >
+                      View Listing
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+        </motion.div>
+
         {/* Today's Voice Matches */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}

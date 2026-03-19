@@ -2,7 +2,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 Deno.serve(async (req) => {
@@ -66,11 +66,12 @@ Deno.serve(async (req) => {
       const { error: memberError } = await supabaseAdmin
         .from("agency_members")
         .insert({ agency_id: agency.id, user_id: userId, role: "principal" });
-      if (memberError) throw memberError;
+      if (memberError && !memberError.message.includes("duplicate")) throw memberError;
 
+      // Upsert agent record (handles re-registration attempts gracefully)
       const { error: agentError } = await supabaseAdmin
         .from("agents")
-        .insert({
+        .upsert({
           user_id: userId,
           name: fullName || email,
           agency: agencyName,
@@ -78,7 +79,7 @@ Deno.serve(async (req) => {
           phone: phone || null,
           agency_id: agency.id,
           ...agentExtras,
-        });
+        }, { onConflict: "user_id" });
       if (agentError) throw agentError;
 
       return new Response(JSON.stringify({ success: true, agencyId: agency.id }), {
@@ -100,7 +101,7 @@ Deno.serve(async (req) => {
       const { error: memberError } = await supabaseAdmin
         .from("agency_members")
         .insert({ agency_id: invite.agency_id, user_id: userId, role: invite.role });
-      if (memberError) throw memberError;
+      if (memberError && !memberError.message.includes("duplicate")) throw memberError;
 
       await supabaseAdmin
         .from("agency_invite_codes")
@@ -110,7 +111,7 @@ Deno.serve(async (req) => {
       const agencyData = invite.agencies as any;
       const { error: agentError } = await supabaseAdmin
         .from("agents")
-        .insert({
+        .upsert({
           user_id: userId,
           name: fullName || email,
           agency: agencyData?.name || null,
@@ -118,7 +119,7 @@ Deno.serve(async (req) => {
           phone: phone || null,
           agency_id: invite.agency_id,
           ...agentExtras,
-        });
+        }, { onConflict: "user_id" });
       if (agentError) throw agentError;
 
       return new Response(JSON.stringify({ success: true, agencyName: agencyData?.name }), {

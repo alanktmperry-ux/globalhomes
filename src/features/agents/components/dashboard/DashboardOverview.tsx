@@ -247,6 +247,21 @@ const DashboardOverview = () => {
     <div>
       <DashboardHeader title="Dashboard" subtitle={effectiveDemo ? "South Yarra Demo Agency" : "Welcome back, Agent"} />
 
+      {!isDemoMode && (
+        <div className="px-4 pt-3 pb-0 flex justify-end">
+          <button
+            onClick={() => setLocalDemoMode(prev => !prev)}
+            className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-all ${
+              localDemoMode
+                ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-600 dark:text-emerald-400'
+                : 'border-border text-muted-foreground hover:border-primary/40 hover:text-foreground'
+            }`}
+          >
+            {localDemoMode ? '🟢 Demo Mode — click to exit' : '👀 Preview with sample data'}
+          </button>
+        </div>
+      )}
+
       <div className="p-4 sm:p-6 space-y-6 max-w-7xl">
         {/* Stats Row */}
         <div className="grid grid-cols-2 lg:grid-cols-7 gap-3">

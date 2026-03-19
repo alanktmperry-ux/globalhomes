@@ -219,7 +219,7 @@ const AdminUsers = () => {
                 <th className="text-left p-3 text-muted-foreground font-medium">Type</th>
                 <th className="text-left p-3 text-muted-foreground font-medium hidden md:table-cell">Plan</th>
                 <th className="text-left p-3 text-muted-foreground font-medium">Status</th>
-                <th className="text-left p-3 text-muted-foreground font-medium hidden sm:table-cell">Last Sign In</th>
+                <th className="text-left p-3 text-muted-foreground font-medium hidden sm:table-cell">Last Active / Requested</th>
                 <th className="text-left p-3 text-muted-foreground font-medium">Actions</th>
               </tr>
             </thead>

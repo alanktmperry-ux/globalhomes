@@ -53,19 +53,55 @@ const ListingDetailPage = () => {
     );
   }
 
+  const isUnpublished = listing.status !== 'public' && listing.status !== 'sold';
+
+  const handlePublish = async () => {
+    setPublishing(true);
+    const { error } = await supabase
+      .from('properties')
+      .update({ status: 'public', is_active: true } as any)
+      .eq('id', listing.id);
+    if (error) {
+      toast({ title: 'Failed to publish', variant: 'destructive' });
+    } else {
+      setListing({ ...listing, status: 'public', is_active: true });
+      toast({ title: 'Listing published!', description: 'Your listing is now visible to buyers.' });
+    }
+    setPublishing(false);
+  };
+
   return (
     <div>
       <DashboardHeader
         title={listing.title || listing.address}
         subtitle={listing.address}
         actions={
-          <Button size="sm" variant="outline" onClick={() => navigate('/dashboard/listings')} className="gap-1.5 text-xs">
-            <ArrowLeft size={14} /> Back to Listings
-          </Button>
+          <div className="flex gap-2">
+            {isUnpublished && (
+              <Button
+                size="sm"
+                className="gap-1.5 text-xs bg-green-600 hover:bg-green-700 text-white"
+                disabled={publishing}
+                onClick={handlePublish}
+              >
+                {publishing ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} />}
+                Publish Listing
+              </Button>
+            )}
+            <Button size="sm" variant="outline" onClick={() => navigate('/dashboard/listings')} className="gap-1.5 text-xs">
+              <ArrowLeft size={14} /> Back to Listings
+            </Button>
+          </div>
         }
       />
 
       <div className="p-4 sm:p-6 max-w-6xl">
+        {isUnpublished && (
+          <div className="flex items-center gap-2.5 mb-4 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-sm text-amber-700 dark:text-amber-400">
+            <AlertTriangle size={16} className="shrink-0" />
+            <span>This listing is in draft — publish it to make it visible to buyers.</span>
+          </div>
+        )}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="bg-secondary mb-6 flex-wrap h-auto gap-1 p-1">
             <TabsTrigger value="details" className="text-xs">Details</TabsTrigger>

@@ -339,45 +339,49 @@ const DashboardOverview = () => {
           <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
             <Mic size={16} className="text-success" /> Today's Voice Matches
           </h3>
-          <div className="space-y-3">
-            {MOCK_MATCHES.map((m) => {
-              const u = URGENCY_CONFIG[m.urgency];
-              const tier = getIntentTier(m.intentScore);
-              return (
-                <div key={m.id} className="border border-border rounded-lg p-3">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Badge className={`${u.color} text-[10px] gap-0.5 border-0`}>
-                      {u.icon} {u.label}
-                    </Badge>
-                    <TooltipProvider>
-                      <UiTooltip>
-                        <TooltipTrigger asChild>
-                          <Badge className={`${tier.className} text-[10px] gap-0.5 border-0 cursor-help`}>{tier.label} {m.intentScore}</Badge>
-                        </TooltipTrigger>
-                        <TooltipContent><p className="text-xs max-w-[200px]">{INTENT_TOOLTIP}</p></TooltipContent>
-                      </UiTooltip>
-                    </TooltipProvider>
-                    <span className="text-[10px] text-muted-foreground">{m.time}</span>
+          {isDemoMode ? (
+            <div className="space-y-3">
+              {MOCK_MATCHES.map((m) => {
+                const u = URGENCY_CONFIG[m.urgency];
+                const tier = getIntentTier(m.intentScore);
+                return (
+                  <div key={m.id} className="border border-border rounded-lg p-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge className={`${u.color} text-[10px] gap-0.5 border-0`}>
+                        {u.icon} {u.label}
+                      </Badge>
+                      <TooltipProvider>
+                        <UiTooltip>
+                          <TooltipTrigger asChild>
+                            <Badge className={`${tier.className} text-[10px] gap-0.5 border-0 cursor-help`}>{tier.label} {m.intentScore}</Badge>
+                          </TooltipTrigger>
+                          <TooltipContent><p className="text-xs max-w-[200px]">{INTENT_TOOLTIP}</p></TooltipContent>
+                        </UiTooltip>
+                      </TooltipProvider>
+                      <span className="text-[10px] text-muted-foreground">{m.time}</span>
+                    </div>
+                    <p className="text-xs font-medium truncate">"{m.transcript}"</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                      📍 {m.buyerLocation} → <strong>{m.matchedListing}</strong>
+                    </p>
+                    <div className="flex items-center gap-1.5 mt-2">
+                      <Button size="sm" variant="outline" className="text-[10px] h-6 px-2 gap-1">
+                        <Phone size={10} /> Call
+                      </Button>
+                      <Button size="sm" variant="outline" className="text-[10px] h-6 px-2 gap-1">
+                        <Send size={10} /> Info
+                      </Button>
+                      <Button size="sm" className="text-[10px] h-6 px-2 gap-1">
+                        <Sparkles size={10} /> AI Reply
+                      </Button>
+                    </div>
                   </div>
-                  <p className="text-xs font-medium truncate">"{m.transcript}"</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">
-                    📍 {m.buyerLocation} → <strong>{m.matchedListing}</strong>
-                  </p>
-                  <div className="flex items-center gap-1.5 mt-2">
-                    <Button size="sm" variant="outline" className="text-[10px] h-6 px-2 gap-1">
-                      <Phone size={10} /> Call
-                    </Button>
-                    <Button size="sm" variant="outline" className="text-[10px] h-6 px-2 gap-1">
-                      <Send size={10} /> Info
-                    </Button>
-                    <Button size="sm" className="text-[10px] h-6 px-2 gap-1">
-                      <Sparkles size={10} /> AI Reply
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground py-4 text-center">No voice matches yet</p>
+          )}
         </motion.div>
 
         {/* Listing Performance */}

@@ -363,40 +363,20 @@ const NetworkPage = () => {
     if (!agentId) return;
     setBriefSubmitting(true);
     try {
-      if (isDemoMode) {
-        const newBrief: BuyerBrief = {
-          id: `demo-${Date.now()}`,
-          agent_id: agentId,
-          agent_name: 'You (Demo)',
-          property_type: briefForm.property_type,
-          min_beds: briefForm.min_beds,
-          max_beds: briefForm.max_beds,
-          min_price: briefForm.min_price,
-          max_price: briefForm.max_price,
-          suburbs: briefForm.suburbs.split(',').map(s => s.trim()).filter(Boolean),
-          notes: briefForm.notes,
-          urgency: briefForm.urgency,
-          is_active: true,
-          created_at: new Date().toISOString(),
-        };
-        setBuyerBriefs(prev => [newBrief, ...prev]);
-        toast.success('Buyer brief posted');
-      } else {
-        const { error } = await supabase.from('buyer_briefs').insert({
-          agent_id: agentId,
-          property_type: briefForm.property_type,
-          min_beds: briefForm.min_beds,
-          max_beds: briefForm.max_beds,
-          min_price: briefForm.min_price,
-          max_price: briefForm.max_price,
-          suburbs: briefForm.suburbs.split(',').map(s => s.trim()).filter(Boolean),
-          notes: briefForm.notes || null,
-          urgency: briefForm.urgency,
-        } as any);
-        if (error) throw error;
-        toast.success('Buyer brief posted');
-        await fetchBuyerBriefs();
-      }
+      const { error } = await supabase.from('buyer_briefs').insert({
+        agent_id: agentId,
+        property_type: briefForm.property_type,
+        min_beds: briefForm.min_beds,
+        max_beds: briefForm.max_beds,
+        min_price: briefForm.min_price,
+        max_price: briefForm.max_price,
+        suburbs: briefForm.suburbs.split(',').map(s => s.trim()).filter(Boolean),
+        notes: briefForm.notes || null,
+        urgency: briefForm.urgency,
+      } as any);
+      if (error) throw error;
+      toast.success('Buyer brief posted');
+      await fetchBuyerBriefs();
       setShowBriefForm(false);
       setBriefForm({ property_type: 'House', min_beds: 1, max_beds: 5, min_price: 400000, max_price: 1000000, suburbs: '', notes: '', urgency: 'active' });
     } catch (e: any) {

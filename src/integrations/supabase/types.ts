@@ -436,6 +436,62 @@ export type Database = {
           },
         ]
       }
+      buyer_briefs: {
+        Row: {
+          agent_id: string
+          created_at: string
+          id: string
+          is_active: boolean
+          max_beds: number
+          max_price: number
+          min_beds: number
+          min_price: number
+          notes: string | null
+          property_type: string
+          suburbs: string[]
+          updated_at: string
+          urgency: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          max_beds?: number
+          max_price?: number
+          min_beds?: number
+          min_price?: number
+          notes?: string | null
+          property_type?: string
+          suburbs?: string[]
+          updated_at?: string
+          urgency?: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          max_beds?: number
+          max_price?: number
+          min_beds?: number
+          min_price?: number
+          notes?: string | null
+          property_type?: string
+          suburbs?: string[]
+          updated_at?: string
+          urgency?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "buyer_briefs_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       buyer_profiles: {
         Row: {
           budget_max: number | null

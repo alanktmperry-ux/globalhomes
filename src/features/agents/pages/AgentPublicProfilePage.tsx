@@ -297,6 +297,9 @@ export default function AgentPublicProfilePage() {
           )}
         </div>
 
+        {/* Reputation Score Card */}
+        <ReputationScoreCard score={DEMO_REPUTATION} />
+
         {/* Agent's listings */}
         {listings.length > 0 && (
           <div>

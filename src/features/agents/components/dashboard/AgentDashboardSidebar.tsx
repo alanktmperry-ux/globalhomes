@@ -30,29 +30,26 @@ const CORE_NAV: NavItem[] = [
 
 const CRM_NAV: NavItem[] = [
   { title: 'Contacts', url: '/dashboard/contacts', icon: Contact },
-  { title: 'Pipeline', url: '/dashboard/pipeline', icon: Kanban, comingSoon: true },
   { title: 'My Listings', url: '/dashboard/listings', icon: List, badgeKey: 'listings' },
   { title: 'Voice Leads', url: '/dashboard/leads', icon: Mic, badgeKey: 'leads' },
+  { title: 'Off-Market Network', url: '/dashboard/network', icon: Users },
 ];
 
 const BUSINESS_NAV: NavItem[] = [
   { title: 'Investments', url: '/dashboard/investments', icon: TrendingUp },
-  { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
-  { title: 'Trust Ledger', url: '/dashboard/trust-ledger', icon: Receipt },
-  { title: 'Reconciliation', url: '/dashboard/reconciliation', icon: Scale },
+  { title: 'Financials', url: '/dashboard/trust', icon: Landmark },
   { title: 'Compliance', url: '/dashboard/compliance', icon: ClipboardCheck, comingSoon: true },
   { title: 'Analytics', url: '/dashboard/analytics', icon: BarChart3 },
   { title: 'Reports', url: '/dashboard/reports', icon: FileText },
+  { title: 'Documents', url: '/dashboard/documents', icon: FileText },
 ];
 
 const TEAM_NAV: NavItem[] = [
-  { title: 'Off-Market Network', url: '/dashboard/network', icon: Users },
   { title: 'Team', url: '/dashboard/team', icon: UserPlus },
-  { title: 'My Agencies', url: '/dashboard/agencies', icon: Building2 },
 ];
 
 const ACCOUNT_NAV: NavItem[] = [
-  { title: 'Documents', url: '/dashboard/documents', icon: FileText },
+  { title: 'My Agencies', url: '/dashboard/agencies', icon: Building2 },
   { title: 'Billing', url: '/dashboard/billing', icon: CreditCard },
   { title: 'Reviews', url: '/dashboard/reviews', icon: Star },
   { title: 'Settings', url: '/dashboard/settings', icon: Settings },

@@ -57,9 +57,9 @@ const URGENCY_CONFIG = {
 };
 
 const MOCK_MATCHES = [
-  { id: '1', transcript: '3 bed house in Berwick with pool under $900k', buyerLocation: 'Melbourne CBD', urgency: 'hot' as const, time: '12 min ago', matchedListing: '42 Panorama Drive' },
-  { id: '2', transcript: 'Investment property near train station, 2 bed apartment', buyerLocation: 'Sydney (relocating)', urgency: 'warm' as const, time: '1h ago', matchedListing: '15 Station Street' },
-  { id: '3', transcript: 'Looking for land in officer area, 600sqm minimum', buyerLocation: 'Pakenham', urgency: 'cold' as const, time: '3h ago', matchedListing: 'Lot 12 Officer South' },
+  { id: '1', transcript: '3 bed house in Berwick with pool under $900k', buyerLocation: 'Melbourne CBD', urgency: 'hot' as const, time: '12 min ago', matchedListing: '42 Panorama Drive', intentScore: 92 },
+  { id: '2', transcript: 'Investment property near train station, 2 bed apartment', buyerLocation: 'Sydney (relocating)', urgency: 'warm' as const, time: '1h ago', matchedListing: '15 Station Street', intentScore: 65 },
+  { id: '3', transcript: 'Looking for land in officer area, 600sqm minimum', buyerLocation: 'Pakenham', urgency: 'cold' as const, time: '3h ago', matchedListing: 'Lot 12 Officer South', intentScore: 30 },
 ];
 
 const DashboardOverview = () => {

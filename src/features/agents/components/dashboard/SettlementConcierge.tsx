@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PartyPopper, MapPin, Clock, ChevronDown, ChevronUp, Copy, Star, ExternalLink, Gift } from 'lucide-react';
-import { useAuth } from '@/features/auth/AuthProvider';
+
 import { toast } from '@/hooks/use-toast';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { differenceInDays, format, isPast, addDays } from 'date-fns';

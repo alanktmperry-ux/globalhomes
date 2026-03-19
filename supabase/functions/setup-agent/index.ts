@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
       const { error: memberError } = await supabaseAdmin
         .from("agency_members")
         .insert({ agency_id: agency.id, user_id: userId, role: "principal" });
-      if (memberError) throw memberError;
+      if (memberError && !memberError.message.includes("duplicate")) throw memberError;
 
       // Upsert agent record (handles re-registration attempts gracefully)
       const { error: agentError } = await supabaseAdmin

@@ -36,39 +36,10 @@ const buildEmptyMonths = () => {
   return months;
 };
 
-const DEMO_PIPELINE_DATA = [
-  { month: 'Apr', deals: 3, value: 128000 },
-  { month: 'May', deals: 4, value: 156000 },
-  { month: 'Jun', deals: 2, value: 94000 },
-  { month: 'Jul', deals: 5, value: 185000 },
-  { month: 'Aug', deals: 3, value: 112000 },
-  { month: 'Sep', deals: 4, value: 148000 },
-  { month: 'Oct', deals: 6, value: 210000 },
-  { month: 'Nov', deals: 3, value: 125000 },
-  { month: 'Dec', deals: 4, value: 164000 },
-  { month: 'Jan', deals: 5, value: 192000 },
-  { month: 'Feb', deals: 4, value: 155000 },
-  { month: 'Mar', deals: 7, value: 380000 },
-];
-
-const URGENCY_CONFIG = {
-  hot: { icon: <Flame size={12} />, color: 'bg-destructive/15 text-destructive', label: 'Hot' },
-  warm: { icon: <Thermometer size={12} />, color: 'bg-primary/15 text-primary', label: 'Warm' },
-  cold: { icon: <Snowflake size={12} />, color: 'bg-muted text-muted-foreground', label: 'Cold' },
-};
-
-const MOCK_MATCHES = [
-  { id: '1', transcript: '3 bed house in Berwick with pool under $900k', buyerLocation: 'Melbourne CBD', urgency: 'hot' as const, time: '12 min ago', matchedListing: '42 Panorama Drive', intentScore: 92 },
-  { id: '2', transcript: 'Investment property near train station, 2 bed apartment', buyerLocation: 'Sydney (relocating)', urgency: 'warm' as const, time: '1h ago', matchedListing: '15 Station Street', intentScore: 65 },
-  { id: '3', transcript: 'Looking for land in officer area, 600sqm minimum', buyerLocation: 'Pakenham', urgency: 'cold' as const, time: '3h ago', matchedListing: 'Lot 12 Officer South', intentScore: 30 },
-];
-
 const DashboardOverview = () => {
-  const { listings, isMockData } = useAgentListings();
-  const { user, isDemoMode } = useAuth();
+  const { listings } = useAgentListings();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const [localDemoMode, setLocalDemoMode] = useState(false);
-  const effectiveDemo = isDemoMode || localDemoMode;
   const [tasksDue, setTasksDue] = useState(0);
   const [unrespondedLeads, setUnrespondedLeads] = useState(0);
   const [activeContacts, setActiveContacts] = useState(0);
@@ -93,17 +64,17 @@ const DashboardOverview = () => {
 
   // Fetch active contacts count
   useEffect(() => {
-    if (!user || effectiveDemo) return;
+    if (!user) return;
     supabase
       .from('contacts')
       .select('id', { count: 'exact', head: true })
       .eq('created_by', user.id)
       .then(({ count }) => setActiveContacts(count || 0));
-  }, [user, effectiveDemo]);
+  }, [user]);
 
   // Fetch trust balance
   useEffect(() => {
-    if (!user || effectiveDemo) return;
+    if (!user) return;
     const fetchTrust = async () => {
       const { data: agent } = await supabase
         .from('agents').select('id').eq('user_id', user.id).single();
@@ -117,11 +88,11 @@ const DashboardOverview = () => {
       setTrustBalance(Math.max(0, balance));
     };
     fetchTrust();
-  }, [user, effectiveDemo]);
+  }, [user]);
 
   // Fetch unresponded leads (status='new', older than 5 min)
   useEffect(() => {
-    if (!user || effectiveDemo) return;
+    if (!user) return;
     const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
     supabase
       .from('agents')
@@ -138,11 +109,11 @@ const DashboardOverview = () => {
           .lt('created_at', fiveMinAgo)
           .then(({ count }) => setUnrespondedLeads(count || 0));
       });
-  }, [user, effectiveDemo]);
+  }, [user]);
 
   // Fetch pipeline data from activities (entity_type='property', action='sold')
   useEffect(() => {
-    if (!user || effectiveDemo) return;
+    if (!user) return;
     const now = new Date();
     const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1).toISOString();
     supabase
@@ -174,7 +145,7 @@ const DashboardOverview = () => {
           setPipelineEmpty(true);
         }
       });
-  }, [user, effectiveDemo]);
+  }, [user]);
 
   // Fetch recent activities
   useEffect(() => {
@@ -190,7 +161,7 @@ const DashboardOverview = () => {
 
   // Fetch today's inspections from properties with inspection_times JSONB
   useEffect(() => {
-    if (!user || effectiveDemo) return;
+    if (!user) return;
     const todayStr = new Date().toISOString().split('T')[0];
     supabase
       .from('properties')
@@ -215,19 +186,19 @@ const DashboardOverview = () => {
         inspections.sort((a, b) => a.time.localeCompare(b.time));
         setTodayInspections(inspections);
       });
-  }, [user, effectiveDemo]);
+  }, [user]);
 
-  // GCI values — demo-aware; real users start at 0
-  const gciActual = effectiveDemo ? 1250000 : 0;
-  const gciBudgeted = effectiveDemo ? 1800000 : 0;
-  const gciPotential = effectiveDemo ? 2200000 : 0;
+  // GCI values — real data; new users start at 0
+  const gciActual = 0;
+  const gciBudgeted = 0;
+  const gciPotential = 0;
   const gciPercent = gciBudgeted > 0 ? Math.round((gciActual / gciBudgeted) * 100) : 0;
 
   // Stats row - Australian CRM focus
-  const unrespondedValue = effectiveDemo ? 2 : unrespondedLeads;
+  const unrespondedValue = unrespondedLeads;
 
   // Reputation score with trend — new users start at 0
-  const repScore = effectiveDemo ? DEMO_REPUTATION.total : 0;
+  const repScore = 0;
   const lastMonthKey = 'gh_rep_last_month';
   const lastMonth = parseInt(localStorage.getItem(lastMonthKey) || '0', 10);
   const repTrend = lastMonth === 0 ? 'neutral' : repScore > lastMonth ? 'up' : repScore < lastMonth ? 'down' : 'neutral';
@@ -235,38 +206,23 @@ const DashboardOverview = () => {
   const repColors = getScoreColor(repScore);
 
   const stats = [
-    { label: 'Tasks Due', value: String(effectiveDemo ? 5 : tasksDue), icon: <CheckSquare size={16} />, color: 'text-destructive', link: '/dashboard/contacts' },
-    { label: 'Active Contacts', value: effectiveDemo ? '62' : String(activeContacts), icon: <Users size={16} />, color: 'text-primary', link: '/dashboard/contacts' },
-    { label: 'Appraisals This Month', value: effectiveDemo ? '9' : '0', icon: <ClipboardList size={16} />, color: 'text-success', link: '/dashboard/listings' },
-    { label: 'Sales This Month', value: AUD.format(effectiveDemo ? 1250000 : 0), icon: <DollarSign size={16} />, color: 'text-primary', link: '/dashboard/reports' },
-    { label: 'Trust Balance', value: AUD.format(effectiveDemo ? 47230 : trustBalance), icon: <Landmark size={16} />, color: 'text-success', link: '/dashboard/trust' },
+    { label: 'Tasks Due', value: String(tasksDue), icon: <CheckSquare size={16} />, color: 'text-destructive', link: '/dashboard/contacts' },
+    { label: 'Active Contacts', value: String(activeContacts), icon: <Users size={16} />, color: 'text-primary', link: '/dashboard/contacts' },
+    { label: 'Appraisals This Month', value: '0', icon: <ClipboardList size={16} />, color: 'text-success', link: '/dashboard/listings' },
+    { label: 'Sales This Month', value: AUD.format(0), icon: <DollarSign size={16} />, color: 'text-primary', link: '/dashboard/reports' },
+    { label: 'Trust Balance', value: AUD.format(trustBalance), icon: <Landmark size={16} />, color: 'text-success', link: '/dashboard/trust' },
     { label: 'Unresponded Leads', value: String(unrespondedValue), icon: <Zap size={16} />, color: unrespondedValue > 0 ? 'text-destructive' : 'text-success', link: '/dashboard/leads' },
   ];
 
   return (
     <div>
-      <DashboardHeader title="Dashboard" subtitle={effectiveDemo ? "South Yarra Demo Agency" : "Welcome back, Agent"} />
-
-      {!isDemoMode && (
-        <div className="px-4 pt-3 pb-0 flex justify-end">
-          <button
-            onClick={() => setLocalDemoMode(prev => !prev)}
-            className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-all ${
-              localDemoMode
-                ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-600 dark:text-emerald-400'
-                : 'border-border text-muted-foreground hover:border-primary/40 hover:text-foreground'
-            }`}
-          >
-            {localDemoMode ? '🟢 Demo Mode — click to exit' : '👀 Preview with sample data'}
-          </button>
-        </div>
-      )}
+      <DashboardHeader title="Dashboard" subtitle="Welcome back, Agent" />
 
       <div className="p-4 sm:p-6 space-y-6 max-w-7xl">
-        {!effectiveDemo && listings.length === 0 && (
+        {listings.length === 0 && (
           <div className="bg-primary/10 border border-primary/20 rounded-2xl p-5">
             <h2 className="font-bold text-lg mb-1">Welcome to GlobalHomes 👋</h2>
-            <p className="text-sm text-muted-foreground mb-4">Your account is live. Here's how to get started — or <button onClick={() => setLocalDemoMode(true)} className="underline text-primary">preview with sample data</button>.</p>
+            <p className="text-sm text-muted-foreground mb-4">Your account is live. Here's how to get started:</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <button onClick={() => navigate('/dashboard/listings')} className="flex items-center gap-2 bg-background rounded-xl border border-border p-3 text-sm font-medium hover:border-primary/40 transition-colors text-left">
                 <span className="text-xl">🏠</span><div><div className="font-semibold text-sm">Add your first listing</div><div className="text-xs text-muted-foreground">Upload a property</div></div>
@@ -329,39 +285,28 @@ const DashboardOverview = () => {
           <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
             <CalendarDays size={16} className="text-primary" /> Today's Inspections
           </h3>
-          {(() => {
-            const DEMO_INSPECTIONS = [
-              { address: '42 Panorama Drive, Berwick', time: '10:00 AM', propertyId: '1' },
-              { address: '15 Station St, Narre Warren', time: '12:30 PM', propertyId: '2' },
-              { address: '8 Ocean View Rd, Brighton', time: '2:00 PM', propertyId: '3' },
-            ];
-            const inspections = effectiveDemo ? DEMO_INSPECTIONS : todayInspections;
-            if (inspections.length === 0) {
-              return (
-                <p className="text-sm text-muted-foreground py-4 text-center">No inspections scheduled for today</p>
-              );
-            }
-            return (
-              <div className="space-y-2">
-                {inspections.map((insp, i) => (
-                  <div key={i} className="flex items-center justify-between border border-border rounded-lg p-3">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium truncate">{insp.address}</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">🕐 {insp.time}</p>
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-[10px] h-6 px-2 shrink-0 ml-2"
-                      onClick={() => navigate(`/dashboard/listings/${insp.propertyId}`)}
-                    >
-                      View Listing
-                    </Button>
+          {todayInspections.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-4 text-center">No inspections scheduled for today</p>
+          ) : (
+            <div className="space-y-2">
+              {todayInspections.map((insp, i) => (
+                <div key={i} className="flex items-center justify-between border border-border rounded-lg p-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium truncate">{insp.address}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">🕐 {insp.time}</p>
                   </div>
-                ))}
-              </div>
-            );
-          })()}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-[10px] h-6 px-2 shrink-0 ml-2"
+                    onClick={() => navigate(`/dashboard/listings/${insp.propertyId}`)}
+                  >
+                    View Listing
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
         </motion.div>
 
         {/* Today's Voice Matches */}
@@ -374,49 +319,7 @@ const DashboardOverview = () => {
           <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
             <Mic size={16} className="text-success" /> Today's Voice Matches
           </h3>
-          {effectiveDemo ? (
-            <div className="space-y-3">
-              {MOCK_MATCHES.map((m) => {
-                const u = URGENCY_CONFIG[m.urgency];
-                const tier = getIntentTier(m.intentScore);
-                return (
-                  <div key={m.id} className="border border-border rounded-lg p-3">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Badge className={`${u.color} text-[10px] gap-0.5 border-0`}>
-                        {u.icon} {u.label}
-                      </Badge>
-                      <TooltipProvider>
-                        <UiTooltip>
-                          <TooltipTrigger asChild>
-                            <Badge className={`${tier.className} text-[10px] gap-0.5 border-0 cursor-help`}>{tier.label} {m.intentScore}</Badge>
-                          </TooltipTrigger>
-                          <TooltipContent><p className="text-xs max-w-[200px]">{INTENT_TOOLTIP}</p></TooltipContent>
-                        </UiTooltip>
-                      </TooltipProvider>
-                      <span className="text-[10px] text-muted-foreground">{m.time}</span>
-                    </div>
-                    <p className="text-xs font-medium truncate">"{m.transcript}"</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">
-                      📍 {m.buyerLocation} → <strong>{m.matchedListing}</strong>
-                    </p>
-                    <div className="flex items-center gap-1.5 mt-2">
-                      <Button size="sm" variant="outline" className="text-[10px] h-6 px-2 gap-1">
-                        <Phone size={10} /> Call
-                      </Button>
-                      <Button size="sm" variant="outline" className="text-[10px] h-6 px-2 gap-1">
-                        <Send size={10} /> Info
-                      </Button>
-                      <Button size="sm" className="text-[10px] h-6 px-2 gap-1">
-                        <Sparkles size={10} /> AI Reply
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground py-4 text-center">No voice matches yet</p>
-          )}
+          <p className="text-sm text-muted-foreground py-4 text-center">No voice matches yet</p>
         </motion.div>
 
         {/* Listing Performance */}
@@ -438,42 +341,11 @@ const DashboardOverview = () => {
                 </tr>
               </thead>
               <tbody>
-                {effectiveDemo ? [
-                  { id: '1', thumb: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=80&h=60&fit=crop', address: '42 Panorama Drive, Berwick', status: 'whisper', views: 24, voiceInquiries: 3, qualifiedLeads: 2, daysListed: 4 },
-                  { id: '2', thumb: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=80&h=60&fit=crop', address: '15 Station St, Narre Warren', status: 'coming-soon', views: 67, voiceInquiries: 8, qualifiedLeads: 5, daysListed: 11 },
-                  { id: '3', thumb: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=80&h=60&fit=crop', address: '8 Ocean View Rd, Brighton', status: 'public', views: 142, voiceInquiries: 12, qualifiedLeads: 7, daysListed: 18 },
-                ].map((l) => {
-                  const daysColor = l.daysListed < 7 ? 'text-success' : l.daysListed < 15 ? 'text-primary' : 'text-destructive';
-                  const statusLabel = l.status === 'whisper' ? '🤫 Whisper' : l.status === 'coming-soon' ? '🔜 Soon' : '🟢 Live';
-                  return (
-                    <tr key={l.id} className="border-b border-border last:border-0 hover:bg-accent/30 transition-colors">
-                      <td className="p-3">
-                        <div className="flex items-center gap-2">
-                          <img src={l.thumb} alt="" className="w-10 h-8 rounded-md object-cover shrink-0" />
-                          <span className="text-xs font-medium truncate max-w-[180px]">{l.address}</span>
-                        </div>
-                      </td>
-                      <td className="p-3"><span className="text-[10px] font-semibold">{statusLabel}</span></td>
-                      <td className="p-3 text-center font-medium">{l.views}</td>
-                      <td className="p-3 text-center font-medium">{l.voiceInquiries}</td>
-                      <td className="p-3 text-center font-medium">{l.qualifiedLeads}</td>
-                      <td className={`p-3 text-center font-bold ${daysColor}`}>{l.daysListed}</td>
-                      <td className="p-3 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2">Edit</Button>
-                          <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2">Boost</Button>
-                          <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 text-success">Sold</Button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                }) : (
-                  <tr>
-                    <td colSpan={7} className="p-6 text-center text-sm text-muted-foreground">
-                      No listings yet — <button onClick={() => navigate('/dashboard/listings/new')} className="text-primary underline underline-offset-2">create your first listing</button>
-                    </td>
-                  </tr>
-                )}
+                <tr>
+                  <td colSpan={7} className="p-6 text-center text-sm text-muted-foreground">
+                    No listings yet — <button onClick={() => navigate('/dashboard/listings/new')} className="text-primary underline underline-offset-2">create your first listing</button>
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -497,24 +369,6 @@ const DashboardOverview = () => {
                   <div className="flex-1 min-w-0">
                     <p className="text-xs">{a.description || a.action}</p>
                     <p className="text-[10px] text-muted-foreground">{AU_DATE(a.created_at)}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : effectiveDemo ? (
-            <div className="space-y-3">
-              {[
-                { text: 'Called Sarah M. re: 42 Panorama Dr appraisal', time: 'Today, 2:15 PM' },
-                { text: 'New lead: John D. enquired about 15 Station St', time: 'Today, 11:30 AM' },
-                { text: 'Listing 8 Ocean View Rd marked as Under Contract', time: 'Yesterday, 4:00 PM' },
-                { text: 'Inspection scheduled: 22 Park Ave, Saturday 10am', time: 'Yesterday, 9:45 AM' },
-                { text: 'Commission invoice #1042 paid — $12,500', time: '10/03/2026' },
-              ].map((a, i) => (
-                <div key={i} className="flex items-start gap-3 text-sm">
-                  <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs">{a.text}</p>
-                    <p className="text-[10px] text-muted-foreground">{a.time}</p>
                   </div>
                 </div>
               ))}
@@ -556,7 +410,7 @@ const DashboardOverview = () => {
                   <span className="text-muted-foreground">Potential (Pipeline)</span>
                   <span className="font-bold text-success">{AUD.format(gciPotential)}</span>
                 </div>
-                <Progress value={Math.round((gciPotential / gciPotential) * 100)} className="h-3 opacity-50" />
+                <Progress value={gciPotential > 0 ? 100 : 0} className="h-3 opacity-50" />
               </div>
               <p className="text-xs text-muted-foreground pt-2 border-t border-border">
                 You're at <strong className="text-primary">{gciPercent}%</strong> of your annual budget target
@@ -575,13 +429,13 @@ const DashboardOverview = () => {
               <TrendingUp size={16} className="text-primary" /> Pipeline — 12 Month Deal Flow
             </h3>
             <div className="h-48 relative">
-              {!effectiveDemo && pipelineEmpty && (
+              {pipelineEmpty && (
                 <div className="absolute inset-0 flex items-center justify-center z-10">
                   <p className="text-sm text-muted-foreground bg-card/80 backdrop-blur-sm px-3 py-1.5 rounded-lg">No completed sales yet</p>
                 </div>
               )}
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={effectiveDemo ? DEMO_PIPELINE_DATA : pipelineData}>
+                <BarChart data={pipelineData}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} className="text-muted-foreground" />
                   <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `$${v / 1000}k`} className="text-muted-foreground" />

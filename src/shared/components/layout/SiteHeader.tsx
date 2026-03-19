@@ -46,7 +46,6 @@ export function SiteHeader() {
         {/* Links - hidden on small screens */}
         <div className="hidden md:flex items-center gap-3">
           <Link to="/terms" className="text-[11px] text-muted-foreground hover:text-foreground transition-colors">Terms</Link>
-          <Link to="/terms" className="text-[11px] text-muted-foreground hover:text-foreground transition-colors">Terms</Link>
           <Link to="/privacy" className="text-[11px] text-muted-foreground hover:text-foreground transition-colors">Privacy</Link>
         </div>
 

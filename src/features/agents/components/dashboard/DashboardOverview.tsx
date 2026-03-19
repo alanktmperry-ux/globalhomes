@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   CheckSquare, Users, ClipboardList, DollarSign, Landmark,
-  Mic, Phone, Send, Calendar, Flame, Thermometer, Snowflake, Sparkles, Eye,
+  Mic, Phone, Send, Calendar, CalendarDays, Flame, Thermometer, Snowflake, Sparkles, Eye,
   TrendingUp, Zap, MessageSquare, Activity,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

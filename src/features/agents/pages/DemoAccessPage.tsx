@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Building2, Loader2, KeyRound, Eye, EyeOff } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { Building2, Loader2, KeyRound, Sparkles } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,26 +8,29 @@ import { toast } from 'sonner';
 
 const DemoAccessPage = () => {
   const navigate = useNavigate();
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [searchParams] = useSearchParams();
+  const prefillEmail = searchParams.get('email') || '';
+
+  const [email, setEmail] = useState(prefillEmail);
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const codeRef = useRef<HTMLInputElement>(null);
+
+  const isEmailPrefilled = !!prefillEmail;
+
+  useEffect(() => {
+    codeRef.current?.focus();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName.trim() || !email.trim() || !password.trim() || !code.trim()) return;
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
-      return;
-    }
+    if (!email.trim() || !code.trim()) return;
     setLoading(true);
     setError('');
 
     try {
-      // 1. Validate the demo code
+      // 1. Validate demo code
       const { data: demoReq, error: queryErr } = await supabase
         .from('demo_requests' as any)
         .select('*')
@@ -40,51 +43,30 @@ const DemoAccessPage = () => {
       if (queryErr) throw queryErr;
 
       if (!demoReq) {
-        setError('This code is invalid, expired, or doesn\'t match this email. Please contact sales@everythingeco.com.au');
+        setError('Invalid or expired code. Please check your email or contact sales@everythingeco.com.au');
         setLoading(false);
         return;
       }
 
-      // 2. Register a new account
-      const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
-        email: email.trim().toLowerCase(),
-        password,
-        options: {
-          data: { display_name: fullName.trim(), phone: '' },
-          emailRedirectTo: window.location.origin,
-        },
+      // 2. Sign in with shared demo account
+      const { error: signInErr } = await supabase.auth.signInWithPassword({
+        email: 'demo@globalhomes.app',
+        password: 'DemoAccess2024!',
       });
-      if (signUpErr) throw signUpErr;
+      if (signInErr) throw signInErr;
 
-      const userId = signUpData.user?.id;
-      if (!userId) throw new Error('Account creation failed.');
-
-      // 3. Seed demo data for this user
-      const { data: seedResult, error: seedErr } = await supabase.functions.invoke('seed-demo-agent', {
-        body: {
-          user_id: userId,
-          display_name: fullName.trim(),
-          email: email.trim().toLowerCase(),
-        },
-      });
-      if (seedErr) throw seedErr;
-      if (seedResult?.error) throw new Error(seedResult.error);
-
-      // 4. Mark demo request as used
+      // 3. Mark as redeemed
       await supabase
         .from('demo_requests' as any)
         .update({ status: 'redeemed' } as any)
         .eq('id', (demoReq as any).id);
 
-      toast.success('Account created! Please check your email to verify, then log in.');
-      navigate('/agents/login');
+      // 4. Navigate to dashboard
+      toast.success('Welcome to the demo!');
+      navigate('/dashboard');
     } catch (err: any) {
-      console.error('Demo registration error:', err);
-      if (err.message?.includes('already registered')) {
-        setError('This email is already registered. Please log in instead.');
-      } else {
-        setError(err.message || 'Something went wrong. Please try again.');
-      }
+      console.error('Demo access error:', err);
+      setError(err.message || 'Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -103,28 +85,21 @@ const DemoAccessPage = () => {
           <h1 className="font-display text-2xl font-bold text-foreground">Global Homes</h1>
           <div className="flex items-center justify-center gap-2 mt-2">
             <KeyRound size={14} className="text-primary" />
-            <span className="text-xs font-semibold text-primary uppercase tracking-wider">Demo Registration</span>
+            <span className="text-xs font-semibold text-primary uppercase tracking-wider">Demo Access</span>
           </div>
         </div>
 
         {/* Form */}
         <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-          <p className="text-sm text-muted-foreground mb-5 text-center">
-            Create your demo account to explore the agent platform.
-          </p>
+          {/* Demo Mode notice */}
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 mb-5 flex items-start gap-2">
+            <Sparkles className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+            <p className="text-xs text-amber-700 dark:text-amber-300">
+              You are about to access a demo environment. To go live, subscribe after exploring.
+            </p>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Full Name</label>
-              <Input
-                type="text"
-                required
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Jane Smith"
-                autoFocus
-              />
-            </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Email Address</label>
               <Input
@@ -133,31 +108,14 @@ const DemoAccessPage = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
+                readOnly={isEmailPrefilled}
+                className={isEmailPrefilled ? 'bg-muted cursor-not-allowed' : ''}
               />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Create Password</label>
-              <div className="relative">
-                <Input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Min 6 characters"
-                  minLength={6}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Access Code</label>
               <Input
+                ref={codeRef}
                 type="text"
                 required
                 value={code}
@@ -165,6 +123,7 @@ const DemoAccessPage = () => {
                 placeholder="RB7X2KPQ"
                 maxLength={8}
                 className="font-mono text-center text-lg tracking-widest"
+                autoFocus
               />
             </div>
 
@@ -175,7 +134,11 @@ const DemoAccessPage = () => {
             )}
 
             <Button type="submit" disabled={loading} className="w-full">
-              {loading ? <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Creating Account...</> : 'Create Demo Account'}
+              {loading ? (
+                <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Accessing...</>
+              ) : (
+                'Access My Demo →'
+              )}
             </Button>
           </form>
         </div>

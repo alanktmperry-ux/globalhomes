@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
-import { Building2, Loader2, KeyRound, Sparkles } from 'lucide-react';
+import { Loader2, KeyRound, Sparkles } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -30,38 +30,39 @@ const DemoAccessPage = () => {
     setError('');
 
     try {
-      // 1. Validate demo code
-      const { data: demoReq, error: queryErr } = await supabase
-        .from('demo_requests' as any)
-        .select('*')
-        .ilike('email', email.trim())
-        .eq('demo_code', code.trim().toUpperCase())
-        .eq('status', 'approved')
-        .gte('demo_code_expires_at', new Date().toISOString())
-        .maybeSingle();
+      // Call edge function to validate code and ensure demo user exists
+      const { data: fnData, error: fnError } = await supabase.functions.invoke('handle-demo-request', {
+        body: { action: 'validate_code', email: email.trim(), code: code.trim().toUpperCase() },
+      });
 
-      if (queryErr) throw queryErr;
-
-      if (!demoReq) {
-        setError('Invalid or expired code. Please check your email or contact sales@everythingeco.com.au');
+      if (fnError) {
+        setError('Something went wrong. Please try again.');
         setLoading(false);
         return;
       }
 
-      // 2. Sign in with shared demo account
+      if (fnData?.error) {
+        setError(fnData.error);
+        setLoading(false);
+        return;
+      }
+
+      // Sign out any existing session first
+      await supabase.auth.signOut();
+
+      // Sign in with the demo account
       const { error: signInErr } = await supabase.auth.signInWithPassword({
-        email: 'demo@globalhomes.app',
-        password: 'DemoAccess2024!',
+        email: fnData.demo_email,
+        password: fnData.demo_password,
       });
-      if (signInErr) throw signInErr;
 
-      // 3. Mark as redeemed
-      await supabase
-        .from('demo_requests' as any)
-        .update({ status: 'redeemed' } as any)
-        .eq('id', (demoReq as any).id);
+      if (signInErr) {
+        console.error('Demo sign-in error:', signInErr);
+        setError('Could not sign in to demo account. Please try again.');
+        setLoading(false);
+        return;
+      }
 
-      // 4. Navigate to dashboard
       toast.success('Welcome to the demo!');
       navigate('/dashboard');
     } catch (err: any) {
@@ -91,7 +92,6 @@ const DemoAccessPage = () => {
 
         {/* Form */}
         <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-          {/* Demo Mode notice */}
           <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 mb-5 flex items-start gap-2">
             <Sparkles className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
             <p className="text-xs text-amber-700 dark:text-amber-300">

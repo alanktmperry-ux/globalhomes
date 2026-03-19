@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/features/auth/AuthProvider';
 import { Mic, Flame, Thermometer, Snowflake, Phone, MessageSquare, Mail, Play, X, MapPin, Shield, Clock, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -40,18 +41,27 @@ const URGENCY = {
 };
 
 const VoiceLeadsPage = () => {
+  const { isDemoMode } = useAuth();
+  const leads = isDemoMode ? LEADS : [];
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const selected = LEADS.find((l) => l.id === selectedId);
+  const selected = leads.find((l) => l.id === selectedId);
 
   return (
     <div>
-      <DashboardHeader title="Voice Leads" subtitle={`${LEADS.length} inquiries from voice searches`} />
+      <DashboardHeader title="Voice Leads" subtitle={`${leads.length} inquiries from voice searches`} />
 
       <div className="flex flex-col lg:flex-row">
         {/* Lead list */}
         <div className={`${selectedId ? 'hidden lg:block lg:w-[380px]' : 'flex-1'} border-r border-border`}>
           <div className="p-4 space-y-2">
-            {LEADS.map((lead) => {
+            {leads.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <Mic size={32} className="text-muted-foreground/30 mb-3" />
+                <p className="text-sm font-medium text-muted-foreground">No voice leads yet</p>
+                <p className="text-xs text-muted-foreground/70 mt-1">Voice search inquiries will appear here</p>
+              </div>
+            )}
+            {leads.map((lead) => {
               const u = URGENCY[lead.urgency];
               return (
                 <motion.button

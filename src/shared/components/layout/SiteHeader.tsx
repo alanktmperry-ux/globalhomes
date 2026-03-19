@@ -149,6 +149,18 @@ export function SiteHeader() {
             </button>
           )}
 
+          {/* Admin shortcut – only for admins */}
+          {user && isAdmin && (
+            <button
+              onClick={() => navigate('/admin')}
+              className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary/20 transition-colors"
+              aria-label="Admin"
+              title="Admin"
+            >
+              <ShieldCheck size={17} />
+            </button>
+          )}
+
           {/* Mode-aware role badge with agent quick actions */}
           {user && userRole && (
             <div ref={agentMenuRef} className="relative">

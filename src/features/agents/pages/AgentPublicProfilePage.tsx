@@ -38,6 +38,61 @@ interface AgentProfile {
   handlesTrustAccounting: boolean;
 }
 
+function ScoreRing({ score, size = 80 }: { score: number; size?: number }) {
+  const colors = getScoreColor(score);
+  const r = (size - 8) / 2;
+  const circ = 2 * Math.PI * r;
+  const offset = circ - (score / 100) * circ;
+  return (
+    <svg width={size} height={size} className="shrink-0">
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={6} className="stroke-muted/30" />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={6} className={colors.ring}
+        strokeDasharray={circ} strokeDashoffset={offset} strokeLinecap="round"
+        transform={`rotate(-90 ${size / 2} ${size / 2})`} style={{ transition: 'stroke-dashoffset 0.8s ease' }} />
+      <text x="50%" y="50%" textAnchor="middle" dominantBaseline="central" className={`${colors.text} text-lg font-bold`} fill="currentColor" style={{ fontSize: size * 0.22 }}>
+        {score}
+      </text>
+    </svg>
+  );
+}
+
+function ReputationScoreCard({ score }: { score: ReputationResult }) {
+  const colors = getScoreColor(score.total);
+  const bars = [
+    { label: 'Reviews', value: score.reviews, max: 25 },
+    { label: 'Response Time', value: score.responseTime, max: 25 },
+    { label: 'Sales Rate', value: score.salesRate, max: 40 },
+    { label: 'Profile', value: score.profile, max: 10 },
+  ];
+  return (
+    <div className={`p-5 rounded-2xl border border-border bg-card shadow-card mb-8 ${colors.bg}`}>
+      <div className="flex items-center gap-5">
+        <ScoreRing score={score.total} size={88} />
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <p className="font-display text-sm font-bold">GlobalHomes Verified Score</p>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild><Info size={14} className="text-muted-foreground cursor-help" /></TooltipTrigger>
+                <TooltipContent className="max-w-[240px] text-xs">{REPUTATION_TOOLTIP}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+          <div className="space-y-2 mt-3">
+            {bars.map(b => (
+              <div key={b.label} className="flex items-center gap-2">
+                <span className="text-[11px] text-muted-foreground w-24 shrink-0">{b.label}</span>
+                <Progress value={(b.value / b.max) * 100} className="h-1.5 flex-1" />
+                <span className="text-[10px] text-muted-foreground w-8 text-right">{b.value}/{b.max}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AgentPublicProfilePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();

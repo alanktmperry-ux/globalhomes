@@ -217,7 +217,7 @@ const DashboardOverview = () => {
 
       <div className="p-4 sm:p-6 space-y-6 max-w-7xl">
         {/* Stats Row */}
-        <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-7 gap-3">
           {stats.map((s) => (
             <motion.div
               key={s.label}
@@ -233,6 +233,25 @@ const DashboardOverview = () => {
               <p className="font-display text-2xl font-extrabold">{s.value}</p>
             </motion.div>
           ))}
+          {/* Reputation Score stat */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            onClick={() => navigate(`/agent/me`)}
+            className={`bg-card border border-border rounded-xl p-4 cursor-pointer hover:border-primary/50 hover:shadow-md transition-all`}
+          >
+            <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
+              <span className={repColors.text}><Shield size={16} /></span>
+              <span className="text-xs">Reputation</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <p className={`font-display text-2xl font-extrabold ${repColors.text}`}>{repScore}</p>
+              <span className="text-xs text-muted-foreground">/100</span>
+              {repTrend === 'up' && <ArrowUp size={14} className="text-green-500" />}
+              {repTrend === 'down' && <ArrowDown size={14} className="text-red-500" />}
+              {repTrend === 'neutral' && <Minus size={14} className="text-muted-foreground" />}
+            </div>
+          </motion.div>
         </div>
 
         {/* Today's Inspections */}

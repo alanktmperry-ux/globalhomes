@@ -58,7 +58,6 @@ Deno.serve(async (req) => {
 
       // Admin alert
       await sendEmail(apiKey, "sales@everythingeco.com.au", `New Demo Request — ${full_name}`, buildAdminEmail({ full_name, email, phone, agency_name, message }));
-      // Applicant confirmation
       // Send access code immediately to applicant
       const demoUrl = `https://globalhomes.lovable.app/agents/demo?email=${encodeURIComponent(email)}`;
       await sendEmail(apiKey, email, "Your Global Homes Access Code", buildAccessCodeEmail(full_name, email, code, demoUrl));
@@ -81,11 +80,13 @@ Deno.serve(async (req) => {
 
     } else if (body.action === "validate_code") {
       const { email, code } = body;
-      if (!email || !code) return new Response(JSON.stringify({ error: "Missing email or code" }), { status: 400, headers: corsHeaders });
+      if (!email || !code) {
+        return new Response(JSON.stringify({ error: "Missing email or code" }), { status: 400, headers: corsHeaders });
+      }
 
       const { data: demoReq, error: qErr } = await supabase
         .from("demo_requests")
-        .select("*")
+        .select("id")
         .ilike("email", email.trim())
         .eq("demo_code", code.trim().toUpperCase())
         .eq("status", "approved")
@@ -97,16 +98,13 @@ Deno.serve(async (req) => {
         return new Response(JSON.stringify({ error: "Invalid or expired code. Please check your email or contact sales@everythingeco.com.au" }), { status: 400, headers: corsHeaders });
       }
 
-      // Ensure demo user exists
+      // Ensure demo auth user exists
       const demoEmail = "demo@globalhomes.app";
       const demoPassword = "DemoAccess2024!";
-      const { data: existingUsers } = await supabase.auth.admin.listUsers({ perPage: 1 });
-      let demoUserId: string | null = null;
+      const { data: listData, error: listErr } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
+      if (listErr) throw listErr;
 
-      // Check if demo user exists
-      const { data: lookupData } = await supabase.auth.admin.listUsers({ perPage: 1000 });
-      const demoUser = lookupData?.users?.find((u: any) => u.email === demoEmail);
-
+      let demoUser = listData.users.find((u: any) => (u.email || "").toLowerCase() === demoEmail.toLowerCase());
       if (!demoUser) {
         const { data: created, error: createErr } = await supabase.auth.admin.createUser({
           email: demoEmail,
@@ -115,30 +113,55 @@ Deno.serve(async (req) => {
           user_metadata: { display_name: "Demo User" },
         });
         if (createErr) throw createErr;
-        demoUserId = created.user.id;
+        demoUser = created.user;
+      }
 
-        // Create agent record for demo user
-        await supabase.from("agents").insert({
-          user_id: demoUserId,
+      // Ensure agent record exists for demo user
+      const { data: existingAgent, error: agentCheckErr } = await supabase
+        .from("agents")
+        .select("id")
+        .eq("user_id", demoUser.id)
+        .maybeSingle();
+      if (agentCheckErr) throw agentCheckErr;
+
+      if (!existingAgent) {
+        const { error: agentInsertErr } = await supabase.from("agents").insert({
+          user_id: demoUser.id,
           name: "Demo Agent",
           email: demoEmail,
           is_demo: true,
           is_subscribed: false,
         });
-
-        // Assign agent role
-        await supabase.from("user_roles").insert({
-          user_id: demoUserId,
-          role: "agent",
-        });
-      } else {
-        demoUserId = demoUser.id;
+        if (agentInsertErr) throw agentInsertErr;
       }
 
-      // Mark as redeemed
-      await supabase.from("demo_requests").update({ status: "redeemed" }).eq("id", demoReq.id);
+      // Ensure agent role exists
+      const { error: roleUpsertErr } = await supabase
+        .from("user_roles")
+        .upsert({ user_id: demoUser.id, role: "agent" }, { onConflict: "user_id,role" });
+      if (roleUpsertErr) throw roleUpsertErr;
 
-      return new Response(JSON.stringify({ success: true, demo_email: demoEmail, demo_password: demoPassword }), { headers: corsHeaders });
+      return new Response(JSON.stringify({
+        success: true,
+        request_id: demoReq.id,
+        demo_email: demoEmail,
+        demo_password: demoPassword,
+      }), { headers: corsHeaders });
+
+    } else if (body.action === "redeem_code") {
+      const { request_id } = body;
+      if (!request_id) {
+        return new Response(JSON.stringify({ error: "Missing request_id" }), { status: 400, headers: corsHeaders });
+      }
+
+      const { error: redeemErr } = await supabase
+        .from("demo_requests")
+        .update({ status: "redeemed" })
+        .eq("id", request_id)
+        .eq("status", "approved");
+
+      if (redeemErr) throw redeemErr;
+      return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
 
     } else {
       return new Response(JSON.stringify({ error: "Invalid action" }), { status: 400, headers: corsHeaders });

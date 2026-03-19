@@ -8,12 +8,14 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Tooltip as UiTooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import DashboardHeader from './DashboardHeader';
+import { getIntentTier, INTENT_TOOLTIP } from '@/features/agents/lib/intentScore';
 import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, CartesianGrid } from 'recharts';
 
 // Australian currency formatter
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
@@ -55,9 +57,9 @@ const URGENCY_CONFIG = {
 };
 
 const MOCK_MATCHES = [
-  { id: '1', transcript: '3 bed house in Berwick with pool under $900k', buyerLocation: 'Melbourne CBD', urgency: 'hot' as const, time: '12 min ago', matchedListing: '42 Panorama Drive' },
-  { id: '2', transcript: 'Investment property near train station, 2 bed apartment', buyerLocation: 'Sydney (relocating)', urgency: 'warm' as const, time: '1h ago', matchedListing: '15 Station Street' },
-  { id: '3', transcript: 'Looking for land in officer area, 600sqm minimum', buyerLocation: 'Pakenham', urgency: 'cold' as const, time: '3h ago', matchedListing: 'Lot 12 Officer South' },
+  { id: '1', transcript: '3 bed house in Berwick with pool under $900k', buyerLocation: 'Melbourne CBD', urgency: 'hot' as const, time: '12 min ago', matchedListing: '42 Panorama Drive', intentScore: 92 },
+  { id: '2', transcript: 'Investment property near train station, 2 bed apartment', buyerLocation: 'Sydney (relocating)', urgency: 'warm' as const, time: '1h ago', matchedListing: '15 Station Street', intentScore: 65 },
+  { id: '3', transcript: 'Looking for land in officer area, 600sqm minimum', buyerLocation: 'Pakenham', urgency: 'cold' as const, time: '3h ago', matchedListing: 'Lot 12 Officer South', intentScore: 30 },
 ];
 
 const DashboardOverview = () => {
@@ -281,12 +283,21 @@ const DashboardOverview = () => {
           <div className="space-y-3">
             {MOCK_MATCHES.map((m) => {
               const u = URGENCY_CONFIG[m.urgency];
+              const tier = getIntentTier(m.intentScore);
               return (
                 <div key={m.id} className="border border-border rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-1">
                     <Badge className={`${u.color} text-[10px] gap-0.5 border-0`}>
                       {u.icon} {u.label}
                     </Badge>
+                    <TooltipProvider>
+                      <UiTooltip>
+                        <TooltipTrigger asChild>
+                          <Badge className={`${tier.className} text-[10px] gap-0.5 border-0 cursor-help`}>{tier.label} {m.intentScore}</Badge>
+                        </TooltipTrigger>
+                        <TooltipContent><p className="text-xs max-w-[200px]">{INTENT_TOOLTIP}</p></TooltipContent>
+                      </UiTooltip>
+                    </TooltipProvider>
                     <span className="text-[10px] text-muted-foreground">{m.time}</span>
                   </div>
                   <p className="text-xs font-medium truncate">"{m.transcript}"</p>
@@ -468,7 +479,7 @@ const DashboardOverview = () => {
                   <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} className="text-muted-foreground" />
                   <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `$${v / 1000}k`} className="text-muted-foreground" />
-                  <Tooltip
+                  <RechartsTooltip
                     formatter={(value: number) => [AUD.format(value), 'Commission']}
                     contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', fontSize: '12px' }}
                   />

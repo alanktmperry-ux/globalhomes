@@ -78,7 +78,7 @@ const PipelinePage = () => {
     };
 
     fetchPipeline();
-  }, [user, isDemoMode]);
+  }, [user]);
 
   const mapLeadStatusToStage = (status: string | null): string => {
     switch (status) {

@@ -36,6 +36,7 @@ import InvestmentDashboardPage from "@/features/agents/components/dashboard/Inve
 import TrustLedgerPage from "@/features/agents/components/dashboard/TrustLedgerPage";
 import BankReconciliationPage from "@/features/agents/components/dashboard/BankReconciliationPage";
 import ReportsPage from "@/features/agents/components/dashboard/ReportsPage";
+import PipelinePage from "@/features/agents/components/dashboard/PipelinePage";
 import SeekerAuthPage from "./pages/SeekerAuthPage";
 import AgentAuthPage from "./pages/AgentAuthPage";
 import AuthLandingPage from "./pages/AuthLandingPage";
@@ -98,6 +99,7 @@ const App = () => (
                 <Route path="listings/:listingId" element={<ListingDetailPage />} />
                 <Route path="contacts" element={<ContactsPage />} />
                 <Route path="leads" element={<VoiceLeadsPage />} />
+                <Route path="pipeline" element={<PipelinePage />} />
                 <Route path="analytics" element={<AnalyticsPage />} />
                 <Route path="network" element={<NetworkPage />} />
                 <Route path="team" element={<TeamPage />} />

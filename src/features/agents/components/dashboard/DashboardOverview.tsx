@@ -131,6 +131,35 @@ const DashboardOverview = () => {
       .then(({ data }) => setRecentActivities(data || []));
   }, [user]);
 
+  // Fetch today's inspections from properties with inspection_times JSONB
+  useEffect(() => {
+    if (!user || isDemoMode) return;
+    const todayStr = new Date().toISOString().split('T')[0];
+    supabase
+      .from('properties')
+      .select('id, address, inspection_times')
+      .eq('is_active', true)
+      .not('inspection_times', 'eq', '[]')
+      .then(({ data }) => {
+        if (!data) return;
+        const inspections: { address: string; time: string; propertyId: string }[] = [];
+        data.forEach((prop) => {
+          const times = prop.inspection_times as any[];
+          if (!Array.isArray(times)) return;
+          times.forEach((slot: any) => {
+            const slotDate = typeof slot === 'string' ? slot : slot?.date || slot?.start;
+            if (typeof slotDate === 'string' && slotDate.startsWith(todayStr)) {
+              const d = new Date(slotDate);
+              const timeStr = d.toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit', hour12: true });
+              inspections.push({ address: prop.address, time: timeStr, propertyId: prop.id });
+            }
+          });
+        });
+        inspections.sort((a, b) => a.time.localeCompare(b.time));
+        setTodayInspections(inspections);
+      });
+  }, [user, isDemoMode]);
+
   // GCI values — demo-aware
   const gciActual = isDemoMode ? 1250000 : 245000;
   const gciBudgeted = isDemoMode ? 1800000 : 400000;

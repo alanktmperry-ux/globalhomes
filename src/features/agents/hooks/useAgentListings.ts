@@ -95,7 +95,7 @@ export function useAgentListings() {
   }, [user, fetchKey]);
 
   const realCount = listings.filter(l => '_source' in l && l._source === 'db').length;
-  const isMockData = listings.length > 0 && listings.every(l => '_source' in l && l._source === 'mock');
+  const isMockData = false;
 
   return { listings, loading, agentId, realCount, isMockData, refetch };
 }

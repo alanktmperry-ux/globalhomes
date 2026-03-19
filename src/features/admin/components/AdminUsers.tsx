@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Search, Ban, Trash2, UserCheck, Loader2, Mail, Clock, Shield, Rocket, Eye } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Ban, Trash2, UserCheck, Loader2, Mail, Clock, Shield, Rocket, Eye, CheckSquare, Square, MinusSquare } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/shared/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface AuthUser {
   id: string;
@@ -83,27 +84,44 @@ const AdminUsers = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [batchLoading, setBatchLoading] = useState(false);
   const [filterType, setFilterType] = useState<string>('all');
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  const getSession = useCallback(async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return session;
+  }, []);
+
+  const callAdminApi = useCallback(async (action: string, body?: any) => {
+    const session = await getSession();
+    if (!session?.access_token) throw new Error('Session expired');
+    const method = body ? 'POST' : 'GET';
+    const response = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=${action}`,
+      {
+        method,
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          'Content-Type': 'application/json',
+        },
+        ...(body ? { body: JSON.stringify(body) } : {}),
+      }
+    );
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error || `HTTP ${response.status}`);
+    }
+    return response.json();
+  }, [getSession]);
 
   const fetchUsers = async () => {
     setLoading(true);
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.access_token) {
-      toast({ title: 'Session expired', description: 'Please sign in again.', variant: 'destructive' });
-      setLoading(false);
-      return;
-    }
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=list_users`,
-        { headers: { Authorization: `Bearer ${session.access_token}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY } }
-      );
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(err.error || `HTTP ${response.status}`);
-      }
-      const data = await response.json();
+      const data = await callAdminApi('list_users');
       setUsers(data.users || []);
+      setSelected(new Set());
     } catch (err: any) {
       toast({ title: 'Failed to load users', description: err.message, variant: 'destructive' });
     } finally {
@@ -116,16 +134,12 @@ const AdminUsers = () => {
   const handleBan = async (userId: string, ban: boolean) => {
     if (userId.startsWith('demo-')) return;
     setActionLoading(userId);
-    const { data: { session } } = await supabase.auth.getSession();
-    await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=ban_user`,
-      {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${session?.access_token}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId, ban }),
-      }
-    );
-    toast({ title: ban ? 'User banned' : 'User unbanned' });
+    try {
+      await callAdminApi('ban_user', { user_id: userId, ban });
+      toast({ title: ban ? 'User banned' : 'User unbanned' });
+    } catch (err: any) {
+      toast({ title: 'Failed', description: err.message, variant: 'destructive' });
+    }
     setActionLoading(null);
     fetchUsers();
   };
@@ -134,24 +148,81 @@ const AdminUsers = () => {
     const isDemoRequest = userId.startsWith('demo-');
     const confirmMsg = isDemoRequest
       ? 'Delete this demo request? This cannot be undone.'
-      : 'This will permanently delete this user AND all their data — properties, listings, leads, transactions, messages, and their agent/agency profile. This cannot be undone. Are you sure?';
+      : 'Permanently delete this user and ALL their data? This cannot be undone.';
     if (!confirm(confirmMsg)) return;
-    if (!confirm('This will permanently delete this user AND all their data — properties, listings, leads, transactions, messages, and their agent/agency profile. This cannot be undone. Are you sure?')) return;
     setActionLoading(userId);
-    const { data: { session } } = await supabase.auth.getSession();
-    const action = isDemoRequest ? 'delete_demo_request' : 'delete_user';
-    const bodyId = isDemoRequest ? userId.replace('demo-', '') : userId;
-    await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=${action}`,
-      {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${session?.access_token}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ [isDemoRequest ? 'request_id' : 'user_id']: bodyId }),
-      }
-    );
-    toast({ title: 'User and all associated data permanently deleted.' });
+    try {
+      const action = isDemoRequest ? 'delete_demo_request' : 'delete_user';
+      const bodyId = isDemoRequest ? userId.replace('demo-', '') : userId;
+      await callAdminApi(action, { [isDemoRequest ? 'request_id' : 'user_id']: bodyId });
+      toast({ title: isDemoRequest ? 'Demo request deleted.' : 'User and all data permanently deleted.' });
+    } catch (err: any) {
+      toast({ title: 'Failed', description: err.message, variant: 'destructive' });
+    }
     setActionLoading(null);
     fetchUsers();
+  };
+
+  // Batch actions
+  const handleBatchDelete = async () => {
+    const count = selected.size;
+    if (count === 0) return;
+    if (!confirm(`Permanently delete ${count} selected user${count > 1 ? 's' : ''}? This cannot be undone.`)) return;
+    setBatchLoading(true);
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const id of selected) {
+      try {
+        const isDemoRequest = id.startsWith('demo-');
+        const action = isDemoRequest ? 'delete_demo_request' : 'delete_user';
+        const bodyId = isDemoRequest ? id.replace('demo-', '') : id;
+        await callAdminApi(action, { [isDemoRequest ? 'request_id' : 'user_id']: bodyId });
+        successCount++;
+      } catch {
+        failCount++;
+      }
+    }
+
+    toast({
+      title: `Deleted ${successCount} user${successCount !== 1 ? 's' : ''}`,
+      description: failCount > 0 ? `${failCount} failed.` : undefined,
+      variant: failCount > 0 ? 'destructive' : 'default',
+    });
+    setBatchLoading(false);
+    fetchUsers();
+  };
+
+  const handleBatchBan = async (ban: boolean) => {
+    const authIds = Array.from(selected).filter(id => !id.startsWith('demo-'));
+    if (authIds.length === 0) {
+      toast({ title: 'No eligible users selected', description: 'Demo requests cannot be banned.', variant: 'destructive' });
+      return;
+    }
+    if (!confirm(`${ban ? 'Ban' : 'Unban'} ${authIds.length} selected user${authIds.length > 1 ? 's' : ''}?`)) return;
+    setBatchLoading(true);
+    let successCount = 0;
+
+    for (const id of authIds) {
+      try {
+        await callAdminApi('ban_user', { user_id: id, ban });
+        successCount++;
+      } catch { /* skip */ }
+    }
+
+    toast({ title: `${ban ? 'Banned' : 'Unbanned'} ${successCount} user${successCount !== 1 ? 's' : ''}` });
+    setBatchLoading(false);
+    fetchUsers();
+  };
+
+  // Selection helpers
+  const toggleSelect = (id: string) => {
+    setSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   };
 
   const filtered = users
@@ -166,6 +237,25 @@ const AdminUsers = () => {
     .filter((u) =>
       (u.display_name || u.email || u.agency_name || '').toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+  const allFilteredSelected = filtered.length > 0 && filtered.every(u => selected.has(u.id));
+  const someFilteredSelected = filtered.some(u => selected.has(u.id));
+
+  const toggleSelectAll = () => {
+    if (allFilteredSelected) {
+      setSelected(prev => {
+        const next = new Set(prev);
+        filtered.forEach(u => next.delete(u.id));
+        return next;
+      });
+    } else {
+      setSelected(prev => {
+        const next = new Set(prev);
+        filtered.forEach(u => next.add(u.id));
+        return next;
+      });
+    }
+  };
 
   const demoCount = users.filter(u => u.user_type === 'demo' || u.user_type === 'demo_request').length;
   const agentCount = users.filter(u => u.user_type === 'agent').length;
@@ -210,11 +300,80 @@ const AdminUsers = () => {
         </div>
       </div>
 
+      {/* Batch action bar */}
+      <AnimatePresence>
+        {selected.size > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="mb-3 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary/10 border border-primary/20"
+          >
+            <span className="text-sm font-medium text-foreground">
+              {selected.size} selected
+            </span>
+            <div className="flex-1" />
+            {batchLoading ? (
+              <Loader2 className="animate-spin text-primary" size={18} />
+            ) : (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 text-xs border-amber-500/30 text-amber-600 hover:bg-amber-500/10"
+                  onClick={() => handleBatchBan(true)}
+                >
+                  <Ban className="h-3 w-3 mr-1" />
+                  Ban
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 text-xs border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10"
+                  onClick={() => handleBatchBan(false)}
+                >
+                  <UserCheck className="h-3 w-3 mr-1" />
+                  Unban
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 text-xs border-red-500/30 text-red-600 hover:bg-red-500/10"
+                  onClick={handleBatchDelete}
+                >
+                  <Trash2 className="h-3 w-3 mr-1" />
+                  Delete
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 text-xs text-muted-foreground"
+                  onClick={() => setSelected(new Set())}
+                >
+                  Clear
+                </Button>
+              </>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="bg-card border border-border rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border">
+                <th className="w-10 p-3">
+                  <button onClick={toggleSelectAll} className="text-muted-foreground hover:text-foreground transition-colors">
+                    {allFilteredSelected ? (
+                      <CheckSquare size={16} className="text-primary" />
+                    ) : someFilteredSelected ? (
+                      <MinusSquare size={16} className="text-primary" />
+                    ) : (
+                      <Square size={16} />
+                    )}
+                  </button>
+                </th>
                 <th className="text-left p-3 text-muted-foreground font-medium">User</th>
                 <th className="text-left p-3 text-muted-foreground font-medium">Type</th>
                 <th className="text-left p-3 text-muted-foreground font-medium hidden md:table-cell">Plan</th>
@@ -225,7 +384,21 @@ const AdminUsers = () => {
             </thead>
             <tbody>
               {filtered.map((u) => (
-                <tr key={u.id} className="border-b border-border last:border-0 hover:bg-accent/50">
+                <tr
+                  key={u.id}
+                  className={`border-b border-border last:border-0 transition-colors ${
+                    selected.has(u.id) ? 'bg-primary/5' : 'hover:bg-accent/50'
+                  }`}
+                >
+                  <td className="w-10 p-3">
+                    <button onClick={() => toggleSelect(u.id)} className="text-muted-foreground hover:text-foreground transition-colors">
+                      {selected.has(u.id) ? (
+                        <CheckSquare size={16} className="text-primary" />
+                      ) : (
+                        <Square size={16} />
+                      )}
+                    </button>
+                  </td>
                   <td className="p-3">
                     <p className="text-foreground font-medium">{u.display_name}</p>
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
@@ -269,7 +442,7 @@ const AdminUsers = () => {
                     ) : '—'}
                   </td>
                   <td className="p-3">
-                     {u.user_type === 'demo_request' ? (
+                    {u.user_type === 'demo_request' ? (
                       <div className="flex gap-1.5">
                         {actionLoading === u.id ? (
                           <Loader2 className="animate-spin text-muted-foreground" size={16} />

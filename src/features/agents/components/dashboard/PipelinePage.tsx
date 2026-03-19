@@ -41,7 +41,7 @@ const daysInStage = (movedAt: string) => {
 };
 
 const PipelinePage = () => {
-  const { user, isDemoMode } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [cards, setCards] = useState<PipelineCard[]>([]);
   const [dragOverStage, setDragOverStage] = useState<string | null>(null);
@@ -49,10 +49,6 @@ const PipelinePage = () => {
 
   // Fetch leads and map to pipeline cards
   useEffect(() => {
-    if (isDemoMode) {
-      setCards(DEMO_CARDS);
-      return;
-    }
     if (!user) return;
 
     const fetchPipeline = async () => {
@@ -82,7 +78,7 @@ const PipelinePage = () => {
     };
 
     fetchPipeline();
-  }, [user, isDemoMode]);
+  }, [user]);
 
   const mapLeadStatusToStage = (status: string | null): string => {
     switch (status) {
@@ -137,15 +133,13 @@ const PipelinePage = () => {
       c.id === cardId ? { ...c, stage: targetStage, movedAt: new Date().toISOString() } : c
     ));
 
-    // Persist to DB if not demo
-    if (!isDemoMode) {
-      const newStatus = mapStageToLeadStatus(targetStage);
-      await supabase
-        .from('leads')
-        .update({ status: newStatus })
-        .eq('id', cardId);
-    }
-  }, [cards, isDemoMode]);
+    // Persist to DB
+    const newStatus = mapStageToLeadStatus(targetStage);
+    await supabase
+      .from('leads')
+      .update({ status: newStatus })
+      .eq('id', cardId);
+  }, [cards]);
 
   const totalValue = cards.reduce((sum, c) => sum + c.estimatedValue, 0);
 

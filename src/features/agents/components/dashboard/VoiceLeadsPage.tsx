@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '@/features/auth/AuthProvider';
+
 import { Mic, Flame, Thermometer, Snowflake, Phone, MessageSquare, Mail, Play, X, MapPin, Shield, Clock, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -41,8 +41,7 @@ const URGENCY = {
 };
 
 const VoiceLeadsPage = () => {
-  const { isDemoMode } = useAuth();
-  const leads = isDemoMode ? LEADS : [];
+  const leads: typeof LEADS = [];
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = leads.find((l) => l.id === selectedId);
 

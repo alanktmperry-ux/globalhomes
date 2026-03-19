@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PartyPopper, MapPin, Clock, ChevronDown, ChevronUp, Copy, Star, ExternalLink, Gift } from 'lucide-react';
-import { useAuth } from '@/features/auth/AuthProvider';
+
 import { toast } from '@/hooks/use-toast';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { differenceInDays, format, isPast, addDays } from 'date-fns';
@@ -45,12 +45,11 @@ const DEMO_POST: Settlement[] = [
 ];
 
 const SettlementConcierge = () => {
-  const { isDemoMode } = useAuth();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [checkStates, setCheckStates] = useState<Record<string, boolean[]>>({});
   const [utilityModal, setUtilityModal] = useState<Settlement | null>(null);
 
-  const allSettlements = useMemo(() => (isDemoMode ? [...DEMO_SETTLEMENTS, ...DEMO_POST] : [...DEMO_SETTLEMENTS, ...DEMO_POST]), [isDemoMode]);
+  const allSettlements = useMemo(() => [...DEMO_SETTLEMENTS, ...DEMO_POST], []);
 
   const upcoming = useMemo(() => allSettlements.filter(s => !isPast(s.settlementDate)).sort((a, b) => a.settlementDate.getTime() - b.settlementDate.getTime()), [allSettlements]);
   const postSettlement = useMemo(() => allSettlements.filter(s => isPast(s.settlementDate)), [allSettlements]);

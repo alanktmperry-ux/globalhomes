@@ -11,7 +11,6 @@ interface AuthContextType {
   isAdmin: boolean;
   userRole: 'user' | 'agent' | 'admin' | null;
   signOut: () => Promise<void>;
-  isDemoMode: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -22,7 +21,6 @@ const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
   userRole: null,
   signOut: async () => {},
-  isDemoMode: false,
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -35,7 +33,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [userRole, setUserRole] = useState<'user' | 'agent' | 'admin' | null>(null);
   const [rolesFetched, setRolesFetched] = useState(false);
-  const [isDemoMode, setIsDemoMode] = useState(false);
   const lastFetchedUserId = useRef<string | null>(null);
 
   const applyRoles = useCallback((roles: string[]) => {
@@ -53,10 +50,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsAdmin(false);
     setUserRole(null);
     setRolesFetched(false);
-    setIsDemoMode(false);
   }, []);
 
-  // Fetch roles and demo status
+  // Fetch roles
   useEffect(() => {
     if (!user) {
       if (rolesFetched) clearRoles();
@@ -69,17 +65,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       lastFetchedUserId.current = user.id;
       console.log('[Auth] fetchRoles for:', user.id);
       try {
-        // Fetch roles and demo status in parallel
-        const [rolesResult, agentResult] = await Promise.all([
-          supabase.from('user_roles').select('role').eq('user_id', user.id),
-          supabase.from('agents').select('is_demo').eq('user_id', user.id).maybeSingle(),
-        ]);
+        const { data } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
         if (cancelled) return;
         
-        const roles = rolesResult.data?.map((r) => r.role) || [];
+        const roles = data?.map((r) => r.role) || [];
         applyRoles(roles);
-        
-        setIsDemoMode(!!(agentResult.data as any)?.is_demo);
       } catch (err) {
         console.error('[Auth] fetchRoles error:', err);
       } finally {
@@ -156,7 +146,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{
-      user, session, loading, isAgent, isAdmin, userRole, signOut, isDemoMode,
+      user, session, loading, isAgent, isAdmin, userRole, signOut,
     }}>
       {children}
     </AuthContext.Provider>

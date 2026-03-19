@@ -41,7 +41,7 @@ const INTEREST_CONFIG: Record<InterestLevel, { label: string; icon: typeof Flame
 };
 
 const InspectionModePage = () => {
-  const { user, isDemoMode } = useAuth();
+  const { user } = useAuth();
 
   const [inspections] = useState<ScheduledInspection[]>(DEMO_INSPECTIONS);
   const [activeInspection, setActiveInspection] = useState<ScheduledInspection | null>(null);
@@ -82,7 +82,7 @@ const InspectionModePage = () => {
 
   const handleEndInspection = async () => {
     setSaving(true);
-    if (!isDemoMode && activeInspection) {
+    if (activeInspection) {
       try {
         const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user?.id ?? '').maybeSingle();
         if (agent) {

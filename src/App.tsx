@@ -36,6 +36,7 @@ import InvestmentDashboardPage from "@/features/agents/components/dashboard/Inve
 import TrustLedgerPage from "@/features/agents/components/dashboard/TrustLedgerPage";
 import BankReconciliationPage from "@/features/agents/components/dashboard/BankReconciliationPage";
 import ReportsPage from "@/features/agents/components/dashboard/ReportsPage";
+import PipelinePage from "@/features/agents/components/dashboard/PipelinePage";
 import SeekerAuthPage from "./pages/SeekerAuthPage";
 import AgentAuthPage from "./pages/AgentAuthPage";
 import AuthLandingPage from "./pages/AuthLandingPage";

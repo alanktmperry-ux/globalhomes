@@ -30,6 +30,7 @@ const CORE_NAV: NavItem[] = [
 
 const CRM_NAV: NavItem[] = [
   { title: 'Contacts', url: '/dashboard/contacts', icon: Contact },
+  { title: 'Pipeline', url: '/dashboard/pipeline', icon: Kanban },
   { title: 'My Listings', url: '/dashboard/listings', icon: List, badgeKey: 'listings' },
   { title: 'Voice Leads', url: '/dashboard/leads', icon: Mic, badgeKey: 'leads' },
   { title: 'Off-Market Network', url: '/dashboard/network', icon: Users },

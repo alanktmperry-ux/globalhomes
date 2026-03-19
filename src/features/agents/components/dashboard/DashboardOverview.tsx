@@ -399,7 +399,7 @@ const DashboardOverview = () => {
                 </tr>
               </thead>
               <tbody>
-                {[
+                {isDemoMode ? [
                   { id: '1', thumb: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=80&h=60&fit=crop', address: '42 Panorama Drive, Berwick', status: 'whisper', views: 24, voiceInquiries: 3, qualifiedLeads: 2, daysListed: 4 },
                   { id: '2', thumb: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=80&h=60&fit=crop', address: '15 Station St, Narre Warren', status: 'coming-soon', views: 67, voiceInquiries: 8, qualifiedLeads: 5, daysListed: 11 },
                   { id: '3', thumb: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=80&h=60&fit=crop', address: '8 Ocean View Rd, Brighton', status: 'public', views: 142, voiceInquiries: 12, qualifiedLeads: 7, daysListed: 18 },
@@ -428,7 +428,13 @@ const DashboardOverview = () => {
                       </td>
                     </tr>
                   );
-                })}
+                }) : (
+                  <tr>
+                    <td colSpan={7} className="p-6 text-center text-sm text-muted-foreground">
+                      No listings yet — <button onClick={() => navigate('/dashboard/listings/new')} className="text-primary underline underline-offset-2">create your first listing</button>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

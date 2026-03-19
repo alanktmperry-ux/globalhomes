@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Building2, KeyRound, Plus, BarChart3, Users, Megaphone, CalendarCheck } from 'lucide-react';
-import RequestDemoModal from '@/features/agents/components/RequestDemoModal';
+import { Building2, KeyRound, Plus, BarChart3, Users, Megaphone, Zap } from 'lucide-react';
 import PhoneInput from '@/shared/components/PhoneInput';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,7 +15,7 @@ const AgentAuthPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, isAgent, isAdmin, loading: authLoading } = useAuth();
-  const [demoModalOpen, setDemoModalOpen] = useState(false);
+  
   const [pendingRedirect, setPendingRedirect] = useState<'dashboard' | null>(null);
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
@@ -276,15 +275,12 @@ const AgentAuthPage = () => {
               </div>
 
               <button
-                onClick={() => setDemoModalOpen(true)}
+                onClick={() => setStep('choose')}
                 className="w-full flex items-center justify-center gap-2 py-3 px-5 rounded-full border border-primary/30 bg-primary/5 text-primary text-sm font-semibold hover:bg-primary/10 transition-colors"
               >
-                <CalendarCheck size={16} />
-                Request a Demo
+                <Zap size={16} />
+                Start Free 60-Day Trial
               </button>
-              <p className="text-xs text-muted-foreground text-center mt-1.5">We'll set up a personalised demo for you</p>
-
-              <RequestDemoModal open={demoModalOpen} onOpenChange={setDemoModalOpen} />
 
               <p className="text-xs text-muted-foreground mt-4 text-center">
                 Have a demo code?{' '}

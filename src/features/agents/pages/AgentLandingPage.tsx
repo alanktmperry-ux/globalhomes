@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Ear, Mic, Globe, Camera, Cpu, ShieldCheck, ArrowRight, CheckCircle2, Star, Play, CalendarCheck, Lock } from 'lucide-react';
+import { Ear, Mic, Globe, Camera, Cpu, ShieldCheck, ArrowRight, CheckCircle2, Star, Play, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AgentRegistrationModal from '@/features/agents/components/AgentRegistrationModal';
-import RequestDemoModal from '@/features/agents/components/RequestDemoModal';
+
 import agentHero from '@/assets/agent-hero.jpg';
 import heatMapBg from '@/assets/heat-map-bg.jpg';
 
@@ -19,7 +19,7 @@ const fadeUp = {
 
 const AgentLandingPage = () => {
   const [showModal, setShowModal] = useState(false);
-  const [showDemoModal, setShowDemoModal] = useState(false);
+  
   const navigate = useNavigate();
 
   return (
@@ -94,25 +94,12 @@ const AgentLandingPage = () => {
                 <Button
                   size="lg"
                   variant="outline"
-                  onClick={() => setShowDemoModal(true)}
-                  className="text-base px-8 py-5 rounded-xl font-bold border-primary/50 text-primary-foreground bg-primary/15 hover:bg-primary/25 backdrop-blur-sm transition-all"
-                >
-                  <CalendarCheck size={18} className="mr-2" />
-                  Request a Demo
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
                   onClick={() => navigate('/agents/login')}
                   className="text-base px-8 py-5 rounded-xl font-bold border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 transition-all"
                 >
                   <Lock size={18} className="mr-2" />
                   Login to Your Agency
                 </Button>
-              </motion.div>
-              <motion.div variants={fadeUp} custom={5} className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start mt-2">
-                <span className="text-xs text-primary-foreground/50 text-center">(We'll set up your access)</span>
-                <span className="text-xs text-primary-foreground/50 text-center">(Email + Password)</span>
               </motion.div>
             </motion.div>
           </div>
@@ -341,7 +328,7 @@ const AgentLandingPage = () => {
       </footer>
 
       <AgentRegistrationModal open={showModal} onOpenChange={setShowModal} />
-      <RequestDemoModal open={showDemoModal} onOpenChange={setShowDemoModal} />
+      
     </div>
   );
 };

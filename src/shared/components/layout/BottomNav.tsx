@@ -24,6 +24,8 @@ export function BottomNav() {
     navigate('/');
   };
 
+  const showAgentDashboard = Boolean(user) && (isAgent || loading);
+
   return (
     <nav className="fixed bottom-0 inset-x-0 z-30 bg-card/95 backdrop-blur-md border-t border-border safe-area-bottom">
       <div className="flex items-center justify-around h-16 max-w-lg mx-auto px-2">
@@ -43,7 +45,7 @@ export function BottomNav() {
             </button>
           );
         })}
-        {user && isAgent && (
+        {showAgentDashboard && (
           <button
             onClick={() => navigate('/dashboard')}
             className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-colors ${

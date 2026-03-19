@@ -291,12 +291,12 @@ const DashboardOverview = () => {
                       {u.icon} {u.label}
                     </Badge>
                     <TooltipProvider>
-                      <Tooltip>
+                      <UiTooltip>
                         <TooltipTrigger asChild>
                           <Badge className={`${tier.className} text-[10px] gap-0.5 border-0 cursor-help`}>{tier.label} {m.intentScore}</Badge>
                         </TooltipTrigger>
                         <TooltipContent><p className="text-xs max-w-[200px]">{INTENT_TOOLTIP}</p></TooltipContent>
-                      </Tooltip>
+                      </UiTooltip>
                     </TooltipProvider>
                     <span className="text-[10px] text-muted-foreground">{m.time}</span>
                   </div>

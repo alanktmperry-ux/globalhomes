@@ -230,7 +230,7 @@ function buildAccessCodeEmail(name: string, email: string, code: string, demoUrl
   <p>Your access code is:</p>
   <div style="font-size:40px;font-weight:900;letter-spacing:8px;font-family:monospace;background:#f1f5f9;padding:24px;border-radius:8px;text-align:center;color:#0f172a;">${code}</div>
   <p style="color:#64748b;font-size:13px;">Valid for 7 days. Do not share.</p>
-  <p><a href="${demoUrl}" style="display:inline-block;background:#16a34a;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;">Log In to Global Homes →</a></p>
+  <p><a href="${demoUrl}" style="display:inline-block;background:#2563eb;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;">Log In to Global Homes →</a></p>
   <p style="color:#94a3b8;font-size:12px;">Questions? <a href="mailto:sales@everythingeco.com.au" style="color:#2563eb;">sales@everythingeco.com.au</a></p>
 </div>
 </body></html>`;

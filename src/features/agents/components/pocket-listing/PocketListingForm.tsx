@@ -253,8 +253,10 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         features: draft.features,
         image_url: mainPhoto,
         images: draft.photos.length > 0 ? draft.photos : [],
-        is_active: draft.visibility === 'public',
-        status: draft.visibility === 'public' ? 'public' : draft.visibility,
+        is_active: editPropertyId ? draft.visibility === 'public' : false,
+        status: editPropertyId
+          ? (draft.visibility === 'public' ? 'public' : draft.visibility)
+          : 'pending',
         lat: draft.lat || null,
         lng: draft.lng || null,
         rental_weekly: draft.listingType === 'rent' ? (draft.rentalWeekly || null) : (draft.estimatedRentalWeekly || null),
@@ -276,7 +278,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         });
         if (error) throw error;
         localStorage.removeItem('pocket-listing-draft');
-        toast({ title: 'Listing published!', description: 'Your property has been saved to the database.' });
+        toast({ title: 'Listing saved!', description: 'Your property is in draft. Publish it from your dashboard to make it visible to buyers.' });
       }
 
       onPublish(title);

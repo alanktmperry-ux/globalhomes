@@ -221,11 +221,11 @@ const DashboardOverview = () => {
       });
   }, [user, isDemoMode]);
 
-  // GCI values — demo-aware
-  const gciActual = isDemoMode ? 1250000 : 245000;
-  const gciBudgeted = isDemoMode ? 1800000 : 400000;
-  const gciPotential = isDemoMode ? 2200000 : 520000;
-  const gciPercent = Math.round((gciActual / gciBudgeted) * 100);
+  // GCI values — demo-aware; real users start at 0
+  const gciActual = isDemoMode ? 1250000 : 0;
+  const gciBudgeted = isDemoMode ? 1800000 : 0;
+  const gciPotential = isDemoMode ? 2200000 : 0;
+  const gciPercent = gciBudgeted > 0 ? Math.round((gciActual / gciBudgeted) * 100) : 0;
 
   // Stats row - Australian CRM focus
   const unrespondedValue = isDemoMode ? 2 : unrespondedLeads;
@@ -239,11 +239,11 @@ const DashboardOverview = () => {
   const repColors = getScoreColor(repScore);
 
   const stats = [
-    { label: 'Tasks Due', value: String(tasksDue || (isDemoMode ? 5 : 3)), icon: <CheckSquare size={16} />, color: 'text-destructive', link: '/dashboard/contacts' },
-    { label: 'Active Contacts', value: isDemoMode ? '62' : '48', icon: <Users size={16} />, color: 'text-primary', link: '/dashboard/contacts' },
-    { label: 'Appraisals This Month', value: isDemoMode ? '9' : '6', icon: <ClipboardList size={16} />, color: 'text-success', link: '/dashboard/listings' },
-    { label: 'Sales This Month', value: AUD.format(isDemoMode ? 1250000 : 1250000), icon: <DollarSign size={16} />, color: 'text-primary', link: '/dashboard/reports' },
-    { label: 'Trust Balance', value: AUD.format(isDemoMode ? 47230 : 890000), icon: <Landmark size={16} />, color: 'text-success', link: '/dashboard/trust' },
+    { label: 'Tasks Due', value: String(isDemoMode ? 5 : tasksDue), icon: <CheckSquare size={16} />, color: 'text-destructive', link: '/dashboard/contacts' },
+    { label: 'Active Contacts', value: isDemoMode ? '62' : String(activeContacts), icon: <Users size={16} />, color: 'text-primary', link: '/dashboard/contacts' },
+    { label: 'Appraisals This Month', value: isDemoMode ? '9' : '0', icon: <ClipboardList size={16} />, color: 'text-success', link: '/dashboard/listings' },
+    { label: 'Sales This Month', value: AUD.format(isDemoMode ? 1250000 : 0), icon: <DollarSign size={16} />, color: 'text-primary', link: '/dashboard/reports' },
+    { label: 'Trust Balance', value: AUD.format(isDemoMode ? 47230 : trustBalance), icon: <Landmark size={16} />, color: 'text-success', link: '/dashboard/trust' },
     { label: 'Unresponded Leads', value: String(unrespondedValue), icon: <Zap size={16} />, color: unrespondedValue > 0 ? 'text-destructive' : 'text-success', link: '/dashboard/leads' },
   ];
 

@@ -39,6 +39,7 @@ import ReportsPage from "@/features/agents/components/dashboard/ReportsPage";
 import PipelinePage from "@/features/agents/components/dashboard/PipelinePage";
 import InspectionModePage from "@/features/agents/components/dashboard/InspectionModePage";
 import SettlementConcierge from "@/features/agents/components/dashboard/SettlementConcierge";
+import CommissionCalculator from "@/features/agents/components/dashboard/CommissionCalculator";
 import SeekerAuthPage from "./pages/SeekerAuthPage";
 import AgentAuthPage from "./pages/AgentAuthPage";
 import AuthLandingPage from "./pages/AuthLandingPage";

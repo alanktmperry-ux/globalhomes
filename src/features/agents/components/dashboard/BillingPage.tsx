@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CreditCard, Check, Loader2, Zap, Crown, Building2, Flame, Mail } from 'lucide-react';
+import { CreditCard, Check, Loader2, Zap, Crown, Building2, Flame, Mail, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';

@@ -122,14 +122,15 @@ const StepBasics = ({ draft, update }: Props) => {
           {isRental ? 'Rent per Week ($)' : 'Price ($)'}
         </Label>
         <Input
-          type="number"
-          min={0}
-          value={draft.priceMin || ''}
+          type="text"
+          inputMode="numeric"
+          value={draft.priceMin ? draft.priceMin.toLocaleString('en-AU') : ''}
           onChange={(e) => {
-            const val = Number(e.target.value) || 0;
+            const raw = e.target.value.replace(/,/g, '');
+            const val = Number(raw) || 0;
             update({ priceMin: val, priceMax: Math.round(val * 1.1) });
           }}
-          placeholder={isRental ? 'e.g. 650' : 'e.g. 1200000'}
+          placeholder={isRental ? 'e.g. 650' : 'e.g. 1,200,000'}
           className="h-10"
         />
         {draft.priceMin > 0 && (

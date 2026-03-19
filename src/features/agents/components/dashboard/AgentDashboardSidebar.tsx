@@ -33,6 +33,7 @@ const CRM_NAV: NavItem[] = [
   { title: 'Pipeline', url: '/dashboard/pipeline', icon: Kanban },
   { title: 'My Listings', url: '/dashboard/listings', icon: List, badgeKey: 'listings' },
   { title: 'Voice Leads', url: '/dashboard/leads', icon: Mic, badgeKey: 'leads' },
+  { title: 'Inspection Day', url: '/dashboard/inspection-mode', icon: CalendarDays },
   { title: 'Off-Market Network', url: '/dashboard/network', icon: Users },
 ];
 

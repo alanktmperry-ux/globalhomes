@@ -7,7 +7,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 
 export function SiteHeader() {
   const { currency, setCurrencyCode, listingMode, setListingMode, isLiveRates } = useCurrency();
-  const { user, userRole, isAgent } = useAuth();
+  const { user, userRole, isAgent, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const [showAgentMenu, setShowAgentMenu] = useState(false);

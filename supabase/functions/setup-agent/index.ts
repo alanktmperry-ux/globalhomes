@@ -101,7 +101,7 @@ Deno.serve(async (req) => {
       const { error: memberError } = await supabaseAdmin
         .from("agency_members")
         .insert({ agency_id: invite.agency_id, user_id: userId, role: invite.role });
-      if (memberError) throw memberError;
+      if (memberError && !memberError.message.includes("duplicate")) throw memberError;
 
       await supabaseAdmin
         .from("agency_invite_codes")

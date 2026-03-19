@@ -462,7 +462,7 @@ const DashboardOverview = () => {
                 </div>
               ))}
             </div>
-          ) : (
+          ) : isDemoMode ? (
             <div className="space-y-3">
               {[
                 { text: 'Called Sarah M. re: 42 Panorama Dr appraisal', time: 'Today, 2:15 PM' },
@@ -480,6 +480,8 @@ const DashboardOverview = () => {
                 </div>
               ))}
             </div>
+          ) : (
+            <p className="text-sm text-muted-foreground py-4 text-center">No recent activity</p>
           )}
         </motion.div>
 

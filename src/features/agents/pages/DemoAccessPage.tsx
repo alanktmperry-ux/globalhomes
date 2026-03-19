@@ -26,48 +26,53 @@ const DemoAccessPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !code.trim()) return;
+
     setLoading(true);
     setError('');
 
     try {
-      // Call edge function to validate code and ensure demo user exists
       const { data: fnData, error: fnError } = await supabase.functions.invoke('handle-demo-request', {
         body: { action: 'validate_code', email: email.trim(), code: code.trim().toUpperCase() },
       });
 
       if (fnError) {
+        let serverMessage = '';
+        try {
+          const payload = await (fnError as any)?.context?.json?.();
+          serverMessage = payload?.error || '';
+        } catch (_) {
+          // ignore parse error
+        }
+        setError(serverMessage || 'Something went wrong. Please try again.');
+        return;
+      }
+
+      if (!fnData?.success || !fnData?.request_id) {
         setError('Something went wrong. Please try again.');
-        setLoading(false);
         return;
       }
 
-      if (fnData?.error) {
-        setError(fnData.error);
-        setLoading(false);
-        return;
-      }
-
-      // Sign out any existing session first
       await supabase.auth.signOut();
 
-      // Sign in with the demo account
       const { error: signInErr } = await supabase.auth.signInWithPassword({
-        email: fnData.demo_email,
-        password: fnData.demo_password,
+        email: fnData.demo_email || 'demo@globalhomes.app',
+        password: fnData.demo_password || 'DemoAccess2024!',
       });
 
       if (signInErr) {
-        console.error('Demo sign-in error:', signInErr);
-        setError('Could not sign in to demo account. Please try again.');
-        setLoading(false);
+        setError('Something went wrong. Please try again.');
         return;
       }
+
+      await supabase.functions.invoke('handle-demo-request', {
+        body: { action: 'redeem_code', request_id: fnData.request_id },
+      });
 
       toast.success('Welcome to the demo!');
       navigate('/dashboard');
     } catch (err: any) {
       console.error('Demo access error:', err);
-      setError(err.message || 'Something went wrong. Please try again.');
+      setError('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -76,7 +81,6 @@ const DemoAccessPage = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
-        {/* Brand */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-4">
             <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
@@ -90,7 +94,6 @@ const DemoAccessPage = () => {
           </div>
         </div>
 
-        {/* Form */}
         <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
           <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 mb-5 flex items-start gap-2">
             <Sparkles className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
@@ -112,6 +115,7 @@ const DemoAccessPage = () => {
                 className={isEmailPrefilled ? 'bg-muted cursor-not-allowed' : ''}
               />
             </div>
+
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Access Code</label>
               <Input

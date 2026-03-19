@@ -93,6 +93,13 @@ const AgentLandingPage = () => {
               <motion.div variants={fadeUp} custom={4} className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mt-4">
                 <Button
                   size="lg"
+                  onClick={() => navigate('/agents/demo')}
+                  className="text-base px-8 py-5 rounded-xl font-bold bg-primary-foreground text-primary hover:bg-primary-foreground/90 transition-all"
+                >
+                  🎯 Try the Demo
+                </Button>
+                <Button
+                  size="lg"
                   variant="outline"
                   onClick={() => navigate('/agents/login')}
                   className="text-base px-8 py-5 rounded-xl font-bold border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 transition-all"

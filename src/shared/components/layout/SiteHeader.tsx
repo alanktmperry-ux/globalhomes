@@ -43,8 +43,9 @@ export function SiteHeader() {
           </span>
         </button>
         
-        {/* Legal links - hidden on small screens */}
+        {/* Links - hidden on small screens */}
         <div className="hidden md:flex items-center gap-3">
+          <Link to="/agents/demo" className="text-[11px] font-semibold text-primary hover:text-primary/80 transition-colors">Try Demo</Link>
           <Link to="/terms" className="text-[11px] text-muted-foreground hover:text-foreground transition-colors">Terms</Link>
           <Link to="/privacy" className="text-[11px] text-muted-foreground hover:text-foreground transition-colors">Privacy</Link>
         </div>

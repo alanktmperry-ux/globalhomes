@@ -2,7 +2,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 Deno.serve(async (req) => {
@@ -55,8 +55,34 @@ Deno.serve(async (req) => {
       const perPage = 50;
       const { data, error } = await supabase.auth.admin.listUsers({ page, perPage });
       if (error) throw error;
-      return new Response(JSON.stringify({
-        users: data.users.map((u: any) => ({
+
+      // Fetch all agents with subscription info
+      const { data: agents } = await supabase
+        .from("agents")
+        .select("user_id, is_demo, is_subscribed, agent_subscriptions(plan_type)");
+
+      // Fetch demo requests (approved/redeemed)
+      const { data: demoRequests } = await supabase
+        .from("demo_requests")
+        .select("*")
+        .in("status", ["approved", "redeemed", "pending"])
+        .order("created_at", { ascending: false });
+
+      // Build agent lookup by user_id
+      const agentMap = new Map<string, any>();
+      for (const a of (agents || [])) {
+        agentMap.set(a.user_id, a);
+      }
+
+      // Map auth users
+      const authUsers = data.users.map((u: any) => {
+        const agent = agentMap.get(u.id);
+        const isDemo = agent?.is_demo || false;
+        const isSubscribed = agent?.is_subscribed || false;
+        const subscription = agent?.agent_subscriptions;
+        const planType = subscription?.plan_type || null;
+
+        return {
           id: u.id,
           email: u.email,
           created_at: u.created_at,
@@ -65,8 +91,35 @@ Deno.serve(async (req) => {
           banned_until: u.banned_until,
           display_name: u.user_metadata?.display_name || u.user_metadata?.full_name || u.email,
           provider: u.app_metadata?.provider || 'email',
-        })),
-        total: data.total,
+          user_type: isDemo ? 'demo' : (agent ? 'agent' : 'seeker'),
+          is_subscribed: isSubscribed,
+          plan_type: planType,
+        };
+      });
+
+      // Map demo request users that are NOT auth users (people who requested demo access)
+      const authEmails = new Set(data.users.map((u: any) => (u.email || '').toLowerCase()));
+      const demoUsers = (demoRequests || [])
+        .filter((dr: any) => !authEmails.has((dr.email || '').toLowerCase()))
+        .map((dr: any) => ({
+          id: `demo-${dr.id}`,
+          email: dr.email,
+          created_at: dr.created_at,
+          last_sign_in_at: null,
+          email_confirmed_at: null,
+          banned_until: null,
+          display_name: dr.full_name,
+          provider: 'demo_request',
+          user_type: 'demo_request',
+          is_subscribed: false,
+          plan_type: null,
+          demo_status: dr.status,
+          agency_name: dr.agency_name,
+        }));
+
+      return new Response(JSON.stringify({
+        users: [...authUsers, ...demoUsers],
+        total: data.total + demoUsers.length,
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -177,7 +230,7 @@ Deno.serve(async (req) => {
       await deleteIn("transactions", "property_id", propIds);
       await deleteIn("trust_transactions", "property_id", propIds);
 
-      // Trust dependencies (must go before deleting agent)
+      // Trust dependencies
       await deleteIn("trust_transactions", "trust_account_id", trustAccountIds);
       await deleteIn("trust_account_balances", "agent_id", agentIds);
       await deleteIn("trust_receipts", "agent_id", agentIds);
@@ -199,7 +252,6 @@ Deno.serve(async (req) => {
       await deleteIn("rental_applications", "agent_id", agentIds);
       await deleteIn("transactions", "agent_id", agentIds);
 
-      // Delete owned properties + agents
       await deleteIn("properties", "id", propIds);
       await deleteIn("agents", "id", agentIds);
 
@@ -211,7 +263,6 @@ Deno.serve(async (req) => {
       await deleteIn("transactions", "office_id", allAgencyIds);
       await deleteIn("contacts", "agency_id", allAgencyIds);
 
-      // Unlink remaining agents from agencies before agency delete
       if (allAgencyIds.length > 0) {
         const { error: unlinkAgentsError } = await supabase
           .from("agents")
@@ -222,7 +273,7 @@ Deno.serve(async (req) => {
 
       await deleteIn("agencies", "id", ownedAgencyIds);
 
-      // Conversations/messages by participant
+      // Conversations/messages
       const { data: convRows, error: convRowsError } = await supabase
         .from("conversations")
         .select("id")
@@ -256,7 +307,6 @@ Deno.serve(async (req) => {
       await deleteEq("user_roles", "user_id", user_id);
       await deleteEq("profiles", "user_id", user_id);
 
-      // Finally delete auth user
       const { error: deleteAuthError } = await supabase.auth.admin.deleteUser(user_id);
       ensure(deleteAuthError, "delete auth user");
 
@@ -267,7 +317,6 @@ Deno.serve(async (req) => {
 
     if (action === "reset_password") {
       const { email } = await req.json();
-      // Use anon client to trigger the standard recovery email flow
       const { error } = await anonClient.auth.resetPasswordForEmail(email, {
         redirectTo: (Deno.env.get("SITE_URL") || "https://globalhomes.lovable.app") + "/reset-password",
       });

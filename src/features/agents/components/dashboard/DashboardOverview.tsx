@@ -113,9 +113,10 @@ const DashboardOverview = () => {
           .from('trust_transactions')
           .select('amount, transaction_type')
           .eq('agent_id', agent.id)
-          .then(({ data }) => {
-            if (!data) return;
-            const balance = data.reduce((sum, t) => {
+          .then((res: any) => {
+            const rows = res.data as { amount: number; transaction_type: string }[] | null;
+            if (!rows) return;
+            const balance = rows.reduce((sum: number, t) => {
               return sum + (t.transaction_type === 'deposit' ? Number(t.amount) : -Number(t.amount));
             }, 0);
             setTrustBalance(Math.max(0, balance));

@@ -275,15 +275,12 @@ const AgentAuthPage = () => {
               </div>
 
               <button
-                onClick={() => setDemoModalOpen(true)}
+                onClick={() => setStep('choose')}
                 className="w-full flex items-center justify-center gap-2 py-3 px-5 rounded-full border border-primary/30 bg-primary/5 text-primary text-sm font-semibold hover:bg-primary/10 transition-colors"
               >
-                <CalendarCheck size={16} />
-                Request a Demo
+                <Zap size={16} />
+                Start Free 60-Day Trial
               </button>
-              <p className="text-xs text-muted-foreground text-center mt-1.5">We'll set up a personalised demo for you</p>
-
-              <RequestDemoModal open={demoModalOpen} onOpenChange={setDemoModalOpen} />
 
               <p className="text-xs text-muted-foreground mt-4 text-center">
                 Have a demo code?{' '}

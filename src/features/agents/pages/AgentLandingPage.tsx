@@ -328,7 +328,7 @@ const AgentLandingPage = () => {
       </footer>
 
       <AgentRegistrationModal open={showModal} onOpenChange={setShowModal} />
-      <RequestDemoModal open={showDemoModal} onOpenChange={setShowDemoModal} />
+      
     </div>
   );
 };

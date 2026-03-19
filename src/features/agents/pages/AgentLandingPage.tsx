@@ -19,7 +19,7 @@ const fadeUp = {
 
 const AgentLandingPage = () => {
   const [showModal, setShowModal] = useState(false);
-  const [showDemoModal, setShowDemoModal] = useState(false);
+  
   const navigate = useNavigate();
 
   return (

@@ -39,6 +39,7 @@ import ReportsPage from "@/features/agents/components/dashboard/ReportsPage";
 import PipelinePage from "@/features/agents/components/dashboard/PipelinePage";
 import InspectionModePage from "@/features/agents/components/dashboard/InspectionModePage";
 import SettlementConcierge from "@/features/agents/components/dashboard/SettlementConcierge";
+import CommissionCalculator from "@/features/agents/components/dashboard/CommissionCalculator";
 import SeekerAuthPage from "./pages/SeekerAuthPage";
 import AgentAuthPage from "./pages/AgentAuthPage";
 import AuthLandingPage from "./pages/AuthLandingPage";
@@ -104,6 +105,7 @@ const App = () => (
                 <Route path="pipeline" element={<PipelinePage />} />
                 <Route path="inspection-mode" element={<InspectionModePage />} />
                 <Route path="settlements" element={<SettlementConcierge />} />
+                <Route path="commission" element={<CommissionCalculator />} />
                 <Route path="analytics" element={<AnalyticsPage />} />
                 <Route path="network" element={<NetworkPage />} />
                 <Route path="team" element={<TeamPage />} />

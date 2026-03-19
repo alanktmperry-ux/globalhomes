@@ -131,7 +131,11 @@ const AdminUsers = () => {
   };
 
   const handleDelete = async (userId: string) => {
-    if (userId.startsWith('demo-')) return;
+    const isDemoRequest = userId.startsWith('demo-');
+    const confirmMsg = isDemoRequest
+      ? 'Delete this demo request? This cannot be undone.'
+      : 'This will permanently delete this user AND all their data — properties, listings, leads, transactions, messages, and their agent/agency profile. This cannot be undone. Are you sure?';
+    if (!confirm(confirmMsg)) return;
     if (!confirm('This will permanently delete this user AND all their data — properties, listings, leads, transactions, messages, and their agent/agency profile. This cannot be undone. Are you sure?')) return;
     setActionLoading(userId);
     const { data: { session } } = await supabase.auth.getSession();

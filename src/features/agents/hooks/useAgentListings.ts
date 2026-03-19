@@ -87,7 +87,7 @@ export function useAgentListings() {
 
       const dbListings: ListingWithMeta[] = (props || []).map(p => ({ ...p, _source: 'db' as const }));
 
-      setListings(dbListings.length > 0 ? dbListings : MOCK_LISTINGS);
+      setListings(dbListings);
       setLoading(false);
     };
 

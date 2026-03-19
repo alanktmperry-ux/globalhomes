@@ -387,10 +387,8 @@ const NetworkPage = () => {
   };
 
   // Compute matches
-  const myBriefs = buyerBriefs.filter(b => b.agent_id === agentId || (isDemoMode && b.agent_id === agentId));
-  const matchedForMe = isDemoMode
-    ? [] // no network listings in demo but could show demo matches
-    : networkListings.filter(l => {
+  const myBriefs = buyerBriefs.filter(b => b.agent_id === agentId);
+  const matchedForMe = networkListings.filter(l => {
         // Check if any of MY briefs match this listing
         return myBriefs.some(b => matchBriefsToListing(l, [b]).length > 0);
       });

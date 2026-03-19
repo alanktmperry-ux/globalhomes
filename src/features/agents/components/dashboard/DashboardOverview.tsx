@@ -65,6 +65,7 @@ const DashboardOverview = () => {
   const { user, isDemoMode } = useAuth();
   const navigate = useNavigate();
   const [tasksDue, setTasksDue] = useState(0);
+  const [unrespondedLeads, setUnrespondedLeads] = useState(0);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
   const [todayInspections, setTodayInspections] = useState<{ address: string; time: string; propertyId: string }[]>([]);
   const [pipelineData, setPipelineData] = useState(buildEmptyMonths());

@@ -67,6 +67,8 @@ const ListingBuyerLeadsTab = ({ listing }: Props) => {
             <tbody>
               {leads.map((l) => {
                 const u = URGENCY_MAP[l.urgency] || URGENCY_MAP.just_browsing;
+                const intent = calcIntentScore(l);
+                const tier = getIntentTier(intent);
                 return (
                   <tr key={l.id} className="border-b border-border last:border-0 hover:bg-accent/30">
                     <td className="p-3 font-medium">{l.user_name}</td>
@@ -78,6 +80,16 @@ const ListingBuyerLeadsTab = ({ listing }: Props) => {
                     </td>
                     <td className="p-3">
                       <Badge className={`${u.color} text-[10px] gap-0.5 border-0`}>{u.icon} {u.label}</Badge>
+                    </td>
+                    <td className="p-3">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Badge className={`${tier.className} text-[10px] gap-0.5 border-0 cursor-help`}>{tier.label} {intent}</Badge>
+                          </TooltipTrigger>
+                          <TooltipContent><p className="text-xs max-w-[200px]">{INTENT_TOOLTIP}</p></TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </td>
                     <td className="p-3">
                       <Badge variant="outline" className="text-[10px] capitalize">{l.status || 'new'}</Badge>

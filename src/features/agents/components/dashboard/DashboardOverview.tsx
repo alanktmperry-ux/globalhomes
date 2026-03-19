@@ -283,12 +283,21 @@ const DashboardOverview = () => {
           <div className="space-y-3">
             {MOCK_MATCHES.map((m) => {
               const u = URGENCY_CONFIG[m.urgency];
+              const tier = getIntentTier(m.intentScore);
               return (
                 <div key={m.id} className="border border-border rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-1">
                     <Badge className={`${u.color} text-[10px] gap-0.5 border-0`}>
                       {u.icon} {u.label}
                     </Badge>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Badge className={`${tier.className} text-[10px] gap-0.5 border-0 cursor-help`}>{tier.label} {m.intentScore}</Badge>
+                        </TooltipTrigger>
+                        <TooltipContent><p className="text-xs max-w-[200px]">{INTENT_TOOLTIP}</p></TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                     <span className="text-[10px] text-muted-foreground">{m.time}</span>
                   </div>
                   <p className="text-xs font-medium truncate">"{m.transcript}"</p>

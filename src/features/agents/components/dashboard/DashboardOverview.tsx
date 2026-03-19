@@ -11,6 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tooltip as UiTooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import DashboardHeader from './DashboardHeader';
 import { getIntentTier, INTENT_TOOLTIP } from '@/features/agents/lib/intentScore';
+import { DEMO_REPUTATION, getScoreColor } from '@/features/agents/utils/reputationScore';
 import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';

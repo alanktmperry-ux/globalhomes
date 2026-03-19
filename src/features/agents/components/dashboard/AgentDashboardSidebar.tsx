@@ -1,7 +1,7 @@
 import {
   LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, LogOut, Building2, UserPlus,
   User, FileText, CreditCard, Star, MapPinned, Shield, Contact, Kanban, Scale, Landmark,
-  ClipboardCheck, CalendarDays, Search, TrendingUp, Receipt, PartyPopper, Calculator,
+  ClipboardCheck, CalendarDays, Search, TrendingUp, Receipt, PartyPopper, Calculator, HelpCircle,
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -57,6 +57,7 @@ const ACCOUNT_NAV: NavItem[] = [
   { title: 'Billing', url: '/dashboard/billing', icon: CreditCard },
   { title: 'Reviews', url: '/dashboard/reviews', icon: Star },
   { title: 'Settings', url: '/dashboard/settings', icon: Settings },
+  { title: 'Help & FAQ', url: '/dashboard/help', icon: HelpCircle },
 ];
 
 const AgentDashboardSidebar = () => {

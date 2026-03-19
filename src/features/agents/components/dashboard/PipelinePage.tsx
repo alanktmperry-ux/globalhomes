@@ -41,7 +41,7 @@ const daysInStage = (movedAt: string) => {
 };
 
 const PipelinePage = () => {
-  const { user, isDemoMode } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [cards, setCards] = useState<PipelineCard[]>([]);
   const [dragOverStage, setDragOverStage] = useState<string | null>(null);

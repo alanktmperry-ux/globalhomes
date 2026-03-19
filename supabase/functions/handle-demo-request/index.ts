@@ -19,6 +19,10 @@ function generateCode(): string {
   return code;
 }
 
+function generateTempPassword(): string {
+  return `GhDemo!${crypto.randomUUID().replace(/-/g, "").slice(0, 16)}aA1`;
+}
+
 async function sendEmail(apiKey: string, intendedTo: string, subject: string, html: string) {
   const recipient = TEST_TO;
   const testSubject = intendedTo === TEST_TO ? subject : `[→ ${intendedTo}] ${subject}`;
@@ -33,18 +37,68 @@ async function sendEmail(apiKey: string, intendedTo: string, subject: string, ht
   else console.log(`[email] SUCCESS: ${txt}`);
 }
 
+async function ensureDemoAuthUser(supabase: any, email: string, fullName?: string) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  const { data: listData, error: listErr } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
+  if (listErr) throw listErr;
+
+  let authUser = listData.users.find((u: any) => (u.email || "").toLowerCase() === normalizedEmail);
+
+  if (!authUser) {
+    const { data: created, error: createErr } = await supabase.auth.admin.createUser({
+      email: normalizedEmail,
+      password: generateTempPassword(),
+      email_confirm: true,
+      user_metadata: {
+        display_name: fullName || normalizedEmail,
+        demo_access: true,
+      },
+    });
+    if (createErr) throw createErr;
+    authUser = created.user;
+  }
+
+  const { data: existingAgent, error: agentCheckErr } = await supabase
+    .from("agents")
+    .select("id")
+    .eq("user_id", authUser.id)
+    .maybeSingle();
+  if (agentCheckErr) throw agentCheckErr;
+
+  if (!existingAgent) {
+    const { error: agentInsertErr } = await supabase.from("agents").insert({
+      user_id: authUser.id,
+      name: fullName || "Demo Agent",
+      email: normalizedEmail,
+      is_demo: true,
+      is_subscribed: false,
+      is_approved: true,
+    });
+    if (agentInsertErr) throw agentInsertErr;
+  }
+
+  const { error: roleUpsertErr } = await supabase
+    .from("user_roles")
+    .upsert({ user_id: authUser.id, role: "agent" }, { onConflict: "user_id,role" });
+  if (roleUpsertErr) throw roleUpsertErr;
+
+  return authUser;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
     const body = await req.json();
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
     const apiKey = Deno.env.get("RESEND_API_KEY");
-    if (!apiKey) {
-      console.error("RESEND_API_KEY is not set!");
-      return new Response(JSON.stringify({ error: "RESEND_API_KEY not configured" }), { status: 500, headers: corsHeaders });
-    }
 
     if (body.action === "submit") {
+      if (!apiKey) {
+        console.error("RESEND_API_KEY is not set!");
+        return new Response(JSON.stringify({ error: "RESEND_API_KEY not configured" }), { status: 500, headers: corsHeaders });
+      }
+
       const { full_name, email, phone, agency_name, message } = body;
       if (!full_name || !email) return new Response(JSON.stringify({ error: "Missing fields" }), { status: 400, headers: corsHeaders });
 
@@ -57,6 +111,8 @@ Deno.serve(async (req) => {
       });
       if (e) throw e;
 
+      await ensureDemoAuthUser(supabase, email, full_name);
+
       // Admin alert
       await sendEmail(apiKey, "sales@everythingeco.com.au", `New Demo Request — ${full_name}`, buildAdminEmail({ full_name, email, phone, agency_name, message }));
       // Send access code immediately to applicant
@@ -65,6 +121,11 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
 
     } else if (body.action === "send_code") {
+      if (!apiKey) {
+        console.error("RESEND_API_KEY is not set!");
+        return new Response(JSON.stringify({ error: "RESEND_API_KEY not configured" }), { status: 500, headers: corsHeaders });
+      }
+
       const { request_id } = body;
       if (!request_id) return new Response(JSON.stringify({ error: "Missing request_id" }), { status: 400, headers: corsHeaders });
 
@@ -74,6 +135,8 @@ Deno.serve(async (req) => {
       const code = r.demo_code || generateCode();
       const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
       await supabase.from("demo_requests").update({ status: "approved", demo_code: code, demo_code_expires_at: expiresAt }).eq("id", request_id);
+
+      await ensureDemoAuthUser(supabase, r.email, r.full_name);
 
       const demoUrl = `https://globalhomes.lovable.app/agents/demo?email=${encodeURIComponent(r.email)}`;
       await sendEmail(apiKey, r.email, "Your Global Homes Demo Access Code", buildAccessCodeEmail(r.full_name, r.email, code, demoUrl));
@@ -87,7 +150,7 @@ Deno.serve(async (req) => {
 
       const { data: demoReq, error: qErr } = await supabase
         .from("demo_requests")
-        .select("id")
+        .select("id, email, full_name")
         .ilike("email", email.trim())
         .eq("demo_code", code.trim().toUpperCase())
         .eq("status", "approved")
@@ -99,7 +162,9 @@ Deno.serve(async (req) => {
         return new Response(JSON.stringify({ error: "Invalid or expired code. Please check your email or contact sales@everythingeco.com.au" }), { status: 400, headers: corsHeaders });
       }
 
-      // Ensure demo auth user exists
+      await ensureDemoAuthUser(supabase, demoReq.email, demoReq.full_name);
+
+      // Keep shared demo environment login behavior
       const demoEmail = "demo@globalhomes.app";
       const demoPassword = "DemoAccess2024!";
       const { data: listData, error: listErr } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
@@ -111,13 +176,13 @@ Deno.serve(async (req) => {
           email: demoEmail,
           password: demoPassword,
           email_confirm: true,
-          user_metadata: { display_name: "Demo User" },
+          user_metadata: { display_name: "Demo User", demo_access: true },
         });
         if (createErr) throw createErr;
         demoUser = created.user;
       }
 
-      // Ensure agent record exists for demo user
+      // Ensure agent record exists for shared demo user
       const { data: existingAgent, error: agentCheckErr } = await supabase
         .from("agents")
         .select("id")
@@ -132,11 +197,12 @@ Deno.serve(async (req) => {
           email: demoEmail,
           is_demo: true,
           is_subscribed: false,
+          is_approved: true,
         });
         if (agentInsertErr) throw agentInsertErr;
       }
 
-      // Ensure agent role exists
+      // Ensure agent role exists for shared demo user
       const { error: roleUpsertErr } = await supabase
         .from("user_roles")
         .upsert({ user_id: demoUser.id, role: "agent" }, { onConflict: "user_id,role" });
@@ -148,6 +214,27 @@ Deno.serve(async (req) => {
         demo_email: demoEmail,
         demo_password: demoPassword,
       }), { headers: corsHeaders });
+
+    } else if (body.action === "ensure_auth_user") {
+      const { email } = body;
+      if (!email) {
+        return new Response(JSON.stringify({ error: "Missing email" }), { status: 400, headers: corsHeaders });
+      }
+
+      const { data: demoReq, error: lookupError } = await supabase
+        .from("demo_requests")
+        .select("email, full_name")
+        .ilike("email", email.trim())
+        .maybeSingle();
+
+      if (lookupError) throw lookupError;
+
+      if (!demoReq) {
+        return new Response(JSON.stringify({ success: true, demo: false }), { headers: corsHeaders });
+      }
+
+      await ensureDemoAuthUser(supabase, demoReq.email, demoReq.full_name);
+      return new Response(JSON.stringify({ success: true, demo: true }), { headers: corsHeaders });
 
     } else if (body.action === "redeem_code") {
       const { request_id } = body;

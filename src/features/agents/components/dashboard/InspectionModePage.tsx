@@ -82,7 +82,7 @@ const InspectionModePage = () => {
 
   const handleEndInspection = async () => {
     setSaving(true);
-    if (!isDemoMode && activeInspection) {
+    if (activeInspection) {
       try {
         const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user?.id ?? '').maybeSingle();
         if (agent) {

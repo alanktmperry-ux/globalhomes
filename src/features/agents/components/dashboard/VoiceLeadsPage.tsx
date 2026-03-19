@@ -41,8 +41,7 @@ const URGENCY = {
 };
 
 const VoiceLeadsPage = () => {
-  const { isDemoMode } = useAuth();
-  const leads = isDemoMode ? LEADS : [];
+  const leads: typeof LEADS = [];
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = leads.find((l) => l.id === selectedId);
 

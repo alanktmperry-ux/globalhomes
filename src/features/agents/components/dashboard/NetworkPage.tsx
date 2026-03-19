@@ -132,7 +132,7 @@ function matchListingsToBriefs(brief: BuyerBrief, listings: NetworkListing[]): N
 /* ─── Component ─── */
 
 const NetworkPage = () => {
-  const { user, isDemoMode } = useAuth();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('my-listings');
   const [loading, setLoading] = useState(true);
   const [agentId, setAgentId] = useState<string | null>(null);

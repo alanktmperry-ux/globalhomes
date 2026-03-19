@@ -45,12 +45,11 @@ const DEMO_POST: Settlement[] = [
 ];
 
 const SettlementConcierge = () => {
-  const { isDemoMode } = useAuth();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [checkStates, setCheckStates] = useState<Record<string, boolean[]>>({});
   const [utilityModal, setUtilityModal] = useState<Settlement | null>(null);
 
-  const allSettlements = useMemo(() => (isDemoMode ? [...DEMO_SETTLEMENTS, ...DEMO_POST] : [...DEMO_SETTLEMENTS, ...DEMO_POST]), [isDemoMode]);
+  const allSettlements = useMemo(() => [...DEMO_SETTLEMENTS, ...DEMO_POST], []);
 
   const upcoming = useMemo(() => allSettlements.filter(s => !isPast(s.settlementDate)).sort((a, b) => a.settlementDate.getTime() - b.settlementDate.getTime()), [allSettlements]);
   const postSettlement = useMemo(() => allSettlements.filter(s => isPast(s.settlementDate)), [allSettlements]);

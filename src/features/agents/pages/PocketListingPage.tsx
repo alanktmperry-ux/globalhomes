@@ -23,8 +23,8 @@ const PocketListingPage = () => {
   const { listings, agentId } = useAgentListings();
   const { toast } = useToast();
 
-  const activeCount = listings.filter(l => ('_mock_status' in l ? l._mock_status !== 'sold' : (l as any).status !== 'sold')).length;
-  const totalLeads = listings.reduce((sum, l) => sum + ('_mock_leads' in l ? l._mock_leads : l.contact_clicks), 0);
+  const activeCount = listings.filter(l => l.status !== 'sold').length;
+  const totalLeads = listings.reduce((sum, l) => sum + l.contact_clicks, 0);
 
   const stats = [
     { label: 'Active', value: String(activeCount), icon: <Zap size={16} /> },

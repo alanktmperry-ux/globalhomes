@@ -22,17 +22,14 @@ const STATUS_CONFIG: Record<string, { icon: React.ReactNode; label: string; colo
 };
 
 function getListingStatus(l: AgentListing): string {
-  if ('_mock_status' in l) return l._mock_status;
-  return (l as any).status || 'public';
+  return l.status || 'public';
 }
 
 function getListingLeads(l: AgentListing): number {
-  if ('_mock_leads' in l) return l._mock_leads;
   return l.contact_clicks;
 }
 
 function getListingDays(l: AgentListing): number {
-  if ('_mock_days' in l) return l._mock_days;
   if (!l.listed_date) return 0;
   return Math.max(0, Math.floor((Date.now() - new Date(l.listed_date).getTime()) / 86400000));
 }

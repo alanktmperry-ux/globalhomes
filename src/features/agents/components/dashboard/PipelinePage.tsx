@@ -133,15 +133,13 @@ const PipelinePage = () => {
       c.id === cardId ? { ...c, stage: targetStage, movedAt: new Date().toISOString() } : c
     ));
 
-    // Persist to DB if not demo
-    if (!isDemoMode) {
-      const newStatus = mapStageToLeadStatus(targetStage);
-      await supabase
-        .from('leads')
-        .update({ status: newStatus })
-        .eq('id', cardId);
-    }
-  }, [cards, isDemoMode]);
+    // Persist to DB
+    const newStatus = mapStageToLeadStatus(targetStage);
+    await supabase
+      .from('leads')
+      .update({ status: newStatus })
+      .eq('id', cardId);
+  }, [cards]);
 
   const totalValue = cards.reduce((sum, c) => sum + c.estimatedValue, 0);
 

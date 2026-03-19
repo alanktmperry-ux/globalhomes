@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import {
   CheckSquare, Users, ClipboardList, DollarSign, Landmark,
   Mic, Phone, Send, Calendar, CalendarDays, Flame, Thermometer, Snowflake, Sparkles, Eye,
-  TrendingUp, Zap, MessageSquare, Activity,
+  TrendingUp, Zap, MessageSquare, Activity, Shield, ArrowUp, ArrowDown, Minus,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tooltip as UiTooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import DashboardHeader from './DashboardHeader';
 import { getIntentTier, INTENT_TOOLTIP } from '@/features/agents/lib/intentScore';
+import { DEMO_REPUTATION, getScoreColor } from '@/features/agents/utils/reputationScore';
 import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
@@ -192,6 +193,15 @@ const DashboardOverview = () => {
 
   // Stats row - Australian CRM focus
   const unrespondedValue = isDemoMode ? 2 : unrespondedLeads;
+
+  // Reputation score with trend
+  const repScore = DEMO_REPUTATION.total;
+  const lastMonthKey = 'gh_rep_last_month';
+  const lastMonth = parseInt(localStorage.getItem(lastMonthKey) || '0', 10);
+  const repTrend = lastMonth === 0 ? 'neutral' : repScore > lastMonth ? 'up' : repScore < lastMonth ? 'down' : 'neutral';
+  useEffect(() => { localStorage.setItem(lastMonthKey, String(repScore)); }, [repScore]);
+  const repColors = getScoreColor(repScore);
+
   const stats = [
     { label: 'Tasks Due', value: String(tasksDue || (isDemoMode ? 5 : 3)), icon: <CheckSquare size={16} />, color: 'text-destructive', link: '/dashboard/contacts' },
     { label: 'Active Contacts', value: isDemoMode ? '62' : '48', icon: <Users size={16} />, color: 'text-primary', link: '/dashboard/contacts' },
@@ -207,7 +217,7 @@ const DashboardOverview = () => {
 
       <div className="p-4 sm:p-6 space-y-6 max-w-7xl">
         {/* Stats Row */}
-        <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-7 gap-3">
           {stats.map((s) => (
             <motion.div
               key={s.label}
@@ -223,6 +233,25 @@ const DashboardOverview = () => {
               <p className="font-display text-2xl font-extrabold">{s.value}</p>
             </motion.div>
           ))}
+          {/* Reputation Score stat */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            onClick={() => navigate(`/agent/me`)}
+            className={`bg-card border border-border rounded-xl p-4 cursor-pointer hover:border-primary/50 hover:shadow-md transition-all`}
+          >
+            <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
+              <span className={repColors.text}><Shield size={16} /></span>
+              <span className="text-xs">Reputation</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <p className={`font-display text-2xl font-extrabold ${repColors.text}`}>{repScore}</p>
+              <span className="text-xs text-muted-foreground">/100</span>
+              {repTrend === 'up' && <ArrowUp size={14} className="text-green-500" />}
+              {repTrend === 'down' && <ArrowDown size={14} className="text-red-500" />}
+              {repTrend === 'neutral' && <Minus size={14} className="text-muted-foreground" />}
+            </div>
+          </motion.div>
         </div>
 
         {/* Today's Inspections */}

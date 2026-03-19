@@ -54,7 +54,7 @@ const VoiceLeadsPage = () => {
         {/* Lead list */}
         <div className={`${selectedId ? 'hidden lg:block lg:w-[380px]' : 'flex-1'} border-r border-border`}>
           <div className="p-4 space-y-2">
-            {LEADS.map((lead) => {
+            {leads.map((lead) => {
               const u = URGENCY[lead.urgency];
               return (
                 <motion.button

@@ -1,0 +1,1 @@
+UPDATE auth.users SET email_confirmed_at = now(), confirmation_token = '' WHERE email = 'alan@everythingeco.com.au' AND email_confirmed_at IS NULL;

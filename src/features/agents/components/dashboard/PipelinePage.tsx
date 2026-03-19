@@ -49,10 +49,6 @@ const PipelinePage = () => {
 
   // Fetch leads and map to pipeline cards
   useEffect(() => {
-    if (isDemoMode) {
-      setCards(DEMO_CARDS);
-      return;
-    }
     if (!user) return;
 
     const fetchPipeline = async () => {

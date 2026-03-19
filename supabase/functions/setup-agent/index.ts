@@ -111,7 +111,7 @@ Deno.serve(async (req) => {
       const agencyData = invite.agencies as any;
       const { error: agentError } = await supabaseAdmin
         .from("agents")
-        .insert({
+        .upsert({
           user_id: userId,
           name: fullName || email,
           agency: agencyData?.name || null,
@@ -119,7 +119,7 @@ Deno.serve(async (req) => {
           phone: phone || null,
           agency_id: invite.agency_id,
           ...agentExtras,
-        });
+        }, { onConflict: "user_id" });
       if (agentError) throw agentError;
 
       return new Response(JSON.stringify({ success: true, agencyName: agencyData?.name }), {

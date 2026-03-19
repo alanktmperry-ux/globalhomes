@@ -139,6 +139,21 @@ Deno.serve(async (req) => {
       });
     }
 
+    if (action === "delete_demo_request") {
+      const { request_id } = await req.json();
+      if (!request_id) {
+        return new Response(JSON.stringify({ error: "Missing request_id" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { error } = await supabase.from("demo_requests").delete().eq("id", request_id);
+      if (error) throw error;
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (action === "delete_user") {
       const { user_id } = await req.json();
 

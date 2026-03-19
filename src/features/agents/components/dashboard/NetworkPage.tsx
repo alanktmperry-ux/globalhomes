@@ -266,7 +266,7 @@ const NetworkPage = () => {
   // Fetch buyer briefs
   const fetchBuyerBriefs = useCallback(async () => {
     if (!agentId) return;
-    if (isDemoMode) { setBuyerBriefs(DEMO_BRIEFS); return; }
+    
     const { data } = await supabase
       .from('buyer_briefs')
       .select('*, agents!buyer_briefs_agent_id_fkey(name)')

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   CheckSquare, Users, ClipboardList, DollarSign, Landmark,
-  Mic, Phone, Send, Calendar, Flame, Thermometer, Snowflake, Sparkles, Eye,
+  Mic, Phone, Send, Calendar, CalendarDays, Flame, Thermometer, Snowflake, Sparkles, Eye,
   TrendingUp, Zap, MessageSquare, Activity,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -66,7 +66,7 @@ const DashboardOverview = () => {
   const navigate = useNavigate();
   const [tasksDue, setTasksDue] = useState(0);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
-
+  const [todayInspections, setTodayInspections] = useState<{ address: string; time: string; propertyId: string }[]>([]);
   const [pipelineData, setPipelineData] = useState(buildEmptyMonths());
   const [pipelineEmpty, setPipelineEmpty] = useState(true);
 
@@ -131,6 +131,35 @@ const DashboardOverview = () => {
       .then(({ data }) => setRecentActivities(data || []));
   }, [user]);
 
+  // Fetch today's inspections from properties with inspection_times JSONB
+  useEffect(() => {
+    if (!user || isDemoMode) return;
+    const todayStr = new Date().toISOString().split('T')[0];
+    supabase
+      .from('properties')
+      .select('id, address, inspection_times')
+      .eq('is_active', true)
+      .not('inspection_times', 'eq', '[]')
+      .then(({ data }) => {
+        if (!data) return;
+        const inspections: { address: string; time: string; propertyId: string }[] = [];
+        data.forEach((prop) => {
+          const times = prop.inspection_times as any[];
+          if (!Array.isArray(times)) return;
+          times.forEach((slot: any) => {
+            const slotDate = typeof slot === 'string' ? slot : slot?.date || slot?.start;
+            if (typeof slotDate === 'string' && slotDate.startsWith(todayStr)) {
+              const d = new Date(slotDate);
+              const timeStr = d.toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit', hour12: true });
+              inspections.push({ address: prop.address, time: timeStr, propertyId: prop.id });
+            }
+          });
+        });
+        inspections.sort((a, b) => a.time.localeCompare(b.time));
+        setTodayInspections(inspections);
+      });
+  }, [user, isDemoMode]);
+
   // GCI values — demo-aware
   const gciActual = isDemoMode ? 1250000 : 245000;
   const gciBudgeted = isDemoMode ? 1800000 : 400000;
@@ -169,6 +198,51 @@ const DashboardOverview = () => {
             </motion.div>
           ))}
         </div>
+
+        {/* Today's Inspections */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="bg-card border border-border rounded-xl p-5"
+        >
+          <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
+            <CalendarDays size={16} className="text-primary" /> Today's Inspections
+          </h3>
+          {(() => {
+            const DEMO_INSPECTIONS = [
+              { address: '42 Panorama Drive, Berwick', time: '10:00 AM', propertyId: '1' },
+              { address: '15 Station St, Narre Warren', time: '12:30 PM', propertyId: '2' },
+              { address: '8 Ocean View Rd, Brighton', time: '2:00 PM', propertyId: '3' },
+            ];
+            const inspections = isDemoMode ? DEMO_INSPECTIONS : todayInspections;
+            if (inspections.length === 0) {
+              return (
+                <p className="text-sm text-muted-foreground py-4 text-center">No inspections scheduled for today</p>
+              );
+            }
+            return (
+              <div className="space-y-2">
+                {inspections.map((insp, i) => (
+                  <div key={i} className="flex items-center justify-between border border-border rounded-lg p-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium truncate">{insp.address}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">🕐 {insp.time}</p>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-[10px] h-6 px-2 shrink-0 ml-2"
+                      onClick={() => navigate(`/dashboard/listings/${insp.propertyId}`)}
+                    >
+                      View Listing
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+        </motion.div>
 
         {/* Today's Voice Matches */}
         <motion.div

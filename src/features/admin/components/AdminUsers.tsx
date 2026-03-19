@@ -131,16 +131,22 @@ const AdminUsers = () => {
   };
 
   const handleDelete = async (userId: string) => {
-    if (userId.startsWith('demo-')) return;
+    const isDemoRequest = userId.startsWith('demo-');
+    const confirmMsg = isDemoRequest
+      ? 'Delete this demo request? This cannot be undone.'
+      : 'This will permanently delete this user AND all their data — properties, listings, leads, transactions, messages, and their agent/agency profile. This cannot be undone. Are you sure?';
+    if (!confirm(confirmMsg)) return;
     if (!confirm('This will permanently delete this user AND all their data — properties, listings, leads, transactions, messages, and their agent/agency profile. This cannot be undone. Are you sure?')) return;
     setActionLoading(userId);
     const { data: { session } } = await supabase.auth.getSession();
+    const action = isDemoRequest ? 'delete_demo_request' : 'delete_user';
+    const bodyId = isDemoRequest ? userId.replace('demo-', '') : userId;
     await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=delete_user`,
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=${action}`,
       {
         method: 'POST',
         headers: { Authorization: `Bearer ${session?.access_token}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId }),
+        body: JSON.stringify({ [isDemoRequest ? 'request_id' : 'user_id']: bodyId }),
       }
     );
     toast({ title: 'User and all associated data permanently deleted.' });
@@ -213,7 +219,7 @@ const AdminUsers = () => {
                 <th className="text-left p-3 text-muted-foreground font-medium">Type</th>
                 <th className="text-left p-3 text-muted-foreground font-medium hidden md:table-cell">Plan</th>
                 <th className="text-left p-3 text-muted-foreground font-medium">Status</th>
-                <th className="text-left p-3 text-muted-foreground font-medium hidden sm:table-cell">Last Sign In</th>
+                <th className="text-left p-3 text-muted-foreground font-medium hidden sm:table-cell">Last Active / Requested</th>
                 <th className="text-left p-3 text-muted-foreground font-medium">Actions</th>
               </tr>
             </thead>
@@ -252,21 +258,40 @@ const AdminUsers = () => {
                     )}
                   </td>
                   <td className="p-3 text-muted-foreground text-xs hidden sm:table-cell">
-                    {u.last_sign_in_at ? (
+                    {u.user_type === 'demo_request' ? (
+                      <span className="flex items-center gap-1">
+                        <Clock size={10} /> {new Date(u.created_at).toLocaleDateString()}
+                      </span>
+                    ) : u.last_sign_in_at ? (
                       <span className="flex items-center gap-1">
                         <Clock size={10} /> {new Date(u.last_sign_in_at).toLocaleDateString()}
                       </span>
                     ) : '—'}
                   </td>
                   <td className="p-3">
-                    {u.user_type === 'demo_request' ? (
-                      <a
-                        href={`mailto:${u.email}?subject=Your Global Homes Demo`}
-                        className="p-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors inline-block"
-                        title="Email"
-                      >
-                        <Mail size={14} />
-                      </a>
+                     {u.user_type === 'demo_request' ? (
+                      <div className="flex gap-1.5">
+                        {actionLoading === u.id ? (
+                          <Loader2 className="animate-spin text-muted-foreground" size={16} />
+                        ) : (
+                          <>
+                            <a
+                              href={`mailto:${u.email}?subject=Your Global Homes Demo`}
+                              className="p-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors inline-block"
+                              title="Email"
+                            >
+                              <Mail size={14} />
+                            </a>
+                            <button
+                              onClick={() => handleDelete(u.id)}
+                              className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
+                              title="Delete demo request"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </>
+                        )}
+                      </div>
                     ) : (
                       <div className="flex gap-1.5">
                         {actionLoading === u.id ? (

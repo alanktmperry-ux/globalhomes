@@ -216,14 +216,24 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
     setPublishing(true);
 
     try {
-      let agentId: string | null = null;
-      if (user) {
-        const { data: agent } = await supabase
-          .from('agents')
-          .select('id')
-          .eq('user_id', user.id)
-          .maybeSingle();
-        agentId = agent?.id ?? null;
+      if (!user) {
+        toast({ title: 'You must be logged in to publish', variant: 'destructive' });
+        setPublishing(false);
+        return;
+      }
+
+      const { data: agent } = await supabase
+        .from('agents')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      const agentId = agent?.id ?? null;
+
+      if (!agentId) {
+        toast({ title: 'Agent profile not found', description: 'Please complete your agent registration first.', variant: 'destructive' });
+        setPublishing(false);
+        return;
       }
 
       const title = draft.generatedTitle || `${draft.propertyType} in ${draft.suburb || 'Location'}`;

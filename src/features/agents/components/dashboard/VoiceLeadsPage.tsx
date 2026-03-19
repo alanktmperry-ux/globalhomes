@@ -41,12 +41,14 @@ const URGENCY = {
 };
 
 const VoiceLeadsPage = () => {
+  const { isDemoMode } = useAuth();
+  const leads = isDemoMode ? LEADS : [];
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const selected = LEADS.find((l) => l.id === selectedId);
+  const selected = leads.find((l) => l.id === selectedId);
 
   return (
     <div>
-      <DashboardHeader title="Voice Leads" subtitle={`${LEADS.length} inquiries from voice searches`} />
+      <DashboardHeader title="Voice Leads" subtitle={`${leads.length} inquiries from voice searches`} />
 
       <div className="flex flex-col lg:flex-row">
         {/* Lead list */}

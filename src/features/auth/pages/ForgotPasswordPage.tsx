@@ -21,6 +21,11 @@ const ForgotPasswordPage = () => {
       const isPreview = window.location.hostname.includes('lovableproject.com') ||
         (window.location.hostname.includes('lovable.app') && window.location.hostname.includes('preview'));
       const origin = isPreview ? publishedOrigin : window.location.origin;
+      // Ensure demo request emails are provisioned as auth users so reset emails can be delivered
+      await supabase.functions.invoke('handle-demo-request', {
+        body: { action: 'ensure_auth_user', email: email.trim() },
+      });
+
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${origin}/reset-password`,
       });

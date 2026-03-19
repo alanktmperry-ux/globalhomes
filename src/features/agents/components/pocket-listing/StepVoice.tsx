@@ -1,12 +1,14 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { Mic, MicOff, Sparkles, Edit3 } from 'lucide-react';
+import { Mic, MicOff, Sparkles, Edit3, RefreshCw, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import { SoundWaveVisualizer } from '@/features/search/components/SoundWaveVisualizer';
 import { useVoiceSearch } from '@/features/search/hooks/useVoiceSearch';
+import { useToast } from '@/shared/hooks/use-toast';
 import type { ListingDraft } from './PocketListingForm';
 
 interface Props {
@@ -14,11 +16,27 @@ interface Props {
   update: (p: Partial<ListingDraft>) => void;
 }
 
+const TONES = [
+  { key: 'standard', label: 'Standard', emoji: '🏡' },
+  { key: 'luxury', label: 'Luxury', emoji: '✨' },
+  { key: 'family', label: 'Family', emoji: '👨‍👩‍👧‍👦' },
+  { key: 'investment', label: 'Investment', emoji: '📈' },
+] as const;
+
+type Tone = typeof TONES[number]['key'];
+
+const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-listing`;
+
 const StepVoice = ({ draft, update }: Props) => {
   const [countdown, setCountdown] = useState(30);
   const [generating, setGenerating] = useState(false);
+  const [aiDescription, setAiDescription] = useState('');
+  const [aiGenerated, setAiGenerated] = useState(false);
+  const [selectedTone, setSelectedTone] = useState<Tone>('standard');
+  const [streamingBullets, setStreamingBullets] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
   const wasListeningRef = useRef(false);
+  const { toast } = useToast();
 
   const onVoiceResult = useCallback((text: string) => {
     update({ voiceTranscript: text });
@@ -61,13 +79,10 @@ const StepVoice = ({ draft, update }: Props) => {
   useEffect(() => () => clearInterval(timerRef.current), []);
 
   const generateFromTranscript = (text: string) => {
-    setGenerating(true);
-    // Simulate AI generation
+    setStreamingBullets(true);
     setTimeout(() => {
-      const words = text.split(' ');
-      const titleWords = words.slice(0, 6).join(' ');
       update({
-        generatedTitle: titleWords.length > 10 ? `Modern ${draft.propertyType} in ${draft.suburb || 'Premium Location'}` : `Stunning ${draft.propertyType} — Must See`,
+        generatedTitle: `Modern ${draft.propertyType} in ${draft.suburb || 'Premium Location'}`,
         generatedBullets: [
           'Spacious open-plan living and dining',
           'Renovated kitchen with stone benchtops',
@@ -75,8 +90,120 @@ const StepVoice = ({ draft, update }: Props) => {
           'Walking distance to cafés and transport',
         ],
       });
-      setGenerating(false);
+      setStreamingBullets(false);
     }, 1500);
+  };
+
+  // AI description generator with streaming
+  const generateAiDescription = async () => {
+    setGenerating(true);
+    setAiDescription('');
+    setAiGenerated(false);
+
+    const formatPrice = (d: ListingDraft) => {
+      const fmt = (v: number) => v >= 1000000 ? `$${(v / 1000000).toFixed(1)}M` : `$${(v / 1000).toFixed(0)}K`;
+      if (d.priceDisplay === 'exact') return fmt(d.priceMax);
+      if (d.priceDisplay === 'range') return `${fmt(d.priceMin)} – ${fmt(d.priceMax)}`;
+      if (d.priceDisplay === 'eoi') return 'Expressions of Interest';
+      return 'Contact Agent';
+    };
+
+    try {
+      const resp = await fetch(GENERATE_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          propertyType: draft.propertyType,
+          beds: draft.beds,
+          baths: draft.baths,
+          parking: draft.cars,
+          suburb: draft.suburb,
+          state: draft.state,
+          price: formatPrice(draft),
+          features: draft.features,
+          tone: selectedTone,
+        }),
+      });
+
+      if (!resp.ok || !resp.body) {
+        const err = await resp.json().catch(() => ({ error: 'Generation failed' }));
+        toast({ title: 'Generation failed', description: err.error, variant: 'destructive' });
+        setGenerating(false);
+        return;
+      }
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let textBuffer = '';
+      let fullText = '';
+      let streamDone = false;
+
+      while (!streamDone) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        textBuffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex: number;
+        while ((newlineIndex = textBuffer.indexOf('\n')) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
+
+          if (line.endsWith('\r')) line = line.slice(0, -1);
+          if (line.startsWith(':') || line.trim() === '') continue;
+          if (!line.startsWith('data: ')) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === '[DONE]') {
+            streamDone = true;
+            break;
+          }
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            if (content) {
+              fullText += content;
+              setAiDescription(fullText);
+            }
+          } catch {
+            textBuffer = line + '\n' + textBuffer;
+            break;
+          }
+        }
+      }
+
+      // Final flush
+      if (textBuffer.trim()) {
+        for (let raw of textBuffer.split('\n')) {
+          if (!raw) continue;
+          if (raw.endsWith('\r')) raw = raw.slice(0, -1);
+          if (raw.startsWith(':') || raw.trim() === '') continue;
+          if (!raw.startsWith('data: ')) continue;
+          const jsonStr = raw.slice(6).trim();
+          if (jsonStr === '[DONE]') continue;
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            if (content) {
+              fullText += content;
+              setAiDescription(fullText);
+            }
+          } catch { /* ignore */ }
+        }
+      }
+
+      setAiGenerated(true);
+      // Also store it in the transcript so it gets saved
+      update({ voiceTranscript: fullText });
+    } catch (e) {
+      console.error('AI generation error:', e);
+      toast({ title: 'Generation failed', description: 'Could not connect to AI service.', variant: 'destructive' });
+    } finally {
+      setGenerating(false);
+    }
   };
 
   return (
@@ -117,27 +244,107 @@ const StepVoice = ({ draft, update }: Props) => {
           <Edit3 size={12} /> Transcript (editable)
         </Label>
         <Textarea
-          value={draft.voiceTranscript}
-          onChange={(e) => update({ voiceTranscript: e.target.value })}
+          value={aiGenerated ? aiDescription : draft.voiceTranscript}
+          onChange={(e) => {
+            if (aiGenerated) {
+              setAiDescription(e.target.value);
+              update({ voiceTranscript: e.target.value });
+            } else {
+              update({ voiceTranscript: e.target.value });
+            }
+          }}
           placeholder="Your property description will appear here, or type it manually..."
           className="bg-secondary border-border min-h-[80px] text-sm"
           rows={3}
         />
-        {draft.voiceTranscript && !draft.generatedTitle && (
+        {draft.voiceTranscript && !draft.generatedTitle && !aiGenerated && (
           <Button
             size="sm"
             variant="outline"
             className="mt-2 text-xs gap-1"
             onClick={() => generateFromTranscript(draft.voiceTranscript)}
-            disabled={generating}
+            disabled={streamingBullets}
           >
-            <Sparkles size={12} /> {generating ? 'Generating...' : 'Generate from text'}
+            <Sparkles size={12} /> {streamingBullets ? 'Generating...' : 'Generate from text'}
           </Button>
         )}
       </div>
 
-      {/* AI Generated Content */}
-      {(draft.generatedTitle || generating) && (
+      {/* AI Description Generator */}
+      <div className="bg-gradient-to-br from-purple-500/10 via-primary/5 to-violet-500/10 border border-purple-500/20 rounded-xl p-4 space-y-3">
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-purple-600 dark:text-purple-400">
+          <Sparkles size={12} /> AI Listing Description Generator
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Auto-generate a polished description from your property details.
+        </p>
+
+        {/* Tone Selector */}
+        <div>
+          <Label className="text-xs text-muted-foreground mb-1.5 block">Tone</Label>
+          <div className="flex gap-1.5 flex-wrap">
+            {TONES.map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => setSelectedTone(t.key)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                  selectedTone === t.key
+                    ? 'bg-purple-500/15 border-purple-500/40 text-purple-600 dark:text-purple-400'
+                    : 'bg-secondary border-border text-muted-foreground hover:border-purple-500/30'
+                }`}
+              >
+                {t.emoji} {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Generate / Regenerate Button */}
+        <Button
+          type="button"
+          onClick={generateAiDescription}
+          disabled={generating}
+          className="w-full gap-2 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white border-0"
+        >
+          {generating ? (
+            <>
+              <Loader2 size={14} className="animate-spin" /> Generating…
+            </>
+          ) : aiGenerated ? (
+            <>
+              <RefreshCw size={14} /> Regenerate ✨
+            </>
+          ) : (
+            <>
+              <Sparkles size={14} /> Generate with AI ✨
+            </>
+          )}
+        </Button>
+
+        {/* Streaming AI Description */}
+        {(generating || aiDescription) && (
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-card border border-border rounded-lg p-3"
+          >
+            <Label className="text-xs text-muted-foreground mb-1 block flex items-center gap-1">
+              <Sparkles size={10} className="text-purple-500" /> AI Description
+              {generating && <span className="text-purple-500 animate-pulse ml-1">●</span>}
+            </Label>
+            <p className="text-sm leading-relaxed whitespace-pre-wrap">
+              {aiDescription || (
+                <span className="text-muted-foreground italic">Writing…</span>
+              )}
+              {generating && <span className="inline-block w-0.5 h-4 bg-purple-500 animate-pulse ml-0.5 align-text-bottom" />}
+            </p>
+          </motion.div>
+        )}
+      </div>
+
+      {/* AI Generated Content from voice */}
+      {(draft.generatedTitle || streamingBullets) && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -147,7 +354,7 @@ const StepVoice = ({ draft, update }: Props) => {
             <Sparkles size={12} /> AI-Generated Content
           </div>
 
-          {generating ? (
+          {streamingBullets ? (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
               Generating listing content...

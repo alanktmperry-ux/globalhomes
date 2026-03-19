@@ -10,7 +10,7 @@ const DemoModeBanner = () => {
   if (!user || !isDemoMode) return null;
 
   return (
-    <div className="bg-amber-500/15 border-b border-amber-500/30 px-4 py-2 flex items-center justify-between gap-3 text-sm">
+    <div className="bg-amber-500/15 border-b border-amber-500/30 px-4 py-2 flex items-center justify-between gap-3 text-sm sticky top-0 z-50">
       <div className="flex items-center gap-2 min-w-0">
         <Info className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
         <div className="min-w-0">
@@ -28,7 +28,7 @@ const DemoModeBanner = () => {
         onClick={() => navigate('/dashboard/billing')}
       >
         <Rocket className="h-3 w-3 mr-1" />
-        Upgrade
+        Go Live
       </Button>
     </div>
   );

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import {
   CheckSquare, Users, ClipboardList, DollarSign, Landmark,
   Mic, Phone, Send, Calendar, CalendarDays, Flame, Thermometer, Snowflake, Sparkles, Eye,
-  TrendingUp, Zap, MessageSquare, Activity,
+  TrendingUp, Zap, MessageSquare, Activity, Shield, ArrowUp, ArrowDown, Minus,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

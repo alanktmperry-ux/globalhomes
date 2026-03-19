@@ -1,6 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, MapPin, Globe, Phone, Mail, Star, BadgeCheck, Briefcase, Languages, Award, Building2 } from 'lucide-react';
+import { ArrowLeft, MapPin, Globe, Phone, Mail, Star, BadgeCheck, Briefcase, Languages, Award, Building2, Info } from 'lucide-react';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+import { Progress } from '@/components/ui/progress';
+import { DEMO_REPUTATION, getScoreColor, REPUTATION_TOOLTIP, type ReputationResult } from '@/features/agents/utils/reputationScore';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { SiteHeader } from '@/shared/components/layout/SiteHeader';
 import { SiteFooter } from '@/shared/components/layout/SiteFooter';

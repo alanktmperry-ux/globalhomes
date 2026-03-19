@@ -72,7 +72,7 @@ export function useAgentListings() {
         .maybeSingle();
 
       if (!agent) {
-        setListings(MOCK_LISTINGS);
+        setListings([]);
         setLoading(false);
         return;
       }

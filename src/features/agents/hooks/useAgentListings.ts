@@ -61,7 +61,7 @@ export function useAgentListings() {
   const refetch = () => setFetchKey(k => k + 1);
 
   useEffect(() => {
-    if (!user) { setListings(MOCK_LISTINGS); setLoading(false); return; }
+    if (!user) { setListings([]); setLoading(false); return; }
 
     const fetch = async () => {
       setLoading(true);

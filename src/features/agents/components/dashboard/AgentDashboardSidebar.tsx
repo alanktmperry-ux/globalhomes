@@ -40,6 +40,7 @@ const CRM_NAV: NavItem[] = [
 const BUSINESS_NAV: NavItem[] = [
   { title: 'Investments', url: '/dashboard/investments', icon: TrendingUp },
   { title: 'Financials', url: '/dashboard/trust', icon: Landmark },
+  { title: 'Commission Calculator', url: '/dashboard/commission', icon: Calculator },
   { title: 'Settlement Concierge', url: '/dashboard/settlements', icon: PartyPopper },
   { title: 'Compliance', url: '/dashboard/compliance', icon: ClipboardCheck, comingSoon: true },
   { title: 'Analytics', url: '/dashboard/analytics', icon: BarChart3 },

@@ -105,6 +105,7 @@ const App = () => (
                 <Route path="pipeline" element={<PipelinePage />} />
                 <Route path="inspection-mode" element={<InspectionModePage />} />
                 <Route path="settlements" element={<SettlementConcierge />} />
+                <Route path="commission" element={<CommissionCalculator />} />
                 <Route path="analytics" element={<AnalyticsPage />} />
                 <Route path="network" element={<NetworkPage />} />
                 <Route path="team" element={<TeamPage />} />

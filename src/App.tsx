@@ -37,6 +37,7 @@ import TrustLedgerPage from "@/features/agents/components/dashboard/TrustLedgerP
 import BankReconciliationPage from "@/features/agents/components/dashboard/BankReconciliationPage";
 import ReportsPage from "@/features/agents/components/dashboard/ReportsPage";
 import PipelinePage from "@/features/agents/components/dashboard/PipelinePage";
+import InspectionModePage from "@/features/agents/components/dashboard/InspectionModePage";
 import SeekerAuthPage from "./pages/SeekerAuthPage";
 import AgentAuthPage from "./pages/AgentAuthPage";
 import AuthLandingPage from "./pages/AuthLandingPage";

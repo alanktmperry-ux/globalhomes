@@ -1,7 +1,6 @@
 import { Home, Building2, Warehouse, Mountain, Store, Minus, Plus, DollarSign, Key } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Slider } from '@/components/ui/slider';
 import type { ListingDraft } from './PocketListingForm';
 
 interface Props {
@@ -117,21 +116,29 @@ const StepBasics = ({ draft, update }: Props) => {
         {draft.propertyType === 'Commercial' && 'Office, retail, warehouse, or mixed-use'}
       </p>
 
-      {/* Price — contextual label */}
+      {/* Price */}
       <div>
-        <Label className="text-sm font-semibold mb-3 block">
-          {isRental ? 'Rent per Week' : 'Price Guide'}: {formatPrice(draft.priceMin)} – {formatPrice(draft.priceMax)}
+        <Label className="text-sm font-semibold mb-2 block">
+          {isRental ? 'Rent per Week ($)' : 'Price ($)'}
         </Label>
-        <Slider
-          min={isRental ? 100 : 100000}
-          max={isRental ? 5000 : 10000000}
-          step={isRental ? 25 : 50000}
-          value={[draft.priceMin, draft.priceMax]}
-          onValueChange={([min, max]) => update({ priceMin: min, priceMax: max })}
-          className="mb-3"
+        <Input
+          type="number"
+          min={0}
+          value={draft.priceMin || ''}
+          onChange={(e) => {
+            const val = Number(e.target.value) || 0;
+            update({ priceMin: val, priceMax: Math.round(val * 1.1) });
+          }}
+          placeholder={isRental ? 'e.g. 650' : 'e.g. 1200000'}
+          className="h-10"
         />
+        {draft.priceMin > 0 && (
+          <p className="text-xs text-muted-foreground mt-1.5">
+            Price Guide: {formatPrice(draft.priceMin)} – {formatPrice(Math.round(draft.priceMin * 1.1))}
+          </p>
+        )}
         {!isRental && (
-          <div className="flex gap-1.5">
+          <div className="flex gap-1.5 mt-3">
             {PRICE_DISPLAYS.map((p) => (
               <button
                 key={p.key}

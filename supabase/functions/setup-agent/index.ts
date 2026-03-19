@@ -68,9 +68,10 @@ Deno.serve(async (req) => {
         .insert({ agency_id: agency.id, user_id: userId, role: "principal" });
       if (memberError) throw memberError;
 
+      // Upsert agent record (handles re-registration attempts gracefully)
       const { error: agentError } = await supabaseAdmin
         .from("agents")
-        .insert({
+        .upsert({
           user_id: userId,
           name: fullName || email,
           agency: agencyName,
@@ -78,7 +79,7 @@ Deno.serve(async (req) => {
           phone: phone || null,
           agency_id: agency.id,
           ...agentExtras,
-        });
+        }, { onConflict: "user_id" });
       if (agentError) throw agentError;
 
       return new Response(JSON.stringify({ success: true, agencyId: agency.id }), {

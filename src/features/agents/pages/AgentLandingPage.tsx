@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Ear, Mic, Globe, Camera, Cpu, ShieldCheck, ArrowRight, CheckCircle2, Star, Play, CalendarCheck, Lock } from 'lucide-react';
+import { Ear, Mic, Globe, Camera, Cpu, ShieldCheck, ArrowRight, CheckCircle2, Star, Play, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AgentRegistrationModal from '@/features/agents/components/AgentRegistrationModal';
 import RequestDemoModal from '@/features/agents/components/RequestDemoModal';

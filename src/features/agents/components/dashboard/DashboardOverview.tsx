@@ -65,8 +65,10 @@ const MOCK_MATCHES = [
 
 const DashboardOverview = () => {
   const { listings, isMockData } = useAgentListings();
-  const { user, isDemoMode } = useAuth();
+  const { user, effectiveDemo } = useAuth();
   const navigate = useNavigate();
+  const [localDemoMode, setLocalDemoMode] = useState(false);
+  const effectiveDemo = isDemoMode || localDemoMode;
   const [tasksDue, setTasksDue] = useState(0);
   const [unrespondedLeads, setUnrespondedLeads] = useState(0);
   const [activeContacts, setActiveContacts] = useState(0);
@@ -91,17 +93,17 @@ const DashboardOverview = () => {
 
   // Fetch active contacts count
   useEffect(() => {
-    if (!user || isDemoMode) return;
+    if (!user || effectiveDemo) return;
     supabase
       .from('contacts')
       .select('id', { count: 'exact', head: true })
       .eq('created_by', user.id)
       .then(({ count }) => setActiveContacts(count || 0));
-  }, [user, isDemoMode]);
+  }, [user, effectiveDemo]);
 
   // Fetch trust balance
   useEffect(() => {
-    if (!user || isDemoMode) return;
+    if (!user || effectiveDemo) return;
     const fetchTrust = async () => {
       const { data: agent } = await supabase
         .from('agents').select('id').eq('user_id', user.id).single();
@@ -115,11 +117,11 @@ const DashboardOverview = () => {
       setTrustBalance(Math.max(0, balance));
     };
     fetchTrust();
-  }, [user, isDemoMode]);
+  }, [user, effectiveDemo]);
 
   // Fetch unresponded leads (status='new', older than 5 min)
   useEffect(() => {
-    if (!user || isDemoMode) return;
+    if (!user || effectiveDemo) return;
     const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
     supabase
       .from('agents')
@@ -136,11 +138,11 @@ const DashboardOverview = () => {
           .lt('created_at', fiveMinAgo)
           .then(({ count }) => setUnrespondedLeads(count || 0));
       });
-  }, [user, isDemoMode]);
+  }, [user, effectiveDemo]);
 
   // Fetch pipeline data from activities (entity_type='property', action='sold')
   useEffect(() => {
-    if (!user || isDemoMode) return;
+    if (!user || effectiveDemo) return;
     const now = new Date();
     const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1).toISOString();
     supabase
@@ -172,7 +174,7 @@ const DashboardOverview = () => {
           setPipelineEmpty(true);
         }
       });
-  }, [user, isDemoMode]);
+  }, [user, effectiveDemo]);
 
   // Fetch recent activities
   useEffect(() => {
@@ -188,7 +190,7 @@ const DashboardOverview = () => {
 
   // Fetch today's inspections from properties with inspection_times JSONB
   useEffect(() => {
-    if (!user || isDemoMode) return;
+    if (!user || effectiveDemo) return;
     const todayStr = new Date().toISOString().split('T')[0];
     supabase
       .from('properties')
@@ -213,16 +215,16 @@ const DashboardOverview = () => {
         inspections.sort((a, b) => a.time.localeCompare(b.time));
         setTodayInspections(inspections);
       });
-  }, [user, isDemoMode]);
+  }, [user, effectiveDemo]);
 
   // GCI values — demo-aware; real users start at 0
-  const gciActual = isDemoMode ? 1250000 : 0;
-  const gciBudgeted = isDemoMode ? 1800000 : 0;
-  const gciPotential = isDemoMode ? 2200000 : 0;
+  const gciActual = effectiveDemo ? 1250000 : 0;
+  const gciBudgeted = effectiveDemo ? 1800000 : 0;
+  const gciPotential = effectiveDemo ? 2200000 : 0;
   const gciPercent = gciBudgeted > 0 ? Math.round((gciActual / gciBudgeted) * 100) : 0;
 
   // Stats row - Australian CRM focus
-  const unrespondedValue = isDemoMode ? 2 : unrespondedLeads;
+  const unrespondedValue = effectiveDemo ? 2 : unrespondedLeads;
 
   // Reputation score with trend
   const repScore = DEMO_REPUTATION.total;
@@ -233,17 +235,17 @@ const DashboardOverview = () => {
   const repColors = getScoreColor(repScore);
 
   const stats = [
-    { label: 'Tasks Due', value: String(isDemoMode ? 5 : tasksDue), icon: <CheckSquare size={16} />, color: 'text-destructive', link: '/dashboard/contacts' },
-    { label: 'Active Contacts', value: isDemoMode ? '62' : String(activeContacts), icon: <Users size={16} />, color: 'text-primary', link: '/dashboard/contacts' },
-    { label: 'Appraisals This Month', value: isDemoMode ? '9' : '0', icon: <ClipboardList size={16} />, color: 'text-success', link: '/dashboard/listings' },
-    { label: 'Sales This Month', value: AUD.format(isDemoMode ? 1250000 : 0), icon: <DollarSign size={16} />, color: 'text-primary', link: '/dashboard/reports' },
-    { label: 'Trust Balance', value: AUD.format(isDemoMode ? 47230 : trustBalance), icon: <Landmark size={16} />, color: 'text-success', link: '/dashboard/trust' },
+    { label: 'Tasks Due', value: String(effectiveDemo ? 5 : tasksDue), icon: <CheckSquare size={16} />, color: 'text-destructive', link: '/dashboard/contacts' },
+    { label: 'Active Contacts', value: effectiveDemo ? '62' : String(activeContacts), icon: <Users size={16} />, color: 'text-primary', link: '/dashboard/contacts' },
+    { label: 'Appraisals This Month', value: effectiveDemo ? '9' : '0', icon: <ClipboardList size={16} />, color: 'text-success', link: '/dashboard/listings' },
+    { label: 'Sales This Month', value: AUD.format(effectiveDemo ? 1250000 : 0), icon: <DollarSign size={16} />, color: 'text-primary', link: '/dashboard/reports' },
+    { label: 'Trust Balance', value: AUD.format(effectiveDemo ? 47230 : trustBalance), icon: <Landmark size={16} />, color: 'text-success', link: '/dashboard/trust' },
     { label: 'Unresponded Leads', value: String(unrespondedValue), icon: <Zap size={16} />, color: unrespondedValue > 0 ? 'text-destructive' : 'text-success', link: '/dashboard/leads' },
   ];
 
   return (
     <div>
-      <DashboardHeader title="Dashboard" subtitle={isDemoMode ? "South Yarra Demo Agency" : "Welcome back, Agent"} />
+      <DashboardHeader title="Dashboard" subtitle={effectiveDemo ? "South Yarra Demo Agency" : "Welcome back, Agent"} />
 
       <div className="p-4 sm:p-6 space-y-6 max-w-7xl">
         {/* Stats Row */}
@@ -300,7 +302,7 @@ const DashboardOverview = () => {
               { address: '15 Station St, Narre Warren', time: '12:30 PM', propertyId: '2' },
               { address: '8 Ocean View Rd, Brighton', time: '2:00 PM', propertyId: '3' },
             ];
-            const inspections = isDemoMode ? DEMO_INSPECTIONS : todayInspections;
+            const inspections = effectiveDemo ? DEMO_INSPECTIONS : todayInspections;
             if (inspections.length === 0) {
               return (
                 <p className="text-sm text-muted-foreground py-4 text-center">No inspections scheduled for today</p>
@@ -339,7 +341,7 @@ const DashboardOverview = () => {
           <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
             <Mic size={16} className="text-success" /> Today's Voice Matches
           </h3>
-          {isDemoMode ? (
+          {effectiveDemo ? (
             <div className="space-y-3">
               {MOCK_MATCHES.map((m) => {
                 const u = URGENCY_CONFIG[m.urgency];
@@ -403,7 +405,7 @@ const DashboardOverview = () => {
                 </tr>
               </thead>
               <tbody>
-                {isDemoMode ? [
+                {effectiveDemo ? [
                   { id: '1', thumb: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=80&h=60&fit=crop', address: '42 Panorama Drive, Berwick', status: 'whisper', views: 24, voiceInquiries: 3, qualifiedLeads: 2, daysListed: 4 },
                   { id: '2', thumb: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=80&h=60&fit=crop', address: '15 Station St, Narre Warren', status: 'coming-soon', views: 67, voiceInquiries: 8, qualifiedLeads: 5, daysListed: 11 },
                   { id: '3', thumb: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=80&h=60&fit=crop', address: '8 Ocean View Rd, Brighton', status: 'public', views: 142, voiceInquiries: 12, qualifiedLeads: 7, daysListed: 18 },
@@ -466,7 +468,7 @@ const DashboardOverview = () => {
                 </div>
               ))}
             </div>
-          ) : isDemoMode ? (
+          ) : effectiveDemo ? (
             <div className="space-y-3">
               {[
                 { text: 'Called Sarah M. re: 42 Panorama Dr appraisal', time: 'Today, 2:15 PM' },
@@ -540,13 +542,13 @@ const DashboardOverview = () => {
               <TrendingUp size={16} className="text-primary" /> Pipeline — 12 Month Deal Flow
             </h3>
             <div className="h-48 relative">
-              {!isDemoMode && pipelineEmpty && (
+              {!effectiveDemo && pipelineEmpty && (
                 <div className="absolute inset-0 flex items-center justify-center z-10">
                   <p className="text-sm text-muted-foreground bg-card/80 backdrop-blur-sm px-3 py-1.5 rounded-lg">No completed sales yet</p>
                 </div>
               )}
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={isDemoMode ? DEMO_PIPELINE_DATA : pipelineData}>
+                <BarChart data={effectiveDemo ? DEMO_PIPELINE_DATA : pipelineData}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} className="text-muted-foreground" />
                   <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `$${v / 1000}k`} className="text-muted-foreground" />

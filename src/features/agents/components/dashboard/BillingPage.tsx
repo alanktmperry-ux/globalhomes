@@ -284,6 +284,8 @@ const BillingPage = () => {
               </div>
             ))}
           </div>
+        </div>
+
         <p className="text-[11px] text-muted-foreground text-center">
           All prices in AUD + GST. Annual plans billed as a single payment. No per-listing fees — ever. Founding Member rate locked for life while subscribed.
         </p>

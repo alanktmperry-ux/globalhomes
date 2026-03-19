@@ -193,6 +193,15 @@ const DashboardOverview = () => {
 
   // Stats row - Australian CRM focus
   const unrespondedValue = isDemoMode ? 2 : unrespondedLeads;
+
+  // Reputation score with trend
+  const repScore = DEMO_REPUTATION.total;
+  const lastMonthKey = 'gh_rep_last_month';
+  const lastMonth = parseInt(localStorage.getItem(lastMonthKey) || '0', 10);
+  const repTrend = lastMonth === 0 ? 'neutral' : repScore > lastMonth ? 'up' : repScore < lastMonth ? 'down' : 'neutral';
+  useEffect(() => { localStorage.setItem(lastMonthKey, String(repScore)); }, [repScore]);
+  const repColors = getScoreColor(repScore);
+
   const stats = [
     { label: 'Tasks Due', value: String(tasksDue || (isDemoMode ? 5 : 3)), icon: <CheckSquare size={16} />, color: 'text-destructive', link: '/dashboard/contacts' },
     { label: 'Active Contacts', value: isDemoMode ? '62' : '48', icon: <Users size={16} />, color: 'text-primary', link: '/dashboard/contacts' },

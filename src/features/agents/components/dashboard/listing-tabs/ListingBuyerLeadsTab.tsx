@@ -58,6 +58,7 @@ const ListingBuyerLeadsTab = ({ listing }: Props) => {
                 <th className="text-left p-3">Name</th>
                 <th className="text-left p-3">Contact</th>
                 <th className="text-left p-3">Urgency</th>
+                <th className="text-left p-3">Intent</th>
                 <th className="text-left p-3">Status</th>
                 <th className="text-left p-3">Date</th>
                 <th className="text-left p-3">Message</th>

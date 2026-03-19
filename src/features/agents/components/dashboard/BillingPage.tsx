@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CreditCard, Check, Loader2, Zap, Crown, Building2 } from 'lucide-react';
+import { CreditCard, Check, Loader2, Zap, Crown, Building2, Flame, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -11,41 +11,54 @@ import DashboardHeader from './DashboardHeader';
 const PLANS = [
   {
     name: 'Starter',
-    monthlyPrice: 79,
-    annualPrice: 67,
+    foundingPrice: 99,
+    fullPrice: 199,
+    annualPrice: 84,
     icon: Zap,
     features: [
-      '10 active listings',
+      '10 active listings (no per-listing fee)',
+      '14-Day GlobalHomes First pre-market window',
+      'Basic CRM',
+      'AI listing writer',
+      'Buyer intent scoring',
+      'Agent profile',
       'Voice lead matching',
-      'Basic CRM (contacts + pipeline)',
-      'Agent profile page',
-      'Email support',
       'Standard analytics',
+      'Email support',
     ],
+    saving: 'Save $800+/mo vs REA Pro + CRM',
     listingLimit: 10,
   },
   {
     name: 'Pro',
-    monthlyPrice: 179,
-    annualPrice: 152,
+    foundingPrice: 199,
+    fullPrice: 349,
+    annualPrice: 169,
     icon: Crown,
     popular: true,
     features: [
-      'Unlimited active listings',
-      'Voice lead matching + AI reply',
-      'Full CRM — contacts, pipeline, tasks',
-      'Trust accounting & reconciliation',
-      'Advanced analytics & reports',
-      'Verified agent badge',
-      'Off-market network access',
+      'Unlimited listings',
+      '14-Day GlobalHomes First + Day-7 match report',
+      'Full CRM',
+      'Trust accounting',
+      'Whisper Market',
+      'Inspection Day Mode',
+      'Settlement Concierge',
+      'Reputation Score',
+      'Commission Calculator',
+      'Advanced analytics',
+      'GCI reports',
+      'Verified badge',
       'Priority support',
     ],
+    saving: 'Save $1,200+/mo vs full agency stack',
     listingLimit: 999,
   },
   {
     name: 'Agency',
-    monthlyPrice: 349,
-    annualPrice: 297,
+    foundingPrice: 399,
+    fullPrice: 699,
+    annualPrice: 339,
     icon: Building2,
     features: [
       'Everything in Pro',
@@ -53,9 +66,11 @@ const PLANS = [
       'Team analytics dashboard',
       'Agency profile & branding',
       'Lead routing between agents',
+      'Xero integration (coming soon)',
       'API access',
       'Dedicated account manager',
     ],
+    saving: 'Save $2,000+/mo for your whole team',
     listingLimit: 999,
   },
 ];
@@ -135,6 +150,30 @@ const BillingPage = () => {
           </div>
         </div>
 
+        {/* 60-Day Free Trial Banner */}
+        <div className="bg-primary/10 border border-primary/20 rounded-2xl p-6 mb-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-bold text-foreground">60 Days Free — No Credit Card</h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                Try GlobalHomes free for 60 days. Full platform access, unlimited listings. After 60 days, keep everything from $99/month.
+              </p>
+            </div>
+            <div className="flex flex-col items-start sm:items-end gap-1 shrink-0">
+              <Button onClick={() => handleUpgrade('trial')}>Start Free Trial</Button>
+              <span className="text-[11px] text-muted-foreground">Then from $99/mo · Cancel anytime</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Founding Member Counter */}
+        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-5 py-3 text-sm mb-6 flex items-center gap-2">
+          <Flame size={16} className="text-amber-500 shrink-0" />
+          <span className="text-foreground">
+            <strong>Founding Member spots:</strong> 73 of 100 remaining — lock your rate for life
+          </span>
+        </div>
+
         {/* Billing toggle */}
         <div className="flex items-center justify-center gap-3">
           <button
@@ -160,7 +199,7 @@ const BillingPage = () => {
         <div className="grid sm:grid-cols-3 gap-4">
           {PLANS.map(plan => {
             const isCurrent = currentPlan === plan.name.toLowerCase();
-            const price = billingCycle === 'annual' ? plan.annualPrice : plan.monthlyPrice;
+            const price = billingCycle === 'annual' ? plan.annualPrice : plan.foundingPrice;
             return (
               <div key={plan.name} className={`bg-card border rounded-xl p-5 space-y-4 relative ${plan.popular ? 'border-primary ring-1 ring-primary/20' : 'border-border'}`}>
                 {plan.popular && (
@@ -170,11 +209,16 @@ const BillingPage = () => {
                   <plan.icon size={24} className="mx-auto text-primary mb-2" />
                   <h4 className="font-display font-bold">{plan.name}</h4>
                   <p className="text-2xl font-bold mt-1">${price}<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
+                  <p className="text-xs text-muted-foreground line-through mt-0.5">
+                    ${plan.fullPrice}/mo after first 100
+                  </p>
                   {billingCycle === 'annual' && (
                     <p className="text-[10px] text-muted-foreground mt-0.5">
                       ${plan.annualPrice * 12}/yr billed annually
                     </p>
                   )}
+                  <p className="text-success text-[10px] font-medium mt-1">{plan.saving}</p>
+                  <p className="text-amber-500 text-[10px] mt-0.5">Rate locked for life · First 100 agencies only</p>
                 </div>
                 <ul className="space-y-2">
                   {plan.features.map(f => (
@@ -197,8 +241,25 @@ const BillingPage = () => {
           })}
         </div>
 
+        {/* Enterprise Card */}
+        <div className="bg-foreground text-background rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h4 className="font-display font-bold text-lg">Enterprise</h4>
+            <p className="text-sm opacity-80 mt-1">Multi-branch agencies, white label, and API access</p>
+          </div>
+          <div className="flex flex-col items-start sm:items-end gap-1 shrink-0">
+            <span className="text-lg font-bold">From $1,499/mo</span>
+            <Button variant="secondary" size="sm" asChild>
+              <a href="mailto:sales@everythingeco.com.au">
+                <Mail size={14} />
+                Contact Sales
+              </a>
+            </Button>
+          </div>
+        </div>
+
         <p className="text-[11px] text-muted-foreground text-center">
-          All prices in AUD + GST. Annual plans billed as one payment.
+          All prices in AUD + GST. Annual plans billed as a single payment. No per-listing fees — ever. Founding Member rate locked for life while subscribed.
         </p>
 
         {/* Payment */}

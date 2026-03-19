@@ -160,7 +160,14 @@ const BillingPage = () => {
               </p>
             </div>
             <div className="flex flex-col items-start sm:items-end gap-1 shrink-0">
-              <Button onClick={() => handleUpgrade('trial')}>Start Free Trial</Button>
+              <Button
+                size="lg"
+                onClick={() => handleUpgrade('trial')}
+                className="text-base px-8 py-5 rounded-xl font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-lg shadow-primary/30"
+              >
+                <Zap size={18} className="mr-2" />
+                Start Free 60-Day Trial
+              </Button>
               <span className="text-[11px] text-muted-foreground">Then from $99/mo · Cancel anytime</span>
             </div>
           </div>

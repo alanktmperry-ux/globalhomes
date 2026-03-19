@@ -36,18 +36,22 @@ const DemoAccessPage = () => {
       });
 
       if (fnError) {
-        let serverMessage = '';
+        let serverMessage = 'Something went wrong. Please try again.';
         try {
-          const payload = await (fnError as any)?.context?.json?.();
-          serverMessage = payload?.error || '';
+          const bodyText = await (fnError as any)?.context?.text?.();
+          if (bodyText) {
+            const parsed = JSON.parse(bodyText);
+            serverMessage = parsed?.error || serverMessage;
+          }
         } catch (_) {
           // ignore parse error
         }
-        setError(serverMessage || 'Something went wrong. Please try again.');
+        setError(serverMessage);
         return;
       }
 
-      if (!fnData?.success || !fnData?.request_id) {
+      const payload = typeof fnData === 'string' ? JSON.parse(fnData) : fnData;
+      if (!payload?.success || !payload?.request_id) {
         setError('Something went wrong. Please try again.');
         return;
       }
@@ -55,8 +59,8 @@ const DemoAccessPage = () => {
       await supabase.auth.signOut();
 
       const { error: signInErr } = await supabase.auth.signInWithPassword({
-        email: fnData.demo_email || 'demo@globalhomes.app',
-        password: fnData.demo_password || 'DemoAccess2024!',
+        email: payload.demo_email || 'demo@globalhomes.app',
+        password: payload.demo_password || 'DemoAccess2024!',
       });
 
       if (signInErr) {
@@ -65,7 +69,7 @@ const DemoAccessPage = () => {
       }
 
       await supabase.functions.invoke('handle-demo-request', {
-        body: { action: 'redeem_code', request_id: fnData.request_id },
+        body: { action: 'redeem_code', request_id: payload.request_id },
       });
 
       toast.success('Welcome to the demo!');

@@ -89,6 +89,40 @@ const DashboardOverview = () => {
       .then(({ count }) => setTasksDue(count || 0));
   }, [user]);
 
+  // Fetch active contacts count
+  useEffect(() => {
+    if (!user || isDemoMode) return;
+    supabase
+      .from('contacts')
+      .select('id', { count: 'exact', head: true })
+      .eq('created_by', user.id)
+      .then(({ count }) => setActiveContacts(count || 0));
+  }, [user, isDemoMode]);
+
+  // Fetch trust balance
+  useEffect(() => {
+    if (!user || isDemoMode) return;
+    supabase
+      .from('agents')
+      .select('id')
+      .eq('user_id', user.id)
+      .single()
+      .then(({ data: agent }) => {
+        if (!agent) return;
+        supabase
+          .from('trust_transactions')
+          .select('amount, transaction_type')
+          .eq('agent_id', agent.id)
+          .then(({ data }) => {
+            if (!data) return;
+            const balance = data.reduce((sum, t) => {
+              return sum + (t.transaction_type === 'deposit' ? Number(t.amount) : -Number(t.amount));
+            }, 0);
+            setTrustBalance(Math.max(0, balance));
+          });
+      });
+  }, [user, isDemoMode]);
+
   // Fetch unresponded leads (status='new', older than 5 min)
   useEffect(() => {
     if (!user || isDemoMode) return;

@@ -205,7 +205,7 @@ const DashboardOverview = () => {
 
       <div className="p-4 sm:p-6 space-y-6 max-w-7xl">
         {/* Stats Row */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
           {stats.map((s) => (
             <motion.div
               key={s.label}

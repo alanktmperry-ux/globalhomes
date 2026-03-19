@@ -57,6 +57,7 @@ const ACCOUNT_NAV: NavItem[] = [
   { title: 'Billing', url: '/dashboard/billing', icon: CreditCard },
   { title: 'Reviews', url: '/dashboard/reviews', icon: Star },
   { title: 'Settings', url: '/dashboard/settings', icon: Settings },
+  { title: 'Help & FAQ', url: '/dashboard/help', icon: HelpCircle },
 ];
 
 const AgentDashboardSidebar = () => {

@@ -120,6 +120,7 @@ const App = () => (
                 <Route path="reconciliation" element={<BankReconciliationPage />} />
                 <Route path="reports" element={<ReportsPage />} />
                 <Route path="settings" element={<SettingsPage />} />
+                <Route path="help" element={<HelpPage />} />
               </Route>
 
               {/* Admin */}

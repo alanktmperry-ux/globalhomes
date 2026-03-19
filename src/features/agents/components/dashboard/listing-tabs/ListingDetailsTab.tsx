@@ -135,6 +135,7 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
             <Select value={form.status} onValueChange={v => setForm(f => ({...f, status: v}))}>
               <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
               <SelectContent>
+                <SelectItem value="pending">Pending (Draft)</SelectItem>
                 <SelectItem value="whisper">Whisper</SelectItem>
                 <SelectItem value="coming-soon">Coming Soon</SelectItem>
                 <SelectItem value="public">Public</SelectItem>

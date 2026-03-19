@@ -18,6 +18,8 @@ const ListingDetailPage = () => {
   const [listing, setListing] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('details');
+  const [publishing, setPublishing] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!listingId) return;

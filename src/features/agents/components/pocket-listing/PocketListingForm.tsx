@@ -278,7 +278,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         });
         if (error) throw error;
         localStorage.removeItem('pocket-listing-draft');
-        toast({ title: 'Listing published!', description: 'Your property has been saved to the database.' });
+        toast({ title: 'Listing saved!', description: 'Your property is in draft. Publish it from your dashboard to make it visible to buyers.' });
       }
 
       onPublish(title);

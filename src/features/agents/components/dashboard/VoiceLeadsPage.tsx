@@ -54,6 +54,13 @@ const VoiceLeadsPage = () => {
         {/* Lead list */}
         <div className={`${selectedId ? 'hidden lg:block lg:w-[380px]' : 'flex-1'} border-r border-border`}>
           <div className="p-4 space-y-2">
+            {leads.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <Mic size={32} className="text-muted-foreground/30 mb-3" />
+                <p className="text-sm font-medium text-muted-foreground">No voice leads yet</p>
+                <p className="text-xs text-muted-foreground/70 mt-1">Voice search inquiries will appear here</p>
+              </div>
+            )}
             {leads.map((lead) => {
               const u = URGENCY[lead.urgency];
               return (

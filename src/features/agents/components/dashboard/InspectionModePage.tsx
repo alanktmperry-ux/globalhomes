@@ -345,7 +345,7 @@ const InspectionModePage = () => {
             <CalendarDays size={48} className="mx-auto mb-3 opacity-40" />
             <p className="font-medium mb-1">No inspections scheduled for today</p>
             <p className="text-sm mb-4">Add inspection times to your listings to see them here.</p>
-            <Button onClick={() => navigate('/agent/listings')} variant="outline">Go to Listings</Button>
+            <Button onClick={() => navigate('/dashboard/listings')} variant="outline">Go to Listings</Button>
           </CardContent>
         </Card>
       ) : (

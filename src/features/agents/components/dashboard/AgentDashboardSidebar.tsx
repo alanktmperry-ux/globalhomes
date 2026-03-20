@@ -190,7 +190,7 @@ const AgentDashboardSidebar = () => {
         {!collapsed ? (
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">G</span>
+              <span className="text-primary-foreground font-bold text-sm">L</span>
             </div>
             <div>
             <p className="font-display text-sm font-bold leading-none">ListHQ</p>

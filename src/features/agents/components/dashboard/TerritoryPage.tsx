@@ -169,7 +169,7 @@ const TerritoryPage = () => {
       setShowForm(false);
       toast.success('Location added');
     } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast.error(`Error — ${(err.message)}`);
     } finally {
       setSaving(false);
     }
@@ -182,7 +182,7 @@ const TerritoryPage = () => {
       setLocations(prev => prev.filter(l => l.id !== id));
       toast.success('Location removed');
     } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast.error(`Error — ${(err.message)}`);
     }
   };
 

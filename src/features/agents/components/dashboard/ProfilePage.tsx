@@ -169,7 +169,7 @@ const ProfilePage = () => {
       setAgent(prev => prev ? { ...prev, avatar_url: publicUrl } : null);
       toast.success('Photo updated');
     } catch (err: any) {
-      toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
+      toast.error(`Upload failed — ${(err.message)}`);
     } finally {
       setUploadingAvatar(false);
     }
@@ -198,7 +198,7 @@ const ProfilePage = () => {
       setAgent(prev => prev ? { ...prev, company_logo_url: publicUrl } : null);
       toast.success('Company logo updated');
     } catch (err: any) {
-      toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
+      toast.error(`Upload failed — ${(err.message)}`);
     } finally {
       setUploadingLogo(false);
     }
@@ -211,7 +211,7 @@ const ProfilePage = () => {
       setAgent(prev => prev ? { ...prev, company_logo_url: null } : null);
       toast.success('Logo removed');
     } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast.error(`Error — ${(err.message)}`);
     }
   };
 
@@ -241,7 +241,7 @@ const ProfilePage = () => {
       toast.success('Document uploaded');
       loadData();
     } catch (err: any) {
-      toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
+      toast.error(`Upload failed — ${(err.message)}`);
     } finally {
       setUploadingDoc(false);
       if (docInputRef.current) docInputRef.current.value = '';
@@ -286,7 +286,7 @@ const ProfilePage = () => {
       toast.success('Profile saved — All changes have been saved successfully.');
       loadData();
     } catch (err: any) {
-      toast({ title: 'Error saving', description: err.message, variant: 'destructive' });
+      toast.error(`Error saving — ${(err.message)}`);
     } finally {
       setSaving(false);
     }

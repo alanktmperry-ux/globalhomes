@@ -153,7 +153,7 @@ const InspectionModePage = () => {
 
   const handleFollowUp = () => {
     const count = visitors.filter(v => v.email).length || visitors.length;
-    toast({ title: '📧 Follow-ups scheduled', description: `Follow-up emails scheduled for ${count} contacts` });
+    toast.success(`📧 Follow-ups scheduled — Follow-up emails scheduled for ${count} contacts`);
   };
 
   const handleExitSummary = () => {

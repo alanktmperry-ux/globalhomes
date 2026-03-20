@@ -107,7 +107,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
 
       setStep('success');
     } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast.error(`Error — ${(err.message)}`);
     } finally {
       setLoading(false);
     }

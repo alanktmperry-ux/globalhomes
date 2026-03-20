@@ -102,7 +102,7 @@ const SettingsPage = () => {
       setAgentData(prev => prev ? { ...prev, avatar_url: publicUrl } : null);
       toast.success('Avatar updated — Your profile photo has been uploaded.');
     } catch (err: any) {
-      toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
+      toast.error(`Upload failed — ${(err.message)}`);
     } finally {
       setUploadingAvatar(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -128,7 +128,7 @@ const SettingsPage = () => {
       toast.success('Profile updated — Your changes have been saved.');
       await loadAgentData(); // Refresh data
     } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast.error(`Error — ${(err.message)}`);
     } finally {
       setSaving(false);
     }

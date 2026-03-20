@@ -129,7 +129,7 @@ const StepVoice = ({ draft, update }: Props) => {
 
       if (!resp.ok || !resp.body) {
         const err = await resp.json().catch(() => ({ error: 'Generation failed' }));
-        toast({ title: 'Generation failed', description: err.error, variant: 'destructive' });
+        toast.error(`Generation failed — ${(err.error)}`);
         setGenerating(false);
         return;
       }

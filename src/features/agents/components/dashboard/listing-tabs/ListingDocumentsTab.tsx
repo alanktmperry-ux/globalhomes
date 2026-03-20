@@ -68,7 +68,7 @@ const ListingDocumentsTab = ({ listing }: Props) => {
       .upload(filePath, file);
 
     if (uploadError) {
-      toast({ title: 'Upload failed', description: uploadError.message, variant: 'destructive' });
+      toast.error(`Upload failed — ${(uploadError.message)}`);
       setUploading(false);
       return;
     }

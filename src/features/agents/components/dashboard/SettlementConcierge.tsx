@@ -91,7 +91,7 @@ const SettlementConcierge = () => {
   };
 
   const handleCongrats = (s: Settlement) => {
-    toast({ title: '🎉 Email sent', description: `Congratulations email sent to ${s.buyerName}` });
+    toast.success(`🎉 Email sent — Congratulations email sent to ${s.buyerName}`);
   };
 
   const handleReviewRequest = (s: Settlement) => {

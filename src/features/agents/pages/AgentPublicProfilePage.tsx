@@ -5,9 +5,6 @@ import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/comp
 import { Progress } from '@/components/ui/progress';
 import { DEMO_REPUTATION, getScoreColor, REPUTATION_TOOLTIP, type ReputationResult } from '@/features/agents/utils/reputationScore';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { SiteHeader } from '@/shared/components/layout/SiteHeader';
-import { SiteFooter } from '@/shared/components/layout/SiteFooter';
-import { BottomNav } from '@/shared/components/layout/BottomNav';
 import { PropertyCard } from '@/features/properties/components/PropertyCard';
 import { useSavedProperties } from '@/features/properties/hooks/useSavedProperties';
 import { useI18n } from '@/shared/lib/i18n';

@@ -602,8 +602,6 @@ export default function PropertyDetailPage() {
         )}
       </AnimatePresence>
 
-      <SiteFooter />
-      <BottomNav />
 
       <AgentContactModal
         property={property}

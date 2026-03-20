@@ -14,6 +14,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
+import { supabase } from '@/integrations/supabase/client';
 
 interface NavItem {
   title: string;

@@ -192,6 +192,79 @@ const DashboardOverview = () => {
       });
   }, [user]);
 
+  // Fetch arrears tenancies
+  useEffect(() => {
+    if (!user) return;
+    const fetchArrears = async () => {
+      const { data: agent } = await supabase
+        .from('agents').select('id').eq('user_id', user.id).single();
+      if (!agent) return;
+
+      const { data: tenancies } = await supabase
+        .from('tenancies')
+        .select('*, properties(address, suburb)')
+        .eq('agent_id', agent.id)
+        .eq('status', 'active');
+      if (!tenancies || tenancies.length === 0) return;
+
+      const tenancyIds = tenancies.map(t => t.id);
+      const { data: payments } = await supabase
+        .from('rent_payments')
+        .select('*')
+        .in('tenancy_id', tenancyIds)
+        .order('payment_date', { ascending: false });
+
+      const today = new Date();
+      const overdue: any[] = [];
+
+      for (const t of tenancies) {
+        const tenancyPayments = (payments || []).filter(p => p.tenancy_id === t.id);
+        const latest = tenancyPayments[0];
+        if (!latest) {
+          // No payments at all — check if lease started more than 3 days ago
+          const leaseStart = new Date(t.lease_start);
+          const daysSinceStart = differenceInDays(today, leaseStart);
+          if (daysSinceStart > 3) {
+            overdue.push({ ...t, daysOverdue: daysSinceStart, amountOwed: Number(t.rent_amount) });
+          }
+          continue;
+        }
+        const periodEnd = new Date(latest.period_to);
+        const daysOverdue = differenceInDays(today, periodEnd);
+        if (daysOverdue > 3 && latest.status !== 'paid') {
+          overdue.push({ ...t, daysOverdue, amountOwed: Number(t.rent_amount) });
+        }
+      }
+      setArrearsTenancies(overdue);
+    };
+    fetchArrears();
+  }, [user]);
+
+  const handleSendReminder = async (tenancy: any) => {
+    setSendingReminder(tenancy.id);
+    try {
+      const address = tenancy.properties?.address || 'your property';
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-notification-email`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}` },
+          body: JSON.stringify({
+            to: tenancy.tenant_email,
+            subject: 'Rent overdue reminder',
+            body: `Dear ${tenancy.tenant_name}, your rent for ${address} is overdue. Please arrange payment at your earliest convenience. Thank you.`,
+          }),
+        }
+      );
+      if (!res.ok) throw new Error('Failed to send');
+      toast.success(`Reminder sent to ${tenancy.tenant_name}`);
+    } catch {
+      toast.error('Failed to send reminder');
+    } finally {
+      setSendingReminder(null);
+    }
+  };
+
   // GCI values — real data; new users start at 0
   const gciActual = 0;
   const gciBudgeted = 0;

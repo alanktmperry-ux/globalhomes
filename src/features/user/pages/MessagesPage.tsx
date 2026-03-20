@@ -44,8 +44,11 @@ const MessagesPage = () => {
   const [newMsgDialogOpen, setNewMsgDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const getConversationKey = (otherUserId: string, propertyId: string | null) => {
     if (!otherUserId) return null;

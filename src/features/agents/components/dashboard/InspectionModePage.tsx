@@ -101,7 +101,7 @@ const InspectionModePage = () => {
     fetchInspections();
   }, [user]);
 
-
+  const handleStartInspection = (inspection: ScheduledInspection) => {
     setActiveInspection(inspection);
     setVisitors([]);
     setShowSummary(false);

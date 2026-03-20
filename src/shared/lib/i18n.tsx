@@ -71,9 +71,9 @@ const translations: Record<Language, Record<string, string>> = {
   },
   ko: {
     'app.name': 'Global Homes',
-    'search.placeholder': '검색 "서울 4베드 아파트 8억"',
+    'search.placeholder': '검색 "멜버른 4베드룸 집 $85만"',
     'search.voice.listening': '듣고 있습니다...',
-    'search.resume': '검색 이어하기',
+    'search.resume': '검색 재개',
     'search.recommended': '추천 매물',
     'search.results': '검색 결과',
     'nav.search': '검색',

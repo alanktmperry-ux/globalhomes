@@ -156,7 +156,7 @@ export function NotificationBell() {
                       }`}
                       onClick={() => {
                         markAsRead(n.id);
-                        if (n.type === 'lead' || n.type === 'voice_match') {
+                        if (n.type === 'lead' || n.type === 'voice_match' || n.type === 'message') {
                           setOpen(false);
                           navigate('/messages');
                         }

@@ -252,6 +252,10 @@ const ReportsPage = () => {
     exportCsv(headers, rows, 'activity_report');
   };
 
+  if (!subLoading && !canAccessTrust) {
+    return <UpgradeGate requiredPlan="Pro or above" message="Advanced reports are available on the Pro plan and above. Export listings, leads, trust, and contacts data as CSV." />;
+  }
+
   return (
     <div>
       <DashboardHeader title="Reports" subtitle="Performance analytics & financial summaries" />

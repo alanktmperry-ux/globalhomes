@@ -536,6 +536,10 @@ const TrustAccountingPage = () => {
     );
   }
 
+  if (!subLoading && !canAccessTrust) {
+    return <UpgradeGate requiredPlan="Pro or above" message="Trust accounting is available on the Pro plan and above. Record deposits, manage client ledgers, generate compliance-ready statements, and import your opening balance from PropertyMe." />;
+  }
+
   return (
     <div>
       <DashboardHeader

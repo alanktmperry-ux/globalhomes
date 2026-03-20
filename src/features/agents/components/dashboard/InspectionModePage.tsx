@@ -276,6 +276,10 @@ const InspectionModePage = () => {
   }
 
   // ── State 1: Scheduled Inspections ──
+  if (!subLoading && !canAccessInspections) {
+    return <UpgradeGate requiredPlan="Pro or above" message="Inspection Day Mode is available on the Pro plan and above. Capture visitor details with QR sign-in, track interest levels, and send follow-ups in one tap." />;
+  }
+
   return (
     <div className="flex-1 p-4 md:p-8">
       <div className="flex items-center gap-3 mb-6">

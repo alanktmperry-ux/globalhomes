@@ -708,6 +708,10 @@ const TeamPage = () => {
     );
   }
 
+  if (!subLoading && !canAccessTeam) {
+    return <UpgradeGate requiredPlan="Agency plan" message="Team management is available on the Agency plan. Invite up to 8 agents under one account with separate logins and centralised billing." />;
+  }
+
   return (
     <div className="max-w-4xl mx-auto space-y-8 p-4 sm:p-6">
       {/* Header with Logo */}

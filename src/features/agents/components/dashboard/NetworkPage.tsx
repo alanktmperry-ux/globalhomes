@@ -414,6 +414,10 @@ const NetworkPage = () => {
     );
   }
 
+  if (!subLoading && !canAccessNetwork) {
+    return <UpgradeGate requiredPlan="Pro or above" message="The Off-Market Network is available on the Pro plan and above. Share listings privately with verified agents and receive buyer briefs before properties go public." />;
+  }
+
   return (
     <div>
       <DashboardHeader title="Whisper Market" subtitle="Off-market network & buyer matching" />

@@ -1103,6 +1103,85 @@ export type Database = {
           },
         ]
       }
+      maintenance_jobs: {
+        Row: {
+          actual_cost: number | null
+          agent_id: string
+          assigned_phone: string | null
+          assigned_to: string | null
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          estimated_cost: number | null
+          id: string
+          priority: string
+          property_id: string
+          reported_by: string
+          status: string
+          tenancy_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          actual_cost?: number | null
+          agent_id: string
+          assigned_phone?: string | null
+          assigned_to?: string | null
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          estimated_cost?: number | null
+          id?: string
+          priority?: string
+          property_id: string
+          reported_by?: string
+          status?: string
+          tenancy_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          actual_cost?: number | null
+          agent_id?: string
+          assigned_phone?: string | null
+          assigned_to?: string | null
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          estimated_cost?: number | null
+          id?: string
+          priority?: string
+          property_id?: string
+          reported_by?: string
+          status?: string
+          tenancy_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_jobs_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_jobs_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_jobs_tenancy_id_fkey"
+            columns: ["tenancy_id"]
+            isOneToOne: false
+            referencedRelation: "tenancies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string
@@ -1306,6 +1385,7 @@ export type Database = {
           agency_authority: string | null
           agent_id: string | null
           agent_split_percent: number | null
+          available_from: string | null
           baths: number
           beds: number
           bushfire_zone: boolean | null
@@ -1319,6 +1399,7 @@ export type Database = {
           estimated_value: string | null
           features: string[] | null
           flood_zone: boolean | null
+          furnished: boolean | null
           id: string
           image_url: string | null
           images: string[] | null
@@ -1326,11 +1407,13 @@ export type Database = {
           is_active: boolean
           land_size: number | null
           lat: number | null
+          lease_term: string | null
           listed_date: string | null
           listing_type: string | null
           lng: number | null
           marketing_budget: number | null
           parking: number
+          pets_allowed: boolean | null
           price: number
           price_formatted: string
           property_type: string | null
@@ -1353,6 +1436,7 @@ export type Database = {
           agency_authority?: string | null
           agent_id?: string | null
           agent_split_percent?: number | null
+          available_from?: string | null
           baths?: number
           beds?: number
           bushfire_zone?: boolean | null
@@ -1366,6 +1450,7 @@ export type Database = {
           estimated_value?: string | null
           features?: string[] | null
           flood_zone?: boolean | null
+          furnished?: boolean | null
           id?: string
           image_url?: string | null
           images?: string[] | null
@@ -1373,11 +1458,13 @@ export type Database = {
           is_active?: boolean
           land_size?: number | null
           lat?: number | null
+          lease_term?: string | null
           listed_date?: string | null
           listing_type?: string | null
           lng?: number | null
           marketing_budget?: number | null
           parking?: number
+          pets_allowed?: boolean | null
           price: number
           price_formatted: string
           property_type?: string | null
@@ -1400,6 +1487,7 @@ export type Database = {
           agency_authority?: string | null
           agent_id?: string | null
           agent_split_percent?: number | null
+          available_from?: string | null
           baths?: number
           beds?: number
           bushfire_zone?: boolean | null
@@ -1413,6 +1501,7 @@ export type Database = {
           estimated_value?: string | null
           features?: string[] | null
           flood_zone?: boolean | null
+          furnished?: boolean | null
           id?: string
           image_url?: string | null
           images?: string[] | null
@@ -1420,11 +1509,13 @@ export type Database = {
           is_active?: boolean
           land_size?: number | null
           lat?: number | null
+          lease_term?: string | null
           listed_date?: string | null
           listing_type?: string | null
           lng?: number | null
           marketing_budget?: number | null
           parking?: number
+          pets_allowed?: boolean | null
           price?: number
           price_formatted?: string
           property_type?: string | null
@@ -1448,6 +1539,66 @@ export type Database = {
             columns: ["agent_id"]
             isOneToOne: false
             referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rent_payments: {
+        Row: {
+          agent_id: string
+          amount: number
+          created_at: string
+          id: string
+          notes: string | null
+          payment_date: string
+          payment_method: string
+          period_from: string
+          period_to: string
+          receipt_number: string
+          status: string
+          tenancy_id: string
+        }
+        Insert: {
+          agent_id: string
+          amount: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          payment_date: string
+          payment_method?: string
+          period_from: string
+          period_to: string
+          receipt_number: string
+          status?: string
+          tenancy_id: string
+        }
+        Update: {
+          agent_id?: string
+          amount?: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          payment_date?: string
+          payment_method?: string
+          period_from?: string
+          period_to?: string
+          receipt_number?: string
+          status?: string
+          tenancy_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rent_payments_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rent_payments_tenancy_id_fkey"
+            columns: ["tenancy_id"]
+            isOneToOne: false
+            referencedRelation: "tenancies"
             referencedColumns: ["id"]
           },
         ]
@@ -1767,6 +1918,106 @@ export type Database = {
             columns: ["office_id"]
             isOneToOne: false
             referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenancies: {
+        Row: {
+          agent_id: string
+          bond_amount: number
+          bond_authority: string | null
+          bond_lodgement_number: string | null
+          created_at: string
+          id: string
+          lease_end: string
+          lease_start: string
+          management_fee_percent: number
+          notes: string | null
+          owner_account_number: string | null
+          owner_bsb: string | null
+          owner_email: string | null
+          owner_name: string | null
+          property_id: string
+          rent_amount: number
+          rent_frequency: string
+          status: string
+          tenant_contact_id: string | null
+          tenant_email: string | null
+          tenant_name: string
+          tenant_phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          bond_amount: number
+          bond_authority?: string | null
+          bond_lodgement_number?: string | null
+          created_at?: string
+          id?: string
+          lease_end: string
+          lease_start: string
+          management_fee_percent?: number
+          notes?: string | null
+          owner_account_number?: string | null
+          owner_bsb?: string | null
+          owner_email?: string | null
+          owner_name?: string | null
+          property_id: string
+          rent_amount: number
+          rent_frequency?: string
+          status?: string
+          tenant_contact_id?: string | null
+          tenant_email?: string | null
+          tenant_name: string
+          tenant_phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          bond_amount?: number
+          bond_authority?: string | null
+          bond_lodgement_number?: string | null
+          created_at?: string
+          id?: string
+          lease_end?: string
+          lease_start?: string
+          management_fee_percent?: number
+          notes?: string | null
+          owner_account_number?: string | null
+          owner_bsb?: string | null
+          owner_email?: string | null
+          owner_name?: string | null
+          property_id?: string
+          rent_amount?: number
+          rent_frequency?: string
+          status?: string
+          tenant_contact_id?: string | null
+          tenant_email?: string | null
+          tenant_name?: string
+          tenant_phone?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenancies_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenancies_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenancies_tenant_contact_id_fkey"
+            columns: ["tenant_contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
             referencedColumns: ["id"]
           },
         ]
@@ -2365,6 +2616,7 @@ export type Database = {
           agency_authority: string | null
           agent_id: string | null
           agent_split_percent: number | null
+          available_from: string | null
           baths: number
           beds: number
           bushfire_zone: boolean | null
@@ -2378,6 +2630,7 @@ export type Database = {
           estimated_value: string | null
           features: string[] | null
           flood_zone: boolean | null
+          furnished: boolean | null
           id: string
           image_url: string | null
           images: string[] | null
@@ -2385,11 +2638,13 @@ export type Database = {
           is_active: boolean
           land_size: number | null
           lat: number | null
+          lease_term: string | null
           listed_date: string | null
           listing_type: string | null
           lng: number | null
           marketing_budget: number | null
           parking: number
+          pets_allowed: boolean | null
           price: number
           price_formatted: string
           property_type: string | null

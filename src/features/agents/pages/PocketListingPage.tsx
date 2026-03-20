@@ -166,6 +166,22 @@ const PocketListingPage = () => {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Listing Limit Dialog */}
+          <Dialog open={showLimitDialog} onOpenChange={setShowLimitDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Listing limit reached</DialogTitle>
+                <DialogDescription>
+                  You have reached your {sub.listingLimit} listing limit on the Starter plan. Upgrade to Pro for unlimited listings.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setShowLimitDialog(false)}>Cancel</Button>
+                <Button onClick={() => navigate('/dashboard/billing')}>View Plans</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </main>
       </div>
     </div>

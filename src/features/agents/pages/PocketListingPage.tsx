@@ -56,7 +56,6 @@ const PocketListingPage = () => {
 
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" className="hidden sm:flex gap-1.5 text-xs" onClick={() => {
-                // Find most recent real (db) listing
                 const realListing = listings.find(l => '_source' in l && l._source === 'db');
                 if (realListing) {
                   navigate(`/pocket-listing?duplicate=${realListing.id}`);
@@ -69,11 +68,19 @@ const PocketListingPage = () => {
                 <Copy size={14} /> Duplicate Previous
               </Button>
               <Button
+                variant="outline"
+                size="sm"
+                onClick={() => { setCreateListingType('rent'); setShowForm(true); setShowSuccess(false); }}
+                className="gap-1.5 text-xs font-bold"
+              >
+                <Key size={14} /> Create Rental Listing
+              </Button>
+              <Button
                 size="sm"
                 onClick={() => { setCreateListingType('sale'); setShowForm(true); setShowSuccess(false); }}
                 className="gap-1.5 text-xs font-bold"
               >
-                <Plus size={14} /> New Listing
+                <Plus size={14} /> Create Sale Listing
               </Button>
             </div>
           </div>
@@ -137,15 +144,7 @@ const PocketListingPage = () => {
                   {['whisper', 'coming-soon', 'public'].map((tab) => (
                     <TabsContent key={tab} value={tab}>
                       <div className="border border-dashed border-border rounded-2xl p-12 text-center">
-                        <p className="text-muted-foreground text-sm mb-3">No {tab} listings yet</p>
-                        <div className="flex items-center justify-center gap-2">
-                          <Button size="sm" onClick={() => { setCreateListingType('sale'); setShowForm(true); }}>
-                            <Plus size={14} className="mr-1" /> Create Sale
-                          </Button>
-                          <Button size="sm" variant="outline" onClick={() => { setCreateListingType('rent'); setShowForm(true); }}>
-                            <Key size={14} className="mr-1" /> Create Rental
-                          </Button>
-                        </div>
+                        <p className="text-muted-foreground text-sm">No {tab} listings yet</p>
                       </div>
                     </TabsContent>
                   ))}

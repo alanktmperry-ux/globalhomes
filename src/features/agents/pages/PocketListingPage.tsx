@@ -70,19 +70,10 @@ const PocketListingPage = () => {
               </Button>
               <Button
                 size="sm"
-                variant="outline"
-                onClick={() => { setCreateListingType('rent'); setShowForm(true); setShowSuccess(false); }}
+                onClick={() => { setCreateListingType('sale'); setShowForm(true); setShowSuccess(false); }}
                 className="gap-1.5 text-xs font-bold"
               >
-                <Key size={14} /> Create Rental Listing
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => { setCreateListingType('sale'); setShowForm(true); setShowSuccess(false); }}
-                className="gap-1.5 relative text-xs font-bold"
-              >
-                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-success rounded-full animate-pulse" />
-                <Plus size={14} /> Create Sale Listing
+                <Plus size={14} /> New Listing
               </Button>
             </div>
           </div>

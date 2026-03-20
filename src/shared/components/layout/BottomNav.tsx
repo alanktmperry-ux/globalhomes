@@ -71,50 +71,36 @@ export function BottomNav() {
           </button>
         )}
         {/* Language picker */}
-        <div className="relative">
-          <button
-            onClick={() => setShowLangPicker(prev => !prev)}
-            className="flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-colors text-muted-foreground hover:text-foreground"
-          >
-            <Globe size={22} strokeWidth={1.8} />
-            <span className="text-[10px] font-medium">{language.toUpperCase()}</span>
-          </button>
+        <button
+          onClick={() => setShowLangPicker(prev => !prev)}
+          className="flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-colors text-muted-foreground hover:text-foreground"
+        >
+          <Globe size={22} strokeWidth={1.8} />
+          <span className="text-[10px] font-medium">{language.toUpperCase()}</span>
+        </button>
 
-          <AnimatePresence>
-            {showLangPicker && (
-              <>
-                <motion.div
-                  className="fixed inset-0 z-40"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  onClick={() => setShowLangPicker(false)}
-                />
-                <motion.div
-                  className="absolute bottom-full mb-2 right-0 z-50 w-40 bg-card rounded-xl shadow-elevated border border-border overflow-y-auto max-h-72"
-                  initial={{ opacity: 0, scale: 0.95, y: 4 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: 4 }}
-                  transition={{ duration: 0.15 }}
-                >
-                  {(Object.entries(languageNames) as [Language, string][]).map(([code, name]) => (
-                    <button
-                      key={code}
-                      onClick={() => { setLanguage(code); setShowLangPicker(false); }}
-                      className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                        code === language
-                          ? 'bg-primary/10 text-primary font-medium'
-                          : 'text-foreground hover:bg-secondary'
-                      }`}
-                    >
-                      {name}
-                    </button>
-                  ))}
-                </motion.div>
-              </>
-            )}
-          </AnimatePresence>
-        </div>
+        {showLangPicker && (
+          <div className="fixed inset-0 z-50 flex items-end" onClick={() => setShowLangPicker(false)}>
+            <div className="w-full bg-card border-t border-border rounded-t-2xl p-4 pb-safe" onClick={e => e.stopPropagation()}>
+              <h3 className="font-bold text-sm mb-3 text-center">Select Language</h3>
+              <div className="grid grid-cols-3 gap-2">
+                {(Object.entries(languageNames) as [Language, string][]).map(([code, name]) => (
+                  <button
+                    key={code}
+                    onClick={() => { setLanguage(code); setShowLangPicker(false); }}
+                    className={`text-xs py-2 px-2 rounded-xl border text-center transition-colors ${
+                      language === code
+                        ? 'bg-primary text-primary-foreground border-primary font-bold'
+                        : 'border-border text-foreground hover:border-primary/40'
+                    }`}
+                  >
+                    {name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {user ? (
           <button

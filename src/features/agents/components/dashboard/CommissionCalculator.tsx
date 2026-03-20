@@ -75,6 +75,12 @@ const CommissionCalculator = () => {
 
   const formatAusDate = (d: Date) => format(d, 'dd/MM/yyyy');
 
+  const { canAccessCommission, loading: subLoading } = useSubscription();
+
+  if (!subLoading && !canAccessCommission) {
+    return <UpgradeGate requiredPlan="Pro or above" message="The Commission Calculator is available on the Pro plan and above. Calculate take-home commission, model agency splits, and project your annual GCI." />;
+  }
+
   return (
     <div className="flex-1 p-4 md:p-8 max-w-4xl">
       <div className="flex items-center justify-between mb-6">

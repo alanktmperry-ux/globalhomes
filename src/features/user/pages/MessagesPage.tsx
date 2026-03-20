@@ -628,47 +628,104 @@ const MessagesPage = () => {
                     <div key={i} className="h-20 bg-secondary/50 rounded-2xl animate-pulse" />
                   ))}
                 </div>
-              ) : conversations.length === 0 ? (
+              ) : visibleConversations.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-                  <MessageCircle size={40} strokeWidth={1.2} className="mb-3" />
-                  <p className="text-sm">No messages yet</p>
-                  <p className="text-xs mt-1">Contact an agent on a listing to start a conversation</p>
+                  {showArchived ? (
+                    <>
+                      <Archive size={40} strokeWidth={1.2} className="mb-3" />
+                      <p className="text-sm">No archived messages</p>
+                      <p className="text-xs mt-1">Archived conversations will appear here</p>
+                    </>
+                  ) : (
+                    <>
+                      <MessageCircle size={40} strokeWidth={1.2} className="mb-3" />
+                      <p className="text-sm">No messages yet</p>
+                      <p className="text-xs mt-1">Contact an agent on a listing to start a conversation</p>
+                    </>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-1 py-2">
-                  {conversations.map(c => (
-                    <button
-                      key={c.id}
-                      onClick={() => setSelectedConvo(c)}
-                      className={`w-full text-left px-4 py-3 rounded-2xl hover:bg-secondary/70 transition-colors flex items-start gap-3 ${
-                        c.unread_count > 0 ? 'bg-primary/5' : ''
-                      }`}
-                    >
-                      <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center shrink-0 mt-0.5 overflow-hidden">
-                        {c.other_user_avatar ? (
-                          <img src={c.other_user_avatar} alt="" className="w-10 h-10 rounded-full object-cover" />
-                        ) : (
-                          <span className="text-sm font-bold text-foreground">
-                            {c.other_user_name.charAt(0).toUpperCase()}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className={`text-sm font-medium truncate ${c.unread_count > 0 ? 'text-foreground' : 'text-foreground/80'}`}>
-                            {c.other_user_name}
-                          </span>
-                          {c.unread_count > 0 && <span className="w-2 h-2 rounded-full bg-primary shrink-0" />}
-                          <span className="ml-auto text-[10px] text-muted-foreground shrink-0">
-                            {formatDistanceToNow(new Date(c.last_message_at), { addSuffix: true })}
-                          </span>
+                  {visibleConversations.map(c => (
+                    <div key={c.id} className="relative group">
+                      <button
+                        onClick={() => setSelectedConvo(c)}
+                        className={`w-full text-left px-4 py-3 rounded-2xl hover:bg-secondary/70 transition-colors flex items-start gap-3 ${
+                          c.unread_count > 0 ? 'bg-primary/5' : ''
+                        }`}
+                      >
+                        <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center shrink-0 mt-0.5 overflow-hidden">
+                          {c.other_user_avatar ? (
+                            <img src={c.other_user_avatar} alt="" className="w-10 h-10 rounded-full object-cover" />
+                          ) : (
+                            <span className="text-sm font-bold text-foreground">
+                              {c.other_user_name.charAt(0).toUpperCase()}
+                            </span>
+                          )}
                         </div>
-                        {c.property_title && (
-                          <p className="text-xs text-muted-foreground truncate">{c.property_title}</p>
-                        )}
-                        <p className="text-xs text-muted-foreground/70 truncate mt-0.5">{c.last_message_text || 'No messages yet'}</p>
-                      </div>
-                    </button>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className={`text-sm font-medium truncate ${c.unread_count > 0 ? 'text-foreground' : 'text-foreground/80'}`}>
+                              {c.other_user_name}
+                            </span>
+                            {c.unread_count > 0 && <span className="w-2 h-2 rounded-full bg-primary shrink-0" />}
+                            <span className="ml-auto text-[10px] text-muted-foreground shrink-0 pr-6">
+                              {formatDistanceToNow(new Date(c.last_message_at), { addSuffix: true })}
+                            </span>
+                          </div>
+                          {c.property_title && (
+                            <p className="text-xs text-muted-foreground truncate">{c.property_title}</p>
+                          )}
+                          <p className="text-xs text-muted-foreground/70 truncate mt-0.5">{c.last_message_text || 'No messages yet'}</p>
+                        </div>
+                      </button>
+
+                      {/* Action menu trigger */}
+                      {!c.id.startsWith('lead-') && (
+                        <div className="absolute top-3 right-3" ref={openMenuId === c.id ? menuRef : undefined}>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === c.id ? null : c.id); }}
+                            className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-secondary transition-all"
+                          >
+                            <MoreVertical size={14} />
+                          </button>
+
+                          <AnimatePresence>
+                            {openMenuId === c.id && (
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                transition={{ duration: 0.1 }}
+                                className="absolute right-0 top-8 z-50 w-40 bg-popover border border-border rounded-xl shadow-lg overflow-hidden"
+                              >
+                                {isArchivedByMe(c) ? (
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); handleUnarchive(c.id); }}
+                                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-secondary transition-colors"
+                                  >
+                                    <ArchiveRestore size={13} /> Unarchive
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); handleArchive(c.id); }}
+                                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-secondary transition-colors"
+                                  >
+                                    <Archive size={13} /> Archive
+                                  </button>
+                                )}
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleDelete(c.id); }}
+                                  className="w-full flex items-center gap-2 px-3 py-2 text-xs text-destructive hover:bg-destructive/10 transition-colors"
+                                >
+                                  <Trash2 size={13} /> Delete
+                                </button>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}

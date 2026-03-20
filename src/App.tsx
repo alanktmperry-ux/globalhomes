@@ -123,9 +123,9 @@ const App = () => (
                 <Route path="/settings" element={<ProtectedRoute><BuyerSettingsPage /></ProtectedRoute>} />
 
                 {/* Agent */}
-                <Route path="/agent-dashboard" element={<AgentPerformanceDashboard />} />
-                <Route path="/agent-portal" element={<AgentPortalPage />} />
-                <Route path="/pocket-listing" element={<PocketListingPage />} />
+                <Route path="/agent-dashboard" element={<ProtectedRoute><AgentPerformanceDashboard /></ProtectedRoute>} />
+                <Route path="/agent-portal" element={<ProtectedRoute><AgentPortalPage /></ProtectedRoute>} />
+                <Route path="/pocket-listing" element={<ProtectedRoute><PocketListingPage /></ProtectedRoute>} />
                 <Route path="/dashboard" element={<AgentDashboardLayout />}>
                   <Route index element={<DashboardOverview />} />
                   <Route path="profile" element={<AgentProfilePage />} />
@@ -159,7 +159,7 @@ const App = () => (
                 </Route>
 
                 {/* Admin */}
-                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
 
                 <Route path="*" element={<NotFound />} />
               </Routes>

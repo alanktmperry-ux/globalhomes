@@ -70,6 +70,12 @@ const PageLoader = () => (
   </div>
 );
 
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  React.useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+};
+
 const queryClient = new QueryClient();
 
 const App = () => (

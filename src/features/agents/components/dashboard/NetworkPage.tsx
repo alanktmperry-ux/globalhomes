@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useSubscription } from '@/features/agents/hooks/useSubscription';
+import UpgradeGate from '@/features/agents/components/shared/UpgradeGate';
 import {
   Users, Search, DollarSign, Handshake, Share2, Eye, EyeOff, Phone,
   TrendingUp, CheckCircle2, XCircle, Landmark, ToggleLeft, ToggleRight,

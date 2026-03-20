@@ -220,13 +220,11 @@ const TeamPage = () => {
         toast.success(`Member added — ${inviteEmail} has been added to your agency.`);
       } else if (data.inviteCode) {
         // Show invite code prominently — email may not have been delivered
-        toast({
-          title: data.emailSent ? 'Invite sent + code generated' : 'Invite code generated',
-          description: data.emailSent
-            ? `Email sent to ${inviteEmail}. Backup code: ${data.inviteCode}`
-            : `Share this code with ${inviteEmail} to join: ${data.inviteCode}`,
-          duration: 15000,
-        });
+        toast.success(
+          data.emailSent
+            ? `Invite sent — Email sent to ${inviteEmail}. Backup code: ${data.inviteCode}`
+            : `Invite code generated — Share this code with ${inviteEmail} to join: ${data.inviteCode}`
+        );
         // Copy code to clipboard for easy sharing
         try { await navigator.clipboard.writeText(data.inviteCode); } catch {}
       } else {

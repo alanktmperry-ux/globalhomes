@@ -155,6 +155,7 @@ const App = () => (
                   <Route path="tenancies/:tenancyId" element={<TenancyDetailPage />} />
                   <Route path="settings" element={<SettingsPage />} />
                   <Route path="help" element={<HelpPage />} />
+                  <Route path="onboarding" element={<AgencyOnboardingPage />} />
                 </Route>
 
                 {/* Admin */}

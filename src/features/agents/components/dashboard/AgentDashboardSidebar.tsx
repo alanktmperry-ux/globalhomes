@@ -103,6 +103,16 @@ const AgentDashboardSidebar = () => {
     fetchArrears();
   }, [user]);
 
+  // Check onboarding status
+  useEffect(() => {
+    if (!user) return;
+    const checkOnboarding = async () => {
+      const { data: agent } = await supabase.from('agents').select('onboarding_complete').eq('user_id', user.id).single();
+      if (agent) setOnboardingComplete(!!(agent as any).onboarding_complete);
+    };
+    checkOnboarding();
+  }, [user]);
+
   const activeCount = listings.filter(l => ('_mock_status' in l ? l._mock_status !== 'sold' : (l as any).status !== 'sold')).length;
 
   const badgeValues: Record<string, string> = {
@@ -110,6 +120,16 @@ const AgentDashboardSidebar = () => {
     leads: '',
     rentRoll: arrearsCount > 0 ? String(arrearsCount) : '',
   };
+
+  // Build ACCOUNT_NAV with conditional Setup item
+  const ACCOUNT_NAV: NavItem[] = [
+    { title: 'My Agencies', url: '/dashboard/agencies', icon: Building2 },
+    ...(!onboardingComplete ? [{ title: 'Setup', url: '/dashboard/onboarding', icon: Settings2 }] : []),
+    { title: 'Billing', url: '/dashboard/billing', icon: CreditCard },
+    { title: 'Reviews', url: '/dashboard/reviews', icon: Star },
+    { title: 'Settings', url: '/dashboard/settings', icon: Settings },
+    { title: 'Help & FAQ', url: '/dashboard/help', icon: HelpCircle },
+  ];
 
   const ADMIN_NAV: NavItem[] = isAdmin ? [{ title: 'Admin Panel', url: '/admin', icon: Shield }] : [];
 

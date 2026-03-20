@@ -159,7 +159,7 @@ const App = () => (
                 </Route>
 
                 {/* Admin */}
-                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
 
                 <Route path="*" element={<NotFound />} />
               </Routes>

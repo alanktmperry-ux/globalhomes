@@ -4,9 +4,11 @@ import { ArrowLeft, Plus, Zap, Eye, MessageSquare, TrendingUp, Copy, Sparkles, K
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import PocketListingForm from '@/features/agents/components/pocket-listing/PocketListingForm';
 import ListingSuccess from '@/features/agents/components/pocket-listing/ListingSuccess';
 import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
+import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import { useToast } from '@/shared/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';

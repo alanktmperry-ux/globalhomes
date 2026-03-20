@@ -402,18 +402,18 @@ const translations: Record<Language, Record<string, string>> = {
 };
 
 export const languageNames: Record<Language, string> = {
-  en: 'English',
-  zh: '中文',
-  ko: '한국어',
-  ms: 'Bahasa Melayu',
-  es: 'Español',
-  ar: 'العربية',
-  hi: 'हिन्दी',
-  fr: 'Français',
-  pt: 'Português',
-  bn: 'বাংলা',
-  ru: 'Русский',
-  ja: '日本語',
+  en: '🇦🇺 English',
+  zh: '🇨🇳 中文',
+  ko: '🇰🇷 한국어',
+  ms: '🇲🇾 Melayu',
+  es: '🇪🇸 Español',
+  ar: '🇦🇪 العربية',
+  hi: '🇮🇳 हिन्दी',
+  fr: '🇫🇷 Français',
+  pt: '🇧🇷 Português',
+  bn: '🇧🇩 বাংলা',
+  ru: '🇷🇺 Русский',
+  ja: '🇯🇵 日本語',
 };
 
 interface I18nContextType {

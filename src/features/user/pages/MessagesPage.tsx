@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { MessageCircle, ArrowLeft, Send, User, Building2, PenSquare } from 'lucide-react';
+import { MessageCircle, ArrowLeft, Send, User, Building2, PenSquare, Archive, Trash2, MoreVertical, ArchiveRestore } from 'lucide-react';
 import { NewMessageDialog } from '@/features/user/components/NewMessageDialog';
 import { BottomNav } from '@/shared/components/layout/BottomNav';
 import { useI18n } from '@/shared/lib/i18n';

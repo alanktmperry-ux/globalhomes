@@ -38,11 +38,6 @@ const DEFAULT: Scenario = {
 };
 
 const CommissionCalculator = () => {
-  const { canAccessCommission, loading: subLoading } = useSubscription();
-
-  if (!subLoading && !canAccessCommission) {
-    return <UpgradeGate requiredPlan="Pro or above" message="The Commission Calculator is available on the Pro plan and above. Calculate take-home commission, model agency splits, and project your annual GCI." />;
-  }
   const [s, setS] = useState<Scenario>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);

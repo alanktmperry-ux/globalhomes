@@ -212,6 +212,7 @@ const MessagesPage = () => {
           property_image: propImage,
           last_message_text: lastMsg?.content,
           unread_count: count || 0,
+          archived_by: c.archived_by || [],
         } as Conversation;
       })
     );

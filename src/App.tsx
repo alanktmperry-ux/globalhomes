@@ -91,7 +91,7 @@ const App = () => (
       <CurrencyProvider>
       <AuthProvider>
         <TooltipProvider>
-          <Toaster />
+          
           <Sonner />
           <BrowserRouter>
             <ScrollToTop />

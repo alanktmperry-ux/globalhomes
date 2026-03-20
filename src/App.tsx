@@ -37,6 +37,7 @@ const PrivacyPage = React.lazy(() => import("./pages/PrivacyPage"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 const AgentPerformanceDashboard = React.lazy(() => import("./features/agents/pages/AgentPerformanceDashboard"));
 const DemoAccessPage = React.lazy(() => import("./features/agents/pages/DemoAccessPage"));
+const PublicLayout = React.lazy(() => import("@/shared/components/layout/PublicLayout"));
 
 // Lazy-loaded dashboard sub-pages
 const DashboardOverview = React.lazy(() => import("@/features/agents/components/dashboard/DashboardOverview"));
@@ -92,20 +93,24 @@ const App = () => (
             <ScrollToTop />
             <Suspense fallback={<PageLoader />}>
               <Routes>
-                {/* Public */}
-                <Route path="/" element={<Index />} />
-                <Route path="/property/:id" element={<PropertyDetailPage />} />
-                <Route path="/agent/:id" element={<AgentPublicProfilePage />} />
-                <Route path="/agents" element={<AgentLandingPage />} />
+                {/* Public with shared navbar/footer */}
+                <Route element={<PublicLayout />}>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/property/:id" element={<PropertyDetailPage />} />
+                  <Route path="/agent/:id" element={<AgentPublicProfilePage />} />
+                  <Route path="/agents" element={<AgentLandingPage />} />
+                  <Route path="/agency/:slug" element={<AgencyProfilePage />} />
+                  <Route path="/terms" element={<TermsPage />} />
+                  <Route path="/privacy" element={<PrivacyPage />} />
+                </Route>
+
+                {/* Auth pages (no shared layout) */}
                 <Route path="/auth" element={<AuthLandingPage />} />
                 <Route path="/login" element={<SeekerAuthPage />} />
                 <Route path="/agents/login" element={<AgentAuthPage />} />
                 <Route path="/agents/demo" element={<DemoAccessPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
-                <Route path="/agency/:slug" element={<AgencyProfilePage />} />
-                <Route path="/terms" element={<TermsPage />} />
-                <Route path="/privacy" element={<PrivacyPage />} />
 
                 {/* Authenticated */}
                 <Route path="/saved" element={<ProtectedRoute><SavedPage /></ProtectedRoute>} />

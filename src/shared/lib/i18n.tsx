@@ -404,6 +404,8 @@ const translations: Record<Language, Record<string, string>> = {
 export const languageNames: Record<Language, string> = {
   en: 'English',
   zh: '中文',
+  ko: '한국어',
+  ms: 'Bahasa Melayu',
   es: 'Español',
   ar: 'العربية',
   hi: 'हिन्दी',

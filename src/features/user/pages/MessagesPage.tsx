@@ -497,21 +497,29 @@ const MessagesPage = () => {
             </button>
           ) : null}
           <h1 className="font-display text-xl font-bold text-foreground truncate">
-            {selectedConvo ? selectedConvo.other_user_name : t('nav.messages')}
+            {selectedConvo ? selectedConvo.other_user_name : (showArchived ? 'Archived' : t('nav.messages'))}
           </h1>
-          {!selectedConvo && conversations.length > 0 && (
-            <span className="ml-auto text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">
-              {conversations.length}
-            </span>
-          )}
           {!selectedConvo && (
-            <button
-              onClick={() => setNewMsgDialogOpen(true)}
-              className="ml-auto w-9 h-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center hover:opacity-90 transition-opacity"
-              title="New message"
-            >
-              <PenSquare size={16} />
-            </button>
+            <div className="ml-auto flex items-center gap-1.5">
+              <button
+                onClick={() => setShowArchived(!showArchived)}
+                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
+                  showArchived ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:text-foreground'
+                }`}
+                title={showArchived ? 'Show inbox' : 'Show archived'}
+              >
+                <Archive size={16} />
+              </button>
+              {!showArchived && (
+                <button
+                  onClick={() => setNewMsgDialogOpen(true)}
+                  className="w-9 h-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center hover:opacity-90 transition-opacity"
+                  title="New message"
+                >
+                  <PenSquare size={16} />
+                </button>
+              )}
+            </div>
           )}
         </div>
       </header>

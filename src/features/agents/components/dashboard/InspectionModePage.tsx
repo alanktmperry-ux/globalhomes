@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import UpgradeGate from '@/features/agents/components/shared/UpgradeGate';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,6 +12,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { format } from 'date-fns';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useNavigate } from 'react-router-dom';
 
 type InterestLevel = 'hot' | 'warm' | 'cold';
 
@@ -31,11 +33,6 @@ interface ScheduledInspection {
   expectedVisitors: number;
 }
 
-const DEMO_INSPECTIONS: ScheduledInspection[] = [
-  { propertyId: 'demo-1', address: '42 Panorama Drive, Berwick', time: '10:00 AM', expectedVisitors: 8 },
-  { propertyId: 'demo-2', address: '8 Ocean View Rd, Brighton', time: '2:00 PM', expectedVisitors: 12 },
-];
-
 const INTEREST_CONFIG: Record<InterestLevel, { label: string; icon: typeof Flame; className: string }> = {
   hot: { label: 'Hot', icon: Flame, className: 'bg-red-500/20 text-red-400 border-red-500/30' },
   warm: { label: 'Warm', icon: Zap, className: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
@@ -44,9 +41,11 @@ const INTEREST_CONFIG: Record<InterestLevel, { label: string; icon: typeof Flame
 
 const InspectionModePage = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const { canAccessInspections, loading: subLoading } = useSubscription();
-  const [inspections] = useState<ScheduledInspection[]>(DEMO_INSPECTIONS);
+  const [inspections, setInspections] = useState<ScheduledInspection[]>([]);
+  const [inspectionsLoading, setInspectionsLoading] = useState(true);
   const [activeInspection, setActiveInspection] = useState<ScheduledInspection | null>(null);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -58,6 +57,49 @@ const InspectionModePage = () => {
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+
+  // Fetch inspections from properties with inspection_times
+  useEffect(() => {
+    if (!user) return;
+    const fetchInspections = async () => {
+      setInspectionsLoading(true);
+      const { data: agent } = await supabase
+        .from('agents')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (!agent) { setInspections([]); setInspectionsLoading(false); return; }
+
+      const { data: props } = await supabase
+        .from('properties')
+        .select('id, address, suburb, inspection_times, views')
+        .eq('agent_id', agent.id)
+        .eq('is_active', true)
+        .not('inspection_times', 'is', null);
+
+      const today = format(new Date(), 'yyyy-MM-dd');
+      const mapped: ScheduledInspection[] = [];
+
+      for (const p of props || []) {
+        const slots = p.inspection_times as Array<{ date: string; start: string; end: string }> | null;
+        if (!slots || !Array.isArray(slots)) continue;
+        for (const slot of slots) {
+          if (slot.date === today) {
+            mapped.push({
+              propertyId: p.id,
+              address: `${p.address}, ${p.suburb}`,
+              time: slot.start,
+              expectedVisitors: p.views ? Math.min(Math.round(p.views / 50), 20) : 5,
+            });
+          }
+        }
+      }
+
+      setInspections(mapped);
+      setInspectionsLoading(false);
+    };
+    fetchInspections();
+  }, [user]);
 
   const handleStartInspection = (inspection: ScheduledInspection) => {
     setActiveInspection(inspection);
@@ -291,11 +333,19 @@ const InspectionModePage = () => {
         </div>
       </div>
 
-      {inspections.length === 0 ? (
+      {inspectionsLoading ? (
+        <div className="space-y-4 max-w-xl">
+          {[1, 2].map(i => (
+            <Card key={i}><CardContent className="p-5"><Skeleton className="h-16 w-full" /></CardContent></Card>
+          ))}
+        </div>
+      ) : inspections.length === 0 ? (
         <Card>
           <CardContent className="py-16 text-center text-muted-foreground">
             <CalendarDays size={48} className="mx-auto mb-3 opacity-40" />
-            <p>No inspections scheduled for today</p>
+            <p className="font-medium mb-1">No inspections scheduled for today</p>
+            <p className="text-sm mb-4">Add inspection times to your listings to see them here.</p>
+            <Button onClick={() => navigate('/agent/listings')} variant="outline">Go to Listings</Button>
           </CardContent>
         </Card>
       ) : (

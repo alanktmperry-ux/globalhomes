@@ -137,7 +137,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
               return merged;
             });
             setUsingCachedAI(false);
-            toast.success(`🔍 Live results ready — ${(Found ${update.properties.length} properties)}`);
+            toast.success(`🔍 Live results ready — Found ${update.properties.length} properties`);
           } else if (update.status === 'failed') {
             setManusStatus(null);
             setManusFailed(true);
@@ -160,7 +160,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
           // Keep any Firecrawl results that may have already been set
         }
         setManusFailed(true);
-        toast.success(`⚠️ AI search paused — ${(cached ? 'Showing cached results from earlier.' : 'Showing web results instead.')}`);
+        toast.success('⚠️ AI search paused — cached ? 'Showing cached results from earlier.' : 'Showing web results instead.'');
         if (cached) setUsingCachedAI(true);
       }
 
@@ -176,7 +176,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
           return merged;
         });
         if (!cached) {
-          toast.success(`🌐 Web results found — ${(Found ${firecrawlResults.length} listings from the web)}`);
+          toast.success(`🌐 Web results found — Found ${firecrawlResults.length} listings from the web`);
         }
       }
 

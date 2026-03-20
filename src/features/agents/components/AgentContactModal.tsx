@@ -263,8 +263,8 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
       }
 
       setStep(3);
-      toast.success(`✅ Qualified Lead Submitted — ${(depositAmount
-          ? `Lead score: ${score)}`);
+      toast.success(`✅ Qualified Lead Submitted — depositAmount
+          ? `Lead score: ${score`);
     } catch (err) {
       console.error('Lead submission error:', err);
       toast.error('Error — Failed to submit. Please try again.');

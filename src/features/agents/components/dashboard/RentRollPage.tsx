@@ -203,7 +203,7 @@ const RentRollPage = () => {
     setSaving(false);
 
     if (error) {
-      toast.error(`Error creating tenancy — ${(error.message)}`);
+      toast.error('Error creating tenancy — error.message');
     } else {
       toast.success('Tenancy created');
       setShowAddModal(false);

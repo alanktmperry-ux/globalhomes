@@ -191,11 +191,11 @@ const TeamPage = () => {
         max_uses: parseInt(newInviteMaxUses) || null,
       });
       if (error) throw error;
-      toast.success(`Invite code created — ${(Code: ${code})}`);
+      toast.success(`Invite code created — Code: ${code}`);
       setInviteDialogOpen(false);
       loadData();
     } catch (err: any) {
-      toast.error(`Error — ${(err.message)}`);
+      toast.error('Error — err.message');
     } finally {
       setCreating(false);
     }
@@ -217,7 +217,7 @@ const TeamPage = () => {
       if (data?.error) throw new Error(data.error);
       
       if (data.isExisting) {
-        toast.success(`Member added — ${(${inviteEmail} has been added to your agency.)}`);
+        toast.success(`Member added — ${inviteEmail} has been added to your agency.`);
       } else if (data.inviteCode) {
         // Show invite code prominently — email may not have been delivered
         toast({
@@ -230,7 +230,7 @@ const TeamPage = () => {
         // Copy code to clipboard for easy sharing
         try { await navigator.clipboard.writeText(data.inviteCode); } catch {}
       } else {
-        toast.success(`Invitation sent — ${(An invite has been sent to ${inviteEmail}.)}`);
+        toast.success(`Invitation sent — An invite has been sent to ${inviteEmail}.`);
       }
       setEmailInviteDialogOpen(false);
       setInviteEmail('');
@@ -238,7 +238,7 @@ const TeamPage = () => {
       setInviteAccessLevel('full');
       loadData();
     } catch (err: any) {
-      toast.error(`Error — ${(err.message)}`);
+      toast.error('Error — err.message');
     } finally {
       setSendingInvite(false);
     }
@@ -251,7 +251,7 @@ const TeamPage = () => {
 
   const handleRemoveMember = async (memberId: string, memberUserId: string) => {
     if (memberUserId === user?.id) {
-      toast.error(`Error — ${("You can't remove yourself")}`);
+      toast.error('Error — "You can't remove yourself"');
       return;
     }
     await supabase.from('agency_members').delete().eq('id', memberId);
@@ -266,10 +266,10 @@ const TeamPage = () => {
         .update({ role: newRole as any })
         .eq('id', memberId);
       if (error) throw error;
-      toast.success(`Role updated — ${(Member role changed to ${newRole})}`);
+      toast.success(`Role updated — Member role changed to ${newRole}`);
       loadData();
     } catch (err: any) {
-      toast.error(`Error — ${(err.message)}`);
+      toast.error('Error — err.message');
     }
   };
 
@@ -280,16 +280,16 @@ const TeamPage = () => {
         .update({ access_level: newAccess })
         .eq('id', memberId);
       if (error) throw error;
-      toast.success(`Access updated — ${(Access changed to ${newAccess})}`);
+      toast.success(`Access updated — Access changed to ${newAccess}`);
       loadData();
     } catch (err: any) {
-      toast.error(`Error — ${(err.message)}`);
+      toast.error('Error — err.message');
     }
   };
 
   const copyCode = (code: string) => {
     navigator.clipboard.writeText(code);
-    toast.success(`Copied! — ${(${code} copied to clipboard)}`);
+    toast.success(`Copied! — ${code} copied to clipboard`);
   };
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -328,7 +328,7 @@ const TeamPage = () => {
       setAgencyLogo(publicUrl);
       toast.success('Logo updated');
     } catch (err: any) {
-      toast.error(`Upload failed — ${(err.message)}`);
+      toast.error('Upload failed — err.message');
     } finally {
       setUploadingLogo(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -353,7 +353,7 @@ const TeamPage = () => {
       toast.success('Agency details saved');
       setEditingBranding(false);
     } catch (err: any) {
-      toast.error(`Error — ${(err.message)}`);
+      toast.error('Error — err.message');
     } finally {
       setSavingBranding(false);
     }
@@ -454,7 +454,7 @@ const TeamPage = () => {
           .then(() => {});
       }
 
-      toast.success(`Agency created! — ${(${newAgencyName} is ready. You are the Principal.)}`);
+      toast.success(`Agency created! — ${newAgencyName} is ready. You are the Principal.`);
       setNewAgencyName('');
       setNewAgencyEmail('');
       setNewAgencyPhone('');
@@ -464,7 +464,7 @@ const TeamPage = () => {
       setNewAgencyLogoPreview(null);
       loadData();
     } catch (err: any) {
-      toast.error(`Error creating agency — ${(err.message)}`);
+      toast.error('Error creating agency — err.message');
     } finally {
       setCreatingAgency(false);
     }
@@ -542,10 +542,10 @@ const TeamPage = () => {
         }
       }
 
-      toast.success(`Joined agency! — ${(Welcome to the team as ${invite.role}.)}`);
+      toast.success(`Joined agency! — Welcome to the team as ${invite.role}.`);
       loadData();
     } catch (err: any) {
-      toast.error(`Error joining — ${(err.message)}`);
+      toast.error('Error joining — err.message');
     } finally {
       setJoiningAgency(false);
     }

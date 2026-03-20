@@ -1,6 +1,8 @@
-import { Search, Heart, MessageCircle, User, LogIn, LogOut, ShieldCheck, Building2 } from 'lucide-react';
-import { useI18n } from '@/shared/lib/i18n';
+import { useState } from 'react';
+import { Search, Heart, MessageCircle, User, LogIn, LogOut, ShieldCheck, Building2, Globe } from 'lucide-react';
+import { useI18n, languageNames, type Language } from '@/shared/lib/i18n';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -13,10 +15,11 @@ const navItems = [
 ];
 
 export function BottomNav() {
-  const { t } = useI18n();
+  const { t, language, setLanguage } = useI18n();
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAdmin, isAgent, loading } = useAuth();
+  const [showLangPicker, setShowLangPicker] = useState(false);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -67,6 +70,52 @@ export function BottomNav() {
             <span className="text-[10px] font-medium">Admin</span>
           </button>
         )}
+        {/* Language picker */}
+        <div className="relative">
+          <button
+            onClick={() => setShowLangPicker(prev => !prev)}
+            className="flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-colors text-muted-foreground hover:text-foreground"
+          >
+            <Globe size={22} strokeWidth={1.8} />
+            <span className="text-[10px] font-medium">{language.toUpperCase()}</span>
+          </button>
+
+          <AnimatePresence>
+            {showLangPicker && (
+              <>
+                <motion.div
+                  className="fixed inset-0 z-40"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setShowLangPicker(false)}
+                />
+                <motion.div
+                  className="absolute bottom-full mb-2 right-0 z-50 w-40 bg-card rounded-xl shadow-elevated border border-border overflow-y-auto max-h-72"
+                  initial={{ opacity: 0, scale: 0.95, y: 4 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: 4 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  {(Object.entries(languageNames) as [Language, string][]).map(([code, name]) => (
+                    <button
+                      key={code}
+                      onClick={() => { setLanguage(code); setShowLangPicker(false); }}
+                      className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                        code === language
+                          ? 'bg-primary/10 text-primary font-medium'
+                          : 'text-foreground hover:bg-secondary'
+                      }`}
+                    >
+                      {name}
+                    </button>
+                  ))}
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+        </div>
+
         {user ? (
           <button
             onClick={handleSignOut}

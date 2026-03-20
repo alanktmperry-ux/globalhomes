@@ -68,8 +68,7 @@ const AgentDashboardSidebar = () => {
   const collapsed = state === 'collapsed';
   const location = useLocation();
   const navigate = useNavigate();
-  const { signOut, isAdmin } = useAuth();
-  const { user } = useAuth();
+  const { signOut, isAdmin, user } = useAuth();
   const { listings } = useAgentListings();
   const [arrearsCount, setArrearsCount] = useState(0);
 

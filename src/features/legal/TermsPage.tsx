@@ -86,7 +86,6 @@ const TermsPage = () => (
         </p>
       </article>
     </main>
-    <SiteFooter />
   </>
 );
 

@@ -99,7 +99,6 @@ const PrivacyPage = () => (
         </p>
       </article>
     </main>
-    <SiteFooter />
   </>
 );
 

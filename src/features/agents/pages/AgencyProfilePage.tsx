@@ -232,7 +232,7 @@ const AgencyProfilePage = () => {
         )}
       </section>
 
-      <SiteFooter />
+      
     </div>
   );
 };

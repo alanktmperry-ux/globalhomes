@@ -373,8 +373,6 @@ export default function AgentPublicProfilePage() {
         )}
       </main>
 
-      <SiteFooter />
-      <BottomNav />
     </div>
   );
 }

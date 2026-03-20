@@ -318,7 +318,7 @@ ${matterRows.length > 0 ? `
 </div>
 
 <div class="footer">
-  Generated ${today} • GlobalHomes Trust Accounting • Retain for minimum 5 years per AFA 2014 s.84
+  Generated ${today} • ListHQ Trust Accounting • Retain for minimum 5 years per AFA 2014 s.84
 </div>
 </body></html>`;
 

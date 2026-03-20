@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Upload, FileText, Trash2, Send, CheckCircle2, Clock, XCircle } from 'lucide-react';
-import { useToast } from '@/shared/hooks/use-toast';
+import { toast } from 'sonner';
 
 const AU_DATE = (d: string) => {
   const date = new Date(d);
@@ -37,7 +37,6 @@ interface Props {
 
 const ListingDocumentsTab = ({ listing }: Props) => {
   const { user } = useAuth();
-  const { toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
   const [docs, setDocs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,14 +87,14 @@ const ListingDocumentsTab = ({ listing }: Props) => {
       mime_type: file.type,
     } as any);
 
-    toast({ title: 'Document uploaded' });
+    toast.success('Document uploaded');
     setUploading(false);
     fetchDocs();
   };
 
   const handleDelete = async (doc: any) => {
     await supabase.from('listing_documents').delete().eq('id', doc.id);
-    toast({ title: 'Document deleted' });
+    toast.success('Document deleted');
     fetchDocs();
   };
 
@@ -105,7 +104,7 @@ const ListingDocumentsTab = ({ listing }: Props) => {
       esign_status: 'sent',
       esign_sent_at: new Date().toISOString(),
     } as any).eq('id', doc.id);
-    toast({ title: 'E-signature request sent', description: 'DocuSign integration placeholder — connect API for full functionality.' });
+    toast.success('E-signature request sent — DocuSign integration placeholder — connect API for full functionality.');
     fetchDocs();
   };
 

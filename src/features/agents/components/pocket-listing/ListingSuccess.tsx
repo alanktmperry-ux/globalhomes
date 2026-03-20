@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Copy, Mail, Instagram, PartyPopper } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/shared/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface Props {
   title: string;
@@ -10,7 +10,6 @@ interface Props {
 }
 
 const ListingSuccess = ({ title, onDone }: Props) => {
-  const { toast } = useToast();
   const [confetti, setConfetti] = useState(true);
 
   useEffect(() => {
@@ -20,7 +19,7 @@ const ListingSuccess = ({ title, onDone }: Props) => {
 
   const copyLink = () => {
     navigator.clipboard.writeText(`https://worldpropertypulse.com/listing/${Date.now()}`);
-    toast({ title: 'Link copied!' });
+    toast.success('Link copied!');
   };
 
   return (

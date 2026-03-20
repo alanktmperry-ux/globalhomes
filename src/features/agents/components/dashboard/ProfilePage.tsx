@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useToast } from '@/shared/hooks/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { autocomplete } from '@/shared/lib/googleMapsService';
@@ -56,7 +56,6 @@ interface Credential {
 
 const ProfilePage = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const docInputRef = useRef<HTMLInputElement>(null);
@@ -151,11 +150,11 @@ const ProfilePage = () => {
     const file = e.target.files?.[0];
     if (!file || !agent) return;
     if (!file.type.startsWith('image/')) {
-      toast({ title: 'Invalid file', description: 'Please upload an image file.', variant: 'destructive' });
+      toast.error('Invalid file — Please upload an image file.');
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      toast({ title: 'File too large', description: 'Max 5MB.', variant: 'destructive' });
+      toast.error('File too large — Max 5MB.');
       return;
     }
 
@@ -168,7 +167,7 @@ const ProfilePage = () => {
       const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath);
       await supabase.from('agents').update({ avatar_url: publicUrl }).eq('id', agent.id);
       setAgent(prev => prev ? { ...prev, avatar_url: publicUrl } : null);
-      toast({ title: 'Photo updated' });
+      toast.success('Photo updated');
     } catch (err: any) {
       toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
     } finally {
@@ -180,11 +179,11 @@ const ProfilePage = () => {
     const file = e.target.files?.[0];
     if (!file || !agent) return;
     if (!file.type.startsWith('image/')) {
-      toast({ title: 'Invalid file', description: 'Please upload an image file.', variant: 'destructive' });
+      toast.error('Invalid file — Please upload an image file.');
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      toast({ title: 'File too large', description: 'Max 5MB.', variant: 'destructive' });
+      toast.error('File too large — Max 5MB.');
       return;
     }
 
@@ -197,7 +196,7 @@ const ProfilePage = () => {
       const { data: { publicUrl } } = supabase.storage.from('agency-logos').getPublicUrl(filePath);
       await supabase.from('agents').update({ company_logo_url: publicUrl } as any).eq('id', agent.id);
       setAgent(prev => prev ? { ...prev, company_logo_url: publicUrl } : null);
-      toast({ title: 'Company logo updated' });
+      toast.success('Company logo updated');
     } catch (err: any) {
       toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
     } finally {
@@ -210,7 +209,7 @@ const ProfilePage = () => {
     try {
       await supabase.from('agents').update({ company_logo_url: null } as any).eq('id', agent.id);
       setAgent(prev => prev ? { ...prev, company_logo_url: null } : null);
-      toast({ title: 'Logo removed' });
+      toast.success('Logo removed');
     } catch (err: any) {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
     }
@@ -220,7 +219,7 @@ const ProfilePage = () => {
     const file = e.target.files?.[0];
     if (!file || !agent || !user) return;
     if (file.size > 10 * 1024 * 1024) {
-      toast({ title: 'File too large', description: 'Max 10MB.', variant: 'destructive' });
+      toast.error('File too large — Max 10MB.');
       return;
     }
 
@@ -239,7 +238,7 @@ const ProfilePage = () => {
       });
       if (insertErr) throw insertErr;
 
-      toast({ title: 'Document uploaded' });
+      toast.success('Document uploaded');
       loadData();
     } catch (err: any) {
       toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
@@ -252,7 +251,7 @@ const ProfilePage = () => {
   const deleteCredential = async (id: string) => {
     await supabase.from('agent_credentials').delete().eq('id', id);
     setCredentials(prev => prev.filter(c => c.id !== id));
-    toast({ title: 'Document removed' });
+    toast.success('Document removed');
   };
 
   const handleSave = async () => {
@@ -284,7 +283,7 @@ const ProfilePage = () => {
         } as any)
         .eq('id', agent.id);
       if (error) throw error;
-      toast({ title: 'Profile saved', description: 'All changes have been saved successfully.' });
+      toast.success('Profile saved — All changes have been saved successfully.');
       loadData();
     } catch (err: any) {
       toast({ title: 'Error saving', description: err.message, variant: 'destructive' });

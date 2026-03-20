@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Property } from '@/shared/lib/types';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 const enquirySchema = z.object({
@@ -53,11 +53,11 @@ export function RentalEnquiryForm({ property, open, onClose }: RentalEnquiryForm
 
       if (error) throw error;
 
-      toast({ title: 'Application submitted!', description: 'The agent will be in touch shortly.' });
+      toast.success('Application submitted! — The agent will be in touch shortly.');
       setForm({ name: '', email: '', phone: '', moveInDate: '', message: '' });
       onClose();
     } catch {
-      toast({ title: 'Something went wrong', description: 'Please try again.', variant: 'destructive' });
+      toast.error('Something went wrong — Please try again.');
     } finally {
       setSubmitting(false);
     }

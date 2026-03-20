@@ -5,7 +5,7 @@ import { manusSearch } from '@/features/properties/api/ManusSearchService';
 import { Filters, defaultFilters } from '@/shared/components/FilterSidebar';
 import { firecrawlPropertySearch } from '@/features/properties/api/firecrawlPropertySearch';
 import { searchAgentListings } from '@/features/properties/api/fetchPublicProperties';
-import { useToast } from '@/shared/hooks/use-toast';
+import { toast } from 'sonner';
 import { isInsidePolygon, haversineDistance } from '@/shared/lib/geoUtils';
 import { useRealtimeProperties } from './useRealtimeProperties';
 import { useCurrency, ListingMode } from '@/shared/lib/CurrencyContext';
@@ -50,7 +50,6 @@ export interface UsePropertySearchOptions {
 }
 
 export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
-  const { toast } = useToast();
   const { listingMode } = useCurrency();
 
   // ── Filters & sort (internalized) ────────────────────────────

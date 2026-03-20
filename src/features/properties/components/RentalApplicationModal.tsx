@@ -4,7 +4,7 @@ import { X, ChevronRight, ChevronLeft, User, Briefcase, Home, Shield, MessageCir
 import { z } from 'zod';
 import { Property } from '@/shared/lib/types';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 /* ── Validation schemas per step ── */
 const step1Schema = z.object({

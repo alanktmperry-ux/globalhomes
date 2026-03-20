@@ -9,7 +9,7 @@ import { Property } from '@/shared/lib/types';
 import type { SearchContext } from '@/features/properties/components/PropertyDrawer';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/shared/hooks/use-toast';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 /* ── Validation ─────────────────────────────────────────────── */
@@ -94,7 +94,6 @@ interface AgentContactModalProps {
 
 export function AgentContactModal({ property, open, onClose, searchContext }: AgentContactModalProps) {
   const { agent } = property;
-  const { toast } = useToast();
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [formData, setFormData] = useState({
@@ -272,7 +271,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
       });
     } catch (err) {
       console.error('Lead submission error:', err);
-      toast({ title: 'Error', description: 'Failed to submit. Please try again.', variant: 'destructive' });
+      toast.error('Error — Failed to submit. Please try again.');
     } finally {
       setSubmitting(false);
     }

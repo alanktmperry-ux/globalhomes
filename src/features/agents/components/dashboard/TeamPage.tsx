@@ -4,7 +4,7 @@ import UpgradeGate from '@/features/agents/components/shared/UpgradeGate';
 import { Copy, Plus, Trash2, UserPlus, Building2, Shield, Users, RefreshCw, Loader2, Camera, Upload, LogIn, ArrowRight, Mail, MapPin, Eye, Lock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { useToast } from '@/shared/hooks/use-toast';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -55,7 +55,6 @@ const accessBadgeClass: Record<string, string> = {
 const TeamPage = () => {
   const { user } = useAuth();
   const { canAccessTeam, seatLimit, loading: subLoading } = useSubscription();
-  const { toast } = useToast();
 
   const [agencyId, setAgencyId] = useState<string | null>(null);
   const [agencyName, setAgencyName] = useState('');
@@ -262,7 +261,7 @@ const TeamPage = () => {
       return;
     }
     await supabase.from('agency_members').delete().eq('id', memberId);
-    toast({ title: 'Member removed' });
+    toast.success('Member removed');
     loadData();
   };
 
@@ -304,11 +303,11 @@ const TeamPage = () => {
     if (!file || !agencyId) return;
 
     if (!file.type.startsWith('image/')) {
-      toast({ title: 'Invalid file', description: 'Please upload an image file.', variant: 'destructive' });
+      toast.error('Invalid file — Please upload an image file.');
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      toast({ title: 'File too large', description: 'Max file size is 5MB.', variant: 'destructive' });
+      toast.error('File too large — Max file size is 5MB.');
       return;
     }
 
@@ -333,7 +332,7 @@ const TeamPage = () => {
       if (updateError) throw updateError;
 
       setAgencyLogo(publicUrl);
-      toast({ title: 'Logo updated' });
+      toast.success('Logo updated');
     } catch (err: any) {
       toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
     } finally {
@@ -357,7 +356,7 @@ const TeamPage = () => {
         })
         .eq('id', agencyId);
       if (error) throw error;
-      toast({ title: 'Agency details saved' });
+      toast.success('Agency details saved');
       setEditingBranding(false);
     } catch (err: any) {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
@@ -370,11 +369,11 @@ const TeamPage = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      toast({ title: 'Invalid file', description: 'Please upload an image file.', variant: 'destructive' });
+      toast.error('Invalid file — Please upload an image file.');
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      toast({ title: 'File too large', description: 'Max 5MB.', variant: 'destructive' });
+      toast.error('File too large — Max 5MB.');
       return;
     }
     setNewAgencyLogoFile(file);
@@ -490,13 +489,13 @@ const TeamPage = () => {
 
       if (inviteError) throw inviteError;
       if (!invite) {
-        toast({ title: 'Invalid code', description: 'This invite code is invalid or has been deactivated.', variant: 'destructive' });
+        toast.error('Invalid code — This invite code is invalid or has been deactivated.');
         setJoiningAgency(false);
         return;
       }
 
       if (invite.max_uses && invite.uses >= invite.max_uses) {
-        toast({ title: 'Code expired', description: 'This invite code has reached its max usage.', variant: 'destructive' });
+        toast.error('Code expired — This invite code has reached its max usage.');
         setJoiningAgency(false);
         return;
       }
@@ -509,7 +508,7 @@ const TeamPage = () => {
         .maybeSingle();
 
       if (existing) {
-        toast({ title: 'Already a member', description: 'You are already part of this agency.', variant: 'destructive' });
+        toast.error('Already a member — You are already part of this agency.');
         setJoiningAgency(false);
         return;
       }

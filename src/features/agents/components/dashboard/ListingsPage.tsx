@@ -10,7 +10,7 @@ import { useAgentListings, type AgentListing } from '@/features/agents/hooks/use
 import { PropertyDrawer } from '@/features/properties/components/PropertyDrawer';
 import { Property } from '@/shared/lib/types';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/shared/hooks/use-toast';
+import { toast } from 'sonner';
 
 const STATUS_CONFIG: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
   pending: { icon: <Clock size={12} />, label: 'Pending', color: 'bg-amber-500/15 text-amber-600' },
@@ -44,32 +44,31 @@ const ListingsPage = () => {
   const { listings, loading, isMockData, refetch } = useAgentListings();
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const { toast } = useToast();
 
   const handlePublish = async (l: AgentListing) => {
-    if (l._source !== 'db') { toast({ title: 'Demo listing', description: 'Create a real listing first.' }); return; }
+    if (l._source !== 'db') { toast.success('Demo listing — Create a real listing first.'); return; }
     setActionLoading(l.id);
     const { error } = await supabase.from('properties').update({ status: 'public', is_active: true } as any).eq('id', l.id);
-    if (error) { toast({ title: 'Failed to publish', variant: 'destructive' }); }
-    else { toast({ title: 'Your listing is now live on Global Homes!' }); refetch(); }
+    if (error) { toast.error('Failed to publish'); }
+    else { toast.success('Your listing is now live on Global Homes!'); refetch(); }
     setActionLoading(null);
   };
 
   const handleBoost = async (l: AgentListing) => {
-    if (l._source !== 'db') { toast({ title: 'Demo listing', description: 'Create a real listing first.' }); return; }
+    if (l._source !== 'db') { toast.success('Demo listing — Create a real listing first.'); return; }
     setActionLoading(l.id);
     const { error } = await supabase.from('properties').update({ status: 'public', is_active: true } as any).eq('id', l.id);
-    if (error) { toast({ title: 'Failed to boost', variant: 'destructive' }); }
-    else { toast({ title: 'Listing boosted!', description: 'Your listing is now public.' }); refetch(); }
+    if (error) { toast.error('Failed to boost'); }
+    else { toast.success('Listing boosted! — Your listing is now public.'); refetch(); }
     setActionLoading(null);
   };
 
   const handleMarkSold = async (l: AgentListing) => {
-    if (l._source !== 'db') { toast({ title: 'Demo listing', description: 'Create a real listing first.' }); return; }
+    if (l._source !== 'db') { toast.success('Demo listing — Create a real listing first.'); return; }
     setActionLoading(l.id);
     const { error } = await supabase.from('properties').update({ status: 'sold', is_active: false } as any).eq('id', l.id);
-    if (error) { toast({ title: 'Failed to update', variant: 'destructive' }); }
-    else { toast({ title: 'Marked as sold!', description: 'Listing has been marked as sold.' }); refetch(); }
+    if (error) { toast.error('Failed to update'); }
+    else { toast.success('Marked as sold! — Listing has been marked as sold.'); refetch(); }
     setActionLoading(null);
   };
 

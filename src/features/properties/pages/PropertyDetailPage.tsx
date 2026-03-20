@@ -13,7 +13,7 @@ import { useSavedProperties } from '@/features/properties/hooks/useSavedProperti
 import { useIsMobile } from '@/shared/hooks/use-mobile';
 import { mockProperties } from '@/features/properties/api/mock-data';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { RentalEnquiryForm } from '@/features/properties/components/RentalEnquiryForm';
 import { InspectionBookingModal } from '@/features/properties/components/InspectionBookingModal';
 import { PriceHistoryChart } from '@/features/properties/components/PriceHistoryChart';
@@ -244,7 +244,7 @@ export default function PropertyDetailPage() {
                   try { await navigator.share({ title, text, url }); } catch {}
                 } else {
                   await navigator.clipboard.writeText(url);
-                  toast({ title: 'Link copied to clipboard!' });
+                  toast.success('Link copied to clipboard!');
                 }
               }}
               className="w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center shadow-md"

@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { CalendarDays, MapPin, Clock, Users, Plus, X, Flame, Zap, Snowflake, CheckCircle, Send } from 'lucide-react';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';

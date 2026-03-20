@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/shared/hooks/use-toast';
-import { DashboardHeader } from './DashboardHeader';
+import DashboardHeader from './DashboardHeader';
 import { addDays, differenceInDays, format, parseISO } from 'date-fns';
 
 interface Tenancy {

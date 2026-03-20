@@ -72,6 +72,7 @@ const AgentDashboardSidebar = () => {
   const { signOut, isAdmin, user } = useAuth();
   const { listings } = useAgentListings();
   const [arrearsCount, setArrearsCount] = useState(0);
+  const [onboardingComplete, setOnboardingComplete] = useState(true);
 
   useEffect(() => {
     if (!user) return;

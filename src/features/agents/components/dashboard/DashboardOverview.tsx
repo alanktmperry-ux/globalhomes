@@ -242,6 +242,39 @@ const DashboardOverview = () => {
     fetchArrears();
   }, [user]);
 
+  // Fetch listings with no vendor report in the last 7 days
+  useEffect(() => {
+    if (!user) return;
+    const fetchReportsDue = async () => {
+      const { data: agent } = await supabase
+        .from('agents')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+      if (!agent) return;
+
+      const { data: props } = await supabase
+        .from('properties')
+        .select('id, address, suburb, views, contact_clicks, listed_date, vendor_name, vendor_email')
+        .eq('agent_id', agent.id)
+        .eq('status', 'public')
+        .eq('is_active', true);
+      if (!props || props.length === 0) return;
+
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      const { data: recentReports } = await supabase
+        .from('vendor_reports')
+        .select('property_id, sent_at')
+        .eq('agent_id', agent.id)
+        .gte('sent_at', sevenDaysAgo);
+
+      const recentPropertyIds = new Set((recentReports || []).map(r => r.property_id));
+      const due = props.filter(p => !recentPropertyIds.has(p.id) && p.vendor_email);
+      setReportsDue(due);
+    };
+    fetchReportsDue();
+  }, [user]);
+
   const handleSendReminder = async (tenancy: any) => {
     setSendingReminder(tenancy.id);
     try {

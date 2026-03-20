@@ -205,7 +205,7 @@ const TenancyDetailPage = () => {
       notes: editForm.notes,
     } as any).eq('id', tenancyId);
     setSaving(false);
-    if (error) { toast({ title: 'Error', description: error.message, variant: 'destructive' }); return; }
+    if (error) { toast.error(`Error — ${(error.message)}`); return; }
     toast.success('Tenancy updated');
     setShowEdit(false);
     fetchAll();
@@ -247,7 +247,7 @@ const TenancyDetailPage = () => {
     }
 
     setSaving(false);
-    if (error) { toast({ title: 'Error', description: error.message, variant: 'destructive' }); return; }
+    if (error) { toast.error(`Error — ${(error.message)}`); return; }
     toast.success('Payment recorded & trust receipt created');
     setShowRecordPayment(false);
     setPayForm({ payment_date: format(new Date(), 'yyyy-MM-dd'), period_from: '', period_to: '', amount: String(tenancy.rent_amount), payment_method: 'bank_transfer', notes: '' });
@@ -274,7 +274,7 @@ const TenancyDetailPage = () => {
       estimated_cost: jobForm.estimated_cost ? parseFloat(jobForm.estimated_cost) : null,
     } as any);
     setSaving(false);
-    if (error) { toast({ title: 'Error', description: error.message, variant: 'destructive' }); return; }
+    if (error) { toast.error(`Error — ${(error.message)}`); return; }
     toast.success('Maintenance job created');
     setShowNewJob(false);
     setJobForm({ title: '', description: '', priority: 'routine', assigned_to: '', estimated_cost: '' });

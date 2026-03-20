@@ -137,15 +137,12 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
               return merged;
             });
             setUsingCachedAI(false);
-            toast({ title: '🔍 Live results ready', description: `Found ${update.properties.length} properties` });
+            toast.success(`🔍 Live results ready — ${(Found ${update.properties.length} properties)}`);
           } else if (update.status === 'failed') {
             setManusStatus(null);
             setManusFailed(true);
             if (!cached) {
-              toast({
-                title: '⚠️ AI search paused',
-                description: 'Showing cached results. Try refreshing later.',
-              });
+              toast.success('⚠️ AI search paused — Showing cached results. Try refreshing later.');
             }
           }
         });
@@ -163,10 +160,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
           // Keep any Firecrawl results that may have already been set
         }
         setManusFailed(true);
-        toast({
-          title: '⚠️ AI search paused',
-          description: cached ? 'Showing cached results from earlier.' : 'Showing web results instead.',
-        });
+        toast.success(`⚠️ AI search paused — ${(cached ? 'Showing cached results from earlier.' : 'Showing web results instead.')}`);
         if (cached) setUsingCachedAI(true);
       }
 
@@ -182,7 +176,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
           return merged;
         });
         if (!cached) {
-          toast({ title: '🌐 Web results found', description: `Found ${firecrawlResults.length} listings from the web` });
+          toast.success(`🌐 Web results found — ${(Found ${firecrawlResults.length} listings from the web)}`);
         }
       }
 
@@ -318,10 +312,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
     setSearchRadius(radius);
     if (radius && !searchCenter) {
       console.warn('[RadiusFilter] Radius set but no search center.');
-      toast({
-        title: '📍 Select a location first',
-        description: 'Pick a location from the suggestions so the radius filter knows where to search from.',
-      });
+      toast.success('📍 Select a location first — Pick a location from the suggestions so the radius filter knows where to search from.');
     }
   }, [searchCenter, toast]);
 

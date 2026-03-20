@@ -263,12 +263,8 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
       }
 
       setStep(3);
-      toast({
-        title: '✅ Qualified Lead Submitted',
-        description: depositAmount
-          ? `Lead score: ${score}/100. Holding deposit of $${depositAmount.toLocaleString()} recorded.`
-          : `Lead score: ${score}/100. ${agent.name} will contact you soon.`,
-      });
+      toast.success(`✅ Qualified Lead Submitted — ${(depositAmount
+          ? `Lead score: ${score)}`);
     } catch (err) {
       console.error('Lead submission error:', err);
       toast.error('Error — Failed to submit. Please try again.');

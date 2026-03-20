@@ -160,7 +160,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
           // Keep any Firecrawl results that may have already been set
         }
         setManusFailed(true);
-        toast.success('⚠️ AI search paused — cached ? 'Showing cached results from earlier.' : 'Showing web results instead.'');
+        toast('⚠️ AI search paused — ' + (cached ? 'Showing cached results from earlier.' : 'Showing web results instead.'));
         if (cached) setUsingCachedAI(true);
       }
 

@@ -249,7 +249,7 @@ const TeamPage = () => {
 
   const handleRemoveMember = async (memberId: string, memberUserId: string) => {
     if (memberUserId === user?.id) {
-      toast.error('Error — "You can't remove yourself"');
+      toast.error("You can't remove yourself");
       return;
     }
     await supabase.from('agency_members').delete().eq('id', memberId);

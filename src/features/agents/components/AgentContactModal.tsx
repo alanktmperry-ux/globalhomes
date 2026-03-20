@@ -309,7 +309,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
             onClick={onClose}
           />
           <motion.div
-            className="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] bg-card rounded-t-3xl shadow-drawer overflow-y-auto overscroll-contain md:inset-x-auto md:left-1/2 md:top-1/2 md:bottom-auto md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md md:rounded-2xl md:max-h-[80vh]"
+            className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+3.25rem)] z-50 max-h-[78vh] bg-card rounded-t-3xl shadow-drawer overflow-y-auto overscroll-contain md:inset-x-auto md:left-1/2 md:top-1/2 md:bottom-auto md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md md:rounded-2xl md:max-h-[80vh]"
             initial={{ y: '100%', opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: '100%', opacity: 0 }}
@@ -320,7 +320,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
               <div className="w-10 h-1 rounded-full bg-border" />
             </div>
 
-            <div className="p-5 space-y-5">
+            <div className="p-5 pb-28 md:pb-6 space-y-5">
               <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-secondary flex items-center justify-center hover:bg-accent transition-colors">
                 <X size={16} />
               </button>

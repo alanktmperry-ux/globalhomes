@@ -358,7 +358,7 @@ export default function TrustStatementModal({ open, onOpenChange }: TrustStateme
                 <h3 className="text-lg font-bold">{monthLabel}</h3>
                 {agentInfo && (
                   <p className="text-xs text-muted-foreground">
-                    {agentInfo.agency || 'Global Homes'} — {agentInfo.name}
+                    {agentInfo.agency || 'ListHQ'} — {agentInfo.name}
                   </p>
                 )}
               </div>

@@ -400,7 +400,7 @@ ${matterRows.length > 0 ? `
   <div class="stamp-box"><span>${completedCount === items.length ? '✓ MIGRATION COMPLIANT' : '⚠ INCOMPLETE — Action Required'}</span></div>
   <h3>Agent Acknowledgement</h3>
   <p style="font-size:9pt;color:#555;line-height:1.6">
-    I confirm that the above migration checklist accurately reflects the trust account data imported into GlobalHomes.
+    I confirm that the above migration checklist accurately reflects the trust account data imported into ListHQ.
     I accept responsibility for verifying the accuracy of all imported records and understand that this checklist
     forms part of the statutory audit trail required under AFA 2014.
   </p>

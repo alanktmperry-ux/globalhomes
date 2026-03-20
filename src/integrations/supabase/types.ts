@@ -339,6 +339,7 @@ export type Database = {
           license_number: string | null
           name: string
           office_address: string | null
+          onboarding_complete: boolean | null
           phone: string | null
           profile_photo_url: string | null
           rating: number | null
@@ -374,6 +375,7 @@ export type Database = {
           license_number?: string | null
           name: string
           office_address?: string | null
+          onboarding_complete?: boolean | null
           phone?: string | null
           profile_photo_url?: string | null
           rating?: number | null
@@ -409,6 +411,7 @@ export type Database = {
           license_number?: string | null
           name?: string
           office_address?: string | null
+          onboarding_complete?: boolean | null
           phone?: string | null
           profile_photo_url?: string | null
           rating?: number | null

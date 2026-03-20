@@ -83,6 +83,11 @@ const DEFAULT_DRAFT: ListingDraft = {
   estimatedRentalWeekly: 0,
   rentalWeekly: 0,
   rentalBondWeeks: 4,
+  availableFrom: '',
+  leaseTerm: '12 months',
+  furnished: false,
+  petsAllowed: false,
+  screeningLevel: 'Basic',
 };
 
 const STEPS = ['Address', 'Basics', 'Photos', 'Voice', 'Settings', 'Preview'];

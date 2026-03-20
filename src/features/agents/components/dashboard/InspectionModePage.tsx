@@ -333,11 +333,19 @@ const InspectionModePage = () => {
         </div>
       </div>
 
-      {inspections.length === 0 ? (
+      {inspectionsLoading ? (
+        <div className="space-y-4 max-w-xl">
+          {[1, 2].map(i => (
+            <Card key={i}><CardContent className="p-5"><Skeleton className="h-16 w-full" /></CardContent></Card>
+          ))}
+        </div>
+      ) : inspections.length === 0 ? (
         <Card>
           <CardContent className="py-16 text-center text-muted-foreground">
             <CalendarDays size={48} className="mx-auto mb-3 opacity-40" />
-            <p>No inspections scheduled for today</p>
+            <p className="font-medium mb-1">No inspections scheduled for today</p>
+            <p className="text-sm mb-4">Add inspection times to your listings to see them here.</p>
+            <Button onClick={() => navigate('/agent/listings')} variant="outline">Go to Listings</Button>
           </CardContent>
         </Card>
       ) : (

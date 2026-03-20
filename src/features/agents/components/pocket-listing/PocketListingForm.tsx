@@ -281,7 +281,16 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         lat: draft.lat || null,
         lng: draft.lng || null,
         rental_weekly: draft.listingType === 'rent' ? (draft.rentalWeekly || null) : (draft.estimatedRentalWeekly || null),
+        available_from: draft.availableFrom || null,
+        lease_term: draft.leaseTerm || null,
+        furnished: draft.furnished,
+        pets_allowed: draft.petsAllowed,
       } as any;
+
+      // Add 'Pets considered' to features if applicable
+      if (draft.petsAllowed && !payload.features?.includes('Pets considered')) {
+        payload.features = [...(payload.features || []), 'Pets considered'];
+      }
 
       if (editPropertyId) {
         // UPDATE existing listing

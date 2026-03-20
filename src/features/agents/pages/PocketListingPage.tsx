@@ -85,14 +85,14 @@ const PocketListingPage = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => { setCreateListingType('rent'); setShowForm(true); setShowSuccess(false); }}
+                onClick={() => checkLimitAndCreate('rent')}
                 className="gap-1.5 text-xs font-bold"
               >
                 <Key size={14} /> Create Rental Listing
               </Button>
               <Button
                 size="sm"
-                onClick={() => { setCreateListingType('sale'); setShowForm(true); setShowSuccess(false); }}
+                onClick={() => checkLimitAndCreate('sale')}
                 className="gap-1.5 text-xs font-bold"
               >
                 <Plus size={14} /> Create Sale Listing

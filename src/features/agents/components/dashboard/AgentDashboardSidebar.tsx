@@ -56,7 +56,7 @@ const TEAM_NAV: NavItem[] = [
   { title: 'Team', url: '/dashboard/team', icon: UserPlus },
 ];
 
-const ACCOUNT_NAV: NavItem[] = [
+const ACCOUNT_NAV_BASE: NavItem[] = [
   { title: 'My Agencies', url: '/dashboard/agencies', icon: Building2 },
   { title: 'Billing', url: '/dashboard/billing', icon: CreditCard },
   { title: 'Reviews', url: '/dashboard/reviews', icon: Star },

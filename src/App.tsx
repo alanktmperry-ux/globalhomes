@@ -64,6 +64,7 @@ const InspectionModePage = React.lazy(() => import("@/features/agents/components
 const SettlementConcierge = React.lazy(() => import("@/features/agents/components/dashboard/SettlementConcierge"));
 const CommissionCalculator = React.lazy(() => import("@/features/agents/components/dashboard/CommissionCalculator"));
 const HelpPage = React.lazy(() => import("@/features/agents/components/dashboard/HelpPage"));
+const RentRollPage = React.lazy(() => import("@/features/agents/components/dashboard/RentRollPage"));
 
 const PageLoader = () => (
   <div className="flex h-screen w-full items-center justify-center bg-background">
@@ -146,6 +147,7 @@ const App = () => (
                   <Route path="trust-ledger" element={<TrustLedgerPage />} />
                   <Route path="reconciliation" element={<BankReconciliationPage />} />
                   <Route path="reports" element={<ReportsPage />} />
+                  <Route path="rent-roll" element={<RentRollPage />} />
                   <Route path="settings" element={<SettingsPage />} />
                   <Route path="help" element={<HelpPage />} />
                 </Route>

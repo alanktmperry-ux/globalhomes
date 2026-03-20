@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, LogOut, Building2, UserPlus,
+  LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, LogOut, Building2, UserPlus, Home,
   User, FileText, CreditCard, Star, MapPinned, Shield, Contact, Kanban, Scale, Landmark,
   ClipboardCheck, CalendarDays, Search, TrendingUp, Receipt, PartyPopper, Calculator, HelpCircle,
 } from 'lucide-react';
@@ -38,6 +38,7 @@ const CRM_NAV: NavItem[] = [
 ];
 
 const BUSINESS_NAV: NavItem[] = [
+  { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home },
   { title: 'Investments', url: '/dashboard/investments', icon: TrendingUp },
   { title: 'Financials', url: '/dashboard/trust', icon: Landmark },
   { title: 'Commission Calculator', url: '/dashboard/commission', icon: Calculator },

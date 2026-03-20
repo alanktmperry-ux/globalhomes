@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { MessageCircle, ArrowLeft, Send, User, Building2, PenSquare } from 'lucide-react';
+import { MessageCircle, ArrowLeft, Send, User, Building2, PenSquare, Archive, Trash2, MoreVertical, ArchiveRestore } from 'lucide-react';
 import { NewMessageDialog } from '@/features/user/components/NewMessageDialog';
 import { BottomNav } from '@/shared/components/layout/BottomNav';
 import { useI18n } from '@/shared/lib/i18n';
@@ -44,8 +44,11 @@ const MessagesPage = () => {
   const [newMsgDialogOpen, setNewMsgDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const getConversationKey = (otherUserId: string, propertyId: string | null) => {
     if (!otherUserId) return null;
@@ -209,6 +212,7 @@ const MessagesPage = () => {
           property_image: propImage,
           last_message_text: lastMsg?.content,
           unread_count: count || 0,
+          archived_by: c.archived_by || [],
         } as Conversation;
       })
     );
@@ -396,6 +400,74 @@ const MessagesPage = () => {
     selectedConvo?.id.startsWith('lead-') && !selectedConvo?.other_user_id
   );
 
+  // Close menu on outside click
+  useEffect(() => {
+    if (!openMenuId) return;
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [openMenuId]);
+
+  const handleArchive = async (convoId: string) => {
+    if (!user || convoId.startsWith('lead-')) return;
+    setOpenMenuId(null);
+
+    // Add current user to archived_by array
+    const convo = conversations.find(c => c.id === convoId);
+    if (!convo) return;
+
+    await supabase
+      .from('conversations')
+      .update({ archived_by: [...((convo as any).archived_by || []), user.id] } as any)
+      .eq('id', convoId);
+
+    setConversations(prev => prev.map(c =>
+      c.id === convoId ? { ...c, archived_by: [...((c as any).archived_by || []), user.id] } as any : c
+    ));
+  };
+
+  const handleUnarchive = async (convoId: string) => {
+    if (!user || convoId.startsWith('lead-')) return;
+    setOpenMenuId(null);
+
+    const convo = conversations.find(c => c.id === convoId);
+    if (!convo) return;
+
+    const currentArchived: string[] = (convo as any).archived_by || [];
+    await supabase
+      .from('conversations')
+      .update({ archived_by: currentArchived.filter((id: string) => id !== user.id) } as any)
+      .eq('id', convoId);
+
+    setConversations(prev => prev.map(c =>
+      c.id === convoId ? { ...c, archived_by: currentArchived.filter((id: string) => id !== user!.id) } as any : c
+    ));
+  };
+
+  const handleDelete = async (convoId: string) => {
+    if (!user || convoId.startsWith('lead-')) return;
+    setOpenMenuId(null);
+
+    await supabase.from('conversations').delete().eq('id', convoId);
+    setConversations(prev => prev.filter(c => c.id !== convoId));
+    if (selectedConvo?.id === convoId) {
+      setSelectedConvo(null);
+      setMessages([]);
+    }
+  };
+
+  const isArchivedByMe = (c: Conversation) => {
+    return ((c as any).archived_by || []).includes(user?.id);
+  };
+
+  const visibleConversations = conversations.filter(c =>
+    showArchived ? isArchivedByMe(c) : !isArchivedByMe(c)
+  );
+
   if (!user) {
     return (
       <div className="min-h-screen bg-background pb-20">
@@ -425,21 +497,29 @@ const MessagesPage = () => {
             </button>
           ) : null}
           <h1 className="font-display text-xl font-bold text-foreground truncate">
-            {selectedConvo ? selectedConvo.other_user_name : t('nav.messages')}
+            {selectedConvo ? selectedConvo.other_user_name : (showArchived ? 'Archived' : t('nav.messages'))}
           </h1>
-          {!selectedConvo && conversations.length > 0 && (
-            <span className="ml-auto text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">
-              {conversations.length}
-            </span>
-          )}
           {!selectedConvo && (
-            <button
-              onClick={() => setNewMsgDialogOpen(true)}
-              className="ml-auto w-9 h-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center hover:opacity-90 transition-opacity"
-              title="New message"
-            >
-              <PenSquare size={16} />
-            </button>
+            <div className="ml-auto flex items-center gap-1.5">
+              <button
+                onClick={() => setShowArchived(!showArchived)}
+                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
+                  showArchived ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:text-foreground'
+                }`}
+                title={showArchived ? 'Show inbox' : 'Show archived'}
+              >
+                <Archive size={16} />
+              </button>
+              {!showArchived && (
+                <button
+                  onClick={() => setNewMsgDialogOpen(true)}
+                  className="w-9 h-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center hover:opacity-90 transition-opacity"
+                  title="New message"
+                >
+                  <PenSquare size={16} />
+                </button>
+              )}
+            </div>
           )}
         </div>
       </header>
@@ -548,47 +628,104 @@ const MessagesPage = () => {
                     <div key={i} className="h-20 bg-secondary/50 rounded-2xl animate-pulse" />
                   ))}
                 </div>
-              ) : conversations.length === 0 ? (
+              ) : visibleConversations.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-                  <MessageCircle size={40} strokeWidth={1.2} className="mb-3" />
-                  <p className="text-sm">No messages yet</p>
-                  <p className="text-xs mt-1">Contact an agent on a listing to start a conversation</p>
+                  {showArchived ? (
+                    <>
+                      <Archive size={40} strokeWidth={1.2} className="mb-3" />
+                      <p className="text-sm">No archived messages</p>
+                      <p className="text-xs mt-1">Archived conversations will appear here</p>
+                    </>
+                  ) : (
+                    <>
+                      <MessageCircle size={40} strokeWidth={1.2} className="mb-3" />
+                      <p className="text-sm">No messages yet</p>
+                      <p className="text-xs mt-1">Contact an agent on a listing to start a conversation</p>
+                    </>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-1 py-2">
-                  {conversations.map(c => (
-                    <button
-                      key={c.id}
-                      onClick={() => setSelectedConvo(c)}
-                      className={`w-full text-left px-4 py-3 rounded-2xl hover:bg-secondary/70 transition-colors flex items-start gap-3 ${
-                        c.unread_count > 0 ? 'bg-primary/5' : ''
-                      }`}
-                    >
-                      <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center shrink-0 mt-0.5 overflow-hidden">
-                        {c.other_user_avatar ? (
-                          <img src={c.other_user_avatar} alt="" className="w-10 h-10 rounded-full object-cover" />
-                        ) : (
-                          <span className="text-sm font-bold text-foreground">
-                            {c.other_user_name.charAt(0).toUpperCase()}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className={`text-sm font-medium truncate ${c.unread_count > 0 ? 'text-foreground' : 'text-foreground/80'}`}>
-                            {c.other_user_name}
-                          </span>
-                          {c.unread_count > 0 && <span className="w-2 h-2 rounded-full bg-primary shrink-0" />}
-                          <span className="ml-auto text-[10px] text-muted-foreground shrink-0">
-                            {formatDistanceToNow(new Date(c.last_message_at), { addSuffix: true })}
-                          </span>
+                  {visibleConversations.map(c => (
+                    <div key={c.id} className="relative group">
+                      <button
+                        onClick={() => setSelectedConvo(c)}
+                        className={`w-full text-left px-4 py-3 rounded-2xl hover:bg-secondary/70 transition-colors flex items-start gap-3 ${
+                          c.unread_count > 0 ? 'bg-primary/5' : ''
+                        }`}
+                      >
+                        <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center shrink-0 mt-0.5 overflow-hidden">
+                          {c.other_user_avatar ? (
+                            <img src={c.other_user_avatar} alt="" className="w-10 h-10 rounded-full object-cover" />
+                          ) : (
+                            <span className="text-sm font-bold text-foreground">
+                              {c.other_user_name.charAt(0).toUpperCase()}
+                            </span>
+                          )}
                         </div>
-                        {c.property_title && (
-                          <p className="text-xs text-muted-foreground truncate">{c.property_title}</p>
-                        )}
-                        <p className="text-xs text-muted-foreground/70 truncate mt-0.5">{c.last_message_text || 'No messages yet'}</p>
-                      </div>
-                    </button>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className={`text-sm font-medium truncate ${c.unread_count > 0 ? 'text-foreground' : 'text-foreground/80'}`}>
+                              {c.other_user_name}
+                            </span>
+                            {c.unread_count > 0 && <span className="w-2 h-2 rounded-full bg-primary shrink-0" />}
+                            <span className="ml-auto text-[10px] text-muted-foreground shrink-0 pr-6">
+                              {formatDistanceToNow(new Date(c.last_message_at), { addSuffix: true })}
+                            </span>
+                          </div>
+                          {c.property_title && (
+                            <p className="text-xs text-muted-foreground truncate">{c.property_title}</p>
+                          )}
+                          <p className="text-xs text-muted-foreground/70 truncate mt-0.5">{c.last_message_text || 'No messages yet'}</p>
+                        </div>
+                      </button>
+
+                      {/* Action menu trigger */}
+                      {!c.id.startsWith('lead-') && (
+                        <div className="absolute top-3 right-3" ref={openMenuId === c.id ? menuRef : undefined}>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === c.id ? null : c.id); }}
+                            className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-secondary transition-all"
+                          >
+                            <MoreVertical size={14} />
+                          </button>
+
+                          <AnimatePresence>
+                            {openMenuId === c.id && (
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                transition={{ duration: 0.1 }}
+                                className="absolute right-0 top-8 z-50 w-40 bg-popover border border-border rounded-xl shadow-lg overflow-hidden"
+                              >
+                                {isArchivedByMe(c) ? (
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); handleUnarchive(c.id); }}
+                                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-secondary transition-colors"
+                                  >
+                                    <ArchiveRestore size={13} /> Unarchive
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); handleArchive(c.id); }}
+                                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-secondary transition-colors"
+                                  >
+                                    <Archive size={13} /> Archive
+                                  </button>
+                                )}
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleDelete(c.id); }}
+                                  className="w-full flex items-center gap-2 px-3 py-2 text-xs text-destructive hover:bg-destructive/10 transition-colors"
+                                >
+                                  <Trash2 size={13} /> Delete
+                                </button>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}

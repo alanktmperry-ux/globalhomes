@@ -89,14 +89,10 @@ const AgencyProfilePage = () => {
 
   if (!agency) {
     return (
-      <div className="min-h-screen bg-background">
-        <SiteHeader />
-        <div className="max-w-6xl mx-auto px-4 py-24 text-center">
-          <Building2 className="mx-auto mb-4 text-muted-foreground" size={48} />
-          <h1 className="text-2xl font-display font-bold text-foreground mb-2">Agency not found</h1>
-          <p className="text-muted-foreground">The agency you're looking for doesn't exist.</p>
-        </div>
-        <SiteFooter />
+      <div className="max-w-6xl mx-auto px-4 py-24 text-center">
+        <Building2 className="mx-auto mb-4 text-muted-foreground" size={48} />
+        <h1 className="text-2xl font-display font-bold text-foreground mb-2">Agency not found</h1>
+        <p className="text-muted-foreground">The agency you're looking for doesn't exist.</p>
       </div>
     );
   }

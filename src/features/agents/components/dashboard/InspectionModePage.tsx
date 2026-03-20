@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import UpgradeGate from '@/features/agents/components/shared/UpgradeGate';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,6 +12,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { format } from 'date-fns';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useNavigate } from 'react-router-dom';
 
 type InterestLevel = 'hot' | 'warm' | 'cold';
 
@@ -30,11 +32,6 @@ interface ScheduledInspection {
   time: string;
   expectedVisitors: number;
 }
-
-const DEMO_INSPECTIONS: ScheduledInspection[] = [
-  { propertyId: 'demo-1', address: '42 Panorama Drive, Berwick', time: '10:00 AM', expectedVisitors: 8 },
-  { propertyId: 'demo-2', address: '8 Ocean View Rd, Brighton', time: '2:00 PM', expectedVisitors: 12 },
-];
 
 const INTEREST_CONFIG: Record<InterestLevel, { label: string; icon: typeof Flame; className: string }> = {
   hot: { label: 'Hot', icon: Flame, className: 'bg-red-500/20 text-red-400 border-red-500/30' },

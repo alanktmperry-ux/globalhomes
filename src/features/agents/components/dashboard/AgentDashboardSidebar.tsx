@@ -125,7 +125,7 @@ const AgentDashboardSidebar = () => {
     { title: 'Billing', url: '/dashboard/billing', icon: CreditCard },
     { title: 'Reviews', url: '/dashboard/reviews', icon: Star },
     { title: 'Settings', url: '/dashboard/settings', icon: Settings },
-    { title: 'Help & FAQ', url: '/dashboard/help', icon: HelpCircle },
+    
   ];
 
   const ADMIN_NAV: NavItem[] = isAdmin ? [{ title: 'Admin Panel', url: '/admin', icon: Shield }] : [];
@@ -252,15 +252,42 @@ const AgentDashboardSidebar = () => {
         {ADMIN_NAV.length > 0 && renderGroup('Admin', ADMIN_NAV)}
       </SidebarContent>
 
-      <SidebarFooter className="p-3">
-        <div className="flex items-center gap-2">
-          <SidebarTrigger className="shrink-0" />
-          {!collapsed && (
-            <button onClick={handleSignOut} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
-              <LogOut size={14} /> Sign out
+      <SidebarFooter className="border-t border-border p-3">
+        {!collapsed ? (
+          <div className="flex flex-col gap-2">
+            <button
+              onClick={() => navigate('/dashboard/help')}
+              className={`flex items-center gap-1.5 text-xs transition-colors ${
+                isActive('/dashboard/help')
+                  ? 'bg-primary/10 text-primary font-medium rounded-lg px-2 py-1.5'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <HelpCircle size={14} className="shrink-0" />
+              Help & FAQ
             </button>
-          )}
-        </div>
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="shrink-0" />
+              <button onClick={handleSignOut} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+                <LogOut size={14} /> Sign out
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-2">
+            <button
+              onClick={() => navigate('/dashboard/help')}
+              className={`p-1.5 rounded-lg transition-colors ${
+                isActive('/dashboard/help')
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <HelpCircle size={16} />
+            </button>
+            <SidebarTrigger className="shrink-0" />
+          </div>
+        )}
       </SidebarFooter>
     </Sidebar>
   );

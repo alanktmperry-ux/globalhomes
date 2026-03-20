@@ -68,13 +68,45 @@ const AgentDashboardSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut, isAdmin } = useAuth();
+  const { user } = useAuth();
   const { listings } = useAgentListings();
+  const [arrearsCount, setArrearsCount] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    const fetchArrears = async () => {
+      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
+      if (!agent) return;
+      const { data: tenancies } = await supabase
+        .from('tenancies').select('id, rent_amount, lease_start').eq('agent_id', agent.id).eq('status', 'active');
+      if (!tenancies || tenancies.length === 0) return;
+      const { data: payments } = await supabase
+        .from('rent_payments').select('tenancy_id, period_to, status')
+        .in('tenancy_id', tenancies.map(t => t.id))
+        .order('payment_date', { ascending: false });
+      const today = new Date();
+      let count = 0;
+      for (const t of tenancies) {
+        const latest = (payments || []).find(p => p.tenancy_id === t.id);
+        if (!latest) {
+          const daysSince = Math.floor((today.getTime() - new Date(t.lease_start).getTime()) / 86400000);
+          if (daysSince > 3) count++;
+          continue;
+        }
+        const daysOver = Math.floor((today.getTime() - new Date(latest.period_to).getTime()) / 86400000);
+        if (daysOver > 3 && latest.status !== 'paid') count++;
+      }
+      setArrearsCount(count);
+    };
+    fetchArrears();
+  }, [user]);
 
   const activeCount = listings.filter(l => ('_mock_status' in l ? l._mock_status !== 'sold' : (l as any).status !== 'sold')).length;
 
   const badgeValues: Record<string, string> = {
     listings: activeCount > 0 ? String(activeCount) : '',
     leads: '',
+    rentRoll: arrearsCount > 0 ? String(arrearsCount) : '',
   };
 
   const ADMIN_NAV: NavItem[] = isAdmin ? [{ title: 'Admin Panel', url: '/admin', icon: Shield }] : [];

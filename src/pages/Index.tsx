@@ -9,10 +9,7 @@ import { MapSkeleton } from '@/features/properties/components/PropertyCardSkelet
 import { PropertyDrawer } from '@/features/properties/components/PropertyDrawer';
 import { MapErrorBoundary } from '@/features/properties/components/MapErrorBoundary';
 import { VoiceSearchErrorBoundary } from '@/features/search/components/VoiceSearchErrorBoundary';
-import { BottomNav } from '@/shared/components/layout/BottomNav';
 import { useI18n } from '@/shared/lib/i18n';
-import { SiteFooter } from '@/shared/components/layout/SiteFooter';
-import { SiteHeader } from '@/shared/components/layout/SiteHeader';
 
 // Lazy-load map — only initialize when needed
 const LazyPropertyMap = lazy(() => import('@/features/properties/components/PropertyMap').then(m => ({ default: m.PropertyMap })));
@@ -582,8 +579,7 @@ const Index = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <SiteHeader />
+    <>
       <VoiceSearchErrorBoundary>
         <VoiceSearchHero
           onSearch={handleSearch}
@@ -760,9 +756,7 @@ const Index = () => {
         onToggleSave={toggleSaved}
         searchContext={searchContextForLead}
       />
-      <SiteFooter />
-      <BottomNav />
-    </div>
+    </>
   );
 };
 

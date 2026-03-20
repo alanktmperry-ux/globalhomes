@@ -20,8 +20,6 @@ export function BottomNav() {
   const navigate = useNavigate();
   const { user, isAdmin, isAgent, loading } = useAuth();
   const [showLangPicker, setShowLangPicker] = useState(false);
-  const navigate = useNavigate();
-  const { user, isAdmin, isAgent, loading } = useAuth();
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();

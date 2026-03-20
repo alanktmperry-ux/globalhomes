@@ -9,9 +9,6 @@ import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { AgentContactModal } from '@/features/agents/components/AgentContactModal';
 import { InvestmentInsightsCard } from '@/features/properties/components/InvestmentInsightsCard';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { SiteHeader } from '@/shared/components/layout/SiteHeader';
-import { SiteFooter } from '@/shared/components/layout/SiteFooter';
-import { BottomNav } from '@/shared/components/layout/BottomNav';
 import { useSavedProperties } from '@/features/properties/hooks/useSavedProperties';
 import { useIsMobile } from '@/shared/hooks/use-mobile';
 import { mockProperties } from '@/features/properties/api/mock-data';
@@ -108,26 +105,20 @@ export default function PropertyDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
-        <SiteHeader />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-        </div>
+      <div className="flex-1 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!property) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
-        <SiteHeader />
-        <div className="flex-1 flex flex-col items-center justify-center gap-4">
-          <Home size={48} className="text-muted-foreground" />
-          <h1 className="font-display text-xl font-bold text-foreground">Property not found</h1>
-          <button onClick={() => navigate('/')} className="px-6 py-2 rounded-xl bg-primary text-primary-foreground font-medium text-sm">
-            Back to search
-          </button>
-        </div>
+      <div className="flex-1 flex flex-col items-center justify-center gap-4">
+        <Home size={48} className="text-muted-foreground" />
+        <h1 className="font-display text-xl font-bold text-foreground">Property not found</h1>
+        <button onClick={() => navigate('/')} className="px-6 py-2 rounded-xl bg-primary text-primary-foreground font-medium text-sm">
+          Back to search
+        </button>
       </div>
     );
   }
@@ -175,8 +166,6 @@ export default function PropertyDetailPage() {
         <meta name="twitter:description" content={(property.description || '').slice(0, 155)} />
         <link rel="canonical" href={typeof window !== 'undefined' ? window.location.origin + window.location.pathname : ''} />
       </Helmet>
-      <SiteHeader />
-
       {/* Back button */}
       <div className="max-w-6xl mx-auto w-full px-4 pt-4">
         <button
@@ -610,8 +599,6 @@ export default function PropertyDetailPage() {
         )}
       </AnimatePresence>
 
-      <SiteFooter />
-      <BottomNav />
 
       <AgentContactModal
         property={property}

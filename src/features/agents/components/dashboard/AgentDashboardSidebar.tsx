@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import {
   LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, LogOut, Building2, UserPlus, Home,
   User, FileText, CreditCard, Star, MapPinned, Shield, Contact, Kanban, Scale, Landmark,
-  ClipboardCheck, CalendarDays, Search, TrendingUp, Receipt, PartyPopper, Calculator, HelpCircle, ClipboardList, Settings2,
+  ClipboardCheck, CalendarDays, Search, TrendingUp, Receipt, PartyPopper, Calculator, HelpCircle, ClipboardList, Settings2, Flame,
 } from 'lucide-react';
+import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
 import {
@@ -66,6 +67,7 @@ const AgentDashboardSidebar = () => {
   const navigate = useNavigate();
   const { signOut, isAdmin, user } = useAuth();
   const { listings } = useAgentListings();
+  const { plan, foundingMember } = useSubscription();
   const [arrearsCount, setArrearsCount] = useState(0);
   const [onboardingComplete, setOnboardingComplete] = useState(true);
 
@@ -195,6 +197,19 @@ const AgentDashboardSidebar = () => {
             <div>
             <p className="font-display text-sm font-bold leading-none">ListHQ</p>
             <p className="text-[10px] text-muted-foreground">Agent Platform</p>
+            {plan && (
+              <div className="flex items-center gap-1 mt-0.5">
+                <Badge variant="outline" className={`text-[10px] px-1 py-0 h-4 ${
+                  plan === 'pro' ? 'bg-primary/10 text-primary border-primary/20' :
+                  plan === 'agency' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' :
+                  plan === 'enterprise' ? 'bg-violet-500/10 text-violet-600 border-violet-500/20' :
+                  'bg-muted text-muted-foreground'
+                }`}>
+                  {plan === 'demo' ? 'Demo' : plan.charAt(0).toUpperCase() + plan.slice(1)}
+                </Badge>
+                {foundingMember && <Flame size={10} className="text-amber-500" />}
+              </div>
+            )}
             </div>
           </div>
         ) : (

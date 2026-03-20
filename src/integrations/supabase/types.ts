@@ -273,39 +273,51 @@ export type Database = {
       agent_subscriptions: {
         Row: {
           agent_id: string
+          annual_billing: boolean
           auto_renew: boolean | null
           created_at: string
           featured_remaining: number
+          founding_member: boolean
           id: string
           listing_limit: number
+          monthly_price_aud: number
           payment_method: Json | null
           plan_type: string
+          seat_limit: number
           subscription_end: string | null
           subscription_start: string
           updated_at: string
         }
         Insert: {
           agent_id: string
+          annual_billing?: boolean
           auto_renew?: boolean | null
           created_at?: string
           featured_remaining?: number
+          founding_member?: boolean
           id?: string
           listing_limit?: number
+          monthly_price_aud?: number
           payment_method?: Json | null
           plan_type?: string
+          seat_limit?: number
           subscription_end?: string | null
           subscription_start?: string
           updated_at?: string
         }
         Update: {
           agent_id?: string
+          annual_billing?: boolean
           auto_renew?: boolean | null
           created_at?: string
           featured_remaining?: number
+          founding_member?: boolean
           id?: string
           listing_limit?: number
+          monthly_price_aud?: number
           payment_method?: Json | null
           plan_type?: string
+          seat_limit?: number
           subscription_end?: string | null
           subscription_start?: string
           updated_at?: string

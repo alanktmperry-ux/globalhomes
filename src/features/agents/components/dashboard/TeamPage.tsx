@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useSubscription } from '@/features/agents/hooks/useSubscription';
+import UpgradeGate from '@/features/agents/components/shared/UpgradeGate';
 import { Copy, Plus, Trash2, UserPlus, Building2, Shield, Users, RefreshCw, Loader2, Camera, Upload, LogIn, ArrowRight, Mail, MapPin, Eye, Lock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -52,6 +54,7 @@ const accessBadgeClass: Record<string, string> = {
 
 const TeamPage = () => {
   const { user } = useAuth();
+  const { canAccessTeam, seatLimit, loading: subLoading } = useSubscription();
   const { toast } = useToast();
 
   const [agencyId, setAgencyId] = useState<string | null>(null);
@@ -705,6 +708,10 @@ const TeamPage = () => {
     );
   }
 
+  if (!subLoading && !canAccessTeam) {
+    return <UpgradeGate requiredPlan="Agency plan" message="Team management is available on the Agency plan. Invite up to 8 agents under one account with separate logins and centralised billing." />;
+  }
+
   return (
     <div className="max-w-4xl mx-auto space-y-8 p-4 sm:p-6">
       {/* Header with Logo */}
@@ -773,13 +780,20 @@ const TeamPage = () => {
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Team Members</h2>
           {isOwnerOrAdmin && (
-            <div className="flex gap-2">
-              <Button size="sm" variant="outline" onClick={() => setEmailInviteDialogOpen(true)}>
+            <div className="flex flex-col gap-2">
+              {members.length >= seatLimit && (
+                <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 text-xs text-foreground">
+                  Your Agency plan includes up to {seatLimit} agent logins. You have used {members.length} of {seatLimit} seats. To add more agents, contact us at sales@listhq.com.au for Enterprise pricing.
+                </div>
+              )}
+              <div className="flex gap-2">
+              <Button size="sm" variant="outline" onClick={() => setEmailInviteDialogOpen(true)} disabled={members.length >= seatLimit}>
                 <Mail size={14} className="mr-1.5" /> Invite by Email
               </Button>
               <Button size="sm" onClick={() => setInviteDialogOpen(true)}>
                 <UserPlus size={14} className="mr-1.5" /> Create Code
               </Button>
+              </div>
             </div>
           )}
         </div>

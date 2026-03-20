@@ -1,4 +1,6 @@
 import { useState, useMemo } from 'react';
+import { useSubscription } from '@/features/agents/hooks/useSubscription';
+import UpgradeGate from '@/features/agents/components/shared/UpgradeGate';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -84,6 +86,7 @@ const StatCard = ({ icon: Icon, label, value, sub, color = 'bg-primary/10 text-p
 // Main Component
 // ──────────────────────────────────────────────
 const ReportsPage = () => {
+  const { canAccessTrust, loading: subLoading } = useSubscription();
   const { listings } = useAgentListings();
   const { accounts, transactions } = useTrustAccounting();
   const { contacts } = useContacts();
@@ -248,6 +251,10 @@ const ReportsPage = () => {
     ]);
     exportCsv(headers, rows, 'activity_report');
   };
+
+  if (!subLoading && !canAccessTrust) {
+    return <UpgradeGate requiredPlan="Pro or above" message="Advanced reports are available on the Pro plan and above. Export listings, leads, trust, and contacts data as CSV." />;
+  }
 
   return (
     <div>

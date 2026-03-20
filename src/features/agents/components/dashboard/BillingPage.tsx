@@ -1,302 +1,337 @@
 import { useState, useEffect } from 'react';
-import { CreditCard, Check, Loader2, Zap, Crown, Building2, Flame, Mail, Clock } from 'lucide-react';
+import { CreditCard, Check, Loader2, Zap, Crown, Building2, Flame, Mail, Lock, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { useToast } from '@/shared/hooks/use-toast';
+import { Separator } from '@/components/ui/separator';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { useSubscription, getPlanFeatures } from '@/features/agents/hooks/useSubscription';
+import { useNavigate } from 'react-router-dom';
 import DashboardHeader from './DashboardHeader';
 
-const PLANS = [
+interface PlanFeature {
+  text: string;
+  key: boolean;
+}
+
+interface PlanDef {
+  id: string;
+  name: string;
+  tagline: string;
+  foundingPrice: number;
+  fullPrice: number;
+  seatLimit: number;
+  listingLimit: number;
+  popular?: boolean;
+  saving: string;
+  comparison: string;
+  features: PlanFeature[];
+  seatsLabel: string;
+  seatsVariant: 'solo' | 'team';
+}
+
+const PLANS: PlanDef[] = [
   {
+    id: 'starter',
     name: 'Starter',
-    foundingPrice: 99,
-    fullPrice: 199,
-    annualPrice: 84,
-    icon: Zap,
-    features: [
-      '10 active listings (no per-listing fee)',
-      '14-Day GlobalHomes First pre-market window',
-      'Basic CRM',
-      'AI listing writer',
-      'Buyer intent scoring',
-      'Agent profile',
-      'Voice lead matching',
-      'Standard analytics',
-      'Email support',
-    ],
-    saving: 'Save $800+/mo vs REA Pro + CRM',
+    tagline: 'For individual agents getting started',
+    foundingPrice: 9900,
+    fullPrice: 19900,
+    seatLimit: 1,
     listingLimit: 10,
+    saving: 'Save $100/mo — locked for life',
+    comparison: 'REA subscription alone starts at $400+/mo. You get a full platform, CRM, AI writer and voice leads for $99.',
+    features: [
+      { text: '10 active listings', key: true },
+      { text: 'AI listing writer (4 tones)', key: true },
+      { text: 'Voice lead matching', key: true },
+      { text: '14-day pre-market window', key: false },
+      { text: 'Basic CRM', key: false },
+      { text: 'Agent profile page', key: false },
+      { text: 'Standard analytics', key: false },
+      { text: 'Email support', key: false },
+    ],
+    seatsLabel: '1 agent login',
+    seatsVariant: 'solo',
   },
   {
+    id: 'pro',
     name: 'Pro',
-    foundingPrice: 199,
-    fullPrice: 349,
-    annualPrice: 169,
-    icon: Crown,
+    tagline: 'For established agents managing sales and rentals',
+    foundingPrice: 19900,
+    fullPrice: 34900,
+    seatLimit: 1,
+    listingLimit: 9999,
     popular: true,
+    saving: 'Save $150/mo — locked for life',
+    comparison: 'Rex CRM is $150–$240/mo. PropertyMe is $176/mo. That is $326–$416/mo for just those two — no portal, no AI, no voice leads.',
     features: [
-      'Unlimited listings',
-      '14-Day GlobalHomes First + Day-7 match report',
-      'Full CRM',
-      'Trust accounting',
-      'Whisper Market',
-      'Inspection Day Mode',
-      'Settlement Concierge',
-      'Reputation Score',
-      'Commission Calculator',
-      'Advanced analytics',
-      'GCI reports',
-      'Verified badge',
-      'Priority support',
+      { text: 'Everything in Starter', key: false },
+      { text: 'Unlimited listings', key: true },
+      { text: 'Full trust accounting', key: true },
+      { text: 'Off-market network', key: true },
+      { text: 'Rent roll management', key: true },
+      { text: 'Full CRM + pipeline board', key: false },
+      { text: 'Inspection Day Mode', key: false },
+      { text: 'Settlement Concierge', key: false },
+      { text: 'Commission calculator', key: false },
+      { text: 'Advanced analytics + reports', key: false },
+      { text: 'Verified agent badge', key: false },
+      { text: 'Priority support', key: false },
     ],
-    saving: 'Save $1,200+/mo vs full agency stack',
-    listingLimit: 999,
+    seatsLabel: '1 agent login',
+    seatsVariant: 'solo',
   },
   {
+    id: 'agency',
     name: 'Agency',
-    foundingPrice: 399,
-    fullPrice: 699,
-    annualPrice: 339,
-    icon: Building2,
+    tagline: 'For principals running a team under one roof',
+    foundingPrice: 39900,
+    fullPrice: 69900,
+    seatLimit: 8,
+    listingLimit: 9999,
+    saving: 'Save $300/mo — locked for life',
+    comparison: '5 agents on Rex + PropertyMe + REA costs $1,500–$2,700/mo. Agency tier replaces all three for $399/mo — saving $1,100+/mo.',
     features: [
-      'Everything in Pro',
-      'Up to 5 agent seats',
-      'Team analytics dashboard',
-      'Agency profile & branding',
-      'Lead routing between agents',
-      'Xero integration (coming soon)',
-      'API access',
-      'Dedicated account manager',
+      { text: 'Everything in Pro — for every agent', key: false },
+      { text: 'Up to 8 separate agent logins', key: true },
+      { text: 'Principal dashboard — whole office view', key: true },
+      { text: 'Centralised trust accounting', key: true },
+      { text: 'White-label listing pages', key: true },
+      { text: 'Owner portal for landlords', key: true },
+      { text: 'Agency-wide rent roll', key: true },
+      { text: 'Lead routing by suburb', key: false },
+      { text: 'Agency performance reports', key: false },
+      { text: 'Xero integration (coming soon)', key: false },
+      { text: 'Priority onboarding call', key: false },
     ],
-    saving: 'Save $2,000+/mo for your whole team',
-    listingLimit: 999,
+    seatsLabel: 'Up to 8 agent logins — one bill',
+    seatsVariant: 'team',
   },
 ];
 
+const formatAUD = (cents: number) => `$${(cents / 100).toLocaleString('en-AU')}`;
+
+const PLAN_ORDER = ['demo', 'starter', 'pro', 'agency', 'enterprise'];
+
 const BillingPage = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
-  const [loading, setLoading] = useState(true);
-  const [currentPlan, setCurrentPlan] = useState('demo');
+  const navigate = useNavigate();
+  const sub = useSubscription();
   const [listingsUsed, setListingsUsed] = useState(0);
-  const [listingLimit, setListingLimit] = useState(3);
-  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
+  const [upgrading, setUpgrading] = useState<string | null>(null);
 
   useEffect(() => {
-    if (user) loadBilling();
-  }, [user]);
-
-  const loadBilling = async () => {
     if (!user) return;
-    try {
-      const { data: agent } = await supabase.from('agents').select('id, is_subscribed').eq('user_id', user.id).single();
+    const countListings = async () => {
+      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
       if (!agent) return;
-
-      const { data: sub } = await supabase.from('agent_subscriptions').select('*').eq('agent_id', agent.id).maybeSingle();
-      if (sub) {
-        setCurrentPlan((sub as any).plan_type);
-        setListingLimit((sub as any).listing_limit);
-      } else {
-        setCurrentPlan('demo');
-        setListingLimit(3);
-      }
-
       const { count } = await supabase.from('properties').select('id', { count: 'exact', head: true }).eq('agent_id', agent.id).neq('status', 'sold');
       setListingsUsed(count || 0);
-    } catch (err) {
-      console.error(err);
+    };
+    countListings();
+  }, [user]);
+
+  const handleUpgrade = async (planId: string) => {
+    if (!user) return;
+    setUpgrading(planId);
+    try {
+      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
+      if (!agent) throw new Error('Agent not found');
+
+      const planDef = PLANS.find(p => p.id === planId);
+      if (!planDef) return;
+
+      // Upsert subscription
+      const { data: existing } = await supabase.from('agent_subscriptions').select('id').eq('agent_id', agent.id).maybeSingle();
+
+      const payload = {
+        agent_id: agent.id,
+        plan_type: planId,
+        listing_limit: planDef.listingLimit,
+        seat_limit: planDef.seatLimit,
+        founding_member: true,
+        monthly_price_aud: planDef.foundingPrice,
+      };
+
+      if (existing) {
+        await supabase.from('agent_subscriptions').update(payload).eq('id', (existing as any).id);
+      } else {
+        await supabase.from('agent_subscriptions').insert(payload);
+      }
+
+      // Mark agent as subscribed
+      await supabase.from('agents').update({ is_subscribed: true }).eq('id', agent.id);
+
+      toast.success("Plan updated! Stripe billing coming soon — we'll email you when payment is ready. Your founding rate is reserved.");
+      // Force reload to update subscription state
+      window.location.reload();
+    } catch (err: any) {
+      toast.error(err.message || 'Upgrade failed');
     } finally {
-      setLoading(false);
+      setUpgrading(null);
     }
   };
 
-  const handleUpgrade = (plan: string) => {
-    toast({ title: 'Coming Soon', description: "Stripe billing coming soon — we'll notify you when it's ready." });
-  };
+  if (sub.loading) {
+    return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" size={24} /></div>;
+  }
 
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" size={24} /></div>;
+  const usagePercent = sub.listingLimit > 0 ? Math.min((listingsUsed / sub.listingLimit) * 100, 100) : 0;
+  const currentIdx = PLAN_ORDER.indexOf(sub.plan || 'demo');
 
-  const usagePercent = Math.min((listingsUsed / listingLimit) * 100, 100);
-  const isDemo = currentPlan === 'demo' || currentPlan === 'basic' || currentPlan === 'free';
+  const displayPlan = sub.plan === 'demo' ? 'Demo' : (sub.plan || 'Demo');
 
   return (
     <div>
-      <DashboardHeader title="Subscription & Billing" subtitle="Manage your plan and payment methods" />
+      <DashboardHeader title="Subscription & Billing" subtitle="Manage your plan and payment" />
       <div className="p-4 sm:p-6 max-w-4xl space-y-6">
-        {/* Current Plan */}
+
+        {/* A) Current Plan Card */}
         <div className="bg-card border border-border rounded-xl p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-display text-sm font-bold">Current Plan</h3>
-              <p className="text-2xl font-bold text-primary capitalize mt-1">{isDemo ? 'Demo' : currentPlan}</p>
+              <h3 className="text-sm font-bold">Current Plan</h3>
+              <p className="text-2xl font-bold text-primary capitalize mt-1">{displayPlan}</p>
             </div>
-            <Badge variant={isDemo ? 'destructive' : 'secondary'} className="capitalize">
-              {isDemo ? 'Demo — Upgrade to unlock' : currentPlan}
-            </Badge>
+            <div className="flex items-center gap-2">
+              {sub.foundingMember && (
+                <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-[10px] gap-1">
+                  <Flame size={10} className="text-amber-500" /> Founding Member — rate locked for life
+                </Badge>
+              )}
+              <Badge variant={sub.isDemo ? 'destructive' : 'secondary'} className="capitalize text-xs">
+                {displayPlan}
+              </Badge>
+            </div>
           </div>
-          {isDemo && (
-            <p className="text-sm text-muted-foreground">
-              You're currently on the demo plan. Upgrade to a paid plan to unlock all features and start listing properties.
+          {sub.isDemo && (
+            <p className="text-sm text-amber-600">
+              You're on the demo plan. Upgrade to start listing and accepting leads.
             </p>
           )}
           <div>
             <div className="flex justify-between text-xs text-muted-foreground mb-1">
-              <span>Listings: {listingsUsed} / {listingLimit}</span>
-              <span>{usagePercent.toFixed(0)}%</span>
+              <span>Listings: {listingsUsed} / {sub.listingLimit >= 9999 ? '∞' : sub.listingLimit}</span>
+              {sub.listingLimit < 9999 && <span>{usagePercent.toFixed(0)}%</span>}
             </div>
-            <Progress value={usagePercent} className="h-2" />
+            <Progress value={sub.listingLimit >= 9999 ? 5 : usagePercent} className="h-2" />
           </div>
         </div>
 
-        {/* 60-Day Free Trial Banner */}
-        <div className="bg-primary/10 border border-primary/20 rounded-2xl p-6 mb-8">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <h3 className="text-lg font-bold text-foreground">60 Days Free — No Credit Card</h3>
-              <p className="text-sm text-muted-foreground mt-1">
-                Try GlobalHomes free for 60 days. Full platform access, unlimited listings. After 60 days, keep everything from $99/month.
-              </p>
-            </div>
-            <div className="flex flex-col items-start sm:items-end gap-1 shrink-0">
-              <Button
-                size="lg"
-                onClick={() => handleUpgrade('trial')}
-                className="text-base px-8 py-5 rounded-xl font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-lg shadow-primary/30"
-              >
-                <Zap size={18} className="mr-2" />
-                Start Free 60-Day Trial
-              </Button>
-              <span className="text-[11px] text-muted-foreground">Then from $99/mo · Cancel anytime</span>
-            </div>
+        {/* B) Founding Member Urgency Banner */}
+        {(sub.isDemo || !sub.isPaid) && (
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-5 py-3 text-sm flex items-center gap-2">
+            <Flame size={16} className="text-amber-500 shrink-0" />
+            <span className="text-foreground">
+              <strong>73 of 100 founding member spots remaining</strong> — lock your rate for life
+            </span>
           </div>
-        </div>
+        )}
 
-        {/* Founding Member Counter */}
-        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-5 py-3 text-sm mb-6 flex items-center gap-2">
-          <Flame size={16} className="text-amber-500 shrink-0" />
-          <span className="text-foreground">
-            <strong>Founding Member spots:</strong> 73 of 100 remaining — lock your rate for life
-          </span>
-        </div>
-
-        {/* Billing toggle */}
-        <div className="flex items-center justify-center gap-3">
-          <button
-            onClick={() => setBillingCycle('monthly')}
-            className={`text-sm font-medium px-4 py-1.5 rounded-full transition-colors ${
-              billingCycle === 'monthly' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            Monthly
-          </button>
-          <button
-            onClick={() => setBillingCycle('annual')}
-            className={`text-sm font-medium px-4 py-1.5 rounded-full transition-colors flex items-center gap-1.5 ${
-              billingCycle === 'annual' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            Annual
-            <Badge className="bg-success text-success-foreground text-[9px] px-1.5 py-0 h-4 border-0">Save 15%</Badge>
-          </button>
-        </div>
-
-        {/* Plans */}
+        {/* C) Plan Cards Grid */}
         <div className="grid sm:grid-cols-3 gap-4">
           {PLANS.map(plan => {
-            const isCurrent = currentPlan === plan.name.toLowerCase();
-            const price = billingCycle === 'annual' ? plan.annualPrice : plan.foundingPrice;
+            const isCurrent = sub.plan === plan.id;
+            const planIdx = PLAN_ORDER.indexOf(plan.id);
+            const isUpgrade = planIdx > currentIdx;
+
             return (
-              <div key={plan.name} className={`bg-card border rounded-xl p-5 space-y-4 relative ${plan.popular ? 'border-primary ring-1 ring-primary/20' : 'border-border'}`}>
-                {plan.popular && (
-                  <Badge className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px]">Most Popular</Badge>
-                )}
-                <div className="text-center">
-                  <plan.icon size={24} className="mx-auto text-primary mb-2" />
-                  <h4 className="font-display font-bold">{plan.name}</h4>
-                  <p className="text-2xl font-bold mt-1">${price}<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
-                  <p className="text-xs text-muted-foreground line-through mt-0.5">
-                    ${plan.fullPrice}/mo after first 100
-                  </p>
-                  {billingCycle === 'annual' && (
-                    <p className="text-[10px] text-muted-foreground mt-0.5">
-                      ${plan.annualPrice * 12}/yr billed annually
-                    </p>
+              <div key={plan.id} className={`bg-card border rounded-xl p-5 space-y-4 relative flex flex-col ${plan.popular ? 'border-primary ring-1 ring-primary/20' : 'border-border'}`}>
+                {/* Badges */}
+                <div className="flex gap-1.5">
+                  {!plan.popular && (
+                    <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-[9px]">Founding rate</Badge>
                   )}
-                  <p className="text-success text-[10px] font-medium mt-1">{plan.saving}</p>
-                  <p className="text-amber-500 text-[10px] mt-0.5">Rate locked for life · First 100 agencies only</p>
+                  {plan.popular && (
+                    <Badge className="bg-primary/10 text-primary border-primary/20 text-[9px]">Most popular</Badge>
+                  )}
                 </div>
-                <ul className="space-y-2">
+
+                {/* Name & tagline */}
+                <div>
+                  <h4 className="text-[15px] font-medium">{plan.name}</h4>
+                  <p className="text-xs text-muted-foreground mt-0.5">{plan.tagline}</p>
+                </div>
+
+                {/* Seats pill */}
+                <Badge variant="outline" className={`text-[10px] w-fit ${plan.seatsVariant === 'team' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 'bg-muted text-muted-foreground'}`}>
+                  <Users size={10} className="mr-1" />
+                  {plan.seatsLabel}
+                </Badge>
+
+                {/* Pricing */}
+                <div>
+                  <span className="text-3xl font-bold">{formatAUD(plan.foundingPrice)}</span>
+                  <span className="text-sm text-muted-foreground">/mo</span>
+                  <p className="text-xs text-muted-foreground line-through mt-0.5">
+                    {formatAUD(plan.fullPrice)}/mo after launch
+                  </p>
+                  <p className="text-xs text-emerald-600 font-medium mt-1">{plan.saving}</p>
+                </div>
+
+                <Separator />
+
+                {/* Features */}
+                <ul className="space-y-2 flex-1">
                   {plan.features.map(f => (
-                    <li key={f} className="text-xs flex items-start gap-2">
-                      <Check size={12} className="text-success mt-0.5 shrink-0" />
-                      <span className="text-muted-foreground">{f}</span>
+                    <li key={f.text} className="text-xs flex items-start gap-2">
+                      <span className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${f.key ? 'bg-emerald-500' : 'bg-muted-foreground/30'}`} />
+                      <span className="text-muted-foreground">{f.text}</span>
                     </li>
                   ))}
                 </ul>
+
+                {/* Comparison box */}
+                <div className="bg-muted/50 rounded-lg p-3">
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">{plan.comparison}</p>
+                </div>
+
+                {/* CTA */}
                 <Button
                   className="w-full"
-                  variant={isCurrent ? 'secondary' : plan.popular ? 'default' : 'outline'}
-                  disabled={isCurrent}
-                  onClick={() => handleUpgrade(plan.name)}
+                  variant={isCurrent ? 'secondary' : 'default'}
+                  disabled={isCurrent || upgrading === plan.id}
+                  onClick={() => handleUpgrade(plan.id)}
                 >
-                  {isCurrent ? 'Current Plan' : isDemo ? 'Get Started' : 'Upgrade'}
+                  {upgrading === plan.id ? <Loader2 size={14} className="animate-spin mr-1" /> : null}
+                  {isCurrent ? 'Current Plan' : sub.isDemo ? 'Get Started' : isUpgrade ? 'Upgrade' : 'Switch'}
                 </Button>
               </div>
             );
           })}
         </div>
 
-        {/* Enterprise Card */}
-        <div className="bg-foreground text-background rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        {/* D) Enterprise Bar */}
+        <div className="bg-muted border border-border rounded-xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h4 className="font-display font-bold text-lg">Enterprise</h4>
-            <p className="text-sm opacity-80 mt-1">Multi-branch agencies, white label, and API access</p>
+            <h4 className="font-bold">Enterprise — 9+ agents</h4>
+            <p className="text-sm text-muted-foreground mt-0.5">Multi-office agencies, white label, API access, and custom integrations</p>
           </div>
           <div className="flex flex-col items-start sm:items-end gap-1 shrink-0">
-            <span className="text-lg font-bold">From $1,499/mo</span>
-            <Button variant="secondary" size="sm" asChild>
-              <a href="mailto:sales@everythingeco.com.au">
-                <Mail size={14} />
-                Contact Sales
+            <span className="text-lg font-bold">From $999/mo</span>
+            <Button variant="outline" size="sm" asChild>
+              <a href="mailto:sales@listhq.com.au">
+                <Mail size={14} className="mr-1" /> Contact Sales
               </a>
             </Button>
           </div>
         </div>
 
-        {/* What's Coming Next */}
-        <div className="bg-secondary border border-border rounded-2xl p-6 mt-6">
-          <h3 className="font-bold text-lg mb-4">What's Coming Next 🚀</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {[
-              { title: 'Xero Integration', desc: 'Sync trust accounting and commission invoices to Xero automatically. No more double entry.' },
-              { title: 'AI Property Valuation', desc: 'Instant AI-powered market estimates on any address. Capture vendor leads 24/7.' },
-              { title: 'Mortgage Referral Network', desc: 'Earn $200–$800 per settled mortgage when buyers use your recommended broker.' },
-              { title: 'International Buyer Tools', desc: 'FIRB eligibility flags, Mandarin listings, and SGD/AED/CNY/MYR pricing for Asian buyers.' },
-            ].map(item => (
-              <div key={item.title} className="flex items-start gap-3 p-3 bg-background rounded-xl border border-border">
-                <Clock size={16} className="text-amber-500 mt-0.5 shrink-0" />
-                <div>
-                  <p className="text-sm font-semibold text-foreground">{item.title}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
+        {/* E) Footnote */}
         <p className="text-[11px] text-muted-foreground text-center">
-          All prices in AUD + GST. Annual plans billed as a single payment. No per-listing fees — ever. Founding Member rate locked for life while subscribed.
+          All prices in AUD + GST · No lock-in contracts, cancel anytime · Founding rate locked for life while subscribed · Annual billing available — save an additional 15% on any plan
         </p>
 
-        {/* Payment */}
+        {/* Payment Method */}
         <div className="bg-card border border-border rounded-xl p-5 space-y-3">
-          <h3 className="font-display text-sm font-bold flex items-center gap-1.5">
+          <h3 className="text-sm font-bold flex items-center gap-1.5">
             <CreditCard size={14} /> Payment Method
           </h3>
           <p className="text-sm text-muted-foreground">No payment method on file.</p>
-          <Button variant="outline" size="sm" onClick={() => toast({ title: 'Coming Soon', description: "Stripe billing coming soon — we'll notify you when it's ready." })}>
+          <Button variant="outline" size="sm" onClick={() => toast.info("Stripe billing coming soon — we'll notify you when it's ready.")}>
             Add Payment Method
           </Button>
         </div>

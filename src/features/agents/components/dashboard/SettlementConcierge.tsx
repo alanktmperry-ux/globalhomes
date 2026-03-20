@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useSubscription } from '@/features/agents/hooks/useSubscription';
+import UpgradeGate from '@/features/agents/components/shared/UpgradeGate';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -97,6 +99,12 @@ const SettlementConcierge = () => {
     navigator.clipboard.writeText(msg);
     toast({ title: '📋 Copied', description: 'Review request copied to clipboard' });
   };
+
+  const { canAccessSettlement, loading: subLoading } = useSubscription();
+
+  if (!subLoading && !canAccessSettlement) {
+    return <UpgradeGate requiredPlan="Pro or above" message="Settlement Concierge is available on the Pro plan and above. Track every milestone from exchange to settlement so nothing slips." />;
+  }
 
   return (
     <div className="flex-1 p-4 md:p-8 max-w-3xl">

@@ -1,4 +1,6 @@
 import { useState, useCallback } from 'react';
+import { useSubscription } from '@/features/agents/hooks/useSubscription';
+import UpgradeGate from '@/features/agents/components/shared/UpgradeGate';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -43,6 +45,7 @@ const INTEREST_CONFIG: Record<InterestLevel, { label: string; icon: typeof Flame
 const InspectionModePage = () => {
   const { user } = useAuth();
 
+  const { canAccessInspections, loading: subLoading } = useSubscription();
   const [inspections] = useState<ScheduledInspection[]>(DEMO_INSPECTIONS);
   const [activeInspection, setActiveInspection] = useState<ScheduledInspection | null>(null);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
@@ -273,6 +276,10 @@ const InspectionModePage = () => {
   }
 
   // ── State 1: Scheduled Inspections ──
+  if (!subLoading && !canAccessInspections) {
+    return <UpgradeGate requiredPlan="Pro or above" message="Inspection Day Mode is available on the Pro plan and above. Capture visitor details with QR sign-in, track interest levels, and send follow-ups in one tap." />;
+  }
+
   return (
     <div className="flex-1 p-4 md:p-8">
       <div className="flex items-center gap-3 mb-6">

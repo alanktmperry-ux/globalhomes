@@ -4,9 +4,11 @@ import { ArrowLeft, Plus, Zap, Eye, MessageSquare, TrendingUp, Copy, Sparkles, K
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import PocketListingForm from '@/features/agents/components/pocket-listing/PocketListingForm';
 import ListingSuccess from '@/features/agents/components/pocket-listing/ListingSuccess';
 import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
+import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import { useToast } from '@/shared/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -20,8 +22,10 @@ const PocketListingPage = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [createListingType, setCreateListingType] = useState<'sale' | 'rent'>('sale');
   const [listingTitle, setListingTitle] = useState('');
+  const [showLimitDialog, setShowLimitDialog] = useState(false);
   const { listings, agentId } = useAgentListings();
   const { toast } = useToast();
+  const sub = useSubscription();
 
   const activeCount = listings.filter(l => l.status !== 'sold').length;
   const totalLeads = listings.reduce((sum, l) => sum + l.contact_clicks, 0);
@@ -36,6 +40,16 @@ const PocketListingPage = () => {
     setListingTitle(title);
     setShowForm(false);
     setShowSuccess(true);
+  };
+
+  const checkLimitAndCreate = (type: 'sale' | 'rent') => {
+    if (sub.isStarter && activeCount >= sub.listingLimit) {
+      setShowLimitDialog(true);
+      return;
+    }
+    setCreateListingType(type);
+    setShowForm(true);
+    setShowSuccess(false);
   };
 
   return (
@@ -70,14 +84,14 @@ const PocketListingPage = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => { setCreateListingType('rent'); setShowForm(true); setShowSuccess(false); }}
+                onClick={() => checkLimitAndCreate('rent')}
                 className="gap-1.5 text-xs font-bold"
               >
                 <Key size={14} /> Create Rental Listing
               </Button>
               <Button
                 size="sm"
-                onClick={() => { setCreateListingType('sale'); setShowForm(true); setShowSuccess(false); }}
+                onClick={() => checkLimitAndCreate('sale')}
                 className="gap-1.5 text-xs font-bold"
               >
                 <Plus size={14} /> Create Sale Listing
@@ -152,6 +166,22 @@ const PocketListingPage = () => {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Listing Limit Dialog */}
+          <Dialog open={showLimitDialog} onOpenChange={setShowLimitDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Listing limit reached</DialogTitle>
+                <DialogDescription>
+                  You have reached your {sub.listingLimit} listing limit on the Starter plan. Upgrade to Pro for unlimited listings.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setShowLimitDialog(false)}>Cancel</Button>
+                <Button onClick={() => navigate('/dashboard/billing')}>View Plans</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </main>
       </div>
     </div>

@@ -1,4 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useSubscription } from '@/features/agents/hooks/useSubscription';
+import UpgradeGate from '@/features/agents/components/shared/UpgradeGate';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,6 +44,7 @@ const STATUS_MAP: Record<string, { variant: 'default' | 'secondary' | 'outline' 
 
 const TrustAccountingPage = () => {
   const { user } = useAuth();
+  const { canAccessTrust, loading: subLoading } = useSubscription();
   const {
     accounts, transactions, contacts, properties, loading,
     fetchAccounts, fetchTransactions,
@@ -531,6 +534,10 @@ const TrustAccountingPage = () => {
         </DialogContent>
       </Dialog>
     );
+  }
+
+  if (!subLoading && !canAccessTrust) {
+    return <UpgradeGate requiredPlan="Pro or above" message="Trust accounting is available on the Pro plan and above. Record deposits, manage client ledgers, generate compliance-ready statements, and import your opening balance from PropertyMe." />;
   }
 
   return (

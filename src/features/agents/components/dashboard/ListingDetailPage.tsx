@@ -120,7 +120,7 @@ const ListingDetailPage = () => {
           </TabsContent>
 
           <TabsContent value="marketing">
-            <ListingMarketingTab listing={listing} />
+            <ListingMarketingTab listing={listing} onViewAllLeads={() => setActiveTab('buyers')} />
           </TabsContent>
 
           <TabsContent value="buyers">

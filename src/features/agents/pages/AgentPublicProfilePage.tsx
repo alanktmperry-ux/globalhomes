@@ -193,15 +193,12 @@ export default function AgentPublicProfilePage() {
 
   if (!agent) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
-        <SiteHeader />
-        <div className="flex-1 flex flex-col items-center justify-center gap-4">
-          <Briefcase size={48} className="text-muted-foreground" />
-          <h1 className="font-display text-xl font-bold text-foreground">Agent not found</h1>
-          <button onClick={() => navigate('/')} className="px-6 py-2 rounded-xl bg-primary text-primary-foreground font-medium text-sm">
-            Back to search
-          </button>
-        </div>
+      <div className="flex-1 flex flex-col items-center justify-center gap-4">
+        <Briefcase size={48} className="text-muted-foreground" />
+        <h1 className="font-display text-xl font-bold text-foreground">Agent not found</h1>
+        <button onClick={() => navigate('/')} className="px-6 py-2 rounded-xl bg-primary text-primary-foreground font-medium text-sm">
+          Back to search
+        </button>
       </div>
     );
   }

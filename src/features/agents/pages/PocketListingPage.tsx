@@ -26,7 +26,6 @@ const PocketListingPage = () => {
   const { listings, agentId } = useAgentListings();
   const { toast } = useToast();
   const sub = useSubscription();
-  const { toast } = useToast();
 
   const activeCount = listings.filter(l => l.status !== 'sold').length;
   const totalLeads = listings.reduce((sum, l) => sum + l.contact_clicks, 0);

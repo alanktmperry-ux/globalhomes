@@ -50,6 +50,8 @@ const DashboardOverview = () => {
   const [todayInspections, setTodayInspections] = useState<{ address: string; time: string; propertyId: string }[]>([]);
   const [pipelineData, setPipelineData] = useState(buildEmptyMonths());
   const [pipelineEmpty, setPipelineEmpty] = useState(true);
+  const [arrearsTenancies, setArrearsTenancies] = useState<any[]>([]);
+  const [sendingReminder, setSendingReminder] = useState<string | null>(null);
 
   // Fetch tasks due today
   useEffect(() => {

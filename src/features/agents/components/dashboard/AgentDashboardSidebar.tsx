@@ -67,6 +67,7 @@ const AgentDashboardSidebar = () => {
   const navigate = useNavigate();
   const { signOut, isAdmin, user } = useAuth();
   const { listings } = useAgentListings();
+  const { plan, foundingMember } = useSubscription();
   const [arrearsCount, setArrearsCount] = useState(0);
   const [onboardingComplete, setOnboardingComplete] = useState(true);
 

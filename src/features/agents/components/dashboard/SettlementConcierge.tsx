@@ -47,6 +47,11 @@ const DEMO_POST: Settlement[] = [
 ];
 
 const SettlementConcierge = () => {
+  const { canAccessSettlement, loading: subLoading } = useSubscription();
+
+  if (!subLoading && !canAccessSettlement) {
+    return <UpgradeGate requiredPlan="Pro or above" message="Settlement Concierge is available on the Pro plan and above. Track every milestone from exchange to settlement so nothing slips." />;
+  }
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [checkStates, setCheckStates] = useState<Record<string, boolean[]>>({});
   const [utilityModal, setUtilityModal] = useState<Settlement | null>(null);

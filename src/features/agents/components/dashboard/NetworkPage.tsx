@@ -135,6 +135,11 @@ function matchListingsToBriefs(brief: BuyerBrief, listings: NetworkListing[]): N
 
 const NetworkPage = () => {
   const { user } = useAuth();
+  const { canAccessNetwork, loading: subLoading } = useSubscription();
+
+  if (!subLoading && !canAccessNetwork) {
+    return <UpgradeGate requiredPlan="Pro or above" message="The Off-Market Network is available on the Pro plan and above. Share listings privately with verified agents and receive buyer briefs before properties go public." />;
+  }
   const [activeTab, setActiveTab] = useState('my-listings');
   const [loading, setLoading] = useState(true);
   const [agentId, setAgentId] = useState<string | null>(null);

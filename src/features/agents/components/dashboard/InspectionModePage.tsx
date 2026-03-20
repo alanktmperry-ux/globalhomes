@@ -44,6 +44,11 @@ const INTEREST_CONFIG: Record<InterestLevel, { label: string; icon: typeof Flame
 
 const InspectionModePage = () => {
   const { user } = useAuth();
+  const { canAccessInspections, loading: subLoading } = useSubscription();
+
+  if (!subLoading && !canAccessInspections) {
+    return <UpgradeGate requiredPlan="Pro or above" message="Inspection Day Mode is available on the Pro plan and above. Capture visitor details with QR sign-in, track interest levels, and send follow-ups in one tap." />;
+  }
 
   const [inspections] = useState<ScheduledInspection[]>(DEMO_INSPECTIONS);
   const [activeInspection, setActiveInspection] = useState<ScheduledInspection | null>(null);

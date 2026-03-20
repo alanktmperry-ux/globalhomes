@@ -22,7 +22,10 @@ const PocketListingPage = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [createListingType, setCreateListingType] = useState<'sale' | 'rent'>('sale');
   const [listingTitle, setListingTitle] = useState('');
+  const [showLimitDialog, setShowLimitDialog] = useState(false);
   const { listings, agentId } = useAgentListings();
+  const { toast } = useToast();
+  const sub = useSubscription();
   const { toast } = useToast();
 
   const activeCount = listings.filter(l => l.status !== 'sold').length;

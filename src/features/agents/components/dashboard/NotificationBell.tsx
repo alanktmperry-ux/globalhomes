@@ -149,15 +149,17 @@ export function NotificationBell() {
                   </div>
                 ) : (
                   notifications.map((n) => (
-                    <div
+                    <button
                       key={n.id}
-                      className={`px-4 py-3 border-b border-border/50 last:border-0 cursor-pointer hover:bg-secondary/50 transition-colors ${
+                      type="button"
+                      className={`w-full text-left px-4 py-3 border-b border-border/50 last:border-0 cursor-pointer hover:bg-secondary/50 transition-colors ${
                         !n.is_read ? 'bg-primary/5' : ''
                       }`}
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         markAsRead(n.id);
+                        setOpen(false);
                         if (n.type === 'lead' || n.type === 'voice_match' || n.type === 'message') {
-                          setOpen(false);
                           navigate('/messages');
                         }
                       }}
@@ -181,9 +183,20 @@ export function NotificationBell() {
                           </p>
                         </div>
                       </div>
-                    </div>
+                    </button>
                   ))
                 )}
+              </div>
+
+              {/* Footer — View all messages */}
+              <div className="border-t border-border">
+                <button
+                  type="button"
+                  onClick={() => { setOpen(false); navigate('/messages'); }}
+                  className="w-full px-4 py-2.5 text-xs font-medium text-primary hover:bg-secondary/50 transition-colors text-center"
+                >
+                  View all messages
+                </button>
               </div>
             </motion.div>
           </>

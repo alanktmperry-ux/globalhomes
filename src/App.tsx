@@ -10,6 +10,7 @@ import { CurrencyProvider } from "@/shared/lib/CurrencyContext";
 import { AuthProvider } from "@/features/auth/AuthProvider";
 import { ProtectedRoute } from "@/features/auth/ProtectedRoute";
 import { Loader2 } from "lucide-react";
+import AppErrorBoundary from "@/components/AppErrorBoundary";
 
 // Lazy-loaded pages
 const Index = React.lazy(() => import("./pages/Index"));
@@ -72,6 +73,7 @@ const PageLoader = () => (
 const queryClient = new QueryClient();
 
 const App = () => (
+  <AppErrorBoundary>
   <HelmetProvider>
   <QueryClientProvider client={queryClient}>
     <I18nProvider>
@@ -149,6 +151,7 @@ const App = () => (
     </I18nProvider>
   </QueryClientProvider>
   </HelmetProvider>
+  </AppErrorBoundary>
 );
 
 export default App;

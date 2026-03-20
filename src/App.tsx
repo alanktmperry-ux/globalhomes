@@ -73,6 +73,7 @@ const PageLoader = () => (
 const queryClient = new QueryClient();
 
 const App = () => (
+  <AppErrorBoundary>
   <HelmetProvider>
   <QueryClientProvider client={queryClient}>
     <I18nProvider>

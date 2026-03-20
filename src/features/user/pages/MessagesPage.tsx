@@ -399,6 +399,74 @@ const MessagesPage = () => {
     selectedConvo?.id.startsWith('lead-') && !selectedConvo?.other_user_id
   );
 
+  // Close menu on outside click
+  useEffect(() => {
+    if (!openMenuId) return;
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [openMenuId]);
+
+  const handleArchive = async (convoId: string) => {
+    if (!user || convoId.startsWith('lead-')) return;
+    setOpenMenuId(null);
+
+    // Add current user to archived_by array
+    const convo = conversations.find(c => c.id === convoId);
+    if (!convo) return;
+
+    await supabase
+      .from('conversations')
+      .update({ archived_by: [...((convo as any).archived_by || []), user.id] } as any)
+      .eq('id', convoId);
+
+    setConversations(prev => prev.map(c =>
+      c.id === convoId ? { ...c, archived_by: [...((c as any).archived_by || []), user.id] } as any : c
+    ));
+  };
+
+  const handleUnarchive = async (convoId: string) => {
+    if (!user || convoId.startsWith('lead-')) return;
+    setOpenMenuId(null);
+
+    const convo = conversations.find(c => c.id === convoId);
+    if (!convo) return;
+
+    const currentArchived: string[] = (convo as any).archived_by || [];
+    await supabase
+      .from('conversations')
+      .update({ archived_by: currentArchived.filter((id: string) => id !== user.id) } as any)
+      .eq('id', convoId);
+
+    setConversations(prev => prev.map(c =>
+      c.id === convoId ? { ...c, archived_by: currentArchived.filter((id: string) => id !== user!.id) } as any : c
+    ));
+  };
+
+  const handleDelete = async (convoId: string) => {
+    if (!user || convoId.startsWith('lead-')) return;
+    setOpenMenuId(null);
+
+    await supabase.from('conversations').delete().eq('id', convoId);
+    setConversations(prev => prev.filter(c => c.id !== convoId));
+    if (selectedConvo?.id === convoId) {
+      setSelectedConvo(null);
+      setMessages([]);
+    }
+  };
+
+  const isArchivedByMe = (c: Conversation) => {
+    return ((c as any).archived_by || []).includes(user?.id);
+  };
+
+  const visibleConversations = conversations.filter(c =>
+    showArchived ? isArchivedByMe(c) : !isArchivedByMe(c)
+  );
+
   if (!user) {
     return (
       <div className="min-h-screen bg-background pb-20">

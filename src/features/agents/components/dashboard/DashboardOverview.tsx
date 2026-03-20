@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import {
   CheckSquare, Users, ClipboardList, DollarSign, Landmark,
   Mic, Phone, Send, Calendar, CalendarDays, Flame, Thermometer, Snowflake, Sparkles, Eye,
-  TrendingUp, Zap, MessageSquare, Activity, Shield, ArrowUp, ArrowDown, Minus,
+  TrendingUp, Zap, MessageSquare, Activity, Shield, ArrowUp, ArrowDown, Minus, AlertTriangle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +17,8 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, CartesianGrid } from 'recharts';
+import { toast } from 'sonner';
+import { differenceInDays } from 'date-fns';
 
 // Australian currency formatter
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });

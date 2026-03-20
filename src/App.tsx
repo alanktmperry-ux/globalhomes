@@ -66,6 +66,7 @@ const CommissionCalculator = React.lazy(() => import("@/features/agents/componen
 const HelpPage = React.lazy(() => import("@/features/agents/components/dashboard/HelpPage"));
 const RentRollPage = React.lazy(() => import("@/features/agents/components/dashboard/RentRollPage"));
 const TenancyDetailPage = React.lazy(() => import("@/features/agents/components/dashboard/TenancyDetailPage"));
+const RentalApplicationsPage = React.lazy(() => import("@/features/agents/components/dashboard/RentalApplicationsPage"));
 
 const PageLoader = () => (
   <div className="flex h-screen w-full items-center justify-center bg-background">
@@ -132,6 +133,7 @@ const App = () => (
                   <Route path="listings/:listingId" element={<ListingDetailPage />} />
                   <Route path="contacts" element={<ContactsPage />} />
                   <Route path="leads" element={<VoiceLeadsPage />} />
+                  <Route path="rental-applications" element={<RentalApplicationsPage />} />
                   <Route path="pipeline" element={<PipelinePage />} />
                   <Route path="inspection-mode" element={<InspectionModePage />} />
                   <Route path="settlements" element={<SettlementConcierge />} />

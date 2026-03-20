@@ -100,8 +100,7 @@ const AgencyProfilePage = () => {
   const roleOrder: Record<string, number> = { owner: 0, admin: 1, agent: 2 };
 
   return (
-    <div className="min-h-screen bg-background">
-      <SiteHeader />
+    <div>
 
       {/* Hero / Branding */}
       <section className="relative bg-gradient-to-br from-primary/10 via-background to-accent/10 border-b border-border">

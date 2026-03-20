@@ -352,7 +352,53 @@ const DashboardOverview = () => {
           </motion.div>
         </div>
 
-        {/* Today's Inspections */}
+        {/* Arrears Alert */}
+        {arrearsTenancies.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-card border border-border border-l-4 border-l-destructive rounded-xl p-5"
+          >
+            <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
+              <AlertTriangle size={16} className="text-destructive" /> Rent Arrears
+              <Badge variant="destructive" className="text-[10px] px-1.5 py-0 h-5">{arrearsTenancies.length}</Badge>
+            </h3>
+            <div className="space-y-2">
+              {arrearsTenancies.map((t) => (
+                <div key={t.id} className="flex items-center justify-between border border-border rounded-lg p-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium truncate">{t.tenant_name}</p>
+                    <p className="text-[10px] text-muted-foreground truncate">{t.properties?.address}{t.properties?.suburb ? `, ${t.properties.suburb}` : ''}</p>
+                    <p className="text-[10px] text-destructive font-medium mt-0.5">{t.daysOverdue} days overdue · {AUD.format(t.amountOwed)} owed</p>
+                  </div>
+                  <div className="flex gap-1.5 ml-2 shrink-0">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-[10px] h-6 px-2"
+                      onClick={() => navigate(`/dashboard/tenancies/${t.id}`)}
+                    >
+                      View
+                    </Button>
+                    {t.tenant_email && (
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        className="text-[10px] h-6 px-2"
+                        disabled={sendingReminder === t.id}
+                        onClick={() => handleSendReminder(t)}
+                      >
+                        <Send size={10} className="mr-1" />
+                        {sendingReminder === t.id ? 'Sending...' : 'Remind'}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}

@@ -39,7 +39,7 @@ const CRM_NAV: NavItem[] = [
 ];
 
 const BUSINESS_NAV: NavItem[] = [
-  { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home },
+  { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home, badgeKey: 'rentRoll' },
   { title: 'Investments', url: '/dashboard/investments', icon: TrendingUp },
   { title: 'Financials', url: '/dashboard/trust', icon: Landmark },
   { title: 'Commission Calculator', url: '/dashboard/commission', icon: Calculator },

@@ -43,6 +43,16 @@ const PocketListingPage = () => {
     setShowSuccess(true);
   };
 
+  const checkLimitAndCreate = (type: 'sale' | 'rent') => {
+    if (sub.isStarter && activeCount >= sub.listingLimit) {
+      setShowLimitDialog(true);
+      return;
+    }
+    setCreateListingType(type);
+    setShowForm(true);
+    setShowSuccess(false);
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="bg-background text-foreground min-h-screen">

@@ -1,12 +1,21 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
-import { Search, ChevronRight } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  Search, ChevronRight, BookOpen, MessageCircle, ExternalLink,
+  Home, DollarSign, Users, BarChart3, Shield, Landmark, Calculator,
+  PartyPopper, Mic, MapPin, Kanban, FileText, Settings, Star,
+  Building2, AlertTriangle, CheckCircle2, Wrench, Key, Globe,
+} from 'lucide-react';
 
-/* ─── HOW-TO GUIDES ─── */
+/* ─── TYPES ─── */
 interface Guide {
   emoji: string;
   title: string;
@@ -14,233 +23,372 @@ interface Guide {
   steps: string[];
 }
 
-const GUIDES: Guide[] = [
-  {
-    emoji: '🚀', title: 'Setting Up Your Account',
-    description: 'Get your agent profile live and ready to receive leads in minutes.',
-    steps: [
-      'Sign up using your email or Google account, then choose "I\'m an Agent" during onboarding.',
-      'Complete your profile — add your headshot, license number, agency name, and a short bio that highlights your specialisation.',
-      'Set your service areas on the Territory page so buyers searching those suburbs see your listings first.',
-      'Connect your subscription under Billing to unlock unlimited listings and premium features.',
-      'You\'re live! Head to the Dashboard to see your performance stats and start adding listings.',
-    ],
-  },
-  {
-    emoji: '🏠', title: 'Adding and Publishing a Listing',
-    description: 'Walk through every step from address entry to going live on the marketplace.',
-    steps: [
-      'Click "New Listing" in the sidebar or the green + button on the Dashboard.',
-      'Enter the property address — our system will auto-fill suburb, state and coordinates.',
-      'Fill in the basics: price, bedrooms, bathrooms, parking, land size and property type.',
-      'Upload high-quality photos. The first image becomes the hero — drag to reorder.',
-      'Optionally record a 30-second voice note to give buyers a personal touch.',
-      'Review the preview, choose visibility (public or GlobalHomes First network only), then hit Publish.',
-    ],
-  },
-  {
-    emoji: '🤫', title: 'Using GlobalHomes First — Pre-Market',
-    description: 'Share off-market listings exclusively with trusted agents before going public.',
-    steps: [
-      'When publishing a listing, select "GlobalHomes First" as the visibility option.',
-      'Your listing is shared only with verified agents in the Off-Market Network — not public buyers.',
-      'Set a referral split percentage to incentivise cooperating agents to bring qualified buyers.',
-      'Monitor interest and enquiries on the listing detail page under the Buyer Leads tab.',
-      'When you\'re ready, flip the listing to public with one click — all lead history is preserved.',
-    ],
-  },
-  {
-    emoji: '👥', title: 'Managing Leads and CRM',
-    description: 'Keep track of every buyer and seller with the built-in CRM and pipeline board.',
-    steps: [
-      'All voice leads and contact-form enquiries land automatically in your Contacts list.',
-      'Tag contacts as Buyer, Seller, Landlord or Tenant and assign a ranking (Hot / Warm / Cold).',
-      'Use the Pipeline board to drag contacts through stages: New → Qualified → Inspected → Offer → Exchanged → Settled.',
-      'Log activities (calls, emails, inspections) against each contact to build a full history.',
-      'Import existing contacts via CSV from the Contacts page — map columns and go.',
-    ],
-  },
-  {
-    emoji: '📅', title: 'Running an Open Home — Inspection Day Mode',
-    description: 'Streamline your open-home workflow from QR sign-in to follow-up.',
-    steps: [
-      'Navigate to Inspection Day in the sidebar before your open home.',
-      'Select the listing you\'re inspecting — the page shows the property details and a live attendee list.',
-      'Visitors scan the QR code at the door or you add them manually — their details are captured instantly.',
-      'After the inspection, all attendees appear in your CRM with the tag "Inspection Attendee".',
-      'Use the one-click follow-up to send a thank-you message or request feedback.',
-    ],
-  },
-  {
-    emoji: '💰', title: 'Trust Accounting',
-    description: 'Record deposits, track balances, and generate trust statements for compliance.',
-    steps: [
-      'Go to Financials in the sidebar to access the Trust Accounting module.',
-      'Record incoming deposits (e.g. holding deposits, rental bonds) against a property or contact.',
-      'Each transaction is logged with a receipt number, date, amount, and category.',
-      'Use the Trust Ledger page to view a running balance and filter by property or date range.',
-      'Generate and download trust statements for audits or end-of-month reconciliation.',
-      'The Bank Reconciliation page lets you match bank entries against trust records.',
-    ],
-  },
-  {
-    emoji: '💸', title: 'Commission Calculator',
-    description: 'Instantly calculate your take-home commission on any sale or lease.',
-    steps: [
-      'Open Commission Calculator from the sidebar under Business.',
-      'Enter the sale price, your commission rate (%), and the agent/agency split.',
-      'The calculator shows gross commission, your net share, and GST breakdown.',
-      'Adjust the split slider to model different scenarios before negotiating with your principal.',
-      'Results update in real time — no need to press a button.',
-    ],
-  },
-  {
-    emoji: '🏡', title: 'Settlement Concierge',
-    description: 'Track every milestone between exchange and settlement so nothing slips.',
-    steps: [
-      'Navigate to Settlement Concierge in the sidebar once a property is under contract.',
-      'The timeline shows key dates: exchange, finance approval, building inspection, and settlement.',
-      'Check off each milestone as it\'s completed — your client and solicitor stay informed.',
-      'Add custom tasks (e.g. "Organise pest report") with due dates and assign to team members.',
-      'Receive reminders 48 hours before each upcoming deadline.',
-    ],
-  },
-  {
-    emoji: '📊', title: 'Understanding Your Dashboard Stats',
-    description: 'Learn what each metric means and how to use data to win more listings.',
-    steps: [
-      'The Dashboard overview shows four key cards: Active Listings, Total Leads, Views, and Contact Clicks.',
-      'Views count how many times buyers have seen your listing cards in search results.',
-      'Contact Clicks track when a buyer taps "Contact Agent" or submits an enquiry form.',
-      'The Analytics page provides deeper charts — views over time, lead sources, and conversion rates.',
-      'Use the Reports page to export weekly or monthly performance summaries as PDF.',
-    ],
-  },
-  {
-    emoji: '🌟', title: 'Building Your Agent Reputation Score',
-    description: 'Understand how the reputation algorithm works and how to improve your score.',
-    steps: [
-      'Your reputation score is visible on your public profile and is calculated from five factors.',
-      'Response time — replying to leads within 1 hour boosts your score significantly.',
-      'Review ratings — encourage happy clients to leave a review on your profile.',
-      'Listing quality — complete listings with photos, descriptions, and floor plans score higher.',
-      'Verification level — upload your license and complete identity checks for a verified badge.',
-      'Activity — regular logins, updated listings, and CRM usage show you\'re an active agent.',
-    ],
-  },
-  {
-    emoji: '🔐', title: 'Account Security',
-    description: 'Protect your account with strong passwords and recovery options.',
-    steps: [
-      'Use a unique, strong password — at least 12 characters with a mix of letters, numbers, and symbols.',
-      'If you forget your password, use the "Forgot Password" link on the login page to receive a reset email.',
-      'Keep your registered email address up to date under Settings so you always receive security alerts.',
-      'Never share your login credentials with anyone — use the Team feature to grant access to staff.',
-      'If you suspect unauthorised access, change your password immediately and contact support.',
-    ],
-  },
-  {
-    emoji: '💳', title: 'Managing Your Subscription',
-    description: 'Upgrade, downgrade, or cancel your plan from the Billing page.',
-    steps: [
-      'Go to Billing in the sidebar to see your current plan, usage, and next billing date.',
-      'Click "Change Plan" to compare available tiers — Starter, Professional, and Enterprise.',
-      'Upgrades take effect immediately; downgrades apply at the end of your current billing cycle.',
-      'Update your payment method by clicking the card icon — we accept Visa, Mastercard, and Amex.',
-      'To cancel, scroll to the bottom of the Billing page and click "Cancel Subscription". Your data is retained for 90 days.',
-    ],
-  },
-];
-
-/* ─── FAQ ─── */
 interface FaqCategory {
   emoji: string;
   title: string;
   items: { q: string; a: string }[];
 }
 
+interface ChecklistItem {
+  icon: React.ElementType;
+  title: string;
+  description: string;
+  route: string;
+}
+
+/* ─── CHECKLIST DATA ─── */
+const CHECKLIST: ChecklistItem[] = [
+  { icon: Users, title: 'Complete your profile', description: 'Add your photo, licence number, bio, and service areas so buyers trust you.', route: '/dashboard/profile' },
+  { icon: MapPin, title: 'Set your territory', description: 'Add the suburbs you operate in so your listings appear in local searches.', route: '/dashboard/territory' },
+  { icon: Home, title: 'Add your first listing', description: 'Use the 6-step listing wizard to add a property in under 3 minutes.', route: '/pocket-listing' },
+  { icon: Landmark, title: 'Set up trust accounting', description: 'Create your trust account or import your opening balance from your current system.', route: '/dashboard/trust' },
+  { icon: Users, title: 'Import your contacts', description: 'Bring your existing client database in via CSV — takes under 2 minutes.', route: '/dashboard/contacts' },
+  { icon: DollarSign, title: 'Choose your plan', description: 'Start on the Starter founding price of $99/mo before it increases.', route: '/dashboard/billing' },
+  { icon: Globe, title: 'Explore the Off-Market Network', description: 'Share listings exclusively with verified agents before going public.', route: '/dashboard/network' },
+  { icon: Key, title: 'Run your first open home', description: 'Use Inspection Day Mode to capture visitor details with a QR code.', route: '/dashboard/inspection-mode' },
+];
+
+const QUICK_REF: { feature: string; route: string; what: string }[] = [
+  { feature: 'Dashboard', route: '/dashboard', what: 'Overview stats, trust balance, today\'s tasks, leads' },
+  { feature: 'Profile', route: '/dashboard/profile', what: 'Your public agent profile, bio, photo, verification' },
+  { feature: 'Territory', route: '/dashboard/territory', what: 'Service area locations shown on buyer map' },
+  { feature: 'Contacts', route: '/dashboard/contacts', what: 'Full CRM — add, tag, import, view activity history' },
+  { feature: 'Pipeline', route: '/dashboard/pipeline', what: 'Kanban board from Prospecting to Settled' },
+  { feature: 'My Listings', route: '/dashboard/listings', what: 'All your active and archived listings' },
+  { feature: 'Voice Leads', route: '/dashboard/leads', what: 'AI-scored buyer leads from voice searches' },
+  { feature: 'Inspection Day', route: '/dashboard/inspection-mode', what: 'Live open home visitor sign-in and tracking' },
+  { feature: 'Off-Market Network', route: '/dashboard/network', what: 'Share and receive off-market listings with other agents' },
+  { feature: 'Investments', route: '/dashboard/investments', what: 'Investment-grade property analysis and yield scoring' },
+  { feature: 'Financials', route: '/dashboard/trust', what: 'Trust account receipts, payments, and reconciliation' },
+  { feature: 'Commission Calc', route: '/dashboard/commission', what: 'Calculate take-home commission and annual GCI' },
+  { feature: 'Settlement', route: '/dashboard/settlements', what: 'Milestone tracker from exchange to settlement' },
+  { feature: 'Analytics', route: '/dashboard/analytics', what: 'Charts and trends — views, leads, conversion' },
+  { feature: 'Reports', route: '/dashboard/reports', what: 'Export CSV/PDF for listings, leads, trust, contacts' },
+  { feature: 'Documents', route: '/dashboard/documents', what: 'Store and manage transaction documents' },
+  { feature: 'Team', route: '/dashboard/team', what: 'Invite agents and manage roles' },
+  { feature: 'My Agencies', route: '/dashboard/agencies', what: 'Agency profile and branding' },
+  { feature: 'Billing', route: '/dashboard/billing', what: 'Subscription plans, payment, usage' },
+  { feature: 'Reviews', route: '/dashboard/reviews', what: 'Client reviews and reputation score' },
+  { feature: 'Settings', route: '/dashboard/settings', what: 'Notifications, preferences, account' },
+  { feature: 'Help & FAQ', route: '/dashboard/help', what: 'This page' },
+];
+
+/* ─── GUIDES DATA ─── */
+const GUIDES: Guide[] = [
+  {
+    emoji: '👤', title: 'Setting Up Your Profile',
+    description: 'Build a trusted public profile that attracts buyer enquiries.',
+    steps: [
+      'Go to Profile in the sidebar. Add your headshot (square image works best), full name, and a short bio that describes your specialisation and local knowledge.',
+      'Enter your real estate licence number — this appears on your public profile and is required for the verified badge.',
+      'Add languages spoken if you work with international buyers. This increases your visibility in multilingual searches.',
+      'Set your service areas on the Territory page — add each suburb you operate in with a Google Maps search. These locations appear on the buyer-facing map.',
+      'Your reputation score (0–100) is shown on your public profile. It is calculated from response time, review rating, listing quality, profile completeness, and activity. Aim for 80+.',
+    ],
+  },
+  {
+    emoji: '🏠', title: 'Creating and Publishing a Listing',
+    description: 'Walk through the 6-step listing wizard from address to publish.',
+    steps: [
+      'Click "New Listing" (the green + button in the sidebar) or navigate to /pocket-listing.',
+      'Step 1 — Address: Type the property address. Suburb, state, and coordinates are auto-filled.',
+      'Step 2 — Basics: Choose Sale or Rent. Select property type (House, Apartment, Townhouse, Land, Commercial). Enter price or weekly rent. Add bedrooms, bathrooms, car spaces, floor area, and land size. For rentals: enter weekly rent, bond weeks (default 4), and estimated rental yield for investor buyers.',
+      'Step 3 — Photos: Upload your property photos. Drag to reorder. The first photo is the hero image shown in search results. Accepted formats: JPEG, PNG, WebP.',
+      'Step 4 — Voice AI Writer: Record a 30-second voice note or type notes about the property. Choose a tone (Standard, Luxury, Family, Investment). Hit Generate — the AI writes a professional listing description in seconds. Edit the result before continuing.',
+      'Step 5 — Settings (sale listings): Choose visibility — Whisper (invite-only), Coming Soon (registered buyers), or Public (full marketplace). Set an exclusive window (7, 14, or 30 days), buyer requirements, and whether to allow co-broke with other agents. Settings (rental listings): Set available-from date, lease term, furnished toggle, pets allowed toggle, and application screening level.',
+      'Step 6 — Preview: Review the full listing. Click Publish to save. New listings are saved as pending until you publish from your Listings page.',
+    ],
+  },
+  {
+    emoji: '🔑', title: 'Managing Rental Listings',
+    description: 'List properties for rent and manage tenant applications.',
+    steps: [
+      'When creating a listing, select "For Rent" on the Basics step. The form switches to rental mode — price becomes weekly rent, and rental-specific fields appear.',
+      'Set the weekly rent and bond weeks (default 4 weeks — the maximum allowed in most Australian states).',
+      'On the Settings step, set the available-from date, preferred lease term (6 months, 12 months, 18 months, or month-to-month), and whether pets are considered.',
+      'Published rental listings appear on the public marketplace with a "For Rent" badge. Buyers can submit a 5-step rental application (personal details, employment, rental history, identity, submit) directly from the listing page.',
+      'Rental applications are reviewed in the Rental Applications section (coming soon to your dashboard). Approved applications create a tenancy record in the Rent Roll.',
+    ],
+  },
+  {
+    emoji: '🤫', title: 'Off-Market Network (ListHQ First)',
+    description: 'Share listings with verified agents before going public.',
+    steps: [
+      'When publishing a listing, set visibility to "Whisper" or "Coming Soon" on the Settings step. Whisper listings are invite-only; Coming Soon listings are visible to registered buyers but not public portals.',
+      'To share a listing with the off-market network, go to the Off-Market Network page in the sidebar.',
+      'Find your listing under "My Off-Market Listings", toggle "Share with Network" to on, and set a referral split percentage (e.g. 20%). This percentage of your commission goes to any agent who introduces the successful buyer.',
+      'Verified network agents can see your listing, view the price and details, and submit a buyer enquiry on behalf of their client.',
+      'Post a Buyer Brief to tell the network what your buyer client is looking for — property type, suburb, price range, and urgency. Other agents with matching stock will reach out directly.',
+      'When ready to go public, navigate to your listing on the Listings page and change visibility to Public. All enquiry history and lead data is preserved.',
+    ],
+  },
+  {
+    emoji: '👥', title: 'Using the CRM and Contacts',
+    description: 'Manage leads, tag contacts, and track your pipeline.',
+    steps: [
+      'Every lead — from listing enquiries, voice searches, open home sign-ins, and rental applications — automatically appears in your Contacts list.',
+      'Open any contact to see their full activity history: enquiries, listings viewed, inspection attendance, and any notes you have added.',
+      'Tag contacts by type (Buyer, Seller, Landlord, Tenant) and set a temperature (Hot, Warm, Cold) to prioritise your follow-up list.',
+      'To import existing contacts: go to Contacts, click "Import CSV". Map your spreadsheet columns to the required fields (name, email, phone, type). Duplicate detection is by email address.',
+      'Use the Pipeline board to track where each contact sits in your sales process. The five stages are: Prospecting → Appraisal → Listed → Under Offer → Settled. Drag cards between columns to update status. Time spent in each stage is shown on the card.',
+    ],
+  },
+  {
+    emoji: '📅', title: 'Running an Open Home — Inspection Day Mode',
+    description: 'Capture visitor details and send follow-ups in one tap.',
+    steps: [
+      'Before your open home, go to Inspection Day in the sidebar. Your scheduled inspections appear as cards.',
+      'Tap "Start Inspection" on the relevant property. The screen switches to a live sign-in interface.',
+      'Add visitors manually: enter first name, last name, phone, and email. Set their interest level — Hot (strong buyer signal), Warm (interested but not urgent), or Cold (browsing).',
+      'After the inspection, tap "End Inspection" to see a summary: total visitors, breakdown by interest level, and a one-click option to send a follow-up message to all attendees.',
+      'All visitors are automatically added to your CRM with the tag "Inspection Attendee" and linked to the property they attended.',
+    ],
+  },
+  {
+    emoji: '🎤', title: 'Understanding Voice Leads',
+    description: 'AI-scored buyer leads from spoken search queries.',
+    steps: [
+      'Voice Leads are buyer enquiries generated when a buyer uses the voice search on the public marketplace. The buyer speaks a query (e.g. "3 bed house in Berwick with a pool under $900k") and the AI matches it to your listings.',
+      'Each voice lead shows a transcript of what the buyer said, their intent score (0–100), urgency rating (Hot/Warm/Cold), search history, pre-approval status, and preferred contact method (call, email, WhatsApp).',
+      'A high intent score means the buyer is ready to act — they have pre-approval, specified urgency, and left a detailed query. Respond to Hot leads within the hour for best conversion.',
+      'The matched property is shown on each lead card so you know exactly which listing triggered the enquiry.',
+      'Tap a lead to see the full detail panel. Use the contact buttons to call, email, or message the buyer directly from the lead view.',
+    ],
+  },
+  {
+    emoji: '📋', title: 'Pipeline — Tracking Your Deals',
+    description: 'Kanban board from prospecting through to settlement.',
+    steps: [
+      'The Pipeline page is a kanban board with five stages: Prospecting, Appraisal, Listed, Under Offer, Settled.',
+      'Each card shows the property address, contact name, estimated value, and how many days the deal has been in the current stage. Long-running cards are highlighted.',
+      'Drag a card from one column to the next as the deal progresses. The move is logged automatically.',
+      'New leads from your CRM can be added to the pipeline — they start in Prospecting.',
+      'Settled cards represent completed deals. The total pipeline value is shown in the header for each column.',
+    ],
+  },
+  {
+    emoji: '🏦', title: 'Trust Accounting — Recording Transactions',
+    description: 'Record receipts, payments, and keep your trust balance accurate.',
+    steps: [
+      'Go to Financials in the sidebar to access the Trust Accounting dashboard. If you have no trust account yet, you will be prompted to create one or import from your existing system.',
+      'The dashboard has three panels: Receipts (money in), Payments (money out), and Reconciliation.',
+      'To record a new receipt: click "New Trust Receipt" in the Receipts panel or Quick Actions sidebar. Fill in: client name, property address, amount, payment method (Cash/Cheque/EFT), purpose (Deposit/Rent/Bond/Holding Fee/Commission), date received, date deposited, and ledger account (Sales Trust or Rental Trust). A sequentially numbered receipt is generated and a PDF is produced automatically.',
+      'To record a deposit or rent payment via the transaction form: use Quick Actions → "New Deposit" or "New Rent Payment". Link it to a contact and property from the dropdown selectors.',
+      'Pending transactions show as "Pending" status. Click the green tick on any row to mark it as Cleared. Use "Mark All Pending as Cleared" for bulk processing.',
+      'The running balance column shows the cumulative trust account balance after each transaction. Monitor this to ensure it always matches your bank balance.',
+    ],
+  },
+  {
+    emoji: '📒', title: 'Trust Accounting — Ledger and Statements',
+    description: 'Monthly ledgers, audit PDFs, and 5-year CSV exports.',
+    steps: [
+      'Go to Trust Ledger in the sidebar (under the Financials section). This shows all receipts and payments for the selected month.',
+      'Use the month navigator (← →) to move between months. The header shows total in, total out, and closing balance for the selected period.',
+      'Filter by All, Receipts only, or Payments only using the tabs. Search by client name, property, or reference number using the search bar.',
+      'To download an individual receipt PDF: click the download icon on any receipt row. The PDF is formatted to the Agents Financial Administration Act 2014 standard with signature lines.',
+      'To generate a full monthly audit PDF: click "Download Audit PDF" in the header. This produces an A4 landscape document with the transaction ledger, client ledger breakdown, reconciliation summary, and a statutory declaration section for the principal to sign.',
+      'To export a 5-year compliant CSV: click "Export CSV 5yr". The file includes the AFA 2014 retention notice and closing balance total.',
+      'To generate a monthly trust statement (for your records or auditor): click "Monthly Statement" at the bottom of the ledger. Select the month and year and click "Generate & Print Statement". The PDF includes GST summary and signature lines.',
+    ],
+  },
+  {
+    emoji: '⚖️', title: 'Trust Accounting — Bank Reconciliation',
+    description: 'Match bank statement entries to trust records.',
+    steps: [
+      'Go to Bank Reconciliation in the sidebar. This is where you match your bank statement entries against your trust records.',
+      'Upload your bank statement CSV or paste entries manually. Each bank entry shows as "Unmatched" until you pair it with a trust receipt or payment.',
+      'Click "Match" on a bank entry and select the corresponding trust receipt or payment from the dropdown. Matched items turn green.',
+      'If a bank entry has no matching trust record (e.g. bank fees), use "Manual" to record it as a non-trust item with a note.',
+      'When all entries are matched, the reconciliation is complete. The Financials dashboard will show the last reconciled date and zero unmatched items.',
+      'Run reconciliation at least monthly — more frequently if you have high transaction volumes.',
+    ],
+  },
+  {
+    emoji: '📥', title: 'Importing Opening Balances (Migration)',
+    description: 'Move from PropertyMe, Reapit, or TrustSoft to ListHQ.',
+    steps: [
+      'If you are migrating from PropertyMe, Console Cloud, Reapit, or TrustSoft, go to Financials and click "Import Existing Account".',
+      'Step 1 — Certify Balance: Enter your trust account bank details (BSB, account number), the current balance from your old system, and the date of last reconciliation. Optionally upload your auditor certification PDF.',
+      'Step 2 — Upload Ledger CSV: Export your trust ledger from your current system as a CSV. The wizard auto-detects PropertyMe, Reapit, and TrustSoft formats. If your format is not recognised, download the Generic template, paste your data in, and re-upload.',
+      'Step 3 — Active Matters: Upload your active matters list — clients who currently have funds held in trust. Format: Client Name, Property, Deposit Held, Status.',
+      'Step 4 — Confirm: Review the import summary. The wizard checks that the sum of imported transactions matches your opening balance. A mismatch is flagged in red — resolve it in your old system first.',
+      'On completion, download the Opening Balance Declaration PDF and Migration Checklist PDF. Print, sign, and retain these for your auditor — they form part of the statutory audit trail.',
+    ],
+  },
+  {
+    emoji: '💸', title: 'Commission Calculator',
+    description: 'Model your take-home commission and annual GCI.',
+    steps: [
+      'Open Commission Calculator from the Business section of the sidebar.',
+      'Enter the sale price and your commission rate (%). The default rate is 2.5% — adjust for your agreement.',
+      'Use the Agency Split slider to set the agent/agency split. For example, a 30% agency split means the agency keeps 30% and you take 70%.',
+      'Toggle GST Included if your rate is GST-inclusive. The calculator shows the 1/11th GST component separately.',
+      'Enter a referral fee percentage if a referring agent is entitled to a share of your commission.',
+      'Set settlement days and deals per month to see your projected monthly and annual GCI (Gross Commission Income).',
+      'Your last scenario is saved automatically and restored next time you open the calculator.',
+    ],
+  },
+  {
+    emoji: '🎉', title: 'Settlement Concierge',
+    description: 'Track milestones from exchange to keys handover.',
+    steps: [
+      'Open Settlement Concierge from the Business section. Upcoming settlements are listed with a countdown in days. Cards turn amber at 7 days and red at 3 days.',
+      'Click a settlement card to expand it and see the checklist: Final inspection booked, Keys handover arranged, Trust funds cleared, Buyer notified, Google review requested.',
+      'Tick off each item as it is completed. Progress is saved automatically in your browser.',
+      'Use the Utility Partners section to quickly send your buyer links to set up electricity (AGL, Origin), internet (Telstra, NBN Co), and other services. Click "Copy link" to get a personalised referral URL.',
+      'Post-settlement properties move to the lower section after their settlement date passes. Use this section to follow up on reviews and referrals.',
+    ],
+  },
+  {
+    emoji: '📊', title: 'Analytics and Reports',
+    description: 'Charts, trends, and CSV exports for every metric.',
+    steps: [
+      'The Analytics page shows charts for your listings performance over time — views, contact clicks, leads, and pipeline movement.',
+      'The Reports page has four tabs: Listings, Leads, Financials, and Contacts. Each tab has a date range picker (30 days, 90 days, 6 months, 12 months, or custom).',
+      'On the Listings tab: see a bar chart of views and leads by month, a pie chart of property types, and a table of your top-performing listings.',
+      'On the Leads tab: see lead volume over time, source breakdown, and conversion rate from enquiry to offer.',
+      'On the Financials tab: see total trust receipts, payments, and closing balance trend by month, pulling live from your trust account data.',
+      'On the Contacts tab: see contact growth and activity breakdown.',
+      'Every tab has an "Export CSV" button that downloads the filtered data for use in Excel or your accountant\'s reporting tools.',
+    ],
+  },
+  {
+    emoji: '🤝', title: 'Managing Your Team',
+    description: 'Invite agents, assign roles, and manage your agency.',
+    steps: [
+      'Go to Team in the sidebar. Click "Invite Member" and enter the email address of the agent you want to add.',
+      'Choose their role: Agent (can add listings and manage their own contacts) or Admin (full access including billing and team management).',
+      'The invited agent receives an email with a unique invite code. They sign up using that code and are automatically linked to your agency.',
+      'Team members appear in the Team list with their status (Active, Pending, Inactive) and role.',
+      'To remove a team member, click the three-dot menu on their row and select "Remove from Agency". Their individual listings and contacts are retained.',
+    ],
+  },
+  {
+    emoji: '⭐', title: 'Reputation Score',
+    description: 'How your agent score is calculated and how to improve it.',
+    steps: [
+      'Your reputation score (0–100) appears on your public agent profile and in the Verified Agent badge section.',
+      'The score is calculated from five factors: Response time (0–25 pts) — replying to leads within 5 minutes scores 25, within 1 hour scores 20. Reviews (0–25 pts) — based on your average star rating weighted by review count. Listing performance (0–25 pts) — ratio of sold/leased listings to total listings. Days on market (0–15 pts) — lower average days on market scores higher. Profile completeness (0–10 pts) — photo, bio, phone, specialisation, and service areas each add 2 points.',
+      'To improve your score: respond to leads faster, ask satisfied clients for reviews, maintain an up-to-date profile, and keep listings active and well-presented.',
+      'Clients can leave reviews from your public profile page. A direct link to your review page is available under the Reviews section of the sidebar.',
+    ],
+  },
+  {
+    emoji: '🔐', title: 'Account Security and Settings',
+    description: 'Passwords, notifications, and keeping your account safe.',
+    steps: [
+      'Go to Settings in the sidebar to manage notifications, display preferences, and account details.',
+      'Change your password from Settings → Security. Use a password at least 12 characters long. If you forget your password, use the "Forgot Password" link on the login page to receive a reset email.',
+      'Keep your registered email address current — all security alerts, lead notifications, and billing receipts go to this address.',
+      'Never share your login credentials. Use the Team feature to give colleagues access — they get their own login, and their activity is tracked separately.',
+      'If you suspect unauthorised access, go to Settings immediately, change your password, and contact support at support@listhq.com.au.',
+    ],
+  },
+];
+
+/* ─── FAQ DATA ─── */
 const FAQ_CATEGORIES: FaqCategory[] = [
   {
     emoji: '🚀', title: 'Getting Started',
     items: [
-      { q: 'How do I create an agent account?', a: 'Click "Sign Up" on the Agent landing page and choose "I\'m an Agent". Complete your profile with your license number, agency, and service areas. You\'ll be ready to list properties within minutes.' },
-      { q: 'Is there a free trial?', a: 'Yes — every new agent gets a 14-day free trial of the Professional plan. No credit card is required to start. You can downgrade to the Starter plan at any time.' },
-      { q: 'Can I use GlobalHomes as a buyer too?', a: 'Absolutely. Your agent account gives you full access to the buyer search experience as well. You can save properties, set alerts, and browse the marketplace just like any buyer.' },
+      { q: 'How do I create an agent account?', a: 'Go to the Agents page and click "Join the Network". Complete the registration form with your full name, email, phone, licence number, and agency name. You will receive a confirmation email. Once verified, complete your profile and you are ready to list.' },
+      { q: 'Is there a free trial?', a: 'Yes — every new agent gets a 14-day free trial of the Pro plan. No credit card required to start.' },
+      { q: 'What is the founding price?', a: 'Founding prices are available for a limited time: Starter at $99/mo (full price $199), Pro at $199/mo (full price $349), Agency at $399/mo (full price $699). Annual billing saves an additional 15%.' },
+      { q: 'Can I use ListHQ as a buyer as well?', a: 'Yes. Your agent login gives you full access to the buyer marketplace — saved searches, property alerts, the AI voice search, and map search.' },
     ],
   },
   {
     emoji: '🏠', title: 'Listings',
     items: [
-      { q: 'How many listings can I have?', a: 'The Starter plan includes up to 5 active listings. Professional and Enterprise plans offer unlimited listings. Check the Billing page for full plan details.' },
-      { q: 'Can I edit a listing after publishing?', a: 'Yes. Open the listing from My Listings, make your changes, and hit Save. Updates go live immediately — there\'s no re-approval process for edits.' },
-      { q: 'What image formats are supported?', a: 'We accept JPEG, PNG, and WebP images up to 10 MB each. For best results, upload landscape photos at least 1200 px wide. The system auto-optimises images for fast loading.' },
+      { q: 'How many listings can I have active at once?', a: 'Starter: 10 active listings. Pro and Agency: unlimited listings. See Billing for full details.' },
+      { q: 'Can I edit a listing after publishing?', a: 'Yes. Open the listing from My Listings, make your changes, and click Save. Updates go live immediately.' },
+      { q: 'What image formats and sizes are supported?', a: 'JPEG, PNG, and WebP up to 10 MB per image. For best results, upload landscape images at least 1200px wide.' },
+      { q: 'What is the difference between Whisper, Coming Soon, and Public visibility?', a: 'Whisper = invite-only, not visible to buyers. Coming Soon = visible to registered buyers on the platform but not on external portals. Public = visible to all buyers on the full marketplace.' },
+      { q: 'Can I duplicate a listing?', a: 'Yes. On the listing detail page in your dashboard, there is a "Duplicate" option. This creates a copy with all the same details — useful for similar properties at the same address.' },
+      { q: 'What is the AI listing writer?', a: 'On Step 4 of the listing wizard, you can record a voice note or type notes about the property. The AI generates a professional listing description in four tones: Standard, Luxury, Family, or Investment. You can edit the output before publishing.' },
     ],
   },
   {
-    emoji: '👥', title: 'Leads & CRM',
+    emoji: '🔑', title: 'Rental Management',
     items: [
-      { q: 'Where do my leads come from?', a: 'Leads are generated when buyers submit an enquiry on your listing, use the voice search that matches your properties, or scan a QR code at an open home. All leads appear in your CRM automatically.' },
-      { q: 'Can I import my existing contacts?', a: 'Yes. Go to Contacts and click "Import CSV". Map your spreadsheet columns to our fields (name, email, phone, type) and import in one click. Duplicates are detected by email address.' },
-      { q: 'How does the pipeline board work?', a: 'The pipeline is a kanban-style board with customisable stages. Drag contacts between columns to track their journey from initial enquiry through to settlement. Each move is logged in the contact\'s activity history.' },
+      { q: 'How do I list a property for rent?', a: 'Create a new listing and choose "For Rent" on the Basics step. The form switches to rental mode with fields for weekly rent, bond weeks, available date, lease term, and pet/furnishing preferences.' },
+      { q: 'Can tenants apply online?', a: 'Yes. A 5-step rental application form is available on every rental listing page. It collects personal details, employment history, rental history, and identity documents.' },
+      { q: 'What is the Rent Roll?', a: 'The Rent Roll (coming to your dashboard) is a summary of all your managed tenancies showing each tenant, their rent, next due date, and arrears status at a glance.' },
+      { q: 'How does the system handle bond?', a: 'When creating a tenancy, you record the bond amount and bond lodgement number. Bond held in your trust account is recorded as a trust receipt with purpose set to "Bond".' },
     ],
   },
   {
-    emoji: '🤝', title: 'GlobalHomes First & Network',
+    emoji: '🏦', title: 'Trust Accounting',
     items: [
-      { q: 'What is GlobalHomes First?', a: 'GlobalHomes First is our pre-market network. When you list a property as "GlobalHomes First", it\'s shared exclusively with verified agents before appearing on the public marketplace. This gives sellers a soft launch and agents early access to stock.' },
-      { q: 'How do referral splits work?', a: 'When sharing an off-market listing, you set a referral split percentage (e.g. 20%). If a cooperating agent introduces the successful buyer, they receive that percentage of the selling agent\'s commission.' },
-      { q: 'Who can see my off-market listings?', a: 'Only agents who are verified members of the GlobalHomes network can see GlobalHomes First listings. Public buyers and unverified agents cannot access them.' },
+      { q: 'Is the trust accounting module legally compliant?', a: 'The module is designed to meet the requirements of the Agents Financial Administration Act 2014 (Qld), Property and Stock Agents Act 2002 (NSW), and Estate Agents Act 1980 (Vic). It produces sequentially numbered receipts, running balance ledgers, monthly statements with GST breakdowns, and 5-year compliant CSV exports. However, compliance requirements can vary — always confirm with your auditor.' },
+      { q: 'Can I import my trust history from PropertyMe?', a: 'Yes. Go to Financials → Import Existing Account. The wizard auto-detects PropertyMe, Reapit, and TrustSoft CSV formats. It walks you through certifying your opening balance, uploading your ledger history, and importing active client matters. You receive a signed declaration PDF and migration checklist for your auditor.' },
+      { q: 'How do I generate a monthly trust statement?', a: 'From the Trust Ledger page, click "Monthly Statement" at the bottom, select your month and year, and click "Generate & Print Statement". The PDF includes all receipts and payments, GST summary (1/11th method), and signature lines for the principal.' },
+      { q: 'How does bank reconciliation work?', a: 'Go to Bank Reconciliation. Upload or paste your bank statement entries. Match each bank line to the corresponding trust receipt or payment. Unmatched items are flagged red. When all items are matched, the reconciliation is complete and the date is recorded on your Financials dashboard.' },
+      { q: 'What is an ABA file?', a: 'An ABA file (Australian Banking Association format) is a bulk payment file you upload to your bank\'s internet banking to process multiple owner disbursements in a single transaction. Generate it from the Financials dashboard under Bulk Payments when you have pending payment records ready to clear.' },
+      { q: 'Can I void a transaction instead of deleting it?', a: 'Yes — you can never hard-delete a trust transaction. Click the delete icon on any transaction row to "void" it. The transaction remains in the ledger marked as Voided and is excluded from the running balance. This preserves the audit trail as required by Australian trust accounting law.' },
+    ],
+  },
+  {
+    emoji: '🤫', title: 'Off-Market Network',
+    items: [
+      { q: 'What is the Off-Market Network?', a: 'The Off-Market Network lets you share listings privately with other verified agents before they go public. This gives sellers a discreet soft launch and gives agents early access to stock.' },
+      { q: 'How do referral splits work?', a: 'When sharing an off-market listing, you set a referral split percentage. If a network agent introduces the successful buyer, they receive that percentage of your commission at settlement.' },
+      { q: 'Who can see my off-market listings?', a: 'Only verified agents on the ListHQ network. Public buyers and unverified agents cannot see them.' },
+      { q: 'What is a Buyer Brief?', a: 'A Buyer Brief is a request you post to the network describing what your buyer client is looking for (property type, suburb, price range, urgency). Other agents with matching off-market stock will contact you directly.' },
     ],
   },
   {
     emoji: '📅', title: 'Inspections',
     items: [
-      { q: 'How does Inspection Day Mode work?', a: 'Inspection Day Mode is a streamlined interface for running open homes. Select your listing, display a QR code for visitor sign-in, and capture attendee details in real time. All visitors are added to your CRM after the event.' },
-      { q: 'Can buyers book private inspections?', a: 'Yes. If you\'ve enabled inspection booking on a listing, buyers can request a time slot directly from the property page. You\'ll receive a notification and can confirm or suggest an alternative.' },
+      { q: 'How does Inspection Day Mode work?', a: 'Select your listing from the scheduled inspections list. During the inspection, add visitor details manually — first name, last name, phone, email, and interest level (Hot/Warm/Cold). After the inspection, send a one-click follow-up and all visitors are added to your CRM.' },
+      { q: 'Can buyers book private inspections?', a: 'Yes. If inspection booking is enabled on a listing, buyers can request a time slot from the listing page. You will receive a notification to confirm.' },
     ],
   },
   {
-    emoji: '💰', title: 'Financials & Trust',
+    emoji: '💸', title: 'Commission and Financials',
     items: [
-      { q: 'Is the trust accounting module compliant?', a: 'The trust accounting tools are designed to help you record and track trust transactions. However, compliance requirements vary by state — we recommend using the module alongside your licensed accounting software and consulting your auditor.' },
-      { q: 'Can I export trust statements?', a: 'Yes. From the Trust Ledger page, filter by date range or property, then click "Export". Statements are generated as PDF documents suitable for audit purposes.' },
-      { q: 'How does bank reconciliation work?', a: 'The Bank Reconciliation page lets you enter or paste your bank statement entries and match them against recorded trust transactions. Matched items are marked green; unmatched items are flagged for review.' },
+      { q: 'How do I calculate my commission?', a: 'Open Commission Calculator from the sidebar. Enter the sale price, commission rate, agency split, and GST preference. The calculator shows gross commission, your net share, GST component, and projected annual GCI. Your last scenario is saved automatically.' },
+      { q: 'What is GCI?', a: 'GCI stands for Gross Commission Income — the total commission you earn before expenses. The Commission Calculator shows your projected monthly and annual GCI based on your deals-per-month setting.' },
     ],
   },
   {
-    emoji: '💳', title: 'Billing & Plans',
+    emoji: '💳', title: 'Plans and Billing',
     items: [
-      { q: 'What payment methods do you accept?', a: 'We accept Visa, Mastercard, and American Express. All payments are processed securely through Stripe. You can update your card at any time on the Billing page.' },
-      { q: 'Can I cancel at any time?', a: 'Yes. There are no lock-in contracts. Cancel from the Billing page and your plan remains active until the end of the current billing period. Your data is retained for 90 days after cancellation.' },
-      { q: 'Do you offer agency-wide plans?', a: 'Yes — the Enterprise plan supports multiple seats under one account with centralised billing. Contact us at sales@everythingeco.com.au for a custom quote tailored to your agency size.' },
+      { q: 'What plans are available?', a: 'Starter ($99/mo founding, $199 full): 10 listings, CRM, AI listing writer, voice leads, standard analytics. Pro ($199/mo founding, $349 full): unlimited listings, trust accounting, Whisper Market, Inspection Day, Settlement Concierge, commission calculator, GCI reports, verified badge. Agency ($399/mo founding, $699 full): everything in Pro plus 5 agent seats, team analytics, agency branding, lead routing, and API access. Annual billing saves 15% on all plans.' },
+      { q: 'Can I cancel at any time?', a: 'Yes. No lock-in contracts. Cancel from the Billing page and your plan remains active until the end of the billing period. Data is retained for 90 days.' },
+      { q: 'What payment methods are accepted?', a: 'Visa, Mastercard, and American Express via Stripe. Update your card at any time on the Billing page.' },
+      { q: 'Is there a per-listing marketing fee?', a: 'Yes. In addition to the subscription, listing campaigns on the public marketplace are charged per listing: Standard $299, Featured $599, Premier $999. These fees are passed to vendors as their marketing campaign cost — typically 50–88% cheaper than REA Group.' },
     ],
   },
   {
-    emoji: '⚙️', title: 'Profile & Settings',
+    emoji: '⚙️', title: 'Profile and Team',
     items: [
-      { q: 'How do I update my public profile?', a: 'Go to Profile in the sidebar. You can edit your headshot, bio, specialisation, languages spoken, and social links. Changes are reflected on your public agent page immediately.' },
-      { q: 'Can I change my registered email?', a: 'Currently, your login email is set during registration. If you need to change it, please contact support at sales@everythingeco.com.au and we\'ll assist you with the migration.' },
-      { q: 'How do I add team members?', a: 'Navigate to Team in the sidebar. Click "Invite Member", enter their email, and choose a role (Agent or Admin). They\'ll receive an invitation email to join your agency workspace.' },
+      { q: 'How do I add team members?', a: 'Go to Team → Invite Member. Enter their email and choose a role (Agent or Admin). They receive an invitation email with a unique code to join your agency workspace.' },
+      { q: 'How do I update my public agent profile?', a: 'Go to Profile in the sidebar. Edit your headshot, bio, specialisation, years of experience, languages spoken, and social links. Changes appear on your public page immediately.' },
+      { q: 'How do I change my email address?', a: 'Email changes require account verification. Contact support at support@listhq.com.au and we will assist.' },
     ],
   },
   {
-    emoji: '🏡', title: 'Settlement Concierge',
+    emoji: '🔧', title: 'Technical Troubleshooting',
     items: [
-      { q: 'What is the Settlement Concierge?', a: 'It\'s a milestone tracker for the period between exchange and settlement. It lists key dates (finance approval, inspections, settlement) and lets you check them off as they\'re completed, keeping all parties informed.' },
-      { q: 'Can I customise the settlement milestones?', a: 'Yes. You can add, remove, or rename milestones to match your state\'s settlement process. Custom tasks can also be assigned to team members with due dates and reminders.' },
+      { q: 'The page is not loading properly — what should I do?', a: 'Try a hard refresh (Ctrl+Shift+R on Windows, Cmd+Shift+R on Mac). If the issue persists, clear your browser cache or try Chrome, Safari, Firefox, or Edge. If the problem continues, email us with a screenshot.' },
+      { q: 'My listing photos are not uploading — why?', a: 'Each image must be under 10 MB and in JPEG, PNG, or WebP format. Try uploading one photo at a time on a faster connection. If the issue continues, contact support with the browser and error message.' },
+      { q: 'I am not receiving email notifications.', a: 'Check your spam folder and add noreply@listhq.com.au to your contacts. Verify your email is correct under Settings and that lead notifications are enabled.' },
+      { q: 'The voice search is not working on my device.', a: 'Voice search requires microphone permission in your browser. On Chrome: click the padlock in the address bar → Site settings → Microphone → Allow. On Safari: go to Settings → Safari → Microphone → Allow. Voice search is not supported in Internet Explorer.' },
+      { q: 'The map is not showing my territory locations.', a: 'The map uses Google Maps and requires a working internet connection. Try refreshing the Territory page. If your locations are saved but not displaying, try a different browser.' },
     ],
   },
   {
-    emoji: '🔧', title: 'Technical & Troubleshooting',
+    emoji: '🔒', title: 'Data and Privacy',
     items: [
-      { q: 'The page isn\'t loading properly — what should I do?', a: 'Try a hard refresh (Ctrl+Shift+R or Cmd+Shift+R). If the issue persists, clear your browser cache or try a different browser. Our platform works best on the latest versions of Chrome, Safari, Firefox, and Edge.' },
-      { q: 'My listing photos aren\'t uploading — why?', a: 'Check that each image is under 10 MB and in JPEG, PNG, or WebP format. If your internet connection is slow, try uploading one image at a time. If the problem continues, email us at sales@everythingeco.com.au with a screenshot.' },
-      { q: 'I\'m not receiving email notifications — what\'s wrong?', a: 'First, check your spam or junk folder. Add noreply@globalhomes.com to your contacts. If emails still aren\'t arriving, verify your email address is correct under Settings and ensure notifications are enabled.' },
+      { q: 'Where is my data stored?', a: 'All data is stored in Australia on secure cloud infrastructure (AWS ap-southeast-2 — Sydney region). We do not store data offshore.' },
+      { q: 'Can I export my data?', a: 'Yes. Contacts can be exported from the Contacts page. Trust transactions can be exported as CSV from the Trust Ledger. Listings can be exported from Reports. Contact support for a full account data export.' },
+      { q: 'What happens to my data if I cancel?', a: 'Your data is retained for 90 days after cancellation. During this window you can export everything. After 90 days, data is permanently deleted per our Privacy Policy.' },
     ],
   },
 ];
 
-/* ─── COMPONENTS ─── */
+/* ─── SUB-COMPONENTS ─── */
 
 const GuideCard = ({ guide }: { guide: Guide }) => {
   const [open, setOpen] = useState(false);
@@ -265,7 +413,34 @@ const GuideCard = ({ guide }: { guide: Guide }) => {
   );
 };
 
+const ChecklistCard = ({ item, index }: { item: ChecklistItem; index: number }) => {
+  const navigate = useNavigate();
+  const Icon = item.icon;
+  return (
+    <Card className="bg-card border border-border">
+      <CardContent className="p-4 flex items-start gap-3">
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold">
+          {index + 1}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <Icon size={16} className="text-muted-foreground flex-shrink-0" />
+            <h3 className="text-sm font-medium truncate">{item.title}</h3>
+          </div>
+          <p className="text-xs text-muted-foreground mb-2">{item.description}</p>
+          <Button variant="outline" size="sm" className="text-xs h-7" onClick={() => navigate(item.route)}>
+            Go there <ChevronRight size={12} />
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+/* ─── MAIN ─── */
+
 const HelpPage = () => {
+  const navigate = useNavigate();
   const [faqSearch, setFaqSearch] = useState('');
   const q = faqSearch.toLowerCase();
 
@@ -274,10 +449,10 @@ const HelpPage = () => {
     items: cat.items.filter(i => i.q.toLowerCase().includes(q) || i.a.toLowerCase().includes(q)),
   })).filter(cat => cat.items.length > 0);
 
-  const footer = (
+  const supportFooter = (
     <p className="text-center text-xs text-muted-foreground mt-8">
       Can't find your answer? Email us at{' '}
-      <a href="mailto:sales@everythingeco.com.au" className="text-primary underline">sales@everythingeco.com.au</a>
+      <a href="mailto:support@listhq.com.au" className="text-primary underline">support@listhq.com.au</a>
     </p>
   );
 
@@ -288,21 +463,71 @@ const HelpPage = () => {
         <p className="text-sm text-muted-foreground">Guides, tips, and answers to common questions.</p>
       </div>
 
-      <Tabs defaultValue="guides">
-        <TabsList>
+      <Tabs defaultValue="getting-started">
+        <TabsList className="flex-wrap h-auto gap-1">
+          <TabsTrigger value="getting-started">Getting Started</TabsTrigger>
           <TabsTrigger value="guides">How-To Guides</TabsTrigger>
           <TabsTrigger value="faq">FAQ</TabsTrigger>
+          <TabsTrigger value="support">Contact &amp; Support</TabsTrigger>
         </TabsList>
 
-        {/* ── Guides ── */}
+        {/* ── TAB 1: Getting Started ── */}
+        <TabsContent value="getting-started" className="space-y-8 mt-4">
+          <div>
+            <h2 className="text-lg font-semibold mb-1">Setup Checklist</h2>
+            <p className="text-sm text-muted-foreground mb-4">Complete these steps to get your agency live on ListHQ.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {CHECKLIST.map((item, i) => (
+                <ChecklistCard key={item.title} item={item} index={i} />
+              ))}
+            </div>
+          </div>
+
+          <Separator />
+
+          <div>
+            <h2 className="text-lg font-semibold mb-3">Quick Reference</h2>
+            <ScrollArea className="rounded-lg border border-border">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border bg-muted/50">
+                      <th className="text-left p-3 font-medium text-muted-foreground">Feature</th>
+                      <th className="text-left p-3 font-medium text-muted-foreground">Where to find it</th>
+                      <th className="text-left p-3 font-medium text-muted-foreground">What it does</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {QUICK_REF.map((row) => (
+                      <tr key={row.route} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
+                        <td className="p-3 font-medium whitespace-nowrap">
+                          <button
+                            className="text-primary hover:underline text-left"
+                            onClick={() => navigate(row.route)}
+                          >
+                            {row.feature}
+                          </button>
+                        </td>
+                        <td className="p-3 text-muted-foreground font-mono text-xs whitespace-nowrap">{row.route}</td>
+                        <td className="p-3 text-muted-foreground">{row.what}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </ScrollArea>
+          </div>
+        </TabsContent>
+
+        {/* ── TAB 2: How-To Guides ── */}
         <TabsContent value="guides">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             {GUIDES.map(g => <GuideCard key={g.title} guide={g} />)}
           </div>
-          {footer}
+          {supportFooter}
         </TabsContent>
 
-        {/* ── FAQ ── */}
+        {/* ── TAB 3: FAQ ── */}
         <TabsContent value="faq">
           <div className="relative mt-4 mb-6">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -333,7 +558,55 @@ const HelpPage = () => {
               </div>
             ))}
           </div>
-          {footer}
+          {supportFooter}
+        </TabsContent>
+
+        {/* ── TAB 4: Contact & Support ── */}
+        <TabsContent value="support" className="space-y-6 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="bg-card border border-border">
+              <CardContent className="p-5 text-center space-y-2">
+                <MessageCircle size={28} className="mx-auto text-primary" />
+                <h3 className="text-sm font-semibold">Email Support</h3>
+                <p className="text-xs text-muted-foreground">For billing, account, and technical questions.</p>
+                <a href="mailto:support@listhq.com.au" className="text-xs text-primary underline">support@listhq.com.au</a>
+              </CardContent>
+            </Card>
+            <Card className="bg-card border border-border">
+              <CardContent className="p-5 text-center space-y-2">
+                <Building2 size={28} className="mx-auto text-primary" />
+                <h3 className="text-sm font-semibold">Agency Sales</h3>
+                <p className="text-xs text-muted-foreground">Interested in an agency plan or white-label?</p>
+                <a href="mailto:sales@listhq.com.au" className="text-xs text-primary underline">sales@listhq.com.au</a>
+              </CardContent>
+            </Card>
+            <Card className="bg-card border border-border">
+              <CardContent className="p-5 text-center space-y-2">
+                <CheckCircle2 size={28} className="mx-auto text-primary" />
+                <h3 className="text-sm font-semibold">Response Time</h3>
+                <p className="text-xs text-muted-foreground">We aim to respond to all enquiries within 4 business hours (AEST, Mon–Fri).</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 flex items-start gap-3">
+            <AlertTriangle size={18} className="text-amber-600 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-muted-foreground">
+              During the founding period, some features shown in this guide are still being rolled out. If a feature described here is not yet visible in your dashboard, it will appear in a future update. Check your billing plan to confirm which features are included.
+            </p>
+          </div>
+
+          <Card className="bg-card border border-border">
+            <CardContent className="p-5 space-y-3">
+              <h3 className="text-sm font-semibold">Help us improve</h3>
+              <p className="text-xs text-muted-foreground">
+                Found a bug? Have a feature request? Use the thumbs-down button below any AI response, or email us directly. Every piece of feedback is read by the team.
+              </p>
+              <Button variant="outline" size="sm" className="text-xs" asChild>
+                <a href="mailto:feedback@listhq.com.au">Send feedback</a>
+              </Button>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

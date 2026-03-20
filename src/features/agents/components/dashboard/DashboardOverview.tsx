@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import {
   CheckSquare, Users, ClipboardList, DollarSign, Landmark,
   Mic, Phone, Send, Calendar, CalendarDays, Flame, Thermometer, Snowflake, Sparkles, Eye,
-  TrendingUp, Zap, MessageSquare, Activity, Shield, ArrowUp, ArrowDown, Minus,
+  TrendingUp, Zap, MessageSquare, Activity, Shield, ArrowUp, ArrowDown, Minus, AlertTriangle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +17,8 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, CartesianGrid } from 'recharts';
+import { toast } from 'sonner';
+import { differenceInDays } from 'date-fns';
 
 // Australian currency formatter
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
@@ -48,6 +50,8 @@ const DashboardOverview = () => {
   const [todayInspections, setTodayInspections] = useState<{ address: string; time: string; propertyId: string }[]>([]);
   const [pipelineData, setPipelineData] = useState(buildEmptyMonths());
   const [pipelineEmpty, setPipelineEmpty] = useState(true);
+  const [arrearsTenancies, setArrearsTenancies] = useState<any[]>([]);
+  const [sendingReminder, setSendingReminder] = useState<string | null>(null);
 
   // Fetch tasks due today
   useEffect(() => {
@@ -188,6 +192,79 @@ const DashboardOverview = () => {
       });
   }, [user]);
 
+  // Fetch arrears tenancies
+  useEffect(() => {
+    if (!user) return;
+    const fetchArrears = async () => {
+      const { data: agent } = await supabase
+        .from('agents').select('id').eq('user_id', user.id).single();
+      if (!agent) return;
+
+      const { data: tenancies } = await supabase
+        .from('tenancies')
+        .select('*, properties(address, suburb)')
+        .eq('agent_id', agent.id)
+        .eq('status', 'active');
+      if (!tenancies || tenancies.length === 0) return;
+
+      const tenancyIds = tenancies.map(t => t.id);
+      const { data: payments } = await supabase
+        .from('rent_payments')
+        .select('*')
+        .in('tenancy_id', tenancyIds)
+        .order('payment_date', { ascending: false });
+
+      const today = new Date();
+      const overdue: any[] = [];
+
+      for (const t of tenancies) {
+        const tenancyPayments = (payments || []).filter(p => p.tenancy_id === t.id);
+        const latest = tenancyPayments[0];
+        if (!latest) {
+          // No payments at all — check if lease started more than 3 days ago
+          const leaseStart = new Date(t.lease_start);
+          const daysSinceStart = differenceInDays(today, leaseStart);
+          if (daysSinceStart > 3) {
+            overdue.push({ ...t, daysOverdue: daysSinceStart, amountOwed: Number(t.rent_amount) });
+          }
+          continue;
+        }
+        const periodEnd = new Date(latest.period_to);
+        const daysOverdue = differenceInDays(today, periodEnd);
+        if (daysOverdue > 3 && latest.status !== 'paid') {
+          overdue.push({ ...t, daysOverdue, amountOwed: Number(t.rent_amount) });
+        }
+      }
+      setArrearsTenancies(overdue);
+    };
+    fetchArrears();
+  }, [user]);
+
+  const handleSendReminder = async (tenancy: any) => {
+    setSendingReminder(tenancy.id);
+    try {
+      const address = tenancy.properties?.address || 'your property';
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-notification-email`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}` },
+          body: JSON.stringify({
+            to: tenancy.tenant_email,
+            subject: 'Rent overdue reminder',
+            body: `Dear ${tenancy.tenant_name}, your rent for ${address} is overdue. Please arrange payment at your earliest convenience. Thank you.`,
+          }),
+        }
+      );
+      if (!res.ok) throw new Error('Failed to send');
+      toast.success(`Reminder sent to ${tenancy.tenant_name}`);
+    } catch {
+      toast.error('Failed to send reminder');
+    } finally {
+      setSendingReminder(null);
+    }
+  };
+
   // GCI values — real data; new users start at 0
   const gciActual = 0;
   const gciBudgeted = 0;
@@ -275,7 +352,53 @@ const DashboardOverview = () => {
           </motion.div>
         </div>
 
-        {/* Today's Inspections */}
+        {/* Arrears Alert */}
+        {arrearsTenancies.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-card border border-border border-l-4 border-l-destructive rounded-xl p-5"
+          >
+            <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
+              <AlertTriangle size={16} className="text-destructive" /> Rent Arrears
+              <Badge variant="destructive" className="text-[10px] px-1.5 py-0 h-5">{arrearsTenancies.length}</Badge>
+            </h3>
+            <div className="space-y-2">
+              {arrearsTenancies.map((t) => (
+                <div key={t.id} className="flex items-center justify-between border border-border rounded-lg p-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium truncate">{t.tenant_name}</p>
+                    <p className="text-[10px] text-muted-foreground truncate">{t.properties?.address}{t.properties?.suburb ? `, ${t.properties.suburb}` : ''}</p>
+                    <p className="text-[10px] text-destructive font-medium mt-0.5">{t.daysOverdue} days overdue · {AUD.format(t.amountOwed)} owed</p>
+                  </div>
+                  <div className="flex gap-1.5 ml-2 shrink-0">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-[10px] h-6 px-2"
+                      onClick={() => navigate(`/dashboard/tenancies/${t.id}`)}
+                    >
+                      View
+                    </Button>
+                    {t.tenant_email && (
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        className="text-[10px] h-6 px-2"
+                        disabled={sendingReminder === t.id}
+                        onClick={() => handleSendReminder(t)}
+                      >
+                        <Send size={10} className="mr-1" />
+                        {sendingReminder === t.id ? 'Sending...' : 'Remind'}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}

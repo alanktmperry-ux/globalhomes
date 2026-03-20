@@ -45,6 +45,12 @@ export interface ListingDraft {
   estimatedRentalWeekly: number;
   rentalWeekly: number;
   rentalBondWeeks: number;
+  // Rental-specific
+  availableFrom: string;
+  leaseTerm: string;
+  furnished: boolean;
+  petsAllowed: boolean;
+  screeningLevel: string;
 }
 
 const DEFAULT_DRAFT: ListingDraft = {

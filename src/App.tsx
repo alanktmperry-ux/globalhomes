@@ -85,11 +85,11 @@ const App = () => (
               <Route path="/terms" element={<TermsPage />} />
               <Route path="/privacy" element={<PrivacyPage />} />
 
-              {/* Authenticated (protection temporarily removed) */}
-              <Route path="/saved" element={<SavedPage />} />
-              <Route path="/messages" element={<MessagesPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/settings" element={<BuyerSettingsPage />} />
+              {/* Authenticated */}
+              <Route path="/saved" element={<ProtectedRoute><SavedPage /></ProtectedRoute>} />
+              <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute><BuyerSettingsPage /></ProtectedRoute>} />
 
               {/* Agent */}
               <Route path="/agent-dashboard" element={<AgentPerformanceDashboard />} />

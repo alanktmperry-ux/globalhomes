@@ -187,7 +187,7 @@ export default function TrustStatementModal({ open, onOpenChange }: TrustStateme
       <p class="period">${monthLabel}</p>
     </div>
     <div class="header-right">
-      <strong>${agency || 'Global Homes'}</strong><br>
+      <strong>${agency || 'ListHQ'}</strong><br>
       ${agentName}${license ? `<br>Licence: ${license}` : ''}<br>
       Generated: ${generatedAt}
     </div>

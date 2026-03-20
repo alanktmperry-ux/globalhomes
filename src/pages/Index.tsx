@@ -579,8 +579,7 @@ const Index = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <SiteHeader />
+    <>
       <VoiceSearchErrorBoundary>
         <VoiceSearchHero
           onSearch={handleSearch}
@@ -757,9 +756,7 @@ const Index = () => {
         onToggleSave={toggleSaved}
         searchContext={searchContextForLead}
       />
-      <SiteFooter />
-      <BottomNav />
-    </div>
+    </>;
   );
 };
 

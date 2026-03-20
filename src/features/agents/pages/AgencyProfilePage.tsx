@@ -77,14 +77,11 @@ const AgencyProfilePage = () => {
 
   if (agencyLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <SiteHeader />
-        <div className="max-w-6xl mx-auto px-4 py-16 space-y-8">
-          <Skeleton className="h-48 w-full rounded-2xl" />
-          <Skeleton className="h-8 w-64" />
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-40 rounded-xl" />)}
-          </div>
+      <div className="max-w-6xl mx-auto px-4 py-16 space-y-8">
+        <Skeleton className="h-48 w-full rounded-2xl" />
+        <Skeleton className="h-8 w-64" />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => <Skeleton key={i} className="h-40 rounded-xl" />)}
         </div>
       </div>
     );

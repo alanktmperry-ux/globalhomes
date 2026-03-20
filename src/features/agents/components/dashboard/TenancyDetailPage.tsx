@@ -19,7 +19,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { useToast } from '@/shared/hooks/use-toast';
+import { toast } from 'sonner';
 import DashboardHeader from './DashboardHeader';
 import { format, parseISO, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { cn } from '@/shared/lib/utils';
@@ -90,7 +90,6 @@ interface MaintenanceJob {
 const TenancyDetailPage = () => {
   const { tenancyId } = useParams<{ tenancyId: string }>();
   const { user } = useAuth();
-  const { toast } = useToast();
   const navigate = useNavigate();
 
   const [tenancy, setTenancy] = useState<Tenancy | null>(null);
@@ -206,8 +205,8 @@ const TenancyDetailPage = () => {
       notes: editForm.notes,
     } as any).eq('id', tenancyId);
     setSaving(false);
-    if (error) { toast({ title: 'Error', description: error.message, variant: 'destructive' }); return; }
-    toast({ title: 'Tenancy updated' });
+    if (error) { toast.error('Error — error.message'); return; }
+    toast.success('Tenancy updated');
     setShowEdit(false);
     fetchAll();
   };
@@ -248,8 +247,8 @@ const TenancyDetailPage = () => {
     }
 
     setSaving(false);
-    if (error) { toast({ title: 'Error', description: error.message, variant: 'destructive' }); return; }
-    toast({ title: 'Payment recorded & trust receipt created' });
+    if (error) { toast.error('Error — error.message'); return; }
+    toast.success('Payment recorded & trust receipt created');
     setShowRecordPayment(false);
     setPayForm({ payment_date: format(new Date(), 'yyyy-MM-dd'), period_from: '', period_to: '', amount: String(tenancy.rent_amount), payment_method: 'bank_transfer', notes: '' });
     fetchAll();
@@ -257,7 +256,7 @@ const TenancyDetailPage = () => {
 
   const handleMarkOverdue = async (paymentId: string) => {
     await supabase.from('rent_payments').update({ status: 'overdue' } as any).eq('id', paymentId);
-    toast({ title: 'Marked as overdue' });
+    toast.success('Marked as overdue');
     fetchAll();
   };
 
@@ -275,8 +274,8 @@ const TenancyDetailPage = () => {
       estimated_cost: jobForm.estimated_cost ? parseFloat(jobForm.estimated_cost) : null,
     } as any);
     setSaving(false);
-    if (error) { toast({ title: 'Error', description: error.message, variant: 'destructive' }); return; }
-    toast({ title: 'Maintenance job created' });
+    if (error) { toast.error('Error — error.message'); return; }
+    toast.success('Maintenance job created');
     setShowNewJob(false);
     setJobForm({ title: '', description: '', priority: 'routine', assigned_to: '', estimated_cost: '' });
     fetchAll();
@@ -290,7 +289,7 @@ const TenancyDetailPage = () => {
       completed_at: jobCompletedAt ? jobCompletedAt.toISOString() : new Date().toISOString(),
     } as any).eq('id', jobId);
     setSaving(false);
-    toast({ title: 'Job marked complete' });
+    toast.success('Job marked complete');
     setExpandedJobId(null);
     fetchAll();
   };

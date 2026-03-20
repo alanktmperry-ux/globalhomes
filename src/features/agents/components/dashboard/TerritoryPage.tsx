@@ -3,7 +3,7 @@ import { MapPin, Plus, Trash2, Loader2, Search, Phone, Mail, Building2 } from 'l
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/shared/hooks/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { autocomplete, getPlaceDetails, loadGoogleMapsScript } from '@/shared/lib/googleMapsService';
@@ -26,7 +26,6 @@ const emptyLocation: Omit<AgentLocation, 'id' | 'agent_id'> = {
 
 const TerritoryPage = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
   const [locations, setLocations] = useState<AgentLocation[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -149,7 +148,7 @@ const TerritoryPage = () => {
   const handleSave = async () => {
     if (!agentId) return;
     if (!form.name.trim() || !form.address.trim() || form.lat === 0) {
-      toast({ title: 'Missing info', description: 'Please search and select an address, and give the location a name.', variant: 'destructive' });
+      toast.error('Missing info — Please search and select an address, and give the location a name.');
       return;
     }
     setSaving(true);
@@ -168,9 +167,9 @@ const TerritoryPage = () => {
       setForm(emptyLocation);
       setSearchQuery('');
       setShowForm(false);
-      toast({ title: 'Location added' });
+      toast.success('Location added');
     } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast.error(`Error — ${(err.message)}`);
     } finally {
       setSaving(false);
     }
@@ -181,9 +180,9 @@ const TerritoryPage = () => {
       const { error } = await supabase.from('agent_locations').delete().eq('id', id);
       if (error) throw error;
       setLocations(prev => prev.filter(l => l.id !== id));
-      toast({ title: 'Location removed' });
+      toast.success('Location removed');
     } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast.error(`Error — ${(err.message)}`);
     }
   };
 

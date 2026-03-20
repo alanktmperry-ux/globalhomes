@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/shared/hooks/use-toast';
+import { toast } from 'sonner';
 import DashboardHeader from './DashboardHeader';
 import { addDays, differenceInDays, format, parseISO } from 'date-fns';
 
@@ -63,7 +63,6 @@ const frequencyDays = (freq: string): number => {
 
 const RentRollPage = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
   const navigate = useNavigate();
 
   const [agentId, setAgentId] = useState<string | null>(null);
@@ -180,7 +179,7 @@ const RentRollPage = () => {
 
   const handleSubmit = async () => {
     if (!agentId || !form.property_id || !form.tenant_name || !form.lease_start || !form.lease_end || !form.rent_amount || !form.bond_amount) {
-      toast({ title: 'Please fill required fields', variant: 'destructive' });
+      toast.error('Please fill required fields');
       return;
     }
     setSaving(true);
@@ -204,9 +203,9 @@ const RentRollPage = () => {
     setSaving(false);
 
     if (error) {
-      toast({ title: 'Error creating tenancy', description: error.message, variant: 'destructive' });
+      toast.error('Error creating tenancy — error.message');
     } else {
-      toast({ title: 'Tenancy created' });
+      toast.success('Tenancy created');
       setShowAddModal(false);
       setForm({
         property_id: '', tenant_name: '', tenant_email: '', tenant_phone: '',

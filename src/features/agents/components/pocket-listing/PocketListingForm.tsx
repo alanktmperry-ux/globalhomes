@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { useToast } from '@/shared/hooks/use-toast';
+import { toast } from 'sonner';
 import StepAddress from './StepAddress';
 import StepBasics from './StepBasics';
 import StepPhotos from './StepPhotos';
@@ -123,7 +123,6 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
   const [loadingEdit, setLoadingEdit] = useState(!!loadPropertyId);
   const autoSaveRef = useRef<ReturnType<typeof setInterval>>();
   const { user } = useAuth();
-  const { toast } = useToast();
 
   const update = (partial: Partial<ListingDraft>) =>
     setDraft((d) => ({ ...d, ...partial }));
@@ -140,7 +139,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         .maybeSingle();
 
       if (error || !prop) {
-        toast({ title: 'Could not load listing', variant: 'destructive' });
+        toast.error('Could not load listing');
         setLoadingEdit(false);
         return;
       }
@@ -233,7 +232,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
 
     try {
       if (!user) {
-        toast({ title: 'You must be logged in to publish', variant: 'destructive' });
+        toast.error('You must be logged in to publish');
         setPublishing(false);
         return;
       }
@@ -247,7 +246,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
       const agentId = agent?.id ?? null;
 
       if (!agentId) {
-        toast({ title: 'Agent profile not found', description: 'Please complete your agent registration first.', variant: 'destructive' });
+        toast.error('Agent profile not found — Please complete your agent registration first.');
         setPublishing(false);
         return;
       }
@@ -304,7 +303,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
           .update(payload)
           .eq('id', editPropertyId);
         if (error) throw error;
-        toast({ title: 'Listing updated!', description: 'Your changes have been saved.' });
+        toast.success('Listing updated! — Your changes have been saved.');
       } else {
         // INSERT new listing
         const { error } = await supabase.from('properties').insert({
@@ -313,17 +312,13 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         });
         if (error) throw error;
         localStorage.removeItem('pocket-listing-draft');
-        toast({ title: 'Listing saved!', description: 'Your property is in draft. Publish it from your dashboard to make it visible to buyers.' });
+        toast.success('Listing saved! — Your property is in draft. Publish it from your dashboard to make it visible to buyers.');
       }
 
       onPublish(title);
     } catch (err: any) {
       console.error('Publish error:', err);
-      toast({
-        title: editPropertyId ? 'Failed to update' : 'Failed to publish',
-        description: err.message || 'Please try again.',
-        variant: 'destructive',
-      });
+      toast.error(editPropertyId ? 'Failed to update' : 'Failed to publish');
     } finally {
       setPublishing(false);
     }

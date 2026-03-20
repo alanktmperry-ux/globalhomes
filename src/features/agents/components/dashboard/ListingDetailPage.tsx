@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import DashboardHeader from './DashboardHeader';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/shared/hooks/use-toast';
+import { toast } from 'sonner';
 import ListingDetailsTab from './listing-tabs/ListingDetailsTab';
 import ListingMarketingTab from './listing-tabs/ListingMarketingTab';
 import ListingBuyerLeadsTab from './listing-tabs/ListingBuyerLeadsTab';
@@ -19,7 +19,6 @@ const ListingDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('details');
   const [publishing, setPublishing] = useState(false);
-  const { toast } = useToast();
 
   useEffect(() => {
     if (!listingId) return;
@@ -62,10 +61,10 @@ const ListingDetailPage = () => {
       .update({ status: 'public', is_active: true } as any)
       .eq('id', listing.id);
     if (error) {
-      toast({ title: 'Failed to publish', variant: 'destructive' });
+      toast.error('Failed to publish');
     } else {
       setListing({ ...listing, status: 'public', is_active: true });
-      toast({ title: 'Listing published!', description: 'Your listing is now visible to buyers.' });
+      toast.success('Listing published! — Your listing is now visible to buyers.');
     }
     setPublishing(false);
   };

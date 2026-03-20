@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PartyPopper, MapPin, Clock, ChevronDown, ChevronUp, Copy, Star, ExternalLink, Gift } from 'lucide-react';
 
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { differenceInDays, format, isPast, addDays } from 'date-fns';
 
@@ -91,13 +91,13 @@ const SettlementConcierge = () => {
   };
 
   const handleCongrats = (s: Settlement) => {
-    toast({ title: '🎉 Email sent', description: `Congratulations email sent to ${s.buyerName}` });
+    toast.success(`🎉 Email sent — Congratulations email sent to ${s.buyerName}`);
   };
 
   const handleReviewRequest = (s: Settlement) => {
     const msg = `Hi ${s.buyerName}, it was a pleasure helping you settle on ${s.address}. If you'd be happy to leave a review, here's the link: ${window.location.origin}/agent/me`;
     navigator.clipboard.writeText(msg);
-    toast({ title: '📋 Copied', description: 'Review request copied to clipboard' });
+    toast.success('📋 Copied — Review request copied to clipboard');
   };
 
   const { canAccessSettlement, loading: subLoading } = useSubscription();

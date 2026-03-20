@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/shared/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface Props {
   open: boolean;
@@ -22,7 +22,6 @@ const SUBURBS_OPTIONS = [
 ];
 
 const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
-  const { toast } = useToast();
   const [step, setStep] = useState<'form' | 'success'>('form');
   const [loading, setLoading] = useState(false);
 
@@ -51,7 +50,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.fullName || !form.email || !form.licenseNumber || !form.mobile) {
-      toast({ title: 'Missing fields', description: 'Please fill in all required fields.', variant: 'destructive' });
+      toast.error('Missing fields — Please fill in all required fields.');
       return;
     }
     setLoading(true);
@@ -108,7 +107,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
 
       setStep('success');
     } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast.error(`Error — ${(err.message)}`);
     } finally {
       setLoading(false);
     }

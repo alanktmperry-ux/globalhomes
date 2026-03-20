@@ -10,7 +10,7 @@ import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Calculator, Save, DollarSign, CalendarDays } from 'lucide-react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { addDays, differenceInDays, format } from 'date-fns';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
@@ -70,7 +70,7 @@ const CommissionCalculator = () => {
 
   const handleSave = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
-    toast({ title: '💾 Scenario saved', description: 'Your commission scenario has been saved' });
+    toast.success('💾 Scenario saved — Your commission scenario has been saved');
   };
 
   const formatAusDate = (d: Date) => format(d, 'dd/MM/yyyy');

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Property, InspectionSlot } from '@/shared/lib/types';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { z } from 'zod';
 import { Calendar, Clock, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -38,7 +38,7 @@ export function InspectionBookingModal({ property, inspectionTimes, open, onClos
     setErrors({});
 
     if (selectedSlot === null) {
-      toast({ title: 'Please select an inspection time', variant: 'destructive' });
+      toast.error('Please select an inspection time');
       return;
     }
 
@@ -93,7 +93,7 @@ export function InspectionBookingModal({ property, inspectionTimes, open, onClos
 
       setSuccess(true);
     } catch {
-      toast({ title: 'Something went wrong', description: 'Please try again.', variant: 'destructive' });
+      toast.error('Something went wrong — Please try again.');
     } finally {
       setSubmitting(false);
     }

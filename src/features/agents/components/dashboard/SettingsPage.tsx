@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/shared/hooks/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import DashboardHeader from './DashboardHeader';
@@ -21,7 +21,6 @@ interface AgentProfile {
 
 const SettingsPage = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [loading, setLoading] = useState(true);
@@ -72,11 +71,11 @@ const SettingsPage = () => {
     if (!file || !agentData) return;
 
     if (!file.type.startsWith('image/')) {
-      toast({ title: 'Invalid file', description: 'Please upload an image file.', variant: 'destructive' });
+      toast.error('Invalid file — Please upload an image file.');
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      toast({ title: 'File too large', description: 'Max file size is 5MB.', variant: 'destructive' });
+      toast.error('File too large — Max file size is 5MB.');
       return;
     }
 
@@ -101,9 +100,9 @@ const SettingsPage = () => {
       if (updateError) throw updateError;
 
       setAgentData(prev => prev ? { ...prev, avatar_url: publicUrl } : null);
-      toast({ title: 'Avatar updated', description: 'Your profile photo has been uploaded.' });
+      toast.success('Avatar updated — Your profile photo has been uploaded.');
     } catch (err: any) {
-      toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
+      toast.error(`Upload failed — ${(err.message)}`);
     } finally {
       setUploadingAvatar(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -126,10 +125,10 @@ const SettingsPage = () => {
       
       if (error) throw error;
       
-      toast({ title: 'Profile updated', description: 'Your changes have been saved.' });
+      toast.success('Profile updated — Your changes have been saved.');
       await loadAgentData(); // Refresh data
     } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast.error(`Error — ${(err.message)}`);
     } finally {
       setSaving(false);
     }

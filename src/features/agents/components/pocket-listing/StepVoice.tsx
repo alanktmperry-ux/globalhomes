@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { SoundWaveVisualizer } from '@/features/search/components/SoundWaveVisualizer';
 import { useVoiceSearch } from '@/features/search/hooks/useVoiceSearch';
-import { useToast } from '@/shared/hooks/use-toast';
+import { toast } from 'sonner';
 import type { ListingDraft } from './PocketListingForm';
 
 interface Props {
@@ -36,7 +36,6 @@ const StepVoice = ({ draft, update }: Props) => {
   const [streamingBullets, setStreamingBullets] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
   const wasListeningRef = useRef(false);
-  const { toast } = useToast();
 
   const onVoiceResult = useCallback((text: string) => {
     update({ voiceTranscript: text });
@@ -130,7 +129,7 @@ const StepVoice = ({ draft, update }: Props) => {
 
       if (!resp.ok || !resp.body) {
         const err = await resp.json().catch(() => ({ error: 'Generation failed' }));
-        toast({ title: 'Generation failed', description: err.error, variant: 'destructive' });
+        toast.error(`Generation failed — ${(err.error)}`);
         setGenerating(false);
         return;
       }
@@ -200,7 +199,7 @@ const StepVoice = ({ draft, update }: Props) => {
       update({ voiceTranscript: fullText });
     } catch (e) {
       console.error('AI generation error:', e);
-      toast({ title: 'Generation failed', description: 'Could not connect to AI service.', variant: 'destructive' });
+      toast.error('Generation failed — Could not connect to AI service.');
     } finally {
       setGenerating(false);
     }

@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, LogOut, Building2, UserPlus,
+  LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, LogOut, Building2, UserPlus, Home,
   User, FileText, CreditCard, Star, MapPinned, Shield, Contact, Kanban, Scale, Landmark,
   ClipboardCheck, CalendarDays, Search, TrendingUp, Receipt, PartyPopper, Calculator, HelpCircle,
 } from 'lucide-react';

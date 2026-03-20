@@ -15,8 +15,11 @@ const navItems = [
 ];
 
 export function BottomNav() {
-  const { t } = useI18n();
+  const { t, language, setLanguage } = useI18n();
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, isAdmin, isAgent, loading } = useAuth();
+  const [showLangPicker, setShowLangPicker] = useState(false);
   const navigate = useNavigate();
   const { user, isAdmin, isAgent, loading } = useAuth();
 

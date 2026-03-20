@@ -10,6 +10,7 @@ import { CurrencyProvider } from "@/shared/lib/CurrencyContext";
 import { AuthProvider } from "@/features/auth/AuthProvider";
 import { ProtectedRoute } from "@/features/auth/ProtectedRoute";
 import { Loader2 } from "lucide-react";
+import AppErrorBoundary from "@/components/AppErrorBoundary";
 
 // Lazy-loaded pages
 const Index = React.lazy(() => import("./pages/Index"));

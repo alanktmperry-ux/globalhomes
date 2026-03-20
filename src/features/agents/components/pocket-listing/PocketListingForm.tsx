@@ -45,6 +45,12 @@ export interface ListingDraft {
   estimatedRentalWeekly: number;
   rentalWeekly: number;
   rentalBondWeeks: number;
+  // Rental-specific
+  availableFrom: string;
+  leaseTerm: string;
+  furnished: boolean;
+  petsAllowed: boolean;
+  screeningLevel: string;
 }
 
 const DEFAULT_DRAFT: ListingDraft = {
@@ -77,6 +83,11 @@ const DEFAULT_DRAFT: ListingDraft = {
   estimatedRentalWeekly: 0,
   rentalWeekly: 0,
   rentalBondWeeks: 4,
+  availableFrom: '',
+  leaseTerm: '12 months',
+  furnished: false,
+  petsAllowed: false,
+  screeningLevel: 'Basic',
 };
 
 const STEPS = ['Address', 'Basics', 'Photos', 'Voice', 'Settings', 'Preview'];
@@ -173,6 +184,11 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         estimatedRentalWeekly: prop.rental_weekly || 0,
         rentalWeekly: prop.listing_type === 'rent' ? (prop.rental_weekly || 0) : 0,
         rentalBondWeeks: 4,
+        availableFrom: (prop as any).available_from || '',
+        leaseTerm: (prop as any).lease_term || '12 months',
+        furnished: (prop as any).furnished || false,
+        petsAllowed: (prop as any).pets_allowed || false,
+        screeningLevel: 'Basic',
       });
       setLoadingEdit(false);
     };
@@ -270,7 +286,16 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         lat: draft.lat || null,
         lng: draft.lng || null,
         rental_weekly: draft.listingType === 'rent' ? (draft.rentalWeekly || null) : (draft.estimatedRentalWeekly || null),
+        available_from: draft.availableFrom || null,
+        lease_term: draft.leaseTerm || null,
+        furnished: draft.furnished,
+        pets_allowed: draft.petsAllowed,
       } as any;
+
+      // Add 'Pets considered' to features if applicable
+      if (draft.petsAllowed && !payload.features?.includes('Pets considered')) {
+        payload.features = [...(payload.features || []), 'Pets considered'];
+      }
 
       if (editPropertyId) {
         // UPDATE existing listing

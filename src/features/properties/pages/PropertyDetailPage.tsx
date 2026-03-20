@@ -169,8 +169,6 @@ export default function PropertyDetailPage() {
         <meta name="twitter:description" content={(property.description || '').slice(0, 155)} />
         <link rel="canonical" href={typeof window !== 'undefined' ? window.location.origin + window.location.pathname : ''} />
       </Helmet>
-      <SiteHeader />
-
       {/* Back button */}
       <div className="max-w-6xl mx-auto w-full px-4 pt-4">
         <button

@@ -140,14 +140,17 @@ export function SiteHeader() {
 
           {/* Agent dashboard shortcut – always visible for agents */}
           {user && isAgent && (
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary/20 transition-colors"
-              aria-label="Dashboard"
-              title="Dashboard"
-            >
-              <LayoutDashboard size={17} />
-            </button>
+            <>
+              <NotificationBell />
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary/20 transition-colors"
+                aria-label="Dashboard"
+                title="Dashboard"
+              >
+                <LayoutDashboard size={17} />
+              </button>
+            </>
           )}
 
           {/* Admin shortcut – only for admins */}

@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCurrency, CURRENCIES, CURRENCY_REGIONS, CurrencyCode } from '@/shared/lib/CurrencyContext';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { NotificationBell } from '@/features/agents/components/dashboard/NotificationBell';
 
 export function SiteHeader() {
   const { currency, setCurrencyCode, listingMode, setListingMode, isLiveRates } = useCurrency();
@@ -139,14 +140,17 @@ export function SiteHeader() {
 
           {/* Agent dashboard shortcut – always visible for agents */}
           {user && isAgent && (
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary/20 transition-colors"
-              aria-label="Dashboard"
-              title="Dashboard"
-            >
-              <LayoutDashboard size={17} />
-            </button>
+            <>
+              <NotificationBell />
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary/20 transition-colors"
+                aria-label="Dashboard"
+                title="Dashboard"
+              >
+                <LayoutDashboard size={17} />
+              </button>
+            </>
           )}
 
           {/* Admin shortcut – only for admins */}

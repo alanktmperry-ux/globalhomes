@@ -21,6 +21,7 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
   lead: <MessageSquare size={14} className="text-primary" />,
   event: <MousePointerClick size={14} className="text-accent-foreground" />,
   voice_match: <Mic size={14} className="text-primary" />,
+  message: <MessageSquare size={14} className="text-emerald-500" />,
 };
 
 export function NotificationBell() {
@@ -155,7 +156,7 @@ export function NotificationBell() {
                       }`}
                       onClick={() => {
                         markAsRead(n.id);
-                        if (n.type === 'lead' || n.type === 'voice_match') {
+                        if (n.type === 'lead' || n.type === 'voice_match' || n.type === 'message') {
                           setOpen(false);
                           navigate('/messages');
                         }

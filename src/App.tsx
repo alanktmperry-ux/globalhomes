@@ -1,3 +1,4 @@
+import React, { Suspense } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -8,54 +9,65 @@ import { I18nProvider } from "@/shared/lib/i18n";
 import { CurrencyProvider } from "@/shared/lib/CurrencyContext";
 import { AuthProvider } from "@/features/auth/AuthProvider";
 import { ProtectedRoute } from "@/features/auth/ProtectedRoute";
-import Index from "./pages/Index";
-import SavedPage from "./pages/SavedPage";
-import MessagesPage from "./pages/MessagesPage";
-import ProfilePage from "./pages/ProfilePage";
-import AgentPortalPage from "./pages/AgentPortalPage";
-import AgentLandingPage from "./pages/AgentLandingPage";
-import PocketListingPage from "./pages/PocketListingPage";
-import AgentDashboardLayout from "./pages/AgentDashboardLayout";
-import DashboardOverview from "@/features/agents/components/dashboard/DashboardOverview";
-import ListingsPage from "@/features/agents/components/dashboard/ListingsPage";
-import VoiceLeadsPage from "@/features/agents/components/dashboard/VoiceLeadsPage";
-import AnalyticsPage from "@/features/agents/components/dashboard/AnalyticsPage";
-import NetworkPage from "@/features/agents/components/dashboard/NetworkPage";
-import SettingsPage from "@/features/agents/components/dashboard/SettingsPage";
-import TeamPage from "@/features/agents/components/dashboard/TeamPage";
-import AgentProfilePage from "@/features/agents/components/dashboard/ProfilePage";
-import DocumentsPage from "@/features/agents/components/dashboard/DocumentsPage";
-import MyAgenciesPage from "./pages/MyAgenciesPage";
-import BillingPage from "@/features/agents/components/dashboard/BillingPage";
-import ReviewsPage from "@/features/agents/components/dashboard/ReviewsPage";
-import TerritoryPage from "@/features/agents/components/dashboard/TerritoryPage";
-import ContactsPage from "@/features/agents/components/dashboard/ContactsPage";
-import ListingDetailPage from "@/features/agents/components/dashboard/ListingDetailPage";
-import TrustAccountingPage from "@/features/agents/components/dashboard/TrustAccountingPage";
-import InvestmentDashboardPage from "@/features/agents/components/dashboard/InvestmentDashboardPage";
-import TrustLedgerPage from "@/features/agents/components/dashboard/TrustLedgerPage";
-import BankReconciliationPage from "@/features/agents/components/dashboard/BankReconciliationPage";
-import ReportsPage from "@/features/agents/components/dashboard/ReportsPage";
-import PipelinePage from "@/features/agents/components/dashboard/PipelinePage";
-import InspectionModePage from "@/features/agents/components/dashboard/InspectionModePage";
-import SettlementConcierge from "@/features/agents/components/dashboard/SettlementConcierge";
-import CommissionCalculator from "@/features/agents/components/dashboard/CommissionCalculator";
-import HelpPage from "@/features/agents/components/dashboard/HelpPage";
-import SeekerAuthPage from "./pages/SeekerAuthPage";
-import AgentAuthPage from "./pages/AgentAuthPage";
-import AuthLandingPage from "./pages/AuthLandingPage";
-import AdminDashboard from "./pages/AdminDashboard";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
-import AgencyProfilePage from "./pages/AgencyProfilePage";
-import PropertyDetailPage from "./pages/PropertyDetailPage";
-import AgentPublicProfilePage from "./pages/AgentPublicProfilePage";
-import BuyerSettingsPage from "./pages/BuyerSettingsPage";
-import AgentPerformanceDashboard from "./features/agents/pages/AgentPerformanceDashboard";
-import DemoAccessPage from "./features/agents/pages/DemoAccessPage";
-import TermsPage from "./pages/TermsPage";
-import PrivacyPage from "./pages/PrivacyPage";
-import NotFound from "./pages/NotFound";
+import { Loader2 } from "lucide-react";
+
+// Lazy-loaded pages
+const Index = React.lazy(() => import("./pages/Index"));
+const SavedPage = React.lazy(() => import("./pages/SavedPage"));
+const MessagesPage = React.lazy(() => import("./pages/MessagesPage"));
+const ProfilePage = React.lazy(() => import("./pages/ProfilePage"));
+const AgentPortalPage = React.lazy(() => import("./pages/AgentPortalPage"));
+const AgentLandingPage = React.lazy(() => import("./pages/AgentLandingPage"));
+const PocketListingPage = React.lazy(() => import("./pages/PocketListingPage"));
+const AgentDashboardLayout = React.lazy(() => import("./pages/AgentDashboardLayout"));
+const MyAgenciesPage = React.lazy(() => import("./pages/MyAgenciesPage"));
+const SeekerAuthPage = React.lazy(() => import("./pages/SeekerAuthPage"));
+const AgentAuthPage = React.lazy(() => import("./pages/AgentAuthPage"));
+const AuthLandingPage = React.lazy(() => import("./pages/AuthLandingPage"));
+const AdminDashboard = React.lazy(() => import("./pages/AdminDashboard"));
+const ForgotPasswordPage = React.lazy(() => import("./pages/ForgotPasswordPage"));
+const ResetPasswordPage = React.lazy(() => import("./pages/ResetPasswordPage"));
+const AgencyProfilePage = React.lazy(() => import("./pages/AgencyProfilePage"));
+const PropertyDetailPage = React.lazy(() => import("./pages/PropertyDetailPage"));
+const AgentPublicProfilePage = React.lazy(() => import("./pages/AgentPublicProfilePage"));
+const BuyerSettingsPage = React.lazy(() => import("./pages/BuyerSettingsPage"));
+const TermsPage = React.lazy(() => import("./pages/TermsPage"));
+const PrivacyPage = React.lazy(() => import("./pages/PrivacyPage"));
+const NotFound = React.lazy(() => import("./pages/NotFound"));
+const AgentPerformanceDashboard = React.lazy(() => import("./features/agents/pages/AgentPerformanceDashboard"));
+const DemoAccessPage = React.lazy(() => import("./features/agents/pages/DemoAccessPage"));
+
+// Lazy-loaded dashboard sub-pages
+const DashboardOverview = React.lazy(() => import("@/features/agents/components/dashboard/DashboardOverview"));
+const ListingsPage = React.lazy(() => import("@/features/agents/components/dashboard/ListingsPage"));
+const VoiceLeadsPage = React.lazy(() => import("@/features/agents/components/dashboard/VoiceLeadsPage"));
+const AnalyticsPage = React.lazy(() => import("@/features/agents/components/dashboard/AnalyticsPage"));
+const NetworkPage = React.lazy(() => import("@/features/agents/components/dashboard/NetworkPage"));
+const SettingsPage = React.lazy(() => import("@/features/agents/components/dashboard/SettingsPage"));
+const TeamPage = React.lazy(() => import("@/features/agents/components/dashboard/TeamPage"));
+const AgentProfilePage = React.lazy(() => import("@/features/agents/components/dashboard/ProfilePage"));
+const DocumentsPage = React.lazy(() => import("@/features/agents/components/dashboard/DocumentsPage"));
+const BillingPage = React.lazy(() => import("@/features/agents/components/dashboard/BillingPage"));
+const ReviewsPage = React.lazy(() => import("@/features/agents/components/dashboard/ReviewsPage"));
+const TerritoryPage = React.lazy(() => import("@/features/agents/components/dashboard/TerritoryPage"));
+const ContactsPage = React.lazy(() => import("@/features/agents/components/dashboard/ContactsPage"));
+const ListingDetailPage = React.lazy(() => import("@/features/agents/components/dashboard/ListingDetailPage"));
+const TrustAccountingPage = React.lazy(() => import("@/features/agents/components/dashboard/TrustAccountingPage"));
+const InvestmentDashboardPage = React.lazy(() => import("@/features/agents/components/dashboard/InvestmentDashboardPage"));
+const TrustLedgerPage = React.lazy(() => import("@/features/agents/components/dashboard/TrustLedgerPage"));
+const BankReconciliationPage = React.lazy(() => import("@/features/agents/components/dashboard/BankReconciliationPage"));
+const ReportsPage = React.lazy(() => import("@/features/agents/components/dashboard/ReportsPage"));
+const PipelinePage = React.lazy(() => import("@/features/agents/components/dashboard/PipelinePage"));
+const InspectionModePage = React.lazy(() => import("@/features/agents/components/dashboard/InspectionModePage"));
+const SettlementConcierge = React.lazy(() => import("@/features/agents/components/dashboard/SettlementConcierge"));
+const CommissionCalculator = React.lazy(() => import("@/features/agents/components/dashboard/CommissionCalculator"));
+const HelpPage = React.lazy(() => import("@/features/agents/components/dashboard/HelpPage"));
+
+const PageLoader = () => (
+  <div className="flex h-screen w-full items-center justify-center bg-background">
+    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+  </div>
+);
 
 const queryClient = new QueryClient();
 
@@ -69,65 +81,67 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
-              {/* Public */}
-              <Route path="/" element={<Index />} />
-              <Route path="/property/:id" element={<PropertyDetailPage />} />
-              <Route path="/agent/:id" element={<AgentPublicProfilePage />} />
-              <Route path="/agents" element={<AgentLandingPage />} />
-              <Route path="/auth" element={<AuthLandingPage />} />
-              <Route path="/login" element={<SeekerAuthPage />} />
-              <Route path="/agents/login" element={<AgentAuthPage />} />
-              <Route path="/agents/demo" element={<DemoAccessPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/reset-password" element={<ResetPasswordPage />} />
-              <Route path="/agency/:slug" element={<AgencyProfilePage />} />
-              <Route path="/terms" element={<TermsPage />} />
-              <Route path="/privacy" element={<PrivacyPage />} />
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                {/* Public */}
+                <Route path="/" element={<Index />} />
+                <Route path="/property/:id" element={<PropertyDetailPage />} />
+                <Route path="/agent/:id" element={<AgentPublicProfilePage />} />
+                <Route path="/agents" element={<AgentLandingPage />} />
+                <Route path="/auth" element={<AuthLandingPage />} />
+                <Route path="/login" element={<SeekerAuthPage />} />
+                <Route path="/agents/login" element={<AgentAuthPage />} />
+                <Route path="/agents/demo" element={<DemoAccessPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
+                <Route path="/agency/:slug" element={<AgencyProfilePage />} />
+                <Route path="/terms" element={<TermsPage />} />
+                <Route path="/privacy" element={<PrivacyPage />} />
 
-              {/* Authenticated */}
-              <Route path="/saved" element={<ProtectedRoute><SavedPage /></ProtectedRoute>} />
-              <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
-              <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-              <Route path="/settings" element={<ProtectedRoute><BuyerSettingsPage /></ProtectedRoute>} />
+                {/* Authenticated */}
+                <Route path="/saved" element={<ProtectedRoute><SavedPage /></ProtectedRoute>} />
+                <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
+                <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+                <Route path="/settings" element={<ProtectedRoute><BuyerSettingsPage /></ProtectedRoute>} />
 
-              {/* Agent */}
-              <Route path="/agent-dashboard" element={<AgentPerformanceDashboard />} />
-              <Route path="/agent-portal" element={<AgentPortalPage />} />
-              <Route path="/pocket-listing" element={<PocketListingPage />} />
-              <Route path="/dashboard" element={<AgentDashboardLayout />}>
-                <Route index element={<DashboardOverview />} />
-                <Route path="profile" element={<AgentProfilePage />} />
-                <Route path="territory" element={<TerritoryPage />} />
-                <Route path="listings" element={<ListingsPage />} />
-                <Route path="listings/:listingId" element={<ListingDetailPage />} />
-                <Route path="contacts" element={<ContactsPage />} />
-                <Route path="leads" element={<VoiceLeadsPage />} />
-                <Route path="pipeline" element={<PipelinePage />} />
-                <Route path="inspection-mode" element={<InspectionModePage />} />
-                <Route path="settlements" element={<SettlementConcierge />} />
-                <Route path="commission" element={<CommissionCalculator />} />
-                <Route path="analytics" element={<AnalyticsPage />} />
-                <Route path="network" element={<NetworkPage />} />
-                <Route path="team" element={<TeamPage />} />
-                <Route path="agencies" element={<MyAgenciesPage />} />
-                <Route path="documents" element={<DocumentsPage />} />
-                <Route path="billing" element={<BillingPage />} />
-                <Route path="reviews" element={<ReviewsPage />} />
-                <Route path="investments" element={<InvestmentDashboardPage />} />
-                <Route path="trust" element={<TrustAccountingPage />} />
-                <Route path="trust-ledger" element={<TrustLedgerPage />} />
-                <Route path="reconciliation" element={<BankReconciliationPage />} />
-                <Route path="reports" element={<ReportsPage />} />
-                <Route path="settings" element={<SettingsPage />} />
-                <Route path="help" element={<HelpPage />} />
-              </Route>
+                {/* Agent */}
+                <Route path="/agent-dashboard" element={<AgentPerformanceDashboard />} />
+                <Route path="/agent-portal" element={<AgentPortalPage />} />
+                <Route path="/pocket-listing" element={<PocketListingPage />} />
+                <Route path="/dashboard" element={<AgentDashboardLayout />}>
+                  <Route index element={<DashboardOverview />} />
+                  <Route path="profile" element={<AgentProfilePage />} />
+                  <Route path="territory" element={<TerritoryPage />} />
+                  <Route path="listings" element={<ListingsPage />} />
+                  <Route path="listings/:listingId" element={<ListingDetailPage />} />
+                  <Route path="contacts" element={<ContactsPage />} />
+                  <Route path="leads" element={<VoiceLeadsPage />} />
+                  <Route path="pipeline" element={<PipelinePage />} />
+                  <Route path="inspection-mode" element={<InspectionModePage />} />
+                  <Route path="settlements" element={<SettlementConcierge />} />
+                  <Route path="commission" element={<CommissionCalculator />} />
+                  <Route path="analytics" element={<AnalyticsPage />} />
+                  <Route path="network" element={<NetworkPage />} />
+                  <Route path="team" element={<TeamPage />} />
+                  <Route path="agencies" element={<MyAgenciesPage />} />
+                  <Route path="documents" element={<DocumentsPage />} />
+                  <Route path="billing" element={<BillingPage />} />
+                  <Route path="reviews" element={<ReviewsPage />} />
+                  <Route path="investments" element={<InvestmentDashboardPage />} />
+                  <Route path="trust" element={<TrustAccountingPage />} />
+                  <Route path="trust-ledger" element={<TrustLedgerPage />} />
+                  <Route path="reconciliation" element={<BankReconciliationPage />} />
+                  <Route path="reports" element={<ReportsPage />} />
+                  <Route path="settings" element={<SettingsPage />} />
+                  <Route path="help" element={<HelpPage />} />
+                </Route>
 
-              {/* Admin */}
-              <Route path="/admin" element={<AdminDashboard />} />
+                {/* Admin */}
+                <Route path="/admin" element={<AdminDashboard />} />
 
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>

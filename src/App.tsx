@@ -151,6 +151,7 @@ const App = () => (
     </I18nProvider>
   </QueryClientProvider>
   </HelmetProvider>
+  </AppErrorBoundary>
 );
 
 export default App;

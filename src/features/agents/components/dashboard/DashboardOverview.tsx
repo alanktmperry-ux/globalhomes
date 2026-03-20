@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import {
   CheckSquare, Users, ClipboardList, DollarSign, Landmark,
   Mic, Phone, Send, Calendar, CalendarDays, Flame, Thermometer, Snowflake, Sparkles, Eye,
-  TrendingUp, Zap, MessageSquare, Activity, Shield, ArrowUp, ArrowDown, Minus, AlertTriangle,
+  TrendingUp, Zap, MessageSquare, Activity, Shield, ArrowUp, ArrowDown, Minus, AlertTriangle, Mail,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -52,6 +52,8 @@ const DashboardOverview = () => {
   const [pipelineEmpty, setPipelineEmpty] = useState(true);
   const [arrearsTenancies, setArrearsTenancies] = useState<any[]>([]);
   const [sendingReminder, setSendingReminder] = useState<string | null>(null);
+  const [reportsDue, setReportsDue] = useState<any[]>([]);
+  const [sendingReport, setSendingReport] = useState<string | null>(null);
 
   // Fetch tasks due today
   useEffect(() => {
@@ -240,6 +242,39 @@ const DashboardOverview = () => {
     fetchArrears();
   }, [user]);
 
+  // Fetch listings with no vendor report in the last 7 days
+  useEffect(() => {
+    if (!user) return;
+    const fetchReportsDue = async () => {
+      const { data: agent } = await supabase
+        .from('agents')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+      if (!agent) return;
+
+      const { data: props } = await supabase
+        .from('properties')
+        .select('id, address, suburb, views, contact_clicks, listed_date, vendor_name, vendor_email')
+        .eq('agent_id', agent.id)
+        .eq('status', 'public')
+        .eq('is_active', true);
+      if (!props || props.length === 0) return;
+
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      const { data: recentReports } = await supabase
+        .from('vendor_reports')
+        .select('property_id, sent_at')
+        .eq('agent_id', agent.id)
+        .gte('sent_at', sevenDaysAgo);
+
+      const recentPropertyIds = new Set((recentReports || []).map(r => r.property_id));
+      const due = props.filter(p => !recentPropertyIds.has(p.id) && p.vendor_email);
+      setReportsDue(due);
+    };
+    fetchReportsDue();
+  }, [user]);
+
   const handleSendReminder = async (tenancy: any) => {
     setSendingReminder(tenancy.id);
     try {
@@ -262,6 +297,89 @@ const DashboardOverview = () => {
       toast.error('Failed to send reminder');
     } finally {
       setSendingReminder(null);
+    }
+  };
+
+  const handleQuickSendReport = async (prop: any) => {
+    setSendingReport(prop.id);
+    try {
+      const { data: agent } = await supabase
+        .from('agents')
+        .select('id, name, agency')
+        .eq('user_id', user?.id ?? '')
+        .maybeSingle();
+
+      const daysOnMarket = prop.listed_date
+        ? differenceInDays(new Date(), new Date(prop.listed_date))
+        : 0;
+      const totalViews = prop.views || 0;
+      const totalEnquiries = prop.contact_clicks || 0;
+
+      const reportHtml = `<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f4f4f5;font-family:-apple-system,sans-serif;">
+<div style="max-width:560px;margin:0 auto;padding:24px 16px;">
+  <div style="background:#1a2744;border-radius:12px;padding:20px;text-align:center;margin-bottom:16px;">
+    <div style="font-size:20px;font-weight:600;color:#fff;">ListHQ</div>
+    <div style="font-size:11px;color:#94a3b8;margin-top:3px;">Vendor Campaign Report</div>
+  </div>
+  <div style="background:#fff;border-radius:12px;padding:20px;margin-bottom:16px;">
+    <p style="font-size:14px;color:#333;margin:0 0 6px;">Hi ${prop.vendor_name},</p>
+    <p style="font-size:13px;color:#555;line-height:1.6;margin:0 0 4px;">Here is your weekly update for <strong>${prop.address}, ${prop.suburb}</strong>.</p>
+    <p style="font-size:12px;color:#888;margin:0;">Prepared by ${agent?.name || 'Your Agent'}${agent?.agency ? ` · ${agent.agency}` : ''}</p>
+  </div>
+  <table style="width:100%;border-collapse:separate;border-spacing:8px;margin-bottom:16px;">
+    <tr>
+      <td style="background:#fff;border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:600;color:#1a2744;">${totalViews.toLocaleString()}</div>
+        <div style="font-size:11px;color:#888;margin-top:3px;">Total views</div>
+      </td>
+      <td style="background:#fff;border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:600;color:#1a2744;">${totalEnquiries}</div>
+        <div style="font-size:11px;color:#888;margin-top:3px;">Enquiries</div>
+      </td>
+      <td style="background:#fff;border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:600;color:#1a2744;">${daysOnMarket}</div>
+        <div style="font-size:11px;color:#888;margin-top:3px;">Days listed</div>
+      </td>
+    </tr>
+  </table>
+  <div style="text-align:center;padding:8px 0;">
+    <p style="font-size:11px;color:#aaa;">Sent via ListHQ · Reply to this email with any questions.</p>
+  </div>
+</div></body></html>`;
+
+      const { error } = await supabase.functions.invoke(
+        'send-notification-email',
+        {
+          body: {
+            to: prop.vendor_email,
+            subject: `Weekly update — ${prop.address}`,
+            html: reportHtml,
+          },
+        }
+      );
+      if (error) throw error;
+
+      if (agent) {
+        await supabase.from('vendor_reports').insert({
+          property_id: prop.id,
+          agent_id: agent.id,
+          vendor_name: prop.vendor_name,
+          vendor_email: prop.vendor_email,
+          views_at_send: totalViews,
+          enquiries_at_send: totalEnquiries,
+          hot_leads_at_send: 0,
+          days_on_market_at_send: daysOnMarket,
+        });
+      }
+
+      setReportsDue(prev => prev.filter(p => p.id !== prop.id));
+      toast.success(`Report sent to ${prop.vendor_name}`);
+    } catch {
+      toast.error('Failed to send report');
+    } finally {
+      setSendingReport(null);
     }
   };
 
@@ -396,6 +514,74 @@ const DashboardOverview = () => {
                 </div>
               ))}
             </div>
+          </motion.div>
+        )}
+
+        {reportsDue.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-card border border-border border-l-4 border-l-primary rounded-xl p-5"
+          >
+            <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
+              <Mail size={16} className="text-primary" />
+              Vendor reports due
+              <Badge className="text-[10px] px-1.5 py-0 h-5 bg-primary/15 text-primary border-0">
+                {reportsDue.length}
+              </Badge>
+            </h3>
+            <div className="space-y-2">
+              {reportsDue.map((prop) => (
+                <div
+                  key={prop.id}
+                  className="flex items-center justify-between border border-border rounded-lg p-3"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium truncate">
+                      {prop.address}
+                      {prop.suburb ? `, ${prop.suburb}` : ''}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                      {prop.vendor_name
+                        ? `Vendor: ${prop.vendor_name}`
+                        : 'No vendor name set'}
+                      {' · '}
+                      {prop.views || 0} views
+                      {' · '}
+                      {prop.contact_clicks || 0} enquiries
+                    </p>
+                  </div>
+                  <div className="flex gap-1.5 ml-2 shrink-0">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-[10px] h-6 px-2"
+                      onClick={() =>
+                        navigate(
+                          `/dashboard/listings/${prop.id}?tab=marketing`
+                        )
+                      }
+                    >
+                      View
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="text-[10px] h-6 px-2 bg-primary hover:bg-primary/90"
+                      disabled={sendingReport === prop.id}
+                      onClick={() => handleQuickSendReport(prop)}
+                    >
+                      <Send size={10} className="mr-1" />
+                      {sendingReport === prop.id
+                        ? 'Sending...'
+                        : 'Send now'}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-3">
+              These listings have no vendor report sent in the last 7 days. Only listings with a vendor email on file are shown.
+            </p>
           </motion.div>
         )}
 

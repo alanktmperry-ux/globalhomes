@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, LogOut, Building2, UserPlus, Home,
   User, FileText, CreditCard, Star, MapPinned, Shield, Contact, Kanban, Scale, Landmark,
-  ClipboardCheck, CalendarDays, Search, TrendingUp, Receipt, PartyPopper, Calculator, HelpCircle, ClipboardList,
+  ClipboardCheck, CalendarDays, Search, TrendingUp, Receipt, PartyPopper, Calculator, HelpCircle, ClipboardList, Settings2,
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -56,13 +56,8 @@ const TEAM_NAV: NavItem[] = [
   { title: 'Team', url: '/dashboard/team', icon: UserPlus },
 ];
 
-const ACCOUNT_NAV: NavItem[] = [
-  { title: 'My Agencies', url: '/dashboard/agencies', icon: Building2 },
-  { title: 'Billing', url: '/dashboard/billing', icon: CreditCard },
-  { title: 'Reviews', url: '/dashboard/reviews', icon: Star },
-  { title: 'Settings', url: '/dashboard/settings', icon: Settings },
-  { title: 'Help & FAQ', url: '/dashboard/help', icon: HelpCircle },
-];
+
+
 
 const AgentDashboardSidebar = () => {
   const { state } = useSidebar();
@@ -72,6 +67,7 @@ const AgentDashboardSidebar = () => {
   const { signOut, isAdmin, user } = useAuth();
   const { listings } = useAgentListings();
   const [arrearsCount, setArrearsCount] = useState(0);
+  const [onboardingComplete, setOnboardingComplete] = useState(true);
 
   useEffect(() => {
     if (!user) return;
@@ -102,6 +98,16 @@ const AgentDashboardSidebar = () => {
     fetchArrears();
   }, [user]);
 
+  // Check onboarding status
+  useEffect(() => {
+    if (!user) return;
+    const checkOnboarding = async () => {
+      const { data: agent } = await supabase.from('agents').select('onboarding_complete').eq('user_id', user.id).single();
+      if (agent) setOnboardingComplete(!!(agent as any).onboarding_complete);
+    };
+    checkOnboarding();
+  }, [user]);
+
   const activeCount = listings.filter(l => ('_mock_status' in l ? l._mock_status !== 'sold' : (l as any).status !== 'sold')).length;
 
   const badgeValues: Record<string, string> = {
@@ -109,6 +115,16 @@ const AgentDashboardSidebar = () => {
     leads: '',
     rentRoll: arrearsCount > 0 ? String(arrearsCount) : '',
   };
+
+  // Build ACCOUNT_NAV with conditional Setup item
+  const ACCOUNT_NAV: NavItem[] = [
+    { title: 'My Agencies', url: '/dashboard/agencies', icon: Building2 },
+    ...(!onboardingComplete ? [{ title: 'Setup', url: '/dashboard/onboarding', icon: Settings2 }] : []),
+    { title: 'Billing', url: '/dashboard/billing', icon: CreditCard },
+    { title: 'Reviews', url: '/dashboard/reviews', icon: Star },
+    { title: 'Settings', url: '/dashboard/settings', icon: Settings },
+    { title: 'Help & FAQ', url: '/dashboard/help', icon: HelpCircle },
+  ];
 
   const ADMIN_NAV: NavItem[] = isAdmin ? [{ title: 'Admin Panel', url: '/admin', icon: Shield }] : [];
 
@@ -174,16 +190,16 @@ const AgentDashboardSidebar = () => {
         {!collapsed ? (
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">G</span>
+              <span className="text-primary-foreground font-bold text-sm">L</span>
             </div>
             <div>
-              <p className="font-display text-sm font-bold leading-none">Global Homes</p>
-              <p className="text-[10px] text-muted-foreground">Agent CRM</p>
+            <p className="font-display text-sm font-bold leading-none">ListHQ</p>
+            <p className="text-[10px] text-muted-foreground">Agent Platform</p>
             </div>
           </div>
         ) : (
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center mx-auto">
-            <span className="text-primary-foreground font-bold text-sm">G</span>
+            <span className="text-primary-foreground font-bold text-sm">L</span>
           </div>
         )}
       </SidebarHeader>

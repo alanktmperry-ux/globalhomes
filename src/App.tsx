@@ -67,6 +67,7 @@ const HelpPage = React.lazy(() => import("@/features/agents/components/dashboard
 const RentRollPage = React.lazy(() => import("@/features/agents/components/dashboard/RentRollPage"));
 const TenancyDetailPage = React.lazy(() => import("@/features/agents/components/dashboard/TenancyDetailPage"));
 const RentalApplicationsPage = React.lazy(() => import("@/features/agents/components/dashboard/RentalApplicationsPage"));
+const AgencyOnboardingPage = React.lazy(() => import("@/features/agents/pages/AgencyOnboardingPage"));
 
 const PageLoader = () => (
   <div className="flex h-screen w-full items-center justify-center bg-background">
@@ -154,6 +155,7 @@ const App = () => (
                   <Route path="tenancies/:tenancyId" element={<TenancyDetailPage />} />
                   <Route path="settings" element={<SettingsPage />} />
                   <Route path="help" element={<HelpPage />} />
+                  <Route path="onboarding" element={<AgencyOnboardingPage />} />
                 </Route>
 
                 {/* Admin */}

@@ -86,11 +86,6 @@ const StatCard = ({ icon: Icon, label, value, sub, color = 'bg-primary/10 text-p
 // Main Component
 // ──────────────────────────────────────────────
 const ReportsPage = () => {
-  const { canAccessTrust, loading: subLoading } = useSubscription();
-
-  if (!subLoading && !canAccessTrust) {
-    return <UpgradeGate requiredPlan="Pro or above" message="Advanced reports are available on the Pro plan and above. Export listings, leads, trust, and contacts data as CSV." />;
-  }
   const { listings } = useAgentListings();
   const { accounts, transactions } = useTrustAccounting();
   const { contacts } = useContacts();

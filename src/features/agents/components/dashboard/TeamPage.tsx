@@ -54,11 +54,6 @@ const accessBadgeClass: Record<string, string> = {
 
 const TeamPage = () => {
   const { user } = useAuth();
-  const { canAccessTeam, seatLimit, loading: subLoading } = useSubscription();
-
-  if (!subLoading && !canAccessTeam) {
-    return <UpgradeGate requiredPlan="Agency plan" message="Team management is available on the Agency plan. Invite up to 8 agents under one account with separate logins and centralised billing." />;
-  }
   const { toast } = useToast();
 
   const [agencyId, setAgencyId] = useState<string | null>(null);

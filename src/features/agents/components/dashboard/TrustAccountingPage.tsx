@@ -44,11 +44,6 @@ const STATUS_MAP: Record<string, { variant: 'default' | 'secondary' | 'outline' 
 
 const TrustAccountingPage = () => {
   const { user } = useAuth();
-  const { canAccessTrust, loading: subLoading } = useSubscription();
-
-  if (!subLoading && !canAccessTrust) {
-    return <UpgradeGate requiredPlan="Pro or above" message="Trust accounting is available on the Pro plan and above. Record deposits, manage client ledgers, generate compliance-ready statements, and import your opening balance from PropertyMe." />;
-  }
   const {
     accounts, transactions, contacts, properties, loading,
     fetchAccounts, fetchTransactions,

@@ -133,6 +133,7 @@ const App = () => (
                   <Route path="listings/:listingId" element={<ListingDetailPage />} />
                   <Route path="contacts" element={<ContactsPage />} />
                   <Route path="leads" element={<VoiceLeadsPage />} />
+                  <Route path="rental-applications" element={<RentalApplicationsPage />} />
                   <Route path="pipeline" element={<PipelinePage />} />
                   <Route path="inspection-mode" element={<InspectionModePage />} />
                   <Route path="settlements" element={<SettlementConcierge />} />

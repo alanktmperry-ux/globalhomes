@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { I18nProvider } from "@/shared/lib/i18n";
 import { CurrencyProvider } from "@/shared/lib/CurrencyContext";
 import { AuthProvider } from "@/features/auth/AuthProvider";
@@ -70,6 +70,12 @@ const PageLoader = () => (
   </div>
 );
 
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  React.useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+};
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -83,6 +89,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <ScrollToTop />
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 {/* Public */}

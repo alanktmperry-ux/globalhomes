@@ -10,7 +10,6 @@ import { AgentContactModal } from '@/features/agents/components/AgentContactModa
 import { InvestmentInsightsCard } from '@/features/properties/components/InvestmentInsightsCard';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useSavedProperties } from '@/features/properties/hooks/useSavedProperties';
-import { useSavedProperties } from '@/features/properties/hooks/useSavedProperties';
 import { useIsMobile } from '@/shared/hooks/use-mobile';
 import { mockProperties } from '@/features/properties/api/mock-data';
 import { supabase } from '@/integrations/supabase/client';

@@ -184,6 +184,11 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         estimatedRentalWeekly: prop.rental_weekly || 0,
         rentalWeekly: prop.listing_type === 'rent' ? (prop.rental_weekly || 0) : 0,
         rentalBondWeeks: 4,
+        availableFrom: (prop as any).available_from || '',
+        leaseTerm: (prop as any).lease_term || '12 months',
+        furnished: (prop as any).furnished || false,
+        petsAllowed: (prop as any).pets_allowed || false,
+        screeningLevel: 'Basic',
       });
       setLoadingEdit(false);
     };

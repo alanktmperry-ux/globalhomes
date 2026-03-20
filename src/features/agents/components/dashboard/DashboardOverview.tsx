@@ -300,6 +300,89 @@ const DashboardOverview = () => {
     }
   };
 
+  const handleQuickSendReport = async (prop: any) => {
+    setSendingReport(prop.id);
+    try {
+      const { data: agent } = await supabase
+        .from('agents')
+        .select('id, name, agency')
+        .eq('user_id', user?.id ?? '')
+        .maybeSingle();
+
+      const daysOnMarket = prop.listed_date
+        ? differenceInDays(new Date(), new Date(prop.listed_date))
+        : 0;
+      const totalViews = prop.views || 0;
+      const totalEnquiries = prop.contact_clicks || 0;
+
+      const reportHtml = `<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f4f4f5;font-family:-apple-system,sans-serif;">
+<div style="max-width:560px;margin:0 auto;padding:24px 16px;">
+  <div style="background:#1a2744;border-radius:12px;padding:20px;text-align:center;margin-bottom:16px;">
+    <div style="font-size:20px;font-weight:600;color:#fff;">ListHQ</div>
+    <div style="font-size:11px;color:#94a3b8;margin-top:3px;">Vendor Campaign Report</div>
+  </div>
+  <div style="background:#fff;border-radius:12px;padding:20px;margin-bottom:16px;">
+    <p style="font-size:14px;color:#333;margin:0 0 6px;">Hi ${prop.vendor_name},</p>
+    <p style="font-size:13px;color:#555;line-height:1.6;margin:0 0 4px;">Here is your weekly update for <strong>${prop.address}, ${prop.suburb}</strong>.</p>
+    <p style="font-size:12px;color:#888;margin:0;">Prepared by ${agent?.name || 'Your Agent'}${agent?.agency ? ` · ${agent.agency}` : ''}</p>
+  </div>
+  <table style="width:100%;border-collapse:separate;border-spacing:8px;margin-bottom:16px;">
+    <tr>
+      <td style="background:#fff;border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:600;color:#1a2744;">${totalViews.toLocaleString()}</div>
+        <div style="font-size:11px;color:#888;margin-top:3px;">Total views</div>
+      </td>
+      <td style="background:#fff;border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:600;color:#1a2744;">${totalEnquiries}</div>
+        <div style="font-size:11px;color:#888;margin-top:3px;">Enquiries</div>
+      </td>
+      <td style="background:#fff;border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:600;color:#1a2744;">${daysOnMarket}</div>
+        <div style="font-size:11px;color:#888;margin-top:3px;">Days listed</div>
+      </td>
+    </tr>
+  </table>
+  <div style="text-align:center;padding:8px 0;">
+    <p style="font-size:11px;color:#aaa;">Sent via ListHQ · Reply to this email with any questions.</p>
+  </div>
+</div></body></html>`;
+
+      const { error } = await supabase.functions.invoke(
+        'send-notification-email',
+        {
+          body: {
+            to: prop.vendor_email,
+            subject: `Weekly update — ${prop.address}`,
+            html: reportHtml,
+          },
+        }
+      );
+      if (error) throw error;
+
+      if (agent) {
+        await supabase.from('vendor_reports').insert({
+          property_id: prop.id,
+          agent_id: agent.id,
+          vendor_name: prop.vendor_name,
+          vendor_email: prop.vendor_email,
+          views_at_send: totalViews,
+          enquiries_at_send: totalEnquiries,
+          hot_leads_at_send: 0,
+          days_on_market_at_send: daysOnMarket,
+        });
+      }
+
+      setReportsDue(prev => prev.filter(p => p.id !== prop.id));
+      toast.success(`Report sent to ${prop.vendor_name}`);
+    } catch {
+      toast.error('Failed to send report');
+    } finally {
+      setSendingReport(null);
+    }
+  };
+
   // GCI values — real data; new users start at 0
   const gciActual = 0;
   const gciBudgeted = 0;

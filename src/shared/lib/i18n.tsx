@@ -85,7 +85,7 @@ const translations: Record<Language, Record<string, string>> = {
     'property.parking': '주차',
     'property.details': '매물 상세',
     'property.description': '설명',
-    'property.estimated': '예상 시세',
+    'property.estimated': '예상 시장 가치',
     'property.agent': '에이전트 정보',
     'property.contact': '에이전트 연락',
     'property.save': '저장',

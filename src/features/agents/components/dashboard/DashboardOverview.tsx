@@ -517,6 +517,74 @@ const DashboardOverview = () => {
           </motion.div>
         )}
 
+        {reportsDue.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-card border border-border border-l-4 border-l-primary rounded-xl p-5"
+          >
+            <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
+              <Mail size={16} className="text-primary" />
+              Vendor reports due
+              <Badge className="text-[10px] px-1.5 py-0 h-5 bg-primary/15 text-primary border-0">
+                {reportsDue.length}
+              </Badge>
+            </h3>
+            <div className="space-y-2">
+              {reportsDue.map((prop) => (
+                <div
+                  key={prop.id}
+                  className="flex items-center justify-between border border-border rounded-lg p-3"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium truncate">
+                      {prop.address}
+                      {prop.suburb ? `, ${prop.suburb}` : ''}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                      {prop.vendor_name
+                        ? `Vendor: ${prop.vendor_name}`
+                        : 'No vendor name set'}
+                      {' · '}
+                      {prop.views || 0} views
+                      {' · '}
+                      {prop.contact_clicks || 0} enquiries
+                    </p>
+                  </div>
+                  <div className="flex gap-1.5 ml-2 shrink-0">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-[10px] h-6 px-2"
+                      onClick={() =>
+                        navigate(
+                          `/dashboard/listings/${prop.id}?tab=marketing`
+                        )
+                      }
+                    >
+                      View
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="text-[10px] h-6 px-2 bg-primary hover:bg-primary/90"
+                      disabled={sendingReport === prop.id}
+                      onClick={() => handleQuickSendReport(prop)}
+                    >
+                      <Send size={10} className="mr-1" />
+                      {sendingReport === prop.id
+                        ? 'Sending...'
+                        : 'Send now'}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-3">
+              These listings have no vendor report sent in the last 7 days. Only listings with a vendor email on file are shown.
+            </p>
+          </motion.div>
+        )}
+
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}

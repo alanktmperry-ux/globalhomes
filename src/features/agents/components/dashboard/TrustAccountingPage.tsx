@@ -44,6 +44,7 @@ const STATUS_MAP: Record<string, { variant: 'default' | 'secondary' | 'outline' 
 
 const TrustAccountingPage = () => {
   const { user } = useAuth();
+  const { canAccessTrust, loading: subLoading } = useSubscription();
   const {
     accounts, transactions, contacts, properties, loading,
     fetchAccounts, fetchTransactions,

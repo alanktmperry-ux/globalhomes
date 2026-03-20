@@ -86,6 +86,7 @@ const StatCard = ({ icon: Icon, label, value, sub, color = 'bg-primary/10 text-p
 // Main Component
 // ──────────────────────────────────────────────
 const ReportsPage = () => {
+  const { canAccessTrust, loading: subLoading } = useSubscription();
   const { listings } = useAgentListings();
   const { accounts, transactions } = useTrustAccounting();
   const { contacts } = useContacts();

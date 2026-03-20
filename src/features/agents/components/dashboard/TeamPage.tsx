@@ -54,6 +54,7 @@ const accessBadgeClass: Record<string, string> = {
 
 const TeamPage = () => {
   const { user } = useAuth();
+  const { canAccessTeam, seatLimit, loading: subLoading } = useSubscription();
   const { toast } = useToast();
 
   const [agencyId, setAgencyId] = useState<string | null>(null);

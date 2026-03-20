@@ -45,6 +45,7 @@ const INTEREST_CONFIG: Record<InterestLevel, { label: string; icon: typeof Flame
 const InspectionModePage = () => {
   const { user } = useAuth();
 
+  const { canAccessInspections, loading: subLoading } = useSubscription();
   const [inspections] = useState<ScheduledInspection[]>(DEMO_INSPECTIONS);
   const [activeInspection, setActiveInspection] = useState<ScheduledInspection | null>(null);
   const [visitors, setVisitors] = useState<Visitor[]>([]);

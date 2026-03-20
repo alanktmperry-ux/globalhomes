@@ -58,7 +58,50 @@ const InspectionModePage = () => {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
 
-  const handleStartInspection = (inspection: ScheduledInspection) => {
+  // Fetch inspections from properties with inspection_times
+  useEffect(() => {
+    if (!user) return;
+    const fetchInspections = async () => {
+      setInspectionsLoading(true);
+      const { data: agent } = await supabase
+        .from('agents')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (!agent) { setInspections([]); setInspectionsLoading(false); return; }
+
+      const { data: props } = await supabase
+        .from('properties')
+        .select('id, address, suburb, inspection_times, views')
+        .eq('agent_id', agent.id)
+        .eq('is_active', true)
+        .not('inspection_times', 'is', null);
+
+      const today = format(new Date(), 'yyyy-MM-dd');
+      const mapped: ScheduledInspection[] = [];
+
+      for (const p of props || []) {
+        const slots = p.inspection_times as Array<{ date: string; start: string; end: string }> | null;
+        if (!slots || !Array.isArray(slots)) continue;
+        for (const slot of slots) {
+          if (slot.date === today) {
+            mapped.push({
+              propertyId: p.id,
+              address: `${p.address}, ${p.suburb}`,
+              time: slot.start,
+              expectedVisitors: p.views ? Math.min(Math.round(p.views / 50), 20) : 5,
+            });
+          }
+        }
+      }
+
+      setInspections(mapped);
+      setInspectionsLoading(false);
+    };
+    fetchInspections();
+  }, [user]);
+
+
     setActiveInspection(inspection);
     setVisitors([]);
     setShowSummary(false);

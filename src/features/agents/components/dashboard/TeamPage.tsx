@@ -793,6 +793,7 @@ const TeamPage = () => {
               <Button size="sm" onClick={() => setInviteDialogOpen(true)}>
                 <UserPlus size={14} className="mr-1.5" /> Create Code
               </Button>
+              </div>
             </div>
           )}
         </div>

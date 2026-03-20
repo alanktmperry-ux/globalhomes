@@ -5,9 +5,6 @@ import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/comp
 import { Progress } from '@/components/ui/progress';
 import { DEMO_REPUTATION, getScoreColor, REPUTATION_TOOLTIP, type ReputationResult } from '@/features/agents/utils/reputationScore';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { SiteHeader } from '@/shared/components/layout/SiteHeader';
-import { SiteFooter } from '@/shared/components/layout/SiteFooter';
-import { BottomNav } from '@/shared/components/layout/BottomNav';
 import { PropertyCard } from '@/features/properties/components/PropertyCard';
 import { useSavedProperties } from '@/features/properties/hooks/useSavedProperties';
 import { useI18n } from '@/shared/lib/i18n';
@@ -188,33 +185,26 @@ export default function AgentPublicProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
-        <SiteHeader />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-        </div>
+      <div className="flex-1 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!agent) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
-        <SiteHeader />
-        <div className="flex-1 flex flex-col items-center justify-center gap-4">
-          <Briefcase size={48} className="text-muted-foreground" />
-          <h1 className="font-display text-xl font-bold text-foreground">Agent not found</h1>
-          <button onClick={() => navigate('/')} className="px-6 py-2 rounded-xl bg-primary text-primary-foreground font-medium text-sm">
-            Back to search
-          </button>
-        </div>
+      <div className="flex-1 flex flex-col items-center justify-center gap-4">
+        <Briefcase size={48} className="text-muted-foreground" />
+        <h1 className="font-display text-xl font-bold text-foreground">Agent not found</h1>
+        <button onClick={() => navigate('/')} className="px-6 py-2 rounded-xl bg-primary text-primary-foreground font-medium text-sm">
+          Back to search
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <SiteHeader />
+    <div className="flex flex-col">
 
       <div className="max-w-5xl mx-auto w-full px-4 pt-4">
         <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
@@ -383,8 +373,6 @@ export default function AgentPublicProfilePage() {
         )}
       </main>
 
-      <SiteFooter />
-      <BottomNav />
     </div>
   );
 }

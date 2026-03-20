@@ -1,6 +1,4 @@
 import { Helmet } from 'react-helmet-async';
-import { SiteHeader } from '@/shared/components/layout/SiteHeader';
-import { SiteFooter } from '@/shared/components/layout/SiteFooter';
 
 const TermsPage = () => (
   <>
@@ -8,8 +6,7 @@ const TermsPage = () => (
       <title>Terms of Service | Global Homes</title>
       <meta name="description" content="Terms of Service for Global Homes, an Australian-based global real estate platform." />
     </Helmet>
-    <SiteHeader />
-    <main className="min-h-screen bg-background">
+    <main className="bg-background">
       <article className="max-w-3xl mx-auto px-4 py-16 prose prose-neutral dark:prose-invert">
         <h1 className="font-display text-3xl font-extrabold text-foreground">Terms of Service</h1>
         <p className="text-sm text-muted-foreground">Last updated: 18 March 2026</p>
@@ -89,7 +86,6 @@ const TermsPage = () => (
         </p>
       </article>
     </main>
-    <SiteFooter />
   </>
 );
 

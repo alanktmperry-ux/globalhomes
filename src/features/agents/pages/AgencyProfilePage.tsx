@@ -1,8 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { SiteHeader } from '@/shared/components/layout/SiteHeader';
-import { SiteFooter } from '@/shared/components/layout/SiteFooter';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -79,14 +77,11 @@ const AgencyProfilePage = () => {
 
   if (agencyLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <SiteHeader />
-        <div className="max-w-6xl mx-auto px-4 py-16 space-y-8">
-          <Skeleton className="h-48 w-full rounded-2xl" />
-          <Skeleton className="h-8 w-64" />
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-40 rounded-xl" />)}
-          </div>
+      <div className="max-w-6xl mx-auto px-4 py-16 space-y-8">
+        <Skeleton className="h-48 w-full rounded-2xl" />
+        <Skeleton className="h-8 w-64" />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => <Skeleton key={i} className="h-40 rounded-xl" />)}
         </div>
       </div>
     );
@@ -94,14 +89,10 @@ const AgencyProfilePage = () => {
 
   if (!agency) {
     return (
-      <div className="min-h-screen bg-background">
-        <SiteHeader />
-        <div className="max-w-6xl mx-auto px-4 py-24 text-center">
-          <Building2 className="mx-auto mb-4 text-muted-foreground" size={48} />
-          <h1 className="text-2xl font-display font-bold text-foreground mb-2">Agency not found</h1>
-          <p className="text-muted-foreground">The agency you're looking for doesn't exist.</p>
-        </div>
-        <SiteFooter />
+      <div className="max-w-6xl mx-auto px-4 py-24 text-center">
+        <Building2 className="mx-auto mb-4 text-muted-foreground" size={48} />
+        <h1 className="text-2xl font-display font-bold text-foreground mb-2">Agency not found</h1>
+        <p className="text-muted-foreground">The agency you're looking for doesn't exist.</p>
       </div>
     );
   }
@@ -109,8 +100,7 @@ const AgencyProfilePage = () => {
   const roleOrder: Record<string, number> = { owner: 0, admin: 1, agent: 2 };
 
   return (
-    <div className="min-h-screen bg-background">
-      <SiteHeader />
+    <div>
 
       {/* Hero / Branding */}
       <section className="relative bg-gradient-to-br from-primary/10 via-background to-accent/10 border-b border-border">
@@ -242,7 +232,7 @@ const AgencyProfilePage = () => {
         )}
       </section>
 
-      <SiteFooter />
+      
     </div>
   );
 };

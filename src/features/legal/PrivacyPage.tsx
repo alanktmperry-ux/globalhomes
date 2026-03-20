@@ -1,6 +1,4 @@
 import { Helmet } from 'react-helmet-async';
-import { SiteHeader } from '@/shared/components/layout/SiteHeader';
-import { SiteFooter } from '@/shared/components/layout/SiteFooter';
 
 const PrivacyPage = () => (
   <>
@@ -8,8 +6,7 @@ const PrivacyPage = () => (
       <title>Privacy Policy | Global Homes</title>
       <meta name="description" content="Privacy Policy for Global Homes — how we collect, use, and protect your personal information." />
     </Helmet>
-    <SiteHeader />
-    <main className="min-h-screen bg-background">
+    <main className="bg-background">
       <article className="max-w-3xl mx-auto px-4 py-16 prose prose-neutral dark:prose-invert">
         <h1 className="font-display text-3xl font-extrabold text-foreground">Privacy Policy</h1>
         <p className="text-sm text-muted-foreground">Last updated: 18 March 2026</p>
@@ -102,7 +99,6 @@ const PrivacyPage = () => (
         </p>
       </article>
     </main>
-    <SiteFooter />
   </>
 );
 

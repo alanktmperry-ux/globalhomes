@@ -66,6 +66,7 @@ const CommissionCalculator = React.lazy(() => import("@/features/agents/componen
 const HelpPage = React.lazy(() => import("@/features/agents/components/dashboard/HelpPage"));
 const RentRollPage = React.lazy(() => import("@/features/agents/components/dashboard/RentRollPage"));
 const TenancyDetailPage = React.lazy(() => import("@/features/agents/components/dashboard/TenancyDetailPage"));
+const RentalApplicationsPage = React.lazy(() => import("@/features/agents/components/dashboard/RentalApplicationsPage"));
 
 const PageLoader = () => (
   <div className="flex h-screen w-full items-center justify-center bg-background">

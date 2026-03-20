@@ -204,8 +204,7 @@ export default function AgentPublicProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <SiteHeader />
+    <div className="flex flex-col">
 
       <div className="max-w-5xl mx-auto w-full px-4 pt-4">
         <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">

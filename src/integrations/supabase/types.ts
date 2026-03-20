@@ -1445,6 +1445,8 @@ export type Database = {
           suburb: string
           title: string
           updated_at: string
+          vendor_email: string | null
+          vendor_name: string | null
           views: number
           year_built: number | null
           zoning: string | null
@@ -1496,6 +1498,8 @@ export type Database = {
           suburb: string
           title: string
           updated_at?: string
+          vendor_email?: string | null
+          vendor_name?: string | null
           views?: number
           year_built?: number | null
           zoning?: string | null
@@ -1547,6 +1551,8 @@ export type Database = {
           suburb?: string
           title?: string
           updated_at?: string
+          vendor_email?: string | null
+          vendor_name?: string | null
           views?: number
           year_built?: number | null
           zoning?: string | null
@@ -2550,6 +2556,60 @@ export type Database = {
         }
         Relationships: []
       }
+      vendor_reports: {
+        Row: {
+          agent_id: string
+          days_on_market_at_send: number
+          enquiries_at_send: number
+          hot_leads_at_send: number
+          id: string
+          property_id: string
+          sent_at: string
+          vendor_email: string
+          vendor_name: string
+          views_at_send: number
+        }
+        Insert: {
+          agent_id: string
+          days_on_market_at_send?: number
+          enquiries_at_send?: number
+          hot_leads_at_send?: number
+          id?: string
+          property_id: string
+          sent_at?: string
+          vendor_email: string
+          vendor_name: string
+          views_at_send?: number
+        }
+        Update: {
+          agent_id?: string
+          days_on_market_at_send?: number
+          enquiries_at_send?: number
+          hot_leads_at_send?: number
+          id?: string
+          property_id?: string
+          sent_at?: string
+          vendor_email?: string
+          vendor_name?: string
+          views_at_send?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_reports_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_reports_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       voice_searches: {
         Row: {
           audio_duration: number | null
@@ -2676,6 +2736,8 @@ export type Database = {
           suburb: string
           title: string
           updated_at: string
+          vendor_email: string | null
+          vendor_name: string | null
           views: number
           year_built: number | null
           zoning: string | null

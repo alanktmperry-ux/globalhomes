@@ -413,7 +413,7 @@ ${matterRows.length > 0 ? `
 </div>
 
 <div class="footer">
-  Generated ${today} • GlobalHomes Trust Accounting • Retain for minimum 5 years
+  Generated ${today} • ListHQ Trust Accounting • Retain for minimum 5 years
 </div>
 </body></html>`;
 

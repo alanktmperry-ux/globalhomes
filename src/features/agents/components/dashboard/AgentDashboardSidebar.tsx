@@ -178,8 +178,8 @@ const AgentDashboardSidebar = () => {
               <span className="text-primary-foreground font-bold text-sm">G</span>
             </div>
             <div>
-              <p className="font-display text-sm font-bold leading-none">Global Homes</p>
-              <p className="text-[10px] text-muted-foreground">Agent CRM</p>
+            <p className="font-display text-sm font-bold leading-none">ListHQ</p>
+            <p className="text-[10px] text-muted-foreground">Agent Platform</p>
             </div>
           </div>
         ) : (

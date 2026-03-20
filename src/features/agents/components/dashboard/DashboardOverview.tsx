@@ -52,6 +52,8 @@ const DashboardOverview = () => {
   const [pipelineEmpty, setPipelineEmpty] = useState(true);
   const [arrearsTenancies, setArrearsTenancies] = useState<any[]>([]);
   const [sendingReminder, setSendingReminder] = useState<string | null>(null);
+  const [reportsDue, setReportsDue] = useState<any[]>([]);
+  const [sendingReport, setSendingReport] = useState<string | null>(null);
 
   // Fetch tasks due today
   useEffect(() => {

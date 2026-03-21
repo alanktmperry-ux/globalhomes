@@ -59,13 +59,27 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   const [pastReports, setPastReports] = useState<any[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
   const [boostLoading, setBoostLoading] = useState<string | null>(null);
+  const [boostState, setBoostState] = useState<{
+    is_featured: boolean;
+    boost_tier: string | null;
+    boost_requested_at: string | null;
+    boost_requested_tier: string | null;
+    featured_until: string | null;
+  }>({
+    is_featured: listing.is_featured || false,
+    boost_tier: listing.boost_tier || null,
+    boost_requested_at: listing.boost_requested_at || null,
+    boost_requested_tier: listing.boost_requested_tier || null,
+    featured_until: listing.featured_until || null,
+  });
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   const [vendorName, setVendorName] = useState(listing.vendor_name || '');
   const [vendorEmail, setVendorEmail] = useState(listing.vendor_email || '');
   const [sending, setSending] = useState(false);
 
-  const isFeaturedActive = listing.is_featured && listing.featured_until && new Date(listing.featured_until) > new Date();
-  const isBoostPending = listing.boost_requested_at && !listing.is_featured;
+  const isFeaturedActive = boostState.is_featured && boostState.featured_until && new Date(boostState.featured_until) > new Date();
+  const isBoostPending = boostState.boost_requested_at && !boostState.is_featured;
 
   const BOOST_TIERS: Record<string, {
     label: string; price: number; priceLabel: string;
@@ -119,22 +133,32 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   };
 
   const handleCancelBoost = async () => {
-    const confirmed = window.confirm('Cancel this boost request? No charge has been made.');
-    if (!confirmed) return;
-    const { error } = await supabase
-      .from('properties')
-      .update({
-        boost_requested_at: null,
-        boost_requested_tier: null,
-        is_featured: false,
-        boost_tier: null,
-      } as any)
-      .eq('id', listing.id);
-    if (!error) {
-      toast.success('Boost cancelled');
-      window.location.reload();
-    } else {
-      toast.error('Could not cancel — email support@listhq.com.au');
+    setBoostLoading('cancelling');
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .update({
+          boost_requested_at: null,
+          boost_requested_tier: null,
+          is_featured: false,
+          boost_tier: null,
+        } as any)
+        .eq('id', listing.id);
+      if (!error) {
+        toast.success('Boost cancelled');
+        setBoostState({
+          is_featured: false,
+          boost_tier: null,
+          boost_requested_at: null,
+          boost_requested_tier: null,
+          featured_until: null,
+        });
+        setShowCancelConfirm(false);
+      } else {
+        toast.error('Could not cancel — email support@listhq.com.au');
+      }
+    } finally {
+      setBoostLoading(null);
     }
   };
 
@@ -237,7 +261,11 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
       });
 
       toast.success(`${tierData.label} boost requested! — We'll activate within 1 business hour.`);
-      window.location.reload();
+      setBoostState(prev => ({
+        ...prev,
+        boost_requested_at: new Date().toISOString(),
+        boost_requested_tier: tier,
+      }));
     } catch (e) {
       toast.error('Failed to submit boost request — please try again');
       console.error(e);
@@ -337,10 +365,10 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Badge className="bg-emerald-500/15 text-emerald-500 border-0 text-[10px]">● Active</Badge>
-                <span className="text-sm font-bold">{BOOST_TIERS[listing.boost_tier]?.label || 'Featured'} boost</span>
+                <span className="text-sm font-bold">{BOOST_TIERS[boostState.boost_tier || '']?.label || 'Featured'} boost</span>
               </div>
               <div className="text-right">
-                <span className="text-xl font-bold">{BOOST_TIERS[listing.boost_tier]?.priceLabel || '$49'}</span>
+                <span className="text-xl font-bold">{BOOST_TIERS[boostState.boost_tier || '']?.priceLabel || '$49'}</span>
                 <span className="text-xs text-muted-foreground">/month</span>
               </div>
             </div>
@@ -348,13 +376,13 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
             <p className="text-sm text-muted-foreground">
               Your listing is live in the featured grid shown to buyers searching near{' '}
               <span className="font-medium text-foreground">{listing.suburb}</span>.
-              {listing.featured_until
-                ? ` Active until ${format(parseISO(listing.featured_until), 'dd MMM yyyy')}.`
+              {boostState.featured_until
+                ? ` Active until ${format(parseISO(boostState.featured_until), 'dd MMM yyyy')}.`
                 : ''}
             </p>
 
             <ul className="space-y-1.5">
-              {(BOOST_TIERS[listing.boost_tier]?.inclusions || []).map((item, i) => (
+              {(BOOST_TIERS[boostState.boost_tier || '']?.inclusions || []).map((item, i) => (
                 <li key={i} className="text-xs text-muted-foreground flex items-center gap-2">
                   <span className="text-emerald-500">✓</span>
                   {item}
@@ -362,10 +390,30 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               ))}
             </ul>
 
-            <div className="flex items-center gap-3 pt-1">
-              <Button variant="outline" size="sm" className="text-xs text-destructive" onClick={handleCancelBoost}>
-                Cancel subscription
-              </Button>
+            <div className="pt-1">
+              {!showCancelConfirm ? (
+                <button
+                  onClick={() => setShowCancelConfirm(true)}
+                  className="text-xs text-muted-foreground hover:text-destructive transition-colors underline">
+                  Cancel subscription
+                </button>
+              ) : (
+                <div className="mt-2 p-3 bg-destructive/10 border border-destructive/20 rounded-xl">
+                  <p className="text-xs font-medium text-destructive mb-1">Cancel your boost?</p>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Your listing will be removed from the featured grid. No further charges after this billing period.
+                  </p>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="destructive" className="text-xs h-7" onClick={handleCancelBoost} disabled={!!boostLoading}>
+                      {boostLoading === 'cancelling' ? <Loader2 size={11} className="animate-spin mr-1"/> : null}
+                      Yes, cancel
+                    </Button>
+                    <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => setShowCancelConfirm(false)}>
+                      Keep boost
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
             <p className="text-[10px] text-muted-foreground">
               Cancelling stops renewal at end of current billing period. Questions?{' '}
@@ -378,12 +426,12 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               <div className="flex items-center gap-2">
                 <Badge className="bg-amber-500/15 text-amber-500 border-0 text-[10px]">Pending activation</Badge>
                 <span className="text-sm font-bold">
-                  {BOOST_TIERS[listing.boost_requested_tier]?.label || 'Featured'} boost
+                  {BOOST_TIERS[boostState.boost_requested_tier || '']?.label || 'Featured'} boost
                 </span>
               </div>
               <div className="text-right">
                 <span className="text-xl font-bold">
-                  {BOOST_TIERS[listing.boost_requested_tier]?.priceLabel || '$49'}
+                  {BOOST_TIERS[boostState.boost_requested_tier || '']?.priceLabel || '$49'}
                 </span>
                 <span className="text-xs text-muted-foreground">/month</span>
                 <p className="text-[10px] text-muted-foreground">charged on activation</p>
@@ -394,7 +442,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
 
             <div className="space-y-2">
               <p className="text-xs font-medium text-foreground">What you're getting</p>
-              {(BOOST_TIERS[listing.boost_requested_tier]?.inclusions || []).map((item, i) => (
+              {(BOOST_TIERS[boostState.boost_requested_tier || '']?.inclusions || []).map((item, i) => (
                 <p key={i} className="text-xs text-muted-foreground flex items-center gap-2">
                   <span className="text-emerald-500">✓</span>
                   {item}
@@ -408,7 +456,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                 'ListHQ team receives your request',
                 'We activate your boost — usually within 1 business hour',
                 'Your listing goes live in the featured grid near ' + listing.suburb,
-                'Your card is charged $' + (BOOST_TIERS[listing.boost_requested_tier]?.price || 49) + '/month from activation date',
+                'Your card is charged $' + (BOOST_TIERS[boostState.boost_requested_tier || '']?.price || 49) + '/month from activation date',
                 'Cancel anytime from this tab — no lock-in',
               ].map((step, i) => (
                 <p key={i} className="text-xs text-muted-foreground flex items-center gap-2">
@@ -420,9 +468,31 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               ))}
             </div>
 
-            <Button variant="outline" size="sm" className="text-xs text-destructive mt-2" onClick={handleCancelBoost}>
-              Cancel this request
-            </Button>
+            <div className="mt-2">
+              {!showCancelConfirm ? (
+                <button
+                  onClick={() => setShowCancelConfirm(true)}
+                  className="text-xs text-muted-foreground hover:text-destructive transition-colors underline">
+                  Cancel this request
+                </button>
+              ) : (
+                <div className="mt-2 p-3 bg-destructive/10 border border-destructive/20 rounded-xl">
+                  <p className="text-xs font-medium text-destructive mb-1">Cancel boost request?</p>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Your request will be withdrawn. No charge has been made.
+                  </p>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="destructive" className="text-xs h-7" onClick={handleCancelBoost} disabled={!!boostLoading}>
+                      {boostLoading === 'cancelling' ? <Loader2 size={11} className="animate-spin mr-1"/> : null}
+                      Yes, cancel
+                    </Button>
+                    <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => setShowCancelConfirm(false)}>
+                      Keep request
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
           </>
         ) : (
           <>

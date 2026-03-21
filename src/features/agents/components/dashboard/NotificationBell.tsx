@@ -162,8 +162,20 @@ export function NotificationBell() {
                         e.stopPropagation();
                         markAsRead(n.id);
                         setOpen(false);
-                        if (n.type === 'lead' || n.type === 'voice_match' || n.type === 'message') {
+                        if (
+                          n.type === 'boost_requested' ||
+                          n.type === 'boost_activated' ||
+                          n.type === 'boost_expiring'
+                        ) {
+                          if (n.property_id) {
+                            navigate(`/dashboard/listings/${n.property_id}?tab=marketing`);
+                          } else {
+                            navigate('/dashboard/listings');
+                          }
+                        } else if (n.type === 'lead' || n.type === 'voice_match' || n.type === 'message') {
                           navigate('/messages');
+                        } else if (n.property_id) {
+                          navigate(`/dashboard/listings/${n.property_id}`);
                         }
                       }}
                     >

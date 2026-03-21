@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Ban, Trash2, UserCheck, Loader2, Mail, Clock, Shield, Rocket, Eye, CheckSquare, Square, MinusSquare, UserCog, Settings, X, Check } from 'lucide-react';
+import { Search, Ban, Trash2, UserCheck, Loader2, Mail, Clock, Shield, Rocket, Eye, CheckSquare, Square, MinusSquare, UserCog, Settings, X, Check, Landmark, ShieldCheck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/shared/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
@@ -21,7 +21,8 @@ interface AuthUser {
   banned_until: string | null;
   display_name: string;
   provider: string;
-  user_type: 'agent' | 'seeker' | 'demo' | 'demo_request';
+  user_type: 'agent' | 'seeker' | 'demo' | 'demo_request' | 'partner';
+  is_partner_verified?: boolean;
   is_subscribed: boolean;
   plan_type: string | null;
   demo_status?: string;
@@ -47,6 +48,18 @@ const UserTypeBadge = ({ user }: { user: AuthUser }) => {
       <Badge variant="outline" className="bg-violet-500/15 text-violet-600 dark:text-violet-400 border-violet-500/30 text-[10px] font-medium">
         <Rocket className="h-2.5 w-2.5 mr-1" />
         Demo
+      </Badge>
+    );
+  }
+  if (user.user_type === 'partner') {
+    return (
+      <Badge variant="outline" className={`text-[10px] font-medium ${
+        user.is_partner_verified
+          ? 'bg-teal-500/15 text-teal-600 border-teal-500/30'
+          : 'bg-amber-500/15 text-amber-600 border-amber-500/30'
+      }`}>
+        <Landmark className="h-2.5 w-2.5 mr-1" />
+        {user.is_partner_verified ? 'Partner · Verified' : 'Partner · Pending'}
       </Badge>
     );
   }
@@ -219,6 +232,23 @@ const AdminUsers = () => {
     fetchUsers();
   };
 
+  const handleVerifyPartner = async (userId: string, verify: boolean) => {
+    setActionLoading(userId);
+    try {
+      await callAdminApi('verify_partner', { user_id: userId, verify });
+      toast({
+        title: verify ? 'Partner verified' : 'Partner unverified',
+        description: verify
+          ? 'They can now accept agency invitations.'
+          : 'Their access has been suspended.',
+      });
+    } catch (err: any) {
+      toast({ title: 'Failed', description: err.message, variant: 'destructive' });
+    }
+    setActionLoading(null);
+    fetchUsers();
+  };
+
   // Batch actions
   const handleBatchDelete = async () => {
     const count = selected.size;
@@ -286,6 +316,7 @@ const AdminUsers = () => {
       if (filterType === 'all') return true;
       if (filterType === 'demo') return u.user_type === 'demo' || u.user_type === 'demo_request';
       if (filterType === 'agent') return u.user_type === 'agent';
+      if (filterType === 'partner') return u.user_type === 'partner';
       if (filterType === 'seeker') return u.user_type === 'seeker';
       if (filterType === 'subscribed') return u.is_subscribed;
       return true;
@@ -315,6 +346,7 @@ const AdminUsers = () => {
 
   const demoCount = users.filter(u => u.user_type === 'demo' || u.user_type === 'demo_request').length;
   const agentCount = users.filter(u => u.user_type === 'agent').length;
+  const partnerCount = users.filter(u => u.user_type === 'partner').length;
   const subscribedCount = users.filter(u => u.is_subscribed).length;
 
   if (loading) {
@@ -338,6 +370,7 @@ const AdminUsers = () => {
           {[
             { key: 'all', label: `All (${users.length})` },
             { key: 'agent', label: `Agents (${agentCount})` },
+            { key: 'partner', label: `Partners (${partnerCount})` },
             { key: 'demo', label: `Demo (${demoCount})` },
             { key: 'subscribed', label: `Subscribed (${subscribedCount})` },
           ].map(f => (
@@ -515,6 +548,33 @@ const AdminUsers = () => {
                               onClick={() => handleDelete(u.id)}
                               className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
                               title="Delete demo request"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    ) : u.user_type === 'partner' ? (
+                      <div className="flex gap-1.5">
+                        {actionLoading === u.id ? (
+                          <Loader2 className="animate-spin text-muted-foreground" size={16} />
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => handleVerifyPartner(u.id, !u.is_partner_verified)}
+                              className={`p-1.5 rounded-lg transition-colors ${
+                                u.is_partner_verified
+                                  ? 'bg-amber-500/10 text-amber-500 hover:bg-amber-500/20'
+                                  : 'bg-teal-500/10 text-teal-600 hover:bg-teal-500/20'
+                              }`}
+                              title={u.is_partner_verified ? 'Unverify partner' : 'Verify partner'}
+                            >
+                              <ShieldCheck size={14} />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(u.id)}
+                              className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
+                              title="Delete partner"
                             >
                               <Trash2 size={14} />
                             </button>

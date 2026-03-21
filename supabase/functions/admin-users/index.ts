@@ -68,6 +68,16 @@ Deno.serve(async (req) => {
         .in("status", ["approved", "redeemed", "pending"])
         .order("created_at", { ascending: false });
 
+      // Fetch partners
+      const { data: partners } = await supabase
+        .from("partners")
+        .select("user_id, is_verified");
+
+      const partnerMap = new Map<string, any>();
+      for (const p of (partners || [])) {
+        partnerMap.set(p.user_id, p);
+      }
+
       // Build agent lookup by user_id
       const agentMap = new Map<string, any>();
       for (const a of (agents || [])) {
@@ -77,6 +87,8 @@ Deno.serve(async (req) => {
       // Map auth users
       const authUsers = data.users.map((u: any) => {
         const agent = agentMap.get(u.id);
+        const partnerRecord = partnerMap.get(u.id);
+        const isPartner = !!partnerRecord;
         const isDemo = agent?.is_demo || false;
         const isSubscribed = agent?.is_subscribed || false;
         const subscription = agent?.agent_subscriptions;
@@ -91,9 +103,10 @@ Deno.serve(async (req) => {
           banned_until: u.banned_until,
           display_name: u.user_metadata?.display_name || u.user_metadata?.full_name || u.email,
           provider: u.app_metadata?.provider || 'email',
-          user_type: isDemo ? 'demo' : (agent ? 'agent' : 'seeker'),
+          user_type: isPartner ? 'partner' : (isDemo ? 'demo' : (agent ? 'agent' : 'seeker')),
           is_subscribed: isSubscribed,
           plan_type: planType,
+          is_partner_verified: partnerRecord?.is_verified || false,
         };
       });
 
@@ -172,6 +185,37 @@ Deno.serve(async (req) => {
         .from("agents")
         .update({ is_subscribed: plan_type !== "demo" })
         .eq("id", agent.id);
+
+      return new Response(
+        JSON.stringify({ success: true }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (action === "verify_partner") {
+      const { user_id, verify } = await req.json();
+      const { data: partner, error: findErr } = await supabase
+        .from("partners")
+        .select("id")
+        .eq("user_id", user_id)
+        .maybeSingle();
+
+      if (findErr || !partner) {
+        return new Response(
+          JSON.stringify({ error: "Partner record not found" }),
+          { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const { error: updateErr } = await supabase
+        .from("partners")
+        .update({
+          is_verified: verify,
+          verified_at: verify ? new Date().toISOString() : null,
+        })
+        .eq("id", partner.id);
+
+      if (updateErr) throw updateErr;
 
       return new Response(
         JSON.stringify({ success: true }),

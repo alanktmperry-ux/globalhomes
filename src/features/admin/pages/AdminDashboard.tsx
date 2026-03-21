@@ -125,6 +125,25 @@ const AdminDashboard = () => {
     fetchData();
   };
 
+  const activateBoost = async (id: string, tier: 'featured' | 'premier', days: number) => {
+    const until = new Date();
+    until.setDate(until.getDate() + days);
+    const { error } = await supabase
+      .from('properties')
+      .update({
+        is_featured: true,
+        featured_until: until.toISOString(),
+        boost_tier: tier,
+        boost_requested_at: null,
+        boost_requested_tier: null,
+      } as any)
+      .eq('id', id);
+    if (!error) {
+      toast({ title: `${tier} boost activated for ${days} days` });
+      fetchData();
+    }
+  };
+
   if (authLoading || (!isAdmin && !authLoading)) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">

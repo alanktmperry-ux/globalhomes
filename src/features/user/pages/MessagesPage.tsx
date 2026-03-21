@@ -412,6 +412,24 @@ const MessagesPage = () => {
     return () => document.removeEventListener('mousedown', handler);
   }, [openMenuId]);
 
+  // Scroll input into view when iOS keyboard opens
+  useEffect(() => {
+    const input = inputRef.current;
+    if (!input) return;
+    const handleFocus = () => {
+      setTimeout(() => {
+        input.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 300);
+    };
+    input.addEventListener('focus', handleFocus);
+    return () => {
+      input.removeEventListener('focus', handleFocus);
+    };
+  }, [inputRef]);
+
   const handleArchive = async (convoId: string) => {
     if (!user || convoId.startsWith('lead-')) return;
     setOpenMenuId(null);
@@ -533,7 +551,7 @@ const MessagesPage = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.15 }}
-              className="flex-1 flex flex-col"
+              className="flex-1 flex flex-col overflow-hidden"
             >
               {/* Property context */}
               {selectedConvo.property_title && (
@@ -553,7 +571,7 @@ const MessagesPage = () => {
               )}
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2" style={{ maxHeight: 'calc(100vh - 240px)' }}>
+              <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2 pb-4" style={{ maxHeight: 'calc(100vh - 240px)' }}>
                 {selectedConvo.id.startsWith('lead-') && messages.length === 0 ? (
                   <div className="bg-secondary/50 rounded-2xl p-4 text-center">
                     <p className="text-sm text-muted-foreground">

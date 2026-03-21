@@ -1,9 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, CheckCircle, Clock, Building2, Inbox } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Loader2, CheckCircle, Clock, Building2, Inbox, Mail } from 'lucide-react';
+import { toast } from 'sonner';
+import { format } from 'date-fns';
 
 interface PartnerProfile {
   id: string;
@@ -13,39 +16,84 @@ interface PartnerProfile {
   contact_email: string;
 }
 
+interface PendingInvite {
+  id: string;
+  agency_id: string;
+  access_level: string;
+  invite_token: string;
+  invited_at: string;
+  agencies: { name: string } | null;
+}
+
+const ACCESS_LABELS: Record<string, string> = {
+  trust_only: 'Trust only',
+  trust_and_pm: 'Trust + PM',
+  full_pm: 'Full PM',
+};
+
 const PartnerOverviewPage = () => {
   const { user } = useAuth();
   const [partner, setPartner] = useState<PartnerProfile | null>(null);
   const [agencyCount, setAgencyCount] = useState(0);
+  const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([]);
   const [loading, setLoading] = useState(true);
+  const [acceptingId, setAcceptingId] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    if (!user) return;
+    setLoading(true);
+
+    const { data: p } = await supabase
+      .from('partners')
+      .select('id, company_name, is_verified, contact_name, contact_email')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (p) {
+      setPartner(p as unknown as PartnerProfile);
+
+      const { count } = await supabase
+        .from('partner_agencies')
+        .select('id', { count: 'exact', head: true })
+        .eq('partner_id', (p as any).id)
+        .eq('status', 'active');
+
+      setAgencyCount(count || 0);
+
+      // Fetch pending invites
+      const { data: invites } = await supabase
+        .from('partner_agencies')
+        .select('id, agency_id, access_level, invite_token, invited_at, agencies(name)')
+        .eq('partner_id', (p as any).id)
+        .eq('status', 'pending')
+        .order('invited_at', { ascending: false });
+
+      if (invites) setPendingInvites(invites as unknown as PendingInvite[]);
+    }
+
+    setLoading(false);
+  }, [user]);
 
   useEffect(() => {
-    if (!user) return;
-    const fetchData = async () => {
-      setLoading(true);
-
-      const { data: p } = await supabase
-        .from('partners')
-        .select('id, company_name, is_verified, contact_name, contact_email')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (p) {
-        setPartner(p as unknown as PartnerProfile);
-
-        const { count } = await supabase
-          .from('partner_agencies')
-          .select('id', { count: 'exact', head: true })
-          .eq('partner_id', (p as any).id)
-          .eq('status', 'active');
-
-        setAgencyCount(count || 0);
-      }
-
-      setLoading(false);
-    };
     fetchData();
-  }, [user]);
+  }, [fetchData]);
+
+  const handleAcceptInvite = async (invite: PendingInvite) => {
+    setAcceptingId(invite.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('accept-partner-invite', {
+        body: { token: invite.invite_token },
+      });
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
+
+      toast.success(`You now have access to ${invite.agencies?.name || 'the agency'}`);
+      await fetchData();
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+    setAcceptingId(null);
+  };
 
   if (loading) {
     return (
@@ -103,6 +151,44 @@ const PartnerOverviewPage = () => {
         </Card>
       )}
 
+      {/* Pending invitations */}
+      {pendingInvites.length > 0 && (
+        <div className="mb-8">
+          <h2 className="font-display text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+            <Mail size={18} className="text-primary" />
+            Pending invitations
+          </h2>
+          <div className="space-y-3">
+            {pendingInvites.map((invite) => (
+              <Card key={invite.id} className="border-primary/20">
+                <CardContent className="flex items-center gap-4 py-4">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <Building2 size={18} className="text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground">{invite.agencies?.name || 'Unknown agency'}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Invited {format(new Date(invite.invited_at), 'dd/MM/yyyy')} · {ACCESS_LABELS[invite.access_level] || invite.access_level}
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={() => handleAcceptInvite(invite)}
+                    disabled={acceptingId === invite.id}
+                  >
+                    {acceptingId === invite.id ? (
+                      <><Loader2 className="animate-spin mr-1" size={14} /> Accepting…</>
+                    ) : (
+                      'Accept'
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
         <Card>
@@ -130,7 +216,7 @@ const PartnerOverviewPage = () => {
       </div>
 
       {/* Empty state */}
-      {agencyCount === 0 && (
+      {agencyCount === 0 && pendingInvites.length === 0 && (
         <Card className="border-dashed">
           <CardContent className="py-12 text-center">
             <Inbox className="mx-auto text-muted-foreground mb-4" size={40} />

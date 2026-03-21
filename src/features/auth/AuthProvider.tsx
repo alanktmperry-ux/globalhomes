@@ -9,7 +9,8 @@ interface AuthContextType {
   loading: boolean;
   isAgent: boolean;
   isAdmin: boolean;
-  userRole: 'user' | 'agent' | 'admin' | null;
+  isPartner: boolean;
+  userRole: 'user' | 'agent' | 'admin' | 'partner' | null;
   signOut: () => Promise<void>;
   impersonating: boolean;
   impersonatedUser: string | null;
@@ -23,6 +24,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   isAgent: false,
   isAdmin: false,
+  isPartner: false,
   userRole: null,
   signOut: async () => {},
   impersonating: false,
@@ -39,7 +41,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [isAgent, setIsAgent] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [userRole, setUserRole] = useState<'user' | 'agent' | 'admin' | null>(null);
+  const [isPartner, setIsPartner] = useState(false);
+  const [userRole, setUserRole] = useState<'user' | 'agent' | 'admin' | 'partner' | null>(null);
   const [rolesFetched, setRolesFetched] = useState(false);
   const lastFetchedUserId = useRef<string | null>(null);
   const [impersonating, setImpersonating] = useState(false);
@@ -83,8 +86,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     console.log('[Auth] applyRoles:', roles);
     setIsAdmin(roles.includes('admin'));
     setIsAgent(roles.includes('agent') || roles.includes('admin'));
+    setIsPartner(roles.includes('partner'));
     setUserRole(
-      roles.includes('admin') ? 'admin' : roles.includes('agent') ? 'agent' : 'user'
+      roles.includes('admin') ? 'admin' : roles.includes('agent') ? 'agent' : roles.includes('partner') ? 'partner' : 'user'
     );
   }, []);
 
@@ -92,6 +96,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     lastFetchedUserId.current = null;
     setIsAgent(false);
     setIsAdmin(false);
+    setIsPartner(false);
     setUserRole(null);
     setRolesFetched(false);
   }, []);
@@ -190,7 +195,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{
-      user, session, loading, isAgent, isAdmin, userRole, signOut,
+      user, session, loading, isAgent, isAdmin, isPartner, userRole, signOut,
       impersonating, impersonatedUser, startImpersonation, stopImpersonation,
     }}>
       {children}

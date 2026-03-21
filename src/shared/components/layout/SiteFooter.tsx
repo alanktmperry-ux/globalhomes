@@ -72,7 +72,7 @@ export function SiteFooter() {
               <Globe size={20} className="text-primary-foreground" />
             </div>
             <span className="font-display text-lg font-bold text-foreground tracking-tight">
-              Global Homes
+              ListHQ
             </span>
           </div>
           <div className="flex items-center gap-3">

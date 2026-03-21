@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, Search, Loader2, X, ChevronDown, MapPin } from 'lucide-react';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { Skeleton } from '@/components/ui/skeleton';
 import { SoundWaveVisualizer } from './SoundWaveVisualizer';
 import { parsePropertyQuery, filtersToChips } from '@/features/search/lib/parsePropertyQuery';
 import { useToast } from '@/shared/hooks/use-toast';
@@ -9,6 +10,7 @@ import { autocomplete, getPlaceDetails } from '@/shared/lib/googleMapsService';
 import { useNavigate } from 'react-router-dom';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { useI18n } from '@/shared/lib/i18n';
+import { supabase } from '@/integrations/supabase/client';
 
 type VoiceState = 'idle' | 'listening' | 'processing' | 'results';
 
@@ -155,6 +157,75 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
   const isSupported = typeof window !== 'undefined' &&
     ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+
+  // ── Dynamic featured listings ──
+  const [featuredListings, setFeaturedListings] = useState<any[]>([]);
+  const [featuredLoading, setFeaturedLoading] = useState(true);
+  const [featuredFallback, setFeaturedFallback] = useState(false);
+  const userLocationRef = useRef<{lat:number;lng:number} | null>(null);
+
+  const fetchFeatured = useCallback(async (lat?: number, lng?: number) => {
+    setFeaturedLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('get-featured-listings', {
+        body: { lat, lng, radius_km: 100 },
+      });
+      if (error || !data) throw error;
+      if (data.fallback || !data.featured?.length) {
+        setFeaturedFallback(true);
+        setFeaturedListings([]);
+      } else {
+        setFeaturedFallback(false);
+        setFeaturedListings(data.featured);
+      }
+    } catch {
+      setFeaturedFallback(true);
+      setFeaturedListings([]);
+    } finally {
+      setFeaturedLoading(false);
+    }
+  }, []);
+
+  // Fetch featured on mount with optional geolocation
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          userLocationRef.current = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          fetchFeatured(pos.coords.latitude, pos.coords.longitude);
+        },
+        () => { fetchFeatured(); },
+        { timeout: 5000, maximumAge: 300000 }
+      );
+    } else {
+      fetchFeatured();
+    }
+  }, [fetchFeatured]);
+
+  // Re-fetch featured when search location changes
+  useEffect(() => {
+    const handler = (e: any) => {
+      if (e.detail?.lat && e.detail?.lng) {
+        fetchFeatured(e.detail.lat, e.detail.lng);
+      }
+    };
+    window.addEventListener('search-location-confirmed', handler);
+    return () => window.removeEventListener('search-location-confirmed', handler);
+  }, [fetchFeatured]);
+
+  const displayFeatured = featuredFallback || featuredListings.length === 0
+    ? FEATURED_PROPERTIES
+    : featuredListings.map((p: any) => ({
+        id: p.id,
+        price: p.price_formatted,
+        address: p.address,
+        suburb: `${p.suburb} ${p.state || ''}`.trim(),
+        beds: p.beds,
+        baths: p.baths,
+        cars: p.parking,
+        tag: p.boost_tier === 'premier' ? 'Premier' : 'Featured',
+        img: p.image_url || p.images?.[0] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&q=70',
+      }));
 
   // Rotating language ticker
   useEffect(() => {
@@ -664,23 +735,27 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
           {/* Top large photo */}
           <div className="relative rounded-2xl overflow-hidden group cursor-pointer">
-            <img src={FEATURED_PROPERTIES[0].img} alt={FEATURED_PROPERTIES[0].address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+            {featuredLoading ? (
+              <Skeleton className="absolute inset-0 w-full h-full" />
+            ) : (
+              <img src={displayFeatured[0]?.img} alt={displayFeatured[0]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+            )}
             <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.7) 100%)'}} />
 
             <div className="absolute top-3 left-3">
               <span className="text-[9px] font-bold px-2.5 py-1 rounded-full text-white bg-foreground/80 backdrop-blur-sm">
-                {FEATURED_PROPERTIES[0].tag}
+                {displayFeatured[0]?.tag}
               </span>
             </div>
 
             <div className="absolute bottom-0 left-0 right-0 p-4">
               <div className="text-white font-extrabold text-lg leading-tight">
-                {FEATURED_PROPERTIES[0].price}
+                {displayFeatured[0]?.price}
               </div>
               <div className="text-white/75 text-[11px] mt-0.5">
-                {FEATURED_PROPERTIES[0].address}
+                {displayFeatured[0]?.address}
                 {' · '}
-                {FEATURED_PROPERTIES[0].suburb}
+                {displayFeatured[0]?.suburb}
               </div>
             </div>
           </div>
@@ -689,21 +764,25 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
           <div className="grid grid-cols-2 gap-2">
             {[1, 2].map(i => (
               <div key={i} className="relative rounded-2xl overflow-hidden group cursor-pointer">
-                <img src={FEATURED_PROPERTIES[i].img} alt={FEATURED_PROPERTIES[i].address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                {featuredLoading ? (
+                  <Skeleton className="absolute inset-0 w-full h-full" />
+                ) : (
+                  <img src={displayFeatured[i]?.img} alt={displayFeatured[i]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                )}
                 <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 30%,rgba(0,0,0,0.65) 100%)'}} />
 
                 <div className="absolute top-2.5 left-2.5">
                   <span className="text-[9px] font-bold px-2 py-0.5 rounded-full text-white bg-foreground/80 backdrop-blur-sm">
-                    {FEATURED_PROPERTIES[i].tag}
+                    {displayFeatured[i]?.tag}
                   </span>
                 </div>
 
                 <div className="absolute bottom-0 left-0 right-0 p-3">
                   <div className="text-white font-bold text-sm leading-tight">
-                    {FEATURED_PROPERTIES[i].price}
+                    {displayFeatured[i]?.price}
                   </div>
                   <div className="text-white/65 text-[10px] mt-0.5">
-                    {FEATURED_PROPERTIES[i].suburb}
+                    {displayFeatured[i]?.suburb}
                   </div>
                 </div>
               </div>
@@ -746,37 +825,41 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
           {/* Large hero card */}
           <div className="row-span-2 relative rounded-2xl overflow-hidden cursor-pointer group" style={{ minHeight: '280px' }}>
-            <img src={FEATURED_PROPERTIES[3].img} alt={FEATURED_PROPERTIES[3].address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            {featuredLoading ? (
+              <Skeleton className="absolute inset-0 w-full h-full" />
+            ) : (
+              <img src={displayFeatured[3 % displayFeatured.length]?.img} alt={displayFeatured[3 % displayFeatured.length]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            )}
             <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 30%,rgba(0,0,0,0.72) 100%)'}} />
             <span className="absolute top-3 left-3 text-[9px] font-bold px-2.5 py-1 rounded-full text-white bg-foreground/80">
-              {FEATURED_PROPERTIES[3].tag}
+              {displayFeatured[3 % displayFeatured.length]?.tag}
             </span>
             <div className="absolute bottom-0 left-0 right-0 p-4">
               <div className="text-white font-extrabold text-lg leading-tight mb-0.5" style={{textShadow: '0 1px 6px rgba(0,0,0,0.4)'}}>
-                {FEATURED_PROPERTIES[3].price}
+                {displayFeatured[3 % displayFeatured.length]?.price}
               </div>
               <div className="text-white/90 text-xs font-semibold mb-0.5">
-                {FEATURED_PROPERTIES[3].address}
+                {displayFeatured[3 % displayFeatured.length]?.address}
               </div>
               <div className="text-white/60 text-[10px] mb-2">
-                {FEATURED_PROPERTIES[3].suburb}
+                {displayFeatured[3 % displayFeatured.length]?.suburb}
               </div>
               <div className="flex gap-2 text-[10px] text-white/70">
                 <span>
-                  {FEATURED_PROPERTIES[3].beds} bed
+                  {displayFeatured[3 % displayFeatured.length]?.beds} bed
                 </span>
                 <span className="text-white/30">
                   ·
                 </span>
                 <span>
-                  {FEATURED_PROPERTIES[3].baths}
+                  {displayFeatured[3 % displayFeatured.length]?.baths}
                   {' bath'}
                 </span>
                 <span className="text-white/30">
                   ·
                 </span>
                 <span>
-                  {FEATURED_PROPERTIES[3].cars}
+                  {displayFeatured[3 % displayFeatured.length]?.cars}
                   {' car'}
                 </span>
               </div>
@@ -784,20 +867,32 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
           </div>
 
           {/* Four smaller cards */}
-          {[4, 5, 0, 1].map((pi, i) => (
-            <div key={i} className="relative rounded-2xl overflow-hidden cursor-pointer group" style={{ height: '134px' }}>
-              <img src={FEATURED_PROPERTIES[pi].img} alt={FEATURED_PROPERTIES[pi].address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 25%,rgba(0,0,0,0.65) 100%)'}} />
-              <div className="absolute bottom-0 left-0 right-0 p-3">
-                <div className="text-white font-bold text-sm leading-tight">
-                  {FEATURED_PROPERTIES[pi].price}
-                </div>
-                <div className="text-white/70 text-[10px] mt-0.5">
-                  {FEATURED_PROPERTIES[pi].suburb}
+          {[4, 5, 0, 1].map((pi, i) => {
+            const idx = pi % displayFeatured.length;
+            return (
+              <div key={i} className="relative rounded-2xl overflow-hidden cursor-pointer group" style={{ height: '134px' }}>
+                {featuredLoading ? (
+                  <Skeleton className="absolute inset-0 w-full h-full" />
+                ) : (
+                  <img src={displayFeatured[idx]?.img} alt={displayFeatured[idx]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                )}
+                <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 25%,rgba(0,0,0,0.65) 100%)'}} />
+                {displayFeatured[idx]?.tag && (
+                  <span className="absolute top-2 left-2 text-[8px] font-bold px-2 py-0.5 rounded-full text-white bg-foreground/80 backdrop-blur-sm">
+                    {displayFeatured[idx].tag}
+                  </span>
+                )}
+                <div className="absolute bottom-0 left-0 right-0 p-3">
+                  <div className="text-white font-bold text-sm leading-tight">
+                    {displayFeatured[idx]?.price}
+                  </div>
+                  <div className="text-white/70 text-[10px] mt-0.5">
+                    {displayFeatured[idx]?.suburb}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

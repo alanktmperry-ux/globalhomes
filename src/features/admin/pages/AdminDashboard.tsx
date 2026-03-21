@@ -30,6 +30,11 @@ interface PropertyRow {
   is_active: boolean;
   views: number;
   created_at: string;
+  is_featured: boolean;
+  featured_until: string | null;
+  boost_tier: string | null;
+  boost_requested_at: string | null;
+  boost_requested_tier: string | null;
 }
 
 const AdminDashboard = () => {
@@ -91,7 +96,7 @@ const AdminDashboard = () => {
     }));
     setUsers(userRows);
 
-    const { data: propData } = await supabase.from('properties').select('id, title, address, suburb, price_formatted, is_active, views, created_at').order('created_at', { ascending: false }).limit(100);
+    const { data: propData } = await supabase.from('properties').select('id, title, address, suburb, price_formatted, is_active, views, created_at, is_featured, featured_until, boost_tier, boost_requested_at, boost_requested_tier').order('created_at', { ascending: false }).limit(100);
     setProperties(propData || []);
     setLoading(false);
   };
@@ -118,6 +123,25 @@ const AdminDashboard = () => {
     await supabase.from('properties').update({ is_active: !isActive }).eq('id', propId);
     toast({ title: isActive ? 'Listing deactivated' : 'Listing activated' });
     fetchData();
+  };
+
+  const activateBoost = async (id: string, tier: 'featured' | 'premier', days: number) => {
+    const until = new Date();
+    until.setDate(until.getDate() + days);
+    const { error } = await supabase
+      .from('properties')
+      .update({
+        is_featured: true,
+        featured_until: until.toISOString(),
+        boost_tier: tier,
+        boost_requested_at: null,
+        boost_requested_tier: null,
+      } as any)
+      .eq('id', id);
+    if (!error) {
+      toast({ title: `${tier} boost activated for ${days} days` });
+      fetchData();
+    }
   };
 
   if (authLoading || (!isAdmin && !authLoading)) {
@@ -184,7 +208,7 @@ const AdminDashboard = () => {
           <>
             {tab === 'overview' && <AdminOverview stats={stats} users={users} />}
             {tab === 'users' && <AdminUsers />}
-            {tab === 'listings' && <AdminListings properties={properties} onToggleActive={togglePropertyActive} />}
+            {tab === 'listings' && <AdminListings properties={properties} onToggleActive={togglePropertyActive} onActivateBoost={activateBoost} />}
             {tab === 'roles' && <AdminRoles users={users} searchQuery={searchQuery} onSearchChange={setSearchQuery} onRoleChange={handleRoleChange} />}
             {tab === 'database' && <AdminDatabase />}
             {tab === 'demo-requests' && <AdminDemoRequests onPendingCountChange={setPendingDemoCount} />}

@@ -1577,6 +1577,9 @@ export type Database = {
           available_from: string | null
           baths: number
           beds: number
+          boost_requested_at: string | null
+          boost_requested_tier: string | null
+          boost_tier: string | null
           bushfire_zone: boolean | null
           commission_rate: number | null
           contact_clicks: number
@@ -1586,6 +1589,7 @@ export type Database = {
           currency_code: string | null
           description: string | null
           estimated_value: string | null
+          featured_until: string | null
           features: string[] | null
           flood_zone: boolean | null
           furnished: boolean | null
@@ -1594,6 +1598,7 @@ export type Database = {
           images: string[] | null
           inspection_times: Json | null
           is_active: boolean
+          is_featured: boolean
           land_size: number | null
           lat: number | null
           lease_term: string | null
@@ -1630,6 +1635,9 @@ export type Database = {
           available_from?: string | null
           baths?: number
           beds?: number
+          boost_requested_at?: string | null
+          boost_requested_tier?: string | null
+          boost_tier?: string | null
           bushfire_zone?: boolean | null
           commission_rate?: number | null
           contact_clicks?: number
@@ -1639,6 +1647,7 @@ export type Database = {
           currency_code?: string | null
           description?: string | null
           estimated_value?: string | null
+          featured_until?: string | null
           features?: string[] | null
           flood_zone?: boolean | null
           furnished?: boolean | null
@@ -1647,6 +1656,7 @@ export type Database = {
           images?: string[] | null
           inspection_times?: Json | null
           is_active?: boolean
+          is_featured?: boolean
           land_size?: number | null
           lat?: number | null
           lease_term?: string | null
@@ -1683,6 +1693,9 @@ export type Database = {
           available_from?: string | null
           baths?: number
           beds?: number
+          boost_requested_at?: string | null
+          boost_requested_tier?: string | null
+          boost_tier?: string | null
           bushfire_zone?: boolean | null
           commission_rate?: number | null
           contact_clicks?: number
@@ -1692,6 +1705,7 @@ export type Database = {
           currency_code?: string | null
           description?: string | null
           estimated_value?: string | null
+          featured_until?: string | null
           features?: string[] | null
           flood_zone?: boolean | null
           furnished?: boolean | null
@@ -1700,6 +1714,7 @@ export type Database = {
           images?: string[] | null
           inspection_times?: Json | null
           is_active?: boolean
+          is_featured?: boolean
           land_size?: number | null
           lat?: number | null
           lease_term?: string | null
@@ -2825,6 +2840,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      expire_featured_listings: { Args: never; Returns: undefined }
       get_suburb_rental_stats: {
         Args: {
           _beds?: number
@@ -2876,6 +2892,9 @@ export type Database = {
           available_from: string | null
           baths: number
           beds: number
+          boost_requested_at: string | null
+          boost_requested_tier: string | null
+          boost_tier: string | null
           bushfire_zone: boolean | null
           commission_rate: number | null
           contact_clicks: number
@@ -2885,6 +2904,7 @@ export type Database = {
           currency_code: string | null
           description: string | null
           estimated_value: string | null
+          featured_until: string | null
           features: string[] | null
           flood_zone: boolean | null
           furnished: boolean | null
@@ -2893,6 +2913,7 @@ export type Database = {
           images: string[] | null
           inspection_times: Json | null
           is_active: boolean
+          is_featured: boolean
           land_size: number | null
           lat: number | null
           lease_term: string | null

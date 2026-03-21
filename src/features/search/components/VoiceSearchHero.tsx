@@ -513,7 +513,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
           {/* Stacked headline */}
           <div className="mb-6">
             <h1 className="font-display text-[38px] md:text-[52px] font-extrabold leading-[1.05] tracking-tight text-foreground">
-              Find
+              Home.
             </h1>
 
             {/* Rotating gradient line */}

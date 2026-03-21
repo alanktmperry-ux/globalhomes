@@ -707,7 +707,7 @@ const HelpPage = () => {
           <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 flex items-start gap-3">
             <AlertTriangle size={18} className="text-amber-600 flex-shrink-0 mt-0.5" />
             <p className="text-xs text-muted-foreground">
-              During the founding period, some features shown in this guide are still being rolled out. If a feature described here is not yet visible in your dashboard, it will appear in a future update. Check your billing plan to confirm which features are included.
+              ListHQ is updated regularly with new features. If a feature described here is not yet visible in your dashboard, it will appear in an upcoming update. Check your billing plan to confirm which features are included in your subscription.
             </p>
           </div>
 

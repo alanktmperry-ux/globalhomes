@@ -435,6 +435,28 @@ const Index = () => {
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
+        {/* Collab button */}
+        {!isCollab && user && (
+          <button
+            onClick={() => createSession({
+              query: lastSearch?.query || '',
+              filters: filters as Record<string, any>,
+              center: searchCenter
+                ? { lat: searchCenter.lat, lng: searchCenter.lng }
+                : undefined,
+            })}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors shrink-0"
+          >
+            <Users size={12} />
+            Search together
+          </button>
+        )}
+        {isCollab && (
+          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold text-primary shrink-0">
+            <Users size={12} />
+            Collab active
+          </span>
+        )}
         {/* Save this search */}
         {hasSearched && (
           <button

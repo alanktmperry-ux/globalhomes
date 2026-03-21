@@ -456,7 +456,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                 'ListHQ team receives your request',
                 'We activate your boost — usually within 1 business hour',
                 'Your listing goes live in the featured grid near ' + listing.suburb,
-                'Your card is charged $' + (BOOST_TIERS[listing.boost_requested_tier]?.price || 49) + '/month from activation date',
+                'Your card is charged $' + (BOOST_TIERS[boostState.boost_requested_tier || '']?.price || 49) + '/month from activation date',
                 'Cancel anytime from this tab — no lock-in',
               ].map((step, i) => (
                 <p key={i} className="text-xs text-muted-foreground flex items-center gap-2">

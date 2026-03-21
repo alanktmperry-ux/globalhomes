@@ -12,6 +12,7 @@ import { fetchPublicProperties } from '@/features/properties/api/fetchPublicProp
 
 const SavedPage = () => {
   const { t } = useI18n();
+  const navigate = useNavigate();
   const { savedIds, isSaved, toggleSaved } = useSavedProperties();
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [dbProperties, setDbProperties] = useState<Property[]>([]);

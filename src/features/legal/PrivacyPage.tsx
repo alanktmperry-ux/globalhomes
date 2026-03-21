@@ -89,8 +89,8 @@ const PrivacyPage = () => (
         <h2>11. Contact & Complaints</h2>
         <p>
           For privacy enquiries or complaints, contact our Privacy Officer at{' '}
-          <a href="mailto:privacy@globalhomes.com.au" className="text-primary hover:underline">
-            privacy@globalhomes.com.au
+          <a href="mailto:privacy@listhq.com.au" className="text-primary hover:underline">
+            privacy@listhq.com.au
           </a>.
           If you are not satisfied with our response, you may lodge a complaint with the{' '}
           <a href="https://www.oaic.gov.au" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">

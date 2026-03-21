@@ -80,8 +80,8 @@ const TermsPage = () => (
         <h2>11. Contact</h2>
         <p>
           Questions about these terms can be directed to{' '}
-          <a href="mailto:legal@globalhomes.com.au" className="text-primary hover:underline">
-            legal@globalhomes.com.au
+          <a href="mailto:legal@listhq.com.au" className="text-primary hover:underline">
+            legal@listhq.com.au
           </a>.
         </p>
       </article>

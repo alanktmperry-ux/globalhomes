@@ -195,7 +195,7 @@ function buildWelcomeEmailHtml(agentName: string) {
   </ul>
   <p style="font-size:15px;color:#333;margin:0 0 24px;">We'll email you as soon as your account is approved. In the meantime, feel free to explore the platform.</p>
   <div style="text-align:center;margin:28px 0;">
-    <a href="https://globalhomes.lovable.app/agent-auth" style="display:inline-block;background:#16a34a;color:#fff;font-size:14px;font-weight:600;padding:12px 32px;border-radius:10px;text-decoration:none;">Sign In to Your Dashboard</a>
+    <a href="https://listhq.lovable.app/agent-auth" style="display:inline-block;background:#16a34a;color:#fff;font-size:14px;font-weight:600;padding:12px 32px;border-radius:10px;text-decoration:none;">Sign In to Your Dashboard</a>
   </div>
   <div style="border-top:1px solid #eee;padding-top:20px;margin-top:32px;text-align:center;">
     <p style="font-size:11px;color:#aaa;margin:0;">Questions? Reply to this email or contact our support team.</p>
@@ -228,7 +228,7 @@ function buildAdminNewAgentHtml(params: { agentName: string; agentAgency: string
     </table>
   </div>
   <div style="text-align:center;margin:28px 0;">
-    <a href="https://globalhomes.lovable.app/admin" style="display:inline-block;background:#2563eb;color:#fff;font-size:14px;font-weight:600;padding:12px 32px;border-radius:10px;text-decoration:none;">Review in Admin Dashboard</a>
+    <a href="https://listhq.lovable.app/admin" style="display:inline-block;background:#2563eb;color:#fff;font-size:14px;font-weight:600;padding:12px 32px;border-radius:10px;text-decoration:none;">Review in Admin Dashboard</a>
   </div>
   <div style="border-top:1px solid #eee;padding-top:20px;margin-top:32px;text-align:center;">
     <p style="font-size:11px;color:#aaa;margin:0;">This is an automated notification from ListHQ.</p>
@@ -279,11 +279,11 @@ function buildLeadEventEmailHtml(params: {
     </div>` : ''}
   </div>` : ''}
   <div style="text-align:center;margin:28px 0;">
-    <a href="https://globalhomes.lovable.app/dashboard/leads" style="display:inline-block;background:${accentColor};color:#fff;font-size:14px;font-weight:600;padding:12px 32px;border-radius:10px;text-decoration:none;">View in Dashboard</a>
+    <a href="https://listhq.lovable.app/dashboard/leads" style="display:inline-block;background:${accentColor};color:#fff;font-size:14px;font-weight:600;padding:12px 32px;border-radius:10px;text-decoration:none;">View in Dashboard</a>
   </div>
   <div style="border-top:1px solid #eee;padding-top:20px;margin-top:32px;text-align:center;">
     <p style="font-size:11px;color:#aaa;margin:0;">You're receiving this because you're a registered agent on ListHQ.</p>
-    <p style="font-size:11px;color:#aaa;margin:4px 0 0;">Manage notification preferences in your <a href="https://globalhomes.lovable.app/dashboard/settings" style="color:#888;">dashboard settings</a>.</p>
+    <p style="font-size:11px;color:#aaa;margin:4px 0 0;">Manage notification preferences in your <a href="https://listhq.lovable.app/dashboard/settings" style="color:#888;">dashboard settings</a>.</p>
   </div>
 </div>
 </body></html>`;

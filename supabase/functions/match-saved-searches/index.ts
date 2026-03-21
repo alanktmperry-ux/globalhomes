@@ -209,7 +209,7 @@ function buildAlertEmail(params: {
       ${propertyCards}
 
       <div style="text-align:center;margin-top:24px;">
-        <a href="https://globalhomes.lovable.app" style="display:inline-block;background:#2563EB;color:#fff;font-size:14px;font-weight:600;padding:12px 32px;border-radius:10px;text-decoration:none;">View All Matches</a>
+        <a href="https://listhq.lovable.app" style="display:inline-block;background:#2563EB;color:#fff;font-size:14px;font-weight:600;padding:12px 32px;border-radius:10px;text-decoration:none;">View All Matches</a>
       </div>
     </div>
 

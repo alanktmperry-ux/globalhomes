@@ -299,7 +299,10 @@ const AgentDashboardSidebar = () => {
         </div>
 
         <div
-          onClick={() => navigate('/dashboard')}
+          onClick={() => {
+            navigate('/dashboard');
+            if (isMobile) setOpenMobile(false);
+          }}
           className={`flex items-center gap-2.5 px-3 py-2 mx-2 rounded-lg text-sm cursor-pointer transition-colors mb-1 ${
             location.pathname === '/dashboard'
               ? 'bg-secondary text-foreground font-medium'

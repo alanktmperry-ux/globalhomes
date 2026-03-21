@@ -46,8 +46,18 @@ const SavedPage = () => {
           </div>
         ) : savedProperties.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-            <Heart size={40} strokeWidth={1.2} className="mb-3" />
-            <p className="text-sm">{t('saved.empty')}</p>
+            <Heart size={40} strokeWidth={1.2} className="mb-3 text-border" />
+            <p className="text-sm font-medium text-foreground mb-1">
+              No saved properties yet
+            </p>
+            <p className="text-xs text-muted-foreground mb-6 text-center max-w-[200px]">
+              Tap the heart on any listing to save it for later
+            </p>
+            <button
+              onClick={() => navigate('/')}
+              className="px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity">
+              Browse properties
+            </button>
           </div>
         ) : (
           <div className="space-y-4">

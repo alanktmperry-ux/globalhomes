@@ -521,36 +521,57 @@ const AdminUsers = () => {
                           </>
                         )}
                       </div>
+                    ) : u.user_type === 'agent' ? (
+                      <div className="flex gap-1.5">
+                        {actionLoading === u.id ? (
+                          <Loader2 className="animate-spin text-muted-foreground" size={16} />
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => handleOpenSubModal(u)}
+                              className="p-1.5 rounded-lg bg-violet-500/10 text-violet-500 hover:bg-violet-500/20 transition-colors"
+                              title="Manage subscription"
+                            >
+                              <Settings size={14} />
+                            </button>
+                            <button
+                              onClick={() => handleImpersonate(u.id, u.email)}
+                              className="p-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                              title="Act as this user"
+                            >
+                              <UserCog size={14} />
+                            </button>
+                            <button
+                              onClick={() => handleBan(u.id, !u.banned_until)}
+                              className={`p-1.5 rounded-lg transition-colors ${
+                                u.banned_until ? 'bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20' : 'bg-amber-500/10 text-amber-500 hover:bg-amber-500/20'
+                              }`}
+                              title={u.banned_until ? 'Unban' : 'Ban'}
+                            >
+                              {u.banned_until ? <UserCheck size={14} /> : <Ban size={14} />}
+                            </button>
+                            <button
+                              onClick={() => handleDelete(u.id)}
+                              className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
+                              title="Delete user"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </>
+                        )}
+                      </div>
                     ) : (
                       <div className="flex gap-1.5">
                         {actionLoading === u.id ? (
                           <Loader2 className="animate-spin text-muted-foreground" size={16} />
                         ) : (
                           <>
-                            {u.user_type === 'agent' && (
-                              <button
-                                onClick={() => handleOpenSubModal(u)}
-                                className="p-1.5 rounded-lg bg-violet-500/10 text-violet-500 hover:bg-violet-500/20 transition-colors"
-                                title="Manage subscription"
-                              >
-                                <Settings size={14} />
-                              </button>
-                            )}
-                            {u.user_type === 'agent' && (
-                              <button
-                                onClick={() => handleImpersonate(u.id, u.email)}
-                                className="p-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-                                title="Act as this user"
-                              >
-                                <UserCog size={14} />
-                              </button>
-                            )}
                             <button
                               onClick={() => handleBan(u.id, !u.banned_until)}
                               className={`p-1.5 rounded-lg transition-colors ${
                                 u.banned_until ? 'bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20' : 'bg-amber-500/10 text-amber-500 hover:bg-amber-500/20'
                               }`}
-                              title={u.banned_until ? 'Unban user' : 'Ban user'}
+                              title={u.banned_until ? 'Unban' : 'Ban'}
                             >
                               {u.banned_until ? <UserCheck size={14} /> : <Ban size={14} />}
                             </button>

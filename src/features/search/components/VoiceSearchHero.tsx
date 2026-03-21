@@ -459,7 +459,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
           {/* Rule + subline + search */}
           <div className="max-w-md">
 
-            <div className="w-10 h-px bg-border mb-4" />
+            <div className="w-10 h-[2px] bg-foreground/20 mb-5" />
 
             <p className="text-[13px] text-muted-foreground leading-relaxed mb-5">
               AI voice search across Australia.

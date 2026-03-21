@@ -441,7 +441,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
             <p className="text-xs text-muted-foreground">
               Appear in the featured grid shown to buyers searching near{' '}
               <span className="font-medium text-foreground">{listing.suburb}</span>.
-              Monthly subscription — cancel anytime from this tab.
+              One-off payment — 30 days of featured placement.
             </p>
 
             {showPaymentStep && (() => {

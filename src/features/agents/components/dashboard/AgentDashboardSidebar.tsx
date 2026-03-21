@@ -105,19 +105,35 @@ const AgentDashboardSidebar = () => {
 
   useEffect(() => {
     if (!user) return;
-    supabase
-      .from('agents')
-      .select('company_logo_url, name, agency')
-      .eq('user_id', user.id)
-      .single()
-      .then(({ data }) => {
-        if (data) {
-          setAgentLogo(data.company_logo_url || null);
-          setAgentName(data.name || null);
-          setAgencyName(data.agency || null);
-        }
-      });
-  }, [user]);
+    const fetchAgentInfo = () => {
+      supabase
+        .from('agents')
+        .select('company_logo_url, name, agency, agency_id')
+        .eq('user_id', user.id)
+        .single()
+        .then(async ({ data }) => {
+          if (data) {
+            setAgentLogo(data.company_logo_url || null);
+            setAgentName(data.name || null);
+            // Prefer agency name from agencies table if linked
+            if (data.agency_id) {
+              const { data: agencyData } = await supabase
+                .from('agencies')
+                .select('name')
+                .eq('id', data.agency_id)
+                .single();
+              setAgencyName(agencyData?.name || data.agency || null);
+            } else {
+              setAgencyName(data.agency || null);
+            }
+          }
+        });
+    };
+    fetchAgentInfo();
+    // Refetch when navigating back to catch profile edits
+    const interval = setInterval(fetchAgentInfo, 30000);
+    return () => clearInterval(interval);
+  }, [user, location.pathname]);
 
   // Check onboarding status
   useEffect(() => {

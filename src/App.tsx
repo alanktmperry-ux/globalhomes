@@ -68,7 +68,9 @@ const RentRollPage = React.lazy(() => import("@/features/agents/components/dashb
 const TenancyDetailPage = React.lazy(() => import("@/features/agents/components/dashboard/TenancyDetailPage"));
 const RentalApplicationsPage = React.lazy(() => import("@/features/agents/components/dashboard/RentalApplicationsPage"));
 const AgencyOnboardingPage = React.lazy(() => import("@/features/agents/pages/AgencyOnboardingPage"));
-
+const PartnerAuthPage = React.lazy(() => import("./features/partners/pages/PartnerAuthPage"));
+const PartnerDashboardLayout = React.lazy(() => import("./features/partners/pages/PartnerDashboardLayout"));
+const PartnerOverviewPage = React.lazy(() => import("./features/partners/pages/PartnerOverviewPage"));
 const PageLoader = () => (
   <div className="flex h-screen w-full items-center justify-center bg-background">
     <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -176,6 +178,12 @@ const App = () => (
                   <Route path="settings" element={<SettingsPage />} />
                   <Route path="help" element={<HelpPage />} />
                   <Route path="onboarding" element={<AgencyOnboardingPage />} />
+                </Route>
+
+                {/* Partner */}
+                <Route path="/partner/login" element={<PartnerAuthPage />} />
+                <Route path="/partner" element={<PartnerDashboardLayout />}>
+                  <Route path="dashboard" element={<PartnerOverviewPage />} />
                 </Route>
 
                 {/* Admin */}

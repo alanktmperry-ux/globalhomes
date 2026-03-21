@@ -71,6 +71,8 @@ const AgencyOnboardingPage = React.lazy(() => import("@/features/agents/pages/Ag
 const PartnerAuthPage = React.lazy(() => import("./features/partners/pages/PartnerAuthPage"));
 const PartnerDashboardLayout = React.lazy(() => import("./features/partners/pages/PartnerDashboardLayout"));
 const PartnerOverviewPage = React.lazy(() => import("./features/partners/pages/PartnerOverviewPage"));
+const PartnerAcceptPage = React.lazy(() => import("./features/partners/pages/PartnerAcceptPage"));
+const PartnerAccessPage = React.lazy(() => import("./features/agents/components/dashboard/PartnerAccessPage"));
 const PageLoader = () => (
   <div className="flex h-screen w-full items-center justify-center bg-background">
     <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />

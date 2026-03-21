@@ -155,7 +155,7 @@ const App = () => (
                 <Route path="/agent-dashboard" element={<ProtectedRoute><AgentPerformanceDashboard /></ProtectedRoute>} />
                 <Route path="/agent-portal" element={<ProtectedRoute><AgentPortalPage /></ProtectedRoute>} />
                 <Route path="/pocket-listing" element={<ProtectedRoute><PocketListingPage /></ProtectedRoute>} />
-                <Route path="/dashboard" element={<AgentDashboardLayout />}>
+                <Route path="/dashboard" element={<ProtectedRoute><AgentDashboardLayout /></ProtectedRoute>}>
                   <Route index element={<DashboardOverview />} />
                   <Route path="profile" element={<AgentProfilePage />} />
                   <Route path="territory" element={<TerritoryPage />} />

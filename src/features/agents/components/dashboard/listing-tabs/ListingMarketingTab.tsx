@@ -426,7 +426,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               <div className="flex items-center gap-2">
                 <Badge className="bg-amber-500/15 text-amber-500 border-0 text-[10px]">Pending activation</Badge>
                 <span className="text-sm font-bold">
-                  {BOOST_TIERS[listing.boost_requested_tier]?.label || 'Featured'} boost
+                  {BOOST_TIERS[boostState.boost_requested_tier || '']?.label || 'Featured'} boost
                 </span>
               </div>
               <div className="text-right">

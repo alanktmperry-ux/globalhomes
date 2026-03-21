@@ -481,6 +481,15 @@ const AdminUsers = () => {
                           <Loader2 className="animate-spin text-muted-foreground" size={16} />
                         ) : (
                           <>
+                            {u.user_type === 'agent' && (
+                              <button
+                                onClick={() => handleImpersonate(u.id, u.email)}
+                                className="p-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                                title="Act as this user"
+                              >
+                                <UserCog size={14} />
+                              </button>
+                            )}
                             <button
                               onClick={() => handleBan(u.id, !u.banned_until)}
                               className={`p-1.5 rounded-lg transition-colors ${

@@ -113,6 +113,7 @@ const App = () => (
           
           <Sonner />
           <BrowserRouter>
+            <ImpersonationBanner />
             <ScrollToTop />
             <Suspense fallback={<PageLoader />}>
               <Routes>

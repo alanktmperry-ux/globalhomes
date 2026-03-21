@@ -12,7 +12,8 @@ import {
 import {
   Eye, MessageCircle, Calendar,
   DollarSign, Mail, Flame, Clock,
-  ChevronRight, Send, Loader2
+  ChevronRight, Send, Loader2,
+  Zap, Star, CheckCircle2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -57,10 +58,14 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   >([]);
   const [pastReports, setPastReports] = useState<any[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
+  const [boostRequesting, setBoostRequesting] = useState(false);
 
   const [vendorName, setVendorName] = useState(listing.vendor_name || '');
   const [vendorEmail, setVendorEmail] = useState(listing.vendor_email || '');
   const [sending, setSending] = useState(false);
+
+  const isFeaturedActive = listing.is_featured && listing.featured_until && new Date(listing.featured_until) > new Date();
+  const isBoostPending = listing.boost_requested_at && !listing.is_featured;
 
   useEffect(() => {
     const load = async () => {
@@ -121,6 +126,51 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
       : daysOnMarket <= 42
       ? 'text-amber-500'
       : 'text-destructive';
+
+  const handleRequestBoost = async (tier: 'featured' | 'premier') => {
+    setBoostRequesting(true);
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .update({
+          boost_requested_at: new Date().toISOString(),
+          boost_requested_tier: tier,
+        } as any)
+        .eq('id', listing.id);
+
+      if (error) throw error;
+
+      // Get agent info for notification email
+      const { data: agent } = await supabase
+        .from('agents')
+        .select('name, email')
+        .eq('user_id', user?.id ?? '')
+        .maybeSingle();
+
+      // Send notification email to admin
+      await supabase.functions.invoke('send-notification-email', {
+        body: {
+          to: 'alan@everythingeco.com.au',
+          subject: `Boost request: ${listing.address} — ${tier} — ${agent?.name || 'Unknown agent'}`,
+          html: `<p><strong>Boost Request</strong></p>
+            <p><strong>Property:</strong> ${listing.address}, ${listing.suburb}</p>
+            <p><strong>Tier:</strong> ${tier}</p>
+            <p><strong>Agent:</strong> ${agent?.name || 'Unknown'} (${agent?.email || 'N/A'})</p>
+            <p><strong>Property ID:</strong> ${listing.id}</p>`,
+        },
+      });
+
+      // Update local listing state
+      listing.boost_requested_at = new Date().toISOString();
+      listing.boost_requested_tier = tier;
+
+      toast.success("Boost request sent — we'll activate your listing within 1 business hour.");
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to request boost — please try again.');
+    }
+    setBoostRequesting(false);
+  };
 
   const handleSendReport = async () => {
     if (!vendorName.trim() || !vendorEmail.trim()) {
@@ -206,6 +256,99 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
 
   return (
     <div className="space-y-6">
+      {/* ── BOOST SECTION ── */}
+      <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+        {isFeaturedActive ? (
+          <>
+            <div className="flex items-center gap-2">
+              <Badge className="bg-teal-500/15 text-teal-500 border-0 text-[10px]">Active</Badge>
+              <Badge variant="outline" className="text-[10px]">
+                {listing.boost_tier === 'premier' ? 'Premier' : 'Featured'}
+              </Badge>
+            </div>
+            <p className="text-sm font-medium text-foreground">
+              This listing is featured until {format(parseISO(listing.featured_until), 'dd MMM yyyy')}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Your listing is appearing in the featured grid to buyers searching near {listing.suburb}.
+            </p>
+          </>
+        ) : isBoostPending ? (
+          <>
+            <div className="flex items-center gap-2">
+              <Badge className="bg-amber-500/15 text-amber-500 border-0 text-[10px]">Pending</Badge>
+            </div>
+            <p className="text-sm font-medium text-foreground">
+              Boost request received — {listing.boost_requested_tier === 'premier' ? 'Premier' : 'Featured'} · Requested {format(parseISO(listing.boost_requested_at), 'dd MMM yyyy')}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              We will activate your boost within 1 business hour. Questions? Email alan@everythingeco.com.au
+            </p>
+          </>
+        ) : (
+          <>
+            <div className="flex items-center gap-2 mb-1">
+              <Zap size={16} className="text-primary" />
+              <h3 className="text-sm font-bold">Boost this listing</h3>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Appear in the featured listings grid shown to buyers searching near {listing.suburb}.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+              {/* Featured card */}
+              <div className="border border-border rounded-xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold">Featured</span>
+                  <span className="text-sm font-bold text-foreground">$299</span>
+                </div>
+                <ul className="space-y-1.5 text-xs text-muted-foreground">
+                  <li className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-primary shrink-0" /> Featured badge on your listing</li>
+                  <li className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-primary shrink-0" /> Homepage featured grid (30 days)</li>
+                  <li className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-primary shrink-0" /> Shown to buyers near {listing.suburb}</li>
+                  <li className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-primary shrink-0" /> Higher search placement</li>
+                </ul>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="w-full gap-2"
+                  disabled={boostRequesting}
+                  onClick={() => handleRequestBoost('featured')}
+                >
+                  {boostRequesting ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} />}
+                  Request Featured
+                </Button>
+              </div>
+              {/* Premier card */}
+              <div className="border-2 border-primary rounded-xl p-4 space-y-3 relative">
+                <span className="absolute -top-2.5 right-3 text-[9px] font-bold px-2 py-0.5 rounded-full bg-primary text-primary-foreground">Most popular</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold">Premier</span>
+                  <span className="text-sm font-bold text-foreground">$599</span>
+                </div>
+                <ul className="space-y-1.5 text-xs text-muted-foreground">
+                  <li className="flex items-center gap-1.5"><Star size={12} className="text-primary shrink-0" /> Everything in Featured</li>
+                  <li className="flex items-center gap-1.5"><Star size={12} className="text-primary shrink-0" /> Top of search results in {listing.suburb}</li>
+                  <li className="flex items-center gap-1.5"><Star size={12} className="text-primary shrink-0" /> Email alert to matching saved searches</li>
+                  <li className="flex items-center gap-1.5"><Star size={12} className="text-primary shrink-0" /> Hero image slot on homepage (30 days)</li>
+                </ul>
+                <Button
+                  size="sm"
+                  className="w-full gap-2"
+                  disabled={boostRequesting}
+                  onClick={() => handleRequestBoost('premier')}
+                >
+                  {boostRequesting ? <Loader2 size={14} className="animate-spin" /> : <Star size={14} />}
+                  Request Premier
+                </Button>
+              </div>
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-2">
+              Payment processed on activation. Boosts activate within 1 business hour.
+            </p>
+          </>
+        )}
+      </div>
+
       {/* ── STAT CARDS ── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {loadingStats ? (
@@ -499,36 +642,22 @@ function buildVendorReportHtml(params: {
 
   ${last7.some(d => d.views > 0) ? `
   <div style="background:#ffffff;border-radius:16px;padding:20px 24px;margin-bottom:16px;">
-    <div style="font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:12px;">Views — last 7 days</div>
+    <div style="font-size:14px;font-weight:700;color:#1a1a2e;margin-bottom:12px;">Views — last 7 days</div>
     <table style="width:100%;border-collapse:collapse;height:60px;">
       <tr>${sparkRows}</tr>
     </table>
-  </div>
-  ` : ''}
+  </div>` : ''}
 
-  <div style="background:#ffffff;border-radius:16px;padding:20px 24px;margin-bottom:16px;">
-    <div style="font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:12px;">Listing details</div>
-    <table style="width:100%;border-collapse:collapse;">
-      <tr>
-        <td style="padding:6px 0;font-size:12px;color:#888;">Asking price</td>
-        <td style="padding:6px 0;font-size:13px;color:#1a1a2e;font-weight:600;text-align:right;">${listingPrice}</td>
-      </tr>
-      <tr>
-        <td style="padding:6px 0;font-size:12px;color:#888;">Marketing budget</td>
-        <td style="padding:6px 0;font-size:13px;color:#1a1a2e;font-weight:600;text-align:right;">${AUD_EMAIL.format(budget)}</td>
-      </tr>
-      <tr>
-        <td style="padding:6px 0;font-size:12px;color:#888;">Days on market</td>
-        <td style="padding:6px 0;font-size:13px;color:#1a1a2e;font-weight:600;text-align:right;">${daysOnMarket} days</td>
-      </tr>
-    </table>
-  </div>
+  ${listingPrice ? `
+  <div style="background:#ffffff;border-radius:16px;padding:16px 24px;margin-bottom:16px;">
+    <span style="font-size:12px;color:#888;">Listing price:</span>
+    <span style="font-size:14px;font-weight:700;color:#1a1a2e;margin-left:8px;">${listingPrice}</span>
+    ${budget > 0 ? `<span style="font-size:12px;color:#888;margin-left:16px;">Budget: ${AUD_EMAIL.format(budget)}</span>` : ''}
+  </div>` : ''}
 
-  <div style="text-align:center;padding:20px 0;">
-    <p style="font-size:11px;color:#aaa;margin:0;">Sent via ListHQ · Questions? Reply to this email.</p>
-    <p style="font-size:11px;color:#aaa;margin:4px 0 0;">© ListHQ Pty Ltd · Australia</p>
+  <div style="text-align:center;padding:16px 0;">
+    <div style="font-size:11px;color:#aaa;">Sent via ListHQ · globalhomes.lovable.app</div>
   </div>
-
 </div>
 </body></html>`;
 }

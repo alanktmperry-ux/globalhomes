@@ -573,6 +573,10 @@ const Index = () => {
           centerOn={mapCenter}
           onScrollToProperty={scrollToProperty}
           formatPrice={formatPrice}
+          onGeolocate={(loc) => {
+            setSearchCenter({ lat: loc.lat, lng: loc.lng });
+            setMapCenter({ lat: loc.lat, lng: loc.lng, key: `geo-${loc.lat}-${loc.lng}` });
+          }}
         />
       </Suspense>
     </MapErrorBoundary>
@@ -584,10 +588,14 @@ const Index = () => {
         <VoiceSearchHero
           onSearch={handleSearch}
           onLocationSelect={(loc) => {
-            console.log('[Index] Location selected:', loc);
             setMapCenter({ lat: loc.lat, lng: loc.lng, key: `${loc.lat}-${loc.lng}` });
             setSearchCenter({ lat: loc.lat, lng: loc.lng });
             setMapCollapsed(false);
+            // Auto-apply 10km radius if none selected
+            // so property list filters to the location
+            if (!searchRadius) {
+              setSearchRadius(10);
+            }
           }}
           onRadiusChange={setSearchRadius}
           selectedRadius={searchRadius}

@@ -343,11 +343,23 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
     setSuggestions([]);
     setShowSuggestions(false);
     setTranscript(suggestion.description);
-    processTranscript(suggestion.description);
+
+    // Parse filters and set chips from the text
+    const filters = parsePropertyQuery(suggestion.description);
+    const chips = filtersToChips(filters);
+    setFilterChips(chips);
+    setEditableTranscript(suggestion.description);
+    setVoiceState('processing');
+
+    // Trigger the search
+    onSearch(suggestion.description);
+
+    // Use place_id for accurate coordinates — skip geocodeLocation to avoid double call
     if (onLocationSelect) {
       const details = await getPlaceDetails(suggestion.place_id);
       if (details) onLocationSelect(details);
     }
+
     setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
   };
 

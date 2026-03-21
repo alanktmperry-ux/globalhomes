@@ -33,10 +33,11 @@ interface PropertyMapProps {
   onMapMoved?: (bounds: { north: number; south: number; east: number; west: number }) => void;
   onScrollToProperty?: (propertyId: string) => void;
   formatPrice?: (audPrice: number, listingType?: string) => string;
+  onGeolocate?: (location: { lat: number; lng: number }) => void;
 }
 
 export function PropertyMap({
-  properties, onPropertySelect, selectedPropertyId, onAreaSearch, centerOn, onMapMoved, onScrollToProperty, formatPrice,
+  properties, onPropertySelect, selectedPropertyId, onAreaSearch, centerOn, onMapMoved, onScrollToProperty, formatPrice, onGeolocate,
 }: PropertyMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
@@ -338,6 +339,12 @@ export function PropertyMap({
         if (map) {
           map.panTo({ lat: pos.coords.latitude, lng: pos.coords.longitude });
           map.setZoom(14);
+        }
+        if (onGeolocate) {
+          onGeolocate({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          });
         }
         setLocating(false);
       },

@@ -319,6 +319,35 @@ const GUIDES: Guide[] = [
       'If you suspect unauthorised access, go to Settings immediately, change your password, and contact support at support@listhq.com.au.',
     ],
   },
+  {
+    emoji: '👫',
+    title: 'Collab Search — Browsing Together',
+    description: 'Share a live search session with a partner, client, or co-buyer.',
+    steps: [
+      'Collab Search lets two people browse the same properties in real time from different devices. Both people see the same results, can react to properties, and can see what the other has already viewed. Perfect for couples searching together, buyers with a partner overseas, or agents browsing with a client.',
+      'To start a session: search for a property or suburb on the homepage. Once results appear, tap the Together button in the results toolbar (next to the Save and Filter buttons). A shareable link is automatically copied to your clipboard.',
+      'Share the link with your partner via WhatsApp, SMS, or email. When they open the link on their device, you are both instantly in the same live Collab session. A "Searching together" badge appears in the toolbar on both screens.',
+      'While in a Collab session, tap any property card to react — use thumbs up (👍), thumbs down (👎), or fire (🔥) to signal your interest. Your partner sees your reactions in real time on their screen.',
+      'Properties your partner has already viewed are marked with a small indicator on the card so you know what they have seen.',
+      'The session stays active as long as both people have the link. If your partner closes the browser, they can re-open the same link to rejoin the session. The session preserves the original search query and filters.',
+      'To end the session, simply close the tab or navigate away. Collab sessions do not expire — the link remains valid.',
+      'Note: you need to be signed in to start a Collab session. Your partner does not need an account to join — they just open the link.',
+    ],
+  },
+  {
+    emoji: '📱',
+    title: 'Using ListHQ on Mobile',
+    description: 'Getting the best experience on iPhone and Android.',
+    steps: [
+      'ListHQ is fully optimised for mobile. The buyer-facing search, map, property cards, and agent contact forms all work on iPhone and Android browsers — no app download required.',
+      'Add to Home Screen for the best experience: on iPhone, open listhq.com.au in Safari, tap the Share button (the box with an arrow), and tap "Add to Home Screen". On Android, open in Chrome, tap the three-dot menu, and tap "Add to Home Screen". ListHQ will appear as an icon on your home screen and open full-screen like a native app.',
+      'Buyer navigation: the bottom bar has five tabs — Search (home), Saved (your saved properties), Agents (find an agent), Messages (your conversations), and Profile (settings and preferences).',
+      'Agent dashboard on mobile: tap the hamburger menu (☰) in the top left corner to open the full navigation sidebar. Tap any menu item to navigate — the sidebar closes automatically. The notification bell is in the top right corner.',
+      'Voice search on mobile: tap the microphone icon on the homepage and speak your search. Allow microphone access when prompted. Voice search works in 24 languages — speak in your preferred language and the AI understands.',
+      'Map search on mobile: the homepage shows a full-screen map with a draggable bottom sheet showing property results. Drag the sheet up to see more results, drag down to see more of the map. Tap any price marker on the map to see the property.',
+      'If you experience issues on mobile, ensure you are using a recent version of Safari (iPhone) or Chrome (Android). Voice search is not supported in third-party in-app browsers (e.g. Instagram or Facebook browser).',
+    ],
+  },
 ];
 
 /* ─── FAQ DATA ─── */
@@ -670,7 +699,7 @@ const HelpPage = () => {
               <CardContent className="p-5 text-center space-y-2">
                 <CheckCircle2 size={28} className="mx-auto text-primary" />
                 <h3 className="text-sm font-semibold">Response Time</h3>
-                <p className="text-xs text-muted-foreground">We aim to respond to all enquiries within 4 business hours (AEST, Mon–Fri).</p>
+                <p className="text-xs text-muted-foreground">We aim to respond to all enquiries within 1 business day (AEST, Mon–Fri).</p>
               </CardContent>
             </Card>
           </div>
@@ -678,9 +707,33 @@ const HelpPage = () => {
           <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 flex items-start gap-3">
             <AlertTriangle size={18} className="text-amber-600 flex-shrink-0 mt-0.5" />
             <p className="text-xs text-muted-foreground">
-              During the founding period, some features shown in this guide are still being rolled out. If a feature described here is not yet visible in your dashboard, it will appear in a future update. Check your billing plan to confirm which features are included.
+              ListHQ is updated regularly with new features. If a feature described here is not yet visible in your dashboard, it will appear in an upcoming update. Check your billing plan to confirm which features are included in your subscription.
             </p>
           </div>
+
+          <Card className="bg-card border border-amber-500/30">
+            <CardContent className="p-5 space-y-2">
+              <div className="flex items-center gap-2 mb-1">
+                <Shield size={16} className="text-amber-600 flex-shrink-0" />
+                <h3 className="text-sm font-semibold">AML/CTF Compliance — Action required by 1 July 2026</h3>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                From 1 July 2026, all Australian real estate agents must enrol with AUSTRAC under the Anti-Money Laundering and Counter-Terrorism Financing Act. Enrolment must be completed by 29 July 2026. This applies to every agent selling or managing property — failure to enrol carries significant penalties.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                ListHQ is building AML compliance tools into the platform ahead of the deadline. In the meantime, enrol directly at AUSTRAC using the link below.
+              </p>
+              <a
+                href="https://www.austrac.gov.au/business/how-comply-guidance-and-resources/enrolment-and-registration/how-enrol-austrac-online"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-primary font-medium hover:underline"
+              >
+                Enrol with AUSTRAC
+                <ExternalLink size={11} />
+              </a>
+            </CardContent>
+          </Card>
 
           <Card className="bg-card border border-border">
             <CardContent className="p-5 space-y-3">

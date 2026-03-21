@@ -68,6 +68,16 @@ Deno.serve(async (req) => {
         .in("status", ["approved", "redeemed", "pending"])
         .order("created_at", { ascending: false });
 
+      // Fetch partners
+      const { data: partners } = await supabase
+        .from("partners")
+        .select("user_id, is_verified");
+
+      const partnerMap = new Map<string, any>();
+      for (const p of (partners || [])) {
+        partnerMap.set(p.user_id, p);
+      }
+
       // Build agent lookup by user_id
       const agentMap = new Map<string, any>();
       for (const a of (agents || [])) {

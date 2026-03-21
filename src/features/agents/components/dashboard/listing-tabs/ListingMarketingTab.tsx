@@ -119,16 +119,13 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   } as const;
 
   const getActivationMessage = () => {
-    const now = new Date();
-    const hour = now.getHours();
-    const day = now.getDay();
-    const isWeekend = day === 0 || day === 6;
-    const isAfterHours = hour < 8 || hour >= 18;
-    if (isWeekend)
-      return 'Our team activates boosts on business days. Yours will go live Monday morning AEST.';
-    if (isAfterHours)
-      return 'Our team activates boosts from 8am AEST. Yours will be live first thing next business day.';
-    return 'Your boost will be activated within 1 business hour.';
+    const h = new Date().getHours();
+    const d = new Date().getDay();
+    if (d === 0 || d === 6)
+      return 'Your boost will go live on the next business day. You\'ll get a bell notification when it\'s active.';
+    if (h < 8 || h >= 18)
+      return 'Your boost will go live next business morning. You\'ll get a bell notification when it\'s active.';
+    return 'Your boost will go live shortly. You\'ll get a bell notification when it\'s active.';
   };
 
 
@@ -197,12 +194,6 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   const handleRequestBoost = async (tier: 'featured' | 'premier') => {
     setBoostLoading(tier);
     try {
-      const { data: agent } = await supabase
-        .from('agents')
-        .select('name, email, agency')
-        .eq('user_id', user?.id ?? '')
-        .maybeSingle();
-
       const { error } = await supabase
         .from('properties')
         .update({
@@ -215,24 +206,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
 
       const tierData = BOOST_TIERS[tier];
 
-      await supabase.functions.invoke('send-notification-email', {
-        body: {
-          to: 'support@listhq.com.au',
-          subject: `⚡ Boost request: ${listing.address} — ${tierData.label} — ${agent?.name || 'Agent'}`,
-          html: `
-            <h2>New boost request</h2>
-            <p><strong>Tier:</strong> ${tierData.label} (${tierData.priceLabel} for 30 days)</p>
-            <p><strong>Property:</strong> ${listing.address}, ${listing.suburb}</p>
-            <p><strong>Listing ID:</strong> ${listing.id}</p>
-            <p><strong>Agent:</strong> ${agent?.name || 'Unknown'} · ${agent?.agency || ''} · ${agent?.email || ''}</p>
-            <p><strong>Requested:</strong> ${new Date().toLocaleString('en-AU', { timeZone: 'Australia/Sydney' })}</p>
-            <hr/>
-            <p>Go to Admin → Listings to activate this boost.</p>
-          `,
-        },
-      });
-
-      toast.success(`${tierData.label} boost requested! — We'll activate within 1 business hour.`);
+      toast.success(`${tierData.label} boost requested! You'll get a bell notification when it's live.`);
       setBoostState(prev => ({
         ...prev,
         boost_requested_at: new Date().toISOString(),
@@ -390,8 +364,6 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               </div>
             </div>
 
-            <p className="text-sm text-muted-foreground">{getActivationMessage()}</p>
-
             <div className="space-y-2">
               <p className="text-xs font-medium text-foreground">What you're getting</p>
               {(BOOST_TIERS[boostState.boost_requested_tier as keyof typeof BOOST_TIERS]?.inclusions || []).map((item, i) => (
@@ -402,29 +374,14 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               ))}
             </div>
 
-            <div className="space-y-2 pt-2">
-              <p className="text-xs font-medium text-foreground">What happens next</p>
-              {[
-                'ListHQ team receives your request',
-                'We contact you to arrange payment and activate your boost — usually within 1 business hour',
-                'Your listing goes live in the featured grid near ' + listing.suburb + ' for 30 days',
-                'You receive an email reminder 5 days before your boost ends',
-              ].map((step, i) => (
-                <p key={i} className="text-xs text-muted-foreground flex items-center gap-2">
-                  <span className="w-4 h-4 rounded-full bg-muted text-[9px] font-bold flex items-center justify-center shrink-0">
-                    {i + 1}
-                  </span>
-                  {step}
-                </p>
-              ))}
+            <div className="space-y-3 pt-2">
+              <p className="text-xs text-muted-foreground flex items-center gap-2">
+                ⏱ {getActivationMessage()}
+              </p>
+              <p className="text-[10px] text-muted-foreground">
+                Check back here anytime — this tab shows your live boost status.
+              </p>
             </div>
-
-            <p className="text-[10px] text-muted-foreground mt-2">
-              Changed your mind? Email{' '}
-              <a href="mailto:support@listhq.com.au" className="underline">
-                support@listhq.com.au
-              </a>
-            </p>
           </>
         ) : (
           <>
@@ -473,10 +430,11 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                     <div className="flex items-start gap-2 text-xs text-muted-foreground bg-amber-50 border border-amber-200 rounded-lg p-3 dark:bg-amber-500/10 dark:border-amber-500/20">
                       <AlertCircle size={14} className="text-amber-600 flex-shrink-0 mt-px" />
                       <div>
-                        <p className="font-medium text-amber-800 dark:text-amber-400 mb-0.5">Payment on activation</p>
+                        <p className="font-medium text-amber-800 dark:text-amber-400 mb-0.5">How payment works right now</p>
                         <p>
-                          Online card payment is coming very soon. For now, our team will contact you to arrange
-                          payment when we activate your boost — usually within 1 business hour.
+                          Stripe instant payment is coming very soon. For now, payment is
+                          confirmed on activation and your listing goes live on the featured
+                          grid immediately.
                         </p>
                       </div>
                     </div>
@@ -499,7 +457,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                     </Button>
                   </div>
                   <p className="text-[10px] text-muted-foreground text-center mt-3">
-                    One-off payment of {tierData.priceLabel}. Your listing is featured for 30 days from activation. Renew anytime after that.
+                    One-off payment of {tierData.priceLabel} for 30 days. Your listing goes live on the featured grid as soon as payment is confirmed. Renew anytime from this tab.
                   </p>
                 </div>
               );
@@ -568,8 +526,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
             </div>
 
             <p className="text-[10px] text-muted-foreground">
-              Payment processed on activation by the ListHQ team · usually within 1 business hour · Questions?{' '}
-              <a href="mailto:support@listhq.com.au" className="underline">support@listhq.com.au</a>
+              One-off payment · goes live on confirmation · renew anytime from this tab
             </p>
           </>
         )}

@@ -89,7 +89,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
 
         sendNotification({
           type: 'agent_welcome',
-          title: 'Welcome to Global Homes — Your Agent Account is Being Reviewed',
+          title: 'Welcome to ListHQ — Your Agent Account is Being Reviewed',
           message: 'Your account is pending approval.',
           agent_name: form.fullName,
           agent_email: form.email,

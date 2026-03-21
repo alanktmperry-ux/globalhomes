@@ -78,4 +78,4 @@ export function getScoreColor(score: number): { ring: string; text: string; bg: 
   return { ring: 'stroke-red-500', text: 'text-red-500', bg: 'bg-red-500/10' };
 }
 
-export const REPUTATION_TOOLTIP = 'Score calculated from verified review data, response times, and listing performance on GlobalHomes';
+export const REPUTATION_TOOLTIP = 'Score calculated from verified review data, response times, and listing performance on ListHQ';

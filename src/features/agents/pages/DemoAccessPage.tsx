@@ -59,7 +59,7 @@ const DemoAccessPage = () => {
       await supabase.auth.signOut();
 
       const { error: signInErr } = await supabase.auth.signInWithPassword({
-        email: payload.demo_email || 'demo@globalhomes.app',
+        email: payload.demo_email || 'demo@listhq.com.au',
         password: payload.demo_password || 'DemoAccess2024!',
       });
 
@@ -91,7 +91,7 @@ const DemoAccessPage = () => {
               <span className="text-primary-foreground text-sm font-bold">W</span>
             </div>
           </Link>
-          <h1 className="font-display text-2xl font-bold text-foreground">Global Homes</h1>
+          <h1 className="font-display text-2xl font-bold text-foreground">ListHQ</h1>
           <div className="flex items-center justify-center gap-2 mt-2">
             <KeyRound size={14} className="text-primary" />
             <span className="text-xs font-semibold text-primary uppercase tracking-wider">Demo Access</span>

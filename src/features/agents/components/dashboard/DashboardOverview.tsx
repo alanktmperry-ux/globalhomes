@@ -416,7 +416,7 @@ const DashboardOverview = () => {
       <div className="p-4 sm:p-6 space-y-6 max-w-7xl">
         {listings.length === 0 && (
           <div className="bg-primary/10 border border-primary/20 rounded-2xl p-5">
-            <h2 className="font-bold text-lg mb-1">Welcome to GlobalHomes 👋</h2>
+            <h2 className="font-bold text-lg mb-1">Welcome to ListHQ 👋</h2>
             <p className="text-sm text-muted-foreground mb-4">Your account is live. Here's how to get started:</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <button onClick={() => navigate('/dashboard/listings')} className="flex items-center gap-2 bg-background rounded-xl border border-border p-3 text-sm font-medium hover:border-primary/40 transition-colors text-left">

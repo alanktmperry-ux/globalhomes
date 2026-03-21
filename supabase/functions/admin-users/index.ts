@@ -417,7 +417,7 @@ Deno.serve(async (req) => {
     if (action === "reset_password") {
       const { email } = await req.json();
       const { error } = await anonClient.auth.resetPasswordForEmail(email, {
-        redirectTo: (Deno.env.get("SITE_URL") || "https://globalhomes.lovable.app") + "/reset-password",
+        redirectTo: (Deno.env.get("SITE_URL") || "https://listhq.lovable.app") + "/reset-password",
       });
       if (error) throw error;
       return new Response(JSON.stringify({ success: true, message: `Recovery email sent to ${email}` }), {

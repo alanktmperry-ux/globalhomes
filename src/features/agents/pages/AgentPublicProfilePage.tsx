@@ -67,7 +67,7 @@ function ReputationScoreCard({ score }: { score: ReputationResult }) {
         <ScoreRing score={score.total} size={88} />
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <p className="font-display text-sm font-bold">GlobalHomes Verified Score</p>
+            <p className="font-display text-sm font-bold">ListHQ Verified Score</p>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild><Info size={14} className="text-muted-foreground cursor-help" /></TooltipTrigger>

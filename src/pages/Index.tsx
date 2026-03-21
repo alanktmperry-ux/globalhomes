@@ -313,7 +313,7 @@ const Index = () => {
     { value: 'beds', label: 'Bedrooms' },
   ] as const;
 
-  const pageTitle = `${currentQuery || 'Melbourne'} Property Search | Global Homes`;
+  const pageTitle = `${currentQuery || 'Melbourne'} Property Search | ListHQ`;
   const pageDescription = `Search ${currentQuery || 'Melbourne'} properties. ${filteredProperties.length} listings. Save searches. Get investor alerts.`;
 
   const statusBar = (

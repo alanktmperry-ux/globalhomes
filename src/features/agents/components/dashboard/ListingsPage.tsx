@@ -50,7 +50,7 @@ const ListingsPage = () => {
     setActionLoading(l.id);
     const { error } = await supabase.from('properties').update({ status: 'public', is_active: true } as any).eq('id', l.id);
     if (error) { toast.error('Failed to publish'); }
-    else { toast.success('Your listing is now live on Global Homes!'); refetch(); }
+    else { toast.success('Your listing is now live on ListHQ!'); refetch(); }
     setActionLoading(null);
   };
 

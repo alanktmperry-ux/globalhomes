@@ -103,6 +103,22 @@ const AgentDashboardSidebar = () => {
     fetchArrears();
   }, [user]);
 
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('agents')
+      .select('company_logo_url, name, agency')
+      .eq('user_id', user.id)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          setAgentLogo(data.company_logo_url || null);
+          setAgentName(data.name || null);
+          setAgencyName(data.agency || null);
+        }
+      });
+  }, [user]);
+
   // Check onboarding status
   useEffect(() => {
     if (!user) return;

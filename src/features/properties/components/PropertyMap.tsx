@@ -46,6 +46,7 @@ export function PropertyMap({
   const drawingManagerRef = useRef<google.maps.drawing.DrawingManager | null>(null);
   const drawnOverlayRef = useRef<google.maps.Circle | google.maps.Polygon | null>(null);
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
+  const pendingCenterRef = useRef<{ lat: number; lng: number } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showSearchArea, setShowSearchArea] = useState(false);

@@ -87,6 +87,8 @@ Deno.serve(async (req) => {
       // Map auth users
       const authUsers = data.users.map((u: any) => {
         const agent = agentMap.get(u.id);
+        const partnerRecord = partnerMap.get(u.id);
+        const isPartner = !!partnerRecord;
         const isDemo = agent?.is_demo || false;
         const isSubscribed = agent?.is_subscribed || false;
         const subscription = agent?.agent_subscriptions;
@@ -101,9 +103,10 @@ Deno.serve(async (req) => {
           banned_until: u.banned_until,
           display_name: u.user_metadata?.display_name || u.user_metadata?.full_name || u.email,
           provider: u.app_metadata?.provider || 'email',
-          user_type: isDemo ? 'demo' : (agent ? 'agent' : 'seeker'),
+          user_type: isPartner ? 'partner' : (isDemo ? 'demo' : (agent ? 'agent' : 'seeker')),
           is_subscribed: isSubscribed,
           plan_type: planType,
+          is_partner_verified: partnerRecord?.is_verified || false,
         };
       });
 

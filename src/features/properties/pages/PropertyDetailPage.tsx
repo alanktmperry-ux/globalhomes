@@ -255,7 +255,7 @@ export default function PropertyDetailPage() {
 
         {/* Thumbnail strip */}
         {images.length > 1 && (
-          <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
+          <div className="flex gap-2 mb-6 overflow-x-auto pb-1 snap-x snap-mandatory scroll-smooth">
             {images.map((img, i) => (
               <button
                 key={i}

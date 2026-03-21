@@ -119,14 +119,14 @@ const PartnerArrearsPage = () => {
       // Log activity
       const { data: partner } = await supabase.from('partners').select('id').eq('user_id', user.id).maybeSingle();
       if (partner) {
-        await supabase.from('partner_activity_log').insert({
+        await (supabase as any).from('partner_activity_log').insert({
           partner_id: (partner as any).id,
           agency_id: t.agencyId,
           action_type: 'arrears_reminder_sent',
           entity_type: 'tenancies',
           entity_id: t.id,
           description: `Sent arrears reminder to ${t.tenant_name} at ${t.properties?.address || ''}`,
-        } as any);
+        });
       }
 
       toast.success(`Reminder sent to ${t.tenant_email}`);

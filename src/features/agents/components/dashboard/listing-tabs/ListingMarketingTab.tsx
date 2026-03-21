@@ -376,8 +376,8 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
             <p className="text-sm text-muted-foreground">
               Your listing is live in the featured grid shown to buyers searching near{' '}
               <span className="font-medium text-foreground">{listing.suburb}</span>.
-              {listing.featured_until
-                ? ` Active until ${format(parseISO(listing.featured_until), 'dd MMM yyyy')}.`
+              {boostState.featured_until
+                ? ` Active until ${format(parseISO(boostState.featured_until), 'dd MMM yyyy')}.`
                 : ''}
             </p>
 

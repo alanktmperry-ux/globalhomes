@@ -139,7 +139,45 @@ Deno.serve(async (req) => {
       });
     }
 
-    if (action === "delete_demo_request") {
+    if (action === "set_subscription") {
+      const { user_id, plan_type, listing_limit, seat_limit, founding_member } = await req.json();
+
+      const { data: agent, error: agentErr } = await supabase
+        .from("agents")
+        .select("id")
+        .eq("user_id", user_id)
+        .maybeSingle();
+
+      if (agentErr || !agent) {
+        return new Response(
+          JSON.stringify({ error: "Agent not found" }),
+          { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const { error: subErr } = await supabase
+        .from("agent_subscriptions")
+        .upsert({
+          agent_id: agent.id,
+          plan_type,
+          listing_limit,
+          seat_limit,
+          founding_member,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: "agent_id" });
+
+      if (subErr) throw subErr;
+
+      await supabase
+        .from("agents")
+        .update({ is_subscribed: plan_type !== "demo" })
+        .eq("id", agent.id);
+
+      return new Response(
+        JSON.stringify({ success: true }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
       const { request_id } = await req.json();
       if (!request_id) {
         return new Response(JSON.stringify({ error: "Missing request_id" }), {

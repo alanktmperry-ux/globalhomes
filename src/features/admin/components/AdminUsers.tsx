@@ -1,10 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Ban, Trash2, UserCheck, Loader2, Mail, Clock, Shield, Rocket, Eye, CheckSquare, Square, MinusSquare, UserCog } from 'lucide-react';
+import { Search, Ban, Trash2, UserCheck, Loader2, Mail, Clock, Shield, Rocket, Eye, CheckSquare, Square, MinusSquare, UserCog, Settings, X, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/shared/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 
@@ -91,11 +95,53 @@ const AdminUsers = () => {
   const [batchLoading, setBatchLoading] = useState(false);
   const [filterType, setFilterType] = useState<string>('all');
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [subModal, setSubModal] = useState<{ open: boolean; userId: string; email: string; currentPlan: string }>({ open: false, userId: '', email: '', currentPlan: 'demo' });
+  const [subForm, setSubForm] = useState({ plan_type: 'demo', listing_limit: 3, seat_limit: 1, founding_member: false });
+  const [savingSub, setSavingSub] = useState(false);
 
   const handleImpersonate = async (userId: string, userEmail: string) => {
     if (!confirm(`View the platform as ${userEmail}? You will see exactly what they see. An orange banner will let you exit.`)) return;
     await startImpersonation(userId, userEmail);
     navigate('/dashboard');
+  };
+
+  const handleOpenSubModal = (u: AuthUser) => {
+    const plan = u.plan_type || 'demo';
+    const limits: Record<string, { listings: number; seats: number }> = {
+      demo: { listings: 3, seats: 1 },
+      starter: { listings: 10, seats: 1 },
+      pro: { listings: 9999, seats: 1 },
+      agency: { listings: 9999, seats: 8 },
+      enterprise: { listings: 9999, seats: 50 },
+    };
+    const def = limits[plan] || limits.demo;
+    setSubForm({ plan_type: plan, listing_limit: def.listings, seat_limit: def.seats, founding_member: false });
+    setSubModal({ open: true, userId: u.id, email: u.email, currentPlan: plan });
+  };
+
+  const handleSaveSub = async () => {
+    setSavingSub(true);
+    try {
+      await callAdminApi('set_subscription', { user_id: subModal.userId, ...subForm });
+      toast({ title: 'Subscription updated', description: `${subModal.email} is now on the ${subForm.plan_type} plan.` });
+      setSubModal(m => ({ ...m, open: false }));
+      fetchUsers();
+    } catch (err: any) {
+      toast({ title: 'Failed', description: err.message, variant: 'destructive' });
+    }
+    setSavingSub(false);
+  };
+
+  const handlePlanChange = (plan: string) => {
+    const limits: Record<string, { listings: number; seats: number }> = {
+      demo: { listings: 3, seats: 1 },
+      starter: { listings: 10, seats: 1 },
+      pro: { listings: 9999, seats: 1 },
+      agency: { listings: 9999, seats: 8 },
+      enterprise: { listings: 9999, seats: 50 },
+    };
+    const def = limits[plan] || limits.demo;
+    setSubForm(f => ({ ...f, plan_type: plan, listing_limit: def.listings, seat_limit: def.seats }));
   };
 
   const getSession = useCallback(async () => {
@@ -483,6 +529,15 @@ const AdminUsers = () => {
                           <>
                             {u.user_type === 'agent' && (
                               <button
+                                onClick={() => handleOpenSubModal(u)}
+                                className="p-1.5 rounded-lg bg-violet-500/10 text-violet-500 hover:bg-violet-500/20 transition-colors"
+                                title="Manage subscription"
+                              >
+                                <Settings size={14} />
+                              </button>
+                            )}
+                            {u.user_type === 'agent' && (
+                              <button
                                 onClick={() => handleImpersonate(u.id, u.email)}
                                 className="p-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
                                 title="Act as this user"
@@ -520,6 +575,74 @@ const AdminUsers = () => {
           <p className="text-center py-8 text-muted-foreground text-sm">No users found</p>
         )}
       </div>
+
+      <Dialog open={subModal.open} onOpenChange={(o) => setSubModal(m => ({ ...m, open: o }))}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Manage subscription</DialogTitle>
+            <p className="text-sm text-muted-foreground">{subModal.email}</p>
+          </DialogHeader>
+
+          <div className="space-y-4 pt-2">
+            <div className="space-y-1.5">
+              <Label>Plan</Label>
+              <Select value={subForm.plan_type} onValueChange={handlePlanChange}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="demo">Demo — 3 listings</SelectItem>
+                  <SelectItem value="starter">Starter — $99/mo, 10 listings</SelectItem>
+                  <SelectItem value="pro">Pro — $199/mo, unlimited</SelectItem>
+                  <SelectItem value="agency">Agency — $399/mo, 8 seats</SelectItem>
+                  <SelectItem value="enterprise">Enterprise — custom</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Listing limit</Label>
+                <input
+                  type="number"
+                  value={subForm.listing_limit}
+                  onChange={(e) => setSubForm(f => ({ ...f, listing_limit: parseInt(e.target.value) || 3 }))}
+                  className="w-full h-9 px-3 text-sm border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Seat limit</Label>
+                <input
+                  type="number"
+                  value={subForm.seat_limit}
+                  onChange={(e) => setSubForm(f => ({ ...f, seat_limit: parseInt(e.target.value) || 1 }))}
+                  className="w-full h-9 px-3 text-sm border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between rounded-lg border border-border p-3">
+              <div>
+                <p className="text-sm font-medium text-foreground">Founding member</p>
+                <p className="text-xs text-muted-foreground">Rate locked for life</p>
+              </div>
+              <Switch
+                checked={subForm.founding_member}
+                onCheckedChange={(v) => setSubForm(f => ({ ...f, founding_member: v }))}
+              />
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <Button onClick={handleSaveSub} disabled={savingSub} className="flex-1">
+                {savingSub ? <><Loader2 className="h-4 w-4 animate-spin mr-1" /> Saving…</> : <><Check className="h-4 w-4 mr-1" /> Save changes</>}
+              </Button>
+              <Button variant="ghost" size="icon" onClick={() => setSubModal(m => ({ ...m, open: false }))}>
+                <X size={16} />
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 };

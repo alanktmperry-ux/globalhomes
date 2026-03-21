@@ -9,7 +9,8 @@ interface AuthContextType {
   loading: boolean;
   isAgent: boolean;
   isAdmin: boolean;
-  userRole: 'user' | 'agent' | 'admin' | null;
+  isPartner: boolean;
+  userRole: 'user' | 'agent' | 'admin' | 'partner' | null;
   signOut: () => Promise<void>;
   impersonating: boolean;
   impersonatedUser: string | null;

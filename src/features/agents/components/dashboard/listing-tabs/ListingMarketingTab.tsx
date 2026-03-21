@@ -261,7 +261,11 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
       });
 
       toast.success(`${tierData.label} boost requested! — We'll activate within 1 business hour.`);
-      window.location.reload();
+      setBoostState(prev => ({
+        ...prev,
+        boost_requested_at: new Date().toISOString(),
+        boost_requested_tier: tier,
+      }));
     } catch (e) {
       toast.error('Failed to submit boost request — please try again');
       console.error(e);

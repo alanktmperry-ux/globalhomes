@@ -38,9 +38,10 @@ interface TrustReceiptModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onCreated?: () => void;
+  agentId?: string;
 }
 
-export default function TrustReceiptModal({ open, onOpenChange, onCreated }: TrustReceiptModalProps) {
+export default function TrustReceiptModal({ open, onOpenChange, onCreated, agentId: agentIdProp }: TrustReceiptModalProps) {
   const { user } = useAuth();
   const [saving, setSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);

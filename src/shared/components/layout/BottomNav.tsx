@@ -48,7 +48,7 @@ export function BottomNav() {
                 <div className="absolute top-1 w-1 h-1 rounded-full bg-primary" />
               )}
               <item.icon size={22} strokeWidth={isActive ? 2.5 : 1.8} />
-              <span className={`text-[10px] ${isActive ? 'font-medium text-primary' : 'font-medium text-muted-foreground'}`}>{t(item.key)}</span>
+              <span className={`text-[10px] ${isActive ? 'font-medium text-primary' : 'font-medium text-muted-foreground'}`}>{t(item.key) || (item.key === 'nav.agents' ? 'Agents' : '')}</span>
             </button>
           );
         })}

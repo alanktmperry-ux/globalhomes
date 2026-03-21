@@ -346,6 +346,7 @@ const AdminUsers = () => {
 
   const demoCount = users.filter(u => u.user_type === 'demo' || u.user_type === 'demo_request').length;
   const agentCount = users.filter(u => u.user_type === 'agent').length;
+  const partnerCount = users.filter(u => u.user_type === 'partner').length;
   const subscribedCount = users.filter(u => u.is_subscribed).length;
 
   if (loading) {

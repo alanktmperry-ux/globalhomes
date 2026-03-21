@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Outlet, useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
-import { LayoutDashboard, LogOut, Landmark, Home, AlertTriangle, ChevronDown } from 'lucide-react';
+import { LayoutDashboard, LogOut, Landmark, Home, AlertTriangle, Users } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface AgencyLink {
@@ -15,18 +15,23 @@ interface PartnerContextType {
   activeAgency: AgencyLink | null;
   agencies: AgencyLink[];
   setActiveAgency: (a: AgencyLink) => void;
+  role: 'owner' | 'member';
+  partnerId: string | null;
 }
 
 export const PartnerContext = React.createContext<PartnerContextType>({
   activeAgency: null,
   agencies: [],
   setActiveAgency: () => {},
+  role: 'member',
+  partnerId: null,
 });
 
 export const usePartner = () => React.useContext(PartnerContext);
 
 const NAV_ITEMS = [
   { label: 'Overview', url: '/partner/dashboard', icon: LayoutDashboard },
+  { label: 'Team', url: '/partner/team', icon: Users },
   { label: 'Trust Accounting', url: '/partner/trust', icon: Landmark },
   { label: 'Rent Roll', url: '/partner/rent-roll', icon: Home },
   { label: 'Arrears', url: '/partner/arrears', icon: AlertTriangle },
@@ -40,6 +45,8 @@ const PartnerDashboardLayout = () => {
   const [activeAgency, setActiveAgency] = useState<AgencyLink | null>(null);
   const [agencies, setAgencies] = useState<AgencyLink[]>([]);
   const [agenciesLoading, setAgenciesLoading] = useState(true);
+  const [memberRole, setMemberRole] = useState<'owner' | 'member'>('member');
+  const [partnerId, setPartnerId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && (!user || !isPartner)) {
@@ -51,18 +58,23 @@ const PartnerDashboardLayout = () => {
     if (!user) return;
     setAgenciesLoading(true);
 
-    const { data: partner } = await supabase
-      .from('partners')
-      .select('id')
+    // Get partner membership via partner_members
+    const { data: membership } = await supabase
+      .from('partner_members')
+      .select('partner_id, role, partners(id, company_name)')
       .eq('user_id', user.id)
       .maybeSingle();
 
-    if (!partner) { setAgenciesLoading(false); return; }
+    if (!membership) { setAgenciesLoading(false); return; }
+
+    const pid = (membership as any).partner_id;
+    setPartnerId(pid);
+    setMemberRole((membership as any).role === 'owner' ? 'owner' : 'member');
 
     const { data: links } = await supabase
       .from('partner_agencies')
       .select('agency_id, invited_by_agent_id, agencies(id, name)')
-      .eq('partner_id', partner.id)
+      .eq('partner_id', pid)
       .eq('status', 'active');
 
     const mapped = (links || []).map((l: any) => ({
@@ -91,7 +103,7 @@ const PartnerDashboardLayout = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <PartnerContext.Provider value={{ activeAgency, agencies, setActiveAgency }}>
+    <PartnerContext.Provider value={{ activeAgency, agencies, setActiveAgency, role: memberRole, partnerId }}>
       <div className="min-h-screen flex w-full bg-background text-foreground">
         {/* Sidebar */}
         <aside className="w-[220px] border-r border-border flex flex-col bg-card shrink-0">

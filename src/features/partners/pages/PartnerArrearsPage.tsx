@@ -117,10 +117,10 @@ const PartnerArrearsPage = () => {
       if (error) throw error;
 
       // Log activity
-      const { data: partner } = await supabase.from('partners').select('id').eq('user_id', user.id).maybeSingle();
-      if (partner) {
+      const { data: membership } = await supabase.from('partner_members').select('partner_id').eq('user_id', user.id).maybeSingle();
+      if (membership) {
         await (supabase as any).from('partner_activity_log').insert({
-          partner_id: (partner as any).id,
+          partner_id: (membership as any).partner_id,
           agency_id: t.agencyId,
           action_type: 'arrears_reminder_sent',
           entity_type: 'tenancies',

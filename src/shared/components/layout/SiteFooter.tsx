@@ -129,7 +129,7 @@ export function SiteFooter() {
         {/* Divider + compliance fine print */}
         <div className="border-t border-border pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground">
-            Global Homes © {new Date().getFullYear()} · ABN 00 000 000 000
+            ListHQ © {new Date().getFullYear()} · ABN 00 000 000 000
           </p>
           <p className="text-xs text-muted-foreground text-center md:text-right max-w-md leading-relaxed">
             Global Homes operates under Australian property law. All trust funds are held in compliance with state fair trading regulations.

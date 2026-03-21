@@ -412,6 +412,24 @@ const MessagesPage = () => {
     return () => document.removeEventListener('mousedown', handler);
   }, [openMenuId]);
 
+  // Scroll input into view when iOS keyboard opens
+  useEffect(() => {
+    const input = inputRef.current;
+    if (!input) return;
+    const handleFocus = () => {
+      setTimeout(() => {
+        input.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 300);
+    };
+    input.addEventListener('focus', handleFocus);
+    return () => {
+      input.removeEventListener('focus', handleFocus);
+    };
+  }, [inputRef]);
+
   const handleArchive = async (convoId: string) => {
     if (!user || convoId.startsWith('lead-')) return;
     setOpenMenuId(null);

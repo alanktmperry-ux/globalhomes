@@ -342,7 +342,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       { q: 'What is the difference between Whisper, Coming Soon, and Public visibility?', a: 'Whisper = invite-only, not visible to buyers. Coming Soon = visible to registered buyers on the platform but not on external portals. Public = visible to all buyers on the full marketplace.' },
       { q: 'Can I duplicate a listing?', a: 'Yes. On the listing detail page in your dashboard, there is a "Duplicate" option. This creates a copy with all the same details — useful for similar properties at the same address.' },
       { q: 'What is the AI listing writer?', a: 'On Step 4 of the listing wizard, you can record a voice note or type notes about the property. The AI generates a professional listing description in four tones: Standard, Luxury, Family, or Investment. You can edit the output before publishing.' },
-      { q: 'How do I get my listing into the featured grid on the homepage?', a: 'Go to the listing detail page, click the Marketing tab, and request a Featured ($49) or Premier ($99) boost. Both run for 30 days as a one-off payment — no subscription. Your listing goes live as soon as payment is confirmed.' },
+      { q: 'How do I get my listing into the featured grid on the homepage?', a: 'Go to My Listings, open the listing, and click the Marketing tab. Choose Featured ($49) or Premier ($99) — both are one-off payments for 30 days. Confirm your selection and your listing goes live on the featured grid. You get a bell notification the moment it is active.' },
     ],
   },
   {

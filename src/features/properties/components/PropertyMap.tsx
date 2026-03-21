@@ -166,8 +166,18 @@ export function PropertyMap({
     if (!map || !centerOn) return;
     userMovedRef.current = false;
     setShowSearchArea(false);
-    map.panTo({ lat: centerOn.lat, lng: centerOn.lng });
-    map.setZoom(15);
+
+    const container = mapRef.current;
+    const hasSize = container && container.offsetHeight > 0 && container.offsetWidth > 0;
+
+    if (hasSize) {
+      map.panTo({ lat: centerOn.lat, lng: centerOn.lng });
+      map.setZoom(14);
+      pendingCenterRef.current = null;
+    } else {
+      // Store it — apply when map becomes visible
+      pendingCenterRef.current = { lat: centerOn.lat, lng: centerOn.lng };
+    }
   }, [centerOn]);
 
   // Drawing events

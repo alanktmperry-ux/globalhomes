@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Bell, X, Check, CheckCheck, MessageSquare, MousePointerClick, Mic } from 'lucide-react';
+import { Bell, X, Check, CheckCheck, MessageSquare, MousePointerClick, Mic, Zap } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { formatDistanceToNow } from 'date-fns';
@@ -22,6 +22,9 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
   event: <MousePointerClick size={14} className="text-accent-foreground" />,
   voice_match: <Mic size={14} className="text-primary" />,
   message: <MessageSquare size={14} className="text-emerald-500" />,
+  boost_requested: <Zap size={14} className="text-amber-500" />,
+  boost_activated: <Zap size={14} className="text-emerald-500" />,
+  boost_expiring: <Zap size={14} className="text-orange-500" />,
 };
 
 export function NotificationBell() {
@@ -159,8 +162,20 @@ export function NotificationBell() {
                         e.stopPropagation();
                         markAsRead(n.id);
                         setOpen(false);
-                        if (n.type === 'lead' || n.type === 'voice_match' || n.type === 'message') {
+                        if (
+                          n.type === 'boost_requested' ||
+                          n.type === 'boost_activated' ||
+                          n.type === 'boost_expiring'
+                        ) {
+                          if (n.property_id) {
+                            navigate(`/dashboard/listings/${n.property_id}?tab=marketing`);
+                          } else {
+                            navigate('/dashboard/listings');
+                          }
+                        } else if (n.type === 'lead' || n.type === 'voice_match' || n.type === 'message') {
                           navigate('/messages');
+                        } else if (n.property_id) {
+                          navigate(`/dashboard/listings/${n.property_id}`);
                         }
                       }}
                     >

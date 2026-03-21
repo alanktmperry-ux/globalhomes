@@ -143,14 +143,15 @@ const AgentDashboardSidebar = () => {
     rentRoll: arrearsCount > 0 ? String(arrearsCount) : '',
   };
 
-  // Build ACCOUNT_NAV with conditional Setup item
   const ACCOUNT_NAV: NavItem[] = [
+    { title: 'Profile', url: '/dashboard/profile', icon: User },
     { title: 'My Agencies', url: '/dashboard/agencies', icon: Building2 },
-    ...(!onboardingComplete ? [{ title: 'Setup', url: '/dashboard/onboarding', icon: Settings2 }] : []),
+    { title: 'Territory', url: '/dashboard/territory', icon: MapPinned },
+    { title: 'Team', url: '/dashboard/team', icon: UserPlus },
     { title: 'Billing', url: '/dashboard/billing', icon: CreditCard },
     { title: 'Reviews', url: '/dashboard/reviews', icon: Star },
     { title: 'Settings', url: '/dashboard/settings', icon: Settings },
-    
+    ...(!onboardingComplete ? [{ title: 'Setup', url: '/dashboard/onboarding', icon: Settings2 }] : []),
   ];
 
   const ADMIN_NAV: NavItem[] = isAdmin ? [{ title: 'Admin Panel', url: '/admin', icon: Shield }] : [];

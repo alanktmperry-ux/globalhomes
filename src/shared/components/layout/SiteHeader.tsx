@@ -139,6 +139,8 @@ export function SiteHeader() {
             </AnimatePresence>
           </div>
 
+          <LanguageSwitcher />
+
           {/* Agent dashboard shortcut – always visible for agents */}
           {user && isAgent && (
             <>

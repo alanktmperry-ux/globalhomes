@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useIsMobile } from '@/shared/hooks/use-mobile';
 import { useAuth } from '@/features/auth/AuthProvider';
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,

@@ -82,6 +82,8 @@ const PlanBadge = ({ user }: { user: AuthUser }) => {
 
 const AdminUsers = () => {
   const { toast } = useToast();
+  const { startImpersonation } = useAuth();
+  const navigate = useNavigate();
   const [users, setUsers] = useState<AuthUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -89,6 +91,12 @@ const AdminUsers = () => {
   const [batchLoading, setBatchLoading] = useState(false);
   const [filterType, setFilterType] = useState<string>('all');
   const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  const handleImpersonate = async (userId: string, userEmail: string) => {
+    if (!confirm(`View the platform as ${userEmail}? You will see exactly what they see. An orange banner will let you exit.`)) return;
+    await startImpersonation(userId, userEmail);
+    navigate('/dashboard');
+  };
 
   const getSession = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession();

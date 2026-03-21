@@ -316,6 +316,7 @@ const AdminUsers = () => {
       if (filterType === 'all') return true;
       if (filterType === 'demo') return u.user_type === 'demo' || u.user_type === 'demo_request';
       if (filterType === 'agent') return u.user_type === 'agent';
+      if (filterType === 'partner') return u.user_type === 'partner';
       if (filterType === 'seeker') return u.user_type === 'seeker';
       if (filterType === 'subscribed') return u.is_subscribed;
       return true;

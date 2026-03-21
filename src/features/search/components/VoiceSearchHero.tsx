@@ -1,11 +1,14 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, MicOff, Search, Loader2, X, Keyboard, ChevronDown, MapPin } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { Mic, MicOff, Search, Loader2, X, ChevronDown, MapPin } from 'lucide-react';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { SoundWaveVisualizer } from './SoundWaveVisualizer';
 import { parsePropertyQuery, filtersToChips } from '@/features/search/lib/parsePropertyQuery';
 import { useToast } from '@/shared/hooks/use-toast';
 import { autocomplete, getPlaceDetails } from '@/shared/lib/googleMapsService';
+import { useNavigate } from 'react-router-dom';
+import { useCurrency } from '@/shared/lib/CurrencyContext';
+import { useI18n } from '@/shared/lib/i18n';
 
 type VoiceState = 'idle' | 'listening' | 'processing' | 'results';
 
@@ -70,6 +73,11 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   const wrapperRef = useRef<HTMLDivElement>(null);
   const suppressAutocompleteRef = useRef(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { listingMode, setListingMode } = useCurrency();
+  const { t } = useI18n();
+
+  const isListening = voiceState === 'listening';
 
   const isSupported = typeof window !== 'undefined' &&
     ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
@@ -145,7 +153,6 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
     setTextQuery(text);
     setVoiceState('processing');
     onSearch(text);
-    // Fire geocode separately so it's not affected by re-renders from onSearch
     geocodeLocation(text);
   }, [onSearch, geocodeLocation]);
 
@@ -194,7 +201,6 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
       recognition.onend = () => {
         if (voiceState === 'listening') {
-          // If no final result was captured
           if (!transcript) setVoiceState('idle');
         }
       };
@@ -234,7 +240,6 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       setTranscript(textQuery.trim());
       processTranscript(textQuery.trim());
     }
-    // Re-enable autocomplete after a delay so typing new queries works
     setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
   };
 
@@ -264,358 +269,266 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
   const selectedLangObj = VOICE_LANGUAGES.find(l => l.code === selectedLang) || VOICE_LANGUAGES[0];
 
-  // Visible rotating languages (show 5 at a time)
   const visibleLanguages = Array.from({ length: 5 }, (_, i) =>
     ROTATING_LANGUAGES[(rotatingIndex + i) % ROTATING_LANGUAGES.length]
   );
 
   return (
-    <div className="relative overflow-visible bg-background">
-      <TooltipProvider delayDuration={400}>
-      {/* Subtle gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-background" />
+    <TooltipProvider delayDuration={400}>
+      {/* SECTION 1 — Full bleed hero */}
+      <div className="relative min-h-[420px] md:min-h-[480px] overflow-hidden flex flex-col">
+        {/* Background image */}
+        <img
+          src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1400&q=80"
+          alt="Australian home"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+        />
+        {/* Overlays */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628]/95 via-[#0a1628]/75 to-[#0a1628]/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628]/90 via-transparent to-transparent" />
 
-      <div className="relative z-10 max-w-2xl mx-auto px-4 py-8 flex flex-col items-center text-center">
-        {/* App title */}
-        <h1 className="font-display text-2xl font-bold text-foreground mb-6 tracking-tight">
-          ListHQ
-        </h1>
-
-        {/* Transcript display area */}
-        <AnimatePresence mode="wait">
-          {voiceState === 'listening' && transcript && (
-            <motion.p
-              key="transcript"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="text-foreground text-lg font-medium mb-4 min-h-[28px]"
-            >
-              "{transcript}"
-            </motion.p>
-          )}
-          {voiceState === 'results' && confidence !== null && (
-            <motion.div
-              key="confidence"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-4"
-            >
-              <div className="flex items-center justify-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${confidence >= 80 ? 'bg-emerald-400' : confidence >= 50 ? 'bg-yellow-400' : 'bg-destructive'}`} />
-                <span className="text-xs text-muted-foreground">{confidence}% confidence</span>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Mic button */}
-        <div className="relative mb-6">
-          {/* Pulsing rings */}
-          {voiceState === 'idle' && (
-            <>
-              <motion.div
-                className="absolute inset-0 rounded-full border-2 border-primary/30"
-                animate={{ scale: [1, 1.3], opacity: [0.4, 0] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeOut' }}
-              />
-              <motion.div
-                className="absolute inset-0 rounded-full border-2 border-primary/20"
-                animate={{ scale: [1, 1.5], opacity: [0.3, 0] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeOut', delay: 0.5 }}
-              />
-            </>
-          )}
-
-          {/* Listening rings - more intense */}
-          {voiceState === 'listening' && (
-            <>
-              <motion.div
-                className="absolute inset-[-8px] rounded-full bg-primary/20"
-                animate={{ scale: [1, 1.4], opacity: [0.5, 0] }}
-                transition={{ duration: 1, repeat: Infinity }}
-              />
-              <motion.div
-                className="absolute inset-[-4px] rounded-full bg-primary/30"
-                animate={{ scale: [1, 1.2], opacity: [0.6, 0] }}
-                transition={{ duration: 1, repeat: Infinity, delay: 0.3 }}
-              />
-            </>
-          )}
-
-          {/* Gradient border */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="p-[3px] rounded-full bg-gradient-to-br from-primary via-purple-500 to-primary">
-                <motion.button
-                  onClick={voiceState === 'listening' ? stopListening : startListening}
-                  className="relative w-20 h-20 rounded-full bg-card flex items-center justify-center shadow-elevated transition-shadow"
-                  whileTap={{ scale: 0.95 }}
-                  animate={voiceState === 'listening' ? { scale: [1, 1.05, 1] } : {}}
-                  transition={voiceState === 'listening' ? { duration: 0.5, repeat: Infinity } : {}}
-                  aria-label={voiceState === 'listening' ? 'Stop listening' : 'Start voice search'}
-                >
-                  {voiceState === 'processing' || isSearching ? (
-                    <Loader2 size={28} className="animate-spin text-primary" />
-                  ) : voiceState === 'listening' ? (
-                    <MicOff size={28} className="text-destructive" />
-                  ) : (
-                    <Mic size={28} className="text-primary" />
-                  )}
-                </motion.button>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              {voiceState === 'listening' ? 'Click to stop listening' : 'Tap to search by voice — describe your dream home in any language'}
-            </TooltipContent>
-          </Tooltip>
-        </div>
-
-        {/* Sound wave visualization */}
-        <AnimatePresence>
-          {voiceState === 'listening' && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="mb-4"
-            >
-              <SoundWaveVisualizer isActive />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* State-dependent text */}
-        <AnimatePresence mode="wait">
-          {voiceState === 'idle' && (
-            <motion.p
-              key="idle"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="text-foreground text-sm font-medium mb-2"
-            >
-              Tap and describe your dream home in any language
-            </motion.p>
-          )}
-          {voiceState === 'listening' && (
-            <motion.p
-              key="listening"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="text-primary text-sm font-medium mb-2"
-            >
-              Listening… speak now
-            </motion.p>
-          )}
-          {(voiceState === 'processing' || isSearching) && (
-            <motion.p
-              key="processing"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="text-muted-foreground text-sm font-medium mb-2 flex items-center gap-2"
-            >
-              <Loader2 size={14} className="animate-spin" />
-              Searching across Australia…
-            </motion.p>
-          )}
-          {voiceState === 'results' && !isSearching && resultCount !== undefined && (
-            <motion.p
-              key="results"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="text-emerald-600 text-sm font-medium mb-2"
-            >
-              Found {resultCount} properties matching your voice search
-            </motion.p>
-          )}
-        </AnimatePresence>
-
-        {/* Filter chips */}
-        <AnimatePresence>
-          {filterChips.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex flex-wrap justify-center gap-2 mb-4"
-            >
-              {filterChips.map(chip => (
-                <motion.button
-                  key={chip.key}
-                  layout
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  onClick={() => removeChip(chip.key)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-foreground text-xs font-medium hover:bg-primary/20 transition-colors"
-                >
-                  {chip.label}
-                  <X size={12} className="text-muted-foreground" />
-                </motion.button>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Language selector */}
-        <div className="relative mb-4">
-          <button
-            onClick={() => setShowLangDropdown(!showLangDropdown)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary text-muted-foreground text-xs hover:text-foreground transition-colors"
-          >
-            <span>{selectedLangObj.flag} {selectedLangObj.label}</span>
-            <ChevronDown size={12} />
+        {/* FLOATING NAV */}
+        <div className="relative z-10 flex items-center justify-between px-4 md:px-8 py-4">
+          {/* Left — Logo */}
+          <button onClick={() => navigate('/')} className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-white/15 border border-white/20 backdrop-blur-sm flex items-center justify-center">
+              <span className="text-white text-[10px] font-extrabold tracking-tight">LHQ</span>
+            </div>
+            <span className="text-white font-bold text-base tracking-tight hidden sm:inline">
+              ListHQ
+            </span>
           </button>
-          <AnimatePresence>
-            {showLangDropdown && (
-              <>
-                <motion.div
-                  className="fixed inset-0 z-40"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  onClick={() => setShowLangDropdown(false)}
-                />
-                <motion.div
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
-                  className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 w-56 max-h-64 overflow-y-auto bg-popover border border-border rounded-xl shadow-elevated"
-                >
-                  {VOICE_LANGUAGES.map(lang => (
-                    <button
-                      key={lang.code}
-                      onClick={() => { setSelectedLang(lang.code); setShowLangDropdown(false); }}
-                      className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                        lang.code === selectedLang
-                          ? 'bg-primary/20 text-primary'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-                      }`}
-                    >
-                      {lang.flag} {lang.label}
-                    </button>
-                  ))}
-                </motion.div>
-              </>
-            )}
-          </AnimatePresence>
+
+          {/* Centre — Sale/Rent toggle */}
+          <div className="flex bg-white/[0.12] border border-white/15 rounded-full p-1 backdrop-blur-sm">
+            <button
+              onClick={() => { setListingMode('sale'); window.dispatchEvent(new CustomEvent('listing-mode-changed')); }}
+              className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
+                listingMode === 'sale'
+                  ? 'bg-white text-[#0a1628]'
+                  : 'text-white/70 hover:text-white'
+              }`}
+            >For Sale</button>
+            <button
+              onClick={() => { setListingMode('rent'); window.dispatchEvent(new CustomEvent('listing-mode-changed')); }}
+              className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
+                listingMode === 'rent'
+                  ? 'bg-white text-[#0a1628]'
+                  : 'text-white/70 hover:text-white'
+              }`}
+            >For Rent</button>
+          </div>
+
+          {/* Right — Currency + language + sign in */}
+          <div className="flex items-center gap-2 bg-white/[0.08] border border-white/[0.12] rounded-full px-3 py-1.5 backdrop-blur-sm">
+            <span className="text-white/65 text-[11px]">AUD $</span>
+            <span className="text-white/25 text-[11px]">|</span>
+            <span className="text-white/65 text-[11px]">EN</span>
+            <span className="text-white/25 text-[11px]">|</span>
+            <button
+              onClick={() => navigate('/auth')}
+              className="text-white/65 text-[11px] hover:text-white transition-colors"
+            >Sign in</button>
+          </div>
         </div>
 
-        {/* Rotating language indicators */}
-        <div className="flex items-center gap-3 text-xs text-muted-foreground overflow-hidden h-5 mb-4">
-          <AnimatePresence mode="popLayout">
-            {visibleLanguages.map((lang, i) => (
-              <motion.span
-                key={`${rotatingIndex}-${i}`}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: i === 2 ? 1 : 0.5, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.4 }}
-                className="whitespace-nowrap"
+        {/* HERO CONTENT */}
+        <div className="relative z-10 flex-1 flex flex-col justify-end px-4 md:px-8 pb-8 md:pb-10">
+          {/* Live badge */}
+          <div className="inline-flex items-center gap-1.5 bg-white/10 border border-white/15 rounded-full px-3 py-1 mb-4 w-fit backdrop-blur-sm">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-white/80 text-[10px] font-medium">Live listings across Australia</span>
+          </div>
+
+          {/* Headline */}
+          <h1 className="font-display font-extrabold text-white leading-[1.08] tracking-tight mb-3 text-[30px] md:text-[42px]">
+            Find your home.<br />
+            <span className="bg-gradient-to-r from-sky-300 to-violet-300 bg-clip-text text-transparent">
+              In any language.
+            </span>
+          </h1>
+
+          {/* Subheadline */}
+          <p className="text-white/55 text-sm leading-relaxed mb-6 max-w-sm">
+            AI voice search in 24 languages. Live exchange rates. Built for how the world buys Australian property.
+          </p>
+
+          {/* SEARCH CARD */}
+          <div ref={wrapperRef} className="bg-white/[0.97] backdrop-blur-md rounded-2xl p-4 max-w-[500px] border border-white/30 shadow-2xl relative">
+            {/* Search input row */}
+            <div className="flex items-center gap-3 mb-3">
+              <button
+                onClick={isListening ? stopListening : startListening}
+                className="w-10 h-10 rounded-xl bg-[#0a1628] flex items-center justify-center shrink-0 hover:bg-[#1a2744] transition-colors"
               >
-                {lang}
-              </motion.span>
-            ))}
-          </AnimatePresence>
-        </div>
-
-        {/* Always-visible text search input */}
-        <div ref={wrapperRef} className="relative w-full max-w-md">
-          <form onSubmit={handleTextSubmit}>
-            <div className="flex items-center gap-2 rounded-xl bg-secondary border border-border px-4 py-3">
-              <Search size={16} className="text-muted-foreground shrink-0" />
+                {isListening
+                  ? <MicOff size={16} className="text-white" />
+                  : <Mic size={16} className="text-white" />}
+              </button>
               <input
                 type="text"
                 value={textQuery}
                 onChange={e => setTextQuery(e.target.value)}
                 onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
-                placeholder="Type your property search here..."
-                className="flex-1 bg-transparent text-foreground text-sm placeholder:text-muted-foreground focus:outline-none"
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && textQuery.trim()) {
+                    onSearch(textQuery.trim());
+                  }
+                }}
+                placeholder={t('search.placeholder')}
+                className="flex-1 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none bg-transparent"
               />
-              {textQuery.trim() && (
-                <button type="submit" className="text-primary hover:text-primary/80">
-                  <Search size={18} />
-                </button>
-              )}
+              <button
+                onClick={() => {
+                  if (textQuery.trim()) onSearch(textQuery.trim());
+                }}
+                className="bg-[#0a1628] text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-[#1a2744] transition-colors shrink-0"
+              >Search</button>
             </div>
-          </form>
 
-          {/* Autocomplete suggestions - directly below input */}
-          <AnimatePresence>
-            {showSuggestions && suggestions.length > 0 && (
-              <motion.ul
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                className="absolute left-0 right-0 top-full z-50 mt-1 bg-popover border border-border rounded-xl shadow-elevated overflow-y-auto max-h-60"
-              >
-                {suggestions.map((s) => (
-                  <li key={s.place_id}>
-                    <button
-                      type="button"
-                      onClick={() => handleSelectSuggestion(s)}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-left text-sm text-foreground hover:bg-accent transition-colors"
-                    >
-                      <MapPin size={16} className="text-muted-foreground shrink-0" />
-                      <span className="truncate">{s.description}</span>
-                    </button>
-                  </li>
+            {/* Divider + radius/language pills */}
+            <div className="border-t border-gray-100 pt-3 flex items-center gap-3 flex-wrap">
+              {/* Radius pills */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[10px] text-gray-400 mr-1">Radius:</span>
+                {[null, 5, 10, 25, 50, 100].map(r => (
+                  <button
+                    key={r ?? 'any'}
+                    onClick={() => onRadiusChange?.(r)}
+                    className={`text-[10px] px-2.5 py-1 rounded-full transition-all font-medium ${
+                      selectedRadius === r
+                        ? 'bg-[#0a1628] text-white'
+                        : 'border border-gray-200 text-gray-400 hover:border-gray-400'
+                    }`}
+                  >
+                    {r ? `${r} km` : 'Any'}
+                  </button>
                 ))}
-              </motion.ul>
+              </div>
+
+              {/* Language pills */}
+              <div className="flex items-center gap-1.5 ml-auto flex-wrap">
+                {['🇦🇺 EN', '🇨🇳 中文', '🇦🇪 عر'].map(l => (
+                  <span key={l} className="text-[10px] px-2.5 py-1 rounded-full border border-gray-200 text-gray-400">
+                    {l}
+                  </span>
+                ))}
+                <span className="text-[10px] text-gray-400">+21</span>
+              </div>
+            </div>
+
+            {/* Autocomplete suggestions */}
+            <AnimatePresence>
+              {showSuggestions && suggestions.length > 0 && (
+                <motion.ul
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  className="absolute left-0 right-0 top-full z-50 mt-1 bg-popover border border-border rounded-xl shadow-elevated overflow-y-auto max-h-60"
+                >
+                  {suggestions.map((s) => (
+                    <li key={s.place_id}>
+                      <button
+                        type="button"
+                        onClick={() => handleSelectSuggestion(s)}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-left text-sm text-foreground hover:bg-accent transition-colors"
+                      >
+                        <MapPin size={16} className="text-muted-foreground shrink-0" />
+                        <span className="truncate">{s.description}</span>
+                      </button>
+                    </li>
+                  ))}
+                </motion.ul>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Voice listening animation */}
+          <AnimatePresence>
+            {voiceState === 'listening' && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-3"
+              >
+                <SoundWaveVisualizer isActive />
+                {transcript && (
+                  <p className="text-white/90 text-sm font-medium mt-2">"{transcript}"</p>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Processing / results state text */}
+          <AnimatePresence mode="wait">
+            {(voiceState === 'processing' || isSearching) && (
+              <motion.p
+                key="processing"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="text-white/60 text-sm font-medium mt-3 flex items-center gap-2"
+              >
+                <Loader2 size={14} className="animate-spin" />
+                Searching across Australia…
+              </motion.p>
+            )}
+            {voiceState === 'results' && !isSearching && resultCount !== undefined && (
+              <motion.p
+                key="results"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-emerald-300 text-sm font-medium mt-3"
+              >
+                Found {resultCount} properties matching your search
+              </motion.p>
+            )}
+          </AnimatePresence>
+
+          {/* Filter chips */}
+          <AnimatePresence>
+            {filterChips.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-wrap gap-2 mt-3"
+              >
+                {filterChips.map(chip => (
+                  <motion.button
+                    key={chip.key}
+                    layout
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    onClick={() => removeChip(chip.key)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/15 text-white text-xs font-medium hover:bg-white/25 transition-colors backdrop-blur-sm"
+                  >
+                    {chip.label}
+                    <X size={12} className="text-white/60" />
+                  </motion.button>
+                ))}
+              </motion.div>
             )}
           </AnimatePresence>
         </div>
-
-        {/* Radius picker - shown below the search wrapper */}
-        <TooltipProvider delayDuration={300}>
-        <div className="flex items-center justify-center gap-2 mt-3 w-full max-w-md">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <MapPin size={14} className="text-muted-foreground cursor-help" />
-            </TooltipTrigger>
-            <TooltipContent>Set a search radius around your chosen location</TooltipContent>
-          </Tooltip>
-          <span className="text-xs text-muted-foreground">Radius:</span>
-          <div className="flex items-center gap-1">
-            {[
-              { label: 'Any', value: null, tip: 'Show all properties regardless of distance' },
-              { label: '5 km', value: 5, tip: 'Only show properties within 5 km of the selected location' },
-              { label: '10 km', value: 10, tip: 'Only show properties within 10 km' },
-              { label: '25 km', value: 25, tip: 'Only show properties within 25 km' },
-              { label: '50 km', value: 50, tip: 'Only show properties within 50 km' },
-              { label: '100 km', value: 100, tip: 'Only show properties within 100 km' },
-            ].map((opt) => (
-              <Tooltip key={opt.label}>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    onClick={() => onRadiusChange?.(opt.value)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-                      selectedRadius === opt.value
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-accent'
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>{opt.tip}</TooltipContent>
-              </Tooltip>
-            ))}
-          </div>
-        </div>
-        </TooltipProvider>
-
-        {/* Bottom spacer */}
-        <div className="h-4" />
-
-        {/* Search history pills */}
-        <VoiceSearchHistory onRerun={onSearch} />
       </div>
-      </TooltipProvider>
-    </div>
+
+      {/* SECTION 2 — Stats bar */}
+      <div className="grid grid-cols-4 border-b border-border bg-background">
+        {[
+          { num: '24', label: 'Languages' },
+          { num: 'Live', label: 'Exchange rates' },
+          { num: 'AI', label: 'Voice search' },
+          { num: 'Free', label: 'To search' },
+        ].map((s, i) => (
+          <div key={i} className={`py-4 text-center ${i < 3 ? 'border-r border-border' : ''}`}>
+            <div className="text-lg font-bold text-foreground">{s.num}</div>
+            <div className="text-[10px] text-muted-foreground mt-0.5">{s.label}</div>
+          </div>
+        ))}
+      </div>
+    </TooltipProvider>
   );
 }
 

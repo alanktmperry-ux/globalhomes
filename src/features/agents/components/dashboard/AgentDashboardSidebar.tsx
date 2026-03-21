@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useIsMobile } from '@/shared/hooks/use-mobile';
 import { useAuth } from '@/features/auth/AuthProvider';
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -52,8 +53,9 @@ const INSIGHTS_NAV: NavItem[] = [
 
 
 const AgentDashboardSidebar = () => {
-  const { state } = useSidebar();
+  const { state, setOpenMobile } = useSidebar();
   const collapsed = state === 'collapsed';
+  const isMobile = useIsMobile();
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut, isAdmin, user } = useAuth();
@@ -180,8 +182,12 @@ const AgentDashboardSidebar = () => {
                 isActive={!item.comingSoon && isActive(item.url)}
               >
                 <button
-                  onClick={() => !item.comingSoon && navigate(item.url)}
-                  className={`flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm transition-colors ${
+                  onClick={() => {
+                    if (item.comingSoon) return;
+                    navigate(item.url);
+                    if (isMobile) setOpenMobile(false);
+                  }}
+                  className={`flex items-center gap-2 w-full px-3 py-2.5 rounded-lg text-sm transition-colors ${
                     item.comingSoon
                       ? 'text-muted-foreground/50 cursor-default'
                       : isActive(item.url)
@@ -215,7 +221,7 @@ const AgentDashboardSidebar = () => {
   );
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-border">
+    <Sidebar collapsible="offcanvas" className="border-r border-border">
       <SidebarHeader className="p-4">
         {!collapsed ? (
           <div className="flex items-center gap-2.5">
@@ -268,7 +274,10 @@ const AgentDashboardSidebar = () => {
         <div className="px-3 mb-2 flex gap-1.5">
           <Button
             size="sm"
-            onClick={() => navigate('/pocket-listing')}
+            onClick={() => {
+              navigate('/pocket-listing');
+              if (isMobile) setOpenMobile(false);
+            }}
             className={`flex-1 gap-1.5 text-xs font-bold relative ${collapsed ? 'px-0 justify-center' : ''}`}
           >
             <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-success rounded-full animate-pulse" />
@@ -289,7 +298,10 @@ const AgentDashboardSidebar = () => {
         </div>
 
         <div
-          onClick={() => navigate('/dashboard')}
+          onClick={() => {
+            navigate('/dashboard');
+            if (isMobile) setOpenMobile(false);
+          }}
           className={`flex items-center gap-2.5 px-3 py-2 mx-2 rounded-lg text-sm cursor-pointer transition-colors mb-1 ${
             location.pathname === '/dashboard'
               ? 'bg-secondary text-foreground font-medium'

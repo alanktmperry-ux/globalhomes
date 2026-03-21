@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { useIsMobile } from '@/shared/hooks/use-mobile';
+import { NotificationBell } from '@/features/agents/components/dashboard/NotificationBell';
 import AgentDashboardSidebar from '@/features/agents/components/dashboard/AgentDashboardSidebar';
 
 const AgentDashboardLayout = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const isMobile = useIsMobile();
   const [checked, setChecked] = useState(false);
   const [onboardingComplete, setOnboardingComplete] = useState(true);
 
@@ -32,7 +35,14 @@ const AgentDashboardLayout = () => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background text-foreground">
         <AgentDashboardSidebar />
-        <main className="flex-1 flex flex-col min-h-screen overflow-x-hidden">
+        <main className="flex-1 flex flex-col min-h-screen overflow-x-hidden pb-[env(safe-area-inset-bottom)]">
+          {isMobile && (
+            <div className="sticky top-0 z-30 flex items-center justify-between px-3 h-12 border-b border-border bg-background/95 backdrop-blur-sm">
+              <SidebarTrigger />
+              <span className="text-sm font-bold tracking-tight">ListHQ</span>
+              <NotificationBell />
+            </div>
+          )}
           <Outlet />
         </main>
       </div>

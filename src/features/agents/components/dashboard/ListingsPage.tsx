@@ -196,9 +196,9 @@ const ListingsPage = () => {
                               {actionLoading === l.id ? <Loader2 size={10} className="animate-spin" /> : <Zap size={10} />} Publish Listing
                             </Button>
                           )}
-                          {l._status !== 'public' && l._status !== 'sold' && l._status !== 'pending' && (
-                            <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5" disabled={actionLoading === l.id} onClick={() => handleBoost(l)}>
-                              {actionLoading === l.id ? <Loader2 size={10} className="animate-spin" /> : <Rocket size={10} />} Boost
+                          {l._source === 'db' && l._status === 'public' && (
+                            <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5 text-amber-600 hover:text-amber-700 hover:bg-amber-50" onClick={() => navigate(`/dashboard/listings/${l.id}?tab=marketing`)}>
+                              <Zap size={10} /> Featured
                             </Button>
                           )}
                           {l._status !== 'sold' && (

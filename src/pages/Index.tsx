@@ -439,7 +439,7 @@ const Index = () => {
         {!isCollab && user && (
           <button
             onClick={() => createSession({
-              query: lastSearch?.query || '',
+              query: lastSearch?.text || '',
               filters: filters as Record<string, any>,
               center: searchCenter
                 ? { lat: searchCenter.lat, lng: searchCenter.lng }

@@ -116,7 +116,7 @@ Deno.serve(async (req) => {
       // Admin alert
       await sendEmail(apiKey, "sales@everythingeco.com.au", `New Demo Request — ${full_name}`, buildAdminEmail({ full_name, email, phone, agency_name, message }));
       // Send access code immediately to applicant
-      const demoUrl = `https://globalhomes.lovable.app/agents/demo?email=${encodeURIComponent(email)}`;
+      const demoUrl = `https://listhq.lovable.app/agents/demo?email=${encodeURIComponent(email)}`;
       await sendEmail(apiKey, email, "Your ListHQ Access Code", buildAccessCodeEmail(full_name, email, code, demoUrl));
       return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
 
@@ -138,7 +138,7 @@ Deno.serve(async (req) => {
 
       await ensureDemoAuthUser(supabase, r.email, r.full_name);
 
-      const demoUrl = `https://globalhomes.lovable.app/agents/demo?email=${encodeURIComponent(r.email)}`;
+      const demoUrl = `https://listhq.lovable.app/agents/demo?email=${encodeURIComponent(r.email)}`;
       await sendEmail(apiKey, r.email, "Your ListHQ Demo Access Code", buildAccessCodeEmail(r.full_name, r.email, code, demoUrl));
       return new Response(JSON.stringify({ success: true, code }), { headers: corsHeaders });
 
@@ -165,7 +165,7 @@ Deno.serve(async (req) => {
       await ensureDemoAuthUser(supabase, demoReq.email, demoReq.full_name);
 
       // Keep shared demo environment login behavior
-      const demoEmail = "demo@globalhomes.app";
+      const demoEmail = "demo@listhq.com.au";
       const demoPassword = "DemoAccess2024!";
       const { data: listData, error: listErr } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
       if (listErr) throw listErr;
@@ -278,7 +278,7 @@ function buildAdminEmail(p: { full_name: string; email: string; phone?: string; 
         <tr><td style="padding:10px 12px;color:#64748b;">Phone</td><td style="padding:10px 12px;">${p.phone || "—"}</td></tr>
       </table>
       <div style="text-align:center;margin-top:28px;">
-        <a href="https://globalhomes.lovable.app/admin" style="display:inline-block;background:#2563eb;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Review in Admin Dashboard →</a>
+        <a href="https://listhq.lovable.app/admin" style="display:inline-block;background:#2563eb;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Review in Admin Dashboard →</a>
       </div>
     </div>
     <div style="text-align:center;padding:20px;color:#94a3b8;font-size:12px;">

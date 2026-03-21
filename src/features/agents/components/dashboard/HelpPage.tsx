@@ -398,6 +398,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       { q: 'How do I add team members?', a: 'Go to Team → Invite Member. Enter their email and choose a role (Agent or Admin). They receive an invitation email with a unique code to join your agency workspace.' },
       { q: 'How do I update my public agent profile?', a: 'Go to Profile in the sidebar. Edit your headshot, bio, specialisation, years of experience, languages spoken, and social links. Changes appear on your public page immediately.' },
       { q: 'How do I change my email address?', a: 'Email changes require account verification. Contact support at support@listhq.com.au and we will assist.' },
+      { q: 'How is Partner Access different from Team?', a: 'Team is for agents and admins inside your own agency — people who work for you and need full dashboard access. Partner Access is for external service providers like outsourced trust accountants who need access to specific parts of your account (trust accounting, rent roll) but should not see your CRM, pipeline, analytics, or billing. Always use Partner Access for your trust accountant — never share your agent login.' },
     ],
   },
   {

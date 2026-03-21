@@ -353,7 +353,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       { q: 'Who sees my featured listing?', a: 'Buyers who visit the ListHQ homepage near your suburb — detected via GPS, IP address, or their search query. If a buyer searches for a property in Doncaster they see featured listings from Doncaster. The targeting is automatic — you do not need to configure anything.' },
       { q: 'How much does a boost cost?', a: 'Featured is $49 for 30 days. Premier is $99 for 30 days. Both are one-off payments — no subscription, no recurring charge, no lock-in.' },
       { q: 'How do I request a boost?', a: 'Go to My Listings, open the listing, click the Marketing tab, choose Featured or Premier, and click Confirm. You will receive a bell notification the moment your boost goes live.' },
-      { q: 'How does payment work?', a: 'Stripe card payment is coming very soon — once live, your boost will go live instantly on payment with no waiting. In the meantime payment is arranged on confirmation and your listing goes live promptly. You are never charged automatically — each boost is a one-off.' },
+      { q: 'How does payment work?', a: 'Payment is arranged on confirmation of your boost request. Your listing goes live promptly once payment is confirmed. Stripe online card payment is coming very soon — once live, your boost will activate instantly on payment. You are never charged automatically — each boost is a separate one-off payment.' },
       { q: 'How long does a boost last?', a: 'Exactly 30 days from when your boost goes live. The Marketing tab shows the exact expiry date at all times. You will receive a bell notification 5 days before it ends. When the 30 days is up your listing returns to standard placement automatically.' },
       { q: 'What happens when my boost expires?', a: 'Five days before expiry you receive a bell notification with a link to renew. When the 30 days ends your listing is automatically removed from the featured grid and returns to standard placement. Renew anytime from the Marketing tab — it takes under a minute.' },
       { q: 'How do I know when my boost expires?', a: 'The Marketing tab on your listing shows the expiry date at all times while your boost is active. You will also receive a bell notification 5 days before expiry as a reminder.' },
@@ -445,7 +445,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     items: [
       { q: 'The page is not loading properly — what should I do?', a: 'Try a hard refresh (Ctrl+Shift+R on Windows, Cmd+Shift+R on Mac). If the issue persists, clear your browser cache or try Chrome, Safari, Firefox, or Edge. If the problem continues, email us with a screenshot.' },
       { q: 'My listing photos are not uploading — why?', a: 'Each image must be under 10 MB and in JPEG, PNG, or WebP format. Try uploading one photo at a time on a faster connection. If the issue continues, contact support with the browser and error message.' },
-      { q: 'I am not receiving email notifications.', a: 'Check your spam folder and add noreply@listhq.com.au to your contacts. Verify your email is correct under Settings and that lead notifications are enabled.' },
+      { q: 'I am not receiving email notifications.', a: 'Check your spam folder and add our sending address to your contacts. Verify your email is correct under Settings and that notifications are enabled.' },
       { q: 'The voice search is not working on my device.', a: 'Voice search requires microphone permission in your browser. On Chrome: click the padlock in the address bar → Site settings → Microphone → Allow. On Safari: go to Settings → Safari → Microphone → Allow. Voice search is not supported in Internet Explorer.' },
       { q: 'The map is not showing my territory locations.', a: 'The map uses Google Maps and requires a working internet connection. Try refreshing the Territory page. If your locations are saved but not displaying, try a different browser.' },
     ],
@@ -456,6 +456,20 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       { q: 'Where is my data stored?', a: 'All data is stored in Australia on secure cloud infrastructure (AWS ap-southeast-2 — Sydney region). We do not store data offshore.' },
       { q: 'Can I export my data?', a: 'Yes. Contacts can be exported from the Contacts page. Trust transactions can be exported as CSV from the Trust Ledger. Listings can be exported from Reports. Contact support for a full account data export.' },
       { q: 'What happens to my data if I cancel?', a: 'Your data is retained for 90 days after cancellation. During this window you can export everything. After 90 days, data is permanently deleted per our Privacy Policy.' },
+    ],
+  },
+  {
+    emoji: '🏠', title: 'For Buyers',
+    items: [
+      { q: 'How do I find an agent who speaks my language?', a: 'Go to the Agents tab in the bottom navigation (or visit /agents). Use the language filter dropdown to select your preferred language — only agents who speak that language will appear. You can also filter by name, suburb, or agency name using the search bar. Tap View Profile to see the agent\'s full profile, listings, and contact details.' },
+      { q: 'How does the voice search work?', a: 'Tap the microphone icon on the homepage and speak your search naturally — for example "3 bedroom house in Richmond under $900k with a garage". The AI understands 24 languages. Your results update automatically. You can also type your search in the search bar.' },
+      { q: 'How do I save a property?', a: 'Tap the heart icon on any property card or listing page. Saved properties appear in the Saved tab in the bottom navigation. You need to be signed in to save properties.' },
+      { q: 'How do I save a search so I get alerts for new listings?', a: 'After searching, tap the Save button in the results toolbar. Give your search a name. When new listings are published that match your saved search, you will receive an email alert. You can manage your saved searches from the homepage search bar.' },
+      { q: 'What is Collab Search — searching together?', a: 'Collab Search lets two people browse the same properties at the same time from different devices — useful for couples searching together or buyers working with a partner who is interstate or overseas. After searching, tap the Together button in the toolbar. A link is copied to your clipboard. Share it with your partner — when they open it, you are both in the same live session. You can each react to properties with thumbs up, thumbs down, or fire emoji. You can see which properties your partner has already viewed.' },
+      { q: 'How do I contact an agent about a property?', a: 'Open any property listing and tap Contact Agent or Enquire / Apply. A form appears where you can send a message, request a call, or submit a rental application. Your message goes directly to the agent and starts a conversation in the Messages tab.' },
+      { q: 'How do I apply for a rental property?', a: 'Open the rental listing and tap Enquire / Apply. A 5-step application form appears — personal details, employment, rental history, identity documents, and submit. Your application goes directly to the managing agent.' },
+      { q: 'Is ListHQ free for buyers?', a: 'Yes — completely free. Create an account, search properties, save listings, contact agents, apply for rentals, and use voice search at no cost. ListHQ is paid for by the agents on the platform.' },
+      { q: 'How do I update my property preferences?', a: 'Go to Profile in the bottom navigation, then tap Settings. You can update your budget, preferred suburbs, and property type preferences here at any time.' },
     ],
   },
 ];

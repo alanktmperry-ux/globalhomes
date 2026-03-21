@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Heart, MessageCircle, User, LogIn, LogOut, ShieldCheck, Building2, Globe } from 'lucide-react';
+import { Search, Heart, MessageCircle, User, LogIn, LogOut, ShieldCheck, Building2, Globe, Users } from 'lucide-react';
 import { useI18n, languageNames, type Language } from '@/shared/lib/i18n';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 const navItems = [
   { key: 'nav.search', icon: Search, path: '/' },
   { key: 'nav.saved', icon: Heart, path: '/saved', auth: true },
+  { key: 'nav.agents', icon: Users, path: '/agents' },
   { key: 'nav.messages', icon: MessageCircle, path: '/messages', auth: true },
   { key: 'nav.profile', icon: User, path: '/profile', auth: true },
 ];
@@ -47,7 +48,7 @@ export function BottomNav() {
                 <div className="absolute top-1 w-1 h-1 rounded-full bg-primary" />
               )}
               <item.icon size={22} strokeWidth={isActive ? 2.5 : 1.8} />
-              <span className={`text-[10px] ${isActive ? 'font-medium text-primary' : 'font-medium text-muted-foreground'}`}>{t(item.key)}</span>
+              <span className={`text-[10px] ${isActive ? 'font-medium text-primary' : 'font-medium text-muted-foreground'}`}>{t(item.key) || (item.key === 'nav.agents' ? 'Agents' : '')}</span>
             </button>
           );
         })}

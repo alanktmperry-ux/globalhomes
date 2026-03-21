@@ -153,7 +153,7 @@ const AgentAuthPage = () => {
     if (step === 'password') { setStep('email'); setPassword(''); }
     else if (step === 'create-agency' || step === 'join-agency') setStep('choose');
     else if (step === 'choose') setStep('email');
-    else navigate('/agents');
+    else navigate('/for-agents');
   };
 
   const inputClass = "w-full px-4 py-3.5 rounded-full border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40";

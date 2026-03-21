@@ -51,6 +51,18 @@ const UserTypeBadge = ({ user }: { user: AuthUser }) => {
       </Badge>
     );
   }
+  if (user.user_type === 'partner') {
+    return (
+      <Badge variant="outline" className={`text-[10px] font-medium ${
+        user.is_partner_verified
+          ? 'bg-teal-500/15 text-teal-600 border-teal-500/30'
+          : 'bg-amber-500/15 text-amber-600 border-amber-500/30'
+      }`}>
+        <Landmark className="h-2.5 w-2.5 mr-1" />
+        {user.is_partner_verified ? 'Partner · Verified' : 'Partner · Pending'}
+      </Badge>
+    );
+  }
   if (user.user_type === 'agent') {
     return (
       <Badge variant="outline" className="bg-primary/15 text-primary border-primary/30 text-[10px] font-medium">

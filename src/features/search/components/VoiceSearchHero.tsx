@@ -701,7 +701,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       </div>
 
       {/* ── STATS BAR ── */}
-      <div className="grid grid-cols-4 border-y border-border bg-background">
+      <div className="hidden md:grid grid-cols-4 border-y border-border bg-background">
         {[
           { num: '24',  lbl: 'Languages' },
           { num: 'Live',lbl: 'Exchange rates' },

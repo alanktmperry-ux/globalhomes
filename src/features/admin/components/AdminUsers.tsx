@@ -575,6 +575,74 @@ const AdminUsers = () => {
           <p className="text-center py-8 text-muted-foreground text-sm">No users found</p>
         )}
       </div>
+
+      <Dialog open={subModal.open} onOpenChange={(o) => setSubModal(m => ({ ...m, open: o }))}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Manage subscription</DialogTitle>
+            <p className="text-sm text-muted-foreground">{subModal.email}</p>
+          </DialogHeader>
+
+          <div className="space-y-4 pt-2">
+            <div className="space-y-1.5">
+              <Label>Plan</Label>
+              <Select value={subForm.plan_type} onValueChange={handlePlanChange}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="demo">Demo — 3 listings</SelectItem>
+                  <SelectItem value="starter">Starter — $99/mo, 10 listings</SelectItem>
+                  <SelectItem value="pro">Pro — $199/mo, unlimited</SelectItem>
+                  <SelectItem value="agency">Agency — $399/mo, 8 seats</SelectItem>
+                  <SelectItem value="enterprise">Enterprise — custom</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Listing limit</Label>
+                <input
+                  type="number"
+                  value={subForm.listing_limit}
+                  onChange={(e) => setSubForm(f => ({ ...f, listing_limit: parseInt(e.target.value) || 3 }))}
+                  className="w-full h-9 px-3 text-sm border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Seat limit</Label>
+                <input
+                  type="number"
+                  value={subForm.seat_limit}
+                  onChange={(e) => setSubForm(f => ({ ...f, seat_limit: parseInt(e.target.value) || 1 }))}
+                  className="w-full h-9 px-3 text-sm border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between rounded-lg border border-border p-3">
+              <div>
+                <p className="text-sm font-medium text-foreground">Founding member</p>
+                <p className="text-xs text-muted-foreground">Rate locked for life</p>
+              </div>
+              <Switch
+                checked={subForm.founding_member}
+                onCheckedChange={(v) => setSubForm(f => ({ ...f, founding_member: v }))}
+              />
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <Button onClick={handleSaveSub} disabled={savingSub} className="flex-1">
+                {savingSub ? <><Loader2 className="h-4 w-4 animate-spin mr-1" /> Saving…</> : <><Check className="h-4 w-4 mr-1" /> Save changes</>}
+              </Button>
+              <Button variant="ghost" size="icon" onClick={() => setSubModal(m => ({ ...m, open: false }))}>
+                <X size={16} />
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 };

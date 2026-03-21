@@ -70,6 +70,7 @@ const PLANS: PlanDef[] = [
     features: [
       { text: 'Everything in Starter', key: false },
       { text: 'Unlimited listings', key: true },
+      { text: 'Featured listing boosts ($49–$99/mo)', key: true },
       { text: 'Full trust accounting', key: true },
       { text: 'Off-market network', key: true },
       { text: 'Rent roll management', key: true },

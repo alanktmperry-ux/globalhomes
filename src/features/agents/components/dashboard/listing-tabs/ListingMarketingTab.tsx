@@ -468,9 +468,31 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               ))}
             </div>
 
-            <Button variant="outline" size="sm" className="text-xs text-destructive mt-2" onClick={handleCancelBoost}>
-              Cancel this request
-            </Button>
+            <div className="mt-2">
+              {!showCancelConfirm ? (
+                <button
+                  onClick={() => setShowCancelConfirm(true)}
+                  className="text-xs text-muted-foreground hover:text-destructive transition-colors underline">
+                  Cancel this request
+                </button>
+              ) : (
+                <div className="mt-2 p-3 bg-destructive/10 border border-destructive/20 rounded-xl">
+                  <p className="text-xs font-medium text-destructive mb-1">Cancel boost request?</p>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Your request will be withdrawn. No charge has been made.
+                  </p>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="destructive" className="text-xs h-7" onClick={handleCancelBoost} disabled={!!boostLoading}>
+                      {boostLoading === 'cancelling' ? <Loader2 size={11} className="animate-spin mr-1"/> : null}
+                      Yes, cancel
+                    </Button>
+                    <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => setShowCancelConfirm(false)}>
+                      Keep request
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
           </>
         ) : (
           <>

@@ -8,7 +8,7 @@ import { lovable } from '@/integrations/lovable/index';
 import { useToast } from '@/shared/hooks/use-toast';
 import seekerHero from '@/assets/seeker-auth-hero.jpg';
 
-type Step = 'email' | 'password' | 'create';
+type Step = 'email' | 'password' | 'create' | 'prefs';
 
 const SeekerAuthPage = () => {
   const navigate = useNavigate();
@@ -19,6 +19,9 @@ const SeekerAuthPage = () => {
   const [displayName, setDisplayName] = useState('');
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
+  const [budgetMax, setBudgetMax] = useState('');
+  const [suburbs, setSuburbs] = useState('');
+  const [propertyType, setPropertyType] = useState('');
 
   const handleEmailContinue = (e: React.FormEvent) => {
     e.preventDefault();

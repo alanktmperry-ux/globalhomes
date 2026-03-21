@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Ban, Trash2, UserCheck, Loader2, Mail, Clock, Shield, Rocket, Eye, CheckSquare, Square, MinusSquare } from 'lucide-react';
+import { Search, Ban, Trash2, UserCheck, Loader2, Mail, Clock, Shield, Rocket, Eye, CheckSquare, Square, MinusSquare, UserCog } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/shared/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/features/auth/AuthProvider';
+import { useNavigate } from 'react-router-dom';
 
 interface AuthUser {
   id: string;

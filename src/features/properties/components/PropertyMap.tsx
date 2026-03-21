@@ -340,6 +340,12 @@ export function PropertyMap({
           map.panTo({ lat: pos.coords.latitude, lng: pos.coords.longitude });
           map.setZoom(14);
         }
+        if (onGeolocate) {
+          onGeolocate({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          });
+        }
         setLocating(false);
       },
       () => setLocating(false),

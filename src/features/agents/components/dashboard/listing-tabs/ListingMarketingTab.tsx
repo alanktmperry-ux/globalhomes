@@ -73,6 +73,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
     boost_requested_tier: listing.boost_requested_tier || null,
     featured_until: listing.featured_until || null,
   });
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   
 
   const [vendorName, setVendorName] = useState(listing.vendor_name || '');

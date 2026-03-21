@@ -571,7 +571,7 @@ const MessagesPage = () => {
               )}
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2" style={{ maxHeight: 'calc(100vh - 240px)' }}>
+              <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2 pb-4" style={{ maxHeight: 'calc(100vh - 240px)' }}>
                 {selectedConvo.id.startsWith('lead-') && messages.length === 0 ? (
                   <div className="bg-secondary/50 rounded-2xl p-4 text-center">
                     <p className="text-sm text-muted-foreground">

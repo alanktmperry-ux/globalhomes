@@ -12,7 +12,7 @@ import {
   Search, ChevronRight, BookOpen, MessageCircle, ExternalLink,
   Home, DollarSign, Users, BarChart3, Shield, Landmark, Calculator,
   PartyPopper, Mic, MapPin, Kanban, FileText, Settings, Star,
-  Building2, AlertTriangle, CheckCircle2, Wrench, Key, Globe,
+  Building2, AlertTriangle, CheckCircle2, Wrench, Key, Globe, Handshake,
 } from 'lucide-react';
 
 /* ─── TYPES ─── */
@@ -45,6 +45,8 @@ const CHECKLIST: ChecklistItem[] = [
   { icon: Users, title: 'Import your contacts', description: 'Bring your existing client database in via CSV — takes under 2 minutes.', route: '/dashboard/contacts' },
   { icon: DollarSign, title: 'Choose your plan', description: 'Start on the Starter founding price of $99/mo before it increases.', route: '/dashboard/billing' },
   { icon: Globe, title: 'Explore the Off-Market Network', description: 'Share listings exclusively with verified agents before going public.', route: '/dashboard/network' },
+  { icon: Key, title: 'Invite your team', description: 'Add agents and admins to your agency workspace.', route: '/dashboard/team' },
+  { icon: Handshake, title: 'Invite a trust accounting partner', description: 'Give your outsourced trust accountant their own partner login to manage your rent roll and trust account.', route: '/dashboard/partner-access' },
   { icon: Key, title: 'Run your first open home', description: 'Use Inspection Day Mode to capture visitor details with a QR code.', route: '/dashboard/inspection-mode' },
 ];
 
@@ -66,6 +68,7 @@ const QUICK_REF: { feature: string; route: string; what: string }[] = [
   { feature: 'Reports', route: '/dashboard/reports', what: 'Export CSV/PDF for listings, leads, trust, contacts' },
   { feature: 'Documents', route: '/dashboard/documents', what: 'Store and manage transaction documents' },
   { feature: 'Team', route: '/dashboard/team', what: 'Invite agents and manage roles' },
+  { feature: 'Partner Access', route: '/dashboard/partner-access', what: 'Invite trust accounting firms and give them access to your rent roll and trust account' },
   { feature: 'My Agencies', route: '/dashboard/agencies', what: 'Agency profile and branding' },
   { feature: 'Billing', route: '/dashboard/billing', what: 'Subscription plans, payment, usage' },
   { feature: 'Reviews', route: '/dashboard/reviews', what: 'Client reviews and reputation score' },
@@ -256,11 +259,26 @@ const GUIDES: Guide[] = [
     emoji: '🤝', title: 'Managing Your Team',
     description: 'Invite agents, assign roles, and manage your agency.',
     steps: [
-      'Go to Team in the sidebar. Click "Invite Member" and enter the email address of the agent you want to add.',
+      'Go to Team in the sidebar (under Account). Click "Invite Member" and enter the email address of the agent you want to add.',
       'Choose their role: Agent (can add listings and manage their own contacts) or Admin (full access including billing and team management).',
-      'The invited agent receives an email with a unique invite code. They sign up using that code and are automatically linked to your agency.',
-      'Team members appear in the Team list with their status (Active, Pending, Inactive) and role.',
-      'To remove a team member, click the three-dot menu on their row and select "Remove from Agency". Their individual listings and contacts are retained.',
+      'The invited agent receives an email with a unique invite link. They sign up using that link and are automatically linked to your agency.',
+      'Team members appear in the Team list with their status (Active, Pending) and role badge.',
+      'To remove a team member, click the three-dot menu on their row and select "Remove from Agency". Their individual listings and contacts are retained but they lose dashboard access immediately.',
+      'For outsourced trust accounting staff, use Partner Access instead of Team — partners get a separate portal designed specifically for trust accounting work, and each of their staff members gets their own individual login.',
+    ],
+  },
+  {
+    emoji: '🤝', title: 'Partner Portal — Trust Accounting Firms',
+    description: 'Give your outsourced trust accountant their own secure login to manage your accounts.',
+    steps: [
+      'ListHQ has a dedicated Partner Portal for outsourced trust accounting firms — businesses like Balance R&R, End of Month Angels, and hastings + co who manage trust accounts on behalf of multiple agencies.',
+      'To invite a partner firm: go to Partner Access in the sidebar (under Account). Enter the partner\'s email address and choose their access level: Trust Only (trust account read/write), Trust & PM (trust plus rent roll and tenancies), or Full PM (complete property management access including maintenance).',
+      'The partner receives a branded invitation email with a unique token link. They click the link, create their account, and land directly in the Partner Portal showing your agency.',
+      'Once accepted, your partner can log in at any time via /partner/login. They see a dedicated portal — separate from the agent dashboard — with your trust account, rent roll, and arrears all in one place.',
+      'Partner firms can manage multiple agencies from one login. A dropdown switcher at the top of their portal lets them move between all the agencies that have invited them.',
+      'Partner firms can invite their own team members from within the Partner Portal. Each staff member gets their own individual login — no shared passwords. The firm owner manages who has access and can remove team members at any time.',
+      'To revoke a partner\'s access: go to Partner Access in your sidebar, find the partner in the active partners table, and click Revoke. Their access is removed immediately.',
+      'All partner activity is logged — every transaction viewed, receipt recorded, or payment processed by a partner is timestamped and attributed to their account.',
     ],
   },
   {
@@ -295,6 +313,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       { q: 'Is there a free trial?', a: 'Yes — every new agent gets a 14-day free trial of the Pro plan. No credit card required to start.' },
       { q: 'What is the founding price?', a: 'Founding prices are available for a limited time: Starter at $99/mo (full price $199), Pro at $199/mo (full price $349), Agency at $399/mo (full price $699). Annual billing saves an additional 15%.' },
       { q: 'Can I use ListHQ as a buyer as well?', a: 'Yes. Your agent login gives you full access to the buyer marketplace — saved searches, property alerts, the AI voice search, and map search.' },
+      { q: 'What is the partner portal and do I need it?', a: 'The partner portal is for agents who use an outsourced trust accounting firm. Instead of sharing your login with your trust accountant, you invite them via Partner Access and they get their own dedicated portal. If you manage your own trust accounting, you do not need it. If you use a firm like Balance R&R or End of Month Angels, set it up in the first week.' },
     ],
   },
   {
@@ -338,6 +357,19 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     ],
   },
   {
+    emoji: '🤝', title: 'Partner Portal',
+    items: [
+      { q: 'What is the Partner Portal?', a: 'The Partner Portal is a dedicated login for outsourced trust accounting firms — businesses that manage trust accounts on behalf of multiple real estate agencies. Instead of sharing your agent login, your trust accountant gets their own secure portal showing only what they need: your trust account, rent roll, tenancies, and arrears. It is completely separate from your agent dashboard.' },
+      { q: 'How do I give my trust accountant access?', a: 'Go to Partner Access in the sidebar under Account. Enter your trust accountant\'s email address and choose their access level (Trust Only, Trust & PM, or Full PM). They receive a branded invitation email with a secure link. Once they accept, they can log in immediately at /partner/login.' },
+      { q: 'What can a partner see and do?', a: 'Depends on the access level you grant. Trust Only: view and record trust receipts, payments, and reconciliation for your agency. Trust & PM: everything in Trust Only plus rent roll, tenancy records, and rent payments. Full PM: complete access including maintenance jobs, bank reconciliation, and arrears management.' },
+      { q: 'Can my trust accounting firm manage multiple agencies from one login?', a: 'Yes — this is the core purpose of the Partner Portal. A firm like Balance R&R can be invited by 20 different agencies. When they log in they see all their active agencies in a dropdown switcher and can move between them instantly. Each agency\'s data is kept completely separate.' },
+      { q: 'Can the partner firm have multiple staff members with individual logins?', a: 'Yes. The firm owner registers first and becomes the account owner. From within the Partner Portal, they can go to Team and invite each of their staff members by email. Each person gets their own individual login and password — no shared credentials. The owner can revoke any team member\'s access at any time.' },
+      { q: 'Is the partner portal free for my trust accountant to use?', a: 'Yes. There is no charge to partner firms for using the portal. The partner portal is included with your Pro and Agency plan subscription.' },
+      { q: 'How do I revoke a partner\'s access?', a: 'Go to Partner Access in your sidebar. Find the partner in the active partners table and click Revoke. Their access is removed immediately and they are notified by email.' },
+      { q: 'Can I see what my partner has done in my account?', a: 'Yes. All partner activity is logged with a timestamp and attributed to the individual team member. You can see who recorded which transaction, when, and from which IP address.' },
+    ],
+  },
+  {
     emoji: '📅', title: 'Inspections',
     items: [
       { q: 'How does Inspection Day Mode work?', a: 'Select your listing from the scheduled inspections list. During the inspection, add visitor details manually — first name, last name, phone, email, and interest level (Hot/Warm/Cold). After the inspection, send a one-click follow-up and all visitors are added to your CRM.' },
@@ -354,7 +386,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
   {
     emoji: '💳', title: 'Plans and Billing',
     items: [
-      { q: 'What plans are available?', a: 'Starter ($99/mo founding, $199 full): 1 login, 10 listings, CRM, AI listing writer, voice leads, standard analytics. Pro ($199/mo founding, $349 full): 1 login, unlimited listings, trust accounting, Whisper Market, Inspection Day, Settlement Concierge, commission calculator, GCI reports, verified badge. Agency ($399/mo founding, $699 full): up to 8 logins, everything in Pro plus team analytics, agency branding, lead routing, and API access. Annual billing saves 15% on all plans.' },
+      { q: 'What plans are available?', a: 'Starter ($99/mo founding, $199 full): 1 seat, 10 listings, CRM, AI listing writer, voice leads, standard analytics. Pro ($199/mo founding, $349 full): 1 seat, unlimited listings, trust accounting, partner portal access, Whisper Market, Inspection Day, Settlement Concierge, commission calculator, GCI reports, verified badge. Agency ($399/mo founding, $699 full): up to 8 seats, everything in Pro plus team analytics, agency branding, lead routing, partner portal access, and API access. Annual billing saves 15% on all plans.' },
       { q: 'Can I cancel at any time?', a: 'Yes. No lock-in contracts. Cancel from the Billing page and your plan remains active until the end of the billing period. Data is retained for 90 days.' },
       { q: 'What payment methods are accepted?', a: 'Visa, Mastercard, and American Express via Stripe. Update your card at any time on the Billing page.' },
       { q: 'Is there a per-listing marketing fee?', a: 'Yes. In addition to the subscription, listing campaigns on the public marketplace are charged per listing: Standard $299, Featured $599, Premier $999. These fees are passed to vendors as their marketing campaign cost — typically 50–88% cheaper than REA Group.' },
@@ -366,6 +398,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       { q: 'How do I add team members?', a: 'Go to Team → Invite Member. Enter their email and choose a role (Agent or Admin). They receive an invitation email with a unique code to join your agency workspace.' },
       { q: 'How do I update my public agent profile?', a: 'Go to Profile in the sidebar. Edit your headshot, bio, specialisation, years of experience, languages spoken, and social links. Changes appear on your public page immediately.' },
       { q: 'How do I change my email address?', a: 'Email changes require account verification. Contact support at support@listhq.com.au and we will assist.' },
+      { q: 'How is Partner Access different from Team?', a: 'Team is for agents and admins inside your own agency — people who work for you and need full dashboard access. Partner Access is for external service providers like outsourced trust accountants who need access to specific parts of your account (trust accounting, rent roll) but should not see your CRM, pipeline, analytics, or billing. Always use Partner Access for your trust accountant — never share your agent login.' },
     ],
   },
   {

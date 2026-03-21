@@ -190,8 +190,10 @@ const App = () => (
                 {/* Partner */}
                 <Route path="/partner/login" element={<PartnerAuthPage />} />
                 <Route path="/partner/accept" element={<PartnerAcceptPage />} />
+                <Route path="/partner/join" element={<PartnerJoinPage />} />
                 <Route path="/partner" element={<PartnerDashboardLayout />}>
                   <Route path="dashboard" element={<PartnerOverviewPage />} />
+                  <Route path="team" element={<PartnerTeamPage />} />
                   <Route path="trust" element={<PartnerTrustPage />} />
                   <Route path="rent-roll" element={<PartnerRentRollPage />} />
                   <Route path="arrears" element={<PartnerArrearsPage />} />

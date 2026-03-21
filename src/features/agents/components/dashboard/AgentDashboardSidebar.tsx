@@ -70,6 +70,9 @@ const AgentDashboardSidebar = () => {
   const { plan, foundingMember } = useSubscription();
   const [arrearsCount, setArrearsCount] = useState(0);
   const [onboardingComplete, setOnboardingComplete] = useState(true);
+  const [agentLogo, setAgentLogo] = useState<string | null>(null);
+  const [agentName, setAgentName] = useState<string | null>(null);
+  const [agencyName, setAgencyName] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;

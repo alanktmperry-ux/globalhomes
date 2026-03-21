@@ -793,10 +793,6 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
           0%,100%{opacity:1}
           50%{opacity:0}
         }
-        @keyframes scrollLeft {
-          0%{transform:translateX(0)}
-          100%{transform:translateX(-50%)}
-        }
       `}</style>
     </div>
   );

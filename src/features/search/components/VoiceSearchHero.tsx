@@ -434,7 +434,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
             </h1>
 
             {/* Rotating gradient line */}
-            <div className="h-[1.15em] overflow-hidden text-[38px] md:text-[52px] font-extrabold leading-[1.05]">
+            <div className="h-[1.15em] overflow-hidden text-[38px] md:text-[52px] font-display font-extrabold leading-[1.05]">
               <AnimatePresence mode="wait">
                 <motion.span
                   key={headlineIndex}

@@ -286,10 +286,21 @@ const AgentDashboardSidebar = () => {
           )}
         </div>
 
-        {renderGroup('Home', CORE_NAV)}
-        {renderGroup('CRM', CRM_NAV)}
-        {renderGroup('Business', BUSINESS_NAV)}
-        {renderGroup('Team & Network', TEAM_NAV)}
+        <div
+          onClick={() => navigate('/dashboard')}
+          className={`flex items-center gap-2.5 px-3 py-2 mx-2 rounded-lg text-sm cursor-pointer transition-colors mb-1 ${
+            location.pathname === '/dashboard'
+              ? 'bg-secondary text-foreground font-medium'
+              : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground'
+          }`}
+        >
+          <LayoutDashboard size={16} />
+          {!collapsed && 'Dashboard'}
+        </div>
+
+        {renderGroup('Sales', SALES_NAV)}
+        {renderGroup('Property Management', PROPERTY_NAV)}
+        {renderGroup('Insights', INSIGHTS_NAV)}
         {renderGroup('Account', ACCOUNT_NAV)}
         {ADMIN_NAV.length > 0 && renderGroup('Admin', ADMIN_NAV)}
       </SidebarContent>

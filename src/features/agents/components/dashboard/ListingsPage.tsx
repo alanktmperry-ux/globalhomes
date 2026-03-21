@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Eye, EyeOff, Zap, CheckCircle2, Clock, Sparkles, TrendingUp, Rocket, Info, Loader2, Pencil, Globe } from 'lucide-react';
+import { Plus, Eye, EyeOff, Zap, CheckCircle2, Clock, Sparkles, TrendingUp, Info, Loader2, Pencil, Globe } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useNavigate } from 'react-router-dom';
 import DashboardHeader from './DashboardHeader';
@@ -54,14 +54,6 @@ const ListingsPage = () => {
     setActionLoading(null);
   };
 
-  const handleBoost = async (l: AgentListing) => {
-    if (l._source !== 'db') { toast.success('Demo listing — Create a real listing first.'); return; }
-    setActionLoading(l.id);
-    const { error } = await supabase.from('properties').update({ status: 'public', is_active: true } as any).eq('id', l.id);
-    if (error) { toast.error('Failed to boost'); }
-    else { toast.success('Listing boosted! — Your listing is now public.'); refetch(); }
-    setActionLoading(null);
-  };
 
   const handleMarkSold = async (l: AgentListing) => {
     if (l._source !== 'db') { toast.success('Demo listing — Create a real listing first.'); return; }
@@ -204,9 +196,9 @@ const ListingsPage = () => {
                               {actionLoading === l.id ? <Loader2 size={10} className="animate-spin" /> : <Zap size={10} />} Publish Listing
                             </Button>
                           )}
-                          {l._status !== 'public' && l._status !== 'sold' && l._status !== 'pending' && (
-                            <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5" disabled={actionLoading === l.id} onClick={() => handleBoost(l)}>
-                              {actionLoading === l.id ? <Loader2 size={10} className="animate-spin" /> : <Rocket size={10} />} Boost
+                          {l._source === 'db' && l._status === 'public' && (
+                            <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5 text-amber-600 hover:text-amber-700 hover:bg-amber-50" onClick={() => navigate(`/dashboard/listings/${l.id}?tab=marketing`)}>
+                              <Zap size={10} /> Featured
                             </Button>
                           )}
                           {l._status !== 'sold' && (

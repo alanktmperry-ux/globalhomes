@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, Search, Loader2, X, ChevronDown, MapPin } from 'lucide-react';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { Skeleton } from '@/components/ui/skeleton';
 import { SoundWaveVisualizer } from './SoundWaveVisualizer';
 import { parsePropertyQuery, filtersToChips } from '@/features/search/lib/parsePropertyQuery';
 import { useToast } from '@/shared/hooks/use-toast';
@@ -9,6 +10,7 @@ import { autocomplete, getPlaceDetails } from '@/shared/lib/googleMapsService';
 import { useNavigate } from 'react-router-dom';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { useI18n } from '@/shared/lib/i18n';
+import { supabase } from '@/integrations/supabase/client';
 
 type VoiceState = 'idle' | 'listening' | 'processing' | 'results';
 

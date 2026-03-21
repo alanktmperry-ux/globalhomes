@@ -131,35 +131,8 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
     return 'Your boost will be activated within 1 business hour.';
   };
 
-  const handleCancelBoost = async () => {
-    setBoostLoading('cancelling');
-    try {
-      const { error } = await supabase
-        .from('properties')
-        .update({
-          boost_requested_at: null,
-          boost_requested_tier: null,
-          is_featured: false,
-          boost_tier: null,
-        } as any)
-        .eq('id', listing.id);
-      if (!error) {
-        toast.success('Boost cancelled');
-        setBoostState({
-          is_featured: false,
-          boost_tier: null,
-          boost_requested_at: null,
-          boost_requested_tier: null,
-          featured_until: null,
-        });
-        setShowCancelConfirm(false);
-      } else {
-        toast.error('Could not cancel — email support@listhq.com.au');
-      }
-    } finally {
-      setBoostLoading(null);
-    }
-  };
+
+
 
   useEffect(() => {
     const load = async () => {

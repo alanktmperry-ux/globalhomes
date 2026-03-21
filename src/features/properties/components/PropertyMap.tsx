@@ -349,11 +349,15 @@ export function PropertyMap({
     });
 
     if (!centerOn) {
+      let capApplied = false;
       map.fitBounds(bounds, { top: 40, right: 40, bottom: 40, left: 40 });
       const listener = google.maps.event.addListener(map, 'idle', () => {
-        const zoom = map.getZoom();
-        if (zoom && zoom > 14) map.setZoom(14);
-        google.maps.event.removeListener(listener);
+        if (!capApplied) {
+          capApplied = true;
+          const zoom = map.getZoom();
+          if (zoom && zoom > 14) map.setZoom(14);
+          google.maps.event.removeListener(listener);
+        }
       });
     }
   }, [properties, selectedPropertyId, onPropertySelect, centerOn, onScrollToProperty, formatPrice]);

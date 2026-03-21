@@ -12,7 +12,7 @@ import {
   Search, ChevronRight, BookOpen, MessageCircle, ExternalLink,
   Home, DollarSign, Users, BarChart3, Shield, Landmark, Calculator,
   PartyPopper, Mic, MapPin, Kanban, FileText, Settings, Star,
-  Building2, AlertTriangle, CheckCircle2, Wrench, Key, Globe,
+  Building2, AlertTriangle, CheckCircle2, Wrench, Key, Globe, Handshake,
 } from 'lucide-react';
 
 /* ─── TYPES ─── */

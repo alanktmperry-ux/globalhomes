@@ -105,6 +105,45 @@ const AdminUsers = () => {
     navigate('/dashboard');
   };
 
+  const handleOpenSubModal = (u: AuthUser) => {
+    const plan = u.plan_type || 'demo';
+    const limits: Record<string, { listings: number; seats: number }> = {
+      demo: { listings: 3, seats: 1 },
+      starter: { listings: 10, seats: 1 },
+      pro: { listings: 9999, seats: 1 },
+      agency: { listings: 9999, seats: 8 },
+      enterprise: { listings: 9999, seats: 50 },
+    };
+    const def = limits[plan] || limits.demo;
+    setSubForm({ plan_type: plan, listing_limit: def.listings, seat_limit: def.seats, founding_member: false });
+    setSubModal({ open: true, userId: u.id, email: u.email, currentPlan: plan });
+  };
+
+  const handleSaveSub = async () => {
+    setSavingSub(true);
+    try {
+      await callAdminApi('set_subscription', { user_id: subModal.userId, ...subForm });
+      toast({ title: 'Subscription updated', description: `${subModal.email} is now on the ${subForm.plan_type} plan.` });
+      setSubModal(m => ({ ...m, open: false }));
+      fetchUsers();
+    } catch (err: any) {
+      toast({ title: 'Failed', description: err.message, variant: 'destructive' });
+    }
+    setSavingSub(false);
+  };
+
+  const handlePlanChange = (plan: string) => {
+    const limits: Record<string, { listings: number; seats: number }> = {
+      demo: { listings: 3, seats: 1 },
+      starter: { listings: 10, seats: 1 },
+      pro: { listings: 9999, seats: 1 },
+      agency: { listings: 9999, seats: 8 },
+      enterprise: { listings: 9999, seats: 50 },
+    };
+    const def = limits[plan] || limits.demo;
+    setSubForm(f => ({ ...f, plan_type: plan, listing_limit: def.listings, seat_limit: def.seats }));
+  };
+
   const getSession = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession();
     return session;

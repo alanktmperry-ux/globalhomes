@@ -545,9 +545,9 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                 </Badge>
                 <div>
                   <span className="text-2xl font-bold">$99</span>
-                  <span className="text-sm text-muted-foreground">/month</span>
+                  <span className="text-sm text-muted-foreground"> for 30 days</span>
                 </div>
-                <p className="text-[10px] text-muted-foreground">Cancel anytime · no lock-in</p>
+                <p className="text-[10px] text-muted-foreground">One-off payment · renew anytime</p>
                 <ul className="space-y-1.5">
                   {BOOST_TIERS.premier.inclusions.map((item, i) => (
                     <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">

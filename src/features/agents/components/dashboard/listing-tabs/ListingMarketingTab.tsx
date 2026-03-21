@@ -400,6 +400,45 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               </span>.
               {' '}Renew for another 30 days anytime.
             </p>
+
+            <div className="pt-2 border-t border-border">
+              {!showCancelConfirm ? (
+                <button
+                  onClick={() => setShowCancelConfirm(true)}
+                  className="text-xs text-muted-foreground hover:text-destructive transition-colors underline">
+                  Cancel remaining boost
+                </button>
+              ) : (
+                <div className="p-3 rounded-xl bg-destructive/8 border border-destructive/20">
+                  <p className="text-xs font-medium text-destructive mb-1">
+                    Cancel your active boost?
+                  </p>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Your listing will be removed from the featured grid immediately.
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      className="text-xs h-7"
+                      onClick={handleCancelBoost}
+                      disabled={boostLoading === 'cancelling'}>
+                      {boostLoading === 'cancelling' && (
+                        <Loader2 size={11} className="animate-spin mr-1" />
+                      )}
+                      Yes, cancel
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-xs h-7"
+                      onClick={() => setShowCancelConfirm(false)}>
+                      Keep boost
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
           </>
         ) : isBoostPending ? (
           <>

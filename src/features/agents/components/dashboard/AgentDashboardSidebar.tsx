@@ -25,36 +25,26 @@ interface NavItem {
   comingSoon?: boolean;
 }
 
-const CORE_NAV: NavItem[] = [
-  { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
-  { title: 'Profile', url: '/dashboard/profile', icon: User },
-  { title: 'Territory', url: '/dashboard/territory', icon: MapPinned },
-];
-
-const CRM_NAV: NavItem[] = [
+const SALES_NAV: NavItem[] = [
+  { title: 'My Listings', url: '/dashboard/listings', icon: List, badgeKey: 'listings' },
   { title: 'Contacts', url: '/dashboard/contacts', icon: Contact },
   { title: 'Pipeline', url: '/dashboard/pipeline', icon: Kanban },
-  { title: 'My Listings', url: '/dashboard/listings', icon: List, badgeKey: 'listings' },
-  { title: 'Applications', url: '/dashboard/rental-applications', icon: ClipboardList },
   { title: 'Voice Leads', url: '/dashboard/leads', icon: Mic, badgeKey: 'leads' },
-  { title: 'Inspection Day', url: '/dashboard/inspection-mode', icon: CalendarDays },
   { title: 'Off-Market Network', url: '/dashboard/network', icon: Users },
 ];
 
-const BUSINESS_NAV: NavItem[] = [
+const PROPERTY_NAV: NavItem[] = [
   { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home, badgeKey: 'rentRoll' },
-  { title: 'Investments', url: '/dashboard/investments', icon: TrendingUp },
-  { title: 'Financials', url: '/dashboard/trust', icon: Landmark },
-  { title: 'Commission Calculator', url: '/dashboard/commission', icon: Calculator },
-  { title: 'Settlement Concierge', url: '/dashboard/settlements', icon: PartyPopper },
-  { title: 'Compliance', url: '/dashboard/compliance', icon: ClipboardCheck, comingSoon: true },
-  { title: 'Analytics', url: '/dashboard/analytics', icon: BarChart3 },
-  { title: 'Reports', url: '/dashboard/reports', icon: FileText },
-  { title: 'Documents', url: '/dashboard/documents', icon: FileText },
+  { title: 'Applications', url: '/dashboard/rental-applications', icon: ClipboardList },
+  { title: 'Inspection Day', url: '/dashboard/inspection-mode', icon: CalendarDays },
+  { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
+  { title: 'Settlement', url: '/dashboard/settlements', icon: PartyPopper },
 ];
 
-const TEAM_NAV: NavItem[] = [
-  { title: 'Team', url: '/dashboard/team', icon: UserPlus },
+const INSIGHTS_NAV: NavItem[] = [
+  { title: 'Analytics', url: '/dashboard/analytics', icon: BarChart3 },
+  { title: 'Reports', url: '/dashboard/reports', icon: FileText },
+  { title: 'Commission', url: '/dashboard/commission', icon: Calculator },
 ];
 
 
@@ -153,14 +143,15 @@ const AgentDashboardSidebar = () => {
     rentRoll: arrearsCount > 0 ? String(arrearsCount) : '',
   };
 
-  // Build ACCOUNT_NAV with conditional Setup item
   const ACCOUNT_NAV: NavItem[] = [
+    { title: 'Profile', url: '/dashboard/profile', icon: User },
     { title: 'My Agencies', url: '/dashboard/agencies', icon: Building2 },
-    ...(!onboardingComplete ? [{ title: 'Setup', url: '/dashboard/onboarding', icon: Settings2 }] : []),
+    { title: 'Territory', url: '/dashboard/territory', icon: MapPinned },
+    { title: 'Team', url: '/dashboard/team', icon: UserPlus },
     { title: 'Billing', url: '/dashboard/billing', icon: CreditCard },
     { title: 'Reviews', url: '/dashboard/reviews', icon: Star },
     { title: 'Settings', url: '/dashboard/settings', icon: Settings },
-    
+    ...(!onboardingComplete ? [{ title: 'Setup', url: '/dashboard/onboarding', icon: Settings2 }] : []),
   ];
 
   const ADMIN_NAV: NavItem[] = isAdmin ? [{ title: 'Admin Panel', url: '/admin', icon: Shield }] : [];
@@ -295,10 +286,21 @@ const AgentDashboardSidebar = () => {
           )}
         </div>
 
-        {renderGroup('Home', CORE_NAV)}
-        {renderGroup('CRM', CRM_NAV)}
-        {renderGroup('Business', BUSINESS_NAV)}
-        {renderGroup('Team & Network', TEAM_NAV)}
+        <div
+          onClick={() => navigate('/dashboard')}
+          className={`flex items-center gap-2.5 px-3 py-2 mx-2 rounded-lg text-sm cursor-pointer transition-colors mb-1 ${
+            location.pathname === '/dashboard'
+              ? 'bg-secondary text-foreground font-medium'
+              : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground'
+          }`}
+        >
+          <LayoutDashboard size={16} />
+          {!collapsed && 'Dashboard'}
+        </div>
+
+        {renderGroup('Sales', SALES_NAV)}
+        {renderGroup('Property Management', PROPERTY_NAV)}
+        {renderGroup('Insights', INSIGHTS_NAV)}
         {renderGroup('Account', ACCOUNT_NAV)}
         {ADMIN_NAV.length > 0 && renderGroup('Admin', ADMIN_NAV)}
       </SidebarContent>

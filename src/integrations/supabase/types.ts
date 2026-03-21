@@ -1440,6 +1440,50 @@ export type Database = {
           },
         ]
       }
+      partner_members: {
+        Row: {
+          created_at: string
+          id: string
+          invite_expires_at: string | null
+          invite_token: string | null
+          invited_by: string | null
+          joined_at: string | null
+          partner_id: string
+          role: Database["public"]["Enums"]["partner_member_role"]
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invite_expires_at?: string | null
+          invite_token?: string | null
+          invited_by?: string | null
+          joined_at?: string | null
+          partner_id: string
+          role?: Database["public"]["Enums"]["partner_member_role"]
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invite_expires_at?: string | null
+          invite_token?: string | null
+          invited_by?: string | null
+          joined_at?: string | null
+          partner_id?: string
+          role?: Database["public"]["Enums"]["partner_member_role"]
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_members_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partners: {
         Row: {
           abn: string | null
@@ -2797,6 +2841,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_active_partner_for_agent: {
+        Args: { _agent_id: string }
+        Returns: boolean
+      }
       is_agency_member: {
         Args: { _agency_id: string; _user_id: string }
         Returns: boolean
@@ -2890,6 +2938,7 @@ export type Database = {
         | "principal"
         | "property_manager"
         | "partner"
+      partner_member_role: "owner" | "member"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3026,6 +3075,7 @@ export const Constants = {
         "property_manager",
         "partner",
       ],
+      partner_member_role: ["owner", "member"],
     },
   },
 } as const

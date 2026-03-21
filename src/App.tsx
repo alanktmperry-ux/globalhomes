@@ -75,6 +75,8 @@ const PartnerAcceptPage = React.lazy(() => import("./features/partners/pages/Par
 const PartnerTrustPage = React.lazy(() => import("./features/partners/pages/PartnerTrustPage"));
 const PartnerRentRollPage = React.lazy(() => import("./features/partners/pages/PartnerRentRollPage"));
 const PartnerArrearsPage = React.lazy(() => import("./features/partners/pages/PartnerArrearsPage"));
+const PartnerJoinPage = React.lazy(() => import("./features/partners/pages/PartnerJoinPage"));
+const PartnerTeamPage = React.lazy(() => import("./features/partners/pages/PartnerTeamPage"));
 const PartnerAccessPage = React.lazy(() => import("./features/agents/components/dashboard/PartnerAccessPage"));
 const PageLoader = () => (
   <div className="flex h-screen w-full items-center justify-center bg-background">
@@ -189,8 +191,10 @@ const App = () => (
                 {/* Partner */}
                 <Route path="/partner/login" element={<PartnerAuthPage />} />
                 <Route path="/partner/accept" element={<PartnerAcceptPage />} />
+                <Route path="/partner/join" element={<PartnerJoinPage />} />
                 <Route path="/partner" element={<PartnerDashboardLayout />}>
                   <Route path="dashboard" element={<PartnerOverviewPage />} />
+                  <Route path="team" element={<PartnerTeamPage />} />
                   <Route path="trust" element={<PartnerTrustPage />} />
                   <Route path="rent-roll" element={<PartnerRentRollPage />} />
                   <Route path="arrears" element={<PartnerArrearsPage />} />

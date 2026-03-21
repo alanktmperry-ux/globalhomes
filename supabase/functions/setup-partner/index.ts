@@ -70,6 +70,18 @@ Deno.serve(async (req) => {
 
     if (partnerErr) throw partnerErr;
 
+    // Add owner to partner_members
+    const { error: memberError } = await supabaseAdmin
+      .from("partner_members")
+      .insert({
+        partner_id: partner.id,
+        user_id: user.id,
+        role: "owner",
+        joined_at: new Date().toISOString(),
+      });
+
+    if (memberError) throw memberError;
+
     // Add partner role to user_roles
     await supabaseAdmin
       .from("user_roles")

@@ -57,15 +57,24 @@ const PartnerOverviewPage = () => {
     if (!user) return;
     setLoading(true);
 
+    // Get partner via partner_members
+    const { data: membership } = await supabase
+      .from('partner_members')
+      .select('partner_id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (!membership) { setLoading(false); return; }
+    const partnerId = (membership as any).partner_id;
+
     const { data: p } = await supabase
       .from('partners')
       .select('id, company_name, is_verified, contact_name, contact_email')
-      .eq('user_id', user.id)
+      .eq('id', partnerId)
       .maybeSingle();
 
     if (!p) { setLoading(false); return; }
     setPartner(p as unknown as PartnerProfile);
-    const partnerId = (p as any).id;
 
     // Counts
     const [activeRes, pendingRes, invitesRes, activityRes] = await Promise.all([

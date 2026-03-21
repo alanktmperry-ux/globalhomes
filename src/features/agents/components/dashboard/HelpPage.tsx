@@ -458,6 +458,20 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       { q: 'What happens to my data if I cancel?', a: 'Your data is retained for 90 days after cancellation. During this window you can export everything. After 90 days, data is permanently deleted per our Privacy Policy.' },
     ],
   },
+  {
+    emoji: '🏠', title: 'For Buyers',
+    items: [
+      { q: 'How do I find an agent who speaks my language?', a: 'Go to the Agents tab in the bottom navigation (or visit /agents). Use the language filter dropdown to select your preferred language — only agents who speak that language will appear. You can also filter by name, suburb, or agency name using the search bar. Tap View Profile to see the agent\'s full profile, listings, and contact details.' },
+      { q: 'How does the voice search work?', a: 'Tap the microphone icon on the homepage and speak your search naturally — for example "3 bedroom house in Richmond under $900k with a garage". The AI understands 24 languages. Your results update automatically. You can also type your search in the search bar.' },
+      { q: 'How do I save a property?', a: 'Tap the heart icon on any property card or listing page. Saved properties appear in the Saved tab in the bottom navigation. You need to be signed in to save properties.' },
+      { q: 'How do I save a search so I get alerts for new listings?', a: 'After searching, tap the Save button in the results toolbar. Give your search a name. When new listings are published that match your saved search, you will receive an email alert. You can manage your saved searches from the homepage search bar.' },
+      { q: 'What is Collab Search — searching together?', a: 'Collab Search lets two people browse the same properties at the same time from different devices — useful for couples searching together or buyers working with a partner who is interstate or overseas. After searching, tap the Together button in the toolbar. A link is copied to your clipboard. Share it with your partner — when they open it, you are both in the same live session. You can each react to properties with thumbs up, thumbs down, or fire emoji. You can see which properties your partner has already viewed.' },
+      { q: 'How do I contact an agent about a property?', a: 'Open any property listing and tap Contact Agent or Enquire / Apply. A form appears where you can send a message, request a call, or submit a rental application. Your message goes directly to the agent and starts a conversation in the Messages tab.' },
+      { q: 'How do I apply for a rental property?', a: 'Open the rental listing and tap Enquire / Apply. A 5-step application form appears — personal details, employment, rental history, identity documents, and submit. Your application goes directly to the managing agent.' },
+      { q: 'Is ListHQ free for buyers?', a: 'Yes — completely free. Create an account, search properties, save listings, contact agents, apply for rentals, and use voice search at no cost. ListHQ is paid for by the agents on the platform.' },
+      { q: 'How do I update my property preferences?', a: 'Go to Profile in the bottom navigation, then tap Settings. You can update your budget, preferred suburbs, and property type preferences here at any time.' },
+    ],
+  },
 ];
 
 /* ─── SUB-COMPONENTS ─── */

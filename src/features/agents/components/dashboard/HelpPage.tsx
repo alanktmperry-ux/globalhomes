@@ -41,6 +41,7 @@ const CHECKLIST: ChecklistItem[] = [
   { icon: Users, title: 'Complete your profile', description: 'Add your photo, licence number, bio, and service areas so buyers trust you.', route: '/dashboard/profile' },
   { icon: MapPin, title: 'Set your territory', description: 'Add the suburbs you operate in so your listings appear in local searches.', route: '/dashboard/territory' },
   { icon: Home, title: 'Add your first listing', description: 'Use the 6-step listing wizard to add a property in under 3 minutes.', route: '/pocket-listing' },
+  { icon: Zap, title: 'Boost a listing to Featured', description: 'Get your listing into the homepage featured grid, shown to buyers searching near your suburb.', route: '/dashboard/listings' },
   { icon: Landmark, title: 'Set up trust accounting', description: 'Create your trust account or import your opening balance from your current system.', route: '/dashboard/trust' },
   { icon: Users, title: 'Import your contacts', description: 'Bring your existing client database in via CSV — takes under 2 minutes.', route: '/dashboard/contacts' },
   { icon: DollarSign, title: 'Choose your plan', description: 'Start on the Starter founding price of $99/mo before it increases.', route: '/dashboard/billing' },

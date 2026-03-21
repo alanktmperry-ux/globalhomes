@@ -756,7 +756,7 @@ const Index = () => {
         onToggleSave={toggleSaved}
         searchContext={searchContextForLead}
       />
-    </>
+    </div>
   );
 };
 

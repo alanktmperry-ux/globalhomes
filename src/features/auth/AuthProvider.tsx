@@ -96,6 +96,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     lastFetchedUserId.current = null;
     setIsAgent(false);
     setIsAdmin(false);
+    setIsPartner(false);
     setUserRole(null);
     setRolesFetched(false);
   }, []);

@@ -96,7 +96,7 @@ const AdminDashboard = () => {
     }));
     setUsers(userRows);
 
-    const { data: propData } = await supabase.from('properties').select('id, title, address, suburb, price_formatted, is_active, views, created_at').order('created_at', { ascending: false }).limit(100);
+    const { data: propData } = await supabase.from('properties').select('id, title, address, suburb, price_formatted, is_active, views, created_at, is_featured, featured_until, boost_tier, boost_requested_at, boost_requested_tier').order('created_at', { ascending: false }).limit(100);
     setProperties(propData || []);
     setLoading(false);
   };

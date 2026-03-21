@@ -73,7 +73,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
     boost_requested_tier: listing.boost_requested_tier || null,
     featured_until: listing.featured_until || null,
   });
-  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  
 
   const [vendorName, setVendorName] = useState(listing.vendor_name || '');
   const [vendorEmail, setVendorEmail] = useState(listing.vendor_email || '');
@@ -82,43 +82,41 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   const isFeaturedActive = boostState.is_featured && boostState.featured_until && new Date(boostState.featured_until) > new Date();
   const isBoostPending = boostState.boost_requested_at && !boostState.is_featured;
 
-  const BOOST_TIERS: Record<string, {
-    label: string; price: number; priceLabel: string;
-    billing: string; color: string; badge?: string;
-    inclusions: string[];
-  }> = {
+  const BOOST_TIERS = {
     featured: {
       label: 'Featured',
       price: 49,
       priceLabel: '$49',
-      billing: '/month · cancel anytime',
+      duration: '30 days',
+      billing: 'one-off · 30 days',
       color: 'amber',
       inclusions: [
         'Featured badge on your listing',
-        'Homepage featured grid — while active',
+        'Homepage featured grid for 30 days',
         'Shown to buyers searching near ' + (listing.suburb || 'your suburb'),
         'Higher placement in search results',
-        '~1.5× more enquiries than standard',
-        'Cancel anytime from this tab',
+        'Approx. 1.5× more enquiries',
+        'Renew anytime for another 30 days',
       ],
     },
     premier: {
       label: 'Premier',
       price: 99,
       priceLabel: '$99',
-      billing: '/month · cancel anytime',
+      duration: '30 days',
+      billing: 'one-off · 30 days',
       color: 'violet',
       badge: 'Most popular',
       inclusions: [
         'Everything in Featured',
-        'Top of search in ' + (listing.suburb || 'your suburb'),
+        'Top of all search results in ' + (listing.suburb || 'your suburb'),
         'Hero image slot on homepage',
-        'Email alert to matching saved searches',
-        'Premier badge — stands out in results',
-        'Cancel anytime from this tab',
+        'Email alert to buyers with matching saved searches',
+        'Premier badge in search results',
+        'Renew anytime for another 30 days',
       ],
     },
-  };
+  } as const;
 
   const getActivationMessage = () => {
     const now = new Date();
@@ -133,35 +131,8 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
     return 'Your boost will be activated within 1 business hour.';
   };
 
-  const handleCancelBoost = async () => {
-    setBoostLoading('cancelling');
-    try {
-      const { error } = await supabase
-        .from('properties')
-        .update({
-          boost_requested_at: null,
-          boost_requested_tier: null,
-          is_featured: false,
-          boost_tier: null,
-        } as any)
-        .eq('id', listing.id);
-      if (!error) {
-        toast.success('Boost cancelled');
-        setBoostState({
-          is_featured: false,
-          boost_tier: null,
-          boost_requested_at: null,
-          boost_requested_tier: null,
-          featured_until: null,
-        });
-        setShowCancelConfirm(false);
-      } else {
-        toast.error('Could not cancel — email support@listhq.com.au');
-      }
-    } finally {
-      setBoostLoading(null);
-    }
-  };
+
+
 
   useEffect(() => {
     const load = async () => {
@@ -250,7 +221,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
           subject: `⚡ Boost request: ${listing.address} — ${tierData.label} — ${agent?.name || 'Agent'}`,
           html: `
             <h2>New boost request</h2>
-            <p><strong>Tier:</strong> ${tierData.label} (${tierData.priceLabel}/month)</p>
+            <p><strong>Tier:</strong> ${tierData.label} (${tierData.priceLabel} for 30 days)</p>
             <p><strong>Property:</strong> ${listing.address}, ${listing.suburb}</p>
             <p><strong>Listing ID:</strong> ${listing.id}</p>
             <p><strong>Agent:</strong> ${agent?.name || 'Unknown'} · ${agent?.agency || ''} · ${agent?.email || ''}</p>
@@ -366,11 +337,11 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Badge className="bg-emerald-500/15 text-emerald-500 border-0 text-[10px]">● Active</Badge>
-                <span className="text-sm font-bold">{BOOST_TIERS[boostState.boost_tier || '']?.label || 'Featured'} boost</span>
+                <span className="text-sm font-bold">{BOOST_TIERS[boostState.boost_tier as keyof typeof BOOST_TIERS]?.label || 'Featured'} boost</span>
               </div>
               <div className="text-right">
-                <span className="text-xl font-bold">{BOOST_TIERS[boostState.boost_tier || '']?.priceLabel || '$49'}</span>
-                <span className="text-xs text-muted-foreground">/month</span>
+                <span className="text-xl font-bold">{BOOST_TIERS[boostState.boost_tier as keyof typeof BOOST_TIERS]?.priceLabel || '$49'}</span>
+                <span className="text-xs text-muted-foreground"> for 30 days</span>
               </div>
             </div>
 
@@ -383,7 +354,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
             </p>
 
             <ul className="space-y-1.5">
-              {(BOOST_TIERS[boostState.boost_tier || '']?.inclusions || []).map((item, i) => (
+              {(BOOST_TIERS[boostState.boost_tier as keyof typeof BOOST_TIERS]?.inclusions || []).map((item, i) => (
                 <li key={i} className="text-xs text-muted-foreground flex items-center gap-2">
                   <span className="text-emerald-500">✓</span>
                   {item}
@@ -391,34 +362,14 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               ))}
             </ul>
 
-            <div className="pt-1">
-              {!showCancelConfirm ? (
-                <button
-                  onClick={() => setShowCancelConfirm(true)}
-                  className="text-xs text-muted-foreground hover:text-destructive transition-colors underline">
-                  Cancel subscription
-                </button>
-              ) : (
-                <div className="mt-2 p-3 bg-destructive/10 border border-destructive/20 rounded-xl">
-                  <p className="text-xs font-medium text-destructive mb-1">Cancel your boost?</p>
-                  <p className="text-xs text-muted-foreground mb-3">
-                    Your listing will be removed from the featured grid. No further charges after this billing period.
-                  </p>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="destructive" className="text-xs h-7" onClick={handleCancelBoost} disabled={!!boostLoading}>
-                      {boostLoading === 'cancelling' ? <Loader2 size={11} className="animate-spin mr-1"/> : null}
-                      Yes, cancel
-                    </Button>
-                    <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => setShowCancelConfirm(false)}>
-                      Keep boost
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-            <p className="text-[10px] text-muted-foreground">
-              Cancelling stops renewal at end of current billing period. Questions?{' '}
-              <a href="mailto:support@listhq.com.au" className="underline">support@listhq.com.au</a>
+            <p className="text-xs text-muted-foreground">
+              Boost expires{' '}
+              <span className="font-medium text-foreground">
+                {boostState.featured_until
+                  ? format(parseISO(boostState.featured_until), 'dd MMM yyyy')
+                  : 'soon'}
+              </span>.
+              {' '}Renew for another 30 days anytime.
             </p>
           </>
         ) : isBoostPending ? (
@@ -427,14 +378,14 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               <div className="flex items-center gap-2">
                 <Badge className="bg-amber-500/15 text-amber-500 border-0 text-[10px]">Pending activation</Badge>
                 <span className="text-sm font-bold">
-                  {BOOST_TIERS[boostState.boost_requested_tier || '']?.label || 'Featured'} boost
+                  {BOOST_TIERS[boostState.boost_requested_tier as keyof typeof BOOST_TIERS]?.label || 'Featured'} boost
                 </span>
               </div>
               <div className="text-right">
                 <span className="text-xl font-bold">
-                  {BOOST_TIERS[boostState.boost_requested_tier || '']?.priceLabel || '$49'}
+                  {BOOST_TIERS[boostState.boost_requested_tier as keyof typeof BOOST_TIERS]?.priceLabel || '$49'}
                 </span>
-                <span className="text-xs text-muted-foreground">/month</span>
+                <span className="text-xs text-muted-foreground"> for 30 days</span>
                 <p className="text-[10px] text-muted-foreground">charged on activation</p>
               </div>
             </div>
@@ -443,7 +394,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
 
             <div className="space-y-2">
               <p className="text-xs font-medium text-foreground">What you're getting</p>
-              {(BOOST_TIERS[boostState.boost_requested_tier || '']?.inclusions || []).map((item, i) => (
+              {(BOOST_TIERS[boostState.boost_requested_tier as keyof typeof BOOST_TIERS]?.inclusions || []).map((item, i) => (
                 <p key={i} className="text-xs text-muted-foreground flex items-center gap-2">
                   <span className="text-emerald-500">✓</span>
                   {item}
@@ -455,10 +406,9 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               <p className="text-xs font-medium text-foreground">What happens next</p>
               {[
                 'ListHQ team receives your request',
-                'We activate your boost — usually within 1 business hour',
-                'Your listing goes live in the featured grid near ' + listing.suburb,
-                'Your card is charged $' + (BOOST_TIERS[boostState.boost_requested_tier || '']?.price || 49) + '/month from activation date',
-                'Cancel anytime from this tab — no lock-in',
+                'We contact you to arrange payment and activate your boost — usually within 1 business hour',
+                'Your listing goes live in the featured grid near ' + listing.suburb + ' for 30 days',
+                'You receive an email reminder 5 days before your boost ends',
               ].map((step, i) => (
                 <p key={i} className="text-xs text-muted-foreground flex items-center gap-2">
                   <span className="w-4 h-4 rounded-full bg-muted text-[9px] font-bold flex items-center justify-center shrink-0">
@@ -469,31 +419,12 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               ))}
             </div>
 
-            <div className="mt-2">
-              {!showCancelConfirm ? (
-                <button
-                  onClick={() => setShowCancelConfirm(true)}
-                  className="text-xs text-muted-foreground hover:text-destructive transition-colors underline">
-                  Cancel this request
-                </button>
-              ) : (
-                <div className="mt-2 p-3 bg-destructive/10 border border-destructive/20 rounded-xl">
-                  <p className="text-xs font-medium text-destructive mb-1">Cancel boost request?</p>
-                  <p className="text-xs text-muted-foreground mb-3">
-                    Your request will be withdrawn. No charge has been made.
-                  </p>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="destructive" className="text-xs h-7" onClick={handleCancelBoost} disabled={!!boostLoading}>
-                      {boostLoading === 'cancelling' ? <Loader2 size={11} className="animate-spin mr-1"/> : null}
-                      Yes, cancel
-                    </Button>
-                    <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => setShowCancelConfirm(false)}>
-                      Keep request
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
+            <p className="text-[10px] text-muted-foreground mt-2">
+              Changed your mind? Email{' '}
+              <a href="mailto:support@listhq.com.au" className="underline">
+                support@listhq.com.au
+              </a>
+            </p>
           </>
         ) : (
           <>
@@ -510,7 +441,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
             <p className="text-xs text-muted-foreground">
               Appear in the featured grid shown to buyers searching near{' '}
               <span className="font-medium text-foreground">{listing.suburb}</span>.
-              Monthly subscription — cancel anytime from this tab.
+              One-off payment — 30 days of featured placement.
             </p>
 
             {showPaymentStep && (() => {
@@ -532,7 +463,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                   <div className="bg-secondary rounded-xl p-4 mb-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-bold">{tierData.label} boost</span>
-                      <span className="text-sm font-bold">{tierData.priceLabel}/month</span>
+                      <span className="text-sm font-bold">{tierData.priceLabel} for 30 days</span>
                     </div>
                     <div className="text-xs text-muted-foreground">
                       {listing.address}, {listing.suburb}
@@ -568,7 +499,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                     </Button>
                   </div>
                   <p className="text-[10px] text-muted-foreground text-center mt-3">
-                    By confirming you agree to be billed {tierData.priceLabel}/month from activation date. Cancel anytime.
+                    One-off payment of {tierData.priceLabel}. Your listing is featured for 30 days from activation. Renew anytime after that.
                   </p>
                 </div>
               );
@@ -582,9 +513,9 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                 </Badge>
                 <div>
                   <span className="text-2xl font-bold">$49</span>
-                  <span className="text-sm text-muted-foreground">/month</span>
+                  <span className="text-sm text-muted-foreground"> for 30 days</span>
                 </div>
-                <p className="text-[10px] text-muted-foreground">Cancel anytime · no lock-in</p>
+                <p className="text-[10px] text-muted-foreground">One-off payment · renew anytime</p>
                 <ul className="space-y-1.5">
                   {BOOST_TIERS.featured.inclusions.map((item, i) => (
                     <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
@@ -600,7 +531,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                   onClick={() => setShowPaymentStep('featured')}
                   disabled={!!boostLoading}
                 >
-                  Start Featured — $49/mo
+                  Start Featured — $49
                 </Button>
               </div>
 
@@ -614,9 +545,9 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                 </Badge>
                 <div>
                   <span className="text-2xl font-bold">$99</span>
-                  <span className="text-sm text-muted-foreground">/month</span>
+                  <span className="text-sm text-muted-foreground"> for 30 days</span>
                 </div>
-                <p className="text-[10px] text-muted-foreground">Cancel anytime · no lock-in</p>
+                <p className="text-[10px] text-muted-foreground">One-off payment · renew anytime</p>
                 <ul className="space-y-1.5">
                   {BOOST_TIERS.premier.inclusions.map((item, i) => (
                     <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
@@ -631,7 +562,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                   onClick={() => setShowPaymentStep('premier')}
                   disabled={!!boostLoading}
                 >
-                  Start Premier — $99/mo
+                  Start Premier — $99
                 </Button>
               </div>
             </div>

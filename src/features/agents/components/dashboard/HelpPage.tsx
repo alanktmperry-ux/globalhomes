@@ -12,7 +12,7 @@ import {
   Search, ChevronRight, BookOpen, MessageCircle, ExternalLink,
   Home, DollarSign, Users, BarChart3, Shield, Landmark, Calculator,
   PartyPopper, Mic, MapPin, Kanban, FileText, Settings, Star,
-  Building2, AlertTriangle, CheckCircle2, Wrench, Key, Globe, Handshake,
+  Building2, AlertTriangle, CheckCircle2, Wrench, Key, Globe, Handshake, Zap,
 } from 'lucide-react';
 
 /* ─── TYPES ─── */
@@ -41,6 +41,7 @@ const CHECKLIST: ChecklistItem[] = [
   { icon: Users, title: 'Complete your profile', description: 'Add your photo, licence number, bio, and service areas so buyers trust you.', route: '/dashboard/profile' },
   { icon: MapPin, title: 'Set your territory', description: 'Add the suburbs you operate in so your listings appear in local searches.', route: '/dashboard/territory' },
   { icon: Home, title: 'Add your first listing', description: 'Use the 6-step listing wizard to add a property in under 3 minutes.', route: '/pocket-listing' },
+  { icon: Zap, title: 'Boost a listing to Featured', description: 'Get your listing into the homepage featured grid, shown to buyers searching near your suburb.', route: '/dashboard/listings' },
   { icon: Landmark, title: 'Set up trust accounting', description: 'Create your trust account or import your opening balance from your current system.', route: '/dashboard/trust' },
   { icon: Users, title: 'Import your contacts', description: 'Bring your existing client database in via CSV — takes under 2 minutes.', route: '/dashboard/contacts' },
   { icon: DollarSign, title: 'Choose your plan', description: 'Start on the Starter founding price of $99/mo before it increases.', route: '/dashboard/billing' },
@@ -100,6 +101,22 @@ const GUIDES: Guide[] = [
       'Step 4 — Voice AI Writer: Record a 30-second voice note or type notes about the property. Choose a tone (Standard, Luxury, Family, Investment). Hit Generate — the AI writes a professional listing description in seconds. Edit the result before continuing.',
       'Step 5 — Settings (sale listings): Choose visibility — Whisper (invite-only), Coming Soon (registered buyers), or Public (full marketplace). Set an exclusive window (7, 14, or 30 days), buyer requirements, and whether to allow co-broke with other agents. Settings (rental listings): Set available-from date, lease term, furnished toggle, pets allowed toggle, and application screening level.',
       'Step 6 — Preview: Review the full listing. Click Publish to save. New listings are saved as pending until you publish from your Listings page.',
+    ],
+  },
+  {
+    emoji: '⚡', title: 'Boosting a Listing to Featured',
+    description: 'Get your property into the featured grid shown to buyers searching near your suburb.',
+    steps: [
+      'Go to My Listings in the sidebar and click on the listing you want to boost. This opens the listing detail page.',
+      'Click the Marketing tab at the top of the listing detail page. This is where all boost options live.',
+      'If the listing has not been boosted before, you will see a "Boost this listing" section at the top of the Marketing tab with two options — Featured ($299) and Premier ($599).',
+      'Featured boost — $299: Your listing appears in the featured grid on the ListHQ homepage for 30 days, shown specifically to buyers searching near your suburb. It also receives a Featured badge and higher placement in search results.',
+      'Premier boost — $599: Everything in Featured, plus your listing appears at the top of all search results in your suburb for 30 days, rotates through the hero image slot on the homepage, and triggers an email notification to registered buyers who have saved searches matching your property.',
+      'Click "Request Featured" or "Request Premier" on your chosen tier. Your request is sent immediately to the ListHQ team.',
+      'Your boost will be activated within 1 business hour. You will see the status change from "Pending activation" to "Active — Featured until [date]" once it is live.',
+      'Once active, your listing appears in the featured grid on the homepage to buyers who are searching near your suburb using GPS location, IP location, or by typing your suburb name into the search bar.',
+      'You can check the status of your boost at any time from the Marketing tab. The boost automatically expires after 30 days. To renew, simply request a new boost from the same tab.',
+      'Note: Payment is processed on activation, not on request. You will not be charged until the ListHQ team activates your boost.',
     ],
   },
   {
@@ -325,6 +342,24 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       { q: 'What is the difference between Whisper, Coming Soon, and Public visibility?', a: 'Whisper = invite-only, not visible to buyers. Coming Soon = visible to registered buyers on the platform but not on external portals. Public = visible to all buyers on the full marketplace.' },
       { q: 'Can I duplicate a listing?', a: 'Yes. On the listing detail page in your dashboard, there is a "Duplicate" option. This creates a copy with all the same details — useful for similar properties at the same address.' },
       { q: 'What is the AI listing writer?', a: 'On Step 4 of the listing wizard, you can record a voice note or type notes about the property. The AI generates a professional listing description in four tones: Standard, Luxury, Family, or Investment. You can edit the output before publishing.' },
+      { q: 'How do I get my listing into the featured grid on the homepage?', a: 'Go to the listing detail page, click the Marketing tab, and request a Featured or Premier boost. Featured costs $299 and Premier costs $599, both for 30 days. Your listing is then shown in the featured grid to buyers searching near your suburb. Boosts are activated within 1 business hour.' },
+    ],
+  },
+  {
+    emoji: '⚡', title: 'Featured Listing Boosts',
+    items: [
+      { q: 'What is a featured listing boost?', a: 'A boost puts your listing into the featured grid on the ListHQ homepage, shown specifically to buyers who are searching near your suburb. Buyers searching Doncaster see featured listings from Doncaster — not from the other side of the country. There are two tiers: Featured ($299) and Premier ($599), both lasting 30 days.' },
+      { q: 'How is a boosted listing different from a standard listing?', a: 'A standard listing appears in search results based on relevance. A Featured boost puts your listing in the homepage featured grid with a Featured badge, higher placement in search results, and targeted visibility to buyers searching near your suburb. Premier adds top-of-search placement in your suburb, the hero image slot on the homepage, and an email notification to buyers with matching saved searches.' },
+      { q: 'Who sees my featured listing?', a: 'Buyers who visit the ListHQ homepage and are located near your suburb — detected via GPS, IP address, or their search query. If a buyer searches "3 bed house in Doncaster", they see featured listings from Doncaster. If a buyer opens the homepage from a Doncaster IP address, they see your listing. The targeting is automatic — you do not need to set it up.' },
+      { q: 'How do I request a boost?', a: 'Go to My Listings, open the listing you want to boost, click the Marketing tab, and click "Request Featured" or "Request Premier". Your request is sent to the ListHQ team immediately. Boosts are activated within 1 business hour during business days.' },
+      { q: 'When am I charged for a boost?', a: 'Payment is processed on activation, not on request. You will not be charged until the ListHQ team confirms your boost is live. You will receive a confirmation when it activates.' },
+      { q: 'How long does a boost last?', a: '30 days from the activation date. You can see the exact expiry date on the Marketing tab under "Active — Featured until [date]". When the boost expires it automatically removes from the featured grid. You can request a new boost at any time to renew.' },
+      { q: 'Can I boost a rental listing?', a: 'Yes. Both sale and rental listings can be boosted. A boosted rental listing appears in the featured grid to buyers who search for rental properties near your suburb.' },
+      { q: 'Can I have more than one listing boosted at the same time?', a: 'Yes. There is no limit on how many listings you can boost simultaneously. Each boost is priced and managed independently.' },
+      { q: 'What is the difference between Featured and Premier?', a: 'Featured ($299): Homepage featured grid for 30 days, Featured badge, higher search placement, targeted to buyers near your suburb. Premier ($599): Everything in Featured, plus top position in all search results in your suburb, rotation in the homepage hero image slot, and an email notification sent to registered buyers with saved searches matching your property type, suburb, and price range.' },
+      { q: 'How do I know if my boost is working?', a: 'The Marketing tab shows your boost status. Once active it displays "Active — Featured until [date]". You can also see the impact in your listing analytics — views and leads typically increase significantly during a boost period compared to before.' },
+      { q: 'Can I cancel a boost early?', a: 'Contact support at support@listhq.com.au. Boosts are charged as a one-time fee so partial refunds are at the discretion of the ListHQ team based on time remaining.' },
+      { q: 'My boost shows Pending — what does that mean?', a: '"Pending activation" means your request has been received and is in the queue to be activated. Boosts are activated within 1 business hour during Monday to Friday business hours AEST. If your request was submitted outside business hours it will be activated first thing the next business day.' },
     ],
   },
   {

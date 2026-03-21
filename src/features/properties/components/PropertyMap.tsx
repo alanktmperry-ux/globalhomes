@@ -86,6 +86,7 @@ export function PropertyMap({
           streetViewControl: false,
           fullscreenControl: false,
           mapTypeControl: false,
+          gestureHandling: 'cooperative',
           styles: LIGHT_MAP_STYLE,
         });
 

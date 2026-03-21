@@ -231,7 +231,7 @@ const PartnerTrustPage = () => {
         )}
       </div>
 
-      <TrustReceiptModal open={showReceipt} onOpenChange={setShowReceipt} onCreated={fetchData} />
+      <TrustReceiptModal open={showReceipt} onOpenChange={setShowReceipt} onCreated={fetchData} agentId={activeAgency?.agentId} />
     </div>
   );
 };

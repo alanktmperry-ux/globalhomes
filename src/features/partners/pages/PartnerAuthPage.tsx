@@ -48,9 +48,11 @@ const PartnerAuthPage = () => {
       }
 
       // Verify partner role exists
+      const { data: { user: signedInUser } } = await supabase.auth.getUser();
       const { data: roleCheck } = await supabase
         .from('user_roles')
         .select('role')
+        .eq('user_id', signedInUser?.id || '')
         .eq('role', 'partner')
         .maybeSingle();
 

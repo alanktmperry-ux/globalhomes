@@ -38,9 +38,10 @@ interface TrustReceiptModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onCreated?: () => void;
+  agentId?: string;
 }
 
-export default function TrustReceiptModal({ open, onOpenChange, onCreated }: TrustReceiptModalProps) {
+export default function TrustReceiptModal({ open, onOpenChange, onCreated, agentId: agentIdProp }: TrustReceiptModalProps) {
   const { user } = useAuth();
   const [saving, setSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
@@ -111,11 +112,15 @@ export default function TrustReceiptModal({ open, onOpenChange, onCreated }: Tru
 
     try {
       // Get agent_id
-      const { data: agent } = await supabase
+      let agentQuery = supabase
         .from('agents')
-        .select('id, name, agency, license_number')
-        .eq('user_id', user.id)
-        .single();
+        .select('id, name, agency, license_number');
+      if (agentIdProp) {
+        agentQuery = agentQuery.eq('id', agentIdProp);
+      } else {
+        agentQuery = agentQuery.eq('user_id', user?.id || '');
+      }
+      const { data: agent } = await agentQuery.single();
 
       if (!agent) {
         toast.error('Agent profile not found');

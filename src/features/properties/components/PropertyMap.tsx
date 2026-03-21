@@ -155,7 +155,8 @@ export function PropertyMap({
       }
     }
 
-    init();
+    let ro: ResizeObserver | undefined;
+    init().then(() => { /* ro is set inside init */ });
     return () => { cancelled = true; };
   }, []);
 

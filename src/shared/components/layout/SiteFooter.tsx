@@ -132,7 +132,7 @@ export function SiteFooter() {
             ListHQ © {new Date().getFullYear()} · ABN 00 000 000 000
           </p>
           <p className="text-xs text-muted-foreground text-center md:text-right max-w-md leading-relaxed">
-            Global Homes operates under Australian property law. All trust funds are held in compliance with state fair trading regulations.
+            ListHQ operates under Australian property law. All trust funds are held in compliance with state fair trading regulations.
           </p>
         </div>
       </div>

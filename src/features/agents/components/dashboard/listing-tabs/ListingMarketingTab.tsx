@@ -82,43 +82,41 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   const isFeaturedActive = boostState.is_featured && boostState.featured_until && new Date(boostState.featured_until) > new Date();
   const isBoostPending = boostState.boost_requested_at && !boostState.is_featured;
 
-  const BOOST_TIERS: Record<string, {
-    label: string; price: number; priceLabel: string;
-    billing: string; color: string; badge?: string;
-    inclusions: string[];
-  }> = {
+  const BOOST_TIERS = {
     featured: {
       label: 'Featured',
       price: 49,
       priceLabel: '$49',
-      billing: '/month · cancel anytime',
+      duration: '30 days',
+      billing: 'one-off · 30 days',
       color: 'amber',
       inclusions: [
         'Featured badge on your listing',
-        'Homepage featured grid — while active',
+        'Homepage featured grid for 30 days',
         'Shown to buyers searching near ' + (listing.suburb || 'your suburb'),
         'Higher placement in search results',
-        '~1.5× more enquiries than standard',
-        'Cancel anytime from this tab',
+        'Approx. 1.5× more enquiries',
+        'Renew anytime for another 30 days',
       ],
     },
     premier: {
       label: 'Premier',
       price: 99,
       priceLabel: '$99',
-      billing: '/month · cancel anytime',
+      duration: '30 days',
+      billing: 'one-off · 30 days',
       color: 'violet',
       badge: 'Most popular',
       inclusions: [
         'Everything in Featured',
-        'Top of search in ' + (listing.suburb || 'your suburb'),
+        'Top of all search results in ' + (listing.suburb || 'your suburb'),
         'Hero image slot on homepage',
-        'Email alert to matching saved searches',
-        'Premier badge — stands out in results',
-        'Cancel anytime from this tab',
+        'Email alert to buyers with matching saved searches',
+        'Premier badge in search results',
+        'Renew anytime for another 30 days',
       ],
     },
-  };
+  } as const;
 
   const getActivationMessage = () => {
     const now = new Date();

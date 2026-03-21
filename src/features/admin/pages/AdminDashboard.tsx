@@ -208,7 +208,7 @@ const AdminDashboard = () => {
           <>
             {tab === 'overview' && <AdminOverview stats={stats} users={users} />}
             {tab === 'users' && <AdminUsers />}
-            {tab === 'listings' && <AdminListings properties={properties} onToggleActive={togglePropertyActive} />}
+            {tab === 'listings' && <AdminListings properties={properties} onToggleActive={togglePropertyActive} onActivateBoost={activateBoost} />}
             {tab === 'roles' && <AdminRoles users={users} searchQuery={searchQuery} onSearchChange={setSearchQuery} onRoleChange={handleRoleChange} />}
             {tab === 'database' && <AdminDatabase />}
             {tab === 'demo-requests' && <AdminDemoRequests onPendingCountChange={setPendingDemoCount} />}

@@ -554,6 +554,33 @@ const AdminUsers = () => {
                           </>
                         )}
                       </div>
+                    ) : u.user_type === 'partner' ? (
+                      <div className="flex gap-1.5">
+                        {actionLoading === u.id ? (
+                          <Loader2 className="animate-spin text-muted-foreground" size={16} />
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => handleVerifyPartner(u.id, !u.is_partner_verified)}
+                              className={`p-1.5 rounded-lg transition-colors ${
+                                u.is_partner_verified
+                                  ? 'bg-amber-500/10 text-amber-500 hover:bg-amber-500/20'
+                                  : 'bg-teal-500/10 text-teal-600 hover:bg-teal-500/20'
+                              }`}
+                              title={u.is_partner_verified ? 'Unverify partner' : 'Verify partner'}
+                            >
+                              <ShieldCheck size={14} />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(u.id)}
+                              className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
+                              title="Delete partner"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </>
+                        )}
+                      </div>
                     ) : u.user_type === 'agent' ? (
                       <div className="flex gap-1.5">
                         {actionLoading === u.id ? (

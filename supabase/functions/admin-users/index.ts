@@ -192,6 +192,37 @@ Deno.serve(async (req) => {
       );
     }
 
+    if (action === "verify_partner") {
+      const { user_id, verify } = await req.json();
+      const { data: partner, error: findErr } = await supabase
+        .from("partners")
+        .select("id")
+        .eq("user_id", user_id)
+        .maybeSingle();
+
+      if (findErr || !partner) {
+        return new Response(
+          JSON.stringify({ error: "Partner record not found" }),
+          { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const { error: updateErr } = await supabase
+        .from("partners")
+        .update({
+          is_verified: verify,
+          verified_at: verify ? new Date().toISOString() : null,
+        })
+        .eq("id", partner.id);
+
+      if (updateErr) throw updateErr;
+
+      return new Response(
+        JSON.stringify({ success: true }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     if (action === "delete_demo_request") {
       const { request_id } = await req.json();
       if (!request_id) {

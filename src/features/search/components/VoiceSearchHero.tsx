@@ -418,7 +418,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       <div className="grid grid-cols-1 md:grid-cols-2 min-h-[520px] md:min-h-[560px]">
 
         {/* LEFT — Headline + search */}
-        <div className="flex flex-col justify-center px-5 md:px-10 py-8 md:py-12 bg-background">
+        <div className="flex flex-col justify-between px-5 md:px-10 py-8 md:py-14 bg-background">
 
           {/* Counter */}
           <div className="mb-6">
@@ -434,7 +434,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
             </h1>
 
             {/* Rotating gradient line */}
-            <div className="h-[1.15em] overflow-hidden text-[38px] md:text-[52px] font-extrabold leading-[1.05]">
+            <div className="h-[1.15em] overflow-hidden text-[38px] md:text-[52px] font-display font-extrabold leading-[1.05]">
               <AnimatePresence mode="wait">
                 <motion.span
                   key={headlineIndex}
@@ -451,7 +451,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
             </div>
 
             {/* Ghost third line */}
-            <div className="text-[38px] md:text-[52px] font-extrabold leading-[1.05] text-muted-foreground/20 select-none" aria-hidden="true">
+            <div className="text-[30px] md:text-[42px] font-extrabold leading-[1.05] text-muted-foreground/15 select-none" aria-hidden="true">
               In any language.
             </div>
           </div>
@@ -459,7 +459,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
           {/* Rule + subline + search */}
           <div className="max-w-md">
 
-            <div className="w-10 h-px bg-border mb-4" />
+            <div className="w-10 h-[2px] bg-foreground/20 mb-5" />
 
             <p className="text-[13px] text-muted-foreground leading-relaxed mb-5">
               AI voice search across Australia.
@@ -507,7 +507,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                     />
                     {!textQuery && (
                       <span
-                        className="absolute inset-0 text-[12px] text-muted-foreground transition-opacity duration-300 pointer-events-none flex items-center"
+                        className="absolute inset-0 text-[12px] text-muted-foreground pointer-events-none flex items-center transition-opacity duration-300"
                         style={{ opacity: placeholderVisible ? 1 : 0 }}
                       >
                         {SEARCH_PLACEHOLDERS[placeholderIndex]}
@@ -648,7 +648,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
         </div>
 
         {/* RIGHT — Photo grid */}
-        <div className="hidden md:grid grid-rows-[1.6fr_1fr] gap-2 p-2 bg-muted/30">
+        <div className="hidden md:grid grid-rows-[1.6fr_1fr] gap-1.5 bg-background border-l border-border">
 
           {/* Top large photo */}
           <div className="relative rounded-2xl overflow-hidden group cursor-pointer">
@@ -701,7 +701,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       </div>
 
       {/* ── STATS BAR ── */}
-      <div className="grid grid-cols-4 border-y border-border bg-background">
+      <div className="hidden md:grid grid-cols-4 border-y border-border bg-background">
         {[
           { num: '24',  lbl: 'Languages' },
           { num: 'Live',lbl: 'Exchange rates' },
@@ -723,7 +723,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       <div className="hidden md:block bg-background px-6 pt-5 pb-6">
         <div className="flex items-center justify-between mb-4">
           <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
-            More featured listings
+            Featured listings
           </span>
           <span className="text-xs text-primary font-medium cursor-pointer hover:underline">
             View all →

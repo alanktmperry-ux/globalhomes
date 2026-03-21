@@ -659,7 +659,7 @@ const Index = () => {
         </div>
       ) : (
         /* Mobile: Map with bottom sheet */
-        <div className="flex-1 relative" style={{ height: `calc(${viewportHeight}px - 250px)` }}>
+        <div className="flex-1 relative min-h-[400px]">
           {mobileView === 'map' ? (
             <>
               <div className="absolute inset-0">{mapComponent}</div>

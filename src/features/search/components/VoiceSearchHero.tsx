@@ -735,23 +735,27 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
           {/* Top large photo */}
           <div className="relative rounded-2xl overflow-hidden group cursor-pointer">
-            <img src={FEATURED_PROPERTIES[0].img} alt={FEATURED_PROPERTIES[0].address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+            {featuredLoading ? (
+              <Skeleton className="absolute inset-0 w-full h-full" />
+            ) : (
+              <img src={displayFeatured[0]?.img} alt={displayFeatured[0]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+            )}
             <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.7) 100%)'}} />
 
             <div className="absolute top-3 left-3">
               <span className="text-[9px] font-bold px-2.5 py-1 rounded-full text-white bg-foreground/80 backdrop-blur-sm">
-                {FEATURED_PROPERTIES[0].tag}
+                {displayFeatured[0]?.tag}
               </span>
             </div>
 
             <div className="absolute bottom-0 left-0 right-0 p-4">
               <div className="text-white font-extrabold text-lg leading-tight">
-                {FEATURED_PROPERTIES[0].price}
+                {displayFeatured[0]?.price}
               </div>
               <div className="text-white/75 text-[11px] mt-0.5">
-                {FEATURED_PROPERTIES[0].address}
+                {displayFeatured[0]?.address}
                 {' · '}
-                {FEATURED_PROPERTIES[0].suburb}
+                {displayFeatured[0]?.suburb}
               </div>
             </div>
           </div>
@@ -760,21 +764,25 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
           <div className="grid grid-cols-2 gap-2">
             {[1, 2].map(i => (
               <div key={i} className="relative rounded-2xl overflow-hidden group cursor-pointer">
-                <img src={FEATURED_PROPERTIES[i].img} alt={FEATURED_PROPERTIES[i].address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                {featuredLoading ? (
+                  <Skeleton className="absolute inset-0 w-full h-full" />
+                ) : (
+                  <img src={displayFeatured[i]?.img} alt={displayFeatured[i]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                )}
                 <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 30%,rgba(0,0,0,0.65) 100%)'}} />
 
                 <div className="absolute top-2.5 left-2.5">
                   <span className="text-[9px] font-bold px-2 py-0.5 rounded-full text-white bg-foreground/80 backdrop-blur-sm">
-                    {FEATURED_PROPERTIES[i].tag}
+                    {displayFeatured[i]?.tag}
                   </span>
                 </div>
 
                 <div className="absolute bottom-0 left-0 right-0 p-3">
                   <div className="text-white font-bold text-sm leading-tight">
-                    {FEATURED_PROPERTIES[i].price}
+                    {displayFeatured[i]?.price}
                   </div>
                   <div className="text-white/65 text-[10px] mt-0.5">
-                    {FEATURED_PROPERTIES[i].suburb}
+                    {displayFeatured[i]?.suburb}
                   </div>
                 </div>
               </div>

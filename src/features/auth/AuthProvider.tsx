@@ -11,6 +11,10 @@ interface AuthContextType {
   isAdmin: boolean;
   userRole: 'user' | 'agent' | 'admin' | null;
   signOut: () => Promise<void>;
+  impersonating: boolean;
+  impersonatedUser: string | null;
+  startImpersonation: (userId: string, userEmail: string) => Promise<void>;
+  stopImpersonation: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -21,6 +25,10 @@ const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
   userRole: null,
   signOut: async () => {},
+  impersonating: false,
+  impersonatedUser: null,
+  startImpersonation: async () => {},
+  stopImpersonation: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -34,6 +42,42 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [userRole, setUserRole] = useState<'user' | 'agent' | 'admin' | null>(null);
   const [rolesFetched, setRolesFetched] = useState(false);
   const lastFetchedUserId = useRef<string | null>(null);
+  const [impersonating, setImpersonating] = useState(false);
+  const [impersonatedUser, setImpersonatedUser] = useState<string | null>(null);
+
+  useEffect(() => {
+    const savedEmail = sessionStorage.getItem('admin_email');
+    if (savedEmail) {
+      setImpersonating(true);
+      setImpersonatedUser(savedEmail);
+    }
+  }, []);
+
+  const startImpersonation = async (userId: string, userEmail: string) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    sessionStorage.setItem('admin_session_token', session.access_token);
+    sessionStorage.setItem('admin_refresh_token', session.refresh_token);
+    sessionStorage.setItem('admin_email', userEmail);
+    setImpersonating(true);
+    setImpersonatedUser(userEmail);
+  };
+
+  const stopImpersonation = async () => {
+    const adminToken = sessionStorage.getItem('admin_session_token');
+    const adminRefresh = sessionStorage.getItem('admin_refresh_token');
+    if (adminToken && adminRefresh) {
+      await supabase.auth.setSession({
+        access_token: adminToken,
+        refresh_token: adminRefresh,
+      });
+    }
+    sessionStorage.removeItem('admin_session_token');
+    sessionStorage.removeItem('admin_refresh_token');
+    sessionStorage.removeItem('admin_email');
+    setImpersonating(false);
+    setImpersonatedUser(null);
+  };
 
   const applyRoles = useCallback((roles: string[]) => {
     console.log('[Auth] applyRoles:', roles);
@@ -147,6 +191,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   return (
     <AuthContext.Provider value={{
       user, session, loading, isAgent, isAdmin, userRole, signOut,
+      impersonating, impersonatedUser, startImpersonation, stopImpersonation,
     }}>
       {children}
     </AuthContext.Provider>

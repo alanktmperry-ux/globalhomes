@@ -4,10 +4,10 @@ import { HelmetProvider } from "react-helmet-async";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { I18nProvider } from "@/shared/lib/i18n";
 import { CurrencyProvider } from "@/shared/lib/CurrencyContext";
-import { AuthProvider } from "@/features/auth/AuthProvider";
+import { AuthProvider, useAuth } from "@/features/auth/AuthProvider";
 import { ProtectedRoute } from "@/features/auth/ProtectedRoute";
 import { Loader2 } from "lucide-react";
 import AppErrorBoundary from "@/components/AppErrorBoundary";
@@ -75,6 +75,25 @@ const PageLoader = () => (
   </div>
 );
 
+const ImpersonationBanner = () => {
+  const { impersonating, impersonatedUser, stopImpersonation } = useAuth();
+  const navigate = useNavigate();
+  if (!impersonating) return null;
+  return (
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999, background: 'linear-gradient(90deg, #d97706, #ea580c)', padding: '6px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
+      <span style={{ color: '#FAEEDA', fontSize: '12px', fontWeight: 500 }}>
+        Viewing as {impersonatedUser} — you are in admin impersonation mode
+      </span>
+      <button
+        onClick={async () => { await stopImpersonation(); navigate('/admin'); }}
+        style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '6px', padding: '4px 12px', color: '#FAEEDA', fontSize: '12px', cursor: 'pointer', fontWeight: 500 }}
+      >
+        Exit — return to admin
+      </button>
+    </div>
+  );
+};
+
 const ScrollToTop = () => {
   const { pathname } = useLocation();
   React.useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
@@ -94,6 +113,7 @@ const App = () => (
           
           <Sonner />
           <BrowserRouter>
+            <ImpersonationBanner />
             <ScrollToTop />
             <Suspense fallback={<PageLoader />}>
               <Routes>

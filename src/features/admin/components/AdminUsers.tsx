@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Ban, Trash2, UserCheck, Loader2, Mail, Clock, Shield, Rocket, Eye, CheckSquare, Square, MinusSquare } from 'lucide-react';
+import { Search, Ban, Trash2, UserCheck, Loader2, Mail, Clock, Shield, Rocket, Eye, CheckSquare, Square, MinusSquare, UserCog } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/shared/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/features/auth/AuthProvider';
+import { useNavigate } from 'react-router-dom';
 
 interface AuthUser {
   id: string;
@@ -80,6 +82,8 @@ const PlanBadge = ({ user }: { user: AuthUser }) => {
 
 const AdminUsers = () => {
   const { toast } = useToast();
+  const { startImpersonation } = useAuth();
+  const navigate = useNavigate();
   const [users, setUsers] = useState<AuthUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -87,6 +91,12 @@ const AdminUsers = () => {
   const [batchLoading, setBatchLoading] = useState(false);
   const [filterType, setFilterType] = useState<string>('all');
   const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  const handleImpersonate = async (userId: string, userEmail: string) => {
+    if (!confirm(`View the platform as ${userEmail}? You will see exactly what they see. An orange banner will let you exit.`)) return;
+    await startImpersonation(userId, userEmail);
+    navigate('/dashboard');
+  };
 
   const getSession = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -471,6 +481,15 @@ const AdminUsers = () => {
                           <Loader2 className="animate-spin text-muted-foreground" size={16} />
                         ) : (
                           <>
+                            {u.user_type === 'agent' && (
+                              <button
+                                onClick={() => handleImpersonate(u.id, u.email)}
+                                className="p-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                                title="Act as this user"
+                              >
+                                <UserCog size={14} />
+                              </button>
+                            )}
                             <button
                               onClick={() => handleBan(u.id, !u.banned_until)}
                               className={`p-1.5 rounded-lg transition-colors ${

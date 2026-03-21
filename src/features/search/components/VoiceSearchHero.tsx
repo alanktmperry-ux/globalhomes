@@ -723,7 +723,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       <div className="hidden md:block bg-background px-6 pt-5 pb-6">
         <div className="flex items-center justify-between mb-4">
           <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
-            More featured listings
+            Featured listings
           </span>
           <span className="text-xs text-primary font-medium cursor-pointer hover:underline">
             View all →

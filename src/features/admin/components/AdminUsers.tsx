@@ -529,6 +529,15 @@ const AdminUsers = () => {
                           <>
                             {u.user_type === 'agent' && (
                               <button
+                                onClick={() => handleOpenSubModal(u)}
+                                className="p-1.5 rounded-lg bg-violet-500/10 text-violet-500 hover:bg-violet-500/20 transition-colors"
+                                title="Manage subscription"
+                              >
+                                <Settings size={14} />
+                              </button>
+                            )}
+                            {u.user_type === 'agent' && (
+                              <button
                                 onClick={() => handleImpersonate(u.id, u.email)}
                                 className="p-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
                                 title="Act as this user"

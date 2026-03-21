@@ -25,36 +25,26 @@ interface NavItem {
   comingSoon?: boolean;
 }
 
-const CORE_NAV: NavItem[] = [
-  { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
-  { title: 'Profile', url: '/dashboard/profile', icon: User },
-  { title: 'Territory', url: '/dashboard/territory', icon: MapPinned },
-];
-
-const CRM_NAV: NavItem[] = [
+const SALES_NAV: NavItem[] = [
+  { title: 'My Listings', url: '/dashboard/listings', icon: List, badgeKey: 'listings' },
   { title: 'Contacts', url: '/dashboard/contacts', icon: Contact },
   { title: 'Pipeline', url: '/dashboard/pipeline', icon: Kanban },
-  { title: 'My Listings', url: '/dashboard/listings', icon: List, badgeKey: 'listings' },
-  { title: 'Applications', url: '/dashboard/rental-applications', icon: ClipboardList },
   { title: 'Voice Leads', url: '/dashboard/leads', icon: Mic, badgeKey: 'leads' },
-  { title: 'Inspection Day', url: '/dashboard/inspection-mode', icon: CalendarDays },
   { title: 'Off-Market Network', url: '/dashboard/network', icon: Users },
 ];
 
-const BUSINESS_NAV: NavItem[] = [
+const PROPERTY_NAV: NavItem[] = [
   { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home, badgeKey: 'rentRoll' },
-  { title: 'Investments', url: '/dashboard/investments', icon: TrendingUp },
-  { title: 'Financials', url: '/dashboard/trust', icon: Landmark },
-  { title: 'Commission Calculator', url: '/dashboard/commission', icon: Calculator },
-  { title: 'Settlement Concierge', url: '/dashboard/settlements', icon: PartyPopper },
-  { title: 'Compliance', url: '/dashboard/compliance', icon: ClipboardCheck, comingSoon: true },
-  { title: 'Analytics', url: '/dashboard/analytics', icon: BarChart3 },
-  { title: 'Reports', url: '/dashboard/reports', icon: FileText },
-  { title: 'Documents', url: '/dashboard/documents', icon: FileText },
+  { title: 'Applications', url: '/dashboard/rental-applications', icon: ClipboardList },
+  { title: 'Inspection Day', url: '/dashboard/inspection-mode', icon: CalendarDays },
+  { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
+  { title: 'Settlement', url: '/dashboard/settlements', icon: PartyPopper },
 ];
 
-const TEAM_NAV: NavItem[] = [
-  { title: 'Team', url: '/dashboard/team', icon: UserPlus },
+const INSIGHTS_NAV: NavItem[] = [
+  { title: 'Analytics', url: '/dashboard/analytics', icon: BarChart3 },
+  { title: 'Reports', url: '/dashboard/reports', icon: FileText },
+  { title: 'Commission', url: '/dashboard/commission', icon: Calculator },
 ];
 
 

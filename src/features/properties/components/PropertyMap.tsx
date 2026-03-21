@@ -94,7 +94,7 @@ export function PropertyMap({
           drawingMode: null,
           drawingControl: true,
           drawingControlOptions: {
-            position: google.maps.ControlPosition.LEFT_CENTER,
+            position: google.maps.ControlPosition.RIGHT_CENTER,
             drawingModes: [
               google.maps.drawing.OverlayType.CIRCLE,
               google.maps.drawing.OverlayType.POLYGON,

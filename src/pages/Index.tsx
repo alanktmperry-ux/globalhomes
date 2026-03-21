@@ -573,6 +573,10 @@ const Index = () => {
           centerOn={mapCenter}
           onScrollToProperty={scrollToProperty}
           formatPrice={formatPrice}
+          onGeolocate={(loc) => {
+            setSearchCenter({ lat: loc.lat, lng: loc.lng });
+            setMapCenter({ lat: loc.lat, lng: loc.lng, key: `geo-${loc.lat}-${loc.lng}` });
+          }}
         />
       </Suspense>
     </MapErrorBoundary>

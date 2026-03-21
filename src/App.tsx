@@ -75,7 +75,8 @@ const PartnerAcceptPage = React.lazy(() => import("./features/partners/pages/Par
 const PartnerTrustPage = React.lazy(() => import("./features/partners/pages/PartnerTrustPage"));
 const PartnerRentRollPage = React.lazy(() => import("./features/partners/pages/PartnerRentRollPage"));
 const PartnerArrearsPage = React.lazy(() => import("./features/partners/pages/PartnerArrearsPage"));
-const PartnerAccessPage = React.lazy(() => import("./features/agents/components/dashboard/PartnerAccessPage"));
+const PartnerJoinPage = React.lazy(() => import("./features/partners/pages/PartnerJoinPage"));
+const PartnerTeamPage = React.lazy(() => import("./features/partners/pages/PartnerTeamPage"));
 const PageLoader = () => (
   <div className="flex h-screen w-full items-center justify-center bg-background">
     <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />

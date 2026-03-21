@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect, useMemo, lazy, Suspense } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence, useMotionValue, useSpring, PanInfo } from 'framer-motion';
-import { ArrowRight, MapPin, Sparkles, Loader2, Zap, Map, List, Mic, GripVertical, ArrowUpDown, X, Bookmark, Share2 } from 'lucide-react';
+import { ArrowRight, MapPin, Sparkles, Loader2, Zap, Map, List, Mic, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users } from 'lucide-react';
 import { VoiceSearchHero } from '@/features/search/components/VoiceSearchHero';
 import { AiPicksSection } from '@/features/properties/components/AiPicksSection';
 import { VirtualizedPropertyList } from '@/features/properties/components/VirtualizedPropertyList';
@@ -435,6 +435,28 @@ const Index = () => {
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
+        {/* Collab button */}
+        {!isCollab && user && (
+          <button
+            onClick={() => createSession({
+              query: lastSearch?.text || '',
+              filters: filters as Record<string, any>,
+              center: searchCenter
+                ? { lat: searchCenter.lat, lng: searchCenter.lng }
+                : undefined,
+            })}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors shrink-0"
+          >
+            <Users size={12} />
+            Search together
+          </button>
+        )}
+        {isCollab && (
+          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold text-primary shrink-0">
+            <Users size={12} />
+            Collab active
+          </span>
+        )}
         {/* Save this search */}
         {hasSearched && (
           <button
@@ -506,10 +528,10 @@ const Index = () => {
           </div>
         ))}
         {isCollab && (
-          <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/30 text-[11px] font-semibold text-primary shrink-0 animate-fade-in">
-            <Share2 size={10} />
-            Collab mode
-          </span>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shrink-0 animate-fade-in">
+            <Users size={12} />
+            Searching together
+          </div>
         )}
       </div>
     )}
@@ -625,6 +647,21 @@ const Index = () => {
           isSearching={isSearching}
         />
       </VoiceSearchErrorBoundary>
+
+      {user && !hasSearched && (
+        <div className="flex justify-center pb-2">
+          <button
+            onClick={() => createSession({
+              query: '',
+              filters: {},
+            })}
+            className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Users size={13} />
+            Browse with a partner
+          </button>
+        </div>
+      )}
 
       {/* Desktop layout */}
       {!isMobile ? (

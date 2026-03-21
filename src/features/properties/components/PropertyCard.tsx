@@ -87,7 +87,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.08, duration: 0.4 }}
-        className="group cursor-pointer rounded-2xl bg-card shadow-card overflow-hidden border border-border/50 transition-all duration-300 hover:shadow-elevated hover:scale-[1.03]"
+        className="group cursor-pointer rounded-2xl bg-card shadow-card overflow-hidden border border-border/50 transition-all duration-300 hover:shadow-elevated active:scale-[0.99]"
       >
         {/* Image */}
         <div className="relative aspect-[4/3] overflow-hidden" onClick={() => { onSelect(property); navigate(`/property/${property.id}`); }}>
@@ -109,7 +109,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
           )}
           <button
             onClick={e => { e.stopPropagation(); onToggleSave(property.id); }}
-            className="absolute top-3 right-3 w-9 h-9 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center transition-transform active:scale-90"
+            className="absolute top-3 right-3 w-11 h-11 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center transition-transform active:scale-90"
             aria-label={isSaved ? `Remove ${property.title} from saved` : `Save ${property.title}`}
             aria-pressed={isSaved}
           >

@@ -200,7 +200,7 @@ const BuyerSettingsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-28">
       <header className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
         <div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-3">
           <button onClick={() => navigate('/profile')} className="text-muted-foreground hover:text-foreground transition-colors">

@@ -170,10 +170,9 @@ export default function PropertyDetailPage() {
       <div className="max-w-6xl mx-auto w-full px-4 pt-4">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
+          className="w-10 h-10 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors mb-4"
         >
-          <ArrowLeft size={16} />
-          Back to results
+          <ArrowLeft size={18} />
         </button>
       </div>
 
@@ -256,12 +255,12 @@ export default function PropertyDetailPage() {
 
         {/* Thumbnail strip */}
         {images.length > 1 && (
-          <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
+          <div className="flex gap-2 mb-6 overflow-x-auto pb-1 snap-x snap-mandatory scroll-smooth">
             {images.map((img, i) => (
               <button
                 key={i}
                 onClick={() => setImageIndex(i)}
-                className={`shrink-0 w-20 h-14 rounded-lg overflow-hidden border-2 transition-all ${
+                className={`shrink-0 w-20 h-14 rounded-lg overflow-hidden border-2 transition-all snap-start ${
                   i === imageIndex ? 'border-primary shadow-md' : 'border-transparent opacity-60 hover:opacity-100'
                 }`}
               >

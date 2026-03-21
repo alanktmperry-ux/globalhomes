@@ -119,16 +119,13 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   } as const;
 
   const getActivationMessage = () => {
-    const now = new Date();
-    const hour = now.getHours();
-    const day = now.getDay();
-    const isWeekend = day === 0 || day === 6;
-    const isAfterHours = hour < 8 || hour >= 18;
-    if (isWeekend)
-      return 'Our team activates boosts on business days. Yours will go live Monday morning AEST.';
-    if (isAfterHours)
-      return 'Our team activates boosts from 8am AEST. Yours will be live first thing next business day.';
-    return 'Your boost will be activated within 1 business hour.';
+    const h = new Date().getHours();
+    const d = new Date().getDay();
+    if (d === 0 || d === 6)
+      return 'Your boost will go live on the next business day. You\'ll get a bell notification when it\'s active.';
+    if (h < 8 || h >= 18)
+      return 'Your boost will go live next business morning. You\'ll get a bell notification when it\'s active.';
+    return 'Your boost will go live shortly. You\'ll get a bell notification when it\'s active.';
   };
 
 

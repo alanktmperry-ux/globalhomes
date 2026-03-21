@@ -699,7 +699,7 @@ const HelpPage = () => {
               <CardContent className="p-5 text-center space-y-2">
                 <CheckCircle2 size={28} className="mx-auto text-primary" />
                 <h3 className="text-sm font-semibold">Response Time</h3>
-                <p className="text-xs text-muted-foreground">We aim to respond to all enquiries within 4 business hours (AEST, Mon–Fri).</p>
+                <p className="text-xs text-muted-foreground">We aim to respond to all enquiries within 1 business day (AEST, Mon–Fri).</p>
               </CardContent>
             </Card>
           </div>

@@ -3,17 +3,17 @@ import { Helmet } from 'react-helmet-async';
 const TermsPage = () => (
   <>
     <Helmet>
-      <title>Terms of Service | Global Homes</title>
-      <meta name="description" content="Terms of Service for Global Homes, an Australian-based global real estate platform." />
+      <title>Terms of Service | ListHQ</title>
+      <meta name="description" content="Terms of Service for ListHQ, an Australian-based global real estate platform." />
     </Helmet>
     <main className="bg-background">
       <article className="max-w-3xl mx-auto px-4 py-16 prose prose-neutral dark:prose-invert">
         <h1 className="font-display text-3xl font-extrabold text-foreground">Terms of Service</h1>
         <p className="text-sm text-muted-foreground">Last updated: 18 March 2026</p>
 
-        <h2>1. About Global Homes</h2>
+        <h2>1. About ListHQ</h2>
         <p>
-          Global Homes Pty Ltd (ABN 00 000 000 000) operates the Global Homes platform from Victoria, Australia.
+          ListHQ Pty Ltd (ABN 00 000 000 000) operates the ListHQ platform from Victoria, Australia.
           By accessing or using the platform you agree to be bound by these terms.
         </p>
 
@@ -48,19 +48,19 @@ const TermsPage = () => (
         <p>
           Where trust accounting features are used, agents remain solely responsible for compliance with the
           trust account provisions of the <em>Estate Agents Act 1980</em> (Vic) and applicable regulations.
-          Global Homes does not hold, manage, or guarantee any trust funds.
+          ListHQ does not hold, manage, or guarantee any trust funds.
         </p>
 
         <h2>7. Intellectual Property</h2>
         <p>
-          All platform content, design, and technology are the property of Global Homes Pty Ltd or its licensors.
+          All platform content, design, and technology are the property of ListHQ Pty Ltd or its licensors.
           User-submitted content (listings, images) remains the property of the submitter, with a licence granted
-          to Global Homes for display purposes.
+          to ListHQ for display purposes.
         </p>
 
         <h2>8. Limitation of Liability</h2>
         <p>
-          To the maximum extent permitted by the <em>Competition and Consumer Act 2010</em> (Cth), Global Homes
+          To the maximum extent permitted by the <em>Competition and Consumer Act 2010</em> (Cth), ListHQ
           excludes liability for indirect, incidental, or consequential damages. The platform is provided
           "as is" without warranties of any kind.
         </p>

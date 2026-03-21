@@ -190,7 +190,7 @@ const AdminDemoRequests = ({ onPendingCountChange }: Props) => {
                     asChild
                     title="Contact"
                   >
-                    <a href={`mailto:${req.email}?subject=Your Global Homes Demo Request`}>
+                    <a href={`mailto:${req.email}?subject=Your ListHQ Demo Request`}>
                       <Mail className="h-4 w-4" />
                     </a>
                   </Button>

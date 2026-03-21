@@ -154,9 +154,9 @@ export default function PropertyDetailPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Helmet>
-        <title>{`${property.title} - ${property.suburb}, ${property.state} | Global Homes`}</title>
+        <title>{`${property.title} - ${property.suburb}, ${property.state} | ListHQ`}</title>
         <meta name="description" content={(property.description || '').slice(0, 155)} />
-        <meta property="og:title" content={`${property.title} - ${property.suburb}, ${property.state} | Global Homes`} />
+        <meta property="og:title" content={`${property.title} - ${property.suburb}, ${property.state} | ListHQ`} />
         <meta property="og:description" content={(property.description || '').slice(0, 155)} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />

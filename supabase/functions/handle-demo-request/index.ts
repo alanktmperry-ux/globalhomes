@@ -117,7 +117,7 @@ Deno.serve(async (req) => {
       await sendEmail(apiKey, "sales@everythingeco.com.au", `New Demo Request — ${full_name}`, buildAdminEmail({ full_name, email, phone, agency_name, message }));
       // Send access code immediately to applicant
       const demoUrl = `https://globalhomes.lovable.app/agents/demo?email=${encodeURIComponent(email)}`;
-      await sendEmail(apiKey, email, "Your Global Homes Access Code", buildAccessCodeEmail(full_name, email, code, demoUrl));
+      await sendEmail(apiKey, email, "Your ListHQ Access Code", buildAccessCodeEmail(full_name, email, code, demoUrl));
       return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
 
     } else if (body.action === "send_code") {
@@ -139,7 +139,7 @@ Deno.serve(async (req) => {
       await ensureDemoAuthUser(supabase, r.email, r.full_name);
 
       const demoUrl = `https://globalhomes.lovable.app/agents/demo?email=${encodeURIComponent(r.email)}`;
-      await sendEmail(apiKey, r.email, "Your Global Homes Demo Access Code", buildAccessCodeEmail(r.full_name, r.email, code, demoUrl));
+      await sendEmail(apiKey, r.email, "Your ListHQ Demo Access Code", buildAccessCodeEmail(r.full_name, r.email, code, demoUrl));
       return new Response(JSON.stringify({ success: true, code }), { headers: corsHeaders });
 
     } else if (body.action === "validate_code") {
@@ -263,7 +263,7 @@ Deno.serve(async (req) => {
 function buildAdminEmail(p: { full_name: string; email: string; phone?: string; agency_name?: string; message?: string }) {
   return `<html><body><div style="font-family:'Helvetica Neue',Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;">
     <div style="background:#0f172a;padding:24px 32px;text-align:center;">
-      <div style="color:#fff;font-size:22px;font-weight:700;letter-spacing:-0.5px;">Global Homes</div>
+      <div style="color:#fff;font-size:22px;font-weight:700;letter-spacing:-0.5px;">ListHQ</div>
       <div style="color:#94a3b8;font-size:13px;margin-top:4px;">Admin Notification</div>
     </div>
     <div style="padding:32px;">
@@ -282,7 +282,7 @@ function buildAdminEmail(p: { full_name: string; email: string; phone?: string; 
       </div>
     </div>
     <div style="text-align:center;padding:20px;color:#94a3b8;font-size:12px;">
-      <div>© Global Homes · Melbourne, Australia</div>
+      <div>© ListHQ · Melbourne, Australia</div>
     </div>
 </div></body></html>`;
 }
@@ -290,12 +290,12 @@ function buildAdminEmail(p: { full_name: string; email: string; phone?: string; 
 function buildConfirmationEmail(name: string, email: string) {
   return `<html><body><div style="font-family:'Helvetica Neue',Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;">
     <div style="background:#0f172a;padding:24px 32px;text-align:center;">
-      <div style="color:#fff;font-size:22px;font-weight:700;letter-spacing:-0.5px;">Global Homes</div>
+      <div style="color:#fff;font-size:22px;font-weight:700;letter-spacing:-0.5px;">ListHQ</div>
       <div style="color:#94a3b8;font-size:13px;margin-top:4px;">Demo Request Received</div>
     </div>
     <div style="padding:32px;">
       <div style="font-size:18px;font-weight:600;color:#0f172a;margin-bottom:12px;">Hi ${name},</div>
-      <div style="color:#334155;font-size:14px;line-height:1.7;margin-bottom:20px;">Thank you for your interest in the Global Homes platform. We've received your demo request and our team will review it shortly.</div>
+      <div style="color:#334155;font-size:14px;line-height:1.7;margin-bottom:20px;">Thank you for your interest in the ListHQ platform. We've received your demo request and our team will review it shortly.</div>
       <div style="background:#f1f5f9;padding:16px 20px;border-radius:8px;margin-bottom:20px;">
         <div style="font-weight:600;color:#0f172a;margin-bottom:6px;">What happens next?</div>
         <div style="color:#475569;font-size:14px;line-height:1.6;">Once approved, we'll send your unique access code to <strong>${email}</strong>. Use that code to log into your personalised demo dashboard.</div>
@@ -303,7 +303,7 @@ function buildConfirmationEmail(name: string, email: string) {
       <div style="color:#64748b;font-size:13px;">If you have any questions in the meantime, reach us at <a href="mailto:sales@everythingeco.com.au" style="color:#2563eb;text-decoration:none;">sales@everythingeco.com.au</a></div>
     </div>
     <div style="text-align:center;padding:20px;color:#94a3b8;font-size:12px;">
-      <div>© Global Homes · Melbourne, Australia · You're receiving this because you requested a demo.</div>
+      <div>© ListHQ · Melbourne, Australia · You're receiving this because you requested a demo.</div>
     </div>
   </div>
 </body></html>`;
@@ -312,12 +312,12 @@ function buildConfirmationEmail(name: string, email: string) {
 function buildAccessCodeEmail(name: string, email: string, code: string, demoUrl: string) {
   return `<html><body>
 <div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:40px 20px;">
-  <h2 style="color:#0f172a;">Global Homes</h2>
+  <h2 style="color:#0f172a;">ListHQ</h2>
   <p>Hi ${name},</p>
   <p>Your access code is:</p>
   <div style="font-size:40px;font-weight:900;letter-spacing:8px;font-family:monospace;background:#f1f5f9;padding:24px;border-radius:8px;text-align:center;color:#0f172a;">${code}</div>
   <p style="color:#64748b;font-size:13px;">Valid for 7 days. Do not share.</p>
-  <p><a href="${demoUrl}" style="display:inline-block;background:#2563eb;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;">Log In to Global Homes →</a></p>
+  <p><a href="${demoUrl}" style="display:inline-block;background:#2563eb;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;">Log In to ListHQ →</a></p>
   <p style="color:#94a3b8;font-size:12px;">Questions? <a href="mailto:sales@everythingeco.com.au" style="color:#2563eb;">sales@everythingeco.com.au</a></p>
 </div>
 </body></html>`;

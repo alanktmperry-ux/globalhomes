@@ -194,7 +194,7 @@ function buildAlertEmail(params: {
   <div style="max-width:560px;margin:0 auto;padding:32px 16px;">
     
     <div style="text-align:center;margin-bottom:24px;">
-      <div style="font-size:24px;font-weight:700;color:#1a1a2e;">Global Homes</div>
+      <div style="font-size:24px;font-weight:700;color:#1a1a2e;">ListHQ</div>
       <div style="font-size:12px;color:#888;margin-top:4px;">Property Alert</div>
     </div>
 
@@ -214,7 +214,7 @@ function buildAlertEmail(params: {
     </div>
 
     <div style="text-align:center;padding-top:20px;">
-      <p style="font-size:11px;color:#aaa;margin:0;">You're receiving this because you saved the search "${searchLabel}" on Global Homes.</p>
+      <p style="font-size:11px;color:#aaa;margin:0;">You're receiving this because you saved the search "${searchLabel}" on ListHQ.</p>
       <p style="font-size:11px;color:#aaa;margin:4px 0 0;">To stop these alerts, remove the saved search from your account.</p>
     </div>
   </div>

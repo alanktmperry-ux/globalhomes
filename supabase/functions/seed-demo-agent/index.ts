@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
       slug,
       owner_user_id: user_id,
       email: email || "",
-      description: "Demo agency for exploring the Global Homes agent platform.",
+      description: "Demo agency for exploring the ListHQ agent platform.",
     }).select("id").single();
 
     if (agencyData && agentRecord) {

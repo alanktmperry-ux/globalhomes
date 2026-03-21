@@ -297,7 +297,7 @@ const AgentLandingPage = () => {
             ))}
           </div>
           <blockquote className="font-display text-xl sm:text-2xl font-semibold italic leading-relaxed mb-4">
-            "Global Homes gave us tools no other platform offers — the voice search alone brought in buyers we'd never have reached."
+            "ListHQ gave us tools no other platform offers — the voice search alone brought in buyers we'd never have reached."
           </blockquote>
           <p className="text-sm text-muted-foreground">
             <strong className="text-foreground">Early Access Agent</strong> · Melbourne, Australia
@@ -329,8 +329,8 @@ const AgentLandingPage = () => {
       {/* ─── FOOTER ─── */}
       <footer className="bg-card border-t border-border py-8">
         <div className="container mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-          <span className="font-display font-bold text-foreground">Global Homes</span>
-          <span>© {new Date().getFullYear()} Global Homes Agent Network. All rights reserved.</span>
+          <span className="font-display font-bold text-foreground">ListHQ</span>
+          <span>© {new Date().getFullYear()} ListHQ Agent Network. All rights reserved.</span>
         </div>
       </footer>
 

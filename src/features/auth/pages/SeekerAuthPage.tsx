@@ -140,7 +140,7 @@ const SeekerAuthPage = () => {
               <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground text-xs font-bold">W</span>
               </div>
-              <span className="font-display text-lg font-bold text-foreground">Global Homes</span>
+              <span className="font-display text-lg font-bold text-foreground">ListHQ</span>
             </Link>
           </div>
 
@@ -199,7 +199,7 @@ const SeekerAuthPage = () => {
               </div>
 
               <p className="text-xs text-muted-foreground mt-8 text-center leading-relaxed">
-                By submitting, I accept Global Homes'{' '}
+                By submitting, I accept ListHQ'{' '}
                 <a href="#" className="text-primary underline underline-offset-2">terms of use</a>
               </p>
             </>
@@ -252,7 +252,7 @@ const SeekerAuthPage = () => {
               </form>
               <button onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">← Back to sign in</button>
               <p className="text-xs text-muted-foreground mt-6 text-center leading-relaxed">
-                By submitting, I accept Global Homes'{' '}
+                By submitting, I accept ListHQ'{' '}
                 <a href="#" className="text-primary underline underline-offset-2">terms of use</a>
               </p>
             </>

@@ -307,7 +307,7 @@ const NetworkPage = () => {
         status: 'active',
       } as any);
       if (error) { toast.error(error.message); return; }
-      toast.success('Shared with Global Homes Network');
+      toast.success('Shared with ListHQ Network');
     }
     await fetchMyListings();
   };

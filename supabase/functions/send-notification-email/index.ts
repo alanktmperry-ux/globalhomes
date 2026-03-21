@@ -39,7 +39,7 @@ async function sendViaResend(to: string, subject: string, html: string) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'Global Homes <onboarding@resend.dev>',
+      from: 'ListHQ <onboarding@resend.dev>',
       to: [to],
       subject,
       html,
@@ -178,14 +178,14 @@ function buildWelcomeEmailHtml(agentName: string) {
 <body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
 <div style="max-width:560px;margin:0 auto;padding:32px 20px;">
   <div style="text-align:center;margin-bottom:32px;">
-    <div style="font-size:24px;font-weight:700;color:#1a1a2e;">Global Homes</div>
+    <div style="font-size:24px;font-weight:700;color:#1a1a2e;">ListHQ</div>
     <div style="font-size:12px;color:#888;margin-top:4px;">Agent Network</div>
   </div>
   <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px 16px;text-align:center;margin-bottom:24px;">
     <span style="font-size:14px;font-weight:600;color:#16a34a;">✅ Account Created</span>
   </div>
   <p style="font-size:15px;color:#333;margin:0 0 16px;">Hi ${agentName},</p>
-  <p style="font-size:15px;color:#333;margin:0 0 16px;">Welcome to Global Homes! Your agent account has been created and is now <strong>pending review</strong>.</p>
+  <p style="font-size:15px;color:#333;margin:0 0 16px;">Welcome to ListHQ! Your agent account has been created and is now <strong>pending review</strong>.</p>
   <p style="font-size:15px;color:#333;margin:0 0 16px;">Our team will verify your credentials and approve your account within <strong>24–48 hours</strong>. Once approved, you'll have full access to:</p>
   <ul style="font-size:14px;color:#555;line-height:1.8;margin:0 0 20px 20px;">
     <li>Voice-qualified buyer leads for your territory</li>
@@ -199,7 +199,7 @@ function buildWelcomeEmailHtml(agentName: string) {
   </div>
   <div style="border-top:1px solid #eee;padding-top:20px;margin-top:32px;text-align:center;">
     <p style="font-size:11px;color:#aaa;margin:0;">Questions? Reply to this email or contact our support team.</p>
-    <p style="font-size:11px;color:#aaa;margin:4px 0 0;">© Global Homes Pty Ltd · Melbourne, Victoria, Australia</p>
+    <p style="font-size:11px;color:#aaa;margin:4px 0 0;">© ListHQ Pty Ltd · Melbourne, Victoria, Australia</p>
   </div>
 </div>
 </body></html>`;
@@ -213,7 +213,7 @@ function buildAdminNewAgentHtml(params: { agentName: string; agentAgency: string
 <body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
 <div style="max-width:560px;margin:0 auto;padding:32px 20px;">
   <div style="text-align:center;margin-bottom:32px;">
-    <div style="font-size:24px;font-weight:700;color:#1a1a2e;">Global Homes</div>
+    <div style="font-size:24px;font-weight:700;color:#1a1a2e;">ListHQ</div>
     <div style="font-size:12px;color:#888;margin-top:4px;">Admin Alert</div>
   </div>
   <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:12px 16px;text-align:center;margin-bottom:24px;">
@@ -231,7 +231,7 @@ function buildAdminNewAgentHtml(params: { agentName: string; agentAgency: string
     <a href="https://globalhomes.lovable.app/admin" style="display:inline-block;background:#2563eb;color:#fff;font-size:14px;font-weight:600;padding:12px 32px;border-radius:10px;text-decoration:none;">Review in Admin Dashboard</a>
   </div>
   <div style="border-top:1px solid #eee;padding-top:20px;margin-top:32px;text-align:center;">
-    <p style="font-size:11px;color:#aaa;margin:0;">This is an automated notification from Global Homes.</p>
+    <p style="font-size:11px;color:#aaa;margin:0;">This is an automated notification from ListHQ.</p>
   </div>
 </div>
 </body></html>`;
@@ -253,7 +253,7 @@ function buildLeadEventEmailHtml(params: {
 <body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
 <div style="max-width:560px;margin:0 auto;padding:32px 20px;">
   <div style="text-align:center;margin-bottom:32px;">
-    <div style="font-size:24px;font-weight:700;color:#1a1a2e;">Global Homes</div>
+    <div style="font-size:24px;font-weight:700;color:#1a1a2e;">ListHQ</div>
     <div style="font-size:12px;color:#888;margin-top:4px;">Agent Notification</div>
   </div>
   <div style="background:${accentColor}10;border:1px solid ${accentColor}30;border-radius:12px;padding:12px 16px;text-align:center;margin-bottom:24px;">
@@ -282,7 +282,7 @@ function buildLeadEventEmailHtml(params: {
     <a href="https://globalhomes.lovable.app/dashboard/leads" style="display:inline-block;background:${accentColor};color:#fff;font-size:14px;font-weight:600;padding:12px 32px;border-radius:10px;text-decoration:none;">View in Dashboard</a>
   </div>
   <div style="border-top:1px solid #eee;padding-top:20px;margin-top:32px;text-align:center;">
-    <p style="font-size:11px;color:#aaa;margin:0;">You're receiving this because you're a registered agent on Global Homes.</p>
+    <p style="font-size:11px;color:#aaa;margin:0;">You're receiving this because you're a registered agent on ListHQ.</p>
     <p style="font-size:11px;color:#aaa;margin:4px 0 0;">Manage notification preferences in your <a href="https://globalhomes.lovable.app/dashboard/settings" style="color:#888;">dashboard settings</a>.</p>
   </div>
 </div>

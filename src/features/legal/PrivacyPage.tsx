@@ -3,8 +3,8 @@ import { Helmet } from 'react-helmet-async';
 const PrivacyPage = () => (
   <>
     <Helmet>
-      <title>Privacy Policy | Global Homes</title>
-      <meta name="description" content="Privacy Policy for Global Homes — how we collect, use, and protect your personal information." />
+      <title>Privacy Policy | ListHQ</title>
+      <meta name="description" content="Privacy Policy for ListHQ — how we collect, use, and protect your personal information." />
     </Helmet>
     <main className="bg-background">
       <article className="max-w-3xl mx-auto px-4 py-16 prose prose-neutral dark:prose-invert">
@@ -13,7 +13,7 @@ const PrivacyPage = () => (
 
         <h2>1. Overview</h2>
         <p>
-          Global Homes Pty Ltd (ABN 00 000 000 000) is committed to protecting your personal information in
+          ListHQ Pty Ltd (ABN 00 000 000 000) is committed to protecting your personal information in
           accordance with the <em>Privacy Act 1988</em> (Cth) and the Australian Privacy Principles (APPs).
           This policy explains how we collect, use, disclose, and safeguard your data.
         </p>

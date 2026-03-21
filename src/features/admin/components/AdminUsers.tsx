@@ -538,7 +538,7 @@ const AdminUsers = () => {
                         ) : (
                           <>
                             <a
-                              href={`mailto:${u.email}?subject=Your Global Homes Demo`}
+                              href={`mailto:${u.email}?subject=Your ListHQ Demo`}
                               className="p-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors inline-block"
                               title="Email"
                             >

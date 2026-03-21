@@ -183,8 +183,12 @@ const AgentDashboardSidebar = () => {
                 isActive={!item.comingSoon && isActive(item.url)}
               >
                 <button
-                  onClick={() => !item.comingSoon && navigate(item.url)}
-                  className={`flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm transition-colors ${
+                  onClick={() => {
+                    if (item.comingSoon) return;
+                    navigate(item.url);
+                    if (isMobile) setOpenMobile(false);
+                  }}
+                  className={`flex items-center gap-2 w-full px-3 py-2.5 rounded-lg text-sm transition-colors ${
                     item.comingSoon
                       ? 'text-muted-foreground/50 cursor-default'
                       : isActive(item.url)

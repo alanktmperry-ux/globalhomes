@@ -275,7 +275,10 @@ const AgentDashboardSidebar = () => {
         <div className="px-3 mb-2 flex gap-1.5">
           <Button
             size="sm"
-            onClick={() => navigate('/pocket-listing')}
+            onClick={() => {
+              navigate('/pocket-listing');
+              if (isMobile) setOpenMobile(false);
+            }}
             className={`flex-1 gap-1.5 text-xs font-bold relative ${collapsed ? 'px-0 justify-center' : ''}`}
           >
             <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-success rounded-full animate-pulse" />

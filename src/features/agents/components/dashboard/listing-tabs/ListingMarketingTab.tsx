@@ -442,7 +442,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
 
             <div className="space-y-2">
               <p className="text-xs font-medium text-foreground">What you're getting</p>
-              {(BOOST_TIERS[listing.boost_requested_tier]?.inclusions || []).map((item, i) => (
+              {(BOOST_TIERS[boostState.boost_requested_tier || '']?.inclusions || []).map((item, i) => (
                 <p key={i} className="text-xs text-muted-foreground flex items-center gap-2">
                   <span className="text-emerald-500">✓</span>
                   {item}

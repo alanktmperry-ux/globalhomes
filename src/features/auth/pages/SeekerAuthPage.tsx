@@ -72,7 +72,7 @@ const SeekerAuthPage = () => {
         setStep('email');
       } else {
         toast({ title: 'Account created!' });
-        navigate('/');
+        setStep('prefs');
       }
     } catch (err: any) {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });

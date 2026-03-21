@@ -382,7 +382,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
           </span>
         </button>
 
-        <div className="flex items-center gap-5 text-[12px] text-muted-foreground">
+        <div className="flex items-center gap-6 text-[12px] text-muted-foreground">
           <button
             onClick={() => {
               setListingMode('sale');
@@ -407,12 +407,6 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
             }`}>
             For Rent
           </button>
-          <span className="text-muted-foreground hover:text-foreground cursor-pointer transition-colors">
-            Agents
-          </span>
-          <span className="text-muted-foreground hover:text-foreground cursor-pointer transition-colors">
-            News
-          </span>
         </div>
 
         <button onClick={() => navigate('/login')} className="text-[12px] font-bold text-foreground">

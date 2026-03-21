@@ -370,6 +370,7 @@ const AdminUsers = () => {
           {[
             { key: 'all', label: `All (${users.length})` },
             { key: 'agent', label: `Agents (${agentCount})` },
+            { key: 'partner', label: `Partners (${partnerCount})` },
             { key: 'demo', label: `Demo (${demoCount})` },
             { key: 'subscribed', label: `Subscribed (${subscribedCount})` },
           ].map(f => (

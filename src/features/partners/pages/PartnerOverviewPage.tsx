@@ -72,7 +72,7 @@ const PartnerOverviewPage = () => {
       supabase.from('partner_agencies').select('id', { count: 'exact', head: true }).eq('partner_id', partnerId).eq('status', 'active'),
       supabase.from('partner_agencies').select('id', { count: 'exact', head: true }).eq('partner_id', partnerId).eq('status', 'pending'),
       supabase.from('partner_agencies').select('id, agency_id, access_level, invite_token, invited_at, agencies(name)').eq('partner_id', partnerId).eq('status', 'pending').order('invited_at', { ascending: false }),
-      supabase.from('partner_activity_log').select('id, action_type, description, agency_id, created_at').eq('partner_id', partnerId).order('created_at', { ascending: false }).limit(10),
+      supabase.from('partner_activity_log' as any).select('id, action_type, description, agency_id, created_at').eq('partner_id', partnerId).order('created_at', { ascending: false }).limit(10),
     ]);
 
     setActiveCount(activeRes.count || 0);

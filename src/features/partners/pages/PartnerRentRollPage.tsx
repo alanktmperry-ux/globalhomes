@@ -168,13 +168,13 @@ const PartnerRentRollPage = () => {
       // Log activity
       const { data: partner } = await supabase.from('partners').select('id').eq('user_id', user.id).maybeSingle();
       if (partner) {
-        await supabase.from('partner_activity_log').insert({
+        await supabase.from('partner_activity_log' as any).insert({
           partner_id: (partner as any).id,
           agency_id: activeAgency.id,
           action_type: 'rent_payment_recorded',
           entity_type: 'rent_payments',
           description: `Recorded rent payment for ${payTenancy.tenant_name} — ${payTenancy.properties?.address || ''}`,
-        } as any);
+        });
       }
       toast.success('Payment recorded');
       setPayTenancy(null);

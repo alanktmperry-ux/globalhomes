@@ -109,7 +109,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
           )}
           <button
             onClick={e => { e.stopPropagation(); onToggleSave(property.id); }}
-            className="absolute top-3 right-3 w-9 h-9 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center transition-transform active:scale-90"
+            className="absolute top-3 right-3 w-11 h-11 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center transition-transform active:scale-90"
             aria-label={isSaved ? `Remove ${property.title} from saved` : `Save ${property.title}`}
             aria-pressed={isSaved}
           >

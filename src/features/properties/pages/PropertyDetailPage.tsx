@@ -260,7 +260,7 @@ export default function PropertyDetailPage() {
               <button
                 key={i}
                 onClick={() => setImageIndex(i)}
-                className={`shrink-0 w-20 h-14 rounded-lg overflow-hidden border-2 transition-all ${
+                className={`shrink-0 w-20 h-14 rounded-lg overflow-hidden border-2 transition-all snap-start ${
                   i === imageIndex ? 'border-primary shadow-md' : 'border-transparent opacity-60 hover:opacity-100'
                 }`}
               >

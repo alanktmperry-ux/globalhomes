@@ -39,12 +39,15 @@ export function BottomNav() {
             <button
               key={item.key}
               onClick={() => navigate(item.path)}
-              className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-colors ${
+              className={`relative flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-colors ${
                 isActive ? 'text-primary' : 'text-muted-foreground'
               }`}
             >
+              {isActive && (
+                <div className="absolute top-1 w-1 h-1 rounded-full bg-primary" />
+              )}
               <item.icon size={22} strokeWidth={isActive ? 2.5 : 1.8} />
-              <span className="text-[10px] font-medium">{t(item.key)}</span>
+              <span className={`text-[10px] ${isActive ? 'font-medium text-primary' : 'font-medium text-muted-foreground'}`}>{t(item.key)}</span>
             </button>
           );
         })}

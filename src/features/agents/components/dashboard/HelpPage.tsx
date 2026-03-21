@@ -424,7 +424,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       { q: 'What plans are available?', a: 'Starter ($99/mo founding, $199 full): 1 seat, 10 listings, CRM, AI listing writer, voice leads, standard analytics. Pro ($199/mo founding, $349 full): 1 seat, unlimited listings, trust accounting, partner portal access, Whisper Market, Inspection Day, Settlement Concierge, commission calculator, GCI reports, verified badge. Agency ($399/mo founding, $699 full): up to 8 seats, everything in Pro plus team analytics, agency branding, lead routing, partner portal access, and API access. Annual billing saves 15% on all plans.' },
       { q: 'Can I cancel at any time?', a: 'Yes. No lock-in contracts. Cancel from the Billing page and your plan remains active until the end of the billing period. Data is retained for 90 days.' },
       { q: 'What payment methods are accepted?', a: 'Visa, Mastercard, and American Express via Stripe. Update your card at any time on the Billing page.' },
-      { q: 'Is there a per-listing marketing fee?', a: 'Yes. In addition to the subscription, listing campaigns on the public marketplace are charged per listing: Standard $299, Featured $599, Premier $999. These fees are passed to vendors as their marketing campaign cost — typically 50–88% cheaper than REA Group.' },
+      { q: 'Is there a per-listing marketing fee?', a: 'Featured listing boosts are available from $49/month — significantly cheaper than REA Group. Boost any listing from the Marketing tab on the listing detail page.' },
     ],
   },
   {

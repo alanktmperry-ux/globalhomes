@@ -608,7 +608,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                     setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
                   }
                 }}
-                className="text-[11px] font-bold text-foreground hover:opacity-70 transition-opacity whitespace-nowrap flex-shrink-0">
+                className="flex items-center justify-center min-h-[44px] px-3 text-[11px] font-bold text-foreground hover:opacity-70 transition-opacity whitespace-nowrap flex-shrink-0">
                 Search →
               </button>
 

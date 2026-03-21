@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useI18n, languageNames, type Language } from '@/lib/i18n';
+import { useI18n, languageNames, type Language } from '@/shared/lib/i18n';
 
 export function LanguageSwitcher() {
   const { language, setLanguage } = useI18n();

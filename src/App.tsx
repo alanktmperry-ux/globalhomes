@@ -180,6 +180,12 @@ const App = () => (
                   <Route path="onboarding" element={<AgencyOnboardingPage />} />
                 </Route>
 
+                {/* Partner */}
+                <Route path="/partner/login" element={<PartnerAuthPage />} />
+                <Route path="/partner" element={<PartnerDashboardLayout />}>
+                  <Route path="dashboard" element={<PartnerOverviewPage />} />
+                </Route>
+
                 {/* Admin */}
                 <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
 

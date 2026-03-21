@@ -567,10 +567,9 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                 <Button
                   size="sm"
                   className="w-full gap-2"
-                  onClick={() => handleRequestBoost('premier')}
+                  onClick={() => setShowPaymentStep('premier')}
                   disabled={!!boostLoading}
                 >
-                  {boostLoading === 'premier' ? <Loader2 size={14} className="animate-spin" /> : null}
                   Start Premier — $99/mo
                 </Button>
               </div>

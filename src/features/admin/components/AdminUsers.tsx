@@ -232,6 +232,23 @@ const AdminUsers = () => {
     fetchUsers();
   };
 
+  const handleVerifyPartner = async (userId: string, verify: boolean) => {
+    setActionLoading(userId);
+    try {
+      await callAdminApi('verify_partner', { user_id: userId, verify });
+      toast({
+        title: verify ? 'Partner verified' : 'Partner unverified',
+        description: verify
+          ? 'They can now accept agency invitations.'
+          : 'Their access has been suspended.',
+      });
+    } catch (err: any) {
+      toast({ title: 'Failed', description: err.message, variant: 'destructive' });
+    }
+    setActionLoading(null);
+    fetchUsers();
+  };
+
   // Batch actions
   const handleBatchDelete = async () => {
     const count = selected.size;

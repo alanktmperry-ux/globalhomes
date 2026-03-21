@@ -592,18 +592,20 @@ const Index = () => {
         <VoiceSearchHero
           onSearch={handleSearch}
           onLocationSelect={(loc) => {
-            setMapCenter({ lat: loc.lat, lng: loc.lng, key: `${loc.lat}-${loc.lng}` });
             setSearchCenter({ lat: loc.lat, lng: loc.lng });
             setMapCollapsed(false);
-            // Auto-apply 10km radius if none selected
-            // so property list filters to the location
-            if (!searchRadius) {
-              setSearchRadius(10);
-            }
-            // Fire event so VoiceSearchHero re-fetches featured listings for this area
+            if (!searchRadius) setSearchRadius(10);
             window.dispatchEvent(new CustomEvent('search-location-confirmed', {
               detail: { lat: loc.lat, lng: loc.lng }
             }));
+            // Delay center so map has expanded first
+            setTimeout(() => {
+              setMapCenter({
+                lat: loc.lat,
+                lng: loc.lng,
+                key: `${loc.lat}-${loc.lng}-${Date.now()}`,
+              });
+            }, 250);
           }}
           onRadiusChange={setSearchRadius}
           selectedRadius={searchRadius}

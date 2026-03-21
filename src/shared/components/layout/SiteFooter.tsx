@@ -14,6 +14,7 @@ const legalLinks = [
   { label: 'Privacy Policy', to: '/privacy' },
   { label: 'Terms of Service', to: '/terms' },
   { label: 'Agent Login', to: '/agents/login' },
+  { label: 'Partner Portal', to: '/partner/login' },
   { label: 'Contact', to: '#' },
 ];
 

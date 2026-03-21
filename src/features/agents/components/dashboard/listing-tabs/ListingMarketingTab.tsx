@@ -499,7 +499,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                     </Button>
                   </div>
                   <p className="text-[10px] text-muted-foreground text-center mt-3">
-                    By confirming you agree to be billed {tierData.priceLabel}/month from activation date. Cancel anytime.
+                    One-off payment of {tierData.priceLabel}. Your listing is featured for 30 days from activation. Renew anytime after that.
                   </p>
                 </div>
               );

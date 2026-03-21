@@ -445,7 +445,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     items: [
       { q: 'The page is not loading properly — what should I do?', a: 'Try a hard refresh (Ctrl+Shift+R on Windows, Cmd+Shift+R on Mac). If the issue persists, clear your browser cache or try Chrome, Safari, Firefox, or Edge. If the problem continues, email us with a screenshot.' },
       { q: 'My listing photos are not uploading — why?', a: 'Each image must be under 10 MB and in JPEG, PNG, or WebP format. Try uploading one photo at a time on a faster connection. If the issue continues, contact support with the browser and error message.' },
-      { q: 'I am not receiving email notifications.', a: 'Check your spam folder and add noreply@listhq.com.au to your contacts. Verify your email is correct under Settings and that lead notifications are enabled.' },
+      { q: 'I am not receiving email notifications.', a: 'Check your spam folder and add our sending address to your contacts. Verify your email is correct under Settings and that notifications are enabled.' },
       { q: 'The voice search is not working on my device.', a: 'Voice search requires microphone permission in your browser. On Chrome: click the padlock in the address bar → Site settings → Microphone → Allow. On Safari: go to Settings → Safari → Microphone → Allow. Voice search is not supported in Internet Explorer.' },
       { q: 'The map is not showing my territory locations.', a: 'The map uses Google Maps and requires a working internet connection. Try refreshing the Territory page. If your locations are saved but not displaying, try a different browser.' },
     ],

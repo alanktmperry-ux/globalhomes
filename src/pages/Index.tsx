@@ -528,10 +528,10 @@ const Index = () => {
           </div>
         ))}
         {isCollab && (
-          <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/30 text-[11px] font-semibold text-primary shrink-0 animate-fade-in">
-            <Share2 size={10} />
-            Collab mode
-          </span>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shrink-0 animate-fade-in">
+            <Users size={12} />
+            Searching together
+          </div>
         )}
       </div>
     )}

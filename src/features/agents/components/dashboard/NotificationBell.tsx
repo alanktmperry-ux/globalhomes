@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Bell, X, Check, CheckCheck, MessageSquare, MousePointerClick, Mic } from 'lucide-react';
+import { Bell, X, Check, CheckCheck, MessageSquare, MousePointerClick, Mic, Zap } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { formatDistanceToNow } from 'date-fns';

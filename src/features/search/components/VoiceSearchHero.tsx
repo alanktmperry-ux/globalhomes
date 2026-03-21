@@ -711,7 +711,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
               Featured listings
             </span>
           </div>
-          <div className="relative overflow-hidden">
+          <div className="relative overflow-hidden w-full">
             <div
               className="flex gap-4 px-4 md:px-8"
               style={{ animation: 'scrollLeft 30s linear infinite', width: 'max-content' }}
@@ -749,8 +749,13 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                 </div>
               ))}
             </div>
+            <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-background to-transparent pointer-events-none z-10" />
             <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-background to-transparent pointer-events-none" />
           </div>
+        </div>
+
+        <div className="px-4 pb-4">
+          <VoiceSearchHistory onRerun={onSearch} />
         </div>
       </TooltipProvider>
 

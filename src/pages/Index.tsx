@@ -579,7 +579,7 @@ const Index = () => {
   );
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <VoiceSearchErrorBoundary>
         <VoiceSearchHero
           onSearch={handleSearch}
@@ -756,7 +756,7 @@ const Index = () => {
         onToggleSave={toggleSaved}
         searchContext={searchContextForLead}
       />
-    </>
+    </div>
   );
 };
 

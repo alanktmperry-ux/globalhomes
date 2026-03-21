@@ -704,53 +704,81 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
           ))}
         </div>
 
-        {/* ── FEATURED STRIP ── */}
-        <div className="bg-background border-b border-border overflow-hidden py-6">
-          <div className="px-4 md:px-8 mb-4">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+        {/* ── FEATURED LISTINGS ── */}
+        <div className="hidden md:block bg-background px-6 pt-5 pb-6">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
               Featured listings
             </span>
+            <span className="text-xs text-primary font-medium cursor-pointer hover:underline">
+              View all →
+            </span>
           </div>
-          <div className="relative overflow-hidden w-full">
-            <div
-              className="flex gap-4 px-4 md:px-8"
-              style={{ animation: 'scrollLeft 30s linear infinite', width: 'max-content' }}
-            >
-              {[...FEATURED_PROPERTIES, ...FEATURED_PROPERTIES].map((p, i) => (
-                <div key={`${p.id}-${i}`} className="w-[220px] shrink-0 rounded-xl border border-border bg-card overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
-                  <div className="relative h-[130px]">
-                    <img src={p.img} alt={p.address} className="w-full h-full object-cover" />
-                    <div className="absolute top-2 left-2">
-                      <span className="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-white/90 text-foreground">
-                        {p.tag}
-                      </span>
-                    </div>
-                    <div className="absolute bottom-2 left-2">
-                      <span className="text-sm font-bold text-white drop-shadow-lg">
-                        {p.price}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="p-3">
-                    <div className="text-xs font-semibold text-foreground truncate">
-                      {p.address}
-                    </div>
-                    <div className="text-[10px] text-muted-foreground mt-0.5 truncate">
-                      {p.suburb}
-                    </div>
-                    <div className="text-[10px] text-muted-foreground mt-1.5 flex items-center gap-1">
-                      {p.beds} bed
-                      <span className="text-border">·</span>
-                      {p.baths} bath
-                      <span className="text-border">·</span>
-                      {p.cars} car
-                    </div>
-                  </div>
+          <div className="grid gap-3" style={{ gridTemplateColumns: '1.65fr 1fr 1fr', gridTemplateRows: 'auto auto' }}>
+            {/* Large hero card — spans 2 rows */}
+            <div className="row-span-2 relative rounded-2xl overflow-hidden cursor-pointer group" style={{ minHeight: '280px' }}>
+              <img src={FEATURED_PROPERTIES[0].img} alt={FEATURED_PROPERTIES[0].address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 30%,rgba(0,0,0,0.72) 100%)'}} />
+              <span className="absolute top-3 left-3 text-[9px] font-bold px-2.5 py-1 rounded-full text-white" style={{background: 'rgba(10,22,40,0.82)'}}>
+                {FEATURED_PROPERTIES[0].tag}
+              </span>
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <div className="text-white font-extrabold text-lg leading-tight mb-0.5" style={{textShadow: '0 1px 6px rgba(0,0,0,0.4)'}}>
+                  {FEATURED_PROPERTIES[0].price}
                 </div>
-              ))}
+                <div className="text-white/90 text-xs font-semibold mb-0.5">{FEATURED_PROPERTIES[0].address}</div>
+                <div className="text-white/60 text-[10px] mb-2">{FEATURED_PROPERTIES[0].suburb}</div>
+                <div className="flex gap-2 text-[10px] text-white/70">
+                  <span>{FEATURED_PROPERTIES[0].beds} bed</span>
+                  <span className="text-white/30">·</span>
+                  <span>{FEATURED_PROPERTIES[0].baths} bath</span>
+                  <span className="text-white/30">·</span>
+                  <span>{FEATURED_PROPERTIES[0].cars} car</span>
+                </div>
+              </div>
             </div>
-            <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-background to-transparent pointer-events-none z-10" />
-            <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-background to-transparent pointer-events-none" />
+            {/* Top right card */}
+            <div className="relative rounded-2xl overflow-hidden cursor-pointer group" style={{ height: '134px' }}>
+              <img src={FEATURED_PROPERTIES[1].img} alt={FEATURED_PROPERTIES[1].address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 25%,rgba(0,0,0,0.65) 100%)'}} />
+              <span className="absolute top-2.5 left-2.5 text-[9px] font-bold px-2 py-0.5 rounded-full text-white" style={{background: 'rgba(10,22,40,0.82)'}}>
+                {FEATURED_PROPERTIES[1].tag}
+              </span>
+              <div className="absolute bottom-0 left-0 right-0 p-3">
+                <div className="text-white font-bold text-sm leading-tight">{FEATURED_PROPERTIES[1].price}</div>
+                <div className="text-white/70 text-[10px] mt-0.5">{FEATURED_PROPERTIES[1].suburb}</div>
+              </div>
+            </div>
+            {/* Top far-right card */}
+            <div className="relative rounded-2xl overflow-hidden cursor-pointer group" style={{ height: '134px' }}>
+              <img src={FEATURED_PROPERTIES[2].img} alt={FEATURED_PROPERTIES[2].address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 25%,rgba(0,0,0,0.65) 100%)'}} />
+              <div className="absolute bottom-0 left-0 right-0 p-3">
+                <div className="text-white font-bold text-sm leading-tight">{FEATURED_PROPERTIES[2].price}</div>
+                <div className="text-white/70 text-[10px] mt-0.5">{FEATURED_PROPERTIES[2].suburb}</div>
+              </div>
+            </div>
+            {/* Bottom right card */}
+            <div className="relative rounded-2xl overflow-hidden cursor-pointer group" style={{ height: '134px' }}>
+              <img src={FEATURED_PROPERTIES[3].img} alt={FEATURED_PROPERTIES[3].address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 25%,rgba(0,0,0,0.65) 100%)'}} />
+              <span className="absolute top-2.5 left-2.5 text-[9px] font-bold px-2 py-0.5 rounded-full text-white" style={{background: 'rgba(10,22,40,0.82)'}}>
+                {FEATURED_PROPERTIES[3].tag}
+              </span>
+              <div className="absolute bottom-0 left-0 right-0 p-3">
+                <div className="text-white font-bold text-sm leading-tight">{FEATURED_PROPERTIES[3].price}</div>
+                <div className="text-white/70 text-[10px] mt-0.5">{FEATURED_PROPERTIES[3].suburb}</div>
+              </div>
+            </div>
+            {/* Bottom far-right card */}
+            <div className="relative rounded-2xl overflow-hidden cursor-pointer group" style={{ height: '134px' }}>
+              <img src={FEATURED_PROPERTIES[4].img} alt={FEATURED_PROPERTIES[4].address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 25%,rgba(0,0,0,0.65) 100%)'}} />
+              <div className="absolute bottom-0 left-0 right-0 p-3">
+                <div className="text-white font-bold text-sm leading-tight">{FEATURED_PROPERTIES[4].price}</div>
+                <div className="text-white/70 text-[10px] mt-0.5">{FEATURED_PROPERTIES[4].suburb}</div>
+              </div>
+            </div>
           </div>
         </div>
 

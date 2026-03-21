@@ -489,28 +489,31 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                   <span className="text-[12px] text-muted-foreground italic">
                     {transcript || 'Listening… speak now'}
                   </span>
-                ) : textQuery ? (
-                  <input
-                    type="text"
-                    value={textQuery}
-                    onChange={e => setTextQuery(e.target.value)}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter' && textQuery.trim()) {
-                        suppressAutocompleteRef.current = true;
-                        processTranscript(textQuery.trim());
-                        setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
-                      }
-                    }}
-                    className="w-full text-[12px] text-foreground bg-transparent focus:outline-none"
-                    autoFocus
-                  />
                 ) : (
-                  <span
-                    className="text-[12px] text-muted-foreground transition-opacity duration-300 pointer-events-none"
-                    style={{ opacity: placeholderVisible ? 1 : 0 }}
-                  >
-                    {SEARCH_PLACEHOLDERS[placeholderIndex]}
-                  </span>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={textQuery}
+                      onChange={e => setTextQuery(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' && textQuery.trim()) {
+                          suppressAutocompleteRef.current = true;
+                          processTranscript(textQuery.trim());
+                          setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
+                        }
+                      }}
+                      className="w-full text-[12px] text-foreground bg-transparent focus:outline-none relative z-10"
+                      placeholder=""
+                    />
+                    {!textQuery && (
+                      <span
+                        className="absolute inset-0 text-[12px] text-muted-foreground transition-opacity duration-300 pointer-events-none flex items-center"
+                        style={{ opacity: placeholderVisible ? 1 : 0 }}
+                      >
+                        {SEARCH_PLACEHOLDERS[placeholderIndex]}
+                      </span>
+                    )}
+                  </div>
                 )}
               </div>
 

@@ -596,6 +596,10 @@ const Index = () => {
             if (!searchRadius) {
               setSearchRadius(10);
             }
+            // Fire event so VoiceSearchHero re-fetches featured listings for this area
+            window.dispatchEvent(new CustomEvent('search-location-confirmed', {
+              detail: { lat: loc.lat, lng: loc.lng }
+            }));
           }}
           onRadiusChange={setSearchRadius}
           selectedRadius={searchRadius}

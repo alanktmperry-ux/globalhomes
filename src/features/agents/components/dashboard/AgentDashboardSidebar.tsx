@@ -217,13 +217,13 @@ const AgentDashboardSidebar = () => {
       <SidebarHeader className="p-4">
         {!collapsed ? (
           <div className="flex items-center gap-2.5">
-            {agentLogo ? (
-              <div className="w-12 h-12 rounded-lg border border-border bg-background flex items-center justify-center overflow-hidden shrink-0">
+             {agentLogo ? (
+              <div className="w-16 h-16 rounded-lg border border-border bg-background flex items-center justify-center overflow-hidden shrink-0">
                 <img src={agentLogo} alt="Agency logo" className="w-full h-full object-contain p-0.5" />
               </div>
             ) : (
-              <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center shrink-0">
-                <span className="text-primary-foreground font-bold text-base">L</span>
+              <div className="w-16 h-16 rounded-lg bg-primary flex items-center justify-center shrink-0">
+                <span className="text-primary-foreground font-bold text-lg">L</span>
               </div>
             )}
             <div className="min-w-0">
@@ -250,12 +250,12 @@ const AgentDashboardSidebar = () => {
           </div>
         ) : (
           agentLogo ? (
-            <div className="w-10 h-10 rounded-lg border border-border bg-background flex items-center justify-center overflow-hidden mx-auto">
+             <div className="w-[52px] h-[52px] rounded-lg border border-border bg-background flex items-center justify-center overflow-hidden mx-auto">
               <img src={agentLogo} alt="Agency logo" className="w-full h-full object-contain p-0.5" />
             </div>
           ) : (
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center mx-auto">
-              <span className="text-primary-foreground font-bold text-sm">L</span>
+            <div className="w-[52px] h-[52px] rounded-lg bg-primary flex items-center justify-center mx-auto">
+              <span className="text-primary-foreground font-bold text-base">L</span>
             </div>
           )
         )}

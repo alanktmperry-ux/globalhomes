@@ -1364,6 +1364,133 @@ export type Database = {
           },
         ]
       }
+      partner_agencies: {
+        Row: {
+          accepted_at: string | null
+          access_level: string
+          agency_id: string
+          created_at: string
+          id: string
+          invite_expires_at: string | null
+          invite_token: string | null
+          invited_at: string
+          invited_by_agent_id: string | null
+          notes: string | null
+          partner_id: string
+          revoked_at: string | null
+          revoked_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          access_level?: string
+          agency_id: string
+          created_at?: string
+          id?: string
+          invite_expires_at?: string | null
+          invite_token?: string | null
+          invited_at?: string
+          invited_by_agent_id?: string | null
+          notes?: string | null
+          partner_id: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          access_level?: string
+          agency_id?: string
+          created_at?: string
+          id?: string
+          invite_expires_at?: string | null
+          invite_token?: string | null
+          invited_at?: string
+          invited_by_agent_id?: string | null
+          notes?: string | null
+          partner_id?: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_agencies_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_agencies_invited_by_agent_id_fkey"
+            columns: ["invited_by_agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_agencies_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partners: {
+        Row: {
+          abn: string | null
+          company_name: string
+          contact_email: string
+          contact_name: string
+          contact_phone: string | null
+          created_at: string
+          id: string
+          is_verified: boolean
+          logo_url: string | null
+          notes: string | null
+          updated_at: string
+          user_id: string
+          verified_at: string | null
+          website: string | null
+        }
+        Insert: {
+          abn?: string | null
+          company_name: string
+          contact_email: string
+          contact_name: string
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          is_verified?: boolean
+          logo_url?: string | null
+          notes?: string | null
+          updated_at?: string
+          user_id: string
+          verified_at?: string | null
+          website?: string | null
+        }
+        Update: {
+          abn?: string | null
+          company_name?: string
+          contact_email?: string
+          contact_name?: string
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          is_verified?: boolean
+          logo_url?: string | null
+          notes?: string | null
+          updated_at?: string
+          user_id?: string
+          verified_at?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -2682,6 +2809,10 @@ export type Database = {
         Args: { _agency_id: string; _user_id: string }
         Returns: boolean
       }
+      is_partner_for_agency: {
+        Args: { _agency_id: string; _user_id: string }
+        Returns: boolean
+      }
       nearby_properties: {
         Args: {
           _lat: number
@@ -2752,7 +2883,13 @@ export type Database = {
     }
     Enums: {
       agency_member_role: "owner" | "admin" | "agent" | "principal"
-      app_role: "user" | "agent" | "admin" | "principal" | "property_manager"
+      app_role:
+        | "user"
+        | "agent"
+        | "admin"
+        | "principal"
+        | "property_manager"
+        | "partner"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2881,7 +3018,14 @@ export const Constants = {
   public: {
     Enums: {
       agency_member_role: ["owner", "admin", "agent", "principal"],
-      app_role: ["user", "agent", "admin", "principal", "property_manager"],
+      app_role: [
+        "user",
+        "agent",
+        "admin",
+        "principal",
+        "property_manager",
+        "partner",
+      ],
     },
   },
 } as const

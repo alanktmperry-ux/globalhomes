@@ -8,7 +8,7 @@ import { lovable } from '@/integrations/lovable/index';
 import { useToast } from '@/shared/hooks/use-toast';
 import seekerHero from '@/assets/seeker-auth-hero.jpg';
 
-type Step = 'email' | 'password' | 'create';
+type Step = 'email' | 'password' | 'create' | 'prefs';
 
 const SeekerAuthPage = () => {
   const navigate = useNavigate();
@@ -19,6 +19,9 @@ const SeekerAuthPage = () => {
   const [displayName, setDisplayName] = useState('');
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
+  const [budgetMax, setBudgetMax] = useState('');
+  const [suburbs, setSuburbs] = useState('');
+  const [propertyType, setPropertyType] = useState('');
 
   const handleEmailContinue = (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,13 +72,29 @@ const SeekerAuthPage = () => {
         setStep('email');
       } else {
         toast({ title: 'Account created!' });
-        navigate('/');
+        setStep('prefs');
       }
     } catch (err: any) {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSavePrefs = async () => {
+    try {
+      const { data: { user: u } } = await supabase.auth.getUser();
+      if (u && (budgetMax || suburbs)) {
+        await supabase
+          .from('user_preferences')
+          .update({
+            budget_max: budgetMax ? parseInt(budgetMax.replace(/[^0-9]/g, '')) : null,
+            preferred_locations: suburbs ? suburbs.split(',').map(s => s.trim()).filter(Boolean) : [],
+          } as any)
+          .eq('user_id', u.id);
+      }
+    } catch {}
+    navigate('/');
   };
 
   const handleOAuth = async (provider: 'google' | 'apple') => {
@@ -154,11 +173,13 @@ const SeekerAuthPage = () => {
             {step === 'email' && 'Sign in to search'}
             {step === 'password' && 'Welcome back'}
             {step === 'create' && 'Create your account'}
+            {step === 'prefs' && ''}
           </h1>
           <p className="text-sm text-muted-foreground mb-6">
             {step === 'email' && 'Find, save, and enquire on properties worldwide.'}
             {step === 'password' && email}
             {step === 'create' && 'Start your property search journey.'}
+            {step === 'prefs' && ''}
           </p>
 
           {/* Step: Email */}
@@ -256,6 +277,96 @@ const SeekerAuthPage = () => {
                 <a href="#" className="text-primary underline underline-offset-2">terms of use</a>
               </p>
             </>
+          )}
+
+          {/* Step: Preferences onboarding */}
+          {step === 'prefs' && (
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-5">
+              <div>
+                <h2 className="text-xl font-bold text-foreground mb-1">
+                  What are you looking for?
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Help us show you the right properties. You can change this anytime in settings.
+                </p>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs font-medium text-foreground mb-1.5 block">
+                    Max budget (optional)
+                  </label>
+                  <select
+                    value={budgetMax}
+                    onChange={e => setBudgetMax(e.target.value)}
+                    className="w-full h-11 rounded-xl border border-border bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    <option value="">No preference</option>
+                    <option value="500000">Up to $500k</option>
+                    <option value="750000">Up to $750k</option>
+                    <option value="1000000">Up to $1M</option>
+                    <option value="1500000">Up to $1.5M</option>
+                    <option value="2000000">Up to $2M</option>
+                    <option value="3000000">Up to $3M</option>
+                    <option value="5000000">Up to $5M</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-foreground mb-1.5 block">
+                    Preferred suburbs (optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={suburbs}
+                    onChange={e => setSuburbs(e.target.value)}
+                    placeholder="e.g. Richmond, Fitzroy, Collingwood"
+                    className="w-full h-11 rounded-xl border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  />
+                  <p className="text-[11px] text-muted-foreground mt-1">
+                    Separate multiple suburbs with commas
+                  </p>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-foreground mb-1.5 block">
+                    Property type (optional)
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {['House', 'Apartment', 'Townhouse', 'Land', 'Any'].map(type => (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => setPropertyType(type === 'Any' ? '' : type)}
+                        className={`py-2 rounded-xl text-xs font-medium border transition-colors ${
+                          (type === 'Any' ? !propertyType : propertyType === type)
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background text-muted-foreground border-border hover:border-primary/50'
+                        }`}
+                      >
+                        {type}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={handleSavePrefs}
+                  className="w-full h-12 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity"
+                >
+                  Start searching
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate('/')}
+                  className="w-full h-10 rounded-xl text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Skip for now
+                </button>
+              </div>
+            </motion.div>
           )}
 
           {/* Agent link — visually distinct */}

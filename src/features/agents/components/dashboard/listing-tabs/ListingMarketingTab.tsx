@@ -194,12 +194,6 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   const handleRequestBoost = async (tier: 'featured' | 'premier') => {
     setBoostLoading(tier);
     try {
-      const { data: agent } = await supabase
-        .from('agents')
-        .select('name, email, agency')
-        .eq('user_id', user?.id ?? '')
-        .maybeSingle();
-
       const { error } = await supabase
         .from('properties')
         .update({
@@ -212,24 +206,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
 
       const tierData = BOOST_TIERS[tier];
 
-      await supabase.functions.invoke('send-notification-email', {
-        body: {
-          to: 'support@listhq.com.au',
-          subject: `⚡ Boost request: ${listing.address} — ${tierData.label} — ${agent?.name || 'Agent'}`,
-          html: `
-            <h2>New boost request</h2>
-            <p><strong>Tier:</strong> ${tierData.label} (${tierData.priceLabel} for 30 days)</p>
-            <p><strong>Property:</strong> ${listing.address}, ${listing.suburb}</p>
-            <p><strong>Listing ID:</strong> ${listing.id}</p>
-            <p><strong>Agent:</strong> ${agent?.name || 'Unknown'} · ${agent?.agency || ''} · ${agent?.email || ''}</p>
-            <p><strong>Requested:</strong> ${new Date().toLocaleString('en-AU', { timeZone: 'Australia/Sydney' })}</p>
-            <hr/>
-            <p>Go to Admin → Listings to activate this boost.</p>
-          `,
-        },
-      });
-
-      toast.success(`${tierData.label} boost requested! — We'll activate within 1 business hour.`);
+      toast.success(`${tierData.label} boost requested! You'll get a bell notification when it's live.`);
       setBoostState(prev => ({
         ...prev,
         boost_requested_at: new Date().toISOString(),

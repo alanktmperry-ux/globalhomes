@@ -447,10 +447,11 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                     <div className="flex items-start gap-2 text-xs text-muted-foreground bg-amber-50 border border-amber-200 rounded-lg p-3 dark:bg-amber-500/10 dark:border-amber-500/20">
                       <AlertCircle size={14} className="text-amber-600 flex-shrink-0 mt-px" />
                       <div>
-                        <p className="font-medium text-amber-800 dark:text-amber-400 mb-0.5">Payment on activation</p>
+                        <p className="font-medium text-amber-800 dark:text-amber-400 mb-0.5">How payment works right now</p>
                         <p>
-                          Online card payment is coming very soon. For now, our team will contact you to arrange
-                          payment when we activate your boost — usually within 1 business hour.
+                          Stripe instant payment is coming very soon. For now, payment is
+                          confirmed on activation and your listing goes live on the featured
+                          grid immediately.
                         </p>
                       </div>
                     </div>
@@ -473,7 +474,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                     </Button>
                   </div>
                   <p className="text-[10px] text-muted-foreground text-center mt-3">
-                    One-off payment of {tierData.priceLabel}. Your listing is featured for 30 days from activation. Renew anytime after that.
+                    One-off payment of {tierData.priceLabel} for 30 days. Your listing goes live on the featured grid as soon as payment is confirmed. Renew anytime from this tab.
                   </p>
                 </div>
               );

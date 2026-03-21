@@ -356,6 +356,19 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     ],
   },
   {
+    emoji: '🤝', title: 'Partner Portal',
+    items: [
+      { q: 'What is the Partner Portal?', a: 'The Partner Portal is a dedicated login for outsourced trust accounting firms — businesses that manage trust accounts on behalf of multiple real estate agencies. Instead of sharing your agent login, your trust accountant gets their own secure portal showing only what they need: your trust account, rent roll, tenancies, and arrears. It is completely separate from your agent dashboard.' },
+      { q: 'How do I give my trust accountant access?', a: 'Go to Partner Access in the sidebar under Account. Enter your trust accountant\'s email address and choose their access level (Trust Only, Trust & PM, or Full PM). They receive a branded invitation email with a secure link. Once they accept, they can log in immediately at /partner/login.' },
+      { q: 'What can a partner see and do?', a: 'Depends on the access level you grant. Trust Only: view and record trust receipts, payments, and reconciliation for your agency. Trust & PM: everything in Trust Only plus rent roll, tenancy records, and rent payments. Full PM: complete access including maintenance jobs, bank reconciliation, and arrears management.' },
+      { q: 'Can my trust accounting firm manage multiple agencies from one login?', a: 'Yes — this is the core purpose of the Partner Portal. A firm like Balance R&R can be invited by 20 different agencies. When they log in they see all their active agencies in a dropdown switcher and can move between them instantly. Each agency\'s data is kept completely separate.' },
+      { q: 'Can the partner firm have multiple staff members with individual logins?', a: 'Yes. The firm owner registers first and becomes the account owner. From within the Partner Portal, they can go to Team and invite each of their staff members by email. Each person gets their own individual login and password — no shared credentials. The owner can revoke any team member\'s access at any time.' },
+      { q: 'Is the partner portal free for my trust accountant to use?', a: 'Yes. There is no charge to partner firms for using the portal. The partner portal is included with your Pro and Agency plan subscription.' },
+      { q: 'How do I revoke a partner\'s access?', a: 'Go to Partner Access in your sidebar. Find the partner in the active partners table and click Revoke. Their access is removed immediately and they are notified by email.' },
+      { q: 'Can I see what my partner has done in my account?', a: 'Yes. All partner activity is logged with a timestamp and attributed to the individual team member. You can see who recorded which transaction, when, and from which IP address.' },
+    ],
+  },
+  {
     emoji: '📅', title: 'Inspections',
     items: [
       { q: 'How does Inspection Day Mode work?', a: 'Select your listing from the scheduled inspections list. During the inspection, add visitor details manually — first name, last name, phone, email, and interest level (Hot/Warm/Cold). After the inspection, send a one-click follow-up and all visitors are added to your CRM.' },

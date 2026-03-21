@@ -17,7 +17,8 @@ const ListingDetailPage = () => {
   const navigate = useNavigate();
   const [listing, setListing] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('details');
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'details');
   const [publishing, setPublishing] = useState(false);
 
   useEffect(() => {

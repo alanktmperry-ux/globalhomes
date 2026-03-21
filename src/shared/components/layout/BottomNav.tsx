@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Heart, MessageCircle, User, LogIn, LogOut, ShieldCheck, Building2, Globe } from 'lucide-react';
+import { Search, Heart, MessageCircle, User, LogIn, LogOut, ShieldCheck, Building2, Globe, Users } from 'lucide-react';
 import { useI18n, languageNames, type Language } from '@/shared/lib/i18n';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';

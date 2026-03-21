@@ -158,6 +158,75 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   const isSupported = typeof window !== 'undefined' &&
     ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
+  // ── Dynamic featured listings ──
+  const [featuredListings, setFeaturedListings] = useState<any[]>([]);
+  const [featuredLoading, setFeaturedLoading] = useState(true);
+  const [featuredFallback, setFeaturedFallback] = useState(false);
+  const userLocationRef = useRef<{lat:number;lng:number} | null>(null);
+
+  const fetchFeatured = useCallback(async (lat?: number, lng?: number) => {
+    setFeaturedLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('get-featured-listings', {
+        body: { lat, lng, radius_km: 100 },
+      });
+      if (error || !data) throw error;
+      if (data.fallback || !data.featured?.length) {
+        setFeaturedFallback(true);
+        setFeaturedListings([]);
+      } else {
+        setFeaturedFallback(false);
+        setFeaturedListings(data.featured);
+      }
+    } catch {
+      setFeaturedFallback(true);
+      setFeaturedListings([]);
+    } finally {
+      setFeaturedLoading(false);
+    }
+  }, []);
+
+  // Fetch featured on mount with optional geolocation
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          userLocationRef.current = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          fetchFeatured(pos.coords.latitude, pos.coords.longitude);
+        },
+        () => { fetchFeatured(); },
+        { timeout: 5000, maximumAge: 300000 }
+      );
+    } else {
+      fetchFeatured();
+    }
+  }, [fetchFeatured]);
+
+  // Re-fetch featured when search location changes
+  useEffect(() => {
+    const handler = (e: any) => {
+      if (e.detail?.lat && e.detail?.lng) {
+        fetchFeatured(e.detail.lat, e.detail.lng);
+      }
+    };
+    window.addEventListener('search-location-confirmed', handler);
+    return () => window.removeEventListener('search-location-confirmed', handler);
+  }, [fetchFeatured]);
+
+  const displayFeatured = featuredFallback || featuredListings.length === 0
+    ? FEATURED_PROPERTIES
+    : featuredListings.map((p: any) => ({
+        id: p.id,
+        price: p.price_formatted,
+        address: p.address,
+        suburb: `${p.suburb} ${p.state || ''}`.trim(),
+        beds: p.beds,
+        baths: p.baths,
+        cars: p.parking,
+        tag: p.boost_tier === 'premier' ? 'Premier' : 'Featured',
+        img: p.image_url || p.images?.[0] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&q=70',
+      }));
+
   // Rotating language ticker
   useEffect(() => {
     const interval = setInterval(() => {

@@ -58,7 +58,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   >([]);
   const [pastReports, setPastReports] = useState<any[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
-  const [boostRequesting, setBoostRequesting] = useState(false);
+  const [boostLoading, setBoostLoading] = useState<string | null>(null);
 
   const [vendorName, setVendorName] = useState(listing.vendor_name || '');
   const [vendorEmail, setVendorEmail] = useState(listing.vendor_email || '');
@@ -66,6 +66,77 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
 
   const isFeaturedActive = listing.is_featured && listing.featured_until && new Date(listing.featured_until) > new Date();
   const isBoostPending = listing.boost_requested_at && !listing.is_featured;
+
+  const BOOST_TIERS: Record<string, {
+    label: string; price: number; priceLabel: string;
+    billing: string; color: string; badge?: string;
+    inclusions: string[];
+  }> = {
+    featured: {
+      label: 'Featured',
+      price: 49,
+      priceLabel: '$49',
+      billing: '/month · cancel anytime',
+      color: 'amber',
+      inclusions: [
+        'Featured badge on your listing',
+        'Homepage featured grid — while active',
+        'Shown to buyers searching near ' + (listing.suburb || 'your suburb'),
+        'Higher placement in search results',
+        '~1.5× more enquiries than standard',
+        'Cancel anytime from this tab',
+      ],
+    },
+    premier: {
+      label: 'Premier',
+      price: 99,
+      priceLabel: '$99',
+      billing: '/month · cancel anytime',
+      color: 'violet',
+      badge: 'Most popular',
+      inclusions: [
+        'Everything in Featured',
+        'Top of search in ' + (listing.suburb || 'your suburb'),
+        'Hero image slot on homepage',
+        'Email alert to matching saved searches',
+        'Premier badge — stands out in results',
+        'Cancel anytime from this tab',
+      ],
+    },
+  };
+
+  const getActivationMessage = () => {
+    const now = new Date();
+    const hour = now.getHours();
+    const day = now.getDay();
+    const isWeekend = day === 0 || day === 6;
+    const isAfterHours = hour < 8 || hour >= 18;
+    if (isWeekend)
+      return 'Our team activates boosts on business days. Yours will go live Monday morning AEST.';
+    if (isAfterHours)
+      return 'Our team activates boosts from 8am AEST. Yours will be live first thing next business day.';
+    return 'Your boost will be activated within 1 business hour.';
+  };
+
+  const handleCancelBoost = async () => {
+    const confirmed = window.confirm('Cancel this boost request? No charge has been made.');
+    if (!confirmed) return;
+    const { error } = await supabase
+      .from('properties')
+      .update({
+        boost_requested_at: null,
+        boost_requested_tier: null,
+        is_featured: false,
+        boost_tier: null,
+      } as any)
+      .eq('id', listing.id);
+    if (!error) {
+      toast.success('Boost cancelled');
+      window.location.reload();
+    } else {
+      toast.error('Could not cancel — email support@listhq.com.au');
+    }
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -128,8 +199,14 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
       : 'text-destructive';
 
   const handleRequestBoost = async (tier: 'featured' | 'premier') => {
-    setBoostRequesting(true);
+    setBoostLoading(tier);
     try {
+      const { data: agent } = await supabase
+        .from('agents')
+        .select('name, email, agency')
+        .eq('user_id', user?.id ?? '')
+        .maybeSingle();
+
       const { error } = await supabase
         .from('properties')
         .update({
@@ -140,36 +217,33 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
 
       if (error) throw error;
 
-      // Get agent info for notification email
-      const { data: agent } = await supabase
-        .from('agents')
-        .select('name, email')
-        .eq('user_id', user?.id ?? '')
-        .maybeSingle();
+      const tierData = BOOST_TIERS[tier];
 
-      // Send notification email to admin
       await supabase.functions.invoke('send-notification-email', {
         body: {
-          to: 'alan@everythingeco.com.au',
-          subject: `Boost request: ${listing.address} — ${tier} — ${agent?.name || 'Unknown agent'}`,
-          html: `<p><strong>Boost Request</strong></p>
+          to: 'support@listhq.com.au',
+          subject: `⚡ Boost request: ${listing.address} — ${tierData.label} — ${agent?.name || 'Agent'}`,
+          html: `
+            <h2>New boost request</h2>
+            <p><strong>Tier:</strong> ${tierData.label} (${tierData.priceLabel}/month)</p>
             <p><strong>Property:</strong> ${listing.address}, ${listing.suburb}</p>
-            <p><strong>Tier:</strong> ${tier}</p>
-            <p><strong>Agent:</strong> ${agent?.name || 'Unknown'} (${agent?.email || 'N/A'})</p>
-            <p><strong>Property ID:</strong> ${listing.id}</p>`,
+            <p><strong>Listing ID:</strong> ${listing.id}</p>
+            <p><strong>Agent:</strong> ${agent?.name || 'Unknown'} · ${agent?.agency || ''} · ${agent?.email || ''}</p>
+            <p><strong>Requested:</strong> ${new Date().toLocaleString('en-AU', { timeZone: 'Australia/Sydney' })}</p>
+            <hr/>
+            <p>Go to Admin → Listings to activate this boost.</p>
+          `,
         },
       });
 
-      // Update local listing state
-      listing.boost_requested_at = new Date().toISOString();
-      listing.boost_requested_tier = tier;
-
-      toast.success("Boost request sent — we'll activate your listing within 1 business hour.");
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to request boost — please try again.');
+      toast.success(`${tierData.label} boost requested! — We'll activate within 1 business hour.`);
+      window.location.reload();
+    } catch (e) {
+      toast.error('Failed to submit boost request — please try again');
+      console.error(e);
+    } finally {
+      setBoostLoading(null);
     }
-    setBoostRequesting(false);
   };
 
   const handleSendReport = async () => {
@@ -257,93 +331,184 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   return (
     <div className="space-y-6">
       {/* ── BOOST SECTION ── */}
-      <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+      <div className="bg-card border border-border rounded-xl p-5 space-y-4">
         {isFeaturedActive ? (
           <>
-            <div className="flex items-center gap-2">
-              <Badge className="bg-teal-500/15 text-teal-500 border-0 text-[10px]">Active</Badge>
-              <Badge variant="outline" className="text-[10px]">
-                {listing.boost_tier === 'premier' ? 'Premier' : 'Featured'}
-              </Badge>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Badge className="bg-emerald-500/15 text-emerald-500 border-0 text-[10px]">● Active</Badge>
+                <span className="text-sm font-bold">{BOOST_TIERS[listing.boost_tier]?.label || 'Featured'} boost</span>
+              </div>
+              <div className="text-right">
+                <span className="text-xl font-bold">{BOOST_TIERS[listing.boost_tier]?.priceLabel || '$49'}</span>
+                <span className="text-xs text-muted-foreground">/month</span>
+              </div>
             </div>
-            <p className="text-sm font-medium text-foreground">
-              This listing is featured until {format(parseISO(listing.featured_until), 'dd MMM yyyy')}
+
+            <p className="text-sm text-muted-foreground">
+              Your listing is live in the featured grid shown to buyers searching near{' '}
+              <span className="font-medium text-foreground">{listing.suburb}</span>.
+              {listing.featured_until
+                ? ` Active until ${format(parseISO(listing.featured_until), 'dd MMM yyyy')}.`
+                : ''}
             </p>
-            <p className="text-xs text-muted-foreground">
-              Your listing is appearing in the featured grid to buyers searching near {listing.suburb}.
+
+            <ul className="space-y-1.5">
+              {(BOOST_TIERS[listing.boost_tier]?.inclusions || []).map((item, i) => (
+                <li key={i} className="text-xs text-muted-foreground flex items-center gap-2">
+                  <span className="text-emerald-500">✓</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+
+            <div className="flex items-center gap-3 pt-1">
+              <Button variant="outline" size="sm" className="text-xs text-destructive" onClick={handleCancelBoost}>
+                Cancel subscription
+              </Button>
+            </div>
+            <p className="text-[10px] text-muted-foreground">
+              Cancelling stops renewal at end of current billing period. Questions?{' '}
+              <a href="mailto:support@listhq.com.au" className="underline">support@listhq.com.au</a>
             </p>
           </>
         ) : isBoostPending ? (
           <>
-            <div className="flex items-center gap-2">
-              <Badge className="bg-amber-500/15 text-amber-500 border-0 text-[10px]">Pending</Badge>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Badge className="bg-amber-500/15 text-amber-500 border-0 text-[10px]">Pending activation</Badge>
+                <span className="text-sm font-bold">
+                  {BOOST_TIERS[listing.boost_requested_tier]?.label || 'Featured'} boost
+                </span>
+              </div>
+              <div className="text-right">
+                <span className="text-xl font-bold">
+                  {BOOST_TIERS[listing.boost_requested_tier]?.priceLabel || '$49'}
+                </span>
+                <span className="text-xs text-muted-foreground">/month</span>
+                <p className="text-[10px] text-muted-foreground">charged on activation</p>
+              </div>
             </div>
-            <p className="text-sm font-medium text-foreground">
-              Boost request received — {listing.boost_requested_tier === 'premier' ? 'Premier' : 'Featured'} · Requested {format(parseISO(listing.boost_requested_at), 'dd MMM yyyy')}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              We will activate your boost within 1 business hour. Questions? Email alan@everythingeco.com.au
-            </p>
+
+            <p className="text-sm text-muted-foreground">{getActivationMessage()}</p>
+
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-foreground">What you're getting</p>
+              {(BOOST_TIERS[listing.boost_requested_tier]?.inclusions || []).map((item, i) => (
+                <p key={i} className="text-xs text-muted-foreground flex items-center gap-2">
+                  <span className="text-emerald-500">✓</span>
+                  {item}
+                </p>
+              ))}
+            </div>
+
+            <div className="space-y-2 pt-2">
+              <p className="text-xs font-medium text-foreground">What happens next</p>
+              {[
+                'ListHQ team receives your request',
+                'We activate your boost — usually within 1 business hour',
+                'Your listing goes live in the featured grid near ' + listing.suburb,
+                'Your card is charged $' + (BOOST_TIERS[listing.boost_requested_tier]?.price || 49) + '/month from activation date',
+                'Cancel anytime from this tab — no lock-in',
+              ].map((step, i) => (
+                <p key={i} className="text-xs text-muted-foreground flex items-center gap-2">
+                  <span className="w-4 h-4 rounded-full bg-muted text-[9px] font-bold flex items-center justify-center shrink-0">
+                    {i + 1}
+                  </span>
+                  {step}
+                </p>
+              ))}
+            </div>
+
+            <Button variant="outline" size="sm" className="text-xs text-destructive mt-2" onClick={handleCancelBoost}>
+              Cancel this request
+            </Button>
           </>
         ) : (
           <>
-            <div className="flex items-center gap-2 mb-1">
-              <Zap size={16} className="text-primary" />
-              <h3 className="text-sm font-bold">Boost this listing</h3>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Zap size={16} className="text-primary" />
+                  <h3 className="text-sm font-bold">Boost this listing</h3>
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Dramatically cheaper than REA</p>
+              </div>
             </div>
+
             <p className="text-xs text-muted-foreground">
-              Appear in the featured listings grid shown to buyers searching near {listing.suburb}.
+              Appear in the featured grid shown to buyers searching near{' '}
+              <span className="font-medium text-foreground">{listing.suburb}</span>.
+              Monthly subscription — cancel anytime from this tab.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Featured card */}
               <div className="border border-border rounded-xl p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold">Featured</span>
-                  <span className="text-sm font-bold text-foreground">$299</span>
+                <Badge variant="outline" className="text-[10px] bg-amber-500/10 text-amber-600 border-amber-500/20">
+                  Featured
+                </Badge>
+                <div>
+                  <span className="text-2xl font-bold">$49</span>
+                  <span className="text-sm text-muted-foreground">/month</span>
                 </div>
-                <ul className="space-y-1.5 text-xs text-muted-foreground">
-                  <li className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-primary shrink-0" /> Featured badge on your listing</li>
-                  <li className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-primary shrink-0" /> Homepage featured grid (30 days)</li>
-                  <li className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-primary shrink-0" /> Shown to buyers near {listing.suburb}</li>
-                  <li className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-primary shrink-0" /> Higher search placement</li>
+                <p className="text-[10px] text-muted-foreground">Cancel anytime · no lock-in</p>
+                <ul className="space-y-1.5">
+                  {BOOST_TIERS.featured.inclusions.map((item, i) => (
+                    <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                      <span className="text-emerald-500 shrink-0">✓</span>
+                      {item}
+                    </li>
+                  ))}
                 </ul>
                 <Button
                   size="sm"
                   variant="outline"
                   className="w-full gap-2"
-                  disabled={boostRequesting}
                   onClick={() => handleRequestBoost('featured')}
+                  disabled={!!boostLoading}
                 >
-                  {boostRequesting ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} />}
-                  Request Featured
+                  {boostLoading === 'featured' ? <Loader2 size={14} className="animate-spin" /> : null}
+                  Start Featured — $49/mo
                 </Button>
               </div>
+
               {/* Premier card */}
               <div className="border-2 border-primary rounded-xl p-4 space-y-3 relative">
-                <span className="absolute -top-2.5 right-3 text-[9px] font-bold px-2 py-0.5 rounded-full bg-primary text-primary-foreground">Most popular</span>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold">Premier</span>
-                  <span className="text-sm font-bold text-foreground">$599</span>
+                <span className="absolute -top-2.5 right-3 text-[9px] font-bold px-2 py-0.5 rounded-full bg-primary text-primary-foreground">
+                  Most popular
+                </span>
+                <Badge variant="outline" className="text-[10px] bg-violet-500/10 text-violet-600 border-violet-500/20">
+                  Premier
+                </Badge>
+                <div>
+                  <span className="text-2xl font-bold">$99</span>
+                  <span className="text-sm text-muted-foreground">/month</span>
                 </div>
-                <ul className="space-y-1.5 text-xs text-muted-foreground">
-                  <li className="flex items-center gap-1.5"><Star size={12} className="text-primary shrink-0" /> Everything in Featured</li>
-                  <li className="flex items-center gap-1.5"><Star size={12} className="text-primary shrink-0" /> Top of search results in {listing.suburb}</li>
-                  <li className="flex items-center gap-1.5"><Star size={12} className="text-primary shrink-0" /> Email alert to matching saved searches</li>
-                  <li className="flex items-center gap-1.5"><Star size={12} className="text-primary shrink-0" /> Hero image slot on homepage (30 days)</li>
+                <p className="text-[10px] text-muted-foreground">Cancel anytime · no lock-in</p>
+                <ul className="space-y-1.5">
+                  {BOOST_TIERS.premier.inclusions.map((item, i) => (
+                    <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                      <span className="text-emerald-500 shrink-0">✓</span>
+                      {item}
+                    </li>
+                  ))}
                 </ul>
                 <Button
                   size="sm"
                   className="w-full gap-2"
-                  disabled={boostRequesting}
                   onClick={() => handleRequestBoost('premier')}
+                  disabled={!!boostLoading}
                 >
-                  {boostRequesting ? <Loader2 size={14} className="animate-spin" /> : <Star size={14} />}
-                  Request Premier
+                  {boostLoading === 'premier' ? <Loader2 size={14} className="animate-spin" /> : null}
+                  Start Premier — $99/mo
                 </Button>
               </div>
             </div>
-            <p className="text-[10px] text-muted-foreground mt-2">
-              Payment processed on activation. Boosts activate within 1 business hour.
+
+            <p className="text-[10px] text-muted-foreground">
+              Payment processed on activation by the ListHQ team · usually within 1 business hour · Questions?{' '}
+              <a href="mailto:support@listhq.com.au" className="underline">support@listhq.com.au</a>
             </p>
           </>
         )}

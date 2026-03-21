@@ -70,6 +70,7 @@ const PLANS: PlanDef[] = [
     features: [
       { text: 'Everything in Starter', key: false },
       { text: 'Unlimited listings', key: true },
+      { text: 'Featured listing boosts ($49–$99/mo)', key: true },
       { text: 'Full trust accounting', key: true },
       { text: 'Off-market network', key: true },
       { text: 'Rent roll management', key: true },
@@ -96,6 +97,7 @@ const PLANS: PlanDef[] = [
     comparison: '5 agents on Rex + PropertyMe + REA costs $1,500–$2,700/mo. Agency tier replaces all three for $399/mo — saving $1,100+/mo.',
     features: [
       { text: 'Everything in Pro — for every agent', key: false },
+      { text: 'Featured listing boosts ($49–$99/mo)', key: true },
       { text: 'Up to 8 separate agent logins', key: true },
       { text: 'Principal dashboard — whole office view', key: true },
       { text: 'Centralised trust accounting', key: true },

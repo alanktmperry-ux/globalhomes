@@ -526,8 +526,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
             </div>
 
             <p className="text-[10px] text-muted-foreground">
-              Payment processed on activation by the ListHQ team · usually within 1 business hour · Questions?{' '}
-              <a href="mailto:support@listhq.com.au" className="underline">support@listhq.com.au</a>
+              One-off payment · goes live on confirmation · renew anytime from this tab
             </p>
           </>
         )}

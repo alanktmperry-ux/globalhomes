@@ -139,6 +139,27 @@ const AdminDashboard = () => {
       } as any)
       .eq('id', id);
     if (!error) {
+      // Send bell notification to agent
+      const { data: propData } = await supabase
+        .from('properties')
+        .select('agent_id, address, suburb')
+        .eq('id', id)
+        .maybeSingle();
+
+      if (propData?.agent_id) {
+        await supabase.from('notifications').insert({
+          agent_id: propData.agent_id,
+          type: 'boost_activated',
+          title: `⚡ Your ${tier} boost is live!`,
+          message:
+            `${propData.address} is now in the`
+            + ` featured grid near`
+            + ` ${propData.suburb}.`
+            + ` Live for ${days} days.`,
+          property_id: id,
+        } as any);
+      }
+
       toast({ title: `${tier} boost activated for ${days} days` });
       fetchData();
     }

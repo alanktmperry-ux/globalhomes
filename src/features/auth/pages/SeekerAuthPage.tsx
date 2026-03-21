@@ -81,6 +81,22 @@ const SeekerAuthPage = () => {
     }
   };
 
+  const handleSavePrefs = async () => {
+    try {
+      const { data: { user: u } } = await supabase.auth.getUser();
+      if (u && (budgetMax || suburbs)) {
+        await supabase
+          .from('user_preferences')
+          .update({
+            budget_max: budgetMax ? parseInt(budgetMax.replace(/[^0-9]/g, '')) : null,
+            preferred_locations: suburbs ? suburbs.split(',').map(s => s.trim()).filter(Boolean) : [],
+          } as any)
+          .eq('user_id', u.id);
+      }
+    } catch {}
+    navigate('/');
+  };
+
   const handleOAuth = async (provider: 'google' | 'apple') => {
     const { error } = await lovable.auth.signInWithOAuth(provider, {
       redirect_uri: window.location.origin,

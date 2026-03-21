@@ -648,6 +648,21 @@ const Index = () => {
         />
       </VoiceSearchErrorBoundary>
 
+      {user && !hasSearched && (
+        <div className="flex justify-center pb-2">
+          <button
+            onClick={() => createSession({
+              query: '',
+              filters: {},
+            })}
+            className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Users size={13} />
+            Browse with a partner
+          </button>
+        </div>
+      )}
+
       {/* Desktop layout */}
       {!isMobile ? (
         <div className="flex-1 flex flex-col px-4 py-4 gap-4 max-w-7xl mx-auto w-full">

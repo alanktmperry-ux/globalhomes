@@ -168,7 +168,7 @@ export function PropertyMap({
     setShowSearchArea(false);
 
     const container = mapRef.current;
-    const hasSize = container && container.offsetHeight > 0 && container.offsetWidth > 0;
+    const hasSize = container && container.offsetHeight > 10 && container.offsetWidth > 10;
 
     if (hasSize) {
       map.panTo({ lat: centerOn.lat, lng: centerOn.lng });

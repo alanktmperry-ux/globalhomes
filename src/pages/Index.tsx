@@ -573,12 +573,23 @@ const Index = () => {
           centerOn={mapCenter}
           onScrollToProperty={scrollToProperty}
           formatPrice={formatPrice}
+          onMapMoved={(bounds) => {
+            handleAreaSearch({
+              type: 'polygon',
+              coordinates: [
+                [bounds.north, bounds.west],
+                [bounds.north, bounds.east],
+                [bounds.south, bounds.east],
+                [bounds.south, bounds.west],
+                [bounds.north, bounds.west],
+              ],
+            });
+          }}
           onGeolocate={(loc) => {
             setSearchCenter({ lat: loc.lat, lng: loc.lng });
-            setMapCollapsed(false);
             if (!searchRadius) setSearchRadius(10);
             setTimeout(() => {
-              setMapCenter({ lat: loc.lat, lng: loc.lng, key: `geo-${loc.lat}-${loc.lng}` });
+              setMapCenter({ lat: loc.lat, lng: loc.lng, key: `geo-${Date.now()}` });
             }, 100);
           }}
         />
@@ -598,14 +609,15 @@ const Index = () => {
             window.dispatchEvent(new CustomEvent('search-location-confirmed', {
               detail: { lat: loc.lat, lng: loc.lng }
             }));
-            // Delay center so map has expanded first
+            // Delay by 300ms so Framer Motion finishes expanding
+            // the container before Google Maps panTo fires.
             setTimeout(() => {
               setMapCenter({
                 lat: loc.lat,
                 lng: loc.lng,
                 key: `${loc.lat}-${loc.lng}-${Date.now()}`,
               });
-            }, 250);
+            }, 300);
           }}
           onRadiusChange={setSearchRadius}
           selectedRadius={searchRadius}

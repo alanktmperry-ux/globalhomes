@@ -221,7 +221,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
           subject: `⚡ Boost request: ${listing.address} — ${tierData.label} — ${agent?.name || 'Agent'}`,
           html: `
             <h2>New boost request</h2>
-            <p><strong>Tier:</strong> ${tierData.label} (${tierData.priceLabel}/month)</p>
+            <p><strong>Tier:</strong> ${tierData.label} (${tierData.priceLabel} for 30 days)</p>
             <p><strong>Property:</strong> ${listing.address}, ${listing.suburb}</p>
             <p><strong>Listing ID:</strong> ${listing.id}</p>
             <p><strong>Agent:</strong> ${agent?.name || 'Unknown'} · ${agent?.agency || ''} · ${agent?.email || ''}</p>

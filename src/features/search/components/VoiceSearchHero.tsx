@@ -711,7 +711,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
               Featured listings
             </span>
           </div>
-          <div className="relative overflow-hidden">
+          <div className="relative overflow-hidden w-full">
             <div
               className="flex gap-4 px-4 md:px-8"
               style={{ animation: 'scrollLeft 30s linear infinite', width: 'max-content' }}

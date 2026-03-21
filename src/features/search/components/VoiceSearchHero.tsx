@@ -507,7 +507,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                     />
                     {!textQuery && (
                       <span
-                        className="absolute inset-0 text-[12px] text-muted-foreground transition-opacity duration-300 pointer-events-none flex items-center"
+                        className="absolute inset-0 text-[12px] text-muted-foreground pointer-events-none flex items-center transition-opacity duration-300"
                         style={{ opacity: placeholderVisible ? 1 : 0 }}
                       >
                         {SEARCH_PLACEHOLDERS[placeholderIndex]}

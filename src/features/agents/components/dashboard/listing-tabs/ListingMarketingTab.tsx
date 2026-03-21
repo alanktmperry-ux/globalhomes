@@ -531,7 +531,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                   onClick={() => setShowPaymentStep('featured')}
                   disabled={!!boostLoading}
                 >
-                  Start Featured — $49/mo
+                  Start Featured — $49
                 </Button>
               </div>
 

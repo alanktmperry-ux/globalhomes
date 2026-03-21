@@ -59,6 +59,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   const [pastReports, setPastReports] = useState<any[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
   const [boostLoading, setBoostLoading] = useState<string | null>(null);
+  const [showPaymentStep, setShowPaymentStep] = useState<'featured' | 'premier' | null>(null);
   const [boostState, setBoostState] = useState<{
     is_featured: boolean;
     boost_tier: string | null;

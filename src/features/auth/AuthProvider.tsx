@@ -11,6 +11,10 @@ interface AuthContextType {
   isAdmin: boolean;
   userRole: 'user' | 'agent' | 'admin' | null;
   signOut: () => Promise<void>;
+  impersonating: boolean;
+  impersonatedUser: string | null;
+  startImpersonation: (userId: string, userEmail: string) => Promise<void>;
+  stopImpersonation: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -21,6 +25,10 @@ const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
   userRole: null,
   signOut: async () => {},
+  impersonating: false,
+  impersonatedUser: null,
+  startImpersonation: async () => {},
+  stopImpersonation: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);

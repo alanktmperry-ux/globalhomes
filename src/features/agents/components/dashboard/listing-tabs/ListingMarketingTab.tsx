@@ -562,7 +562,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                   onClick={() => setShowPaymentStep('premier')}
                   disabled={!!boostLoading}
                 >
-                  Start Premier — $99/mo
+                  Start Premier — $99
                 </Button>
               </div>
             </div>

@@ -59,13 +59,27 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   const [pastReports, setPastReports] = useState<any[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
   const [boostLoading, setBoostLoading] = useState<string | null>(null);
+  const [boostState, setBoostState] = useState<{
+    is_featured: boolean;
+    boost_tier: string | null;
+    boost_requested_at: string | null;
+    boost_requested_tier: string | null;
+    featured_until: string | null;
+  }>({
+    is_featured: listing.is_featured || false,
+    boost_tier: listing.boost_tier || null,
+    boost_requested_at: listing.boost_requested_at || null,
+    boost_requested_tier: listing.boost_requested_tier || null,
+    featured_until: listing.featured_until || null,
+  });
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   const [vendorName, setVendorName] = useState(listing.vendor_name || '');
   const [vendorEmail, setVendorEmail] = useState(listing.vendor_email || '');
   const [sending, setSending] = useState(false);
 
-  const isFeaturedActive = listing.is_featured && listing.featured_until && new Date(listing.featured_until) > new Date();
-  const isBoostPending = listing.boost_requested_at && !listing.is_featured;
+  const isFeaturedActive = boostState.is_featured && boostState.featured_until && new Date(boostState.featured_until) > new Date();
+  const isBoostPending = boostState.boost_requested_at && !boostState.is_featured;
 
   const BOOST_TIERS: Record<string, {
     label: string; price: number; priceLabel: string;

@@ -185,6 +185,7 @@ const App = () => (
 
                 {/* Partner */}
                 <Route path="/partner/login" element={<PartnerAuthPage />} />
+                <Route path="/partner/accept" element={<PartnerAcceptPage />} />
                 <Route path="/partner" element={<PartnerDashboardLayout />}>
                   <Route path="dashboard" element={<PartnerOverviewPage />} />
                 </Route>

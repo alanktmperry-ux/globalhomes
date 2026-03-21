@@ -428,7 +428,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       { q: 'What plans are available?', a: 'Starter ($99/mo founding, $199 full): 1 seat, 10 listings, CRM, AI listing writer, voice leads, standard analytics. Pro ($199/mo founding, $349 full): 1 seat, unlimited listings, trust accounting, partner portal access, Whisper Market, Inspection Day, Settlement Concierge, commission calculator, GCI reports, verified badge. Agency ($399/mo founding, $699 full): up to 8 seats, everything in Pro plus team analytics, agency branding, lead routing, partner portal access, and API access. Annual billing saves 15% on all plans.' },
       { q: 'Can I cancel at any time?', a: 'Yes. No lock-in contracts. Cancel from the Billing page and your plan remains active until the end of the billing period. Data is retained for 90 days.' },
       { q: 'What payment methods are accepted?', a: 'Visa, Mastercard, and American Express via Stripe. Update your card at any time on the Billing page.' },
-      { q: 'Is there a per-listing marketing fee?', a: 'Listing boosts are available separately — Featured at $49 for 30 days and Premier at $99 for 30 days. Both are one-off payments, not subscriptions.' },
+      { q: 'Is there a per-listing boost fee?', a: 'Yes, optional. You can boost any listing to the homepage featured grid for a one-off fee — Featured is $49 for 30 days and Premier is $99 for 30 days. There is no mandatory per-listing fee. Standard listings are included in your subscription at no extra cost.' },
     ],
   },
   {

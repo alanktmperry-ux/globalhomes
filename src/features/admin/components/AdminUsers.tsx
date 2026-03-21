@@ -21,7 +21,8 @@ interface AuthUser {
   banned_until: string | null;
   display_name: string;
   provider: string;
-  user_type: 'agent' | 'seeker' | 'demo' | 'demo_request';
+  user_type: 'agent' | 'seeker' | 'demo' | 'demo_request' | 'partner';
+  is_partner_verified?: boolean;
   is_subscribed: boolean;
   plan_type: string | null;
   demo_status?: string;

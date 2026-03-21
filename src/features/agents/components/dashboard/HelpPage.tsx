@@ -45,6 +45,8 @@ const CHECKLIST: ChecklistItem[] = [
   { icon: Users, title: 'Import your contacts', description: 'Bring your existing client database in via CSV — takes under 2 minutes.', route: '/dashboard/contacts' },
   { icon: DollarSign, title: 'Choose your plan', description: 'Start on the Starter founding price of $99/mo before it increases.', route: '/dashboard/billing' },
   { icon: Globe, title: 'Explore the Off-Market Network', description: 'Share listings exclusively with verified agents before going public.', route: '/dashboard/network' },
+  { icon: Key, title: 'Invite your team', description: 'Add agents and admins to your agency workspace.', route: '/dashboard/team' },
+  { icon: Handshake, title: 'Invite a trust accounting partner', description: 'Give your outsourced trust accountant their own partner login to manage your rent roll and trust account.', route: '/dashboard/partner-access' },
   { icon: Key, title: 'Run your first open home', description: 'Use Inspection Day Mode to capture visitor details with a QR code.', route: '/dashboard/inspection-mode' },
 ];
 

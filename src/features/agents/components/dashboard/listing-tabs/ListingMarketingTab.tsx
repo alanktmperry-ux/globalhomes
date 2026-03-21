@@ -58,7 +58,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   >([]);
   const [pastReports, setPastReports] = useState<any[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
-  const [boostRequesting, setBoostRequesting] = useState(false);
+  const [boostLoading, setBoostLoading] = useState<string | null>(null);
 
   const [vendorName, setVendorName] = useState(listing.vendor_name || '');
   const [vendorEmail, setVendorEmail] = useState(listing.vendor_email || '');
@@ -66,6 +66,77 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
 
   const isFeaturedActive = listing.is_featured && listing.featured_until && new Date(listing.featured_until) > new Date();
   const isBoostPending = listing.boost_requested_at && !listing.is_featured;
+
+  const BOOST_TIERS: Record<string, {
+    label: string; price: number; priceLabel: string;
+    billing: string; color: string; badge?: string;
+    inclusions: string[];
+  }> = {
+    featured: {
+      label: 'Featured',
+      price: 49,
+      priceLabel: '$49',
+      billing: '/month · cancel anytime',
+      color: 'amber',
+      inclusions: [
+        'Featured badge on your listing',
+        'Homepage featured grid — while active',
+        'Shown to buyers searching near ' + (listing.suburb || 'your suburb'),
+        'Higher placement in search results',
+        '~1.5× more enquiries than standard',
+        'Cancel anytime from this tab',
+      ],
+    },
+    premier: {
+      label: 'Premier',
+      price: 99,
+      priceLabel: '$99',
+      billing: '/month · cancel anytime',
+      color: 'violet',
+      badge: 'Most popular',
+      inclusions: [
+        'Everything in Featured',
+        'Top of search in ' + (listing.suburb || 'your suburb'),
+        'Hero image slot on homepage',
+        'Email alert to matching saved searches',
+        'Premier badge — stands out in results',
+        'Cancel anytime from this tab',
+      ],
+    },
+  };
+
+  const getActivationMessage = () => {
+    const now = new Date();
+    const hour = now.getHours();
+    const day = now.getDay();
+    const isWeekend = day === 0 || day === 6;
+    const isAfterHours = hour < 8 || hour >= 18;
+    if (isWeekend)
+      return 'Our team activates boosts on business days. Yours will go live Monday morning AEST.';
+    if (isAfterHours)
+      return 'Our team activates boosts from 8am AEST. Yours will be live first thing next business day.';
+    return 'Your boost will be activated within 1 business hour.';
+  };
+
+  const handleCancelBoost = async () => {
+    const confirmed = window.confirm('Cancel this boost request? No charge has been made.');
+    if (!confirmed) return;
+    const { error } = await supabase
+      .from('properties')
+      .update({
+        boost_requested_at: null,
+        boost_requested_tier: null,
+        is_featured: false,
+        boost_tier: null,
+      } as any)
+      .eq('id', listing.id);
+    if (!error) {
+      toast.success('Boost cancelled');
+      window.location.reload();
+    } else {
+      toast.error('Could not cancel — email support@listhq.com.au');
+    }
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -128,8 +199,14 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
       : 'text-destructive';
 
   const handleRequestBoost = async (tier: 'featured' | 'premier') => {
-    setBoostRequesting(true);
+    setBoostLoading(tier);
     try {
+      const { data: agent } = await supabase
+        .from('agents')
+        .select('name, email, agency')
+        .eq('user_id', user?.id ?? '')
+        .maybeSingle();
+
       const { error } = await supabase
         .from('properties')
         .update({
@@ -140,36 +217,33 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
 
       if (error) throw error;
 
-      // Get agent info for notification email
-      const { data: agent } = await supabase
-        .from('agents')
-        .select('name, email')
-        .eq('user_id', user?.id ?? '')
-        .maybeSingle();
+      const tierData = BOOST_TIERS[tier];
 
-      // Send notification email to admin
       await supabase.functions.invoke('send-notification-email', {
         body: {
-          to: 'alan@everythingeco.com.au',
-          subject: `Boost request: ${listing.address} — ${tier} — ${agent?.name || 'Unknown agent'}`,
-          html: `<p><strong>Boost Request</strong></p>
+          to: 'support@listhq.com.au',
+          subject: `⚡ Boost request: ${listing.address} — ${tierData.label} — ${agent?.name || 'Agent'}`,
+          html: `
+            <h2>New boost request</h2>
+            <p><strong>Tier:</strong> ${tierData.label} (${tierData.priceLabel}/month)</p>
             <p><strong>Property:</strong> ${listing.address}, ${listing.suburb}</p>
-            <p><strong>Tier:</strong> ${tier}</p>
-            <p><strong>Agent:</strong> ${agent?.name || 'Unknown'} (${agent?.email || 'N/A'})</p>
-            <p><strong>Property ID:</strong> ${listing.id}</p>`,
+            <p><strong>Listing ID:</strong> ${listing.id}</p>
+            <p><strong>Agent:</strong> ${agent?.name || 'Unknown'} · ${agent?.agency || ''} · ${agent?.email || ''}</p>
+            <p><strong>Requested:</strong> ${new Date().toLocaleString('en-AU', { timeZone: 'Australia/Sydney' })}</p>
+            <hr/>
+            <p>Go to Admin → Listings to activate this boost.</p>
+          `,
         },
       });
 
-      // Update local listing state
-      listing.boost_requested_at = new Date().toISOString();
-      listing.boost_requested_tier = tier;
-
-      toast.success("Boost request sent — we'll activate your listing within 1 business hour.");
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to request boost — please try again.');
+      toast.success(`${tierData.label} boost requested! — We'll activate within 1 business hour.`);
+      window.location.reload();
+    } catch (e) {
+      toast.error('Failed to submit boost request — please try again');
+      console.error(e);
+    } finally {
+      setBoostLoading(null);
     }
-    setBoostRequesting(false);
   };
 
   const handleSendReport = async () => {

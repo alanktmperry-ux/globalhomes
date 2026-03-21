@@ -364,8 +364,6 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               </div>
             </div>
 
-            <p className="text-sm text-muted-foreground">{getActivationMessage()}</p>
-
             <div className="space-y-2">
               <p className="text-xs font-medium text-foreground">What you're getting</p>
               {(BOOST_TIERS[boostState.boost_requested_tier as keyof typeof BOOST_TIERS]?.inclusions || []).map((item, i) => (
@@ -376,29 +374,14 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               ))}
             </div>
 
-            <div className="space-y-2 pt-2">
-              <p className="text-xs font-medium text-foreground">What happens next</p>
-              {[
-                'ListHQ team receives your request',
-                'We contact you to arrange payment and activate your boost — usually within 1 business hour',
-                'Your listing goes live in the featured grid near ' + listing.suburb + ' for 30 days',
-                'You receive an email reminder 5 days before your boost ends',
-              ].map((step, i) => (
-                <p key={i} className="text-xs text-muted-foreground flex items-center gap-2">
-                  <span className="w-4 h-4 rounded-full bg-muted text-[9px] font-bold flex items-center justify-center shrink-0">
-                    {i + 1}
-                  </span>
-                  {step}
-                </p>
-              ))}
+            <div className="space-y-3 pt-2">
+              <p className="text-xs text-muted-foreground flex items-center gap-2">
+                ⏱ {getActivationMessage()}
+              </p>
+              <p className="text-[10px] text-muted-foreground">
+                Check back here anytime — this tab shows your live boost status.
+              </p>
             </div>
-
-            <p className="text-[10px] text-muted-foreground mt-2">
-              Changed your mind? Email{' '}
-              <a href="mailto:support@listhq.com.au" className="underline">
-                support@listhq.com.au
-              </a>
-            </p>
           </>
         ) : (
           <>

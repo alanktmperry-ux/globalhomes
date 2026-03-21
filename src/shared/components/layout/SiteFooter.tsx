@@ -14,6 +14,7 @@ const legalLinks = [
   { label: 'Privacy Policy', to: '/privacy' },
   { label: 'Terms of Service', to: '/terms' },
   { label: 'Agent Login', to: '/agents/login' },
+  { label: 'Partner Portal', to: '/partner/login' },
   { label: 'Contact', to: '#' },
 ];
 
@@ -71,7 +72,7 @@ export function SiteFooter() {
               <Globe size={20} className="text-primary-foreground" />
             </div>
             <span className="font-display text-lg font-bold text-foreground tracking-tight">
-              Global Homes
+              ListHQ
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -128,10 +129,10 @@ export function SiteFooter() {
         {/* Divider + compliance fine print */}
         <div className="border-t border-border pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground">
-            Global Homes © {new Date().getFullYear()} · ABN 00 000 000 000
+            ListHQ © {new Date().getFullYear()} · ABN 00 000 000 000
           </p>
           <p className="text-xs text-muted-foreground text-center md:text-right max-w-md leading-relaxed">
-            Global Homes operates under Australian property law. All trust funds are held in compliance with state fair trading regulations.
+            ListHQ operates under Australian property law. All trust funds are held in compliance with state fair trading regulations.
           </p>
         </div>
       </div>

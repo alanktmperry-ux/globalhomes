@@ -132,6 +132,22 @@ export function PropertyMap({
         });
 
         setIsLoading(false);
+
+        // Watch for pending center when map container becomes visible
+        const ro = new ResizeObserver((entries) => {
+          for (const entry of entries) {
+            const { width, height } = entry.contentRect;
+            if (width > 0 && height > 0 && pendingCenterRef.current) {
+              const pc = pendingCenterRef.current;
+              pendingCenterRef.current = null;
+              map.panTo({ lat: pc.lat, lng: pc.lng });
+              map.setZoom(14);
+              ro.disconnect();
+            }
+          }
+        });
+        if (mapRef.current) ro.observe(mapRef.current);
+
       } catch (err) {
         if (!cancelled) {
           setError(err instanceof Error ? err.message : 'Failed to load map');

@@ -551,7 +551,7 @@ const MessagesPage = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.15 }}
-              className="flex-1 flex flex-col"
+              className="flex-1 flex flex-col overflow-hidden"
             >
               {/* Property context */}
               {selectedConvo.property_title && (

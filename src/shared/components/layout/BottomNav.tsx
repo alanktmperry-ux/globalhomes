@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 const navItems = [
   { key: 'nav.search', icon: Search, path: '/' },
   { key: 'nav.saved', icon: Heart, path: '/saved', auth: true },
+  { key: 'nav.agents', icon: Users, path: '/agents' },
   { key: 'nav.messages', icon: MessageCircle, path: '/messages', auth: true },
   { key: 'nav.profile', icon: User, path: '/profile', auth: true },
 ];

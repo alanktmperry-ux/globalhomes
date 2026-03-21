@@ -1577,6 +1577,7 @@ export type Database = {
           available_from: string | null
           baths: number
           beds: number
+          boost_expiry_warned: boolean
           boost_requested_at: string | null
           boost_requested_tier: string | null
           boost_tier: string | null
@@ -1635,6 +1636,7 @@ export type Database = {
           available_from?: string | null
           baths?: number
           beds?: number
+          boost_expiry_warned?: boolean
           boost_requested_at?: string | null
           boost_requested_tier?: string | null
           boost_tier?: string | null
@@ -1693,6 +1695,7 @@ export type Database = {
           available_from?: string | null
           baths?: number
           beds?: number
+          boost_expiry_warned?: boolean
           boost_requested_at?: string | null
           boost_requested_tier?: string | null
           boost_tier?: string | null
@@ -2892,6 +2895,7 @@ export type Database = {
           available_from: string | null
           baths: number
           beds: number
+          boost_expiry_warned: boolean
           boost_requested_at: string | null
           boost_requested_tier: string | null
           boost_tier: string | null

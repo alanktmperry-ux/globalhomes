@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useCurrency, CURRENCIES, CURRENCY_REGIONS, CurrencyCode } from '@/shared/lib/CurrencyContext';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { NotificationBell } from '@/features/agents/components/dashboard/NotificationBell';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 export function SiteHeader() {
   const { currency, setCurrencyCode, listingMode, setListingMode, isLiveRates } = useCurrency();
@@ -137,6 +138,8 @@ export function SiteHeader() {
               )}
             </AnimatePresence>
           </div>
+
+          <LanguageSwitcher />
 
           {/* Agent dashboard shortcut – always visible for agents */}
           {user && isAgent && (

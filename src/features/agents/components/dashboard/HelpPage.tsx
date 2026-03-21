@@ -711,6 +711,30 @@ const HelpPage = () => {
             </p>
           </div>
 
+          <Card className="bg-card border border-amber-500/30">
+            <CardContent className="p-5 space-y-2">
+              <div className="flex items-center gap-2 mb-1">
+                <Shield size={16} className="text-amber-600 flex-shrink-0" />
+                <h3 className="text-sm font-semibold">AML/CTF Compliance — Action required by 1 July 2026</h3>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                From 1 July 2026, all Australian real estate agents must enrol with AUSTRAC under the Anti-Money Laundering and Counter-Terrorism Financing Act. Enrolment must be completed by 29 July 2026. This applies to every agent selling or managing property — failure to enrol carries significant penalties.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                ListHQ is building AML compliance tools into the platform ahead of the deadline. In the meantime, enrol directly at AUSTRAC using the link below.
+              </p>
+              <a
+                href="https://www.austrac.gov.au/business/how-comply-guidance-and-resources/enrolment-and-registration/how-enrol-austrac-online"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-primary font-medium hover:underline"
+              >
+                Enrol with AUSTRAC
+                <ExternalLink size={11} />
+              </a>
+            </CardContent>
+          </Card>
+
           <Card className="bg-card border border-border">
             <CardContent className="p-5 space-y-3">
               <h3 className="text-sm font-semibold">Help us improve</h3>

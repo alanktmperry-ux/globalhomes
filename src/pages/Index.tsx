@@ -575,7 +575,11 @@ const Index = () => {
           formatPrice={formatPrice}
           onGeolocate={(loc) => {
             setSearchCenter({ lat: loc.lat, lng: loc.lng });
-            setMapCenter({ lat: loc.lat, lng: loc.lng, key: `geo-${loc.lat}-${loc.lng}` });
+            setMapCollapsed(false);
+            if (!searchRadius) setSearchRadius(10);
+            setTimeout(() => {
+              setMapCenter({ lat: loc.lat, lng: loc.lng, key: `geo-${loc.lat}-${loc.lng}` });
+            }, 100);
           }}
         />
       </Suspense>

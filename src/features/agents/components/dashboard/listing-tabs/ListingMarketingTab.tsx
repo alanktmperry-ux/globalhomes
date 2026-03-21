@@ -431,7 +431,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               </div>
               <div className="text-right">
                 <span className="text-xl font-bold">
-                  {BOOST_TIERS[listing.boost_requested_tier]?.priceLabel || '$49'}
+                  {BOOST_TIERS[boostState.boost_requested_tier || '']?.priceLabel || '$49'}
                 </span>
                 <span className="text-xs text-muted-foreground">/month</span>
                 <p className="text-[10px] text-muted-foreground">charged on activation</p>

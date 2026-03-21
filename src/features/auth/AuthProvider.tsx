@@ -86,8 +86,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     console.log('[Auth] applyRoles:', roles);
     setIsAdmin(roles.includes('admin'));
     setIsAgent(roles.includes('agent') || roles.includes('admin'));
+    setIsPartner(roles.includes('partner'));
     setUserRole(
-      roles.includes('admin') ? 'admin' : roles.includes('agent') ? 'agent' : 'user'
+      roles.includes('admin') ? 'admin' : roles.includes('agent') ? 'agent' : roles.includes('partner') ? 'partner' : 'user'
     );
   }, []);
 

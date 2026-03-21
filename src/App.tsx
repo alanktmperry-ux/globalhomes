@@ -191,6 +191,9 @@ const App = () => (
                 <Route path="/partner/accept" element={<PartnerAcceptPage />} />
                 <Route path="/partner" element={<PartnerDashboardLayout />}>
                   <Route path="dashboard" element={<PartnerOverviewPage />} />
+                  <Route path="trust" element={<PartnerTrustPage />} />
+                  <Route path="rent-roll" element={<PartnerRentRollPage />} />
+                  <Route path="arrears" element={<PartnerArrearsPage />} />
                 </Route>
 
                 {/* Admin */}

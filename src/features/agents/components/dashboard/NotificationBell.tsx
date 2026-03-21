@@ -22,6 +22,9 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
   event: <MousePointerClick size={14} className="text-accent-foreground" />,
   voice_match: <Mic size={14} className="text-primary" />,
   message: <MessageSquare size={14} className="text-emerald-500" />,
+  boost_requested: <Zap size={14} className="text-amber-500" />,
+  boost_activated: <Zap size={14} className="text-emerald-500" />,
+  boost_expiring: <Zap size={14} className="text-orange-500" />,
 };
 
 export function NotificationBell() {

@@ -68,6 +68,7 @@ const QUICK_REF: { feature: string; route: string; what: string }[] = [
   { feature: 'Reports', route: '/dashboard/reports', what: 'Export CSV/PDF for listings, leads, trust, contacts' },
   { feature: 'Documents', route: '/dashboard/documents', what: 'Store and manage transaction documents' },
   { feature: 'Team', route: '/dashboard/team', what: 'Invite agents and manage roles' },
+  { feature: 'Partner Access', route: '/dashboard/partner-access', what: 'Invite trust accounting firms and give them access to your rent roll and trust account' },
   { feature: 'My Agencies', route: '/dashboard/agencies', what: 'Agency profile and branding' },
   { feature: 'Billing', route: '/dashboard/billing', what: 'Subscription plans, payment, usage' },
   { feature: 'Reviews', route: '/dashboard/reviews', what: 'Client reviews and reputation score' },

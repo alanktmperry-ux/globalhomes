@@ -648,7 +648,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
         </div>
 
         {/* RIGHT — Photo grid */}
-        <div className="hidden md:grid grid-rows-[1.6fr_1fr] gap-2 p-2 bg-muted/30">
+        <div className="hidden md:grid grid-rows-[1.6fr_1fr] gap-1.5 bg-background border-l border-border">
 
           {/* Top large photo */}
           <div className="relative rounded-2xl overflow-hidden group cursor-pointer">

@@ -575,7 +575,11 @@ const Index = () => {
           formatPrice={formatPrice}
           onGeolocate={(loc) => {
             setSearchCenter({ lat: loc.lat, lng: loc.lng });
-            setMapCenter({ lat: loc.lat, lng: loc.lng, key: `geo-${loc.lat}-${loc.lng}` });
+            setMapCollapsed(false);
+            if (!searchRadius) setSearchRadius(10);
+            setTimeout(() => {
+              setMapCenter({ lat: loc.lat, lng: loc.lng, key: `geo-${loc.lat}-${loc.lng}` });
+            }, 100);
           }}
         />
       </Suspense>
@@ -588,18 +592,20 @@ const Index = () => {
         <VoiceSearchHero
           onSearch={handleSearch}
           onLocationSelect={(loc) => {
-            setMapCenter({ lat: loc.lat, lng: loc.lng, key: `${loc.lat}-${loc.lng}` });
             setSearchCenter({ lat: loc.lat, lng: loc.lng });
             setMapCollapsed(false);
-            // Auto-apply 10km radius if none selected
-            // so property list filters to the location
-            if (!searchRadius) {
-              setSearchRadius(10);
-            }
-            // Fire event so VoiceSearchHero re-fetches featured listings for this area
+            if (!searchRadius) setSearchRadius(10);
             window.dispatchEvent(new CustomEvent('search-location-confirmed', {
               detail: { lat: loc.lat, lng: loc.lng }
             }));
+            // Delay center so map has expanded first
+            setTimeout(() => {
+              setMapCenter({
+                lat: loc.lat,
+                lng: loc.lng,
+                key: `${loc.lat}-${loc.lng}-${Date.now()}`,
+              });
+            }, 250);
           }}
           onRadiusChange={setSearchRadius}
           selectedRadius={searchRadius}
@@ -631,7 +637,7 @@ const Index = () => {
               {!mapCollapsed && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: mapFullscreen ? '70vh' : 180, opacity: 1 }}
+                  animate={{ height: mapFullscreen ? '70vh' : 320, opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.2 }}
                   className="relative rounded-b-xl overflow-hidden border border-border border-t-0 shadow-sm"

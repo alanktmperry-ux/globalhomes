@@ -46,6 +46,7 @@ export function PropertyMap({
   const drawingManagerRef = useRef<google.maps.drawing.DrawingManager | null>(null);
   const drawnOverlayRef = useRef<google.maps.Circle | google.maps.Polygon | null>(null);
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
+  const pendingCenterRef = useRef<{ lat: number; lng: number } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showSearchArea, setShowSearchArea] = useState(false);
@@ -85,6 +86,7 @@ export function PropertyMap({
           streetViewControl: false,
           fullscreenControl: false,
           mapTypeControl: false,
+          gestureHandling: 'cooperative',
           styles: LIGHT_MAP_STYLE,
         });
 
@@ -92,7 +94,7 @@ export function PropertyMap({
           drawingMode: null,
           drawingControl: true,
           drawingControlOptions: {
-            position: google.maps.ControlPosition.TOP_LEFT,
+            position: google.maps.ControlPosition.LEFT_CENTER,
             drawingModes: [
               google.maps.drawing.OverlayType.CIRCLE,
               google.maps.drawing.OverlayType.POLYGON,
@@ -130,6 +132,22 @@ export function PropertyMap({
         });
 
         setIsLoading(false);
+
+        // Watch for pending center when map container becomes visible
+        const ro = new ResizeObserver((entries) => {
+          for (const entry of entries) {
+            const { width, height } = entry.contentRect;
+            if (width > 0 && height > 0 && pendingCenterRef.current) {
+              const pc = pendingCenterRef.current;
+              pendingCenterRef.current = null;
+              map.panTo({ lat: pc.lat, lng: pc.lng });
+              map.setZoom(14);
+              ro.disconnect();
+            }
+          }
+        });
+        if (mapRef.current) ro.observe(mapRef.current);
+
       } catch (err) {
         if (!cancelled) {
           setError(err instanceof Error ? err.message : 'Failed to load map');
@@ -148,8 +166,18 @@ export function PropertyMap({
     if (!map || !centerOn) return;
     userMovedRef.current = false;
     setShowSearchArea(false);
-    map.panTo({ lat: centerOn.lat, lng: centerOn.lng });
-    map.setZoom(15);
+
+    const container = mapRef.current;
+    const hasSize = container && container.offsetHeight > 0 && container.offsetWidth > 0;
+
+    if (hasSize) {
+      map.panTo({ lat: centerOn.lat, lng: centerOn.lng });
+      map.setZoom(14);
+      pendingCenterRef.current = null;
+    } else {
+      // Store it — apply when map becomes visible
+      pendingCenterRef.current = { lat: centerOn.lat, lng: centerOn.lng };
+    }
   }, [centerOn]);
 
   // Drawing events
@@ -321,11 +349,15 @@ export function PropertyMap({
     });
 
     if (!centerOn) {
+      let capApplied = false;
       map.fitBounds(bounds, { top: 40, right: 40, bottom: 40, left: 40 });
       const listener = google.maps.event.addListener(map, 'idle', () => {
-        const zoom = map.getZoom();
-        if (zoom && zoom > 14) map.setZoom(14);
-        google.maps.event.removeListener(listener);
+        if (!capApplied) {
+          capApplied = true;
+          const zoom = map.getZoom();
+          if (zoom && zoom > 14) map.setZoom(14);
+          google.maps.event.removeListener(listener);
+        }
       });
     }
   }, [properties, selectedPropertyId, onPropertySelect, centerOn, onScrollToProperty, formatPrice]);
@@ -424,7 +456,7 @@ export function PropertyMap({
       <Tooltip>
         <TooltipTrigger asChild>
           <button
-            className="absolute top-14 left-3 z-20 w-8 h-8 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated flex items-center justify-center hover:bg-card transition-colors"
+            className="absolute bottom-16 left-4 z-20 w-8 h-8 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated flex items-center justify-center hover:bg-card transition-colors"
           >
             <HelpCircle size={14} className="text-muted-foreground" />
           </button>

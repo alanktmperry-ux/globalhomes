@@ -536,10 +536,9 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                   size="sm"
                   variant="outline"
                   className="w-full gap-2"
-                  onClick={() => handleRequestBoost('featured')}
+                  onClick={() => setShowPaymentStep('featured')}
                   disabled={!!boostLoading}
                 >
-                  {boostLoading === 'featured' ? <Loader2 size={14} className="animate-spin" /> : null}
                   Start Featured — $49/mo
                 </Button>
               </div>

@@ -378,14 +378,14 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               <div className="flex items-center gap-2">
                 <Badge className="bg-amber-500/15 text-amber-500 border-0 text-[10px]">Pending activation</Badge>
                 <span className="text-sm font-bold">
-                  {BOOST_TIERS[boostState.boost_requested_tier || '']?.label || 'Featured'} boost
+                  {BOOST_TIERS[boostState.boost_requested_tier as keyof typeof BOOST_TIERS]?.label || 'Featured'} boost
                 </span>
               </div>
               <div className="text-right">
                 <span className="text-xl font-bold">
-                  {BOOST_TIERS[boostState.boost_requested_tier || '']?.priceLabel || '$49'}
+                  {BOOST_TIERS[boostState.boost_requested_tier as keyof typeof BOOST_TIERS]?.priceLabel || '$49'}
                 </span>
-                <span className="text-xs text-muted-foreground">/month</span>
+                <span className="text-xs text-muted-foreground"> for 30 days</span>
                 <p className="text-[10px] text-muted-foreground">charged on activation</p>
               </div>
             </div>
@@ -394,7 +394,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
 
             <div className="space-y-2">
               <p className="text-xs font-medium text-foreground">What you're getting</p>
-              {(BOOST_TIERS[boostState.boost_requested_tier || '']?.inclusions || []).map((item, i) => (
+              {(BOOST_TIERS[boostState.boost_requested_tier as keyof typeof BOOST_TIERS]?.inclusions || []).map((item, i) => (
                 <p key={i} className="text-xs text-muted-foreground flex items-center gap-2">
                   <span className="text-emerald-500">✓</span>
                   {item}
@@ -406,10 +406,9 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               <p className="text-xs font-medium text-foreground">What happens next</p>
               {[
                 'ListHQ team receives your request',
-                'We activate your boost — usually within 1 business hour',
-                'Your listing goes live in the featured grid near ' + listing.suburb,
-                'Your card is charged $' + (BOOST_TIERS[boostState.boost_requested_tier || '']?.price || 49) + '/month from activation date',
-                'Cancel anytime from this tab — no lock-in',
+                'We contact you to arrange payment and activate your boost — usually within 1 business hour',
+                'Your listing goes live in the featured grid near ' + listing.suburb + ' for 30 days',
+                'You receive an email reminder 5 days before your boost ends',
               ].map((step, i) => (
                 <p key={i} className="text-xs text-muted-foreground flex items-center gap-2">
                   <span className="w-4 h-4 rounded-full bg-muted text-[9px] font-bold flex items-center justify-center shrink-0">
@@ -420,31 +419,12 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               ))}
             </div>
 
-            <div className="mt-2">
-              {!showCancelConfirm ? (
-                <button
-                  onClick={() => setShowCancelConfirm(true)}
-                  className="text-xs text-muted-foreground hover:text-destructive transition-colors underline">
-                  Cancel this request
-                </button>
-              ) : (
-                <div className="mt-2 p-3 bg-destructive/10 border border-destructive/20 rounded-xl">
-                  <p className="text-xs font-medium text-destructive mb-1">Cancel boost request?</p>
-                  <p className="text-xs text-muted-foreground mb-3">
-                    Your request will be withdrawn. No charge has been made.
-                  </p>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="destructive" className="text-xs h-7" onClick={handleCancelBoost} disabled={!!boostLoading}>
-                      {boostLoading === 'cancelling' ? <Loader2 size={11} className="animate-spin mr-1"/> : null}
-                      Yes, cancel
-                    </Button>
-                    <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => setShowCancelConfirm(false)}>
-                      Keep request
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
+            <p className="text-[10px] text-muted-foreground mt-2">
+              Changed your mind? Email{' '}
+              <a href="mailto:support@listhq.com.au" className="underline">
+                support@listhq.com.au
+              </a>
+            </p>
           </>
         ) : (
           <>

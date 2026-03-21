@@ -71,6 +71,8 @@ const AgencyOnboardingPage = React.lazy(() => import("@/features/agents/pages/Ag
 const PartnerAuthPage = React.lazy(() => import("./features/partners/pages/PartnerAuthPage"));
 const PartnerDashboardLayout = React.lazy(() => import("./features/partners/pages/PartnerDashboardLayout"));
 const PartnerOverviewPage = React.lazy(() => import("./features/partners/pages/PartnerOverviewPage"));
+const PartnerAcceptPage = React.lazy(() => import("./features/partners/pages/PartnerAcceptPage"));
+const PartnerAccessPage = React.lazy(() => import("./features/agents/components/dashboard/PartnerAccessPage"));
 const PageLoader = () => (
   <div className="flex h-screen w-full items-center justify-center bg-background">
     <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -177,11 +179,13 @@ const App = () => (
                   <Route path="tenancies/:tenancyId" element={<TenancyDetailPage />} />
                   <Route path="settings" element={<SettingsPage />} />
                   <Route path="help" element={<HelpPage />} />
+                  <Route path="partner-access" element={<PartnerAccessPage />} />
                   <Route path="onboarding" element={<AgencyOnboardingPage />} />
                 </Route>
 
                 {/* Partner */}
                 <Route path="/partner/login" element={<PartnerAuthPage />} />
+                <Route path="/partner/accept" element={<PartnerAcceptPage />} />
                 <Route path="/partner" element={<PartnerDashboardLayout />}>
                   <Route path="dashboard" element={<PartnerOverviewPage />} />
                 </Route>

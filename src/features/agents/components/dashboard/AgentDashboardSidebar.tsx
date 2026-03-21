@@ -3,6 +3,7 @@ import {
   LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, LogOut, Building2, UserPlus, Home,
   User, FileText, CreditCard, Star, MapPinned, Shield, Contact, Kanban, Scale, Landmark,
   ClipboardCheck, CalendarDays, Search, TrendingUp, Receipt, PartyPopper, Calculator, HelpCircle, ClipboardList, Settings2, Flame,
+  Handshake,
 } from 'lucide-react';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -148,6 +149,7 @@ const AgentDashboardSidebar = () => {
     { title: 'My Agencies', url: '/dashboard/agencies', icon: Building2 },
     { title: 'Territory', url: '/dashboard/territory', icon: MapPinned },
     { title: 'Team', url: '/dashboard/team', icon: UserPlus },
+    { title: 'Partner Access', url: '/dashboard/partner-access', icon: Handshake },
     { title: 'Billing', url: '/dashboard/billing', icon: CreditCard },
     { title: 'Reviews', url: '/dashboard/reviews', icon: Star },
     { title: 'Settings', url: '/dashboard/settings', icon: Settings },

@@ -207,6 +207,27 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
 
       const tierData = BOOST_TIERS[tier];
 
+      const { data: agent } = await supabase
+        .from('agents')
+        .select('id, name, agency')
+        .eq('user_id', user?.id ?? '')
+        .maybeSingle();
+
+      if (agent?.id) {
+        await supabase
+          .from('notifications')
+          .insert({
+            agent_id: agent.id,
+            type: 'boost_requested',
+            title: `⚡ ${tierData.label} boost requested`,
+            message:
+              `${listing.address} — pending`
+              + ` activation. You'll get another`
+              + ` notification when it goes live.`,
+            property_id: listing.id,
+          } as any);
+      }
+
       toast.success(`${tierData.label} boost requested! You'll get a bell notification when it's live.`);
       setBoostState(prev => ({
         ...prev,
@@ -220,6 +241,39 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
       setBoostLoading(null);
     }
   };
+
+  const handleCancelBoost = async () => {
+    setBoostLoading('cancelling');
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .update({
+          boost_requested_at: null,
+          boost_requested_tier: null,
+          is_featured: false,
+          boost_tier: null,
+          featured_until: null,
+        } as any)
+        .eq('id', listing.id);
+
+      if (error) throw error;
+
+      setBoostState({
+        is_featured: false,
+        boost_tier: null,
+        boost_requested_at: null,
+        boost_requested_tier: null,
+        featured_until: null,
+      });
+      setShowCancelConfirm(false);
+      toast.success('Boost cancelled.');
+    } catch {
+      toast.error('Could not cancel — please try again');
+    } finally {
+      setBoostLoading(null);
+    }
+  };
+
 
   const handleSendReport = async () => {
     if (!vendorName.trim() || !vendorEmail.trim()) {

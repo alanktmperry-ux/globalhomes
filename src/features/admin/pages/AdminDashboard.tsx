@@ -30,6 +30,11 @@ interface PropertyRow {
   is_active: boolean;
   views: number;
   created_at: string;
+  is_featured: boolean;
+  featured_until: string | null;
+  boost_tier: string | null;
+  boost_requested_at: string | null;
+  boost_requested_tier: string | null;
 }
 
 const AdminDashboard = () => {

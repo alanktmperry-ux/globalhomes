@@ -456,7 +456,7 @@ export function PropertyMap({
       <Tooltip>
         <TooltipTrigger asChild>
           <button
-            className="absolute top-14 left-3 z-20 w-8 h-8 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated flex items-center justify-center hover:bg-card transition-colors"
+            className="absolute bottom-16 left-4 z-20 w-8 h-8 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated flex items-center justify-center hover:bg-card transition-colors"
           >
             <HelpCircle size={14} className="text-muted-foreground" />
           </button>

@@ -637,7 +637,7 @@ const Index = () => {
               {!mapCollapsed && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: mapFullscreen ? '70vh' : 180, opacity: 1 }}
+                  animate={{ height: mapFullscreen ? '70vh' : 320, opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.2 }}
                   className="relative rounded-b-xl overflow-hidden border border-border border-t-0 shadow-sm"

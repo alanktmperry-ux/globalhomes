@@ -337,11 +337,11 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Badge className="bg-emerald-500/15 text-emerald-500 border-0 text-[10px]">● Active</Badge>
-                <span className="text-sm font-bold">{BOOST_TIERS[boostState.boost_tier || '']?.label || 'Featured'} boost</span>
+                <span className="text-sm font-bold">{BOOST_TIERS[boostState.boost_tier as keyof typeof BOOST_TIERS]?.label || 'Featured'} boost</span>
               </div>
               <div className="text-right">
-                <span className="text-xl font-bold">{BOOST_TIERS[boostState.boost_tier || '']?.priceLabel || '$49'}</span>
-                <span className="text-xs text-muted-foreground">/month</span>
+                <span className="text-xl font-bold">{BOOST_TIERS[boostState.boost_tier as keyof typeof BOOST_TIERS]?.priceLabel || '$49'}</span>
+                <span className="text-xs text-muted-foreground"> for 30 days</span>
               </div>
             </div>
 
@@ -354,7 +354,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
             </p>
 
             <ul className="space-y-1.5">
-              {(BOOST_TIERS[boostState.boost_tier || '']?.inclusions || []).map((item, i) => (
+              {(BOOST_TIERS[boostState.boost_tier as keyof typeof BOOST_TIERS]?.inclusions || []).map((item, i) => (
                 <li key={i} className="text-xs text-muted-foreground flex items-center gap-2">
                   <span className="text-emerald-500">✓</span>
                   {item}
@@ -362,34 +362,14 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               ))}
             </ul>
 
-            <div className="pt-1">
-              {!showCancelConfirm ? (
-                <button
-                  onClick={() => setShowCancelConfirm(true)}
-                  className="text-xs text-muted-foreground hover:text-destructive transition-colors underline">
-                  Cancel subscription
-                </button>
-              ) : (
-                <div className="mt-2 p-3 bg-destructive/10 border border-destructive/20 rounded-xl">
-                  <p className="text-xs font-medium text-destructive mb-1">Cancel your boost?</p>
-                  <p className="text-xs text-muted-foreground mb-3">
-                    Your listing will be removed from the featured grid. No further charges after this billing period.
-                  </p>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="destructive" className="text-xs h-7" onClick={handleCancelBoost} disabled={!!boostLoading}>
-                      {boostLoading === 'cancelling' ? <Loader2 size={11} className="animate-spin mr-1"/> : null}
-                      Yes, cancel
-                    </Button>
-                    <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => setShowCancelConfirm(false)}>
-                      Keep boost
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-            <p className="text-[10px] text-muted-foreground">
-              Cancelling stops renewal at end of current billing period. Questions?{' '}
-              <a href="mailto:support@listhq.com.au" className="underline">support@listhq.com.au</a>
+            <p className="text-xs text-muted-foreground">
+              Boost expires{' '}
+              <span className="font-medium text-foreground">
+                {boostState.featured_until
+                  ? format(parseISO(boostState.featured_until), 'dd MMM yyyy')
+                  : 'soon'}
+              </span>.
+              {' '}Renew for another 30 days anytime.
             </p>
           </>
         ) : isBoostPending ? (

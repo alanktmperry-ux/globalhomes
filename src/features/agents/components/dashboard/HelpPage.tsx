@@ -103,6 +103,22 @@ const GUIDES: Guide[] = [
     ],
   },
   {
+    emoji: '⚡', title: 'Boosting a Listing to Featured',
+    description: 'Get your property into the featured grid shown to buyers searching near your suburb.',
+    steps: [
+      'Go to My Listings in the sidebar and click on the listing you want to boost. This opens the listing detail page.',
+      'Click the Marketing tab at the top of the listing detail page. This is where all boost options live.',
+      'If the listing has not been boosted before, you will see a "Boost this listing" section at the top of the Marketing tab with two options — Featured ($299) and Premier ($599).',
+      'Featured boost — $299: Your listing appears in the featured grid on the ListHQ homepage for 30 days, shown specifically to buyers searching near your suburb. It also receives a Featured badge and higher placement in search results.',
+      'Premier boost — $599: Everything in Featured, plus your listing appears at the top of all search results in your suburb for 30 days, rotates through the hero image slot on the homepage, and triggers an email notification to registered buyers who have saved searches matching your property.',
+      'Click "Request Featured" or "Request Premier" on your chosen tier. Your request is sent immediately to the ListHQ team.',
+      'Your boost will be activated within 1 business hour. You will see the status change from "Pending activation" to "Active — Featured until [date]" once it is live.',
+      'Once active, your listing appears in the featured grid on the homepage to buyers who are searching near your suburb using GPS location, IP location, or by typing your suburb name into the search bar.',
+      'You can check the status of your boost at any time from the Marketing tab. The boost automatically expires after 30 days. To renew, simply request a new boost from the same tab.',
+      'Note: Payment is processed on activation, not on request. You will not be charged until the ListHQ team activates your boost.',
+    ],
+  },
+  {
     emoji: '🔑', title: 'Managing Rental Listings',
     description: 'List properties for rent and manage tenant applications.',
     steps: [

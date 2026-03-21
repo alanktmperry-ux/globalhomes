@@ -342,7 +342,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       { q: 'What is the difference between Whisper, Coming Soon, and Public visibility?', a: 'Whisper = invite-only, not visible to buyers. Coming Soon = visible to registered buyers on the platform but not on external portals. Public = visible to all buyers on the full marketplace.' },
       { q: 'Can I duplicate a listing?', a: 'Yes. On the listing detail page in your dashboard, there is a "Duplicate" option. This creates a copy with all the same details — useful for similar properties at the same address.' },
       { q: 'What is the AI listing writer?', a: 'On Step 4 of the listing wizard, you can record a voice note or type notes about the property. The AI generates a professional listing description in four tones: Standard, Luxury, Family, or Investment. You can edit the output before publishing.' },
-      { q: 'How do I get my listing into the featured grid on the homepage?', a: 'Go to the listing detail page, click the Marketing tab, and request a Featured or Premier boost. Featured costs $299 and Premier costs $599, both for 30 days. Your listing is then shown in the featured grid to buyers searching near your suburb. Boosts are activated within 1 business hour.' },
+      { q: 'How do I get my listing into the featured grid on the homepage?', a: 'Go to the listing detail page, click the Marketing tab, and request a Featured or Premier boost. Featured costs $49/month and Premier costs $99/month. Cancel anytime from the Marketing tab. Your listing is then shown in the featured grid to buyers searching near your suburb. Boosts are activated within 1 business hour.' },
     ],
   },
   {

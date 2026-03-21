@@ -573,12 +573,23 @@ const Index = () => {
           centerOn={mapCenter}
           onScrollToProperty={scrollToProperty}
           formatPrice={formatPrice}
+          onMapMoved={(bounds) => {
+            handleAreaSearch({
+              type: 'polygon',
+              coordinates: [
+                [bounds.north, bounds.west],
+                [bounds.north, bounds.east],
+                [bounds.south, bounds.east],
+                [bounds.south, bounds.west],
+                [bounds.north, bounds.west],
+              ],
+            });
+          }}
           onGeolocate={(loc) => {
             setSearchCenter({ lat: loc.lat, lng: loc.lng });
-            setMapCollapsed(false);
             if (!searchRadius) setSearchRadius(10);
             setTimeout(() => {
-              setMapCenter({ lat: loc.lat, lng: loc.lng, key: `geo-${loc.lat}-${loc.lng}` });
+              setMapCenter({ lat: loc.lat, lng: loc.lng, key: `geo-${Date.now()}` });
             }, 100);
           }}
         />

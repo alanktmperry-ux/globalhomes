@@ -463,7 +463,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                   <div className="bg-secondary rounded-xl p-4 mb-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-bold">{tierData.label} boost</span>
-                      <span className="text-sm font-bold">{tierData.priceLabel}/month</span>
+                      <span className="text-sm font-bold">{tierData.priceLabel} for 30 days</span>
                     </div>
                     <div className="text-xs text-muted-foreground">
                       {listing.address}, {listing.suburb}

@@ -178,6 +178,8 @@ Deno.serve(async (req) => {
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    if (action === "delete_demo_request") {
       const { request_id } = await req.json();
       if (!request_id) {
         return new Response(JSON.stringify({ error: "Missing request_id" }), {

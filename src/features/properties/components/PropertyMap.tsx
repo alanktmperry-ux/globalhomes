@@ -134,16 +134,15 @@ export function PropertyMap({
         setIsLoading(false);
 
         // Watch for pending center when map container becomes visible
-        const ro = new ResizeObserver((entries) => {
-          for (const entry of entries) {
-            const { width, height } = entry.contentRect;
-            if (width > 0 && height > 0 && pendingCenterRef.current) {
-              const pc = pendingCenterRef.current;
-              pendingCenterRef.current = null;
-              map.panTo({ lat: pc.lat, lng: pc.lng });
-              map.setZoom(14);
-              ro.disconnect();
-            }
+        const ro = new ResizeObserver(() => {
+          const pc = pendingCenterRef.current;
+          const h = mapRef.current?.offsetHeight ?? 0;
+          const w = mapRef.current?.offsetWidth ?? 0;
+          if (pc && h > 10 && w > 10) {
+            pendingCenterRef.current = null;
+            mapInstanceRef.current?.panTo({ lat: pc.lat, lng: pc.lng });
+            mapInstanceRef.current?.setZoom(14);
+            ro.disconnect();
           }
         });
         if (mapRef.current) ro.observe(mapRef.current);

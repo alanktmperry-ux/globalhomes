@@ -55,6 +55,8 @@ const INSIGHTS_NAV: NavItem[] = [
 const AgentDashboardSidebar = () => {
   const { state } = useSidebar();
   const collapsed = state === 'collapsed';
+  const isMobile = useIsMobile();
+  const { setOpenMobile } = useSidebar();
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut, isAdmin, user } = useAuth();

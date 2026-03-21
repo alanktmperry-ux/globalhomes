@@ -49,12 +49,12 @@ const ROTATING_LANGUAGES = [
 ];
 
 const HEADLINE_WORDS = [
-  { text: 'in any language.', color: '#a78bfa' },
-  { text: 'in Chinese.',      color: '#38bdf8' },
-  { text: 'in Arabic.',       color: '#34d399' },
-  { text: 'in Hindi.',        color: '#fbbf24' },
-  { text: 'in Spanish.',      color: '#f472b6' },
-  { text: 'in Japanese.',     color: '#818cf8' },
+  { text: 'any language.', color: '#a78bfa' },
+  { text: 'Chinese.',      color: '#38bdf8' },
+  { text: 'Arabic.',       color: '#34d399' },
+  { text: 'Hindi.',        color: '#fbbf24' },
+  { text: 'Spanish.',      color: '#f472b6' },
+  { text: 'Japanese.',     color: '#818cf8' },
 ];
 
 const SEARCH_PLACEHOLDERS = [

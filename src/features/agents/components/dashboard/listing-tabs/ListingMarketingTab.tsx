@@ -13,7 +13,7 @@ import {
   Eye, MessageCircle, Calendar,
   DollarSign, Mail, Flame, Clock,
   ChevronRight, Send, Loader2,
-  Zap, Star, CheckCircle2
+  Zap, Star, CheckCircle2, AlertCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -59,6 +59,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   const [pastReports, setPastReports] = useState<any[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
   const [boostLoading, setBoostLoading] = useState<string | null>(null);
+  const [showPaymentStep, setShowPaymentStep] = useState<'featured' | 'premier' | null>(null);
   const [boostState, setBoostState] = useState<{
     is_featured: boolean;
     boost_tier: string | null;
@@ -512,6 +513,67 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               Monthly subscription — cancel anytime from this tab.
             </p>
 
+            {showPaymentStep && (() => {
+              const tier = showPaymentStep;
+              const tierData = BOOST_TIERS[tier];
+              return (
+                <div className="border-2 border-primary rounded-2xl p-5 mb-3 bg-card">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
+                      <Zap size={15} className="text-amber-500" />
+                      Confirm your boost
+                    </h4>
+                    <button
+                      onClick={() => setShowPaymentStep(null)}
+                      className="text-xs text-muted-foreground hover:text-foreground">
+                      ✕ Back
+                    </button>
+                  </div>
+                  <div className="bg-secondary rounded-xl p-4 mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-bold">{tierData.label} boost</span>
+                      <span className="text-sm font-bold">{tierData.priceLabel}/month</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {listing.address}, {listing.suburb}
+                    </div>
+                  </div>
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-start gap-2 text-xs text-muted-foreground bg-amber-50 border border-amber-200 rounded-lg p-3 dark:bg-amber-500/10 dark:border-amber-500/20">
+                      <AlertCircle size={14} className="text-amber-600 flex-shrink-0 mt-px" />
+                      <div>
+                        <p className="font-medium text-amber-800 dark:text-amber-400 mb-0.5">Payment on activation</p>
+                        <p>
+                          Online card payment is coming very soon. For now, our team will contact you to arrange
+                          payment when we activate your boost — usually within 1 business hour.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      className="flex-1"
+                      onClick={async () => {
+                        setShowPaymentStep(null);
+                        await handleRequestBoost(tier);
+                      }}
+                      disabled={!!boostLoading}>
+                      {boostLoading === tier
+                        ? <Loader2 size={13} className="animate-spin mr-2" />
+                        : <Zap size={13} className="mr-2" />}
+                      Confirm — request {tierData.label}
+                    </Button>
+                    <Button variant="outline" onClick={() => setShowPaymentStep(null)}>
+                      Back
+                    </Button>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground text-center mt-3">
+                    By confirming you agree to be billed {tierData.priceLabel}/month from activation date. Cancel anytime.
+                  </p>
+                </div>
+              );
+            })()}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Featured card */}
               <div className="border border-border rounded-xl p-4 space-y-3">
@@ -535,10 +597,9 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                   size="sm"
                   variant="outline"
                   className="w-full gap-2"
-                  onClick={() => handleRequestBoost('featured')}
+                  onClick={() => setShowPaymentStep('featured')}
                   disabled={!!boostLoading}
                 >
-                  {boostLoading === 'featured' ? <Loader2 size={14} className="animate-spin" /> : null}
                   Start Featured — $49/mo
                 </Button>
               </div>
@@ -567,10 +628,9 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                 <Button
                   size="sm"
                   className="w-full gap-2"
-                  onClick={() => handleRequestBoost('premier')}
+                  onClick={() => setShowPaymentStep('premier')}
                   disabled={!!boostLoading}
                 >
-                  {boostLoading === 'premier' ? <Loader2 size={14} className="animate-spin" /> : null}
                   Start Premier — $99/mo
                 </Button>
               </div>

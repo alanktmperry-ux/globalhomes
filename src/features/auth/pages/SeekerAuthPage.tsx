@@ -165,7 +165,7 @@ const SeekerAuthPage = () => {
 
 
           <h1 className="font-display text-2xl font-bold text-foreground mb-1">
-            {step === 'email' && 'Sign in to search'}
+            {step === 'email' && 'Welcome to ListHQ'}
             {step === 'password' && 'Welcome back'}
             {step === 'create' && 'Create your account'}
             {step === 'prefs' && ''}

@@ -129,7 +129,7 @@ const PartnerAuthPage = () => {
     <div className="min-h-screen flex">
       {/* Left hero */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        <img src={agentHero} alt="Partner portal" className="absolute inset-0 w-full h-full object-cover" />
+        <img src={partnerHero} alt="Trust accounting partner portal" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-[hsl(222,47%,8%)]/95 via-[hsl(222,47%,11%)]/70 to-[hsl(222,47%,11%)]/30" />
         <div className="relative z-10 flex flex-col justify-between p-12 text-white h-full">
           <div className="flex items-center gap-2.5">

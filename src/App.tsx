@@ -122,7 +122,7 @@ const App = () => (
       <AuthProvider>
         <TooltipProvider>
           
-          <Sonner />
+          <Sonner position="top-center" richColors closeButton duration={5000} />
           <BrowserRouter>
             <ImpersonationBanner />
             <ScrollToTop />

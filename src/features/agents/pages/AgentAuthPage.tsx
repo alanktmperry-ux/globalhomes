@@ -346,26 +346,42 @@ const AgentAuthPage = () => {
           {/* Step: Choose signup path */}
           {step === 'choose' && (
             <div className="space-y-3">
-              <button onClick={() => setStep('create-agency')} className="w-full flex items-center gap-4 p-4 rounded-2xl border border-border text-left hover:border-primary/50 transition-colors">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                  <Plus size={22} className="text-primary" />
+              {/* 60-day trial badge */}
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 mb-1">
+                <Zap size={13} className="text-emerald-600 shrink-0" />
+                <p className="text-xs font-medium text-emerald-700">Free for 60 days — no credit card required. Cancel anytime.</p>
+              </div>
+
+              <button
+                onClick={() => setStep('create-agency')}
+                className="w-full flex items-center gap-4 p-4 rounded-2xl border border-border text-left hover:border-primary hover:bg-primary/5 transition-colors group">
+                <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
+                  <Building2 size={20} className="text-primary" />
                 </div>
-                <div>
-                  <p className="font-semibold text-foreground text-sm">Create a New Agency</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Set up your company, add staff later</p>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-foreground text-sm group-hover:text-primary transition-colors">Create a New Agency</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Set up your profile and start listing immediately</p>
                 </div>
+                <ChevronRight size={16} className="text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
               </button>
-              <button onClick={() => setStep('join-agency')} className="w-full flex items-center gap-4 p-4 rounded-2xl border border-border text-left hover:border-primary/50 transition-colors">
-                <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center shrink-0">
-                  <KeyRound size={22} className="text-foreground" />
+
+              <button
+                onClick={() => setStep('join-agency')}
+                className="w-full flex items-center gap-4 p-4 rounded-2xl border border-border text-left hover:border-primary hover:bg-primary/5 transition-colors group">
+                <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
+                  <KeyRound size={20} className="text-primary" />
                 </div>
-                <div>
-                  <p className="font-semibold text-foreground text-sm">Join with Invite Code</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Your agency admin gave you a code</p>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-foreground text-sm group-hover:text-primary transition-colors">Join with Invite Code</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Your agency admin sent you an invite code</p>
                 </div>
+                <ChevronRight size={16} className="text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
               </button>
-              <button onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">
-                ← Back to sign in
+
+              <button
+                onClick={goBack}
+                className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors py-2 text-center">
+                ← Already have an account? Sign in
               </button>
             </div>
           )}

@@ -102,6 +102,14 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Sort: Premier first, then Featured, randomised within each tier
+    featured.sort((a: any, b: any) => {
+      const tierA = a.boost_tier === 'premier' ? 0 : 1;
+      const tierB = b.boost_tier === 'premier' ? 0 : 1;
+      if (tierA !== tierB) return tierA - tierB;
+      return Math.random() - 0.5;
+    });
+
     if (featured.length === 0) {
       return new Response(
         JSON.stringify({ featured: [], fallback: true }),

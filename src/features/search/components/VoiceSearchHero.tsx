@@ -217,6 +217,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
     ? FEATURED_PROPERTIES
     : featuredListings.map((p: any) => ({
         id: p.id,
+        agent_id: p.agent_id,
         price: p.price_formatted,
         address: p.address,
         suburb: `${p.suburb} ${p.state || ''}`.trim(),
@@ -226,6 +227,15 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
         tag: p.boost_tier === 'premier' ? 'Premier' : 'Featured',
         img: p.image_url || p.images?.[0] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&q=70',
       }));
+
+  // One listing per agent maximum
+  const seenAgents = new Set<string>();
+  const dedupedFeatured = displayFeatured.filter((p: any) => {
+    const agentId = p.agent_id || p.id;
+    if (seenAgents.has(agentId)) return false;
+    seenAgents.add(agentId);
+    return true;
+  });
 
   // Rotating language ticker
   useEffect(() => {

@@ -269,7 +269,7 @@ const AgentAuthPage = () => {
             {step === 'email' && 'Access your dashboard, listings, and leads.'}
             {step === 'password' && email}
             {step === 'choose' && 'Choose how you want to get started.'}
-            {step === 'create-agency' && 'Set up your agency and start listing.'}
+            {step === 'create-agency' && 'Set up your agent profile and start listing in minutes.'}
             {step === 'join-agency' && 'Enter your invite code to join a team.'}
           </p>
 

@@ -318,7 +318,7 @@ export default function AgencyOnboardingPage() {
               </Select>
             </div>
             <div>
-              <Label className="text-xs font-medium">Agency phone *</Label>
+              <Label className="text-xs font-semibold text-foreground">Agency phone <span className="text-destructive ml-0.5">*</span></Label>
               <Input value={agencyPhone} onChange={e => setAgencyPhone(e.target.value)} placeholder="(03) 9123 4567" className="mt-1.5" />
             </div>
             <div className="sm:col-span-2">

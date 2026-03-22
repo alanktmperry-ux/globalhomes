@@ -265,7 +265,7 @@ const AgentAuthPage = () => {
           <p className="text-sm text-muted-foreground mb-6">
             {step === 'email' && 'Access your dashboard, listings, and leads.'}
             {step === 'password' && email}
-            {step === 'choose' && 'Choose how you want to get started.'}
+            {step === 'choose' && 'Start your free 60-day trial. No credit card required.'}
             {step === 'create-agency' && 'Set up your agent profile and start listing in minutes.'}
             {step === 'join-agency' && 'Enter your invite code to join a team.'}
           </p>

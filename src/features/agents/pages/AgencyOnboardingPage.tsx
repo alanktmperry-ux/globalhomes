@@ -542,14 +542,15 @@ export default function AgencyOnboardingPage() {
         </div>
         {/* Progress */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h1 className="text-lg font-bold flex items-center gap-2">
-              <Building2 size={20} className="text-primary" />
+          <div>
+            <h1 className="text-xl font-bold text-foreground">
               Agency Setup
             </h1>
-            <Badge variant="outline" className="text-xs">Step {step + 1} of {totalSteps}</Badge>
+            <p className="text-sm text-muted-foreground">
+              Step {step + 1} of {totalSteps}
+            </p>
           </div>
-          <Progress value={progressPct} className="h-1.5" />
+          <Progress value={progressPct} className="h-2" />
           <div className="flex justify-between">
             {stepLabels.map((label, i) => (
               <span

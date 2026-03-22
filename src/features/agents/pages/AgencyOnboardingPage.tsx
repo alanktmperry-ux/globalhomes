@@ -233,7 +233,7 @@ export default function AgencyOnboardingPage() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <Card
-              className={`cursor-pointer transition-all hover:shadow-md ${path === 'fresh' ? 'ring-2 ring-primary shadow-md' : ''}`}
+              className={`cursor-pointer transition-all border-2 ${path === 'fresh' ? 'border-primary bg-primary/5 shadow-md' : 'border-border hover:border-primary/40 hover:shadow-sm'}`}
               onClick={() => setPath('fresh')}
             >
               <CardContent className="p-6 space-y-3">

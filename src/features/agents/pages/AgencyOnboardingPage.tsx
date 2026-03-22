@@ -55,6 +55,8 @@ export default function AgencyOnboardingPage() {
   const [licenceNumber, setLicenceNumber] = useState('');
   const [principalName, setPrincipalName] = useState('');
   const [operatingState, setOperatingState] = useState('');
+  const [country, setCountry] = useState('Australia');
+  const isAustralia = country === 'Australia';
   const [agencyAddress, setAgencyAddress] = useState('');
   const [agencyPhone, setAgencyPhone] = useState('');
   const [agencyEmail, setAgencyEmail] = useState('');

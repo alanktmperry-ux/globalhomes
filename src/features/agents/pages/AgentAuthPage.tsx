@@ -494,14 +494,30 @@ const AgentAuthPage = () => {
                     <p className="text-[11px] text-muted-foreground mt-0.5">Yes, I need compliance-ready reporting</p>
                   </div>
                 </label>
-                <label className="flex items-start gap-2.5 cursor-pointer">
-                  <input type="checkbox" checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)} className="mt-1 accent-primary" />
-                  <span className="text-xs text-muted-foreground leading-relaxed">
-                    I agree to the{' '}
-                    <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">terms of service</a>{' '}
-                    and confirm the information provided is accurate.
-                  </span>
-                </label>
+                <div className={`p-3 rounded-xl border transition-colors ${agreedToTerms ? 'border-primary bg-primary/5' : 'border-border bg-background'}`}>
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <div className={`w-5 h-5 mt-0.5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${agreedToTerms ? 'bg-primary border-primary' : 'border-border'}`}>
+                      {agreedToTerms && (
+                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                          <path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </div>
+                    <input type="checkbox" checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)} className="sr-only" />
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-foreground">I agree to the ListHQ Terms of Service</p>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        By creating an account I confirm I hold a current real estate licence, that all information provided is accurate, and that I have read and agree to the{' '}
+                        <a href="/terms" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-primary underline underline-offset-2 hover:opacity-80">Terms of Service</a>
+                        {' '}and{' '}
+                        <a href="/privacy" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-primary underline underline-offset-2 hover:opacity-80">Privacy Policy</a>.
+                      </p>
+                    </div>
+                  </label>
+                </div>
+                {!agreedToTerms && (
+                  <p className="text-xs text-muted-foreground text-center">You must agree to the terms before creating your account</p>
+                )}
                 <button type="submit" disabled={loading || !agreedToTerms} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
                   {loading ? 'Please wait...' : 'Create Agency & Account'}
                 </button>

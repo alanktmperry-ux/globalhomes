@@ -4,7 +4,7 @@ import { Building2, Landmark, Users, FileText, CheckCircle } from 'lucide-react'
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import agentHero from '@/assets/agent-auth-hero.jpg';
+const partnerHero = 'https://images.unsplash.com/photo-1556761175-4b46a572b786?w=800&q=80';
 
 type Step = 'email' | 'password' | 'register';
 

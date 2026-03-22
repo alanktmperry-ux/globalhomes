@@ -107,6 +107,7 @@ export default function FindAgentPage() {
     const q = searchText.toLowerCase().trim();
     return agents.filter(a => {
       if (languageFilter !== 'any' && !(a.languages_spoken || []).includes(languageFilter)) return false;
+      if (specialisationFilter !== 'any' && !(a.investment_niche || '').split(',').map((s: string) => s.trim()).includes(specialisationFilter)) return false;
       if (!q) return true;
       if (a.name.toLowerCase().includes(q)) return true;
       if (a.agency?.toLowerCase().includes(q)) return true;

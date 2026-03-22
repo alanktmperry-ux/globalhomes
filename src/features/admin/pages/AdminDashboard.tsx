@@ -19,6 +19,7 @@ interface UserRow {
   created_at: string;
   display_name?: string;
   roles: string[];
+  last_sign_in_at?: string | null;
 }
 
 interface PropertyRow {
@@ -87,12 +88,32 @@ const AdminDashboard = () => {
       roleMap.set(r.user_id, existing);
     });
 
+    // Fetch last_sign_in_at from admin-users edge function
+    const { data: sessionData } = await supabase.auth.getSession();
+    const signInMap = new Map<string, string | null>();
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=list`,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionData.session?.access_token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      const adminData = await res.json();
+      (adminData.users || []).forEach((u: any) => {
+        signInMap.set(u.id, u.last_sign_in_at || null);
+      });
+    } catch {}
+
     const userRows: UserRow[] = (profileData || []).map((p) => ({
       id: p.user_id,
       email: p.display_name || 'Unknown',
       created_at: p.created_at,
       display_name: p.display_name || undefined,
       roles: roleMap.get(p.user_id) || ['user'],
+      last_sign_in_at: signInMap.get(p.user_id) ?? null,
     }));
     setUsers(userRows);
 

@@ -178,7 +178,12 @@ const AgentAuthPage = () => {
         setLoading(false);
       }
     } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      console.error('[handleSignup]', err);
+      toast({
+        title: 'Sign up failed',
+        description: err.message || 'Something went wrong. Please try again.',
+        variant: 'destructive'
+      });
       setLoading(false);
     }
   };

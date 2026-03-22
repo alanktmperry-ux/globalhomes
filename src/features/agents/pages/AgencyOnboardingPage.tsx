@@ -555,9 +555,9 @@ export default function AgencyOnboardingPage() {
             {stepLabels.map((label, i) => (
               <span
                 key={i}
-                className={`text-[10px] font-medium ${i < step ? 'text-primary' : i === step ? 'text-foreground' : 'text-muted-foreground'}`}
+                className={`text-[11px] font-medium transition-colors ${i < step ? 'text-primary' : i === step ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}
               >
-                {i < step ? '✓' : ''} {label}
+                {i < step ? '✓ ' : ''}{label}
               </span>
             ))}
           </div>

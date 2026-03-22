@@ -51,17 +51,31 @@ Deno.serve(async (req) => {
       const slug = agencyName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") +
         "-" + Math.random().toString(36).slice(2, 6);
 
-      const { data: agency, error: agencyError } = await supabaseAdmin
+      // Check if agency already exists for this user (re-registration)
+      const { data: existing } = await supabaseAdmin
         .from("agencies")
-        .insert({
-          name: agencyName,
-          slug,
-          owner_user_id: userId,
-          email: agencyEmail || email || null,
-        })
-        .select()
-        .single();
-      if (agencyError) throw agencyError;
+        .select("id, name")
+        .eq("owner_user_id", userId)
+        .eq("name", agencyName)
+        .maybeSingle();
+
+      let agency;
+      if (existing) {
+        agency = existing;
+      } else {
+        const { data: newAgency, error: agencyError } = await supabaseAdmin
+          .from("agencies")
+          .insert({
+            name: agencyName,
+            slug,
+            owner_user_id: userId,
+            email: agencyEmail || email || null,
+          })
+          .select()
+          .single();
+        if (agencyError) throw agencyError;
+        agency = newAgency;
+      }
 
       const { error: memberError } = await supabaseAdmin
         .from("agency_members")

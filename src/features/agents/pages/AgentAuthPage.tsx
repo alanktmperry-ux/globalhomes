@@ -129,7 +129,7 @@ const AgentAuthPage = () => {
     e.preventDefault();
 
     if (!email.trim()) { toast.error('Email required'); return; }
-    if (!fullName.trim()) { toast({ title: 'Full name required', variant: 'destructive' }); return; }
+    if (!fullName.trim()) { toast.error('Full name required'); return; }
     if (!agencyName.trim()) { toast({ title: 'Agency name required', variant: 'destructive' }); return; }
     if (!officeAddress.trim()) { toast({ title: 'Office address required', description: 'Please enter and select your office address.', variant: 'destructive' }); return; }
     if (password.length < 6) { toast({ title: 'Password too short', description: 'Minimum 6 characters.', variant: 'destructive' }); return; }

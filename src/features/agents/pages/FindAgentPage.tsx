@@ -74,6 +74,7 @@ export default function FindAgentPage() {
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState('');
   const [languageFilter, setLanguageFilter] = useState('any');
+  const [specialisationFilter, setSpecialisationFilter] = useState('any');
 
   useEffect(() => {
     const fetchAgents = async () => {

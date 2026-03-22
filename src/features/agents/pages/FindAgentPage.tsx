@@ -25,6 +25,7 @@ interface AgentRow {
   handles_trust_accounting: boolean | null;
 }
 
+
 function getInitials(name: string) {
   return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 }
@@ -73,6 +74,7 @@ export default function FindAgentPage() {
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState('');
   const [languageFilter, setLanguageFilter] = useState('any');
+  const [specialisationFilter, setSpecialisationFilter] = useState('any');
 
   useEffect(() => {
     const fetchAgents = async () => {
@@ -92,17 +94,27 @@ export default function FindAgentPage() {
     return Array.from(langs).sort();
   }, [agents]);
 
+  const allSpecialisations = useMemo(() => {
+    const set = new Set<string>();
+    agents.forEach(a => {
+      if (!a.investment_niche) return;
+      a.investment_niche.split(',').map(s => s.trim()).filter(Boolean).forEach(s => set.add(s));
+    });
+    return Array.from(set).sort();
+  }, [agents]);
+
   const filtered = useMemo(() => {
     const q = searchText.toLowerCase().trim();
     return agents.filter(a => {
       if (languageFilter !== 'any' && !(a.languages_spoken || []).includes(languageFilter)) return false;
+      if (specialisationFilter !== 'any' && !(a.investment_niche || '').split(',').map((s: string) => s.trim()).includes(specialisationFilter)) return false;
       if (!q) return true;
       if (a.name.toLowerCase().includes(q)) return true;
       if (a.agency?.toLowerCase().includes(q)) return true;
       if ((a.service_areas || []).some(s => s.toLowerCase().includes(q))) return true;
       return false;
     });
-  }, [agents, searchText, languageFilter]);
+  }, [agents, searchText, languageFilter, specialisationFilter]);
 
   const showBadge = (level: string | null) => level === 'license' || level === 'top_performer';
 
@@ -131,6 +143,19 @@ export default function FindAgentPage() {
                   <SelectItem value="any">Any language</SelectItem>
                   {allLanguages.map(l => (
                     <SelectItem key={l} value={l}>{l}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {allSpecialisations.length > 0 && (
+              <Select value={specialisationFilter} onValueChange={setSpecialisationFilter}>
+                <SelectTrigger className="h-10 rounded-xl bg-secondary border-0 text-sm min-w-[160px]">
+                  <SelectValue placeholder="Any specialisation" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="any">Any specialisation</SelectItem>
+                  {allSpecialisations.map(s => (
+                    <SelectItem key={s} value={s}>{s}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

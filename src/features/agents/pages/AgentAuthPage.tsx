@@ -29,7 +29,14 @@ const AgentAuthPage = () => {
   const [officeAddress, setOfficeAddress] = useState('');
   const [yearsExperience, setYearsExperience] = useState('');
   const [specialization, setSpecialization] = useState('Residential');
-  const [investmentNiche, setInvestmentNiche] = useState('');
+  const [specialisations, setSpecialisations] = useState<string[]>([]);
+  const toggleSpecialisation = (value: string) => {
+    setSpecialisations(prev =>
+      prev.includes(value)
+        ? prev.filter(s => s !== value)
+        : [...prev, value]
+    );
+  };
   const [handlesTrustAccounting, setHandlesTrustAccounting] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -113,7 +120,7 @@ const AgentAuthPage = () => {
           officeAddress,
           yearsExperience,
           specialization,
-          investmentNiche: investmentNiche || null,
+          investmentNiche: specialisations.length > 0 ? specialisations.join(',') : null,
           handlesTrustAccounting,
         },
       });
@@ -382,32 +389,49 @@ const AgentAuthPage = () => {
                     <select value={specialization} onChange={(e) => setSpecialization(e.target.value)} className={inputClass + ' appearance-none'}>
                       <option value="Residential">Residential</option>
                       <option value="Commercial">Commercial</option>
-                      <option value="Luxury">Luxury</option>
-                      <option value="Land">Land</option>
+                      <option value="Rural & Lifestyle">Rural & Lifestyle</option>
                       <option value="Industrial">Industrial</option>
+                      <option value="Business Broking">Business Broking</option>
                     </select>
                   </div>
                 </div>
 
-                {/* Investment Niche */}
+                {/* Specialisations multi-select */}
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">What's your investment niche?</label>
-                  <div className="grid grid-cols-2 gap-2 mt-1">
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">
+                    I also specialise in
+                    <span className="text-xs text-muted-foreground ml-1 font-normal">(select all that apply)</span>
+                  </label>
+                  <div className="flex flex-wrap gap-2 mt-1">
                     {[
-                      { value: 'family_homes', label: 'Family Homes' },
-                      { value: 'first_home_buyers', label: 'First Home Buyers' },
-                      { value: 'coastal_str', label: 'Coastal STR' },
-                      { value: 'new_builds', label: 'New Builds/Off-Plan' },
-                      { value: 'foreign_investors', label: 'Foreign Investors' },
-                      { value: 'commercial', label: 'Commercial' },
-                    ].map(n => (
-                      <button key={n.value} type="button" onClick={() => setInvestmentNiche(investmentNiche === n.value ? '' : n.value)}
-                        className={`px-3 py-2 rounded-xl border text-xs font-medium text-left transition-colors ${
-                          investmentNiche === n.value
+                      'Residential Sales',
+                      'Property Management',
+                      'Commercial Sales',
+                      'Commercial Leasing',
+                      'Rural & Lifestyle',
+                      'Land & Development',
+                      'Prestige & Luxury',
+                      'Industrial & Warehousing',
+                      'First Home Buyers',
+                      'Overseas & Foreign Buyers',
+                      'Off-the-Plan',
+                      'Property Investment',
+                      'Holiday & Short-Stay',
+                      'Retirement & Downsizing',
+                      'Strata & Apartments',
+                      'Business Broking',
+                    ].map(s => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => toggleSpecialisation(s)}
+                        className={`px-3 py-1.5 rounded-full border text-xs font-medium transition-colors ${
+                          specialisations.includes(s)
                             ? 'border-primary bg-primary/10 text-primary'
-                            : 'border-border bg-background text-foreground hover:border-primary/30'
-                        }`}>
-                        {investmentNiche === n.value ? '✅ ' : '☐ '}{n.label}
+                            : 'border-border bg-background text-muted-foreground hover:border-primary/30 hover:text-foreground'
+                        }`}
+                      >
+                        {s}
                       </button>
                     ))}
                   </div>

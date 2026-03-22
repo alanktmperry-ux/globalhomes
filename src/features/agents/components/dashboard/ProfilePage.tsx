@@ -525,10 +525,54 @@ const ProfilePage = () => {
                     onChange={e => setForm(f => ({ ...f, specialization: e.target.value }))}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
-                    {['Residential', 'Commercial', 'Land', 'Luxury', 'Rural', 'Industrial'].map(s => (
+                    {['Residential', 'Commercial', 'Rural & Lifestyle', 'Industrial', 'Business Broking'].map(s => (
                       <option key={s} value={s}>{s}</option>
                     ))}
                   </select>
+                </div>
+                <div>
+                  <Label className="text-xs">I also specialise in</Label>
+                  <p className="text-[11px] text-muted-foreground mb-2">Select all that apply</p>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      'Residential Sales',
+                      'Property Management',
+                      'Commercial Sales',
+                      'Commercial Leasing',
+                      'Rural & Lifestyle',
+                      'Land & Development',
+                      'Prestige & Luxury',
+                      'Industrial & Warehousing',
+                      'First Home Buyers',
+                      'Overseas & Foreign Buyers',
+                      'Off-the-Plan',
+                      'Property Investment',
+                      'Holiday & Short-Stay',
+                      'Retirement & Downsizing',
+                      'Strata & Apartments',
+                      'Business Broking',
+                    ].map(s => {
+                      const current = ((form as any).investment_niche || '').split(',').map((x: string) => x.trim()).filter(Boolean);
+                      const active = current.includes(s);
+                      return (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => {
+                            const updated = active ? current.filter((x: string) => x !== s) : [...current, s];
+                            setForm(f => ({ ...f, investment_niche: updated.join(', ') } as any));
+                          }}
+                          className={`px-3 py-1.5 rounded-full border text-xs font-medium transition-colors ${
+                            active
+                              ? 'border-primary bg-primary/10 text-primary'
+                              : 'border-border bg-background text-muted-foreground hover:border-primary/30 hover:text-foreground'
+                          }`}
+                        >
+                          {s}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
                 <div>
                   <Label className="text-xs">Website URL</Label>

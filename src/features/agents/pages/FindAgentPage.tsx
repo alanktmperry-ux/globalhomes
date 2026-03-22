@@ -147,6 +147,19 @@ export default function FindAgentPage() {
                 </SelectContent>
               </Select>
             )}
+            {allSpecialisations.length > 0 && (
+              <Select value={specialisationFilter} onValueChange={setSpecialisationFilter}>
+                <SelectTrigger className="h-10 rounded-xl bg-secondary border-0 text-sm min-w-[160px]">
+                  <SelectValue placeholder="Any specialisation" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="any">Any specialisation</SelectItem>
+                  {allSpecialisations.map(s => (
+                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
         </div>
       </div>

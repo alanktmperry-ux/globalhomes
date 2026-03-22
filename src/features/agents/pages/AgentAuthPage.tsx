@@ -6,7 +6,7 @@ import PhoneInput from '@/shared/components/PhoneInput';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
-import { useToast } from '@/shared/hooks/use-toast';
+import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/AuthProvider';
 import agentHero from '@/assets/agent-auth-hero.jpg';
 

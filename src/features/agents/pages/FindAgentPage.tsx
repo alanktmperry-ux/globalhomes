@@ -114,7 +114,7 @@ export default function FindAgentPage() {
       if ((a.service_areas || []).some(s => s.toLowerCase().includes(q))) return true;
       return false;
     });
-  }, [agents, searchText, languageFilter]);
+  }, [agents, searchText, languageFilter, specialisationFilter]);
 
   const showBadge = (level: string | null) => level === 'license' || level === 'top_performer';
 

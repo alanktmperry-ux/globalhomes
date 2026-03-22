@@ -67,7 +67,7 @@ export default function AgencyOnboardingPage() {
     if (!user?.id) return;
     supabase
       .from('agents')
-      .select('agency, office_address, email, phone')
+      .select('agency, office_address, email, phone, name, license_number')
       .eq('user_id', user.id)
       .single()
       .then(({ data }) => {
@@ -76,6 +76,8 @@ export default function AgencyOnboardingPage() {
         if (data.office_address) setAgencyAddress(data.office_address);
         if (data.email) setAgencyEmail(data.email);
         if (data.phone) setAgencyPhone(data.phone);
+        if (data.name) setPrincipalName(data.name);
+        if (data.license_number) setLicenceNumber(data.license_number);
       });
   }, [user?.id]);
 

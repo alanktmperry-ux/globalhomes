@@ -471,7 +471,7 @@ const AgentAuthPage = () => {
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">
                     Office Address
-                    <span className="text-xs font-normal text-muted-foreground ml-1">(optional)</span>
+                    <span className="text-destructive ml-0.5">*</span>
                   </label>
                   <div className="relative">
                     <input

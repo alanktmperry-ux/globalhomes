@@ -170,14 +170,20 @@ const AgentAuthPage = () => {
         setPendingRedirect('dashboard');
       } else {
         toast({
-          title: 'Check your email',
-          description: 'We sent you a confirmation link. Please verify your email to sign in.',
+          title: 'Account created!',
+          description: `We sent a confirmation email to ${email}. Click the link in that email to verify your account and sign in.`,
+          duration: 8000,
         });
         setStep('email');
         setLoading(false);
       }
     } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      console.error('[handleSignup]', err);
+      toast({
+        title: 'Sign up failed',
+        description: err.message || 'Something went wrong. Please try again.',
+        variant: 'destructive'
+      });
       setLoading(false);
     }
   };
@@ -444,6 +450,9 @@ const AgentAuthPage = () => {
                     {confirmPassword.length > 0 && confirmPassword !== password && (
                       <p className="text-[11px] text-red-500 font-medium mt-1">Passwords do not match</p>
                     )}
+                    {confirmPassword.length > 0 && confirmPassword === password && (
+                      <p className="text-[11px] text-emerald-600 font-medium mt-1">✓ Passwords match</p>
+                    )}
                   </div>
                 </div>
                 <div>
@@ -566,7 +575,7 @@ const AgentAuthPage = () => {
                 {!agreedToTerms && (
                   <p className="text-xs text-muted-foreground text-center">You must agree to the terms before creating your account</p>
                 )}
-                <button type="submit" disabled={loading || !agreedToTerms} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
+                <button type="submit" disabled={loading || !agreedToTerms || password.length < 6 || (confirmPassword.length > 0 && confirmPassword !== password)} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
                   {loading ? 'Setting up your account…' : 'Create Account'}
                 </button>
               </form>

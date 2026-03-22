@@ -53,7 +53,7 @@ const AgentAuthPage = () => {
   // ── Derived values (not hooks) ──
   const strength = getPasswordStrength(password);
   const passwordsMatch = password === confirmPassword;
-  const canSubmit = !loading && agreedToTerms && password.length >= 6 && passwordsMatch;
+  const canSubmit = !loading;
 
   // ── useEffect hooks ──
   useEffect(() => {

@@ -225,13 +225,15 @@ export default function AgencyOnboardingPage() {
       return (
         <div className="space-y-6">
           <div className="text-center space-y-2">
-            <Building2 size={36} className="mx-auto text-primary" />
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+              <Building2 size={28} className="text-primary" />
+            </div>
             <h2 className="text-xl font-bold">Welcome — let's get your agency set up</h2>
             <p className="text-sm text-muted-foreground">Choose how you'd like to get started</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <Card
-              className={`cursor-pointer transition-all hover:shadow-md ${path === 'fresh' ? 'ring-2 ring-primary shadow-md' : ''}`}
+              className={`cursor-pointer transition-all border-2 ${path === 'fresh' ? 'border-primary bg-primary/5 shadow-md' : 'border-border hover:border-primary/40 hover:shadow-sm'}`}
               onClick={() => setPath('fresh')}
             >
               <CardContent className="p-6 space-y-3">
@@ -244,7 +246,7 @@ export default function AgencyOnboardingPage() {
               </CardContent>
             </Card>
             <Card
-              className={`cursor-pointer transition-all hover:shadow-md ${path === 'migration' ? 'ring-2 ring-primary shadow-md' : ''}`}
+              className={`cursor-pointer transition-all border-2 ${path === 'migration' ? 'border-primary bg-primary/5 shadow-md' : 'border-border hover:border-primary/40 hover:shadow-sm'}`}
               onClick={() => setPath('migration')}
             >
               <CardContent className="p-6 space-y-3">
@@ -533,23 +535,31 @@ export default function AgencyOnboardingPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-2xl mx-auto p-4 sm:p-8 space-y-6">
+        {/* Brand */}
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center">
+            <span className="text-primary-foreground text-xs font-bold">L</span>
+          </div>
+          <span className="font-display text-lg font-bold text-foreground">ListHQ</span>
+        </div>
         {/* Progress */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h1 className="text-lg font-bold flex items-center gap-2">
-              <Building2 size={20} className="text-primary" />
+          <div>
+            <h1 className="text-xl font-bold text-foreground">
               Agency Setup
             </h1>
-            <Badge variant="outline" className="text-xs">Step {step + 1} of {totalSteps}</Badge>
+            <p className="text-sm text-muted-foreground">
+              Step {step + 1} of {totalSteps}
+            </p>
           </div>
-          <Progress value={progressPct} className="h-1.5" />
+          <Progress value={progressPct} className="h-2" />
           <div className="flex justify-between">
             {stepLabels.map((label, i) => (
               <span
                 key={i}
-                className={`text-[10px] font-medium ${i < step ? 'text-primary' : i === step ? 'text-foreground' : 'text-muted-foreground'}`}
+                className={`text-[11px] font-medium transition-colors ${i < step ? 'text-primary' : i === step ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}
               >
-                {i < step ? '✓' : ''} {label}
+                {i < step ? '✓ ' : ''}{label}
               </span>
             ))}
           </div>
@@ -571,14 +581,14 @@ export default function AgencyOnboardingPage() {
 
         {/* Navigation */}
         {(showBackButton || showNextButton) && (
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2">
             {showBackButton ? (
-              <Button variant="ghost" size="sm" onClick={() => setStep(s => s - 1)} disabled={loading}>
+              <Button variant="ghost" size="sm" onClick={() => setStep(s => s - 1)} disabled={loading} className="w-full sm:w-auto">
                 <ArrowLeft size={14} className="mr-1" /> Back
               </Button>
             ) : <div />}
             {showNextButton && (
-              <Button size="sm" disabled={!canNext() || loading} onClick={handleNext}>
+              <Button size="sm" disabled={!canNext() || loading} onClick={handleNext} className="w-full sm:w-auto">
                 {loading && <Loader2 size={14} className="mr-1 animate-spin" />}
                 Next <ArrowRight size={14} className="ml-1" />
               </Button>

@@ -331,9 +331,9 @@ export default function AgencyOnboardingPage() {
             </div>
           </div>
           {operatingState && (
-            <div className="bg-muted/50 border border-border rounded-lg p-3 flex items-start gap-2">
-              <Landmark size={14} className="text-muted-foreground shrink-0 mt-0.5" />
-              <p className="text-xs text-muted-foreground">{STATE_LEGISLATION[operatingState]}</p>
+            <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex items-start gap-2.5">
+              <Landmark size={14} className="text-primary shrink-0 mt-0.5" />
+              <p className="text-xs text-primary/80 font-medium">{STATE_LEGISLATION[operatingState]}</p>
             </div>
           )}
         </div>

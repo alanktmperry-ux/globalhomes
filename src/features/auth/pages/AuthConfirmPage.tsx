@@ -11,17 +11,49 @@ const AuthConfirmPage = () => {
   useEffect(() => {
     const handleConfirmation = async () => {
       try {
-        const hash = window.location.hash;
-        const params = new URLSearchParams(hash.replace('#', '?'));
-        const accessToken = params.get('access_token');
-        const refreshToken = params.get('refresh_token');
-        const errorDesc = params.get('error_description');
+        // Supabase v2 sends token_hash as a query param (?token_hash=...&type=signup)
+        // Older format sent access_token in the hash fragment (#access_token=...)
+        // We handle both.
+
+        const queryParams = new URLSearchParams(window.location.search);
+        const hashParams = new URLSearchParams(
+          window.location.hash.replace('#', '?')
+        );
+
+        // Check for error in either location
+        const errorDesc =
+          queryParams.get('error_description') ||
+          hashParams.get('error_description');
 
         if (errorDesc) {
           setStatus('error');
           setMessage(decodeURIComponent(errorDesc));
           return;
         }
+
+        // Format 1 — Supabase v2 query param style
+        const tokenHash = queryParams.get('token_hash');
+        const type = queryParams.get('type');
+
+        if (tokenHash && type) {
+          const { error } = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: type as any,
+          });
+
+          if (error) throw error;
+
+          setStatus('success');
+          setMessage('Email confirmed! Taking you to your dashboard...');
+          setTimeout(() => {
+            navigate('/dashboard', { replace: true });
+          }, 1500);
+          return;
+        }
+
+        // Format 2 — hash fragment style (older Supabase / PKCE)
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
 
         if (accessToken && refreshToken) {
           const { data, error } = await supabase.auth.setSession({
@@ -38,13 +70,16 @@ const AuthConfirmPage = () => {
               navigate('/dashboard', { replace: true });
             }, 1500);
           }
-        } else {
-          setStatus('error');
-          setMessage('Invalid confirmation link. Please try signing up again.');
+          return;
         }
+
+        // Nothing found in URL
+        setStatus('error');
+        setMessage('Invalid confirmation link. Please try signing up again or contact support@listhq.com.au');
+
       } catch (err: any) {
         setStatus('error');
-        setMessage(err.message || 'Confirmation failed.');
+        setMessage(err.message || 'Confirmation failed. Please try again.');
       }
     };
 
@@ -54,37 +89,46 @@ const AuthConfirmPage = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md text-center space-y-6">
+
         <div className="flex justify-center">
           {status === 'verifying' && (
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
           )}
           {status === 'success' && (
-            <CheckCircle2 className="h-12 w-12 text-green-500" />
+            <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
+              <CheckCircle2 className="h-8 w-8 text-emerald-500" />
+            </div>
           )}
           {status === 'error' && (
-            <XCircle className="h-12 w-12 text-destructive" />
+            <div className="w-16 h-16 rounded-2xl bg-destructive/10 flex items-center justify-center">
+              <XCircle className="h-8 w-8 text-destructive" />
+            </div>
           )}
         </div>
 
-        <h1 className="text-2xl font-bold text-foreground">
-          {status === 'verifying' && 'Confirming your email…'}
-          {status === 'success' && 'Email confirmed!'}
-          {status === 'error' && 'Confirmation failed'}
-        </h1>
-
-        <p className="text-muted-foreground">
-          {status === 'verifying' && 'Please wait a moment.'}
-          {message}
-        </p>
+        <div>
+          <h1 className="text-2xl font-bold text-foreground mb-2">
+            {status === 'verifying' && 'Confirming your email…'}
+            {status === 'success' && 'Email confirmed!'}
+            {status === 'error' && 'Confirmation failed'}
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            {status === 'verifying' && 'Please wait a moment.'}
+            {message}
+          </p>
+        </div>
 
         {status === 'error' && (
           <Link
             to="/agents/login"
-            className="inline-block rounded-lg bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+            className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
           >
             Back to sign in
           </Link>
         )}
+
       </div>
     </div>
   );

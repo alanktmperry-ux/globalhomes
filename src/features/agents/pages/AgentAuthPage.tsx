@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Building2, KeyRound, Plus, BarChart3, Users, Megaphone, Zap, MapPin, CheckCircle2 } from 'lucide-react';
+import { Building2, KeyRound, Plus, BarChart3, Users, Megaphone, MapPin, CheckCircle2, Home } from 'lucide-react';
 import { autocomplete } from '@/shared/lib/googleMapsService';
 import PhoneInput from '@/shared/components/PhoneInput';
 import { useNavigate, Link } from 'react-router-dom';
@@ -246,17 +246,14 @@ const AgentAuthPage = () => {
           <div className="mb-2">
             <Link to="/" className="inline-flex items-center gap-2">
               <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground text-xs font-bold">W</span>
+                <span className="text-primary-foreground text-xs font-bold">L</span>
               </div>
               <span className="font-display text-lg font-bold text-foreground">ListHQ</span>
             </Link>
           </div>
 
-          {/* Role badge */}
-          <div className="flex items-center gap-2 mb-6">
-            <Building2 size={14} className="text-primary" />
-            <span className="text-xs font-semibold text-primary uppercase tracking-wider">Agent Portal</span>
-          </div>
+
+
 
           <h1 className="font-display text-2xl font-bold text-foreground mb-1">
             {step === 'email' && 'Agent Sign In'}
@@ -283,14 +280,14 @@ const AgentAuthPage = () => {
                   </label>
                   <input type="email" required autoFocus value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} />
                 </div>
-                <button type="submit" className="w-full py-3.5 rounded-full bg-primary/80 hover:bg-primary text-primary-foreground font-semibold text-sm transition-colors">
+                <button type="submit" className="w-full py-3.5 rounded-full bg-primary hover:opacity-90 text-primary-foreground font-semibold text-sm transition-opacity">
                   Continue
                 </button>
               </form>
 
               <p className="text-sm text-muted-foreground mt-4">
-                Don't have an agent account?{' '}
-                <button onClick={() => setStep('choose')} className="text-primary font-semibold underline underline-offset-2">Register</button>
+                New to ListHQ?{' '}
+                <button onClick={() => setStep('choose')} className="text-primary font-semibold underline underline-offset-2">Start your free 60-day trial</button>
               </p>
 
               <div className="flex items-center gap-4 my-6">
@@ -300,36 +297,27 @@ const AgentAuthPage = () => {
               </div>
 
               <div className="space-y-3">
-                <button onClick={() => handleOAuth('google')} className="w-full flex items-center gap-3 py-3.5 px-5 rounded-full border border-[hsl(0,0%,82%)] bg-white text-[hsl(0,0%,20%)] text-sm font-medium hover:shadow-md transition-shadow">
+                <button onClick={() => handleOAuth('google')} className="w-full flex items-center gap-3 py-3.5 px-5 rounded-full border border-border bg-background text-foreground text-sm font-medium hover:bg-accent transition-colors">
                   <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
                   Continue with Google
                 </button>
               </div>
 
-              <div className="flex items-center gap-4 my-4">
-                <div className="flex-1 h-px bg-border" />
-                <span className="text-xs font-medium text-muted-foreground uppercase">Or explore first</span>
-                <div className="flex-1 h-px bg-border" />
-              </div>
 
-              <button
-                onClick={() => setStep('choose')}
-                className="w-full flex items-center justify-center gap-2 py-3 px-5 rounded-full border border-primary/30 bg-primary/5 text-primary text-sm font-semibold hover:bg-primary/10 transition-colors"
-              >
-                <Zap size={16} />
-                Start Free 60-Day Trial
-              </button>
 
-              <p className="text-xs text-muted-foreground mt-4 text-center">
+
+              <p className="text-xs text-muted-foreground mt-3 text-center">
                 Have a demo code?{' '}
-                <Link to="/agents/demo" className="text-primary font-medium underline underline-offset-2">
-                  Access demo here →
+                <Link to="/agents/demo" className="text-primary font-medium hover:underline">
+                  Access demo →
                 </Link>
               </p>
 
-              <p className="text-xs text-muted-foreground mt-4 text-center leading-relaxed">
-                By submitting, I accept ListHQ'{' '}
-                <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">terms of use</a>
+              <p className="text-xs text-muted-foreground mt-3 text-center leading-relaxed">
+                By continuing you agree to our{' '}
+                <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">Terms of Service</a>
+                {' '}and{' '}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">Privacy Policy</a>.
               </p>
             </>
           )}
@@ -599,19 +587,26 @@ const AgentAuthPage = () => {
                 </button>
               </form>
               <button onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">← Back to options</button>
-              <p className="text-xs text-muted-foreground mt-6 text-center leading-relaxed">
-                By submitting, I accept ListHQ'{' '}
-                <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">terms of use</a>
+              <p className="text-xs text-muted-foreground mt-3 text-center leading-relaxed">
+                By continuing you agree to our{' '}
+                <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">Terms of Service</a>
+                {' '}and{' '}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">Privacy Policy</a>.
               </p>
             </>
           )}
 
-          {/* Buyer link — visually distinct */}
-          <div className="mt-8 pt-6 border-t border-border text-center">
-            <p className="text-xs text-muted-foreground">
-              Looking to buy a property?{' '}
-              <Link to="/login" className="text-primary font-semibold underline underline-offset-2">Buyer sign in →</Link>
-            </p>
+          {/* Buyer link */}
+          <div className="mt-6 pt-5 border-t border-border">
+            <Link to="/login" className="flex items-center gap-3 p-3.5 rounded-xl border border-border hover:border-primary/40 hover:bg-accent/50 transition-colors group">
+              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                <Home size={16} className="text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">Looking to buy a property?</p>
+                <p className="text-xs text-muted-foreground">Search properties as a buyer →</p>
+              </div>
+            </Link>
           </div>
         </motion.div>
       </main>

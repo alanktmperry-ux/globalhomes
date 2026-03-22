@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Building2, KeyRound, Plus, BarChart3, Users, Megaphone, Zap } from 'lucide-react';
+import { Building2, KeyRound, Plus, BarChart3, Users, Megaphone, Zap, MapPin, CheckCircle2 } from 'lucide-react';
+import { autocomplete } from '@/shared/lib/googleMapsService';
 import PhoneInput from '@/shared/components/PhoneInput';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -40,6 +41,28 @@ const AgentAuthPage = () => {
   const [handlesTrustAccounting, setHandlesTrustAccounting] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [officeSuggestions, setOfficeSuggestions] = useState<{ description: string; place_id: string }[]>([]);
+  const [officeConfirmed, setOfficeConfirmed] = useState(false);
+  const officeDebounceRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const handleOfficeInput = (value: string) => {
+    setOfficeAddress(value);
+    setOfficeConfirmed(false);
+    if (officeDebounceRef.current) clearTimeout(officeDebounceRef.current);
+    if (value.length < 3) { setOfficeSuggestions([]); return; }
+    officeDebounceRef.current = setTimeout(async () => {
+      try {
+        const results = await autocomplete(value, 'address');
+        setOfficeSuggestions(results.slice(0, 5));
+      } catch { setOfficeSuggestions([]); }
+    }, 350);
+  };
+
+  const selectOfficeAddress = (suggestion: { description: string; place_id: string }) => {
+    setOfficeAddress(suggestion.description);
+    setOfficeSuggestions([]);
+    setOfficeConfirmed(true);
+  };
 
   const generateSlug = (name: string) =>
     name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Math.random().toString(36).slice(2, 6);
@@ -373,7 +396,37 @@ const AgentAuthPage = () => {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Office Address</label>
-                  <input type="text" value={officeAddress} onChange={(e) => setOfficeAddress(e.target.value)} placeholder="e.g. 123 Main St, Sydney" className={inputClass} />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={officeAddress}
+                      onChange={(e) => handleOfficeInput(e.target.value)}
+                      placeholder="e.g. 123 Main St, Sydney"
+                      className={inputClass}
+                      autoComplete="off"
+                    />
+                    {officeConfirmed && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2 text-primary">
+                        <CheckCircle2 size={18} />
+                      </div>
+                    )}
+                    {officeSuggestions.length > 0 && (
+                      <div className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-xl shadow-elevated overflow-hidden">
+                        {officeSuggestions.map((s) => (
+                          <button
+                            key={s.place_id}
+                            type="button"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => selectOfficeAddress(s)}
+                            className="w-full text-left px-4 py-3 text-sm hover:bg-accent transition-colors flex items-center gap-2"
+                          >
+                            <MapPin size={14} className="text-muted-foreground shrink-0" />
+                            <span className="truncate">{s.description}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">License / Registration Number</label>

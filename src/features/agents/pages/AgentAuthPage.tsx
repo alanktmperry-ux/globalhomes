@@ -583,8 +583,11 @@ const AgentAuthPage = () => {
                     <p className="text-[11px] text-muted-foreground mt-0.5">Yes, I need compliance-ready reporting</p>
                   </div>
                 </label>
-                <div className={`p-3 rounded-xl border transition-colors ${agreedToTerms ? 'border-primary bg-primary/5' : 'border-border bg-background'}`}>
-                  <label className="flex items-start gap-3 cursor-pointer">
+                <div
+                  onClick={() => setAgreedToTerms(!agreedToTerms)}
+                  className={`p-3 rounded-xl border cursor-pointer transition-colors ${agreedToTerms ? 'border-primary bg-primary/5' : 'border-border bg-background'}`}
+                >
+                  <div className="flex items-start gap-3">
                     <div className={`w-5 h-5 mt-0.5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${agreedToTerms ? 'bg-primary border-primary' : 'border-border'}`}>
                       {agreedToTerms && (
                         <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
@@ -592,22 +595,21 @@ const AgentAuthPage = () => {
                         </svg>
                       )}
                     </div>
-                    <input type="checkbox" checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)} className="sr-only" />
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-foreground">I agree to the ListHQ Terms of Service</p>
                       <p className="text-xs text-muted-foreground leading-relaxed">
                         By creating an account I confirm I hold a current real estate licence, that all information provided is accurate, and that I have read and agree to the{' '}
-                        <a href="/terms" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-primary underline underline-offset-2 hover:opacity-80">Terms of Service</a>
+                        <a href="/terms" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-primary underline underline-offset-2">Terms of Service</a>
                         {' '}and{' '}
-                        <a href="/privacy" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-primary underline underline-offset-2 hover:opacity-80">Privacy Policy</a>.
+                        <a href="/privacy" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-primary underline underline-offset-2">Privacy Policy</a>.
                       </p>
                     </div>
-                  </label>
+                  </div>
                 </div>
                 {!agreedToTerms && (
                   <p className="text-xs text-muted-foreground text-center">You must agree to the terms before creating your account</p>
                 )}
-                <button type="submit" disabled={loading || !agreedToTerms || password.length < 6 || (confirmPassword.length > 0 && confirmPassword !== password)} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
+                <button type="submit" disabled={loading || !agreedToTerms || password.length < 6 || password !== confirmPassword} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
                   {loading ? 'Setting up your account…' : 'Create Account'}
                 </button>
               </form>

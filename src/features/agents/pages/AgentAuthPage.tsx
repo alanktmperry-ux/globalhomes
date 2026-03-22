@@ -498,7 +498,7 @@ const AgentAuthPage = () => {
                   <input type="checkbox" checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)} className="mt-1 accent-primary" />
                   <span className="text-xs text-muted-foreground leading-relaxed">
                     I agree to the{' '}
-                    <a href="#" className="text-primary underline underline-offset-2">terms of service</a>{' '}
+                    <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">terms of service</a>{' '}
                     and confirm the information provided is accurate.
                   </span>
                 </label>

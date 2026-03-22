@@ -280,7 +280,7 @@ const AgentAuthPage = () => {
                   </label>
                   <input type="email" required autoFocus value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} />
                 </div>
-                <button type="submit" className="w-full py-3.5 rounded-full bg-primary/80 hover:bg-primary text-primary-foreground font-semibold text-sm transition-colors">
+                <button type="submit" className="w-full py-3.5 rounded-full bg-primary hover:opacity-90 text-primary-foreground font-semibold text-sm transition-opacity">
                   Continue
                 </button>
               </form>

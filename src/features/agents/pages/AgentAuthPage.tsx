@@ -6,7 +6,7 @@ import PhoneInput from '@/shared/components/PhoneInput';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
-import { useToast } from '@/shared/hooks/use-toast';
+import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/AuthProvider';
 import agentHero from '@/assets/agent-auth-hero.jpg';
 
@@ -22,7 +22,6 @@ function getPasswordStrength(p: string): 'weak' | 'fair' | 'strong' | null {
 
 const AgentAuthPage = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { user, isAgent, isAdmin, loading: authLoading } = useAuth();
 
   // ── All useState hooks together, no code between them ──
@@ -69,11 +68,11 @@ const AgentAuthPage = () => {
       const timeout = setTimeout(() => {
         setPendingRedirect(null);
         setLoading(false);
-        toast({ title: 'Error', description: 'This account does not have agent access. Please contact support if you believe this is an error.', variant: 'destructive' });
+        toast.error('Access denied', { description: 'This account does not have agent access. Please contact support if you believe this is an error.' });
       }, 8000);
       return () => clearTimeout(timeout);
     }
-  }, [pendingRedirect, user, authLoading, isAgent, isAdmin, toast]);
+  }, [pendingRedirect, user, authLoading, isAgent, isAdmin]);
 
   // ── Handlers ──
   const toggleSpecialisation = (value: string) => {
@@ -118,10 +117,10 @@ const AgentAuthPage = () => {
         }
         throw error;
       }
-      toast({ title: 'Welcome back!' });
+      toast('Welcome back!');
       setPendingRedirect('dashboard');
     } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast.error('Sign in failed', { description: err.message });
       setLoading(false);
     }
   };
@@ -129,13 +128,13 @@ const AgentAuthPage = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!email.trim()) { toast({ title: 'Email required', variant: 'destructive' }); return; }
-    if (!fullName.trim()) { toast({ title: 'Full name required', variant: 'destructive' }); return; }
-    if (!agencyName.trim()) { toast({ title: 'Agency name required', variant: 'destructive' }); return; }
-    if (!officeAddress.trim()) { toast({ title: 'Office address required', description: 'Please enter and select your office address.', variant: 'destructive' }); return; }
-    if (password.length < 6) { toast({ title: 'Password too short', description: 'Minimum 6 characters.', variant: 'destructive' }); return; }
-    if (password !== confirmPassword) { toast({ title: 'Passwords do not match', description: 'Both password fields must be identical.', variant: 'destructive' }); return; }
-    if (!agreedToTerms) { toast({ title: 'Please agree to the Terms of Service', variant: 'destructive' }); return; }
+    if (!email.trim()) { toast.error('Email required'); return; }
+    if (!fullName.trim()) { toast.error('Full name required'); return; }
+    if (!agencyName.trim()) { toast.error('Agency name required'); return; }
+    if (!officeAddress.trim()) { toast.error('Office address required', { description: 'Please enter and select your office address.' }); return; }
+    if (password.length < 6) { toast.error('Password too short', { description: 'Minimum 6 characters.' }); return; }
+    if (password !== confirmPassword) { toast.error('Passwords do not match', { description: 'Both password fields must be identical.' }); return; }
+    if (!agreedToTerms) { toast.error('Please agree to the Terms of Service'); return; }
 
     setLoading(true);
     try {
@@ -181,16 +180,14 @@ const AgentAuthPage = () => {
       const { data: sessionData } = await supabase.auth.getSession();
 
       if (sessionData?.session) {
-        toast({
-          title: '🎉 Account created!',
+        toast.success('🎉 Account created!', {
           description: step === 'create-agency'
             ? `Your agency "${agencyName}" is ready. Taking you to your dashboard...`
             : `You've joined the agency. Taking you to your dashboard...`,
         });
         setPendingRedirect('dashboard');
       } else {
-        toast({
-          title: '✉️ Check your email',
+        toast('✉️ Check your email', {
           description: `We sent a confirmation link to ${email}. Click it to verify your account and sign in. Check your spam folder if you don't see it.`,
           duration: 10000,
         });
@@ -199,10 +196,8 @@ const AgentAuthPage = () => {
       }
     } catch (err: any) {
       console.error('[handleSignup]', err);
-      toast({
-        title: 'Registration failed',
+      toast.error('Registration failed', {
         description: err.message || 'Something went wrong. Please try again or contact support@listhq.com.au',
-        variant: 'destructive',
         duration: 8000,
       });
       setLoading(false);
@@ -211,7 +206,7 @@ const AgentAuthPage = () => {
 
   const handleOAuth = async (provider: 'google' | 'apple') => {
     const { error } = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin });
-    if (error) toast({ title: 'Error', description: String(error), variant: 'destructive' });
+    if (error) toast.error('Sign in failed', { description: String(error) });
   };
 
   const goBack = () => {

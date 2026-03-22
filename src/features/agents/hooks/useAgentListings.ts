@@ -12,7 +12,7 @@ interface ListingWithMeta extends Property {
 export type AgentListing = ListingWithMeta;
 
 export function useAgentListings() {
-  const { user } = useAuth();
+  const { user, impersonatedUserId } = useAuth();
   const [listings, setListings] = useState<AgentListing[]>([]);
   const [loading, setLoading] = useState(true);
   const [agentId, setAgentId] = useState<string | null>(null);
@@ -21,14 +21,15 @@ export function useAgentListings() {
   const refetch = () => setFetchKey(k => k + 1);
 
   useEffect(() => {
-    if (!user) { setListings([]); setLoading(false); return; }
+    const effectiveUserId = impersonatedUserId || user?.id;
+    if (!effectiveUserId) { setListings([]); setLoading(false); return; }
 
     const fetch = async () => {
       setLoading(true);
       const { data: agent } = await supabase
         .from('agents')
         .select('id')
-        .eq('user_id', user.id)
+        .eq('user_id', effectiveUserId)
         .maybeSingle();
 
       if (!agent) {
@@ -52,7 +53,7 @@ export function useAgentListings() {
     };
 
     fetch();
-  }, [user, fetchKey]);
+  }, [user, impersonatedUserId, fetchKey]);
 
   const realCount = listings.length;
   const isMockData = false;

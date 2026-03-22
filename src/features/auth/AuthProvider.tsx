@@ -14,6 +14,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   impersonating: boolean;
   impersonatedUser: string | null;
+  impersonatedUserId: string | null;
   startImpersonation: (userId: string, userEmail: string) => Promise<void>;
   stopImpersonation: () => Promise<void>;
 }
@@ -29,6 +30,7 @@ const AuthContext = createContext<AuthContextType>({
   signOut: async () => {},
   impersonating: false,
   impersonatedUser: null,
+  impersonatedUserId: null,
   startImpersonation: async () => {},
   stopImpersonation: async () => {},
 });
@@ -47,12 +49,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const lastFetchedUserId = useRef<string | null>(null);
   const [impersonating, setImpersonating] = useState(false);
   const [impersonatedUser, setImpersonatedUser] = useState<string | null>(null);
+  const [impersonatedUserId, setImpersonatedUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const savedEmail = sessionStorage.getItem('admin_email');
+    const savedId = sessionStorage.getItem('admin_impersonated_id');
     if (savedEmail) {
       setImpersonating(true);
       setImpersonatedUser(savedEmail);
+    }
+    if (savedId) {
+      setImpersonatedUserId(savedId);
     }
   }, []);
 
@@ -62,8 +69,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     sessionStorage.setItem('admin_session_token', session.access_token);
     sessionStorage.setItem('admin_refresh_token', session.refresh_token);
     sessionStorage.setItem('admin_email', userEmail);
+    sessionStorage.setItem('admin_impersonated_id', userId);
     setImpersonating(true);
     setImpersonatedUser(userEmail);
+    setImpersonatedUserId(userId);
   };
 
   const stopImpersonation = async () => {
@@ -78,8 +87,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     sessionStorage.removeItem('admin_session_token');
     sessionStorage.removeItem('admin_refresh_token');
     sessionStorage.removeItem('admin_email');
+    sessionStorage.removeItem('admin_impersonated_id');
     setImpersonating(false);
     setImpersonatedUser(null);
+    setImpersonatedUserId(null);
   };
 
   const applyRoles = useCallback((roles: string[]) => {
@@ -196,7 +207,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   return (
     <AuthContext.Provider value={{
       user, session, loading, isAgent, isAdmin, isPartner, userRole, signOut,
-      impersonating, impersonatedUser, startImpersonation, stopImpersonation,
+      impersonating, impersonatedUser, impersonatedUserId, startImpersonation, stopImpersonation,
     }}>
       {children}
     </AuthContext.Provider>

@@ -8,7 +8,7 @@ import { NotificationBell } from '@/features/agents/components/dashboard/Notific
 import AgentDashboardSidebar from '@/features/agents/components/dashboard/AgentDashboardSidebar';
 
 const AgentDashboardLayout = () => {
-  const { user } = useAuth();
+  const { user, impersonatedUserId } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
@@ -16,20 +16,21 @@ const AgentDashboardLayout = () => {
   const [onboardingComplete, setOnboardingComplete] = useState(true);
 
   useEffect(() => {
-    if (!user || checked) return;
+    const effectiveUserId = impersonatedUserId || user?.id;
+    if (!effectiveUserId || checked) return;
     const checkOnboarding = async () => {
-      const { data: agent } = await supabase.from('agents').select('onboarding_complete').eq('user_id', user.id).single();
+      const { data: agent } = await supabase.from('agents').select('onboarding_complete').eq('user_id', effectiveUserId).single();
       if (agent) {
         const complete = !!(agent as any).onboarding_complete;
         setOnboardingComplete(complete);
-        if (!complete && !location.pathname.includes('/dashboard/onboarding')) {
+        if (!complete && !impersonatedUserId && !location.pathname.includes('/dashboard/onboarding')) {
           navigate('/dashboard/onboarding', { replace: true });
         }
       }
       setChecked(true);
     };
     checkOnboarding();
-  }, [user, checked, location.pathname, navigate]);
+  }, [user, impersonatedUserId, checked, location.pathname, navigate]);
 
   return (
     <SidebarProvider>

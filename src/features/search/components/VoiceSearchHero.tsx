@@ -535,7 +535,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
             {/* Ghost third line */}
             <div className="text-[30px] md:text-[42px] font-extrabold leading-[1.05] text-muted-foreground/15 select-none" aria-hidden="true">
-              In any language.
+              24 languages.
             </div>
           </div>
 

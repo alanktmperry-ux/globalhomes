@@ -306,10 +306,10 @@ const AgentAuthPage = () => {
 
 
 
-              <p className="text-xs text-muted-foreground mt-4 text-center">
+              <p className="text-xs text-muted-foreground mt-3 text-center">
                 Have a demo code?{' '}
-                <Link to="/agents/demo" className="text-primary font-medium underline underline-offset-2">
-                  Access demo here →
+                <Link to="/agents/demo" className="text-primary font-medium hover:underline">
+                  Access demo →
                 </Link>
               </p>
 

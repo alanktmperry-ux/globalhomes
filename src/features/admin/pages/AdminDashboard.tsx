@@ -93,7 +93,7 @@ const AdminDashboard = () => {
     const signInMap = new Map<string, string | null>();
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=list`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=list_users`,
         {
           headers: {
             Authorization: `Bearer ${sessionData.session?.access_token}`,

@@ -258,7 +258,7 @@ const AgentAuthPage = () => {
           <h1 className="font-display text-2xl font-bold text-foreground mb-1">
             {step === 'email' && 'Agent Sign In'}
             {step === 'password' && 'Welcome back, Agent'}
-            {step === 'choose' && 'Register as Agent'}
+            {step === 'choose' && 'Join ListHQ'}
             {step === 'create-agency' && 'Create your account'}
             {step === 'join-agency' && 'Join an Agency'}
           </h1>

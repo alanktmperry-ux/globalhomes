@@ -262,7 +262,7 @@ const AgentAuthPage = () => {
             {step === 'email' && 'Agent Sign In'}
             {step === 'password' && 'Welcome back, Agent'}
             {step === 'choose' && 'Register as Agent'}
-            {step === 'create-agency' && 'Create Your Agency'}
+            {step === 'create-agency' && 'Create your account'}
             {step === 'join-agency' && 'Join an Agency'}
           </h1>
           <p className="text-sm text-muted-foreground mb-6">

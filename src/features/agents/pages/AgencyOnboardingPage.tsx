@@ -301,7 +301,7 @@ export default function AgencyOnboardingPage() {
               )}
             </div>
             <div>
-              <Label className="text-xs font-medium">Real estate licence number *</Label>
+              <Label className="text-xs font-semibold text-foreground">Real estate licence number <span className="text-destructive ml-0.5">*</span></Label>
               <Input value={licenceNumber} onChange={e => setLicenceNumber(e.target.value)} placeholder="e.g. 074356" className="mt-1.5" />
             </div>
             <div className="sm:col-span-2">

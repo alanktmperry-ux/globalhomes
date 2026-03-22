@@ -94,6 +94,15 @@ export default function FindAgentPage() {
     return Array.from(langs).sort();
   }, [agents]);
 
+  const allSpecialisations = useMemo(() => {
+    const set = new Set<string>();
+    agents.forEach(a => {
+      if (!a.investment_niche) return;
+      a.investment_niche.split(',').map(s => s.trim()).filter(Boolean).forEach(s => set.add(s));
+    });
+    return Array.from(set).sort();
+  }, [agents]);
+
   const filtered = useMemo(() => {
     const q = searchText.toLowerCase().trim();
     return agents.filter(a => {

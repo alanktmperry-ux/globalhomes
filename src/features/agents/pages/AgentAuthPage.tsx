@@ -180,8 +180,7 @@ const AgentAuthPage = () => {
       const { data: sessionData } = await supabase.auth.getSession();
 
       if (sessionData?.session) {
-        toast({
-          title: '🎉 Account created!',
+        toast.success('🎉 Account created!', {
           description: step === 'create-agency'
             ? `Your agency "${agencyName}" is ready. Taking you to your dashboard...`
             : `You've joined the agency. Taking you to your dashboard...`,

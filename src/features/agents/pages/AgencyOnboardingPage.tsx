@@ -294,6 +294,9 @@ export default function AgencyOnboardingPage() {
             <div className="sm:col-span-2">
               <Label className="text-xs font-semibold text-foreground">Agency trading name <span className="text-destructive ml-0.5">*</span></Label>
               <Input value={agencyName} onChange={e => setAgencyName(e.target.value)} placeholder="e.g. Smith Property Group" className="mt-1.5" />
+              {agencyName && (
+                <p className="text-[11px] text-muted-foreground mt-1">Pre-filled from your registration — edit if needed</p>
+              )}
             </div>
             <div>
               <Label className="text-xs font-semibold text-foreground">ABN <span className="text-destructive ml-0.5">*</span></Label>

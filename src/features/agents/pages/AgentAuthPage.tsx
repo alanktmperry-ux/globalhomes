@@ -128,7 +128,7 @@ const AgentAuthPage = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!email.trim()) { toast({ title: 'Email required', variant: 'destructive' }); return; }
+    if (!email.trim()) { toast.error('Email required'); return; }
     if (!fullName.trim()) { toast({ title: 'Full name required', variant: 'destructive' }); return; }
     if (!agencyName.trim()) { toast({ title: 'Agency name required', variant: 'destructive' }); return; }
     if (!officeAddress.trim()) { toast({ title: 'Office address required', description: 'Please enter and select your office address.', variant: 'destructive' }); return; }

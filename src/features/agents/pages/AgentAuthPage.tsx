@@ -72,7 +72,7 @@ const AgentAuthPage = () => {
       }, 8000);
       return () => clearTimeout(timeout);
     }
-  }, [pendingRedirect, user, authLoading, isAgent, isAdmin, toast]);
+  }, [pendingRedirect, user, authLoading, isAgent, isAdmin]);
 
   // ── Handlers ──
   const toggleSpecialisation = (value: string) => {

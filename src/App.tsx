@@ -147,6 +147,7 @@ const App = () => (
                 <Route path="/agents/demo" element={<DemoAccessPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
+                <Route path="/auth/confirm" element={<AuthConfirmPage />} />
 
                 {/* Authenticated */}
                 <Route path="/saved" element={<ProtectedRoute><SavedPage /></ProtectedRoute>} />

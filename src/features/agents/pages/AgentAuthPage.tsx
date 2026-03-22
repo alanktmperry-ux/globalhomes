@@ -444,6 +444,9 @@ const AgentAuthPage = () => {
                     {confirmPassword.length > 0 && confirmPassword !== password && (
                       <p className="text-[11px] text-red-500 font-medium mt-1">Passwords do not match</p>
                     )}
+                    {confirmPassword.length > 0 && confirmPassword === password && (
+                      <p className="text-[11px] text-emerald-600 font-medium mt-1">✓ Passwords match</p>
+                    )}
                   </div>
                 </div>
                 <div>

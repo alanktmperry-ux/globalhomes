@@ -620,7 +620,7 @@ export default function AgencyOnboardingPage() {
   const canNext = () => {
     switch (step) {
       case 0: return !!path;
-      case 1: return agencyName.trim() && abn.length === 11 && licenceNumber.trim() && principalName.trim() && operatingState && agencyAddress.trim() && agencyPhone.trim() && agencyEmail.trim();
+      case 1: return agencyName.trim() && abn.trim() && (isAustralia ? abn.length === 11 : true) && licenceNumber.trim() && principalName.trim() && (isAustralia ? !!operatingState : true) && agencyAddress.trim() && agencyPhone.trim() && agencyEmail.trim();
       case 2: return bankName && bsb.replace(/-/g, '').length === 6 && accountNumber.trim();
       case 3: return path === 'fresh' || !!cutoverDate;
       default: return false;

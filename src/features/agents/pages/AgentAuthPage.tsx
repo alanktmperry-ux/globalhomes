@@ -566,7 +566,7 @@ const AgentAuthPage = () => {
                 {!agreedToTerms && (
                   <p className="text-xs text-muted-foreground text-center">You must agree to the terms before creating your account</p>
                 )}
-                <button type="submit" disabled={loading || !agreedToTerms} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
+                <button type="submit" disabled={loading || !agreedToTerms || password.length < 6 || (confirmPassword.length > 0 && confirmPassword !== password)} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
                   {loading ? 'Setting up your account…' : 'Create Account'}
                 </button>
               </form>

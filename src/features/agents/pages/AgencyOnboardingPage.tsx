@@ -64,29 +64,20 @@ export default function AgencyOnboardingPage() {
 
   // Pre-fill agency details from agents table
   useEffect(() => {
-    if (!user) return;
-    const prefill = async () => {
-      const { data } = await supabase
-        .from('agents')
-        .select('agency, office_address, email, phone')
-        .eq('user_id', user.id)
-        .single();
-      if (!data) return;
-      if (data.agency && !agencyName) {
-        setAgencyName(data.agency);
-      }
-      if (data.office_address && !agencyAddress) {
-        setAgencyAddress(data.office_address);
-      }
-      if (data.email && !agencyEmail) {
-        setAgencyEmail(data.email);
-      }
-      if (data.phone && !agencyPhone) {
-        setAgencyPhone(data.phone);
-      }
-    };
-    prefill();
-  }, [user]);
+    if (!user?.id) return;
+    supabase
+      .from('agents')
+      .select('agency, office_address, email, phone')
+      .eq('user_id', user.id)
+      .single()
+      .then(({ data }) => {
+        if (!data) return;
+        if (data.agency) setAgencyName(data.agency);
+        if (data.office_address) setAgencyAddress(data.office_address);
+        if (data.email) setAgencyEmail(data.email);
+        if (data.phone) setAgencyPhone(data.phone);
+      });
+  }, [user?.id]);
 
   const totalSteps = path === 'migration' ? 6 : 5;
   const progressPct = ((step + 1) / totalSteps) * 100;

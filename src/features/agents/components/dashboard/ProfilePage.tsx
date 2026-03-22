@@ -91,6 +91,7 @@ const ProfilePage = () => {
     social_linkedin: '',
     social_facebook: '',
     social_twitter: '',
+    investment_niche: '',
   });
 
   const [serviceAreas, setServiceAreas] = useState<string[]>([]);

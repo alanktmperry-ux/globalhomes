@@ -217,6 +217,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
     ? FEATURED_PROPERTIES
     : featuredListings.map((p: any) => ({
         id: p.id,
+        agent_id: p.agent_id,
         price: p.price_formatted,
         address: p.address,
         suburb: `${p.suburb} ${p.state || ''}`.trim(),
@@ -226,6 +227,15 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
         tag: p.boost_tier === 'premier' ? 'Premier' : 'Featured',
         img: p.image_url || p.images?.[0] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&q=70',
       }));
+
+  // One listing per agent maximum
+  const seenAgents = new Set<string>();
+  const dedupedFeatured = displayFeatured.filter((p: any) => {
+    const agentId = p.agent_id || p.id;
+    if (seenAgents.has(agentId)) return false;
+    seenAgents.add(agentId);
+    return true;
+  });
 
   // Rotating language ticker
   useEffect(() => {
@@ -737,24 +747,24 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
             {featuredLoading ? (
               <Skeleton className="absolute inset-0 w-full h-full" />
             ) : (
-              <img src={displayFeatured[0]?.img} alt={displayFeatured[0]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+              <img src={dedupedFeatured[0]?.img} alt={dedupedFeatured[0]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
             )}
             <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.7) 100%)'}} />
 
             <div className="absolute top-3 left-3">
               <span className="text-[9px] font-bold px-2.5 py-1 rounded-full text-white bg-foreground/80 backdrop-blur-sm">
-                {displayFeatured[0]?.tag}
+                {dedupedFeatured[0]?.tag}
               </span>
             </div>
 
             <div className="absolute bottom-0 left-0 right-0 p-4">
               <div className="text-white font-extrabold text-lg leading-tight">
-                {displayFeatured[0]?.price}
+                {dedupedFeatured[0]?.price}
               </div>
               <div className="text-white/75 text-[11px] mt-0.5">
-                {displayFeatured[0]?.address}
+                {dedupedFeatured[0]?.address}
                 {' · '}
-                {displayFeatured[0]?.suburb}
+                {dedupedFeatured[0]?.suburb}
               </div>
             </div>
           </div>
@@ -766,22 +776,22 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                 {featuredLoading ? (
                   <Skeleton className="absolute inset-0 w-full h-full" />
                 ) : (
-                  <img src={displayFeatured[i]?.img} alt={displayFeatured[i]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <img src={dedupedFeatured[i]?.img} alt={dedupedFeatured[i]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 )}
                 <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 30%,rgba(0,0,0,0.65) 100%)'}} />
 
                 <div className="absolute top-2.5 left-2.5">
                   <span className="text-[9px] font-bold px-2 py-0.5 rounded-full text-white bg-foreground/80 backdrop-blur-sm">
-                    {displayFeatured[i]?.tag}
+                    {dedupedFeatured[i]?.tag}
                   </span>
                 </div>
 
                 <div className="absolute bottom-0 left-0 right-0 p-3">
                   <div className="text-white font-bold text-sm leading-tight">
-                    {displayFeatured[i]?.price}
+                    {dedupedFeatured[i]?.price}
                   </div>
                   <div className="text-white/65 text-[10px] mt-0.5">
-                    {displayFeatured[i]?.suburb}
+                    {dedupedFeatured[i]?.suburb}
                   </div>
                 </div>
               </div>
@@ -827,38 +837,38 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
             {featuredLoading ? (
               <Skeleton className="absolute inset-0 w-full h-full" />
             ) : (
-              <img src={displayFeatured[3 % displayFeatured.length]?.img} alt={displayFeatured[3 % displayFeatured.length]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <img src={dedupedFeatured[3 % dedupedFeatured.length]?.img} alt={dedupedFeatured[3 % dedupedFeatured.length]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
             )}
             <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 30%,rgba(0,0,0,0.72) 100%)'}} />
             <span className="absolute top-3 left-3 text-[9px] font-bold px-2.5 py-1 rounded-full text-white bg-foreground/80">
-              {displayFeatured[3 % displayFeatured.length]?.tag}
+              {dedupedFeatured[3 % dedupedFeatured.length]?.tag}
             </span>
             <div className="absolute bottom-0 left-0 right-0 p-4">
               <div className="text-white font-extrabold text-lg leading-tight mb-0.5" style={{textShadow: '0 1px 6px rgba(0,0,0,0.4)'}}>
-                {displayFeatured[3 % displayFeatured.length]?.price}
+                {dedupedFeatured[3 % dedupedFeatured.length]?.price}
               </div>
               <div className="text-white/90 text-xs font-semibold mb-0.5">
-                {displayFeatured[3 % displayFeatured.length]?.address}
+                {dedupedFeatured[3 % dedupedFeatured.length]?.address}
               </div>
               <div className="text-white/60 text-[10px] mb-2">
-                {displayFeatured[3 % displayFeatured.length]?.suburb}
+                {dedupedFeatured[3 % dedupedFeatured.length]?.suburb}
               </div>
               <div className="flex gap-2 text-[10px] text-white/70">
                 <span>
-                  {displayFeatured[3 % displayFeatured.length]?.beds} bed
+                  {dedupedFeatured[3 % dedupedFeatured.length]?.beds} bed
                 </span>
                 <span className="text-white/30">
                   ·
                 </span>
                 <span>
-                  {displayFeatured[3 % displayFeatured.length]?.baths}
+                  {dedupedFeatured[3 % dedupedFeatured.length]?.baths}
                   {' bath'}
                 </span>
                 <span className="text-white/30">
                   ·
                 </span>
                 <span>
-                  {displayFeatured[3 % displayFeatured.length]?.cars}
+                  {dedupedFeatured[3 % dedupedFeatured.length]?.cars}
                   {' car'}
                 </span>
               </div>
@@ -867,26 +877,26 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
           {/* Four smaller cards */}
           {[4, 5, 0, 1].map((pi, i) => {
-            const idx = pi % displayFeatured.length;
+            const idx = pi % dedupedFeatured.length;
             return (
               <div key={i} className="relative rounded-2xl overflow-hidden cursor-pointer group" style={{ height: '134px' }}>
                 {featuredLoading ? (
                   <Skeleton className="absolute inset-0 w-full h-full" />
                 ) : (
-                  <img src={displayFeatured[idx]?.img} alt={displayFeatured[idx]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src={dedupedFeatured[idx]?.img} alt={dedupedFeatured[idx]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 )}
                 <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 25%,rgba(0,0,0,0.65) 100%)'}} />
-                {displayFeatured[idx]?.tag && (
+                {dedupedFeatured[idx]?.tag && (
                   <span className="absolute top-2 left-2 text-[8px] font-bold px-2 py-0.5 rounded-full text-white bg-foreground/80 backdrop-blur-sm">
-                    {displayFeatured[idx].tag}
+                    {dedupedFeatured[idx].tag}
                   </span>
                 )}
                 <div className="absolute bottom-0 left-0 right-0 p-3">
                   <div className="text-white font-bold text-sm leading-tight">
-                    {displayFeatured[idx]?.price}
+                    {dedupedFeatured[idx]?.price}
                   </div>
                   <div className="text-white/70 text-[10px] mt-0.5">
-                    {displayFeatured[idx]?.suburb}
+                    {dedupedFeatured[idx]?.suburb}
                   </div>
                 </div>
               </div>

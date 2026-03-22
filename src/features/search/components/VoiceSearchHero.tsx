@@ -49,12 +49,12 @@ const ROTATING_LANGUAGES = [
 ];
 
 const HEADLINE_WORDS = [
-  { text: 'any language.', color: '#a78bfa' },
-  { text: 'Chinese.',      color: '#38bdf8' },
-  { text: 'Arabic.',       color: '#34d399' },
-  { text: 'Hindi.',        color: '#fbbf24' },
-  { text: 'Spanish.',      color: '#f472b6' },
-  { text: 'Japanese.',     color: '#818cf8' },
+  { text: 'in any language.', color: '#a78bfa' },
+  { text: 'in Chinese.',      color: '#38bdf8' },
+  { text: 'in Arabic.',       color: '#34d399' },
+  { text: 'in Hindi.',        color: '#fbbf24' },
+  { text: 'in Spanish.',      color: '#f472b6' },
+  { text: 'in Japanese.',     color: '#818cf8' },
 ];
 
 const SEARCH_PLACEHOLDERS = [
@@ -535,7 +535,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
             {/* Ghost third line */}
             <div className="text-[30px] md:text-[42px] font-extrabold leading-[1.05] text-muted-foreground/15 select-none" aria-hidden="true">
-              24 languages.
+              In any language.
             </div>
           </div>
 
@@ -545,10 +545,11 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
             <div className="w-10 h-[2px] bg-foreground/20 mb-5" />
 
             <p className="text-[13px] text-muted-foreground leading-relaxed mb-5">
-              The only Australian property platform
-              built for the world. Search in
-              24 languages, see prices in
-              your currency.
+              AI voice search across Australia.
+              Speak in English, Chinese, Arabic,
+              Hindi — or any of 24 languages.
+              Live exchange rates for overseas
+              buyers.
             </p>
 
             {/* Search bar */}

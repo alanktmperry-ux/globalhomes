@@ -21,7 +21,20 @@ type OnboardingPath = 'fresh' | 'migration';
 
 const STATES = ['VIC', 'NSW', 'QLD', 'SA', 'WA', 'TAS', 'ACT', 'NT'] as const;
 
-
+const COUNTRIES = [
+  'Australia',
+  'New Zealand',
+  'United Kingdom',
+  'United States',
+  'Canada',
+  'Singapore',
+  'Malaysia',
+  'Hong Kong',
+  'UAE',
+  'South Africa',
+  'India',
+  'Other',
+] as const;
 const BANKS = ['NAB', 'CBA', 'ANZ', 'Westpac', 'Bendigo', 'BOQ', 'Macquarie', 'Other'];
 
 const DATE_AU = new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: 'long', year: 'numeric' });
@@ -42,6 +55,8 @@ export default function AgencyOnboardingPage() {
   const [licenceNumber, setLicenceNumber] = useState('');
   const [principalName, setPrincipalName] = useState('');
   const [operatingState, setOperatingState] = useState('');
+  const [country, setCountry] = useState('Australia');
+  const isAustralia = country === 'Australia';
   const [agencyAddress, setAgencyAddress] = useState('');
   const [agencyPhone, setAgencyPhone] = useState('');
   const [agencyEmail, setAgencyEmail] = useState('');
@@ -283,66 +298,138 @@ export default function AgencyOnboardingPage() {
             <h3 className="text-lg font-bold text-foreground">Agency & Licence Details</h3>
             <p className="text-sm text-muted-foreground">Required for compliance and trust account setup</p>
           </div>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <div className="sm:col-span-2">
-              <Label className="text-xs font-semibold text-foreground">Agency trading name <span className="text-destructive ml-0.5">*</span></Label>
-              <Input value={agencyName} onChange={e => setAgencyName(e.target.value)} placeholder="e.g. Smith Property Group" className="mt-1.5" />
-              {agencyName && (
-                <p className="text-[11px] text-muted-foreground mt-1">Pre-filled from your registration — edit if needed</p>
-              )}
-            </div>
+          <div className="space-y-4">
+            {/* Country selector — first */}
             <div>
-              <Label className="text-xs font-semibold text-foreground">ABN <span className="text-destructive ml-0.5">*</span></Label>
-              <Input
-                value={abn.replace(/(\d{2})(\d{3})(\d{3})(\d{3})/, '$1 $2 $3 $4')}
-                onChange={e => {
-                  const digits = e.target.value.replace(/\D/g, '').slice(0, 11);
-                  setAbn(digits);
-                }}
-                placeholder="12 345 678 901"
-                className="mt-1.5 font-mono tracking-wider"
-                maxLength={14}
-              />
-              {abn.length > 0 && abn.length < 11 && (
-                <p className="text-[11px] text-muted-foreground mt-1">
-                  {11 - abn.length} more digit{11 - abn.length !== 1 ? 's' : ''} to go
-                </p>
-              )}
-              {abn.length === 11 && (
-                <p className="text-[11px] text-emerald-600 font-medium mt-1">✓ ABN complete</p>
-              )}
-            </div>
-            <div>
-              <Label className="text-xs font-semibold text-foreground">Real estate licence number <span className="text-destructive ml-0.5">*</span></Label>
-              <Input value={licenceNumber} onChange={e => setLicenceNumber(e.target.value)} placeholder="e.g. 074356" className="mt-1.5" />
-            </div>
-            <div className="sm:col-span-2">
-              <Label className="text-xs font-semibold text-foreground">Principal's full name <span className="text-destructive ml-0.5">*</span></Label>
-              <Input value={principalName} onChange={e => setPrincipalName(e.target.value)} placeholder="e.g. Sarah Mitchell" className="mt-1.5" />
-            </div>
-            <div>
-              <Label className="text-xs font-semibold text-foreground">State of operation <span className="text-destructive ml-0.5">*</span></Label>
-              <Select value={operatingState} onValueChange={setOperatingState}>
-                <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select state" /></SelectTrigger>
+              <Label className="text-xs font-semibold text-foreground">
+                Country <span className="text-destructive ml-0.5">*</span>
+              </Label>
+              <Select value={country} onValueChange={setCountry}>
+                <SelectTrigger className="mt-1.5">
+                  <SelectValue placeholder="Select country" />
+                </SelectTrigger>
                 <SelectContent>
-                  {STATES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                  {COUNTRIES.map(c => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <Label className="text-xs font-semibold text-foreground">Agency phone <span className="text-destructive ml-0.5">*</span></Label>
-              <Input value={agencyPhone} onChange={e => setAgencyPhone(e.target.value)} placeholder="(03) 9123 4567" className="mt-1.5" />
-            </div>
-            <div className="sm:col-span-2">
-              <Label className="text-xs font-semibold text-foreground">Agency street address <span className="text-destructive ml-0.5">*</span></Label>
-              <Input value={agencyAddress} onChange={e => setAgencyAddress(e.target.value)} placeholder="123 High Street, Richmond VIC 3121" className="mt-1.5" />
-              {agencyAddress && (
-                <p className="text-[11px] text-muted-foreground mt-1">Pre-filled from your registration — edit if needed</p>
+
+            {/* Two col grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Agency name */}
+              <div className="sm:col-span-2">
+                <Label className="text-xs font-semibold text-foreground">
+                  Agency or Trading Name <span className="text-destructive ml-0.5">*</span>
+                </Label>
+                <Input value={agencyName} onChange={e => setAgencyName(e.target.value)} placeholder="e.g. Smith Property Group" className="mt-1.5" />
+                {agencyName && (
+                  <p className="text-[11px] text-muted-foreground mt-1">Pre-filled from your registration — edit if needed</p>
+                )}
+              </div>
+
+              {/* Principal name */}
+              <div className="sm:col-span-2">
+                <Label className="text-xs font-semibold text-foreground">
+                  Principal's Full Name <span className="text-destructive ml-0.5">*</span>
+                </Label>
+                <Input value={principalName} onChange={e => setPrincipalName(e.target.value)} placeholder="e.g. Sarah Mitchell" className="mt-1.5" />
+                {principalName && (
+                  <p className="text-[11px] text-muted-foreground mt-1">Pre-filled from your registration — edit if needed</p>
+                )}
+              </div>
+
+              {/* Business registration — label adapts by country */}
+              <div>
+                <Label className="text-xs font-semibold text-foreground">
+                  {isAustralia ? 'ABN' : 'Business Reg. No.'} <span className="text-destructive ml-0.5">*</span>
+                </Label>
+                {isAustralia ? (
+                  <>
+                    <Input
+                      value={abn.replace(/(\d{2})(\d{3})(\d{3})(\d{3})/, '$1 $2 $3 $4')}
+                      onChange={e => {
+                        const digits = e.target.value.replace(/\D/g, '').slice(0, 11);
+                        setAbn(digits);
+                      }}
+                      placeholder="12 345 678 901"
+                      className="mt-1.5 font-mono tracking-wider"
+                      maxLength={14}
+                    />
+                    {abn.length > 0 && abn.length < 11 && (
+                      <p className="text-[11px] text-muted-foreground mt-1">
+                        {11 - abn.length} more digit{11 - abn.length !== 1 ? 's' : ''} to go
+                      </p>
+                    )}
+                    {abn.length === 11 && (
+                      <p className="text-[11px] text-emerald-600 font-medium mt-1">✓ ABN complete</p>
+                    )}
+                  </>
+                ) : (
+                  <Input
+                    value={abn}
+                    onChange={e => setAbn(e.target.value)}
+                    placeholder={
+                      country === 'Singapore' ? 'e.g. 202012345K'
+                      : country === 'New Zealand' ? 'e.g. 12-345-678'
+                      : country === 'United Kingdom' ? 'e.g. 12345678'
+                      : 'Business registration number'
+                    }
+                    className="mt-1.5"
+                  />
+                )}
+              </div>
+
+              {/* Licence number */}
+              <div>
+                <Label className="text-xs font-semibold text-foreground">
+                  {isAustralia ? 'Real Estate Licence No.' : 'Licence / Registration No.'} <span className="text-destructive ml-0.5">*</span>
+                </Label>
+                <Input value={licenceNumber} onChange={e => setLicenceNumber(e.target.value)} placeholder="e.g. 074356" className="mt-1.5" />
+              </div>
+
+              {/* State of operation — only for Australia */}
+              {isAustralia && (
+                <div>
+                  <Label className="text-xs font-semibold text-foreground">
+                    State of Operation <span className="text-destructive ml-0.5">*</span>
+                  </Label>
+                  <Select value={operatingState} onValueChange={setOperatingState}>
+                    <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select state" /></SelectTrigger>
+                    <SelectContent>
+                      {STATES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
               )}
-            </div>
-            <div className="sm:col-span-2">
-              <Label className="text-xs font-semibold text-foreground">Agency email <span className="text-destructive ml-0.5">*</span></Label>
-              <Input type="email" value={agencyEmail} onChange={e => setAgencyEmail(e.target.value)} placeholder="office@smithproperty.com.au" className="mt-1.5" />
+
+              {/* Agency phone */}
+              <div>
+                <Label className="text-xs font-semibold text-foreground">
+                  Agency Phone <span className="text-destructive ml-0.5">*</span>
+                </Label>
+                <Input value={agencyPhone} onChange={e => setAgencyPhone(e.target.value)} placeholder={isAustralia ? '(03) 9123 4567' : 'Office phone number'} className="mt-1.5" />
+              </div>
+
+              {/* Agency street address */}
+              <div className="sm:col-span-2">
+                <Label className="text-xs font-semibold text-foreground">
+                  Agency Street Address <span className="text-destructive ml-0.5">*</span>
+                </Label>
+                <Input value={agencyAddress} onChange={e => setAgencyAddress(e.target.value)} placeholder={isAustralia ? '123 High Street, Richmond VIC 3121' : 'Office street address'} className="mt-1.5" />
+                {agencyAddress && (
+                  <p className="text-[11px] text-muted-foreground mt-1">Pre-filled from your registration — edit if needed</p>
+                )}
+              </div>
+
+              {/* Agency email */}
+              <div className="sm:col-span-2">
+                <Label className="text-xs font-semibold text-foreground">
+                  Agency Email <span className="text-destructive ml-0.5">*</span>
+                </Label>
+                <Input type="email" value={agencyEmail} onChange={e => setAgencyEmail(e.target.value)} placeholder="office@smithproperty.com.au" className="mt-1.5" />
+              </div>
             </div>
           </div>
         </div>
@@ -533,7 +620,7 @@ export default function AgencyOnboardingPage() {
   const canNext = () => {
     switch (step) {
       case 0: return !!path;
-      case 1: return agencyName.trim() && abn.length === 11 && licenceNumber.trim() && principalName.trim() && operatingState && agencyAddress.trim() && agencyPhone.trim() && agencyEmail.trim();
+      case 1: return agencyName.trim() && abn.trim() && (isAustralia ? abn.length === 11 : true) && licenceNumber.trim() && principalName.trim() && (isAustralia ? !!operatingState : true) && agencyAddress.trim() && agencyPhone.trim() && agencyEmail.trim();
       case 2: return bankName && bsb.replace(/-/g, '').length === 6 && accountNumber.trim();
       case 3: return path === 'fresh' || !!cutoverDate;
       default: return false;

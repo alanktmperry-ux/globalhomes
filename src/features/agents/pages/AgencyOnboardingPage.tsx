@@ -21,16 +21,6 @@ type OnboardingPath = 'fresh' | 'migration';
 
 const STATES = ['VIC', 'NSW', 'QLD', 'SA', 'WA', 'TAS', 'ACT', 'NT'] as const;
 
-const STATE_LEGISLATION: Record<string, string> = {
-  VIC: 'Governed by Estate Agents Act 1980 (Vic)',
-  NSW: 'Governed by Property and Stock Agents Act 2002 (NSW)',
-  QLD: 'Governed by Agents Financial Administration Act 2014 (Qld)',
-  SA: 'Governed by Land Agents Act 1994 (SA)',
-  WA: 'Governed by Real Estate and Business Agents Act 1978 (WA)',
-  TAS: 'Governed by Property Agents and Land Transactions Act 2005 (Tas)',
-  ACT: 'Governed by Agents Act 2003 (ACT)',
-  NT: 'Governed by Agents Licensing Act 1979 (NT)',
-};
 
 const BANKS = ['NAB', 'CBA', 'ANZ', 'Westpac', 'Bendigo', 'BOQ', 'Macquarie', 'Other'];
 
@@ -71,6 +61,32 @@ export default function AgencyOnboardingPage() {
       setTrustAccountName(`${agencyName} Trust Account`);
     }
   }, [agencyName]);
+
+  // Pre-fill agency details from agents table
+  useEffect(() => {
+    if (!user) return;
+    const prefill = async () => {
+      const { data } = await supabase
+        .from('agents')
+        .select('agency, office_address, email, phone')
+        .eq('user_id', user.id)
+        .single();
+      if (!data) return;
+      if (data.agency && !agencyName) {
+        setAgencyName(data.agency);
+      }
+      if (data.office_address && !agencyAddress) {
+        setAgencyAddress(data.office_address);
+      }
+      if (data.email && !agencyEmail) {
+        setAgencyEmail(data.email);
+      }
+      if (data.phone && !agencyPhone) {
+        setAgencyPhone(data.phone);
+      }
+    };
+    prefill();
+  }, [user]);
 
   const totalSteps = path === 'migration' ? 6 : 5;
   const progressPct = ((step + 1) / totalSteps) * 100;
@@ -278,6 +294,9 @@ export default function AgencyOnboardingPage() {
             <div className="sm:col-span-2">
               <Label className="text-xs font-semibold text-foreground">Agency trading name <span className="text-destructive ml-0.5">*</span></Label>
               <Input value={agencyName} onChange={e => setAgencyName(e.target.value)} placeholder="e.g. Smith Property Group" className="mt-1.5" />
+              {agencyName && (
+                <p className="text-[11px] text-muted-foreground mt-1">Pre-filled from your registration — edit if needed</p>
+              )}
             </div>
             <div>
               <Label className="text-xs font-semibold text-foreground">ABN <span className="text-destructive ml-0.5">*</span></Label>
@@ -324,18 +343,15 @@ export default function AgencyOnboardingPage() {
             <div className="sm:col-span-2">
               <Label className="text-xs font-semibold text-foreground">Agency street address <span className="text-destructive ml-0.5">*</span></Label>
               <Input value={agencyAddress} onChange={e => setAgencyAddress(e.target.value)} placeholder="123 High Street, Richmond VIC 3121" className="mt-1.5" />
+              {agencyAddress && (
+                <p className="text-[11px] text-muted-foreground mt-1">Pre-filled from your registration — edit if needed</p>
+              )}
             </div>
             <div className="sm:col-span-2">
               <Label className="text-xs font-semibold text-foreground">Agency email <span className="text-destructive ml-0.5">*</span></Label>
               <Input type="email" value={agencyEmail} onChange={e => setAgencyEmail(e.target.value)} placeholder="office@smithproperty.com.au" className="mt-1.5" />
             </div>
           </div>
-          {operatingState && (
-            <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex items-start gap-2.5">
-              <Landmark size={14} className="text-primary shrink-0 mt-0.5" />
-              <p className="text-xs text-primary/80 font-medium">{STATE_LEGISLATION[operatingState]}</p>
-            </div>
-          )}
         </div>
       );
     }

@@ -14,6 +14,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   impersonating: boolean;
   impersonatedUser: string | null;
+  impersonatedUserId: string | null;
   startImpersonation: (userId: string, userEmail: string) => Promise<void>;
   stopImpersonation: () => Promise<void>;
 }

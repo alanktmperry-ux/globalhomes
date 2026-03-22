@@ -303,19 +303,8 @@ const AgentAuthPage = () => {
                 </button>
               </div>
 
-              <div className="flex items-center gap-4 my-4">
-                <div className="flex-1 h-px bg-border" />
-                <span className="text-xs font-medium text-muted-foreground uppercase">Or explore first</span>
-                <div className="flex-1 h-px bg-border" />
-              </div>
 
-              <button
-                onClick={() => setStep('choose')}
-                className="w-full flex items-center justify-center gap-2 py-3 px-5 rounded-full border border-primary/30 bg-primary/5 text-primary text-sm font-semibold hover:bg-primary/10 transition-colors"
-              >
-                <Zap size={16} />
-                Start Free 60-Day Trial
-              </button>
+
 
               <p className="text-xs text-muted-foreground mt-4 text-center">
                 Have a demo code?{' '}

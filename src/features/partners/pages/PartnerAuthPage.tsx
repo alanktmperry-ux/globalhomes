@@ -4,7 +4,7 @@ import { Building2, Landmark, Users, FileText, CheckCircle } from 'lucide-react'
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import agentHero from '@/assets/agent-auth-hero.jpg';
+const partnerHero = 'https://images.unsplash.com/photo-1556761175-4b46a572b786?w=800&q=80';
 
 type Step = 'email' | 'password' | 'register';
 
@@ -129,7 +129,7 @@ const PartnerAuthPage = () => {
     <div className="min-h-screen flex">
       {/* Left hero */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        <img src={agentHero} alt="Partner portal" className="absolute inset-0 w-full h-full object-cover" />
+        <img src={partnerHero} alt="Trust accounting partner portal" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-[hsl(222,47%,8%)]/95 via-[hsl(222,47%,11%)]/70 to-[hsl(222,47%,11%)]/30" />
         <div className="relative z-10 flex flex-col justify-between p-12 text-white h-full">
           <div className="flex items-center gap-2.5">

@@ -170,8 +170,9 @@ const AgentAuthPage = () => {
         setPendingRedirect('dashboard');
       } else {
         toast({
-          title: 'Check your email',
-          description: 'We sent you a confirmation link. Please verify your email to sign in.',
+          title: 'Account created!',
+          description: `We sent a confirmation email to ${email}. Click the link in that email to verify your account and sign in.`,
+          duration: 8000,
         });
         setStep('email');
         setLoading(false);

@@ -42,7 +42,7 @@ const SeekerAuthPage = () => {
       toast('Welcome back!');
       navigate('/');
     } catch (err: any) {
-      toast.error('Sign in failed', { description: err.message });
+      toast.error('Something went wrong', { description: err?.message || 'Please try again.' });
     } finally {
       setLoading(false);
     }
@@ -70,11 +70,11 @@ const SeekerAuthPage = () => {
         toast('✉️ Check your email', { description: `We sent a confirmation link to ${email}. Click it to verify your account and sign in. Check your spam folder if you don't see it.`, duration: 10000 });
         setStep('email');
       } else {
-        toast.success('🎉 Account created!', { description: 'Taking you to your dashboard...' });
+        toast.success('🎉 Account created!', { description: 'Setting up your preferences...' });
         setStep('prefs');
       }
     } catch (err: any) {
-      toast.error('Sign in failed', { description: err.message });
+      toast.error('Something went wrong', { description: err?.message || 'Please try again.' });
     } finally {
       setLoading(false);
     }
@@ -101,7 +101,7 @@ const SeekerAuthPage = () => {
       redirect_uri: window.location.origin,
     });
     if (error) {
-      toast.error('Sign in failed', { description: String(error) });
+      toast.error('Something went wrong', { description: err?.message || 'Please try again.' });
     }
   };
 

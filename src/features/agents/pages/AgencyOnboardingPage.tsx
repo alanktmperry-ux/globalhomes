@@ -280,9 +280,25 @@ export default function AgencyOnboardingPage() {
               <Input value={agencyName} onChange={e => setAgencyName(e.target.value)} placeholder="e.g. Smith Property Group" className="mt-1.5" />
             </div>
             <div>
-              <Label className="text-xs font-medium">ABN *</Label>
-              <Input value={abn} onChange={e => setAbn(e.target.value.replace(/\D/g, '').slice(0, 11))} placeholder="12 345 678 901" className="mt-1.5 font-mono" maxLength={11} />
-              {abn && abn.length !== 11 && <p className="text-[10px] text-destructive mt-1">ABN must be 11 digits</p>}
+              <Label className="text-xs font-semibold text-foreground">ABN <span className="text-destructive ml-0.5">*</span></Label>
+              <Input
+                value={abn.replace(/(\d{2})(\d{3})(\d{3})(\d{3})/, '$1 $2 $3 $4')}
+                onChange={e => {
+                  const digits = e.target.value.replace(/\D/g, '').slice(0, 11);
+                  setAbn(digits);
+                }}
+                placeholder="12 345 678 901"
+                className="mt-1.5 font-mono tracking-wider"
+                maxLength={14}
+              />
+              {abn.length > 0 && abn.length < 11 && (
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  {11 - abn.length} more digit{11 - abn.length !== 1 ? 's' : ''} to go
+                </p>
+              )}
+              {abn.length === 11 && (
+                <p className="text-[11px] text-emerald-600 font-medium mt-1">✓ ABN complete</p>
+              )}
             </div>
             <div>
               <Label className="text-xs font-medium">Real estate licence number *</Label>

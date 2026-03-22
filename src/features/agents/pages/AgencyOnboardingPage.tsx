@@ -581,14 +581,14 @@ export default function AgencyOnboardingPage() {
 
         {/* Navigation */}
         {(showBackButton || showNextButton) && (
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2">
             {showBackButton ? (
-              <Button variant="ghost" size="sm" onClick={() => setStep(s => s - 1)} disabled={loading}>
+              <Button variant="ghost" size="sm" onClick={() => setStep(s => s - 1)} disabled={loading} className="w-full sm:w-auto">
                 <ArrowLeft size={14} className="mr-1" /> Back
               </Button>
             ) : <div />}
             {showNextButton && (
-              <Button size="sm" disabled={!canNext() || loading} onClick={handleNext}>
+              <Button size="sm" disabled={!canNext() || loading} onClick={handleNext} className="w-full sm:w-auto">
                 {loading && <Loader2 size={14} className="mr-1 animate-spin" />}
                 Next <ArrowRight size={14} className="ml-1" />
               </Button>

@@ -5,14 +5,13 @@ import PhoneInput from '@/shared/components/PhoneInput';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
-import { useToast } from '@/shared/hooks/use-toast';
+import { toast } from 'sonner';
 import seekerHero from '@/assets/seeker-auth-hero.jpg';
 
 type Step = 'email' | 'password' | 'create' | 'prefs';
 
 const SeekerAuthPage = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -40,10 +39,10 @@ const SeekerAuthPage = () => {
         }
         throw error;
       }
-      toast({ title: 'Welcome back!' });
+      toast('Welcome back!');
       navigate('/');
     } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast.error('Sign in failed', { description: err.message });
     } finally {
       setLoading(false);
     }
@@ -52,7 +51,7 @@ const SeekerAuthPage = () => {
   const handleCreateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!phone.trim()) {
-      toast({ title: 'Phone required', description: 'Please enter your mobile number.', variant: 'destructive' });
+      toast.error('Phone required', { description: 'Please enter your mobile number.' });
       return;
     }
     setLoading(true);
@@ -68,14 +67,14 @@ const SeekerAuthPage = () => {
       if (error) throw error;
 
       if (data.user && !data.session) {
-        toast({ title: 'Check your email', description: 'We sent you a confirmation link. Please verify your email before signing in.' });
+        toast('✉️ Check your email', { description: `We sent a confirmation link to ${email}. Click it to verify your account and sign in. Check your spam folder if you don't see it.`, duration: 10000 });
         setStep('email');
       } else {
-        toast({ title: 'Account created!' });
+        toast.success('🎉 Account created!', { description: 'Taking you to your dashboard...' });
         setStep('prefs');
       }
     } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast.error('Sign in failed', { description: err.message });
     } finally {
       setLoading(false);
     }
@@ -102,7 +101,7 @@ const SeekerAuthPage = () => {
       redirect_uri: window.location.origin,
     });
     if (error) {
-      toast({ title: 'Error', description: String(error), variant: 'destructive' });
+      toast.error('Sign in failed', { description: String(error) });
     }
   };
 

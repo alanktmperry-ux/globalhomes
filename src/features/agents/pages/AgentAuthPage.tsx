@@ -120,7 +120,7 @@ const AgentAuthPage = () => {
       toast('Welcome back!');
       setPendingRedirect('dashboard');
     } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast.error('Sign in failed', { description: err.message });
       setLoading(false);
     }
   };

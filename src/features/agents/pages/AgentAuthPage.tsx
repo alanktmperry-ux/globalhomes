@@ -21,6 +21,14 @@ const AgentAuthPage = () => {
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const passwordStrength = (p: string) => {
+    if (p.length === 0) return null;
+    if (p.length < 6) return 'weak';
+    if (p.length < 10 || !/[A-Z]/.test(p) || !/[0-9]/.test(p)) return 'fair';
+    return 'strong';
+  };
+  const strength = passwordStrength(password);
   const [fullName, setFullName] = useState('');
   const [agencyName, setAgencyName] = useState('');
   const [phone, setPhone] = useState('');
@@ -254,14 +262,14 @@ const AgentAuthPage = () => {
             {step === 'email' && 'Agent Sign In'}
             {step === 'password' && 'Welcome back, Agent'}
             {step === 'choose' && 'Register as Agent'}
-            {step === 'create-agency' && 'Create Your Agency'}
+            {step === 'create-agency' && 'Create your account'}
             {step === 'join-agency' && 'Join an Agency'}
           </h1>
           <p className="text-sm text-muted-foreground mb-6">
             {step === 'email' && 'Access your dashboard, listings, and leads.'}
             {step === 'password' && email}
             {step === 'choose' && 'Choose how you want to get started.'}
-            {step === 'create-agency' && 'Set up your agency and start listing.'}
+            {step === 'create-agency' && 'Set up your agent profile and start listing in minutes.'}
             {step === 'join-agency' && 'Enter your invite code to join a team.'}
           </p>
 
@@ -387,16 +395,52 @@ const AgentAuthPage = () => {
                   <input type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)} className={inputClass} />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">Agency / Company Name<span className="text-destructive">*</span></label>
+                  <label className="text-sm font-medium text-foreground mb-1 block">Agency or Trading Name<span className="text-destructive">*</span></label>
+                  <p className="text-xs text-muted-foreground mb-1.5">Your agency name, or your own name if you are a sole trader.</p>
                   <input type="text" required value={agencyName} onChange={(e) => setAgencyName(e.target.value)} className={inputClass} />
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Phone Number<span className="text-destructive">*</span></label>
                   <PhoneInput value={phone} onChange={setPhone} />
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">Password<span className="text-destructive">*</span></label>
-                  <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Password<span className="text-destructive">*</span></label>
+                    <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
+                    {strength && (
+                      <div className="mt-2 space-y-1">
+                        <div className="flex gap-1">
+                          {['weak', 'fair', 'strong'].map((level, i) => (
+                            <div
+                              key={level}
+                              className={`h-1 flex-1 rounded-full transition-colors ${
+                                strength === 'weak' && i === 0 ? 'bg-red-400'
+                                : strength === 'fair' && i <= 1 ? 'bg-amber-400'
+                                : strength === 'strong' && i <= 2 ? 'bg-emerald-500'
+                                : 'bg-border'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <p className={`text-[11px] font-medium ${
+                          strength === 'weak' ? 'text-red-500'
+                          : strength === 'fair' ? 'text-amber-500'
+                          : 'text-emerald-600'
+                        }`}>
+                          {strength === 'weak' && 'Too short — minimum 6 characters'}
+                          {strength === 'fair' && 'Fair — add uppercase and numbers for a stronger password'}
+                          {strength === 'strong' && 'Strong password'}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Confirm Password<span className="text-destructive">*</span></label>
+                    <input type="password" required minLength={6} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={inputClass} />
+                    {confirmPassword.length > 0 && confirmPassword !== password && (
+                      <p className="text-[11px] text-red-500 font-medium mt-1">Passwords do not match</p>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Office Address</label>

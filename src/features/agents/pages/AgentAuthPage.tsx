@@ -395,7 +395,8 @@ const AgentAuthPage = () => {
                   <input type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)} className={inputClass} />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">Agency / Company Name<span className="text-destructive">*</span></label>
+                  <label className="text-sm font-medium text-foreground mb-1 block">Agency or Trading Name<span className="text-destructive">*</span></label>
+                  <p className="text-xs text-muted-foreground mb-1.5">Your agency name, or your own name if you are a sole trader.</p>
                   <input type="text" required value={agencyName} onChange={(e) => setAgencyName(e.target.value)} className={inputClass} />
                 </div>
                 <div>

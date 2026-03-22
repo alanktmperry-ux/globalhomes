@@ -38,6 +38,7 @@ const PrivacyPage = React.lazy(() => import("./pages/PrivacyPage"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 const AgentPerformanceDashboard = React.lazy(() => import("./features/agents/pages/AgentPerformanceDashboard"));
 const DemoAccessPage = React.lazy(() => import("./features/agents/pages/DemoAccessPage"));
+const AuthConfirmPage = React.lazy(() => import("./features/auth/pages/AuthConfirmPage"));
 const PublicLayout = React.lazy(() => import("@/shared/components/layout/PublicLayout"));
 
 // Lazy-loaded dashboard sub-pages

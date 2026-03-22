@@ -389,9 +389,9 @@ const AgentAuthPage = () => {
                     <select value={specialization} onChange={(e) => setSpecialization(e.target.value)} className={inputClass + ' appearance-none'}>
                       <option value="Residential">Residential</option>
                       <option value="Commercial">Commercial</option>
-                      <option value="Luxury">Luxury</option>
-                      <option value="Land">Land</option>
+                      <option value="Rural & Lifestyle">Rural & Lifestyle</option>
                       <option value="Industrial">Industrial</option>
+                      <option value="Business Broking">Business Broking</option>
                     </select>
                   </div>
                 </div>

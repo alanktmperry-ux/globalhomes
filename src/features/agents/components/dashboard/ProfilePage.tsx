@@ -129,6 +129,7 @@ const ProfilePage = () => {
         social_linkedin: social.linkedin || '',
         social_facebook: social.facebook || '',
         social_twitter: social.twitter || '',
+        investment_niche: (data as any).investment_niche || '',
       });
       setServiceAreas((data as any).service_areas || []);
       setLanguages((data as any).languages_spoken || []);

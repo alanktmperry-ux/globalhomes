@@ -134,7 +134,7 @@ const AgentAuthPage = () => {
     if (!officeAddress.trim()) { toast.error('Office address required', { description: 'Please enter and select your office address.' }); return; }
     if (password.length < 6) { toast.error('Password too short', { description: 'Minimum 6 characters.' }); return; }
     if (password !== confirmPassword) { toast.error('Passwords do not match', { description: 'Both password fields must be identical.' }); return; }
-    if (!agreedToTerms) { toast({ title: 'Please agree to the Terms of Service', variant: 'destructive' }); return; }
+    if (!agreedToTerms) { toast.error('Please agree to the Terms of Service'); return; }
 
     setLoading(true);
     try {

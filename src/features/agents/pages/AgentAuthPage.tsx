@@ -129,7 +129,30 @@ const AgentAuthPage = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!canSubmit) return;
+    if (password.length < 6) {
+      toast({ title: 'Password too short', description: 'Password must be at least 6 characters.', variant: 'destructive' });
+      return;
+    }
+    if (password !== confirmPassword) {
+      toast({ title: 'Passwords do not match', description: 'Please make sure both password fields are identical.', variant: 'destructive' });
+      return;
+    }
+    if (!agreedToTerms) {
+      toast({ title: 'Please agree to the terms', description: 'Tick the Terms of Service checkbox to continue.', variant: 'destructive' });
+      return;
+    }
+    if (!email.trim()) {
+      toast({ title: 'Email required', variant: 'destructive' });
+      return;
+    }
+    if (!fullName.trim()) {
+      toast({ title: 'Full name required', variant: 'destructive' });
+      return;
+    }
+    if (!agencyName.trim()) {
+      toast({ title: 'Agency name required', variant: 'destructive' });
+      return;
+    }
 
     setLoading(true);
     try {

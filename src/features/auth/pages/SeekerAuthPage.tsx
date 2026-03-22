@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Home, Search, Heart, Mic, Building2 } from 'lucide-react';
+import { Home, Search, Heart, Mic, Building2, Landmark } from 'lucide-react';
 import PhoneInput from '@/shared/components/PhoneInput';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -378,6 +378,15 @@ const SeekerAuthPage = () => {
               <div className="flex-1">
                 <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">Are you a real estate agent?</p>
                 <p className="text-xs text-muted-foreground">Sign in to your Agent Portal →</p>
+              </div>
+            </Link>
+            <Link to="/partner/login" className="flex items-center gap-3 p-4 rounded-2xl border border-border hover:border-primary/50 transition-colors group">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                <Landmark size={18} className="text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">Are you a trust accounting partner?</p>
+                <p className="text-xs text-muted-foreground">Sign in to your Partner Portal →</p>
               </div>
             </Link>
           </div>

@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Building2, KeyRound, Plus, BarChart3, Users, Megaphone, MapPin, CheckCircle2, Home, Zap, ChevronRight } from 'lucide-react';
+import { Building2, KeyRound, BarChart3, Users, Megaphone, MapPin, CheckCircle2, Home, Zap, ChevronRight } from 'lucide-react';
 import { autocomplete } from '@/shared/lib/googleMapsService';
 import PhoneInput from '@/shared/components/PhoneInput';
 import { useNavigate, Link } from 'react-router-dom';
@@ -12,23 +12,25 @@ import agentHero from '@/assets/agent-auth-hero.jpg';
 
 type Step = 'email' | 'password' | 'choose' | 'create-agency' | 'join-agency';
 
+// Password strength helper — outside component so it never breaks hook order
+function getPasswordStrength(p: string): 'weak' | 'fair' | 'strong' | null {
+  if (p.length === 0) return null;
+  if (p.length < 6) return 'weak';
+  if (p.length < 10 || !/[A-Z]/.test(p) || !/[0-9]/.test(p)) return 'fair';
+  return 'strong';
+}
+
 const AgentAuthPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, isAgent, isAdmin, loading: authLoading } = useAuth();
-  
+
+  // ── All useState hooks together, no code between them ──
   const [pendingRedirect, setPendingRedirect] = useState<'dashboard' | null>(null);
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const passwordStrength = (p: string) => {
-    if (p.length === 0) return null;
-    if (p.length < 6) return 'weak';
-    if (p.length < 10 || !/[A-Z]/.test(p) || !/[0-9]/.test(p)) return 'fair';
-    return 'strong';
-  };
-  const strength = passwordStrength(password);
   const [fullName, setFullName] = useState('');
   const [agencyName, setAgencyName] = useState('');
   const [phone, setPhone] = useState('');
@@ -39,19 +41,46 @@ const AgentAuthPage = () => {
   const [yearsExperience, setYearsExperience] = useState('');
   const [specialization, setSpecialization] = useState('Residential');
   const [specialisations, setSpecialisations] = useState<string[]>([]);
-  const toggleSpecialisation = (value: string) => {
-    setSpecialisations(prev =>
-      prev.includes(value)
-        ? prev.filter(s => s !== value)
-        : [...prev, value]
-    );
-  };
   const [handlesTrustAccounting, setHandlesTrustAccounting] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [officeSuggestions, setOfficeSuggestions] = useState<{ description: string; place_id: string }[]>([]);
   const [officeConfirmed, setOfficeConfirmed] = useState(false);
+
+  // ── All useRef hooks ──
   const officeDebounceRef = useRef<ReturnType<typeof setTimeout>>();
+
+  // ── Derived values (not hooks) ──
+  const strength = getPasswordStrength(password);
+  const passwordsMatch = password === confirmPassword;
+  const canSubmit = !loading && agreedToTerms && password.length >= 6 && passwordsMatch;
+
+  // ── useEffect hooks ──
+  useEffect(() => {
+    if (pendingRedirect === 'dashboard' && user && (isAgent || isAdmin) && !authLoading) {
+      setPendingRedirect(null);
+      setLoading(false);
+      navigate('/dashboard');
+    }
+  }, [pendingRedirect, user, isAgent, isAdmin, authLoading, navigate]);
+
+  useEffect(() => {
+    if (pendingRedirect === 'dashboard' && user && !authLoading && !isAgent && !isAdmin) {
+      const timeout = setTimeout(() => {
+        setPendingRedirect(null);
+        setLoading(false);
+        toast({ title: 'Error', description: 'This account does not have agent access. Please contact support if you believe this is an error.', variant: 'destructive' });
+      }, 8000);
+      return () => clearTimeout(timeout);
+    }
+  }, [pendingRedirect, user, authLoading, isAgent, isAdmin, toast]);
+
+  // ── Handlers ──
+  const toggleSpecialisation = (value: string) => {
+    setSpecialisations(prev =>
+      prev.includes(value) ? prev.filter(s => s !== value) : [...prev, value]
+    );
+  };
 
   const handleOfficeInput = (value: string) => {
     setOfficeAddress(value);
@@ -72,51 +101,24 @@ const AgentAuthPage = () => {
     setOfficeConfirmed(true);
   };
 
-  const generateSlug = (name: string) =>
-    name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Math.random().toString(36).slice(2, 6);
-
   const handleEmailContinue = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
     setStep('password');
   };
 
-  // Navigate once AuthProvider confirms the user is an agent or admin
-  useEffect(() => {
-    if (pendingRedirect === 'dashboard' && user && (isAgent || isAdmin) && !authLoading) {
-      setPendingRedirect(null);
-      setLoading(false);
-      navigate('/dashboard');
-    }
-  }, [pendingRedirect, user, isAgent, isAdmin, authLoading, navigate]);
-
-  // Safety: if pending redirect but auth settles without agent/admin role, reset
-  // Wait up to 8 seconds for roles to load before showing error
-  useEffect(() => {
-    if (pendingRedirect === 'dashboard' && user && !authLoading && !isAgent && !isAdmin) {
-      const timeout = setTimeout(() => {
-        setPendingRedirect(null);
-        setLoading(false);
-        toast({ title: 'Error', description: 'This account does not have agent access. Please contact support if you believe this is an error.', variant: 'destructive' });
-      }, 8000);
-      return () => clearTimeout(timeout);
-    }
-  }, [pendingRedirect, user, authLoading, isAgent, isAdmin, toast]);
-
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      console.log('[AgentAuth] Attempting sign in for:', email);
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      console.log('[AgentAuth] Sign in result:', { user: data?.user?.id, error: error?.message });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         if (error.message.includes('Email not confirmed')) {
           throw new Error('Please check your email and click the confirmation link before signing in.');
         }
         throw error;
       }
-      toast({ title: 'Welcome back, Agent!' });
+      toast({ title: 'Welcome back!' });
       setPendingRedirect('dashboard');
     } catch (err: any) {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
@@ -127,23 +129,7 @@ const AgentAuthPage = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
-      toast({
-        title: 'Passwords do not match',
-        description: 'Please make sure both password fields are the same.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (password.length < 6) {
-      toast({
-        title: 'Password too short',
-        description: 'Password must be at least 6 characters.',
-        variant: 'destructive',
-      });
-      return;
-    }
+    if (!canSubmit) return;
 
     setLoading(true);
     try {
@@ -153,19 +139,16 @@ const AgentAuthPage = () => {
         password,
         options: {
           emailRedirectTo: window.location.origin,
-          data: {
-            display_name: fullName || email,
-            phone,
-          },
+          data: { display_name: fullName || email, phone },
         },
       });
 
       if (error) throw new Error(`Account creation failed: ${error.message}`);
-      if (!data.user) throw new Error('No user returned from signup.');
+      if (!data.user) throw new Error('No user returned. Please try again.');
 
       const userId = data.user.id;
 
-      // Step 2 — set up agent profile
+      // Step 2 — set up agent profile via edge function
       const { data: setupResult, error: setupError } = await supabase.functions.invoke('setup-agent', {
         body: {
           userId,
@@ -188,7 +171,7 @@ const AgentAuthPage = () => {
       if (setupError) throw new Error(`Profile setup failed: ${setupError.message}`);
       if (setupResult?.error) throw new Error(`Profile setup error: ${setupResult.error}`);
 
-      // Step 3 — check session state
+      // Step 3 — check if session exists (auto-confirm on) or needs email verification
       const { data: sessionData } = await supabase.auth.getSession();
 
       if (sessionData?.session) {
@@ -243,12 +226,11 @@ const AgentAuthPage = () => {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left hero panel — dark professional theme, hidden on mobile */}
+      {/* Left hero panel */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         <img src={agentHero} alt="Real estate professional" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-[hsl(222,47%,8%)]/95 via-[hsl(222,47%,11%)]/70 to-[hsl(222,47%,11%)]/30" />
         <div className="relative z-10 flex flex-col justify-between p-12 text-white h-full">
-          {/* Top badge */}
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center">
               <Building2 size={20} />
@@ -258,8 +240,6 @@ const AgentAuthPage = () => {
               <p className="text-white/50 text-[10px] uppercase tracking-widest">For Real Estate Professionals</p>
             </div>
           </div>
-
-          {/* Bottom content */}
           <div>
             <h2 className="font-display text-4xl font-bold leading-tight mb-4">Grow your<br />business</h2>
             <p className="text-white/70 text-base mb-6 max-w-sm">The complete platform for real estate agents and agencies.</p>
@@ -280,8 +260,9 @@ const AgentAuthPage = () => {
       {/* Right form panel */}
       <main className="flex-1 bg-background flex flex-col justify-center max-w-sm mx-auto w-full px-6 py-12 lg:max-w-md lg:px-12">
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+
           {/* Brand */}
-          <div className="mb-2">
+          <div className="mb-6">
             <Link to="/" className="inline-flex items-center gap-2">
               <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground text-xs font-bold">L</span>
@@ -290,12 +271,9 @@ const AgentAuthPage = () => {
             </Link>
           </div>
 
-
-
-
           <h1 className="font-display text-2xl font-bold text-foreground mb-1">
             {step === 'email' && 'Agent Sign In'}
-            {step === 'password' && 'Welcome back, Agent'}
+            {step === 'password' && 'Welcome back'}
             {step === 'choose' && 'Join ListHQ'}
             {step === 'create-agency' && 'Create your account'}
             {step === 'join-agency' && 'Join an Agency'}
@@ -308,7 +286,7 @@ const AgentAuthPage = () => {
             {step === 'join-agency' && 'Enter your invite code to join a team.'}
           </p>
 
-          {/* Step: Email */}
+          {/* ── Step: Email ── */}
           {step === 'email' && (
             <>
               <form onSubmit={handleEmailContinue} className="space-y-4">
@@ -325,7 +303,9 @@ const AgentAuthPage = () => {
 
               <p className="text-sm text-muted-foreground mt-4">
                 New to ListHQ?{' '}
-                <button onClick={() => setStep('choose')} className="text-primary font-semibold underline underline-offset-2">Start your free 60-day trial</button>
+                <button type="button" onClick={() => setStep('choose')} className="text-primary font-semibold underline underline-offset-2">
+                  Start your free 60-day trial
+                </button>
               </p>
 
               <div className="flex items-center gap-4 my-6">
@@ -334,21 +314,14 @@ const AgentAuthPage = () => {
                 <div className="flex-1 h-px bg-border" />
               </div>
 
-              <div className="space-y-3">
-                <button onClick={() => handleOAuth('google')} className="w-full flex items-center gap-3 py-3.5 px-5 rounded-full border border-border bg-background text-foreground text-sm font-medium hover:bg-accent transition-colors">
-                  <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                  Continue with Google
-                </button>
-              </div>
-
-
-
+              <button type="button" onClick={() => handleOAuth('google')} className="w-full flex items-center gap-3 py-3.5 px-5 rounded-full border border-border bg-background text-foreground text-sm font-medium hover:bg-accent transition-colors">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                Continue with Google
+              </button>
 
               <p className="text-xs text-muted-foreground mt-3 text-center">
                 Have a demo code?{' '}
-                <Link to="/agents/demo" className="text-primary font-medium hover:underline">
-                  Access demo →
-                </Link>
+                <Link to="/agents/demo" className="text-primary font-medium hover:underline">Access demo →</Link>
               </p>
 
               <p className="text-xs text-muted-foreground mt-3 text-center leading-relaxed">
@@ -360,7 +333,7 @@ const AgentAuthPage = () => {
             </>
           )}
 
-          {/* Step: Password */}
+          {/* ── Step: Password ── */}
           {step === 'password' && (
             <>
               <form onSubmit={handleSignIn} className="space-y-4">
@@ -372,25 +345,25 @@ const AgentAuthPage = () => {
                   <Link to="/forgot-password" className="text-xs text-primary font-medium underline underline-offset-2">Forgot password?</Link>
                 </div>
                 <button type="submit" disabled={loading} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
-                  {loading ? 'Please wait...' : 'Sign In'}
+                  {loading ? 'Signing in…' : 'Sign In'}
                 </button>
               </form>
-              <button onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">
+              <button type="button" onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">
                 ← Use a different email
               </button>
             </>
           )}
 
-          {/* Step: Choose signup path */}
+          {/* ── Step: Choose signup path ── */}
           {step === 'choose' && (
             <div className="space-y-3">
-              {/* 60-day trial badge */}
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 mb-1">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
                 <Zap size={13} className="text-emerald-600 shrink-0" />
                 <p className="text-xs font-medium text-emerald-700">Free for 60 days — no credit card required. Cancel anytime.</p>
               </div>
 
               <button
+                type="button"
                 onClick={() => setStep('create-agency')}
                 className="w-full flex items-center gap-4 p-4 rounded-2xl border border-border text-left hover:border-primary hover:bg-primary/5 transition-colors group">
                 <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
@@ -404,6 +377,7 @@ const AgentAuthPage = () => {
               </button>
 
               <button
+                type="button"
                 onClick={() => setStep('join-agency')}
                 className="w-full flex items-center gap-4 p-4 rounded-2xl border border-border text-left hover:border-primary hover:bg-primary/5 transition-colors group">
                 <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
@@ -417,6 +391,7 @@ const AgentAuthPage = () => {
               </button>
 
               <button
+                type="button"
                 onClick={goBack}
                 className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors py-2 text-center">
                 ← Already have an account? Sign in
@@ -424,7 +399,7 @@ const AgentAuthPage = () => {
             </div>
           )}
 
-          {/* Step: Create agency */}
+          {/* ── Step: Create agency ── */}
           {step === 'create-agency' && (
             <>
               <form onSubmit={handleSignup} className="space-y-4">
@@ -445,6 +420,8 @@ const AgentAuthPage = () => {
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Phone Number<span className="text-destructive">*</span></label>
                   <PhoneInput value={phone} onChange={setPhone} />
                 </div>
+
+                {/* Password */}
                 <div className="space-y-3">
                   <div>
                     <label className="text-sm font-medium text-foreground mb-1.5 block">Password<span className="text-destructive">*</span></label>
@@ -453,15 +430,12 @@ const AgentAuthPage = () => {
                       <div className="mt-2 space-y-1">
                         <div className="flex gap-1">
                           {['weak', 'fair', 'strong'].map((level, i) => (
-                            <div
-                              key={level}
-                              className={`h-1 flex-1 rounded-full transition-colors ${
-                                strength === 'weak' && i === 0 ? 'bg-red-400'
-                                : strength === 'fair' && i <= 1 ? 'bg-amber-400'
-                                : strength === 'strong' && i <= 2 ? 'bg-emerald-500'
-                                : 'bg-border'
-                              }`}
-                            />
+                            <div key={level} className={`h-1 flex-1 rounded-full transition-colors ${
+                              strength === 'weak' && i === 0 ? 'bg-red-400'
+                              : strength === 'fair' && i <= 1 ? 'bg-amber-400'
+                              : strength === 'strong' && i <= 2 ? 'bg-emerald-500'
+                              : 'bg-border'
+                            }`} />
                           ))}
                         </div>
                         <p className={`text-[11px] font-medium ${
@@ -471,7 +445,7 @@ const AgentAuthPage = () => {
                         }`}>
                           {strength === 'weak' && 'Too short — minimum 6 characters'}
                           {strength === 'fair' && 'Fair — add uppercase and numbers for a stronger password'}
-                          {strength === 'strong' && 'Strong password'}
+                          {strength === 'strong' && '✓ Strong password'}
                         </p>
                       </div>
                     )}
@@ -479,16 +453,21 @@ const AgentAuthPage = () => {
                   <div>
                     <label className="text-sm font-medium text-foreground mb-1.5 block">Confirm Password<span className="text-destructive">*</span></label>
                     <input type="password" required minLength={6} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={inputClass} />
-                    {confirmPassword.length > 0 && confirmPassword !== password && (
+                    {confirmPassword.length > 0 && !passwordsMatch && (
                       <p className="text-[11px] text-red-500 font-medium mt-1">Passwords do not match</p>
                     )}
-                    {confirmPassword.length > 0 && confirmPassword === password && (
+                    {confirmPassword.length > 0 && passwordsMatch && (
                       <p className="text-[11px] text-emerald-600 font-medium mt-1">✓ Passwords match</p>
                     )}
                   </div>
                 </div>
+
+                {/* Office address */}
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">Office Address</label>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">
+                    Office Address
+                    <span className="text-xs font-normal text-muted-foreground ml-1">(optional)</span>
+                  </label>
                   <div className="relative">
                     <input
                       type="text"
@@ -504,7 +483,7 @@ const AgentAuthPage = () => {
                       </div>
                     )}
                     {officeSuggestions.length > 0 && (
-                      <div className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-xl shadow-elevated overflow-hidden">
+                      <div className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-xl shadow-lg overflow-hidden">
                         {officeSuggestions.map((s) => (
                           <button
                             key={s.place_id}
@@ -521,17 +500,28 @@ const AgentAuthPage = () => {
                     )}
                   </div>
                 </div>
+
+                {/* Licence */}
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">Real Estate Licence Number</label>
-                  <input type="text" value={licenseNumber} onChange={(e) => setLicenseNumber(e.target.value)} placeholder="Optional but encouraged" className={inputClass} />
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">
+                    Real Estate Licence Number
+                    <span className="text-xs font-normal text-muted-foreground ml-1">(optional)</span>
+                  </label>
+                  <input type="text" value={licenseNumber} onChange={(e) => setLicenseNumber(e.target.value)} placeholder="e.g. 1234567" className={inputClass} />
+                  <p className="text-[11px] text-muted-foreground mt-1.5">Required to display your Verified Agent badge on your public profile.</p>
                 </div>
+
+                {/* Years / Specialization */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="text-sm font-medium text-foreground mb-1.5 block">Years of Experience</label>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">
+                      Years of Experience
+                      <span className="text-xs font-normal text-muted-foreground ml-1">(optional)</span>
+                    </label>
                     <input type="number" min="0" max="60" value={yearsExperience} onChange={(e) => setYearsExperience(e.target.value)} placeholder="e.g. 5" className={inputClass} />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-foreground mb-1.5 block">Specialization</label>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Primary Specialisation</label>
                     <select value={specialization} onChange={(e) => setSpecialization(e.target.value)} className={inputClass + ' appearance-none'}>
                       <option value="Residential">Residential</option>
                       <option value="Commercial">Commercial</option>
@@ -549,16 +539,7 @@ const AgentAuthPage = () => {
                     <span className="text-xs text-muted-foreground ml-1 font-normal">(select all that apply)</span>
                   </label>
                   <div className="flex flex-wrap gap-2 mt-1">
-                    {[
-                      'Residential Sales',
-                      'Residential Rentals',
-                      'Commercial',
-                      'Rural',
-                      'Prestige',
-                      'Property Management',
-                      'Business Broking',
-                      'Holiday Rentals',
-                    ].map(s => (
+                    {['Residential Sales', 'Residential Rentals', 'Commercial', 'Rural', 'Prestige', 'Property Management', 'Business Broking', 'Holiday Rentals'].map(s => (
                       <button
                         key={s}
                         type="button"
@@ -575,7 +556,7 @@ const AgentAuthPage = () => {
                   </div>
                 </div>
 
-                {/* Trust Accounting */}
+                {/* Trust accounting */}
                 <label className="flex items-start gap-2.5 cursor-pointer p-3 rounded-xl border border-border hover:border-primary/30 transition-colors">
                   <input type="checkbox" checked={handlesTrustAccounting} onChange={(e) => setHandlesTrustAccounting(e.target.checked)} className="mt-0.5 accent-primary" />
                   <div>
@@ -583,12 +564,18 @@ const AgentAuthPage = () => {
                     <p className="text-[11px] text-muted-foreground mt-0.5">Yes, I need compliance-ready reporting</p>
                   </div>
                 </label>
+
+                {/* Terms checkbox — direct onClick on div, no sr-only tricks */}
                 <div
-                  onClick={() => setAgreedToTerms(!agreedToTerms)}
-                  className={`p-3 rounded-xl border cursor-pointer transition-colors ${agreedToTerms ? 'border-primary bg-primary/5' : 'border-border bg-background'}`}
+                  onClick={() => setAgreedToTerms(v => !v)}
+                  className={`p-3 rounded-xl border cursor-pointer select-none transition-colors ${
+                    agreedToTerms ? 'border-primary bg-primary/5' : 'border-border bg-background'
+                  }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className={`w-5 h-5 mt-0.5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${agreedToTerms ? 'bg-primary border-primary' : 'border-border'}`}>
+                    <div className={`w-5 h-5 mt-0.5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
+                      agreedToTerms ? 'bg-primary border-primary' : 'border-border'
+                    }`}>
                       {agreedToTerms && (
                         <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
                           <path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -606,18 +593,28 @@ const AgentAuthPage = () => {
                     </div>
                   </div>
                 </div>
+
                 {!agreedToTerms && (
                   <p className="text-xs text-muted-foreground text-center">You must agree to the terms before creating your account</p>
                 )}
-                <button type="submit" disabled={loading || !agreedToTerms || password.length < 6 || password !== confirmPassword} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
+
+                <button
+                  type="submit"
+                  disabled={!canSubmit}
+                  className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50"
+                >
                   {loading ? 'Setting up your account…' : 'Create Account'}
                 </button>
+
+                <p className="text-xs text-center text-muted-foreground">
+                  You will be taken to your dashboard immediately after sign up.
+                </p>
               </form>
-              <button onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">← Back to options</button>
+              <button type="button" onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">← Back to options</button>
             </>
           )}
 
-          {/* Step: Join agency */}
+          {/* ── Step: Join agency ── */}
           {step === 'join-agency' && (
             <>
               <form onSubmit={handleSignup} className="space-y-4">
@@ -642,10 +639,10 @@ const AgentAuthPage = () => {
                   <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
                 </div>
                 <button type="submit" disabled={loading} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
-                  {loading ? 'Please wait...' : 'Join Agency'}
+                  {loading ? 'Joining…' : 'Join Agency'}
                 </button>
               </form>
-              <button onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">← Back to options</button>
+              <button type="button" onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">← Back to options</button>
               <p className="text-xs text-muted-foreground mt-3 text-center leading-relaxed">
                 By continuing you agree to our{' '}
                 <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">Terms of Service</a>
@@ -667,6 +664,7 @@ const AgentAuthPage = () => {
               </div>
             </Link>
           </div>
+
         </motion.div>
       </main>
     </div>

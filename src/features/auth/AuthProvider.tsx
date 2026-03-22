@@ -49,12 +49,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const lastFetchedUserId = useRef<string | null>(null);
   const [impersonating, setImpersonating] = useState(false);
   const [impersonatedUser, setImpersonatedUser] = useState<string | null>(null);
+  const [impersonatedUserId, setImpersonatedUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const savedEmail = sessionStorage.getItem('admin_email');
+    const savedId = sessionStorage.getItem('admin_impersonated_id');
     if (savedEmail) {
       setImpersonating(true);
       setImpersonatedUser(savedEmail);
+    }
+    if (savedId) {
+      setImpersonatedUserId(savedId);
     }
   }, []);
 

@@ -352,12 +352,6 @@ export default function AgencyOnboardingPage() {
               <Input type="email" value={agencyEmail} onChange={e => setAgencyEmail(e.target.value)} placeholder="office@smithproperty.com.au" className="mt-1.5" />
             </div>
           </div>
-          {operatingState && (
-            <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex items-start gap-2.5">
-              <Landmark size={14} className="text-primary shrink-0 mt-0.5" />
-              <p className="text-xs text-primary/80 font-medium">{STATE_LEGISLATION[operatingState]}</p>
-            </div>
-          )}
         </div>
       );
     }

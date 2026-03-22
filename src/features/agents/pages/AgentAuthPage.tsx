@@ -476,6 +476,9 @@ const AgentAuthPage = () => {
                   <div>
                     <label className="text-sm font-medium text-foreground mb-1.5 block">Confirm Password<span className="text-destructive">*</span></label>
                     <input type="password" required minLength={6} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={inputClass} />
+                    {confirmPassword.length === 0 && password.length >= 6 && (
+                      <p className="text-[11px] text-muted-foreground mt-1">Please re-enter your password to confirm</p>
+                    )}
                     {confirmPassword.length > 0 && !passwordsMatch && (
                       <p className="text-[11px] text-red-500 font-medium mt-1">Passwords do not match</p>
                     )}

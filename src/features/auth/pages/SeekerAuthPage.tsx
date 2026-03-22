@@ -163,11 +163,6 @@ const SeekerAuthPage = () => {
             </Link>
           </div>
 
-          {/* Role badge — always visible, prominent on mobile */}
-          <div className="flex items-center gap-2 mb-6">
-            <Home size={14} className="text-primary" />
-            <span className="text-xs font-semibold text-primary uppercase tracking-wider">Property Seeker</span>
-          </div>
 
           <h1 className="font-display text-2xl font-bold text-foreground mb-1">
             {step === 'email' && 'Sign in to search'}

@@ -29,7 +29,14 @@ const AgentAuthPage = () => {
   const [officeAddress, setOfficeAddress] = useState('');
   const [yearsExperience, setYearsExperience] = useState('');
   const [specialization, setSpecialization] = useState('Residential');
-  const [investmentNiche, setInvestmentNiche] = useState('');
+  const [specialisations, setSpecialisations] = useState<string[]>([]);
+  const toggleSpecialisation = (value: string) => {
+    setSpecialisations(prev =>
+      prev.includes(value)
+        ? prev.filter(s => s !== value)
+        : [...prev, value]
+    );
+  };
   const [handlesTrustAccounting, setHandlesTrustAccounting] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);

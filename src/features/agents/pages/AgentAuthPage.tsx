@@ -23,7 +23,6 @@ function getPasswordStrength(p: string): 'weak' | 'fair' | 'strong' | null {
 const AgentAuthPage = () => {
   const navigate = useNavigate();
   const { user, isAgent, isAdmin, loading: authLoading } = useAuth();
-  const { user, isAgent, isAdmin, loading: authLoading } = useAuth();
 
   // ── All useState hooks together, no code between them ──
   const [pendingRedirect, setPendingRedirect] = useState<'dashboard' | null>(null);

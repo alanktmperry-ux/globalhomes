@@ -101,7 +101,7 @@ const SeekerAuthPage = () => {
       redirect_uri: window.location.origin,
     });
     if (error) {
-      toast.error('Something went wrong', { description: err?.message || 'Please try again.' });
+      toast.error('Something went wrong', { description: error?.message || 'Please try again.' });
     }
   };
 

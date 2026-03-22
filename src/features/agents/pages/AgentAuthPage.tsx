@@ -68,7 +68,7 @@ const AgentAuthPage = () => {
       const timeout = setTimeout(() => {
         setPendingRedirect(null);
         setLoading(false);
-        toast({ title: 'Error', description: 'This account does not have agent access. Please contact support if you believe this is an error.', variant: 'destructive' });
+        toast.error('Access denied', { description: 'This account does not have agent access. Please contact support if you believe this is an error.' });
       }, 8000);
       return () => clearTimeout(timeout);
     }

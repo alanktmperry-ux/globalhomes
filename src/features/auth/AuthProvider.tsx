@@ -69,8 +69,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     sessionStorage.setItem('admin_session_token', session.access_token);
     sessionStorage.setItem('admin_refresh_token', session.refresh_token);
     sessionStorage.setItem('admin_email', userEmail);
+    sessionStorage.setItem('admin_impersonated_id', userId);
     setImpersonating(true);
     setImpersonatedUser(userEmail);
+    setImpersonatedUserId(userId);
   };
 
   const stopImpersonation = async () => {

@@ -196,10 +196,8 @@ const AgentAuthPage = () => {
       }
     } catch (err: any) {
       console.error('[handleSignup]', err);
-      toast({
-        title: 'Registration failed',
+      toast.error('Registration failed', {
         description: err.message || 'Something went wrong. Please try again or contact support@listhq.com.au',
-        variant: 'destructive',
         duration: 8000,
       });
       setLoading(false);

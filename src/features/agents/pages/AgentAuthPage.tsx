@@ -286,8 +286,8 @@ const AgentAuthPage = () => {
               </form>
 
               <p className="text-sm text-muted-foreground mt-4">
-                Don't have an agent account?{' '}
-                <button onClick={() => setStep('choose')} className="text-primary font-semibold underline underline-offset-2">Register</button>
+                New to ListHQ?{' '}
+                <button onClick={() => setStep('choose')} className="text-primary font-semibold underline underline-offset-2">Start your free 60-day trial</button>
               </p>
 
               <div className="flex items-center gap-4 my-6">

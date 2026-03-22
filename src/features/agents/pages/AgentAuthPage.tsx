@@ -143,7 +143,7 @@ const AgentAuthPage = () => {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/confirm`,
+          emailRedirectTo: window.location.origin,
           data: { display_name: fullName || email, phone },
         },
       });

@@ -252,11 +252,8 @@ const AgentAuthPage = () => {
             </Link>
           </div>
 
-          {/* Role badge */}
-          <div className="flex items-center gap-2 mb-6">
-            <Building2 size={14} className="text-primary" />
-            <span className="text-xs font-semibold text-primary uppercase tracking-wider">Agent Portal</span>
-          </div>
+
+
 
           <h1 className="font-display text-2xl font-bold text-foreground mb-1">
             {step === 'email' && 'Agent Sign In'}

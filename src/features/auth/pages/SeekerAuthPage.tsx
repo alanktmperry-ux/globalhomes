@@ -368,23 +368,23 @@ const SeekerAuthPage = () => {
             </motion.div>
           )}
 
-          {/* Agent link — visually distinct */}
-          <div className="mt-8 pt-6 border-t border-border">
-            <Link to="/agents/login" className="flex items-center gap-3 p-4 rounded-2xl border border-border hover:border-primary/50 transition-colors group">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                <Building2 size={18} className="text-primary" />
+          {/* Agent & Partner links */}
+          <div className="mt-6 pt-5 border-t border-border space-y-2">
+            <Link to="/agents/login" className="flex items-center gap-3 p-3.5 rounded-xl border border-border hover:border-primary/40 hover:bg-accent/50 transition-colors group">
+              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                <Building2 size={16} className="text-primary" />
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">Are you a real estate agent?</p>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">Are you a real estate agent?</p>
                 <p className="text-xs text-muted-foreground">Sign in to your Agent Portal →</p>
               </div>
             </Link>
-            <Link to="/partner/login" className="flex items-center gap-3 p-4 rounded-2xl border border-border hover:border-primary/50 transition-colors group">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                <Landmark size={18} className="text-primary" />
+            <Link to="/partner/login" className="flex items-center gap-3 p-3.5 rounded-xl border border-border hover:border-primary/40 hover:bg-accent/50 transition-colors group">
+              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                <Landmark size={16} className="text-primary" />
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">Are you a trust accounting partner?</p>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">Are you a trust accounting partner?</p>
                 <p className="text-xs text-muted-foreground">Sign in to your Partner Portal →</p>
               </div>
             </Link>

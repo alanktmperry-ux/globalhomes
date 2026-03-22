@@ -305,7 +305,7 @@ export default function AgencyOnboardingPage() {
               <Input value={licenceNumber} onChange={e => setLicenceNumber(e.target.value)} placeholder="e.g. 074356" className="mt-1.5" />
             </div>
             <div className="sm:col-span-2">
-              <Label className="text-xs font-medium">Principal's full name *</Label>
+              <Label className="text-xs font-semibold text-foreground">Principal's full name <span className="text-destructive ml-0.5">*</span></Label>
               <Input value={principalName} onChange={e => setPrincipalName(e.target.value)} placeholder="e.g. Sarah Mitchell" className="mt-1.5" />
             </div>
             <div>

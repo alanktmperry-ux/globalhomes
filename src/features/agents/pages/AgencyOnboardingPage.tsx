@@ -343,6 +343,9 @@ export default function AgencyOnboardingPage() {
             <div className="sm:col-span-2">
               <Label className="text-xs font-semibold text-foreground">Agency street address <span className="text-destructive ml-0.5">*</span></Label>
               <Input value={agencyAddress} onChange={e => setAgencyAddress(e.target.value)} placeholder="123 High Street, Richmond VIC 3121" className="mt-1.5" />
+              {agencyAddress && (
+                <p className="text-[11px] text-muted-foreground mt-1">Pre-filled from your registration — edit if needed</p>
+              )}
             </div>
             <div className="sm:col-span-2">
               <Label className="text-xs font-semibold text-foreground">Agency email <span className="text-destructive ml-0.5">*</span></Label>

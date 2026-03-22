@@ -429,7 +429,7 @@ const AgentAuthPage = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">License / Registration Number</label>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Real Estate Licence Number</label>
                   <input type="text" value={licenseNumber} onChange={(e) => setLicenseNumber(e.target.value)} placeholder="Optional but encouraged" className={inputClass} />
                 </div>
                 <div className="grid grid-cols-2 gap-3">

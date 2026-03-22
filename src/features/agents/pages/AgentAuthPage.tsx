@@ -596,12 +596,17 @@ const AgentAuthPage = () => {
             </>
           )}
 
-          {/* Buyer link — visually distinct */}
-          <div className="mt-8 pt-6 border-t border-border text-center">
-            <p className="text-xs text-muted-foreground">
-              Looking to buy a property?{' '}
-              <Link to="/login" className="text-primary font-semibold underline underline-offset-2">Buyer sign in →</Link>
-            </p>
+          {/* Buyer link */}
+          <div className="mt-6 pt-5 border-t border-border">
+            <Link to="/login" className="flex items-center gap-3 p-3.5 rounded-xl border border-border hover:border-primary/40 hover:bg-accent/50 transition-colors group">
+              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                <Home size={16} className="text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">Looking to buy a property?</p>
+                <p className="text-xs text-muted-foreground">Search properties as a buyer →</p>
+              </div>
+            </Link>
           </div>
         </motion.div>
       </main>

@@ -171,7 +171,7 @@ const SeekerAuthPage = () => {
             {step === 'prefs' && ''}
           </h1>
           <p className="text-sm text-muted-foreground mb-6">
-            {step === 'email' && 'Find, save, and enquire on properties worldwide.'}
+            {step === 'email' && 'Sign in or create a free account to save and enquire on properties.'}
             {step === 'password' && email}
             {step === 'create' && 'Start your property search journey.'}
             {step === 'prefs' && ''}

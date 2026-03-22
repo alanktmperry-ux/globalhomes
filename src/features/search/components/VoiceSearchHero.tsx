@@ -545,11 +545,10 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
             <div className="w-10 h-[2px] bg-foreground/20 mb-5" />
 
             <p className="text-[13px] text-muted-foreground leading-relaxed mb-5">
-              AI voice search across Australia.
-              Speak in English, Chinese, Arabic,
-              Hindi — or any of 24 languages.
-              Live exchange rates for overseas
-              buyers.
+              The only Australian property platform
+              built for the world. Search in
+              24 languages, see prices in
+              your currency.
             </p>
 
             {/* Search bar */}

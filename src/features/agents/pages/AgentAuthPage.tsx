@@ -246,7 +246,7 @@ const AgentAuthPage = () => {
           <div className="mb-2">
             <Link to="/" className="inline-flex items-center gap-2">
               <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground text-xs font-bold">W</span>
+                <span className="text-primary-foreground text-xs font-bold">L</span>
               </div>
               <span className="font-display text-lg font-bold text-foreground">ListHQ</span>
             </Link>

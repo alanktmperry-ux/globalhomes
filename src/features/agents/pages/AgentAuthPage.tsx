@@ -587,9 +587,11 @@ const AgentAuthPage = () => {
                 </button>
               </form>
               <button onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">← Back to options</button>
-              <p className="text-xs text-muted-foreground mt-6 text-center leading-relaxed">
-                By submitting, I accept ListHQ'{' '}
-                <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">terms of use</a>
+              <p className="text-xs text-muted-foreground mt-3 text-center leading-relaxed">
+                By continuing you agree to our{' '}
+                <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">Terms of Service</a>
+                {' '}and{' '}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">Privacy Policy</a>.
               </p>
             </>
           )}

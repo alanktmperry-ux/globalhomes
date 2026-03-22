@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Building2, KeyRound, Plus, BarChart3, Users, Megaphone, MapPin, CheckCircle2, Home } from 'lucide-react';
+import { Building2, KeyRound, Plus, BarChart3, Users, Megaphone, MapPin, CheckCircle2, Home, Zap, ChevronRight } from 'lucide-react';
 import { autocomplete } from '@/shared/lib/googleMapsService';
 import PhoneInput from '@/shared/components/PhoneInput';
 import { useNavigate, Link } from 'react-router-dom';

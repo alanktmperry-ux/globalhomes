@@ -282,6 +282,7 @@ const ProfilePage = () => {
           },
           languages_spoken: languages,
           service_areas: serviceAreas,
+          investment_niche: form.investment_niche || null,
         } as any)
         .eq('id', agent.id);
       if (error) throw error;

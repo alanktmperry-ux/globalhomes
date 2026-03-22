@@ -129,30 +129,12 @@ const AgentAuthPage = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (password.length < 6) {
-      toast({ title: 'Password too short', description: 'Password must be at least 6 characters.', variant: 'destructive' });
-      return;
-    }
-    if (password !== confirmPassword) {
-      toast({ title: 'Passwords do not match', description: 'Please make sure both password fields are identical.', variant: 'destructive' });
-      return;
-    }
-    if (!agreedToTerms) {
-      toast({ title: 'Please agree to the terms', description: 'Tick the Terms of Service checkbox to continue.', variant: 'destructive' });
-      return;
-    }
-    if (!email.trim()) {
-      toast({ title: 'Email required', variant: 'destructive' });
-      return;
-    }
-    if (!fullName.trim()) {
-      toast({ title: 'Full name required', variant: 'destructive' });
-      return;
-    }
-    if (!agencyName.trim()) {
-      toast({ title: 'Agency name required', variant: 'destructive' });
-      return;
-    }
+    if (!email.trim()) { toast({ title: 'Email required', variant: 'destructive' }); return; }
+    if (!fullName.trim()) { toast({ title: 'Full name required', variant: 'destructive' }); return; }
+    if (!agencyName.trim()) { toast({ title: 'Agency name required', variant: 'destructive' }); return; }
+    if (password.length < 6) { toast({ title: 'Password too short', description: 'Minimum 6 characters.', variant: 'destructive' }); return; }
+    if (password !== confirmPassword) { toast({ title: 'Passwords do not match', description: 'Both password fields must be identical.', variant: 'destructive' }); return; }
+    if (!agreedToTerms) { toast({ title: 'Please agree to the Terms of Service', variant: 'destructive' }); return; }
 
     setLoading(true);
     try {
@@ -161,7 +143,7 @@ const AgentAuthPage = () => {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/confirm`,
+          emailRedirectTo: window.location.origin,
           data: { display_name: fullName || email, phone },
         },
       });
@@ -476,9 +458,6 @@ const AgentAuthPage = () => {
                   <div>
                     <label className="text-sm font-medium text-foreground mb-1.5 block">Confirm Password<span className="text-destructive">*</span></label>
                     <input type="password" required minLength={6} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={inputClass} />
-                    {confirmPassword.length === 0 && password.length >= 6 && (
-                      <p className="text-[11px] text-muted-foreground mt-1">Please re-enter your password to confirm</p>
-                    )}
                     {confirmPassword.length > 0 && !passwordsMatch && (
                       <p className="text-[11px] text-red-500 font-medium mt-1">Passwords do not match</p>
                     )}
@@ -626,7 +605,7 @@ const AgentAuthPage = () => {
 
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={!canSubmit}
                   className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50"
                 >
                   {loading ? 'Setting up your account…' : 'Create Account'}

@@ -30,6 +30,7 @@ const AuthContext = createContext<AuthContextType>({
   signOut: async () => {},
   impersonating: false,
   impersonatedUser: null,
+  impersonatedUserId: null,
   startImpersonation: async () => {},
   stopImpersonation: async () => {},
 });

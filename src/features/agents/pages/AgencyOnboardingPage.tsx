@@ -21,16 +21,6 @@ type OnboardingPath = 'fresh' | 'migration';
 
 const STATES = ['VIC', 'NSW', 'QLD', 'SA', 'WA', 'TAS', 'ACT', 'NT'] as const;
 
-const STATE_LEGISLATION: Record<string, string> = {
-  VIC: 'Governed by Estate Agents Act 1980 (Vic)',
-  NSW: 'Governed by Property and Stock Agents Act 2002 (NSW)',
-  QLD: 'Governed by Agents Financial Administration Act 2014 (Qld)',
-  SA: 'Governed by Land Agents Act 1994 (SA)',
-  WA: 'Governed by Real Estate and Business Agents Act 1978 (WA)',
-  TAS: 'Governed by Property Agents and Land Transactions Act 2005 (Tas)',
-  ACT: 'Governed by Agents Act 2003 (ACT)',
-  NT: 'Governed by Agents Licensing Act 1979 (NT)',
-};
 
 const BANKS = ['NAB', 'CBA', 'ANZ', 'Westpac', 'Bendigo', 'BOQ', 'Macquarie', 'Other'];
 

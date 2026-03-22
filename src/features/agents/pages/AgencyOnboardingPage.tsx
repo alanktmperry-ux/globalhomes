@@ -267,10 +267,12 @@ export default function AgencyOnboardingPage() {
     if (step === 1) {
       return (
         <div className="space-y-5">
-          <div className="text-center space-y-1 mb-4">
-            <Building2 size={32} className="mx-auto text-primary" />
-            <h3 className="text-base font-bold">Agency & Licence Details</h3>
-            <p className="text-xs text-muted-foreground">Required for compliance and trust account setup</p>
+          <div className="text-center space-y-2 mb-6">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+              <Building2 size={26} className="text-primary" />
+            </div>
+            <h3 className="text-lg font-bold text-foreground">Agency & Licence Details</h3>
+            <p className="text-sm text-muted-foreground">Required for compliance and trust account setup</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">

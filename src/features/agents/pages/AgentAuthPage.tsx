@@ -206,7 +206,7 @@ const AgentAuthPage = () => {
 
   const handleOAuth = async (provider: 'google' | 'apple') => {
     const { error } = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin });
-    if (error) toast({ title: 'Error', description: String(error), variant: 'destructive' });
+    if (error) toast.error('Sign in failed', { description: String(error) });
   };
 
   const goBack = () => {

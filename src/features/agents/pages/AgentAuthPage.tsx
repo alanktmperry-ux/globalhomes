@@ -187,8 +187,7 @@ const AgentAuthPage = () => {
         });
         setPendingRedirect('dashboard');
       } else {
-        toast({
-          title: '✉️ Check your email',
+        toast('✉️ Check your email', {
           description: `We sent a confirmation link to ${email}. Click it to verify your account and sign in. Check your spam folder if you don't see it.`,
           duration: 10000,
         });

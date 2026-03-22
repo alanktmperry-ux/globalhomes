@@ -49,7 +49,7 @@ const ROTATING_LANGUAGES = [
 ];
 
 const HEADLINE_WORDS = [
-  { text: 'in any language.', color: '#a78bfa' },
+  
   { text: 'in Chinese.',      color: '#38bdf8' },
   { text: 'in Arabic.',       color: '#34d399' },
   { text: 'in Hindi.',        color: '#fbbf24' },

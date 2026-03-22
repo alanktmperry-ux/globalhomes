@@ -132,6 +132,7 @@ const AgentAuthPage = () => {
     if (!email.trim()) { toast({ title: 'Email required', variant: 'destructive' }); return; }
     if (!fullName.trim()) { toast({ title: 'Full name required', variant: 'destructive' }); return; }
     if (!agencyName.trim()) { toast({ title: 'Agency name required', variant: 'destructive' }); return; }
+    if (!officeAddress.trim()) { toast({ title: 'Office address required', description: 'Please enter and select your office address.', variant: 'destructive' }); return; }
     if (password.length < 6) { toast({ title: 'Password too short', description: 'Minimum 6 characters.', variant: 'destructive' }); return; }
     if (password !== confirmPassword) { toast({ title: 'Passwords do not match', description: 'Both password fields must be identical.', variant: 'destructive' }); return; }
     if (!agreedToTerms) { toast({ title: 'Please agree to the Terms of Service', variant: 'destructive' }); return; }
@@ -471,7 +472,7 @@ const AgentAuthPage = () => {
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">
                     Office Address
-                    <span className="text-xs font-normal text-muted-foreground ml-1">(optional)</span>
+                    <span className="text-destructive ml-0.5">*</span>
                   </label>
                   <div className="relative">
                     <input

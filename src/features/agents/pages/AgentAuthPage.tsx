@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Building2, KeyRound, Plus, BarChart3, Users, Megaphone, Zap } from 'lucide-react';
 import PhoneInput from '@/shared/components/PhoneInput';

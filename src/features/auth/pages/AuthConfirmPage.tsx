@@ -5,85 +5,75 @@ import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
 
 const AuthConfirmPage = () => {
   const navigate = useNavigate();
-  const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
+  const [status, setStatus] = useState<
+    'verifying' | 'success' | 'error'
+  >('verifying');
   const [message, setMessage] = useState('');
 
   useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>;
+
     const handleConfirmation = async () => {
-      try {
-        // Supabase v2 sends token_hash as a query param (?token_hash=...&type=signup)
-        // Older format sent access_token in the hash fragment (#access_token=...)
-        // We handle both.
+      // Lovable's email proxy handles the token
+      // and fires onAuthStateChange automatically.
+      // We just need to check if a session exists.
 
-        const queryParams = new URLSearchParams(window.location.search);
-        const hashParams = new URLSearchParams(
-          window.location.hash.replace('#', '?')
+      // Give Supabase a moment to process
+      // the auth state change from Lovable
+      await new Promise(r => setTimeout(r, 1500));
+
+      const { data: { session } } =
+        await supabase.auth.getSession();
+
+      if (session?.user) {
+        setStatus('success');
+        setMessage(
+          'Email confirmed! Taking you to your dashboard...'
         );
+        setTimeout(() => {
+          navigate('/dashboard', { replace: true });
+        }, 1500);
+      } else {
+        // Listen for auth state change
+        // in case Lovable fires it slightly later
+        const { data: { subscription } } =
+          supabase.auth.onAuthStateChange(
+            (event, session) => {
+              if (
+                event === 'SIGNED_IN' &&
+                session?.user
+              ) {
+                subscription.unsubscribe();
+                setStatus('success');
+                setMessage(
+                  'Email confirmed! Taking you to your dashboard...'
+                );
+                setTimeout(() => {
+                  navigate('/dashboard',
+                    { replace: true });
+                }, 1500);
+              }
+            }
+          );
 
-        // Check for error in either location
-        const errorDesc =
-          queryParams.get('error_description') ||
-          hashParams.get('error_description');
-
-        if (errorDesc) {
+        // If still no session after 8 seconds
+        // something genuinely went wrong
+        timeout = setTimeout(() => {
+          subscription.unsubscribe();
           setStatus('error');
-          setMessage(decodeURIComponent(errorDesc));
-          return;
-        }
-
-        // Format 1 — Supabase v2 query param style
-        const tokenHash = queryParams.get('token_hash');
-        const type = queryParams.get('type');
-
-        if (tokenHash && type) {
-          const { error } = await supabase.auth.verifyOtp({
-            token_hash: tokenHash,
-            type: type as any,
-          });
-
-          if (error) throw error;
-
-          setStatus('success');
-          setMessage('Email confirmed! Taking you to your dashboard...');
-          setTimeout(() => {
-            navigate('/dashboard', { replace: true });
-          }, 1500);
-          return;
-        }
-
-        // Format 2 — hash fragment style (older Supabase / PKCE)
-        const accessToken = hashParams.get('access_token');
-        const refreshToken = hashParams.get('refresh_token');
-
-        if (accessToken && refreshToken) {
-          const { data, error } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken,
-          });
-
-          if (error) throw error;
-
-          if (data.session) {
-            setStatus('success');
-            setMessage('Email confirmed! Taking you to your dashboard...');
-            setTimeout(() => {
-              navigate('/dashboard', { replace: true });
-            }, 1500);
-          }
-          return;
-        }
-
-        // Nothing found in URL
-        setStatus('error');
-        setMessage('Invalid confirmation link. Please try signing up again or contact support@listhq.com.au');
-
-      } catch (err: any) {
-        setStatus('error');
-        setMessage(err.message || 'Confirmation failed. Please try again.');
+          setMessage(
+            'Confirmation link has expired or ' +
+            'already been used. Please sign up again.'
+          );
+        }, 8000);
       }
     };
 
     handleConfirmation();
+
+    return () => {
+      if (timeout) clearTimeout(timeout);
+    };
   }, [navigate]);
 
   return (

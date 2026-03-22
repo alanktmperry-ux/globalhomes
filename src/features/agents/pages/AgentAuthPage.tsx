@@ -321,7 +321,7 @@ const AgentAuthPage = () => {
 
               <p className="text-xs text-muted-foreground mt-4 text-center leading-relaxed">
                 By submitting, I accept ListHQ'{' '}
-                <a href="#" className="text-primary underline underline-offset-2">terms of use</a>
+                <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">terms of use</a>
               </p>
             </>
           )}

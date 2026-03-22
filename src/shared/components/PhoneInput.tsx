@@ -170,7 +170,7 @@ const PhoneInput = ({ value, onChange, className = '' }: PhoneInputProps) => {
         type="tel"
         value={localNumber}
         onChange={(e) => handleNumberChange(e.target.value)}
-        placeholder="412 345 678"
+        placeholder="0412 345 678"
         className="flex-1 px-4 py-3.5 rounded-r-full border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
       />
     </div>

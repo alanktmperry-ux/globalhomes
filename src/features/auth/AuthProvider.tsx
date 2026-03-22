@@ -159,6 +159,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           lastFetchedUserId.current = null;
           setRolesFetched(false);
           setLoading(true);
+
+          // If this is an email confirmation (token_hash in URL), redirect agent to dashboard or home
+          const hash = window.location.hash;
+          const params = new URLSearchParams(hash.replace('#', '?'));
+          const type = params.get('type');
+          if (type === 'signup' || type === 'email') {
+            window.history.replaceState({}, '', window.location.pathname);
+          }
         }
         setSession(session);
         setUser(session?.user ?? null);

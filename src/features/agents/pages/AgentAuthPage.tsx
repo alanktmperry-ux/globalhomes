@@ -1,26 +1,104 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Home, Search, Heart, Mic, Building2, Landmark } from 'lucide-react';
+import { Building2, KeyRound, BarChart3, Users, Megaphone, MapPin, CheckCircle2, Home, Zap, ChevronRight } from 'lucide-react';
+import { autocomplete } from '@/shared/lib/googleMapsService';
 import PhoneInput from '@/shared/components/PhoneInput';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
 import { toast } from 'sonner';
-import seekerHero from '@/assets/seeker-auth-hero.jpg';
+import { useAuth } from '@/features/auth/AuthProvider';
+import agentHero from '@/assets/agent-auth-hero.jpg';
 
-type Step = 'email' | 'password' | 'create' | 'prefs';
+type Step = 'email' | 'password' | 'choose' | 'create-agency' | 'join-agency';
 
-const SeekerAuthPage = () => {
+// Password strength helper — outside component so it never breaks hook order
+function getPasswordStrength(p: string): 'weak' | 'fair' | 'strong' | null {
+  if (p.length === 0) return null;
+  if (p.length < 6) return 'weak';
+  if (p.length < 10 || !/[A-Z]/.test(p) || !/[0-9]/.test(p)) return 'fair';
+  return 'strong';
+}
+
+const AgentAuthPage = () => {
   const navigate = useNavigate();
+  const { user, isAgent, isAdmin, loading: authLoading } = useAuth();
+
+  // ── All useState hooks together, no code between them ──
+  const [pendingRedirect, setPendingRedirect] = useState<'dashboard' | null>(null);
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [agencyName, setAgencyName] = useState('');
   const [phone, setPhone] = useState('');
+  const [agencyEmail, setAgencyEmail] = useState('');
+  const [inviteCode, setInviteCode] = useState('');
+  const [licenseNumber, setLicenseNumber] = useState('');
+  const [officeAddress, setOfficeAddress] = useState('');
+  const [yearsExperience, setYearsExperience] = useState('');
+  const [specialization, setSpecialization] = useState('Residential');
+  const [specialisations, setSpecialisations] = useState<string[]>([]);
+  const [handlesTrustAccounting, setHandlesTrustAccounting] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [budgetMax, setBudgetMax] = useState('');
-  const [suburbs, setSuburbs] = useState('');
-  const [propertyType, setPropertyType] = useState('');
+  const [officeSuggestions, setOfficeSuggestions] = useState<{ description: string; place_id: string }[]>([]);
+  const [officeConfirmed, setOfficeConfirmed] = useState(false);
+
+  // ── All useRef hooks ──
+  const officeDebounceRef = useRef<ReturnType<typeof setTimeout>>();
+
+  // ── Derived values (not hooks) ──
+  const strength = getPasswordStrength(password);
+  const passwordsMatch = password === confirmPassword;
+  const canSubmit = !loading;
+
+  // ── useEffect hooks ──
+  useEffect(() => {
+    if (pendingRedirect === 'dashboard' && user && (isAgent || isAdmin) && !authLoading) {
+      setPendingRedirect(null);
+      setLoading(false);
+      navigate('/dashboard');
+    }
+  }, [pendingRedirect, user, isAgent, isAdmin, authLoading, navigate]);
+
+  useEffect(() => {
+    if (pendingRedirect === 'dashboard' && user && !authLoading && !isAgent && !isAdmin) {
+      const timeout = setTimeout(() => {
+        setPendingRedirect(null);
+        setLoading(false);
+        toast.error('Error', { description: 'This account does not have agent access. Please contact support if you believe this is an error.' });
+      }, 8000);
+      return () => clearTimeout(timeout);
+    }
+  }, [pendingRedirect, user, authLoading, isAgent, isAdmin, toast]);
+
+  // ── Handlers ──
+  const toggleSpecialisation = (value: string) => {
+    setSpecialisations(prev =>
+      prev.includes(value) ? prev.filter(s => s !== value) : [...prev, value]
+    );
+  };
+
+  const handleOfficeInput = (value: string) => {
+    setOfficeAddress(value);
+    setOfficeConfirmed(false);
+    if (officeDebounceRef.current) clearTimeout(officeDebounceRef.current);
+    if (value.length < 3) { setOfficeSuggestions([]); return; }
+    officeDebounceRef.current = setTimeout(async () => {
+      try {
+        const results = await autocomplete(value, 'address');
+        setOfficeSuggestions(results.slice(0, 5));
+      } catch { setOfficeSuggestions([]); }
+    }, 350);
+  };
+
+  const selectOfficeAddress = (suggestion: { description: string; place_id: string }) => {
+    setOfficeAddress(suggestion.description);
+    setOfficeSuggestions([]);
+    setOfficeConfirmed(true);
+  };
 
   const handleEmailContinue = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,120 +118,142 @@ const SeekerAuthPage = () => {
         throw error;
       }
       toast('Welcome back!');
-      navigate('/');
+      setPendingRedirect('dashboard');
     } catch (err: any) {
-      toast.error('Something went wrong', { description: err?.message || 'Please try again.' });
-    } finally {
+      toast.error('Sign in failed', { description: err.message });
       setLoading(false);
     }
   };
 
-  const handleCreateAccount = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!phone.trim()) {
-      toast.error('Phone required', { description: 'Please enter your mobile number.' });
-      return;
-    }
+
+    if (!email.trim()) { toast.error('Email required'); return; }
+    if (!fullName.trim()) { toast.error('Full name required'); return; }
+    if (step === 'create-agency' && !agencyName.trim()) { toast.error('Agency name required'); return; }
+    if (step === 'join-agency' && !inviteCode.trim()) { toast.error('Invite code required'); return; }
+    if (password.length < 6) { toast.error('Password too short', { description: 'Minimum 6 characters.' }); return; }
+    if (step === 'create-agency' && password !== confirmPassword) { toast.error('Passwords do not match', { description: 'Both password fields must be identical.' }); return; }
+    if (step === 'create-agency' && !agreedToTerms) { toast.error('Please agree to the Terms of Service'); return; }
+
     setLoading(true);
     try {
+      // Step 1 — create auth user
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: window.location.origin,
-          data: { display_name: displayName || email, phone },
+          data: { display_name: fullName || email, phone },
         },
       });
-      if (error) throw error;
 
-      if (data.user && !data.session) {
+      if (error) throw new Error(`Account creation failed: ${error.message}`);
+      if (!data.user) throw new Error('No user returned. Please try again.');
+
+      const userId = data.user.id;
+
+      // Step 2 — set up agent profile via edge function
+      const { data: setupResult, error: setupError } = await supabase.functions.invoke('setup-agent', {
+        body: {
+          userId,
+          email,
+          fullName,
+          phone,
+          mode: step,
+          agencyName,
+          agencyEmail,
+          inviteCode,
+          licenseNumber,
+          officeAddress,
+          yearsExperience,
+          specialization,
+          investmentNiche: specialisations.length > 0 ? specialisations.join(',') : null,
+          handlesTrustAccounting,
+        },
+      });
+
+      if (setupError) throw new Error(`Profile setup failed: ${setupError.message}`);
+      if (setupResult?.error) throw new Error(`Profile setup error: ${setupResult.error}`);
+
+      // Step 3 — check if session exists (auto-confirm on) or needs email verification
+      const { data: sessionData } = await supabase.auth.getSession();
+
+      if (sessionData?.session) {
+        toast.success('🎉 Account created!');
+        setPendingRedirect('dashboard');
+      } else {
         toast('✉️ Check your email', { description: `We sent a confirmation link to ${email}. Click it to verify your account and sign in. Check your spam folder if you don't see it.`, duration: 10000 });
         setStep('email');
-      } else {
-        toast.success('🎉 Account created!', { description: 'Setting up your preferences...' });
-        setStep('prefs');
+        setLoading(false);
       }
     } catch (err: any) {
-      toast.error('Something went wrong', { description: err?.message || 'Please try again.' });
-    } finally {
+      console.error('[handleSignup]', err);
+      toast.error('Registration failed', { duration: 8000 });
       setLoading(false);
     }
   };
 
-  const handleSavePrefs = async () => {
-    try {
-      const { data: { user: u } } = await supabase.auth.getUser();
-      if (u && (budgetMax || suburbs)) {
-        await supabase
-          .from('user_preferences')
-          .update({
-            budget_max: budgetMax ? parseInt(budgetMax.replace(/[^0-9]/g, '')) : null,
-            preferred_locations: suburbs ? suburbs.split(',').map(s => s.trim()).filter(Boolean) : [],
-          } as any)
-          .eq('user_id', u.id);
-      }
-    } catch {}
-    navigate('/');
-  };
-
   const handleOAuth = async (provider: 'google' | 'apple') => {
-    const { error } = await lovable.auth.signInWithOAuth(provider, {
-      redirect_uri: window.location.origin,
-    });
-    if (error) {
-      toast.error('Something went wrong', { description: err?.message || 'Please try again.' });
-    }
+    const { error } = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin });
+    if (error) toast.error('Error');
   };
 
   const goBack = () => {
-    if (step === 'password' || step === 'create') {
-      setStep('email');
-      setPassword('');
-    } else {
-      navigate('/');
-    }
+    if (step === 'password') { setStep('email'); setPassword(''); }
+    else if (step === 'create-agency' || step === 'join-agency') setStep('choose');
+    else if (step === 'choose') setStep('email');
+    else navigate('/for-agents');
   };
 
   const inputClass = "w-full px-4 py-3.5 rounded-full border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40";
 
   const features = [
-    { icon: Search, text: 'Search thousands of properties worldwide' },
-    { icon: Mic, text: 'AI-powered voice search in any language' },
-    { icon: Heart, text: 'Save favourites & get price alerts' },
+    { icon: Building2, text: 'Manage all your property listings' },
+    { icon: BarChart3, text: 'Track views, leads & analytics' },
+    { icon: Users, text: 'Build your team & grow your network' },
+    { icon: Megaphone, text: 'Capture voice-search leads automatically' },
   ];
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Left hero panel — hidden on mobile */}
+    <div className="min-h-screen flex">
+      {/* Left hero panel */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        <img src={seekerHero} alt="Find your dream home" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-        <div className="relative z-10 flex flex-col justify-end p-12 text-white">
-          <div className="flex items-center gap-2.5 mb-5">
-            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-              <Home size={20} />
+        <img src={agentHero} alt="Real estate professional" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[hsl(222,47%,8%)]/95 via-[hsl(222,47%,11%)]/70 to-[hsl(222,47%,11%)]/30" />
+        <div className="relative z-10 flex flex-col justify-between p-12 text-white h-full">
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center">
+              <Building2 size={20} />
             </div>
-            <span className="text-sm font-semibold uppercase tracking-wider text-white/90">Property Seeker</span>
+            <div>
+              <span className="text-sm font-bold uppercase tracking-wider">Agent Portal</span>
+              <p className="text-white/50 text-[10px] uppercase tracking-widest">For Real Estate Professionals</p>
+            </div>
           </div>
-          <h2 className="font-display text-4xl font-bold leading-tight mb-4">Find your<br />dream home</h2>
-          <div className="space-y-3 mt-2">
-            {features.map((f, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
-                  <f.icon size={15} />
+          <div>
+            <h2 className="font-display text-4xl font-bold leading-tight mb-4">Grow your<br />business</h2>
+            <p className="text-white/70 text-base mb-6 max-w-sm">The complete platform for real estate agents and agencies.</p>
+            <div className="space-y-3">
+              {features.map((f, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+                    <f.icon size={15} />
+                  </div>
+                  <span className="text-white/80 text-sm">{f.text}</span>
                 </div>
-                <span className="text-white/85 text-sm">{f.text}</span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Right form panel */}
-      <main className="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full px-6 py-12 lg:max-w-md lg:px-12">
+      <main className="flex-1 bg-background flex flex-col justify-center max-w-sm mx-auto w-full px-6 py-12 lg:max-w-md lg:px-12">
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+
           {/* Brand */}
-          <div className="mb-2">
+          <div className="mb-6">
             <Link to="/" className="inline-flex items-center gap-2">
               <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground text-xs font-bold">L</span>
@@ -162,21 +262,22 @@ const SeekerAuthPage = () => {
             </Link>
           </div>
 
-
           <h1 className="font-display text-2xl font-bold text-foreground mb-1">
-            {step === 'email' && 'Welcome to ListHQ'}
+            {step === 'email' && 'Agent Sign In'}
             {step === 'password' && 'Welcome back'}
-            {step === 'create' && 'Create your account'}
-            {step === 'prefs' && ''}
+            {step === 'choose' && 'Join ListHQ'}
+            {step === 'create-agency' && 'Create your account'}
+            {step === 'join-agency' && 'Join an Agency'}
           </h1>
           <p className="text-sm text-muted-foreground mb-6">
-            {step === 'email' && 'Sign in or create a free account to save and enquire on properties.'}
+            {step === 'email' && 'Access your dashboard, listings, and leads.'}
             {step === 'password' && email}
-            {step === 'create' && 'Start your property search journey.'}
-            {step === 'prefs' && ''}
+            {step === 'choose' && 'Start your free 60-day trial. No credit card required.'}
+            {step === 'create-agency' && 'Set up your agent profile and start listing in minutes.'}
+            {step === 'join-agency' && 'Enter your invite code to join a team.'}
           </p>
 
-          {/* Step: Email */}
+          {/* ── Step: Email ── */}
           {step === 'email' && (
             <>
               <form onSubmit={handleEmailContinue} className="space-y-4">
@@ -192,8 +293,10 @@ const SeekerAuthPage = () => {
               </form>
 
               <p className="text-sm text-muted-foreground mt-4">
-                New here?{' '}
-                <button onClick={() => setStep('create')} className="text-primary font-semibold underline underline-offset-2">Create account</button>
+                New to ListHQ?{' '}
+                <button type="button" onClick={() => setStep('choose')} className="text-primary font-semibold underline underline-offset-2">
+                  Start your free 60-day trial
+                </button>
               </p>
 
               <div className="flex items-center gap-4 my-6">
@@ -202,18 +305,17 @@ const SeekerAuthPage = () => {
                 <div className="flex-1 h-px bg-border" />
               </div>
 
-              <div className="space-y-3">
-                <button onClick={() => handleOAuth('google')} className="w-full flex items-center gap-3 py-3.5 px-5 rounded-full border border-border bg-background text-foreground text-sm font-medium hover:bg-accent transition-colors">
-                  <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                  Continue with Google
-                </button>
-                <button onClick={() => handleOAuth('apple')} className="w-full flex items-center gap-3 py-3.5 px-5 rounded-full border border-border bg-background text-foreground text-sm font-medium hover:bg-accent transition-colors">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
-                  Continue with Apple
-                </button>
-              </div>
+              <button type="button" onClick={() => handleOAuth('google')} className="w-full flex items-center gap-3 py-3.5 px-5 rounded-full border border-border bg-background text-foreground text-sm font-medium hover:bg-accent transition-colors">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                Continue with Google
+              </button>
 
-              <p className="text-xs text-muted-foreground mt-6 text-center leading-relaxed">
+              <p className="text-xs text-muted-foreground mt-3 text-center">
+                Have a demo code?{' '}
+                <Link to="/agents/demo" className="text-primary font-medium hover:underline">Access demo →</Link>
+              </p>
+
+              <p className="text-xs text-muted-foreground mt-3 text-center leading-relaxed">
                 By continuing you agree to our{' '}
                 <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">Terms of Service</a>
                 {' '}and{' '}
@@ -222,7 +324,7 @@ const SeekerAuthPage = () => {
             </>
           )}
 
-          {/* Step: Password */}
+          {/* ── Step: Password ── */}
           {step === 'password' && (
             <>
               <form onSubmit={handleSignIn} className="space-y-4">
@@ -234,29 +336,293 @@ const SeekerAuthPage = () => {
                   <Link to="/forgot-password" className="text-xs text-primary font-medium underline underline-offset-2">Forgot password?</Link>
                 </div>
                 <button type="submit" disabled={loading} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
-                  {loading ? 'Please wait...' : 'Sign In'}
+                  {loading ? 'Signing in…' : 'Sign In'}
                 </button>
               </form>
-              <button onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">
+              <button type="button" onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">
                 ← Use a different email
               </button>
             </>
           )}
 
-          {/* Step: Create account */}
-          {step === 'create' && (
+          {/* ── Step: Choose signup path ── */}
+          {step === 'choose' && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                <Zap size={13} className="text-emerald-600 shrink-0" />
+                <p className="text-xs font-medium text-emerald-700">Free for 60 days — no credit card required. Cancel anytime.</p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setStep('create-agency')}
+                className="w-full flex items-center gap-4 p-4 rounded-2xl border border-border text-left hover:border-primary hover:bg-primary/5 transition-colors group">
+                <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
+                  <Building2 size={20} className="text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-foreground text-sm group-hover:text-primary transition-colors">Create a New Agency</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Set up your profile and start listing immediately</p>
+                </div>
+                <ChevronRight size={16} className="text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setStep('join-agency')}
+                className="w-full flex items-center gap-4 p-4 rounded-2xl border border-border text-left hover:border-primary hover:bg-primary/5 transition-colors group">
+                <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
+                  <KeyRound size={20} className="text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-foreground text-sm group-hover:text-primary transition-colors">Join with Invite Code</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Your agency admin sent you an invite code</p>
+                </div>
+                <ChevronRight size={16} className="text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+              </button>
+
+              <button
+                type="button"
+                onClick={goBack}
+                className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors py-2 text-center">
+                ← Already have an account? Sign in
+              </button>
+            </div>
+          )}
+
+          {/* ── Step: Create agency ── */}
+          {step === 'create-agency' && (
             <>
-              <form onSubmit={handleCreateAccount} className="space-y-4">
+              <form onSubmit={handleSignup} className="space-y-4">
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Email Address<span className="text-destructive">*</span></label>
-                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} />
+                  <input type="email" required autoFocus value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">Display name</label>
-                  <input type="text" autoFocus value={displayName} onChange={(e) => setDisplayName(e.target.value)} className={inputClass} />
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Your Full Name<span className="text-destructive">*</span></label>
+                  <input type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)} className={inputClass} />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">Mobile Phone<span className="text-destructive">*</span></label>
+                  <label className="text-sm font-medium text-foreground mb-1 block">Agency or Trading Name<span className="text-destructive">*</span></label>
+                  <p className="text-xs text-muted-foreground mb-1.5">Your agency name, or your own name if you are a sole trader.</p>
+                  <input type="text" required value={agencyName} onChange={(e) => setAgencyName(e.target.value)} className={inputClass} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Phone Number<span className="text-destructive">*</span></label>
+                  <PhoneInput value={phone} onChange={setPhone} />
+                </div>
+
+                {/* Password */}
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Password<span className="text-destructive">*</span></label>
+                    <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
+                    {strength && (
+                      <div className="mt-2 space-y-1">
+                        <div className="flex gap-1">
+                          {['weak', 'fair', 'strong'].map((level, i) => (
+                            <div key={level} className={`h-1 flex-1 rounded-full transition-colors ${
+                              strength === 'weak' && i === 0 ? 'bg-red-400'
+                              : strength === 'fair' && i <= 1 ? 'bg-amber-400'
+                              : strength === 'strong' && i <= 2 ? 'bg-emerald-500'
+                              : 'bg-border'
+                            }`} />
+                          ))}
+                        </div>
+                        <p className={`text-[11px] font-medium ${
+                          strength === 'weak' ? 'text-red-500'
+                          : strength === 'fair' ? 'text-amber-500'
+                          : 'text-emerald-600'
+                        }`}>
+                          {strength === 'weak' && 'Too short — minimum 6 characters'}
+                          {strength === 'fair' && 'Fair — add uppercase and numbers for a stronger password'}
+                          {strength === 'strong' && '✓ Strong password'}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Confirm Password<span className="text-destructive">*</span></label>
+                    <input type="password" required minLength={6} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={inputClass} />
+                    {confirmPassword.length > 0 && !passwordsMatch && (
+                      <p className="text-[11px] text-red-500 font-medium mt-1">Passwords do not match</p>
+                    )}
+                    {confirmPassword.length > 0 && passwordsMatch && (
+                      <p className="text-[11px] text-emerald-600 font-medium mt-1">✓ Passwords match</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Office address */}
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">
+                    Office Address
+                    <span className="text-destructive ml-0.5">*</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={officeAddress}
+                      onChange={(e) => handleOfficeInput(e.target.value)}
+                      placeholder="e.g. 123 Main St, Sydney"
+                      className={inputClass}
+                      autoComplete="off"
+                    />
+                    {officeConfirmed && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2 text-primary">
+                        <CheckCircle2 size={18} />
+                      </div>
+                    )}
+                    {officeSuggestions.length > 0 && (
+                      <div className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-xl shadow-lg overflow-hidden">
+                        {officeSuggestions.map((s) => (
+                          <button
+                            key={s.place_id}
+                            type="button"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => selectOfficeAddress(s)}
+                            className="w-full text-left px-4 py-3 text-sm hover:bg-accent transition-colors flex items-center gap-2"
+                          >
+                            <MapPin size={14} className="text-muted-foreground shrink-0" />
+                            <span className="truncate">{s.description}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Licence */}
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">
+                    Real Estate Licence Number
+                    <span className="text-xs font-normal text-muted-foreground ml-1">(optional)</span>
+                  </label>
+                  <input type="text" value={licenseNumber} onChange={(e) => setLicenseNumber(e.target.value)} placeholder="e.g. 1234567" className={inputClass} />
+                  <p className="text-[11px] text-muted-foreground mt-1.5">Required to display your Verified Agent badge on your public profile.</p>
+                </div>
+
+                {/* Years / Specialization */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">
+                      Years of Experience
+                      <span className="text-xs font-normal text-muted-foreground ml-1">(optional)</span>
+                    </label>
+                    <input type="number" min="0" max="60" value={yearsExperience} onChange={(e) => setYearsExperience(e.target.value)} placeholder="e.g. 5" className={inputClass} />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Primary Specialisation</label>
+                    <select value={specialization} onChange={(e) => setSpecialization(e.target.value)} className={inputClass + ' appearance-none'}>
+                      <option value="Residential">Residential</option>
+                      <option value="Commercial">Commercial</option>
+                      <option value="Rural & Lifestyle">Rural & Lifestyle</option>
+                      <option value="Industrial">Industrial</option>
+                      <option value="Business Broking">Business Broking</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Specialisations multi-select */}
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">
+                    I also specialise in
+                    <span className="text-xs text-muted-foreground ml-1 font-normal">(select all that apply)</span>
+                  </label>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {['Residential Sales', 'Residential Rentals', 'Commercial', 'Rural', 'Prestige', 'Property Management', 'Business Broking', 'Holiday Rentals'].map(s => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => toggleSpecialisation(s)}
+                        className={`px-3 py-1.5 rounded-full border text-xs font-medium transition-colors ${
+                          specialisations.includes(s)
+                            ? 'border-primary bg-primary/10 text-primary'
+                            : 'border-border bg-background text-muted-foreground hover:border-primary/30 hover:text-foreground'
+                        }`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Trust accounting */}
+                <label className="flex items-start gap-2.5 cursor-pointer p-3 rounded-xl border border-border hover:border-primary/30 transition-colors">
+                  <input type="checkbox" checked={handlesTrustAccounting} onChange={(e) => setHandlesTrustAccounting(e.target.checked)} className="mt-0.5 accent-primary" />
+                  <div>
+                    <span className="text-sm font-medium text-foreground">Do you handle trust accounting?</span>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">Yes, I need compliance-ready reporting</p>
+                  </div>
+                </label>
+
+                {/* Terms checkbox — direct onClick on div, no sr-only tricks */}
+                <div
+                  onClick={() => setAgreedToTerms(v => !v)}
+                  className={`p-3 rounded-xl border cursor-pointer select-none transition-colors ${
+                    agreedToTerms ? 'border-primary bg-primary/5' : 'border-border bg-background'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`w-5 h-5 mt-0.5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
+                      agreedToTerms ? 'bg-primary border-primary' : 'border-border'
+                    }`}>
+                      {agreedToTerms && (
+                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                          <path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-foreground">I agree to the ListHQ Terms of Service</p>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        By creating an account I confirm I hold a current real estate licence, that all information provided is accurate, and that I have read and agree to the{' '}
+                        <a href="/terms" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-primary underline underline-offset-2">Terms of Service</a>
+                        {' '}and{' '}
+                        <a href="/privacy" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-primary underline underline-offset-2">Privacy Policy</a>.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {!agreedToTerms && (
+                  <p className="text-xs text-muted-foreground text-center">You must agree to the terms before creating your account</p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={!canSubmit}
+                  className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50"
+                >
+                  {loading ? 'Setting up your account…' : 'Create Account'}
+                </button>
+
+                <p className="text-xs text-center text-muted-foreground">
+                  You will be taken to your dashboard immediately after sign up.
+                </p>
+              </form>
+              <button type="button" onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">← Back to options</button>
+            </>
+          )}
+
+          {/* ── Step: Join agency ── */}
+          {step === 'join-agency' && (
+            <>
+              <form onSubmit={handleSignup} className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Email Address<span className="text-destructive">*</span></label>
+                  <input type="email" required autoFocus value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Your Full Name<span className="text-destructive">*</span></label>
+                  <input type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)} className={inputClass} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Invite Code<span className="text-destructive">*</span></label>
+                  <input type="text" required value={inviteCode} onChange={(e) => setInviteCode(e.target.value.toUpperCase())} className={inputClass + ' uppercase tracking-widest font-mono'} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Phone Number</label>
                   <PhoneInput value={phone} onChange={setPhone} />
                 </div>
                 <div>
@@ -264,11 +630,11 @@ const SeekerAuthPage = () => {
                   <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
                 </div>
                 <button type="submit" disabled={loading} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
-                  {loading ? 'Please wait...' : 'Create Account'}
+                  {loading ? 'Joining…' : 'Join Agency'}
                 </button>
               </form>
-              <button onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">← Back to sign in</button>
-              <p className="text-xs text-muted-foreground mt-6 text-center leading-relaxed">
+              <button type="button" onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">← Back to options</button>
+              <p className="text-xs text-muted-foreground mt-3 text-center leading-relaxed">
                 By continuing you agree to our{' '}
                 <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">Terms of Service</a>
                 {' '}and{' '}
@@ -277,121 +643,23 @@ const SeekerAuthPage = () => {
             </>
           )}
 
-          {/* Step: Preferences onboarding */}
-          {step === 'prefs' && (
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-5">
-              <div>
-                <h2 className="text-xl font-bold text-foreground mb-1">
-                  What are you looking for?
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  Help us show you the right properties. You can change this anytime in settings.
-                </p>
-              </div>
-              <div className="space-y-3">
-                <div>
-                  <label className="text-xs font-medium text-foreground mb-1.5 block">
-                    Max budget (optional)
-                  </label>
-                  <select
-                    value={budgetMax}
-                    onChange={e => setBudgetMax(e.target.value)}
-                    className="w-full h-11 rounded-xl border border-border bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                  >
-                    <option value="">No preference</option>
-                    <option value="500000">Up to $500k</option>
-                    <option value="750000">Up to $750k</option>
-                    <option value="1000000">Up to $1M</option>
-                    <option value="1500000">Up to $1.5M</option>
-                    <option value="2000000">Up to $2M</option>
-                    <option value="3000000">Up to $3M</option>
-                    <option value="5000000">Up to $5M</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-foreground mb-1.5 block">
-                    Preferred suburbs (optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={suburbs}
-                    onChange={e => setSuburbs(e.target.value)}
-                    placeholder="e.g. Richmond, Fitzroy, Collingwood"
-                    className="w-full h-11 rounded-xl border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                  />
-                  <p className="text-[11px] text-muted-foreground mt-1">
-                    Separate multiple suburbs with commas
-                  </p>
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-foreground mb-1.5 block">
-                    Property type (optional)
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {['House', 'Apartment', 'Townhouse', 'Land', 'Any'].map(type => (
-                      <button
-                        key={type}
-                        type="button"
-                        onClick={() => setPropertyType(type === 'Any' ? '' : type)}
-                        className={`py-2 rounded-xl text-xs font-medium border transition-colors ${
-                          (type === 'Any' ? !propertyType : propertyType === type)
-                            ? 'bg-primary text-primary-foreground border-primary'
-                            : 'bg-background text-muted-foreground border-border hover:border-primary/50'
-                        }`}
-                      >
-                        {type}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={handleSavePrefs}
-                  className="w-full h-12 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity"
-                >
-                  Start searching
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigate('/')}
-                  className="w-full h-10 rounded-xl text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Skip for now
-                </button>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Agent & Partner links */}
-          <div className="mt-6 pt-5 border-t border-border space-y-2">
-            <Link to="/agents/login" className="flex items-center gap-3 p-3.5 rounded-xl border border-border hover:border-primary/40 hover:bg-accent/50 transition-colors group">
+          {/* Buyer link */}
+          <div className="mt-6 pt-5 border-t border-border">
+            <Link to="/login" className="flex items-center gap-3 p-3.5 rounded-xl border border-border hover:border-primary/40 hover:bg-accent/50 transition-colors group">
               <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <Building2 size={16} className="text-primary" />
+                <Home size={16} className="text-primary" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">Are you a real estate agent?</p>
-                <p className="text-xs text-muted-foreground">Sign in to your Agent Portal →</p>
-              </div>
-            </Link>
-            <Link to="/partner/login" className="flex items-center gap-3 p-3.5 rounded-xl border border-border hover:border-primary/40 hover:bg-accent/50 transition-colors group">
-              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <Landmark size={16} className="text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">Are you a trust accounting partner?</p>
-                <p className="text-xs text-muted-foreground">Sign in to your Partner Portal →</p>
+                <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">Looking to buy a property?</p>
+                <p className="text-xs text-muted-foreground">Search properties as a buyer →</p>
               </div>
             </Link>
           </div>
+
         </motion.div>
       </main>
     </div>
   );
 };
 
-export default SeekerAuthPage;
+export default AgentAuthPage;

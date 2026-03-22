@@ -21,6 +21,14 @@ const AgentAuthPage = () => {
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const passwordStrength = (p: string) => {
+    if (p.length === 0) return null;
+    if (p.length < 6) return 'weak';
+    if (p.length < 10 || !/[A-Z]/.test(p) || !/[0-9]/.test(p)) return 'fair';
+    return 'strong';
+  };
+  const strength = passwordStrength(password);
   const [fullName, setFullName] = useState('');
   const [agencyName, setAgencyName] = useState('');
   const [phone, setPhone] = useState('');

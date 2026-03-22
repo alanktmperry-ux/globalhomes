@@ -567,7 +567,7 @@ const AgentAuthPage = () => {
                   <p className="text-xs text-muted-foreground text-center">You must agree to the terms before creating your account</p>
                 )}
                 <button type="submit" disabled={loading || !agreedToTerms} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
-                  {loading ? 'Please wait...' : 'Create Agency & Account'}
+                  {loading ? 'Setting up your account…' : 'Create Account'}
                 </button>
               </form>
               <button onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">← Back to options</button>

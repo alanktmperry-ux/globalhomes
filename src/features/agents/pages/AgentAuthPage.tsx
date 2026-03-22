@@ -623,7 +623,7 @@ const AgentAuthPage = () => {
 
                 <button
                   type="submit"
-                  disabled={!canSubmit}
+                  disabled={loading}
                   className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50"
                 >
                   {loading ? 'Setting up your account…' : 'Create Account'}

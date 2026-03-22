@@ -87,8 +87,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     sessionStorage.removeItem('admin_session_token');
     sessionStorage.removeItem('admin_refresh_token');
     sessionStorage.removeItem('admin_email');
+    sessionStorage.removeItem('admin_impersonated_id');
     setImpersonating(false);
     setImpersonatedUser(null);
+    setImpersonatedUserId(null);
   };
 
   const applyRoles = useCallback((roles: string[]) => {

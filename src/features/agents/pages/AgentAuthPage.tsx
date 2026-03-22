@@ -395,6 +395,10 @@ const AgentAuthPage = () => {
                   <PhoneInput value={phone} onChange={setPhone} />
                 </div>
                 <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Password<span className="text-destructive">*</span></label>
+                  <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
+                </div>
+                <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Office Address</label>
                   <div className="relative">
                     <input
@@ -432,7 +436,7 @@ const AgentAuthPage = () => {
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Real Estate Licence Number</label>
                   <input type="text" value={licenseNumber} onChange={(e) => setLicenseNumber(e.target.value)} placeholder="Optional but encouraged" className={inputClass} />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="text-sm font-medium text-foreground mb-1.5 block">Years of Experience</label>
                     <input type="number" min="0" max="60" value={yearsExperience} onChange={(e) => setYearsExperience(e.target.value)} placeholder="e.g. 5" className={inputClass} />
@@ -490,11 +494,6 @@ const AgentAuthPage = () => {
                     <p className="text-[11px] text-muted-foreground mt-0.5">Yes, I need compliance-ready reporting</p>
                   </div>
                 </label>
-
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">Password<span className="text-destructive">*</span></label>
-                  <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
-                </div>
                 <label className="flex items-start gap-2.5 cursor-pointer">
                   <input type="checkbox" checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)} className="mt-1 accent-primary" />
                   <span className="text-xs text-muted-foreground leading-relaxed">

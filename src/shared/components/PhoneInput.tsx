@@ -77,9 +77,34 @@ const PhoneInput = ({ value, onChange, className = '' }: PhoneInputProps) => {
   }, []);
 
   const handleNumberChange = (num: string) => {
-    const cleaned = num.replace(/[^\d\s-]/g, '');
-    setLocalNumber(cleaned);
-    onChange(cleaned ? `${countryCode} ${cleaned}` : '');
+    const digits = num.replace(/\D/g, '');
+    let formatted = digits;
+    if (countryCode === '+61') {
+      if (digits.startsWith('0')) {
+        const local = digits.slice(1);
+        if (local.length <= 3) {
+          formatted = `0${local}`;
+        } else if (local.length <= 6) {
+          formatted = `0${local.slice(0, 3)} ${local.slice(3)}`;
+        } else {
+          formatted = `0${local.slice(0, 3)} ${local.slice(3, 6)} ${local.slice(6, 9)}`;
+        }
+      } else if (digits.length > 0) {
+        if (digits.length <= 3) {
+          formatted = digits;
+        } else if (digits.length <= 6) {
+          formatted = `${digits.slice(0, 4)} ${digits.slice(4)}`;
+        } else {
+          formatted = `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7, 10)}`;
+        }
+      }
+    } else {
+      formatted = digits
+        .replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3')
+        .trim();
+    }
+    setLocalNumber(formatted);
+    onChange(formatted ? `${countryCode} ${formatted}` : '');
   };
 
   const handleCodeSelect = (code: string) => {
@@ -145,7 +170,7 @@ const PhoneInput = ({ value, onChange, className = '' }: PhoneInputProps) => {
         type="tel"
         value={localNumber}
         onChange={(e) => handleNumberChange(e.target.value)}
-        placeholder="412 345 678"
+        placeholder="0412 345 678"
         className="flex-1 px-4 py-3.5 rounded-r-full border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
       />
     </div>

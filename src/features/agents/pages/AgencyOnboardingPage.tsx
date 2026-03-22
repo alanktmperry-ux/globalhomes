@@ -225,7 +225,9 @@ export default function AgencyOnboardingPage() {
       return (
         <div className="space-y-6">
           <div className="text-center space-y-2">
-            <Building2 size={36} className="mx-auto text-primary" />
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+              <Building2 size={28} className="text-primary" />
+            </div>
             <h2 className="text-xl font-bold">Welcome — let's get your agency set up</h2>
             <p className="text-sm text-muted-foreground">Choose how you'd like to get started</p>
           </div>

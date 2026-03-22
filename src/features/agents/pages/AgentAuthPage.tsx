@@ -403,9 +403,44 @@ const AgentAuthPage = () => {
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Phone Number<span className="text-destructive">*</span></label>
                   <PhoneInput value={phone} onChange={setPhone} />
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">Password<span className="text-destructive">*</span></label>
-                  <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Password<span className="text-destructive">*</span></label>
+                    <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
+                    {strength && (
+                      <div className="mt-2 space-y-1">
+                        <div className="flex gap-1">
+                          {['weak', 'fair', 'strong'].map((level, i) => (
+                            <div
+                              key={level}
+                              className={`h-1 flex-1 rounded-full transition-colors ${
+                                strength === 'weak' && i === 0 ? 'bg-red-400'
+                                : strength === 'fair' && i <= 1 ? 'bg-amber-400'
+                                : strength === 'strong' && i <= 2 ? 'bg-emerald-500'
+                                : 'bg-border'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <p className={`text-[11px] font-medium ${
+                          strength === 'weak' ? 'text-red-500'
+                          : strength === 'fair' ? 'text-amber-500'
+                          : 'text-emerald-600'
+                        }`}>
+                          {strength === 'weak' && 'Too short — minimum 6 characters'}
+                          {strength === 'fair' && 'Fair — add uppercase and numbers for a stronger password'}
+                          {strength === 'strong' && 'Strong password'}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Confirm Password<span className="text-destructive">*</span></label>
+                    <input type="password" required minLength={6} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={inputClass} />
+                    {confirmPassword.length > 0 && confirmPassword !== password && (
+                      <p className="text-[11px] text-red-500 font-medium mt-1">Passwords do not match</p>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Office Address</label>

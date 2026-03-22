@@ -322,7 +322,7 @@ export default function AgencyOnboardingPage() {
               <Input value={agencyPhone} onChange={e => setAgencyPhone(e.target.value)} placeholder="(03) 9123 4567" className="mt-1.5" />
             </div>
             <div className="sm:col-span-2">
-              <Label className="text-xs font-medium">Agency street address *</Label>
+              <Label className="text-xs font-semibold text-foreground">Agency street address <span className="text-destructive ml-0.5">*</span></Label>
               <Input value={agencyAddress} onChange={e => setAgencyAddress(e.target.value)} placeholder="123 High Street, Richmond VIC 3121" className="mt-1.5" />
             </div>
             <div className="sm:col-span-2">

@@ -267,31 +267,49 @@ export default function AgencyOnboardingPage() {
     if (step === 1) {
       return (
         <div className="space-y-5">
-          <div className="text-center space-y-1 mb-4">
-            <Building2 size={32} className="mx-auto text-primary" />
-            <h3 className="text-base font-bold">Agency & Licence Details</h3>
-            <p className="text-xs text-muted-foreground">Required for compliance and trust account setup</p>
+          <div className="text-center space-y-2 mb-6">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+              <Building2 size={26} className="text-primary" />
+            </div>
+            <h3 className="text-lg font-bold text-foreground">Agency & Licence Details</h3>
+            <p className="text-sm text-muted-foreground">Required for compliance and trust account setup</p>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-5 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <Label className="text-xs font-medium">Agency trading name *</Label>
+              <Label className="text-xs font-semibold text-foreground">Agency trading name <span className="text-destructive ml-0.5">*</span></Label>
               <Input value={agencyName} onChange={e => setAgencyName(e.target.value)} placeholder="e.g. Smith Property Group" className="mt-1.5" />
             </div>
             <div>
-              <Label className="text-xs font-medium">ABN *</Label>
-              <Input value={abn} onChange={e => setAbn(e.target.value.replace(/\D/g, '').slice(0, 11))} placeholder="12 345 678 901" className="mt-1.5 font-mono" maxLength={11} />
-              {abn && abn.length !== 11 && <p className="text-[10px] text-destructive mt-1">ABN must be 11 digits</p>}
+              <Label className="text-xs font-semibold text-foreground">ABN <span className="text-destructive ml-0.5">*</span></Label>
+              <Input
+                value={abn.replace(/(\d{2})(\d{3})(\d{3})(\d{3})/, '$1 $2 $3 $4')}
+                onChange={e => {
+                  const digits = e.target.value.replace(/\D/g, '').slice(0, 11);
+                  setAbn(digits);
+                }}
+                placeholder="12 345 678 901"
+                className="mt-1.5 font-mono tracking-wider"
+                maxLength={14}
+              />
+              {abn.length > 0 && abn.length < 11 && (
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  {11 - abn.length} more digit{11 - abn.length !== 1 ? 's' : ''} to go
+                </p>
+              )}
+              {abn.length === 11 && (
+                <p className="text-[11px] text-emerald-600 font-medium mt-1">✓ ABN complete</p>
+              )}
             </div>
             <div>
-              <Label className="text-xs font-medium">Real estate licence number *</Label>
+              <Label className="text-xs font-semibold text-foreground">Real estate licence number <span className="text-destructive ml-0.5">*</span></Label>
               <Input value={licenceNumber} onChange={e => setLicenceNumber(e.target.value)} placeholder="e.g. 074356" className="mt-1.5" />
             </div>
             <div className="sm:col-span-2">
-              <Label className="text-xs font-medium">Principal's full name *</Label>
+              <Label className="text-xs font-semibold text-foreground">Principal's full name <span className="text-destructive ml-0.5">*</span></Label>
               <Input value={principalName} onChange={e => setPrincipalName(e.target.value)} placeholder="e.g. Sarah Mitchell" className="mt-1.5" />
             </div>
             <div>
-              <Label className="text-xs font-medium">State of operation *</Label>
+              <Label className="text-xs font-semibold text-foreground">State of operation <span className="text-destructive ml-0.5">*</span></Label>
               <Select value={operatingState} onValueChange={setOperatingState}>
                 <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select state" /></SelectTrigger>
                 <SelectContent>
@@ -300,22 +318,22 @@ export default function AgencyOnboardingPage() {
               </Select>
             </div>
             <div>
-              <Label className="text-xs font-medium">Agency phone *</Label>
+              <Label className="text-xs font-semibold text-foreground">Agency phone <span className="text-destructive ml-0.5">*</span></Label>
               <Input value={agencyPhone} onChange={e => setAgencyPhone(e.target.value)} placeholder="(03) 9123 4567" className="mt-1.5" />
             </div>
             <div className="sm:col-span-2">
-              <Label className="text-xs font-medium">Agency street address *</Label>
+              <Label className="text-xs font-semibold text-foreground">Agency street address <span className="text-destructive ml-0.5">*</span></Label>
               <Input value={agencyAddress} onChange={e => setAgencyAddress(e.target.value)} placeholder="123 High Street, Richmond VIC 3121" className="mt-1.5" />
             </div>
             <div className="sm:col-span-2">
-              <Label className="text-xs font-medium">Agency email *</Label>
+              <Label className="text-xs font-semibold text-foreground">Agency email <span className="text-destructive ml-0.5">*</span></Label>
               <Input type="email" value={agencyEmail} onChange={e => setAgencyEmail(e.target.value)} placeholder="office@smithproperty.com.au" className="mt-1.5" />
             </div>
           </div>
           {operatingState && (
-            <div className="bg-muted/50 border border-border rounded-lg p-3 flex items-start gap-2">
-              <Landmark size={14} className="text-muted-foreground shrink-0 mt-0.5" />
-              <p className="text-xs text-muted-foreground">{STATE_LEGISLATION[operatingState]}</p>
+            <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex items-start gap-2.5">
+              <Landmark size={14} className="text-primary shrink-0 mt-0.5" />
+              <p className="text-xs text-primary/80 font-medium">{STATE_LEGISLATION[operatingState]}</p>
             </div>
           )}
         </div>

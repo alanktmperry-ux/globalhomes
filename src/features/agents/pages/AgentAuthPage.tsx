@@ -132,7 +132,7 @@ const AgentAuthPage = () => {
     if (!fullName.trim()) { toast.error('Full name required'); return; }
     if (!agencyName.trim()) { toast.error('Agency name required'); return; }
     if (!officeAddress.trim()) { toast.error('Office address required', { description: 'Please enter and select your office address.' }); return; }
-    if (password.length < 6) { toast({ title: 'Password too short', description: 'Minimum 6 characters.', variant: 'destructive' }); return; }
+    if (password.length < 6) { toast.error('Password too short', { description: 'Minimum 6 characters.' }); return; }
     if (password !== confirmPassword) { toast({ title: 'Passwords do not match', description: 'Both password fields must be identical.', variant: 'destructive' }); return; }
     if (!agreedToTerms) { toast({ title: 'Please agree to the Terms of Service', variant: 'destructive' }); return; }
 

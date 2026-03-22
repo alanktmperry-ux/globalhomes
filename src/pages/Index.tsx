@@ -439,11 +439,8 @@ const Index = () => {
         {!isCollab && user && (
           <button
             onClick={() => createSession({
-              query: lastSearch?.text || '',
+              query: currentQuery || '',
               filters: filters as Record<string, any>,
-              center: searchCenter
-                ? { lat: searchCenter.lat, lng: searchCenter.lng }
-                : undefined,
             })}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors shrink-0"
           >
@@ -648,20 +645,6 @@ const Index = () => {
         />
       </VoiceSearchErrorBoundary>
 
-      {user && !hasSearched && (
-        <div className="flex justify-center pb-2">
-          <button
-            onClick={() => createSession({
-              query: '',
-              filters: {},
-            })}
-            className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <Users size={13} />
-            Browse with a partner
-          </button>
-        </div>
-      )}
 
       {/* Desktop layout */}
       {!isMobile ? (

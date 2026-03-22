@@ -309,7 +309,7 @@ export default function AgencyOnboardingPage() {
               <Input value={principalName} onChange={e => setPrincipalName(e.target.value)} placeholder="e.g. Sarah Mitchell" className="mt-1.5" />
             </div>
             <div>
-              <Label className="text-xs font-medium">State of operation *</Label>
+              <Label className="text-xs font-semibold text-foreground">State of operation <span className="text-destructive ml-0.5">*</span></Label>
               <Select value={operatingState} onValueChange={setOperatingState}>
                 <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select state" /></SelectTrigger>
                 <SelectContent>

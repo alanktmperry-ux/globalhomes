@@ -19,6 +19,7 @@ interface UserRow {
   created_at: string;
   display_name?: string;
   roles: string[];
+  last_sign_in_at?: string | null;
 }
 
 interface PropertyRow {

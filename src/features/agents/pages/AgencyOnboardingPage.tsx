@@ -21,7 +21,20 @@ type OnboardingPath = 'fresh' | 'migration';
 
 const STATES = ['VIC', 'NSW', 'QLD', 'SA', 'WA', 'TAS', 'ACT', 'NT'] as const;
 
-
+const COUNTRIES = [
+  'Australia',
+  'New Zealand',
+  'United Kingdom',
+  'United States',
+  'Canada',
+  'Singapore',
+  'Malaysia',
+  'Hong Kong',
+  'UAE',
+  'South Africa',
+  'India',
+  'Other',
+] as const;
 const BANKS = ['NAB', 'CBA', 'ANZ', 'Westpac', 'Bendigo', 'BOQ', 'Macquarie', 'Other'];
 
 const DATE_AU = new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: 'long', year: 'numeric' });

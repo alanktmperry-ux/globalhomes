@@ -41,6 +41,28 @@ const AgentAuthPage = () => {
   const [handlesTrustAccounting, setHandlesTrustAccounting] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [officeSuggestions, setOfficeSuggestions] = useState<{ description: string; place_id: string }[]>([]);
+  const [officeConfirmed, setOfficeConfirmed] = useState(false);
+  const officeDebounceRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const handleOfficeInput = (value: string) => {
+    setOfficeAddress(value);
+    setOfficeConfirmed(false);
+    if (officeDebounceRef.current) clearTimeout(officeDebounceRef.current);
+    if (value.length < 3) { setOfficeSuggestions([]); return; }
+    officeDebounceRef.current = setTimeout(async () => {
+      try {
+        const results = await autocomplete(value, 'address');
+        setOfficeSuggestions(results.slice(0, 5));
+      } catch { setOfficeSuggestions([]); }
+    }, 350);
+  };
+
+  const selectOfficeAddress = (suggestion: { description: string; place_id: string }) => {
+    setOfficeAddress(suggestion.description);
+    setOfficeSuggestions([]);
+    setOfficeConfirmed(true);
+  };
 
   const generateSlug = (name: string) =>
     name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Math.random().toString(36).slice(2, 6);

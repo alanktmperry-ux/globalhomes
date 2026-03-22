@@ -126,17 +126,46 @@ const AgentAuthPage = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      toast({
+        title: 'Passwords do not match',
+        description: 'Please make sure both password fields are the same.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (password.length < 6) {
+      toast({
+        title: 'Password too short',
+        description: 'Password must be at least 6 characters.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setLoading(true);
     try {
+      // Step 1 — create auth user
       const { data, error } = await supabase.auth.signUp({
-        email, password,
-        options: { emailRedirectTo: window.location.origin, data: { display_name: fullName || email, phone } },
+        email,
+        password,
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: {
+            display_name: fullName || email,
+            phone,
+          },
+        },
       });
-      if (error) throw error;
-      if (!data.user) throw new Error('Signup failed');
+
+      if (error) throw new Error(`Account creation failed: ${error.message}`);
+      if (!data.user) throw new Error('No user returned from signup.');
+
       const userId = data.user.id;
 
-      // Use edge function with service role to set up agent data (bypasses RLS when no active session)
+      // Step 2 — set up agent profile
       const { data: setupResult, error: setupError } = await supabase.functions.invoke('setup-agent', {
         body: {
           userId,
@@ -156,23 +185,25 @@ const AgentAuthPage = () => {
         },
       });
 
-      if (setupError) throw new Error(setupError.message || 'Setup failed');
-      if (setupResult?.error) throw new Error(setupResult.error);
+      if (setupError) throw new Error(`Profile setup failed: ${setupError.message}`);
+      if (setupResult?.error) throw new Error(`Profile setup error: ${setupResult.error}`);
 
-      // Check if session is active (auto-confirm) or needs email verification
+      // Step 3 — check session state
       const { data: sessionData } = await supabase.auth.getSession();
+
       if (sessionData?.session) {
-        if (step === 'create-agency') {
-          toast({ title: 'Agency created!', description: `"${agencyName}" is ready.` });
-        } else {
-          toast({ title: 'Welcome to the team!', description: `You've joined ${setupResult?.agencyName || 'the agency'}.` });
-        }
+        toast({
+          title: '🎉 Account created!',
+          description: step === 'create-agency'
+            ? `Your agency "${agencyName}" is ready. Taking you to your dashboard...`
+            : `You've joined the agency. Taking you to your dashboard...`,
+        });
         setPendingRedirect('dashboard');
       } else {
         toast({
-          title: 'Account created!',
-          description: `We sent a confirmation email to ${email}. Click the link in that email to verify your account and sign in.`,
-          duration: 8000,
+          title: '✉️ Check your email',
+          description: `We sent a confirmation link to ${email}. Click it to verify your account and sign in. Check your spam folder if you don't see it.`,
+          duration: 10000,
         });
         setStep('email');
         setLoading(false);
@@ -180,9 +211,10 @@ const AgentAuthPage = () => {
     } catch (err: any) {
       console.error('[handleSignup]', err);
       toast({
-        title: 'Sign up failed',
-        description: err.message || 'Something went wrong. Please try again.',
-        variant: 'destructive'
+        title: 'Registration failed',
+        description: err.message || 'Something went wrong. Please try again or contact support@listhq.com.au',
+        variant: 'destructive',
+        duration: 8000,
       });
       setLoading(false);
     }

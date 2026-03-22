@@ -458,21 +458,13 @@ const AgentAuthPage = () => {
                   <div className="flex flex-wrap gap-2 mt-1">
                     {[
                       'Residential Sales',
+                      'Residential Rentals',
+                      'Commercial',
+                      'Rural',
+                      'Prestige',
                       'Property Management',
-                      'Commercial Sales',
-                      'Commercial Leasing',
-                      'Rural & Lifestyle',
-                      'Land & Development',
-                      'Prestige & Luxury',
-                      'Industrial & Warehousing',
-                      'First Home Buyers',
-                      'Overseas & Foreign Buyers',
-                      'Off-the-Plan',
-                      'Property Investment',
-                      'Holiday & Short-Stay',
-                      'Retirement & Downsizing',
-                      'Strata & Apartments',
                       'Business Broking',
+                      'Holiday Rentals',
                     ].map(s => (
                       <button
                         key={s}

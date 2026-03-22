@@ -117,7 +117,7 @@ const AgentAuthPage = () => {
         }
         throw error;
       }
-      toast({ title: 'Welcome back!' });
+      toast('Welcome back!');
       setPendingRedirect('dashboard');
     } catch (err: any) {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });

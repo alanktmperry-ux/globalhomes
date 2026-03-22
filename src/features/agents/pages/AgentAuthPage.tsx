@@ -120,7 +120,7 @@ const AgentAuthPage = () => {
           officeAddress,
           yearsExperience,
           specialization,
-          investmentNiche: investmentNiche || null,
+          investmentNiche: specialisations.length > 0 ? specialisations.join(',') : null,
           handlesTrustAccounting,
         },
       });

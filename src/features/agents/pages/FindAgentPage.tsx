@@ -25,6 +25,7 @@ interface AgentRow {
   handles_trust_accounting: boolean | null;
 }
 
+
 function getInitials(name: string) {
   return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 }

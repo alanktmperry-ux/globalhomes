@@ -246,7 +246,7 @@ export default function AgencyOnboardingPage() {
               </CardContent>
             </Card>
             <Card
-              className={`cursor-pointer transition-all hover:shadow-md ${path === 'migration' ? 'ring-2 ring-primary shadow-md' : ''}`}
+              className={`cursor-pointer transition-all border-2 ${path === 'migration' ? 'border-primary bg-primary/5 shadow-md' : 'border-border hover:border-primary/40 hover:shadow-sm'}`}
               onClick={() => setPath('migration')}
             >
               <CardContent className="p-6 space-y-3">

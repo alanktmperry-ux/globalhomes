@@ -119,6 +119,7 @@ const App = () => (
   <HelmetProvider>
   <QueryClientProvider client={queryClient}>
     <I18nProvider>
+      <ConsentProvider>
       <CurrencyProvider>
       <AuthProvider>
         <TooltipProvider>

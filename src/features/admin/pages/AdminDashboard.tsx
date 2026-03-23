@@ -138,21 +138,26 @@ const AdminDashboard = () => {
 
     const { data: sessionData } = await supabase.auth.getSession();
     const signInMap = new Map<string, string | null>();
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=list_users`,
-        {
-          headers: {
-            Authorization: `Bearer ${sessionData.session?.access_token}`,
-            'Content-Type': 'application/json',
-          },
+    const token = sessionData.session?.access_token;
+    if (token) {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=list_users`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        if (res.ok) {
+          const adminData = await res.json();
+          (adminData.users || []).forEach((u: any) => {
+            signInMap.set(u.id, u.last_sign_in_at || null);
+          });
         }
-      );
-      const adminData = await res.json();
-      (adminData.users || []).forEach((u: any) => {
-        signInMap.set(u.id, u.last_sign_in_at || null);
-      });
-    } catch {}
+      } catch {}
+    }
 
     const userRows: UserRow[] = (profileData.data || []).map((p) => ({
       id: p.user_id,

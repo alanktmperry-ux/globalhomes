@@ -359,6 +359,7 @@ const AdminDashboard = () => {
         ) : (
           <>
             {tab === 'command-centre' && <CommandCentre />}
+            {tab === 'agent-lifecycle' && <AgentLifecycle />}
             {tab === 'overview' && <AdminOverview stats={stats} users={users} insights={insights} />}
             {tab === 'users' && <AdminUsers />}
             {tab === 'listings' && <AdminListings properties={properties} onToggleActive={togglePropertyActive} onActivateBoost={activateBoost} />}

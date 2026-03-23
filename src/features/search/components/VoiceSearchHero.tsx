@@ -862,89 +862,108 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       </div>
 
       {/* ── FEATURED MASONRY ── */}
-      <div className="hidden md:block bg-background px-6 pt-5 pb-6">
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
-            Featured listings
-          </span>
-          <span className="text-xs text-primary font-medium cursor-pointer hover:underline">
-            View all →
-          </span>
-        </div>
-
-        <div className="grid gap-3" style={{ gridTemplateColumns: '1.65fr 1fr 1fr', gridTemplateRows: 'auto auto' }}>
-
-          {/* Large hero card */}
-          <div className="row-span-2 relative rounded-2xl overflow-hidden cursor-pointer group" style={{ minHeight: '280px' }}>
-            {featuredLoading ? (
-              <Skeleton className="absolute inset-0 w-full h-full" />
-            ) : (
-              <img src={dedupedFeatured[3 % dedupedFeatured.length]?.img} alt={dedupedFeatured[3 % dedupedFeatured.length]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-            )}
-            <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 30%,rgba(0,0,0,0.72) 100%)'}} />
-            <span className="absolute top-3 left-3 text-[9px] font-bold px-2.5 py-1 rounded-full text-white bg-foreground/80">
-              {dedupedFeatured[3 % dedupedFeatured.length]?.tag}
+      {dedupedFeatured.length > 0 ? (
+        <div className="hidden md:block bg-background px-6 pt-5 pb-6">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
+              Featured listings
             </span>
-            <div className="absolute bottom-0 left-0 right-0 p-4">
-              <div className="text-white font-extrabold text-lg leading-tight mb-0.5" style={{textShadow: '0 1px 6px rgba(0,0,0,0.4)'}}>
-                {dedupedFeatured[3 % dedupedFeatured.length]?.price}
-              </div>
-              <div className="text-white/90 text-xs font-semibold mb-0.5">
-                {dedupedFeatured[3 % dedupedFeatured.length]?.address}
-              </div>
-              <div className="text-white/60 text-[10px] mb-2">
-                {dedupedFeatured[3 % dedupedFeatured.length]?.suburb}
-              </div>
-              <div className="flex gap-2 text-[10px] text-white/70">
-                <span>
-                  {dedupedFeatured[3 % dedupedFeatured.length]?.beds} bed
-                </span>
-                <span className="text-white/30">
-                  ·
-                </span>
-                <span>
-                  {dedupedFeatured[3 % dedupedFeatured.length]?.baths}
-                  {' bath'}
-                </span>
-                <span className="text-white/30">
-                  ·
-                </span>
-                <span>
-                  {dedupedFeatured[3 % dedupedFeatured.length]?.cars}
-                  {' car'}
-                </span>
-              </div>
-            </div>
+            <span className="text-xs text-primary font-medium cursor-pointer hover:underline">
+              View all →
+            </span>
           </div>
 
-          {/* Four smaller cards */}
-          {[4, 5, 0, 1].map((pi, i) => {
-            const idx = pi % dedupedFeatured.length;
-            return (
-              <div key={i} className="relative rounded-2xl overflow-hidden cursor-pointer group" style={{ height: '134px' }}>
-                {featuredLoading ? (
-                  <Skeleton className="absolute inset-0 w-full h-full" />
-                ) : (
-                  <img src={dedupedFeatured[idx]?.img} alt={dedupedFeatured[idx]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                )}
-                <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 25%,rgba(0,0,0,0.65) 100%)'}} />
-                {dedupedFeatured[idx]?.tag && (
-                  <span className="absolute top-2 left-2 text-[8px] font-bold px-2 py-0.5 rounded-full text-white bg-foreground/80 backdrop-blur-sm">
-                    {dedupedFeatured[idx].tag}
+          <div className="grid gap-3" style={{ gridTemplateColumns: '1.65fr 1fr 1fr', gridTemplateRows: 'auto auto' }}>
+
+            {/* Large hero card */}
+            <div className="row-span-2 relative rounded-2xl overflow-hidden cursor-pointer group" style={{ minHeight: '280px' }}>
+              {featuredLoading ? (
+                <Skeleton className="absolute inset-0 w-full h-full" />
+              ) : (
+                <img src={dedupedFeatured[3 % dedupedFeatured.length]?.img} alt={dedupedFeatured[3 % dedupedFeatured.length]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              )}
+              <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 30%,rgba(0,0,0,0.72) 100%)'}} />
+              <span className="absolute top-3 left-3 text-[9px] font-bold px-2.5 py-1 rounded-full text-white bg-foreground/80">
+                {dedupedFeatured[3 % dedupedFeatured.length]?.tag}
+              </span>
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <div className="text-white font-extrabold text-lg leading-tight mb-0.5" style={{textShadow: '0 1px 6px rgba(0,0,0,0.4)'}}>
+                  {dedupedFeatured[3 % dedupedFeatured.length]?.price}
+                </div>
+                <div className="text-white/90 text-xs font-semibold mb-0.5">
+                  {dedupedFeatured[3 % dedupedFeatured.length]?.address}
+                </div>
+                <div className="text-white/60 text-[10px] mb-2">
+                  {dedupedFeatured[3 % dedupedFeatured.length]?.suburb}
+                </div>
+                <div className="flex gap-2 text-[10px] text-white/70">
+                  <span>
+                    {dedupedFeatured[3 % dedupedFeatured.length]?.beds} bed
                   </span>
-                )}
-                <div className="absolute bottom-0 left-0 right-0 p-3">
-                  <div className="text-white font-bold text-sm leading-tight">
-                    {dedupedFeatured[idx]?.price}
-                  </div>
-                  <div className="text-white/70 text-[10px] mt-0.5">
-                    {dedupedFeatured[idx]?.suburb}
-                  </div>
+                  <span className="text-white/30">
+                    ·
+                  </span>
+                  <span>
+                    {dedupedFeatured[3 % dedupedFeatured.length]?.baths}
+                    {' bath'}
+                  </span>
+                  <span className="text-white/30">
+                    ·
+                  </span>
+                  <span>
+                    {dedupedFeatured[3 % dedupedFeatured.length]?.cars}
+                    {' car'}
+                  </span>
                 </div>
               </div>
-            );
-          })}
+            </div>
+
+            {/* Four smaller cards */}
+            {[4, 5, 0, 1].map((pi, i) => {
+              const idx = pi % dedupedFeatured.length;
+              return (
+                <div key={i} className="relative rounded-2xl overflow-hidden cursor-pointer group" style={{ height: '134px' }}>
+                  {featuredLoading ? (
+                    <Skeleton className="absolute inset-0 w-full h-full" />
+                  ) : (
+                    <img src={dedupedFeatured[idx]?.img} alt={dedupedFeatured[idx]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  )}
+                  <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 25%,rgba(0,0,0,0.65) 100%)'}} />
+                  {dedupedFeatured[idx]?.tag && (
+                    <span className="absolute top-2 left-2 text-[8px] font-bold px-2 py-0.5 rounded-full text-white bg-foreground/80 backdrop-blur-sm">
+                      {dedupedFeatured[idx].tag}
+                    </span>
+                  )}
+                  <div className="absolute bottom-0 left-0 right-0 p-3">
+                    <div className="text-white font-bold text-sm leading-tight">
+                      {dedupedFeatured[idx]?.price}
+                    </div>
+                    <div className="text-white/70 text-[10px] mt-0.5">
+                      {dedupedFeatured[idx]?.suburb}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
+      ) : !featuredLoading && (
+        <div className="hidden md:block bg-background px-6 pt-5 pb-6">
+          <div className="rounded-2xl border border-dashed border-border bg-secondary/30 p-8 text-center space-y-3">
+            <p className="text-sm font-medium text-foreground">
+              Be the first agent in your area
+            </p>
+            <p className="text-xs text-muted-foreground">
+              List your first property free — no credit card required during your 60-day trial.
+            </p>
+            <button
+              onClick={() => window.location.href = '/agent/auth'}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity">
+              List a property free
+            </button>
+          </div>
+        </div>
+      )}
       </div>
 
       {/* Search history */}

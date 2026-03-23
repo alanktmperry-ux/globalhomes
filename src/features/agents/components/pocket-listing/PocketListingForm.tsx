@@ -51,6 +51,38 @@ export interface ListingDraft {
   furnished: boolean;
   petsAllowed: boolean;
   screeningLevel: string;
+
+  // Sale — additional details
+  ensuites: number;
+  studyRooms: number;
+  garageType: string;
+  hasPool: boolean;
+  hasOutdoorEnt: boolean;
+  hasAlfresco: boolean;
+  hasSolar: boolean;
+  airConType: string;
+  heatingType: string;
+  auctionDate: string;
+  auctionTime: string;
+  yearBuilt: string;
+  councilRates: number;
+  waterRates: number;
+  strataFees: number;
+
+  // Rental — additional details
+  waterIncluded: boolean;
+  electricityIncluded: boolean;
+  internetIncluded: boolean;
+  hasInternalLaundry: boolean;
+  hasDishwasher: boolean;
+  hasWashingMachine: boolean;
+  hasAirCon: boolean;
+  hasBalcony: boolean;
+  hasPoolAccess: boolean;
+  hasGymAccess: boolean;
+  smokingAllowed: boolean;
+  maxOccupants: number;
+  rentalParkingType: string;
 }
 
 const DEFAULT_DRAFT: ListingDraft = {
@@ -88,6 +120,35 @@ const DEFAULT_DRAFT: ListingDraft = {
   furnished: false,
   petsAllowed: false,
   screeningLevel: 'Basic',
+
+  ensuites: 0,
+  studyRooms: 0,
+  garageType: '',
+  hasPool: false,
+  hasOutdoorEnt: false,
+  hasAlfresco: false,
+  hasSolar: false,
+  airConType: '',
+  heatingType: '',
+  auctionDate: '',
+  auctionTime: '',
+  yearBuilt: '',
+  councilRates: 0,
+  waterRates: 0,
+  strataFees: 0,
+  waterIncluded: false,
+  electricityIncluded: false,
+  internetIncluded: false,
+  hasInternalLaundry: false,
+  hasDishwasher: false,
+  hasWashingMachine: false,
+  hasAirCon: false,
+  hasBalcony: false,
+  hasPoolAccess: false,
+  hasGymAccess: false,
+  smokingAllowed: false,
+  maxOccupants: 0,
+  rentalParkingType: '',
 };
 
 const STEPS = ['Address', 'Basics', 'Photos', 'Voice', 'Settings', 'Preview'];
@@ -154,6 +215,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
       const transcriptLines = descLines.filter(l => !l.startsWith('•') && l !== 'Key Features:');
 
       setDraft({
+        ...DEFAULT_DRAFT,
         address: duplicatePropertyId ? '' : prop.address,
         suburb: duplicatePropertyId ? '' : prop.suburb,
         state: duplicatePropertyId ? '' : prop.state,

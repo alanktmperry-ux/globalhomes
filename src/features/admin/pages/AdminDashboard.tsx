@@ -320,6 +320,7 @@ const AdminDashboard = () => {
     { id: 'comms', label: 'Communications', icon: Megaphone },
     { id: 'partners', label: 'Partners', icon: Landmark },
     { id: 'growth', label: 'Growth Funnel', icon: TrendingUp },
+    { id: 'support', label: 'Support', icon: MessageSquare },
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'users', label: 'Users', icon: Users },
     { id: 'listings', label: 'Listings', icon: Building2 },

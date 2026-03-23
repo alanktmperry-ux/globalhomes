@@ -676,6 +676,7 @@ const ProfilePage = () => {
               </p>
             </div>
 
+            <Button onClick={handleSave} disabled={saving} className="w-full">
               {saving ? <><Loader2 size={16} className="animate-spin mr-2" /> Saving...</> : 'Save All Changes'}
             </Button>
           </TabsContent>

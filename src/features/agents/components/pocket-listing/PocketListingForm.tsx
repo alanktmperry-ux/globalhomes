@@ -215,6 +215,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
       const transcriptLines = descLines.filter(l => !l.startsWith('•') && l !== 'Key Features:');
 
       setDraft({
+        ...DEFAULT_DRAFT,
         address: duplicatePropertyId ? '' : prop.address,
         suburb: duplicatePropertyId ? '' : prop.suburb,
         state: duplicatePropertyId ? '' : prop.state,

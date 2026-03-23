@@ -23,7 +23,10 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
 
   const handleVoiceResult = useCallback((text: string) => {
     setQuery(text);
-    onSearch(text);
+    // Auto-submit voice result immediately
+    if (text.trim()) {
+      onSearch(text.trim());
+    }
   }, [onSearch]);
 
   const handleVoiceError = useCallback((message: string) => {

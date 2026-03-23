@@ -271,6 +271,13 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Show confirmation text when processing
+  useEffect(() => {
+    if (voiceState === 'processing' && transcript) {
+      setTranscript(`Got it — searching for "${transcript}"`);
+    }
+  }, [voiceState]);
+
   // Update state when external search completes
   useEffect(() => {
     if (!isSearching && voiceState === 'processing') {

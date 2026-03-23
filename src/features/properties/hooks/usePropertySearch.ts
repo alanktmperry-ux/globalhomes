@@ -213,7 +213,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
 
       setIsSearching(false);
     },
-    [addSearch, toast, listingMode],
+    [addSearch, toast, listingMode, setFilters],
   );
 
   // ── Re-trigger search when listing mode changes ──────────────

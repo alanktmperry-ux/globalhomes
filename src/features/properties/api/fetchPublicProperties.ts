@@ -75,24 +75,36 @@ const PROPERTIES_WITH_AGENTS =
  * Searches agent listings by keyword matching against title, address, suburb, state, description.
  * Results are ordered: subscribed agents first, then by recency.
  */
-export async function searchAgentListings(query: string, limit = 20, listingType?: 'sale' | 'rent'): Promise<Property[]> {
+export async function searchAgentListings(
+  query: string,
+  limit = 20,
+  listingType?: 'sale' | 'rent',
+  structured?: {
+    beds?: number;
+    baths?: number;
+    priceMin?: number;
+    priceMax?: number;
+    suburb?: string;
+    features?: string[];
+  }
+): Promise<Property[]> {
   const words = query
     .toLowerCase()
     .split(/\s+/)
     .filter((w) => w.length > 2);
 
-  if (words.length === 0) return [];
+  if (words.length === 0 && !structured?.suburb) return [];
 
-  // Build an OR filter using ilike for each keyword across searchable columns
+  // When a structured suburb is provided, narrow keyword matching to address/suburb only
+  // to prevent noise words like "bedroom" or "under" matching descriptions
+  const searchColumns = structured?.suburb
+    ? ['address', 'suburb']
+    : ['title', 'address', 'suburb', 'state', 'description', 'property_type'];
+
   const orClauses = words
-    .flatMap((w) => [
-      `title.ilike.%${w}%`,
-      `address.ilike.%${w}%`,
-      `suburb.ilike.%${w}%`,
-      `state.ilike.%${w}%`,
-      `description.ilike.%${w}%`,
-      `property_type.ilike.%${w}%`,
-    ])
+    .flatMap((w) =>
+      searchColumns.map((col) => `${col}.ilike.%${w}%`)
+    )
     .join(',');
 
   let dbQuery = supabase
@@ -100,9 +112,29 @@ export async function searchAgentListings(query: string, limit = 20, listingType
     .select(PROPERTIES_WITH_AGENTS)
     .eq('is_active', true)
     .eq('status', 'public')
-    .or(orClauses)
     .order('created_at', { ascending: false })
     .limit(limit);
+
+  if (orClauses) {
+    dbQuery = dbQuery.or(orClauses);
+  }
+
+  // Apply structured filters
+  if (structured?.beds) {
+    dbQuery = dbQuery.gte('beds', structured.beds);
+  }
+  if (structured?.baths) {
+    dbQuery = dbQuery.gte('baths', structured.baths);
+  }
+  if (structured?.priceMin) {
+    dbQuery = dbQuery.gte('price', structured.priceMin);
+  }
+  if (structured?.priceMax) {
+    dbQuery = dbQuery.lte('price', structured.priceMax);
+  }
+  if (structured?.suburb) {
+    dbQuery = dbQuery.ilike('suburb', `%${structured.suburb}%`);
+  }
 
   if (listingType === 'rent') {
     dbQuery = dbQuery.eq('listing_type', 'rent');

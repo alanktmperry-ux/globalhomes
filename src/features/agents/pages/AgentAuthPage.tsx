@@ -457,7 +457,7 @@ const AgentAuthPage = () => {
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">
                     Office Address
-                    <span className="text-destructive ml-0.5">*</span>
+                    <span className="text-xs font-normal text-muted-foreground ml-1">(optional)</span>
                   </label>
                   <div className="relative">
                     <input
@@ -591,7 +591,7 @@ const AgentAuthPage = () => {
 
                 <button
                   type="submit"
-                  disabled={!canSubmit}
+                  disabled={loading || !agreedToTerms || password !== confirmPassword || password.length < 6}
                   className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50"
                 >
                   {loading ? 'Setting up your account…' : 'Create Account'}

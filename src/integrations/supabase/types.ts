@@ -1577,6 +1577,9 @@ export type Database = {
           agency_authority: string | null
           agent_id: string | null
           agent_split_percent: number | null
+          air_con_type: string | null
+          auction_date: string | null
+          auction_time: string | null
           available_from: string | null
           baths: number
           beds: number
@@ -1592,15 +1595,31 @@ export type Database = {
           created_at: string
           currency_code: string | null
           description: string | null
+          electricity_included: boolean | null
+          ensuites: number | null
           estimated_value: string | null
           featured_until: string | null
           features: string[] | null
           flood_zone: boolean | null
           furnished: boolean | null
+          garage_type: string | null
+          has_air_con: boolean | null
+          has_alfresco: boolean | null
+          has_balcony: boolean | null
+          has_dishwasher: boolean | null
+          has_gym_access: boolean | null
+          has_internal_laundry: boolean | null
+          has_outdoor_ent: boolean | null
+          has_pool: boolean | null
+          has_pool_access: boolean | null
+          has_solar: boolean | null
+          has_washing_machine: boolean | null
+          heating_type: string | null
           id: string
           image_url: string | null
           images: string[] | null
           inspection_times: Json | null
+          internet_included: boolean | null
           is_active: boolean
           is_featured: boolean
           land_size: number | null
@@ -1610,24 +1629,29 @@ export type Database = {
           listing_type: string | null
           lng: number | null
           marketing_budget: number | null
+          max_occupants: number | null
           parking: number
           pets_allowed: boolean | null
           price: number
           price_formatted: string
           property_type: string | null
+          rental_parking_type: string | null
           rental_weekly: number | null
           rental_yield_pct: number | null
+          smoking_allowed: boolean | null
           sqm: number
           state: string
           status: string
           str_permitted: boolean | null
           strata_fees_quarterly: number | null
+          study_rooms: number | null
           suburb: string
           title: string
           updated_at: string
           vendor_email: string | null
           vendor_name: string | null
           views: number
+          water_included: boolean | null
           year_built: number | null
           zoning: string | null
         }
@@ -1636,6 +1660,9 @@ export type Database = {
           agency_authority?: string | null
           agent_id?: string | null
           agent_split_percent?: number | null
+          air_con_type?: string | null
+          auction_date?: string | null
+          auction_time?: string | null
           available_from?: string | null
           baths?: number
           beds?: number
@@ -1651,15 +1678,31 @@ export type Database = {
           created_at?: string
           currency_code?: string | null
           description?: string | null
+          electricity_included?: boolean | null
+          ensuites?: number | null
           estimated_value?: string | null
           featured_until?: string | null
           features?: string[] | null
           flood_zone?: boolean | null
           furnished?: boolean | null
+          garage_type?: string | null
+          has_air_con?: boolean | null
+          has_alfresco?: boolean | null
+          has_balcony?: boolean | null
+          has_dishwasher?: boolean | null
+          has_gym_access?: boolean | null
+          has_internal_laundry?: boolean | null
+          has_outdoor_ent?: boolean | null
+          has_pool?: boolean | null
+          has_pool_access?: boolean | null
+          has_solar?: boolean | null
+          has_washing_machine?: boolean | null
+          heating_type?: string | null
           id?: string
           image_url?: string | null
           images?: string[] | null
           inspection_times?: Json | null
+          internet_included?: boolean | null
           is_active?: boolean
           is_featured?: boolean
           land_size?: number | null
@@ -1669,24 +1712,29 @@ export type Database = {
           listing_type?: string | null
           lng?: number | null
           marketing_budget?: number | null
+          max_occupants?: number | null
           parking?: number
           pets_allowed?: boolean | null
           price: number
           price_formatted: string
           property_type?: string | null
+          rental_parking_type?: string | null
           rental_weekly?: number | null
           rental_yield_pct?: number | null
+          smoking_allowed?: boolean | null
           sqm?: number
           state: string
           status?: string
           str_permitted?: boolean | null
           strata_fees_quarterly?: number | null
+          study_rooms?: number | null
           suburb: string
           title: string
           updated_at?: string
           vendor_email?: string | null
           vendor_name?: string | null
           views?: number
+          water_included?: boolean | null
           year_built?: number | null
           zoning?: string | null
         }
@@ -1695,6 +1743,9 @@ export type Database = {
           agency_authority?: string | null
           agent_id?: string | null
           agent_split_percent?: number | null
+          air_con_type?: string | null
+          auction_date?: string | null
+          auction_time?: string | null
           available_from?: string | null
           baths?: number
           beds?: number
@@ -1710,15 +1761,31 @@ export type Database = {
           created_at?: string
           currency_code?: string | null
           description?: string | null
+          electricity_included?: boolean | null
+          ensuites?: number | null
           estimated_value?: string | null
           featured_until?: string | null
           features?: string[] | null
           flood_zone?: boolean | null
           furnished?: boolean | null
+          garage_type?: string | null
+          has_air_con?: boolean | null
+          has_alfresco?: boolean | null
+          has_balcony?: boolean | null
+          has_dishwasher?: boolean | null
+          has_gym_access?: boolean | null
+          has_internal_laundry?: boolean | null
+          has_outdoor_ent?: boolean | null
+          has_pool?: boolean | null
+          has_pool_access?: boolean | null
+          has_solar?: boolean | null
+          has_washing_machine?: boolean | null
+          heating_type?: string | null
           id?: string
           image_url?: string | null
           images?: string[] | null
           inspection_times?: Json | null
+          internet_included?: boolean | null
           is_active?: boolean
           is_featured?: boolean
           land_size?: number | null
@@ -1728,24 +1795,29 @@ export type Database = {
           listing_type?: string | null
           lng?: number | null
           marketing_budget?: number | null
+          max_occupants?: number | null
           parking?: number
           pets_allowed?: boolean | null
           price?: number
           price_formatted?: string
           property_type?: string | null
+          rental_parking_type?: string | null
           rental_weekly?: number | null
           rental_yield_pct?: number | null
+          smoking_allowed?: boolean | null
           sqm?: number
           state?: string
           status?: string
           str_permitted?: boolean | null
           strata_fees_quarterly?: number | null
+          study_rooms?: number | null
           suburb?: string
           title?: string
           updated_at?: string
           vendor_email?: string | null
           vendor_name?: string | null
           views?: number
+          water_included?: boolean | null
           year_built?: number | null
           zoning?: string | null
         }
@@ -3059,6 +3131,9 @@ export type Database = {
           agency_authority: string | null
           agent_id: string | null
           agent_split_percent: number | null
+          air_con_type: string | null
+          auction_date: string | null
+          auction_time: string | null
           available_from: string | null
           baths: number
           beds: number
@@ -3074,15 +3149,31 @@ export type Database = {
           created_at: string
           currency_code: string | null
           description: string | null
+          electricity_included: boolean | null
+          ensuites: number | null
           estimated_value: string | null
           featured_until: string | null
           features: string[] | null
           flood_zone: boolean | null
           furnished: boolean | null
+          garage_type: string | null
+          has_air_con: boolean | null
+          has_alfresco: boolean | null
+          has_balcony: boolean | null
+          has_dishwasher: boolean | null
+          has_gym_access: boolean | null
+          has_internal_laundry: boolean | null
+          has_outdoor_ent: boolean | null
+          has_pool: boolean | null
+          has_pool_access: boolean | null
+          has_solar: boolean | null
+          has_washing_machine: boolean | null
+          heating_type: string | null
           id: string
           image_url: string | null
           images: string[] | null
           inspection_times: Json | null
+          internet_included: boolean | null
           is_active: boolean
           is_featured: boolean
           land_size: number | null
@@ -3092,24 +3183,29 @@ export type Database = {
           listing_type: string | null
           lng: number | null
           marketing_budget: number | null
+          max_occupants: number | null
           parking: number
           pets_allowed: boolean | null
           price: number
           price_formatted: string
           property_type: string | null
+          rental_parking_type: string | null
           rental_weekly: number | null
           rental_yield_pct: number | null
+          smoking_allowed: boolean | null
           sqm: number
           state: string
           status: string
           str_permitted: boolean | null
           strata_fees_quarterly: number | null
+          study_rooms: number | null
           suburb: string
           title: string
           updated_at: string
           vendor_email: string | null
           vendor_name: string | null
           views: number
+          water_included: boolean | null
           year_built: number | null
           zoning: string | null
         }[]

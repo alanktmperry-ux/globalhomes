@@ -1,103 +1,118 @@
 import { useState, useCallback, useRef } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
-interface SpeechRecognitionEvent {
-  results: SpeechRecognitionResultList;
-  resultIndex: number;
-}
-
-interface SpeechRecognitionErrorEvent {
-  error: string;
-}
-
-export function useVoiceSearch(onResult: (text: string) => void, onError?: (message: string) => void) {
+export function useVoiceSearch(
+  onResult: (text: string) => void,
+  onError?: (msg: string) => void
+) {
   const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef<any>(null);
-  const finalTranscriptRef = useRef('');
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+  const streamRef = useRef<MediaStream | null>(null);
 
-  const isSupported = typeof window !== 'undefined' && 
-    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+  const isSupported =
+    typeof window !== 'undefined' &&
+    !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
 
-  const startListening = useCallback(() => {
+  const startListening = useCallback(async () => {
     if (!isSupported) {
-      onError?.('Voice search is not supported in this browser.');
+      onError?.('Microphone not supported in this browser.');
       return;
     }
 
     try {
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      const recognition = new SpeechRecognition();
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          sampleRate: 16000,
+          channelCount: 1,
+          echoCancellation: true,
+          noiseSuppression: true,
+        }
+      });
 
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = navigator.language || 'en-US';
+      streamRef.current = stream;
+      chunksRef.current = [];
 
-      finalTranscriptRef.current = '';
+      const mimeType =
+        MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+          ? 'audio/webm;codecs=opus'
+          : MediaRecorder.isTypeSupported('audio/mp4')
+            ? 'audio/mp4'
+            : 'audio/webm';
 
-      recognition.onresult = (event: SpeechRecognitionEvent) => {
-        let finalTranscript = '';
-        let interimTranscript = '';
+      const recorder = new MediaRecorder(stream, { mimeType });
 
-        for (let i = 0; i < event.results.length; i++) {
-          const result = event.results[i];
-          if (result.isFinal) {
-            finalTranscript += result[0].transcript + ' ';
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          chunksRef.current.push(e.data);
+        }
+      };
+
+      recorder.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop());
+
+        if (chunksRef.current.length === 0) return;
+
+        setIsTranscribing(true);
+
+        try {
+          const blob = new Blob(chunksRef.current, { type: mimeType });
+          const arrayBuffer = await blob.arrayBuffer();
+
+          const { data, error } = await supabase.functions.invoke(
+            'transcribe-audio',
+            {
+              body: arrayBuffer,
+              headers: {
+                'Content-Type': mimeType,
+              },
+            }
+          );
+
+          if (error) throw error;
+
+          const transcript = data?.transcript?.trim();
+
+          if (transcript) {
+            onResult(transcript);
           } else {
-            interimTranscript += result[0].transcript;
+            onError?.('No speech detected. Please try again.');
           }
-        }
-
-        if (finalTranscript) {
-          finalTranscriptRef.current = finalTranscript.trim();
-        }
-
-        // Send the combined transcript (final + interim) for live preview
-        const combined = (finalTranscriptRef.current + ' ' + interimTranscript).trim();
-        if (combined) {
-          onResult(combined);
+        } catch (err: any) {
+          console.error('[Whisper]', err);
+          onError?.('Transcription failed. Please try again.');
+        } finally {
+          setIsTranscribing(false);
         }
       };
 
-      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-        console.warn('[VoiceSearch] Error:', event.error);
-        setIsListening(false);
-        
-        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-          onError?.('Microphone access denied. Please allow microphone permissions and try again.');
-        } else if (event.error === 'no-speech') {
-          onError?.('No speech detected. Please try again and speak clearly.');
-        } else if (event.error === 'network') {
-          onError?.('Network error. Voice search requires an internet connection.');
-        } else if (event.error === 'aborted') {
-          // User or system aborted, no error needed
-        } else {
-          onError?.('Voice search failed. Try typing your search instead.');
-        }
-      };
-
-      recognition.onend = () => {
-        setIsListening(false);
-        // Deliver final transcript when recognition ends
-        if (finalTranscriptRef.current) {
-          onResult(finalTranscriptRef.current);
-        }
-      };
-
-      recognitionRef.current = recognition;
-      recognition.start();
+      mediaRecorderRef.current = recorder;
+      recorder.start();
       setIsListening(true);
-    } catch (err) {
-      console.error('[VoiceSearch] Failed to start:', err);
+
+    } catch (err: any) {
+      if (err.name === 'NotAllowedError') {
+        onError?.('Microphone access denied. Please allow microphone permissions and try again.');
+      } else {
+        onError?.('Could not access microphone. Please try again.');
+      }
       setIsListening(false);
-      onError?.('Voice search is not available. Try typing your search instead.');
     }
   }, [isSupported, onResult, onError]);
 
   const stopListening = useCallback(() => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
-      setIsListening(false);
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
     }
+    setIsListening(false);
   }, []);
 
-  return { isListening, startListening, stopListening, isSupported };
+  return {
+    isListening,
+    isTranscribing,
+    startListening,
+    stopListening,
+    isSupported,
+  };
 }

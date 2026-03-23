@@ -1090,6 +1090,89 @@ export type Database = {
         }
         Relationships: []
       }
+      feature_request_upvotes: {
+        Row: {
+          agent_id: string
+          created_at: string
+          feature_request_id: string
+          id: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          feature_request_id: string
+          id?: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          feature_request_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feature_request_upvotes_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feature_request_upvotes_feature_request_id_fkey"
+            columns: ["feature_request_id"]
+            isOneToOne: false
+            referencedRelation: "feature_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feature_requests: {
+        Row: {
+          admin_response: string | null
+          agent_id: string | null
+          category: string | null
+          created_at: string
+          description: string
+          id: string
+          status: string
+          title: string
+          updated_at: string
+          upvote_count: number
+        }
+        Insert: {
+          admin_response?: string | null
+          agent_id?: string | null
+          category?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          status?: string
+          title: string
+          updated_at?: string
+          upvote_count?: number
+        }
+        Update: {
+          admin_response?: string | null
+          agent_id?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          upvote_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feature_requests_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lead_events: {
         Row: {
           agent_id: string
@@ -2416,6 +2499,62 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      support_tickets: {
+        Row: {
+          admin_notes: string | null
+          agent_id: string | null
+          category: string
+          created_at: string
+          description: string
+          id: string
+          priority: string
+          resolved_at: string | null
+          status: string
+          subject: string
+          submitter_email: string
+          submitter_name: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          agent_id?: string | null
+          category?: string
+          created_at?: string
+          description: string
+          id?: string
+          priority?: string
+          resolved_at?: string | null
+          status?: string
+          subject: string
+          submitter_email: string
+          submitter_name: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          agent_id?: string | null
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          priority?: string
+          resolved_at?: string | null
+          status?: string
+          subject?: string
+          submitter_email?: string
+          submitter_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_tickets_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tasks: {
         Row: {

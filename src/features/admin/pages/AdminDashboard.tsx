@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Building2, BarChart3, Shield, ShieldAlert, Database, ArrowLeft, Loader2, Gamepad2, Zap, DollarSign, Megaphone, Landmark, TrendingUp } from 'lucide-react';
+import { Users, Building2, BarChart3, Shield, ShieldAlert, Database, ArrowLeft, Loader2, Gamepad2, Zap, DollarSign, Megaphone, Landmark, TrendingUp, MessageSquare } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
@@ -18,8 +18,9 @@ import RevenueBilling from '@/features/admin/components/RevenueBilling';
 import CommsCentre from '@/features/admin/components/CommsCentre';
 import PartnerPerformance from '@/features/admin/components/PartnerPerformance';
 import GrowthFunnel from '@/features/admin/components/GrowthFunnel';
+import SupportInbox from '@/features/admin/components/SupportInbox';
 
-type Tab = 'command-centre' | 'agent-lifecycle' | 'compliance' | 'revenue' | 'comms' | 'partners' | 'growth' | 'overview' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests' | 'reports';
+type Tab = 'command-centre' | 'agent-lifecycle' | 'compliance' | 'revenue' | 'comms' | 'partners' | 'growth' | 'support' | 'overview' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests' | 'reports';
 
 interface UserRow {
   id: string;
@@ -319,6 +320,7 @@ const AdminDashboard = () => {
     { id: 'comms', label: 'Communications', icon: Megaphone },
     { id: 'partners', label: 'Partners', icon: Landmark },
     { id: 'growth', label: 'Growth Funnel', icon: TrendingUp },
+    { id: 'support', label: 'Support', icon: MessageSquare },
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'users', label: 'Users', icon: Users },
     { id: 'listings', label: 'Listings', icon: Building2 },
@@ -380,6 +382,7 @@ const AdminDashboard = () => {
             {tab === 'comms' && <CommsCentre />}
             {tab === 'partners' && <PartnerPerformance />}
             {tab === 'growth' && <GrowthFunnel />}
+            {tab === 'support' && <SupportInbox />}
             {tab === 'overview' && <AdminOverview stats={stats} users={users} insights={insights} />}
             {tab === 'users' && <AdminUsers />}
             {tab === 'listings' && <AdminListings properties={properties} onToggleActive={togglePropertyActive} onActivateBoost={activateBoost} />}

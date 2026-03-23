@@ -144,7 +144,37 @@ const TrustAccountingPage = () => {
     setUnmatchedCount(uCount || 0);
   }, [user]);
 
-  useEffect(() => { fetchPendingPayments(); fetchDashboardStats(); }, [fetchPendingPayments, fetchDashboardStats]);
+  const checkOverdrawn = useCallback(async () => {
+    if (!agent?.id) return;
+    const { data } = await supabase
+      .from('trust_transactions')
+      .select('payee_name, amount, transaction_type, status')
+      .eq('status', 'completed')
+      .in('trust_account_id', accounts.map(a => a.id));
+    if (!data) return;
+    const ledgers = new Map<string, number>();
+    data.forEach((tx: any) => {
+      const key = tx.payee_name || 'Unknown';
+      const current = ledgers.get(key) || 0;
+      const impact = tx.transaction_type === 'deposit' ? tx.amount : -tx.amount;
+      ledgers.set(key, current + impact);
+    });
+    const overdrawn = Array.from(ledgers.entries())
+      .filter(([_, bal]) => bal < 0)
+      .map(([name, balance]) => ({ name, balance }));
+    setOverdrawnLedgers(overdrawn);
+    if (overdrawn.length > 0) {
+      toast.error(
+        `⚠️ ${overdrawn.length} client ledger${overdrawn.length > 1 ? 's are' : ' is'} overdrawn`,
+        {
+          description: 'A trust account ledger must never have a debit balance. Notify your regulator immediately and remedy the shortfall.',
+          duration: 12000,
+        }
+      );
+    }
+  }, [agent?.id, accounts]);
+
+  useEffect(() => { fetchPendingPayments(); fetchDashboardStats(); checkOverdrawn(); }, [fetchPendingPayments, fetchDashboardStats, checkOverdrawn]);
 
   // New tx form
   const [txCategory, setTxCategory] = useState('deposit');

@@ -18,8 +18,9 @@ import RevenueBilling from '@/features/admin/components/RevenueBilling';
 import CommsCentre from '@/features/admin/components/CommsCentre';
 import PartnerPerformance from '@/features/admin/components/PartnerPerformance';
 import GrowthFunnel from '@/features/admin/components/GrowthFunnel';
+import SupportInbox from '@/features/admin/components/SupportInbox';
 
-type Tab = 'command-centre' | 'agent-lifecycle' | 'compliance' | 'revenue' | 'comms' | 'partners' | 'growth' | 'overview' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests' | 'reports';
+type Tab = 'command-centre' | 'agent-lifecycle' | 'compliance' | 'revenue' | 'comms' | 'partners' | 'growth' | 'support' | 'overview' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests' | 'reports';
 
 interface UserRow {
   id: string;

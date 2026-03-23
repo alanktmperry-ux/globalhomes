@@ -59,7 +59,7 @@ Deno.serve(async (req) => {
       // Fetch all agents with subscription info
       const { data: agents } = await supabase
         .from("agents")
-        .select("user_id, is_demo, is_subscribed, agent_subscriptions(plan_type)");
+        .select("user_id, is_demo, is_subscribed, support_pin, agent_subscriptions(plan_type)");
 
       // Fetch demo requests (approved/redeemed)
       const { data: demoRequests } = await supabase
@@ -107,6 +107,7 @@ Deno.serve(async (req) => {
           is_subscribed: isSubscribed,
           plan_type: planType,
           is_partner_verified: partnerRecord?.is_verified || false,
+          support_pin: agent?.support_pin || null,
         };
       });
 

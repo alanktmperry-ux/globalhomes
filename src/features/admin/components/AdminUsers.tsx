@@ -27,6 +27,7 @@ interface AuthUser {
   plan_type: string | null;
   demo_status?: string;
   agency_name?: string;
+  support_pin?: string | null;
 }
 
 const UserTypeBadge = ({ user }: { user: AuthUser }) => {
@@ -493,6 +494,12 @@ const AdminUsers = () => {
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <Mail size={10} /> {u.email}
                     </p>
+                    {u.support_pin && (
+                      <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                        <Shield size={10} />
+                        PIN: <span className="font-mono font-semibold text-foreground tracking-wider">{u.support_pin}</span>
+                      </p>
+                    )}
                     {u.agency_name && (
                       <p className="text-xs text-muted-foreground mt-0.5">{u.agency_name}</p>
                     )}

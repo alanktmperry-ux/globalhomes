@@ -643,7 +643,39 @@ const ProfilePage = () => {
               </div>
             </div>
 
-            <Button onClick={handleSave} disabled={saving} className="w-full">
+            {/* Support PIN */}
+            <div className="bg-card border border-border rounded-xl p-5 space-y-3">
+              <h3 className="font-display text-sm font-bold flex items-center gap-1.5">
+                <Shield size={14} /> Support PIN
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Quote this PIN when contacting ListHQ support so we can verify your identity instantly.
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="bg-primary/5 border border-primary/20 rounded-xl px-6 py-3 flex items-center gap-3">
+                  <span className="font-mono text-2xl font-bold text-primary tracking-widest">
+                    {agent.support_pin
+                      ? agent.support_pin.replace(/(\d{3})(\d{3})/, '$1 $2')
+                      : '— — —'}
+                  </span>
+                </div>
+                <button
+                  onClick={() => {
+                    if (agent.support_pin) {
+                      navigator.clipboard.writeText(agent.support_pin);
+                      toast.success('PIN copied to clipboard');
+                    }
+                  }}
+                  className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
+                >
+                  Copy
+                </button>
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                Your PIN is unique to your account and cannot be changed. Do not share it publicly.
+              </p>
+            </div>
+
               {saving ? <><Loader2 size={16} className="animate-spin mr-2" /> Saving...</> : 'Save All Changes'}
             </Button>
           </TabsContent>

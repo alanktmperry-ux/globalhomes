@@ -2412,6 +2412,78 @@ export type Database = {
           },
         ]
       }
+      trust_journal_entries: {
+        Row: {
+          agent_id: string
+          amount: number
+          created_at: string
+          created_by: string
+          credit_ledger: string
+          debit_ledger: string
+          entry_date: string
+          id: string
+          reason_code: string
+          reason_detail: string
+          reference: string | null
+          trust_account_id: string
+          void_reason: string | null
+          voided: boolean
+          voided_at: string | null
+          voided_by: string | null
+        }
+        Insert: {
+          agent_id: string
+          amount: number
+          created_at?: string
+          created_by: string
+          credit_ledger: string
+          debit_ledger: string
+          entry_date?: string
+          id?: string
+          reason_code: string
+          reason_detail: string
+          reference?: string | null
+          trust_account_id: string
+          void_reason?: string | null
+          voided?: boolean
+          voided_at?: string | null
+          voided_by?: string | null
+        }
+        Update: {
+          agent_id?: string
+          amount?: number
+          created_at?: string
+          created_by?: string
+          credit_ledger?: string
+          debit_ledger?: string
+          entry_date?: string
+          id?: string
+          reason_code?: string
+          reason_detail?: string
+          reference?: string | null
+          trust_account_id?: string
+          void_reason?: string | null
+          voided?: boolean
+          voided_at?: string | null
+          voided_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trust_journal_entries_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_journal_entries_trust_account_id_fkey"
+            columns: ["trust_account_id"]
+            isOneToOne: false
+            referencedRelation: "trust_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trust_payments: {
         Row: {
           account_number: string | null
@@ -2591,6 +2663,76 @@ export type Database = {
           },
         ]
       }
+      trust_suspense: {
+        Row: {
+          agent_id: string
+          amount: number
+          bank_reference: string | null
+          created_at: string
+          created_by: string
+          id: string
+          matched_at: string | null
+          matched_by: string | null
+          matched_transaction_id: string | null
+          notes: string | null
+          received_date: string
+          status: string
+          trust_account_id: string
+        }
+        Insert: {
+          agent_id: string
+          amount: number
+          bank_reference?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          matched_at?: string | null
+          matched_by?: string | null
+          matched_transaction_id?: string | null
+          notes?: string | null
+          received_date?: string
+          status?: string
+          trust_account_id: string
+        }
+        Update: {
+          agent_id?: string
+          amount?: number
+          bank_reference?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          matched_at?: string | null
+          matched_by?: string | null
+          matched_transaction_id?: string | null
+          notes?: string | null
+          received_date?: string
+          status?: string
+          trust_account_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trust_suspense_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_suspense_matched_transaction_id_fkey"
+            columns: ["matched_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "trust_transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_suspense_trust_account_id_fkey"
+            columns: ["trust_account_id"]
+            isOneToOne: false
+            referencedRelation: "trust_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trust_transactions: {
         Row: {
           aba_exported: boolean
@@ -2598,13 +2740,18 @@ export type Database = {
           amount: number
           category: string
           contact_id: string | null
+          correction_reason: string | null
           created_at: string
           created_by: string
           description: string | null
+          dishonoured_at: string | null
           due_date: string | null
           gst_amount: number
           id: string
           invoice_number: string | null
+          is_dishonoured: boolean
+          original_transaction_id: string | null
+          overdrawn_notified: boolean
           payee_name: string | null
           property_id: string | null
           receipt_number: string | null
@@ -2623,13 +2770,18 @@ export type Database = {
           amount?: number
           category?: string
           contact_id?: string | null
+          correction_reason?: string | null
           created_at?: string
           created_by: string
           description?: string | null
+          dishonoured_at?: string | null
           due_date?: string | null
           gst_amount?: number
           id?: string
           invoice_number?: string | null
+          is_dishonoured?: boolean
+          original_transaction_id?: string | null
+          overdrawn_notified?: boolean
           payee_name?: string | null
           property_id?: string | null
           receipt_number?: string | null
@@ -2648,13 +2800,18 @@ export type Database = {
           amount?: number
           category?: string
           contact_id?: string | null
+          correction_reason?: string | null
           created_at?: string
           created_by?: string
           description?: string | null
+          dishonoured_at?: string | null
           due_date?: string | null
           gst_amount?: number
           id?: string
           invoice_number?: string | null
+          is_dishonoured?: boolean
+          original_transaction_id?: string | null
+          overdrawn_notified?: boolean
           payee_name?: string | null
           property_id?: string | null
           receipt_number?: string | null
@@ -2673,6 +2830,13 @@ export type Database = {
             columns: ["contact_id"]
             isOneToOne: false
             referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_transactions_original_transaction_id_fkey"
+            columns: ["original_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "trust_transactions"
             referencedColumns: ["id"]
           },
           {

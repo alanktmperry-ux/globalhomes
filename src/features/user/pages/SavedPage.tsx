@@ -6,7 +6,6 @@ import { PropertyCard } from '@/features/properties/components/PropertyCard';
 import { PropertyDrawer } from '@/features/properties/components/PropertyDrawer';
 import { useI18n } from '@/shared/lib/i18n';
 import { useSavedProperties } from '@/features/properties/hooks/useSavedProperties';
-import { mockProperties } from '@/features/properties/api/mock-data';
 import { Property } from '@/shared/lib/types';
 import { fetchPublicProperties } from '@/features/properties/api/fetchPublicProperties';
 
@@ -25,11 +24,8 @@ const SavedPage = () => {
     });
   }, []);
 
-  // Combine mock + DB properties, deduplicate by ID, then filter to saved
-  const allProperties = [...mockProperties, ...dbProperties];
-  const uniqueMap = new Map<string, Property>();
-  allProperties.forEach(p => { if (!uniqueMap.has(p.id)) uniqueMap.set(p.id, p); });
-  const savedProperties = Array.from(uniqueMap.values()).filter(p => savedIds.has(p.id));
+  // Filter real DB properties to saved IDs only
+  const savedProperties = dbProperties.filter(p => savedIds.has(p.id));
 
   return (
     <div className="min-h-screen bg-background pb-20">

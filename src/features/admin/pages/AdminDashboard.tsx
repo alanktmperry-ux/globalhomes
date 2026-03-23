@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Users, Building2, BarChart3, Shield, Database, ArrowLeft, Loader2, Gamepad2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { useToast } from '@/shared/hooks/use-toast';
+import { toast } from 'sonner';
 import AdminOverview from '@/features/admin/components/AdminOverview';
 import AdminUsers from '@/features/admin/components/AdminUsers';
 import AdminListings from '@/features/admin/components/AdminListings';
@@ -38,14 +38,37 @@ interface PropertyRow {
   boost_requested_tier: string | null;
 }
 
+export interface InsightsData {
+  // Subscriptions
+  activeSubscriptions: number;
+  trialAgents: number;
+  trialsExpiringThisWeek: number;
+  // Platform activity
+  listingsPublished: number;
+  listingsThisWeek: number;
+  voiceSearches30d: number;
+  voiceSearchesPrev30d: number;
+  leadsToday: number;
+  leads30d: number;
+  // Listing health
+  avgViewsPerListing: number;
+  boostRequestsPending: number;
+  inactiveListings: number; // no views in 14 days
+  listingsNoPhotos: number;
+  // Needs attention
+  agentsNoListings: number;
+  // Voice search languages
+  topLanguages: { language: string; count: number }[];
+}
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { user, isAdmin, loading: authLoading } = useAuth();
-  const { toast } = useToast();
   const [tab, setTab] = useState<Tab>('overview');
   const [users, setUsers] = useState<UserRow[]>([]);
   const [properties, setProperties] = useState<PropertyRow[]>([]);
   const [stats, setStats] = useState({ totalUsers: 0, totalAgents: 0, totalListings: 0, totalLeads: 0, totalVoiceSearches: 0 });
+  const [insights, setInsights] = useState<InsightsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [pendingDemoCount, setPendingDemoCount] = useState(0);
@@ -62,12 +85,36 @@ const AdminDashboard = () => {
 
   const fetchData = async () => {
     setLoading(true);
-    const [profilesRes, agentsRes, propsRes, leadsRes, voiceRes] = await Promise.all([
+
+    const now = new Date();
+    const day30ago = new Date(now.getTime() - 30 * 86400000).toISOString();
+    const day60ago = new Date(now.getTime() - 60 * 86400000).toISOString();
+    const day7ago = new Date(now.getTime() - 7 * 86400000).toISOString();
+    const day14ago = new Date(now.getTime() - 14 * 86400000).toISOString();
+    const todayStart = new Date(now.setHours(0, 0, 0, 0)).toISOString();
+
+    const [
+      profilesRes, agentsRes, propsRes, leadsRes, voiceRes,
+      profileData, roleData,
+      agentsFull, propsFull,
+      voice30d, voicePrev30d,
+      leadsToday, leads30d,
+      voiceLang,
+    ] = await Promise.all([
       supabase.from('profiles').select('id', { count: 'exact', head: true }),
       supabase.from('agents').select('id', { count: 'exact', head: true }),
       supabase.from('properties').select('id', { count: 'exact', head: true }),
       supabase.from('leads').select('id', { count: 'exact', head: true }),
       supabase.from('voice_searches').select('id', { count: 'exact', head: true }),
+      supabase.from('profiles').select('user_id, display_name, created_at'),
+      supabase.from('user_roles').select('user_id, role'),
+      supabase.from('agents').select('id, user_id, is_subscribed, subscription_expires_at, onboarding_complete, agency_id, created_at'),
+      supabase.from('properties').select('id, title, address, suburb, price_formatted, is_active, views, images, created_at, is_featured, featured_until, boost_tier, boost_requested_at, boost_requested_tier, agent_id, listed_date').order('created_at', { ascending: false }).limit(200),
+      supabase.from('voice_searches').select('id', { count: 'exact', head: true }).gte('created_at', day30ago),
+      supabase.from('voice_searches').select('id', { count: 'exact', head: true }).gte('created_at', day60ago).lt('created_at', day30ago),
+      supabase.from('leads').select('id', { count: 'exact', head: true }).gte('created_at', todayStart),
+      supabase.from('leads').select('id', { count: 'exact', head: true }).gte('created_at', day30ago),
+      supabase.from('voice_searches').select('detected_language').gte('created_at', day30ago),
     ]);
 
     setStats({
@@ -78,17 +125,14 @@ const AdminDashboard = () => {
       totalVoiceSearches: voiceRes.count || 0,
     });
 
-    const { data: profileData } = await supabase.from('profiles').select('user_id, display_name, created_at');
-    const { data: roleData } = await supabase.from('user_roles').select('user_id, role');
-
+    // Build user rows
     const roleMap = new Map<string, string[]>();
-    roleData?.forEach((r) => {
+    roleData.data?.forEach((r) => {
       const existing = roleMap.get(r.user_id) || [];
       existing.push(r.role);
       roleMap.set(r.user_id, existing);
     });
 
-    // Fetch last_sign_in_at from admin-users edge function
     const { data: sessionData } = await supabase.auth.getSession();
     const signInMap = new Map<string, string | null>();
     try {
@@ -107,7 +151,7 @@ const AdminDashboard = () => {
       });
     } catch {}
 
-    const userRows: UserRow[] = (profileData || []).map((p) => ({
+    const userRows: UserRow[] = (profileData.data || []).map((p) => ({
       id: p.user_id,
       email: p.display_name || 'Unknown',
       created_at: p.created_at,
@@ -117,8 +161,73 @@ const AdminDashboard = () => {
     }));
     setUsers(userRows);
 
-    const { data: propData } = await supabase.from('properties').select('id, title, address, suburb, price_formatted, is_active, views, created_at, is_featured, featured_until, boost_tier, boost_requested_at, boost_requested_tier').order('created_at', { ascending: false }).limit(100);
-    setProperties(propData || []);
+    const allProps = propsFull.data || [];
+    setProperties(allProps as PropertyRow[]);
+
+    // --- Build insights ---
+    const agents = agentsFull.data || [];
+    const agentIds = new Set(agents.map((a) => a.id));
+
+    // Subscriptions
+    const activeSubscriptions = agents.filter((a) => a.is_subscribed).length;
+    const trialAgents = agents.filter((a) => !a.is_subscribed).length;
+    const trialsExpiringThisWeek = agents.filter((a) => {
+      if (a.is_subscribed || !a.created_at) return false;
+      const trialEnd = new Date(new Date(a.created_at).getTime() + 60 * 86400000);
+      return trialEnd > now && trialEnd <= new Date(now.getTime() + 7 * 86400000);
+    }).length;
+
+    // Listings
+    const activeProps = allProps.filter((p) => p.is_active);
+    const listingsThisWeek = allProps.filter((p) => p.created_at >= day7ago).length;
+    const totalViews = activeProps.reduce((sum, p) => sum + (p.views || 0), 0);
+    const avgViewsPerListing = activeProps.length > 0 ? Math.round(totalViews / activeProps.length) : 0;
+    const boostRequestsPending = allProps.filter((p) => p.boost_requested_at && !p.is_featured).length;
+    const inactiveListings = activeProps.filter((p) => (p.views || 0) === 0).length;
+    const listingsNoPhotos = allProps.filter((p) => {
+      const imgs = (p as any).images;
+      return !imgs || imgs.length === 0;
+    }).length;
+
+    // Agents with no listings
+    const agentsWithListings = new Set(allProps.map((p) => (p as any).agent_id).filter(Boolean));
+    const agentsNoListings = agents.filter((a) => !agentsWithListings.has(a.id)).length;
+
+    // Voice languages
+    const langCount = new Map<string, number>();
+    (voiceLang.data || []).forEach((v: any) => {
+      const lang = v.detected_language || 'en';
+      langCount.set(lang, (langCount.get(lang) || 0) + 1);
+    });
+    const langLabels: Record<string, string> = {
+      en: 'English', zh: 'Mandarin', ar: 'Arabic',
+      hi: 'Hindi', vi: 'Vietnamese', ko: 'Korean',
+      ja: 'Japanese', es: 'Spanish', fr: 'French',
+      it: 'Italian', pt: 'Portuguese', de: 'German',
+    };
+    const topLanguages = Array.from(langCount.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([lang, count]) => ({ language: langLabels[lang] || lang.toUpperCase(), count }));
+
+    setInsights({
+      activeSubscriptions,
+      trialAgents,
+      trialsExpiringThisWeek,
+      listingsPublished: activeProps.length,
+      listingsThisWeek,
+      voiceSearches30d: voice30d.count || 0,
+      voiceSearchesPrev30d: voicePrev30d.count || 0,
+      leadsToday: leadsToday.count || 0,
+      leads30d: leads30d.count || 0,
+      avgViewsPerListing,
+      boostRequestsPending,
+      inactiveListings,
+      listingsNoPhotos,
+      agentsNoListings,
+      topLanguages,
+    });
+
     setLoading(false);
   };
 
@@ -132,17 +241,17 @@ const AdminDashboard = () => {
           await supabase.from('agents').insert({ user_id: userId, name: userProfile?.display_name || 'Agent', email: userProfile?.email });
         }
       }
-      toast({ title: `Role "${role}" added` });
+      toast(`Role "${role}" added`);
     } else {
       await supabase.from('user_roles').delete().eq('user_id', userId).eq('role', role as any);
-      toast({ title: `Role "${role}" removed` });
+      toast(`Role "${role}" removed`);
     }
     fetchData();
   };
 
   const togglePropertyActive = async (propId: string, isActive: boolean) => {
     await supabase.from('properties').update({ is_active: !isActive }).eq('id', propId);
-    toast({ title: isActive ? 'Listing deactivated' : 'Listing activated' });
+    toast(isActive ? 'Listing deactivated' : 'Listing activated');
     fetchData();
   };
 
@@ -160,7 +269,6 @@ const AdminDashboard = () => {
       } as any)
       .eq('id', id);
     if (!error) {
-      // Send bell notification to agent
       const { data: propData } = await supabase
         .from('properties')
         .select('agent_id, address, suburb')
@@ -172,16 +280,12 @@ const AdminDashboard = () => {
           agent_id: propData.agent_id,
           type: 'boost_activated',
           title: `⚡ Your ${tier} boost is live!`,
-          message:
-            `${propData.address} is now in the`
-            + ` featured grid near`
-            + ` ${propData.suburb}.`
-            + ` Live for ${days} days.`,
+          message: `${propData.address} is now in the featured grid near ${propData.suburb}. Live for ${days} days.`,
           property_id: id,
         } as any);
       }
 
-      toast({ title: `${tier} boost activated for ${days} days` });
+      toast(`${tier} boost activated for ${days} days`);
       fetchData();
     }
   };
@@ -248,7 +352,7 @@ const AdminDashboard = () => {
           </div>
         ) : (
           <>
-            {tab === 'overview' && <AdminOverview stats={stats} users={users} />}
+            {tab === 'overview' && <AdminOverview stats={stats} users={users} insights={insights} />}
             {tab === 'users' && <AdminUsers />}
             {tab === 'listings' && <AdminListings properties={properties} onToggleActive={togglePropertyActive} onActivateBoost={activateBoost} />}
             {tab === 'roles' && <AdminRoles users={users} searchQuery={searchQuery} onSearchChange={setSearchQuery} onRoleChange={handleRoleChange} />}

@@ -151,6 +151,7 @@ const App = () => (
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
                 <Route path="/auth/confirm" element={<AuthConfirmPage />} />
+                <Route path="/review/:token" element={<ReviewSubmitPage />} />
 
                 {/* Authenticated */}
                 <Route path="/saved" element={<ProtectedRoute><SavedPage /></ProtectedRoute>} />

@@ -33,6 +33,8 @@ interface AgentProfile {
   agencyId: string | null;
   investmentNiche: string | null;
   handlesTrustAccounting: boolean;
+  avgRating?: number;
+  reviewCount?: number;
 }
 
 function ScoreRing({ score, size = 80 }: { score: number; size?: number }) {

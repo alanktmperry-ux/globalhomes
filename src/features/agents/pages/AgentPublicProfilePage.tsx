@@ -101,6 +101,7 @@ export default function AgentPublicProfilePage() {
   const [agent, setAgent] = useState<AgentProfile | null>(null);
   const [listings, setListings] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  const [agentReviews, setAgentReviews] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchAgent = async () => {

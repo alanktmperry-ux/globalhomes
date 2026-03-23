@@ -143,10 +143,6 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
   }, [listingMode, currentQuery, handleSearch]);
 
 
-  // ── Force-refresh AI results ─────────────────────────────────
-  const refreshAIResults = useCallback(() => {
-    if (currentQuery) handleSearch(currentQuery, true);
-  }, [currentQuery, handleSearch]);
 
   // ── Derived: all properties (DB + mock fallback) ─────────────
   const allProperties = useMemo(() => {

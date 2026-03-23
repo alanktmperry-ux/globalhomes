@@ -8,6 +8,7 @@ import { useToast } from '@/shared/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
+import { useConsent } from '@/shared/components/CookieConsent';
 import { BottomNav } from '@/shared/components/layout/BottomNav';
 
 const PROPERTY_TYPES = ['House', 'Apartment', 'Townhouse', 'Land', 'Villa', 'Unit'];

@@ -134,6 +134,8 @@ export default function AgentPublicProfilePage() {
           agencyId: data.agency_id,
           investmentNiche: data.investment_niche,
           handlesTrustAccounting: data.handles_trust_accounting || false,
+          avgRating: data.rating ?? 0,
+          reviewCount: data.review_count ?? 0,
         });
 
         // Fetch agent's listings

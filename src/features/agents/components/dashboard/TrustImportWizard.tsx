@@ -898,7 +898,7 @@ ${matterRows.length > 0 ? `
       <div className="py-2 px-4 rounded-lg bg-muted/50 border border-border flex items-center justify-center gap-2">
         <ShieldCheck size={12} className="text-primary shrink-0" />
         <p className="text-[10px] text-muted-foreground text-center">
-          AFA 2014 compliant • Audit trail preserved • 5-year retention
+          All-state compliant • Audit trail preserved • 7-year retention
         </p>
       </div>
     </div>

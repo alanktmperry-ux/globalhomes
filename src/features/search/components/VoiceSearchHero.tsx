@@ -81,56 +81,7 @@ const SEARCH_PLACEHOLDERS = [
   'townhouse with a garage…',
 ];
 
-const FEATURED_PROPERTIES = [
-  {
-    id: '1', price: '$2,450,000',
-    address: '12 Marine Parade',
-    suburb: 'Brighton VIC 3186',
-    beds: 4, baths: 3, cars: 2,
-    tag: 'Featured',
-    img: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&q=70',
-  },
-  {
-    id: '2', price: '$875,000',
-    address: '7 Smith Street',
-    suburb: 'Fitzroy VIC 3065',
-    beds: 2, baths: 1, cars: 1,
-    tag: 'New',
-    img: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=70',
-  },
-  {
-    id: '3', price: '$3,100,000',
-    address: '4 Orrong Road',
-    suburb: 'Toorak VIC 3142',
-    beds: 5, baths: 4, cars: 3,
-    tag: 'Featured',
-    img: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&q=70',
-  },
-  {
-    id: '4', price: '$1,250,000',
-    address: '22 Acland Street',
-    suburb: 'St Kilda VIC 3182',
-    beds: 3, baths: 2, cars: 1,
-    tag: 'New',
-    img: 'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=400&q=70',
-  },
-  {
-    id: '5', price: '$1,890,000',
-    address: '15 Toorak Road',
-    suburb: 'South Yarra VIC 3141',
-    beds: 4, baths: 3, cars: 2,
-    tag: 'Featured',
-    img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=70',
-  },
-  {
-    id: '6', price: '$965,000',
-    address: '8 Church Street',
-    suburb: 'Richmond VIC 3121',
-    beds: 3, baths: 2, cars: 1,
-    tag: 'New',
-    img: 'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=400&q=70',
-  },
-];
+
 
 interface VoiceSearchHeroProps {
   onSearch: (query: string) => void;

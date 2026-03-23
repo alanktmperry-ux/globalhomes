@@ -43,6 +43,7 @@ interface AgentData {
   is_subscribed: boolean;
   created_at: string;
   company_logo_url: string | null;
+  support_pin?: string | null;
 }
 
 interface Credential {

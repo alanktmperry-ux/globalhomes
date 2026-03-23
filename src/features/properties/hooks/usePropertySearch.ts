@@ -125,7 +125,6 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
         listingMode,
         {
           beds: parsedFilters.beds || undefined,
-          baths: parsedFilters.baths || undefined,
           priceMin: parsedFilters.priceMin || undefined,
           priceMax: parsedFilters.priceMax || undefined,
           suburb: parsedFilters.location || undefined,

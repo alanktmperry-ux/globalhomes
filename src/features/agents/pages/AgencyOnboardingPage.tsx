@@ -269,21 +269,21 @@ export default function AgencyOnboardingPage() {
       <div class="brand">List<span>HQ</span></div>
       <div class="doc-title">Trust Account Migration Pre-Import Checklist</div>
       <div class="doc-meta">
-        Agency: <strong>\${agencyName || '________________________'}</strong> &nbsp;|&nbsp;
-        State: <strong>\${operatingState || '____'}</strong> &nbsp;|&nbsp;
-        Cut-over date: <strong>\${cutoverDate || '_______________'}</strong>
+        Agency: <strong>${agencyName || '________________________'}</strong> &nbsp;|&nbsp;
+        State: <strong>${operatingState || '____'}</strong> &nbsp;|&nbsp;
+        Cut-over date: <strong>${cutoverDate || '_______________'}</strong>
       </div>
     </div>
     <div class="ref">
-      Generated: \${today}<br/>
-      Ref: MIG-\${Date.now().toString(36).toUpperCase()}
+      Generated: ${today}<br/>
+      Ref: MIG-${Date.now().toString(36).toUpperCase()}
     </div>
   </div>
 </div>
 
 <div class="legislation-box">
-  📋 <strong>Governing legislation for \${operatingState || 'your state'}:</strong> \${legislation}
-  &nbsp;|&nbsp; Annual audit due: <strong>\${auditDue}</strong>
+  📋 <strong>Governing legislation for ${operatingState || 'your state'}:</strong> ${legislation}
+  &nbsp;|&nbsp; Annual audit due: <strong>${auditDue}</strong>
 </div>
 
 <div class="aml-box">
@@ -409,7 +409,7 @@ export default function AgencyOnboardingPage() {
     <div class="item-content">
       <div class="item-title">All bonds lodged with state bond authority <span class="req-badge req-state">STATE-SPECIFIC</span></div>
       <div class="item-desc">Bonds must NOT be held in your general trust account — they must be lodged with the relevant state bond authority within the prescribed timeframe.</div>
-      <div class="state-note">\${operatingState ? `\${operatingState}: \${bondAuth}` : 'Check your state bond authority requirements'}</div>
+      <div class="state-note">${operatingState ? `${operatingState}: ${bondAuth}` : 'Check your state bond authority requirements'}</div>
       <div class="write-in-grid">
         <div><div class="write-in-label">Number of active bonds:</div><div class="write-in"></div></div>
         <div><div class="write-in-label">Total bond amount: $</div><div class="write-in"></div></div>
@@ -428,7 +428,7 @@ export default function AgencyOnboardingPage() {
     <div class="checkbox"></div>
     <div class="item-content">
       <div class="item-title">Interest on trust funds — disbursed correctly <span class="req-badge req-state">STATE-SPECIFIC</span></div>
-      <div class="item-desc">Some states require interest earned on trust accounts above certain thresholds to be paid to the state's statutory authority or to the client. Confirm any interest earned has been handled in accordance with \${operatingState || 'your state'} legislation.</div>
+      <div class="item-desc">Some states require interest earned on trust accounts above certain thresholds to be paid to the state's statutory authority or to the client. Confirm any interest earned has been handled in accordance with ${operatingState || 'your state'} legislation.</div>
       <div class="write-in-grid">
         <div><div class="write-in-label">Interest earned (period): $</div><div class="write-in"></div></div>
         <div><div class="write-in-label">Disbursed to:</div><div class="write-in"></div></div>
@@ -514,7 +514,7 @@ export default function AgencyOnboardingPage() {
       </tr>
     </thead>
     <tbody>
-      <tr class="\${operatingState === 'VIC' ? 'highlight-row' : ''}">
+      <tr class="${operatingState === 'VIC' ? 'highlight-row' : ''}">
         <td><strong>VIC</strong></td>
         <td>Estate Agents Act 1980</td>
         <td>1 Jul – 30 Jun</td>
@@ -522,7 +522,7 @@ export default function AgencyOnboardingPage() {
         <td>Consumer Affairs Victoria (myCAV)</td>
         <td>7 years</td>
       </tr>
-      <tr class="\${operatingState === 'NSW' ? 'highlight-row' : ''}">
+      <tr class="${operatingState === 'NSW' ? 'highlight-row' : ''}">
         <td><strong>NSW</strong></td>
         <td>Property &amp; Stock Agents Act 2002</td>
         <td>1 Jul – 30 Jun</td>
@@ -530,7 +530,7 @@ export default function AgencyOnboardingPage() {
         <td>NSW Fair Trading (Auditor's Report Online)</td>
         <td>3 years (min)</td>
       </tr>
-      <tr class="\${operatingState === 'QLD' ? 'highlight-row' : ''}">
+      <tr class="${operatingState === 'QLD' ? 'highlight-row' : ''}">
         <td><strong>QLD</strong></td>
         <td>Agents Financial Administration Act 2014</td>
         <td>Licence anniversary</td>
@@ -538,7 +538,7 @@ export default function AgencyOnboardingPage() {
         <td>Office of Fair Trading (online portal)</td>
         <td>5 years</td>
       </tr>
-      <tr class="\${operatingState === 'WA' ? 'highlight-row' : ''}">
+      <tr class="${operatingState === 'WA' ? 'highlight-row' : ''}">
         <td><strong>WA</strong></td>
         <td>Real Estate &amp; Business Agents Act 1978</td>
         <td>1 Jan – 31 Dec</td>
@@ -546,7 +546,7 @@ export default function AgencyOnboardingPage() {
         <td>Commissioner for Consumer Protection</td>
         <td>6 years</td>
       </tr>
-      <tr class="\${operatingState === 'SA' ? 'highlight-row' : ''}">
+      <tr class="${operatingState === 'SA' ? 'highlight-row' : ''}">
         <td><strong>SA</strong></td>
         <td>Land Agents Act 1994</td>
         <td>2 months before licence expiry</td>
@@ -554,7 +554,7 @@ export default function AgencyOnboardingPage() {
         <td>Consumer &amp; Business Services</td>
         <td>7 years</td>
       </tr>
-      <tr class="\${operatingState === 'TAS' ? 'highlight-row' : ''}">
+      <tr class="${operatingState === 'TAS' ? 'highlight-row' : ''}">
         <td><strong>TAS</strong></td>
         <td>Property Agents &amp; Land Transactions Act 2016</td>
         <td>1 Jul – 30 Jun</td>
@@ -562,7 +562,7 @@ export default function AgencyOnboardingPage() {
         <td>Property Agents Board</td>
         <td>7 years</td>
       </tr>
-      <tr class="\${operatingState === 'ACT' ? 'highlight-row' : ''}">
+      <tr class="${operatingState === 'ACT' ? 'highlight-row' : ''}">
         <td><strong>ACT</strong></td>
         <td>Agents Act 2003</td>
         <td>1 Jul – 30 Jun</td>
@@ -570,7 +570,7 @@ export default function AgencyOnboardingPage() {
         <td>Access Canberra</td>
         <td>7 years</td>
       </tr>
-      <tr class="\${operatingState === 'NT' ? 'highlight-row' : ''}">
+      <tr class="${operatingState === 'NT' ? 'highlight-row' : ''}">
         <td><strong>NT</strong></td>
         <td>Agents Licensing Act 1979</td>
         <td>1 Jul – 30 Jun</td>
@@ -590,7 +590,7 @@ export default function AgencyOnboardingPage() {
     I, the undersigned, declare that I have reviewed the above checklist and confirm that:
     (1) all trust account records have been reconciled and are accurate as at the cut-over date;
     (2) all client funds held in trust are correctly identified and accounted for;
-    (3) all bond lodgements, receipt sequences, and disbursement authorities comply with \${legislation};
+    (3) all bond lodgements, receipt sequences, and disbursement authorities comply with ${legislation};
     (4) this checklist forms part of the statutory audit trail for trust account migration purposes;
     (5) records will be retained for a minimum of 7 years in accordance with the strictest applicable state requirement;
     and (6) I accept responsibility for the accuracy of all data imported into ListHQ from this date.
@@ -605,8 +605,8 @@ export default function AgencyOnboardingPage() {
 
 <div class="footer">
   ListHQ Trust Account Migration Pre-Import Checklist &nbsp;|&nbsp;
-  Generated \${today} &nbsp;|&nbsp;
-  Ref: MIG-\${Date.now().toString(36).toUpperCase()} &nbsp;|&nbsp;
+  Generated ${today} &nbsp;|&nbsp;
+  Ref: MIG-${Date.now().toString(36).toUpperCase()} &nbsp;|&nbsp;
   Retain for minimum 7 years — do not discard &nbsp;|&nbsp;
   This document forms part of your statutory trust accounting audit trail.
 </div>

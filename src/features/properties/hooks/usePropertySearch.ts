@@ -51,16 +51,12 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
     listingType: listingMode,
   });
 
-  // ── Search handler (with stale-while-revalidate caching) ─────
+  // ── Search handler ────────────────────────────────────────────
   const handleSearch = useCallback(
-    async (query: string, forceRefresh = false) => {
+    async (query: string) => {
       setHasSearched(true);
-      setManusStatus(null);
-      setManusFailed(false);
-      setUsingCachedAI(false);
       setCurrentQuery(query);
       addSearch(query);
-      manusSearch.cancelPolling();
 
       // Parse structured filters from the query
       const parsedFilters = parsePropertyQuery(query);
@@ -79,14 +75,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
           : prev.propertyTypes,
       }));
 
-      // Serve cached AI results immediately if available
-      const cached = !forceRefresh ? getCachedAIResults(query) : null;
-      if (cached && cached.length > 0) {
-        setResults(cached);
-        setUsingCachedAI(true);
-      }
-
-      setIsSearching(!cached);
+      setIsSearching(true);
 
       // Phase 1 (agent listings) + Phase 2 (Firecrawl) in parallel
       const agentListingsPromise = searchAgentListings(
@@ -119,50 +108,10 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
             const ids = new Set(prev.map((p) => p.id));
             const unique = agentResults.filter((p) => !ids.has(p.id));
             if (unique.length === 0) return prev;
-            // Agent listings prepended — always first
             return [...unique, ...prev];
           });
         }
       });
-
-      try {
-        const result = await manusSearch.search({ query }, (update) => {
-          setManusStatus(update.status);
-          if (update.status === 'completed' && update.properties && update.properties.length > 0) {
-            setResults((prev) => {
-              const ids = new Set(prev.map((p) => p.id));
-              const unique = update.properties!.filter((p) => !ids.has(p.id));
-              const merged = [...prev, ...unique];
-              setCachedAIResults(query, merged);
-              return merged;
-            });
-            setUsingCachedAI(false);
-            toast.success(`🔍 Live results ready — Found ${update.properties.length} properties`);
-          } else if (update.status === 'failed') {
-            setManusStatus(null);
-            setManusFailed(true);
-            if (!cached) {
-              toast.success('⚠️ AI search paused — Showing cached results. Try refreshing later.');
-            }
-          }
-        });
-        if (result.properties.length > 0) {
-          setResults((prev) => {
-            const ids = new Set(prev.map((p) => p.id));
-            const unique = result.properties.filter((p) => !ids.has(p.id));
-            return [...prev, ...unique];
-          });
-          setUsingCachedAI(false);
-        }
-      } catch (err) {
-        console.error('[handleSearch] AI search failed:', err);
-        if (!cached || cached.length === 0) {
-          // Keep any Firecrawl results that may have already been set
-        }
-        setManusFailed(true);
-        toast('⚠️ AI search paused — ' + (cached ? 'Showing cached results from earlier.' : 'Showing web results instead.'));
-        if (cached) setUsingCachedAI(true);
-      }
 
       // Merge Firecrawl results
       const firecrawlResults = await firecrawlPromise;
@@ -171,13 +120,9 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
           const ids = new Set(prev.map((p) => p.id));
           const unique = firecrawlResults.filter((p) => !ids.has(p.id));
           if (unique.length === 0) return prev;
-          const merged = [...prev, ...unique];
-          setCachedAIResults(query, merged);
-          return merged;
+          return [...prev, ...unique];
         });
-        if (!cached) {
-          toast.success(`🌐 Web results found — Found ${firecrawlResults.length} listings from the web`);
-        }
+        toast.success(`🌐 Web results found — Found ${firecrawlResults.length} listings from the web`);
       }
 
       setIsSearching(false);

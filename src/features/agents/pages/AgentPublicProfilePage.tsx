@@ -257,11 +257,15 @@ export default function AgentPublicProfilePage() {
                 {agent.agency && <> · {agent.agency}</>}
               </p>
 
-              <div className="flex items-center gap-1 mt-2">
-                <Star size={16} className="fill-yellow-400 text-yellow-400" />
-                <span className="font-medium text-foreground">4.8</span>
-                <span className="text-sm text-muted-foreground ml-1">Rating</span>
-              </div>
+              {(agent.avgRating ?? 0) > 0 && (
+                <div className="flex items-center gap-1 mt-2">
+                  <Star size={16} className="fill-yellow-400 text-yellow-400" />
+                  <span className="font-medium text-foreground">{agent.avgRating!.toFixed(1)}</span>
+                  <span className="text-sm text-muted-foreground ml-1">
+                    {agent.reviewCount === 1 ? '1 review' : `${agent.reviewCount} reviews`}
+                  </span>
+                </div>
+              )}
 
               {/* Quick info chips */}
               <div className="flex flex-wrap gap-2 mt-4">

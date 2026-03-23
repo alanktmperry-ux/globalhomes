@@ -129,10 +129,11 @@ const BillingPage = () => {
   useEffect(() => {
     if (!user) return;
     const countListings = async () => {
-      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
-      if (!agent) return;
-      const { count } = await supabase.from('properties').select('id', { count: 'exact', head: true }).eq('agent_id', agent.id).neq('status', 'sold');
+      const { data: agentData } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
+      if (!agentData) return;
+      const { count } = await supabase.from('properties').select('id', { count: 'exact', head: true }).eq('agent_id', agentData.id).neq('status', 'sold');
       setListingsUsed(count || 0);
+      setAgentId(agentData.id);
     };
     countListings();
   }, [user]);

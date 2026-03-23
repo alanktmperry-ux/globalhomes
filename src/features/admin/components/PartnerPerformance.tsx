@@ -320,8 +320,8 @@ export default function PartnerPerformance() {
         ? await supabase.from('trust_account_balances').select('agent_id, current_balance, last_reconciled_date').in('agent_id', agentIds)
         : { data: [] };
 
-      const tenanciesRes = allAgencyIds.length > 0
-        ? await supabase.from('tenancies').select('agency_id, status').in('agency_id', allAgencyIds)
+      const tenanciesRes = agentIds.length > 0
+        ? await supabase.from('tenancies').select('agent_id, status').in('agent_id', agentIds)
         : { data: [] };
 
       const agentToAgency = new Map<string, string>();
@@ -342,9 +342,10 @@ export default function PartnerPerformance() {
       const activeTensByAgency = new Map<string, number>();
       const arrearsByAgency = new Map<string, number>();
       (tenanciesRes.data || []).forEach((t: any) => {
-        if (!t.agency_id) return;
-        if (t.status === 'active') activeTensByAgency.set(t.agency_id, (activeTensByAgency.get(t.agency_id) || 0) + 1);
-        if (t.status === 'arrears') arrearsByAgency.set(t.agency_id, (arrearsByAgency.get(t.agency_id) || 0) + 1);
+        const agId = agentToAgency.get(t.agent_id);
+        if (!agId) return;
+        if (t.status === 'active') activeTensByAgency.set(agId, (activeTensByAgency.get(agId) || 0) + 1);
+        if (t.status === 'arrears') arrearsByAgency.set(agId, (arrearsByAgency.get(agId) || 0) + 1);
       });
 
       const rows: PartnerRow[] = allPartners.map((p: any) => {

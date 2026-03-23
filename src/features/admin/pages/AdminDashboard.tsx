@@ -66,7 +66,7 @@ export interface InsightsData {
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { user, isAdmin, loading: authLoading } = useAuth();
-  const [tab, setTab] = useState<Tab>('overview');
+  const [tab, setTab] = useState<Tab>('command-centre');
   const [users, setUsers] = useState<UserRow[]>([]);
   const [properties, setProperties] = useState<PropertyRow[]>([]);
   const [stats, setStats] = useState({ totalUsers: 0, totalAgents: 0, totalListings: 0, totalLeads: 0, totalVoiceSearches: 0 });

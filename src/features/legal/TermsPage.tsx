@@ -9,7 +9,7 @@ const TermsPage = () => (
     <main className="bg-background">
       <article className="max-w-3xl mx-auto px-4 py-16 prose prose-neutral dark:prose-invert">
         <h1 className="font-display text-3xl font-extrabold text-foreground">Terms of Service</h1>
-        <p className="text-sm text-muted-foreground">Last updated: 18 March 2026</p>
+        <p className="text-sm text-muted-foreground">Last updated: 23 March 2026</p>
 
         <h2>1. About ListHQ</h2>
         <p>

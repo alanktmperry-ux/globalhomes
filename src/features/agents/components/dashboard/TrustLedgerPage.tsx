@@ -10,8 +10,12 @@ import {
   Receipt, ArrowUpCircle, ArrowDownCircle, CalendarIcon, Search,
   FileDown, DollarSign, Clock, CheckCircle2, XCircle, Filter,
   FileText, ChevronLeft, ChevronRight, Download, ShieldCheck,
+  AlertTriangle, BookOpen, PlusCircle, ArrowLeftRight,
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import DashboardHeader from './DashboardHeader';
 import TrustReceiptModal from './TrustReceiptModal';
 import TrustStatementModal from './TrustStatementModal';
@@ -89,7 +93,50 @@ const TrustLedgerPage = () => {
   const [showNewReceipt, setShowNewReceipt] = useState(false);
   const [showStatement, setShowStatement] = useState(false);
 
-  // Month navigation
+  const [showJournal, setShowJournal] = useState(false);
+  const [journalSaving, setJournalSaving] = useState(false);
+  const [journalForm, setJournalForm] = useState({
+    debitLedger: '',
+    creditLedger: '',
+    amount: '',
+    reasonCode: 'balance_correction',
+    reasonDetail: '',
+    reference: '',
+    entryDate: new Date().toISOString().slice(0, 10),
+  });
+  const [suspenseItems, setSuspenseItems] = useState<any[]>([]);
+  const [showSuspense, setShowSuspense] = useState(false);
+  const [suspenseForm, setSuspenseForm] = useState({
+    amount: '',
+    bankReference: '',
+    notes: '',
+    receivedDate: new Date().toISOString().slice(0, 10),
+  });
+  const [suspenseSaving, setSuspenseSaving] = useState(false);
+
+  // Fetch agent record for current user
+  const [agent, setAgent] = useState<any>(null);
+  const [accounts, setAccounts] = useState<any[]>([]);
+
+  const fetchAgentAndAccounts = useCallback(async () => {
+    if (!user) return;
+    const { data: agentData } = await supabase
+      .from('agents')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    if (agentData) {
+      setAgent(agentData);
+      const { data: accts } = await supabase
+        .from('trust_accounts' as any)
+        .select('id')
+        .eq('agent_id', agentData.id)
+        .limit(1);
+      setAccounts(accts || []);
+    }
+  }, [user]);
+
+  useEffect(() => { fetchAgentAndAccounts(); }, [fetchAgentAndAccounts]);
   const [viewMonth, setViewMonth] = useState(new Date().getMonth());
   const [viewYear, setViewYear] = useState(new Date().getFullYear());
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -109,6 +156,96 @@ const TrustLedgerPage = () => {
   }, [user]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
+
+  const fetchSuspense = useCallback(async () => {
+    if (!agent?.id) return;
+    const { data } = await supabase
+      .from('trust_suspense' as any)
+      .select('*')
+      .eq('agent_id', agent.id)
+      .eq('status', 'unidentified')
+      .order('received_date', { ascending: false });
+    setSuspenseItems(data || []);
+  }, [agent?.id]);
+
+  useEffect(() => { fetchSuspense(); }, [fetchSuspense]);
+
+  const saveJournal = async () => {
+    if (!agent?.id || !accounts[0]?.id) return;
+    if (!journalForm.debitLedger.trim() || !journalForm.creditLedger.trim() || !journalForm.amount || !journalForm.reasonDetail.trim()) {
+      toast.error('Please complete all required fields');
+      return;
+    }
+    setJournalSaving(true);
+    try {
+      const { error } = await supabase
+        .from('trust_journal_entries' as any)
+        .insert({
+          trust_account_id: accounts[0].id,
+          agent_id: agent.id,
+          entry_date: journalForm.entryDate,
+          debit_ledger: journalForm.debitLedger,
+          credit_ledger: journalForm.creditLedger,
+          amount: parseFloat(journalForm.amount),
+          reason_code: journalForm.reasonCode,
+          reason_detail: journalForm.reasonDetail,
+          reference: journalForm.reference,
+          created_by: user?.id,
+        });
+      if (error) throw error;
+      toast.success('Journal adjustment recorded — audit trail updated');
+      setShowJournal(false);
+      setJournalForm({
+        debitLedger: '',
+        creditLedger: '',
+        amount: '',
+        reasonCode: 'balance_correction',
+        reasonDetail: '',
+        reference: '',
+        entryDate: new Date().toISOString().slice(0, 10),
+      });
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setJournalSaving(false);
+    }
+  };
+
+  const saveSuspense = async () => {
+    if (!agent?.id || !accounts[0]?.id) return;
+    if (!suspenseForm.amount || !suspenseForm.bankReference.trim()) {
+      toast.error('Amount and bank reference are required');
+      return;
+    }
+    setSuspenseSaving(true);
+    try {
+      const { error } = await supabase
+        .from('trust_suspense' as any)
+        .insert({
+          trust_account_id: accounts[0].id,
+          agent_id: agent.id,
+          received_date: suspenseForm.receivedDate,
+          amount: parseFloat(suspenseForm.amount),
+          bank_reference: suspenseForm.bankReference,
+          notes: suspenseForm.notes,
+          created_by: user?.id,
+        });
+      if (error) throw error;
+      toast.success('Receipt held in suspense — match it when identified');
+      setShowSuspense(false);
+      setSuspenseForm({
+        amount: '',
+        bankReference: '',
+        notes: '',
+        receivedDate: new Date().toISOString().slice(0, 10),
+      });
+      fetchSuspense();
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setSuspenseSaving(false);
+    }
+  };
 
   // Merge into unified ledger
   const ledgerEntries: LedgerEntry[] = useMemo(() => {
@@ -475,6 +612,16 @@ const TrustLedgerPage = () => {
             <Button size="sm" variant="outline" onClick={exportCsv} className="gap-1.5 text-xs">
               <FileDown size={13} /> Export CSV 5yr
             </Button>
+            <Button size="sm" variant="outline" onClick={() => setShowJournal(true)} className="gap-1.5 text-xs">
+              <BookOpen size={13} /> Journal Adjustment
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => setShowSuspense(true)}
+              className={`gap-1.5 text-xs ${suspenseItems.length > 0 ? 'border-amber-500 text-amber-600' : ''}`}>
+              <AlertTriangle size={13} /> Suspense
+              {suspenseItems.length > 0 && (
+                <Badge variant="destructive" className="ml-1 text-[9px] px-1 h-4">{suspenseItems.length}</Badge>
+              )}
+            </Button>
             <Button size="sm" onClick={() => setShowNewReceipt(true)} className="gap-1.5 text-xs">
               <Receipt size={13} /> New Receipt
             </Button>
@@ -633,6 +780,172 @@ const TrustLedgerPage = () => {
 
       <TrustReceiptModal open={showNewReceipt} onOpenChange={setShowNewReceipt} onCreated={fetchData} />
       <TrustStatementModal open={showStatement} onOpenChange={setShowStatement} />
+
+      {/* Journal Adjustment Dialog */}
+      <Dialog open={showJournal} onOpenChange={setShowJournal}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <BookOpen size={18} />
+              Journal Adjustment Entry
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/30 p-3 text-xs text-amber-800 dark:text-amber-300 flex gap-2">
+              <AlertTriangle size={14} className="shrink-0 mt-0.5" />
+              <p>
+                ⚠️ Journal adjustments are permanent and form part of your statutory audit trail.
+                The original entry and this correction will both be visible to your auditor.
+                Only use this for genuine accounting corrections — not to hide or alter transactions.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs">Entry date <span className="text-destructive">*</span></Label>
+                <input type="date" value={journalForm.entryDate}
+                  onChange={e => setJournalForm(f => ({ ...f, entryDate: e.target.value }))}
+                  className="mt-1.5 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/40"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Amount ($) <span className="text-destructive">*</span></Label>
+                <Input type="number" step="0.01" min="0.01" placeholder="0.00" value={journalForm.amount}
+                  onChange={e => setJournalForm(f => ({ ...f, amount: e.target.value }))}
+                  className="mt-1.5 font-mono"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs">Debit ledger <span className="text-destructive">*</span></Label>
+                <Input placeholder="e.g. Trust Cash" value={journalForm.debitLedger}
+                  onChange={e => setJournalForm(f => ({ ...f, debitLedger: e.target.value }))}
+                  className="mt-1.5"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Credit ledger <span className="text-destructive">*</span></Label>
+                <Input placeholder="e.g. Client Ledger" value={journalForm.creditLedger}
+                  onChange={e => setJournalForm(f => ({ ...f, creditLedger: e.target.value }))}
+                  className="mt-1.5"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-xs">Reason code</Label>
+              <Select value={journalForm.reasonCode} onValueChange={v => setJournalForm(f => ({ ...f, reasonCode: v }))}>
+                <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="balance_correction">Balance Correction</SelectItem>
+                  <SelectItem value="dishonoured_cheque">Dishonoured Cheque</SelectItem>
+                  <SelectItem value="bank_error">Bank Error</SelectItem>
+                  <SelectItem value="misallocation">Misallocation</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label className="text-xs">Reason detail <span className="text-destructive">*</span></Label>
+              <Textarea placeholder="Explain the reason for this adjustment…" value={journalForm.reasonDetail}
+                onChange={e => setJournalForm(f => ({ ...f, reasonDetail: e.target.value }))}
+                className="mt-1.5" rows={3}
+              />
+            </div>
+
+            <div>
+              <Label className="text-xs">Reference</Label>
+              <Input placeholder="Optional reference number" value={journalForm.reference}
+                onChange={e => setJournalForm(f => ({ ...f, reference: e.target.value }))}
+                className="mt-1.5"
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setShowJournal(false)}>Cancel</Button>
+            <Button onClick={saveJournal} disabled={journalSaving} className="gap-1.5">
+              <ArrowLeftRight size={14} />
+              {journalSaving ? 'Recording…' : 'Record Adjustment'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Suspense Dialog */}
+      <Dialog open={showSuspense} onOpenChange={setShowSuspense}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle size={18} />
+              Suspense Account
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {suspenseItems.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-muted-foreground">Unidentified receipts ({suspenseItems.length})</p>
+                {suspenseItems.map((item: any) => (
+                  <div key={item.id} className="flex items-center justify-between rounded-lg border border-border p-2.5 text-xs">
+                    <div>
+                      <p className="font-medium">{AUD.format(item.amount)}</p>
+                      <p className="text-muted-foreground">{item.bank_reference} · {item.received_date}</p>
+                    </div>
+                    <Badge variant="outline" className="text-amber-600 border-amber-400 text-[9px]">Unidentified</Badge>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="border-t border-border pt-4">
+              <p className="text-xs font-semibold mb-3">Add new suspense entry</p>
+              <div className="space-y-3">
+                <div>
+                  <Label className="text-xs">Received date</Label>
+                  <input type="date" value={suspenseForm.receivedDate}
+                    onChange={e => setSuspenseForm(f => ({ ...f, receivedDate: e.target.value }))}
+                    className="mt-1.5 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/40"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Amount ($) <span className="text-destructive">*</span></Label>
+                  <Input type="number" step="0.01" min="0.01" placeholder="0.00" value={suspenseForm.amount}
+                    onChange={e => setSuspenseForm(f => ({ ...f, amount: e.target.value }))}
+                    className="mt-1.5 font-mono"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Bank reference <span className="text-destructive">*</span></Label>
+                  <Input placeholder="Bank transaction reference" value={suspenseForm.bankReference}
+                    onChange={e => setSuspenseForm(f => ({ ...f, bankReference: e.target.value }))}
+                    className="mt-1.5"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Notes</Label>
+                  <Textarea placeholder="Any identifying details…" value={suspenseForm.notes}
+                    onChange={e => setSuspenseForm(f => ({ ...f, notes: e.target.value }))}
+                    className="mt-1.5" rows={2}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setShowSuspense(false)}>Close</Button>
+            <Button onClick={saveSuspense} disabled={suspenseSaving} className="gap-1.5">
+              <PlusCircle size={14} />
+              {suspenseSaving ? 'Saving…' : 'Add to Suspense'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

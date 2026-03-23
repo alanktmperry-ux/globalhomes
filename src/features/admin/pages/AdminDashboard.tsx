@@ -14,8 +14,9 @@ import AdminReports from '@/features/admin/components/AdminReports';
 import CommandCentre from '@/features/admin/components/CommandCentre';
 import AgentLifecycle from '@/features/admin/components/AgentLifecycle';
 import ComplianceMonitor from '@/features/admin/components/ComplianceMonitor';
+import RevenueBilling from '@/features/admin/components/RevenueBilling';
 
-type Tab = 'command-centre' | 'agent-lifecycle' | 'compliance' | 'overview' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests' | 'reports';
+type Tab = 'command-centre' | 'agent-lifecycle' | 'compliance' | 'revenue' | 'overview' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests' | 'reports';
 
 interface UserRow {
   id: string;

@@ -1,7 +1,6 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { Property } from '@/shared/lib/types';
 
-import { manusSearch } from '@/features/properties/api/ManusSearchService';
 import { Filters, defaultFilters } from '@/shared/components/FilterSidebar';
 import { firecrawlPropertySearch } from '@/features/properties/api/firecrawlPropertySearch';
 import { searchAgentListings } from '@/features/properties/api/fetchPublicProperties';

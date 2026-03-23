@@ -200,7 +200,7 @@ const GUIDES: Guide[] = [
   },
   {
     emoji: '📒', title: 'Trust Accounting — Ledger and Statements',
-    description: 'Monthly ledgers, audit PDFs, and 5-year CSV exports.',
+    description: 'Monthly ledgers, audit PDFs, and 7-year CSV exports.',
     steps: [
       'Go to Trust Ledger in the sidebar (under the Financials section). This shows all receipts and payments for the selected month.',
       'Use the month navigator (← →) to move between months. The header shows total in, total out, and closing balance for the selected period.',

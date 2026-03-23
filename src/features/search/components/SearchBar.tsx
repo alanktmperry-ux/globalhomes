@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { Search, Mic, MapPin } from 'lucide-react';
+import { Search, Mic, MapPin, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useI18n } from '@/shared/lib/i18n';
 import { useVoiceSearch } from '@/features/search/hooks/useVoiceSearch';
@@ -33,7 +33,7 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
     toast({ title: '🎙️ Voice Search', description: message, variant: 'destructive' });
   }, [toast]);
 
-  const { isListening, startListening, stopListening, isSupported } = useVoiceSearch(handleVoiceResult, handleVoiceError);
+  const { isListening, isTranscribing, startListening, stopListening, isSupported } = useVoiceSearch(handleVoiceResult, handleVoiceError);
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -92,7 +92,8 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
             <button
               type="button"
               onClick={isListening ? stopListening : startListening}
-              className="absolute right-3 flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-primary-foreground transition-transform active:scale-95"
+              disabled={isTranscribing}
+              className="absolute right-3 flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-primary-foreground transition-transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Voice search"
             >
               <AnimatePresence>
@@ -105,7 +106,7 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
                   />
                 )}
               </AnimatePresence>
-              <Mic size={18} />
+              {isTranscribing ? <Loader2 size={18} className="animate-spin" /> : <Mic size={18} />}
             </button>
           )}
         </div>
@@ -136,14 +137,14 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
       </AnimatePresence>
 
       <AnimatePresence>
-        {isListening && (
+        {(isListening || isTranscribing) && (
           <motion.p
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             className="mt-2 text-center text-sm text-primary font-medium"
           >
-            {t('search.voice.listening')}
+            {isTranscribing ? 'Transcribing…' : t('search.voice.listening')}
           </motion.p>
         )}
       </AnimatePresence>

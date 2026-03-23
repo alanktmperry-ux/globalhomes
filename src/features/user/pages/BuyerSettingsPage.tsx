@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { User, Bell, MapPin, DollarSign, Camera, Loader2, ArrowLeft, Home } from 'lucide-react';
+import { User, Bell, MapPin, DollarSign, Camera, Loader2, ArrowLeft, Home, Shield } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';

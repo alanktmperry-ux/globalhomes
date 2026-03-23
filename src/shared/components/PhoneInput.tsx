@@ -80,22 +80,15 @@ const PhoneInput = ({ value, onChange, className = '' }: PhoneInputProps) => {
     const digits = num.replace(/\D/g, '');
     let formatted = digits;
     if (countryCode === '+61') {
-      if (digits.startsWith('0')) {
-        const local = digits.slice(1);
+      const local = digits.startsWith('0')
+        ? digits.slice(1) : digits;
+      if (local.length > 0) {
         if (local.length <= 3) {
-          formatted = `0${local}`;
+          formatted = local;
         } else if (local.length <= 6) {
-          formatted = `0${local.slice(0, 3)} ${local.slice(3)}`;
+          formatted = `${local.slice(0, 3)} ${local.slice(3)}`;
         } else {
-          formatted = `0${local.slice(0, 3)} ${local.slice(3, 6)} ${local.slice(6, 9)}`;
-        }
-      } else if (digits.length > 0) {
-        if (digits.length <= 3) {
-          formatted = digits;
-        } else if (digits.length <= 6) {
-          formatted = `${digits.slice(0, 4)} ${digits.slice(4)}`;
-        } else {
-          formatted = `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7, 10)}`;
+          formatted = `${local.slice(0, 3)} ${local.slice(3, 6)} ${local.slice(6, 9)}`;
         }
       }
     } else {

@@ -280,7 +280,6 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
 
     // Actions
     handleSearch,
-    refreshAIResults,
     handleAreaSearch,
     setSearchCenter,
     setSearchRadius: handleSetSearchRadius,
@@ -289,9 +288,6 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
     // Flat state
     isSearching,
     hasSearched,
-    manusStatus,
-    manusFailed,
-    usingCachedAI,
     currentQuery,
     searchCenter,
     searchRadius,

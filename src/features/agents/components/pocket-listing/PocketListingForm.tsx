@@ -51,6 +51,38 @@ export interface ListingDraft {
   furnished: boolean;
   petsAllowed: boolean;
   screeningLevel: string;
+
+  // Sale — additional details
+  ensuites: number;
+  studyRooms: number;
+  garageType: string;
+  hasPool: boolean;
+  hasOutdoorEnt: boolean;
+  hasAlfresco: boolean;
+  hasSolar: boolean;
+  airConType: string;
+  heatingType: string;
+  auctionDate: string;
+  auctionTime: string;
+  yearBuilt: string;
+  councilRates: number;
+  waterRates: number;
+  strataFees: number;
+
+  // Rental — additional details
+  waterIncluded: boolean;
+  electricityIncluded: boolean;
+  internetIncluded: boolean;
+  hasInternalLaundry: boolean;
+  hasDishwasher: boolean;
+  hasWashingMachine: boolean;
+  hasAirCon: boolean;
+  hasBalcony: boolean;
+  hasPoolAccess: boolean;
+  hasGymAccess: boolean;
+  smokingAllowed: boolean;
+  maxOccupants: number;
+  rentalParkingType: string;
 }
 
 const DEFAULT_DRAFT: ListingDraft = {

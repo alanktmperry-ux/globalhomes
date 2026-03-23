@@ -66,7 +66,21 @@ export async function getPlaceDetails(placeId: string): Promise<{ lat: number; l
 
 let loadPromise: Promise<void> | null = null;
 
+function hasMapsConsent(): boolean {
+  try {
+    const saved = localStorage.getItem('listhq-cookie-consent');
+    if (!saved) return false;
+    const parsed = JSON.parse(saved);
+    return parsed?.maps === true;
+  } catch {
+    return false;
+  }
+}
+
 export function loadGoogleMapsScript(): Promise<void> {
+  if (!hasMapsConsent()) {
+    return Promise.reject(new Error('maps-consent-required'));
+  }
   if (loadPromise) return loadPromise;
   if ((window as any).google?.maps) return Promise.resolve();
 
@@ -77,9 +91,16 @@ export function loadGoogleMapsScript(): Promise<void> {
       script.async = true;
       script.defer = true;
       script.onload = () => resolve();
-      script.onerror = () => reject(new Error('Failed to load Google Maps script'));
+      script.onerror = () => {
+        loadPromise = null;
+        reject(new Error('Failed to load Google Maps script'));
+      };
       document.head.appendChild(script);
     });
   });
   return loadPromise;
+}
+
+export function resetMapsLoader(): void {
+  loadPromise = null;
 }

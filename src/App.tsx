@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { I18nProvider } from "@/shared/lib/i18n";
+import { ConsentProvider } from "@/shared/components/CookieConsent";
 import { CurrencyProvider } from "@/shared/lib/CurrencyContext";
 import { AuthProvider, useAuth } from "@/features/auth/AuthProvider";
 import { ProtectedRoute } from "@/features/auth/ProtectedRoute";
@@ -118,6 +119,7 @@ const App = () => (
   <HelmetProvider>
   <QueryClientProvider client={queryClient}>
     <I18nProvider>
+      <ConsentProvider>
       <CurrencyProvider>
       <AuthProvider>
         <TooltipProvider>
@@ -214,6 +216,7 @@ const App = () => (
         </TooltipProvider>
       </AuthProvider>
       </CurrencyProvider>
+    </ConsentProvider>
     </I18nProvider>
   </QueryClientProvider>
   </HelmetProvider>

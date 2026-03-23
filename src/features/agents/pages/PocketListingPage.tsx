@@ -54,6 +54,77 @@ const PocketListingPage = () => {
     setShowSuccess(false);
   };
 
+  const handleImportListing = (imported: any) => {
+    const draft = {
+      address: imported.address || '',
+      suburb: imported.suburb || '',
+      state: imported.state || '',
+      listingType: imported.listingType || 'sale',
+      priceMin: imported.priceMin || 0,
+      priceMax: imported.priceMax || 0,
+      priceDisplay: imported.priceDisplay || 'contact',
+      propertyType: imported.propertyType || 'House',
+      beds: imported.beds || 0,
+      baths: imported.baths || 0,
+      cars: imported.cars || 0,
+      sqm: imported.sqm || 0,
+      landSize: imported.landSize || 0,
+      photos: imported.photos || [],
+      primaryPhoto: 0,
+      features: imported.features || [],
+      voiceTranscript: imported.description || '',
+      generatedTitle: imported.address ? `${imported.propertyType || 'Property'} at ${imported.address}` : '',
+      generatedBullets: [],
+      visibility: 'whisper' as const,
+      exclusiveDays: 14,
+      buyerRequirements: 'none',
+      showContact: true,
+      allowCoBroke: true,
+      autoDeclineBelow: 0,
+      scheduledAt: null,
+      estimatedRentalWeekly: 0,
+      rentalWeekly: 0,
+      rentalBondWeeks: 4,
+      availableFrom: '',
+      leaseTerm: '12 months',
+      furnished: false,
+      petsAllowed: false,
+      screeningLevel: 'Basic',
+      ensuites: 0,
+      studyRooms: 0,
+      garageType: '',
+      hasPool: false,
+      hasOutdoorEnt: false,
+      hasAlfresco: false,
+      hasSolar: false,
+      airConType: '',
+      heatingType: '',
+      auctionDate: '',
+      auctionTime: '',
+      waterIncluded: false,
+      electricityIncluded: false,
+      internetIncluded: false,
+      hasInternalLaundry: false,
+      hasDishwasher: false,
+      hasWashingMachine: false,
+      hasAirCon: false,
+      hasBalcony: false,
+      hasPoolAccess: false,
+      hasGymAccess: false,
+      smokingAllowed: false,
+      maxOccupants: 0,
+      rentalParkingType: '',
+      yearBuilt: '',
+      councilRates: 0,
+      waterRates: 0,
+      strataFees: 0,
+    };
+    localStorage.setItem('pocket-listing-draft', JSON.stringify(draft));
+    setCreateListingType(imported.listingType || 'sale');
+    setShowForm(true);
+    setShowSuccess(false);
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="bg-background text-foreground min-h-screen">

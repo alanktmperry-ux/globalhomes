@@ -10,8 +10,12 @@ import {
   Receipt, ArrowUpCircle, ArrowDownCircle, CalendarIcon, Search,
   FileDown, DollarSign, Clock, CheckCircle2, XCircle, Filter,
   FileText, ChevronLeft, ChevronRight, Download, ShieldCheck,
+  AlertTriangle, BookOpen, PlusCircle, ArrowLeftRight,
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import DashboardHeader from './DashboardHeader';
 import TrustReceiptModal from './TrustReceiptModal';
 import TrustStatementModal from './TrustStatementModal';

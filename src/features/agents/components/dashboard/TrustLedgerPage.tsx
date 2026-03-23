@@ -93,7 +93,50 @@ const TrustLedgerPage = () => {
   const [showNewReceipt, setShowNewReceipt] = useState(false);
   const [showStatement, setShowStatement] = useState(false);
 
-  // Month navigation
+  const [showJournal, setShowJournal] = useState(false);
+  const [journalSaving, setJournalSaving] = useState(false);
+  const [journalForm, setJournalForm] = useState({
+    debitLedger: '',
+    creditLedger: '',
+    amount: '',
+    reasonCode: 'balance_correction',
+    reasonDetail: '',
+    reference: '',
+    entryDate: new Date().toISOString().slice(0, 10),
+  });
+  const [suspenseItems, setSuspenseItems] = useState<any[]>([]);
+  const [showSuspense, setShowSuspense] = useState(false);
+  const [suspenseForm, setSuspenseForm] = useState({
+    amount: '',
+    bankReference: '',
+    notes: '',
+    receivedDate: new Date().toISOString().slice(0, 10),
+  });
+  const [suspenseSaving, setSuspenseSaving] = useState(false);
+
+  // Fetch agent record for current user
+  const [agent, setAgent] = useState<any>(null);
+  const [accounts, setAccounts] = useState<any[]>([]);
+
+  const fetchAgentAndAccounts = useCallback(async () => {
+    if (!user) return;
+    const { data: agentData } = await supabase
+      .from('agents')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    if (agentData) {
+      setAgent(agentData);
+      const { data: accts } = await supabase
+        .from('trust_accounts' as any)
+        .select('id')
+        .eq('agent_id', agentData.id)
+        .limit(1);
+      setAccounts(accts || []);
+    }
+  }, [user]);
+
+  useEffect(() => { fetchAgentAndAccounts(); }, [fetchAgentAndAccounts]);
   const [viewMonth, setViewMonth] = useState(new Date().getMonth());
   const [viewYear, setViewYear] = useState(new Date().getFullYear());
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];

@@ -96,11 +96,17 @@ function PartnerRowComponent({ partner }: { partner: PartnerRow }) {
 
       const agentsByAgency = new Map<string, number>();
       const agentToAgency = new Map<string, string>();
+      const allAgentIdsHere: string[] = [];
       (agentsRes.data || []).forEach((a: any) => {
         if (!a.agency_id) return;
         agentToAgency.set(a.id, a.agency_id);
         agentsByAgency.set(a.agency_id, (agentsByAgency.get(a.agency_id) || 0) + 1);
+        allAgentIdsHere.push(a.id);
       });
+
+      const tenanciesRes = allAgentIdsHere.length > 0
+        ? await supabase.from('tenancies').select('agent_id, status').in('agent_id', allAgentIdsHere)
+        : { data: [] };
 
       const trustByAgency = new Map<string, { balance: number; lastRec: string | null }>();
       (balancesRes.data || []).forEach((b: any) => {
@@ -115,9 +121,10 @@ function PartnerRowComponent({ partner }: { partner: PartnerRow }) {
       const activeByAgency = new Map<string, number>();
       const arrearsByAgency = new Map<string, number>();
       (tenanciesRes.data || []).forEach((t: any) => {
-        if (!t.agency_id) return;
-        if (t.status === 'active') activeByAgency.set(t.agency_id, (activeByAgency.get(t.agency_id) || 0) + 1);
-        if (t.status === 'arrears') arrearsByAgency.set(t.agency_id, (arrearsByAgency.get(t.agency_id) || 0) + 1);
+        const agId = agentToAgency.get(t.agent_id);
+        if (!agId) return;
+        if (t.status === 'active') activeByAgency.set(agId, (activeByAgency.get(agId) || 0) + 1);
+        if (t.status === 'arrears') arrearsByAgency.set(agId, (arrearsByAgency.get(agId) || 0) + 1);
       });
 
       const details: AgencyDetail[] = paRows.map((r: any) => {

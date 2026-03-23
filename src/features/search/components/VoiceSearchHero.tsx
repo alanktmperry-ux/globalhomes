@@ -158,6 +158,16 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   const isSupported = typeof window !== 'undefined' &&
     ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
+  const isSafari = typeof window !== 'undefined' &&
+    /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+  // Auto-show text input on Safari or unsupported browsers
+  useEffect(() => {
+    if (!isSupported || isSafari) {
+      setShowTextInput(true);
+    }
+  }, []);
+
   // ── Dynamic featured listings ──
   const [featuredListings, setFeaturedListings] = useState<any[]>([]);
   const [featuredLoading, setFeaturedLoading] = useState(true);
@@ -591,16 +601,37 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
             <div ref={wrapperRef} className="flex items-center gap-3 border-b border-border pb-3 mb-3 relative">
 
               <button
-                onClick={isListening ? stopListening : startListening}
+                onClick={() => {
+                  if (!isSupported || isSafari) {
+                    setShowTextInput(true);
+                    setTimeout(() => {
+                      const input = document.querySelector(
+                        'input[data-voice-fallback]'
+                      ) as HTMLInputElement;
+                      input?.focus();
+                    }, 50);
+                  } else {
+                    isListening ? stopListening() : startListening();
+                  }
+                }}
                 className="shrink-0"
+                aria-label={(!isSupported || isSafari) ? 'Type your search' : 'Voice search'}
               >
                 {voiceState === 'processing' || isSearching
                   ? <Loader2 size={16} className="text-muted-foreground animate-spin" />
                   : voiceState === 'listening'
                   ? <MicOff size={16} className="text-foreground" />
+                  : (!isSupported || isSafari)
+                  ? <Search size={16} className="text-muted-foreground hover:text-foreground transition-colors" />
                   : <Mic size={16} className="text-muted-foreground hover:text-foreground transition-colors" />
                 }
               </button>
+
+              {isSafari && !isListening && (
+                <p className="text-xs text-muted-foreground mt-1 text-center absolute -bottom-5 left-0">
+                  Voice search works best in Chrome — or type below
+                </p>
+              )}
 
               <div className="flex-1 min-w-0 relative">
                 {voiceState === 'listening' ? (
@@ -611,6 +642,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                   <div className="relative">
                     <input
                       type="text"
+                      data-voice-fallback
                       value={textQuery}
                       onChange={e => setTextQuery(e.target.value)}
                       onKeyDown={e => {
@@ -620,10 +652,11 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                           setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
                         }
                       }}
+                      autoFocus={showTextInput && (!isSupported || isSafari)}
                       className="w-full text-[12px] text-foreground bg-transparent focus:outline-none relative z-10"
-                      placeholder=""
+                      placeholder={(!isSupported || isSafari) ? "Type your search — e.g. 3 bed house in Berwick under $900k" : ""}
                     />
-                    {!textQuery && (
+                    {!textQuery && isSupported && !isSafari && (
                       <span
                         className="absolute inset-0 text-[12px] text-muted-foreground pointer-events-none flex items-center transition-opacity duration-300"
                         style={{ opacity: placeholderVisible ? 1 : 0 }}

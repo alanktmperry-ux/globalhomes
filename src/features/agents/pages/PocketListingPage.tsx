@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Plus, Zap, Eye, MessageSquare, TrendingUp, Copy, Sparkles, Key } from 'lucide-react';
+import { ArrowLeft, Plus, Zap, Eye, MessageSquare, TrendingUp, Copy, Sparkles, Key, Link } from 'lucide-react';
+import { ImportListingDialog } from '@/features/agents/components/pocket-listing/ImportListingDialog';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -26,6 +27,7 @@ const PocketListingPage = () => {
   const { listings, agentId } = useAgentListings();
   const { toast } = useToast();
   const sub = useSubscription();
+  const [showImportDialog, setShowImportDialog] = useState(false);
 
   const activeCount = listings.filter(l => l.status !== 'sold').length;
   const totalLeads = listings.reduce((sum, l) => sum + l.contact_clicks, 0);
@@ -48,6 +50,77 @@ const PocketListingPage = () => {
       return;
     }
     setCreateListingType(type);
+    setShowForm(true);
+    setShowSuccess(false);
+  };
+
+  const handleImportListing = (imported: any) => {
+    const draft = {
+      address: imported.address || '',
+      suburb: imported.suburb || '',
+      state: imported.state || '',
+      listingType: imported.listingType || 'sale',
+      priceMin: imported.priceMin || 0,
+      priceMax: imported.priceMax || 0,
+      priceDisplay: imported.priceDisplay || 'contact',
+      propertyType: imported.propertyType || 'House',
+      beds: imported.beds || 0,
+      baths: imported.baths || 0,
+      cars: imported.cars || 0,
+      sqm: imported.sqm || 0,
+      landSize: imported.landSize || 0,
+      photos: imported.photos || [],
+      primaryPhoto: 0,
+      features: imported.features || [],
+      voiceTranscript: imported.description || '',
+      generatedTitle: imported.address ? `${imported.propertyType || 'Property'} at ${imported.address}` : '',
+      generatedBullets: [],
+      visibility: 'whisper' as const,
+      exclusiveDays: 14,
+      buyerRequirements: 'none',
+      showContact: true,
+      allowCoBroke: true,
+      autoDeclineBelow: 0,
+      scheduledAt: null,
+      estimatedRentalWeekly: 0,
+      rentalWeekly: 0,
+      rentalBondWeeks: 4,
+      availableFrom: '',
+      leaseTerm: '12 months',
+      furnished: false,
+      petsAllowed: false,
+      screeningLevel: 'Basic',
+      ensuites: 0,
+      studyRooms: 0,
+      garageType: '',
+      hasPool: false,
+      hasOutdoorEnt: false,
+      hasAlfresco: false,
+      hasSolar: false,
+      airConType: '',
+      heatingType: '',
+      auctionDate: '',
+      auctionTime: '',
+      waterIncluded: false,
+      electricityIncluded: false,
+      internetIncluded: false,
+      hasInternalLaundry: false,
+      hasDishwasher: false,
+      hasWashingMachine: false,
+      hasAirCon: false,
+      hasBalcony: false,
+      hasPoolAccess: false,
+      hasGymAccess: false,
+      smokingAllowed: false,
+      maxOccupants: 0,
+      rentalParkingType: '',
+      yearBuilt: '',
+      councilRates: 0,
+      waterRates: 0,
+      strataFees: 0,
+    };
+    localStorage.setItem('pocket-listing-draft', JSON.stringify(draft));
+    setCreateListingType(imported.listingType || 'sale');
     setShowForm(true);
     setShowSuccess(false);
   };
@@ -80,6 +153,14 @@ const PocketListingPage = () => {
                 }
               }}>
                 <Copy size={14} /> Duplicate Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowImportDialog(true)}
+                className="gap-1.5 text-xs font-medium"
+              >
+                <Link size={14} /> Import from REA/Domain
               </Button>
               <Button
                 variant="outline"
@@ -183,6 +264,12 @@ const PocketListingPage = () => {
             </DialogContent>
           </Dialog>
         </main>
+
+        <ImportListingDialog
+          open={showImportDialog}
+          onClose={() => setShowImportDialog(false)}
+          onImport={handleImportListing}
+        />
       </div>
     </div>
   );

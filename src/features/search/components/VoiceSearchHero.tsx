@@ -979,7 +979,6 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
           </div>
         </div>
       )}
-      </div>
 
       {/* Search history */}
       <div className="px-4 pb-4">

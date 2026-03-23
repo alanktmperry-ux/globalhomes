@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import AdminReports from '@/features/admin/components/AdminReports';
 import { CreditCard, Check, Loader2, Zap, Crown, Building2, Flame, Mail, Lock, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -124,14 +125,16 @@ const BillingPage = () => {
   const sub = useSubscription();
   const [listingsUsed, setListingsUsed] = useState(0);
   const [upgrading, setUpgrading] = useState<string | null>(null);
+  const [agentId, setAgentId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
     const countListings = async () => {
-      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
-      if (!agent) return;
-      const { count } = await supabase.from('properties').select('id', { count: 'exact', head: true }).eq('agent_id', agent.id).neq('status', 'sold');
+      const { data: agentData } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
+      if (!agentData) return;
+      const { count } = await supabase.from('properties').select('id', { count: 'exact', head: true }).eq('agent_id', agentData.id).neq('status', 'sold');
       setListingsUsed(count || 0);
+      setAgentId(agentData.id);
     };
     countListings();
   }, [user]);
@@ -336,8 +339,13 @@ const BillingPage = () => {
           <Button variant="outline" size="sm" onClick={() => toast.info("Stripe billing coming soon — we'll notify you when it's ready.")}>
             Add Payment Method
           </Button>
-        </div>
+
+        {/* Agent Reports */}
+        {agentId && (
+          <AdminReports isAdmin={false} currentAgentId={agentId} />
+        )}
       </div>
+    </div>
     </div>
   );
 };

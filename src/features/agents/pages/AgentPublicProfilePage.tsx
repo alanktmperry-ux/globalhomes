@@ -182,6 +182,14 @@ export default function AgentPublicProfilePage() {
             status: 'listed' as const,
           })));
         }
+
+        const { data: reviews } = await supabase
+          .from('agent_reviews')
+          .select('id, reviewer_name, rating, review_text, reply_text, created_at')
+          .eq('agent_id', data.id)
+          .eq('status', 'approved')
+          .order('created_at', { ascending: false });
+        if (reviews) setAgentReviews(reviews);
       }
       setLoading(false);
     };

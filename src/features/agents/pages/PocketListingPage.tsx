@@ -157,6 +157,14 @@ const PocketListingPage = () => {
               <Button
                 variant="outline"
                 size="sm"
+                onClick={() => setShowImportDialog(true)}
+                className="gap-1.5 text-xs font-medium"
+              >
+                <Link size={14} /> Import from REA/Domain
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => checkLimitAndCreate('rent')}
                 className="gap-1.5 text-xs font-bold"
               >

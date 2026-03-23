@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Building2, BarChart3, Shield, Database, ArrowLeft, Loader2, Gamepad2 } from 'lucide-react';
+import { Users, Building2, BarChart3, Shield, Database, ArrowLeft, Loader2, Gamepad2, Zap } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
@@ -11,8 +11,9 @@ import AdminRoles from '@/features/admin/components/AdminRoles';
 import AdminDatabase from '@/features/admin/components/AdminDatabase';
 import AdminDemoRequests from '@/features/admin/components/AdminDemoRequests';
 import AdminReports from '@/features/admin/components/AdminReports';
+import CommandCentre from '@/features/admin/components/CommandCentre';
 
-type Tab = 'overview' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests' | 'reports';
+type Tab = 'command-centre' | 'overview' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests' | 'reports';
 
 interface UserRow {
   id: string;
@@ -65,7 +66,7 @@ export interface InsightsData {
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { user, isAdmin, loading: authLoading } = useAuth();
-  const [tab, setTab] = useState<Tab>('overview');
+  const [tab, setTab] = useState<Tab>('command-centre');
   const [users, setUsers] = useState<UserRow[]>([]);
   const [properties, setProperties] = useState<PropertyRow[]>([]);
   const [stats, setStats] = useState({ totalUsers: 0, totalAgents: 0, totalListings: 0, totalLeads: 0, totalVoiceSearches: 0 });
@@ -300,6 +301,7 @@ const AdminDashboard = () => {
   }
 
   const tabs: { id: Tab; label: string; icon: any; badge?: number }[] = [
+    { id: 'command-centre', label: 'Command Centre', icon: Zap },
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'users', label: 'Users', icon: Users },
     { id: 'listings', label: 'Listings', icon: Building2 },
@@ -354,6 +356,7 @@ const AdminDashboard = () => {
           </div>
         ) : (
           <>
+            {tab === 'command-centre' && <CommandCentre />}
             {tab === 'overview' && <AdminOverview stats={stats} users={users} insights={insights} />}
             {tab === 'users' && <AdminUsers />}
             {tab === 'listings' && <AdminListings properties={properties} onToggleActive={togglePropertyActive} onActivateBoost={activateBoost} />}

@@ -770,7 +770,14 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                     {VOICE_LANGUAGES.map(lang => (
                       <button
                         key={lang.code}
-                        onClick={() => { setSelectedLang(lang.code); setShowLangDropdown(false); }}
+                        onClick={() => {
+                          setSelectedLang(lang.code);
+                          const i18nCode = VOICE_LANG_TO_I18N[lang.code];
+                          if (i18nCode) {
+                            setLanguage(i18nCode as any);
+                          }
+                          setShowLangDropdown(false);
+                        }}
                         className={`w-full text-left px-4 py-2.5 text-[12px] transition-colors ${
                           lang.code === selectedLang
                             ? 'bg-accent text-foreground'

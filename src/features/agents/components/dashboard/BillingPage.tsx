@@ -125,6 +125,7 @@ const BillingPage = () => {
   const sub = useSubscription();
   const [listingsUsed, setListingsUsed] = useState(0);
   const [upgrading, setUpgrading] = useState<string | null>(null);
+  const [agentId, setAgentId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;

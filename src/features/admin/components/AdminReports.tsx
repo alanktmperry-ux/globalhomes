@@ -345,7 +345,7 @@ const AdminReports = ({ isAdmin, currentAgentId }: Props) => {
     try {
       let query = supabase
         .from('agents')
-        .select('id, name, email, agency, plan_type, is_subscribed, subscription_expires_at, created_at, support_pin')
+        .select('id, name, email, agency, is_subscribed, subscription_expires_at, created_at, support_pin, agent_subscriptions(plan_type)')
         .order('created_at', { ascending: false });
 
       if (!isAdmin && currentAgentId) {

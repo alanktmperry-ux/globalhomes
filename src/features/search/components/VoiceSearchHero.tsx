@@ -158,6 +158,16 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   const isSupported = typeof window !== 'undefined' &&
     ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
+  const isSafari = typeof window !== 'undefined' &&
+    /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+  // Auto-show text input on Safari or unsupported browsers
+  useEffect(() => {
+    if (!isSupported || isSafari) {
+      setShowTextInput(true);
+    }
+  }, []);
+
   // ── Dynamic featured listings ──
   const [featuredListings, setFeaturedListings] = useState<any[]>([]);
   const [featuredLoading, setFeaturedLoading] = useState(true);

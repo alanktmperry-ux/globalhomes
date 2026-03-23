@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { User, Bell, MapPin, DollarSign, Camera, Loader2, ArrowLeft, Home } from 'lucide-react';
+import { User, Bell, MapPin, DollarSign, Camera, Loader2, ArrowLeft, Home, Shield } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -8,12 +8,14 @@ import { useToast } from '@/shared/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
+import { useConsent } from '@/shared/components/CookieConsent';
 import { BottomNav } from '@/shared/components/layout/BottomNav';
 
 const PROPERTY_TYPES = ['House', 'Apartment', 'Townhouse', 'Land', 'Villa', 'Unit'];
 
 const BuyerSettingsPage = () => {
   const { user, loading: authLoading } = useAuth();
+  const { consent, acceptAll, declineMaps, resetConsent } = useConsent();
   const { toast } = useToast();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -376,6 +378,37 @@ const BuyerSettingsPage = () => {
               <Switch checked={n.value} onCheckedChange={n.set} />
             </div>
           ))}
+        </div>
+
+        {/* Privacy */}
+        <div className="bg-card border border-border rounded-xl p-5 space-y-4">
+          <h3 className="font-display text-sm font-bold flex items-center gap-1.5">
+            <Shield size={14} /> Privacy
+          </h3>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Google Maps</p>
+              <p className="text-xs text-muted-foreground">
+                Used for address autocomplete and property map display.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={`text-xs font-medium ${consent.maps ? 'text-green-600' : 'text-muted-foreground'}`}>
+                {consent.maps ? 'Enabled' : 'Disabled'}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => (consent.maps ? declineMaps() : acceptAll())}
+                className="text-xs h-7 px-2.5"
+              >
+                {consent.maps ? 'Disable' : 'Enable'}
+              </Button>
+            </div>
+          </div>
+          <button onClick={resetConsent} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors">
+            Reset all cookie preferences
+          </button>
         </div>
 
         <Button onClick={handleSave} disabled={saving} className="w-full">

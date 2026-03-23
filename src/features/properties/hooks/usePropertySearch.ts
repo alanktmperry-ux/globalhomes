@@ -6,6 +6,7 @@ import { Filters, defaultFilters } from '@/shared/components/FilterSidebar';
 import { firecrawlPropertySearch } from '@/features/properties/api/firecrawlPropertySearch';
 import { searchAgentListings } from '@/features/properties/api/fetchPublicProperties';
 import { toast } from 'sonner';
+import { parsePropertyQuery } from '@/features/search/lib/parsePropertyQuery';
 import { isInsidePolygon, haversineDistance } from '@/shared/lib/geoUtils';
 import { useRealtimeProperties } from './useRealtimeProperties';
 import { useCurrency, ListingMode } from '@/shared/lib/CurrencyContext';

@@ -523,23 +523,18 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       <div className="grid grid-cols-1 md:grid-cols-2 min-h-[520px] md:min-h-[560px]">
 
         {/* LEFT — Headline + search */}
-        <div className="flex flex-col justify-between px-5 md:px-10 py-8 md:py-14 bg-background">
+        <div className="flex flex-col justify-center gap-0 px-5 md:px-10 py-8 md:py-12 bg-background">
 
-          {/* Counter */}
-          <div className="mb-6">
-            <span className="text-[10px] text-muted-foreground tracking-widest uppercase font-medium">
-              01 / 06 · Featured
-            </span>
-          </div>
+
 
           {/* Stacked headline */}
-          <div className="mb-6">
-            <h1 className="font-display text-[38px] md:text-[52px] font-extrabold leading-[1.05] tracking-tight text-foreground">
+          <div className="mb-4">
+            <h1 className="font-display text-[32px] md:text-[44px] font-extrabold leading-[1.05] tracking-tight text-foreground">
               Home.
             </h1>
 
             {/* Rotating gradient line */}
-            <div className="h-[1.15em] overflow-hidden text-[38px] md:text-[52px] font-display font-extrabold leading-[1.05]">
+            <div className="h-[1.15em] overflow-hidden text-[32px] md:text-[44px] font-display font-extrabold leading-[1.05]">
               <AnimatePresence mode="wait">
                 <motion.span
                   key={headlineIndex}
@@ -556,25 +551,21 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
             </div>
 
             {/* Ghost third line */}
-            <div className="text-[30px] md:text-[42px] font-extrabold leading-[1.05] text-muted-foreground/15 select-none" aria-hidden="true">
+            <div className="text-[26px] md:text-[36px] font-extrabold leading-[1.05] text-muted-foreground/15 select-none" aria-hidden="true">
               24 languages.
             </div>
           </div>
 
-          {/* Rule + subline + search */}
-          <div className="max-w-md">
+          {/* Search block */}
+          <div className="max-w-lg mt-5">
 
-            <div className="w-10 h-[2px] bg-foreground/20 mb-5" />
-
-            <p className="text-[13px] text-muted-foreground leading-relaxed mb-5">
-              The only Australian property platform
-              built for the world. Search in
-              24 languages, see prices in
-              your currency.
+            <p className="text-[12px] text-muted-foreground leading-relaxed mb-4">
+              The only Australian property platform built for the world.
+              Search in 24 languages, see prices in your currency.
             </p>
 
-            {/* Search bar */}
-            <div ref={wrapperRef} className="flex items-center gap-3 border-b border-border pb-3 mb-3 relative">
+            {/* Search bar — prominent */}
+            <div ref={wrapperRef} className="flex items-center gap-3 bg-card border-2 border-border hover:border-primary/40 focus-within:border-primary rounded-2xl px-4 py-3 mb-3 relative shadow-sm transition-colors">
 
               <button
                 onClick={() => {
@@ -590,16 +581,20 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                     isListening ? stopListening() : startListening();
                   }
                 }}
-                className="shrink-0"
+                className={`shrink-0 w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
+                  voiceState === 'listening'
+                    ? 'bg-destructive/10 text-destructive'
+                    : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-accent'
+                }`}
                 aria-label={(!isSupported || isSafari) ? 'Type your search' : 'Voice search'}
               >
                 {voiceState === 'processing' || isSearching
-                  ? <Loader2 size={16} className="text-muted-foreground animate-spin" />
+                  ? <Loader2 size={15} className="animate-spin" />
                   : voiceState === 'listening'
-                  ? <MicOff size={16} className="text-foreground" />
+                  ? <MicOff size={15} />
                   : (!isSupported || isSafari)
-                  ? <Search size={16} className="text-muted-foreground hover:text-foreground transition-colors" />
-                  : <Mic size={16} className="text-muted-foreground hover:text-foreground transition-colors" />
+                  ? <Search size={15} />
+                  : <Mic size={15} />
                 }
               </button>
 
@@ -629,12 +624,12 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                         }
                       }}
                       autoFocus={showTextInput && (!isSupported || isSafari)}
-                      className="w-full text-[12px] text-foreground bg-transparent focus:outline-none relative z-10"
+                      className="w-full text-[14px] text-foreground bg-transparent focus:outline-none relative z-10"
                       placeholder={(!isSupported || isSafari) ? "Type your search — e.g. 3 bed house in Berwick under $900k" : ""}
                     />
                     {!textQuery && isSupported && !isSafari && (
                       <span
-                        className="absolute inset-0 text-[12px] text-muted-foreground pointer-events-none flex items-center transition-opacity duration-300"
+                        className="absolute inset-0 text-[14px] text-muted-foreground pointer-events-none flex items-center transition-opacity duration-300"
                         style={{ opacity: placeholderVisible ? 1 : 0 }}
                       >
                         {SEARCH_PLACEHOLDERS[placeholderIndex]}
@@ -652,8 +647,8 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                     setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
                   }
                 }}
-                className="flex items-center justify-center min-h-[44px] px-3 text-[11px] font-bold text-foreground hover:opacity-70 transition-opacity whitespace-nowrap flex-shrink-0">
-                Search →
+                className="flex items-center justify-center h-9 px-4 rounded-xl bg-primary text-primary-foreground text-[11px] font-bold hover:opacity-90 transition-opacity whitespace-nowrap flex-shrink-0 gap-1.5">
+                <Search size={12} /> Search
               </button>
 
               {/* Autocomplete */}

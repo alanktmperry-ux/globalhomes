@@ -10,8 +10,9 @@ import AdminListings from '@/features/admin/components/AdminListings';
 import AdminRoles from '@/features/admin/components/AdminRoles';
 import AdminDatabase from '@/features/admin/components/AdminDatabase';
 import AdminDemoRequests from '@/features/admin/components/AdminDemoRequests';
+import AdminReports from '@/features/admin/components/AdminReports';
 
-type Tab = 'overview' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests';
+type Tab = 'overview' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests' | 'reports';
 
 interface UserRow {
   id: string;
@@ -305,6 +306,7 @@ const AdminDashboard = () => {
     { id: 'roles', label: 'Roles', icon: Shield },
     { id: 'database', label: 'Database', icon: Database },
     { id: 'demo-requests', label: 'Demo Requests', icon: Gamepad2, badge: pendingDemoCount },
+    { id: 'reports', label: 'Reports', icon: BarChart3 },
   ];
 
   return (
@@ -358,6 +360,7 @@ const AdminDashboard = () => {
             {tab === 'roles' && <AdminRoles users={users} searchQuery={searchQuery} onSearchChange={setSearchQuery} onRoleChange={handleRoleChange} />}
             {tab === 'database' && <AdminDatabase />}
             {tab === 'demo-requests' && <AdminDemoRequests onPendingCountChange={setPendingDemoCount} />}
+            {tab === 'reports' && <AdminReports isAdmin={true} />}
           </>
         )}
       </div>

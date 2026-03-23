@@ -99,7 +99,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
       setFilters(prev => ({
         ...prev,
         minBeds: parsedFilters.beds || prev.minBeds,
-        minBaths: parsedFilters.baths || prev.minBaths,
+        minBaths: prev.minBaths,
         priceRange: [
           parsedFilters.priceMin || prev.priceRange[0],
           parsedFilters.priceMax || prev.priceRange[1],

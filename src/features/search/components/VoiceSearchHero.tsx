@@ -344,6 +344,8 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       recognition.interimResults = true;
       recognition.lang = selectedLang;
 
+      let silenceTimer: ReturnType<typeof setTimeout> | null = null;
+
       recognition.onresult = (event: any) => {
         let interim = '';
         let final = '';
@@ -356,14 +358,26 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
             interim += t;
           }
         }
-        if (interim) setTranscript(interim);
+
+        if (interim) {
+          setTranscript(interim);
+        }
         if (final) {
           setTranscript(final);
-          processTranscript(final);
+          if (silenceTimer) clearTimeout(silenceTimer);
+          recognition.stop();
+          return;
         }
+
+        // Auto-stop after 750ms of silence (helps iOS Safari)
+        if (silenceTimer) clearTimeout(silenceTimer);
+        silenceTimer = setTimeout(() => {
+          recognition.stop();
+        }, 750);
       };
 
       recognition.onerror = (event: any) => {
+        if (silenceTimer) clearTimeout(silenceTimer);
         setVoiceState('idle');
         if (event.error === 'not-allowed') {
           toast({ title: '🎙️ Microphone Access', description: 'Please allow microphone permissions and try again.', variant: 'destructive' });
@@ -375,8 +389,13 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       };
 
       recognition.onend = () => {
+        if (silenceTimer) clearTimeout(silenceTimer);
         if (voiceState === 'listening') {
-          if (!transcript) setVoiceState('idle');
+          if (transcript) {
+            processTranscript(transcript);
+          } else {
+            setVoiceState('idle');
+          }
         }
       };
 

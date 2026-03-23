@@ -92,18 +92,48 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
       addSearch(query);
       manusSearch.cancelPolling();
 
+      // Parse structured filters from the query
+      const parsedFilters = parsePropertyQuery(query);
+
+      // Update the filter sidebar to reflect what was spoken/typed
+      setFilters(prev => ({
+        ...prev,
+        minBeds: parsedFilters.beds || prev.minBeds,
+        minBaths: parsedFilters.baths || prev.minBaths,
+        priceRange: [
+          parsedFilters.priceMin || prev.priceRange[0],
+          parsedFilters.priceMax || prev.priceRange[1],
+        ],
+        propertyTypes: parsedFilters.propertyType
+          ? [parsedFilters.propertyType]
+          : prev.propertyTypes,
+      }));
+
       // Serve cached AI results immediately if available
       const cached = !forceRefresh ? getCachedAIResults(query) : null;
       if (cached && cached.length > 0) {
         setResults(cached);
         setUsingCachedAI(true);
-        // Don't show loading state — we have data
       }
 
       setIsSearching(!cached);
 
       // Phase 1 (agent listings) + Phase 2 (Firecrawl) in parallel
-      const agentListingsPromise = searchAgentListings(query, 20, listingMode).catch((err) => {
+      const agentListingsPromise = searchAgentListings(
+        query,
+        20,
+        listingMode,
+        {
+          beds: parsedFilters.beds || undefined,
+          baths: parsedFilters.baths || undefined,
+          priceMin: parsedFilters.priceMin || undefined,
+          priceMax: parsedFilters.priceMax || undefined,
+          suburb: parsedFilters.location || undefined,
+          features: parsedFilters.features.length > 0
+            ? parsedFilters.features
+            : undefined,
+        }
+      ).catch((err) => {
         console.warn('[handleSearch] Agent listings search failed:', err);
         return [] as Property[];
       });

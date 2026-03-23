@@ -523,25 +523,21 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       <div className="grid grid-cols-1 md:grid-cols-2 min-h-[520px] md:min-h-[560px]">
 
         {/* LEFT — Headline + search */}
-        <div className="flex flex-col justify-center gap-0 px-5 md:px-10 py-8 md:py-12 bg-background">
+        <div className="flex flex-col justify-center px-6 md:px-10 py-10 md:py-14 bg-background">
 
-
-
-          {/* Stacked headline */}
-          <div className="mb-4">
-            <h1 className="font-display text-[32px] md:text-[44px] font-extrabold leading-[1.05] tracking-tight text-foreground">
+          {/* Headline — compact */}
+          <div className="mb-6">
+            <h1 className="font-display text-[36px] md:text-[48px] font-extrabold leading-[1.05] tracking-tight text-foreground">
               Home.
             </h1>
-
-            {/* Rotating gradient line */}
-            <div className="h-[1.15em] overflow-hidden text-[32px] md:text-[44px] font-display font-extrabold leading-[1.05]">
+            <div className="h-[1.1em] overflow-hidden text-[36px] md:text-[48px] font-display font-extrabold leading-[1.05]">
               <AnimatePresence mode="wait">
                 <motion.span
                   key={headlineIndex}
-                  initial={{ opacity: 0, y: 24 }}
+                  initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -24 }}
-                  transition={{ duration: 0.35 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
                   className="block"
                   style={{ color: HEADLINE_WORDS[headlineIndex].color }}
                 >
@@ -549,116 +545,108 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                 </motion.span>
               </AnimatePresence>
             </div>
-
-            {/* Ghost third line */}
-            <div className="text-[26px] md:text-[36px] font-extrabold leading-[1.05] text-muted-foreground/15 select-none" aria-hidden="true">
-              24 languages.
-            </div>
-          </div>
-
-          {/* Search block */}
-          <div className="max-w-lg mt-5">
-
-            <p className="text-[12px] text-muted-foreground leading-relaxed mb-4">
-              The only Australian property platform built for the world.
+            <p className="text-[13px] text-muted-foreground mt-3 leading-relaxed max-w-sm">
+              Australia's only property platform built for the world.
               Search in 24 languages, see prices in your currency.
             </p>
+          </div>
 
-            {/* Search bar — prominent */}
-            <div ref={wrapperRef} className="flex items-center gap-3 bg-card border-2 border-border hover:border-primary/40 focus-within:border-primary rounded-2xl px-4 py-3 mb-3 relative shadow-sm transition-colors">
+          {/* ── SEARCH BOX ── */}
+          <div className="max-w-lg space-y-3">
 
-              <button
-                onClick={() => {
-                  if (!isSupported || isSafari) {
-                    setShowTextInput(true);
-                    setTimeout(() => {
-                      const input = document.querySelector(
-                        'input[data-voice-fallback]'
-                      ) as HTMLInputElement;
-                      input?.focus();
-                    }, 50);
-                  } else {
-                    isListening ? stopListening() : startListening();
+            {/* Main search input */}
+            <div ref={wrapperRef} className="relative">
+              <div className="flex items-center gap-2 bg-card border-2 border-border hover:border-primary/50 focus-within:border-primary rounded-2xl px-3 py-3 shadow-sm transition-all duration-200">
+
+                {/* Mic / search icon button */}
+                <button
+                  onClick={() => {
+                    if (!isSupported || isSafari) {
+                      setShowTextInput(true);
+                      setTimeout(() => {
+                        const input = document.querySelector('input[data-voice-fallback]') as HTMLInputElement;
+                        input?.focus();
+                      }, 50);
+                    } else {
+                      isListening ? stopListening() : startListening();
+                    }
+                  }}
+                  className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
+                    voiceState === 'listening'
+                      ? 'bg-destructive/10 text-destructive'
+                      : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-accent'
+                  }`}
+                  title={(!isSupported || isSafari) ? 'Type your search' : 'Voice search'}
+                >
+                  {voiceState === 'processing' || isSearching
+                    ? <Loader2 size={16} className="animate-spin" />
+                    : voiceState === 'listening'
+                    ? <MicOff size={16} />
+                    : (!isSupported || isSafari)
+                    ? <Search size={16} />
+                    : <Mic size={16} />
                   }
-                }}
-                className={`shrink-0 w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
-                  voiceState === 'listening'
-                    ? 'bg-destructive/10 text-destructive'
-                    : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-accent'
-                }`}
-                aria-label={(!isSupported || isSafari) ? 'Type your search' : 'Voice search'}
-              >
-                {voiceState === 'processing' || isSearching
-                  ? <Loader2 size={15} className="animate-spin" />
-                  : voiceState === 'listening'
-                  ? <MicOff size={15} />
-                  : (!isSupported || isSafari)
-                  ? <Search size={15} />
-                  : <Mic size={15} />
-                }
-              </button>
+                </button>
 
-              {isSafari && !isListening && (
-                <p className="text-xs text-muted-foreground mt-1 text-center absolute -bottom-5 left-0">
-                  Voice search works best in Chrome — or type below
-                </p>
-              )}
+                {/* Text input */}
+                <div className="flex-1 min-w-0 relative">
+                  {voiceState === 'listening' ? (
+                    <span className="text-[13px] text-muted-foreground italic">
+                      {transcript || 'Listening… speak now'}
+                    </span>
+                  ) : (
+                    <div className="relative">
+                      <input
+                        type="text"
+                        data-voice-fallback
+                        value={textQuery}
+                        onChange={e => setTextQuery(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter' && textQuery.trim()) {
+                            suppressAutocompleteRef.current = true;
+                            processTranscript(textQuery.trim());
+                            setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
+                          }
+                        }}
+                        autoFocus={showTextInput && (!isSupported || isSafari)}
+                        className="w-full text-[14px] text-foreground bg-transparent focus:outline-none relative z-10"
+                        placeholder="e.g. 3 bed house in Berwick under $900k"
+                      />
+                      {!textQuery && isSupported && !isSafari && (
+                        <span
+                          className="absolute inset-0 text-[14px] text-muted-foreground/70 pointer-events-none flex items-center transition-opacity duration-300"
+                          style={{ opacity: placeholderVisible ? 1 : 0 }}
+                        >
+                          {SEARCH_PLACEHOLDERS[placeholderIndex]}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
 
-              <div className="flex-1 min-w-0 relative">
-                {voiceState === 'listening' ? (
-                  <span className="text-[12px] text-muted-foreground italic">
-                    {transcript || 'Listening… speak now'}
-                  </span>
-                ) : (
-                  <div className="relative">
-                    <input
-                      type="text"
-                      data-voice-fallback
-                      value={textQuery}
-                      onChange={e => setTextQuery(e.target.value)}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter' && textQuery.trim()) {
-                          suppressAutocompleteRef.current = true;
-                          processTranscript(textQuery.trim());
-                          setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
-                        }
-                      }}
-                      autoFocus={showTextInput && (!isSupported || isSafari)}
-                      className="w-full text-[14px] text-foreground bg-transparent focus:outline-none relative z-10"
-                      placeholder={(!isSupported || isSafari) ? "Type your search — e.g. 3 bed house in Berwick under $900k" : ""}
-                    />
-                    {!textQuery && isSupported && !isSafari && (
-                      <span
-                        className="absolute inset-0 text-[14px] text-muted-foreground pointer-events-none flex items-center transition-opacity duration-300"
-                        style={{ opacity: placeholderVisible ? 1 : 0 }}
-                      >
-                        {SEARCH_PLACEHOLDERS[placeholderIndex]}
-                      </span>
-                    )}
-                  </div>
-                )}
+                {/* Search CTA button */}
+                <button
+                  onClick={() => {
+                    if (textQuery.trim()) {
+                      suppressAutocompleteRef.current = true;
+                      processTranscript(textQuery.trim());
+                      setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
+                    }
+                  }}
+                  className="shrink-0 flex items-center gap-1.5 h-9 px-4 rounded-xl bg-primary text-primary-foreground text-[12px] font-bold hover:opacity-90 active:scale-95 transition-all whitespace-nowrap"
+                >
+                  <Search size={13} /> Search
+                </button>
               </div>
 
-              <button
-                onClick={() => {
-                  if (textQuery.trim()) {
-                    suppressAutocompleteRef.current = true;
-                    processTranscript(textQuery.trim());
-                    setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
-                  }
-                }}
-                className="flex items-center justify-center h-9 px-4 rounded-xl bg-primary text-primary-foreground text-[11px] font-bold hover:opacity-90 transition-opacity whitespace-nowrap flex-shrink-0 gap-1.5">
-                <Search size={12} /> Search
-              </button>
-
-              {/* Autocomplete */}
+              {/* Autocomplete dropdown */}
               <AnimatePresence>
                 {showSuggestions && suggestions.length > 0 && (
                   <motion.ul
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -4 }}
-                    className="absolute left-0 right-0 top-full z-50 mt-1 bg-popover border border-border rounded-xl shadow-elevated overflow-y-auto max-h-60"
+                    className="absolute left-0 right-0 top-full z-50 mt-1 bg-popover border border-border rounded-xl shadow-lg overflow-y-auto max-h-60"
                   >
                     {suggestions.map(s => (
                       <li key={s.place_id}>
@@ -677,9 +665,16 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
               </AnimatePresence>
             </div>
 
-            {/* Radius row */}
+            {/* Safari hint — separate line, no overlap */}
+            {isSafari && (
+              <p className="text-[11px] text-muted-foreground">
+                Voice search works best in Chrome — type your search above
+              </p>
+            )}
+
+            {/* Controls row: radius + language */}
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[10px] text-muted-foreground mr-1">
+              <span className="text-[10px] text-muted-foreground font-medium">
                 Radius
               </span>
               {[

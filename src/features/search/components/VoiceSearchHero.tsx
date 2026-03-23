@@ -601,16 +601,37 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
             <div ref={wrapperRef} className="flex items-center gap-3 border-b border-border pb-3 mb-3 relative">
 
               <button
-                onClick={isListening ? stopListening : startListening}
+                onClick={() => {
+                  if (!isSupported || isSafari) {
+                    setShowTextInput(true);
+                    setTimeout(() => {
+                      const input = document.querySelector(
+                        'input[data-voice-fallback]'
+                      ) as HTMLInputElement;
+                      input?.focus();
+                    }, 50);
+                  } else {
+                    isListening ? stopListening() : startListening();
+                  }
+                }}
                 className="shrink-0"
+                aria-label={(!isSupported || isSafari) ? 'Type your search' : 'Voice search'}
               >
                 {voiceState === 'processing' || isSearching
                   ? <Loader2 size={16} className="text-muted-foreground animate-spin" />
                   : voiceState === 'listening'
                   ? <MicOff size={16} className="text-foreground" />
+                  : (!isSupported || isSafari)
+                  ? <Search size={16} className="text-muted-foreground hover:text-foreground transition-colors" />
                   : <Mic size={16} className="text-muted-foreground hover:text-foreground transition-colors" />
                 }
               </button>
+
+              {isSafari && !isListening && (
+                <p className="text-xs text-muted-foreground mt-1 text-center absolute -bottom-5 left-0">
+                  Voice search works best in Chrome — or type below
+                </p>
+              )}
 
               <div className="flex-1 min-w-0 relative">
                 {voiceState === 'listening' ? (

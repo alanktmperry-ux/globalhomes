@@ -216,6 +216,7 @@ const App = () => (
         </TooltipProvider>
       </AuthProvider>
       </CurrencyProvider>
+    </ConsentProvider>
     </I18nProvider>
   </QueryClientProvider>
   </HelmetProvider>

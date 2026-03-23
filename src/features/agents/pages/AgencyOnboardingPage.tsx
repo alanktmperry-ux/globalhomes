@@ -409,7 +409,7 @@ export default function AgencyOnboardingPage() {
     <div class="item-content">
       <div class="item-title">All bonds lodged with state bond authority <span class="req-badge req-state">STATE-SPECIFIC</span></div>
       <div class="item-desc">Bonds must NOT be held in your general trust account — they must be lodged with the relevant state bond authority within the prescribed timeframe.</div>
-      <div class="state-note">${operatingState ? `${operatingState}: ${bondAuth}` : 'Check your state bond authority requirements'}</div>
+      <div class="state-note">${operatingState ? operatingState + ': ' + bondAuth : 'Check your state bond authority requirements'}</div>
       <div class="write-in-grid">
         <div><div class="write-in-label">Number of active bonds:</div><div class="write-in"></div></div>
         <div><div class="write-in-label">Total bond amount: $</div><div class="write-in"></div></div>

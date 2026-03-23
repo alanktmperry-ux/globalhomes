@@ -557,6 +557,51 @@ export type Database = {
           },
         ]
       }
+      broadcast_campaigns: {
+        Row: {
+          audience: string
+          body: string
+          created_at: string
+          created_by: string | null
+          id: string
+          recipient_count: number | null
+          send_method: string
+          sent_at: string | null
+          sent_count: number | null
+          status: string
+          subject: string
+          title: string
+        }
+        Insert: {
+          audience: string
+          body: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          recipient_count?: number | null
+          send_method: string
+          sent_at?: string | null
+          sent_count?: number | null
+          status?: string
+          subject: string
+          title: string
+        }
+        Update: {
+          audience?: string
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          recipient_count?: number | null
+          send_method?: string
+          sent_at?: string | null
+          sent_count?: number | null
+          status?: string
+          subject?: string
+          title?: string
+        }
+        Relationships: []
+      }
       buyer_briefs: {
         Row: {
           agent_id: string
@@ -1305,6 +1350,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      message_templates: {
+        Row: {
+          audience: string | null
+          body: string
+          category: string | null
+          created_at: string
+          id: string
+          name: string
+          subject: string
+        }
+        Insert: {
+          audience?: string | null
+          body: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          subject: string
+        }
+        Update: {
+          audience?: string | null
+          body?: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          subject?: string
+        }
+        Relationships: []
       }
       messages: {
         Row: {

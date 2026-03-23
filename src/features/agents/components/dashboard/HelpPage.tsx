@@ -101,7 +101,7 @@ const GUIDES: Guide[] = [
     steps: [
       'Click "New Listing" (the green + button in the sidebar) or navigate to /pocket-listing.',
       'Step 1 — Address: Type the property address. Suburb, state, and coordinates are auto-filled.',
-      'Step 2 — Basics: Choose Sale or Rent. Select property type (House, Apartment, Townhouse, Land, Commercial). Enter price or weekly rent. Add bedrooms, bathrooms, car spaces, floor area, and land size. For rentals: enter weekly rent, bond weeks (default 4), and estimated rental yield for investor buyers.',
+      'Step 2 — Basics: Choose Sale or Rent. Select property type (House, Apartment, Townhouse, Land, Commercial). For sale: enter price, select display mode (Exact, Range, EOI, or Contact Agent). Range mode shows a Price To field — auto-filled at +10% but fully editable. Add bedrooms, bathrooms, ensuites, study/home office, car spaces, garage type, floor area, and land size. Outdoor features: pool, outdoor entertainment, alfresco/deck. Climate: air conditioning type, heating type, solar panels. Financial details (optional): year built, council rates, water rates, strata fees for apartments and townhouses. If EOI is selected, enter the auction date and time. For rentals: enter weekly rent and bond weeks (default 4). Rental-specific fields include parking type, inclusions (water/electricity/internet), appliances (dishwasher, washing machine, internal laundry), building facilities (pool access, gym), and tenancy rules (smoking permitted, max occupants).',
       'Step 3 — Photos: Upload your property photos. Drag to reorder. The first photo is the hero image shown in search results. Accepted formats: JPEG, PNG, WebP.',
       'Step 4 — Voice AI Writer: Record a 30-second voice note or type notes about the property. Choose a tone (Standard, Luxury, Family, Investment). Hit Generate — the AI writes a professional listing description in seconds. Edit the result before continuing.',
       'Step 5 — Settings (sale listings): Choose visibility — Whisper (invite-only), Coming Soon (registered buyers), or Public (full marketplace). Set an exclusive window (7, 14, or 30 days), buyer requirements, and whether to allow co-broke with other agents. Settings (rental listings): Set available-from date, lease term, furnished toggle, pets allowed toggle, and application screening level.',
@@ -129,7 +129,7 @@ const GUIDES: Guide[] = [
     description: 'List properties for rent and manage tenant applications.',
     steps: [
       'When creating a listing, select "For Rent" on the Basics step. The form switches to rental mode — price becomes weekly rent, and rental-specific fields appear.',
-      'Set the weekly rent and bond weeks (default 4 weeks — the maximum allowed in most Australian states).',
+      'Set the weekly rent and bond weeks (default 4 weeks — the maximum in most Australian states). Then set parking type, and use the Inclusions section to toggle water, electricity, and internet if included in rent.',
       'On the Settings step, set the available-from date, preferred lease term (6 months, 12 months, 18 months, or month-to-month), and whether pets are considered.',
       'Published rental listings appear on the public marketplace with a "For Rent" badge. Buyers can submit a 5-step rental application (personal details, employment, rental history, identity, submit) directly from the listing page.',
       'Rental applications are reviewed in the Rental Applications section (coming soon to your dashboard). Approved applications create a tenancy record in the Rent Roll.',
@@ -419,7 +419,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
   {
     emoji: '🔑', title: 'Rental Management',
     items: [
-      { q: 'How do I list a property for rent?', a: 'Create a new listing and choose "For Rent" on the Basics step. The form switches to rental mode with fields for weekly rent, bond weeks, available date, lease term, and pet/furnishing preferences.' },
+      { q: 'How do I list a property for rent?', a: 'Create a new listing and choose "For Rent" on the Basics step. The form switches to rental mode with fields for weekly rent, bond weeks, parking type, and inclusions (water/electricity/internet). Toggle appliances (dishwasher, washing machine, internal laundry), building facilities (pool access, gym), and tenancy rules (smoking permitted, max occupants). On the Settings step, set available-from date, lease term, furnished toggle, pets allowed toggle, and screening level.' },
       { q: 'Can tenants apply online?', a: 'Yes. A 5-step rental application form is available on every rental listing page. It collects personal details, employment history, rental history, and identity documents.' },
       { q: 'What is the Rent Roll?', a: 'The Rent Roll (coming to your dashboard) is a summary of all your managed tenancies showing each tenant, their rent, next due date, and arrears status at a glance.' },
       { q: 'How does the system handle bond?', a: 'When creating a tenancy, you record the bond amount and bond lodgement number. Bond held in your trust account is recorded as a trust receipt with purpose set to "Bond".' },

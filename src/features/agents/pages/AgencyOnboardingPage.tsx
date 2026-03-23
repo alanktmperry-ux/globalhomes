@@ -197,7 +197,7 @@ export default function AgencyOnboardingPage() {
     };
     const stateAuditDue: Record<string, string> = {
       VIC: '30 September (via myCAV)',
-      NSW: '30 September (via Auditor's Report Online)',
+      NSW: "30 September (via Auditor's Report Online)",
       QLD: 'Within 4 months of licence anniversary',
       SA:  'Within 2 months of licence expiry',
       WA:  '31 March (calendar year ending 31 Dec)',

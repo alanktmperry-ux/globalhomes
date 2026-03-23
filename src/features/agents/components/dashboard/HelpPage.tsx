@@ -207,7 +207,7 @@ const GUIDES: Guide[] = [
       'Filter by All, Receipts only, or Payments only using the tabs. Search by client name, property, or reference number using the search bar.',
       'To download an individual receipt PDF: click the download icon on any receipt row. The PDF is formatted to the Agents Financial Administration Act 2014 standard with signature lines.',
       'To generate a full monthly audit PDF: click "Download Audit PDF" in the header. This produces an A4 landscape document with the transaction ledger, client ledger breakdown, reconciliation summary, and a statutory declaration section for the principal to sign.',
-      'To export a 5-year compliant CSV: click "Export CSV 5yr". The file includes the AFA 2014 retention notice and closing balance total.',
+      'To export a 7-year compliant CSV: click "Export CSV 7yr". The file includes the statutory retention notice and closing balance total.',
       'To generate a monthly trust statement (for your records or auditor): click "Monthly Statement" at the bottom of the ledger. Select the month and year and click "Generate & Print Statement". The PDF includes GST summary and signature lines.',
     ],
   },

@@ -185,62 +185,436 @@ export default function AgencyOnboardingPage() {
 
   const generateImportChecklist = () => {
     const today = DATE_AU.format(new Date());
-    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Trust Migration Pre-Import Checklist</title>
+    const stateAct: Record<string, string> = {
+      VIC: 'Estate Agents Act 1980 (Vic)',
+      NSW: 'Property and Stock Agents Act 2002 (NSW)',
+      QLD: 'Agents Financial Administration Act 2014 (Qld)',
+      SA:  'Land Agents Act 1994 (SA)',
+      WA:  'Real Estate and Business Agents Act 1978 (WA)',
+      TAS: 'Property Agents and Land Transactions Act 2016 (Tas)',
+      ACT: 'Agents Act 2003 (ACT)',
+      NT:  'Agents Licensing Act 1979 (NT)',
+    };
+    const stateAuditDue: Record<string, string> = {
+      VIC: '30 September (via myCAV)',
+      NSW: '30 September (via Auditor's Report Online)',
+      QLD: 'Within 4 months of licence anniversary',
+      SA:  'Within 2 months of licence expiry',
+      WA:  '31 March (calendar year ending 31 Dec)',
+      TAS: '30 September (via Property Agents Board)',
+      ACT: '30 September',
+      NT:  '30 September',
+    };
+    const stateBondAuthority: Record<string, string> = {
+      VIC: 'RTBA (Residential Tenancies Bond Authority) — within 10 days',
+      NSW: 'NSW Fair Trading Rental Bonds Online — within 10 days',
+      QLD: 'RTA (Residential Tenancies Authority) — within 10 days',
+      SA:  'Consumer and Business Services — within 7 days',
+      WA:  'Bond Administrator — within 14 days',
+      TAS: 'Director of Consumer Affairs — within 10 days',
+      ACT: 'ACT Revenue Office — within 10 days',
+      NT:  'Held by landlord/agent in trust — no central authority',
+    };
+    const legislation = stateAct[operatingState] || 'Applicable state trust accounting legislation';
+    const auditDue = stateAuditDue[operatingState] || 'Check with your state regulator';
+    const bondAuth = stateBondAuthority[operatingState] || 'State bond authority — check local requirements';
+
+    const html = \`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Trust Account Migration Pre-Import Checklist</title>
 <style>
-  @page { size: A4; margin: 25mm 20mm; }
+  @page { size: A4; margin: 20mm 18mm; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 11pt; color: #1a1a1a; line-height: 1.6; }
-  .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 16px; margin-bottom: 24px; }
-  .header h1 { font-size: 16pt; margin-bottom: 4px; }
-  .header p { font-size: 10pt; color: #666; }
-  .item { display: flex; gap: 12px; padding: 16px 0; border-bottom: 1px solid #eee; }
-  .checkbox { width: 20px; height: 20px; border: 2px solid #333; border-radius: 3px; flex-shrink: 0; margin-top: 2px; }
-  .item-content h3 { font-size: 11pt; margin-bottom: 4px; }
-  .item-content p { font-size: 9pt; color: #666; }
-  .write-in { border-bottom: 1px solid #999; min-height: 24px; margin-top: 8px; }
-  .footer { margin-top: 30px; text-align: center; font-size: 8pt; color: #aaa; border-top: 1px solid #ddd; padding-top: 10px; }
+  body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10.5pt; color: #1a1a1a; line-height: 1.55; }
+  .header { border-bottom: 3px solid #1a1a2e; padding-bottom: 14px; margin-bottom: 6px; }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .brand { font-size: 13pt; font-weight: 700; color: #1a1a2e; letter-spacing: -0.3px; }
+  .brand span { color: #2563eb; }
+  .doc-title { font-size: 14pt; font-weight: 700; margin: 8px 0 2px; }
+  .doc-meta { font-size: 8.5pt; color: #666; }
+  .ref { font-size: 8.5pt; color: #999; text-align: right; }
+  .legislation-box { background: #f0f4ff; border: 1px solid #c7d7ff; border-radius: 4px; padding: 8px 12px; margin: 12px 0; font-size: 8.5pt; color: #1e3a8a; }
+  .section { margin-top: 14px; }
+  .section-title { font-size: 9pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #2563eb; border-bottom: 1.5px solid #e5e7eb; padding-bottom: 4px; margin-bottom: 2px; }
+  .item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f0f0f0; page-break-inside: avoid; }
+  .item:last-child { border-bottom: none; }
+  .checkbox { width: 18px; height: 18px; border: 2px solid #374151; border-radius: 3px; flex-shrink: 0; margin-top: 1px; }
+  .item-content { flex: 1; }
+  .item-title { font-size: 10pt; font-weight: 600; color: #111; margin-bottom: 2px; }
+  .item-desc { font-size: 8.5pt; color: #555; line-height: 1.45; }
+  .write-in { border-bottom: 1px solid #bbb; min-height: 20px; margin-top: 6px; font-size: 8.5pt; color: #999; }
+  .write-in-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+  .write-in-label { font-size: 7.5pt; color: #888; margin-bottom: 2px; }
+  .req-badge { display: inline-block; font-size: 7pt; font-weight: 600; padding: 1px 5px; border-radius: 10px; margin-left: 6px; vertical-align: middle; }
+  .req-mandatory { background: #fee2e2; color: #991b1b; }
+  .req-state { background: #fef3c7; color: #92400e; }
+  .state-note { font-size: 7.5pt; color: #2563eb; font-style: italic; margin-top: 3px; }
+  .sig-section { margin-top: 20px; border-top: 2px solid #1a1a2e; padding-top: 14px; page-break-inside: avoid; }
+  .sig-title { font-size: 10pt; font-weight: 700; margin-bottom: 6px; }
+  .sig-declaration { font-size: 8pt; color: #555; line-height: 1.5; margin-bottom: 16px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px; padding: 8px 10px; }
+  .sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 10px; }
+  .sig-field { border-top: 1px solid #374151; padding-top: 4px; }
+  .sig-label { font-size: 8pt; color: #666; }
+  .aml-box { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 4px; padding: 8px 12px; margin: 12px 0; font-size: 8pt; color: #9a3412; }
+  .footer { margin-top: 18px; text-align: center; font-size: 7.5pt; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 8px; }
+  .state-table { width: 100%; border-collapse: collapse; font-size: 8pt; margin-top: 6px; }
+  .state-table th { background: #f3f4f6; padding: 5px 8px; text-align: left; font-weight: 600; color: #374151; border: 1px solid #e5e7eb; }
+  .state-table td { padding: 4px 8px; border: 1px solid #e5e7eb; color: #555; }
+  .state-table tr:nth-child(even) td { background: #f9fafb; }
+  .highlight-row td { background: #eff6ff !important; font-weight: 600; color: #1d4ed8 !important; }
   @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
 </style></head><body>
+
 <div class="header">
-  <h1>Trust Migration Pre-Import Checklist</h1>
-  <p>Prepare these documents before importing into ListHQ</p>
-  <p style="font-size:9pt;color:#999;margin-top:4px;">Agency: ${agencyName} · Cut-over date: ${cutoverDate || '_______________'}</p>
-</div>
-<div class="item">
-  <div class="checkbox"></div>
-  <div class="item-content">
-    <h3>Trust Trial Balance as at cut-over date</h3>
-    <p>Run the Trial Balance report from your current system. Balance: <div class="write-in"></div></p>
+  <div class="header-top">
+    <div>
+      <div class="brand">List<span>HQ</span></div>
+      <div class="doc-title">Trust Account Migration Pre-Import Checklist</div>
+      <div class="doc-meta">
+        Agency: <strong>\${agencyName || '________________________'}</strong> &nbsp;|&nbsp;
+        State: <strong>\${operatingState || '____'}</strong> &nbsp;|&nbsp;
+        Cut-over date: <strong>\${cutoverDate || '_______________'}</strong>
+      </div>
+    </div>
+    <div class="ref">
+      Generated: \${today}<br/>
+      Ref: MIG-\${Date.now().toString(36).toUpperCase()}
+    </div>
   </div>
 </div>
-<div class="item">
-  <div class="checkbox"></div>
-  <div class="item-content">
-    <h3>Client Ledger Summary</h3>
-    <p>From Reports in your current system — lists all clients with trust funds held. Number of clients: <div class="write-in"></div></p>
+
+<div class="legislation-box">
+  📋 <strong>Governing legislation for \${operatingState || 'your state'}:</strong> \${legislation}
+  &nbsp;|&nbsp; Annual audit due: <strong>\${auditDue}</strong>
+</div>
+
+<div class="aml-box">
+  ⚠️ <strong>AML/CTF Notice:</strong> From 1 July 2026, real estate agents must comply with AUSTRAC Anti-Money Laundering and Counter-Terrorism Financing requirements. Ensure your agency is enrolled with AUSTRAC before that date.
+</div>
+
+<!-- SECTION 1: THREE-WAY RECONCILIATION -->
+<div class="section">
+  <div class="section-title">Section 1 — Three-Way Reconciliation (Mandatory — All States)</div>
+
+  <div class="item">
+    <div class="checkbox"></div>
+    <div class="item-content">
+      <div class="item-title">Trust cashbook closing balance <span class="req-badge req-mandatory">MANDATORY</span></div>
+      <div class="item-desc">Record the closing balance from your trust cashbook (receipts minus payments) as at the cut-over date. This must agree with the bank statement and trust ledger totals.</div>
+      <div class="write-in">Cashbook closing balance: $________________________ &nbsp;&nbsp; Date: ________________________</div>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="checkbox"></div>
+    <div class="item-content">
+      <div class="item-title">Trust bank statement closing balance <span class="req-badge req-mandatory">MANDATORY</span></div>
+      <div class="item-desc">Must match the cashbook balance after adjusting for outstanding deposits and unpresented cheques. Attach the bank statement or note the statement details below.</div>
+      <div class="write-in-grid">
+        <div><div class="write-in-label">Bank statement balance: $</div><div class="write-in"></div></div>
+        <div><div class="write-in-label">Statement date:</div><div class="write-in"></div></div>
+        <div><div class="write-in-label">Outstanding deposits: $</div><div class="write-in"></div></div>
+        <div><div class="write-in-label">Unpresented cheques: $</div><div class="write-in"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="checkbox"></div>
+    <div class="item-content">
+      <div class="item-title">Trust ledger total (sum of all client ledgers) <span class="req-badge req-mandatory">MANDATORY</span></div>
+      <div class="item-desc">The sum of all individual client ledger balances must equal the cashbook and bank statement balance. A trial balance report from your current system satisfies this requirement.</div>
+      <div class="write-in-grid">
+        <div><div class="write-in-label">Trust ledger total: $</div><div class="write-in"></div></div>
+        <div><div class="write-in-label">Number of client ledgers:</div><div class="write-in"></div></div>
+      </div>
+      <div class="write-in" style="margin-top:6px;">Three-way agreement confirmed: Cashbook = Bank = Ledger &nbsp;☐ YES &nbsp;&nbsp; ☐ NO (explain discrepancy below)</div>
+    </div>
   </div>
 </div>
-<div class="item">
-  <div class="checkbox"></div>
-  <div class="item-content">
-    <h3>Last bank statement showing closing balance</h3>
-    <p>Must match the Trial Balance total. Closing balance: <div class="write-in"></div></p>
+
+<!-- SECTION 2: CLIENT LEDGER RECORDS -->
+<div class="section">
+  <div class="section-title">Section 2 — Client Ledger Records (Mandatory — All States)</div>
+
+  <div class="item">
+    <div class="checkbox"></div>
+    <div class="item-content">
+      <div class="item-title">Individual client ledger summary <span class="req-badge req-mandatory">MANDATORY</span></div>
+      <div class="item-desc">A total balance alone is NOT sufficient. You must have a record of each individual client name and the amount held for them. Auditors in all states require this breakdown. Export this from your current system before migration.</div>
+      <div class="write-in">Number of individual client ledgers exported: ________________________</div>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="checkbox"></div>
+    <div class="item-content">
+      <div class="item-title">Written client authorities and disbursement directions <span class="req-badge req-mandatory">MANDATORY</span></div>
+      <div class="item-desc">For every payment made from trust, you must hold written authority from the client. Confirm you have retained all authorisations, management agreements, and disbursement directions.</div>
+      <div class="write-in">Confirmed all written authorities are retained and accessible: &nbsp;☐ YES &nbsp;&nbsp; ☐ NO</div>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="checkbox"></div>
+    <div class="item-content">
+      <div class="item-title">Active matters list (clients with funds currently held) <span class="req-badge req-mandatory">MANDATORY</span></div>
+      <div class="item-desc">A complete list of all matters where client funds remain in trust as at the cut-over date. Include property address, tenant/owner name, and balance held for each.</div>
+      <div class="write-in">Number of active matters: ________________________</div>
+    </div>
   </div>
 </div>
-<div class="item">
-  <div class="checkbox"></div>
-  <div class="item-content">
-    <h3>Active matters list (clients with funds in trust)</h3>
-    <p>Export from your current system. Number of active matters: <div class="write-in"></div></p>
+
+<!-- SECTION 3: RECEIPTS AND PAYMENTS -->
+<div class="section">
+  <div class="section-title">Section 3 — Receipt Register and Payment Records (Mandatory — All States)</div>
+
+  <div class="item">
+    <div class="checkbox"></div>
+    <div class="item-content">
+      <div class="item-title">Numbered receipt register — sequence verified <span class="req-badge req-mandatory">MANDATORY</span></div>
+      <div class="item-desc">All trust receipts must be numbered sequentially and include: payer name, amount received, date, purpose, and property address. No gaps in the sequence are permitted. Unused receipt books must also be accounted for.</div>
+      <div class="write-in-grid">
+        <div><div class="write-in-label">First receipt number:</div><div class="write-in"></div></div>
+        <div><div class="write-in-label">Last receipt number:</div><div class="write-in"></div></div>
+        <div><div class="write-in-label">Total receipts issued:</div><div class="write-in"></div></div>
+        <div><div class="write-in-label">Any voided receipts? If yes, retained?</div><div class="write-in"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="checkbox"></div>
+    <div class="item-content">
+      <div class="item-title">All trust deposits banked next business day <span class="req-badge req-mandatory">MANDATORY</span></div>
+      <div class="item-desc">All rent, bond money, and other trust receipts must be banked by the next business day after receipt. Confirm no funds were held beyond this requirement in the period being migrated.</div>
+      <div class="write-in">Confirmed same/next business day banking throughout the period: &nbsp;☐ YES &nbsp;&nbsp; ☐ NO (note exceptions)</div>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="checkbox"></div>
+    <div class="item-content">
+      <div class="item-title">Payment authorisations — LIC sign-off confirmed <span class="req-badge req-mandatory">MANDATORY</span></div>
+      <div class="item-desc">Only the Licensee in Charge (LIC) may authorise disbursements from the trust account. Confirm all payments in the period were properly authorised by the LIC.</div>
+      <div class="write-in">LIC name: ________________________ &nbsp;&nbsp; Licence number: ________________________</div>
+    </div>
   </div>
 </div>
+
+<!-- SECTION 4: RENTAL BONDS -->
+<div class="section">
+  <div class="section-title">Section 4 — Rental Bonds (State-Specific Requirements)</div>
+
+  <div class="item">
+    <div class="checkbox"></div>
+    <div class="item-content">
+      <div class="item-title">All bonds lodged with state bond authority <span class="req-badge req-state">STATE-SPECIFIC</span></div>
+      <div class="item-desc">Bonds must NOT be held in your general trust account — they must be lodged with the relevant state bond authority within the prescribed timeframe.</div>
+      <div class="state-note">\${operatingState ? \`\${operatingState}: \${bondAuth}\` : 'Check your state bond authority requirements'}</div>
+      <div class="write-in-grid">
+        <div><div class="write-in-label">Number of active bonds:</div><div class="write-in"></div></div>
+        <div><div class="write-in-label">Total bond amount: $</div><div class="write-in"></div></div>
+        <div><div class="write-in-label">All lodged within required timeframe?</div><div class="write-in">☐ YES &nbsp;&nbsp; ☐ NO</div></div>
+        <div><div class="write-in-label">Bond authority reference numbers held?</div><div class="write-in">☐ YES &nbsp;&nbsp; ☐ NO</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 5: TRUST ACCOUNT INTEREST -->
+<div class="section">
+  <div class="section-title">Section 5 — Trust Account Interest</div>
+
+  <div class="item">
+    <div class="checkbox"></div>
+    <div class="item-content">
+      <div class="item-title">Interest on trust funds — disbursed correctly <span class="req-badge req-state">STATE-SPECIFIC</span></div>
+      <div class="item-desc">Some states require interest earned on trust accounts above certain thresholds to be paid to the state's statutory authority or to the client. Confirm any interest earned has been handled in accordance with \${operatingState || 'your state'} legislation.</div>
+      <div class="write-in-grid">
+        <div><div class="write-in-label">Interest earned (period): $</div><div class="write-in"></div></div>
+        <div><div class="write-in-label">Disbursed to:</div><div class="write-in"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 6: AUDITOR CERTIFICATION -->
+<div class="section">
+  <div class="section-title">Section 6 — Auditor Certification and Compliance History</div>
+
+  <div class="item">
+    <div class="checkbox"></div>
+    <div class="item-content">
+      <div class="item-title">Most recent annual audit report <span class="req-badge req-mandatory">MANDATORY</span></div>
+      <div class="item-desc">An independent audit by a Registered Company Auditor (ASIC-registered) or approved accounting body member (CPA Australia, CA ANZ, or IPA) must be conducted annually. Attach or reference the most recent audit report. The auditor must be independent — they cannot be employed by or a partner of your agency.</div>
+      <div class="write-in-grid">
+        <div><div class="write-in-label">Auditor name:</div><div class="write-in"></div></div>
+        <div><div class="write-in-label">Auditor professional body & number:</div><div class="write-in"></div></div>
+        <div><div class="write-in-label">Audit period covered:</div><div class="write-in"></div></div>
+        <div><div class="write-in-label">Date audit report issued:</div><div class="write-in"></div></div>
+        <div><div class="write-in-label">Lodged with regulator? Date:</div><div class="write-in"></div></div>
+        <div><div class="write-in-label">Any qualified findings?</div><div class="write-in">☐ YES (attach details) &nbsp;&nbsp; ☐ NO</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="checkbox"></div>
+    <div class="item-content">
+      <div class="item-title">Nil audit declaration (if no trust transactions in period)</div>
+      <div class="item-desc">If no trust money was received or held during the audit period, most states accept a statutory declaration in lieu of a full audit. This declaration must still be lodged with the regulator within the required timeframe.</div>
+      <div class="write-in">Nil declaration lodged: &nbsp;☐ YES &nbsp;&nbsp; ☐ NO &nbsp;&nbsp; ☐ N/A (trust money was held)</div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 7: SOURCE SYSTEM CUT-OVER -->
+<div class="section">
+  <div class="section-title">Section 7 — Source System Cut-Over</div>
+
+  <div class="item">
+    <div class="checkbox"></div>
+    <div class="item-content">
+      <div class="item-title">Current system final export completed</div>
+      <div class="item-desc">Confirm you have exported your complete trust ledger from your current system (PropertyMe, Console Cloud, Reapit, or TrustSoft) including all transaction history, client ledgers, receipt register, and outstanding matters.</div>
+      <div class="write-in">Source system: ________________________ &nbsp;&nbsp; Export date: ________________________</div>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="checkbox"></div>
+    <div class="item-content">
+      <div class="item-title">No further transactions in source system after cut-over date</div>
+      <div class="item-desc">From the cut-over date, all new trust transactions must be recorded in ListHQ only. Processing transactions in both systems simultaneously will cause reconciliation discrepancies that are difficult to unwind.</div>
+      <div class="write-in">Confirmed source system access restricted from: ________________________</div>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="checkbox"></div>
+    <div class="item-content">
+      <div class="item-title">Record retention confirmed — minimum 7 years</div>
+      <div class="item-desc">All trust records must be retained for the period required by your state legislation. To be safe across all jurisdictions, retain all records for a minimum of 7 years from the date of the last entry. Electronic storage is acceptable if records remain accessible and reproducible.</div>
+      <div class="write-in">Records archived and accessible: &nbsp;☐ YES &nbsp;&nbsp; Storage method: ________________________</div>
+    </div>
+  </div>
+</div>
+
+<!-- STATE REFERENCE TABLE -->
+<div class="section" style="page-break-before: always;">
+  <div class="section-title">State-by-State Reference — Annual Audit Requirements</div>
+  <table class="state-table">
+    <thead>
+      <tr>
+        <th>State</th>
+        <th>Governing Legislation</th>
+        <th>Audit Period</th>
+        <th>Report Due</th>
+        <th>Lodge With</th>
+        <th>Records Retention</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="\${operatingState === 'VIC' ? 'highlight-row' : ''}">
+        <td><strong>VIC</strong></td>
+        <td>Estate Agents Act 1980</td>
+        <td>1 Jul – 30 Jun</td>
+        <td>30 September</td>
+        <td>Consumer Affairs Victoria (myCAV)</td>
+        <td>7 years</td>
+      </tr>
+      <tr class="\${operatingState === 'NSW' ? 'highlight-row' : ''}">
+        <td><strong>NSW</strong></td>
+        <td>Property &amp; Stock Agents Act 2002</td>
+        <td>1 Jul – 30 Jun</td>
+        <td>30 September</td>
+        <td>NSW Fair Trading (Auditor's Report Online)</td>
+        <td>3 years (min)</td>
+      </tr>
+      <tr class="\${operatingState === 'QLD' ? 'highlight-row' : ''}">
+        <td><strong>QLD</strong></td>
+        <td>Agents Financial Administration Act 2014</td>
+        <td>Licence anniversary</td>
+        <td>Within 4 months of period end</td>
+        <td>Office of Fair Trading (online portal)</td>
+        <td>5 years</td>
+      </tr>
+      <tr class="\${operatingState === 'WA' ? 'highlight-row' : ''}">
+        <td><strong>WA</strong></td>
+        <td>Real Estate &amp; Business Agents Act 1978</td>
+        <td>1 Jan – 31 Dec</td>
+        <td>31 March</td>
+        <td>Commissioner for Consumer Protection</td>
+        <td>6 years</td>
+      </tr>
+      <tr class="\${operatingState === 'SA' ? 'highlight-row' : ''}">
+        <td><strong>SA</strong></td>
+        <td>Land Agents Act 1994</td>
+        <td>2 months before licence expiry</td>
+        <td>With licence renewal</td>
+        <td>Consumer &amp; Business Services</td>
+        <td>7 years</td>
+      </tr>
+      <tr class="\${operatingState === 'TAS' ? 'highlight-row' : ''}">
+        <td><strong>TAS</strong></td>
+        <td>Property Agents &amp; Land Transactions Act 2016</td>
+        <td>1 Jul – 30 Jun</td>
+        <td>30 September</td>
+        <td>Property Agents Board</td>
+        <td>7 years</td>
+      </tr>
+      <tr class="\${operatingState === 'ACT' ? 'highlight-row' : ''}">
+        <td><strong>ACT</strong></td>
+        <td>Agents Act 2003</td>
+        <td>1 Jul – 30 Jun</td>
+        <td>30 September</td>
+        <td>Access Canberra</td>
+        <td>7 years</td>
+      </tr>
+      <tr class="\${operatingState === 'NT' ? 'highlight-row' : ''}">
+        <td><strong>NT</strong></td>
+        <td>Agents Licensing Act 1979</td>
+        <td>1 Jul – 30 Jun</td>
+        <td>30 September</td>
+        <td>NT Consumer Affairs</td>
+        <td>7 years</td>
+      </tr>
+    </tbody>
+  </table>
+  <p style="font-size:7.5pt;color:#888;margin-top:6px;">★ Your state is highlighted. Always verify current deadlines with your state regulator as requirements may change.</p>
+</div>
+
+<!-- SIGNATURE BLOCK -->
+<div class="sig-section">
+  <div class="sig-title">Agent Acknowledgement and Declaration</div>
+  <div class="sig-declaration">
+    I, the undersigned, declare that I have reviewed the above checklist and confirm that:
+    (1) all trust account records have been reconciled and are accurate as at the cut-over date;
+    (2) all client funds held in trust are correctly identified and accounted for;
+    (3) all bond lodgements, receipt sequences, and disbursement authorities comply with \${legislation};
+    (4) this checklist forms part of the statutory audit trail for trust account migration purposes;
+    (5) records will be retained for a minimum of 7 years in accordance with the strictest applicable state requirement;
+    and (6) I accept responsibility for the accuracy of all data imported into ListHQ from this date.
+  </div>
+  <div class="sig-grid">
+    <div class="sig-field"><div class="sig-label">Licensee in Charge — Signature</div></div>
+    <div class="sig-field"><div class="sig-label">Print Full Name</div></div>
+    <div class="sig-field"><div class="sig-label">Real Estate Licence Number</div></div>
+    <div class="sig-field"><div class="sig-label">Date Signed</div></div>
+  </div>
+</div>
+
 <div class="footer">
-  Generated ${today} · ListHQ Trust Accounting · Retain for audit records
+  ListHQ Trust Account Migration Pre-Import Checklist &nbsp;|&nbsp;
+  Generated \${today} &nbsp;|&nbsp;
+  Ref: MIG-\${Date.now().toString(36).toUpperCase()} &nbsp;|&nbsp;
+  Retain for minimum 7 years — do not discard &nbsp;|&nbsp;
+  This document forms part of your statutory trust accounting audit trail.
 </div>
-</body></html>`;
-    const w = window.open('', '_blank', 'width=800,height=1100');
+
+</body></html>\`;
+    const w = window.open('', '_blank', 'width=900,height=1200');
     if (w) { w.document.write(html); w.document.close(); w.print(); }
-    toast.success('Import checklist generated');
+    toast.success('Compliance checklist generated — print or save as PDF');
   };
 
   const renderStep = () => {

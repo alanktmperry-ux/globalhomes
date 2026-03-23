@@ -382,6 +382,7 @@ const AdminDashboard = () => {
             {tab === 'comms' && <CommsCentre />}
             {tab === 'partners' && <PartnerPerformance />}
             {tab === 'growth' && <GrowthFunnel />}
+            {tab === 'support' && <SupportInbox />}
             {tab === 'overview' && <AdminOverview stats={stats} users={users} insights={insights} />}
             {tab === 'users' && <AdminUsers />}
             {tab === 'listings' && <AdminListings properties={properties} onToggleActive={togglePropertyActive} onActivateBoost={activateBoost} />}

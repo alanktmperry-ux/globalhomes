@@ -592,6 +592,36 @@ const TrustAccountingPage = () => {
           </Button>
         }
       />
+
+      {overdrawnLedgers.length > 0 && (
+        <div className="mx-4 mt-4 sm:mx-6 bg-destructive/10 border border-destructive/30 rounded-xl p-4 flex items-start gap-3">
+          <AlertTriangle size={18} className="text-destructive flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm font-bold text-destructive">
+              ⚠️ Trust ledger overdrawn — immediate action required
+            </p>
+            <p className="text-xs text-destructive/80 mt-1">
+              The following client ledger{overdrawnLedgers.length > 1 ? 's have' : ' has'} a debit balance.
+              Under Australian trust accounting law, a trust ledger must never go into debit.
+              You must remedy the shortfall immediately and notify your state regulator in writing.
+            </p>
+            <div className="mt-2 space-y-1">
+              {overdrawnLedgers.map(l => (
+                <div key={l.name} className="flex items-center justify-between text-xs bg-destructive/10 rounded px-2 py-1">
+                  <span className="font-medium text-foreground">{l.name}</span>
+                  <span className="font-mono text-destructive font-bold">−${Math.abs(l.balance).toFixed(2)}</span>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Remedy: Transfer funds from your trading account to cover the shortfall, then notify your state regulator
+              in writing with the date, amount, reason, and corrective action taken.
+              Use Journal Adjustment in the Trust Ledger to record the correction.
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="p-4 sm:p-6 max-w-[1600px]">
         {/* ── 3-Panel Dashboard Cards ── */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">

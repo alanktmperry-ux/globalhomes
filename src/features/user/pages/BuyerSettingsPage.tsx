@@ -380,6 +380,37 @@ const BuyerSettingsPage = () => {
           ))}
         </div>
 
+        {/* Privacy */}
+        <div className="bg-card border border-border rounded-xl p-5 space-y-4">
+          <h3 className="font-display text-sm font-bold flex items-center gap-1.5">
+            <Shield size={14} /> Privacy
+          </h3>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Google Maps</p>
+              <p className="text-xs text-muted-foreground">
+                Used for address autocomplete and property map display.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={`text-xs font-medium ${consent.maps ? 'text-green-600' : 'text-muted-foreground'}`}>
+                {consent.maps ? 'Enabled' : 'Disabled'}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => (consent.maps ? declineMaps() : acceptAll())}
+                className="text-xs h-7 px-2.5"
+              >
+                {consent.maps ? 'Disable' : 'Enable'}
+              </Button>
+            </div>
+          </div>
+          <button onClick={resetConsent} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors">
+            Reset all cookie preferences
+          </button>
+        </div>
+
         <Button onClick={handleSave} disabled={saving} className="w-full">
           {saving ? <><Loader2 size={16} className="animate-spin mr-2" /> Saving...</> : 'Save Changes'}
         </Button>

@@ -264,6 +264,12 @@ const PocketListingPage = () => {
             </DialogContent>
           </Dialog>
         </main>
+
+        <ImportListingDialog
+          open={showImportDialog}
+          onClose={() => setShowImportDialog(false)}
+          onImport={handleImportListing}
+        />
       </div>
     </div>
   );

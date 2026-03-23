@@ -418,6 +418,7 @@ export type Database = {
         Row: {
           agency: string | null
           agency_id: string | null
+          aml_ctf_acknowledged: boolean | null
           avatar_url: string | null
           avg_rating: number | null
           bio: string | null
@@ -431,7 +432,9 @@ export type Database = {
           is_demo: boolean
           is_subscribed: boolean
           languages_spoken: string[] | null
+          last_compliance_check_at: string | null
           lead_source: string | null
+          licence_expiry_date: string | null
           license_number: string | null
           lifecycle_stage: string | null
           name: string
@@ -458,6 +461,7 @@ export type Database = {
         Insert: {
           agency?: string | null
           agency_id?: string | null
+          aml_ctf_acknowledged?: boolean | null
           avatar_url?: string | null
           avg_rating?: number | null
           bio?: string | null
@@ -471,7 +475,9 @@ export type Database = {
           is_demo?: boolean
           is_subscribed?: boolean
           languages_spoken?: string[] | null
+          last_compliance_check_at?: string | null
           lead_source?: string | null
+          licence_expiry_date?: string | null
           license_number?: string | null
           lifecycle_stage?: string | null
           name: string
@@ -498,6 +504,7 @@ export type Database = {
         Update: {
           agency?: string | null
           agency_id?: string | null
+          aml_ctf_acknowledged?: boolean | null
           avatar_url?: string | null
           avg_rating?: number | null
           bio?: string | null
@@ -511,7 +518,9 @@ export type Database = {
           is_demo?: boolean
           is_subscribed?: boolean
           languages_spoken?: string[] | null
+          last_compliance_check_at?: string | null
           lead_source?: string | null
+          licence_expiry_date?: string | null
           license_number?: string | null
           lifecycle_stage?: string | null
           name?: string

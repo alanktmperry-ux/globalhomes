@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Building2, BarChart3, Shield, ShieldAlert, Database, ArrowLeft, Loader2, Gamepad2, Zap, DollarSign } from 'lucide-react';
+import { Users, Building2, BarChart3, Shield, ShieldAlert, Database, ArrowLeft, Loader2, Gamepad2, Zap, DollarSign, Megaphone } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
@@ -15,8 +15,9 @@ import CommandCentre from '@/features/admin/components/CommandCentre';
 import AgentLifecycle from '@/features/admin/components/AgentLifecycle';
 import ComplianceMonitor from '@/features/admin/components/ComplianceMonitor';
 import RevenueBilling from '@/features/admin/components/RevenueBilling';
+import CommsCentre from '@/features/admin/components/CommsCentre';
 
-type Tab = 'command-centre' | 'agent-lifecycle' | 'compliance' | 'revenue' | 'overview' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests' | 'reports';
+type Tab = 'command-centre' | 'agent-lifecycle' | 'compliance' | 'revenue' | 'comms' | 'overview' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests' | 'reports';
 
 interface UserRow {
   id: string;
@@ -313,6 +314,7 @@ const AdminDashboard = () => {
     { id: 'agent-lifecycle', label: 'Agent Lifecycle', icon: Users },
     { id: 'compliance', label: 'Compliance', icon: ShieldAlert },
     { id: 'revenue', label: 'Revenue & Billing', icon: DollarSign },
+    { id: 'comms', label: 'Communications', icon: Megaphone },
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'users', label: 'Users', icon: Users },
     { id: 'listings', label: 'Listings', icon: Building2 },
@@ -371,6 +373,7 @@ const AdminDashboard = () => {
             {tab === 'agent-lifecycle' && <AgentLifecycle />}
             {tab === 'compliance' && <ComplianceMonitor />}
             {tab === 'revenue' && <RevenueBilling />}
+            {tab === 'comms' && <CommsCentre />}
             {tab === 'overview' && <AdminOverview stats={stats} users={users} insights={insights} />}
             {tab === 'users' && <AdminUsers />}
             {tab === 'listings' && <AdminListings properties={properties} onToggleActive={togglePropertyActive} onActivateBoost={activateBoost} />}

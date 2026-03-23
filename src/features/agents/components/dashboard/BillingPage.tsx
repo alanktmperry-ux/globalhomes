@@ -339,8 +339,13 @@ const BillingPage = () => {
           <Button variant="outline" size="sm" onClick={() => toast.info("Stripe billing coming soon — we'll notify you when it's ready.")}>
             Add Payment Method
           </Button>
-        </div>
+
+        {/* Agent Reports */}
+        {agentId && (
+          <AdminReports isAdmin={false} currentAgentId={agentId} />
+        )}
       </div>
+    </div>
     </div>
   );
 };

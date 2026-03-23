@@ -80,10 +80,10 @@ function PartnerRowComponent({ partner }: { partner: PartnerRow }) {
     setLoadingAgencies(true);
     try {
       const now = new Date();
-      const { data: paRows } = await supabase
+      const { data: paRows } = await (supabase
         .from('partner_agencies')
         .select('agency_id, status, access_level, accepted_at, agencies(id, name)')
-        .eq('partner_id', partner.id);
+        .eq('partner_id', partner.id) as any);
 
       if (!paRows || paRows.length === 0) { setLoadingAgencies(false); return; }
 

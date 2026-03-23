@@ -642,6 +642,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                   <div className="relative">
                     <input
                       type="text"
+                      data-voice-fallback
                       value={textQuery}
                       onChange={e => setTextQuery(e.target.value)}
                       onKeyDown={e => {
@@ -651,10 +652,11 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                           setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
                         }
                       }}
+                      autoFocus={showTextInput && (!isSupported || isSafari)}
                       className="w-full text-[12px] text-foreground bg-transparent focus:outline-none relative z-10"
-                      placeholder=""
+                      placeholder={(!isSupported || isSafari) ? "Type your search — e.g. 3 bed house in Berwick under $900k" : ""}
                     />
-                    {!textQuery && (
+                    {!textQuery && isSupported && !isSafari && (
                       <span
                         className="absolute inset-0 text-[12px] text-muted-foreground pointer-events-none flex items-center transition-opacity duration-300"
                         style={{ opacity: placeholderVisible ? 1 : 0 }}

@@ -386,6 +386,45 @@ export default function AgentPublicProfilePage() {
             <p className="text-muted-foreground">No active listings from this agent.</p>
           </div>
         )}
+
+        {agentReviews.length > 0 && (
+          <div className="mt-8">
+            <h2 className="font-display text-xl font-bold text-foreground mb-4">
+              Client Reviews ({agentReviews.length})
+            </h2>
+            <div className="space-y-4">
+              {agentReviews.map((r: any) => (
+                <div key={r.id} className="bg-card border border-border rounded-xl p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-xs font-bold text-primary">
+                        {r.reviewer_name[0].toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{r.reviewer_name}</p>
+                        <p className="text-[10px] text-muted-foreground">{new Date(r.created_at).toLocaleDateString('en-AU')}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-0.5">
+                      {[1, 2, 3, 4, 5].map(i => (
+                        <Star key={i} size={12} className={i <= r.rating ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground'} />
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{r.review_text}</p>
+                  {r.reply_text && (
+                    <div className="ml-4 pl-4 border-l-2 border-primary/20">
+                      <p className="text-[10px] text-muted-foreground mb-1">
+                        <span className="font-medium text-foreground">{agent.name}</span> replied
+                      </p>
+                      <p className="text-sm text-foreground">{r.reply_text}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
 
     </div>

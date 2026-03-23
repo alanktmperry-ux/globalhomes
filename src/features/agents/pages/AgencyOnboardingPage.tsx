@@ -197,7 +197,7 @@ export default function AgencyOnboardingPage() {
     };
     const stateAuditDue: Record<string, string> = {
       VIC: '30 September (via myCAV)',
-      NSW: '30 September (via Auditor's Report Online)',
+      NSW: "30 September (via Auditor's Report Online)",
       QLD: 'Within 4 months of licence anniversary',
       SA:  'Within 2 months of licence expiry',
       WA:  '31 March (calendar year ending 31 Dec)',
@@ -219,7 +219,7 @@ export default function AgencyOnboardingPage() {
     const auditDue = stateAuditDue[operatingState] || 'Check with your state regulator';
     const bondAuth = stateBondAuthority[operatingState] || 'State bond authority — check local requirements';
 
-    const html = \`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Trust Account Migration Pre-Import Checklist</title>
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Trust Account Migration Pre-Import Checklist</title>
 <style>
   @page { size: A4; margin: 20mm 18mm; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -409,7 +409,7 @@ export default function AgencyOnboardingPage() {
     <div class="item-content">
       <div class="item-title">All bonds lodged with state bond authority <span class="req-badge req-state">STATE-SPECIFIC</span></div>
       <div class="item-desc">Bonds must NOT be held in your general trust account — they must be lodged with the relevant state bond authority within the prescribed timeframe.</div>
-      <div class="state-note">\${operatingState ? \`\${operatingState}: \${bondAuth}\` : 'Check your state bond authority requirements'}</div>
+      <div class="state-note">\${operatingState ? `\${operatingState}: \${bondAuth}` : 'Check your state bond authority requirements'}</div>
       <div class="write-in-grid">
         <div><div class="write-in-label">Number of active bonds:</div><div class="write-in"></div></div>
         <div><div class="write-in-label">Total bond amount: $</div><div class="write-in"></div></div>
@@ -611,7 +611,7 @@ export default function AgencyOnboardingPage() {
   This document forms part of your statutory trust accounting audit trail.
 </div>
 
-</body></html>\`;
+</body></html>`;
     const w = window.open('', '_blank', 'width=900,height=1200');
     if (w) { w.document.write(html); w.document.close(); w.print(); }
     toast.success('Compliance checklist generated — print or save as PDF');

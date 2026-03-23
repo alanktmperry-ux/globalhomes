@@ -356,7 +356,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     emoji: '🚀', title: 'Getting Started',
     items: [
       { q: 'How do I create an agent account?', a: 'Go to the Agents page and click "Join the Network". Complete the registration form with your full name, email, phone, licence number, and agency name. You will receive a confirmation email. Once verified, complete your profile and you are ready to list.' },
-      { q: 'Is there a free trial?', a: 'Yes — every new agent gets a 14-day free trial of the Pro plan. No credit card required to start.' },
+      { q: 'Is there a free trial?', a: 'Yes — every new agent gets a 60-day free trial. No credit card required to start. During your trial you have full access to all features on your selected plan.' },
       { q: 'What is the founding price?', a: 'Founding prices are available for a limited time: Starter at $99/mo (full price $199), Pro at $199/mo (full price $349), Agency at $399/mo (full price $699). Annual billing saves an additional 15%.' },
       { q: 'Can I use ListHQ as a buyer as well?', a: 'Yes. Your agent login gives you full access to the buyer marketplace — saved searches, property alerts, the AI voice search, and map search.' },
       { q: 'What is the partner portal and do I need it?', a: 'The partner portal is for agents who use an outsourced trust accounting firm. Instead of sharing your login with your trust accountant, you invite them via Partner Access and they get their own dedicated portal. If you manage your own trust accounting, you do not need it. If you use a firm like Balance R&R or End of Month Angels, set it up in the first week.' },

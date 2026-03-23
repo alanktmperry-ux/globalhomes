@@ -393,8 +393,9 @@ const AdminReports = ({ isAdmin, currentAgentId }: Props) => {
         leadMap.set(l.agent_id, (leadMap.get(l.agent_id) || 0) + 1);
       });
 
-      setAgents((data || []).map(a => ({
+      setAgents((data || []).map((a: any) => ({
         ...a,
+        plan_type: a.agent_subscriptions?.plan_type || null,
         last_sign_in_at: signInMap.get(a.id) ?? null,
         active_listings: propMap.get(a.id)?.listings || 0,
         total_views: propMap.get(a.id)?.views || 0,

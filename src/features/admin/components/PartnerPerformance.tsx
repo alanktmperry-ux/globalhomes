@@ -89,10 +89,10 @@ function PartnerRowComponent({ partner }: { partner: PartnerRow }) {
 
       const agencyIds = paRows.map((r: any) => r.agency_id);
 
-      const [agentsRes, balancesRes, tenanciesRes] = await Promise.all([
-        supabase.from('agents').select('id, agency_id').in('agency_id', agencyIds) as any,
-        supabase.from('trust_account_balances').select('agent_id, current_balance, last_reconciled_date') as any,
-        supabase.from('tenancies').select('agency_id, status').in('agency_id', agencyIds) as any,
+      const [agentsRes, balancesRes, tenanciesRes]: any[] = await Promise.all([
+        supabase.from('agents').select('id, agency_id').in('agency_id', agencyIds),
+        supabase.from('trust_account_balances').select('agent_id, current_balance, last_reconciled_date'),
+        supabase.from('tenancies').select('agency_id, status').in('agency_id', agencyIds),
       ]);
 
       const agentsByAgency = new Map<string, number>();

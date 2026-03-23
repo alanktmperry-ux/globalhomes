@@ -314,6 +314,7 @@ const AdminDashboard = () => {
     { id: 'agent-lifecycle', label: 'Agent Lifecycle', icon: Users },
     { id: 'compliance', label: 'Compliance', icon: ShieldAlert },
     { id: 'revenue', label: 'Revenue & Billing', icon: DollarSign },
+    { id: 'comms', label: 'Communications', icon: Megaphone },
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'users', label: 'Users', icon: Users },
     { id: 'listings', label: 'Listings', icon: Building2 },

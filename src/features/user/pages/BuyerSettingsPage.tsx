@@ -15,6 +15,7 @@ const PROPERTY_TYPES = ['House', 'Apartment', 'Townhouse', 'Land', 'Villa', 'Uni
 
 const BuyerSettingsPage = () => {
   const { user, loading: authLoading } = useAuth();
+  const { consent, acceptAll, declineMaps, resetConsent } = useConsent();
   const { toast } = useToast();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);

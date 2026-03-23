@@ -36,6 +36,26 @@ Deno.serve(async (req) => {
       .insert({ user_id: userId, role: "agent" });
     if (roleError && !roleError.message.includes("duplicate")) throw roleError;
 
+    // Generate unique 6-digit support PIN
+    const generatePin = () =>
+      String(Math.floor(100000 + Math.random() * 900000));
+    let supportPin = generatePin();
+    let pinUnique = false;
+    let attempts = 0;
+    while (!pinUnique && attempts < 10) {
+      const { data: existing } = await supabaseAdmin
+        .from('agents')
+        .select('id')
+        .eq('support_pin', supportPin)
+        .maybeSingle();
+      if (!existing) {
+        pinUnique = true;
+      } else {
+        supportPin = generatePin();
+        attempts++;
+      }
+    }
+
     const agentExtras = {
       license_number: licenseNumber || null,
       office_address: officeAddress || null,
@@ -43,6 +63,7 @@ Deno.serve(async (req) => {
       specialization: specialization || "Residential",
       investment_niche: investmentNiche || null,
       handles_trust_accounting: handlesTrustAccounting === true,
+      support_pin: supportPin,
     };
 
     if (mode === "create-agency") {

@@ -90,6 +90,17 @@ const TrustAccountingPage = () => {
   const [lastReconciledDate, setLastReconciledDate] = useState<string | null>(null);
   const [unmatchedCount, setUnmatchedCount] = useState(0);
 
+  const [overdrawnLedgers, setOverdrawnLedgers] = useState<{ name: string; balance: number }[]>([]);
+
+  // Fetch agent record
+  const [agent, setAgent] = useState<{ id: string } | null>(null);
+  useEffect(() => {
+    if (!user) return;
+    supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle().then(({ data }) => {
+      if (data) setAgent(data);
+    });
+  }, [user]);
+
   const fetchPendingPayments = useCallback(async () => {
     if (!user) return;
     const { data } = await supabase
@@ -134,7 +145,37 @@ const TrustAccountingPage = () => {
     setUnmatchedCount(uCount || 0);
   }, [user]);
 
-  useEffect(() => { fetchPendingPayments(); fetchDashboardStats(); }, [fetchPendingPayments, fetchDashboardStats]);
+  const checkOverdrawn = useCallback(async () => {
+    if (!agent?.id) return;
+    const { data } = await supabase
+      .from('trust_transactions')
+      .select('payee_name, amount, transaction_type, status')
+      .eq('status', 'completed')
+      .in('trust_account_id', accounts.map(a => a.id));
+    if (!data) return;
+    const ledgers = new Map<string, number>();
+    data.forEach((tx: any) => {
+      const key = tx.payee_name || 'Unknown';
+      const current = ledgers.get(key) || 0;
+      const impact = tx.transaction_type === 'deposit' ? tx.amount : -tx.amount;
+      ledgers.set(key, current + impact);
+    });
+    const overdrawn = Array.from(ledgers.entries())
+      .filter(([_, bal]) => bal < 0)
+      .map(([name, balance]) => ({ name, balance }));
+    setOverdrawnLedgers(overdrawn);
+    if (overdrawn.length > 0) {
+      toast.error(
+        `⚠️ ${overdrawn.length} client ledger${overdrawn.length > 1 ? 's are' : ' is'} overdrawn`,
+        {
+          description: 'A trust account ledger must never have a debit balance. Notify your regulator immediately and remedy the shortfall.',
+          duration: 12000,
+        }
+      );
+    }
+  }, [agent?.id, accounts]);
+
+  useEffect(() => { fetchPendingPayments(); fetchDashboardStats(); checkOverdrawn(); }, [fetchPendingPayments, fetchDashboardStats, checkOverdrawn]);
 
   // New tx form
   const [txCategory, setTxCategory] = useState('deposit');
@@ -551,6 +592,36 @@ const TrustAccountingPage = () => {
           </Button>
         }
       />
+
+      {overdrawnLedgers.length > 0 && (
+        <div className="mx-4 mt-4 sm:mx-6 bg-destructive/10 border border-destructive/30 rounded-xl p-4 flex items-start gap-3">
+          <AlertTriangle size={18} className="text-destructive flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm font-bold text-destructive">
+              ⚠️ Trust ledger overdrawn — immediate action required
+            </p>
+            <p className="text-xs text-destructive/80 mt-1">
+              The following client ledger{overdrawnLedgers.length > 1 ? 's have' : ' has'} a debit balance.
+              Under Australian trust accounting law, a trust ledger must never go into debit.
+              You must remedy the shortfall immediately and notify your state regulator in writing.
+            </p>
+            <div className="mt-2 space-y-1">
+              {overdrawnLedgers.map(l => (
+                <div key={l.name} className="flex items-center justify-between text-xs bg-destructive/10 rounded px-2 py-1">
+                  <span className="font-medium text-foreground">{l.name}</span>
+                  <span className="font-mono text-destructive font-bold">−${Math.abs(l.balance).toFixed(2)}</span>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Remedy: Transfer funds from your trading account to cover the shortfall, then notify your state regulator
+              in writing with the date, amount, reason, and corrective action taken.
+              Use Journal Adjustment in the Trust Ledger to record the correction.
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="p-4 sm:p-6 max-w-[1600px]">
         {/* ── 3-Panel Dashboard Cards ── */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">

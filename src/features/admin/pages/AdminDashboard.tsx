@@ -376,6 +376,7 @@ const AdminDashboard = () => {
             {tab === 'compliance' && <ComplianceMonitor />}
             {tab === 'revenue' && <RevenueBilling />}
             {tab === 'comms' && <CommsCentre />}
+            {tab === 'partners' && <PartnerPerformance />}
             {tab === 'overview' && <AdminOverview stats={stats} users={users} insights={insights} />}
             {tab === 'users' && <AdminUsers />}
             {tab === 'listings' && <AdminListings properties={properties} onToggleActive={togglePropertyActive} onActivateBoost={activateBoost} />}

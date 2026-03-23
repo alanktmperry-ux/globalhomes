@@ -41,6 +41,21 @@ const VOICE_LANGUAGES = [
   { code: 'id-ID', flag: '🇮🇩', label: 'Bahasa Indonesia' },
 ] as const;
 
+const VOICE_LANG_TO_I18N: Record<string, string> = {
+  'en-AU': 'en', 'en-US': 'en',
+  'en-GB': 'en', 'zh-CN': 'zh',
+  'zh-TW': 'zh', 'ko-KR': 'ko',
+  'ms-MY': 'ms', 'es-ES': 'es',
+  'es-MX': 'es', 'ar-SA': 'ar',
+  'hi-IN': 'hi', 'fr-FR': 'fr',
+  'pt-BR': 'pt', 'pt-PT': 'pt',
+  'ru-RU': 'ru', 'ja-JP': 'ja',
+  'de-DE': 'en', 'it-IT': 'en',
+  'th-TH': 'en', 'vi-VN': 'en',
+  'tr-TR': 'en', 'pl-PL': 'en',
+  'bn-BD': 'bn',
+};
+
 const ROTATING_LANGUAGES = [
   '🇺🇸 English', '🇪🇸 Español', '🇨🇳 中文', '🇦🇪 العربية', '🇮🇳 हिंदी',
   '🇫🇷 Français', '🇯🇵 日本語', '🇩🇪 Deutsch', '🇮🇹 Italiano', '🇵🇹 Português',
@@ -146,7 +161,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   const { toast } = useToast();
   const navigate = useNavigate();
   const { listingMode, setListingMode } = useCurrency();
-  const { t } = useI18n();
+  const { t, language, setLanguage } = useI18n();
 
   const [headlineIndex, setHeadlineIndex] = useState(0);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
@@ -165,6 +180,16 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   useEffect(() => {
     if (!isSupported || isSafari) {
       setShowTextInput(true);
+    }
+  }, []);
+
+  // Sync dropdown to current i18n language on mount
+  useEffect(() => {
+    const match = VOICE_LANGUAGES.find(
+      l => VOICE_LANG_TO_I18N[l.code] === language
+    );
+    if (match) {
+      setSelectedLang(match.code);
     }
   }, []);
 
@@ -745,7 +770,14 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                     {VOICE_LANGUAGES.map(lang => (
                       <button
                         key={lang.code}
-                        onClick={() => { setSelectedLang(lang.code); setShowLangDropdown(false); }}
+                        onClick={() => {
+                          setSelectedLang(lang.code);
+                          const i18nCode = VOICE_LANG_TO_I18N[lang.code];
+                          if (i18nCode) {
+                            setLanguage(i18nCode as any);
+                          }
+                          setShowLangDropdown(false);
+                        }}
                         className={`w-full text-left px-4 py-2.5 text-[12px] transition-colors ${
                           lang.code === selectedLang
                             ? 'bg-accent text-foreground'

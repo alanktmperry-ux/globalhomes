@@ -27,6 +27,7 @@ interface AuthUser {
   plan_type: string | null;
   demo_status?: string;
   agency_name?: string;
+  support_pin?: string | null;
 }
 
 const UserTypeBadge = ({ user }: { user: AuthUser }) => {

@@ -41,6 +41,21 @@ const VOICE_LANGUAGES = [
   { code: 'id-ID', flag: '🇮🇩', label: 'Bahasa Indonesia' },
 ] as const;
 
+const VOICE_LANG_TO_I18N: Record<string, string> = {
+  'en-AU': 'en', 'en-US': 'en',
+  'en-GB': 'en', 'zh-CN': 'zh',
+  'zh-TW': 'zh', 'ko-KR': 'ko',
+  'ms-MY': 'ms', 'es-ES': 'es',
+  'es-MX': 'es', 'ar-SA': 'ar',
+  'hi-IN': 'hi', 'fr-FR': 'fr',
+  'pt-BR': 'pt', 'pt-PT': 'pt',
+  'ru-RU': 'ru', 'ja-JP': 'ja',
+  'de-DE': 'en', 'it-IT': 'en',
+  'th-TH': 'en', 'vi-VN': 'en',
+  'tr-TR': 'en', 'pl-PL': 'en',
+  'bn-BD': 'bn',
+};
+
 const ROTATING_LANGUAGES = [
   '🇺🇸 English', '🇪🇸 Español', '🇨🇳 中文', '🇦🇪 العربية', '🇮🇳 हिंदी',
   '🇫🇷 Français', '🇯🇵 日本語', '🇩🇪 Deutsch', '🇮🇹 Italiano', '🇵🇹 Português',

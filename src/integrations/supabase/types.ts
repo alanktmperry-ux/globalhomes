@@ -425,6 +425,7 @@ export type Database = {
           company_logo_url: string | null
           created_at: string
           email: string | null
+          founding_member: boolean | null
           handles_trust_accounting: boolean | null
           id: string
           investment_niche: string | null
@@ -468,6 +469,7 @@ export type Database = {
           company_logo_url?: string | null
           created_at?: string
           email?: string | null
+          founding_member?: boolean | null
           handles_trust_accounting?: boolean | null
           id?: string
           investment_niche?: string | null
@@ -511,6 +513,7 @@ export type Database = {
           company_logo_url?: string | null
           created_at?: string
           email?: string | null
+          founding_member?: boolean | null
           handles_trust_accounting?: boolean | null
           id?: string
           investment_niche?: string | null
@@ -2204,6 +2207,50 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      subscription_events: {
+        Row: {
+          agent_id: string
+          created_at: string
+          event_type: string
+          from_plan: string | null
+          id: string
+          mrr_change: number | null
+          notes: string | null
+          stripe_event_id: string | null
+          to_plan: string | null
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          event_type: string
+          from_plan?: string | null
+          id?: string
+          mrr_change?: number | null
+          notes?: string | null
+          stripe_event_id?: string | null
+          to_plan?: string | null
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          event_type?: string
+          from_plan?: string | null
+          id?: string
+          mrr_change?: number | null
+          notes?: string | null
+          stripe_event_id?: string | null
+          to_plan?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_events_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       suburb_price_history: {
         Row: {

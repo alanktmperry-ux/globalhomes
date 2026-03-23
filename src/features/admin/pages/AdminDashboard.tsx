@@ -306,6 +306,7 @@ const AdminDashboard = () => {
     { id: 'roles', label: 'Roles', icon: Shield },
     { id: 'database', label: 'Database', icon: Database },
     { id: 'demo-requests', label: 'Demo Requests', icon: Gamepad2, badge: pendingDemoCount },
+    { id: 'reports', label: 'Reports', icon: BarChart3 },
   ];
 
   return (

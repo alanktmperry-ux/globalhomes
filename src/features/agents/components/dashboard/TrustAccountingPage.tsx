@@ -90,7 +90,17 @@ const TrustAccountingPage = () => {
   const [lastReconciledDate, setLastReconciledDate] = useState<string | null>(null);
   const [unmatchedCount, setUnmatchedCount] = useState(0);
 
-  const fetchPendingPayments = useCallback(async () => {
+  const [overdrawnLedgers, setOverdrawnLedgers] = useState<{ name: string; balance: number }[]>([]);
+
+  // Fetch agent record
+  const [agent, setAgent] = useState<{ id: string } | null>(null);
+  useEffect(() => {
+    if (!user) return;
+    supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle().then(({ data }) => {
+      if (data) setAgent(data);
+    });
+  }, [user]);
+
     if (!user) return;
     const { data } = await supabase
       .from('trust_payments')

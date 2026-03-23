@@ -318,7 +318,7 @@ ${matterRows.length > 0 ? `
 </div>
 
 <div class="footer">
-  Generated ${today} • ListHQ Trust Accounting • Retain for minimum 5 years per AFA 2014 s.84
+  Generated ${today} • ListHQ Trust Accounting • Retain for minimum 7 years per applicable state trust accounting legislation
 </div>
 </body></html>`;
 
@@ -399,11 +399,11 @@ ${matterRows.length > 0 ? `
 <div class="sig-section">
   <div class="stamp-box"><span>${completedCount === items.length ? '✓ MIGRATION COMPLIANT' : '⚠ INCOMPLETE — Action Required'}</span></div>
   <h3>Agent Acknowledgement</h3>
-  <p style="font-size:9pt;color:#555;line-height:1.6">
-    I confirm that the above migration checklist accurately reflects the trust account data imported into ListHQ.
-    I accept responsibility for verifying the accuracy of all imported records and understand that this checklist
-    forms part of the statutory audit trail required under AFA 2014.
-  </p>
+   <p style="font-size:9pt;color:#555;line-height:1.6">
+     I confirm that the above migration checklist accurately reflects the trust account data imported into ListHQ.
+     I accept responsibility for verifying the accuracy of all imported records and understand that this checklist
+     forms part of the statutory audit trail required under applicable Australian state trust accounting legislation (VIC: Estate Agents Act 1980 · NSW: Property and Stock Agents Act 2002 · QLD: Agents Financial Administration Act 2014 · SA: Land Agents Act 1994 · WA: Real Estate and Business Agents Act 1978). Records must be retained for a minimum of 7 years.
+   </p>
   <div class="sig-row">
     <div class="sig-line">Signature</div>
     <div class="sig-line">Print Name</div>
@@ -413,7 +413,7 @@ ${matterRows.length > 0 ? `
 </div>
 
 <div class="footer">
-  Generated ${today} • ListHQ Trust Accounting • Retain for minimum 5 years
+  Generated ${today} • ListHQ Trust Accounting • Retain for minimum 7 years
 </div>
 </body></html>`;
 
@@ -547,7 +547,7 @@ ${matterRows.length > 0 ? `
         <div className="py-2 px-4 rounded-lg bg-muted/50 border border-border flex items-center justify-center gap-2">
           <ShieldCheck size={12} className="text-primary shrink-0" />
           <p className="text-[10px] text-muted-foreground text-center">
-            AFA 2014 compliant • Documents retained for audit • 5-year minimum
+            All-state compliant • Documents retained for audit • 7-year minimum
           </p>
         </div>
       </div>
@@ -898,7 +898,7 @@ ${matterRows.length > 0 ? `
       <div className="py-2 px-4 rounded-lg bg-muted/50 border border-border flex items-center justify-center gap-2">
         <ShieldCheck size={12} className="text-primary shrink-0" />
         <p className="text-[10px] text-muted-foreground text-center">
-          AFA 2014 compliant • Audit trail preserved • 5-year retention
+          All-state compliant • Audit trail preserved • 7-year retention
         </p>
       </div>
     </div>

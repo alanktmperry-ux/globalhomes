@@ -387,6 +387,7 @@ export type Database = {
           agency: string | null
           agency_id: string | null
           avatar_url: string | null
+          avg_rating: number | null
           bio: string | null
           company_logo_url: string | null
           created_at: string
@@ -424,6 +425,7 @@ export type Database = {
           agency?: string | null
           agency_id?: string | null
           avatar_url?: string | null
+          avg_rating?: number | null
           bio?: string | null
           company_logo_url?: string | null
           created_at?: string
@@ -461,6 +463,7 @@ export type Database = {
           agency?: string | null
           agency_id?: string | null
           avatar_url?: string | null
+          avg_rating?: number | null
           bio?: string | null
           company_logo_url?: string | null
           created_at?: string
@@ -3310,6 +3313,7 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      refresh_agent_rating: { Args: { p_agent_id: string }; Returns: undefined }
     }
     Enums: {
       agency_member_role: "owner" | "admin" | "agent" | "principal"

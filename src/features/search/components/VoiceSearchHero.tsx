@@ -183,6 +183,16 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
     }
   }, []);
 
+  // Sync dropdown to current i18n language on mount
+  useEffect(() => {
+    const match = VOICE_LANGUAGES.find(
+      l => VOICE_LANG_TO_I18N[l.code] === language
+    );
+    if (match) {
+      setSelectedLang(match.code);
+    }
+  }, []);
+
   // ── Dynamic featured listings ──
   const [featuredListings, setFeaturedListings] = useState<any[]>([]);
   const [featuredLoading, setFeaturedLoading] = useState(true);

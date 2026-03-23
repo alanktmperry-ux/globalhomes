@@ -200,14 +200,14 @@ const GUIDES: Guide[] = [
   },
   {
     emoji: '📒', title: 'Trust Accounting — Ledger and Statements',
-    description: 'Monthly ledgers, audit PDFs, and 5-year CSV exports.',
+    description: 'Monthly ledgers, audit PDFs, and 7-year CSV exports.',
     steps: [
       'Go to Trust Ledger in the sidebar (under the Financials section). This shows all receipts and payments for the selected month.',
       'Use the month navigator (← →) to move between months. The header shows total in, total out, and closing balance for the selected period.',
       'Filter by All, Receipts only, or Payments only using the tabs. Search by client name, property, or reference number using the search bar.',
       'To download an individual receipt PDF: click the download icon on any receipt row. The PDF is formatted to the Agents Financial Administration Act 2014 standard with signature lines.',
       'To generate a full monthly audit PDF: click "Download Audit PDF" in the header. This produces an A4 landscape document with the transaction ledger, client ledger breakdown, reconciliation summary, and a statutory declaration section for the principal to sign.',
-      'To export a 5-year compliant CSV: click "Export CSV 5yr". The file includes the AFA 2014 retention notice and closing balance total.',
+      'To export a 7-year compliant CSV: click "Export CSV 7yr". The file includes the statutory retention notice and closing balance total.',
       'To generate a monthly trust statement (for your records or auditor): click "Monthly Statement" at the bottom of the ledger. Select the month and year and click "Generate & Print Statement". The PDF includes GST summary and signature lines.',
     ],
   },
@@ -356,7 +356,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     emoji: '🚀', title: 'Getting Started',
     items: [
       { q: 'How do I create an agent account?', a: 'Go to the Agents page and click "Join the Network". Complete the registration form with your full name, email, phone, licence number, and agency name. You will receive a confirmation email. Once verified, complete your profile and you are ready to list.' },
-      { q: 'Is there a free trial?', a: 'Yes — every new agent gets a 14-day free trial of the Pro plan. No credit card required to start.' },
+      { q: 'Is there a free trial?', a: 'Yes — every new agent gets a 60-day free trial. No credit card required to start. During your trial you have full access to all features on your selected plan.' },
       { q: 'What is the founding price?', a: 'Founding prices are available for a limited time: Starter at $99/mo (full price $199), Pro at $199/mo (full price $349), Agency at $399/mo (full price $699). Annual billing saves an additional 15%.' },
       { q: 'Can I use ListHQ as a buyer as well?', a: 'Yes. Your agent login gives you full access to the buyer marketplace — saved searches, property alerts, the AI voice search, and map search.' },
       { q: 'What is the partner portal and do I need it?', a: 'The partner portal is for agents who use an outsourced trust accounting firm. Instead of sharing your login with your trust accountant, you invite them via Partner Access and they get their own dedicated portal. If you manage your own trust accounting, you do not need it. If you use a firm like Balance R&R or End of Month Angels, set it up in the first week.' },
@@ -407,7 +407,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
   {
     emoji: '🏦', title: 'Trust Accounting',
     items: [
-      { q: 'Is the trust accounting module legally compliant?', a: 'The module is designed to meet the requirements of the Agents Financial Administration Act 2014 (Qld), Property and Stock Agents Act 2002 (NSW), and Estate Agents Act 1980 (Vic). It produces sequentially numbered receipts, running balance ledgers, monthly statements with GST breakdowns, and 5-year compliant CSV exports. However, compliance requirements can vary — always confirm with your auditor.' },
+      { q: 'Is the trust accounting module legally compliant?', a: 'The module is designed to meet trust accounting requirements across all Australian states and territories: Estate Agents Act 1980 (VIC), Property and Stock Agents Act 2002 (NSW), Agents Financial Administration Act 2014 (QLD), Land Agents Act 1994 (SA), Real Estate and Business Agents Act 1978 (WA), Property Agents and Land Transactions Act 2016 (TAS), Agents Act 2003 (ACT), and Agents Licensing Act 1979 (NT). It produces sequentially numbered receipts, running balance ledgers, monthly statements with GST breakdowns, and 7-year compliant CSV exports. Compliance requirements vary by state — always confirm with your registered auditor before your annual audit.' },
       { q: 'Can I import my trust history from PropertyMe?', a: 'Yes. Go to Financials → Import Existing Account. The wizard auto-detects PropertyMe, Reapit, and TrustSoft CSV formats. It walks you through certifying your opening balance, uploading your ledger history, and importing active client matters. You receive a signed declaration PDF and migration checklist for your auditor.' },
       { q: 'How do I generate a monthly trust statement?', a: 'From the Trust Ledger page, click "Monthly Statement" at the bottom, select your month and year, and click "Generate & Print Statement". The PDF includes all receipts and payments, GST summary (1/11th method), and signature lines for the principal.' },
       { q: 'How does bank reconciliation work?', a: 'Go to Bank Reconciliation. Upload or paste your bank statement entries. Match each bank line to the corresponding trust receipt or payment. Unmatched items are flagged red. When all items are matched, the reconciliation is complete and the date is recorded on your Financials dashboard.' },

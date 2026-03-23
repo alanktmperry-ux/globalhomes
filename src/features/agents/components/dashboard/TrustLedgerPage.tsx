@@ -612,6 +612,16 @@ const TrustLedgerPage = () => {
             <Button size="sm" variant="outline" onClick={exportCsv} className="gap-1.5 text-xs">
               <FileDown size={13} /> Export CSV 5yr
             </Button>
+            <Button size="sm" variant="outline" onClick={() => setShowJournal(true)} className="gap-1.5 text-xs">
+              <BookOpen size={13} /> Journal Adjustment
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => setShowSuspense(true)}
+              className={`gap-1.5 text-xs ${suspenseItems.length > 0 ? 'border-amber-500 text-amber-600' : ''}`}>
+              <AlertTriangle size={13} /> Suspense
+              {suspenseItems.length > 0 && (
+                <Badge variant="destructive" className="ml-1 text-[9px] px-1 h-4">{suspenseItems.length}</Badge>
+              )}
+            </Button>
             <Button size="sm" onClick={() => setShowNewReceipt(true)} className="gap-1.5 text-xs">
               <Receipt size={13} /> New Receipt
             </Button>

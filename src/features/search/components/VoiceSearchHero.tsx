@@ -783,62 +783,77 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
         {/* RIGHT — Photo grid */}
         <div className="hidden md:grid grid-rows-[1.6fr_1fr] gap-1.5 bg-background border-l border-border">
-
-          {/* Top large photo */}
-          <div className="relative rounded-2xl overflow-hidden group cursor-pointer">
-            {featuredLoading ? (
-              <Skeleton className="absolute inset-0 w-full h-full" />
-            ) : (
-              <img src={dedupedFeatured[0]?.img} alt={dedupedFeatured[0]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-            )}
-            <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.7) 100%)'}} />
-
-            <div className="absolute top-3 left-3">
-              <span className="text-[9px] font-bold px-2.5 py-1 rounded-full text-white bg-foreground/80 backdrop-blur-sm">
-                {dedupedFeatured[0]?.tag}
-              </span>
-            </div>
-
-            <div className="absolute bottom-0 left-0 right-0 p-4">
-              <div className="text-white font-extrabold text-lg leading-tight">
-                {dedupedFeatured[0]?.price}
-              </div>
-              <div className="text-white/75 text-[11px] mt-0.5">
-                {dedupedFeatured[0]?.address}
-                {' · '}
-                {dedupedFeatured[0]?.suburb}
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom two photos side by side */}
-          <div className="grid grid-cols-2 gap-2">
-            {[1, 2].map(i => (
-              <div key={i} className="relative rounded-2xl overflow-hidden group cursor-pointer">
+          {dedupedFeatured.length > 0 ? (
+            <>
+              {/* Top large photo */}
+              <div className="relative rounded-2xl overflow-hidden group cursor-pointer">
                 {featuredLoading ? (
                   <Skeleton className="absolute inset-0 w-full h-full" />
                 ) : (
-                  <img src={dedupedFeatured[i]?.img} alt={dedupedFeatured[i]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <img src={dedupedFeatured[0]?.img} alt={dedupedFeatured[0]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 )}
-                <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 30%,rgba(0,0,0,0.65) 100%)'}} />
-
-                <div className="absolute top-2.5 left-2.5">
-                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-full text-white bg-foreground/80 backdrop-blur-sm">
-                    {dedupedFeatured[i]?.tag}
+                <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.7) 100%)'}} />
+                <div className="absolute top-3 left-3">
+                  <span className="text-[9px] font-bold px-2.5 py-1 rounded-full text-white bg-foreground/80 backdrop-blur-sm">
+                    {dedupedFeatured[0]?.tag}
                   </span>
                 </div>
-
-                <div className="absolute bottom-0 left-0 right-0 p-3">
-                  <div className="text-white font-bold text-sm leading-tight">
-                    {dedupedFeatured[i]?.price}
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <div className="text-white font-extrabold text-lg leading-tight">
+                    {dedupedFeatured[0]?.price}
                   </div>
-                  <div className="text-white/65 text-[10px] mt-0.5">
-                    {dedupedFeatured[i]?.suburb}
+                  <div className="text-white/75 text-[11px] mt-0.5">
+                    {dedupedFeatured[0]?.address}
+                    {' · '}
+                    {dedupedFeatured[0]?.suburb}
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+
+              {/* Bottom two photos side by side */}
+              <div className="grid grid-cols-2 gap-2">
+                {[1, 2].map(i => (
+                  <div key={i} className="relative rounded-2xl overflow-hidden group cursor-pointer">
+                    {featuredLoading ? (
+                      <Skeleton className="absolute inset-0 w-full h-full" />
+                    ) : (
+                      <img src={dedupedFeatured[i]?.img} alt={dedupedFeatured[i]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                    )}
+                    <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 30%,rgba(0,0,0,0.65) 100%)'}} />
+                    <div className="absolute top-2.5 left-2.5">
+                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-full text-white bg-foreground/80 backdrop-blur-sm">
+                        {dedupedFeatured[i]?.tag}
+                      </span>
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 p-3">
+                      <div className="text-white font-bold text-sm leading-tight">
+                        {dedupedFeatured[i]?.price}
+                      </div>
+                      <div className="text-white/65 text-[10px] mt-0.5">
+                        {dedupedFeatured[i]?.suburb}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : !featuredLoading && (
+            <div className="row-span-2 flex items-center justify-center p-8">
+              <div className="rounded-2xl border border-dashed border-border bg-secondary/30 p-8 text-center space-y-3">
+                <p className="text-sm font-medium text-foreground">
+                  Be the first agent in your area
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  List your first property free — no credit card required during your 60-day trial.
+                </p>
+                <button
+                  onClick={() => window.location.href = '/agent/auth'}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity">
+                  List a property free
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

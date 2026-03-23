@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect, useMemo, lazy, Suspense } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence, useMotionValue, useSpring, PanInfo } from 'framer-motion';
-import { ArrowRight, MapPin, Sparkles, Loader2, Zap, Map, List, Mic, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users } from 'lucide-react';
+import { ArrowRight, MapPin, Sparkles, Map, List, Mic, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users } from 'lucide-react';
 import { VoiceSearchHero } from '@/features/search/components/VoiceSearchHero';
 import { AiPicksSection } from '@/features/properties/components/AiPicksSection';
 import { VirtualizedPropertyList } from '@/features/properties/components/VirtualizedPropertyList';
@@ -67,16 +67,12 @@ const Index = () => {
     filteredProperties,
     displayProperties,
     handleSearch,
-    refreshAIResults,
     handleAreaSearch,
     setSearchCenter,
     setSearchRadius,
     clearSearchRadius,
     isSearching,
     hasSearched,
-    manusStatus,
-    manusFailed,
-    usingCachedAI,
     currentQuery,
     searchRadius,
     searchCenter,
@@ -392,45 +388,6 @@ const Index = () => {
             {areaSearch.type === 'circle' ? `${Math.round(areaSearch.radius / 1000)}km circle` : 'Custom area'}
             <X size={10} className="opacity-60" />
           </button>
-        )}
-        {manusStatus && (manusStatus === 'running' || manusStatus === 'pending') && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-1 text-xs text-primary font-medium shrink-0">
-            <Loader2 size={12} className="animate-spin" />
-            <span className="truncate max-w-[200px]">
-              Searching: {currentQuery.length > 40 ? currentQuery.slice(0, 40) + '…' : currentQuery}
-            </span>
-          </motion.div>
-        )}
-        {manusStatus === 'completed' && !usingCachedAI && (
-          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-1 text-xs text-success font-medium shrink-0">
-            <Zap size={12} />
-            <span>AI results live</span>
-          </motion.div>
-        )}
-        {usingCachedAI && !isSearching && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2 shrink-0">
-            <span className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 font-medium">
-              <Zap size={12} />
-              Cached AI results
-            </span>
-            <button
-              onClick={refreshAIResults}
-              className="text-[11px] text-primary font-medium hover:underline"
-            >
-              Refresh
-            </button>
-          </motion.div>
-        )}
-        {manusFailed && !usingCachedAI && !isSearching && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2 shrink-0">
-            <span className="text-xs text-muted-foreground font-medium">AI search paused — showing database results</span>
-            <button
-              onClick={refreshAIResults}
-              className="text-[11px] text-primary font-medium hover:underline"
-            >
-              Retry
-            </button>
-          </motion.div>
         )}
       </div>
 

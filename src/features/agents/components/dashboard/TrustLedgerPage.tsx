@@ -157,6 +157,96 @@ const TrustLedgerPage = () => {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
+  const fetchSuspense = useCallback(async () => {
+    if (!agent?.id) return;
+    const { data } = await supabase
+      .from('trust_suspense' as any)
+      .select('*')
+      .eq('agent_id', agent.id)
+      .eq('status', 'unidentified')
+      .order('received_date', { ascending: false });
+    setSuspenseItems(data || []);
+  }, [agent?.id]);
+
+  useEffect(() => { fetchSuspense(); }, [fetchSuspense]);
+
+  const saveJournal = async () => {
+    if (!agent?.id || !accounts[0]?.id) return;
+    if (!journalForm.debitLedger.trim() || !journalForm.creditLedger.trim() || !journalForm.amount || !journalForm.reasonDetail.trim()) {
+      toast.error('Please complete all required fields');
+      return;
+    }
+    setJournalSaving(true);
+    try {
+      const { error } = await supabase
+        .from('trust_journal_entries' as any)
+        .insert({
+          trust_account_id: accounts[0].id,
+          agent_id: agent.id,
+          entry_date: journalForm.entryDate,
+          debit_ledger: journalForm.debitLedger,
+          credit_ledger: journalForm.creditLedger,
+          amount: parseFloat(journalForm.amount),
+          reason_code: journalForm.reasonCode,
+          reason_detail: journalForm.reasonDetail,
+          reference: journalForm.reference,
+          created_by: user?.id,
+        });
+      if (error) throw error;
+      toast.success('Journal adjustment recorded — audit trail updated');
+      setShowJournal(false);
+      setJournalForm({
+        debitLedger: '',
+        creditLedger: '',
+        amount: '',
+        reasonCode: 'balance_correction',
+        reasonDetail: '',
+        reference: '',
+        entryDate: new Date().toISOString().slice(0, 10),
+      });
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setJournalSaving(false);
+    }
+  };
+
+  const saveSuspense = async () => {
+    if (!agent?.id || !accounts[0]?.id) return;
+    if (!suspenseForm.amount || !suspenseForm.bankReference.trim()) {
+      toast.error('Amount and bank reference are required');
+      return;
+    }
+    setSuspenseSaving(true);
+    try {
+      const { error } = await supabase
+        .from('trust_suspense' as any)
+        .insert({
+          trust_account_id: accounts[0].id,
+          agent_id: agent.id,
+          received_date: suspenseForm.receivedDate,
+          amount: parseFloat(suspenseForm.amount),
+          bank_reference: suspenseForm.bankReference,
+          notes: suspenseForm.notes,
+          created_by: user?.id,
+        });
+      if (error) throw error;
+      toast.success('Receipt held in suspense — match it when identified');
+      setShowSuspense(false);
+      setSuspenseForm({
+        amount: '',
+        bankReference: '',
+        notes: '',
+        receivedDate: new Date().toISOString().slice(0, 10),
+      });
+      fetchSuspense();
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setSuspenseSaving(false);
+    }
+  };
+
   // Merge into unified ledger
   const ledgerEntries: LedgerEntry[] = useMemo(() => {
     const rEntries: LedgerEntry[] = receipts.map(r => ({

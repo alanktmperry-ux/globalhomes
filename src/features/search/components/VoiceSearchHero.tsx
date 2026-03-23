@@ -199,9 +199,8 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
     return () => window.removeEventListener('search-location-confirmed', handler);
   }, [fetchFeatured]);
 
-  const displayFeatured = featuredFallback || featuredListings.length === 0
-    ? FEATURED_PROPERTIES
-    : featuredListings.map((p: any) => ({
+  const displayFeatured = featuredListings.length > 0
+    ? featuredListings.map((p: any) => ({
         id: p.id,
         agent_id: p.agent_id,
         price: p.price_formatted,
@@ -212,7 +211,8 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
         cars: p.parking,
         tag: p.boost_tier === 'premier' ? 'Premier' : 'Featured',
         img: p.image_url || p.images?.[0] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&q=70',
-      }));
+      }))
+    : [];
 
   // One listing per agent maximum
   const seenAgents = new Set<string>();

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import AdminReports from '@/features/admin/components/AdminReports';
 import { CreditCard, Check, Loader2, Zap, Crown, Building2, Flame, Mail, Lock, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

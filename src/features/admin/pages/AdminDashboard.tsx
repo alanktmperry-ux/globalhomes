@@ -12,8 +12,9 @@ import AdminDatabase from '@/features/admin/components/AdminDatabase';
 import AdminDemoRequests from '@/features/admin/components/AdminDemoRequests';
 import AdminReports from '@/features/admin/components/AdminReports';
 import CommandCentre from '@/features/admin/components/CommandCentre';
+import AgentLifecycle from '@/features/admin/components/AgentLifecycle';
 
-type Tab = 'command-centre' | 'overview' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests' | 'reports';
+type Tab = 'command-centre' | 'agent-lifecycle' | 'overview' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests' | 'reports';
 
 interface UserRow {
   id: string;
@@ -302,6 +303,7 @@ const AdminDashboard = () => {
 
   const tabs: { id: Tab; label: string; icon: any; badge?: number }[] = [
     { id: 'command-centre', label: 'Command Centre', icon: Zap },
+    { id: 'agent-lifecycle', label: 'Agent Lifecycle', icon: Users },
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'users', label: 'Users', icon: Users },
     { id: 'listings', label: 'Listings', icon: Building2 },
@@ -357,6 +359,7 @@ const AdminDashboard = () => {
         ) : (
           <>
             {tab === 'command-centre' && <CommandCentre />}
+            {tab === 'agent-lifecycle' && <AgentLifecycle />}
             {tab === 'overview' && <AdminOverview stats={stats} users={users} insights={insights} />}
             {tab === 'users' && <AdminUsers />}
             {tab === 'listings' && <AdminListings properties={properties} onToggleActive={togglePropertyActive} onActivateBoost={activateBoost} />}

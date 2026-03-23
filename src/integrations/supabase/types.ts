@@ -223,6 +223,38 @@ export type Database = {
           },
         ]
       }
+      agent_lifecycle_notes: {
+        Row: {
+          agent_id: string
+          author_name: string
+          created_at: string
+          id: string
+          note: string
+        }
+        Insert: {
+          agent_id: string
+          author_name?: string
+          created_at?: string
+          id?: string
+          note: string
+        }
+        Update: {
+          agent_id?: string
+          author_name?: string
+          created_at?: string
+          id?: string
+          note?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_lifecycle_notes_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agent_locations: {
         Row: {
           address: string
@@ -399,7 +431,9 @@ export type Database = {
           is_demo: boolean
           is_subscribed: boolean
           languages_spoken: string[] | null
+          lead_source: string | null
           license_number: string | null
+          lifecycle_stage: string | null
           name: string
           office_address: string | null
           onboarding_complete: boolean | null
@@ -437,7 +471,9 @@ export type Database = {
           is_demo?: boolean
           is_subscribed?: boolean
           languages_spoken?: string[] | null
+          lead_source?: string | null
           license_number?: string | null
+          lifecycle_stage?: string | null
           name: string
           office_address?: string | null
           onboarding_complete?: boolean | null
@@ -475,7 +511,9 @@ export type Database = {
           is_demo?: boolean
           is_subscribed?: boolean
           languages_spoken?: string[] | null
+          lead_source?: string | null
           license_number?: string | null
+          lifecycle_stage?: string | null
           name?: string
           office_address?: string | null
           onboarding_complete?: boolean | null

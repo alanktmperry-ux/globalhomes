@@ -101,6 +101,7 @@ const TrustAccountingPage = () => {
     });
   }, [user]);
 
+  const fetchPendingPayments = useCallback(async () => {
     if (!user) return;
     const { data } = await supabase
       .from('trust_payments')

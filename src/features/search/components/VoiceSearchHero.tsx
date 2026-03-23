@@ -161,7 +161,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   const { toast } = useToast();
   const navigate = useNavigate();
   const { listingMode, setListingMode } = useCurrency();
-  const { t } = useI18n();
+  const { t, language, setLanguage } = useI18n();
 
   const [headlineIndex, setHeadlineIndex] = useState(0);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);

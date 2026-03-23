@@ -11,8 +11,9 @@ import AdminRoles from '@/features/admin/components/AdminRoles';
 import AdminDatabase from '@/features/admin/components/AdminDatabase';
 import AdminDemoRequests from '@/features/admin/components/AdminDemoRequests';
 import AdminReports from '@/features/admin/components/AdminReports';
+import CommandCentre from '@/features/admin/components/CommandCentre';
 
-type Tab = 'overview' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests' | 'reports';
+type Tab = 'command-centre' | 'overview' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests' | 'reports';
 
 interface UserRow {
   id: string;

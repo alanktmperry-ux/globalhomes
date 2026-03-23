@@ -33,6 +33,8 @@ interface AgentProfile {
   agencyId: string | null;
   investmentNiche: string | null;
   handlesTrustAccounting: boolean;
+  avgRating?: number;
+  reviewCount?: number;
 }
 
 function ScoreRing({ score, size = 80 }: { score: number; size?: number }) {
@@ -99,6 +101,7 @@ export default function AgentPublicProfilePage() {
   const [agent, setAgent] = useState<AgentProfile | null>(null);
   const [listings, setListings] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  const [agentReviews, setAgentReviews] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchAgent = async () => {
@@ -132,6 +135,8 @@ export default function AgentPublicProfilePage() {
           agencyId: data.agency_id,
           investmentNiche: data.investment_niche,
           handlesTrustAccounting: data.handles_trust_accounting || false,
+          avgRating: data.rating ?? 0,
+          reviewCount: data.review_count ?? 0,
         });
 
         // Fetch agent's listings
@@ -177,6 +182,14 @@ export default function AgentPublicProfilePage() {
             status: 'listed' as const,
           })));
         }
+
+        const { data: reviews } = await supabase
+          .from('agent_reviews')
+          .select('id, reviewer_name, rating, review_text, reply_text, created_at')
+          .eq('agent_id', data.id)
+          .eq('status', 'approved')
+          .order('created_at', { ascending: false });
+        if (reviews) setAgentReviews(reviews);
       }
       setLoading(false);
     };
@@ -244,11 +257,15 @@ export default function AgentPublicProfilePage() {
                 {agent.agency && <> · {agent.agency}</>}
               </p>
 
-              <div className="flex items-center gap-1 mt-2">
-                <Star size={16} className="fill-yellow-400 text-yellow-400" />
-                <span className="font-medium text-foreground">4.8</span>
-                <span className="text-sm text-muted-foreground ml-1">Rating</span>
-              </div>
+              {(agent.avgRating ?? 0) > 0 && (
+                <div className="flex items-center gap-1 mt-2">
+                  <Star size={16} className="fill-yellow-400 text-yellow-400" />
+                  <span className="font-medium text-foreground">{agent.avgRating!.toFixed(1)}</span>
+                  <span className="text-sm text-muted-foreground ml-1">
+                    {agent.reviewCount === 1 ? '1 review' : `${agent.reviewCount} reviews`}
+                  </span>
+                </div>
+              )}
 
               {/* Quick info chips */}
               <div className="flex flex-wrap gap-2 mt-4">
@@ -367,6 +384,45 @@ export default function AgentPublicProfilePage() {
         {listings.length === 0 && (
           <div className="text-center py-12">
             <p className="text-muted-foreground">No active listings from this agent.</p>
+          </div>
+        )}
+
+        {agentReviews.length > 0 && (
+          <div className="mt-8">
+            <h2 className="font-display text-xl font-bold text-foreground mb-4">
+              Client Reviews ({agentReviews.length})
+            </h2>
+            <div className="space-y-4">
+              {agentReviews.map((r: any) => (
+                <div key={r.id} className="bg-card border border-border rounded-xl p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-xs font-bold text-primary">
+                        {r.reviewer_name[0].toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{r.reviewer_name}</p>
+                        <p className="text-[10px] text-muted-foreground">{new Date(r.created_at).toLocaleDateString('en-AU')}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-0.5">
+                      {[1, 2, 3, 4, 5].map(i => (
+                        <Star key={i} size={12} className={i <= r.rating ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground'} />
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{r.review_text}</p>
+                  {r.reply_text && (
+                    <div className="ml-4 pl-4 border-l-2 border-primary/20">
+                      <p className="text-[10px] text-muted-foreground mb-1">
+                        <span className="font-medium text-foreground">{agent.name}</span> replied
+                      </p>
+                      <p className="text-sm text-foreground">{r.reply_text}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </main>

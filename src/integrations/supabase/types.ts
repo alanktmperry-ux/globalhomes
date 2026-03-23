@@ -270,6 +270,56 @@ export type Database = {
           },
         ]
       }
+      agent_reviews: {
+        Row: {
+          agent_id: string
+          created_at: string
+          id: string
+          rating: number
+          relationship: string
+          replied_at: string | null
+          reply_text: string | null
+          review_text: string
+          reviewer_email: string | null
+          reviewer_name: string
+          status: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          id?: string
+          rating: number
+          relationship?: string
+          replied_at?: string | null
+          reply_text?: string | null
+          review_text: string
+          reviewer_email?: string | null
+          reviewer_name: string
+          status?: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          id?: string
+          rating?: number
+          relationship?: string
+          replied_at?: string | null
+          reply_text?: string | null
+          review_text?: string
+          reviewer_email?: string | null
+          reviewer_name?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_reviews_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agent_subscriptions: {
         Row: {
           agent_id: string
@@ -1983,6 +2033,50 @@ export type Database = {
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_requests: {
+        Row: {
+          agent_id: string
+          client_email: string | null
+          client_name: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          token: string
+          used: boolean
+          used_at: string | null
+        }
+        Insert: {
+          agent_id: string
+          client_email?: string | null
+          client_name?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          token?: string
+          used?: boolean
+          used_at?: string | null
+        }
+        Update: {
+          agent_id?: string
+          client_email?: string | null
+          client_name?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          token?: string
+          used?: boolean
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_requests_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
             referencedColumns: ["id"]
           },
         ]

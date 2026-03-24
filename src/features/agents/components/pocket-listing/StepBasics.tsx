@@ -88,15 +88,32 @@ const StepBasics = ({ draft, update }: Props) => {
   const showRange = draft.priceDisplay === 'range';
   const showAuction = draft.priceDisplay === 'eoi';
 
+  // Track whether agent has manually overridden priceMax away from the auto-10%
+  // Auto-apply +10% when: priceMax is unset (0), OR priceMax still equals the
+  // auto-calculated value from the previous priceMin (i.e. agent hasn't touched it)
   const handlePriceMinChange = (raw: string) => {
     const val = Number(raw.replace(/,/g, '')) || 0;
     const autoMax = Math.round(val * 1.1);
-    const currentRatio = draft.priceMax / (draft.priceMin || 1);
-    const isAutoMax = Math.abs(currentRatio - 1.1) < 0.01 || draft.priceMin === 0;
+    // Consider the max "auto" if it's 0 (never set), or if it currently equals
+    // exactly the +10% of the previous priceMin (meaning agent hasn't overridden it)
+    const prevAutoMax = Math.round((draft.priceMin || 0) * 1.1);
+    const isStillAuto = draft.priceMax === 0 || draft.priceMax === prevAutoMax;
     update({
       priceMin: val,
-      priceMax: isAutoMax ? autoMax : draft.priceMax,
+      priceMax: isStillAuto ? autoMax : draft.priceMax,
     });
+  };
+
+  const handlePriceMaxChange = (raw: string) => {
+    const val = Number(raw.replace(/,/g, '')) || 0;
+    update({ priceMax: val });
+  };
+
+  // Reset priceMax back to auto +10% when agent clicks the reset link
+  const resetPriceMaxToAuto = () => {
+    if (draft.priceMin > 0) {
+      update({ priceMax: Math.round(draft.priceMin * 1.1) });
+    }
   };
 
   return (
@@ -151,19 +168,34 @@ const StepBasics = ({ draft, update }: Props) => {
         {!isRental && showRange && (
           <div className="mt-3">
             <Label className="text-xs text-muted-foreground mb-1 block">
-              Price To ($) <span className="text-muted-foreground/60">— auto +10%, override if needed</span>
+              Price To ($) <span className="text-muted-foreground/60">— defaults to +10%, edit to override</span>
             </Label>
-            <Input
-              type="text"
-              inputMode="numeric"
-              value={draft.priceMax ? draft.priceMax.toLocaleString('en-AU') : ''}
-              onChange={(e) => {
-                const val = Number(e.target.value.replace(/,/g, '')) || 0;
-                update({ priceMax: val });
-              }}
-              placeholder="e.g. 1,320,000"
-              className="h-10"
-            />
+            <div className="relative">
+              <Input
+                type="text"
+                inputMode="numeric"
+                value={draft.priceMax ? draft.priceMax.toLocaleString('en-AU') : ''}
+                onChange={(e) => handlePriceMaxChange(e.target.value)}
+                placeholder="e.g. 1,320,000"
+                className="h-10 pr-16"
+              />
+              {/* Show "Auto" badge when priceMax equals the auto +10% value */}
+              {draft.priceMin > 0 && draft.priceMax === Math.round(draft.priceMin * 1.1) && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 select-none">
+                  Auto +10%
+                </span>
+              )}
+              {/* Show "Reset" link when agent has manually overridden */}
+              {draft.priceMin > 0 && draft.priceMax > 0 && draft.priceMax !== Math.round(draft.priceMin * 1.1) && (
+                <button
+                  type="button"
+                  onClick={resetPriceMaxToAuto}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-primary hover:opacity-70 transition-opacity"
+                >
+                  Reset to auto
+                </button>
+              )}
+            </div>
             {draft.priceMin > 0 && draft.priceMax > 0 && (
               <p className="text-xs text-muted-foreground mt-1.5">
                 Price guide will show: {formatPrice(draft.priceMin)} – {formatPrice(draft.priceMax)}

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useBuyerMatching } from '@/features/agents/hooks/useBuyerMatching';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Save, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -184,6 +185,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
   const [loadingEdit, setLoadingEdit] = useState(!!loadPropertyId);
   const autoSaveRef = useRef<ReturnType<typeof setInterval>>();
   const { user } = useAuth();
+  const { matchBuyersToListing } = useBuyerMatching();
 
   const update = (partial: Partial<ListingDraft>) =>
     setDraft((d) => ({ ...d, ...partial }));
@@ -391,14 +393,38 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         if (error) throw error;
         toast.success('Listing updated! — Your changes have been saved.');
       } else {
-        // INSERT new listing
-        const { error } = await supabase.from('properties').insert({
-          ...payload,
-          agent_id: agentId,
-        });
+        const { data: inserted, error } = await supabase
+          .from('properties')
+          .insert({
+            ...payload,
+            agent_id: agentId,
+          })
+          .select('id')
+          .single();
         if (error) throw error;
         localStorage.removeItem('pocket-listing-draft');
-        toast.success('Listing saved! — Your property is in draft. Publish it from your dashboard to make it visible to buyers.');
+
+        const matched = await matchBuyersToListing({
+          id: inserted.id,
+          agent_id: agentId,
+          suburb: draft.suburb || '',
+          state: draft.state || '',
+          price: draft.priceMax,
+          beds: draft.beds,
+          baths: draft.baths,
+          listing_type: draft.listingType,
+          title,
+          address: draft.address,
+        });
+
+        if (matched.length > 0) {
+          toast.success(
+            `Listing saved! ${matched.length} buyer${matched.length > 1 ? 's' : ''} on your list match this suburb — check your notifications.`,
+            { duration: 6000 }
+          );
+        } else {
+          toast.success('Listing saved! — Your property is in draft. Publish it from your dashboard to make it visible to buyers.');
+        }
       }
 
       onPublish(title);

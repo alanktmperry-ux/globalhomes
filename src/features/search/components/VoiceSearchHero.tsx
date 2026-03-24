@@ -8,6 +8,7 @@ import { parsePropertyQuery, filtersToChips } from '@/features/search/lib/parseP
 import { useToast } from '@/shared/hooks/use-toast';
 import { autocomplete, getPlaceDetails } from '@/shared/lib/googleMapsService';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/features/auth/AuthProvider';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { useI18n } from '@/shared/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
@@ -137,6 +138,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   const { toast } = useToast();
   const navigate = useNavigate();
   const { listingMode, setListingMode } = useCurrency();
+  const { user, isAgent } = useAuth();
   const { t, language, setLanguage } = useI18n();
 
   const [headlineIndex, setHeadlineIndex] = useState(0);
@@ -540,9 +542,21 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
           </button>
         </div>
 
-        <button onClick={() => navigate('/login')} className="text-[12px] font-bold text-foreground">
-          Sign in →
-        </button>
+        {user ? (
+          <button
+            onClick={() => navigate(isAgent ? '/dashboard' : '/profile')}
+            className="text-[12px] font-bold text-foreground hover:opacity-70 transition-opacity"
+          >
+            {isAgent ? 'Dashboard →' : 'My Account →'}
+          </button>
+        ) : (
+          <button
+            onClick={() => navigate('/login')}
+            className="text-[12px] font-bold text-foreground hover:opacity-70 transition-opacity"
+          >
+            Sign in →
+          </button>
+        )}
       </div>
 
       {/* ── HERO SPLIT ── */}

@@ -13,5 +13,7 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     storage: localStorage,
     persistSession: true,
     autoRefreshToken: true,
+    // Prevent spurious SIGNED_OUT events when navigating between routes
+    detectSessionInUrl: false,
   }
 });

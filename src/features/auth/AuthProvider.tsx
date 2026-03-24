@@ -115,10 +115,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Fetch roles
   useEffect(() => {
     if (!user) {
-      if (rolesFetched) clearRoles();
+      clearRoles();
       return;
     }
-    if (lastFetchedUserId.current === user.id) return;
+    // Same user with roles already fetched — skip to avoid role flicker on navigation
+    if (lastFetchedUserId.current === user.id && rolesFetched) return;
 
     let cancelled = false;
     const doFetch = async () => {
@@ -155,12 +156,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         console.log('[Auth] onAuthStateChange event:', _event, 'user:', session?.user?.id ?? 'none');
-        if (_event === 'SIGNED_IN' && session?.user) {
-          lastFetchedUserId.current = null;
-          setRolesFetched(false);
-          setLoading(true);
 
-          // If this is an email confirmation (token_hash in URL), redirect agent to dashboard or home
+        // Explicit sign-out — clear everything
+        if (_event === 'SIGNED_OUT') {
+          setSession(null);
+          setUser(null);
+          clearRoles();
+          setLoading(false);
+          return;
+        }
+
+        // Silent token refresh or initial session load — update session
+        // without resetting roles or triggering loading spinner
+        if (_event === 'TOKEN_REFRESHED' || _event === 'INITIAL_SESSION') {
+          setSession(session);
+          setUser(session?.user ?? null);
+          if (!session?.user) setLoading(false);
+          return;
+        }
+
+        // Genuine new sign-in — re-fetch roles only if different user
+        if (_event === 'SIGNED_IN' && session?.user) {
+          const isNewUser = lastFetchedUserId.current !== session.user.id;
+          if (isNewUser) {
+            lastFetchedUserId.current = null;
+            setRolesFetched(false);
+            setLoading(true);
+          }
+          // Clean up email confirmation hash from URL
           const hash = window.location.hash;
           const params = new URLSearchParams(hash.replace('#', '?'));
           const type = params.get('type');
@@ -168,6 +191,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             window.history.replaceState({}, '', window.location.pathname);
           }
         }
+
         setSession(session);
         setUser(session?.user ?? null);
         if (!session?.user) setLoading(false);

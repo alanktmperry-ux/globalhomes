@@ -72,14 +72,34 @@ const HEADLINE_WORDS = [
   { text: 'in Japanese.',     color: '#818cf8' },
 ];
 
-const SEARCH_PLACEHOLDERS = [
-  'Tap to speak, or type your search…',
-  '3 bed house in Brighton…',
-  'apartment with parking under $800k…',
-  '2 bedroom near good schools…',
-  'beachside home under $2M…',
-  'townhouse with a garage…',
-];
+const SEARCH_PLACEHOLDERS_BY_LANG: Record<string, string[]> = {
+  'en-AU': ['3 bed house in Brighton…', 'apartment with parking under $800k…', '2 bed near good schools…', 'beachside home under $2M…'],
+  'en-US': ['3 bed house in Brighton…', 'apartment with parking under $800k…', '2 bed near good schools…', 'beachside home under $2M…'],
+  'en-GB': ['3 bed house in Brighton…', 'apartment with parking under $800k…', '2 bed near good schools…', 'beachside home under $2M…'],
+  'zh-CN': ['布莱顿3卧室房屋…', '80万以下带车位公寓…', '靠近好学校的2卧室…', '200万以下海滨住宅…'],
+  'zh-TW': ['布萊頓3臥室房屋…', '80萬以下帶車位公寓…', '靠近好學校的2臥室…', '200萬以下海濱住宅…'],
+  'ar-SA': ['منزل 3 غرف في برايتون…', 'شقة بموقف بأقل من 800k…', 'غرفتان قرب مدارس جيدة…', 'منزل شاطئي بأقل من 2M…'],
+  'hi-IN': ['ब्राइटन में 3 BHK घर…', '800k से कम पार्किंग वाला अपार्टमेंट…', 'अच्छे स्कूलों के पास 2 BHK…', '2M से कम बीचसाइड होम…'],
+  'es-ES': ['casa de 3 hab en Brighton…', 'piso con garaje bajo 800k…', '2 hab cerca de colegios…', 'casa en playa bajo 2M…'],
+  'es-MX': ['casa de 3 rec en Brighton…', 'depto con estac. bajo 800k…', '2 rec cerca de escuelas…', 'casa de playa bajo 2M…'],
+  'fr-FR': ['maison 3 ch à Brighton…', 'appt avec parking sous 800k…', '2 pièces près des écoles…', 'maison en mer sous 2M…'],
+  'de-DE': ['3-Zi-Haus in Brighton…', 'Wohnung mit Stellplatz < 800k…', '2 Zi in Schulnähe…', 'Strandhaus unter 2M…'],
+  'ja-JP': ['ブライトンの3LDK…', '駐車場付きマンション80万以下…', '良い学校の近くの2LDK…', '海辺の住宅200万以下…'],
+  'it-IT': ['casa 3 cam a Brighton…', 'appart con parcheggio < 800k…', '2 cam vicino scuole…', 'casa al mare < 2M…'],
+  'pt-BR': ['casa 3 quartos em Brighton…', 'apto com vaga abaixo de 800k…', '2 quartos perto de escolas…', 'casa praia abaixo de 2M…'],
+  'ru-RU': ['3-комн дом в Брайтоне…', 'квартира с парковкой до 800k…', '2 комн рядом со школой…', 'дом у моря до 2M…'],
+  'ko-KR': ['브라이턴 3베드 주택…', '주차 포함 아파트 80만 이하…', '좋은 학교 근처 2베드…', '해변 200만 이하…'],
+  'th-TH': ['บ้าน 3 ห้องในไบรตัน…', 'คอนโดมีที่จอดรถต่ำ 800k…', '2 ห้องใกล้โรงเรียนดี…', 'บ้านทะเลต่ำ 2M…'],
+  'vi-VN': ['nhà 3 phòng ở Brighton…', 'căn hộ đỗ xe dưới 800k…', '2 phòng gần trường tốt…', 'nhà biển dưới 2M…'],
+  'tr-TR': ['Brighton 3 yatak oda…', '800k altı garajlı daire…', 'okul yakını 2 yatak…', '2M altı deniz evi…'],
+  'pl-PL': ['dom 3-pok w Brighton…', 'mieszkanie z parkingiem < 800k…', '2 pok blisko szkoły…', 'dom morski < 2M…'],
+  'nl-NL': ['3-kamer woning Brighton…', 'appt met parkeren < 800k…', '2 kamers bij school…', 'strandhuis < 2M…'],
+  'sv-SE': ['3-rumsbostad Brighton…', 'lägen med parkering < 800k…', '2 rum nära skola…', 'strandhus < 2M…'],
+  'el-GR': ['σπίτι 3 δωμ Brighton…', 'διαμ με parking < 800k…', '2 δωμ κοντά σε σχολεία…', 'παραθαλάσσιο < 2M…'],
+  'id-ID': ['rumah 3 kamar Brighton…', 'apartemen parkir < 800k…', '2 kamar dekat sekolah…', 'rumah pantai < 2M…'],
+};
+const getPlaceholders = (lang: string) =>
+  SEARCH_PLACEHOLDERS_BY_LANG[lang] || SEARCH_PLACEHOLDERS_BY_LANG['en-AU'];
 
 
 
@@ -109,6 +129,11 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const suppressAutocompleteRef = useRef(false);
+  // Refs mirror state so recognition callbacks never capture stale values
+  const voiceStateRef = useRef<VoiceState>('idle');
+  const transcriptRef = useRef('');
+  const syncVoiceState = (s: VoiceState) => { voiceStateRef.current = s; setVoiceState(s); };
+  const syncTranscript = (t: string) => { transcriptRef.current = t; setTranscript(t); };
   const { toast } = useToast();
   const navigate = useNavigate();
   const { listingMode, setListingMode } = useCurrency();
@@ -260,14 +285,14 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   // Show confirmation text when processing
   useEffect(() => {
     if (voiceState === 'processing' && transcript) {
-      setTranscript(`Got it — searching for "${transcript}"`);
+      syncTranscript(`Got it — searching for "${transcript}"`);  
     }
   }, [voiceState]);
 
   // Update state when external search completes
   useEffect(() => {
     if (!isSearching && voiceState === 'processing') {
-      setVoiceState(resultCount !== undefined ? 'results' : 'idle');
+      syncVoiceState(resultCount !== undefined ? 'results' : 'idle');
     }
   }, [isSearching, resultCount, voiceState]);
 
@@ -284,7 +309,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
     const t = setInterval(() => {
       setPlaceholderVisible(false);
       setTimeout(() => {
-        setPlaceholderIndex(i => (i + 1) % SEARCH_PLACEHOLDERS.length);
+        setPlaceholderIndex(i => i + 1);
         setPlaceholderVisible(true);
       }, 300);
     }, 3000);
@@ -319,7 +344,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
     setFilterChips(chips);
     setEditableTranscript(text);
     setTextQuery(text);
-    setVoiceState('processing');
+    syncVoiceState('processing');
     onSearch(text);
     geocodeLocation(text);
   }, [onSearch, geocodeLocation]);
@@ -353,10 +378,10 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
         }
 
         if (interim) {
-          setTranscript(interim);
+          syncTranscript(interim);
         }
         if (final) {
-          setTranscript(final);
+          syncTranscript(final);
           if (silenceTimer) clearTimeout(silenceTimer);
           recognition.stop();
           return;
@@ -371,7 +396,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
       recognition.onerror = (event: any) => {
         if (silenceTimer) clearTimeout(silenceTimer);
-        setVoiceState('idle');
+        syncVoiceState('idle');
         if (event.error === 'not-allowed') {
           toast({ title: '🎙️ Microphone Access', description: 'Please allow microphone permissions and try again.', variant: 'destructive' });
         } else if (event.error === 'no-speech') {
@@ -383,19 +408,20 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
       recognition.onend = () => {
         if (silenceTimer) clearTimeout(silenceTimer);
-        if (voiceState === 'listening') {
-          if (transcript) {
-            processTranscript(transcript);
+        // Read refs — not stale closure values
+        if (voiceStateRef.current === 'listening') {
+          if (transcriptRef.current) {
+            processTranscript(transcriptRef.current);
           } else {
-            setVoiceState('idle');
+            syncVoiceState('idle');
           }
         }
       };
 
       recognitionRef.current = recognition;
       recognition.start();
-      setVoiceState('listening');
-      setTranscript('');
+      syncVoiceState('listening');
+      syncTranscript('');
       setConfidence(null);
       setFilterChips([]);
     } catch (err) {
@@ -411,12 +437,12 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
   const stopListening = useCallback(() => {
     recognitionRef.current?.stop();
-    if (voiceState === 'listening' && transcript) {
-      processTranscript(transcript);
+    if (voiceStateRef.current === 'listening' && transcriptRef.current) {
+      processTranscript(transcriptRef.current);
     } else {
-      setVoiceState('idle');
+      syncVoiceState('idle');
     }
-  }, [voiceState, transcript, processTranscript]);
+  }, [processTranscript]);
 
   const handleTextSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -442,7 +468,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
     const chips = filtersToChips(filters);
     setFilterChips(chips);
     setEditableTranscript(suggestion.description);
-    setVoiceState('processing');
+    syncVoiceState('processing');
 
     // Trigger the search
     onSearch(suggestion.description);
@@ -592,7 +618,16 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                 <div className="flex-1 min-w-0 relative">
                   {voiceState === 'listening' ? (
                     <span className="text-[13px] text-muted-foreground italic">
-                      {transcript || 'Listening… speak now'}
+                      {transcript || ({
+                      'zh-CN': '正在聆听…请说话', 'zh-TW': '正在聆聽…請說話',
+                      'ar-SA': 'جارِ الاستماع…', 'hi-IN': 'सुन रहा हूँ…',
+                      'es-ES': 'Escuchando…', 'es-MX': 'Escuchando…',
+                      'fr-FR': 'Écoute en cours…', 'de-DE': 'Ich höre zu…',
+                      'ja-JP': '聞いています…', 'ru-RU': 'Слушаю…',
+                      'ko-KR': '듣고 있어요…', 'it-IT': 'In ascolto…',
+                      'pt-BR': 'Ouvindo…', 'th-TH': 'กำลังฟัง…',
+                      'vi-VN': 'Đang nghe…', 'tr-TR': 'Dinliyorum…',
+                    } as Record<string, string>)[selectedLang] || 'Listening… speak now'}
                     </span>
                   ) : (
                     <div className="relative">
@@ -617,7 +652,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                           className="absolute inset-0 text-[14px] text-muted-foreground/70 pointer-events-none flex items-center transition-opacity duration-300"
                           style={{ opacity: placeholderVisible ? 1 : 0 }}
                         >
-                          {SEARCH_PLACEHOLDERS[placeholderIndex]}
+                          {getPlaceholders(selectedLang)[placeholderIndex % getPlaceholders(selectedLang).length]}
                         </span>
                       )}
                     </div>

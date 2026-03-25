@@ -2,9 +2,10 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { Property } from '@/shared/lib/types';
 import { loadGoogleMapsScript } from '@/shared/lib/googleMapsService';
-import { Loader2, Locate, Search, X, HelpCircle } from 'lucide-react';
+import { Loader2, Locate, Search, X, HelpCircle, MapPin } from 'lucide-react';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { useConsent } from '@/shared/components/CookieConsent';
 
 const TYPE_COLORS: Record<string, string> = {
   house: '#06b6d4',
@@ -39,6 +40,21 @@ interface PropertyMapProps {
 export function PropertyMap({
   properties, onPropertySelect, selectedPropertyId, onAreaSearch, centerOn, onMapMoved, onScrollToProperty, formatPrice, onGeolocate,
 }: PropertyMapProps) {
+  const { consent } = useConsent();
+
+  // If user hasn't consented to maps, show a placeholder
+  if (!consent.maps) {
+    return (
+      <div className="w-full h-full min-h-[300px] flex flex-col items-center justify-center bg-secondary/50 rounded-xl border border-border text-center p-6">
+        <MapPin size={32} className="text-muted-foreground/40 mb-3" />
+        <p className="text-sm font-medium text-foreground mb-1">Map disabled</p>
+        <p className="text-xs text-muted-foreground max-w-[240px]">
+          Enable maps in your <a href="/settings" className="text-primary underline">privacy settings</a> to see properties on the map.
+        </p>
+      </div>
+    );
+  }
+
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);

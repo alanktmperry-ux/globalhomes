@@ -26,15 +26,6 @@ const STAGES = [
   { key: 'settled', label: 'Settled', description: 'Deal closed', color: 'bg-slate-500' },
 ] as const;
 
-const DEMO_CARDS: PipelineCard[] = [
-  { id: 'd1', address: '42 Panorama Drive, Berwick', contactName: 'Sarah Mitchell', estimatedValue: 890000, stage: 'prospecting', movedAt: new Date(Date.now() - 2 * 86400000).toISOString() },
-  { id: 'd2', address: '7 Elm Court, Toorak', contactName: 'James Chen', estimatedValue: 2150000, stage: 'prospecting', movedAt: new Date(Date.now() - 5 * 86400000).toISOString() },
-  { id: 'd3', address: '15 Station St, Narre Warren', contactName: 'David Park', estimatedValue: 720000, stage: 'appraisal', movedAt: new Date(Date.now() - 3 * 86400000).toISOString() },
-  { id: 'd4', address: '8 Ocean View Rd, Brighton', contactName: 'Lisa Wong', estimatedValue: 1450000, stage: 'listed', movedAt: new Date(Date.now() - 7 * 86400000).toISOString() },
-  { id: 'd5', address: '22 Park Avenue, Hawthorn', contactName: 'Michael Ross', estimatedValue: 1100000, stage: 'under_offer', movedAt: new Date(Date.now() - 1 * 86400000).toISOString() },
-  { id: 'd6', address: '3 Bayview Terrace, Mentone', contactName: 'Karen Taylor', estimatedValue: 980000, stage: 'settled', movedAt: new Date(Date.now() - 14 * 86400000).toISOString() },
-];
-
 const daysInStage = (movedAt: string) => {
   const diff = Date.now() - new Date(movedAt).getTime();
   return Math.max(0, Math.floor(diff / 86400000));

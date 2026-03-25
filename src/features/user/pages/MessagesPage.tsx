@@ -375,6 +375,19 @@ const MessagesPage = () => {
         .from('conversations')
         .update({ last_message_at: new Date().toISOString() })
         .eq('id', convoId);
+
+      // Notify recipient via email (best-effort)
+      if (selectedConvo.other_user_id) {
+        supabase.functions.invoke('send-notification-email', {
+          body: {
+            type: 'new_message',
+            title: `New message from ${user.email || 'a user'}`,
+            message: content.length > 200 ? content.slice(0, 200) + '…' : content,
+            recipient_user_id: selectedConvo.other_user_id,
+            property_id: selectedConvo.property_id || undefined,
+          },
+        }).catch(() => {});
+      }
     } finally {
       setSending(false);
       inputRef.current?.focus();

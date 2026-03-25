@@ -10,18 +10,18 @@ const footerLinks = [
 ];
 
 const legalLinks = [
-  { label: 'About', to: '#' },
+  { label: 'About', to: '/for-agents' },
   { label: 'Privacy Policy', to: '/privacy' },
   { label: 'Terms of Service', to: '/terms' },
   { label: 'Agent Login', to: '/agents/login' },
   { label: 'Partner Portal', to: '/partner/login' },
-  { label: 'Contact', to: '#' },
+  { label: 'Contact', to: 'mailto:support@listhq.com.au' },
 ];
 
 const socialLinks = [
-  { icon: Instagram, href: '#', label: 'Instagram' },
-  { icon: Linkedin, href: '#', label: 'LinkedIn' },
-  { icon: Twitter, href: '#', label: 'Twitter' },
+  { icon: Instagram, href: 'https://instagram.com/listhq', label: 'Instagram' },
+  { icon: Linkedin, href: 'https://linkedin.com/company/listhq', label: 'LinkedIn' },
+  { icon: Twitter, href: 'https://x.com/listhq', label: 'Twitter' },
 ];
 
 const complianceBadges = [
@@ -100,9 +100,15 @@ export function SiteFooter() {
             <ul className="space-y-2">
               {legalLinks.map((link) => (
                 <li key={link.label}>
-                  <Link to={link.to} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                    {link.label}
-                  </Link>
+                  {link.to.startsWith('mailto:') ? (
+                    <a href={link.to} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                      {link.label}
+                    </a>
+                  ) : (
+                    <Link to={link.to} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                      {link.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

@@ -3504,6 +3504,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_contact_clicks: {
+        Args: { property_id: string }
+        Returns: undefined
+      }
       increment_property_views: {
         Args: { property_id: string }
         Returns: undefined

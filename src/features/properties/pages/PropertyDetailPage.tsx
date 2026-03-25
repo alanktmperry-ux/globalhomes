@@ -11,7 +11,6 @@ import { InvestmentInsightsCard } from '@/features/properties/components/Investm
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useSavedProperties } from '@/features/properties/hooks/useSavedProperties';
 import { useIsMobile } from '@/shared/hooks/use-mobile';
-import { mockProperties } from '@/features/properties/api/mock-data';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { RentalEnquiryForm } from '@/features/properties/components/RentalEnquiryForm';
@@ -40,11 +39,22 @@ export default function PropertyDetailPage() {
   useEffect(() => {
     const fetchProperty = async () => {
       setLoading(true);
-      const { data } = await supabase
+
+      if (!id) {
+        setProperty(null);
+        setLoading(false);
+        return;
+      }
+
+      const { data, error } = await supabase
         .from('properties')
         .select('*, agents(id, name, agency, phone, email, avatar_url, is_subscribed)')
-        .eq('id', id || '')
+        .eq('id', id)
         .single();
+
+      if (error) {
+        console.warn('[PropertyDetail] Fetch failed:', error.message);
+      }
 
       if (data) {
         const p: any = data;
@@ -92,8 +102,7 @@ export default function PropertyDetailPage() {
         });
         setInspectionTimes(Array.isArray(p.inspection_times) ? p.inspection_times : []);
       } else {
-        const mock = mockProperties.find(p => p.id === id);
-        setProperty(mock || null);
+        setProperty(null);
       }
       setLoading(false);
     };

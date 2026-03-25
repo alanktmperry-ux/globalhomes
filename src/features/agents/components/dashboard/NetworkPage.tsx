@@ -91,15 +91,7 @@ const URGENCY_CONFIG: Record<string, { icon: React.ReactNode; color: string; lab
 
 const PROPERTY_TYPES = ['House', 'Apartment', 'Townhouse', 'Land', 'Commercial'];
 
-/* ─── Mock data for demo ─── */
-
-const DEMO_BRIEFS: BuyerBrief[] = [
-  { id: 'db1', agent_id: 'demo1', agent_name: 'Sarah Chen', property_type: 'House', min_beds: 3, max_beds: 5, min_price: 700000, max_price: 950000, suburbs: ['Berwick', 'Narre Warren', 'Officer'], notes: 'Cash buyer relocating from Sydney, pre-approved $950k. Needs pool or space for one.', urgency: 'hot', is_active: true, created_at: new Date(Date.now() - 3600000).toISOString() },
-  { id: 'db2', agent_id: 'demo2', agent_name: 'Marcus Hill', property_type: 'Apartment', min_beds: 2, max_beds: 3, min_price: 400000, max_price: 600000, suburbs: ['South Yarra', 'Prahran', 'Richmond'], notes: 'Investor seeking 5%+ yield near train. First-home buyer grant eligible.', urgency: 'active', is_active: true, created_at: new Date(Date.now() - 86400000).toISOString() },
-  { id: 'db3', agent_id: 'demo3', agent_name: 'Priya Sharma', property_type: 'Land', min_beds: 0, max_beds: 0, min_price: 300000, max_price: 550000, suburbs: ['Officer', 'Clyde North', 'Pakenham'], notes: 'Developer looking for 600sqm+ lots. Flexible on timing.', urgency: 'passive', is_active: true, created_at: new Date(Date.now() - 172800000).toISOString() },
-];
-
-/* ─── Matching logic ─── */
+const PROPERTY_TYPES = ['House', 'Apartment', 'Townhouse', 'Land', 'Commercial'];
 
 function matchBriefsToListing(listing: NetworkListing | MyOffMarketListing, briefs: BuyerBrief[]): BuyerBrief[] {
   return briefs.filter(b => {

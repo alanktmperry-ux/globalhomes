@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -87,7 +87,7 @@ export default function PropertyDetailPage() {
             isSubscribed: p.agents.is_subscribed || false,
           } : { id: '', name: 'Private Seller', agency: '', phone: '', email: '', avatarUrl: '', isSubscribed: false },
           listedDate: p.listed_date || p.created_at,
-          views: p.views,
+          views: (p.views ?? 0) + 1,
           contactClicks: p.contact_clicks,
           status: 'listed',
           rentalYieldPct: p.rental_yield_pct,
@@ -101,6 +101,20 @@ export default function PropertyDetailPage() {
           inspectionTimes: Array.isArray(p.inspection_times) ? p.inspection_times : [],
         });
         setInspectionTimes(Array.isArray(p.inspection_times) ? p.inspection_times : []);
+
+        // Fire-and-forget: atomically increment view count in DB
+        supabase.rpc('increment_property_views', { property_id: p.id }).then(({ error: rpcErr }) => {
+          if (rpcErr) {
+            // Fallback: direct update if RPC doesn't exist yet
+            supabase
+              .from('properties')
+              .update({ views: (p.views ?? 0) + 1 })
+              .eq('id', p.id)
+              .then(({ error: updateErr }) => {
+                if (updateErr) console.warn('[PropertyDetail] View count update failed:', updateErr.message);
+              });
+          }
+        });
       } else {
         setProperty(null);
       }
@@ -108,6 +122,26 @@ export default function PropertyDetailPage() {
     };
     fetchProperty();
   }, [id]);
+
+  // ── Increment view count (fire-and-forget, once per page load) ──
+  const viewTracked = useRef(false);
+  useEffect(() => {
+    if (!property || viewTracked.current) return;
+    viewTracked.current = true;
+
+    supabase.rpc('increment_property_views', { property_id: property.id }).then(({ error }) => {
+      if (error) {
+        // Fallback: direct update if the RPC doesn't exist yet
+        supabase
+          .from('properties')
+          .update({ views: (property.views || 0) + 1 })
+          .eq('id', property.id)
+          .then(({ error: updateError }) => {
+            if (updateError) console.warn('[PropertyDetail] View increment failed:', updateError.message);
+          });
+      }
+    });
+  }, [property]);
 
   const prevImage = () => setImageIndex(i => (i > 0 ? i - 1 : (property?.images.length || 1) - 1));
   const nextImage = () => setImageIndex(i => (i < (property?.images.length || 1) - 1 ? i + 1 : 0));

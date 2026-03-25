@@ -1,16 +1,18 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import UpgradeGate from '@/features/agents/components/shared/UpgradeGate';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { PartyPopper, MapPin, Clock, ChevronDown, ChevronUp, Copy, Star, ExternalLink, Gift } from 'lucide-react';
+import { PartyPopper, MapPin, Clock, ChevronDown, ChevronUp, Star, ExternalLink, Gift, Loader2 } from 'lucide-react';
 
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { differenceInDays, format, isPast, addDays } from 'date-fns';
+import { differenceInDays, format, isPast, parseISO } from 'date-fns';
 
 interface Settlement {
   id: string;
@@ -18,6 +20,7 @@ interface Settlement {
   buyerName: string;
   settlementDate: Date;
   propertyId: string;
+  contactId: string | null;
 }
 
 const CHECKLIST_ITEMS = [
@@ -35,36 +38,95 @@ const UTILITY_PARTNERS = [
   { name: 'NBN Co', url: 'https://www.nbnco.com.au', color: 'bg-purple-600' },
 ];
 
-const now = new Date();
-
-const DEMO_SETTLEMENTS: Settlement[] = [
-  { id: 'demo-s1', address: '8 Ocean View Rd, Brighton', buyerName: 'Sarah Chen', settlementDate: addDays(now, 3), propertyId: 'demo-p1' },
-  { id: 'demo-s2', address: '15 Station St, Richmond', buyerName: 'James Nguyen', settlementDate: addDays(now, 9), propertyId: 'demo-p2' },
-];
-
-const DEMO_POST: Settlement[] = [
-  { id: 'demo-s3', address: '42 Panorama Drive, Berwick', buyerName: 'Emma Wilson', settlementDate: addDays(now, -5), propertyId: 'demo-p3' },
-];
-
 const SettlementConcierge = () => {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [settlements, setSettlements] = useState<Settlement[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [checkStates, setCheckStates] = useState<Record<string, boolean[]>>({});
   const [utilityModal, setUtilityModal] = useState<Settlement | null>(null);
 
-  const allSettlements = useMemo(() => [...DEMO_SETTLEMENTS, ...DEMO_POST], []);
+  const fetchSettlements = useCallback(async () => {
+    if (!user) return;
+    setLoading(true);
 
-  const upcoming = useMemo(() => allSettlements.filter(s => !isPast(s.settlementDate)).sort((a, b) => a.settlementDate.getTime() - b.settlementDate.getTime()), [allSettlements]);
-  const postSettlement = useMemo(() => allSettlements.filter(s => isPast(s.settlementDate)), [allSettlements]);
+    try {
+      const { data: agent } = await supabase
+        .from('agents')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
 
-  // Load checklist state from localStorage
-  useEffect(() => {
-    const loaded: Record<string, boolean[]> = {};
-    allSettlements.forEach(s => {
-      const stored = localStorage.getItem(`settlement-checklist-${s.propertyId}`);
-      loaded[s.propertyId] = stored ? JSON.parse(stored) : new Array(CHECKLIST_ITEMS.length).fill(false);
-    });
-    setCheckStates(loaded);
-  }, [allSettlements]);
+      if (!agent) { setLoading(false); return; }
+
+      // Get contacts in under_offer or settled stage (these represent active/completed deals)
+      const { data: contacts } = await supabase
+        .from('contacts')
+        .select('id, first_name, last_name, property_address, seller_pipeline_stage, buyer_pipeline_stage, updated_at, estimated_value')
+        .eq('created_by', agent.id)
+        .or('seller_pipeline_stage.in.(under_offer,settled),buyer_pipeline_stage.in.(under_offer,settled)');
+
+      // Also check trust_transactions for settlement-related entries
+      const { data: trustTx } = await supabase
+        .from('trust_transactions')
+        .select('property_id, payee_name, created_at, status, category')
+        .in('category', ['settlement', 'holding_deposit', 'deposit'])
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      // Build settlements from contacts
+      const fromContacts: Settlement[] = (contacts || [])
+        .filter((c: any) => c.property_address)
+        .map((c: any) => {
+          const stage = c.seller_pipeline_stage || c.buyer_pipeline_stage || 'under_offer';
+          // Use updated_at as a proxy for settlement date + 30 days for "under_offer", or updated_at for "settled"
+          const baseDate = parseISO(c.updated_at);
+          const settlementDate = stage === 'settled' ? baseDate : new Date(baseDate.getTime() + 30 * 86400000);
+
+          return {
+            id: `contact-${c.id}`,
+            address: c.property_address,
+            buyerName: [c.first_name, c.last_name].filter(Boolean).join(' '),
+            settlementDate,
+            propertyId: c.id,
+            contactId: c.id,
+          };
+        });
+
+      // Build settlements from trust transactions (for deals tracked via trust)
+      const contactIds = new Set(fromContacts.map(s => s.contactId));
+      const fromTrust: Settlement[] = (trustTx || [])
+        .filter((tx: any) => tx.property_id && !contactIds.has(tx.property_id))
+        .map((tx: any) => ({
+          id: `trust-${tx.property_id}-${tx.created_at}`,
+          address: tx.property_id,
+          buyerName: tx.payee_name || 'Unknown buyer',
+          settlementDate: parseISO(tx.created_at),
+          propertyId: tx.property_id,
+          contactId: null,
+        }));
+
+      setSettlements([...fromContacts, ...fromTrust]);
+
+      // Load checklist states from localStorage
+      const loaded: Record<string, boolean[]> = {};
+      [...fromContacts, ...fromTrust].forEach(s => {
+        const stored = localStorage.getItem(`settlement-checklist-${s.propertyId}`);
+        loaded[s.propertyId] = stored ? JSON.parse(stored) : new Array(CHECKLIST_ITEMS.length).fill(false);
+      });
+      setCheckStates(loaded);
+    } catch (err) {
+      console.warn('[Settlement] Fetch failed:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
+  useEffect(() => { fetchSettlements(); }, [fetchSettlements]);
+
+  const now = new Date();
+  const upcoming = useMemo(() => settlements.filter(s => !isPast(s.settlementDate)).sort((a, b) => a.settlementDate.getTime() - b.settlementDate.getTime()), [settlements]);
+  const postSettlement = useMemo(() => settlements.filter(s => isPast(s.settlementDate)).sort((a, b) => b.settlementDate.getTime() - a.settlementDate.getTime()), [settlements]);
 
   const toggleCheck = (propertyId: string, idx: number) => {
     setCheckStates(prev => {
@@ -106,6 +168,24 @@ const SettlementConcierge = () => {
     return <UpgradeGate requiredPlan="Pro or above" message="Settlement Concierge is available on the Pro plan and above. Track every milestone from exchange to settlement so nothing slips." />;
   }
 
+  if (loading) {
+    return (
+      <div className="flex-1 p-4 md:p-8 max-w-3xl">
+        <div className="flex items-center gap-3 mb-6">
+          <SidebarTrigger className="md:hidden" />
+          <PartyPopper size={24} className="text-primary" />
+          <div>
+            <h1 className="text-xl font-bold">Settlement Concierge</h1>
+            <p className="text-sm text-muted-foreground">Loading settlements...</p>
+          </div>
+        </div>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 size={24} className="animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 p-4 md:p-8 max-w-3xl">
       <div className="flex items-center gap-3 mb-6">
@@ -121,7 +201,10 @@ const SettlementConcierge = () => {
       <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Upcoming Settlements</h2>
       {upcoming.length === 0 ? (
         <Card className="mb-8">
-          <CardContent className="py-12 text-center text-muted-foreground">No upcoming settlements</CardContent>
+          <CardContent className="py-12 text-center text-muted-foreground">
+            <p className="text-sm">No upcoming settlements</p>
+            <p className="text-xs mt-1">Move a deal to &quot;Under Offer&quot; in your Pipeline to see it here.</p>
+          </CardContent>
         </Card>
       ) : (
         <div className="space-y-3 mb-8">
@@ -209,7 +292,7 @@ const SettlementConcierge = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2"><Gift size={18} /> Utility Referrals</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground mb-4">Help {utilityModal?.buyerName} get set up at their new home. You may earn a referral fee for each signup.</p>
+          <p className="text-sm text-muted-foreground mb-4">Help {utilityModal?.buyerName} get set up at their new home.</p>
           <div className="space-y-3">
             {UTILITY_PARTNERS.map(u => (
               <a key={u.name} href={u.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-accent transition-colors">
@@ -218,7 +301,6 @@ const SettlementConcierge = () => {
               </a>
             ))}
           </div>
-          <p className="text-[11px] text-muted-foreground mt-2 italic">Note: You may earn a referral fee for each signup through these links.</p>
         </DialogContent>
       </Dialog>
     </div>

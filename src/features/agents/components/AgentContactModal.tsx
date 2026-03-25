@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, Phone, Mail, MessageCircle, Calendar, CheckCircle2, BadgeCheck,
@@ -113,6 +113,30 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
   useEffect(() => {
     setLeadScore(calcLeadScore(formData, searchContext));
   }, [formData, searchContext]);
+
+  // ── Increment contact_clicks once per modal open ──────────
+  const contactTracked = useRef(false);
+  useEffect(() => {
+    if (!open) {
+      contactTracked.current = false;
+      return;
+    }
+    if (contactTracked.current) return;
+    contactTracked.current = true;
+
+    supabase.rpc('increment_contact_clicks', { property_id: property.id }).then(({ error }) => {
+      if (error) {
+        // Fallback: direct update if the RPC doesn't exist yet
+        supabase
+          .from('properties')
+          .update({ contact_clicks: (property.contactClicks || 0) + 1 })
+          .eq('id', property.id)
+          .then(({ error: updateError }) => {
+            if (updateError) console.warn('[AgentContactModal] contact_clicks increment failed:', updateError.message);
+          });
+      }
+    });
+  }, [open, property.id, property.contactClicks]);
 
   // Reset on close
   useEffect(() => {

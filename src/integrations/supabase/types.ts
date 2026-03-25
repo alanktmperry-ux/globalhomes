@@ -3504,6 +3504,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_property_views: {
+        Args: { property_id: string }
+        Returns: undefined
+      }
       is_active_partner_for_agent: {
         Args: { _agent_id: string }
         Returns: boolean

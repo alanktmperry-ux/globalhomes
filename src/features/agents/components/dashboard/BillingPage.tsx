@@ -224,6 +224,20 @@ const BillingPage = () => {
             </div>
             <Progress value={sub.listingLimit >= 9999 ? 5 : usagePercent} className="h-2" />
           </div>
+          {sub.subscriptionEnd && (() => {
+            const daysLeft = Math.ceil((new Date(sub.subscriptionEnd).getTime() - Date.now()) / 86400000);
+            const colorClass = daysLeft <= 0 ? 'bg-destructive/10 text-destructive'
+              : daysLeft <= 14 ? 'bg-amber-500/10 text-amber-600'
+              : 'bg-secondary text-muted-foreground';
+            const label = daysLeft <= 0 ? 'Subscription expired'
+              : `Renews ${new Date(sub.subscriptionEnd).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })} (${daysLeft} days)`;
+            return (
+              <div className={`flex items-center justify-between text-xs rounded-lg p-3 ${colorClass}`}>
+                <span>{label}</span>
+                <span className="font-medium">{sub.autoRenew ? 'Auto-renew ON' : 'Auto-renew OFF'}</span>
+              </div>
+            );
+          })()}
         </div>
 
         {/* B) Founding Member Urgency Banner */}

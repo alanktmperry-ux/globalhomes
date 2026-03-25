@@ -338,13 +338,45 @@ const RentRollPage = () => {
                               </TableCell>
                               <TableCell className="text-right tabular-nums">{t.management_fee_percent}%</TableCell>
                               <TableCell>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => navigate(`/dashboard/tenancies/${t.id}`)}
-                                >
-                                  View
-                                </Button>
+                                <div className="flex items-center gap-1 justify-end">
+                                  {expiringSoon && t.tenant_email && (
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="text-[10px] h-7"
+                                      onClick={async (e) => {
+                                        e.stopPropagation();
+                                        const addr = t.properties?.address || 'your property';
+                                        try {
+                                          const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user?.id || '').single();
+                                          if (!agent) return;
+                                          await supabase.functions.invoke('send-notification-email', {
+                                            body: {
+                                              agent_id: agent.id,
+                                              type: 'lease_expiry',
+                                              title: `Lease expiry reminder — ${addr}`,
+                                              message: `Hi ${t.tenant_name}, this is a reminder that your lease for ${addr} expires on ${format(leaseEnd, 'dd MMM yyyy')} (${daysToEnd} days from now). Please contact us to discuss your renewal options.`,
+                                              recipient_email: t.tenant_email,
+                                              lead_name: t.tenant_name,
+                                            },
+                                          });
+                                          toast.success(`Expiry reminder sent to ${t.tenant_name}`);
+                                        } catch {
+                                          toast.error('Failed to send reminder');
+                                        }
+                                      }}
+                                    >
+                                      Notify
+                                    </Button>
+                                  )}
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => navigate(`/dashboard/tenancies/${t.id}`)}
+                                  >
+                                    View
+                                  </Button>
+                                </div>
                               </TableCell>
                             </TableRow>
                           );

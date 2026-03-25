@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Ear, Mic, Globe, Camera, Cpu, ShieldCheck, ArrowRight, CheckCircle2, Star, Play, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AgentRegistrationModal from '@/features/agents/components/AgentRegistrationModal';
+import { supabase } from '@/integrations/supabase/client';
 
 import agentHero from '@/assets/agent-hero.jpg';
 import heatMapBg from '@/assets/heat-map-bg.jpg';
@@ -19,8 +20,14 @@ const fadeUp = {
 
 const AgentLandingPage = () => {
   const [showModal, setShowModal] = useState(false);
+  const [agentCount, setAgentCount] = useState<number | null>(null);
   
   const navigate = useNavigate();
+
+  useEffect(() => {
+    supabase.from('agents').select('id', { count: 'exact', head: true })
+      .then(({ count }) => { if (count !== null) setAgentCount(count); });
+  }, []);
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -68,7 +75,7 @@ const AgentLandingPage = () => {
                 custom={2}
                 className="text-lg text-primary-foreground/70 mb-8 max-w-md mx-auto lg:mx-0"
               >
-                Join 2,400+ agents using voice search data to find qualified buyers in 48&nbsp;hours
+                Join {agentCount !== null ? `${agentCount.toLocaleString()}+` : ''} agents using voice search data to find qualified buyers in 48&nbsp;hours
               </motion.p>
 
               <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">

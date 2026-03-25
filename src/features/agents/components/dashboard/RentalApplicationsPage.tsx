@@ -98,6 +98,19 @@ const RentalApplicationsPage = () => {
       } as any);
       if (tenancyErr) throw tenancyErr;
 
+      // Notify applicant via email
+      supabase.functions.invoke('send-notification-email', {
+        body: {
+          agent_id: app.agent_id,
+          type: 'rental_application',
+          title: `Your rental application has been approved`,
+          message: `Great news, ${app.full_name}! Your application for ${app.properties?.address || 'the property'} has been approved. The agent will be in touch with lease details shortly.`,
+          recipient_email: app.email,
+          lead_name: app.full_name,
+          property_id: app.property_id,
+        },
+      }).catch(() => {});
+
       toast.success(`Application approved — tenancy created for ${app.full_name}`);
       fetchApplications();
     } catch (err: any) {
@@ -115,6 +128,19 @@ const RentalApplicationsPage = () => {
         .update({ status: 'declined' })
         .eq('id', app.id);
       if (error) throw error;
+      // Notify applicant via email
+      supabase.functions.invoke('send-notification-email', {
+        body: {
+          agent_id: app.agent_id,
+          type: 'rental_application',
+          title: `Update on your rental application`,
+          message: `Hi ${app.full_name}, thank you for your application for ${app.properties?.address || 'the property'}. Unfortunately, the landlord has decided to proceed with another applicant. We wish you all the best in your property search.`,
+          recipient_email: app.email,
+          lead_name: app.full_name,
+          property_id: app.property_id,
+        },
+      }).catch(() => {});
+
       toast.success(`Application declined`);
       fetchApplications();
     } catch (err: any) {

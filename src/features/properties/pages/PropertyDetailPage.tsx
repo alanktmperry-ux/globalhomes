@@ -514,6 +514,9 @@ export default function PropertyDetailPage() {
               currentPrice={property.price}
               listedDate={property.listedDate}
               priceFormatted={property.priceFormatted}
+              suburb={property.suburb}
+              state={property.state}
+              propertyType={property.propertyType}
             />
 
             {/* Features */}

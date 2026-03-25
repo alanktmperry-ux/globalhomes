@@ -4,16 +4,23 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Search, ChevronRight, BookOpen, MessageCircle, ExternalLink,
   Home, DollarSign, Users, BarChart3, Shield, Landmark, Calculator,
   PartyPopper, Mic, MapPin, Kanban, FileText, Settings, Star,
   Building2, AlertTriangle, CheckCircle2, Wrench, Key, Globe, Handshake, Zap,
+  Loader2, Send,
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/features/auth/AuthProvider';
+import { toast } from 'sonner';
 
 /* ─── TYPES ─── */
 interface Guide {
@@ -775,10 +782,114 @@ const HelpPage = () => {
               </Button>
             </CardContent>
           </Card>
+
+          <SupportTicketForm />
         </TabsContent>
       </Tabs>
     </div>
   );
 };
+
+/* ─── Support Ticket Form ─── */
+const TICKET_CATEGORIES = ['Bug report', 'Feature request', 'Billing', 'Trust accounting', 'Technical issue', 'Other'];
+
+function SupportTicketForm() {
+  const { user } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [form, setForm] = useState({ subject: '', description: '', category: 'Bug report', name: '', email: '' });
+
+  const handleSubmit = async () => {
+    if (!form.subject.trim() || !form.description.trim()) {
+      toast.error('Please fill in the subject and description');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const { data: agent } = user
+        ? await supabase.from('agents').select('id, name, email').eq('user_id', user.id).maybeSingle()
+        : { data: null };
+
+      const { error } = await supabase.from('support_tickets').insert({
+        agent_id: agent?.id || null,
+        subject: form.subject.trim(),
+        description: form.description.trim(),
+        category: form.category,
+        priority: 'normal',
+        status: 'open',
+        submitter_name: agent?.name || form.name || user?.email || 'Unknown',
+        submitter_email: agent?.email || form.email || user?.email || '',
+      } as any);
+
+      if (error) throw error;
+
+      setSubmitted(true);
+      toast.success('Support ticket submitted — we\'ll get back to you within 1 business day');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to submit ticket');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (submitted) {
+    return (
+      <Card className="bg-card border border-primary/20">
+        <CardContent className="p-5 text-center space-y-3">
+          <CheckCircle2 size={32} className="mx-auto text-primary" />
+          <h3 className="text-sm font-semibold">Ticket Submitted</h3>
+          <p className="text-xs text-muted-foreground">We'll respond within 1 business day (AEST, Mon–Fri).</p>
+          <Button variant="outline" size="sm" className="text-xs" onClick={() => { setSubmitted(false); setForm({ subject: '', description: '', category: 'Bug report', name: '', email: '' }); }}>
+            Submit Another
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="bg-card border border-border">
+      <CardContent className="p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <Send size={16} className="text-primary" />
+          <h3 className="text-sm font-semibold">Submit a Support Ticket</h3>
+        </div>
+        <div>
+          <Label className="text-xs">Category</Label>
+          <Select value={form.category} onValueChange={v => setForm(f => ({ ...f, category: v }))}>
+            <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {TICKET_CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label className="text-xs">Subject *</Label>
+          <Input
+            value={form.subject}
+            onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
+            placeholder="Brief summary of your issue"
+            className="h-9 text-sm"
+          />
+        </div>
+        <div>
+          <Label className="text-xs">Description *</Label>
+          <Textarea
+            value={form.description}
+            onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+            placeholder="Describe your issue in detail. Include steps to reproduce if reporting a bug."
+            rows={4}
+            className="text-sm"
+          />
+        </div>
+        <Button onClick={handleSubmit} disabled={submitting} className="w-full gap-1.5" size="sm">
+          {submitting ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+          {submitting ? 'Submitting…' : 'Submit Ticket'}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default HelpPage;

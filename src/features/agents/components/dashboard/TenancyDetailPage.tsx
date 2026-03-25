@@ -248,6 +248,24 @@ const TenancyDetailPage = () => {
 
     setSaving(false);
     if (error) { toast.error('Error — error.message'); return; }
+
+    // Email receipt to tenant
+    if (tenancy.tenant_email) {
+      const propertyAddr = tenancy.properties
+        ? `${tenancy.properties.address}, ${tenancy.properties.suburb}`
+        : 'your property';
+      supabase.functions.invoke('send-notification-email', {
+        body: {
+          agent_id: agentId,
+          type: 'rent_receipt',
+          title: `Rent payment receipt — ${receiptNumber}`,
+          message: `Hi ${tenancy.tenant_name}, this confirms your rent payment of $${parseFloat(payForm.amount).toLocaleString()} for ${propertyAddr} received on ${payForm.payment_date}. Receipt number: ${receiptNumber}. Thank you.`,
+          recipient_email: tenancy.tenant_email,
+          lead_name: tenancy.tenant_name,
+        },
+      }).catch(() => {});
+    }
+
     toast.success('Payment recorded & trust receipt created');
     setShowRecordPayment(false);
     setPayForm({ payment_date: format(new Date(), 'yyyy-MM-dd'), period_from: '', period_to: '', amount: String(tenancy.rent_amount), payment_method: 'bank_transfer', notes: '' });

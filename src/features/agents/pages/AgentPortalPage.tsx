@@ -3,10 +3,18 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Eye, MousePointerClick, TrendingUp, Crown, Loader2, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useI18n } from '@/shared/lib/i18n';
-import { mockProperties } from '@/features/properties/api/mock-data';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useToast } from '@/shared/hooks/use-toast';
+
+interface PortalListing {
+  id: string;
+  title: string;
+  imageUrl: string;
+  priceFormatted: string;
+  views: number;
+  contactClicks: number;
+}
 
 const AgentPortalPage = () => {
   const { t } = useI18n();
@@ -16,15 +24,49 @@ const AgentPortalPage = () => {
   const [tab, setTab] = useState<'dashboard' | 'subscribe'>('dashboard');
   const [subscribing, setSubscribing] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [agentListings, setAgentListings] = useState<PortalListing[]>([]);
+  const [listingsLoading, setListingsLoading] = useState(true);
 
   useEffect(() => {
-    if (user) checkSubscription();
+    if (user) {
+      checkSubscription();
+      fetchAgentListings();
+    }
   }, [user]);
 
   const checkSubscription = async () => {
     if (!user) return;
     const { data: agent } = await supabase.from('agents').select('id, is_subscribed').eq('user_id', user.id).maybeSingle();
     if (agent?.is_subscribed) setIsSubscribed(true);
+  };
+
+  const fetchAgentListings = async () => {
+    if (!user) return;
+    setListingsLoading(true);
+    try {
+      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
+      if (!agent) { setListingsLoading(false); return; }
+
+      const { data: listings } = await supabase
+        .from('properties')
+        .select('id, title, image_url, images, price_formatted, views, contact_clicks')
+        .eq('agent_id', agent.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      setAgentListings((listings || []).map((p: any) => ({
+        id: p.id,
+        title: p.title,
+        imageUrl: p.image_url || p.images?.[0] || '/placeholder.svg',
+        priceFormatted: p.price_formatted || '',
+        views: p.views || 0,
+        contactClicks: p.contact_clicks || 0,
+      })));
+    } catch (err) {
+      console.warn('[AgentPortal] Failed to fetch listings:', err);
+    } finally {
+      setListingsLoading(false);
+    }
   };
 
   const handleSubscribe = async () => {
@@ -62,8 +104,6 @@ const AgentPortalPage = () => {
     }
   };
 
-  // Mock agent data
-  const agentListings = mockProperties.filter(p => p.agent.id === 'a1');
   const totalViews = agentListings.reduce((s, p) => s + p.views, 0);
   const totalClicks = agentListings.reduce((s, p) => s + p.contactClicks, 0);
 
@@ -123,6 +163,18 @@ const AgentPortalPage = () => {
             {/* Listings */}
             <div>
               <h3 className="font-display font-semibold text-foreground mb-3">Your Listings</h3>
+              {listingsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 size={20} className="animate-spin text-muted-foreground" />
+                </div>
+              ) : agentListings.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-sm text-muted-foreground mb-3">No listings yet</p>
+                  <button onClick={() => navigate('/pocket-listing')} className="px-5 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium">
+                    Create your first listing
+                  </button>
+                </div>
+              ) : (
               <div className="space-y-3">
                 {agentListings.map(listing => (
                   <div key={listing.id} className="flex gap-3 p-3 rounded-xl bg-card border border-border">
@@ -138,6 +190,7 @@ const AgentPortalPage = () => {
                   </div>
                 ))}
               </div>
+              )}
             </div>
           </motion.div>
         )}

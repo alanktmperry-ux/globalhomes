@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, MapPin, Globe, Phone, Mail, Star, BadgeCheck, Briefcase, Languages, Award, Building2, Info } from 'lucide-react';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
-import { DEMO_REPUTATION, getScoreColor, REPUTATION_TOOLTIP, type ReputationResult } from '@/features/agents/utils/reputationScore';
+import { calcReputationScore, getScoreColor, REPUTATION_TOOLTIP, type ReputationResult } from '@/features/agents/utils/reputationScore';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { PropertyCard } from '@/features/properties/components/PropertyCard';
 import { useSavedProperties } from '@/features/properties/hooks/useSavedProperties';
@@ -358,7 +358,17 @@ export default function AgentPublicProfilePage() {
         </div>
 
         {/* Reputation Score Card */}
-        <ReputationScoreCard score={DEMO_REPUTATION} />
+        <ReputationScoreCard score={calcReputationScore({
+          rating: agent.avgRating || agent.reviewCount ? (agent.avgRating || 0) : null,
+          reviewCount: agent.reviewCount || 0,
+          totalListings: listings.length,
+          soldListings: 0,
+          hasAvatar: !!agent.avatarUrl,
+          hasBio: !!agent.bio,
+          hasPhone: !!agent.phone,
+          hasSpecialization: !!agent.specialization,
+          hasServiceAreas: agent.serviceAreas.length > 0,
+        })} />
 
         {/* Agent's listings */}
         {listings.length > 0 && (

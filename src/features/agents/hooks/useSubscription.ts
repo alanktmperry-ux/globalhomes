@@ -30,6 +30,8 @@ export interface SubscriptionState extends PlanFeatures {
   listingLimit: number;
   seatLimit: number;
   foundingMember: boolean;
+  subscriptionEnd: string | null;
+  autoRenew: boolean;
   loading: boolean;
 }
 
@@ -67,6 +69,8 @@ export function useSubscription(): SubscriptionState {
     listingLimit: 3,
     seatLimit: 1,
     foundingMember: false,
+    subscriptionEnd: null,
+    autoRenew: false,
     loading: true,
     ...getPlanFeatures(null),
   });
@@ -115,6 +119,8 @@ export function useSubscription(): SubscriptionState {
           listingLimit: (sub as any)?.listing_limit ?? 3,
           seatLimit: (sub as any)?.seat_limit ?? 1,
           foundingMember: (sub as any)?.founding_member ?? false,
+          subscriptionEnd: (sub as any)?.subscription_end ?? null,
+          autoRenew: (sub as any)?.auto_renew ?? false,
           loading: false,
           ...features,
         });

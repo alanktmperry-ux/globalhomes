@@ -91,8 +91,6 @@ const URGENCY_CONFIG: Record<string, { icon: React.ReactNode; color: string; lab
 
 const PROPERTY_TYPES = ['House', 'Apartment', 'Townhouse', 'Land', 'Commercial'];
 
-const PROPERTY_TYPES = ['House', 'Apartment', 'Townhouse', 'Land', 'Commercial'];
-
 function matchBriefsToListing(listing: NetworkListing | MyOffMarketListing, briefs: BuyerBrief[]): BuyerBrief[] {
   return briefs.filter(b => {
     if (!b.is_active) return false;

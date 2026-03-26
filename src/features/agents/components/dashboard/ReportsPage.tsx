@@ -20,9 +20,9 @@ import {
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { cn } from '@/lib/utils';
 import DashboardHeader from './DashboardHeader';
-import { useAgentListings } from '@/hooks/useAgentListings';
-import { useTrustAccounting } from '@/hooks/useTrustAccounting';
-import { useContacts } from '@/hooks/useContacts';
+import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
+import { useTrustAccounting } from '@/features/agents/hooks/useTrustAccounting';
+import { useContacts } from '@/features/agents/hooks/useContacts';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
 const DATE_FMT = new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: '2-digit', year: 'numeric' });

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Building2, BarChart3, Shield, ShieldAlert, Database, ArrowLeft, Loader2, Gamepad2, Zap, DollarSign, Megaphone, Landmark, TrendingUp, MessageSquare } from 'lucide-react';
+import { Users, Building2, BarChart3, Shield, ShieldAlert, Database, ArrowLeft, Loader2, Gamepad2, Zap, DollarSign, Megaphone, Landmark, TrendingUp, MessageSquare, FileText, UserCheck, LayoutDashboard } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
@@ -312,22 +312,25 @@ const AdminDashboard = () => {
     );
   }
 
-  const tabs: { id: Tab; label: string; icon: any; badge?: number }[] = [
-    { id: 'command-centre', label: 'Command Centre', icon: Zap },
-    { id: 'agent-lifecycle', label: 'Agent Lifecycle', icon: Users },
-    { id: 'compliance', label: 'Compliance', icon: ShieldAlert },
-    { id: 'revenue', label: 'Revenue & Billing', icon: DollarSign },
-    { id: 'comms', label: 'Communications', icon: Megaphone },
-    { id: 'partners', label: 'Partners', icon: Landmark },
-    { id: 'growth', label: 'Growth Funnel', icon: TrendingUp },
-    { id: 'support', label: 'Support', icon: MessageSquare },
-    { id: 'overview', label: 'Overview', icon: BarChart3 },
-    { id: 'users', label: 'Users', icon: Users },
-    { id: 'listings', label: 'Listings', icon: Building2 },
-    { id: 'roles', label: 'Roles', icon: Shield },
-    { id: 'database', label: 'Database', icon: Database },
-    { id: 'demo-requests', label: 'Demo Requests', icon: Gamepad2, badge: pendingDemoCount },
-    { id: 'reports', label: 'Reports', icon: BarChart3 },
+  const tabs: { id: Tab; label: string; icon: any; badge?: number; dividerBefore?: string }[] = [
+    // ── DAILY OPERATIONS ──
+    { id: 'command-centre',  label: 'Command Centre',   icon: Zap,             dividerBefore: 'Daily Operations' },
+    { id: 'demo-requests',   label: 'Demo Requests',    icon: Gamepad2,        badge: pendingDemoCount },
+    { id: 'support',         label: 'Support Inbox',    icon: MessageSquare },
+    { id: 'listings',        label: 'Listings',         icon: Building2 },
+    { id: 'users',           label: 'Users',            icon: UserCheck },
+    // ── STRATEGY & GROWTH ──
+    { id: 'agent-lifecycle', label: 'Agent Lifecycle',  icon: Users,           dividerBefore: 'Strategy & Growth' },
+    { id: 'revenue',         label: 'Revenue & Billing',icon: DollarSign },
+    { id: 'growth',          label: 'Growth Funnel',    icon: TrendingUp },
+    { id: 'comms',           label: 'Communications',   icon: Megaphone },
+    { id: 'partners',        label: 'Partners',         icon: Landmark },
+    { id: 'compliance',      label: 'Compliance',       icon: ShieldAlert },
+    // ── ADMIN UTILITIES ──
+    { id: 'overview',        label: 'Overview',         icon: LayoutDashboard, dividerBefore: 'Admin Utilities' },
+    { id: 'roles',           label: 'Roles',            icon: Shield },
+    { id: 'reports',         label: 'Reports',          icon: FileText },
+    { id: 'database',        label: 'Database',         icon: Database },
   ];
 
   return (
@@ -349,23 +352,32 @@ const AdminDashboard = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex gap-1 mb-6 overflow-x-auto pb-2">
+        <div className="flex items-center gap-1 mb-6 overflow-x-auto pb-2">
           {tabs.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              className={`relative flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${
-                tab === t.id ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <t.icon size={16} />
-              {t.label}
-              {t.badge != null && t.badge > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold px-1">
-                  {t.badge}
-                </span>
+            <div key={t.id} className="flex items-center gap-1 flex-shrink-0">
+              {t.dividerBefore && (
+                <div className="flex items-center gap-1.5 px-2 flex-shrink-0">
+                  {t.id !== 'command-centre' && <div className="w-px h-6 bg-border mx-1" />}
+                  <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 whitespace-nowrap">
+                    {t.dividerBefore}
+                  </span>
+                </div>
               )}
-            </button>
+              <button
+                onClick={() => setTab(t.id)}
+                className={`relative flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${
+                  tab === t.id ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <t.icon size={16} />
+                {t.label}
+                {t.badge != null && t.badge > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold px-1">
+                    {t.badge}
+                  </span>
+                )}
+              </button>
+            </div>
           ))}
         </div>
 

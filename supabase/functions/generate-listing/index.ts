@@ -15,6 +15,8 @@ const TONE_PROMPTS: Record<string, string> = {
     "Tone: friendly, reassuring, and community-focused. Highlight family-friendly features like schools, parks, and safety.",
   investment:
     "Tone: analytical yet persuasive. Emphasise rental yield, capital growth potential, and investor appeal.",
+  seller_outreach:
+    "Tone: respectful, consultative, and compelling. You are writing a direct mail letter to a property owner who may be considering selling. Introduce yourself as a local agent, reference recent market activity in their suburb, and invite them for a no-obligation appraisal. Be personal, not salesy.",
 };
 
 serve(async (req) => {

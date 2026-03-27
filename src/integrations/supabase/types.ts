@@ -2366,6 +2366,47 @@ export type Database = {
         }
         Relationships: []
       }
+      seller_likelihood_scores: {
+        Row: {
+          created_at: string
+          id: string
+          property_id: string
+          score: number
+          scored_at: string
+          signals: Json
+          summary: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          property_id: string
+          score?: number
+          scored_at?: string
+          signals?: Json
+          summary?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          property_id?: string
+          score?: number
+          scored_at?: string
+          signals?: Json
+          summary?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_likelihood_scores_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscription_events: {
         Row: {
           agent_id: string

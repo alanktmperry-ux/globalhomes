@@ -47,6 +47,7 @@ const DashboardOverview = React.lazy(() => import("@/features/agents/components/
 const ListingsPage = React.lazy(() => import("@/features/agents/components/dashboard/ListingsPage"));
 const VoiceLeadsPage = React.lazy(() => import("@/features/agents/components/dashboard/VoiceLeadsPage"));
 const BuyerConciergePage = React.lazy(() => import("@/features/agents/components/dashboard/BuyerConciergePage"));
+const PreMarketPage = React.lazy(() => import("@/features/agents/components/dashboard/PreMarketPage"));
 const AnalyticsPage = React.lazy(() => import("@/features/agents/components/dashboard/AnalyticsPage"));
 const NetworkPage = React.lazy(() => import("@/features/agents/components/dashboard/NetworkPage"));
 const SettingsPage = React.lazy(() => import("@/features/agents/components/dashboard/SettingsPage"));
@@ -173,6 +174,7 @@ const App = () => (
                   <Route path="contacts" element={<ContactsPage />} />
                   <Route path="leads" element={<VoiceLeadsPage />} />
                   <Route path="concierge" element={<BuyerConciergePage />} />
+                  <Route path="pre-market" element={<PreMarketPage />} />
                   <Route path="rental-applications" element={<RentalApplicationsPage />} />
                   <Route path="pipeline" element={<PipelinePage />} />
                   <Route path="inspection-mode" element={<InspectionModePage />} />

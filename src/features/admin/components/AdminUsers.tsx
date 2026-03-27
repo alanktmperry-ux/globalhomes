@@ -348,6 +348,7 @@ const AdminUsers = () => {
   const demoCount = users.filter(u => u.user_type === 'demo' || u.user_type === 'demo_request').length;
   const agentCount = users.filter(u => u.user_type === 'agent').length;
   const partnerCount = users.filter(u => u.user_type === 'partner').length;
+  const seekerCount = users.filter(u => u.user_type === 'seeker').length;
   const subscribedCount = users.filter(u => u.is_subscribed).length;
 
   if (loading) {
@@ -369,11 +370,12 @@ const AdminUsers = () => {
         </div>
         <div className="flex items-center gap-1.5 flex-wrap">
           {[
-            { key: 'all', label: `All (${users.length})` },
-            { key: 'agent', label: `Agents (${agentCount})` },
-            { key: 'partner', label: `Partners (${partnerCount})` },
-            { key: 'demo', label: `Demo (${demoCount})` },
-            { key: 'subscribed', label: `Subscribed (${subscribedCount})` },
+            { key: 'all',        label: `All (${users.length})` },
+            { key: 'agent',      label: `Agents (${agentCount})` },
+            { key: 'subscribed', label: `Paid Plans (${subscribedCount})` },
+            { key: 'partner',    label: `Partners (${partnerCount})` },
+            { key: 'seeker',     label: `Seekers (${seekerCount})` },
+            { key: 'demo',       label: `Demo (${demoCount})` },
           ].map(f => (
             <button
               key={f.key}

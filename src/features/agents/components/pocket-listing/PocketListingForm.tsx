@@ -169,6 +169,9 @@ interface Props {
 }
 
 const formatPriceForDB = (draft: ListingDraft): string => {
+  if (draft.listingType === 'rent') {
+    return draft.rentalWeekly > 0 ? `$${draft.rentalWeekly.toLocaleString('en-AU')}/wk` : 'Contact Agent';
+  }
   const fmt = (v: number) => v >= 1000000 ? `$${(v / 1000000).toFixed(1)}M` : `$${(v / 1000).toFixed(0)}K`;
   switch (draft.priceDisplay) {
     case 'exact': return fmt(draft.priceMax);

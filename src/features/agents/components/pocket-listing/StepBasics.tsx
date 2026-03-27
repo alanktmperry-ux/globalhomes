@@ -88,14 +88,16 @@ const StepBasics = ({ draft, update }: Props) => {
   const showRange = draft.priceDisplay === 'range';
   const showAuction = draft.priceDisplay === 'eoi';
 
-  // Track whether agent has manually overridden priceMax away from the auto-10%
-  // Auto-apply +10% when: priceMax is unset (0), OR priceMax still equals the
-  // auto-calculated value from the previous priceMin (i.e. agent hasn't touched it)
+  // ── RENTAL: single source of truth is rentalWeekly; sync to priceMin/priceMax
+  const handleRentChange = (raw: string) => {
+    const val = Number(raw.replace(/,/g, '')) || 0;
+    update({ rentalWeekly: val, priceMin: val, priceMax: val });
+  };
+
+  // ── SALE: track whether agent has manually overridden priceMax away from the auto-10%
   const handlePriceMinChange = (raw: string) => {
     const val = Number(raw.replace(/,/g, '')) || 0;
     const autoMax = Math.round(val * 1.1);
-    // Consider the max "auto" if it's 0 (never set), or if it currently equals
-    // exactly the +10% of the previous priceMin (meaning agent hasn't overridden it)
     const prevAutoMax = Math.round((draft.priceMin || 0) * 1.1);
     const isStillAuto = draft.priceMax === 0 || draft.priceMax === prevAutoMax;
     update({
@@ -109,7 +111,6 @@ const StepBasics = ({ draft, update }: Props) => {
     update({ priceMax: val });
   };
 
-  // Reset priceMax back to auto +10% when agent clicks the reset link
   const resetPriceMaxToAuto = () => {
     if (draft.priceMin > 0) {
       update({ priceMax: Math.round(draft.priceMin * 1.1) });
@@ -155,14 +156,25 @@ const StepBasics = ({ draft, update }: Props) => {
       {/* ── PRICE ── */}
       <div>
         <Label className="text-sm font-semibold mb-2 block">{isRental ? 'Rent per Week ($)' : 'Price ($)'}</Label>
-        <Input
-          type="text"
-          inputMode="numeric"
-          value={draft.priceMin ? draft.priceMin.toLocaleString('en-AU') : ''}
-          onChange={(e) => handlePriceMinChange(e.target.value)}
-          placeholder={isRental ? 'e.g. 650' : 'e.g. 1,200,000'}
-          className="h-10"
-        />
+        {isRental ? (
+          <Input
+            type="text"
+            inputMode="numeric"
+            value={draft.rentalWeekly ? draft.rentalWeekly.toLocaleString('en-AU') : ''}
+            onChange={(e) => handleRentChange(e.target.value)}
+            placeholder="e.g. 650"
+            className="h-10"
+          />
+        ) : (
+          <Input
+            type="text"
+            inputMode="numeric"
+            value={draft.priceMin ? draft.priceMin.toLocaleString('en-AU') : ''}
+            onChange={(e) => handlePriceMinChange(e.target.value)}
+            placeholder="e.g. 1,200,000"
+            className="h-10"
+          />
+        )}
 
         {/* Price To — only for Range */}
         {!isRental && showRange && (

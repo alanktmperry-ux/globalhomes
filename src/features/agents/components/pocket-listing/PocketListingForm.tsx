@@ -84,6 +84,8 @@ export interface ListingDraft {
   smokingAllowed: boolean;
   maxOccupants: number;
   rentalParkingType: string;
+  commissionRate: number;
+  lettingFeeWeeks: number;
 }
 
 const DEFAULT_DRAFT: ListingDraft = {
@@ -150,6 +152,8 @@ const DEFAULT_DRAFT: ListingDraft = {
   smokingAllowed: false,
   maxOccupants: 0,
   rentalParkingType: '',
+  commissionRate: 0,
+  lettingFeeWeeks: 0,
 };
 
 const STEPS = ['Address', 'Basics', 'Photos', 'Voice', 'Settings', 'Preview'];
@@ -377,6 +381,8 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         smoking_allowed: draft.smokingAllowed || false,
         max_occupants: draft.maxOccupants || 0,
         rental_parking_type: draft.rentalParkingType || '',
+        commission_rate: draft.commissionRate || null,
+        agent_split_percent: draft.lettingFeeWeeks || null,
       } as any;
 
       // Add 'Pets considered' to features if applicable

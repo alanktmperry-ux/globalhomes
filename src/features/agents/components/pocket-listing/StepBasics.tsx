@@ -125,7 +125,15 @@ const StepBasics = ({ draft, update }: Props) => {
         <Label className="text-sm font-semibold mb-3 block">Listing Type</Label>
         <div className="grid grid-cols-2 gap-2">
           {LISTING_TYPES.map(lt => (
-            <button key={lt.key} type="button" onClick={() => update({ listingType: lt.key })} className={`flex items-center justify-center gap-2 py-3 rounded-xl border transition-all text-sm font-medium ${draft.listingType === lt.key ? 'bg-primary/15 border-primary text-primary' : 'bg-secondary border-border text-muted-foreground hover:border-primary/40'}`}>
+            <button key={lt.key} type="button" onClick={() => {
+              if (lt.key === 'rent' && draft.listingType !== 'rent') {
+                update({ listingType: lt.key, priceMin: draft.rentalWeekly || 0, priceMax: draft.rentalWeekly || 0 });
+              } else if (lt.key === 'sale' && draft.listingType !== 'sale') {
+                update({ listingType: lt.key, priceMin: 500000, priceMax: 550000 });
+              } else {
+                update({ listingType: lt.key });
+              }
+            }} className={`flex items-center justify-center gap-2 py-3 rounded-xl border transition-all text-sm font-medium ${draft.listingType === lt.key ? 'bg-primary/15 border-primary text-primary' : 'bg-secondary border-border text-muted-foreground hover:border-primary/40'}`}>
               {lt.icon}
               {lt.label}
             </button>

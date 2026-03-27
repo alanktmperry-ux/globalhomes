@@ -84,6 +84,8 @@ export interface ListingDraft {
   smokingAllowed: boolean;
   maxOccupants: number;
   rentalParkingType: string;
+  commissionRate: number;
+  lettingFeeWeeks: number;
 }
 
 const DEFAULT_DRAFT: ListingDraft = {
@@ -150,6 +152,8 @@ const DEFAULT_DRAFT: ListingDraft = {
   smokingAllowed: false,
   maxOccupants: 0,
   rentalParkingType: '',
+  commissionRate: 0,
+  lettingFeeWeeks: 0,
 };
 
 const STEPS = ['Address', 'Basics', 'Photos', 'Voice', 'Settings', 'Preview'];
@@ -165,6 +169,9 @@ interface Props {
 }
 
 const formatPriceForDB = (draft: ListingDraft): string => {
+  if (draft.listingType === 'rent') {
+    return draft.rentalWeekly > 0 ? `$${draft.rentalWeekly.toLocaleString('en-AU')}/wk` : 'Contact Agent';
+  }
   const fmt = (v: number) => v >= 1000000 ? `$${(v / 1000000).toFixed(1)}M` : `$${(v / 1000).toFixed(0)}K`;
   switch (draft.priceDisplay) {
     case 'exact': return fmt(draft.priceMax);
@@ -222,8 +229,8 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         suburb: duplicatePropertyId ? '' : prop.suburb,
         state: duplicatePropertyId ? '' : prop.state,
         listingType: prop.listing_type === 'rent' ? 'rent' : 'sale',
-        priceMin: Math.round(prop.price * 0.9),
-        priceMax: prop.price,
+        priceMin: prop.listing_type === 'rent' ? (prop.rental_weekly || prop.price) : Math.round(prop.price * 0.9),
+        priceMax: prop.listing_type === 'rent' ? (prop.rental_weekly || prop.price) : prop.price,
         priceDisplay,
         propertyType: prop.property_type || 'House',
         beds: prop.beds,
@@ -252,6 +259,8 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         furnished: (prop as any).furnished || false,
         petsAllowed: (prop as any).pets_allowed || false,
         screeningLevel: 'Basic',
+        commissionRate: prop.commission_rate || 0,
+        lettingFeeWeeks: prop.agent_split_percent || 0,
       });
       setLoadingEdit(false);
     };
@@ -329,7 +338,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         suburb: draft.suburb || 'Unknown',
         state: draft.state || 'Unknown',
         country: 'Australia',
-        price: draft.priceMax,
+        price: draft.listingType === 'rent' ? (draft.rentalWeekly || draft.priceMax) : draft.priceMax,
         price_formatted: formatPriceForDB(draft),
         beds: draft.beds,
         baths: draft.baths,
@@ -377,6 +386,8 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         smoking_allowed: draft.smokingAllowed || false,
         max_occupants: draft.maxOccupants || 0,
         rental_parking_type: draft.rentalParkingType || '',
+        commission_rate: draft.commissionRate || null,
+        agent_split_percent: draft.lettingFeeWeeks || null,
       } as any;
 
       // Add 'Pets considered' to features if applicable

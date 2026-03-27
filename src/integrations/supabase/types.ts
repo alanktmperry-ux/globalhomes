@@ -828,6 +828,80 @@ export type Database = {
           },
         ]
       }
+      consumer_profiles: {
+        Row: {
+          budget_max: number | null
+          budget_min: number | null
+          buying_situation: string
+          created_at: string
+          email: string
+          id: string
+          is_purchasable: boolean | null
+          lead_score: number | null
+          min_bedrooms: number | null
+          name: string
+          preferred_suburbs: string[] | null
+          preferred_type: string | null
+          purchase_price: number | null
+          purchased_at: string | null
+          purchased_by: string | null
+          search_count: number | null
+          trigger_query: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          budget_max?: number | null
+          budget_min?: number | null
+          buying_situation?: string
+          created_at?: string
+          email: string
+          id?: string
+          is_purchasable?: boolean | null
+          lead_score?: number | null
+          min_bedrooms?: number | null
+          name: string
+          preferred_suburbs?: string[] | null
+          preferred_type?: string | null
+          purchase_price?: number | null
+          purchased_at?: string | null
+          purchased_by?: string | null
+          search_count?: number | null
+          trigger_query?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          budget_max?: number | null
+          budget_min?: number | null
+          buying_situation?: string
+          created_at?: string
+          email?: string
+          id?: string
+          is_purchasable?: boolean | null
+          lead_score?: number | null
+          min_bedrooms?: number | null
+          name?: string
+          preferred_suburbs?: string[] | null
+          preferred_type?: string | null
+          purchase_price?: number | null
+          purchased_at?: string | null
+          purchased_by?: string | null
+          search_count?: number | null
+          trigger_query?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consumer_profiles_purchased_by_fkey"
+            columns: ["purchased_by"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contact_activities: {
         Row: {
           activity_type: string

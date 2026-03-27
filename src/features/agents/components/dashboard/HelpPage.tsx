@@ -57,6 +57,8 @@ const CHECKLIST: ChecklistItem[] = [
   { icon: Handshake, title: 'Invite a trust accounting partner', description: 'Give your outsourced trust accountant their own partner login to manage your rent roll and trust account.', route: '/dashboard/partner-access' },
   { icon: Key, title: 'Run your first open home', description: 'Use Inspection Day Mode to capture visitor details with a QR code.', route: '/dashboard/inspection-mode' },
   { icon: Shield, title: 'Note your Support PIN', description: 'Your unique 6-digit Support PIN is in your Profile. Keep a note of it — you will need it if you ever contact ListHQ support to verify your identity.', route: '/dashboard/profile' },
+  { icon: BarChart3, title: 'Review your Seller Likelihood Scores', description: 'Check the AI motivation scores on your active listings — a score above 70 is a signal to call your vendor. Scores update every Sunday.', route: '/dashboard/listings' },
+  { icon: Zap, title: 'Check the Lead Marketplace', description: 'Browse verified buyer profiles matched to your listings and purchase contact details for leads you want to pursue. Go to Voice Leads → Marketplace tab.', route: '/dashboard/leads' },
 ];
 
 const QUICK_REF: { feature: string; route: string; what: string }[] = [
@@ -85,6 +87,9 @@ const QUICK_REF: { feature: string; route: string; what: string }[] = [
   { feature: 'Billing', route: '/dashboard/billing', what: 'Subscription plans, payment, usage' },
   { feature: 'Reviews', route: '/dashboard/reviews', what: 'Client reviews and reputation score' },
   { feature: 'Settings', route: '/dashboard/settings', what: 'Notifications, preferences, account' },
+  { feature: 'Seller Scores', route: '/dashboard/listings', what: 'AI weekly seller likelihood score (0–100) on each listing' },
+  { feature: 'AI Offer Generator', route: '/dashboard/leads', what: 'Generate a professional offer letter from any buyer lead' },
+  { feature: 'Lead Marketplace', route: '/dashboard/leads', what: 'Purchase verified buyer profiles matched to your listings' },
   { feature: 'Help & FAQ', route: '/dashboard/help', what: 'This page' },
 ];
 
@@ -180,8 +185,9 @@ const GUIDES: Guide[] = [
     emoji: '🎤', title: 'Understanding Voice Leads',
     description: 'AI-scored buyer leads from spoken search queries.',
     steps: [
-      'Voice Leads are buyer enquiries generated when a buyer uses the voice search on the public marketplace. The buyer speaks a query (e.g. "3 bed house in Berwick with a pool under $900k") and the AI matches it to your listings.',
-      'Each voice lead shows a transcript of what the buyer said, their intent score (0–100), urgency rating (Hot/Warm/Cold), search history, pre-approval status, and preferred contact method (call, email, WhatsApp).',
+      'Voice Leads are buyer enquiries generated when a buyer uses the voice search on the public marketplace. The buyer speaks a query (e.g. "3 bed house in Berwick with a pool under $900k") and the AI matches it to your listings and buyer briefs.',
+      'Each voice lead shows a transcript of what the buyer said, their AI intent score (0–100), urgency rating (Hot/Warm/Cold), search history, pre-approval status, and preferred contact method (call, email, WhatsApp).',
+      'The AI Buyer Concierge automatically processes every new voice search — it scores the buyer, finds matching properties, checks your Buyer Briefs on the Off-Market Network, creates a lead in your dashboard, and sends you an email notification. You do not need to do anything — it happens in seconds.',
       'A high intent score means the buyer is ready to act — they have pre-approval, specified urgency, and left a detailed query. Respond to Hot leads within the hour for best conversion.',
       'The matched property is shown on each lead card so you know exactly which listing triggered the enquiry.',
       'Tap a lead to see the full detail panel. Use the contact buttons to call, email, or message the buyer directly from the lead view.',
@@ -375,6 +381,50 @@ const GUIDES: Guide[] = [
       'If you experience issues on mobile, ensure you are using a recent version of Safari (iPhone) or Chrome (Android). Voice search is not supported in third-party in-app browsers (e.g. Instagram or Facebook browser).',
     ],
   },
+  {
+    emoji: '📊',
+    title: 'Seller Likelihood Score',
+    description: 'AI scores that identify which of your listed properties has a motivated seller.',
+    steps: [
+      'The Seller Likelihood Score is an AI-calculated score (0–100) shown on each listing in your dashboard. It predicts how motivated the seller is to transact — based on five signals analysed weekly.',
+      'Signal 1 — Days on Market vs Suburb Median: Properties listed significantly longer than the suburb average score higher (up to +30 pts). A property sitting 30+ days over the median is a strong signal.',
+      'Signal 2 — Price Reductions: Each time the asking price is reduced, the score increases (up to +25 pts). Multiple reductions in quick succession score near maximum.',
+      'Signal 3 — Suburb Price Trend: If the suburb\'s median price is declining, sellers face increasing pressure to move (up to +20 pts).',
+      'Signal 4 — Status Churn: Properties that have moved between Active, Under Offer, and back to Active signal a deal that fell through — a very strong motivation indicator (up to +15 pts).',
+      'Signal 5 — Activity Gap: If there has been no activity (price changes, status updates, notes) on the listing in the past 30 days, the seller may be disengaged and more open to offers (up to +10 pts).',
+      'Scores are recalculated every Sunday. Open the listing in your dashboard to see the current score, breakdown of each signal, an AI-generated summary, and how your suburb\'s median compares.',
+      'Use the Seller Likelihood Score to prioritise your vendor calls — a score of 70+ is a strong signal that the seller is ready to negotiate.',
+    ],
+  },
+  {
+    emoji: '📝',
+    title: 'AI Offer Generator',
+    description: 'Draft a professional offer letter in seconds using AI and real comparable sales.',
+    steps: [
+      'The AI Offer Generator creates a professional offer letter for any buyer lead. Open a lead from the Voice Leads page, then click "Generate Offer" to start.',
+      'The AI pre-fills the property address, suburb, listing price, and agent details automatically. Enter the offer amount, settlement days, and any offer conditions (e.g. subject to finance, subject to building inspection).',
+      'The AI pulls real comparable sales data — recent sold prices in the same suburb from the last 90 days — and includes them in the offer letter to support your pricing position.',
+      'The generated offer letter includes: property details, buyer introduction, offer price and conditions, comparable sales table, settlement timeline, and a professional closing section.',
+      'Review the draft and edit any section before finalising. The offer is saved to the lead record under the Offers tab so you have a full history.',
+      'Offer status tracks through six stages: Draft → Sent → Accepted / Rejected / Countered / Withdrawn. Update the status as negotiations progress.',
+      'All offer history is stored against the lead and the listing — visible from both the Voice Leads page and the listing detail page under the Buyer Leads tab.',
+    ],
+  },
+  {
+    emoji: '🛒',
+    title: 'Lead Marketplace — Purchasing Buyer Profiles',
+    description: 'Buy verified buyer profiles matched to your listings from the lead marketplace.',
+    steps: [
+      'The Lead Marketplace lets agents purchase verified buyer profiles — real buyers who have submitted their search preferences, budget, and contact details via the ListHQ consumer portal.',
+      'Buyer profiles are shown in the Marketplace tab of your Voice Leads page. Each profile shows the buyer\'s preferred suburbs, property type, budget range, and an AI-calculated lead score — but contact details are hidden until you purchase.',
+      'A profile is only shown to you if it matches one of your active listings or buyer briefs. You will not see unmatched profiles.',
+      'To purchase a lead: click on the profile card and tap "Unlock Contact Details". Confirm the purchase. The buyer\'s name, email, and phone number are instantly revealed.',
+      'Each lead can only be purchased by one agent — once purchased, it is marked as claimed and removed from the marketplace. Act quickly on high-scoring leads.',
+      'After purchase, the buyer receives an introduction email from ListHQ notifying them that an agent will be in touch. Your contact details are shared with the buyer at the same time.',
+      'Purchased leads are saved to your CRM automatically — tagged as "Marketplace Lead" and linked to the matching listing.',
+      'Lead pricing is shown on each profile card before you purchase. Pricing varies by lead score and suburb.',
+    ],
+  },
 ];
 
 /* ─── FAQ DATA ─── */
@@ -521,6 +571,19 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       { q: 'Where is my data stored?', a: 'All data is stored in Australia on secure cloud infrastructure (AWS ap-southeast-2 — Sydney region). We do not store data offshore.' },
       { q: 'Can I export my data?', a: 'Yes. Contacts can be exported from the Contacts page. Trust transactions can be exported as CSV from the Trust Ledger. Listings can be exported from Reports. Contact support for a full account data export.' },
       { q: 'What happens to my data if I cancel?', a: 'Your data is retained for 90 days after cancellation. During this window you can export everything. After 90 days, data is permanently deleted per our Privacy Policy.' },
+    ],
+  },
+  {
+    emoji: '🤖',
+    title: 'AI Features',
+    items: [
+      { q: 'How does the AI Buyer Concierge work?', a: 'When a buyer completes a voice search on ListHQ, the AI Buyer Concierge automatically scores their intent (0–100), finds matching properties in your listings, checks your Buyer Briefs on the Off-Market Network, creates a lead in your dashboard, and sends you a notification email — all within seconds. You do not need to manually review voice searches; the concierge does it for you.' },
+      { q: 'What is the Seller Likelihood Score?', a: 'The Seller Likelihood Score (0–100) is an AI-calculated weekly score on each of your listings. It measures how motivated the seller is based on five signals: days on market vs the suburb median, number of price reductions, suburb price trend, status churn (listings that went Under Offer and fell through), and activity gap (no updates in 30+ days). A score above 70 is a strong signal to prioritise vendor communication.' },
+      { q: 'How do I generate an AI offer letter?', a: 'Open any lead from the Voice Leads page and click "Generate Offer". Enter the offer amount, settlement days, and conditions. The AI drafts a professional offer letter with the property details, comparable sales from the last 90 days, and a complete negotiation package — ready in seconds. Review, edit if needed, and save. The offer is tracked through stages: Draft, Sent, Accepted, Rejected, Countered, or Withdrawn.' },
+      { q: 'What comparable sales does the AI use for offer letters?', a: 'The AI pulls recent sold properties in the same suburb from the past 90 days — specifically properties with a sold status in the ListHQ database. It uses these as the comparable sales table in your offer letter. The suburb median price is also included for context.' },
+      { q: 'What is the Lead Marketplace?', a: 'The Lead Marketplace is a pool of verified buyer profiles — real buyers who have submitted their preferences and budget via the ListHQ buyer portal. Profiles matched to your listings appear in the Marketplace tab of your Voice Leads page. Contact details are hidden until you purchase the lead. Each lead can only be purchased by one agent, so act quickly on high-scoring profiles.' },
+      { q: 'Can I see a lead\'s contact details before purchasing from the marketplace?', a: 'No. Contact details (name, email, phone) are hidden until you purchase. You can see the buyer\'s preferred suburbs, property type, budget range, urgency, and AI lead score before deciding whether to purchase.' },
+      { q: 'What happens after I purchase a marketplace lead?', a: 'Two things happen immediately: (1) the buyer receives an introduction email from ListHQ letting them know an agent will be in touch, and (2) the lead is added to your CRM tagged as "Marketplace Lead" and linked to the matching listing. Contact details are unlocked on your screen instantly.' },
     ],
   },
   {

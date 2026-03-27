@@ -3,7 +3,7 @@ import {
   LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, LogOut, Building2, UserPlus, Home,
   User, FileText, CreditCard, Star, MapPinned, Shield, Contact, Kanban, Scale, Landmark,
   ClipboardCheck, CalendarDays, Search, TrendingUp, Receipt, PartyPopper, Calculator, HelpCircle, ClipboardList, Settings2, Flame,
-  Handshake,
+  Handshake, Sparkles,
 } from 'lucide-react';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -32,6 +32,7 @@ const SALES_NAV: NavItem[] = [
   { title: 'Contacts', url: '/dashboard/contacts', icon: Contact },
   { title: 'Pipeline', url: '/dashboard/pipeline', icon: Kanban },
   { title: 'Voice Leads', url: '/dashboard/leads', icon: Mic, badgeKey: 'leads' },
+  { title: 'AI Concierge', url: '/dashboard/concierge', icon: Sparkles },
   { title: 'Off-Market Network', url: '/dashboard/network', icon: Users },
 ];
 

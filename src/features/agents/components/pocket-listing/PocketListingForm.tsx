@@ -256,6 +256,8 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         furnished: (prop as any).furnished || false,
         petsAllowed: (prop as any).pets_allowed || false,
         screeningLevel: 'Basic',
+        commissionRate: prop.commission_rate || 0,
+        lettingFeeWeeks: prop.agent_split_percent || 0,
       });
       setLoadingEdit(false);
     };

@@ -1628,6 +1628,82 @@ export type Database = {
           },
         ]
       }
+      offers: {
+        Row: {
+          agent_id: string
+          comparable_sales: Json | null
+          conditions: string | null
+          created_at: string
+          draft_text: string | null
+          id: string
+          lead_id: string
+          offer_amount: number
+          property_id: string
+          resolved_at: string | null
+          sent_at: string | null
+          settlement_days: number
+          status: string
+          suburb_median: number | null
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          comparable_sales?: Json | null
+          conditions?: string | null
+          created_at?: string
+          draft_text?: string | null
+          id?: string
+          lead_id: string
+          offer_amount: number
+          property_id: string
+          resolved_at?: string | null
+          sent_at?: string | null
+          settlement_days?: number
+          status?: string
+          suburb_median?: number | null
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          comparable_sales?: Json | null
+          conditions?: string | null
+          created_at?: string
+          draft_text?: string | null
+          id?: string
+          lead_id?: string
+          offer_amount?: number
+          property_id?: string
+          resolved_at?: string | null
+          sent_at?: string | null
+          settlement_days?: number
+          status?: string
+          suburb_median?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offers_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "offers_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "offers_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partner_agencies: {
         Row: {
           accepted_at: string | null

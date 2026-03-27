@@ -41,7 +41,7 @@ const AIInsights = () => {
         supabase.from('voice_searches').select('location').gte('created_at', d30).limit(200),
       ]);
 
-      const scores = (sellerScores.data || []) as { score: number }[];
+      const scores = (sellerScores.data || []) as unknown as { score: number }[];
       const high = scores.filter(s => s.score >= 70).length;
       const med = scores.filter(s => s.score >= 40 && s.score < 70).length;
       const low = scores.filter(s => s.score < 40).length;
@@ -131,12 +131,12 @@ const AIInsights = () => {
         <h3 className="text-sm font-semibold text-foreground">Build 2 — Seller Likelihood Scores</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="bg-card border border-border rounded-xl p-4 text-center">
-            <p className="text-2xl font-bold text-green-500">{data.sellerScoresHigh}</p>
+            <p className="text-2xl font-bold text-primary">{data.sellerScoresHigh}</p>
             <p className="text-sm text-muted-foreground">High motivation</p>
             <p className="text-xs text-muted-foreground/70">Score 70+</p>
           </div>
           <div className="bg-card border border-border rounded-xl p-4 text-center">
-            <p className="text-2xl font-bold text-yellow-500">{data.sellerScoresMed}</p>
+            <p className="text-2xl font-bold text-accent-foreground">{data.sellerScoresMed}</p>
             <p className="text-sm text-muted-foreground">Medium motivation</p>
             <p className="text-xs text-muted-foreground/70">Score 40–69</p>
           </div>

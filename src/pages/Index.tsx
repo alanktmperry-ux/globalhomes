@@ -24,6 +24,7 @@ import { Slider } from '@/components/ui/slider';
 import { useSavedSearches } from '@/features/search/hooks/useSavedSearches';
 import { useCollabSession } from '@/features/search/hooks/useCollabSession';
 import { useAuth } from '@/features/auth/AuthProvider';
+import ConsumerSignUpModal from '@/features/search/components/ConsumerSignUpModal';
 
 const Index = () => {
   const { t } = useI18n();
@@ -43,6 +44,7 @@ const Index = () => {
     syncSelectedProperty,
   } = useCollabSession();
 
+  const [showConsumerModal, setShowConsumerModal] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const viewedPropertiesRef = useRef(new Set<string>());
   const [viewedIds, setViewedIds] = useState<Set<string>>(new Set());
@@ -82,6 +84,20 @@ const Index = () => {
     filters,
     setFilters,
   } = usePropertySearch({ addSearch });
+
+  // Consumer sign-up modal trigger after 3rd anonymous search
+  const wrappedHandleSearch = useCallback((query: string) => {
+    handleSearch(query);
+    if (!user) {
+      const alreadySignedUp = localStorage.getItem('listhq_consumer_signed_up');
+      if (alreadySignedUp) return;
+      const dismissed = localStorage.getItem('listhq_consumer_dismissed');
+      if (dismissed && Date.now() - Number(dismissed) < 7 * 24 * 60 * 60 * 1000) return;
+      const count = Number(localStorage.getItem('listhq_search_count') || '0') + 1;
+      localStorage.setItem('listhq_search_count', String(count));
+      if (count >= 3) setShowConsumerModal(true);
+    }
+  }, [handleSearch, user]);
 
   const initializedFromUrl = useRef(false);
 
@@ -577,7 +593,7 @@ const Index = () => {
     <div className="flex flex-col min-h-screen">
       <VoiceSearchErrorBoundary>
         <VoiceSearchHero
-          onSearch={handleSearch}
+          onSearch={wrappedHandleSearch}
           onLocationSelect={(loc) => {
             setSearchCenter({ lat: loc.lat, lng: loc.lng });
             setMapCollapsed(false);
@@ -762,6 +778,12 @@ const Index = () => {
         isSaved={selectedProperty ? isSaved(selectedProperty.id) : false}
         onToggleSave={toggleSaved}
         searchContext={searchContextForLead}
+      />
+
+      <ConsumerSignUpModal
+        open={showConsumerModal}
+        onOpenChange={setShowConsumerModal}
+        lastQuery={currentQuery || lastSearch?.text || ''}
       />
     </div>
   );

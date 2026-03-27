@@ -335,7 +335,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         suburb: draft.suburb || 'Unknown',
         state: draft.state || 'Unknown',
         country: 'Australia',
-        price: draft.priceMax,
+        price: draft.listingType === 'rent' ? (draft.rentalWeekly || draft.priceMax) : draft.priceMax,
         price_formatted: formatPriceForDB(draft),
         beds: draft.beds,
         baths: draft.baths,

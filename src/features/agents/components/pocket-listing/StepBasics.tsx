@@ -261,14 +261,44 @@ const StepBasics = ({ draft, update }: Props) => {
           <Label className="text-sm font-semibold block">Rental Details</Label>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label className="text-xs text-muted-foreground mb-1 block">Weekly Rent ($)</Label>
-              <Input type="number" min={0} value={draft.rentalWeekly || ''} onChange={(e) => update({ rentalWeekly: Number(e.target.value) || 0 })} placeholder="e.g. 650" className="h-9" />
-            </div>
-            <div>
               <Label className="text-xs text-muted-foreground mb-1 block">Bond (weeks)</Label>
               <Input type="number" min={1} max={8} value={draft.rentalBondWeeks || 4} onChange={(e) => update({ rentalBondWeeks: Number(e.target.value) || 4 })} placeholder="4" className="h-9" />
             </div>
+            <div>
+              <Label className="text-xs text-muted-foreground mb-1 block">Available From</Label>
+              <Input type="date" value={draft.availableFrom} onChange={(e) => update({ availableFrom: e.target.value })} className="h-9" />
+            </div>
           </div>
+        </div>
+      )}
+
+      {/* ── AGENT COMMISSION (rental) ── */}
+      {isRental && (
+        <div className="bg-secondary/50 rounded-xl p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <DollarSign size={16} className="text-primary" />
+            <Label className="text-sm font-semibold">Agent Commission</Label>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label className="text-xs text-muted-foreground mb-1 block">Management Fee (%)</Label>
+              <Input type="number" min={0} max={100} step={0.1} value={draft.commissionRate || ''} onChange={(e) => update({ commissionRate: Number(e.target.value) || 0 })} placeholder="e.g. 5.5" className="h-9" />
+            </div>
+            <div>
+              <Label className="text-xs text-muted-foreground mb-1 block">Letting Fee (weeks rent)</Label>
+              <Input type="number" min={0} max={8} step={0.5} value={draft.lettingFeeWeeks || ''} onChange={(e) => update({ lettingFeeWeeks: Number(e.target.value) || 0 })} placeholder="e.g. 1" className="h-9" />
+            </div>
+          </div>
+          {draft.rentalWeekly > 0 && (draft.commissionRate > 0 || draft.lettingFeeWeeks > 0) && (
+            <div className="bg-background rounded-lg p-3 text-xs text-muted-foreground space-y-1">
+              {draft.commissionRate > 0 && (
+                <p>Annual management income: <strong className="text-foreground">${((draft.rentalWeekly * 52 * draft.commissionRate) / 100).toLocaleString('en-AU', { maximumFractionDigits: 0 })}</strong> /yr</p>
+              )}
+              {draft.lettingFeeWeeks > 0 && (
+                <p>Letting fee: <strong className="text-foreground">${(draft.rentalWeekly * draft.lettingFeeWeeks).toLocaleString('en-AU', { maximumFractionDigits: 0 })}</strong> per new tenancy</p>
+              )}
+            </div>
+          )}
         </div>
       )}
 

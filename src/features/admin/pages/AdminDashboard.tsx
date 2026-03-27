@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Building2, BarChart3, Shield, ShieldAlert, Database, ArrowLeft, Loader2, Gamepad2, Zap, DollarSign, Megaphone, Landmark, TrendingUp, MessageSquare, FileText, UserCheck, LayoutDashboard } from 'lucide-react';
+import { Users, Building2, BarChart3, Shield, ShieldAlert, Database, ArrowLeft, Loader2, Gamepad2, Zap, DollarSign, Megaphone, Landmark, TrendingUp, MessageSquare, FileText, UserCheck, Brain, ChevronRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
-import AdminOverview from '@/features/admin/components/AdminOverview';
 import AdminUsers from '@/features/admin/components/AdminUsers';
 import AdminListings from '@/features/admin/components/AdminListings';
 import AdminRoles from '@/features/admin/components/AdminRoles';
@@ -19,8 +18,9 @@ import CommsCentre from '@/features/admin/components/CommsCentre';
 import PartnerPerformance from '@/features/admin/components/PartnerPerformance';
 import GrowthFunnel from '@/features/admin/components/GrowthFunnel';
 import SupportInbox from '@/features/admin/components/SupportInbox';
+import AIInsights from '@/features/admin/components/AIInsights';
 
-type Tab = 'command-centre' | 'agent-lifecycle' | 'compliance' | 'revenue' | 'comms' | 'partners' | 'growth' | 'support' | 'overview' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests' | 'reports';
+type Tab = 'command-centre' | 'agent-lifecycle' | 'compliance' | 'revenue' | 'comms' | 'partners' | 'growth' | 'support' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests' | 'reports' | 'ai-insights';
 
 interface UserRow {
   id: string;
@@ -48,27 +48,45 @@ interface PropertyRow {
 }
 
 export interface InsightsData {
-  // Subscriptions
   activeSubscriptions: number;
   trialAgents: number;
   trialsExpiringThisWeek: number;
-  // Platform activity
   listingsPublished: number;
   listingsThisWeek: number;
   voiceSearches30d: number;
   voiceSearchesPrev30d: number;
   leadsToday: number;
   leads30d: number;
-  // Listing health
   avgViewsPerListing: number;
   boostRequestsPending: number;
-  inactiveListings: number; // no views in 14 days
+  inactiveListings: number;
   listingsNoPhotos: number;
-  // Needs attention
   agentsNoListings: number;
-  // Voice search languages
   topLanguages: { language: string; count: number }[];
 }
+
+const NavItem = ({
+  id, label, icon: Icon, tab, setTab, badge,
+}: {
+  id: Tab; label: string; icon: any; tab: Tab; setTab: (t: Tab) => void; badge?: number;
+}) => (
+  <button
+    onClick={() => setTab(id)}
+    className={`relative w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors text-left ${
+      tab === id
+        ? 'bg-primary text-primary-foreground font-medium'
+        : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+    }`}
+  >
+    <Icon size={16} />
+    {label}
+    {badge != null && badge > 0 && (
+      <span className="absolute right-2 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold px-1">
+        {badge}
+      </span>
+    )}
+  </button>
+);
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -134,7 +152,6 @@ const AdminDashboard = () => {
       totalVoiceSearches: voiceRes.count || 0,
     });
 
-    // Build user rows
     const roleMap = new Map<string, string[]>();
     roleData.data?.forEach((r) => {
       const existing = roleMap.get(r.user_id) || [];
@@ -178,11 +195,7 @@ const AdminDashboard = () => {
     const allProps = propsFull.data || [];
     setProperties(allProps as PropertyRow[]);
 
-    // --- Build insights ---
     const agents = agentsFull.data || [];
-    const agentIds = new Set(agents.map((a) => a.id));
-
-    // Subscriptions
     const activeSubscriptions = agents.filter((a) => a.is_subscribed).length;
     const trialAgents = agents.filter((a) => !a.is_subscribed).length;
     const trialsExpiringThisWeek = agents.filter((a) => {
@@ -191,7 +204,6 @@ const AdminDashboard = () => {
       return trialEnd > now && trialEnd <= new Date(now.getTime() + 7 * 86400000);
     }).length;
 
-    // Listings
     const activeProps = allProps.filter((p) => p.is_active);
     const listingsThisWeek = allProps.filter((p) => p.created_at >= day7ago).length;
     const totalViews = activeProps.reduce((sum, p) => sum + (p.views || 0), 0);
@@ -203,11 +215,9 @@ const AdminDashboard = () => {
       return !imgs || imgs.length === 0;
     }).length;
 
-    // Agents with no listings
     const agentsWithListings = new Set(allProps.map((p) => (p as any).agent_id).filter(Boolean));
     const agentsNoListings = agents.filter((a) => !agentsWithListings.has(a.id)).length;
 
-    // Voice languages
     const langCount = new Map<string, number>();
     (voiceLang.data || []).forEach((v: any) => {
       const lang = v.detected_language || 'en';
@@ -312,99 +322,119 @@ const AdminDashboard = () => {
     );
   }
 
-  const tabs: { id: Tab; label: string; icon: any; badge?: number; dividerBefore?: string }[] = [
-    // ── DAILY OPERATIONS ──
-    { id: 'command-centre',  label: 'Command Centre',   icon: Zap,             dividerBefore: 'Daily Operations' },
-    { id: 'demo-requests',   label: 'Demo Requests',    icon: Gamepad2,        badge: pendingDemoCount },
-    { id: 'support',         label: 'Support Inbox',    icon: MessageSquare },
-    { id: 'listings',        label: 'Listings',         icon: Building2 },
-    { id: 'users',           label: 'Users',            icon: UserCheck },
-    // ── STRATEGY & GROWTH ──
-    { id: 'agent-lifecycle', label: 'Agent Lifecycle',  icon: Users,           dividerBefore: 'Strategy & Growth' },
-    { id: 'revenue',         label: 'Revenue & Billing',icon: DollarSign },
-    { id: 'growth',          label: 'Growth Funnel',    icon: TrendingUp },
-    { id: 'comms',           label: 'Communications',   icon: Megaphone },
-    { id: 'partners',        label: 'Partners',         icon: Landmark },
-    { id: 'compliance',      label: 'Compliance',       icon: ShieldAlert },
-    // ── ADMIN UTILITIES ──
-    { id: 'overview',        label: 'Overview',         icon: LayoutDashboard, dividerBefore: 'Admin Utilities' },
-    { id: 'roles',           label: 'Roles',            icon: Shield },
-    { id: 'reports',         label: 'Reports',          icon: FileText },
-    { id: 'database',        label: 'Database',         icon: Database },
-  ];
-
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-30 bg-card/80 backdrop-blur-md border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button onClick={() => navigate('/dashboard')} className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center" title="Back to Dashboard">
-              <ArrowLeft size={18} />
-            </button>
-            <div>
-              <button onClick={() => navigate('/')} className="text-lg font-bold text-foreground flex items-center gap-2 hover:text-primary transition-colors">
-                <Shield size={18} className="text-primary" /> Admin Dashboard
-              </button>
-              <p className="text-xs text-muted-foreground">Platform management & analytics</p>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-background flex">
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex items-center gap-1 mb-6 overflow-x-auto pb-2">
-          {tabs.map((t) => (
-            <div key={t.id} className="flex items-center gap-1 flex-shrink-0">
-              {t.dividerBefore && (
-                <div className="flex items-center gap-1.5 px-2 flex-shrink-0">
-                  {t.id !== 'command-centre' && <div className="w-px h-6 bg-border mx-1" />}
-                  <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 whitespace-nowrap">
-                    {t.dividerBefore}
-                  </span>
-                </div>
-              )}
-              <button
-                onClick={() => setTab(t.id)}
-                className={`relative flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${
-                  tab === t.id ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <t.icon size={16} />
-                {t.label}
-                {t.badge != null && t.badge > 0 && (
-                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold px-1">
-                    {t.badge}
-                  </span>
-                )}
-              </button>
-            </div>
-          ))}
+      {/* ── LEFT SIDEBAR ── */}
+      <aside className="w-[220px] flex-shrink-0 border-r border-border bg-card/60 backdrop-blur-md flex flex-col sticky top-0 h-screen overflow-y-auto">
+
+        {/* Header */}
+        <div className="px-4 pt-5 pb-3 border-b border-border">
+          <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 text-sm font-bold text-foreground hover:text-primary transition-colors">
+            <Shield size={18} className="text-primary" />
+            Admin
+          </button>
+          <p className="text-[10px] text-muted-foreground mt-0.5">Platform management</p>
         </div>
 
-        {loading && tab !== 'users' && tab !== 'database' ? (
-          <div className="flex justify-center py-20">
-            <Loader2 className="animate-spin text-primary" size={32} />
+        {/* Nav */}
+        <nav className="flex-1 px-2.5 py-3 space-y-4 text-sm">
+
+          {/* HOME */}
+          <div className="space-y-0.5">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-2.5 mb-1">Home</p>
+            <NavItem id="command-centre" label="Command Centre" icon={Zap} tab={tab} setTab={setTab} />
           </div>
-        ) : (
-          <>
-            {tab === 'command-centre' && <CommandCentre />}
-            {tab === 'agent-lifecycle' && <AgentLifecycle />}
-            {tab === 'compliance' && <ComplianceMonitor />}
-            {tab === 'revenue' && <RevenueBilling />}
-            {tab === 'comms' && <CommsCentre />}
-            {tab === 'partners' && <PartnerPerformance />}
-            {tab === 'growth' && <GrowthFunnel />}
-            {tab === 'support' && <SupportInbox />}
-            {tab === 'overview' && <AdminOverview stats={stats} users={users} insights={insights} />}
-            {tab === 'users' && <AdminUsers />}
-            {tab === 'listings' && <AdminListings properties={properties} onToggleActive={togglePropertyActive} onActivateBoost={activateBoost} />}
-            {tab === 'roles' && <AdminRoles users={users} searchQuery={searchQuery} onSearchChange={setSearchQuery} onRoleChange={handleRoleChange} />}
-            {tab === 'database' && <AdminDatabase />}
-            {tab === 'demo-requests' && <AdminDemoRequests onPendingCountChange={setPendingDemoCount} />}
-            {tab === 'reports' && <AdminReports isAdmin={true} />}
-          </>
-        )}
-      </div>
+
+          {/* URGENT */}
+          <div className="space-y-0.5">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-2.5 mb-1">Urgent</p>
+            <NavItem id="demo-requests" label="Demo Requests" icon={Gamepad2} tab={tab} setTab={setTab} badge={pendingDemoCount} />
+            <NavItem id="support" label="Support Inbox" icon={MessageSquare} tab={tab} setTab={setTab} />
+          </div>
+
+          {/* AGENTS */}
+          <div className="space-y-0.5">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-2.5 mb-1">Agents</p>
+            <NavItem id="agent-lifecycle" label="Agent Lifecycle" icon={Users} tab={tab} setTab={setTab} />
+            <NavItem id="users" label="Users" icon={UserCheck} tab={tab} setTab={setTab} />
+            <NavItem id="roles" label="Roles" icon={Shield} tab={tab} setTab={setTab} />
+          </div>
+
+          {/* PLATFORM */}
+          <div className="space-y-0.5">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-2.5 mb-1">Platform</p>
+            <NavItem id="listings" label="Listings" icon={Building2} tab={tab} setTab={setTab} />
+            <NavItem id="revenue" label="Revenue & Billing" icon={DollarSign} tab={tab} setTab={setTab} />
+            <NavItem id="growth" label="Growth Funnel" icon={TrendingUp} tab={tab} setTab={setTab} />
+          </div>
+
+          {/* ENGAGE */}
+          <div className="space-y-0.5">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-2.5 mb-1">Engage</p>
+            <NavItem id="comms" label="Communications" icon={Megaphone} tab={tab} setTab={setTab} />
+            <NavItem id="partners" label="Partners" icon={Landmark} tab={tab} setTab={setTab} />
+          </div>
+
+          {/* COMPLIANCE */}
+          <div className="space-y-0.5">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-2.5 mb-1">Compliance</p>
+            <NavItem id="compliance" label="Compliance" icon={ShieldAlert} tab={tab} setTab={setTab} />
+          </div>
+
+          {/* AI */}
+          <div className="space-y-0.5">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-2.5 mb-1">AI</p>
+            <NavItem id="ai-insights" label="AI Insights" icon={Brain} tab={tab} setTab={setTab} />
+          </div>
+
+          {/* SYSTEM */}
+          <div className="space-y-0.5">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-2.5 mb-1">System</p>
+            <NavItem id="reports" label="Reports" icon={FileText} tab={tab} setTab={setTab} />
+            <NavItem id="database" label="Database" icon={Database} tab={tab} setTab={setTab} />
+          </div>
+
+        </nav>
+
+        {/* Footer */}
+        <div className="px-4 py-3 border-t border-border">
+          <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft size={14} /> Back to Dashboard
+          </button>
+        </div>
+
+      </aside>
+
+      {/* ── CONTENT AREA ── */}
+      <main className="flex-1 min-w-0 overflow-y-auto">
+        <div className="max-w-6xl mx-auto px-6 py-6">
+          {loading && tab !== 'users' && tab !== 'database' && tab !== 'ai-insights' ? (
+            <div className="flex justify-center py-20">
+              <Loader2 className="animate-spin text-primary" size={32} />
+            </div>
+          ) : (
+            <>
+              {tab === 'command-centre' && <CommandCentre />}
+              {tab === 'agent-lifecycle' && <AgentLifecycle />}
+              {tab === 'compliance' && <ComplianceMonitor />}
+              {tab === 'revenue' && <RevenueBilling />}
+              {tab === 'comms' && <CommsCentre />}
+              {tab === 'partners' && <PartnerPerformance />}
+              {tab === 'growth' && <GrowthFunnel />}
+              {tab === 'support' && <SupportInbox />}
+              {tab === 'users' && <AdminUsers />}
+              {tab === 'listings' && <AdminListings properties={properties} onToggleActive={togglePropertyActive} onActivateBoost={activateBoost} />}
+              {tab === 'roles' && <AdminRoles users={users} searchQuery={searchQuery} onSearchChange={setSearchQuery} onRoleChange={handleRoleChange} />}
+              {tab === 'database' && <AdminDatabase />}
+              {tab === 'demo-requests' && <AdminDemoRequests onPendingCountChange={setPendingDemoCount} />}
+              {tab === 'reports' && <AdminReports isAdmin={true} />}
+              {tab === 'ai-insights' && <AIInsights />}
+            </>
+          )}
+        </div>
+      </main>
+
     </div>
   );
 };

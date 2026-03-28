@@ -105,10 +105,6 @@ function SidebarContent({ tab, setTab, pendingDemoCount = 0, onClose }: AdminSid
 
           <SectionLabel>AI Builds</SectionLabel>
           <NavItem id="ai-insights" label="AI Insights" icon={Brain} tab={tab} setTab={setTab} onClose={onClose} />
-          <NavItem id="ai-buyer-concierge" label="Buyer Concierge" icon={Bot} tab={tab} setTab={setTab} onClose={onClose} />
-          <NavItem id="ai-seller-score" label="Seller Scores" icon={Star} tab={tab} setTab={setTab} onClose={onClose} />
-          <NavItem id="ai-offer-generator" label="Offer Generator" icon={FileSignature} tab={tab} setTab={setTab} onClose={onClose} />
-          <NavItem id="ai-lead-marketplace" label="Lead Marketplace" icon={ShoppingCart} tab={tab} setTab={setTab} onClose={onClose} />
 
           <SectionLabel>System</SectionLabel>
           <NavItem id="reports" label="Reports" icon={FileText} tab={tab} setTab={setTab} onClose={onClose} />

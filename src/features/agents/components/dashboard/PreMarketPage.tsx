@@ -126,7 +126,7 @@ const PreMarketPage = () => {
           state: p.state || '',
           price: p.price,
           propertyType: p.property_type,
-          bedrooms: p.bedrooms,
+          bedrooms: p.beds,
           agentId: p.agent_id,
         };
       });

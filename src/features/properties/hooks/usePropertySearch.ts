@@ -96,7 +96,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
         return [] as Property[];
       });
 
-      const firecrawlPromise = firecrawlPropertySearch(query, 8).catch((err) => {
+      const firecrawlPromise = firecrawlPropertySearch(query, 8, listingMode).catch((err) => {
         console.warn('[handleSearch] Firecrawl search failed:', err);
         return [] as Property[];
       });

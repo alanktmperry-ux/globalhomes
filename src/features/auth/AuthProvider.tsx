@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const applyRoles = useCallback((roles: string[]) => {
-    console.log('[Auth] applyRoles:', roles);
+    
     setIsAdmin(roles.includes('admin'));
     setIsAgent(roles.includes('agent') || roles.includes('admin'));
     setIsPartner(roles.includes('partner'));
@@ -113,7 +113,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let cancelled = false;
     const doFetch = async () => {
       lastFetchedUserId.current = user.id;
-      console.log('[Auth] fetchRoles for:', user.id);
+      
       try {
         const { data } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
         if (cancelled) return;
@@ -137,14 +137,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const timeout = setTimeout(() => {
       setLoading((prev) => {
-        if (prev) console.warn('[Auth] Timed out, forcing loading=false');
+        
         return false;
       });
     }, 8000);
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
-        console.log('[Auth] onAuthStateChange event:', _event, 'user:', session?.user?.id ?? 'none');
+        
 
         // Explicit sign-out — clear everything
         if (_event === 'SIGNED_OUT') {
@@ -188,7 +188,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('[Auth] getSession result, user:', session?.user?.id ?? 'none');
+      
       setSession(session);
       setUser(session?.user ?? null);
       if (!session?.user) setLoading(false);

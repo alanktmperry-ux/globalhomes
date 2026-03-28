@@ -47,7 +47,7 @@ class ManusSearchService {
 
     // Fire off Manus task in background
     this.startManusSearch(params, onUpdate).catch((err) =>
-      console.warn('Manus background search failed:', err)
+      {} // silently ignore background search failure
     );
 
     return {
@@ -66,19 +66,19 @@ class ManusSearchService {
       });
 
       if (error || !data?.taskId) {
-        console.warn('Manus task creation failed, using sample data:', error || data?.error || 'No taskId');
+        
         onUpdate?.({ status: 'failed' });
         return;
       }
 
       const taskId = data.taskId;
-      console.log('Manus task created:', taskId);
+      
       onUpdate?.({ status: 'running' });
 
       // Start polling
       await this.pollTaskStatus(taskId, onUpdate);
     } catch (err) {
-      console.warn('Manus search error:', err);
+      
     }
   }
 
@@ -99,11 +99,11 @@ class ManusSearchService {
         });
 
         if (error) {
-          console.warn('Poll error:', error);
+          
           continue;
         }
 
-        console.log('Manus task poll:', data?.status);
+        
 
         if (data?.status === 'completed') {
           this.activePolls.delete(taskId);
@@ -114,7 +114,7 @@ class ManusSearchService {
 
         if (data?.status === 'failed') {
           this.activePolls.delete(taskId);
-          console.warn('Manus task failed:', data.error);
+          
           onUpdate?.({ status: 'failed' });
           return;
         }
@@ -122,7 +122,7 @@ class ManusSearchService {
         // Still pending/running
         onUpdate?.({ status: data?.status || 'running' });
       } catch (err) {
-        console.warn('Poll iteration error:', err);
+        
       }
     }
 
@@ -220,7 +220,7 @@ class ManusSearchService {
         contactClicks: 0,
       }));
     } catch (err) {
-      console.warn('Failed to parse Manus output:', err);
+      
       return [];
     }
   }

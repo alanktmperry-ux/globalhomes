@@ -182,10 +182,11 @@ Deno.serve(async (req) => {
 
       if (subErr) throw subErr;
 
-      await supabase
+      const { error: agentUpdateErr } = await supabase
         .from("agents")
         .update({ is_subscribed: plan_type !== "demo" })
         .eq("id", agent.id);
+      if (agentUpdateErr) throw agentUpdateErr;
 
       return new Response(
         JSON.stringify({ success: true }),

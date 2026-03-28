@@ -1,5 +1,5 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
-import { useLocation } from 'react-router-dom';
+
 import { MapPin, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -37,8 +37,8 @@ function ConsentGate({
   onAccept: () => void;
   onDecline: () => void;
 }) {
-  const { pathname } = useLocation();
   if (decided) return null;
+  const pathname = window.location.pathname;
   if (AUTH_ROUTES.some((r) => pathname.startsWith(r))) return null;
   return <ConsentBanner onAccept={onAccept} onDecline={onDecline} />;
 }

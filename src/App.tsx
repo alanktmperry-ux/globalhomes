@@ -123,13 +123,13 @@ const App = () => (
   <HelmetProvider>
   <QueryClientProvider client={queryClient}>
     <I18nProvider>
+      <BrowserRouter>
       <ConsentProvider>
       <CurrencyProvider>
       <AuthProvider>
         <TooltipProvider>
           
           <Sonner position="top-center" richColors closeButton duration={5000} />
-          <BrowserRouter>
             <ImpersonationBanner />
             <ScrollToTop />
             <Suspense fallback={<PageLoader />}>
@@ -220,11 +220,11 @@ const App = () => (
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
-          </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>
       </CurrencyProvider>
     </ConsentProvider>
+      </BrowserRouter>
     </I18nProvider>
   </QueryClientProvider>
   </HelmetProvider>

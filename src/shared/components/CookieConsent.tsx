@@ -25,24 +25,6 @@ export function useConsent() {
   return ctx;
 }
 
-// Routes where Google Maps is not used — suppress the banner here
-const AUTH_ROUTES = ['/auth', '/login', '/forgot-password', '/reset-password', '/auth/confirm'];
-
-function ConsentGate({
-  decided,
-  onAccept,
-  onDecline,
-}: {
-  decided: boolean;
-  onAccept: () => void;
-  onDecline: () => void;
-}) {
-  if (decided) return null;
-  const pathname = window.location.pathname;
-  if (AUTH_ROUTES.some((r) => pathname.startsWith(r))) return null;
-  return <ConsentBanner onAccept={onAccept} onDecline={onDecline} />;
-}
-
 export function ConsentProvider({ children }: { children: ReactNode }) {
   const [consent, setConsent] = useState<ConsentState>(() => {
     try {
@@ -67,10 +49,13 @@ export function ConsentProvider({ children }: { children: ReactNode }) {
   return (
     <ConsentContext.Provider value={{ consent, acceptAll, declineMaps, resetConsent }}>
       {children}
-      <ConsentGate onAccept={acceptAll} onDecline={declineMaps} decided={consent.decided} />
+      {!consent.decided && <ConsentBanner onAccept={acceptAll} onDecline={declineMaps} />}
     </ConsentContext.Provider>
   );
 }
+
+// Routes where Google Maps is not used — suppress the banner on these pages
+const AUTH_ROUTES = ['/auth', '/login', '/forgot-password', '/reset-password', '/auth/confirm'];
 
 function ConsentBanner({
   onAccept,
@@ -82,6 +67,10 @@ function ConsentBanner({
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    const path = window.location.pathname;
+    const isAuthPage = AUTH_ROUTES.some((r) => path.startsWith(r));
+    if (isAuthPage) return;
+
     const t = setTimeout(() => setVisible(true), 800);
     return () => clearTimeout(t);
   }, []);
@@ -94,8 +83,7 @@ function ConsentBanner({
         <div className="rounded-xl sm:rounded-2xl border border-border bg-card shadow-lg p-3.5 sm:p-5 space-y-3 sm:space-y-4">
           <div className="flex items-start gap-2.5">
             <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-              <Shield size={14} className="text-primary sm:hidden" />
-              <Shield size={16} className="text-primary hidden sm:block" />
+              <Shield size={15} className="text-primary" />
             </div>
             <div className="space-y-0.5 sm:space-y-1">
               <p className="text-xs sm:text-sm font-semibold text-foreground">

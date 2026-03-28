@@ -73,6 +73,7 @@ Deno.serve(async (req) => {
 
     for (const p of properties) {
       const suburbKey = `${(p.suburb || "").toLowerCase()}|${(p.state || "").toLowerCase()}`;
+      const suburb = suburbMedians[suburbKey] || { medianPrice: 0, medianDom: 30, count: 0 };
       const dom = p.listed_date ? Math.floor((Date.now() - new Date(p.listed_date).getTime()) / 86400000) : 0;
       const priceCuts = priceChangeCount[p.id] || 0;
 

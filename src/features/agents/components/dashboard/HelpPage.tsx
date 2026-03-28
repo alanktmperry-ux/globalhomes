@@ -16,7 +16,7 @@ import {
   Home, DollarSign, Users, BarChart3, Shield, Landmark, Calculator,
   PartyPopper, Mic, MapPin, Kanban, FileText, Settings, Star,
   Building2, AlertTriangle, CheckCircle2, Wrench, Key, Globe, Handshake, Zap,
-  Loader2, Send,
+  Loader2, Send, Sparkles, TrendingUp, ShoppingBag, PenTool,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';

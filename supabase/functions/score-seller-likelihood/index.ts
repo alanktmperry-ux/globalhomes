@@ -19,7 +19,7 @@ Deno.serve(async (req) => {
     // Fetch active listings
     const { data: properties, error: propErr } = await supabase
       .from("properties")
-      .select("id, title, address, suburb, state, price, property_type, bedrooms, days_on_market, status, is_active, created_at, agent_id")
+      .select("id, title, address, suburb, state, price, property_type, beds, status, is_active, created_at, listed_date, agent_id")
       .eq("is_active", true)
       .limit(500);
 
@@ -37,7 +37,8 @@ Deno.serve(async (req) => {
       if (!suburbStats[key]) suburbStats[key] = { prices: [], count: 0, totalDom: 0 };
       suburbStats[key].count++;
       if (p.price) suburbStats[key].prices.push(p.price);
-      if (p.days_on_market) suburbStats[key].totalDom += p.days_on_market;
+      const dom = p.listed_date ? Math.floor((Date.now() - new Date(p.listed_date).getTime()) / 86400000) : 0;
+      if (dom > 0) suburbStats[key].totalDom += dom;
     }
 
     // Calculate median DOM and price per suburb
@@ -73,7 +74,7 @@ Deno.serve(async (req) => {
     for (const p of properties) {
       const suburbKey = `${(p.suburb || "").toLowerCase()}|${(p.state || "").toLowerCase()}`;
       const suburb = suburbMedians[suburbKey] || { medianPrice: 0, medianDom: 30, count: 0 };
-      const dom = p.days_on_market || 0;
+      const dom = p.listed_date ? Math.floor((Date.now() - new Date(p.listed_date).getTime()) / 86400000) : 0;
       const priceCuts = priceChangeCount[p.id] || 0;
 
       // Signal calculations

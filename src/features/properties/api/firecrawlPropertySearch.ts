@@ -71,12 +71,12 @@ export async function firecrawlPropertySearch(query: string, limit = 8, listingM
       });
 
     if (error) {
-      console.warn('[firecrawlPropertySearch] Edge function error:', error.message);
+      
       return [];
     }
 
     if (!data?.success || !data.listings?.length) {
-      console.log('[firecrawlPropertySearch] No listings found');
+      
       return [];
     }
 

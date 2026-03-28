@@ -177,11 +177,11 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   const [featuredFallback, setFeaturedFallback] = useState(false);
   const userLocationRef = useRef<{lat:number;lng:number} | null>(null);
 
-  const fetchFeatured = useCallback(async (lat?: number, lng?: number) => {
+  const fetchFeatured = useCallback(async (lat?: number, lng?: number, mode?: 'sale' | 'rent') => {
     setFeaturedLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('get-featured-listings', {
-        body: { lat, lng, radius_km: 100 },
+        body: { lat, lng, radius_km: 100, listing_type: mode ?? listingMode },
       });
       if (error || !data) throw error;
       if (data.fallback || !data.featured?.length) {
@@ -214,6 +214,15 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       fetchFeatured();
     }
   }, [fetchFeatured]);
+
+  // Re-fetch featured listings whenever sale/rent mode changes
+  useEffect(() => {
+    fetchFeatured(
+      userLocationRef.current?.lat,
+      userLocationRef.current?.lng,
+      listingMode,
+    );
+  }, [listingMode]);
 
   // Re-fetch featured when search location changes
   useEffect(() => {

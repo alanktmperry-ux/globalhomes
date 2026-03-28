@@ -20,12 +20,16 @@ Deno.serve(async (req) => {
     let lat: number | undefined;
     let lng: number | undefined;
     let radius_km = 100;
+    let listing_type: 'sale' | 'rent' | undefined;
 
     try {
       const body = await req.json();
       lat = body.lat;
       lng = body.lng;
       if (body.radius_km) radius_km = body.radius_km;
+      if (body.listing_type === 'rent' || body.listing_type === 'sale') {
+        listing_type = body.listing_type;
+      }
     } catch {
       // No body or invalid JSON — proceed without location
     }
@@ -44,16 +48,24 @@ Deno.serve(async (req) => {
 
       // If RPC doesn't exist, fall back to manual query
       if (error) {
-        const { data: fallbackData } = await supabase
+        let fallbackQuery = supabase
           .from("properties")
           .select(
-            "id, title, address, suburb, state, price_formatted, beds, baths, parking, image_url, images, lat, lng, boost_tier, featured_until, agent_id"
+            "id, title, address, suburb, state, price_formatted, beds, baths, parking, image_url, images, lat, lng, boost_tier, featured_until, agent_id, listing_type"
           )
           .eq("is_featured", true)
           .eq("is_active", true)
           .gt("featured_until", now)
           .order("featured_until", { ascending: true })
           .limit(50);
+
+        if (listing_type === 'rent') {
+          fallbackQuery = fallbackQuery.eq('listing_type', 'rent');
+        } else if (listing_type === 'sale') {
+          fallbackQuery = fallbackQuery.or('listing_type.eq.sale,listing_type.is.null');
+        }
+
+        const { data: fallbackData } = await fallbackQuery;
 
         // Filter by distance client-side
         if (fallbackData) {
@@ -81,16 +93,24 @@ Deno.serve(async (req) => {
     // If fewer than 6, top up nationally
     if (featured.length < 6) {
       const existingIds = featured.map((p: any) => p.id);
-      const { data: national } = await supabase
+      let nationalQuery = supabase
         .from("properties")
         .select(
-          "id, title, address, suburb, state, price_formatted, beds, baths, parking, image_url, images, lat, lng, boost_tier, featured_until, agent_id"
+          "id, title, address, suburb, state, price_formatted, beds, baths, parking, image_url, images, lat, lng, boost_tier, featured_until, agent_id, listing_type"
         )
         .eq("is_featured", true)
         .eq("is_active", true)
         .gt("featured_until", now)
         .order("featured_until", { ascending: true })
         .limit(6);
+
+      if (listing_type === 'rent') {
+        nationalQuery = nationalQuery.eq('listing_type', 'rent');
+      } else if (listing_type === 'sale') {
+        nationalQuery = nationalQuery.or('listing_type.eq.sale,listing_type.is.null');
+      }
+
+      const { data: national } = await nationalQuery;
 
       if (national) {
         for (const p of national) {

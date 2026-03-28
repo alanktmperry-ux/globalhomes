@@ -107,7 +107,7 @@ const PreMarketPage = () => {
     try {
       const { data } = await supabase
         .from('seller_likelihood_scores')
-        .select('*, properties(id, title, address, suburb, state, price, property_type, bedrooms, agent_id)')
+        .select('*, properties(id, title, address, suburb, state, price, property_type, beds, agent_id)')
         .gte('score', 50)
         .order('score', { ascending: false })
         .limit(50) as any;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Building2, BarChart3, Shield, ShieldAlert, Database, ArrowLeft, Loader2, Gamepad2, Zap, DollarSign, Megaphone, Landmark, TrendingUp, MessageSquare, FileText, UserCheck, Brain, ChevronRight } from 'lucide-react';
+import { Users, Building2, BarChart3, Shield, ShieldAlert, Database, ArrowLeft, Loader2, Gamepad2, Zap, DollarSign, Megaphone, Landmark, TrendingUp, MessageSquare, FileText, UserCheck, Brain, ChevronRight, ClipboardCheck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
@@ -394,6 +394,7 @@ const AdminDashboard = () => {
             <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-2.5 mb-1">System</p>
             <NavItem id="reports" label="Reports" icon={FileText} tab={tab} setTab={setTab} />
             <NavItem id="database" label="Database" icon={Database} tab={tab} setTab={setTab} />
+            <NavItem id="pre-launch" label="Pre-Launch" icon={ClipboardCheck} tab={tab} setTab={setTab} />
           </div>
 
         </nav>
@@ -431,6 +432,7 @@ const AdminDashboard = () => {
               {tab === 'demo-requests' && <AdminDemoRequests onPendingCountChange={setPendingDemoCount} />}
               {tab === 'reports' && <AdminReports isAdmin={true} />}
               {tab === 'ai-insights' && <AIInsights />}
+              {tab === 'pre-launch' && <PreLaunchChecklist />}
             </>
           )}
         </div>

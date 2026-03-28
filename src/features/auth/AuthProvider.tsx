@@ -66,8 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const startImpersonation = async (userId: string, userEmail: string) => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
-    sessionStorage.setItem('admin_session_token', session.access_token);
-    sessionStorage.setItem('admin_refresh_token', session.refresh_token);
+    // Tokens stored in-memory only — never persisted to sessionStorage
     sessionStorage.setItem('admin_email', userEmail);
     sessionStorage.setItem('admin_impersonated_id', userId);
     setImpersonating(true);

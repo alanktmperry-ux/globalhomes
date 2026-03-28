@@ -212,15 +212,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (error) {
         console.error('[Auth] signOut error:', error);
         try {
-          const storageKey = `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID || 'ngrkbohpmkzjonaofgbb'}-auth-token`;
+        const storageKey = `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`;
           localStorage.removeItem(storageKey);
         } catch (e) { /* ignore */ }
       }
     } catch (err) {
       console.error('[Auth] signOut failed:', err);
       try {
-        const storageKey = `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID || 'ngrkbohpmkzjonaofgbb'}-auth-token`;
-        localStorage.removeItem(storageKey);
+        const storageKey = `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`;
+          localStorage.removeItem(storageKey);
       } catch (e) { /* ignore */ }
     }
   };

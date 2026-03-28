@@ -148,6 +148,10 @@ Keep the tone professional and concise. Use Australian real estate conventions.`
 
     if (offerError) {
       console.error("Offer insert error:", offerError);
+      return new Response(
+        JSON.stringify({ error: "Offer was generated but could not be saved. Please try again." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     return new Response(

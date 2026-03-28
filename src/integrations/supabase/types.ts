@@ -3678,6 +3678,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_user_cascade: { Args: { p_user_id: string }; Returns: undefined }
       expire_featured_listings: { Args: never; Returns: undefined }
       get_suburb_rental_stats: {
         Args: {

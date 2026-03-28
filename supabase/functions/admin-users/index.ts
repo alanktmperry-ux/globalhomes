@@ -242,173 +242,26 @@ Deno.serve(async (req) => {
     if (action === "delete_user") {
       const { user_id } = await req.json();
 
-      const ensure = (error: any, step: string) => {
-        if (error) throw new Error(`${step}: ${error.message}`);
-      };
+      const { error: rpcError } = await supabase.rpc("delete_user_cascade", {
+        p_user_id: user_id,
+      });
 
-      const deleteIn = async (table: string, column: string, ids: string[]) => {
-        if (!ids.length) return;
-        const { error } = await supabase.from(table as any).delete().in(column, ids as any);
-        ensure(error, `delete ${table}`);
-      };
-
-      const deleteEq = async (table: string, column: string, value: string) => {
-        const { error } = await supabase.from(table as any).delete().eq(column, value as any);
-        ensure(error, `delete ${table}`);
-      };
-
-      // Load owned agent + agency ids
-      const { data: agentRows, error: agentRowsError } = await supabase
-        .from("agents")
-        .select("id, agency_id")
-        .eq("user_id", user_id);
-      ensure(agentRowsError, "load agents");
-
-      const { data: ownedAgencies, error: ownedAgenciesError } = await supabase
-        .from("agencies")
-        .select("id")
-        .eq("owner_user_id", user_id);
-      ensure(ownedAgenciesError, "load owned agencies");
-
-      const agentIds = Array.from(new Set((agentRows || []).map((a: any) => a.id).filter(Boolean)));
-      const agencyIdsFromAgent = (agentRows || []).map((a: any) => a.agency_id).filter(Boolean);
-      const ownedAgencyIds = (ownedAgencies || []).map((a: any) => a.id);
-      const allAgencyIds = Array.from(new Set([...agencyIdsFromAgent, ...ownedAgencyIds]));
-
-      // Load properties owned by these agents
-      let propIds: string[] = [];
-      if (agentIds.length > 0) {
-        const { data: propRows, error: propRowsError } = await supabase
-          .from("properties")
-          .select("id")
-          .in("agent_id", agentIds);
-        ensure(propRowsError, "load agent properties");
-        propIds = (propRows || []).map((p: any) => p.id);
+      if (rpcError) {
+        console.error("delete_user_cascade error:", rpcError);
+        return new Response(
+          JSON.stringify({ error: "User deletion failed. No data was deleted. Please try again." }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
-
-      // Load trust accounts for these agents/agencies
-      const trustAccountIdSet = new Set<string>();
-      if (agentIds.length > 0) {
-        const { data: taByAgent, error: taByAgentError } = await supabase
-          .from("trust_accounts")
-          .select("id")
-          .in("agent_id", agentIds);
-        ensure(taByAgentError, "load trust accounts by agent");
-        (taByAgent || []).forEach((r: any) => trustAccountIdSet.add(r.id));
-      }
-      if (allAgencyIds.length > 0) {
-        const { data: taByAgency, error: taByAgencyError } = await supabase
-          .from("trust_accounts")
-          .select("id")
-          .in("agency_id", allAgencyIds);
-        ensure(taByAgencyError, "load trust accounts by agency");
-        (taByAgency || []).forEach((r: any) => trustAccountIdSet.add(r.id));
-      }
-      const trustAccountIds = Array.from(trustAccountIdSet);
-
-      // Load trust transaction ids to clear off_market_shares trust_entry references first
-      if (trustAccountIds.length > 0) {
-        const { data: trustTxRows, error: trustTxRowsError } = await supabase
-          .from("trust_transactions")
-          .select("id")
-          .in("trust_account_id", trustAccountIds);
-        ensure(trustTxRowsError, "load trust transactions");
-        const trustTxIds = (trustTxRows || []).map((t: any) => t.id);
-        await deleteIn("off_market_shares", "trust_entry_id", trustTxIds);
-      }
-
-      // Property dependencies
-      await deleteIn("listing_documents", "property_id", propIds);
-      await deleteIn("saved_properties", "property_id", propIds);
-      await deleteIn("lead_events", "property_id", propIds);
-      await deleteIn("leads", "property_id", propIds);
-      await deleteIn("notifications", "property_id", propIds);
-      await deleteIn("collab_reactions", "property_id", propIds);
-      await deleteIn("collab_views", "property_id", propIds);
-      await deleteIn("off_market_shares", "property_id", propIds);
-      await deleteIn("rental_applications", "property_id", propIds);
-      await deleteIn("transactions", "property_id", propIds);
-      await deleteIn("trust_transactions", "property_id", propIds);
-
-      // Trust dependencies
-      await deleteIn("trust_transactions", "trust_account_id", trustAccountIds);
-      await deleteIn("trust_account_balances", "agent_id", agentIds);
-      await deleteIn("trust_receipts", "agent_id", agentIds);
-      await deleteIn("trust_payments", "agent_id", agentIds);
-      await deleteIn("trust_reconciliations", "agent_id", agentIds);
-      await deleteIn("trust_accounts", "agent_id", agentIds);
-      await deleteIn("trust_accounts", "agency_id", allAgencyIds);
-
-      // Agent dependencies
-      await deleteIn("notifications", "agent_id", agentIds);
-      await deleteIn("lead_events", "agent_id", agentIds);
-      await deleteIn("leads", "agent_id", agentIds);
-      await deleteIn("agent_subscriptions", "agent_id", agentIds);
-      await deleteIn("agent_credentials", "agent_id", agentIds);
-      await deleteIn("agent_locations", "agent_id", agentIds);
-      await deleteIn("off_market_shares", "sharing_agent_id", agentIds);
-      await deleteIn("off_market_shares", "shared_with_agent_id", agentIds);
-      await deleteIn("contacts", "assigned_agent_id", agentIds);
-      await deleteIn("rental_applications", "agent_id", agentIds);
-      await deleteIn("transactions", "agent_id", agentIds);
-
-      await deleteIn("properties", "id", propIds);
-      await deleteIn("agents", "id", agentIds);
-
-      // Agency dependencies
-      await deleteIn("agency_invite_codes", "agency_id", allAgencyIds);
-      await deleteIn("agency_members", "agency_id", allAgencyIds);
-      await deleteIn("activities", "office_id", allAgencyIds);
-      await deleteIn("tasks", "office_id", allAgencyIds);
-      await deleteIn("transactions", "office_id", allAgencyIds);
-      await deleteIn("contacts", "agency_id", allAgencyIds);
-
-      if (allAgencyIds.length > 0) {
-        const { error: unlinkAgentsError } = await supabase
-          .from("agents")
-          .update({ agency_id: null })
-          .in("agency_id", allAgencyIds);
-        ensure(unlinkAgentsError, "unlink agents from agency");
-      }
-
-      await deleteIn("agencies", "id", ownedAgencyIds);
-
-      // Conversations/messages
-      const { data: convRows, error: convRowsError } = await supabase
-        .from("conversations")
-        .select("id")
-        .or(`participant_1.eq.${user_id},participant_2.eq.${user_id}`);
-      ensure(convRowsError, "load conversations");
-      const convIds = (convRows || []).map((c: any) => c.id);
-      await deleteIn("messages", "conversation_id", convIds);
-      await deleteEq("messages", "sender_id", user_id);
-
-      const { error: conversationsDeleteError } = await supabase
-        .from("conversations")
-        .delete()
-        .or(`participant_1.eq.${user_id},participant_2.eq.${user_id}`);
-      ensure(conversationsDeleteError, "delete conversations");
-
-      // User-level rows
-      await deleteEq("agency_members", "user_id", user_id);
-      await deleteEq("agency_invite_codes", "created_by", user_id);
-      await deleteEq("saved_properties", "user_id", user_id);
-      await deleteEq("saved_search_alerts", "user_id", user_id);
-      await deleteEq("buyer_profiles", "user_id", user_id);
-      await deleteEq("collab_reactions", "user_id", user_id);
-      await deleteEq("collab_views", "user_id", user_id);
-      await deleteEq("contact_activities", "user_id", user_id);
-      await deleteEq("contacts", "created_by", user_id);
-      await deleteEq("activities", "user_id", user_id);
-      await deleteEq("tasks", "user_id", user_id);
-      await deleteEq("leads", "user_id", user_id);
-      await deleteEq("lead_events", "user_id", user_id);
-      await deleteEq("user_preferences", "user_id", user_id);
-      await deleteEq("user_roles", "user_id", user_id);
-      await deleteEq("profiles", "user_id", user_id);
 
       const { error: deleteAuthError } = await supabase.auth.admin.deleteUser(user_id);
-      ensure(deleteAuthError, "delete auth user");
+      if (deleteAuthError) {
+        console.error("delete auth user error:", deleteAuthError);
+        return new Response(
+          JSON.stringify({ error: "Data deleted but auth account removal failed. Contact support." }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
 
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

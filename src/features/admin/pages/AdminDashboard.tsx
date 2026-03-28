@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Building2, BarChart3, Shield, ShieldAlert, Database, ArrowLeft, Loader2, Gamepad2, Zap, DollarSign, Megaphone, Landmark, TrendingUp, MessageSquare, FileText, UserCheck, Brain, ChevronRight, ClipboardCheck } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
@@ -20,8 +20,9 @@ import GrowthFunnel from '@/features/admin/components/GrowthFunnel';
 import SupportInbox from '@/features/admin/components/SupportInbox';
 import AIInsights from '@/features/admin/components/AIInsights';
 import PreLaunchChecklist from '@/features/admin/components/PreLaunchChecklist';
+import AdminSidebar, { type AdminTab } from '@/features/admin/components/AdminSidebar';
 
-type Tab = 'command-centre' | 'agent-lifecycle' | 'compliance' | 'revenue' | 'comms' | 'partners' | 'growth' | 'support' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests' | 'reports' | 'ai-insights' | 'pre-launch';
+type Tab = AdminTab;
 
 interface UserRow {
   id: string;
@@ -66,28 +67,6 @@ export interface InsightsData {
   topLanguages: { language: string; count: number }[];
 }
 
-const NavItem = ({
-  id, label, icon: Icon, tab, setTab, badge,
-}: {
-  id: Tab; label: string; icon: any; tab: Tab; setTab: (t: Tab) => void; badge?: number;
-}) => (
-  <button
-    onClick={() => setTab(id)}
-    className={`relative w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors text-left ${
-      tab === id
-        ? 'bg-primary text-primary-foreground font-medium'
-        : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-    }`}
-  >
-    <Icon size={16} />
-    {label}
-    {badge != null && badge > 0 && (
-      <span className="absolute right-2 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold px-1">
-        {badge}
-      </span>
-    )}
-  </button>
-);
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -324,93 +303,13 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex flex-col md:flex-row">
 
-      {/* ── LEFT SIDEBAR ── */}
-      <aside className="w-[220px] flex-shrink-0 border-r border-border bg-card/60 backdrop-blur-md flex flex-col sticky top-0 h-screen overflow-y-auto">
-
-        {/* Header */}
-        <div className="px-4 pt-5 pb-3 border-b border-border">
-          <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 text-sm font-bold text-foreground hover:text-primary transition-colors">
-            <Shield size={18} className="text-primary" />
-            Admin
-          </button>
-          <p className="text-[10px] text-muted-foreground mt-0.5">Platform management</p>
-        </div>
-
-        {/* Nav */}
-        <nav className="flex-1 px-2.5 py-3 space-y-4 text-sm">
-
-          {/* HOME */}
-          <div className="space-y-0.5">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-2.5 mb-1">Home</p>
-            <NavItem id="command-centre" label="Command Centre" icon={Zap} tab={tab} setTab={setTab} />
-          </div>
-
-          {/* URGENT */}
-          <div className="space-y-0.5">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-2.5 mb-1">Urgent</p>
-            <NavItem id="demo-requests" label="Demo Requests" icon={Gamepad2} tab={tab} setTab={setTab} badge={pendingDemoCount} />
-            <NavItem id="support" label="Support Inbox" icon={MessageSquare} tab={tab} setTab={setTab} />
-          </div>
-
-          {/* AGENTS */}
-          <div className="space-y-0.5">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-2.5 mb-1">Agents</p>
-            <NavItem id="agent-lifecycle" label="Agent Lifecycle" icon={Users} tab={tab} setTab={setTab} />
-            <NavItem id="users" label="Users" icon={UserCheck} tab={tab} setTab={setTab} />
-            <NavItem id="roles" label="Roles" icon={Shield} tab={tab} setTab={setTab} />
-          </div>
-
-          {/* PLATFORM */}
-          <div className="space-y-0.5">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-2.5 mb-1">Platform</p>
-            <NavItem id="listings" label="Listings" icon={Building2} tab={tab} setTab={setTab} />
-            <NavItem id="revenue" label="Revenue & Billing" icon={DollarSign} tab={tab} setTab={setTab} />
-            <NavItem id="growth" label="Growth Funnel" icon={TrendingUp} tab={tab} setTab={setTab} />
-          </div>
-
-          {/* ENGAGE */}
-          <div className="space-y-0.5">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-2.5 mb-1">Engage</p>
-            <NavItem id="comms" label="Communications" icon={Megaphone} tab={tab} setTab={setTab} />
-            <NavItem id="partners" label="Partners" icon={Landmark} tab={tab} setTab={setTab} />
-          </div>
-
-          {/* COMPLIANCE */}
-          <div className="space-y-0.5">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-2.5 mb-1">Compliance</p>
-            <NavItem id="compliance" label="Compliance" icon={ShieldAlert} tab={tab} setTab={setTab} />
-          </div>
-
-          {/* AI */}
-          <div className="space-y-0.5">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-2.5 mb-1">AI</p>
-            <NavItem id="ai-insights" label="AI Insights" icon={Brain} tab={tab} setTab={setTab} />
-          </div>
-
-          {/* SYSTEM */}
-          <div className="space-y-0.5">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-2.5 mb-1">System</p>
-            <NavItem id="reports" label="Reports" icon={FileText} tab={tab} setTab={setTab} />
-            <NavItem id="database" label="Database" icon={Database} tab={tab} setTab={setTab} />
-            <NavItem id="pre-launch" label="Pre-Launch" icon={ClipboardCheck} tab={tab} setTab={setTab} />
-          </div>
-
-        </nav>
-
-        {/* Footer */}
-        <div className="px-4 py-3 border-t border-border">
-          <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft size={14} /> Back to Dashboard
-          </button>
-        </div>
-
-      </aside>
+      <AdminSidebar tab={tab} setTab={setTab} pendingDemoCount={pendingDemoCount} />
 
       {/* ── CONTENT AREA ── */}
       <main className="flex-1 min-w-0 overflow-y-auto">
-        <div className="max-w-6xl mx-auto px-6 py-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
           {loading && tab !== 'users' && tab !== 'database' && tab !== 'ai-insights' ? (
             <div className="flex justify-center py-20">
               <Loader2 className="animate-spin text-primary" size={32} />
@@ -433,6 +332,10 @@ const AdminDashboard = () => {
               {tab === 'reports' && <AdminReports isAdmin={true} />}
               {tab === 'ai-insights' && <AIInsights />}
               {tab === 'pre-launch' && <PreLaunchChecklist />}
+              {tab === 'ai-buyer-concierge' && <div className="text-muted-foreground text-center py-20">Buyer Concierge dashboard — coming soon</div>}
+              {tab === 'ai-seller-score' && <div className="text-muted-foreground text-center py-20">Seller Likelihood Scores — coming soon</div>}
+              {tab === 'ai-offer-generator' && <div className="text-muted-foreground text-center py-20">AI Offer Generator stats — coming soon</div>}
+              {tab === 'ai-lead-marketplace' && <div className="text-muted-foreground text-center py-20">Lead Marketplace admin — coming soon</div>}
             </>
           )}
         </div>

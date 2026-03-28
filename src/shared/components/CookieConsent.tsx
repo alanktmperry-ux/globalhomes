@@ -1,5 +1,5 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
-
+import { useLocation } from 'react-router-dom';
 import { MapPin, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -64,16 +64,18 @@ function ConsentBanner({
   onAccept: () => void;
   onDecline: () => void;
 }) {
+  const { pathname } = useLocation();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const path = window.location.pathname;
+    const path = pathname;
     const isAuthPage = AUTH_ROUTES.some((r) => path.startsWith(r));
+    setVisible(false);
     if (isAuthPage) return;
 
     const t = setTimeout(() => setVisible(true), 800);
     return () => clearTimeout(t);
-  }, []);
+  }, [pathname]);
 
   if (!visible) return null;
 

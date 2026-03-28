@@ -77,8 +77,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const stopImpersonation = async () => {
     await supabase.auth.signOut();
     window.location.href = '/admin/login';
-    sessionStorage.removeItem('admin_email');
-    sessionStorage.removeItem('admin_impersonated_id');
     setImpersonating(false);
     setImpersonatedUser(null);
     setImpersonatedUserId(null);

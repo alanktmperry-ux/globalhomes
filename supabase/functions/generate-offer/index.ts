@@ -104,7 +104,7 @@ Draft a professional offer letter addressed to the vendor's agent. Include:
 
 Keep the tone professional and concise. Use Australian real estate conventions.`;
 
-    const aiRes = await fetch("https://ai-gateway.lovable.dev/api/chat", {
+    const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

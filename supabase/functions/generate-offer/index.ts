@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
     // Fetch property details
     const { data: property } = await supabase
       .from("properties")
-      .select("title, address, suburb, state, price, property_type, bedrooms, bathrooms")
+      .select("title, address, suburb, state, price, property_type, beds, baths")
       .eq("id", property_id)
       .single();
 
@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
     // Fetch comparable sales (recent settled properties in the same suburb)
     const { data: comparables } = await supabase
       .from("properties")
-      .select("address, price, suburb")
+      .select("address, price, suburb, beds, baths, property_type")
       .eq("suburb", property?.suburb || "")
       .neq("id", property_id)
       .not("price", "is", null)
@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
     const prompt = `You are a licensed Australian real estate agent drafting a formal offer letter.
 
 Property: ${property?.address || "Unknown"}, ${property?.suburb || ""} ${property?.state || ""}
-Property Type: ${property?.property_type || "Residential"}, ${property?.bedrooms || "?"} bed, ${property?.bathrooms || "?"} bath
+Property Type: ${property?.property_type || "Residential"}, ${property?.beds || "?"} bed, ${property?.baths || "?"} bath
 Asking Price: ${property?.price ? AUD.format(parseFloat(property.price)) : "Not disclosed"}
 
 Offer Amount: ${AUD.format(offer_amount)}
@@ -104,7 +104,7 @@ Draft a professional offer letter addressed to the vendor's agent. Include:
 
 Keep the tone professional and concise. Use Australian real estate conventions.`;
 
-    const aiRes = await fetch("https://ai.lovable.dev/api/chat", {
+    const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

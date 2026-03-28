@@ -19,7 +19,7 @@ Deno.serve(async (req) => {
     // Fetch active listings
     const { data: properties, error: propErr } = await supabase
       .from("properties")
-      .select("id, title, address, suburb, state, price, property_type, bedrooms, days_on_market, status, is_active, created_at, agent_id")
+      .select("id, title, address, suburb, state, price, property_type, beds, status, is_active, created_at, listed_date, agent_id")
       .eq("is_active", true)
       .limit(500);
 

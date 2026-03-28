@@ -19,8 +19,9 @@ import PartnerPerformance from '@/features/admin/components/PartnerPerformance';
 import GrowthFunnel from '@/features/admin/components/GrowthFunnel';
 import SupportInbox from '@/features/admin/components/SupportInbox';
 import AIInsights from '@/features/admin/components/AIInsights';
+import PreLaunchChecklist from '@/features/admin/components/PreLaunchChecklist';
 
-type Tab = 'command-centre' | 'agent-lifecycle' | 'compliance' | 'revenue' | 'comms' | 'partners' | 'growth' | 'support' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests' | 'reports' | 'ai-insights';
+type Tab = 'command-centre' | 'agent-lifecycle' | 'compliance' | 'revenue' | 'comms' | 'partners' | 'growth' | 'support' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests' | 'reports' | 'ai-insights' | 'pre-launch';
 
 interface UserRow {
   id: string;

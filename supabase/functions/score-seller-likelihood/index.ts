@@ -37,7 +37,8 @@ Deno.serve(async (req) => {
       if (!suburbStats[key]) suburbStats[key] = { prices: [], count: 0, totalDom: 0 };
       suburbStats[key].count++;
       if (p.price) suburbStats[key].prices.push(p.price);
-      if (p.days_on_market) suburbStats[key].totalDom += p.days_on_market;
+      const dom = p.listed_date ? Math.floor((Date.now() - new Date(p.listed_date).getTime()) / 86400000) : 0;
+      if (dom > 0) suburbStats[key].totalDom += dom;
     }
 
     // Calculate median DOM and price per suburb

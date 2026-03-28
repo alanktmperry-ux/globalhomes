@@ -748,7 +748,320 @@ const HelpPage = () => {
           {supportFooter}
         </TabsContent>
 
-        {/* ── TAB 3: FAQ ── */}
+        {/* ── TAB 3: AI Builds ── */}
+        <TabsContent value="ai-builds" className="space-y-8 mt-4">
+          <div>
+            <h2 className="text-lg font-semibold mb-1">AI-Powered Features</h2>
+            <p className="text-sm text-muted-foreground mb-6">ListHQ includes four AI tools designed to help you find buyers, identify sellers, generate offers, and acquire leads — all automatically.</p>
+          </div>
+
+          {/* AI Build 1: Buyer Concierge */}
+          <Card className="bg-card border border-border">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-3 mb-1">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Sparkles size={20} className="text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-base">AI Build 1: Buyer Concierge</CardTitle>
+                  <CardDescription className="text-xs">Automatically connect with buyers searching for properties like yours</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <h4 className="text-sm font-semibold mb-2">What is Buyer Concierge?</h4>
+                <p className="text-sm text-muted-foreground">Buyer Concierge is an AI feature that monitors every voice search on ListHQ. When a buyer searches for properties similar to yours, the AI scores their intent, matches them to your listings, and creates a lead in your dashboard — all within seconds. You don't need to do anything; the concierge works automatically in the background.</p>
+              </div>
+              <Separator />
+              <div>
+                <h4 className="text-sm font-semibold mb-2">How it works — step by step</h4>
+                <ol className="space-y-2 list-decimal list-inside text-sm text-muted-foreground">
+                  <li>A buyer speaks a search query (e.g. "3-bed house in Bondi under $1M with parking")</li>
+                  <li>The AI transcribes the query and extracts suburb, property type, bedrooms, and budget</li>
+                  <li>Your listings and Buyer Briefs are matched against the search criteria</li>
+                  <li>The buyer receives a lead score (0–100) based on match quality</li>
+                  <li>A lead is created in your Voice Leads dashboard with the score, transcript, and matched property</li>
+                  <li>You receive a notification email — respond to Hot leads within the hour for best conversion</li>
+                </ol>
+              </div>
+              <Separator />
+              <div>
+                <h4 className="text-sm font-semibold mb-2">Understanding lead scores</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="rounded-lg border border-border p-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge className="bg-green-500/10 text-green-700 border-green-500/20">🔥 Hot (70–100)</Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Strong match on suburb, type, beds, and price. Buyer is ready to act. Priority follow-up.</p>
+                  </div>
+                  <div className="rounded-lg border border-border p-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge className="bg-amber-500/10 text-amber-700 border-amber-500/20">⚡ Warm (40–69)</Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Partial match. Buyer is interested but criteria don't fully align. Worth following up.</p>
+                  </div>
+                  <div className="rounded-lg border border-border p-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge className="bg-muted text-muted-foreground border-border">❄️ Cold (0–39)</Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Low match. Buyer is browsing or criteria are far from your listings. Monitor for changes.</p>
+                  </div>
+                </div>
+              </div>
+              <Separator />
+              <div>
+                <h4 className="text-sm font-semibold mb-2">Score calculation breakdown</h4>
+                <div className="text-sm text-muted-foreground space-y-1">
+                  <p>• <strong>Suburb match</strong> — 40 points: buyer's searched suburb matches your listing suburb</p>
+                  <p>• <strong>Property type</strong> — 20 points: house, apartment, townhouse, land match</p>
+                  <p>• <strong>Bedrooms</strong> — 20 points: bedroom count within range of your listing</p>
+                  <p>• <strong>Price</strong> — 20 points: buyer's budget overlaps your listing price</p>
+                </div>
+              </div>
+              <Separator />
+              <div>
+                <h4 className="text-sm font-semibold mb-2">Tips for better results</h4>
+                <ul className="space-y-1 text-sm text-muted-foreground list-disc list-inside">
+                  <li>Keep your agent profile complete — photo, bio, and specialisations</li>
+                  <li>Ensure listings are accurate and up-to-date with correct suburb, type, beds, and price</li>
+                  <li>Post Buyer Briefs on the Off-Market Network to cast a wider net</li>
+                  <li>Respond to Hot leads within 1 hour — first-to-call wins the client</li>
+                  <li>Check notifications in Settings to ensure email alerts are enabled</li>
+                </ul>
+              </div>
+              <div className="bg-muted/50 rounded-lg p-3">
+                <p className="text-xs text-muted-foreground"><strong>Troubleshooting:</strong> Not receiving notifications? Check Settings → Notifications. Also ensure your listings are active (not archived) and your profile is published. If issues persist, submit a support ticket below.</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* AI Build 2: Seller Likelihood Score */}
+          <Card className="bg-card border border-border">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-3 mb-1">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <TrendingUp size={20} className="text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-base">AI Build 2: Seller Likelihood Score</CardTitle>
+                  <CardDescription className="text-xs">AI-powered prediction of seller motivation for your listings</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <h4 className="text-sm font-semibold mb-2">What is the Seller Likelihood Score?</h4>
+                <p className="text-sm text-muted-foreground">The Seller Likelihood Score is an AI-calculated prediction (0–100) of how motivated a property owner might be to sell. It analyses market signals, listing behaviour, and suburb trends to help you prioritise which vendors to contact. Scores update weekly every Sunday.</p>
+              </div>
+              <Separator />
+              <div>
+                <h4 className="text-sm font-semibold mb-2">How scores are calculated</h4>
+                <p className="text-sm text-muted-foreground mb-3">The AI analyses five key signals for each listing:</p>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3 p-3 rounded-lg border border-border">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
+                    <div>
+                      <p className="text-sm font-medium">Days on Market</p>
+                      <p className="text-xs text-muted-foreground">Compares how long the listing has been active vs the suburb median. Longer than average = higher score.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 rounded-lg border border-border">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
+                    <div>
+                      <p className="text-sm font-medium">Price Reductions</p>
+                      <p className="text-xs text-muted-foreground">Multiple price drops signal a motivated seller. More reductions = higher score.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 rounded-lg border border-border">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
+                    <div>
+                      <p className="text-sm font-medium">Suburb Price Trend</p>
+                      <p className="text-xs text-muted-foreground">If the suburb median is trending down, owners may want to sell before further decline.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 rounded-lg border border-border">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold flex-shrink-0">4</div>
+                    <div>
+                      <p className="text-sm font-medium">Status Churn</p>
+                      <p className="text-xs text-muted-foreground">Listings that went Under Offer and fell through indicate a seller who is ready but hasn't found the right buyer.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 rounded-lg border border-border">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold flex-shrink-0">5</div>
+                    <div>
+                      <p className="text-sm font-medium">Activity Gap</p>
+                      <p className="text-xs text-muted-foreground">No listing updates in 30+ days signals potential disengagement — the vendor may be open to a new approach.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <Separator />
+              <div>
+                <h4 className="text-sm font-semibold mb-2">What the score means</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="rounded-lg border border-border p-3 bg-green-500/5">
+                    <p className="text-sm font-semibold text-green-700 mb-1">🟢 High (70–100)</p>
+                    <p className="text-xs text-muted-foreground">Strong sell signal. Prioritise contact with this vendor — they are likely motivated to sell soon.</p>
+                  </div>
+                  <div className="rounded-lg border border-border p-3 bg-amber-500/5">
+                    <p className="text-sm font-semibold text-amber-700 mb-1">🟡 Medium (50–69)</p>
+                    <p className="text-xs text-muted-foreground">Some indicators present. Worth following up — schedule a vendor call or appraisal.</p>
+                  </div>
+                  <div className="rounded-lg border border-border p-3 bg-muted/50">
+                    <p className="text-sm font-semibold text-muted-foreground mb-1">🔴 Low (0–49)</p>
+                    <p className="text-xs text-muted-foreground">Low likelihood right now. Revisit in 3–6 months or wait for market changes.</p>
+                  </div>
+                </div>
+              </div>
+              <Separator />
+              <div>
+                <h4 className="text-sm font-semibold mb-2">Where to find scores</h4>
+                <ol className="space-y-1 list-decimal list-inside text-sm text-muted-foreground">
+                  <li>Go to <strong>My Listings</strong> in the sidebar</li>
+                  <li>Each listing shows a score ring with the current value</li>
+                  <li>Click a listing to see the full signal breakdown and AI summary</li>
+                  <li>Use the Pre-Market page for a filtered view of high-scoring listings</li>
+                </ol>
+              </div>
+              <div className="bg-muted/50 rounded-lg p-3">
+                <p className="text-xs text-muted-foreground"><strong>FAQ:</strong> "Why is my property's score low?" — New listings need time to develop signals. Scores are based on market behaviour, not property quality. A low score simply means the AI hasn't detected strong sell signals yet. Scores update every Sunday.</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* AI Build 3: Offer Generator */}
+          <Card className="bg-card border border-border">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-3 mb-1">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <PenTool size={20} className="text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-base">AI Build 3: Offer Generator</CardTitle>
+                  <CardDescription className="text-xs">Generate professional offer letters with comparable sales analysis in seconds</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <h4 className="text-sm font-semibold mb-2">What is the Offer Generator?</h4>
+                <p className="text-sm text-muted-foreground">The Offer Generator uses AI to create professional offer letters for property buyers. It automatically pulls comparable sales from the same suburb, calculates the suburb median price, and drafts a complete negotiation package — ready to review and send in seconds.</p>
+              </div>
+              <Separator />
+              <div>
+                <h4 className="text-sm font-semibold mb-2">How to generate an offer — step by step</h4>
+                <ol className="space-y-2 list-decimal list-inside text-sm text-muted-foreground">
+                  <li>Open a lead from the <strong>Voice Leads</strong> page</li>
+                  <li>Click the <strong>"Generate Offer"</strong> button on the lead detail panel</li>
+                  <li>Enter the offer details: offer amount ($), settlement days, and any conditions (e.g. "subject to inspection", "finance approval")</li>
+                  <li>Click <strong>Generate</strong> — the AI analyses comparable sales and drafts the letter</li>
+                  <li>Review the generated letter. Edit any text, conditions, or comparable sales as needed</li>
+                  <li>Save the offer. It's tracked through stages: Draft → Sent → Accepted / Rejected / Countered / Withdrawn</li>
+                </ol>
+              </div>
+              <Separator />
+              <div>
+                <h4 className="text-sm font-semibold mb-2">Comparable sales data</h4>
+                <p className="text-sm text-muted-foreground mb-2">The AI automatically includes comparable sales in your offer letter:</p>
+                <ul className="space-y-1 text-sm text-muted-foreground list-disc list-inside">
+                  <li>Pulls recent sold properties from the same suburb (last 90 days)</li>
+                  <li>Matches by property type, bedrooms, and bathrooms where possible</li>
+                  <li>Includes the suburb median price for context</li>
+                  <li>Comparable sales are presented in a table within the offer letter</li>
+                </ul>
+              </div>
+              <Separator />
+              <div>
+                <h4 className="text-sm font-semibold mb-2">Customising your offer</h4>
+                <p className="text-sm text-muted-foreground">The generated letter is a draft — you have full control:</p>
+                <ul className="space-y-1 text-sm text-muted-foreground list-disc list-inside mt-2">
+                  <li>Edit the offer amount, settlement terms, and conditions</li>
+                  <li>Modify the letter body text, tone, and phrasing</li>
+                  <li>Add or remove comparable sales if you know better ones</li>
+                  <li>Add your brokerage branding and personal details</li>
+                  <li>Track the offer outcome (accepted, rejected, countered, withdrawn)</li>
+                </ul>
+              </div>
+              <div className="bg-muted/50 rounded-lg p-3">
+                <p className="text-xs text-muted-foreground"><strong>Troubleshooting:</strong> "Comparable sales not showing" — The AI searches for sold properties in the same suburb from the past 90 days. If no comparable sales exist (e.g. rural area with few transactions), the letter will note limited data. You can manually add comps you know about.</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* AI Build 4: Lead Marketplace */}
+          <Card className="bg-card border border-border">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-3 mb-1">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <ShoppingBag size={20} className="text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-base">AI Build 4: Lead Marketplace</CardTitle>
+                  <CardDescription className="text-xs">Purchase verified buyer leads matched to your listings</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <h4 className="text-sm font-semibold mb-2">What is the Lead Marketplace?</h4>
+                <p className="text-sm text-muted-foreground">The Lead Marketplace is a pool of verified buyer profiles — real buyers who have submitted their preferences and budget via the ListHQ consumer portal. These profiles are matched to your listings using AI. Contact details are hidden until you purchase a lead, ensuring quality and exclusivity.</p>
+              </div>
+              <Separator />
+              <div>
+                <h4 className="text-sm font-semibold mb-2">How to purchase a lead — step by step</h4>
+                <ol className="space-y-2 list-decimal list-inside text-sm text-muted-foreground">
+                  <li>Go to <strong>Voice Leads</strong> in the sidebar, then click the <strong>Marketplace</strong> tab</li>
+                  <li>Browse available buyer profiles — you can see preferred suburbs, property type, budget range, urgency, and AI intent score</li>
+                  <li>Click a profile to see the full buyer brief (contact details are blurred)</li>
+                  <li>Click <strong>"Purchase Lead"</strong> and confirm the purchase</li>
+                  <li>Contact details are unlocked instantly — name, email, phone, and direct WhatsApp/email links</li>
+                  <li>The buyer receives an automated introduction email from ListHQ</li>
+                  <li>The lead is added to your CRM tagged as "Marketplace Lead"</li>
+                </ol>
+              </div>
+              <Separator />
+              <div>
+                <h4 className="text-sm font-semibold mb-2">Understanding lead quality</h4>
+                <p className="text-sm text-muted-foreground mb-2">Each marketplace lead includes:</p>
+                <ul className="space-y-1 text-sm text-muted-foreground list-disc list-inside">
+                  <li><strong>Intent score</strong> — AI-calculated score based on buyer activity and specificity</li>
+                  <li><strong>Buying situation</strong> — first home buyer, upgrader, downsizer, or investor</li>
+                  <li><strong>Budget range</strong> — minimum and maximum budget the buyer specified</li>
+                  <li><strong>Preferred suburbs</strong> — where the buyer wants to live</li>
+                  <li><strong>Property type</strong> — house, apartment, townhouse, or land</li>
+                  <li><strong>Search count</strong> — how many searches the buyer has completed (higher = more engaged)</li>
+                </ul>
+              </div>
+              <Separator />
+              <div>
+                <h4 className="text-sm font-semibold mb-2">Privacy and exclusivity</h4>
+                <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+                  <p className="text-xs text-muted-foreground">• <strong>One agent per lead</strong> — once purchased, the lead is exclusive to you. No other agent can buy the same lead.</p>
+                  <p className="text-xs text-muted-foreground">• <strong>Row-Level Security</strong> — your purchased leads are invisible to other agents. They cannot see your lead data, contact details, or purchase history.</p>
+                  <p className="text-xs text-muted-foreground">• <strong>Buyer notification</strong> — purchased buyers receive an introduction email so they know to expect your call.</p>
+                </div>
+              </div>
+              <Separator />
+              <div>
+                <h4 className="text-sm font-semibold mb-2">Pricing</h4>
+                <p className="text-sm text-muted-foreground">Lead pricing varies based on location demand, buyer urgency, and property type specificity. Typical range: <strong>$25–$150 per lead</strong>. High-demand suburbs and urgent buyers are priced higher. You only pay for leads you choose to purchase — there are no subscriptions or minimums for marketplace leads.</p>
+              </div>
+              <div className="bg-muted/50 rounded-lg p-3">
+                <p className="text-xs text-muted-foreground"><strong>Tip:</strong> Act quickly on high-scoring leads. Other agents in the same suburb can see the same profiles. The first agent to purchase gets exclusive access.</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="bg-primary/5 border border-primary/10 rounded-lg p-4">
+            <p className="text-sm font-medium mb-1">Need a Pro plan for AI features?</p>
+            <p className="text-xs text-muted-foreground">All four AI features — Buyer Concierge, Seller Scores, Offer Generator, and Lead Marketplace — are included with the Pro plan ($199/mo founding price) and Agency plan ($399/mo). Upgrade from the Billing page.</p>
+          </div>
+
+          {supportFooter}
+        </TabsContent>
+
+        {/* ── TAB 4: FAQ ── */}
         <TabsContent value="faq">
           <div className="relative mt-4 mb-6">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />

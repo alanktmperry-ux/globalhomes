@@ -67,28 +67,6 @@ export interface InsightsData {
   topLanguages: { language: string; count: number }[];
 }
 
-const NavItem = ({
-  id, label, icon: Icon, tab, setTab, badge,
-}: {
-  id: Tab; label: string; icon: any; tab: Tab; setTab: (t: Tab) => void; badge?: number;
-}) => (
-  <button
-    onClick={() => setTab(id)}
-    className={`relative w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors text-left ${
-      tab === id
-        ? 'bg-primary text-primary-foreground font-medium'
-        : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-    }`}
-  >
-    <Icon size={16} />
-    {label}
-    {badge != null && badge > 0 && (
-      <span className="absolute right-2 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold px-1">
-        {badge}
-      </span>
-    )}
-  </button>
-);
 
 const AdminDashboard = () => {
   const navigate = useNavigate();

@@ -75,16 +75,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const stopImpersonation = async () => {
-    const adminToken = sessionStorage.getItem('admin_session_token');
-    const adminRefresh = sessionStorage.getItem('admin_refresh_token');
-    if (adminToken && adminRefresh) {
-      await supabase.auth.setSession({
-        access_token: adminToken,
-        refresh_token: adminRefresh,
-      });
-    }
-    sessionStorage.removeItem('admin_session_token');
-    sessionStorage.removeItem('admin_refresh_token');
+    await supabase.auth.signOut();
+    window.location.href = '/admin/login';
     sessionStorage.removeItem('admin_email');
     sessionStorage.removeItem('admin_impersonated_id');
     setImpersonating(false);

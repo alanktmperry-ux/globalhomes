@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Building2, BarChart3, Shield, ShieldAlert, Database, ArrowLeft, Loader2, Gamepad2, Zap, DollarSign, Megaphone, Landmark, TrendingUp, MessageSquare, FileText, UserCheck, Brain, ChevronRight, ClipboardCheck } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
@@ -20,8 +20,9 @@ import GrowthFunnel from '@/features/admin/components/GrowthFunnel';
 import SupportInbox from '@/features/admin/components/SupportInbox';
 import AIInsights from '@/features/admin/components/AIInsights';
 import PreLaunchChecklist from '@/features/admin/components/PreLaunchChecklist';
+import AdminSidebar, { type AdminTab } from '@/features/admin/components/AdminSidebar';
 
-type Tab = 'command-centre' | 'agent-lifecycle' | 'compliance' | 'revenue' | 'comms' | 'partners' | 'growth' | 'support' | 'users' | 'listings' | 'roles' | 'database' | 'demo-requests' | 'reports' | 'ai-insights' | 'pre-launch';
+type Tab = AdminTab;
 
 interface UserRow {
   id: string;

@@ -88,10 +88,12 @@ export async function searchAgentListings(
     features?: string[];
   }
 ): Promise<Property[]> {
-  const words = query
+  const sanitizedQuery = query.trim().slice(0, 200);
+  const words = sanitizedQuery
     .toLowerCase()
     .split(/\s+/)
-    .filter((w) => w.length > 2);
+    .filter((w) => w.length > 2)
+    .slice(0, 10);
 
   if (words.length === 0 && !structured?.suburb) return [];
 

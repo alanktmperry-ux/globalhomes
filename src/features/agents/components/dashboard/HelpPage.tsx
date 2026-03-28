@@ -578,12 +578,18 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     title: 'AI Features',
     items: [
       { q: 'How does the AI Buyer Concierge work?', a: 'When a buyer completes a voice search on ListHQ, the AI Buyer Concierge automatically scores their intent (0–100), finds matching properties in your listings, checks your Buyer Briefs on the Off-Market Network, creates a lead in your dashboard, and sends you a notification email — all within seconds. You do not need to manually review voice searches; the concierge does it for you.' },
+      { q: 'How is the Buyer Concierge lead score calculated?', a: 'The AI scores each lead out of 100 based on four factors: suburb match (40 pts), property type match (20 pts), bedroom match (20 pts), and price match (20 pts). A score of 70+ is Hot 🔥, 40–69 is Warm ⚡, and below 40 is Cold ❄️.' },
       { q: 'What is the Seller Likelihood Score?', a: 'The Seller Likelihood Score (0–100) is an AI-calculated weekly score on each of your listings. It measures how motivated the seller is based on five signals: days on market vs the suburb median, number of price reductions, suburb price trend, status churn (listings that went Under Offer and fell through), and activity gap (no updates in 30+ days). A score above 70 is a strong signal to prioritise vendor communication.' },
+      { q: 'When do Seller Likelihood Scores update?', a: 'Scores are recalculated weekly (every Sunday). The "scored_at" date on each listing shows when the last calculation ran. If a listing is new, it may take up to 7 days for the first score to appear.' },
       { q: 'How do I generate an AI offer letter?', a: 'Open any lead from the Voice Leads page and click "Generate Offer". Enter the offer amount, settlement days, and conditions. The AI drafts a professional offer letter with the property details, comparable sales from the last 90 days, and a complete negotiation package — ready in seconds. Review, edit if needed, and save. The offer is tracked through stages: Draft, Sent, Accepted, Rejected, Countered, or Withdrawn.' },
       { q: 'What comparable sales does the AI use for offer letters?', a: 'The AI pulls recent sold properties in the same suburb from the past 90 days — specifically properties with a sold status in the ListHQ database. It uses these as the comparable sales table in your offer letter. The suburb median price is also included for context.' },
+      { q: 'Can I edit the AI-generated offer letter?', a: 'Yes. The AI generates a draft — you can edit every part of it including the offer amount, conditions, settlement terms, and the body text. Save your changes and the updated version is stored against the lead.' },
       { q: 'What is the Lead Marketplace?', a: 'The Lead Marketplace is a pool of verified buyer profiles — real buyers who have submitted their preferences and budget via the ListHQ buyer portal. Profiles matched to your listings appear in the Marketplace tab of your Voice Leads page. Contact details are hidden until you purchase the lead. Each lead can only be purchased by one agent, so act quickly on high-scoring profiles.' },
       { q: 'Can I see a lead\'s contact details before purchasing from the marketplace?', a: 'No. Contact details (name, email, phone) are hidden until you purchase. You can see the buyer\'s preferred suburbs, property type, budget range, urgency, and AI lead score before deciding whether to purchase.' },
       { q: 'What happens after I purchase a marketplace lead?', a: 'Two things happen immediately: (1) the buyer receives an introduction email from ListHQ letting them know an agent will be in touch, and (2) the lead is added to your CRM tagged as "Marketplace Lead" and linked to the matching listing. Contact details are unlocked on your screen instantly.' },
+      { q: 'How are marketplace leads priced?', a: 'Lead pricing depends on location demand, buyer urgency, and property type specificity. Typical range is $25–$150 per lead. High-demand suburbs and urgent buyers are priced higher.' },
+      { q: 'Can other agents see my purchased leads?', a: 'No. Row-Level Security ensures each agent can only see their own purchased leads. Other agents cannot see your lead data, contact details, or purchase history.' },
+      { q: 'Do I need a Pro plan for AI features?', a: 'The Buyer Concierge, Seller Likelihood Scores, AI Offer Generator, and Lead Marketplace are all available on the Pro plan ($199/mo founding price) and above. Starter plan users can upgrade from the Billing page.' },
     ],
   },
   {
@@ -681,6 +687,7 @@ const HelpPage = () => {
         <TabsList className="flex-wrap h-auto gap-1">
           <TabsTrigger value="getting-started">Getting Started</TabsTrigger>
           <TabsTrigger value="guides">How-To Guides</TabsTrigger>
+          <TabsTrigger value="ai-builds">AI Builds</TabsTrigger>
           <TabsTrigger value="faq">FAQ</TabsTrigger>
           <TabsTrigger value="support">Contact &amp; Support</TabsTrigger>
         </TabsList>

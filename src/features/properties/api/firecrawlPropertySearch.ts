@@ -27,9 +27,9 @@ function hashCode(str: string): string {
   return Math.abs(hash).toString(36);
 }
 
-function toProperty(listing: FirecrawlListing, index: number): Property {
-  return {
-    id: `google-${hashCode(listing.title + listing.address)}-${index}`,
+function toProperty(listing: FirecrawlListing, index: number, listingType: 'sale' | 'rent'): Property {
+    return {
+      id: `google-${hashCode(listing.title + listing.address)}-${index}`,
     title: listing.title,
     address: listing.address,
     suburb: '', // extracted from address if possible
@@ -59,15 +59,16 @@ function toProperty(listing: FirecrawlListing, index: number): Property {
     listedDate: new Date().toISOString(),
     views: 0,
     contactClicks: 0,
-    aiSummary: `Found via web search • ${listing.source}`,
-  };
-}
+      aiSummary: `Found via web search • ${listing.source}`,
+      listingType,
+    };
+  }
 
-export async function firecrawlPropertySearch(query: string, limit = 8): Promise<Property[]> {
-  try {
-    const { data, error } = await supabase.functions.invoke('firecrawl-property-search', {
-      body: { query, limit },
-    });
+export async function firecrawlPropertySearch(query: string, limit = 8, listingMode: 'sale' | 'rent' = 'sale'): Promise<Property[]> {
+    try {
+      const { data, error } = await supabase.functions.invoke('firecrawl-property-search', {
+        body: { query, limit, listing_type: listingMode },
+      });
 
     if (error) {
       console.warn('[firecrawlPropertySearch] Edge function error:', error.message);
@@ -79,7 +80,7 @@ export async function firecrawlPropertySearch(query: string, limit = 8): Promise
       return [];
     }
 
-    return data.listings.map((l: FirecrawlListing, i: number) => toProperty(l, i));
+    return data.listings.map((l: FirecrawlListing, i: number) => toProperty(l, i, listingMode));
   } catch (err) {
     console.error('[firecrawlPropertySearch] Failed:', err);
     return [];

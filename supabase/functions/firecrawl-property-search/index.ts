@@ -110,7 +110,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { query, limit = 10 } = await req.json();
+    const { query, limit = 10, listing_type = 'sale' } = await req.json();
 
     if (!query) {
       return new Response(
@@ -127,7 +127,9 @@ Deno.serve(async (req) => {
       );
     }
 
-    const searchQuery = `${query} property for sale listing price`;
+    const searchQuery = listing_type === 'rent'
+      ? `${query} rental property for rent weekly price`
+      : `${query} property for sale listing price`;
     console.log('Firecrawl property search:', searchQuery);
 
     const response = await fetch('https://api.firecrawl.dev/v1/search', {

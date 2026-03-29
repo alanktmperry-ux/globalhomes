@@ -447,7 +447,76 @@ const DashboardOverview = () => {
       <DashboardHeader title="Dashboard" subtitle="Welcome back, Agent" />
 
       <div className="p-4 sm:p-6 space-y-6 max-w-7xl">
-        {listings.length === 0 && (
+        {/* Onboarding Checklist */}
+        {(() => {
+          if (onboardingDismissed) return null;
+          const step1 = !!(onboardingAgent?.name && onboardingAgent?.avatar_url && onboardingAgent?.bio);
+          const step2 = onboardingHasListing || listings.length > 0;
+          const step3 = !!onboardingAgent?.agency_id;
+          const step4 = !!onboardingAgent?.stripe_customer_id;
+          const step5 = onboardingStep5;
+          const steps = [
+            { label: 'Complete your profile', done: step1, link: '/dashboard/profile' },
+            { label: 'Add your first listing', done: step2, link: '/dashboard/listings' },
+            { label: 'Connect or create your agency', done: step3, link: '/dashboard/agencies' },
+            { label: 'Set up billing', done: step4, link: '/dashboard/billing' },
+            { label: 'Explore your dashboard', done: step5, link: '/dashboard/help', manual: true },
+          ];
+          const completed = steps.filter(s => s.done).length;
+          if (completed === 5) {
+            localStorage.setItem('listhq-onboarding-dismissed', 'true');
+            return null;
+          }
+          return (
+            <Card className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-primary/3 to-transparent border-primary/20">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg font-bold">Getting Started</CardTitle>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={() => {
+                      localStorage.setItem('listhq-onboarding-dismissed', 'true');
+                      setOnboardingDismissed(true);
+                    }}
+                  >
+                    <X size={16} />
+                  </Button>
+                </div>
+                <div className="flex items-center gap-3 mt-1">
+                  <Progress value={(completed / 5) * 100} className="h-2 flex-1" />
+                  <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">{completed} of 5 steps complete</span>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0 space-y-1">
+                {steps.map((step, i) => (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      if (step.manual && !step.done) {
+                        localStorage.setItem('listhq-onboarding-step5', 'true');
+                        setOnboardingStep5(true);
+                      }
+                      navigate(step.link);
+                    }}
+                    className="w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-primary/5 group text-left"
+                  >
+                    {step.done ? (
+                      <div className="h-5 w-5 rounded-full bg-primary flex items-center justify-center shrink-0">
+                        <Check size={12} className="text-primary-foreground" />
+                      </div>
+                    ) : (
+                      <Circle size={20} className="text-muted-foreground/40 shrink-0" />
+                    )}
+                    <span className={step.done ? 'line-through text-muted-foreground' : 'text-foreground font-medium'}>{step.label}</span>
+                    <ChevronRight size={14} className="ml-auto text-muted-foreground/40 group-hover:text-primary transition-colors" />
+                  </button>
+                ))}
+              </CardContent>
+            </Card>
+          );
+        })()}
           <div className="bg-primary/10 border border-primary/20 rounded-2xl p-5">
             <h2 className="font-bold text-lg mb-1">Welcome to ListHQ 👋</h2>
             <p className="text-sm text-muted-foreground mb-4">Your account is live. Here's how to get started:</p>

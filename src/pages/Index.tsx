@@ -84,6 +84,7 @@ const Index = () => {
     setSortBy,
     filters,
     setFilters,
+    searchSummary,
   } = usePropertySearch({ addSearch });
 
   // Consumer sign-up modal trigger after 3rd anonymous search

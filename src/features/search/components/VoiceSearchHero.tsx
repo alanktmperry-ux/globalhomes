@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, MicOff, Search, Loader2, X, ChevronDown, MapPin } from 'lucide-react';
+import { Mic, MicOff, Search, Loader2, X, ChevronDown, MapPin, SlidersHorizontal } from 'lucide-react';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SoundWaveVisualizer } from './SoundWaveVisualizer';
@@ -74,33 +74,54 @@ const HEADLINE_WORDS = [
 ];
 
 const SEARCH_PLACEHOLDERS_BY_LANG: Record<string, string[]> = {
-  'en-AU': ['3 bed house in Brighton…', 'apartment with parking under $800k…', '2 bed near good schools…', 'beachside home under $2M…'],
-  'en-US': ['3 bed house in Brighton…', 'apartment with parking under $800k…', '2 bed near good schools…', 'beachside home under $2M…'],
-  'en-GB': ['3 bed house in Brighton…', 'apartment with parking under $800k…', '2 bed near good schools…', 'beachside home under $2M…'],
-  'zh-CN': ['布莱顿3卧室房屋…', '80万以下带车位公寓…', '靠近好学校的2卧室…', '200万以下海滨住宅…'],
-  'zh-TW': ['布萊頓3臥室房屋…', '80萬以下帶車位公寓…', '靠近好學校的2臥室…', '200萬以下海濱住宅…'],
-  'ar-SA': ['منزل 3 غرف في برايتون…', 'شقة بموقف بأقل من 800k…', 'غرفتان قرب مدارس جيدة…', 'منزل شاطئي بأقل من 2M…'],
-  'hi-IN': ['ब्राइटन में 3 BHK घर…', '800k से कम पार्किंग वाला अपार्टमेंट…', 'अच्छे स्कूलों के पास 2 BHK…', '2M से कम बीचसाइड होम…'],
-  'es-ES': ['casa de 3 hab en Brighton…', 'piso con garaje bajo 800k…', '2 hab cerca de colegios…', 'casa en playa bajo 2M…'],
-  'es-MX': ['casa de 3 rec en Brighton…', 'depto con estac. bajo 800k…', '2 rec cerca de escuelas…', 'casa de playa bajo 2M…'],
-  'fr-FR': ['maison 3 ch à Brighton…', 'appt avec parking sous 800k…', '2 pièces près des écoles…', 'maison en mer sous 2M…'],
-  'de-DE': ['3-Zi-Haus in Brighton…', 'Wohnung mit Stellplatz < 800k…', '2 Zi in Schulnähe…', 'Strandhaus unter 2M…'],
-  'ja-JP': ['ブライトンの3LDK…', '駐車場付きマンション80万以下…', '良い学校の近くの2LDK…', '海辺の住宅200万以下…'],
-  'it-IT': ['casa 3 cam a Brighton…', 'appart con parcheggio < 800k…', '2 cam vicino scuole…', 'casa al mare < 2M…'],
-  'pt-BR': ['casa 3 quartos em Brighton…', 'apto com vaga abaixo de 800k…', '2 quartos perto de escolas…', 'casa praia abaixo de 2M…'],
-  'ru-RU': ['3-комн дом в Брайтоне…', 'квартира с парковкой до 800k…', '2 комн рядом со школой…', 'дом у моря до 2M…'],
-  'ko-KR': ['브라이턴 3베드 주택…', '주차 포함 아파트 80만 이하…', '좋은 학교 근처 2베드…', '해변 200만 이하…'],
-  'th-TH': ['บ้าน 3 ห้องในไบรตัน…', 'คอนโดมีที่จอดรถต่ำ 800k…', '2 ห้องใกล้โรงเรียนดี…', 'บ้านทะเลต่ำ 2M…'],
-  'vi-VN': ['nhà 3 phòng ở Brighton…', 'căn hộ đỗ xe dưới 800k…', '2 phòng gần trường tốt…', 'nhà biển dưới 2M…'],
-  'tr-TR': ['Brighton 3 yatak oda…', '800k altı garajlı daire…', 'okul yakını 2 yatak…', '2M altı deniz evi…'],
-  'pl-PL': ['dom 3-pok w Brighton…', 'mieszkanie z parkingiem < 800k…', '2 pok blisko szkoły…', 'dom morski < 2M…'],
-  'nl-NL': ['3-kamer woning Brighton…', 'appt met parkeren < 800k…', '2 kamers bij school…', 'strandhuis < 2M…'],
-  'sv-SE': ['3-rumsbostad Brighton…', 'lägen med parkering < 800k…', '2 rum nära skola…', 'strandhus < 2M…'],
-  'el-GR': ['σπίτι 3 δωμ Brighton…', 'διαμ με parking < 800k…', '2 δωμ κοντά σε σχολεία…', 'παραθαλάσσιο < 2M…'],
-  'id-ID': ['rumah 3 kamar Brighton…', 'apartemen parkir < 800k…', '2 kamar dekat sekolah…', 'rumah pantai < 2M…'],
+  'en-AU': [
+    'e.g. 3 bed house in Doncaster under $1.3M',
+    'e.g. apartment in Melbourne CBD under $600k',
+    'e.g. rental unit near the city under $500pw',
+    'e.g. townhouse in Brisbane with 2 bathrooms',
+    'e.g. house in Sydney near good schools under $900k',
+    'e.g. land for sale in regional Victoria',
+    'e.g. 4 bed family home in Perth with a pool',
+  ],
+  'en-US': [
+    'e.g. 3 bed house in Doncaster under $1.3M',
+    'e.g. apartment in Melbourne CBD under $600k',
+    'e.g. rental unit near the city under $500pw',
+    'e.g. townhouse in Brisbane with 2 bathrooms',
+  ],
+  'en-GB': ['e.g. 3 bed house in Brighton under $800k', 'e.g. apartment with parking under $600k'],
+  'zh-CN': ['例如: 布莱顿3卧室房屋…', '例如: 80万以下带车位公寓…', '例如: 靠近好学校的2卧室…'],
+  'zh-TW': ['例如: 布萊頓3臥室房屋…', '例如: 80萬以下帶車位公寓…'],
+  'ar-SA': ['مثال: منزل 3 غرف في برايتون…', 'مثال: شقة بموقف بأقل من 800k…'],
+  'hi-IN': ['उदा: ब्राइटन में 3 BHK घर…', 'उदा: 800k से कम पार्किंग वाला अपार्टमेंट…'],
+  'es-ES': ['ej. casa de 3 hab en Brighton…', 'ej. piso con garaje bajo 800k…'],
+  'es-MX': ['ej. casa de 3 rec en Brighton…', 'ej. depto con estac. bajo 800k…'],
+  'fr-FR': ['ex. maison 3 ch à Brighton…', 'ex. appt avec parking sous 800k…'],
+  'de-DE': ['z.B. 3-Zi-Haus in Brighton…', 'z.B. Wohnung mit Stellplatz < 800k…'],
+  'ja-JP': ['例: ブライトンの3LDK…', '例: 駐車場付きマンション80万以下…'],
+  'it-IT': ['es. casa 3 cam a Brighton…', 'es. appart con parcheggio < 800k…'],
+  'pt-BR': ['ex. casa 3 quartos em Brighton…', 'ex. apto com vaga abaixo de 800k…'],
+  'ru-RU': ['напр. 3-комн дом в Брайтоне…', 'напр. квартира с парковкой до 800k…'],
+  'ko-KR': ['예: 브라이턴 3베드 주택…', '예: 주차 포함 아파트 80만 이하…'],
+  'th-TH': ['เช่น บ้าน 3 ห้องในไบรตัน…', 'เช่น คอนโดมีที่จอดรถต่ำ 800k…'],
+  'vi-VN': ['VD: nhà 3 phòng ở Brighton…', 'VD: căn hộ đỗ xe dưới 800k…'],
+  'tr-TR': ['örn. Brighton 3 yatak oda…', 'örn. 800k altı garajlı daire…'],
+  'pl-PL': ['np. dom 3-pok w Brighton…', 'np. mieszkanie z parkingiem < 800k…'],
+  'nl-NL': ['bijv. 3-kamer woning Brighton…', 'bijv. appt met parkeren < 800k…'],
+  'sv-SE': ['t.ex. 3-rumsbostad Brighton…', 't.ex. lägen med parkering < 800k…'],
+  'el-GR': ['π.χ. σπίτι 3 δωμ Brighton…', 'π.χ. διαμ με parking < 800k…'],
+  'id-ID': ['cth. rumah 3 kamar Brighton…', 'cth. apartemen parkir < 800k…'],
 };
 const getPlaceholders = (lang: string) =>
   SEARCH_PLACEHOLDERS_BY_LANG[lang] || SEARCH_PLACEHOLDERS_BY_LANG['en-AU'];
+
+const EXAMPLE_CHIPS = [
+  { label: '🏠 House in Doncaster', query: 'house in Doncaster Victoria' },
+  { label: '🏢 Apartment Sydney CBD', query: 'apartment in Sydney CBD under $800k' },
+  { label: '🔑 Rentals under $500pw', query: 'rental property under $500 per week Melbourne' },
+  { label: '🌿 4 bed family home', query: '4 bedroom family home under $1.2M' },
+  { label: '🏗️ Land for sale', query: 'land for sale Victoria' },
+];
 
 
 
@@ -315,17 +336,19 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
     return () => clearInterval(t);
   }, []);
 
-  // Animated placeholder
+  // Animated placeholder — rotate every 3.5s with fade
   useEffect(() => {
     const t = setInterval(() => {
       setPlaceholderVisible(false);
       setTimeout(() => {
         setPlaceholderIndex(i => i + 1);
         setPlaceholderVisible(true);
-      }, 300);
-    }, 3000);
+      }, 400);
+    }, 3500);
     return () => clearInterval(t);
   }, []);
+
+  const [showRefine, setShowRefine] = useState(false);
 
   const geocodeLocation = useCallback(async (text: string) => {
     if (!onLocationSelect) return;

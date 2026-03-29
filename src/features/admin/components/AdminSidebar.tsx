@@ -17,7 +17,7 @@ export type AdminTab =
   | 'comms' | 'partners' | 'growth' | 'support' | 'users' | 'listings'
   | 'roles' | 'database' | 'demo-requests' | 'reports' | 'ai-insights'
   | 'pre-launch' | 'ai-buyer-concierge' | 'ai-seller-score'
-  | 'ai-offer-generator' | 'ai-lead-marketplace';
+  | 'ai-offer-generator' | 'ai-lead-marketplace' | 'legal-compliance';
 
 interface NavItemProps {
   id: AdminTab;

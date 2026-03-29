@@ -20,6 +20,7 @@ import GrowthFunnel from '@/features/admin/components/GrowthFunnel';
 import SupportInbox from '@/features/admin/components/SupportInbox';
 import AIInsights from '@/features/admin/components/AIInsights';
 import PreLaunchChecklist from '@/features/admin/components/PreLaunchChecklist';
+import LegalComplianceChecklist from '@/features/admin/components/LegalComplianceChecklist';
 import AdminSidebar, { type AdminTab } from '@/features/admin/components/AdminSidebar';
 
 type Tab = AdminTab;
@@ -332,6 +333,7 @@ const AdminDashboard = () => {
               {tab === 'reports' && <AdminReports isAdmin={true} />}
               {tab === 'ai-insights' && <AIInsights />}
               {tab === 'pre-launch' && <PreLaunchChecklist />}
+              {tab === 'legal-compliance' && <LegalComplianceChecklist />}
               {tab === 'ai-buyer-concierge' && <div className="text-muted-foreground text-center py-20">Buyer Concierge dashboard — coming soon</div>}
               {tab === 'ai-seller-score' && <div className="text-muted-foreground text-center py-20">Seller Likelihood Scores — coming soon</div>}
               {tab === 'ai-offer-generator' && <div className="text-muted-foreground text-center py-20">AI Offer Generator stats — coming soon</div>}

@@ -1347,6 +1347,13 @@ export type Database = {
             referencedRelation: "consumer_profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "lead_purchases_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "consumer_profiles_marketplace"
+            referencedColumns: ["id"]
+          },
         ]
       }
       leads: {
@@ -3735,7 +3742,51 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      consumer_profiles_marketplace: {
+        Row: {
+          budget_max: number | null
+          budget_min: number | null
+          buying_situation: string | null
+          created_at: string | null
+          email: string | null
+          id: string | null
+          is_purchasable: boolean | null
+          lead_score: number | null
+          min_bedrooms: number | null
+          name: string | null
+          preferred_suburbs: string[] | null
+          preferred_type: string | null
+        }
+        Insert: {
+          budget_max?: number | null
+          budget_min?: number | null
+          buying_situation?: string | null
+          created_at?: string | null
+          email?: never
+          id?: string | null
+          is_purchasable?: boolean | null
+          lead_score?: number | null
+          min_bedrooms?: number | null
+          name?: never
+          preferred_suburbs?: string[] | null
+          preferred_type?: string | null
+        }
+        Update: {
+          budget_max?: number | null
+          budget_min?: number | null
+          buying_situation?: string | null
+          created_at?: string | null
+          email?: never
+          id?: string | null
+          is_purchasable?: boolean | null
+          lead_score?: number | null
+          min_bedrooms?: number | null
+          name?: never
+          preferred_suburbs?: string[] | null
+          preferred_type?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       delete_user_cascade: { Args: { p_user_id: string }; Returns: undefined }

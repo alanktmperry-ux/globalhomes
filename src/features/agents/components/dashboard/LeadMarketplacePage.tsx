@@ -14,6 +14,8 @@ import { toast } from '@/hooks/use-toast';
 
 interface ConsumerLead {
   id: string;
+  name: string;
+  email: string | null;
   buying_situation: string;
   budget_min: number;
   budget_max: number;
@@ -21,9 +23,8 @@ interface ConsumerLead {
   preferred_type: string;
   min_bedrooms: number;
   lead_score: number;
-  purchase_price: number;
+  is_purchasable: boolean;
   created_at: string;
-  trigger_query: string | null;
 }
 
 interface PurchasedBuyer {
@@ -75,10 +76,9 @@ const LeadMarketplacePage = () => {
   const fetchLeads = useCallback(async () => {
     setLoading(true);
     const { data, error } = await supabase
-      .from('consumer_profiles' as any)
-      .select('id, buying_situation, budget_min, budget_max, preferred_suburbs, preferred_type, min_bedrooms, lead_score, purchase_price, created_at, trigger_query')
+      .from('consumer_profiles_marketplace' as any)
+      .select('id, name, email, buying_situation, budget_min, budget_max, preferred_suburbs, preferred_type, min_bedrooms, lead_score, is_purchasable, created_at')
       .eq('is_purchasable', true)
-      .is('purchased_by', null)
       .order('lead_score', { ascending: false }) as any;
 
     if (!error && data) setLeads(data);
@@ -185,10 +185,10 @@ const LeadMarketplacePage = () => {
                   <span className="flex items-center gap-1"><BedDouble size={12} />{lead.min_bedrooms}+ beds</span>
                 </div>
 
-                {/* Trigger query */}
-                {lead.trigger_query && (
-                  <p className="text-xs italic text-muted-foreground truncate">
-                    searched for: "{lead.trigger_query}"
+                {/* Show unlocked name if purchased */}
+                {lead.name !== 'Verified Buyer' && lead.email && (
+                  <p className="text-xs font-medium text-foreground">
+                    {lead.name} — {lead.email}
                   </p>
                 )}
 
@@ -211,7 +211,7 @@ const LeadMarketplacePage = () => {
                   ) : (
                     <ShoppingBag size={14} className="mr-2" />
                   )}
-                  Purchase Lead — ${lead.purchase_price || 29}
+                  Purchase Lead — $29
                 </Button>
               </motion.div>
             ))}

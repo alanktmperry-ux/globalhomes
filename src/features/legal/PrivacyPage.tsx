@@ -13,7 +13,7 @@ const PrivacyPage = () => (
 
         <h2>1. Overview</h2>
         <p>
-          ListHQ Pty Ltd (ABN 00 000 000 000) is committed to protecting your personal information in
+          ListHQ Pty Ltd (ABN 65 608 526 781) is committed to protecting your personal information in
           accordance with the <em>Privacy Act 1988</em> (Cth) and the Australian Privacy Principles (APPs).
           This policy explains how we collect, use, disclose, and safeguard your data.
         </p>
@@ -53,19 +53,32 @@ const PrivacyPage = () => (
         </ul>
         <p>We do not sell your personal information to third parties.</p>
 
-        <h2>6. Data Storage & Security</h2>
+        <h2>6. Third-Party Service Providers</h2>
+        <p>We use the following third-party services to operate the platform, each of whom may process your personal data:</p>
+        <ul>
+          <li><strong>Supabase</strong> — database hosting and authentication (servers located in the United States).</li>
+          <li><strong>Stripe</strong> — payment processing (United States).</li>
+          <li><strong>Google Maps Platform</strong> — property location and address services (United States).</li>
+          <li><strong>Resend / email provider</strong> — transactional email delivery.</li>
+        </ul>
+        <p>
+          Each provider operates under their own privacy policy and data processing agreements.
+          Cross-border transfers are conducted in accordance with APP 8 of the <em>Privacy Act 1988</em> (Cth).
+        </p>
+
+        <h2>7. Data Storage & Security</h2>
         <p>
           Your data is stored on secure servers with encryption at rest and in transit. While we take
           reasonable steps to protect your information, no method of electronic storage is 100% secure.
         </p>
 
-        <h2>7. Cookies & Tracking</h2>
+        <h2>8. Cookies & Tracking</h2>
         <p>
           We use cookies and similar technologies to enhance your experience, remember preferences, and
           analyse platform usage. You can manage cookie preferences through your browser settings.
         </p>
 
-        <h2>8. Your Rights</h2>
+        <h2>9. Your Rights</h2>
         <p>Under Australian privacy law, you have the right to:</p>
         <ul>
           <li>Access personal information we hold about you.</li>
@@ -74,19 +87,19 @@ const PrivacyPage = () => (
           <li>Opt out of marketing communications at any time.</li>
         </ul>
 
-        <h2>9. International Data Transfers</h2>
+        <h2>10. International Data Transfers</h2>
         <p>
           As a global platform, some data may be processed in jurisdictions outside Australia. We ensure
           appropriate safeguards are in place in accordance with APP 8 (cross-border disclosure).
         </p>
 
-        <h2>10. Changes to This Policy</h2>
+        <h2>11. Changes to This Policy</h2>
         <p>
           We may update this policy from time to time. Material changes will be communicated via email or
           an in-app notification.
         </p>
 
-        <h2>11. Contact & Complaints</h2>
+        <h2>12. Contact & Complaints</h2>
         <p>
           For privacy enquiries or complaints, contact our Privacy Officer at{' '}
           <a href="mailto:privacy@listhq.com.au" className="text-primary hover:underline">

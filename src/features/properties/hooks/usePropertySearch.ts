@@ -40,6 +40,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
   const [searchCenter, setSearchCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [searchRadius, setSearchRadius] = useState<number | null>(5);
   const [areaSearch, setAreaSearch] = useState<AreaSearch | null>(null);
+  const [searchSummary, setSearchSummary] = useState<string>('');
 
   // ── Realtime properties with React Query caching ─────────────
   const {

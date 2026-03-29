@@ -362,7 +362,12 @@ const Index = () => {
         <span className="text-sm font-medium text-foreground shrink-0">
           {filteredProperties.length} properties
         </span>
-        {hasSearched && (
+        {hasSearched && searchSummary && (
+          <span className="text-xs text-primary font-medium truncate max-w-[300px]" title={searchSummary}>
+            {searchSummary}
+          </span>
+        )}
+        {hasSearched && !searchSummary && (
           <span className="text-xs text-muted-foreground truncate">{t('search.results')}</span>
         )}
         {!hasSearched && (

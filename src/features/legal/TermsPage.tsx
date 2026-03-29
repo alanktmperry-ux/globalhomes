@@ -13,7 +13,7 @@ const TermsPage = () => (
 
         <h2>1. About ListHQ</h2>
         <p>
-          ListHQ Pty Ltd (ABN 00 000 000 000) operates the ListHQ platform from Victoria, Australia.
+          ListHQ Pty Ltd (ABN 65 608 526 781) operates the ListHQ platform from Victoria, Australia.
           By accessing or using the platform you agree to be bound by these terms.
         </p>
 
@@ -77,7 +77,24 @@ const TermsPage = () => (
           subject to the exclusive jurisdiction of the courts of Victoria.
         </p>
 
-        <h2>11. Contact</h2>
+        <h2>11. Subscription & Payments</h2>
+        <p>
+          Agent subscriptions are billed on a recurring basis via Stripe. By subscribing you
+          authorise ListHQ to charge your nominated payment method at the start of each billing
+          period. Subscriptions auto-renew unless cancelled before the renewal date.
+        </p>
+        <p>
+          Refunds are assessed on a case-by-case basis in accordance with the{' '}
+          <em>Australian Consumer Law</em>. Where a statutory guarantee applies, ListHQ will
+          provide a remedy as required by law. No refunds are issued for partial billing periods
+          unless required by law.
+        </p>
+        <p>
+          You may cancel your subscription at any time from your billing settings. Access
+          continues until the end of the paid period.
+        </p>
+
+        <h2>12. Contact</h2>
         <p>
           Questions about these terms can be directed to{' '}
           <a href="mailto:legal@listhq.com.au" className="text-primary hover:underline">

@@ -32,6 +32,7 @@ async function sendViaResend(to: string, subject: string, html: string) {
     console.error('RESEND_API_KEY not configured');
     return { ok: false, reason: 'RESEND_API_KEY not set' };
   }
+  const from = Deno.env.get("EMAIL_FROM") || "ListHQ <noreply@listhq.com.au>";
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -39,7 +40,7 @@ async function sendViaResend(to: string, subject: string, html: string) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'ListHQ <onboarding@resend.dev>',
+      from,
       to: [to],
       subject,
       html,

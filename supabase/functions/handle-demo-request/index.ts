@@ -6,11 +6,7 @@ const corsHeaders = {
   "Content-Type": "application/json",
 };
 
-// TEST MODE: Resend free tier only delivers to the account owner email.
-// All emails are physically sent to TEST_TO but subject shows the real recipient.
-// When domain is verified, remove TEST_TO and use the real `to` address.
-const FROM = "onboarding@resend.dev";
-const TEST_TO = "alanktmperry@gmail.com";
+const FROM = Deno.env.get("EMAIL_FROM") || "ListHQ <noreply@listhq.com.au>";
 
 function generateCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -24,13 +20,11 @@ function generateTempPassword(): string {
 }
 
 async function sendEmail(apiKey: string, intendedTo: string, subject: string, html: string) {
-  const recipient = TEST_TO;
-  const testSubject = intendedTo === TEST_TO ? subject : `[→ ${intendedTo}] ${subject}`;
-  console.log(`[email] Sending to: ${recipient} (intended: ${intendedTo}) | Subject: ${subject}`);
+  console.log(`[email] Sending to: ${intendedTo} | Subject: ${subject}`);
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from: FROM, to: [recipient], subject: testSubject, html }),
+    body: JSON.stringify({ from: FROM, to: [intendedTo], subject, html }),
   });
   const txt = await res.text();
   if (!res.ok) console.error(`[email] FAILED ${res.status}: ${txt}`);
@@ -114,9 +108,9 @@ Deno.serve(async (req) => {
       await ensureDemoAuthUser(supabase, email, full_name);
 
       // Admin alert
-      await sendEmail(apiKey, "sales@everythingeco.com.au", `New Demo Request — ${full_name}`, buildAdminEmail({ full_name, email, phone, agency_name, message }));
+      await sendEmail(apiKey, "admin@listhq.com.au", `New Demo Request — ${full_name}`, buildAdminEmail({ full_name, email, phone, agency_name, message }));
       // Send access code immediately to applicant
-      const demoUrl = `https://listhq.lovable.app/agents/demo?email=${encodeURIComponent(email)}`;
+      const demoUrl = `https://listhq.com.au/agents/demo?email=${encodeURIComponent(email)}`;
       await sendEmail(apiKey, email, "Your ListHQ Access Code", buildAccessCodeEmail(full_name, email, code, demoUrl));
       return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
 
@@ -138,7 +132,7 @@ Deno.serve(async (req) => {
 
       await ensureDemoAuthUser(supabase, r.email, r.full_name);
 
-      const demoUrl = `https://listhq.lovable.app/agents/demo?email=${encodeURIComponent(r.email)}`;
+      const demoUrl = `https://listhq.com.au/agents/demo?email=${encodeURIComponent(r.email)}`;
       await sendEmail(apiKey, r.email, "Your ListHQ Demo Access Code", buildAccessCodeEmail(r.full_name, r.email, code, demoUrl));
       return new Response(JSON.stringify({ success: true, code }), { headers: corsHeaders });
 
@@ -159,7 +153,7 @@ Deno.serve(async (req) => {
 
       if (qErr) throw qErr;
       if (!demoReq) {
-        return new Response(JSON.stringify({ error: "Invalid or expired code. Please check your email or contact sales@everythingeco.com.au" }), { status: 400, headers: corsHeaders });
+        return new Response(JSON.stringify({ error: "Invalid or expired code. Please check your email or contact support@listhq.com.au" }), { status: 400, headers: corsHeaders });
       }
 
       await ensureDemoAuthUser(supabase, demoReq.email, demoReq.full_name);
@@ -300,7 +294,7 @@ function buildConfirmationEmail(name: string, email: string) {
         <div style="font-weight:600;color:#0f172a;margin-bottom:6px;">What happens next?</div>
         <div style="color:#475569;font-size:14px;line-height:1.6;">Once approved, we'll send your unique access code to <strong>${email}</strong>. Use that code to log into your personalised demo dashboard.</div>
       </div>
-      <div style="color:#64748b;font-size:13px;">If you have any questions in the meantime, reach us at <a href="mailto:sales@everythingeco.com.au" style="color:#2563eb;text-decoration:none;">sales@everythingeco.com.au</a></div>
+      <div style="color:#64748b;font-size:13px;">If you have any questions in the meantime, reach us at <a href="mailto:support@listhq.com.au" style="color:#2563eb;text-decoration:none;">support@listhq.com.au</a></div>
     </div>
     <div style="text-align:center;padding:20px;color:#94a3b8;font-size:12px;">
       <div>© ListHQ · Melbourne, Australia · You're receiving this because you requested a demo.</div>
@@ -318,7 +312,7 @@ function buildAccessCodeEmail(name: string, email: string, code: string, demoUrl
   <div style="font-size:40px;font-weight:900;letter-spacing:8px;font-family:monospace;background:#f1f5f9;padding:24px;border-radius:8px;text-align:center;color:#0f172a;">${code}</div>
   <p style="color:#64748b;font-size:13px;">Valid for 7 days. Do not share.</p>
   <p><a href="${demoUrl}" style="display:inline-block;background:#2563eb;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;">Log In to ListHQ →</a></p>
-  <p style="color:#94a3b8;font-size:12px;">Questions? <a href="mailto:sales@everythingeco.com.au" style="color:#2563eb;">sales@everythingeco.com.au</a></p>
+  <p style="color:#94a3b8;font-size:12px;">Questions? <a href="mailto:support@listhq.com.au" style="color:#2563eb;">support@listhq.com.au</a></p>
 </div>
 </body></html>`;
 }

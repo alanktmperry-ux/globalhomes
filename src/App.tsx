@@ -144,6 +144,7 @@ const App = () => (
                   <Route path="/agents" element={<FindAgentPage />} />
                   <Route path="/for-agents" element={<AgentLandingPage />} />
                   <Route path="/launch" element={<MarketingLandingPage />} />
+                  <Route path="/waitlist" element={<WaitlistPage />} />
                   <Route path="/agency/:slug" element={<AgencyProfilePage />} />
                   <Route path="/terms" element={<TermsPage />} />
                   <Route path="/privacy" element={<PrivacyPage />} />

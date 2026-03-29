@@ -54,14 +54,45 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
     listingType: listingMode,
   });
 
+  // ── Build human-readable summary from parsed intent ─────────
+  const buildSearchSummary = useCallback((intent: Record<string, unknown>): string => {
+    const parts: string[] = [];
+    if (intent.property_type) parts.push(String(intent.property_type));
+    if (intent.suburb) parts.push(`in ${intent.suburb}`);
+    if (intent.state) parts.push(String(intent.state));
+    if (intent.price_min && intent.price_max) {
+      const fmtMin = Number(intent.price_min) >= 1_000_000
+        ? `$${(Number(intent.price_min) / 1_000_000).toFixed(1)}M`
+        : `$${(Number(intent.price_min) / 1000).toFixed(0)}k`;
+      const fmtMax = Number(intent.price_max) >= 1_000_000
+        ? `$${(Number(intent.price_max) / 1_000_000).toFixed(1)}M`
+        : `$${(Number(intent.price_max) / 1000).toFixed(0)}k`;
+      parts.push(`${fmtMin}–${fmtMax}`);
+    } else if (intent.price_max) {
+      const fmt = Number(intent.price_max) >= 1_000_000
+        ? `$${(Number(intent.price_max) / 1_000_000).toFixed(1)}M`
+        : `$${(Number(intent.price_max) / 1000).toFixed(0)}k`;
+      parts.push(`under ${fmt}`);
+    } else if (intent.price_min) {
+      const fmt = Number(intent.price_min) >= 1_000_000
+        ? `$${(Number(intent.price_min) / 1_000_000).toFixed(1)}M`
+        : `$${(Number(intent.price_min) / 1000).toFixed(0)}k`;
+      parts.push(`from ${fmt}`);
+    }
+    if (intent.bedrooms_min) parts.push(`${intent.bedrooms_min}+ bed`);
+    if (intent.bathrooms_min) parts.push(`${intent.bathrooms_min}+ bath`);
+    return parts.length > 0 ? `Showing ${parts.join(' · ')}` : '';
+  }, []);
+
   // ── Search handler ────────────────────────────────────────────
   const handleSearch = useCallback(
     async (query: string) => {
       setHasSearched(true);
       setCurrentQuery(query);
       addSearch(query);
+      setSearchSummary('');
 
-      // Parse structured filters from the query
+      // Parse structured filters from the query (local fallback)
       const parsedFilters = parsePropertyQuery(query);
 
       // Update the filter sidebar to reflect what was spoken/typed
@@ -79,6 +110,53 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
       }));
 
       setIsSearching(true);
+
+      // Phase 0: AI-powered query parsing (runs in parallel with other phases)
+      const aiSearchPromise = supabase.functions
+        .invoke('parse-search-query', {
+          body: { query: query.trim().slice(0, 300), listing_mode: listingMode },
+        })
+        .then(({ data, error }) => {
+          if (error || !data) {
+            console.warn('[handleSearch] AI parse failed:', error);
+            return null;
+          }
+          // Update search summary from parsed intent
+          if (data.parsed_intent) {
+            const summary = buildSearchSummary(data.parsed_intent);
+            setSearchSummary(summary);
+
+            // Update filters from AI-parsed intent (more accurate than regex)
+            const intent = data.parsed_intent;
+            setFilters(prev => ({
+              ...prev,
+              minBeds: intent.bedrooms_min || prev.minBeds,
+              minBaths: intent.bathrooms_min || prev.minBaths,
+              priceRange: [
+                intent.price_min || prev.priceRange[0],
+                intent.price_max || prev.priceRange[1],
+              ],
+              propertyTypes: intent.property_type
+                ? [intent.property_type]
+                : prev.propertyTypes,
+            }));
+          }
+          // Map AI results to Property objects and merge
+          if (data.listings?.length > 0) {
+            const mapped = data.listings.map(mapDbProperty);
+            setResults(prev => {
+              const ids = new Set(prev.map(p => p.id));
+              const unique = mapped.filter((p: Property) => !ids.has(p.id));
+              if (unique.length === 0) return prev;
+              return [...unique, ...prev];
+            });
+          }
+          return data;
+        })
+        .catch(err => {
+          console.warn('[handleSearch] AI parse error:', err);
+          return null;
+        });
 
       // Phase 1 (agent listings) + Phase 2 (Firecrawl) in parallel
       const agentListingsPromise = searchAgentListings(
@@ -128,9 +206,12 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
         toast.success(`🌐 Web results found — Found ${firecrawlResults.length} listings from the web`);
       }
 
+      // Wait for AI search to complete too before marking done
+      await aiSearchPromise;
+
       setIsSearching(false);
     },
-    [addSearch, toast, listingMode, setFilters],
+    [addSearch, toast, listingMode, setFilters, buildSearchSummary],
   );
 
   // ── Re-trigger search when listing mode changes ──────────────

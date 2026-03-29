@@ -1389,6 +1389,7 @@ export type Database = {
       leads: {
         Row: {
           agent_id: string
+          archived_at: string | null
           budget_range: string | null
           buying_purpose: string | null
           created_at: string
@@ -1398,6 +1399,7 @@ export type Database = {
           pre_approval_status: string | null
           preferred_contact: string | null
           property_id: string
+          read: boolean | null
           score: number | null
           search_context: Json | null
           status: string | null
@@ -1410,6 +1412,7 @@ export type Database = {
         }
         Insert: {
           agent_id: string
+          archived_at?: string | null
           budget_range?: string | null
           buying_purpose?: string | null
           created_at?: string
@@ -1419,6 +1422,7 @@ export type Database = {
           pre_approval_status?: string | null
           preferred_contact?: string | null
           property_id: string
+          read?: boolean | null
           score?: number | null
           search_context?: Json | null
           status?: string | null
@@ -1431,6 +1435,7 @@ export type Database = {
         }
         Update: {
           agent_id?: string
+          archived_at?: string | null
           budget_range?: string | null
           buying_purpose?: string | null
           created_at?: string
@@ -1440,6 +1445,7 @@ export type Database = {
           pre_approval_status?: string | null
           preferred_contact?: string | null
           property_id?: string
+          read?: boolean | null
           score?: number | null
           search_context?: Json | null
           status?: string | null

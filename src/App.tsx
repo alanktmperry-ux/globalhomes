@@ -37,6 +37,7 @@ const BuyerSettingsPage = React.lazy(() => import("./pages/BuyerSettingsPage"));
 const TermsPage = React.lazy(() => import("./pages/TermsPage"));
 const PrivacyPage = React.lazy(() => import("./pages/PrivacyPage"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
+const MarketingLandingPage = React.lazy(() => import("./features/marketing/pages/MarketingLandingPage"));
 const AgentPerformanceDashboard = React.lazy(() => import("./features/agents/pages/AgentPerformanceDashboard"));
 const DemoAccessPage = React.lazy(() => import("./features/agents/pages/DemoAccessPage"));
 const AuthConfirmPage = React.lazy(() => import("./features/auth/pages/AuthConfirmPage"));
@@ -141,6 +142,7 @@ const App = () => (
                   <Route path="/agent/:id" element={<AgentPublicProfilePage />} />
                   <Route path="/agents" element={<FindAgentPage />} />
                   <Route path="/for-agents" element={<AgentLandingPage />} />
+                  <Route path="/launch" element={<MarketingLandingPage />} />
                   <Route path="/agency/:slug" element={<AgencyProfilePage />} />
                   <Route path="/terms" element={<TermsPage />} />
                   <Route path="/privacy" element={<PrivacyPage />} />

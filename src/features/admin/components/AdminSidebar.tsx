@@ -102,6 +102,7 @@ function SidebarContent({ tab, setTab, pendingDemoCount = 0, onClose }: AdminSid
 
           <SectionLabel>Compliance</SectionLabel>
           <NavItem id="compliance" label="Compliance" icon={ShieldAlert} tab={tab} setTab={setTab} onClose={onClose} />
+          <NavItem id="legal-compliance" label="Legal Checklist" icon={FileSignature} tab={tab} setTab={setTab} onClose={onClose} />
 
           <SectionLabel>AI Builds</SectionLabel>
           <NavItem id="ai-insights" label="AI Insights" icon={Brain} tab={tab} setTab={setTab} onClose={onClose} />

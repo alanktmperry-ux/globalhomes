@@ -1,6 +1,7 @@
 import { Globe, Instagram, Linkedin, Twitter, ShieldCheck, Scale, FileCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { DarkModeToggle } from './DarkModeToggle';
+import { useConsent } from '@/shared/components/CookieConsent';
 
 const footerLinks = [
   { label: 'Home', to: '/' },
@@ -43,6 +44,7 @@ const complianceBadges = [
 ];
 
 export function SiteFooter() {
+  const { resetConsent } = useConsent();
   return (
     <footer className="bg-card border-t border-border pb-20 md:pb-0">
       {/* Compliance banner */}
@@ -137,9 +139,17 @@ export function SiteFooter() {
           <p className="text-xs text-muted-foreground">
             ListHQ © {new Date().getFullYear()} · ABN 00 000 000 000
           </p>
-          <p className="text-xs text-muted-foreground text-center md:text-right max-w-md leading-relaxed">
-            ListHQ operates under Australian property law. All trust funds are held in compliance with state fair trading regulations.
-          </p>
+          <div className="flex items-center gap-3">
+            <p className="text-xs text-muted-foreground text-center md:text-right max-w-md leading-relaxed">
+              ListHQ operates under Australian property law. All trust funds are held in compliance with state fair trading regulations.
+            </p>
+            <button
+              onClick={resetConsent}
+              className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 whitespace-nowrap transition-colors"
+            >
+              Reset cookie preferences
+            </button>
+          </div>
         </div>
       </div>
     </footer>

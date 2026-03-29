@@ -67,9 +67,21 @@ const SeekerAuthPage = () => {
       if (error) throw error;
 
       if (data.user && !data.session) {
+        // Store terms acceptance
+        await supabase.from('profiles').update({
+          terms_accepted_at: new Date().toISOString(),
+          terms_version: '1.0',
+        } as any).eq('user_id', data.user.id);
+
         toast('✉️ Check your email', { description: `We sent a confirmation link to ${email}. Click it to verify your account and sign in. Check your spam folder if you don't see it.`, duration: 10000 });
         setStep('email');
       } else {
+        if (data.user) {
+          await supabase.from('profiles').update({
+            terms_accepted_at: new Date().toISOString(),
+            terms_version: '1.0',
+          } as any).eq('user_id', data.user.id);
+        }
         toast.success('🎉 Account created!', { description: 'Setting up your preferences...' });
         setStep('prefs');
       }

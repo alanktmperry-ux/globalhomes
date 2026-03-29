@@ -95,6 +95,14 @@ const OfferModal = ({ open, onOpenChange, card, propertyId, agentId, onSent }: O
 
         <p className="text-xs text-muted-foreground mb-3">{card.address} · {card.contactName}</p>
 
+        <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2 mb-3">
+          <p className="text-[11px] text-amber-700 dark:text-amber-400 leading-relaxed">
+            ⚠️ This offer letter is generated as an administrative aid only and does not constitute
+            legal advice. Agents must hold a current real estate licence to use this platform.
+            All offer letters must be reviewed before submission. ListHQ is not a licensed real estate agency.
+          </p>
+        </div>
+
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div>
             <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Offer Amount (AUD)</label>

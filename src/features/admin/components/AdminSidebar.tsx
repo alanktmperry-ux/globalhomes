@@ -17,7 +17,7 @@ export type AdminTab =
   | 'comms' | 'partners' | 'growth' | 'support' | 'users' | 'listings'
   | 'roles' | 'database' | 'demo-requests' | 'reports' | 'ai-insights'
   | 'pre-launch' | 'ai-buyer-concierge' | 'ai-seller-score'
-  | 'ai-offer-generator' | 'ai-lead-marketplace';
+  | 'ai-offer-generator' | 'ai-lead-marketplace' | 'legal-compliance';
 
 interface NavItemProps {
   id: AdminTab;
@@ -102,6 +102,7 @@ function SidebarContent({ tab, setTab, pendingDemoCount = 0, onClose }: AdminSid
 
           <SectionLabel>Compliance</SectionLabel>
           <NavItem id="compliance" label="Compliance" icon={ShieldAlert} tab={tab} setTab={setTab} onClose={onClose} />
+          <NavItem id="legal-compliance" label="Legal Checklist" icon={FileSignature} tab={tab} setTab={setTab} onClose={onClose} />
 
           <SectionLabel>AI Builds</SectionLabel>
           <NavItem id="ai-insights" label="AI Insights" icon={Brain} tab={tab} setTab={setTab} onClose={onClose} />

@@ -236,6 +236,13 @@ const RentRollPage = () => {
         }
       />
 
+      <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+        <AlertTriangle size={14} className="text-amber-600 shrink-0 mt-0.5" />
+        <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
+          📋 Tenancy records are retained for 7 years in compliance with Australian tenancy law. Records cannot be deleted during this period.
+        </p>
+      </div>
+
       {loading ? (
         <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" size={28} /></div>
       ) : (

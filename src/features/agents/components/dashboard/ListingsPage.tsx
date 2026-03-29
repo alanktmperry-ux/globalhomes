@@ -193,6 +193,36 @@ const ListingsPage = () => {
   const handleMarkSold = async (l: AgentListing) => {
     if (l._source !== 'db') { toast.success('Demo listing — Create a real listing first.'); return; }
     setActionLoading(l.id);
+
+    // Safety check: block if active tenancy exists
+    const { data: activeTenancies } = await supabase
+      .from('tenancies')
+      .select('id')
+      .eq('property_id', l.id)
+      .eq('status', 'active')
+      .limit(1) as any;
+
+    if (activeTenancies && activeTenancies.length > 0) {
+      toast.error('This property has an active tenancy. End the tenancy before marking as sold.');
+      setActionLoading(null);
+      return;
+    }
+
+    // Warning check: pending offers
+    const { data: pendingOffers } = await supabase
+      .from('offers')
+      .select('id')
+      .eq('property_id', l.id)
+      .eq('status', 'pending')
+      .limit(1) as any;
+
+    if (pendingOffers && pendingOffers.length > 0) {
+      if (!confirm('This listing has pending offers. Marking as sold will close them. Continue?')) {
+        setActionLoading(null);
+        return;
+      }
+    }
+
     const { error } = await supabase.from('properties').update({ status: 'sold', is_active: false } as any).eq('id', l.id);
     if (error) { toast.error('Failed to update'); }
     else { toast.success('Marked as sold! — Listing has been marked as sold.'); refetch(); }

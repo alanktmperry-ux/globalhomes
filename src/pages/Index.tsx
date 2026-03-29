@@ -88,6 +88,19 @@ const Index = () => {
   // Consumer sign-up modal trigger after 3rd anonymous search
   const wrappedHandleSearch = useCallback((query: string) => {
     handleSearch(query);
+
+    // Fire-and-forget: log every search to voice_searches for AI Buyer Concierge pipeline
+    supabase
+      .from('voice_searches')
+      .insert({
+        transcript: query.slice(0, 200),
+        user_id: user?.id ?? null,
+        detected_language: 'en',
+        status: 'completed',
+      })
+      .then(() => {})
+      .catch(() => {});
+
     if (!user) {
       const alreadySignedUp = localStorage.getItem('listhq_consumer_signed_up');
       if (alreadySignedUp) return;

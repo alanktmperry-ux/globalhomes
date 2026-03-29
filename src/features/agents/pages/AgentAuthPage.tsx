@@ -176,7 +176,12 @@ const AgentAuthPage = () => {
       if (setupError) throw new Error(`Profile setup failed: ${setupError.message}`);
       if (setupResult?.error) throw new Error(`Profile setup error: ${setupResult.error}`);
 
-      // Step 3 — check if session exists (auto-confirm on) or needs email verification
+      // Store terms acceptance
+      await supabase.from('profiles').update({
+        terms_accepted_at: new Date().toISOString(),
+        terms_version: '1.0',
+      } as any).eq('user_id', userId);
+
       const { data: sessionData } = await supabase.auth.getSession();
 
       if (sessionData?.session) {

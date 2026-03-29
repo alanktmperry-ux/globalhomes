@@ -100,6 +100,7 @@ function SidebarContent({ tab, setTab, pendingDemoCount = 0, onClose }: AdminSid
           <SectionLabel>Engage</SectionLabel>
           <NavItem id="comms" label="Communications" icon={Megaphone} tab={tab} setTab={setTab} onClose={onClose} />
           <NavItem id="partners" label="Partners" icon={Landmark} tab={tab} setTab={setTab} onClose={onClose} />
+          <NavItem id="press-outreach" label="PR Outreach" icon={Megaphone} tab={tab} setTab={setTab} onClose={onClose} />
 
           <SectionLabel>Compliance</SectionLabel>
           <NavItem id="compliance" label="Compliance" icon={ShieldAlert} tab={tab} setTab={setTab} onClose={onClose} />

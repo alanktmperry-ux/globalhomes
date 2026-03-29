@@ -447,7 +447,7 @@ const DashboardOverview = () => {
       <DashboardHeader title="Dashboard" subtitle="Welcome back, Agent" />
 
       <div className="p-4 sm:p-6 space-y-6 max-w-7xl">
-        {/* Onboarding Checklist */}
+        {listings.length === 0 && (
         {(() => {
           if (onboardingDismissed) return null;
           const step1 = !!(onboardingAgent?.name && onboardingAgent?.avatar_url && onboardingAgent?.bio);

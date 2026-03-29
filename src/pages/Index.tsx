@@ -99,8 +99,7 @@ const Index = () => {
         detected_language: 'en',
         status: 'completed',
       })
-      .then(() => {})
-      .catch(() => {});
+      .then(() => {});
 
     if (!user) {
       const alreadySignedUp = localStorage.getItem('listhq_consumer_signed_up');

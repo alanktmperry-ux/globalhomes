@@ -10,7 +10,8 @@ interface AuthContextType {
   isAgent: boolean;
   isAdmin: boolean;
   isPartner: boolean;
-  userRole: 'user' | 'agent' | 'admin' | 'partner' | null;
+  isStrataManager: boolean;
+  userRole: 'user' | 'agent' | 'admin' | 'partner' | 'strata_manager' | null;
   signOut: () => Promise<void>;
   impersonating: boolean;
   impersonatedUser: string | null;
@@ -26,6 +27,7 @@ const AuthContext = createContext<AuthContextType>({
   isAgent: false,
   isAdmin: false,
   isPartner: false,
+  isStrataManager: false,
   userRole: null,
   signOut: async () => {},
   impersonating: false,
@@ -44,7 +46,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAgent, setIsAgent] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isPartner, setIsPartner] = useState(false);
-  const [userRole, setUserRole] = useState<'user' | 'agent' | 'admin' | 'partner' | null>(null);
+  const [isStrataManager, setIsStrataManager] = useState(false);
+  const [userRole, setUserRole] = useState<'user' | 'agent' | 'admin' | 'partner' | 'strata_manager' | null>(null);
   const [rolesFetched, setRolesFetched] = useState(false);
   const lastFetchedUserId = useRef<string | null>(null);
   const [impersonating, setImpersonating] = useState(false);
@@ -87,8 +90,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsAdmin(roles.includes('admin'));
     setIsAgent(roles.includes('agent') || roles.includes('admin'));
     setIsPartner(roles.includes('partner'));
+    setIsStrataManager(roles.includes('strata_manager'));
     setUserRole(
-      roles.includes('admin') ? 'admin' : roles.includes('agent') ? 'agent' : roles.includes('partner') ? 'partner' : 'user'
+      roles.includes('admin') ? 'admin' : roles.includes('agent') ? 'agent' : roles.includes('partner') ? 'partner' : roles.includes('strata_manager') ? 'strata_manager' : 'user'
     );
   }, []);
 
@@ -97,6 +101,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsAgent(false);
     setIsAdmin(false);
     setIsPartner(false);
+    setIsStrataManager(false);
     setUserRole(null);
     setRolesFetched(false);
   }, []);
@@ -227,7 +232,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{
-      user, session, loading, isAgent, isAdmin, isPartner, userRole, signOut,
+      user, session, loading, isAgent, isAdmin, isPartner, isStrataManager, userRole, signOut,
       impersonating, impersonatedUser, impersonatedUserId, startImpersonation, stopImpersonation,
     }}>
       {children}

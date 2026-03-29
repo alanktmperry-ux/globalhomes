@@ -447,9 +447,7 @@ const DashboardOverview = () => {
       <DashboardHeader title="Dashboard" subtitle="Welcome back, Agent" />
 
       <div className="p-4 sm:p-6 space-y-6 max-w-7xl">
-        {listings.length === 0 && (
-        {(() => {
-          if (onboardingDismissed) return null;
+        {!onboardingDismissed && (() => {
           const step1 = !!(onboardingAgent?.name && onboardingAgent?.avatar_url && onboardingAgent?.bio);
           const step2 = onboardingHasListing || listings.length > 0;
           const step3 = !!onboardingAgent?.agency_id;
@@ -460,7 +458,7 @@ const DashboardOverview = () => {
             { label: 'Add your first listing', done: step2, link: '/dashboard/listings' },
             { label: 'Connect or create your agency', done: step3, link: '/dashboard/agencies' },
             { label: 'Set up billing', done: step4, link: '/dashboard/billing' },
-            { label: 'Explore your dashboard', done: step5, link: '/dashboard/help', manual: true },
+            { label: 'Explore your dashboard', done: step5, link: '/dashboard/help', manual: true as const },
           ];
           const completed = steps.filter(s => s.done).length;
           if (completed === 5) {
@@ -494,7 +492,7 @@ const DashboardOverview = () => {
                   <button
                     key={i}
                     onClick={() => {
-                      if (step.manual && !step.done) {
+                      if ('manual' in step && step.manual && !step.done) {
                         localStorage.setItem('listhq-onboarding-step5', 'true');
                         setOnboardingStep5(true);
                       }
@@ -517,6 +515,8 @@ const DashboardOverview = () => {
             </Card>
           );
         })()}
+
+        {listings.length === 0 && (
           <div className="bg-primary/10 border border-primary/20 rounded-2xl p-5">
             <h2 className="font-bold text-lg mb-1">Welcome to ListHQ 👋</h2>
             <p className="text-sm text-muted-foreground mb-4">Your account is live. Here's how to get started:</p>

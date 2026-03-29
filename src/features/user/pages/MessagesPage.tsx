@@ -949,7 +949,7 @@ const MessagesPage = () => {
                     </>
                   ) : activeTab === 'unread' ? (
                     <>
-                      <CheckCircle2 size={40} strokeWidth={1.2} className="mb-3 text-green-500" />
+                      <CheckCircle2 size={40} strokeWidth={1.2} className="mb-3 text-primary" />
                       <p className="text-sm font-medium">You're all caught up!</p>
                       <p className="text-xs mt-1">No unread messages</p>
                     </>

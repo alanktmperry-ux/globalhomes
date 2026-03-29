@@ -54,6 +54,20 @@ const OfferModal = ({ open, onOpenChange, card, propertyId, agentId, onSent }: O
     toast({ title: 'Copied to clipboard' });
   };
 
+  const handleDownloadPdf = () => {
+    generateOfferPdf({
+      propertyAddress: card.address,
+      buyerName: card.contactName,
+      offerAmount,
+      settlementDays,
+      conditions,
+      draftText,
+      comparableSales,
+      suburbMedian,
+    });
+    toast({ title: 'PDF downloaded' });
+  };
+
   const handleMarkSent = async () => {
     if (!offerId) return;
     setMarking(true);

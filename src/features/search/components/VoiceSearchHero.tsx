@@ -358,7 +358,20 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
     syncVoiceState('processing');
     onSearch(text);
     geocodeLocation(text);
-  }, [onSearch, geocodeLocation]);
+
+    // Fire-and-forget: log to voice_searches so the AI Buyer Concierge trigger fires
+    supabase
+      .from('voice_searches')
+      .insert({
+        transcript: text,
+        user_id: user?.id ?? null,
+        detected_language: selectedLang,
+        status: 'completed',
+      })
+      .then(({ error }) => {
+        if (error) console.warn('[VoiceSearch] Failed to log search:', error.message);
+      });
+  }, [onSearch, geocodeLocation, user?.id, selectedLang]);
 
   const startListening = useCallback(() => {
     if (!isSupported) {

@@ -225,6 +225,9 @@ const App = () => (
                   <Route path="arrears" element={<PartnerArrearsPage />} />
                 </Route>
 
+                {/* Strata */}
+                <Route path="/strata-dashboard" element={<ProtectedRoute><StrataDashboardLayout /></ProtectedRoute>} />
+
                 {/* Admin */}
                 <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
 

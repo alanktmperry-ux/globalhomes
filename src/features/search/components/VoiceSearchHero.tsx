@@ -608,7 +608,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       <div className="grid grid-cols-1 md:grid-cols-2 min-h-[520px] md:min-h-[560px]">
 
         {/* LEFT — Headline + search */}
-        <div className="flex flex-col justify-center px-6 md:px-10 py-10 md:py-14 bg-background">
+        <div className="flex flex-col justify-center items-center md:items-start px-6 md:px-10 py-12 md:py-14 bg-background">
 
           {/* Headline — compact */}
           <div className="mb-6">

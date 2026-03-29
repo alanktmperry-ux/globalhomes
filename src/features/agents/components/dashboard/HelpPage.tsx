@@ -1,1278 +1,201 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import {
-  Search, ChevronRight, BookOpen, MessageCircle, ExternalLink,
-  Home, DollarSign, Users, BarChart3, Shield, Landmark, Calculator,
-  PartyPopper, Mic, MapPin, Kanban, FileText, Settings, Star,
-  Building2, AlertTriangle, CheckCircle2, Wrench, Key, Globe, Handshake, Zap,
-  Loader2, Send, Sparkles, TrendingUp, ShoppingBag, PenTool,
+  Rocket, CreditCard, Home, Users, Landmark, Shield, Wrench,
 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/features/auth/AuthProvider';
-import { toast } from 'sonner';
 
-/* ─── TYPES ─── */
-interface Guide {
-  emoji: string;
-  title: string;
-  description: string;
-  steps: string[];
-}
-
-interface FaqCategory {
-  emoji: string;
+interface FaqSection {
+  icon: React.ElementType;
   title: string;
   items: { q: string; a: string }[];
 }
 
-interface ChecklistItem {
-  icon: React.ElementType;
-  title: string;
-  description: string;
-  route: string;
-}
-
-/* ─── CHECKLIST DATA ─── */
-const CHECKLIST: ChecklistItem[] = [
-  { icon: Users, title: 'Complete your profile', description: 'Add your photo, licence number, bio, and service areas so buyers trust you.', route: '/dashboard/profile' },
-  { icon: MapPin, title: 'Set your territory', description: 'Add the suburbs you operate in so your listings appear in local searches.', route: '/dashboard/territory' },
-  { icon: Home, title: 'Add your first listing', description: 'Use the 6-step listing wizard to add a property in under 3 minutes.', route: '/pocket-listing' },
-  { icon: Zap, title: 'Boost a listing to Featured', description: 'Get your listing into the homepage featured grid for $49 (Featured) or $99 (Premier) for 30 days. Go to My Listings, open a listing, and click the Marketing tab.', route: '/dashboard/listings' },
-  { icon: Landmark, title: 'Set up trust accounting', description: 'Create your trust account or import your opening balance. Download the Pre-Import Checklist first if you are migrating from another system.', route: '/dashboard/trust' },
-  { icon: Users, title: 'Import your contacts', description: 'Bring your existing client database in via CSV — takes under 2 minutes.', route: '/dashboard/contacts' },
-  { icon: DollarSign, title: 'Choose your plan', description: 'You have 60 days free — lock in the founding price before it increases. Starter $99/mo, Pro $199/mo, Agency $399/mo.', route: '/dashboard/billing' },
-  { icon: Globe, title: 'Explore the Off-Market Network', description: 'Share listings exclusively with verified agents before going public.', route: '/dashboard/network' },
-  { icon: Key, title: 'Invite your team', description: 'Add agents and admins to your agency workspace.', route: '/dashboard/team' },
-  { icon: Handshake, title: 'Invite a trust accounting partner', description: 'Give your outsourced trust accountant their own partner login to manage your rent roll and trust account.', route: '/dashboard/partner-access' },
-  { icon: Key, title: 'Run your first open home', description: 'Use Inspection Day Mode to capture visitor details with a QR code.', route: '/dashboard/inspection-mode' },
-  { icon: Shield, title: 'Note your Support PIN', description: 'Your unique 6-digit Support PIN is in your Profile. Keep a note of it — you will need it if you ever contact ListHQ support to verify your identity.', route: '/dashboard/profile' },
-  { icon: BarChart3, title: 'Review your Seller Likelihood Scores', description: 'Check the AI motivation scores on your active listings — a score above 70 is a signal to call your vendor. Scores update every Sunday.', route: '/dashboard/listings' },
-  { icon: Zap, title: 'Check the Lead Marketplace', description: 'Browse verified buyer profiles matched to your listings and purchase contact details for leads you want to pursue. Go to Voice Leads → Marketplace tab.', route: '/dashboard/leads' },
-];
-
-const QUICK_REF: { feature: string; route: string; what: string }[] = [
-  { feature: 'Dashboard', route: '/dashboard', what: 'Overview stats, trust balance, today\'s tasks, leads' },
-  { feature: 'Profile', route: '/dashboard/profile', what: 'Your public agent profile, bio, photo, verification' },
-  { feature: 'Territory', route: '/dashboard/territory', what: 'Service area locations shown on buyer map' },
-  { feature: 'Contacts', route: '/dashboard/contacts', what: 'Full CRM — add, tag, import, view activity history' },
-  { feature: 'Pipeline', route: '/dashboard/pipeline', what: 'Kanban board from Prospecting to Settled' },
-  { feature: 'My Listings', route: '/dashboard/listings', what: 'All your active and archived listings' },
-  { feature: 'Voice Leads', route: '/dashboard/leads', what: 'AI-scored buyer leads from voice searches' },
-  { feature: 'Inspection Day', route: '/dashboard/inspection-mode', what: 'Live open home visitor sign-in and tracking' },
-  { feature: 'Off-Market Network', route: '/dashboard/network', what: 'Share and receive off-market listings with other agents' },
-  { feature: 'Investments', route: '/dashboard/investments', what: 'Investment-grade property analysis and yield scoring' },
-  { feature: 'Financials', route: '/dashboard/trust', what: 'Trust account receipts, payments, and reconciliation' },
-  { feature: 'Trust Ledger', route: '/dashboard/trust-ledger', what: 'Monthly trust ledger, receipt PDFs, audit PDF, 7-year CSV export' },
-  { feature: 'Bank Reconciliation', route: '/dashboard/reconciliation', what: 'Three-way bank reconciliation — match bank statement to trust records monthly' },
-  { feature: 'Rent Roll', route: '/dashboard/rent-roll', what: 'All managed tenancies, rent due dates, and arrears at a glance' },
-  { feature: 'Commission Calc', route: '/dashboard/commission', what: 'Calculate take-home commission and annual GCI' },
-  { feature: 'Settlement', route: '/dashboard/settlements', what: 'Milestone tracker from exchange to settlement' },
-  { feature: 'Analytics', route: '/dashboard/analytics', what: 'Charts and trends — views, leads, conversion' },
-  { feature: 'Reports', route: '/dashboard/reports', what: 'Export CSV/PDF for listings, leads, trust, contacts' },
-  { feature: 'Documents', route: '/dashboard/documents', what: 'Store and manage transaction documents' },
-  { feature: 'Team', route: '/dashboard/team', what: 'Invite agents and manage roles' },
-  { feature: 'Partner Access', route: '/dashboard/partner-access', what: 'Invite trust accounting firms and give them access to your rent roll and trust account' },
-  { feature: 'My Agencies', route: '/dashboard/agencies', what: 'Agency profile and branding' },
-  { feature: 'Billing', route: '/dashboard/billing', what: 'Subscription plans, payment, usage' },
-  { feature: 'Reviews', route: '/dashboard/reviews', what: 'Client reviews and reputation score' },
-  { feature: 'Settings', route: '/dashboard/settings', what: 'Notifications, preferences, account' },
-  { feature: 'Seller Scores', route: '/dashboard/listings', what: 'AI weekly seller likelihood score (0–100) on each listing' },
-  { feature: 'AI Offer Generator', route: '/dashboard/leads', what: 'Generate a professional offer letter from any buyer lead' },
-  { feature: 'Lead Marketplace', route: '/dashboard/leads', what: 'Purchase verified buyer profiles matched to your listings' },
-  { feature: 'Help & FAQ', route: '/dashboard/help', what: 'This page' },
-];
-
-/* ─── GUIDES DATA ─── */
-const GUIDES: Guide[] = [
+const FAQ_SECTIONS: FaqSection[] = [
   {
-    emoji: '👤', title: 'Setting Up Your Profile',
-    description: 'Build a trusted public profile that attracts buyer enquiries.',
-    steps: [
-      'Go to Profile in the sidebar. Add your headshot (square image works best), full name, and a short bio that describes your specialisation and local knowledge.',
-      'Enter your real estate licence number — this appears on your public profile and is required for the verified badge.',
-      'Add languages spoken if you work with international buyers. This increases your visibility in multilingual searches.',
-      'Set your service areas on the Territory page — add each suburb you operate in with a Google Maps search. These locations appear on the buyer-facing map.',
-      'Your Support PIN is a unique 6-digit code shown in your Profile page under the Support PIN section. Keep a note of it — you will need it when contacting ListHQ support. Find it at Dashboard → Profile → Support PIN.',
-      'Your reputation score (0–100) is shown on your public profile. It is calculated from response time, review rating, listing quality, profile completeness, and activity. Aim for 80+.',
+    icon: Rocket,
+    title: 'Getting Started',
+    items: [
+      {
+        q: 'How do I create my agent account?',
+        a: 'Click "For Agents" on the homepage, then select your plan and complete registration. You\'ll need a valid email address and Australian real estate licence number. Once registered, your account enters a brief verification period before full activation.',
+      },
+      {
+        q: 'How do I add my first property listing?',
+        a: 'From your dashboard, go to Listings → New Listing. Fill in the property details, upload photos, and set your price. Listings go live immediately once saved.',
+      },
+      {
+        q: 'How do I connect my agency?',
+        a: 'Go to Dashboard → Agencies and either create a new agency or join an existing one using an invite code from your principal.',
+      },
     ],
   },
   {
-    emoji: '🏠', title: 'Creating and Publishing a Listing',
-    description: 'Walk through the 6-step listing wizard from address to publish.',
-    steps: [
-      'Click "New Listing" (the green + button in the sidebar) or navigate to /pocket-listing.',
-      'Step 1 — Address: Type the property address. Suburb, state, and coordinates are auto-filled.',
-      'Step 2 — Basics: Choose Sale or Rent. Select property type (House, Apartment, Townhouse, Land, Commercial). For sale: enter price, select display mode (Exact, Range, EOI, or Contact Agent). Range mode shows a Price To field — auto-filled at +10% but fully editable. Add bedrooms, bathrooms, ensuites, study/home office, car spaces, garage type, floor area, and land size. Outdoor features: pool, outdoor entertainment, alfresco/deck. Climate: air conditioning type, heating type, solar panels. Financial details (optional): year built, council rates, water rates, strata fees for apartments and townhouses. If EOI is selected, enter the auction date and time. For rentals: enter weekly rent and bond weeks (default 4). Rental-specific fields include parking type, inclusions (water/electricity/internet), appliances (dishwasher, washing machine, internal laundry), building facilities (pool access, gym), and tenancy rules (smoking permitted, max occupants).',
-      'Step 3 — Photos: Upload your property photos. Drag to reorder. The first photo is the hero image shown in search results. Accepted formats: JPEG, PNG, WebP.',
-      'Step 4 — Voice AI Writer: Record a 30-second voice note or type notes about the property. Choose a tone (Standard, Luxury, Family, Investment). Hit Generate — the AI writes a professional listing description in seconds. Edit the result before continuing.',
-      'Step 5 — Settings (sale listings): Choose visibility — Whisper (invite-only), Coming Soon (registered buyers), or Public (full marketplace). Set an exclusive window (7, 14, or 30 days), buyer requirements, and whether to allow co-broke with other agents. Settings (rental listings): Set available-from date, lease term, furnished toggle, pets allowed toggle, and application screening level.',
-      'Step 6 — Preview: Review the full listing. Click Publish to save. New listings are saved as pending until you publish from your Listings page.',
+    icon: CreditCard,
+    title: 'Subscriptions & Billing',
+    items: [
+      {
+        q: 'What plans are available?',
+        a: 'ListHQ offers Demo, Basic, and Pro plans. Demo gives you limited access to explore the platform. Basic and Pro unlock full listing and lead management features. Visit your Billing page for current pricing.',
+      },
+      {
+        q: 'How do I upgrade or change my plan?',
+        a: 'Go to Dashboard → Billing and select a new plan. Upgrades take effect immediately. Downgrades apply at the end of your current billing period.',
+      },
+      {
+        q: 'How do I cancel my subscription?',
+        a: 'Go to Dashboard → Billing → Cancel Subscription. You\'ll retain access until the end of your paid period. Your data is preserved for 30 days after cancellation.',
+      },
+      {
+        q: 'Why was my payment declined?',
+        a: 'Check that your card details are up to date in Billing settings. If the problem persists, contact your bank or reach out to support@listhq.com.au.',
+      },
     ],
   },
   {
-    emoji: '⚡', title: 'Boosting a Listing to Featured',
-    description: 'Get your property into the featured grid shown to buyers searching near your suburb.',
-    steps: [
-      'Go to My Listings in the sidebar and click on the listing you want to boost. This opens the listing detail page.',
-      'Click the Marketing tab at the top of the listing detail page. This is where all boost options live.',
-      'You will see a Boost this listing section at the top with two options — Featured ($49) and Premier ($99), both for 30 days as a one-off payment.',
-      'Featured — $49 for 30 days: Your listing appears in the homepage featured grid, shown to buyers searching near your suburb. Includes a Featured badge and higher search placement in results.',
-      'Premier — $99 for 30 days: Everything in Featured, plus top of all search results in your suburb, hero image slot on the homepage, and an email alert to buyers with saved searches matching your property.',
-      'Click Select Featured or Select Premier. A confirmation step appears showing exactly what you are getting and the one-off price. Review it and click Confirm to submit.',
-      'Your boost request is submitted. You will see the status change to Pending on the Marketing tab. You will receive a bell notification the moment your boost goes live on the featured grid.',
-      'Once active, the Marketing tab shows your boost status, the expiry date, and everything that is included. Your listing is live in the featured grid shown to buyers searching near your suburb.',
-      'You will receive a bell notification 5 days before your boost expires, with a direct link back to the Marketing tab to renew. After 30 days the boost ends automatically and your listing returns to standard placement.',
-      'There are no automatic renewals and no subscriptions. Each boost is a one-off payment. Renew only when you want to, directly from the Marketing tab on your listing.',
+    icon: Home,
+    title: 'Listings & Properties',
+    items: [
+      {
+        q: 'How many listings can I have active at once?',
+        a: 'This depends on your plan. Basic plans include up to 10 active listings. Pro plans have no listing limit. Your current allowance is shown at the top of your Listings page.',
+      },
+      {
+        q: 'Can I mark a listing as off-market or pre-market?',
+        a: 'Yes. When creating or editing a listing, toggle the "Pre-Market" option. Pre-market listings are visible only to registered buyers who have saved a matching search.',
+      },
+      {
+        q: 'How do I deactivate a listing?',
+        a: 'Open the listing from Dashboard → Listings and click "Deactivate". Note: listings with active tenancies cannot be deactivated until the tenancy is resolved.',
+      },
+      {
+        q: 'Can I upload my own property photos?',
+        a: 'Yes. You can upload multiple photos per listing. We recommend at least 8 photos in landscape orientation at 1600px wide or larger for best results.',
+      },
     ],
   },
   {
-    emoji: '🔑', title: 'Managing Rental Listings',
-    description: 'List properties for rent and manage tenant applications.',
-    steps: [
-      'When creating a listing, select "For Rent" on the Basics step. The form switches to rental mode — price becomes weekly rent, and rental-specific fields appear.',
-      'Set the weekly rent and bond weeks (default 4 weeks — the maximum in most Australian states). Then set parking type, and use the Inclusions section to toggle water, electricity, and internet if included in rent.',
-      'On the Settings step, set the available-from date, preferred lease term (6 months, 12 months, 18 months, or month-to-month), and whether pets are considered.',
-      'Published rental listings appear on the public marketplace with a "For Rent" badge. Buyers can submit a 5-step rental application (personal details, employment, rental history, identity, submit) directly from the listing page.',
-      'Rental applications are reviewed in the Rental Applications section (coming soon to your dashboard). Approved applications create a tenancy record in the Rent Roll.',
+    icon: Users,
+    title: 'Leads & CRM',
+    items: [
+      {
+        q: 'Where do my leads come from?',
+        a: 'Leads are generated when buyers submit enquiries on your listings, use voice search that matches your properties, or contact you via your public agent profile.',
+      },
+      {
+        q: 'How do I manage my lead pipeline?',
+        a: 'Go to Dashboard → Pipeline to view all leads in a Kanban-style board. Drag leads between stages (New, Contacted, Qualified, Offer, Closed) to track progress.',
+      },
+      {
+        q: 'Can I set reminders or tasks for leads?',
+        a: 'Yes. Open any lead or contact and use the Tasks tab to add follow-up reminders with due dates and notes.',
+      },
+      {
+        q: 'How do I export my contacts?',
+        a: 'Go to Dashboard → Contacts and use the Export button to download a CSV of all your contacts.',
+      },
     ],
   },
   {
-    emoji: '🤫', title: 'Off-Market Network (ListHQ First)',
-    description: 'Share listings with verified agents before going public.',
-    steps: [
-      'When publishing a listing, set visibility to "Whisper" or "Coming Soon" on the Settings step. Whisper listings are invite-only; Coming Soon listings are visible to registered buyers but not public portals.',
-      'To share a listing with the off-market network, go to the Off-Market Network page in the sidebar.',
-      'Find your listing under "My Off-Market Listings", toggle "Share with Network" to on, and set a referral split percentage (e.g. 20%). This percentage of your commission goes to any agent who introduces the successful buyer.',
-      'Verified network agents can see your listing, view the price and details, and submit a buyer enquiry on behalf of their client.',
-      'Post a Buyer Brief to tell the network what your buyer client is looking for — property type, suburb, price range, and urgency. Other agents with matching stock will reach out directly.',
-      'When ready to go public, navigate to your listing on the Listings page and change visibility to Public. All enquiry history and lead data is preserved.',
+    icon: Landmark,
+    title: 'Trust Accounting',
+    items: [
+      {
+        q: 'Does ListHQ manage trust funds?',
+        a: 'No. ListHQ provides trust accounting record-keeping tools only. All trust funds are held and managed by you in accordance with the Estate Agents Act 1980 (Vic) and applicable regulations. ListHQ does not hold, process, or guarantee any trust money.',
+      },
+      {
+        q: 'How do I record a trust receipt?',
+        a: 'Go to Dashboard → Trust → Trust Ledger → New Receipt. Enter the amount, payer details, and property reference. All entries are timestamped and auditable.',
+      },
+      {
+        q: 'Can I reconcile my trust account in ListHQ?',
+        a: 'Yes. Dashboard → Trust → Reconciliation provides a monthly reconciliation workflow. You\'ll need to match entries against your bank statement.',
+      },
     ],
   },
   {
-    emoji: '👥', title: 'Using the CRM and Contacts',
-    description: 'Manage leads, tag contacts, and track your pipeline.',
-    steps: [
-      'Every lead — from listing enquiries, voice searches, open home sign-ins, and rental applications — automatically appears in your Contacts list.',
-      'Open any contact to see their full activity history: enquiries, listings viewed, inspection attendance, and any notes you have added.',
-      'Tag contacts by type (Buyer, Seller, Landlord, Tenant) and set a temperature (Hot, Warm, Cold) to prioritise your follow-up list.',
-      'To import existing contacts: go to Contacts, click "Import CSV". Map your spreadsheet columns to the required fields (name, email, phone, type). Duplicate detection is by email address.',
-      'Use the Pipeline board to track where each contact sits in your sales process. The five stages are: Prospecting → Appraisal → Listed → Under Offer → Settled. Drag cards between columns to update status. Time spent in each stage is shown on the card.',
+    icon: Shield,
+    title: 'Privacy & Data',
+    items: [
+      {
+        q: 'Does ListHQ sell my data?',
+        a: 'No. We do not sell personal information to third parties. See our Privacy Policy for full details.',
+      },
+      {
+        q: 'How do I delete my account?',
+        a: 'Go to Dashboard → Settings → Account and select "Delete Account". This permanently removes your data within 30 days. Active subscriptions must be cancelled first.',
+      },
+      {
+        q: 'How do I manage cookie preferences?',
+        a: 'Click "Without Maps" on the cookie banner to use the platform without Google Maps data collection, or visit Settings → Privacy to update your preference at any time.',
+      },
     ],
   },
   {
-    emoji: '📅', title: 'Running an Open Home — Inspection Day Mode',
-    description: 'Capture visitor details and send follow-ups in one tap.',
-    steps: [
-      'Before your open home, go to Inspection Day in the sidebar. Your scheduled inspections appear as cards.',
-      'Tap "Start Inspection" on the relevant property. The screen switches to a live sign-in interface.',
-      'Add visitors manually: enter first name, last name, phone, and email. Set their interest level — Hot (strong buyer signal), Warm (interested but not urgent), or Cold (browsing).',
-      'After the inspection, tap "End Inspection" to see a summary: total visitors, breakdown by interest level, and a one-click option to send a follow-up message to all attendees.',
-      'All visitors are automatically added to your CRM with the tag "Inspection Attendee" and linked to the property they attended.',
-    ],
-  },
-  {
-    emoji: '🎤', title: 'Understanding Voice Leads',
-    description: 'AI-scored buyer leads from spoken search queries.',
-    steps: [
-      'Voice Leads are buyer enquiries generated when a buyer uses the voice search on the public marketplace. The buyer speaks a query (e.g. "3 bed house in Berwick with a pool under $900k") and the AI matches it to your listings and buyer briefs.',
-      'Each voice lead shows a transcript of what the buyer said, their AI intent score (0–100), urgency rating (Hot/Warm/Cold), search history, pre-approval status, and preferred contact method (call, email, WhatsApp).',
-      'The AI Buyer Concierge automatically processes every new voice search — it scores the buyer, finds matching properties, checks your Buyer Briefs on the Off-Market Network, creates a lead in your dashboard, and sends you an email notification. You do not need to do anything — it happens in seconds.',
-      'A high intent score means the buyer is ready to act — they have pre-approval, specified urgency, and left a detailed query. Respond to Hot leads within the hour for best conversion.',
-      'The matched property is shown on each lead card so you know exactly which listing triggered the enquiry.',
-      'Tap a lead to see the full detail panel. Use the contact buttons to call, email, or message the buyer directly from the lead view.',
-    ],
-  },
-  {
-    emoji: '📋', title: 'Pipeline — Tracking Your Deals',
-    description: 'Kanban board from prospecting through to settlement.',
-    steps: [
-      'The Pipeline page is a kanban board with five stages: Prospecting, Appraisal, Listed, Under Offer, Settled.',
-      'Each card shows the property address, contact name, estimated value, and how many days the deal has been in the current stage. Long-running cards are highlighted.',
-      'Drag a card from one column to the next as the deal progresses. The move is logged automatically.',
-      'New leads from your CRM can be added to the pipeline — they start in Prospecting.',
-      'Settled cards represent completed deals. The total pipeline value is shown in the header for each column.',
-    ],
-  },
-  {
-    emoji: '🏦', title: 'Trust Accounting — Recording Transactions',
-    description: 'Record receipts, payments, and keep your trust balance accurate.',
-    steps: [
-      'Go to Financials in the sidebar to access the Trust Accounting dashboard. If you have no trust account yet, you will be prompted to create one or import from your existing system.',
-      'The dashboard has three panels: Receipts (money in), Payments (money out), and Reconciliation.',
-      'To record a new receipt: click "New Trust Receipt" in the Receipts panel or Quick Actions sidebar. Fill in: client name, property address, amount, payment method (Cash/Cheque/EFT), purpose (Deposit/Rent/Bond/Holding Fee/Commission), date received, date deposited, and ledger account (Sales Trust or Rental Trust). A sequentially numbered receipt is generated and a PDF is produced automatically.',
-      'To record a deposit or rent payment via the transaction form: use Quick Actions → "New Deposit" or "New Rent Payment". Link it to a contact and property from the dropdown selectors.',
-      'Pending transactions show as "Pending" status. Click the green tick on any row to mark it as Cleared. Use "Mark All Pending as Cleared" for bulk processing.',
-      'The running balance column shows the cumulative trust account balance after each transaction. Monitor this to ensure it always matches your bank balance.',
-    ],
-  },
-  {
-    emoji: '📒', title: 'Trust Accounting — Ledger and Statements',
-    description: 'Monthly ledgers, audit PDFs, and 5-year CSV exports.',
-    steps: [
-      'Go to Trust Ledger in the sidebar (under the Financials section). This shows all receipts and payments for the selected month.',
-      'Use the month navigator (← →) to move between months. The header shows total in, total out, and closing balance for the selected period.',
-      'Filter by All, Receipts only, or Payments only using the tabs. Search by client name, property, or reference number using the search bar.',
-      'To download an individual receipt PDF: click the download icon on any receipt row. The PDF is formatted to the Agents Financial Administration Act 2014 standard with signature lines.',
-      'To generate a full monthly audit PDF: click "Download Audit PDF" in the header. This produces an A4 landscape document with the transaction ledger, client ledger breakdown, reconciliation summary, and a statutory declaration section for the principal to sign.',
-      'To export a 7-year compliant CSV: click "Export CSV 7yr". The file includes the statutory retention notice and closing balance total. Retain this export for a minimum of 7 years as required by Australian trust accounting legislation.',
-      'To generate a monthly trust statement (for your records or auditor): click "Monthly Statement" at the bottom of the ledger. Select the month and year and click "Generate & Print Statement". The PDF includes GST summary and signature lines.',
-    ],
-  },
-  {
-    emoji: '⚖️', title: 'Trust Accounting — Bank Reconciliation',
-    description: 'Match bank statement entries to trust records.',
-    steps: [
-      'Australian trust accounting law requires a three-way reconciliation each month — your bank statement, trust cashbook, and trust ledger must all agree. Go to Bank Reconciliation in the sidebar to complete this process and match your bank statement entries against your trust records.',
-      'Upload your bank statement CSV or paste entries manually. Each bank entry shows as "Unmatched" until you pair it with a trust receipt or payment.',
-      'Click "Match" on a bank entry and select the corresponding trust receipt or payment from the dropdown. Matched items turn green.',
-      'If a bank entry has no matching trust record (e.g. bank fees), use "Manual" to record it as a non-trust item with a note.',
-      'When all entries are matched, the reconciliation is complete. The Financials dashboard will show the last reconciled date and zero unmatched items.',
-      'Run reconciliation at least monthly — more frequently if you have high transaction volumes.',
-    ],
-  },
-  {
-    emoji: '⚖️', title: 'Trust Accounting — Corrections and Adjustments',
-    description: 'How to correct errors, handle dishonoured payments, and manage unidentified receipts.',
-    steps: [
-      'Trust records in Australia can never be deleted — every correction must preserve the original entry and the correction in the audit trail. Your auditor will see both entries.',
-      'The golden rule: void the incorrect entry first, then raise the correct one. Go to Trust Ledger, find the incorrect transaction, click the void icon. The entry stays marked Voided. Then raise a new correct entry.',
-      'Journal Adjustment Entry — for balance corrections that need a formal debit/credit entry (e.g. opening balance differences, suspense matches, fee corrections). Go to Trust Ledger → Journal Adjustment. Fill in: entry date, debit ledger, credit ledger, amount, reason code, and a mandatory explanation your auditor will read. The entry is permanent and immediately visible in the audit trail.',
-      'Reason codes for journal adjustments: Balance Correction, Wrong Client Ledger, Opening Balance Adjustment, Dishonoured Payment Reversal, Bank Error Correction, Suspense Account Match, Management Fee Correction, Other. Always choose the most specific code and explain fully.',
-      'Dishonoured payment — when a payment bounces, void the original receipt, then use Journal Adjustment with reason "Dishonoured Payment Reversal" to debit the client ledger. Notify the payer immediately. Do not disburse funds that have not cleared.',
-      'Suspense Account — when money arrives in your trust bank account but you cannot identify the client, go to Trust Ledger → Suspense. Enter the amount, bank reference, and date. It sits in suspense until identified — the amber Suspense button shows a badge count of outstanding items. Once identified, use Journal Adjustment with reason "Suspense Account Match" to move it to the correct client ledger.',
-      'Overdrawn client ledger — if any client ledger goes negative, a red alert banner appears on the Trust Financials dashboard. This is a serious breach. Immediately transfer funds from your trading account to remedy the shortfall, notify your state regulator in writing, and use Journal Adjustment to record the correction.',
-      'All corrections are timestamped, attributed to the user who made them, and cannot be deleted. The reason you enter at the time of the correction is what your auditor will see.',
-    ],
-  },
-  {
-    emoji: '📥', title: 'Importing Opening Balances (Migration)',
-    description: 'Move from PropertyMe, Reapit, or TrustSoft to ListHQ.',
-    steps: [
-      'If you are migrating from PropertyMe, Console Cloud, Reapit, or TrustSoft, go to Financials and click "Import Existing Account".',
-      'Before starting the import wizard, download and complete the Trust Migration Pre-Import Checklist. This is available on the Agency Setup onboarding page (step 4 — Cut-over date) under "Download import checklist". The checklist covers all 7 compliance sections required for a valid migration: three-way reconciliation, client ledger records, receipt register, rental bonds, trust account interest, auditor certification, and source system cut-over. Complete it, print it, sign it, and retain it with your audit records for a minimum of 7 years.',
-      'Step 1 — Certify Balance: Enter your trust account bank details (BSB, account number), the current balance from your old system, and the date of last reconciliation. Optionally upload your auditor certification PDF.',
-      'Step 2 — Upload Ledger CSV: Export your trust ledger from your current system as a CSV. The wizard auto-detects PropertyMe, Reapit, and TrustSoft formats. If your format is not recognised, download the Generic template, paste your data in, and re-upload.',
-      'Step 3 — Active Matters: Upload your active matters list — clients who currently have funds held in trust. Format: Client Name, Property, Deposit Held, Status.',
-      'Step 4 — Confirm: Review the import summary. The wizard checks that the sum of imported transactions matches your opening balance. A mismatch is flagged in red — resolve it in your old system first.',
-      'On completion, download the Opening Balance Declaration PDF and Migration Checklist PDF. Print, sign, and retain these for your auditor — they form part of the statutory audit trail.',
-    ],
-  },
-  {
-    emoji: '💸', title: 'Commission Calculator',
-    description: 'Model your take-home commission and annual GCI.',
-    steps: [
-      'Open Commission Calculator from the Business section of the sidebar.',
-      'Enter the sale price and your commission rate (%). The default rate is 2.5% — adjust for your agreement.',
-      'Use the Agency Split slider to set the agent/agency split. For example, a 30% agency split means the agency keeps 30% and you take 70%.',
-      'Toggle GST Included if your rate is GST-inclusive. The calculator shows the 1/11th GST component separately.',
-      'Enter a referral fee percentage if a referring agent is entitled to a share of your commission.',
-      'Set settlement days and deals per month to see your projected monthly and annual GCI (Gross Commission Income).',
-      'Your last scenario is saved automatically and restored next time you open the calculator.',
-    ],
-  },
-  {
-    emoji: '🎉', title: 'Settlement Concierge',
-    description: 'Track milestones from exchange to keys handover.',
-    steps: [
-      'Open Settlement Concierge from the Business section. Upcoming settlements are listed with a countdown in days. Cards turn amber at 7 days and red at 3 days.',
-      'Click a settlement card to expand it and see the checklist: Final inspection booked, Keys handover arranged, Trust funds cleared, Buyer notified, Google review requested.',
-      'Tick off each item as it is completed. Progress is saved automatically in your browser.',
-      'Use the Utility Partners section to quickly send your buyer links to set up electricity (AGL, Origin), internet (Telstra, NBN Co), and other services. Click "Copy link" to get a personalised referral URL.',
-      'Post-settlement properties move to the lower section after their settlement date passes. Use this section to follow up on reviews and referrals.',
-    ],
-  },
-  {
-    emoji: '📊', title: 'Analytics and Reports',
-    description: 'Charts, trends, and CSV exports for every metric.',
-    steps: [
-      'The Analytics page shows charts for your listings performance over time — views, contact clicks, leads, and pipeline movement.',
-      'The Reports page has four tabs: Listings, Leads, Financials, and Contacts. Each tab has a date range picker (30 days, 90 days, 6 months, 12 months, or custom).',
-      'On the Listings tab: see a bar chart of views and leads by month, a pie chart of property types, and a table of your top-performing listings.',
-      'On the Leads tab: see lead volume over time, source breakdown, and conversion rate from enquiry to offer.',
-      'On the Financials tab: see total trust receipts, payments, and closing balance trend by month, pulling live from your trust account data.',
-      'On the Contacts tab: see contact growth and activity breakdown.',
-      'Every tab has an "Export CSV" button that downloads the filtered data for use in Excel or your accountant\'s reporting tools.',
-    ],
-  },
-  {
-    emoji: '🤝', title: 'Managing Your Team',
-    description: 'Invite agents, assign roles, and manage your agency.',
-    steps: [
-      'Go to Team in the sidebar (under Account). Click "Invite Member" and enter the email address of the agent you want to add.',
-      'Choose their role: Agent (can add listings and manage their own contacts) or Admin (full access including billing and team management).',
-      'The invited agent receives an email with a unique invite link. They sign up using that link and are automatically linked to your agency.',
-      'Team members appear in the Team list with their status (Active, Pending) and role badge.',
-      'To remove a team member, click the three-dot menu on their row and select "Remove from Agency". Their individual listings and contacts are retained but they lose dashboard access immediately.',
-      'For outsourced trust accounting staff, use Partner Access instead of Team — partners get a separate portal designed specifically for trust accounting work, and each of their staff members gets their own individual login.',
-    ],
-  },
-  {
-    emoji: '🤝', title: 'Partner Portal — Trust Accounting Firms',
-    description: 'Give your outsourced trust accountant their own secure login to manage your accounts.',
-    steps: [
-      'ListHQ has a dedicated Partner Portal for outsourced trust accounting firms — businesses like Balance R&R, End of Month Angels, and hastings + co who manage trust accounts on behalf of multiple agencies.',
-      'To invite a partner firm: go to Partner Access in the sidebar (under Account). Enter the partner\'s email address and choose their access level: Trust Only (trust account read/write), Trust & PM (trust plus rent roll and tenancies), or Full PM (complete property management access including maintenance).',
-      'The partner receives a branded invitation email with a unique token link. They click the link, create their account, and land directly in the Partner Portal showing your agency.',
-      'Once accepted, your partner can log in at any time via /partner/login. They see a dedicated portal — separate from the agent dashboard — with your trust account, rent roll, and arrears all in one place.',
-      'Partner firms can manage multiple agencies from one login. A dropdown switcher at the top of their portal lets them move between all the agencies that have invited them.',
-      'Partner firms can invite their own team members from within the Partner Portal. Each staff member gets their own individual login — no shared passwords. The firm owner manages who has access and can remove team members at any time.',
-      'To revoke a partner\'s access: go to Partner Access in your sidebar, find the partner in the active partners table, and click Revoke. Their access is removed immediately.',
-      'All partner activity is logged — every transaction viewed, receipt recorded, or payment processed by a partner is timestamped and attributed to their account.',
-    ],
-  },
-  {
-    emoji: '⭐', title: 'Reputation Score',
-    description: 'How your agent score is calculated and how to improve it.',
-    steps: [
-      'Your reputation score (0–100) appears on your public agent profile and in the Verified Agent badge section.',
-      'The score is calculated from five factors: Response time (0–25 pts) — replying to leads within 5 minutes scores 25, within 1 hour scores 20. Reviews (0–25 pts) — based on your average star rating weighted by review count. Listing performance (0–25 pts) — ratio of sold/leased listings to total listings. Days on market (0–15 pts) — lower average days on market scores higher. Profile completeness (0–10 pts) — photo, bio, phone, specialisation, and service areas each add 2 points.',
-      'To improve your score: respond to leads faster, ask satisfied clients for reviews, maintain an up-to-date profile, and keep listings active and well-presented.',
-      'Clients can leave reviews from your public profile page. A direct link to your review page is available under the Reviews section of the sidebar.',
-    ],
-  },
-  {
-    emoji: '🔐', title: 'Account Security and Settings',
-    description: 'Passwords, notifications, and keeping your account safe.',
-    steps: [
-      'Go to Settings in the sidebar to manage notifications, display preferences, and account details.',
-      'Change your password from Settings → Security. Use a password at least 12 characters long. If you forget your password, use the "Forgot Password" link on the login page to receive a reset email.',
-      'Keep your registered email address current — all security alerts, lead notifications, and billing receipts go to this address.',
-      'Never share your login credentials. Use the Team feature to give colleagues access — they get their own login, and their activity is tracked separately.',
-      'If you suspect unauthorised access, go to Settings immediately, change your password, and contact support at support@listhq.com.au.',
-    ],
-  },
-  {
-    emoji: '👫',
-    title: 'Collab Search — Browsing Together',
-    description: 'Share a live search session with a partner, client, or co-buyer.',
-    steps: [
-      'Collab Search lets two people browse the same properties in real time from different devices. Both people see the same results, can react to properties, and can see what the other has already viewed. Perfect for couples searching together, buyers with a partner overseas, or agents browsing with a client.',
-      'To start a session: search for a property or suburb on the homepage. Once results appear, tap the Together button in the results toolbar (next to the Save and Filter buttons). A shareable link is automatically copied to your clipboard.',
-      'Share the link with your partner via WhatsApp, SMS, or email. When they open the link on their device, you are both instantly in the same live Collab session. A "Searching together" badge appears in the toolbar on both screens.',
-      'While in a Collab session, tap any property card to react — use thumbs up (👍), thumbs down (👎), or fire (🔥) to signal your interest. Your partner sees your reactions in real time on their screen.',
-      'Properties your partner has already viewed are marked with a small indicator on the card so you know what they have seen.',
-      'The session stays active as long as both people have the link. If your partner closes the browser, they can re-open the same link to rejoin the session. The session preserves the original search query and filters.',
-      'To end the session, simply close the tab or navigate away. Collab sessions do not expire — the link remains valid.',
-      'Note: you need to be signed in to start a Collab session. Your partner does not need an account to join — they just open the link.',
-    ],
-  },
-  {
-    emoji: '📱',
-    title: 'Using ListHQ on Mobile',
-    description: 'Getting the best experience on iPhone and Android.',
-    steps: [
-      'ListHQ is fully optimised for mobile. The buyer-facing search, map, property cards, and agent contact forms all work on iPhone and Android browsers — no app download required.',
-      'Add to Home Screen for the best experience: on iPhone, open listhq.com.au in Safari, tap the Share button (the box with an arrow), and tap "Add to Home Screen". On Android, open in Chrome, tap the three-dot menu, and tap "Add to Home Screen". ListHQ will appear as an icon on your home screen and open full-screen like a native app.',
-      'Buyer navigation: the bottom bar has five tabs — Search (home), Saved (your saved properties), Agents (find an agent), Messages (your conversations), and Profile (settings and preferences).',
-      'Agent dashboard on mobile: tap the hamburger menu (☰) in the top left corner to open the full navigation sidebar. Tap any menu item to navigate — the sidebar closes automatically. The notification bell is in the top right corner.',
-      'Voice search on mobile: tap the microphone icon on the homepage and speak your search. Allow microphone access when prompted. Voice search works in 24 languages — speak in your preferred language and the AI understands.',
-      'Map search on mobile: the homepage shows a full-screen map with a draggable bottom sheet showing property results. Drag the sheet up to see more results, drag down to see more of the map. Tap any price marker on the map to see the property.',
-      'If you experience issues on mobile, ensure you are using a recent version of Safari (iPhone) or Chrome (Android). Voice search is not supported in third-party in-app browsers (e.g. Instagram or Facebook browser).',
-    ],
-  },
-  {
-    emoji: '📊',
-    title: 'Seller Likelihood Score',
-    description: 'AI scores that identify which of your listed properties has a motivated seller.',
-    steps: [
-      'The Seller Likelihood Score is an AI-calculated score (0–100) shown on each listing in your dashboard. It predicts how motivated the seller is to transact — based on five signals analysed weekly.',
-      'Signal 1 — Days on Market vs Suburb Median: Properties listed significantly longer than the suburb average score higher (up to +30 pts). A property sitting 30+ days over the median is a strong signal.',
-      'Signal 2 — Price Reductions: Each time the asking price is reduced, the score increases (up to +25 pts). Multiple reductions in quick succession score near maximum.',
-      'Signal 3 — Suburb Price Trend: If the suburb\'s median price is declining, sellers face increasing pressure to move (up to +20 pts).',
-      'Signal 4 — Status Churn: Properties that have moved between Active, Under Offer, and back to Active signal a deal that fell through — a very strong motivation indicator (up to +15 pts).',
-      'Signal 5 — Activity Gap: If there has been no activity (price changes, status updates, notes) on the listing in the past 30 days, the seller may be disengaged and more open to offers (up to +10 pts).',
-      'Scores are recalculated every Sunday. Open the listing in your dashboard to see the current score, breakdown of each signal, an AI-generated summary, and how your suburb\'s median compares.',
-      'Use the Seller Likelihood Score to prioritise your vendor calls — a score of 70+ is a strong signal that the seller is ready to negotiate.',
-    ],
-  },
-  {
-    emoji: '📝',
-    title: 'AI Offer Generator',
-    description: 'Draft a professional offer letter in seconds using AI and real comparable sales.',
-    steps: [
-      'The AI Offer Generator creates a professional offer letter for any buyer lead. Open a lead from the Voice Leads page, then click "Generate Offer" to start.',
-      'The AI pre-fills the property address, suburb, listing price, and agent details automatically. Enter the offer amount, settlement days, and any offer conditions (e.g. subject to finance, subject to building inspection).',
-      'The AI pulls real comparable sales data — recent sold prices in the same suburb from the last 90 days — and includes them in the offer letter to support your pricing position.',
-      'The generated offer letter includes: property details, buyer introduction, offer price and conditions, comparable sales table, settlement timeline, and a professional closing section.',
-      'Review the draft and edit any section before finalising. The offer is saved to the lead record under the Offers tab so you have a full history.',
-      'Offer status tracks through six stages: Draft → Sent → Accepted / Rejected / Countered / Withdrawn. Update the status as negotiations progress.',
-      'All offer history is stored against the lead and the listing — visible from both the Voice Leads page and the listing detail page under the Buyer Leads tab.',
-    ],
-  },
-  {
-    emoji: '🛒',
-    title: 'Lead Marketplace — Purchasing Buyer Profiles',
-    description: 'Buy verified buyer profiles matched to your listings from the lead marketplace.',
-    steps: [
-      'The Lead Marketplace lets agents purchase verified buyer profiles — real buyers who have submitted their search preferences, budget, and contact details via the ListHQ consumer portal.',
-      'Buyer profiles are shown in the Marketplace tab of your Voice Leads page. Each profile shows the buyer\'s preferred suburbs, property type, budget range, and an AI-calculated lead score — but contact details are hidden until you purchase.',
-      'A profile is only shown to you if it matches one of your active listings or buyer briefs. You will not see unmatched profiles.',
-      'To purchase a lead: click on the profile card and tap "Unlock Contact Details". Confirm the purchase. The buyer\'s name, email, and phone number are instantly revealed.',
-      'Each lead can only be purchased by one agent — once purchased, it is marked as claimed and removed from the marketplace. Act quickly on high-scoring leads.',
-      'After purchase, the buyer receives an introduction email from ListHQ notifying them that an agent will be in touch. Your contact details are shared with the buyer at the same time.',
-      'Purchased leads are saved to your CRM automatically — tagged as "Marketplace Lead" and linked to the matching listing.',
-      'Lead pricing is shown on each profile card before you purchase. Pricing varies by lead score and suburb.',
+    icon: Wrench,
+    title: 'Technical Support',
+    items: [
+      {
+        q: 'The platform isn\'t loading correctly. What should I do?',
+        a: 'Try clearing your browser cache and reloading. ListHQ works best on the latest versions of Chrome, Safari, Firefox, and Edge. If the issue persists, email support@listhq.com.au with a description and screenshot.',
+      },
+      {
+        q: 'How do I report a bug?',
+        a: 'Email support@listhq.com.au with the subject line "Bug Report" and include what you were doing, what you expected to happen, and what actually happened. Screenshots are helpful.',
+      },
+      {
+        q: 'Who do I contact for urgent support?',
+        a: 'Email support@listhq.com.au. We aim to respond to all queries within one business day (AEST).',
+      },
     ],
   },
 ];
 
-/* ─── FAQ DATA ─── */
-const FAQ_CATEGORIES: FaqCategory[] = [
-  {
-    emoji: '🚀', title: 'Getting Started',
-    items: [
-      { q: 'How do I create an agent account?', a: 'Go to the Agents page and click "Join the Network". Complete the registration form with your full name, email, phone, licence number, and agency name. You will receive a confirmation email. Once verified, complete your profile and you are ready to list.' },
-      { q: 'Is there a free trial?', a: 'Yes — every new agent gets a 60-day free trial. No credit card required to start. During your trial you have full access to all features on your selected plan.' },
-      { q: 'What is the founding price?', a: 'Founding prices are available for a limited time: Starter at $99/mo (full price $199), Pro at $199/mo (full price $349), Agency at $399/mo (full price $699). Annual billing saves an additional 15%.' },
-      { q: 'Can I use ListHQ as a buyer as well?', a: 'Yes. Your agent login gives you full access to the buyer marketplace — saved searches, property alerts, the AI voice search, and map search.' },
-      { q: 'What is the partner portal and do I need it?', a: 'The partner portal is for agents who use an outsourced trust accounting firm. Instead of sharing your login with your trust accountant, you invite them via Partner Access and they get their own dedicated portal. If you manage your own trust accounting, you do not need it. If you use a firm like Balance R&R or End of Month Angels, set it up in the first week.' },
-      { q: 'Is ListHQ available outside Australia?', a: 'Yes. The platform supports agents in any country. The agency setup form detects your country and adapts the compliance fields accordingly — Australian agents see ABN and state-specific fields, international agents see generic business registration and region fields. Voice search, property search, and all core features work globally.' },
-    ],
-  },
-  {
-    emoji: '🏠', title: 'Listings',
-    items: [
-      { q: 'How many listings can I have active at once?', a: 'Starter: 10 active listings. Pro and Agency: unlimited listings. See Billing for full details.' },
-      { q: 'Can I edit a listing after publishing?', a: 'Yes. Open the listing from My Listings, make your changes, and click Save. Updates go live immediately.' },
-      { q: 'What image formats and sizes are supported?', a: 'JPEG, PNG, and WebP up to 10 MB per image. For best results, upload landscape images at least 1200px wide.' },
-      { q: 'What is the difference between Whisper, Coming Soon, and Public visibility?', a: 'Whisper = invite-only, not visible to buyers. Coming Soon = visible to registered buyers on the platform but not on external portals. Public = visible to all buyers on the full marketplace.' },
-      { q: 'Can I duplicate a listing?', a: 'Yes. On the listing detail page in your dashboard, there is a "Duplicate" option. This creates a copy with all the same details — useful for similar properties at the same address.' },
-      { q: 'What is the AI listing writer?', a: 'On Step 4 of the listing wizard, you can record a voice note or type notes about the property. The AI generates a professional listing description in four tones: Standard, Luxury, Family, or Investment. You can edit the output before publishing.' },
-      { q: 'How do I get my listing into the featured grid on the homepage?', a: 'Go to My Listings, open the listing, and click the Marketing tab. Choose Featured ($49) or Premier ($99) — both are one-off payments for 30 days. Confirm your selection and your listing goes live on the featured grid. You get a bell notification the moment it is active.' },
-    ],
-  },
-  {
-    emoji: '⚡', title: 'Featured Listing Boosts',
-    items: [
-      { q: 'What is a featured listing boost?', a: 'A boost puts your listing into the featured grid on the ListHQ homepage, shown to buyers searching near your suburb. Featured costs $49 and Premier costs $99 — both are one-off payments for 30 days. No subscription, no automatic renewals.' },
-      { q: 'How is a boosted listing different from a standard listing?', a: 'A standard listing appears in search results based on relevance and recency. A Featured boost places your listing in the homepage featured grid with a Featured badge and higher search placement, targeted to buyers searching near your suburb. Premier adds top position in all search results in your suburb, the hero image slot on the homepage, and an email to buyers with matching saved searches.' },
-      { q: 'Who sees my featured listing?', a: 'Buyers who visit the ListHQ homepage near your suburb — detected via GPS, IP address, or their search query. If a buyer searches for a property in Doncaster they see featured listings from Doncaster. The targeting is automatic — you do not need to configure anything.' },
-      { q: 'How much does a boost cost?', a: 'Featured is $49 for 30 days. Premier is $99 for 30 days. Both are one-off payments — no subscription, no recurring charge, no lock-in.' },
-      { q: 'How do I request a boost?', a: 'Go to My Listings, open the listing, click the Marketing tab, choose Featured or Premier, and click Confirm. You will receive a bell notification the moment your boost goes live.' },
-      { q: 'How does payment work?', a: 'Payment is arranged on confirmation of your boost request. Your listing goes live promptly once payment is confirmed. Stripe online card payment is coming very soon — once live, your boost will activate instantly on payment. You are never charged automatically — each boost is a separate one-off payment.' },
-      { q: 'How long does a boost last?', a: 'Exactly 30 days from when your boost goes live. The Marketing tab shows the exact expiry date at all times. You will receive a bell notification 5 days before it ends. When the 30 days is up your listing returns to standard placement automatically.' },
-      { q: 'What happens when my boost expires?', a: 'Five days before expiry you receive a bell notification with a link to renew. When the 30 days ends your listing is automatically removed from the featured grid and returns to standard placement. Renew anytime from the Marketing tab — it takes under a minute.' },
-      { q: 'How do I know when my boost expires?', a: 'The Marketing tab on your listing shows the expiry date at all times while your boost is active. You will also receive a bell notification 5 days before expiry as a reminder.' },
-      { q: 'Can I renew my boost?', a: 'Yes — anytime, directly from the Marketing tab. Once your current boost ends just select a tier and confirm again. Each renewal is a fresh one-off payment.' },
-      { q: 'Can I cancel a boost early?', a: 'Yes. Go to the Marketing tab on your listing and click Cancel boost. Your listing will be removed from the featured grid immediately.' },
-      { q: 'What is the difference between Featured and Premier?', a: 'Featured ($49 for 30 days): Homepage featured grid, Featured badge, higher search placement, targeted to buyers near your suburb. Premier ($99 for 30 days): Everything in Featured, plus top position in all search results in your suburb, rotation in the homepage hero image slot, and an email notification to registered buyers with saved searches matching your property.' },
-      { q: 'Can I boost a rental listing?', a: 'Yes. Both sale and rental listings can be boosted. A boosted rental appears in the featured grid to buyers searching for rentals near your suburb.' },
-      { q: 'Can I have more than one listing boosted at the same time?', a: 'Yes — no limit. Each listing is boosted independently with its own 30-day period.' },
-      { q: 'My boost shows Pending — what does that mean?', a: 'Pending means your request has been submitted and is being processed. Your listing will go live on the featured grid shortly. You will get a bell notification the moment it is active. Check the Marketing tab anytime to see the current status.' },
-      { q: 'Where do I manage my active boosts?', a: 'Everything is on the Marketing tab of each listing. It shows your live boost status, expiry date, what is included, and options to cancel or renew. You never need to contact anyone — it is fully self-serve.' },
-    ],
-  },
-  {
-    emoji: '🔑', title: 'Rental Management',
-    items: [
-      { q: 'How do I list a property for rent?', a: 'Create a new listing and choose "For Rent" on the Basics step. The form switches to rental mode with fields for weekly rent, bond weeks, parking type, and inclusions (water/electricity/internet). Toggle appliances (dishwasher, washing machine, internal laundry), building facilities (pool access, gym), and tenancy rules (smoking permitted, max occupants). On the Settings step, set available-from date, lease term, furnished toggle, pets allowed toggle, and screening level.' },
-      { q: 'Can tenants apply online?', a: 'Yes. A 5-step rental application form is available on every rental listing page. It collects personal details, employment history, rental history, and identity documents.' },
-      { q: 'What is the Rent Roll?', a: 'The Rent Roll (coming to your dashboard) is a summary of all your managed tenancies showing each tenant, their rent, next due date, and arrears status at a glance.' },
-      { q: 'How does the system handle bond?', a: 'When creating a tenancy, you record the bond amount and bond lodgement number. Bond held in your trust account is recorded as a trust receipt with purpose set to "Bond".' },
-    ],
-  },
-  {
-    emoji: '🏦', title: 'Trust Accounting',
-    items: [
-      { q: 'Is the trust accounting module legally compliant?', a: 'The module is designed to meet trust accounting requirements across all Australian states and territories: Estate Agents Act 1980 (VIC), Property and Stock Agents Act 2002 (NSW), Agents Financial Administration Act 2014 (QLD), Land Agents Act 1994 (SA), Real Estate and Business Agents Act 1978 (WA), Property Agents and Land Transactions Act 2016 (TAS), Agents Act 2003 (ACT), and Agents Licensing Act 1979 (NT). It produces sequentially numbered receipts, running balance ledgers, monthly statements with GST breakdowns, and 7-year compliant CSV exports. Compliance requirements vary by state — always confirm with your registered auditor before your annual audit.' },
-      { q: 'Can I import my trust history from PropertyMe?', a: 'Yes. Go to Financials → Import Existing Account. The wizard auto-detects PropertyMe, Reapit, and TrustSoft CSV formats. It walks you through certifying your opening balance, uploading your ledger history, and importing active client matters. You receive a signed declaration PDF and migration checklist for your auditor.' },
-      { q: 'How do I generate a monthly trust statement?', a: 'From the Trust Ledger page, click "Monthly Statement" at the bottom, select your month and year, and click "Generate & Print Statement". The PDF includes all receipts and payments, GST summary (1/11th method), and signature lines for the principal.' },
-      { q: 'How does bank reconciliation work?', a: 'Go to Bank Reconciliation. Upload or paste your bank statement entries. Match each bank line to the corresponding trust receipt or payment. Unmatched items are flagged red. When all items are matched, the reconciliation is complete and the date is recorded on your Financials dashboard.' },
-      { q: 'What is an ABA file?', a: 'An ABA file (Australian Banking Association format) is a bulk payment file you upload to your bank\'s internet banking to process multiple owner disbursements in a single transaction. Generate it from the Financials dashboard under Bulk Payments when you have pending payment records ready to clear.' },
-      { q: 'Can I void a transaction instead of deleting it?', a: 'Yes — you can never hard-delete a trust transaction. Click the delete icon on any transaction row to \"void\" it. The transaction remains in the ledger marked as Voided and is excluded from the running balance. This preserves the audit trail as required by Australian trust accounting law.' },
-      { q: 'What record retention period applies to my trust records?', a: 'Retention requirements vary by state: NSW requires 3 years minimum, QLD 5 years, WA 6 years, and VIC, SA, TAS, ACT and NT all require 7 years. To be safe across all jurisdictions, ListHQ recommends retaining all trust records — bank statements, receipts, ledgers, reconciliations, and audit reports — for a minimum of 7 years from the date of the last entry. Electronic storage is acceptable provided records remain accessible and reproducible.' },
-      { q: 'Do I need to comply with AML/CTF requirements?', a: 'Yes. From 1 July 2026, all Australian real estate agents must enrol with AUSTRAC under the Anti-Money Laundering and Counter-Terrorism Financing Act. Enrolment must be completed by 29 July 2026 and applies to every agent who sells or manages property. Failure to enrol carries significant penalties including fines and licence suspension. ListHQ is building AML compliance tools into the platform ahead of the deadline. In the meantime, enrol directly at austrac.gov.au. A direct enrolment link is available in the Contact & Support tab.' },
-      { q: 'How do I correct an error in a trust transaction?', a: 'You can never delete a trust transaction — Australian law requires the full history to be preserved. The correct process is: (1) Void the incorrect entry by clicking the void icon on the transaction — it stays in the ledger marked Voided. (2) Raise a new correct entry with the right details. For complex corrections such as opening balance differences or suspense account matches, use the Journal Adjustment feature in the Trust Ledger.' },
-      { q: 'What is a Journal Adjustment Entry?', a: 'A Journal Adjustment is a formal accounting correction that transfers a balance between two ledgers. Use it for: wrong client ledger, opening balance correction after migration, dishonoured payment reversal, suspense account match, or overcharged management fee. Go to Trust Ledger → Journal Adjustment. You must enter the debit ledger, credit ledger, amount, reason code, and a mandatory explanation that your auditor will see permanently. The entry cannot be deleted.' },
-      { q: 'What is the Suspense Account?', a: 'The Suspense Account holds unidentified receipts — money in your trust bank account that you cannot yet match to a client. Never leave unidentified money unrecorded. Go to Trust Ledger → Suspense and enter the amount, bank reference, and date. The amber Suspense button shows a badge count of outstanding items. Once you identify the client, use Journal Adjustment with reason "Suspense Account Match" to transfer it to the correct ledger.' },
-      { q: 'What happens if a client ledger goes overdrawn?', a: 'A trust client ledger must never show a negative balance — this is a serious breach in all Australian states. If it occurs, a red alert banner appears on your Trust Financials dashboard. You must immediately transfer funds from your trading account to remedy the shortfall, notify your state regulator in writing (date, amount, reason, corrective action), and use Journal Adjustment to record the correction.' },
-      { q: 'What do I do when a tenant payment is dishonoured?', a: 'When a payment bounces: (1) void the original receipt in the Trust Ledger, (2) use Journal Adjustment with reason "Dishonoured Payment Reversal" to debit the client ledger, (3) notify the payer immediately and do not disburse any funds from that ledger until resolved. Always wait for cleared funds before processing disbursements.' },
-    ],
-  },
-  {
-    emoji: '🤫', title: 'Off-Market Network',
-    items: [
-      { q: 'What is the Off-Market Network?', a: 'The Off-Market Network lets you share listings privately with other verified agents before they go public. This gives sellers a discreet soft launch and gives agents early access to stock.' },
-      { q: 'How do referral splits work?', a: 'When sharing an off-market listing, you set a referral split percentage. If a network agent introduces the successful buyer, they receive that percentage of your commission at settlement.' },
-      { q: 'Who can see my off-market listings?', a: 'Only verified agents on the ListHQ network. Public buyers and unverified agents cannot see them.' },
-      { q: 'What is a Buyer Brief?', a: 'A Buyer Brief is a request you post to the network describing what your buyer client is looking for (property type, suburb, price range, urgency). Other agents with matching off-market stock will contact you directly.' },
-    ],
-  },
-  {
-    emoji: '🤝', title: 'Partner Portal',
-    items: [
-      { q: 'What is the Partner Portal?', a: 'The Partner Portal is a dedicated login for outsourced trust accounting firms — businesses that manage trust accounts on behalf of multiple real estate agencies. Instead of sharing your agent login, your trust accountant gets their own secure portal showing only what they need: your trust account, rent roll, tenancies, and arrears. It is completely separate from your agent dashboard.' },
-      { q: 'How do I give my trust accountant access?', a: 'Go to Partner Access in the sidebar under Account. Enter your trust accountant\'s email address and choose their access level (Trust Only, Trust & PM, or Full PM). They receive a branded invitation email with a secure link. Once they accept, they can log in immediately at /partner/login.' },
-      { q: 'What can a partner see and do?', a: 'Depends on the access level you grant. Trust Only: view and record trust receipts, payments, and reconciliation for your agency. Trust & PM: everything in Trust Only plus rent roll, tenancy records, and rent payments. Full PM: complete access including maintenance jobs, bank reconciliation, and arrears management.' },
-      { q: 'Can my trust accounting firm manage multiple agencies from one login?', a: 'Yes — this is the core purpose of the Partner Portal. A firm like Balance R&R can be invited by 20 different agencies. When they log in they see all their active agencies in a dropdown switcher and can move between them instantly. Each agency\'s data is kept completely separate.' },
-      { q: 'Can the partner firm have multiple staff members with individual logins?', a: 'Yes. The firm owner registers first and becomes the account owner. From within the Partner Portal, they can go to Team and invite each of their staff members by email. Each person gets their own individual login and password — no shared credentials. The owner can revoke any team member\'s access at any time.' },
-      { q: 'Is the partner portal free for my trust accountant to use?', a: 'Yes. There is no charge to partner firms for using the portal. The partner portal is included with your Pro and Agency plan subscription.' },
-      { q: 'How do I revoke a partner\'s access?', a: 'Go to Partner Access in your sidebar. Find the partner in the active partners table and click Revoke. Their access is removed immediately and they are notified by email.' },
-      { q: 'Can I see what my partner has done in my account?', a: 'Yes. All partner activity is logged with a timestamp and attributed to the individual team member. You can see who recorded which transaction, when, and from which IP address.' },
-    ],
-  },
-  {
-    emoji: '📅', title: 'Inspections',
-    items: [
-      { q: 'How does Inspection Day Mode work?', a: 'Select your listing from the scheduled inspections list. During the inspection, add visitor details manually — first name, last name, phone, email, and interest level (Hot/Warm/Cold). After the inspection, send a one-click follow-up and all visitors are added to your CRM.' },
-      { q: 'Can buyers book private inspections?', a: 'Yes. If inspection booking is enabled on a listing, buyers can request a time slot from the listing page. You will receive a notification to confirm.' },
-    ],
-  },
-  {
-    emoji: '💸', title: 'Commission and Financials',
-    items: [
-      { q: 'How do I calculate my commission?', a: 'Open Commission Calculator from the sidebar. Enter the sale price, commission rate, agency split, and GST preference. The calculator shows gross commission, your net share, GST component, and projected annual GCI. Your last scenario is saved automatically.' },
-      { q: 'What is GCI?', a: 'GCI stands for Gross Commission Income — the total commission you earn before expenses. The Commission Calculator shows your projected monthly and annual GCI based on your deals-per-month setting.' },
-    ],
-  },
-  {
-    emoji: '💳', title: 'Plans and Billing',
-    items: [
-      { q: 'What plans are available?', a: 'Starter ($99/mo founding, $199 full): 1 seat, 10 listings, CRM, AI listing writer, voice leads, standard analytics. Pro ($199/mo founding, $349 full): 1 seat, unlimited listings, trust accounting, partner portal access, Whisper Market, Inspection Day, Settlement Concierge, commission calculator, GCI reports, verified badge. Agency ($399/mo founding, $699 full): up to 8 seats, everything in Pro plus team analytics, agency branding, lead routing, partner portal access, and API access. Annual billing saves 15% on all plans.' },
-      { q: 'Can I cancel at any time?', a: 'Yes. No lock-in contracts. Cancel from the Billing page and your plan remains active until the end of the billing period. Data is retained for 90 days.' },
-      { q: 'What payment methods are accepted?', a: 'Visa, Mastercard, and American Express via Stripe. Update your card at any time on the Billing page.' },
-      { q: 'Is there a per-listing boost fee?', a: 'Yes, optional. You can boost any listing to the homepage featured grid for a one-off fee — Featured is $49 for 30 days and Premier is $99 for 30 days. There is no mandatory per-listing fee. Standard listings are included in your subscription at no extra cost.' },
-    ],
-  },
-  {
-    emoji: '⚙️', title: 'Profile and Team',
-    items: [
-      { q: 'How do I add team members?', a: 'Go to Team → Invite Member. Enter their email and choose a role (Agent or Admin). They receive an invitation email with a unique code to join your agency workspace.' },
-      { q: 'How do I update my public agent profile?', a: 'Go to Profile in the sidebar. Edit your headshot, bio, specialisation, years of experience, languages spoken, and social links. Changes appear on your public page immediately.' },
-      { q: 'How do I change my email address?', a: 'Email changes require account verification. Contact support at support@listhq.com.au and we will assist.' },
-      { q: 'How is Partner Access different from Team?', a: 'Team is for agents and admins inside your own agency — people who work for you and need full dashboard access. Partner Access is for external service providers like outsourced trust accountants who need access to specific parts of your account (trust accounting, rent roll) but should not see your CRM, pipeline, analytics, or billing. Always use Partner Access for your trust accountant — never share your agent login.' },
-      { q: 'What is my Support PIN and where do I find it?', a: 'Your Support PIN is a unique 6-digit number assigned to your account when you register. It appears in your Profile page under the Support PIN section — shown as two groups of 3 digits (e.g. 412 893). When you contact ListHQ support by phone or email, we will ask you to quote this PIN to instantly verify your identity. Your PIN is permanent and unique to your account — it cannot be changed. Do not share it publicly. Find it at Dashboard → Profile → scroll to Support PIN.' },
-    ],
-  },
-  {
-    emoji: '🔧', title: 'Technical Troubleshooting',
-    items: [
-      { q: 'The page is not loading properly — what should I do?', a: 'Try a hard refresh (Ctrl+Shift+R on Windows, Cmd+Shift+R on Mac). If the issue persists, clear your browser cache or try Chrome, Safari, Firefox, or Edge. If the problem continues, email us with a screenshot.' },
-      { q: 'My listing photos are not uploading — why?', a: 'Each image must be under 10 MB and in JPEG, PNG, or WebP format. Try uploading one photo at a time on a faster connection. If the issue continues, contact support with the browser and error message.' },
-      { q: 'I am not receiving email notifications.', a: 'Check your spam folder and add our sending address to your contacts. Verify your email is correct under Settings and that notifications are enabled.' },
-      { q: 'The voice search is not working on my device.', a: 'Voice search requires microphone permission in your browser. On Chrome: click the padlock in the address bar → Site settings → Microphone → Allow. On Safari: go to Settings → Safari → Microphone → Allow. Voice search is not supported in Internet Explorer.' },
-      { q: 'The map is not showing my territory locations.', a: 'The map uses Google Maps and requires a working internet connection. Try refreshing the Territory page. If your locations are saved but not displaying, try a different browser.' },
-    ],
-  },
-  {
-    emoji: '🔒', title: 'Data and Privacy',
-    items: [
-      { q: 'Where is my data stored?', a: 'All data is stored in Australia on secure cloud infrastructure (AWS ap-southeast-2 — Sydney region). We do not store data offshore.' },
-      { q: 'Can I export my data?', a: 'Yes. Contacts can be exported from the Contacts page. Trust transactions can be exported as CSV from the Trust Ledger. Listings can be exported from Reports. Contact support for a full account data export.' },
-      { q: 'What happens to my data if I cancel?', a: 'Your data is retained for 90 days after cancellation. During this window you can export everything. After 90 days, data is permanently deleted per our Privacy Policy.' },
-    ],
-  },
-  {
-    emoji: '🤖',
-    title: 'AI Features',
-    items: [
-      { q: 'How does the AI Buyer Concierge work?', a: 'When a buyer completes a voice search on ListHQ, the AI Buyer Concierge automatically scores their intent (0–100), finds matching properties in your listings, checks your Buyer Briefs on the Off-Market Network, creates a lead in your dashboard, and sends you a notification email — all within seconds. You do not need to manually review voice searches; the concierge does it for you.' },
-      { q: 'How is the Buyer Concierge lead score calculated?', a: 'The AI scores each lead out of 100 based on four factors: suburb match (40 pts), property type match (20 pts), bedroom match (20 pts), and price match (20 pts). A score of 70+ is Hot 🔥, 40–69 is Warm ⚡, and below 40 is Cold ❄️.' },
-      { q: 'What is the Seller Likelihood Score?', a: 'The Seller Likelihood Score (0–100) is an AI-calculated weekly score on each of your listings. It measures how motivated the seller is based on five signals: days on market vs the suburb median, number of price reductions, suburb price trend, status churn (listings that went Under Offer and fell through), and activity gap (no updates in 30+ days). A score above 70 is a strong signal to prioritise vendor communication.' },
-      { q: 'When do Seller Likelihood Scores update?', a: 'Scores are recalculated weekly (every Sunday). The "scored_at" date on each listing shows when the last calculation ran. If a listing is new, it may take up to 7 days for the first score to appear.' },
-      { q: 'How do I generate an AI offer letter?', a: 'Open any lead from the Voice Leads page and click "Generate Offer". Enter the offer amount, settlement days, and conditions. The AI drafts a professional offer letter with the property details, comparable sales from the last 90 days, and a complete negotiation package — ready in seconds. Review, edit if needed, and save. The offer is tracked through stages: Draft, Sent, Accepted, Rejected, Countered, or Withdrawn.' },
-      { q: 'What comparable sales does the AI use for offer letters?', a: 'The AI pulls recent sold properties in the same suburb from the past 90 days — specifically properties with a sold status in the ListHQ database. It uses these as the comparable sales table in your offer letter. The suburb median price is also included for context.' },
-      { q: 'Can I edit the AI-generated offer letter?', a: 'Yes. The AI generates a draft — you can edit every part of it including the offer amount, conditions, settlement terms, and the body text. Save your changes and the updated version is stored against the lead.' },
-      { q: 'What is the Lead Marketplace?', a: 'The Lead Marketplace is a pool of verified buyer profiles — real buyers who have submitted their preferences and budget via the ListHQ buyer portal. Profiles matched to your listings appear in the Marketplace tab of your Voice Leads page. Contact details are hidden until you purchase the lead. Each lead can only be purchased by one agent, so act quickly on high-scoring profiles.' },
-      { q: 'Can I see a lead\'s contact details before purchasing from the marketplace?', a: 'No. Contact details (name, email, phone) are hidden until you purchase. You can see the buyer\'s preferred suburbs, property type, budget range, urgency, and AI lead score before deciding whether to purchase.' },
-      { q: 'What happens after I purchase a marketplace lead?', a: 'Two things happen immediately: (1) the buyer receives an introduction email from ListHQ letting them know an agent will be in touch, and (2) the lead is added to your CRM tagged as "Marketplace Lead" and linked to the matching listing. Contact details are unlocked on your screen instantly.' },
-      { q: 'How are marketplace leads priced?', a: 'Lead pricing depends on location demand, buyer urgency, and property type specificity. Typical range is $25–$150 per lead. High-demand suburbs and urgent buyers are priced higher.' },
-      { q: 'Can other agents see my purchased leads?', a: 'No. Row-Level Security ensures each agent can only see their own purchased leads. Other agents cannot see your lead data, contact details, or purchase history.' },
-      { q: 'Do I need a Pro plan for AI features?', a: 'The Buyer Concierge, Seller Likelihood Scores, AI Offer Generator, and Lead Marketplace are all available on the Pro plan ($199/mo founding price) and above. Starter plan users can upgrade from the Billing page.' },
-    ],
-  },
-  {
-    emoji: '🏠', title: 'For Buyers',
-    items: [
-      { q: 'How do I find an agent who speaks my language?', a: 'Go to the Agents tab in the bottom navigation (or visit /agents). Use the language filter dropdown to select your preferred language — only agents who speak that language will appear. You can also filter by name, suburb, or agency name using the search bar. Tap View Profile to see the agent\'s full profile, listings, and contact details.' },
-      { q: 'How does the voice search work?', a: 'Tap the microphone icon on the homepage and speak your search naturally — for example "3 bedroom house in Richmond under $900k with a garage". The AI understands 24 languages. Your results update automatically. You can also type your search in the search bar.' },
-      { q: 'How do I save a property?', a: 'Tap the heart icon on any property card or listing page. Saved properties appear in the Saved tab in the bottom navigation. You need to be signed in to save properties.' },
-      { q: 'How do I save a search so I get alerts for new listings?', a: 'After searching, tap the Save button in the results toolbar. Give your search a name. When new listings are published that match your saved search, you will receive an email alert. You can manage your saved searches from the homepage search bar.' },
-      { q: 'What is Collab Search — searching together?', a: 'Collab Search lets two people browse the same properties at the same time from different devices — useful for couples searching together or buyers working with a partner who is interstate or overseas. After searching, tap the Together button in the toolbar. A link is copied to your clipboard. Share it with your partner — when they open it, you are both in the same live session. You can each react to properties with thumbs up, thumbs down, or fire emoji. You can see which properties your partner has already viewed.' },
-      { q: 'How do I contact an agent about a property?', a: 'Open any property listing and tap Contact Agent or Enquire / Apply. A form appears where you can send a message, request a call, or submit a rental application. Your message goes directly to the agent and starts a conversation in the Messages tab.' },
-      { q: 'How do I apply for a rental property?', a: 'Open the rental listing and tap Enquire / Apply. A 5-step application form appears — personal details, employment, rental history, identity documents, and submit. Your application goes directly to the managing agent.' },
-      { q: 'Is ListHQ free for buyers?', a: 'Yes — completely free. Create an account, search properties, save listings, contact agents, apply for rentals, and use voice search at no cost. ListHQ is paid for by the agents on the platform.' },
-      { q: 'How do I update my property preferences?', a: 'Go to Profile in the bottom navigation, then tap Settings. You can update your budget, preferred suburbs, and property type preferences here at any time.' },
-    ],
-  },
-];
-
-/* ─── SUB-COMPONENTS ─── */
-
-const GuideCard = ({ guide }: { guide: Guide }) => {
-  const [open, setOpen] = useState(false);
-  return (
-    <Card className="bg-card border border-border">
-      <CardHeader className="pb-2">
-        <div className="text-3xl mb-1">{guide.emoji}</div>
-        <CardTitle className="text-base">{guide.title}</CardTitle>
-        <CardDescription className="text-xs">{guide.description}</CardDescription>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <Button variant="ghost" size="sm" className="px-0 text-xs text-primary gap-1" onClick={() => setOpen(!open)}>
-          {open ? 'Hide Guide' : 'View Guide'} <ChevronRight size={14} className={`transition-transform ${open ? 'rotate-90' : ''}`} />
-        </Button>
-        {open && (
-          <ol className="mt-3 space-y-2 list-decimal list-inside text-sm text-muted-foreground">
-            {guide.steps.map((s, i) => <li key={i}>{s}</li>)}
-          </ol>
-        )}
-      </CardContent>
-    </Card>
-  );
-};
-
-const ChecklistCard = ({ item, index }: { item: ChecklistItem; index: number }) => {
-  const navigate = useNavigate();
-  const Icon = item.icon;
-  return (
-    <Card className="bg-card border border-border">
-      <CardContent className="p-4 flex items-start gap-3">
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold">
-          {index + 1}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <Icon size={16} className="text-muted-foreground flex-shrink-0" />
-            <h3 className="text-sm font-medium truncate">{item.title}</h3>
-          </div>
-          <p className="text-xs text-muted-foreground mb-2">{item.description}</p>
-          <Button variant="outline" size="sm" className="text-xs h-7" onClick={() => navigate(item.route)}>
-            Go there <ChevronRight size={12} />
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
-/* ─── MAIN ─── */
-
-const HelpPage = () => {
-  const navigate = useNavigate();
-  const [faqSearch, setFaqSearch] = useState('');
-  const q = faqSearch.toLowerCase();
-
-  const filteredCategories = FAQ_CATEGORIES.map(cat => ({
-    ...cat,
-    items: cat.items.filter(i => i.q.toLowerCase().includes(q) || i.a.toLowerCase().includes(q)),
-  })).filter(cat => cat.items.length > 0);
-
-  const supportFooter = (
-    <p className="text-center text-xs text-muted-foreground mt-8">
-      Can't find your answer? Email us at{' '}
-      <a href="mailto:support@listhq.com.au" className="text-primary underline">support@listhq.com.au</a>
-    </p>
-  );
-
-  return (
-    <div className="p-4 sm:p-6 max-w-5xl mx-auto w-full space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Help &amp; FAQ</h1>
-        <p className="text-sm text-muted-foreground">Guides, tips, and answers to common questions.</p>
-      </div>
-
-      <Tabs defaultValue="getting-started">
-        <TabsList className="flex-wrap h-auto gap-1">
-          <TabsTrigger value="getting-started">Getting Started</TabsTrigger>
-          <TabsTrigger value="guides">How-To Guides</TabsTrigger>
-          <TabsTrigger value="ai-builds">AI Builds</TabsTrigger>
-          <TabsTrigger value="faq">FAQ</TabsTrigger>
-          <TabsTrigger value="support">Contact &amp; Support</TabsTrigger>
-        </TabsList>
-
-        {/* ── TAB 1: Getting Started ── */}
-        <TabsContent value="getting-started" className="space-y-8 mt-4">
-          <div>
-            <h2 className="text-lg font-semibold mb-1">Setup Checklist</h2>
-            <p className="text-sm text-muted-foreground mb-4">Complete these steps to get your agency live on ListHQ.</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {CHECKLIST.map((item, i) => (
-                <ChecklistCard key={item.title} item={item} index={i} />
-              ))}
-            </div>
-          </div>
-
-          <Separator />
-
-          <div>
-            <h2 className="text-lg font-semibold mb-3">Quick Reference</h2>
-            <ScrollArea className="rounded-lg border border-border">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border bg-muted/50">
-                      <th className="text-left p-3 font-medium text-muted-foreground">Feature</th>
-                      <th className="text-left p-3 font-medium text-muted-foreground">Where to find it</th>
-                      <th className="text-left p-3 font-medium text-muted-foreground">What it does</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {QUICK_REF.map((row) => (
-                      <tr key={row.route} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
-                        <td className="p-3 font-medium whitespace-nowrap">
-                          <button
-                            className="text-primary hover:underline text-left"
-                            onClick={() => navigate(row.route)}
-                          >
-                            {row.feature}
-                          </button>
-                        </td>
-                        <td className="p-3 text-muted-foreground font-mono text-xs whitespace-nowrap">{row.route}</td>
-                        <td className="p-3 text-muted-foreground">{row.what}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </ScrollArea>
-          </div>
-        </TabsContent>
-
-        {/* ── TAB 2: How-To Guides ── */}
-        <TabsContent value="guides">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            {GUIDES.map(g => <GuideCard key={g.title} guide={g} />)}
-          </div>
-          {supportFooter}
-        </TabsContent>
-
-        {/* ── TAB 3: AI Builds ── */}
-        <TabsContent value="ai-builds" className="space-y-8 mt-4">
-          <div>
-            <h2 className="text-lg font-semibold mb-1">AI-Powered Features</h2>
-            <p className="text-sm text-muted-foreground mb-6">ListHQ includes four AI tools designed to help you find buyers, identify sellers, generate offers, and acquire leads — all automatically.</p>
-          </div>
-
-          {/* AI Build 1: Buyer Concierge */}
-          <Card className="bg-card border border-border">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-3 mb-1">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Sparkles size={20} className="text-primary" />
-                </div>
-                <div>
-                  <CardTitle className="text-base">AI Build 1: Buyer Concierge</CardTitle>
-                  <CardDescription className="text-xs">Automatically connect with buyers searching for properties like yours</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h4 className="text-sm font-semibold mb-2">What is Buyer Concierge?</h4>
-                <p className="text-sm text-muted-foreground">Buyer Concierge is an AI feature that monitors every voice search on ListHQ. When a buyer searches for properties similar to yours, the AI scores their intent, matches them to your listings, and creates a lead in your dashboard — all within seconds. You don't need to do anything; the concierge works automatically in the background.</p>
-              </div>
-              <Separator />
-              <div>
-                <h4 className="text-sm font-semibold mb-2">How it works — step by step</h4>
-                <ol className="space-y-2 list-decimal list-inside text-sm text-muted-foreground">
-                  <li>A buyer speaks a search query (e.g. "3-bed house in Bondi under $1M with parking")</li>
-                  <li>The AI transcribes the query and extracts suburb, property type, bedrooms, and budget</li>
-                  <li>Your listings and Buyer Briefs are matched against the search criteria</li>
-                  <li>The buyer receives a lead score (0–100) based on match quality</li>
-                  <li>A lead is created in your Voice Leads dashboard with the score, transcript, and matched property</li>
-                  <li>You receive a notification email — respond to Hot leads within the hour for best conversion</li>
-                </ol>
-              </div>
-              <Separator />
-              <div>
-                <h4 className="text-sm font-semibold mb-2">Understanding lead scores</h4>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="rounded-lg border border-border p-3">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Badge className="bg-green-500/10 text-green-700 border-green-500/20">🔥 Hot (70–100)</Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground">Strong match on suburb, type, beds, and price. Buyer is ready to act. Priority follow-up.</p>
-                  </div>
-                  <div className="rounded-lg border border-border p-3">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Badge className="bg-amber-500/10 text-amber-700 border-amber-500/20">⚡ Warm (40–69)</Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground">Partial match. Buyer is interested but criteria don't fully align. Worth following up.</p>
-                  </div>
-                  <div className="rounded-lg border border-border p-3">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Badge className="bg-muted text-muted-foreground border-border">❄️ Cold (0–39)</Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground">Low match. Buyer is browsing or criteria are far from your listings. Monitor for changes.</p>
-                  </div>
-                </div>
-              </div>
-              <Separator />
-              <div>
-                <h4 className="text-sm font-semibold mb-2">Score calculation breakdown</h4>
-                <div className="text-sm text-muted-foreground space-y-1">
-                  <p>• <strong>Suburb match</strong> — 40 points: buyer's searched suburb matches your listing suburb</p>
-                  <p>• <strong>Property type</strong> — 20 points: house, apartment, townhouse, land match</p>
-                  <p>• <strong>Bedrooms</strong> — 20 points: bedroom count within range of your listing</p>
-                  <p>• <strong>Price</strong> — 20 points: buyer's budget overlaps your listing price</p>
-                </div>
-              </div>
-              <Separator />
-              <div>
-                <h4 className="text-sm font-semibold mb-2">Tips for better results</h4>
-                <ul className="space-y-1 text-sm text-muted-foreground list-disc list-inside">
-                  <li>Keep your agent profile complete — photo, bio, and specialisations</li>
-                  <li>Ensure listings are accurate and up-to-date with correct suburb, type, beds, and price</li>
-                  <li>Post Buyer Briefs on the Off-Market Network to cast a wider net</li>
-                  <li>Respond to Hot leads within 1 hour — first-to-call wins the client</li>
-                  <li>Check notifications in Settings to ensure email alerts are enabled</li>
-                </ul>
-              </div>
-              <div className="bg-muted/50 rounded-lg p-3">
-                <p className="text-xs text-muted-foreground"><strong>Troubleshooting:</strong> Not receiving notifications? Check Settings → Notifications. Also ensure your listings are active (not archived) and your profile is published. If issues persist, submit a support ticket below.</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* AI Build 2: Seller Likelihood Score */}
-          <Card className="bg-card border border-border">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-3 mb-1">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <TrendingUp size={20} className="text-primary" />
-                </div>
-                <div>
-                  <CardTitle className="text-base">AI Build 2: Seller Likelihood Score</CardTitle>
-                  <CardDescription className="text-xs">AI-powered prediction of seller motivation for your listings</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h4 className="text-sm font-semibold mb-2">What is the Seller Likelihood Score?</h4>
-                <p className="text-sm text-muted-foreground">The Seller Likelihood Score is an AI-calculated prediction (0–100) of how motivated a property owner might be to sell. It analyses market signals, listing behaviour, and suburb trends to help you prioritise which vendors to contact. Scores update weekly every Sunday.</p>
-              </div>
-              <Separator />
-              <div>
-                <h4 className="text-sm font-semibold mb-2">How scores are calculated</h4>
-                <p className="text-sm text-muted-foreground mb-3">The AI analyses five key signals for each listing:</p>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3 p-3 rounded-lg border border-border">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
-                    <div>
-                      <p className="text-sm font-medium">Days on Market</p>
-                      <p className="text-xs text-muted-foreground">Compares how long the listing has been active vs the suburb median. Longer than average = higher score.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-3 rounded-lg border border-border">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
-                    <div>
-                      <p className="text-sm font-medium">Price Reductions</p>
-                      <p className="text-xs text-muted-foreground">Multiple price drops signal a motivated seller. More reductions = higher score.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-3 rounded-lg border border-border">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
-                    <div>
-                      <p className="text-sm font-medium">Suburb Price Trend</p>
-                      <p className="text-xs text-muted-foreground">If the suburb median is trending down, owners may want to sell before further decline.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-3 rounded-lg border border-border">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold flex-shrink-0">4</div>
-                    <div>
-                      <p className="text-sm font-medium">Status Churn</p>
-                      <p className="text-xs text-muted-foreground">Listings that went Under Offer and fell through indicate a seller who is ready but hasn't found the right buyer.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-3 rounded-lg border border-border">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold flex-shrink-0">5</div>
-                    <div>
-                      <p className="text-sm font-medium">Activity Gap</p>
-                      <p className="text-xs text-muted-foreground">No listing updates in 30+ days signals potential disengagement — the vendor may be open to a new approach.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <Separator />
-              <div>
-                <h4 className="text-sm font-semibold mb-2">What the score means</h4>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="rounded-lg border border-border p-3 bg-green-500/5">
-                    <p className="text-sm font-semibold text-green-700 mb-1">🟢 High (70–100)</p>
-                    <p className="text-xs text-muted-foreground">Strong sell signal. Prioritise contact with this vendor — they are likely motivated to sell soon.</p>
-                  </div>
-                  <div className="rounded-lg border border-border p-3 bg-amber-500/5">
-                    <p className="text-sm font-semibold text-amber-700 mb-1">🟡 Medium (50–69)</p>
-                    <p className="text-xs text-muted-foreground">Some indicators present. Worth following up — schedule a vendor call or appraisal.</p>
-                  </div>
-                  <div className="rounded-lg border border-border p-3 bg-muted/50">
-                    <p className="text-sm font-semibold text-muted-foreground mb-1">🔴 Low (0–49)</p>
-                    <p className="text-xs text-muted-foreground">Low likelihood right now. Revisit in 3–6 months or wait for market changes.</p>
-                  </div>
-                </div>
-              </div>
-              <Separator />
-              <div>
-                <h4 className="text-sm font-semibold mb-2">Where to find scores</h4>
-                <ol className="space-y-1 list-decimal list-inside text-sm text-muted-foreground">
-                  <li>Go to <strong>My Listings</strong> in the sidebar</li>
-                  <li>Each listing shows a score ring with the current value</li>
-                  <li>Click a listing to see the full signal breakdown and AI summary</li>
-                  <li>Use the Pre-Market page for a filtered view of high-scoring listings</li>
-                </ol>
-              </div>
-              <div className="bg-muted/50 rounded-lg p-3">
-                <p className="text-xs text-muted-foreground"><strong>FAQ:</strong> "Why is my property's score low?" — New listings need time to develop signals. Scores are based on market behaviour, not property quality. A low score simply means the AI hasn't detected strong sell signals yet. Scores update every Sunday.</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* AI Build 3: Offer Generator */}
-          <Card className="bg-card border border-border">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-3 mb-1">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <PenTool size={20} className="text-primary" />
-                </div>
-                <div>
-                  <CardTitle className="text-base">AI Build 3: Offer Generator</CardTitle>
-                  <CardDescription className="text-xs">Generate professional offer letters with comparable sales analysis in seconds</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h4 className="text-sm font-semibold mb-2">What is the Offer Generator?</h4>
-                <p className="text-sm text-muted-foreground">The Offer Generator uses AI to create professional offer letters for property buyers. It automatically pulls comparable sales from the same suburb, calculates the suburb median price, and drafts a complete negotiation package — ready to review and send in seconds.</p>
-              </div>
-              <Separator />
-              <div>
-                <h4 className="text-sm font-semibold mb-2">How to generate an offer — step by step</h4>
-                <ol className="space-y-2 list-decimal list-inside text-sm text-muted-foreground">
-                  <li>Open a lead from the <strong>Voice Leads</strong> page</li>
-                  <li>Click the <strong>"Generate Offer"</strong> button on the lead detail panel</li>
-                  <li>Enter the offer details: offer amount ($), settlement days, and any conditions (e.g. "subject to inspection", "finance approval")</li>
-                  <li>Click <strong>Generate</strong> — the AI analyses comparable sales and drafts the letter</li>
-                  <li>Review the generated letter. Edit any text, conditions, or comparable sales as needed</li>
-                  <li>Save the offer. It's tracked through stages: Draft → Sent → Accepted / Rejected / Countered / Withdrawn</li>
-                </ol>
-              </div>
-              <Separator />
-              <div>
-                <h4 className="text-sm font-semibold mb-2">Comparable sales data</h4>
-                <p className="text-sm text-muted-foreground mb-2">The AI automatically includes comparable sales in your offer letter:</p>
-                <ul className="space-y-1 text-sm text-muted-foreground list-disc list-inside">
-                  <li>Pulls recent sold properties from the same suburb (last 90 days)</li>
-                  <li>Matches by property type, bedrooms, and bathrooms where possible</li>
-                  <li>Includes the suburb median price for context</li>
-                  <li>Comparable sales are presented in a table within the offer letter</li>
-                </ul>
-              </div>
-              <Separator />
-              <div>
-                <h4 className="text-sm font-semibold mb-2">Customising your offer</h4>
-                <p className="text-sm text-muted-foreground">The generated letter is a draft — you have full control:</p>
-                <ul className="space-y-1 text-sm text-muted-foreground list-disc list-inside mt-2">
-                  <li>Edit the offer amount, settlement terms, and conditions</li>
-                  <li>Modify the letter body text, tone, and phrasing</li>
-                  <li>Add or remove comparable sales if you know better ones</li>
-                  <li>Add your brokerage branding and personal details</li>
-                  <li>Track the offer outcome (accepted, rejected, countered, withdrawn)</li>
-                </ul>
-              </div>
-              <div className="bg-muted/50 rounded-lg p-3">
-                <p className="text-xs text-muted-foreground"><strong>Troubleshooting:</strong> "Comparable sales not showing" — The AI searches for sold properties in the same suburb from the past 90 days. If no comparable sales exist (e.g. rural area with few transactions), the letter will note limited data. You can manually add comps you know about.</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* AI Build 4: Lead Marketplace */}
-          <Card className="bg-card border border-border">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-3 mb-1">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <ShoppingBag size={20} className="text-primary" />
-                </div>
-                <div>
-                  <CardTitle className="text-base">AI Build 4: Lead Marketplace</CardTitle>
-                  <CardDescription className="text-xs">Purchase verified buyer leads matched to your listings</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h4 className="text-sm font-semibold mb-2">What is the Lead Marketplace?</h4>
-                <p className="text-sm text-muted-foreground">The Lead Marketplace is a pool of verified buyer profiles — real buyers who have submitted their preferences and budget via the ListHQ consumer portal. These profiles are matched to your listings using AI. Contact details are hidden until you purchase a lead, ensuring quality and exclusivity.</p>
-              </div>
-              <Separator />
-              <div>
-                <h4 className="text-sm font-semibold mb-2">How to purchase a lead — step by step</h4>
-                <ol className="space-y-2 list-decimal list-inside text-sm text-muted-foreground">
-                  <li>Go to <strong>Voice Leads</strong> in the sidebar, then click the <strong>Marketplace</strong> tab</li>
-                  <li>Browse available buyer profiles — you can see preferred suburbs, property type, budget range, urgency, and AI intent score</li>
-                  <li>Click a profile to see the full buyer brief (contact details are blurred)</li>
-                  <li>Click <strong>"Purchase Lead"</strong> and confirm the purchase</li>
-                  <li>Contact details are unlocked instantly — name, email, phone, and direct WhatsApp/email links</li>
-                  <li>The buyer receives an automated introduction email from ListHQ</li>
-                  <li>The lead is added to your CRM tagged as "Marketplace Lead"</li>
-                </ol>
-              </div>
-              <Separator />
-              <div>
-                <h4 className="text-sm font-semibold mb-2">Understanding lead quality</h4>
-                <p className="text-sm text-muted-foreground mb-2">Each marketplace lead includes:</p>
-                <ul className="space-y-1 text-sm text-muted-foreground list-disc list-inside">
-                  <li><strong>Intent score</strong> — AI-calculated score based on buyer activity and specificity</li>
-                  <li><strong>Buying situation</strong> — first home buyer, upgrader, downsizer, or investor</li>
-                  <li><strong>Budget range</strong> — minimum and maximum budget the buyer specified</li>
-                  <li><strong>Preferred suburbs</strong> — where the buyer wants to live</li>
-                  <li><strong>Property type</strong> — house, apartment, townhouse, or land</li>
-                  <li><strong>Search count</strong> — how many searches the buyer has completed (higher = more engaged)</li>
-                </ul>
-              </div>
-              <Separator />
-              <div>
-                <h4 className="text-sm font-semibold mb-2">Privacy and exclusivity</h4>
-                <div className="bg-muted/50 rounded-lg p-3 space-y-2">
-                  <p className="text-xs text-muted-foreground">• <strong>One agent per lead</strong> — once purchased, the lead is exclusive to you. No other agent can buy the same lead.</p>
-                  <p className="text-xs text-muted-foreground">• <strong>Row-Level Security</strong> — your purchased leads are invisible to other agents. They cannot see your lead data, contact details, or purchase history.</p>
-                  <p className="text-xs text-muted-foreground">• <strong>Buyer notification</strong> — purchased buyers receive an introduction email so they know to expect your call.</p>
-                </div>
-              </div>
-              <Separator />
-              <div>
-                <h4 className="text-sm font-semibold mb-2">Pricing</h4>
-                <p className="text-sm text-muted-foreground">Lead pricing varies based on location demand, buyer urgency, and property type specificity. Typical range: <strong>$25–$150 per lead</strong>. High-demand suburbs and urgent buyers are priced higher. You only pay for leads you choose to purchase — there are no subscriptions or minimums for marketplace leads.</p>
-              </div>
-              <div className="bg-muted/50 rounded-lg p-3">
-                <p className="text-xs text-muted-foreground"><strong>Tip:</strong> Act quickly on high-scoring leads. Other agents in the same suburb can see the same profiles. The first agent to purchase gets exclusive access.</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="bg-primary/5 border border-primary/10 rounded-lg p-4">
-            <p className="text-sm font-medium mb-1">Need a Pro plan for AI features?</p>
-            <p className="text-xs text-muted-foreground">All four AI features — Buyer Concierge, Seller Scores, Offer Generator, and Lead Marketplace — are included with the Pro plan ($199/mo founding price) and Agency plan ($399/mo). Upgrade from the Billing page.</p>
-          </div>
-
-          {supportFooter}
-        </TabsContent>
-
-        {/* ── TAB 4: FAQ ── */}
-        <TabsContent value="faq">
-          <div className="relative mt-4 mb-6">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search questions…"
-              value={faqSearch}
-              onChange={e => setFaqSearch(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-
-          {filteredCategories.length === 0 && (
-            <p className="text-sm text-muted-foreground text-center py-8">No results found. Try a different search term.</p>
-          )}
-
-          <div className="space-y-6">
-            {filteredCategories.map(cat => (
-              <div key={cat.title} className="bg-card border border-border rounded-xl p-4 sm:p-6">
-                <h2 className="text-sm font-semibold mb-3">{cat.emoji} {cat.title}</h2>
-                <Accordion type="multiple">
-                  {cat.items.map((item, i) => (
-                    <AccordionItem key={i} value={`${cat.title}-${i}`}>
-                      <AccordionTrigger className="text-sm text-left">{item.q}</AccordionTrigger>
-                      <AccordionContent className="text-sm text-muted-foreground">{item.a}</AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
-              </div>
-            ))}
-          </div>
-          {supportFooter}
-        </TabsContent>
-
-        {/* ── TAB 4: Contact & Support ── */}
-        <TabsContent value="support" className="space-y-6 mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="bg-card border border-border">
-              <CardContent className="p-5 text-center space-y-2">
-                <MessageCircle size={28} className="mx-auto text-primary" />
-                <h3 className="text-sm font-semibold">Email Support</h3>
-                <p className="text-xs text-muted-foreground">For billing, account, and technical questions.</p>
-                <a href="mailto:support@listhq.com.au" className="text-xs text-primary underline">support@listhq.com.au</a>
-              </CardContent>
-            </Card>
-            <Card className="bg-card border border-border">
-              <CardContent className="p-5 text-center space-y-2">
-                <Building2 size={28} className="mx-auto text-primary" />
-                <h3 className="text-sm font-semibold">Agency Sales</h3>
-                <p className="text-xs text-muted-foreground">Interested in an agency plan or white-label?</p>
-                <a href="mailto:sales@listhq.com.au" className="text-xs text-primary underline">sales@listhq.com.au</a>
-              </CardContent>
-            </Card>
-            <Card className="bg-card border border-border">
-              <CardContent className="p-5 text-center space-y-2">
-                <CheckCircle2 size={28} className="mx-auto text-primary" />
-                <h3 className="text-sm font-semibold">Response Time</h3>
-                <p className="text-xs text-muted-foreground">We aim to respond to all enquiries within 1 business day (AEST, Mon–Fri).</p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 flex items-start gap-3">
-            <AlertTriangle size={18} className="text-amber-600 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-muted-foreground">
-              ListHQ is updated regularly with new features. If a feature described here is not yet visible in your dashboard, it will appear in an upcoming update. Check your billing plan to confirm which features are included in your subscription.
-            </p>
-          </div>
-
-          <Card className="bg-card border border-amber-500/30">
-            <CardContent className="p-5 space-y-2">
-              <div className="flex items-center gap-2 mb-1">
-                <Shield size={16} className="text-amber-600 flex-shrink-0" />
-                <h3 className="text-sm font-semibold">AML/CTF Compliance — Action required by 1 July 2026</h3>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                From 1 July 2026, all Australian real estate agents must enrol with AUSTRAC under the Anti-Money Laundering and Counter-Terrorism Financing Act. Enrolment must be completed by 29 July 2026. This applies to every agent selling or managing property — failure to enrol carries significant penalties.
-              </p>
-              <p className="text-xs text-muted-foreground">
-                ListHQ is building AML compliance tools into the platform ahead of the deadline. In the meantime, enrol directly at AUSTRAC using the link below.
-              </p>
-              <a
-                href="https://www.austrac.gov.au/business/how-comply-guidance-and-resources/enrolment-and-registration/how-enrol-austrac-online"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-primary font-medium hover:underline"
-              >
-                Enrol with AUSTRAC
-                <ExternalLink size={11} />
-              </a>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card border border-border">
-            <CardContent className="p-5 space-y-3">
-              <h3 className="text-sm font-semibold">Help us improve</h3>
-              <p className="text-xs text-muted-foreground">
-                Found a bug? Have a feature request? Use the thumbs-down button below any AI response, or email us directly. Every piece of feedback is read by the team.
-              </p>
-              <Button variant="outline" size="sm" className="text-xs" asChild>
-                <a href="mailto:feedback@listhq.com.au">Send feedback</a>
-              </Button>
-            </CardContent>
-          </Card>
-
-          <SupportTicketForm />
-        </TabsContent>
-      </Tabs>
+const HelpPage = () => (
+  <div className="space-y-8 max-w-3xl mx-auto py-8 px-4">
+    <div>
+      <h1 className="text-3xl font-bold text-foreground">Help & FAQ</h1>
+      <p className="text-muted-foreground mt-1">
+        Find answers to the most common questions about ListHQ.
+      </p>
     </div>
-  );
-};
 
-/* ─── Support Ticket Form ─── */
-const TICKET_CATEGORIES = ['Bug report', 'Feature request', 'Billing', 'Trust accounting', 'Technical issue', 'Other'];
+    {FAQ_SECTIONS.map((section) => {
+      const Icon = section.icon;
+      return (
+        <Card key={section.title}>
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Icon className="h-5 w-5 text-primary" />
+              {section.title}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Accordion type="multiple" className="w-full">
+              {section.items.map((item, idx) => (
+                <AccordionItem key={idx} value={`${section.title}-${idx}`}>
+                  <AccordionTrigger className="text-left text-sm font-medium">
+                    {item.q}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
+                    {item.a}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </CardContent>
+        </Card>
+      );
+    })}
 
-function SupportTicketForm() {
-  const { user } = useAuth();
-  const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [form, setForm] = useState({ subject: '', description: '', category: 'Bug report', name: '', email: '' });
-
-  const handleSubmit = async () => {
-    if (!form.subject.trim() || !form.description.trim()) {
-      toast.error('Please fill in the subject and description');
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const { data: agent } = user
-        ? await supabase.from('agents').select('id, name, email').eq('user_id', user.id).maybeSingle()
-        : { data: null };
-
-      const { error } = await supabase.from('support_tickets').insert({
-        agent_id: agent?.id || null,
-        subject: form.subject.trim(),
-        description: form.description.trim(),
-        category: form.category,
-        priority: 'normal',
-        status: 'open',
-        submitter_name: agent?.name || form.name || user?.email || 'Unknown',
-        submitter_email: agent?.email || form.email || user?.email || '',
-      } as any);
-
-      if (error) throw error;
-
-      setSubmitted(true);
-      toast.success('Support ticket submitted — we\'ll get back to you within 1 business day');
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to submit ticket');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  if (submitted) {
-    return (
-      <Card className="bg-card border border-primary/20">
-        <CardContent className="p-5 text-center space-y-3">
-          <CheckCircle2 size={32} className="mx-auto text-primary" />
-          <h3 className="text-sm font-semibold">Ticket Submitted</h3>
-          <p className="text-xs text-muted-foreground">We'll respond within 1 business day (AEST, Mon–Fri).</p>
-          <Button variant="outline" size="sm" className="text-xs" onClick={() => { setSubmitted(false); setForm({ subject: '', description: '', category: 'Bug report', name: '', email: '' }); }}>
-            Submit Another
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <Card className="bg-card border border-border">
-      <CardContent className="p-5 space-y-4">
-        <div className="flex items-center gap-2">
-          <Send size={16} className="text-primary" />
-          <h3 className="text-sm font-semibold">Submit a Support Ticket</h3>
-        </div>
-        <div>
-          <Label className="text-xs">Category</Label>
-          <Select value={form.category} onValueChange={v => setForm(f => ({ ...f, category: v }))}>
-            <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {TICKET_CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label className="text-xs">Subject *</Label>
-          <Input
-            value={form.subject}
-            onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
-            placeholder="Brief summary of your issue"
-            className="h-9 text-sm"
-          />
-        </div>
-        <div>
-          <Label className="text-xs">Description *</Label>
-          <Textarea
-            value={form.description}
-            onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-            placeholder="Describe your issue in detail. Include steps to reproduce if reporting a bug."
-            rows={4}
-            className="text-sm"
-          />
-        </div>
-        <Button onClick={handleSubmit} disabled={submitting} className="w-full gap-1.5" size="sm">
-          {submitting ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
-          {submitting ? 'Submitting…' : 'Submit Ticket'}
-        </Button>
-      </CardContent>
-    </Card>
-  );
-}
+    <p className="text-center text-sm text-muted-foreground pb-4">
+      Can't find what you're looking for? Email{' '}
+      <a href="mailto:support@listhq.com.au" className="text-primary hover:underline">
+        support@listhq.com.au
+      </a>{' '}
+      — we respond within one business day.
+    </p>
+  </div>
+);
 
 export default HelpPage;

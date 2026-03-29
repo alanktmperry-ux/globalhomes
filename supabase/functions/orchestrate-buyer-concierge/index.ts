@@ -97,9 +97,9 @@ Deno.serve(async (req) => {
           }
 
           // Bedroom match
-          if (wantedBeds > 0 && p.bedrooms) {
-            if (p.bedrooms === wantedBeds) score += 20;
-            else if (Math.abs(p.bedrooms - wantedBeds) === 1) score += 10;
+          if (wantedBeds > 0 && p.beds) {
+            if (p.beds === wantedBeds) score += 20;
+            else if (Math.abs(p.beds - wantedBeds) === 1) score += 10;
           }
 
           // Price match

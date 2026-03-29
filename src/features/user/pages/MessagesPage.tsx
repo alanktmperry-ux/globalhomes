@@ -501,11 +501,9 @@ const MessagesPage = () => {
     const leadIds = getLeadIdsFromSelection();
     const convoIds = getConvoIdsFromSelection();
 
-    const promises: Promise<any>[] = [];
-    if (leadIds.length) promises.push(supabase.from('leads').delete().in('id', leadIds));
-    if (convoIds.length) promises.push(supabase.from('conversations').delete().in('id', convoIds));
+    if (leadIds.length) await supabase.from('leads').delete().in('id', leadIds);
+    if (convoIds.length) await supabase.from('conversations').delete().in('id', convoIds);
 
-    await Promise.all(promises);
     setConversations(prev => prev.filter(c => !selectedIds.has(c.id)));
     toast.success(`Deleted ${selectedIds.size} message${selectedIds.size > 1 ? 's' : ''}`);
     exitSelectionMode();
@@ -515,24 +513,19 @@ const MessagesPage = () => {
     const leadIds = getLeadIdsFromSelection();
     const convoIds = getConvoIdsFromSelection();
 
-    const promises: Promise<any>[] = [];
     if (leadIds.length) {
-      promises.push(supabase.from('leads').update({ status: 'archived', archived_at: new Date().toISOString() } as any).in('id', leadIds));
+      await supabase.from('leads').update({ status: 'archived', archived_at: new Date().toISOString() } as any).in('id', leadIds);
     }
     if (convoIds.length && user) {
       for (const cid of convoIds) {
         const convo = conversations.find(c => c.id === cid);
         if (convo) {
-          promises.push(
-            supabase.from('conversations')
-              .update({ archived_by: [...((convo as any).archived_by || []), user.id] } as any)
-              .eq('id', cid)
-          );
+          await supabase.from('conversations')
+            .update({ archived_by: [...((convo as any).archived_by || []), user.id] } as any)
+            .eq('id', cid);
         }
       }
     }
-
-    await Promise.all(promises);
     setConversations(prev => prev.map(c => {
       if (!selectedIds.has(c.id)) return c;
       if (c.lead_id) return { ...c, lead_status: 'archived' };

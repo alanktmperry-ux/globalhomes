@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Fetch consumer profile
+    // Fetch consumer profile (must be available)
     const { data: profile, error: profileError } = await adminClient
       .from("consumer_profiles")
       .select("*")
@@ -77,7 +77,44 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Mark as purchased
+    const purchasePrice = profile.purchase_price || 2900; // cents
+
+    // ── Stripe charge (when key is configured) ──────────────
+    let stripeChargeId: string | null = null;
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+
+    if (stripeKey) {
+      const { default: Stripe } = await import("https://esm.sh/stripe@14.21.0?target=deno");
+      const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
+
+      // Retrieve or create Stripe customer for agent
+      let customerId = agent.stripe_customer_id;
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: agent.email,
+          name: agent.name,
+          metadata: { agent_id: agent.id },
+        });
+        customerId = customer.id;
+        await adminClient.from("agents").update({ stripe_customer_id: customerId }).eq("id", agent.id);
+      }
+
+      // Create and confirm a charge via PaymentIntent
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: purchasePrice,
+        currency: "aud",
+        customer: customerId,
+        confirm: false,
+        metadata: {
+          lead_id: consumer_profile_id,
+          agent_id,
+          type: "lead_purchase",
+        },
+      });
+      stripeChargeId = paymentIntent.id;
+    }
+
+    // ── Mark consumer profile as purchased ──────────────────
     const { error: updateError } = await adminClient
       .from("consumer_profiles")
       .update({
@@ -94,7 +131,16 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Log activity
+    // ── Record in lead_purchases table ─────────────────────
+    await adminClient.from("lead_purchases").insert({
+      lead_id: consumer_profile_id,
+      agent_id,
+      price: purchasePrice,
+      stripe_charge_id: stripeChargeId,
+      status: "completed",
+    });
+
+    // ── Log activity ───────────────────────────────────────
     await adminClient.from("activities").insert({
       user_id: user.id,
       action: "lead_purchased",
@@ -103,7 +149,21 @@ Deno.serve(async (req) => {
       description: `Purchased lead: ${profile.name}`,
     });
 
-    // TODO Phase 2: Stripe charge, email notification to buyer
+    // ── Send introduction email to buyer ───────────────────
+    try {
+      await adminClient.functions.invoke("send-notification-email", {
+        body: {
+          to: profile.email,
+          subject: "A specialist agent will be in touch — ListHQ",
+          html: `<p>Hi ${profile.name},</p>
+<p>Great news! A specialist agent, <strong>${agent.name}</strong>, has been matched with you based on your property search.</p>
+<p>They'll be in touch shortly to help you find the perfect property.</p>
+<p>Best regards,<br>The ListHQ Team</p>`,
+        },
+      });
+    } catch (emailErr) {
+      console.error("Failed to send buyer intro email:", emailErr);
+    }
 
     return new Response(
       JSON.stringify({
@@ -125,6 +185,7 @@ Deno.serve(async (req) => {
       }
     );
   } catch (err) {
+    console.error("purchase-lead error:", err);
     return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

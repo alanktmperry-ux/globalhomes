@@ -2054,6 +2054,8 @@ export type Database = {
           id: string
           phone: string | null
           preferred_language: string | null
+          referral_code: string | null
+          referred_by: string | null
           terms_accepted_at: string | null
           terms_version: string | null
           updated_at: string
@@ -2066,6 +2068,8 @@ export type Database = {
           id?: string
           phone?: string | null
           preferred_language?: string | null
+          referral_code?: string | null
+          referred_by?: string | null
           terms_accepted_at?: string | null
           terms_version?: string | null
           updated_at?: string
@@ -2078,6 +2082,8 @@ export type Database = {
           id?: string
           phone?: string | null
           preferred_language?: string | null
+          referral_code?: string | null
+          referred_by?: string | null
           terms_accepted_at?: string | null
           terms_version?: string | null
           updated_at?: string
@@ -3773,6 +3779,36 @@ export type Database = {
           transcript?: string
           user_id?: string | null
           user_location?: Json | null
+        }
+        Relationships: []
+      }
+      waitlist: {
+        Row: {
+          agency: string | null
+          created_at: string | null
+          email: string
+          id: string
+          name: string | null
+          position: number | null
+          referred_by: string | null
+        }
+        Insert: {
+          agency?: string | null
+          created_at?: string | null
+          email: string
+          id?: string
+          name?: string | null
+          position?: number | null
+          referred_by?: string | null
+        }
+        Update: {
+          agency?: string | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          name?: string | null
+          position?: number | null
+          referred_by?: string | null
         }
         Relationships: []
       }

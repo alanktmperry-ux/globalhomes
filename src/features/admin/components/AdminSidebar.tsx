@@ -17,7 +17,8 @@ export type AdminTab =
   | 'comms' | 'partners' | 'growth' | 'support' | 'users' | 'listings'
   | 'roles' | 'database' | 'demo-requests' | 'reports' | 'ai-insights'
   | 'pre-launch' | 'ai-buyer-concierge' | 'ai-seller-score'
-  | 'ai-offer-generator' | 'ai-lead-marketplace' | 'legal-compliance';
+  | 'ai-offer-generator' | 'ai-lead-marketplace' | 'legal-compliance'
+  | 'press-outreach';
 
 interface NavItemProps {
   id: AdminTab;
@@ -99,6 +100,7 @@ function SidebarContent({ tab, setTab, pendingDemoCount = 0, onClose }: AdminSid
           <SectionLabel>Engage</SectionLabel>
           <NavItem id="comms" label="Communications" icon={Megaphone} tab={tab} setTab={setTab} onClose={onClose} />
           <NavItem id="partners" label="Partners" icon={Landmark} tab={tab} setTab={setTab} onClose={onClose} />
+          <NavItem id="press-outreach" label="PR Outreach" icon={Megaphone} tab={tab} setTab={setTab} onClose={onClose} />
 
           <SectionLabel>Compliance</SectionLabel>
           <NavItem id="compliance" label="Compliance" icon={ShieldAlert} tab={tab} setTab={setTab} onClose={onClose} />

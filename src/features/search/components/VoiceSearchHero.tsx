@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, MicOff, Search, Loader2, X, ChevronDown, MapPin } from 'lucide-react';
+import { Mic, MicOff, Search, Loader2, X, ChevronDown, MapPin, SlidersHorizontal } from 'lucide-react';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SoundWaveVisualizer } from './SoundWaveVisualizer';
@@ -74,33 +74,54 @@ const HEADLINE_WORDS = [
 ];
 
 const SEARCH_PLACEHOLDERS_BY_LANG: Record<string, string[]> = {
-  'en-AU': ['3 bed house in Brighton…', 'apartment with parking under $800k…', '2 bed near good schools…', 'beachside home under $2M…'],
-  'en-US': ['3 bed house in Brighton…', 'apartment with parking under $800k…', '2 bed near good schools…', 'beachside home under $2M…'],
-  'en-GB': ['3 bed house in Brighton…', 'apartment with parking under $800k…', '2 bed near good schools…', 'beachside home under $2M…'],
-  'zh-CN': ['布莱顿3卧室房屋…', '80万以下带车位公寓…', '靠近好学校的2卧室…', '200万以下海滨住宅…'],
-  'zh-TW': ['布萊頓3臥室房屋…', '80萬以下帶車位公寓…', '靠近好學校的2臥室…', '200萬以下海濱住宅…'],
-  'ar-SA': ['منزل 3 غرف في برايتون…', 'شقة بموقف بأقل من 800k…', 'غرفتان قرب مدارس جيدة…', 'منزل شاطئي بأقل من 2M…'],
-  'hi-IN': ['ब्राइटन में 3 BHK घर…', '800k से कम पार्किंग वाला अपार्टमेंट…', 'अच्छे स्कूलों के पास 2 BHK…', '2M से कम बीचसाइड होम…'],
-  'es-ES': ['casa de 3 hab en Brighton…', 'piso con garaje bajo 800k…', '2 hab cerca de colegios…', 'casa en playa bajo 2M…'],
-  'es-MX': ['casa de 3 rec en Brighton…', 'depto con estac. bajo 800k…', '2 rec cerca de escuelas…', 'casa de playa bajo 2M…'],
-  'fr-FR': ['maison 3 ch à Brighton…', 'appt avec parking sous 800k…', '2 pièces près des écoles…', 'maison en mer sous 2M…'],
-  'de-DE': ['3-Zi-Haus in Brighton…', 'Wohnung mit Stellplatz < 800k…', '2 Zi in Schulnähe…', 'Strandhaus unter 2M…'],
-  'ja-JP': ['ブライトンの3LDK…', '駐車場付きマンション80万以下…', '良い学校の近くの2LDK…', '海辺の住宅200万以下…'],
-  'it-IT': ['casa 3 cam a Brighton…', 'appart con parcheggio < 800k…', '2 cam vicino scuole…', 'casa al mare < 2M…'],
-  'pt-BR': ['casa 3 quartos em Brighton…', 'apto com vaga abaixo de 800k…', '2 quartos perto de escolas…', 'casa praia abaixo de 2M…'],
-  'ru-RU': ['3-комн дом в Брайтоне…', 'квартира с парковкой до 800k…', '2 комн рядом со школой…', 'дом у моря до 2M…'],
-  'ko-KR': ['브라이턴 3베드 주택…', '주차 포함 아파트 80만 이하…', '좋은 학교 근처 2베드…', '해변 200만 이하…'],
-  'th-TH': ['บ้าน 3 ห้องในไบรตัน…', 'คอนโดมีที่จอดรถต่ำ 800k…', '2 ห้องใกล้โรงเรียนดี…', 'บ้านทะเลต่ำ 2M…'],
-  'vi-VN': ['nhà 3 phòng ở Brighton…', 'căn hộ đỗ xe dưới 800k…', '2 phòng gần trường tốt…', 'nhà biển dưới 2M…'],
-  'tr-TR': ['Brighton 3 yatak oda…', '800k altı garajlı daire…', 'okul yakını 2 yatak…', '2M altı deniz evi…'],
-  'pl-PL': ['dom 3-pok w Brighton…', 'mieszkanie z parkingiem < 800k…', '2 pok blisko szkoły…', 'dom morski < 2M…'],
-  'nl-NL': ['3-kamer woning Brighton…', 'appt met parkeren < 800k…', '2 kamers bij school…', 'strandhuis < 2M…'],
-  'sv-SE': ['3-rumsbostad Brighton…', 'lägen med parkering < 800k…', '2 rum nära skola…', 'strandhus < 2M…'],
-  'el-GR': ['σπίτι 3 δωμ Brighton…', 'διαμ με parking < 800k…', '2 δωμ κοντά σε σχολεία…', 'παραθαλάσσιο < 2M…'],
-  'id-ID': ['rumah 3 kamar Brighton…', 'apartemen parkir < 800k…', '2 kamar dekat sekolah…', 'rumah pantai < 2M…'],
+  'en-AU': [
+    'e.g. 3 bed house in Doncaster under $1.3M',
+    'e.g. apartment in Melbourne CBD under $600k',
+    'e.g. rental unit near the city under $500pw',
+    'e.g. townhouse in Brisbane with 2 bathrooms',
+    'e.g. house in Sydney near good schools under $900k',
+    'e.g. land for sale in regional Victoria',
+    'e.g. 4 bed family home in Perth with a pool',
+  ],
+  'en-US': [
+    'e.g. 3 bed house in Doncaster under $1.3M',
+    'e.g. apartment in Melbourne CBD under $600k',
+    'e.g. rental unit near the city under $500pw',
+    'e.g. townhouse in Brisbane with 2 bathrooms',
+  ],
+  'en-GB': ['e.g. 3 bed house in Brighton under $800k', 'e.g. apartment with parking under $600k'],
+  'zh-CN': ['例如: 布莱顿3卧室房屋…', '例如: 80万以下带车位公寓…', '例如: 靠近好学校的2卧室…'],
+  'zh-TW': ['例如: 布萊頓3臥室房屋…', '例如: 80萬以下帶車位公寓…'],
+  'ar-SA': ['مثال: منزل 3 غرف في برايتون…', 'مثال: شقة بموقف بأقل من 800k…'],
+  'hi-IN': ['उदा: ब्राइटन में 3 BHK घर…', 'उदा: 800k से कम पार्किंग वाला अपार्टमेंट…'],
+  'es-ES': ['ej. casa de 3 hab en Brighton…', 'ej. piso con garaje bajo 800k…'],
+  'es-MX': ['ej. casa de 3 rec en Brighton…', 'ej. depto con estac. bajo 800k…'],
+  'fr-FR': ['ex. maison 3 ch à Brighton…', 'ex. appt avec parking sous 800k…'],
+  'de-DE': ['z.B. 3-Zi-Haus in Brighton…', 'z.B. Wohnung mit Stellplatz < 800k…'],
+  'ja-JP': ['例: ブライトンの3LDK…', '例: 駐車場付きマンション80万以下…'],
+  'it-IT': ['es. casa 3 cam a Brighton…', 'es. appart con parcheggio < 800k…'],
+  'pt-BR': ['ex. casa 3 quartos em Brighton…', 'ex. apto com vaga abaixo de 800k…'],
+  'ru-RU': ['напр. 3-комн дом в Брайтоне…', 'напр. квартира с парковкой до 800k…'],
+  'ko-KR': ['예: 브라이턴 3베드 주택…', '예: 주차 포함 아파트 80만 이하…'],
+  'th-TH': ['เช่น บ้าน 3 ห้องในไบรตัน…', 'เช่น คอนโดมีที่จอดรถต่ำ 800k…'],
+  'vi-VN': ['VD: nhà 3 phòng ở Brighton…', 'VD: căn hộ đỗ xe dưới 800k…'],
+  'tr-TR': ['örn. Brighton 3 yatak oda…', 'örn. 800k altı garajlı daire…'],
+  'pl-PL': ['np. dom 3-pok w Brighton…', 'np. mieszkanie z parkingiem < 800k…'],
+  'nl-NL': ['bijv. 3-kamer woning Brighton…', 'bijv. appt met parkeren < 800k…'],
+  'sv-SE': ['t.ex. 3-rumsbostad Brighton…', 't.ex. lägen med parkering < 800k…'],
+  'el-GR': ['π.χ. σπίτι 3 δωμ Brighton…', 'π.χ. διαμ με parking < 800k…'],
+  'id-ID': ['cth. rumah 3 kamar Brighton…', 'cth. apartemen parkir < 800k…'],
 };
 const getPlaceholders = (lang: string) =>
   SEARCH_PLACEHOLDERS_BY_LANG[lang] || SEARCH_PLACEHOLDERS_BY_LANG['en-AU'];
+
+const EXAMPLE_CHIPS = [
+  { label: '🏠 House in Doncaster', query: 'house in Doncaster Victoria' },
+  { label: '🏢 Apartment Sydney CBD', query: 'apartment in Sydney CBD under $800k' },
+  { label: '🔑 Rentals under $500pw', query: 'rental property under $500 per week Melbourne' },
+  { label: '🌿 4 bed family home', query: '4 bedroom family home under $1.2M' },
+  { label: '🏗️ Land for sale', query: 'land for sale Victoria' },
+];
 
 
 
@@ -315,17 +336,19 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
     return () => clearInterval(t);
   }, []);
 
-  // Animated placeholder
+  // Animated placeholder — rotate every 3.5s with fade
   useEffect(() => {
     const t = setInterval(() => {
       setPlaceholderVisible(false);
       setTimeout(() => {
         setPlaceholderIndex(i => i + 1);
         setPlaceholderVisible(true);
-      }, 300);
-    }, 3000);
+      }, 400);
+    }, 3500);
     return () => clearInterval(t);
   }, []);
+
+  const [showRefine, setShowRefine] = useState(false);
 
   const geocodeLocation = useCallback(async (text: string) => {
     if (!onLocationSelect) return;
@@ -585,7 +608,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       <div className="grid grid-cols-1 md:grid-cols-2 min-h-[520px] md:min-h-[560px]">
 
         {/* LEFT — Headline + search */}
-        <div className="flex flex-col justify-center px-6 md:px-10 py-10 md:py-14 bg-background">
+        <div className="flex flex-col justify-center items-center md:items-start px-6 md:px-10 py-12 md:py-14 bg-background">
 
           {/* Headline — compact */}
           <div className="mb-6">
@@ -613,14 +636,18 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
             </p>
           </div>
 
-          {/* ── SEARCH BOX ── */}
-          <div className="max-w-lg space-y-3">
+          {/* ── SEARCH BOX — Bigger, smarter ── */}
+          <div className="max-w-[760px] w-full space-y-4">
 
-            {/* Main search input */}
+            {/* Main search bar — tall and prominent */}
             <div ref={wrapperRef} className="relative">
-              <div className="flex items-center gap-2 bg-card border-2 border-border hover:border-primary/50 focus-within:border-primary rounded-2xl px-3 py-3 shadow-sm transition-all duration-200">
+              <div className={`flex items-center gap-3 bg-card border-2 rounded-2xl px-4 sm:px-5 py-4 shadow-md transition-all duration-200 ${
+                voiceState === 'listening'
+                  ? 'border-destructive/50 shadow-destructive/10'
+                  : 'border-border hover:border-primary/40 focus-within:border-primary focus-within:shadow-lg focus-within:shadow-primary/10'
+              }`}>
 
-                {/* Mic / search icon button */}
+                {/* Mic button */}
                 <button
                   onClick={() => {
                     if (!isSupported || isSafari) {
@@ -633,7 +660,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                       isListening ? stopListening() : startListening();
                     }
                   }}
-                  className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
+                  className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
                     voiceState === 'listening'
                       ? 'bg-destructive/10 text-destructive'
                       : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-accent'
@@ -641,19 +668,19 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                   title={(!isSupported || isSafari) ? 'Type your search' : 'Voice search'}
                 >
                   {voiceState === 'processing' || isSearching
-                    ? <Loader2 size={16} className="animate-spin" />
+                    ? <Loader2 size={18} className="animate-spin" />
                     : voiceState === 'listening'
-                    ? <MicOff size={16} />
+                    ? <MicOff size={18} />
                     : (!isSupported || isSafari)
-                    ? <Search size={16} />
-                    : <Mic size={16} />
+                    ? <Search size={18} />
+                    : <Mic size={18} />
                   }
                 </button>
 
                 {/* Text input */}
                 <div className="flex-1 min-w-0 relative">
                   {voiceState === 'listening' ? (
-                    <span className="text-[13px] text-muted-foreground italic">
+                    <span className="text-[15px] text-muted-foreground italic">
                       {transcript || ({
                       'zh-CN': '正在聆听…请说话', 'zh-TW': '正在聆聽…請說話',
                       'ar-SA': 'جارِ الاستماع…', 'hi-IN': 'सुन रहा हूँ…',
@@ -680,12 +707,12 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                           }
                         }}
                         autoFocus={showTextInput && (!isSupported || isSafari)}
-                        className="w-full text-[14px] text-foreground bg-transparent focus:outline-none relative z-10"
-                        placeholder="e.g. 3 bed house in Berwick under $900k"
+                        className="w-full text-[16px] md:text-[17px] text-foreground bg-transparent focus:outline-none relative z-10"
+                        placeholder=" "
                       />
-                      {!textQuery && isSupported && !isSafari && (
+                      {!textQuery && (
                         <span
-                          className="absolute inset-0 text-[14px] text-muted-foreground/70 pointer-events-none flex items-center transition-opacity duration-300"
+                          className="absolute inset-0 text-[16px] md:text-[17px] text-muted-foreground/60 pointer-events-none flex items-center transition-opacity duration-400"
                           style={{ opacity: placeholderVisible ? 1 : 0 }}
                         >
                           {getPlaceholders(selectedLang)[placeholderIndex % getPlaceholders(selectedLang).length]}
@@ -694,6 +721,16 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                     </div>
                   )}
                 </div>
+
+                {/* Clear button */}
+                {textQuery && (
+                  <button
+                    onClick={() => setTextQuery('')}
+                    className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                  >
+                    <X size={16} />
+                  </button>
+                )}
 
                 {/* Search CTA button */}
                 <button
@@ -704,11 +741,25 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                       setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
                     }
                   }}
-                  className="shrink-0 flex items-center gap-1.5 h-9 px-4 rounded-xl bg-primary text-primary-foreground text-[12px] font-bold hover:opacity-90 active:scale-95 transition-all whitespace-nowrap"
+                  className="shrink-0 flex items-center gap-2 h-10 px-5 rounded-xl bg-primary text-primary-foreground text-[14px] font-semibold hover:opacity-90 active:scale-95 transition-all whitespace-nowrap hidden sm:flex"
                 >
-                  <Search size={13} /> Search
+                  <Search size={15} /> Search
                 </button>
               </div>
+
+              {/* Mobile full-width search button */}
+              <button
+                onClick={() => {
+                  if (textQuery.trim()) {
+                    suppressAutocompleteRef.current = true;
+                    processTranscript(textQuery.trim());
+                    setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
+                  }
+                }}
+                className="sm:hidden w-full flex items-center justify-center gap-2 h-11 mt-2 rounded-xl bg-primary text-primary-foreground text-[14px] font-semibold active:scale-[0.98] transition-all"
+              >
+                <Search size={15} /> Search
+              </button>
 
               {/* Autocomplete dropdown */}
               <AnimatePresence>
@@ -736,49 +787,105 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
               </AnimatePresence>
             </div>
 
-            {/* Safari hint — separate line, no overlap */}
+            {/* Hint text */}
+            <p className="text-[13px] text-muted-foreground text-center">
+              Describe what you're looking for in plain English — our AI does the rest
+            </p>
+
+            {/* Safari hint */}
             {isSafari && (
-              <p className="text-[11px] text-muted-foreground">
+              <p className="text-[11px] text-muted-foreground text-center">
                 Voice search works best in Chrome — type your search above
               </p>
             )}
 
-            {/* Controls row: radius + language */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[10px] text-muted-foreground font-medium">
-                Radius
-              </span>
-              {[
-                { label: 'Any',   value: null as number | null },
-                { label: '5 km',  value: 5 },
-                { label: '10 km', value: 10 },
-                { label: '25 km', value: 25 },
-                { label: '50 km', value: 50 },
-              ].map(opt => (
+            {/* ── Example chips ── */}
+            <div className="flex gap-2 overflow-x-auto sm:flex-wrap sm:justify-center pb-1 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
+              {EXAMPLE_CHIPS.map((chip) => (
                 <button
-                  key={opt.label}
-                  onClick={() => onRadiusChange?.(opt.value)}
-                  className={`text-[10px] px-2.5 py-1 rounded-full transition-all font-medium ${
-                    selectedRadius === opt.value
-                      ? 'bg-foreground text-background'
-                      : 'border border-border text-muted-foreground hover:border-foreground/40'
-                  }`}>
-                  {opt.label}
+                  key={chip.query}
+                  onClick={() => {
+                    setTextQuery(chip.query);
+                    suppressAutocompleteRef.current = true;
+                    processTranscript(chip.query);
+                    setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
+                  }}
+                  className="shrink-0 px-4 py-2 rounded-full text-[13px] font-medium border border-border bg-secondary text-muted-foreground hover:bg-accent hover:border-primary/30 hover:text-foreground transition-all whitespace-nowrap active:scale-95"
+                >
+                  {chip.label}
                 </button>
               ))}
-              <button
-                onClick={() => setShowLangDropdown(!showLangDropdown)}
-                className="text-[10px] px-2.5 py-1 rounded-full border border-border text-muted-foreground hover:border-foreground/40 transition-all ml-auto">
-                {selectedLangObj.flag}{' '}{selectedLangObj.label}
-              </button>
             </div>
 
-            {/* Language dropdown */}
+            {/* ── Refine search toggle ── */}
+            <div className="space-y-2">
+              <button
+                onClick={() => setShowRefine(!showRefine)}
+                className="flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground transition-colors mx-auto"
+              >
+                <SlidersHorizontal size={14} />
+                {showRefine ? 'Hide options' : 'Refine search'}
+                <ChevronDown size={14} className={`transition-transform duration-200 ${showRefine ? 'rotate-180' : ''}`} />
+              </button>
+
+              <AnimatePresence>
+                {showRefine && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="p-4 bg-secondary/50 border border-border rounded-xl space-y-3">
+                      {/* Radius row */}
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                        <span className="text-[12px] text-foreground font-medium min-w-[60px]">Radius</span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {[
+                            { label: 'Any', value: null as number | null },
+                            { label: '5 km', value: 5 },
+                            { label: '10 km', value: 10 },
+                            { label: '25 km', value: 25 },
+                            { label: '50 km', value: 50 },
+                          ].map(opt => (
+                            <button
+                              key={opt.label}
+                              onClick={() => onRadiusChange?.(opt.value)}
+                              className={`text-[11px] px-3 py-1.5 rounded-full transition-all font-medium ${
+                                selectedRadius === opt.value
+                                  ? 'bg-foreground text-background'
+                                  : 'border border-border text-muted-foreground hover:border-foreground/40'
+                              }`}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Language row */}
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                        <span className="text-[12px] text-foreground font-medium min-w-[60px]">Language</span>
+                        <button
+                          onClick={() => setShowLangDropdown(!showLangDropdown)}
+                          className="text-[11px] px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:border-foreground/40 transition-all w-fit"
+                        >
+                          {selectedLangObj.flag}{' '}{selectedLangObj.label}
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Language dropdown — absolute positioned */}
             <div className="relative">
               {showLangDropdown && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setShowLangDropdown(false)} />
-                  <div className="absolute left-0 right-0 top-full z-50 mt-1 bg-popover border border-border rounded-xl shadow-elevated overflow-y-auto max-h-60">
+                  <div className="absolute left-0 right-0 bottom-full z-50 mb-1 bg-popover border border-border rounded-xl shadow-elevated overflow-y-auto max-h-60">
                     {VOICE_LANGUAGES.map(lang => (
                       <button
                         key={lang.code}
@@ -794,7 +901,8 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                           lang.code === selectedLang
                             ? 'bg-accent text-foreground'
                             : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-                        }`}>
+                        }`}
+                      >
                         {lang.flag} {lang.label}
                       </button>
                     ))}
@@ -804,37 +912,36 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
             </div>
 
             {/* Filter chips */}
-            <div className="mt-3">
-              {filterChips.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {filterChips.map(chip => (
-                    <button
-                      key={chip.key}
-                      onClick={() => removeChip(chip.key)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium border border-border text-muted-foreground hover:text-foreground transition-colors">
-                      {chip.label}
-                      <X size={12} />
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            {filterChips.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {filterChips.map(chip => (
+                  <button
+                    key={chip.key}
+                    onClick={() => removeChip(chip.key)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium border border-border text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {chip.label}
+                    <X size={12} />
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Voice state feedback */}
-            <div className="mt-3">
+            <div>
               {voiceState === 'listening' && (
                 <div className="mt-1">
                   <SoundWaveVisualizer isActive />
                 </div>
               )}
               {(voiceState === 'processing' || isSearching) && (
-                <p className="text-muted-foreground text-[12px] font-medium flex items-center gap-2">
+                <p className="text-muted-foreground text-[12px] font-medium flex items-center gap-2 justify-center">
                   <Loader2 size={14} className="animate-spin" />
                   Searching across Australia…
                 </p>
               )}
               {voiceState === 'results' && !isSearching && resultCount !== undefined && (
-                <p className="text-primary text-[12px] font-medium">
+                <p className="text-primary text-[12px] font-medium text-center">
                   Found {resultCount} properties
                 </p>
               )}

@@ -25,6 +25,7 @@ import { useSavedSearches } from '@/features/search/hooks/useSavedSearches';
 import { useCollabSession } from '@/features/search/hooks/useCollabSession';
 import { useAuth } from '@/features/auth/AuthProvider';
 import ConsumerSignUpModal from '@/features/search/components/ConsumerSignUpModal';
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const { t } = useI18n();

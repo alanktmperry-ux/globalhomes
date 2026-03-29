@@ -1289,6 +1289,66 @@ export type Database = {
           },
         ]
       }
+      lead_purchases: {
+        Row: {
+          agent_id: string
+          contacted_at: string | null
+          created_at: string
+          followed_up: boolean | null
+          id: string
+          lead_id: string
+          notes: string | null
+          outcome: string | null
+          price: number
+          purchased_at: string
+          status: string
+          stripe_charge_id: string | null
+        }
+        Insert: {
+          agent_id: string
+          contacted_at?: string | null
+          created_at?: string
+          followed_up?: boolean | null
+          id?: string
+          lead_id: string
+          notes?: string | null
+          outcome?: string | null
+          price?: number
+          purchased_at?: string
+          status?: string
+          stripe_charge_id?: string | null
+        }
+        Update: {
+          agent_id?: string
+          contacted_at?: string | null
+          created_at?: string
+          followed_up?: boolean | null
+          id?: string
+          lead_id?: string
+          notes?: string | null
+          outcome?: string | null
+          price?: number
+          purchased_at?: string
+          status?: string
+          stripe_charge_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_purchases_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_purchases_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "consumer_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           agent_id: string

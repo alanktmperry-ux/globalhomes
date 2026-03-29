@@ -57,6 +57,37 @@ const DashboardOverview = () => {
   const [reportsDue, setReportsDue] = useState<any[]>([]);
   const [sendingReport, setSendingReport] = useState<string | null>(null);
 
+  // Onboarding checklist state
+  const [onboardingDismissed, setOnboardingDismissed] = useState(() =>
+    localStorage.getItem('listhq-onboarding-dismissed') === 'true'
+  );
+  const [onboardingAgent, setOnboardingAgent] = useState<{
+    name?: string; avatar_url?: string; bio?: string; agency_id?: string; stripe_customer_id?: string;
+  } | null>(null);
+  const [onboardingHasListing, setOnboardingHasListing] = useState(false);
+  const [onboardingStep5, setOnboardingStep5] = useState(() =>
+    localStorage.getItem('listhq-onboarding-step5') === 'true'
+  );
+
+  // Fetch onboarding agent data
+  useEffect(() => {
+    if (!user || onboardingDismissed) return;
+    const fetchOnboarding = async () => {
+      const { data: agent } = await supabase
+        .from('agents')
+        .select('name, avatar_url, bio, agency_id, stripe_customer_id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      setOnboardingAgent(agent);
+      const { count } = await supabase
+        .from('properties')
+        .select('id', { count: 'exact', head: true })
+        .eq('agent_id', (agent as any)?.id ?? '');
+      setOnboardingHasListing((count || 0) > 0);
+    };
+    fetchOnboarding();
+  }, [user, onboardingDismissed]);
+
   // Fetch tasks due today
   useEffect(() => {
     if (!user) return;

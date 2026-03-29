@@ -140,7 +140,10 @@ const OfferModal = ({ open, onOpenChange, card, propertyId, agentId, onSent }: O
               </div>
             )}
 
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" onClick={handleDownloadPdf} className="flex-1 gap-1.5 text-xs">
+                <FileDown size={12} /> Download PDF
+              </Button>
               <Button variant="outline" onClick={handleCopy} className="flex-1 gap-1.5 text-xs">
                 <Copy size={12} /> Copy Letter
               </Button>

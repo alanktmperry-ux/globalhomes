@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Heart, MessageCircle, User, LogIn, LogOut, ShieldCheck, Building2, Globe, Users } from 'lucide-react';
 import { useI18n, languageNames, type Language } from '@/shared/lib/i18n';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -11,7 +10,7 @@ const navItems = [
   { key: 'nav.search', icon: Search, path: '/' },
   { key: 'nav.saved', icon: Heart, path: '/saved', auth: true },
   { key: 'nav.agents', icon: Users, path: '/agents' },
-  { key: 'nav.messages', icon: MessageCircle, path: '/messages', auth: true },
+  { key: 'nav.messages', icon: MessageCircle, path: '/messages', auth: true, showBadge: true },
   { key: 'nav.profile', icon: User, path: '/profile', auth: true },
 ];
 
@@ -21,6 +20,59 @@ export function BottomNav() {
   const navigate = useNavigate();
   const { user, isAdmin, isAgent, loading } = useAuth();
   const [showLangPicker, setShowLangPicker] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Fetch unread count for messages badge
+  useEffect(() => {
+    if (!user) { setUnreadCount(0); return; }
+
+    const fetchUnread = async () => {
+      // Check if agent
+      const { data: agent } = await supabase
+        .from('agents')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (agent) {
+        // Count unread leads
+        const { count } = await supabase
+          .from('leads')
+          .select('id', { count: 'exact', head: true })
+          .eq('agent_id', agent.id)
+          .eq('read', false)
+          .neq('status', 'archived');
+
+        // Count unread messages
+        const { count: msgCount } = await supabase
+          .from('messages')
+          .select('id', { count: 'exact', head: true })
+          .eq('is_read', false)
+          .neq('sender_id', user.id);
+
+        setUnreadCount((count || 0) + (msgCount || 0));
+      } else {
+        const { count: msgCount } = await supabase
+          .from('messages')
+          .select('id', { count: 'exact', head: true })
+          .eq('is_read', false)
+          .neq('sender_id', user.id);
+
+        setUnreadCount(msgCount || 0);
+      }
+    };
+
+    fetchUnread();
+
+    // Refresh on lead/message changes
+    const channel = supabase
+      .channel('unread-badge')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => fetchUnread())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => fetchUnread())
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [user]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -47,7 +99,14 @@ export function BottomNav() {
               {isActive && (
                 <div className="absolute top-1 w-1 h-1 rounded-full bg-primary" />
               )}
-              <item.icon size={22} strokeWidth={isActive ? 2.5 : 1.8} />
+              <div className="relative">
+                <item.icon size={22} strokeWidth={isActive ? 2.5 : 1.8} />
+                {item.showBadge && unreadCount > 0 && (
+                  <span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </div>
               <span className={`text-[10px] ${isActive ? 'font-medium text-primary' : 'font-medium text-muted-foreground'}`}>{t(item.key) || (item.key === 'nav.agents' ? 'Agents' : '')}</span>
             </button>
           );

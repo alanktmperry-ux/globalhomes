@@ -109,9 +109,12 @@ Deno.serve(async (req) => {
         10
       );
 
-      // STRICT: Require at least suburb OR state to match — reject vague queries
-      if (!wantedSuburb && !wantedState) {
-        console.log(`Query too vague to match — no suburb or state extracted: "${transcript.slice(0, 80)}"`);
+      // Debug: log parsed intent for diagnosis
+      console.log(`[Concierge] Parsed intent: suburb="${wantedSuburb}", state="${wantedState}", type="${wantedType}", beds=${wantedBeds}, maxPrice=${wantedMaxPrice}`);
+
+      // STRICT: Require suburb to be present — state alone is too broad
+      if (!wantedSuburb) {
+        console.log(`[Concierge] No suburb extracted — skipping lead creation: "${transcript.slice(0, 80)}"`);
         continue;
       }
 

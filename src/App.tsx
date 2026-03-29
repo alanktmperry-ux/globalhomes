@@ -87,6 +87,10 @@ const PartnerJoinPage = React.lazy(() => import("./features/partners/pages/Partn
 const PartnerTeamPage = React.lazy(() => import("./features/partners/pages/PartnerTeamPage"));
 const PartnerAccessPage = React.lazy(() => import("./features/agents/components/dashboard/PartnerAccessPage"));
 const ReviewSubmitPage = React.lazy(() => import("./features/agents/pages/ReviewSubmitPage"));
+const StrataDirectoryPage = React.lazy(() => import("./features/strata/pages/StrataDirectoryPage"));
+const SchemeProfilePage = React.lazy(() => import("./features/strata/pages/SchemeProfilePage"));
+const StrataDashboardLayout = React.lazy(() => import("./features/strata/pages/StrataDashboardLayout"));
+const StrataAuthPage = React.lazy(() => import("./features/strata/pages/StrataAuthPage"));
 const PageLoader = () => (
   <div className="flex h-screen w-full items-center justify-center bg-background">
     <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -148,6 +152,8 @@ const App = () => (
                   <Route path="/agency/:slug" element={<AgencyProfilePage />} />
                   <Route path="/terms" element={<TermsPage />} />
                   <Route path="/privacy" element={<PrivacyPage />} />
+                  <Route path="/strata" element={<StrataDirectoryPage />} />
+                  <Route path="/schemes/:id" element={<SchemeProfilePage />} />
                 </Route>
 
                 {/* Auth pages (no shared layout) */}
@@ -159,6 +165,7 @@ const App = () => (
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
                 <Route path="/auth/confirm" element={<AuthConfirmPage />} />
                 <Route path="/review/:token" element={<ReviewSubmitPage />} />
+                <Route path="/strata/login" element={<StrataAuthPage />} />
 
                 {/* Authenticated */}
                 <Route path="/saved" element={<ProtectedRoute><SavedPage /></ProtectedRoute>} />
@@ -217,6 +224,9 @@ const App = () => (
                   <Route path="rent-roll" element={<PartnerRentRollPage />} />
                   <Route path="arrears" element={<PartnerArrearsPage />} />
                 </Route>
+
+                {/* Strata */}
+                <Route path="/strata-dashboard" element={<ProtectedRoute><StrataDashboardLayout /></ProtectedRoute>} />
 
                 {/* Admin */}
                 <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />

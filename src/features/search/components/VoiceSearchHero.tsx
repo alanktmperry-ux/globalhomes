@@ -636,14 +636,18 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
             </p>
           </div>
 
-          {/* ── SEARCH BOX ── */}
-          <div className="max-w-lg space-y-3">
+          {/* ── SEARCH BOX — Bigger, smarter ── */}
+          <div className="max-w-[760px] w-full space-y-4">
 
-            {/* Main search input */}
+            {/* Main search bar — tall and prominent */}
             <div ref={wrapperRef} className="relative">
-              <div className="flex items-center gap-2 bg-card border-2 border-border hover:border-primary/50 focus-within:border-primary rounded-2xl px-3 py-3 shadow-sm transition-all duration-200">
+              <div className={`flex items-center gap-3 bg-card border-2 rounded-2xl px-4 sm:px-5 py-4 shadow-md transition-all duration-200 ${
+                voiceState === 'listening'
+                  ? 'border-destructive/50 shadow-destructive/10'
+                  : 'border-border hover:border-primary/40 focus-within:border-primary focus-within:shadow-lg focus-within:shadow-primary/10'
+              }`}>
 
-                {/* Mic / search icon button */}
+                {/* Mic button */}
                 <button
                   onClick={() => {
                     if (!isSupported || isSafari) {
@@ -656,7 +660,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                       isListening ? stopListening() : startListening();
                     }
                   }}
-                  className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
+                  className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
                     voiceState === 'listening'
                       ? 'bg-destructive/10 text-destructive'
                       : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-accent'
@@ -664,19 +668,19 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                   title={(!isSupported || isSafari) ? 'Type your search' : 'Voice search'}
                 >
                   {voiceState === 'processing' || isSearching
-                    ? <Loader2 size={16} className="animate-spin" />
+                    ? <Loader2 size={18} className="animate-spin" />
                     : voiceState === 'listening'
-                    ? <MicOff size={16} />
+                    ? <MicOff size={18} />
                     : (!isSupported || isSafari)
-                    ? <Search size={16} />
-                    : <Mic size={16} />
+                    ? <Search size={18} />
+                    : <Mic size={18} />
                   }
                 </button>
 
                 {/* Text input */}
                 <div className="flex-1 min-w-0 relative">
                   {voiceState === 'listening' ? (
-                    <span className="text-[13px] text-muted-foreground italic">
+                    <span className="text-[15px] text-muted-foreground italic">
                       {transcript || ({
                       'zh-CN': '正在聆听…请说话', 'zh-TW': '正在聆聽…請說話',
                       'ar-SA': 'جارِ الاستماع…', 'hi-IN': 'सुन रहा हूँ…',
@@ -703,12 +707,12 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                           }
                         }}
                         autoFocus={showTextInput && (!isSupported || isSafari)}
-                        className="w-full text-[14px] text-foreground bg-transparent focus:outline-none relative z-10"
-                        placeholder="e.g. 3 bed house in Berwick under $900k"
+                        className="w-full text-[16px] md:text-[17px] text-foreground bg-transparent focus:outline-none relative z-10"
+                        placeholder=" "
                       />
-                      {!textQuery && isSupported && !isSafari && (
+                      {!textQuery && (
                         <span
-                          className="absolute inset-0 text-[14px] text-muted-foreground/70 pointer-events-none flex items-center transition-opacity duration-300"
+                          className="absolute inset-0 text-[16px] md:text-[17px] text-muted-foreground/60 pointer-events-none flex items-center transition-opacity duration-400"
                           style={{ opacity: placeholderVisible ? 1 : 0 }}
                         >
                           {getPlaceholders(selectedLang)[placeholderIndex % getPlaceholders(selectedLang).length]}
@@ -717,6 +721,16 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                     </div>
                   )}
                 </div>
+
+                {/* Clear button */}
+                {textQuery && (
+                  <button
+                    onClick={() => setTextQuery('')}
+                    className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                  >
+                    <X size={16} />
+                  </button>
+                )}
 
                 {/* Search CTA button */}
                 <button
@@ -727,11 +741,25 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                       setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
                     }
                   }}
-                  className="shrink-0 flex items-center gap-1.5 h-9 px-4 rounded-xl bg-primary text-primary-foreground text-[12px] font-bold hover:opacity-90 active:scale-95 transition-all whitespace-nowrap"
+                  className="shrink-0 flex items-center gap-2 h-10 px-5 rounded-xl bg-primary text-primary-foreground text-[14px] font-semibold hover:opacity-90 active:scale-95 transition-all whitespace-nowrap hidden sm:flex"
                 >
-                  <Search size={13} /> Search
+                  <Search size={15} /> Search
                 </button>
               </div>
+
+              {/* Mobile full-width search button */}
+              <button
+                onClick={() => {
+                  if (textQuery.trim()) {
+                    suppressAutocompleteRef.current = true;
+                    processTranscript(textQuery.trim());
+                    setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
+                  }
+                }}
+                className="sm:hidden w-full flex items-center justify-center gap-2 h-11 mt-2 rounded-xl bg-primary text-primary-foreground text-[14px] font-semibold active:scale-[0.98] transition-all"
+              >
+                <Search size={15} /> Search
+              </button>
 
               {/* Autocomplete dropdown */}
               <AnimatePresence>
@@ -759,49 +787,105 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
               </AnimatePresence>
             </div>
 
-            {/* Safari hint — separate line, no overlap */}
+            {/* Hint text */}
+            <p className="text-[13px] text-muted-foreground text-center">
+              Describe what you're looking for in plain English — our AI does the rest
+            </p>
+
+            {/* Safari hint */}
             {isSafari && (
-              <p className="text-[11px] text-muted-foreground">
+              <p className="text-[11px] text-muted-foreground text-center">
                 Voice search works best in Chrome — type your search above
               </p>
             )}
 
-            {/* Controls row: radius + language */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[10px] text-muted-foreground font-medium">
-                Radius
-              </span>
-              {[
-                { label: 'Any',   value: null as number | null },
-                { label: '5 km',  value: 5 },
-                { label: '10 km', value: 10 },
-                { label: '25 km', value: 25 },
-                { label: '50 km', value: 50 },
-              ].map(opt => (
+            {/* ── Example chips ── */}
+            <div className="flex gap-2 overflow-x-auto sm:flex-wrap sm:justify-center pb-1 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
+              {EXAMPLE_CHIPS.map((chip) => (
                 <button
-                  key={opt.label}
-                  onClick={() => onRadiusChange?.(opt.value)}
-                  className={`text-[10px] px-2.5 py-1 rounded-full transition-all font-medium ${
-                    selectedRadius === opt.value
-                      ? 'bg-foreground text-background'
-                      : 'border border-border text-muted-foreground hover:border-foreground/40'
-                  }`}>
-                  {opt.label}
+                  key={chip.query}
+                  onClick={() => {
+                    setTextQuery(chip.query);
+                    suppressAutocompleteRef.current = true;
+                    processTranscript(chip.query);
+                    setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
+                  }}
+                  className="shrink-0 px-4 py-2 rounded-full text-[13px] font-medium border border-border bg-secondary text-muted-foreground hover:bg-accent hover:border-primary/30 hover:text-foreground transition-all whitespace-nowrap active:scale-95"
+                >
+                  {chip.label}
                 </button>
               ))}
-              <button
-                onClick={() => setShowLangDropdown(!showLangDropdown)}
-                className="text-[10px] px-2.5 py-1 rounded-full border border-border text-muted-foreground hover:border-foreground/40 transition-all ml-auto">
-                {selectedLangObj.flag}{' '}{selectedLangObj.label}
-              </button>
             </div>
 
-            {/* Language dropdown */}
+            {/* ── Refine search toggle ── */}
+            <div className="space-y-2">
+              <button
+                onClick={() => setShowRefine(!showRefine)}
+                className="flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground transition-colors mx-auto"
+              >
+                <SlidersHorizontal size={14} />
+                {showRefine ? 'Hide options' : 'Refine search'}
+                <ChevronDown size={14} className={`transition-transform duration-200 ${showRefine ? 'rotate-180' : ''}`} />
+              </button>
+
+              <AnimatePresence>
+                {showRefine && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="p-4 bg-secondary/50 border border-border rounded-xl space-y-3">
+                      {/* Radius row */}
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                        <span className="text-[12px] text-foreground font-medium min-w-[60px]">Radius</span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {[
+                            { label: 'Any', value: null as number | null },
+                            { label: '5 km', value: 5 },
+                            { label: '10 km', value: 10 },
+                            { label: '25 km', value: 25 },
+                            { label: '50 km', value: 50 },
+                          ].map(opt => (
+                            <button
+                              key={opt.label}
+                              onClick={() => onRadiusChange?.(opt.value)}
+                              className={`text-[11px] px-3 py-1.5 rounded-full transition-all font-medium ${
+                                selectedRadius === opt.value
+                                  ? 'bg-foreground text-background'
+                                  : 'border border-border text-muted-foreground hover:border-foreground/40'
+                              }`}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Language row */}
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                        <span className="text-[12px] text-foreground font-medium min-w-[60px]">Language</span>
+                        <button
+                          onClick={() => setShowLangDropdown(!showLangDropdown)}
+                          className="text-[11px] px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:border-foreground/40 transition-all w-fit"
+                        >
+                          {selectedLangObj.flag}{' '}{selectedLangObj.label}
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Language dropdown — absolute positioned */}
             <div className="relative">
               {showLangDropdown && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setShowLangDropdown(false)} />
-                  <div className="absolute left-0 right-0 top-full z-50 mt-1 bg-popover border border-border rounded-xl shadow-elevated overflow-y-auto max-h-60">
+                  <div className="absolute left-0 right-0 bottom-full z-50 mb-1 bg-popover border border-border rounded-xl shadow-elevated overflow-y-auto max-h-60">
                     {VOICE_LANGUAGES.map(lang => (
                       <button
                         key={lang.code}
@@ -817,7 +901,8 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                           lang.code === selectedLang
                             ? 'bg-accent text-foreground'
                             : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-                        }`}>
+                        }`}
+                      >
                         {lang.flag} {lang.label}
                       </button>
                     ))}
@@ -827,37 +912,36 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
             </div>
 
             {/* Filter chips */}
-            <div className="mt-3">
-              {filterChips.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {filterChips.map(chip => (
-                    <button
-                      key={chip.key}
-                      onClick={() => removeChip(chip.key)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium border border-border text-muted-foreground hover:text-foreground transition-colors">
-                      {chip.label}
-                      <X size={12} />
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            {filterChips.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {filterChips.map(chip => (
+                  <button
+                    key={chip.key}
+                    onClick={() => removeChip(chip.key)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium border border-border text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {chip.label}
+                    <X size={12} />
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Voice state feedback */}
-            <div className="mt-3">
+            <div>
               {voiceState === 'listening' && (
                 <div className="mt-1">
                   <SoundWaveVisualizer isActive />
                 </div>
               )}
               {(voiceState === 'processing' || isSearching) && (
-                <p className="text-muted-foreground text-[12px] font-medium flex items-center gap-2">
+                <p className="text-muted-foreground text-[12px] font-medium flex items-center gap-2 justify-center">
                   <Loader2 size={14} className="animate-spin" />
                   Searching across Australia…
                 </p>
               )}
               {voiceState === 'results' && !isSearching && resultCount !== undefined && (
-                <p className="text-primary text-[12px] font-medium">
+                <p className="text-primary text-[12px] font-medium text-center">
                   Found {resultCount} properties
                 </p>
               )}

@@ -2666,6 +2666,200 @@ export type Database = {
           },
         ]
       }
+      strata_listing_data: {
+        Row: {
+          admin_levy_per_lot: number | null
+          capital_works_levy_per_lot: number | null
+          created_at: string | null
+          id: string
+          listing_id: string
+          scheme_id: string | null
+          special_levy_active: boolean | null
+          special_levy_amount: number | null
+          strata_health_score: number | null
+          total_quarterly_levy: number | null
+        }
+        Insert: {
+          admin_levy_per_lot?: number | null
+          capital_works_levy_per_lot?: number | null
+          created_at?: string | null
+          id?: string
+          listing_id: string
+          scheme_id?: string | null
+          special_levy_active?: boolean | null
+          special_levy_amount?: number | null
+          strata_health_score?: number | null
+          total_quarterly_levy?: number | null
+        }
+        Update: {
+          admin_levy_per_lot?: number | null
+          capital_works_levy_per_lot?: number | null
+          created_at?: string | null
+          id?: string
+          listing_id?: string
+          scheme_id?: string | null
+          special_levy_active?: boolean | null
+          special_levy_amount?: number | null
+          strata_health_score?: number | null
+          total_quarterly_levy?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "strata_listing_data_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: true
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "strata_listing_data_scheme_id_fkey"
+            columns: ["scheme_id"]
+            isOneToOne: false
+            referencedRelation: "strata_schemes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      strata_managers: {
+        Row: {
+          abn: string | null
+          bio: string | null
+          company_name: string
+          created_at: string | null
+          id: string
+          licence_number: string | null
+          phone: string | null
+          state: string
+          updated_at: string | null
+          user_id: string
+          verified: boolean | null
+          website: string | null
+        }
+        Insert: {
+          abn?: string | null
+          bio?: string | null
+          company_name: string
+          created_at?: string | null
+          id?: string
+          licence_number?: string | null
+          phone?: string | null
+          state: string
+          updated_at?: string | null
+          user_id: string
+          verified?: boolean | null
+          website?: string | null
+        }
+        Update: {
+          abn?: string | null
+          bio?: string | null
+          company_name?: string
+          created_at?: string | null
+          id?: string
+          licence_number?: string | null
+          phone?: string | null
+          state?: string
+          updated_at?: string | null
+          user_id?: string
+          verified?: boolean | null
+          website?: string | null
+        }
+        Relationships: []
+      }
+      strata_schemes: {
+        Row: {
+          address: string
+          admin_fund_levy_per_lot: number | null
+          agm_last_held: string | null
+          building_defects_disclosed: boolean | null
+          building_type: string | null
+          capital_works_levy_per_lot: number | null
+          capital_works_plan_year: number | null
+          created_at: string | null
+          defect_bond_active: boolean | null
+          defect_description: string | null
+          id: string
+          postcode: string
+          scheme_name: string
+          sinking_fund_balance: number | null
+          sinking_fund_target: number | null
+          special_levy_amount: number | null
+          special_levy_issued_5yr: boolean | null
+          special_levy_reason: string | null
+          special_levy_year: number | null
+          state: string
+          strata_health_score: number | null
+          strata_manager_id: string | null
+          suburb: string
+          total_lots: number
+          updated_at: string | null
+          year_built: number | null
+        }
+        Insert: {
+          address: string
+          admin_fund_levy_per_lot?: number | null
+          agm_last_held?: string | null
+          building_defects_disclosed?: boolean | null
+          building_type?: string | null
+          capital_works_levy_per_lot?: number | null
+          capital_works_plan_year?: number | null
+          created_at?: string | null
+          defect_bond_active?: boolean | null
+          defect_description?: string | null
+          id?: string
+          postcode: string
+          scheme_name: string
+          sinking_fund_balance?: number | null
+          sinking_fund_target?: number | null
+          special_levy_amount?: number | null
+          special_levy_issued_5yr?: boolean | null
+          special_levy_reason?: string | null
+          special_levy_year?: number | null
+          state: string
+          strata_health_score?: number | null
+          strata_manager_id?: string | null
+          suburb: string
+          total_lots?: number
+          updated_at?: string | null
+          year_built?: number | null
+        }
+        Update: {
+          address?: string
+          admin_fund_levy_per_lot?: number | null
+          agm_last_held?: string | null
+          building_defects_disclosed?: boolean | null
+          building_type?: string | null
+          capital_works_levy_per_lot?: number | null
+          capital_works_plan_year?: number | null
+          created_at?: string | null
+          defect_bond_active?: boolean | null
+          defect_description?: string | null
+          id?: string
+          postcode?: string
+          scheme_name?: string
+          sinking_fund_balance?: number | null
+          sinking_fund_target?: number | null
+          special_levy_amount?: number | null
+          special_levy_issued_5yr?: boolean | null
+          special_levy_reason?: string | null
+          special_levy_year?: number | null
+          state?: string
+          strata_health_score?: number | null
+          strata_manager_id?: string | null
+          suburb?: string
+          total_lots?: number
+          updated_at?: string | null
+          year_built?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "strata_schemes_strata_manager_id_fkey"
+            columns: ["strata_manager_id"]
+            isOneToOne: false
+            referencedRelation: "strata_managers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscription_events: {
         Row: {
           agent_id: string
@@ -4015,6 +4209,7 @@ export type Database = {
         | "principal"
         | "property_manager"
         | "partner"
+        | "strata_manager"
       partner_member_role: "owner" | "member"
     }
     CompositeTypes: {
@@ -4151,6 +4346,7 @@ export const Constants = {
         "principal",
         "property_manager",
         "partner",
+        "strata_manager",
       ],
       partner_member_role: ["owner", "member"],
     },

@@ -378,6 +378,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
     areaSearch,
     dbLoading,
     dbError,
+    searchSummary,
 
     // Internalized filters & sort
     filters,

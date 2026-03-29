@@ -25,6 +25,7 @@ import { useSavedSearches } from '@/features/search/hooks/useSavedSearches';
 import { useCollabSession } from '@/features/search/hooks/useCollabSession';
 import { useAuth } from '@/features/auth/AuthProvider';
 import ConsumerSignUpModal from '@/features/search/components/ConsumerSignUpModal';
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const { t } = useI18n();
@@ -88,6 +89,18 @@ const Index = () => {
   // Consumer sign-up modal trigger after 3rd anonymous search
   const wrappedHandleSearch = useCallback((query: string) => {
     handleSearch(query);
+
+    // Fire-and-forget: log every search to voice_searches for AI Buyer Concierge pipeline
+    supabase
+      .from('voice_searches')
+      .insert({
+        transcript: query.slice(0, 200),
+        user_id: user?.id ?? null,
+        detected_language: 'en',
+        status: 'completed',
+      })
+      .then(() => {});
+
     if (!user) {
       const alreadySignedUp = localStorage.getItem('listhq_consumer_signed_up');
       if (alreadySignedUp) return;

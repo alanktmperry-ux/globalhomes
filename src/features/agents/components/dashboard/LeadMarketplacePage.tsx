@@ -14,6 +14,8 @@ import { toast } from '@/hooks/use-toast';
 
 interface ConsumerLead {
   id: string;
+  name: string;
+  email: string | null;
   buying_situation: string;
   budget_min: number;
   budget_max: number;
@@ -21,9 +23,8 @@ interface ConsumerLead {
   preferred_type: string;
   min_bedrooms: number;
   lead_score: number;
-  purchase_price: number;
+  is_purchasable: boolean;
   created_at: string;
-  trigger_query: string | null;
 }
 
 interface PurchasedBuyer {

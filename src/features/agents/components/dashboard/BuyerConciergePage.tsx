@@ -140,6 +140,38 @@ const BuyerConciergePage = () => {
 
   useEffect(() => { fetchLeads(); }, [fetchLeads]);
 
+  // Realtime subscription for new leads
+  useEffect(() => {
+    if (!user) return;
+    let agentId: string | null = null;
+
+    const setup = async () => {
+      const { data: agent } = await supabase
+        .from('agents').select('id').eq('user_id', user.id).single();
+      if (!agent) return;
+      agentId = agent.id;
+
+      const channel = supabase
+        .channel('buyer_concierge_leads')
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'leads',
+          filter: `agent_id=eq.${agentId}`,
+        }, () => {
+          // Refetch to get full joined data
+          fetchLeads();
+        })
+        .subscribe();
+
+      return () => { supabase.removeChannel(channel); };
+    };
+
+    let cleanup: (() => void) | undefined;
+    setup().then(c => { cleanup = c; });
+    return () => { cleanup?.(); };
+  }, [user, fetchLeads]);
+
   const hasContact = (l: ConciergeeLead) => !!(l.userEmail || l.userPhone);
 
   return (

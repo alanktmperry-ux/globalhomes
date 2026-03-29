@@ -121,7 +121,7 @@ Return ONLY this JSON structure:
     let qb = supabase
       .from("properties")
       .select(`
-        id, title, address, suburb, state, country, postcode,
+        id, title, address, suburb, state, country,
         price, price_formatted, listing_type, property_type,
         beds, baths, parking, sqm,
         description, images, image_url, features,
@@ -145,9 +145,6 @@ Return ONLY this JSON structure:
     }
     if (parsed.state) {
       qb = qb.ilike("state", `%${parsed.state}%`);
-    }
-    if (parsed.postcode) {
-      qb = qb.eq("postcode", parsed.postcode as string);
     }
     if (parsed.price_min) {
       qb = qb.gte("price", parsed.price_min as number);
@@ -177,18 +174,18 @@ Return ONLY this JSON structure:
       let fb = supabase
         .from("properties")
         .select(`
-          id, title, address, suburb, state, country, postcode,
-          price, price_formatted, listing_type, property_type,
-          beds, baths, parking, sqm,
-          description, images, image_url, features,
-          is_featured, boost_tier, featured_until,
-          lat, lng, listed_date,
-          agent_id,
-          agents!inner ( id, name, agency, phone, email, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count )
-        `)
-        .eq("is_active", true)
-        .eq("status", "public")
-        .ilike("address", `%${parsed.suburb}%`)
+        id, title, address, suburb, state, country,
+        price, price_formatted, listing_type, property_type,
+        beds, baths, parking, sqm,
+        description, images, image_url, features,
+        is_featured, boost_tier, featured_until,
+        lat, lng, listed_date,
+        agent_id,
+        agents!inner ( id, name, agency, phone, email, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count )
+      `)
+      .eq("is_active", true)
+      .eq("status", "public")
+      .ilike("address", `%${parsed.suburb}%`)
         .limit(30);
 
       if (parsed.price_min) fb = fb.gte("price", parsed.price_min as number);

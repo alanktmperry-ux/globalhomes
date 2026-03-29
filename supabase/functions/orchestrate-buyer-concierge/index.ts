@@ -6,6 +6,19 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const STATE_MAP: Record<string, string> = {
+  'victoria': 'VIC', 'new south wales': 'NSW', 'queensland': 'QLD',
+  'western australia': 'WA', 'south australia': 'SA', 'tasmania': 'TAS',
+  'australian capital territory': 'ACT', 'northern territory': 'NT',
+  'vic': 'VIC', 'nsw': 'NSW', 'qld': 'QLD',
+  'wa': 'WA', 'sa': 'SA', 'tas': 'TAS', 'act': 'ACT', 'nt': 'NT',
+};
+
+function normaliseState(raw: string): string {
+  const key = raw.toLowerCase().trim();
+  return STATE_MAP[key] || raw.toUpperCase().trim();
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -99,7 +112,7 @@ Deno.serve(async (req) => {
       const wantedSuburb = (parsed.suburb || existingParsed.location || existingParsed.suburb || userLoc.suburb || "").toLowerCase().trim();
       const wantedType = (parsed.property_type || existingParsed.property_type || existingParsed.propertyType || "").toLowerCase();
       const wantedBeds = parseInt(parsed.bedrooms_min || existingParsed.bedrooms || existingParsed.beds || "0", 10);
-      const wantedState = (parsed.state || existingParsed.state || "").toUpperCase().trim();
+      const wantedState = normaliseState(parsed.state || existingParsed.state || "");
       const wantedMaxPrice = parseInt(
         (parsed.price_max || existingParsed.max_price || existingParsed.budget || "0").toString().replace(/[^0-9]/g, ""),
         10
@@ -123,7 +136,7 @@ Deno.serve(async (req) => {
         .map((p: any) => {
           let score = 0;
           const pSuburb = (p.suburb || "").toLowerCase();
-          const pState = (p.state || "").toUpperCase();
+          const pState = normaliseState(p.state || "");
           const pAddress = (p.address || "").toLowerCase();
 
           // Suburb match (strongest signal — required for tight matching)
@@ -138,14 +151,15 @@ Deno.serve(async (req) => {
             }
           }
 
-          // State match — required if provided
+          // State match — boosts score; mismatch only disqualifies if suburb also didn't match
           if (wantedState) {
             if (pState === wantedState) {
               score += 10;
-            } else {
-              // State mismatch = disqualify (prevents cross-state leads)
+            } else if (!suburbMatched) {
+              // State mismatch AND no suburb match = definitely wrong agent, disqualify
               return { property: p, score: 0 };
             }
+            // If suburb matched but state is wrong format/missing, we still allow it
           }
 
           // Property type match

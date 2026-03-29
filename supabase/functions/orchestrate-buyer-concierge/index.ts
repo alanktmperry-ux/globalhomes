@@ -32,18 +32,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // 2. Deduplicate — skip searches already processed as concierge leads
-    const { data: existingLeads } = await supabase
-      .from("leads")
-      .select("message, user_email")
-      .filter("search_context->>source", "eq", "ai_buyer_concierge")
-      .gte("created_at", sevenDaysAgo);
-
-    const existingSet = new Set(
-      (existingLeads || []).map((l: any) => `${(l.message || "").toLowerCase().trim().slice(0, 100)}|${l.user_email}`)
-    );
-
-    // 3. Fetch all active public listings with agents
+    // 2. Fetch all active public listings with agents
     const { data: properties } = await supabase
       .from("properties")
       .select("id, title, address, suburb, state, price, property_type, beds, baths, agent_id, lat, lng")
@@ -57,16 +46,14 @@ Deno.serve(async (req) => {
       });
     }
 
-    // 4. Use AI to parse each search transcript
+    // 3. Parse each search transcript and match to agents
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
     let matchedCount = 0;
+    let skippedCount = 0;
 
     for (const search of searches) {
       const transcript = (search.transcript || "").trim();
       if (!transcript) continue;
-
-      const key = `${transcript.toLowerCase().slice(0, 100)}|${search.user_id || ""}`;
-      if (existingSet.has(key)) continue;
 
       // Parse transcript via AI
       let parsed: Record<string, any> = {};
@@ -83,7 +70,7 @@ Deno.serve(async (req) => {
               messages: [
                 {
                   role: "system",
-                  content: `Parse Australian property search queries into JSON. Return ONLY valid JSON, no explanation. Prices as integers. States as abbreviations (VIC, NSW, QLD, WA, SA, TAS, ACT, NT).`,
+                  content: `Parse Australian property search queries into JSON. Return ONLY valid JSON, no explanation. Prices as integers. States as abbreviations (VIC, NSW, QLD, WA, SA, TAS, ACT, NT). Suburbs should be the suburb name only (e.g. "Doncaster" not "Doncaster VIC").`,
                 },
                 {
                   role: "user",
@@ -102,18 +89,17 @@ Deno.serve(async (req) => {
             parsed = JSON.parse(raw);
           }
         } catch (e) {
-          console.warn("AI parse failed for transcript, using fallback scoring:", e);
+          console.warn("AI parse failed for transcript, using fallback:", e);
         }
       }
 
-      // Also try the already-parsed query from voice_searches if available
       const existingParsed = (search.parsed_query || {}) as Record<string, any>;
       const userLoc = (search.user_location || {}) as Record<string, any>;
 
-      const wantedSuburb = (parsed.suburb || existingParsed.location || existingParsed.suburb || userLoc.suburb || "").toLowerCase();
+      const wantedSuburb = (parsed.suburb || existingParsed.location || existingParsed.suburb || userLoc.suburb || "").toLowerCase().trim();
       const wantedType = (parsed.property_type || existingParsed.property_type || existingParsed.propertyType || "").toLowerCase();
       const wantedBeds = parseInt(parsed.bedrooms_min || existingParsed.bedrooms || existingParsed.beds || "0", 10);
-      const wantedState = (parsed.state || existingParsed.state || "").toUpperCase();
+      const wantedState = (parsed.state || existingParsed.state || "").toUpperCase().trim();
       const wantedMaxPrice = parseInt(
         (parsed.price_max || existingParsed.max_price || existingParsed.budget || "0").toString().replace(/[^0-9]/g, ""),
         10
@@ -123,23 +109,40 @@ Deno.serve(async (req) => {
         10
       );
 
-      // Score each property
+      // STRICT: Require at least suburb OR state to match — reject vague queries
+      if (!wantedSuburb && !wantedState) {
+        console.log(`Query too vague to match — no suburb or state extracted: "${transcript.slice(0, 80)}"`);
+        continue;
+      }
+
+      // Score each property — require suburb match for lead creation
       const scored = properties
         .map((p: any) => {
           let score = 0;
+          const pSuburb = (p.suburb || "").toLowerCase();
+          const pState = (p.state || "").toUpperCase();
+          const pAddress = (p.address || "").toLowerCase();
 
-          // Suburb match (strongest signal)
-          if (wantedSuburb && p.suburb && p.suburb.toLowerCase().includes(wantedSuburb)) {
-            score += 40;
-          } else if (wantedSuburb && p.address && p.address.toLowerCase().includes(wantedSuburb)) {
-            score += 25;
-          } else if (wantedSuburb && p.state && p.state.toLowerCase().includes(wantedSuburb)) {
-            score += 15;
+          // Suburb match (strongest signal — required for tight matching)
+          let suburbMatched = false;
+          if (wantedSuburb) {
+            if (pSuburb.includes(wantedSuburb) || wantedSuburb.includes(pSuburb)) {
+              score += 40;
+              suburbMatched = true;
+            } else if (pAddress.includes(wantedSuburb)) {
+              score += 25;
+              suburbMatched = true;
+            }
           }
 
-          // State match
-          if (wantedState && p.state && p.state.toUpperCase() === wantedState) {
-            score += 10;
+          // State match — required if provided
+          if (wantedState) {
+            if (pState === wantedState) {
+              score += 10;
+            } else {
+              // State mismatch = disqualify (prevents cross-state leads)
+              return { property: p, score: 0 };
+            }
           }
 
           // Property type match
@@ -153,50 +156,78 @@ Deno.serve(async (req) => {
             else if (Math.abs(p.beds - wantedBeds) === 1) score += 10;
           }
 
-          // Price match
+          // Price match (10% buffer)
           if (wantedMaxPrice > 0 && p.price) {
             if (p.price <= wantedMaxPrice) score += 15;
-            else if (p.price <= wantedMaxPrice * 1.15) score += 5;
+            else if (p.price <= wantedMaxPrice * 1.10) score += 5;
           }
           if (wantedMinPrice > 0 && p.price) {
-            if (p.price >= wantedMinPrice) score += 5;
+            if (p.price >= wantedMinPrice * 0.90) score += 5;
           }
 
           return { property: p, score };
         })
-        .filter((s: any) => s.score >= 20) // Lower threshold to catch more matches
+        .filter((s: any) => s.score >= 30) // Raised threshold: need suburb match + at least one other signal
         .sort((a: any, b: any) => b.score - a.score)
-        .slice(0, 5);
+        .slice(0, 3); // Max 3 properties per search
 
-      // Create leads for top matches
-      for (const match of scored) {
-        const prop = match.property;
-        if (!prop.agent_id) continue;
+      if (scored.length === 0) {
+        console.log(`No matches for query: "${transcript.slice(0, 80)}" (suburb="${wantedSuburb}", state="${wantedState}", type="${wantedType}")`);
+        continue;
+      }
 
+      // Deduplicate: collect unique agent IDs from scored properties
+      const agentIds = [...new Set(scored.map((s: any) => s.property.agent_id).filter(Boolean))];
+
+      // Check for recently created leads for these agents with the same message (10 min window)
+      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+      const { data: recentLeads } = await supabase
+        .from("leads")
+        .select("agent_id")
+        .eq("message", transcript)
+        .filter("search_context->>source", "eq", "ai_buyer_concierge")
+        .in("agent_id", agentIds)
+        .gte("created_at", tenMinutesAgo);
+
+      const alreadyNotified = new Set((recentLeads ?? []).map((l: any) => l.agent_id));
+      const dedupedAgentIds = agentIds.filter((id: string) => !alreadyNotified.has(id));
+
+      if (dedupedAgentIds.length === 0) {
+        skippedCount++;
+        console.log(`All ${agentIds.length} matching agents already notified recently for: "${transcript.slice(0, 50)}"`);
+        continue;
+      }
+
+      // Insert ONE lead per deduped agent (pick the best-scoring property for that agent)
+      for (const agentId of dedupedAgentIds) {
+        const bestMatch = scored.find((s: any) => s.property.agent_id === agentId);
+        if (!bestMatch) continue;
+
+        const prop = bestMatch.property;
         const lead = {
-          agent_id: prop.agent_id,
+          agent_id: agentId,
           property_id: prop.id,
           user_name: search.user_id ? "Voice Searcher" : "Anonymous Searcher",
           user_email: search.user_id || `anon-${search.id}@listhq.local`,
           user_id: search.user_id || null,
           message: transcript,
-          score: Math.min(match.score, 100),
+          score: Math.min(bestMatch.score, 100),
           status: "new",
-          urgency: match.score >= 70 ? "ready_to_buy" : match.score >= 40 ? "actively_searching" : "just_browsing",
-          timeframe: match.score >= 70 ? "This week" : "1–3 months",
+          urgency: bestMatch.score >= 70 ? "ready_to_buy" : bestMatch.score >= 40 ? "actively_searching" : "just_browsing",
+          timeframe: bestMatch.score >= 70 ? "This week" : "1–3 months",
           preferred_contact: "call",
           budget_range: wantedMaxPrice > 0 ? `Up to $${wantedMaxPrice.toLocaleString()}` : null,
           search_context: {
             source: "ai_buyer_concierge",
             parsed_query: {
-              location: wantedSuburb || userLoc.suburb || null,
+              location: wantedSuburb || null,
               state: wantedState || null,
               budget: wantedMaxPrice > 0 ? `$${wantedMaxPrice.toLocaleString()}` : null,
               property_type: wantedType || null,
               bedrooms: wantedBeds > 0 ? String(wantedBeds) : null,
               features: existingParsed.features || [],
             },
-            matchScore: match.score,
+            matchScore: bestMatch.score,
             voiceSearchId: search.id,
           },
         };
@@ -204,20 +235,15 @@ Deno.serve(async (req) => {
         const { error: insertErr } = await supabase.from("leads").insert(lead);
         if (!insertErr) {
           matchedCount++;
-          existingSet.add(key);
-          console.log(`Created lead for agent ${prop.agent_id} from query: "${transcript.slice(0, 50)}..." (score: ${match.score})`);
+          console.log(`Created lead for agent ${agentId} from query: "${transcript.slice(0, 50)}..." (score: ${bestMatch.score})`);
         } else {
           console.error("Lead insert error:", insertErr);
         }
       }
-
-      if (scored.length === 0) {
-        console.log(`No matches for query: "${transcript.slice(0, 80)}" (suburb="${wantedSuburb}", type="${wantedType}")`);
-      }
     }
 
     return new Response(
-      JSON.stringify({ matched: matchedCount, processed: searches.length }),
+      JSON.stringify({ matched: matchedCount, processed: searches.length, skipped: skippedCount }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err: any) {

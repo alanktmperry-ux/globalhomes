@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, Loader2, Copy, Send } from 'lucide-react';
+import { Sparkles, Loader2, Copy, Send, FileDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { generateOfferPdf } from '@/features/agents/lib/generateOfferPdf';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
 
@@ -51,6 +52,20 @@ const OfferModal = ({ open, onOpenChange, card, propertyId, agentId, onSent }: O
   const handleCopy = () => {
     navigator.clipboard.writeText(draftText);
     toast({ title: 'Copied to clipboard' });
+  };
+
+  const handleDownloadPdf = () => {
+    generateOfferPdf({
+      propertyAddress: card.address,
+      buyerName: card.contactName,
+      offerAmount,
+      settlementDays,
+      conditions,
+      draftText,
+      comparableSales,
+      suburbMedian,
+    });
+    toast({ title: 'PDF downloaded' });
   };
 
   const handleMarkSent = async () => {
@@ -125,7 +140,10 @@ const OfferModal = ({ open, onOpenChange, card, propertyId, agentId, onSent }: O
               </div>
             )}
 
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" onClick={handleDownloadPdf} className="flex-1 gap-1.5 text-xs">
+                <FileDown size={12} /> Download PDF
+              </Button>
               <Button variant="outline" onClick={handleCopy} className="flex-1 gap-1.5 text-xs">
                 <Copy size={12} /> Copy Letter
               </Button>

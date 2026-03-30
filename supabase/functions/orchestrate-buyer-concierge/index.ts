@@ -370,6 +370,7 @@ Deno.serve(async (req) => {
           user_id: search.user_id || null,
           message: transcript,
           score: Math.min(bestMatch.score, 100),
+          source: "ai_buyer_concierge",
           status: "new",
           urgency: bestMatch.score >= 70 ? "ready_to_buy" : bestMatch.score >= 40 ? "actively_searching" : "just_browsing",
           timeframe: bestMatch.score >= 70 ? "This week" : "1-3 months",

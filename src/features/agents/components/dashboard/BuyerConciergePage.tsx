@@ -97,7 +97,7 @@ const BuyerConciergePage = () => {
         .from('leads')
         .select('*, properties(title, address, suburb)')
         .eq('agent_id', agent.id)
-        .filter('search_context->>source', 'eq', 'ai_buyer_concierge')
+        .eq('source', 'ai_buyer_concierge')
         .order('created_at', { ascending: false })
         .limit(50);
 

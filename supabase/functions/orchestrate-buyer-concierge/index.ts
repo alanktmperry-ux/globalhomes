@@ -49,6 +49,19 @@ function sanitiseSuburb(raw: string): string {
     .trim();
 }
 
+// Calculate distance in km between two lat/lng points (Haversine formula)
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) *
+    Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
 function parseNumber(value: unknown): number {
   const cleaned = String(value ?? "0").replace(/[^0-9]/g, "");
   const parsed = Number.parseInt(cleaned || "0", 10);
@@ -207,6 +220,31 @@ Deno.serve(async (req) => {
         continue;
       }
 
+      // Geocode the searched suburb for radius matching
+      let searchLat: number | null = null;
+      let searchLng: number | null = null;
+      if (intent.suburb) {
+        try {
+          const geoQuery = [intent.suburb, intent.state, "Australia"]
+            .filter(Boolean)
+            .join(", ");
+          const geoResp = await fetch(
+            `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(geoQuery)}&format=json&limit=1&countrycodes=au`,
+            { headers: { "User-Agent": "ListHQ-BuyerConcierge/1.0" } }
+          );
+          if (geoResp.ok) {
+            const geoData = await geoResp.json();
+            if (geoData.length > 0) {
+              searchLat = parseFloat(geoData[0].lat);
+              searchLng = parseFloat(geoData[0].lon);
+              console.log(`[Concierge] Geocoded "${intent.suburb}" → lat=${searchLat}, lng=${searchLng}`);
+            }
+          }
+        } catch (e) {
+          console.warn("[Concierge] Geocoding failed, radius matching disabled:", e);
+        }
+      }
+
       // 3) Score properties
       const scored = properties
         .map((p: Record<string, unknown>) => {
@@ -222,6 +260,25 @@ Deno.serve(async (req) => {
           } else if (intent.suburb && pAddress.includes(intent.suburb)) {
             score += 25;
             suburbMatched = true;
+          }
+
+          // Radius match — score properties within 5km even if suburb name doesn't match
+          if (
+            !suburbMatched &&
+            searchLat !== null &&
+            searchLng !== null &&
+            p.lat != null &&
+            p.lng != null
+          ) {
+            const distKm = haversineKm(searchLat, searchLng, Number(p.lat), Number(p.lng));
+            if (distKm <= 5) {
+              score += 30;
+              suburbMatched = true;
+              console.log(`[Concierge] Radius match: ${p.suburb} is ${distKm.toFixed(1)}km from ${intent.suburb}`);
+            } else if (distKm <= 10) {
+              score += 15;
+              suburbMatched = true;
+            }
           }
 
           if (intent.state) {

@@ -220,6 +220,31 @@ Deno.serve(async (req) => {
         continue;
       }
 
+      // Geocode the searched suburb for radius matching
+      let searchLat: number | null = null;
+      let searchLng: number | null = null;
+      if (intent.suburb) {
+        try {
+          const geoQuery = [intent.suburb, intent.state, "Australia"]
+            .filter(Boolean)
+            .join(", ");
+          const geoResp = await fetch(
+            `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(geoQuery)}&format=json&limit=1&countrycodes=au`,
+            { headers: { "User-Agent": "ListHQ-BuyerConcierge/1.0" } }
+          );
+          if (geoResp.ok) {
+            const geoData = await geoResp.json();
+            if (geoData.length > 0) {
+              searchLat = parseFloat(geoData[0].lat);
+              searchLng = parseFloat(geoData[0].lon);
+              console.log(`[Concierge] Geocoded "${intent.suburb}" → lat=${searchLat}, lng=${searchLng}`);
+            }
+          }
+        } catch (e) {
+          console.warn("[Concierge] Geocoding failed, radius matching disabled:", e);
+        }
+      }
+
       // 3) Score properties
       const scored = properties
         .map((p: Record<string, unknown>) => {

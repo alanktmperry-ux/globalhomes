@@ -58,24 +58,50 @@ const DashboardOverview = () => {
   const [sendingReport, setSendingReport] = useState<string | null>(null);
 
   // Onboarding checklist state
-  const [onboardingDismissed, setOnboardingDismissed] = useState(() =>
-    localStorage.getItem('listhq-onboarding-dismissed') === 'true'
-  );
+  const [onboardingDismissed, setOnboardingDismissed] = useState(false);
   const [onboardingAgent, setOnboardingAgent] = useState<{
-    name?: string; avatar_url?: string; bio?: string; agency_id?: string; stripe_customer_id?: string;
+    name?: string; phone?: string; avatar_url?: string; bio?: string; agency_id?: string; stripe_customer_id?: string;
   } | null>(null);
   const [onboardingHasListing, setOnboardingHasListing] = useState(false);
-  const [onboardingStep5, setOnboardingStep5] = useState(() =>
-    localStorage.getItem('listhq-onboarding-step5') === 'true'
-  );
+  const [onboardingSteps, setOnboardingSteps] = useState<Record<string, boolean>>({});
 
-  // Fetch onboarding agent data
+  const persistOnboardingStep = async (key: string) => {
+    if (!user) return;
+    const updated = { ...onboardingSteps, [key]: true };
+    setOnboardingSteps(updated);
+    await supabase
+      .from('profiles')
+      .update({ onboarding_steps_completed: updated } as any)
+      .eq('user_id', user.id);
+  };
+
+  const dismissOnboarding = async () => {
+    setOnboardingDismissed(true);
+    if (!user) return;
+    const updated = { ...onboardingSteps, dismissed: true };
+    await supabase
+      .from('profiles')
+      .update({ onboarding_steps_completed: updated } as any)
+      .eq('user_id', user.id);
+  };
+
+  // Fetch onboarding agent data + persisted steps
   useEffect(() => {
-    if (!user || onboardingDismissed) return;
+    if (!user) return;
     const fetchOnboarding = async () => {
+      // Load persisted onboarding state from profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('onboarding_steps_completed')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      const steps = (profile as any)?.onboarding_steps_completed || {};
+      setOnboardingSteps(steps);
+      if (steps.dismissed) { setOnboardingDismissed(true); return; }
+
       const { data: agent } = await supabase
         .from('agents')
-        .select('name, avatar_url, bio, agency_id, stripe_customer_id')
+        .select('name, phone, avatar_url, bio, agency_id, stripe_customer_id')
         .eq('user_id', user.id)
         .maybeSingle();
       setOnboardingAgent(agent);
@@ -86,7 +112,7 @@ const DashboardOverview = () => {
       setOnboardingHasListing((count || 0) > 0);
     };
     fetchOnboarding();
-  }, [user, onboardingDismissed]);
+  }, [user]);
 
   // Fetch tasks due today
   useEffect(() => {

@@ -474,21 +474,21 @@ const DashboardOverview = () => {
 
       <div className="p-4 sm:p-6 space-y-6 max-w-7xl">
         {!onboardingDismissed && (() => {
-          const step1 = !!(onboardingAgent?.name && onboardingAgent?.avatar_url && onboardingAgent?.bio);
+          const step1 = !!(onboardingAgent?.name && onboardingAgent?.phone && onboardingAgent?.avatar_url && onboardingAgent?.bio);
           const step2 = onboardingHasListing || listings.length > 0;
           const step3 = !!onboardingAgent?.agency_id;
           const step4 = !!onboardingAgent?.stripe_customer_id;
-          const step5 = onboardingStep5;
+          const step5 = !!onboardingSteps.dashboard;
           const steps = [
-            { label: 'Complete your profile', done: step1, link: '/dashboard/profile' },
-            { label: 'Add your first listing', done: step2, link: '/dashboard/listings' },
-            { label: 'Connect or create your agency', done: step3, link: '/dashboard/agencies' },
-            { label: 'Set up billing', done: step4, link: '/dashboard/billing' },
-            { label: 'Explore your dashboard', done: step5, link: '/dashboard/help', manual: true as const },
+            { label: 'Complete your profile', done: step1, link: '/dashboard/profile', key: 'profile' },
+            { label: 'Add your first listing', done: step2, link: '/dashboard/listings', key: 'listing' },
+            { label: 'Connect or create your agency', done: step3, link: '/dashboard/agencies', key: 'agency' },
+            { label: 'Set up billing', done: step4, link: '/dashboard/billing', key: 'billing' },
+            { label: 'Explore your dashboard', done: step5, link: '', key: 'dashboard', manual: true as const },
           ];
           const completed = steps.filter(s => s.done).length;
           if (completed === 5) {
-            localStorage.setItem('listhq-onboarding-dismissed', 'true');
+            dismissOnboarding();
             return null;
           }
           return (
@@ -500,10 +500,7 @@ const DashboardOverview = () => {
                     variant="ghost"
                     size="icon"
                     className="h-7 w-7"
-                    onClick={() => {
-                      localStorage.setItem('listhq-onboarding-dismissed', 'true');
-                      setOnboardingDismissed(true);
-                    }}
+                    onClick={dismissOnboarding}
                   >
                     <X size={16} />
                   </Button>
@@ -519,12 +516,11 @@ const DashboardOverview = () => {
                     key={i}
                     onClick={() => {
                       if ('manual' in step && step.manual && !step.done) {
-                        localStorage.setItem('listhq-onboarding-step5', 'true');
-                        setOnboardingStep5(true);
+                        persistOnboardingStep('dashboard');
                       }
-                      navigate(step.link);
+                      if (step.link) navigate(step.link);
                     }}
-                    className="w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-primary/5 group text-left"
+                    className="w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-primary/5 group text-left cursor-pointer"
                   >
                     {step.done ? (
                       <div className="h-5 w-5 rounded-full bg-primary flex items-center justify-center shrink-0">

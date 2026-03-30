@@ -1402,6 +1402,7 @@ export type Database = {
           read: boolean | null
           score: number | null
           search_context: Json | null
+          source: string | null
           status: string | null
           timeframe: string | null
           urgency: string | null
@@ -1425,6 +1426,7 @@ export type Database = {
           read?: boolean | null
           score?: number | null
           search_context?: Json | null
+          source?: string | null
           status?: string | null
           timeframe?: string | null
           urgency?: string | null
@@ -1448,6 +1450,7 @@ export type Database = {
           read?: boolean | null
           score?: number | null
           search_context?: Json | null
+          source?: string | null
           status?: string | null
           timeframe?: string | null
           urgency?: string | null

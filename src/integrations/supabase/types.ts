@@ -2061,6 +2061,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          onboarding_steps_completed: Json | null
           phone: string | null
           preferred_language: string | null
           referral_code: string | null
@@ -2075,6 +2076,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          onboarding_steps_completed?: Json | null
           phone?: string | null
           preferred_language?: string | null
           referral_code?: string | null
@@ -2089,6 +2091,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          onboarding_steps_completed?: Json | null
           phone?: string | null
           preferred_language?: string | null
           referral_code?: string | null

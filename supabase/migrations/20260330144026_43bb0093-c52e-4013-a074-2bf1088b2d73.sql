@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS onboarding_steps_completed JSONB DEFAULT '{}'::jsonb;

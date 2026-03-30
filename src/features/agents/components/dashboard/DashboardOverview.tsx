@@ -58,24 +58,50 @@ const DashboardOverview = () => {
   const [sendingReport, setSendingReport] = useState<string | null>(null);
 
   // Onboarding checklist state
-  const [onboardingDismissed, setOnboardingDismissed] = useState(() =>
-    localStorage.getItem('listhq-onboarding-dismissed') === 'true'
-  );
+  const [onboardingDismissed, setOnboardingDismissed] = useState(false);
   const [onboardingAgent, setOnboardingAgent] = useState<{
-    name?: string; avatar_url?: string; bio?: string; agency_id?: string; stripe_customer_id?: string;
+    name?: string; phone?: string; avatar_url?: string; bio?: string; agency_id?: string; stripe_customer_id?: string;
   } | null>(null);
   const [onboardingHasListing, setOnboardingHasListing] = useState(false);
-  const [onboardingStep5, setOnboardingStep5] = useState(() =>
-    localStorage.getItem('listhq-onboarding-step5') === 'true'
-  );
+  const [onboardingSteps, setOnboardingSteps] = useState<Record<string, boolean>>({});
 
-  // Fetch onboarding agent data
+  const persistOnboardingStep = async (key: string) => {
+    if (!user) return;
+    const updated = { ...onboardingSteps, [key]: true };
+    setOnboardingSteps(updated);
+    await supabase
+      .from('profiles')
+      .update({ onboarding_steps_completed: updated } as any)
+      .eq('user_id', user.id);
+  };
+
+  const dismissOnboarding = async () => {
+    setOnboardingDismissed(true);
+    if (!user) return;
+    const updated = { ...onboardingSteps, dismissed: true };
+    await supabase
+      .from('profiles')
+      .update({ onboarding_steps_completed: updated } as any)
+      .eq('user_id', user.id);
+  };
+
+  // Fetch onboarding agent data + persisted steps
   useEffect(() => {
-    if (!user || onboardingDismissed) return;
+    if (!user) return;
     const fetchOnboarding = async () => {
+      // Load persisted onboarding state from profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('onboarding_steps_completed')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      const steps = (profile as any)?.onboarding_steps_completed || {};
+      setOnboardingSteps(steps);
+      if (steps.dismissed) { setOnboardingDismissed(true); return; }
+
       const { data: agent } = await supabase
         .from('agents')
-        .select('name, avatar_url, bio, agency_id, stripe_customer_id')
+        .select('name, phone, avatar_url, bio, agency_id, stripe_customer_id')
         .eq('user_id', user.id)
         .maybeSingle();
       setOnboardingAgent(agent);
@@ -86,7 +112,7 @@ const DashboardOverview = () => {
       setOnboardingHasListing((count || 0) > 0);
     };
     fetchOnboarding();
-  }, [user, onboardingDismissed]);
+  }, [user]);
 
   // Fetch tasks due today
   useEffect(() => {
@@ -448,21 +474,21 @@ const DashboardOverview = () => {
 
       <div className="p-4 sm:p-6 space-y-6 max-w-7xl">
         {!onboardingDismissed && (() => {
-          const step1 = !!(onboardingAgent?.name && onboardingAgent?.avatar_url && onboardingAgent?.bio);
+          const step1 = !!(onboardingAgent?.name && onboardingAgent?.phone && onboardingAgent?.avatar_url && onboardingAgent?.bio);
           const step2 = onboardingHasListing || listings.length > 0;
           const step3 = !!onboardingAgent?.agency_id;
           const step4 = !!onboardingAgent?.stripe_customer_id;
-          const step5 = onboardingStep5;
+          const step5 = !!onboardingSteps.dashboard;
           const steps = [
-            { label: 'Complete your profile', done: step1, link: '/dashboard/profile' },
-            { label: 'Add your first listing', done: step2, link: '/dashboard/listings' },
-            { label: 'Connect or create your agency', done: step3, link: '/dashboard/agencies' },
-            { label: 'Set up billing', done: step4, link: '/dashboard/billing' },
-            { label: 'Explore your dashboard', done: step5, link: '/dashboard/help', manual: true as const },
+            { label: 'Complete your profile', done: step1, link: '/dashboard/profile', key: 'profile' },
+            { label: 'Add your first listing', done: step2, link: '/dashboard/listings', key: 'listing' },
+            { label: 'Connect or create your agency', done: step3, link: '/dashboard/agencies', key: 'agency' },
+            { label: 'Set up billing', done: step4, link: '/dashboard/billing', key: 'billing' },
+            { label: 'Explore your dashboard', done: step5, link: '', key: 'dashboard', manual: true as const },
           ];
           const completed = steps.filter(s => s.done).length;
           if (completed === 5) {
-            localStorage.setItem('listhq-onboarding-dismissed', 'true');
+            dismissOnboarding();
             return null;
           }
           return (
@@ -474,10 +500,7 @@ const DashboardOverview = () => {
                     variant="ghost"
                     size="icon"
                     className="h-7 w-7"
-                    onClick={() => {
-                      localStorage.setItem('listhq-onboarding-dismissed', 'true');
-                      setOnboardingDismissed(true);
-                    }}
+                    onClick={dismissOnboarding}
                   >
                     <X size={16} />
                   </Button>
@@ -493,12 +516,11 @@ const DashboardOverview = () => {
                     key={i}
                     onClick={() => {
                       if ('manual' in step && step.manual && !step.done) {
-                        localStorage.setItem('listhq-onboarding-step5', 'true');
-                        setOnboardingStep5(true);
+                        persistOnboardingStep('dashboard');
                       }
-                      navigate(step.link);
+                      if (step.link) navigate(step.link);
                     }}
-                    className="w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-primary/5 group text-left"
+                    className="w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-primary/5 group text-left cursor-pointer"
                   >
                     {step.done ? (
                       <div className="h-5 w-5 rounded-full bg-primary flex items-center justify-center shrink-0">

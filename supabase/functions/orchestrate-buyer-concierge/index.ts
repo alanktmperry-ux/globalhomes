@@ -168,7 +168,6 @@ Deno.serve(async (req) => {
       .from("properties")
       .select("id, title, address, suburb, state, price, property_type, beds, baths, agent_id, lat, lng")
       .eq("is_active", true)
-      .eq("status", "public")
       .limit(1000);
 
     if (!properties || properties.length === 0) {

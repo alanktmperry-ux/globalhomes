@@ -262,6 +262,25 @@ Deno.serve(async (req) => {
             suburbMatched = true;
           }
 
+          // Radius match — score properties within 5km even if suburb name doesn't match
+          if (
+            !suburbMatched &&
+            searchLat !== null &&
+            searchLng !== null &&
+            p.lat != null &&
+            p.lng != null
+          ) {
+            const distKm = haversineKm(searchLat, searchLng, Number(p.lat), Number(p.lng));
+            if (distKm <= 5) {
+              score += 30;
+              suburbMatched = true;
+              console.log(`[Concierge] Radius match: ${p.suburb} is ${distKm.toFixed(1)}km from ${intent.suburb}`);
+            } else if (distKm <= 10) {
+              score += 15;
+              suburbMatched = true;
+            }
+          }
+
           if (intent.state) {
             if (pState === intent.state) {
               score += 40;

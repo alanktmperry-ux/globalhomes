@@ -115,7 +115,6 @@ export function useRealtimeProperties({
         'postgres_changes',
         { event: '*', schema: 'public', table: 'properties' },
         (payload) => {
-          console.log('[Realtime] Property change:', payload.eventType, payload.new?.['id'] ?? payload.old?.['id']);
           // Invalidate all property queries to refetch
           queryClient.invalidateQueries({ queryKey: ['properties'] });
         }

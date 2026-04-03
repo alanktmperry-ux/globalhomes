@@ -55,8 +55,6 @@ const BuyerConciergePage = () => {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      console.log('[BuyerConcierge] user.id:', user.id, 'Agent:', agent, 'Error:', agentErr);
-
       if (agentErr) {
         setError(`Agent lookup error: ${agentErr.message}`);
         setLoading(false);
@@ -70,7 +68,6 @@ const BuyerConciergePage = () => {
       }
 
       setAgentId(agent.id);
-      console.log('[BuyerConcierge] Querying leads for agent_id:', agent.id);
 
       const { data: rows, error: leadsErr } = await supabase
         .from('leads')
@@ -80,8 +77,6 @@ const BuyerConciergePage = () => {
         .is('archived_at', null)
         .order('created_at', { ascending: false })
         .limit(50);
-
-      console.log('[BuyerConcierge] Leads result:', rows?.length, 'Error:', leadsErr);
 
       if (leadsErr) {
         setError(`Failed to load leads: ${leadsErr.message}`);

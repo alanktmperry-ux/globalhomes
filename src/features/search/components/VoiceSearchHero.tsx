@@ -356,9 +356,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       const { geocode } = await import('@/lib/googleMapsService');
       const filters = parsePropertyQuery(text);
       const locationQuery = filters.location || text;
-      console.log('[GeoDebug] Geocoding:', locationQuery);
       const location = await geocode(locationQuery);
-      console.log('[GeoDebug] Result:', location);
       if (location) {
         onLocationSelect({ lat: location.lat, lng: location.lng, address: locationQuery });
       } else if (filters.location && filters.location !== text) {

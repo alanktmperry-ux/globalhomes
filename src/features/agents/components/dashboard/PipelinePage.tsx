@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, DragEvent } from 'react';
 import { motion } from 'framer-motion';
 import { GripVertical, FileText, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import DashboardHeader from './DashboardHeader';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
@@ -17,6 +18,7 @@ interface PipelineCard {
   stage: string;
   movedAt: string;
   propertyId: string;
+  listingType: string;
   sentOfferId?: string;
 }
 
@@ -60,6 +62,7 @@ const mapStageToStatus = (stage: string): { status: string; is_active: boolean }
 
 const PipelinePage = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [cards, setCards] = useState<PipelineCard[]>([]);
   const [dragOverStage, setDragOverStage] = useState<string | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
@@ -106,6 +109,7 @@ const PipelinePage = () => {
         stage: mapStatusToStage(prop.status, prop.is_active),
         movedAt: prop.updated_at || prop.listed_date || new Date().toISOString(),
         propertyId: prop.id,
+        listingType: prop.listing_type || 'sale',
         sentOfferId: offerMap.get(prop.id) || undefined,
       }));
       setCards(mapped);
@@ -177,6 +181,14 @@ const PipelinePage = () => {
         title="Pipeline"
         subtitle={`${cards.length} listings · ${AUD.format(totalValue)} total value`}
       />
+      <div className="px-4 sm:px-6 pt-4 flex justify-end">
+        <button
+          onClick={() => navigate('/pocket-listing')}
+          className="flex items-center gap-1.5 text-xs font-medium bg-primary text-primary-foreground px-3 py-1.5 rounded-lg hover:bg-primary/90 transition"
+        >
+          <Plus size={13} /> Add Listing
+        </button>
+      </div>
 
       <div className="p-4 sm:p-6 max-w-[1600px]">
         <div className="flex gap-3 overflow-x-auto pb-4">
@@ -229,7 +241,12 @@ const PipelinePage = () => {
                           <GripVertical size={12} className="text-muted-foreground/50 mt-0.5 shrink-0" />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-1">
-                              <p className="text-xs font-medium truncate flex-1">{card.address}</p>
+                              <p
+                                className="text-xs font-medium truncate flex-1 hover:text-primary hover:underline cursor-pointer"
+                                onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/listings/${card.propertyId}`); }}
+                              >
+                                {card.address}
+                              </p>
                               {card.stage === 'under_offer' && (
                                 <button
                                   onClick={(e) => { e.stopPropagation(); setOfferCard(card); }}
@@ -240,7 +257,16 @@ const PipelinePage = () => {
                                 </button>
                               )}
                             </div>
-                            <p className="text-[10px] text-muted-foreground mt-0.5">{card.contactName}</p>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full ${
+                                card.listingType === 'rent'
+                                  ? 'bg-blue-500/10 text-blue-600'
+                                  : 'bg-amber-500/10 text-amber-600'
+                              }`}>
+                                {card.listingType === 'rent' ? 'Rent' : 'Sale'}
+                              </span>
+                              <p className="text-[10px] text-muted-foreground truncate">{card.contactName}</p>
+                            </div>
                             <div className="flex items-center justify-between mt-2">
                               <span className="text-[10px] font-bold">{AUD.format(card.estimatedValue)}</span>
                               <span className={`text-[10px] font-semibold ${daysColor}`}>{days}d</span>

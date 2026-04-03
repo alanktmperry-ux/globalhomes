@@ -34,7 +34,7 @@
   <circle cx="1100" cy="480" r="100" fill="none" stroke="rgba(59,130,246,0.06)" stroke-width="1"/>
 
   <!-- Brand name -->
-  <text x="96" y="460" font-family="system-ui, -apple-system, sans-serif" font-size="88" font-weight="800" fill="white" letter-spacing="-2">GlobalHomes</text>
+  <text x="96" y="460" font-family="system-ui, -apple-system, sans-serif" font-size="88" font-weight="800" fill="white" letter-spacing="-2">ListHQ</text>
 
   <!-- Tagline -->
   <text x="100" y="520" font-family="system-ui, -apple-system, sans-serif" font-size="32" font-weight="400" fill="rgba(148,163,184,1)">Australia's AI-powered property platform</text>

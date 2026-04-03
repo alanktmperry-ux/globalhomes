@@ -152,8 +152,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       (_event, session) => {
         
 
-        // Explicit sign-out — clear everything
+        // Explicit sign-out — only clear if there is no active session
+        // (guards against spurious SIGNED_OUT from detectSessionInUrl on navigation)
         if (_event === 'SIGNED_OUT') {
+          if (session) return; // session still valid, ignore
           setSession(null);
           setUser(null);
           clearRoles();

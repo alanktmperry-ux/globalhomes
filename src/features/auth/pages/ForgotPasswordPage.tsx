@@ -16,11 +16,7 @@ const ForgotPasswordPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Always use the published URL so the reset link doesn't hit the preview auth gate
-      const publishedOrigin = 'https://listhq.lovable.app';
-      const isPreview = window.location.hostname.includes('lovableproject.com') ||
-        (window.location.hostname.includes('lovable.app') && window.location.hostname.includes('preview'));
-      const origin = isPreview ? publishedOrigin : window.location.origin;
+      const origin = window.location.origin;
       // Ensure demo request emails are provisioned as auth users so reset emails can be delivered
       await supabase.functions.invoke('handle-demo-request', {
         body: { action: 'ensure_auth_user', email: email.trim() },

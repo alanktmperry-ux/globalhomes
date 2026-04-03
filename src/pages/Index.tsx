@@ -30,6 +30,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { geocode } from '@/shared/lib/googleMapsService';
 
 const Index = () => {
+  const navigate = useNavigate();
   const { t } = useI18n();
   const { addSearch, lastSearch } = useSearchHistory();
   const { savedIds, isSaved, toggleSaved } = useSavedProperties();

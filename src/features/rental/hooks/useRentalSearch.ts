@@ -33,6 +33,8 @@ export function useRentalSearch(filters: RentalFilters = {}) {
     if (filters.maxRent) q = q.lte('rental_weekly', filters.maxRent);
     if (filters.minBedrooms) q = q.gte('beds', filters.minBedrooms);
     if (filters.petsAllowed) q = q.eq('pets_allowed', true);
+    if (filters.furnished === 'furnished') q = q.eq('furnished', true);
+    if (filters.furnished === 'unfurnished') q = q.eq('furnished', false);
     if (filters.propertyTypes?.length)
       q = q.in('property_type', filters.propertyTypes);
     if (filters.availableFrom)

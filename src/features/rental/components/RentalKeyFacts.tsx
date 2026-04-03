@@ -1,8 +1,32 @@
-import { Calendar, PawPrint, Sofa, Clock, Zap, Cigarette } from 'lucide-react';
+import { Calendar, PawPrint, Sofa, Clock, Zap, Cigarette, Car, WashingMachine, Wind, Users } from 'lucide-react';
 
 interface Props { property: any; }
 
+// Build utilities list from either array or individual boolean columns
+function getUtilities(p: any): string | null {
+  if (p.utilities_included?.length > 0) return p.utilities_included.join(', ');
+  const items = [
+    p.water_included && 'water',
+    p.electricity_included && 'electricity',
+    p.internet_included && 'internet',
+  ].filter(Boolean) as string[];
+  return items.length > 0 ? items.join(', ') : null;
+}
+
+// Build appliances list
+function getAppliances(p: any): string | null {
+  const items = [
+    p.has_internal_laundry && 'laundry',
+    p.has_dishwasher && 'dishwasher',
+    p.has_washing_machine && 'washing machine',
+  ].filter(Boolean) as string[];
+  return items.length > 0 ? items.join(', ') : null;
+}
+
 export function RentalKeyFacts({ property: p }: Props) {
+  const utilities = getUtilities(p);
+  const appliances = getAppliances(p);
+
   const facts = [
     {
       icon: <Calendar className="w-4 h-4" />,
@@ -25,10 +49,10 @@ export function RentalKeyFacts({ property: p }: Props) {
       value: p.pets_allowed ? 'Pets considered' : 'No pets',
       highlight: p.pets_allowed,
     },
-    ...(p.utilities_included?.length > 0 ? [{
+    ...(utilities ? [{
       icon: <Zap className="w-4 h-4" />,
       label: 'Includes',
-      value: p.utilities_included.join(', '),
+      value: utilities,
       highlight: true,
     }] : []),
     {
@@ -36,6 +60,27 @@ export function RentalKeyFacts({ property: p }: Props) {
       label: 'Smoking',
       value: p.smoking_allowed ? 'Smoking permitted' : 'No smoking',
     },
+    ...(p.rental_parking_type ? [{
+      icon: <Car className="w-4 h-4" />,
+      label: 'Parking',
+      value: p.rental_parking_type,
+    }] : []),
+    ...(appliances ? [{
+      icon: <WashingMachine className="w-4 h-4" />,
+      label: 'Appliances',
+      value: appliances,
+    }] : []),
+    ...(p.has_air_con ? [{
+      icon: <Wind className="w-4 h-4" />,
+      label: 'Cooling',
+      value: 'Air conditioning',
+      highlight: true,
+    }] : []),
+    ...(p.max_occupants > 0 ? [{
+      icon: <Users className="w-4 h-4" />,
+      label: 'Max occupants',
+      value: `${p.max_occupants} people`,
+    }] : []),
   ];
 
   return (

@@ -405,6 +405,17 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         vendor_name: draft.vendorName || null,
         vendor_email: draft.vendorEmail || null,
         vendor_phone: draft.vendorPhone || null,
+        listing_category: draft.listingType === 'rent' ? 'rent' : 'sale',
+        bond_amount: draft.listingType === 'rent' && draft.rentalBondWeeks && draft.rentalWeekly
+          ? draft.rentalBondWeeks * draft.rentalWeekly
+          : null,
+        utilities_included: draft.listingType === 'rent'
+          ? [
+              draft.waterIncluded ? 'water' : null,
+              draft.electricityIncluded ? 'electricity' : null,
+              draft.internetIncluded ? 'internet' : null,
+            ].filter(Boolean)
+          : [],
       } as any;
 
       // Add 'Pets considered' to features if applicable

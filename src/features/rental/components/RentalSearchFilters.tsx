@@ -91,6 +91,16 @@ export function RentalSearchFilters({ value: filters, onChange }: Props) {
             🐾 Pets allowed
           </button>
 
+          <select
+            value={filters.furnished ?? ''}
+            onChange={e => set('furnished', e.target.value || undefined)}
+            className="border border-border rounded-full px-3 py-1.5 text-sm bg-card text-foreground focus:outline-none"
+          >
+            <option value="">Any furnishings</option>
+            <option value="furnished">Furnished</option>
+            <option value="unfurnished">Unfurnished</option>
+          </select>
+
           {['house', 'apartment', 'townhouse', 'studio'].map(t => (
             <button
               key={t}

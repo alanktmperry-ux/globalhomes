@@ -761,10 +761,8 @@ const Index = () => {
                       <div
                         key={prop.id}
                         className="group relative rounded-xl overflow-hidden border border-border cursor-pointer hover:border-primary/40 hover:shadow-md transition-all"
-                        onClick={() => {
-                          handleSelectProperty(prop as any);
-                          if (prop.lat && prop.lng) setMapCenter({ lat: prop.lat, lng: prop.lng, key: `${prop.lat}-${prop.lng}` });
-                        }}
+                        onClick={() => navigate(`/property/${prop.id}`)}
+                      >
                       >
                         <div className="relative h-40 bg-muted overflow-hidden">
                           {img ? (

@@ -679,9 +679,9 @@ const Index = () => {
   );
 
   return (
-    <div className="flex flex-col bg-background min-h-screen">
+    <div className={`flex flex-col bg-background ${!isMobile ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
     {/* ── Top: Voice Search Bar ─────────────────────────────── */}
-    <div>
+    <div className="shrink-0">
         <VoiceSearchErrorBoundary>
           <VoiceSearchHero
             onSearch={wrappedHandleSearch}
@@ -704,7 +704,6 @@ const Index = () => {
     {!isMobile ? (
       <div
         className="flex overflow-hidden flex-1 min-h-0"
-        style={{ height: 'calc(100vh - 56px)' }}
       >
           {/* LEFT: fixed map panel */}
           <div

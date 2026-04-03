@@ -763,7 +763,6 @@ const Index = () => {
                         className="group relative rounded-xl overflow-hidden border border-border cursor-pointer hover:border-primary/40 hover:shadow-md transition-all"
                         onClick={() => navigate(`/property/${prop.id}`)}
                       >
-                      >
                         <div className="relative h-40 bg-muted overflow-hidden">
                           {img ? (
                             <img src={img} alt={prop.title || prop.address} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />

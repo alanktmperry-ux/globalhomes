@@ -11,6 +11,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useCurrency } from '@/lib/CurrencyContext';
+import { useI18n } from '@/shared/lib/i18n';
 
 export interface Filters {
   priceRange: [number, number];
@@ -159,6 +160,7 @@ function Section({ title, children, defaultOpen = true }: { title: string; child
 
 export function FilterSidebar({ filters, onChange, isOpen, onToggle, totalCount, filteredCount, listingMode = 'sale' }: FilterSidebarProps) {
   const { formatPrice } = useCurrency();
+  const { t } = useI18n();
   const isRental = listingMode === 'rent';
 
   const priceMax = isRental ? 3_000 : 5_000_000;
@@ -210,7 +212,7 @@ export function FilterSidebar({ filters, onChange, isOpen, onToggle, totalCount,
         className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary border border-border text-xs font-medium text-foreground hover:bg-accent transition-colors relative"
       >
         <SlidersHorizontal size={14} />
-        Filters
+        {t('filter.header')}
         {hasActiveFilters && (
           <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
             {activeFilterCount}
@@ -239,7 +241,7 @@ export function FilterSidebar({ filters, onChange, isOpen, onToggle, totalCount,
               {/* Header */}
               <div className="flex items-center justify-between px-5 py-4 border-b border-border">
                 <div>
-                  <h2 className="text-base font-display font-bold text-foreground">Filters</h2>
+                  <h2 className="text-base font-display font-bold text-foreground">{t('filter.header')}</h2>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     {filteredCount} of {totalCount} properties
                   </p>
@@ -250,7 +252,7 @@ export function FilterSidebar({ filters, onChange, isOpen, onToggle, totalCount,
                       onClick={handleReset}
                       className="flex items-center gap-1 text-xs text-destructive hover:text-destructive/80 font-medium transition-colors"
                     >
-                      <RotateCcw size={12} /> Reset
+                      <RotateCcw size={12} /> {t('filter.reset')}
                     </button>
                   )}
                   <button onClick={onToggle} className="w-8 h-8 rounded-lg hover:bg-secondary flex items-center justify-center transition-colors">
@@ -264,17 +266,17 @@ export function FilterSidebar({ filters, onChange, isOpen, onToggle, totalCount,
 
                 {/* ===== RENTAL: Quick rental filters at top ===== */}
                 {isRental && (
-                  <Section title="Rental Preferences">
+                  <Section title={t('filter.petFriendly').split(' ')[0] + ' ' + 'Preferences'}>
                     <ToggleRow
                       icon={PawPrint}
-                      label="Pet friendly"
+                      label={t('filter.petFriendly')}
                       description="Allows cats, dogs, or other pets"
                       checked={filters.petFriendly}
                       onChange={v => update('petFriendly', v)}
                     />
                     <ToggleRow
                       icon={Sofa}
-                      label="Furnished"
+                      label={t('filter.furnished')}
                       description="Fully or partially furnished"
                       checked={filters.furnished}
                       onChange={v => update('furnished', v)}
@@ -284,7 +286,7 @@ export function FilterSidebar({ filters, onChange, isOpen, onToggle, totalCount,
                     <div className="space-y-2 pt-1">
                       <span className="text-sm font-medium text-foreground flex items-center gap-1.5">
                         <CalendarDays size={14} className="text-primary" />
-                        Availability
+                        {t('filter.availability')}
                       </span>
                       <div className="flex gap-2">
                         <button
@@ -299,7 +301,7 @@ export function FilterSidebar({ filters, onChange, isOpen, onToggle, totalCount,
                               : "bg-secondary text-foreground border-border hover:border-primary/50"
                           )}
                         >
-                          Available now
+                          {t('filter.availableNow')}
                         </button>
                         <Popover>
                           <PopoverTrigger asChild>
@@ -402,7 +404,7 @@ export function FilterSidebar({ filters, onChange, isOpen, onToggle, totalCount,
                 </Section>
 
                 {/* Property Type */}
-                <Section title="Property Type">
+                <Section title={t('filter.propertyType')}>
                   <div className="grid grid-cols-2 gap-2">
                     {PROPERTY_TYPES.map(type => (
                       <label key={type} className="flex items-center gap-2 cursor-pointer group">
@@ -417,7 +419,7 @@ export function FilterSidebar({ filters, onChange, isOpen, onToggle, totalCount,
                 </Section>
 
                 {/* Beds / Baths / Parking */}
-                <Section title="Rooms & Parking">
+                <Section title={t('filter.roomsParking')}>
                   <Counter label="Bedrooms" value={filters.minBeds} onChange={v => update('minBeds', v)} />
                   <Counter label="Bathrooms" value={filters.minBaths} onChange={v => update('minBaths', v)} />
                   <Counter label="Parking spots" value={filters.minParking} onChange={v => update('minParking', v)} />
@@ -495,7 +497,7 @@ export function FilterSidebar({ filters, onChange, isOpen, onToggle, totalCount,
                 )}
 
                 {/* Features */}
-                <Section title="Features" defaultOpen={false}>
+                <Section title={t('filter.features')} defaultOpen={false}>
                   <div className="flex flex-wrap gap-2">
                     {COMMON_FEATURES.map(feature => {
                       const active = filters.features.includes(feature);
@@ -520,7 +522,7 @@ export function FilterSidebar({ filters, onChange, isOpen, onToggle, totalCount,
               {/* Footer */}
               <div className="px-5 py-4 border-t border-border">
                 <Button onClick={onToggle} className="w-full">
-                  Show {filteredCount} properties
+                  {t('filter.show').replace('{count}', String(filteredCount))}
                 </Button>
               </div>
             </motion.aside>

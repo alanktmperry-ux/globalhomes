@@ -109,7 +109,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
           )}
           {isFeatured && (
             <span className="absolute top-3 left-3 mt-0 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase shadow-sm bg-primary/90 text-primary-foreground" style={badge ? { marginTop: 28 } : undefined}>
-              ★ Featured
+              ★ {t('property.featured')}
             </span>
           )}
           <button
@@ -135,7 +135,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
                 ? 'bg-emerald-500/90 text-white'
                 : 'bg-blue-500/90 text-white'
             }`}>
-              {isRental ? 'Per Week' : 'For Sale'}
+              {isRental ? t('property.perWeek') : t('listing.forsale')}
             </span>
           </div>
           <TourBadge
@@ -182,18 +182,18 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground bg-secondary/70 px-2 py-0.5 rounded-full">
                 <CalendarDays size={11} />
-                Available Now
+                {t('filter.availableNow')}
               </span>
               {isFurnished && (
                 <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
                   <Sofa size={11} />
-                  Furnished
+                  {t('filter.furnished')}
                 </span>
               )}
               {isPetFriendly && (
                 <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
                   <PawPrint size={11} />
-                  Pet Friendly
+                  {t('filter.petFriendly')}
                 </span>
               )}
             </div>
@@ -289,7 +289,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
                 onClick={(e) => { e.stopPropagation(); setContactOpen(true); }}
                 className="px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors whitespace-nowrap"
               >
-                {isRental ? 'Enquire / Apply' : t('property.contact')}
+                {isRental ? t('property.enquire') : t('property.contact')}
               </button>
             </div>
           </div>

@@ -4,6 +4,7 @@ import { FixedSizeList } from 'react-window';
 import { PropertyCard, CollabReaction } from '@/features/properties/components/PropertyCard';
 import { PropertyCardSkeleton } from '@/features/properties/components/PropertyCardSkeleton';
 import { Property } from '@/shared/lib/types';
+import { useI18n } from '@/shared/lib/i18n';
 
 const CARD_HEIGHT_MOBILE = 520;
 const CARD_HEIGHT_DESKTOP = 540;
@@ -87,6 +88,7 @@ export function VirtualizedPropertyList(props: VirtualizedPropertyListProps) {
   const { properties, isSearching, isMobile, areaSearch, searchRadius, onClearAreaSearch, listingMode } = props;
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerHeight, setContainerHeight] = useState(600);
+  const { t } = useI18n();
 
   useEffect(() => {
     const measure = () => {
@@ -118,10 +120,10 @@ export function VirtualizedPropertyList(props: VirtualizedPropertyListProps) {
         </div>
         <p className="text-sm font-medium text-foreground mb-1">
           {isRentMode
-            ? 'No rental listings found'
+            ? t('empty.noRentals')
             : areaSearch
-              ? 'No properties in this area'
-              : 'No properties found'}
+              ? t('empty.noPropertiesArea')
+              : t('empty.noProperties')}
         </p>
         <p className="text-xs text-muted-foreground max-w-xs mx-auto">
           {isRentMode

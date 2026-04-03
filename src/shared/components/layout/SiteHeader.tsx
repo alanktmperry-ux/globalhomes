@@ -7,10 +7,12 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { NotificationBell } from '@/features/agents/components/dashboard/NotificationBell';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { InvestorModeToggle } from '@/components/investor/InvestorModeToggle';
+import { useI18n } from '@/shared/lib/i18n';
 
 export function SiteHeader() {
   const { currency, setCurrencyCode, listingMode, setListingMode, isLiveRates } = useCurrency();
   const { user, userRole, isAgent, isAdmin } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const [showAgentMenu, setShowAgentMenu] = useState(false);
@@ -62,7 +64,7 @@ export function SiteHeader() {
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            For Sale
+            {t('listing.forsale')}
           </button>
           <button
             onClick={() => {
@@ -75,7 +77,7 @@ export function SiteHeader() {
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            For Rent
+            {t('listing.forrent')}
           </button>
         </div>
 
@@ -182,7 +184,7 @@ export function SiteHeader() {
               >
                 {isAgent ? <Building2 size={13} /> : <Home size={13} />}
                 <span className="text-[11px] font-semibold uppercase tracking-wide">
-                  {isAgent ? 'Agent' : 'Buyer'}
+                  {isAgent ? t('agent.portal') : t('nav.search')}
                 </span>
                 {isAgent && <ChevronDown size={12} />}
               </button>
@@ -201,14 +203,14 @@ export function SiteHeader() {
                       className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors"
                     >
                       <Plus size={14} className="text-primary" />
-                      List a property
+                      {t('header.listProperty')}
                     </button>
                     <button
                       onClick={() => { navigate('/dashboard/listings'); setShowAgentMenu(false); }}
                       className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors"
                     >
                       <List size={14} className="text-muted-foreground" />
-                      My listings
+                      {t('header.myListings')}
                     </button>
                     <div className="border-t border-border" />
                     <button
@@ -228,7 +230,7 @@ export function SiteHeader() {
           <button
             onClick={() => navigate(user ? '/profile' : '/auth')}
             className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-            aria-label={user ? 'Profile' : 'Sign in'}
+            aria-label={user ? t('nav.profile') : t('common.signin')}
           >
             {user ? <User size={18} /> : <LogIn size={18} />}
           </button>

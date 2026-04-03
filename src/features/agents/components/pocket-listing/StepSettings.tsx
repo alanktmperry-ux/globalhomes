@@ -288,11 +288,11 @@ const StepSettings = ({ draft, update }: Props) => {
       ) : (
         /* ═══ SALE SETTINGS ═══ */
         <>
-          {/* Exclusive Period */}
+          {/* Pre-market Period */}
           <div>
             <div className="flex items-center gap-1.5 mb-3">
-              <Label className="text-sm font-semibold">Exclusive Period</Label>
-              <InfoTip text="Days your listing stays exclusively on this platform before going to other portals." />
+              <Label className="text-sm font-semibold">Pre-market Period</Label>
+              <InfoTip text="How long this listing stays whisper/off-market before going public. Separate from your agency agreement exclusive period." />
             </div>
             <div className="flex gap-2">
               {EXCLUSIVE_OPTIONS.map((d) => (

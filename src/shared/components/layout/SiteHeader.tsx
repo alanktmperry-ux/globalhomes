@@ -1,29 +1,24 @@
 import { useState, useRef, useEffect } from 'react';
 import { Globe, ChevronDown, User, LogIn, Home, Building2, Plus, List, LayoutDashboard, ShieldCheck } from 'lucide-react';
+// ChevronDown retained for agent dropdown
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useCurrency, CURRENCIES, CURRENCY_REGIONS, CurrencyCode } from '@/shared/lib/CurrencyContext';
+import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { NotificationBell } from '@/features/agents/components/dashboard/NotificationBell';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { InvestorModeToggle } from '@/components/investor/InvestorModeToggle';
 import { useI18n } from '@/shared/lib/i18n';
 
 export function SiteHeader() {
-  const { currency, setCurrencyCode, listingMode, setListingMode, isLiveRates } = useCurrency();
+  const { listingMode, setListingMode } = useCurrency();
   const { user, userRole, isAgent, isAdmin } = useAuth();
   const { t } = useI18n();
   const navigate = useNavigate();
-  const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const [showAgentMenu, setShowAgentMenu] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const agentMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setShowCurrencyDropdown(false);
-      }
       if (agentMenuRef.current && !agentMenuRef.current.contains(e.target as Node)) {
         setShowAgentMenu(false);
       }
@@ -45,12 +40,6 @@ export function SiteHeader() {
           </span>
         </Link>
         
-        {/* Links - hidden on small screens */}
-        <div className="hidden md:flex items-center gap-3">
-          <Link to="/terms" className="text-[11px] text-muted-foreground hover:text-foreground transition-colors">Terms</Link>
-          <Link to="/privacy" className="text-[11px] text-muted-foreground hover:text-foreground transition-colors">Privacy</Link>
-        </div>
-
         {/* Sale / Rent toggle */}
         <div className="flex items-center bg-secondary rounded-full p-0.5 shrink-0">
           <button
@@ -83,63 +72,6 @@ export function SiteHeader() {
 
         {/* Right side actions */}
         <div className="flex items-center gap-2 shrink-0">
-          {/* Currency selector */}
-          <div ref={dropdownRef} className="relative">
-            <button
-              onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-secondary text-sm font-medium text-foreground hover:bg-accent transition-colors"
-            >
-              {isLiveRates && (
-                <span className="flex items-center gap-1 text-[10px] font-medium text-emerald-500 mr-0.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Live
-                </span>
-              )}
-              <span>{currency.label}</span>
-              <ChevronDown size={14} className="text-muted-foreground" />
-            </button>
-
-            <AnimatePresence>
-              {showCurrencyDropdown && (
-                <motion.div
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
-                  className="absolute right-0 top-full mt-1 w-44 bg-popover border border-border rounded-xl shadow-elevated overflow-hidden z-50 max-h-80 overflow-y-auto"
-                >
-                  {CURRENCY_REGIONS.map((region) => (
-                    <div key={region.region}>
-                      <div className="px-3 pt-2.5 pb-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                        {region.region}
-                      </div>
-                      {region.currencies.map((code) => {
-                        const c = CURRENCIES.find((cur) => cur.code === code);
-                        if (!c) return null;
-                        return (
-                          <button
-                            key={c.code}
-                            onClick={() => {
-                              setCurrencyCode(c.code as CurrencyCode);
-                              setShowCurrencyDropdown(false);
-                            }}
-                            className={`w-full text-left px-4 py-2 text-sm transition-colors ${
-                              c.code === currency.code
-                                ? 'bg-primary/10 text-primary font-medium'
-                                : 'text-foreground hover:bg-accent'
-                            }`}
-                          >
-                            {c.label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          <InvestorModeToggle />
           <LanguageSwitcher />
 
           {/* Agent dashboard shortcut – always visible for agents */}

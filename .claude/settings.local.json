@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -r \"STRIPE\\\\|stripe\" /Users/alanperry/Downloads/globalhomes-main/.env*)",
+      "Bash(grep -l \"user_roles\\\\|CREATE TABLE agents\\\\|CREATE TABLE profiles\" /Users/alanperry/Downloads/globalhomes-main/supabase/migrations/*.sql)",
+      "Bash(grep -h \"CREATE TABLE\\\\|ENABLE ROW LEVEL SECURITY\" /Users/alanperry/Downloads/globalhomes-main/supabase/migrations/*.sql)",
+      "Bash(grep -n \"FOR SELECT USING \\(true\\)\" /Users/alanperry/Downloads/globalhomes-main/supabase/migrations/*.sql)",
+      "Bash(grep -A30 \"CREATE TABLE public.trust_accounts\\\\|CREATE TABLE public.trust_transactions\\\\|trust_accounts.*RLS\\\\|trust_transactions.*RLS\" /Users/alanperry/Downloads/globalhomes-main/supabase/migrations/*.sql)",
+      "Bash(find /Users/alanperry/Downloads/globalhomes-main/src -type f -name *SEO* -o -name *Helmet* -o -name *Meta*)",
+      "Bash(grep -E \"\\\\.\\(tsx|ts\\)$\")",
+      "Bash(find /Users/alanperry/Downloads/globalhomes-main/src -name \"*.tsx\" -exec wc -l {} +)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}

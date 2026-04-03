@@ -1,0 +1,1 @@
+ALTER TABLE public.agents ADD COLUMN IF NOT EXISTS onboarding_complete BOOLEAN DEFAULT false;

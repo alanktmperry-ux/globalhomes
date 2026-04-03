@@ -1,0 +1,43 @@
+project_id = "ngrkbohpmkzjonaofgbb"
+
+[functions.google-maps-proxy]
+verify_jwt = false
+
+[functions.manus-search]
+verify_jwt = false
+
+[functions.manus-task-status]
+verify_jwt = false
+
+[functions.voice-search]
+verify_jwt = false
+
+[functions.capture-lead]
+verify_jwt = false
+
+[functions.send-notification-email]
+verify_jwt = false
+
+[functions.setup-agent]
+verify_jwt = false
+
+[functions.admin-users]
+verify_jwt = false
+
+[functions.match-saved-searches]
+verify_jwt = false
+
+[functions.get-exchange-rates]
+verify_jwt = false
+
+[functions.handle-demo-request]
+verify_jwt = false
+
+[functions.generate-listing]
+verify_jwt = false
+
+[functions.get-featured-listings]
+verify_jwt = false
+
+[functions.send-marketing-email]
+verify_jwt = false

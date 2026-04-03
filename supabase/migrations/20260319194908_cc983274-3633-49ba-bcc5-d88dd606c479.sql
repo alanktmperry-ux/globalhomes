@@ -1,0 +1,1 @@
+UPDATE auth.users SET email_confirmed_at = NULL WHERE email = 'alan@everythingeco.com.au';

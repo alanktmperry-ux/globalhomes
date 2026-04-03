@@ -1,0 +1,839 @@
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { PropertySEOHead } from '@/features/seo/components/PropertySEOHead';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Calendar, Eye, Home, BadgeCheck, Star, X, PawPrint, Sofa, Clock, FileText, Users } from 'lucide-react';
+import { Property } from '@/shared/lib/types';
+import { useI18n } from '@/shared/lib/i18n';
+import { useCurrency } from '@/shared/lib/CurrencyContext';
+import { AgentContactModal } from '@/features/agents/components/AgentContactModal';
+import { InvestmentInsightsCard } from '@/features/properties/components/InvestmentInsightsCard';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { useSavedProperties } from '@/features/properties/hooks/useSavedProperties';
+import { useIsMobile } from '@/shared/hooks/use-mobile';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { RentalEnquiryForm } from '@/features/properties/components/RentalEnquiryForm';
+import { InspectionBookingModal } from '@/features/properties/components/InspectionBookingModal';
+import { PriceHistoryChart } from '@/features/properties/components/PriceHistoryChart';
+import { RentalApplicationModal } from '@/features/properties/components/RentalApplicationModal';
+import { InspectionSlot } from '@/shared/lib/types';
+import { StampDutyCalculator } from '@/components/StampDutyCalculator';
+import { detectStateFromAddress } from '@/lib/stampDuty';
+import { SchoolsNearby } from '@/components/SchoolsNearby';
+import { SuburbClearanceRate } from '@/components/auction/SuburbClearanceRate';
+import { DaysOnMarketBadge } from '@/components/auction/DaysOnMarketBadge';
+import { PriceGuideHistory } from '@/components/auction/PriceGuideHistory';
+import { AuctionRegisterPanel } from '@/components/auction/AuctionRegisterPanel';
+import { AuctionResultBadge } from '@/components/auction/AuctionResultBadge';
+import { InvestorCalculatorPanel } from '@/components/investor/InvestorCalculatorPanel';
+import { useInvestorMode } from '@/context/InvestorModeContext';
+import { ComparableSales } from '@/components/comparable/ComparableSales';
+import { TourTabStrip } from '@/components/tour/TourTabStrip';
+import { WhatSoldNearby } from '@/features/market/components/WhatSoldNearby';
+import { SuburbMarketSnapshot } from '@/features/market/components/SuburbMarketSnapshot';
+import { OpenHomeSection } from '@/features/open-homes/components/OpenHomeSection';
+import { OffMarketBadge } from '@/features/offmarket/components/OffMarketBadge';
+import { EOISubmitPanel } from '@/features/offmarket/components/EOISubmitPanel';
+import { useLogPropertyView } from '@/features/vendor/hooks/useLogPropertyView';
+import { DocumentVault } from '@/features/documents/components/DocumentVault';
+import { useAuth } from '@/features/auth/AuthProvider';
+
+export default function PropertyDetailPage() {
+  // Support both /property/:slug and /property/:uuid for backward compat
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { t } = useI18n();
+  const { formatPrice, currency, listingMode } = useCurrency();
+  const { isSaved, toggleSaved } = useSavedProperties();
+  const isMobile = useIsMobile();
+  const { investorMode } = useInvestorMode();
+  const { user } = useAuth();
+
+  const [property, setProperty] = useState<Property | null>(null);
+  useLogPropertyView(property?.id);
+  const [loading, setLoading] = useState(true);
+  const [imageIndex, setImageIndex] = useState(0);
+  const [contactOpen, setContactOpen] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [rentalEnquiryOpen, setRentalEnquiryOpen] = useState(false);
+  const [inspectionBookingOpen, setInspectionBookingOpen] = useState(false);
+  const [rentalApplicationOpen, setRentalApplicationOpen] = useState(false);
+  const [inspectionTimes, setInspectionTimes] = useState<InspectionSlot[]>([]);
+  useEffect(() => {
+    const fetchProperty = async () => {
+      setLoading(true);
+
+      if (!id) {
+        setProperty(null);
+        setLoading(false);
+        return;
+      }
+
+      // Support slug-based or UUID-based lookups
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+      const query = supabase
+        .from('properties')
+        .select('*, agents(id, name, agency, phone, email, avatar_url, is_subscribed)')
+        .eq(isUuid ? 'id' : 'slug', id)
+        .single();
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.warn('[PropertyDetail] Fetch failed:', error.message);
+      }
+
+      if (data) {
+        const p: any = data;
+        setProperty({
+          id: p.id,
+          title: p.title,
+          address: p.address,
+          suburb: p.suburb,
+          state: p.state,
+          country: p.country,
+          price: p.price,
+          priceFormatted: p.price_formatted,
+          beds: p.beds,
+          baths: p.baths,
+          parking: p.parking,
+          sqm: p.sqm,
+          imageUrl: p.image_url || p.images?.[0] || '',
+          images: p.images || (p.image_url ? [p.image_url] : []),
+          description: p.description || '',
+          estimatedValue: p.estimated_value || '',
+          propertyType: p.property_type || 'House',
+          features: p.features || [],
+          agent: p.agents ? {
+            id: p.agents.id || p.agent_id || '',
+            name: p.agents.name || 'Agent',
+            agency: p.agents.agency || '',
+            phone: p.agents.phone || '',
+            email: p.agents.email || '',
+            avatarUrl: p.agents.avatar_url || '',
+            isSubscribed: p.agents.is_subscribed || false,
+          } : { id: '', name: 'Private Seller', agency: '', phone: '', email: '', avatarUrl: '', isSubscribed: false },
+          listedDate: p.listed_date || p.created_at,
+          views: (p.views ?? 0) + 1,
+          contactClicks: p.contact_clicks,
+          status: 'listed',
+          rentalYieldPct: p.rental_yield_pct,
+          strPermitted: p.str_permitted,
+          yearBuilt: p.year_built,
+          councilRatesAnnual: p.council_rates_annual,
+          strataFeesQuarterly: p.strata_fees_quarterly,
+          rentalWeekly: p.rental_weekly,
+          currencyCode: p.currency_code,
+          listingType: p.listing_type || null,
+          inspectionTimes: Array.isArray(p.inspection_times) ? p.inspection_times : [],
+        });
+        setInspectionTimes(Array.isArray(p.inspection_times) ? p.inspection_times : []);
+
+        // Fire-and-forget: atomically increment view count in DB
+        supabase.rpc('increment_property_views', { property_id: p.id }).then(({ error: rpcErr }) => {
+          if (rpcErr) {
+            // Fallback: direct update if RPC doesn't exist yet
+            supabase
+              .from('properties')
+              .update({ views: (p.views ?? 0) + 1 })
+              .eq('id', p.id)
+              .then(({ error: updateErr }) => {
+                if (updateErr) console.warn('[PropertyDetail] View count update failed:', updateErr.message);
+              });
+          }
+        });
+      } else {
+        setProperty(null);
+      }
+      setLoading(false);
+    };
+    fetchProperty();
+  }, [id]);
+
+  // ── Increment view count (fire-and-forget, once per page load) ──
+  const viewTracked = useRef(false);
+  useEffect(() => {
+    if (!property || viewTracked.current) return;
+    viewTracked.current = true;
+
+    supabase.rpc('increment_property_views', { property_id: property.id }).then(({ error }) => {
+      if (error) {
+        // Fallback: direct update if the RPC doesn't exist yet
+        supabase
+          .from('properties')
+          .update({ views: (property.views || 0) + 1 })
+          .eq('id', property.id)
+          .then(({ error: updateError }) => {
+            if (updateError) console.warn('[PropertyDetail] View increment failed:', updateError.message);
+          });
+      }
+    });
+  }, [property]);
+
+  const prevImage = () => setImageIndex(i => (i > 0 ? i - 1 : (property?.images.length || 1) - 1));
+  const nextImage = () => setImageIndex(i => (i < (property?.images.length || 1) - 1 ? i + 1 : 0));
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!property) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center gap-4">
+        <Home size={48} className="text-muted-foreground" />
+        <h1 className="font-display text-xl font-bold text-foreground">Property not found</h1>
+        <button onClick={() => navigate('/')} className="px-6 py-2 rounded-xl bg-primary text-primary-foreground font-medium text-sm">
+          Back to search
+        </button>
+      </div>
+    );
+  }
+
+  const saved = isSaved(property.id);
+  const images = property.images.length > 0 ? property.images : [property.imageUrl];
+  const isRental = listingMode === 'rent' || property.listingType === 'rent' || property.listingType === 'rental' || property.price < 50000;
+
+  // Rental-specific derived data
+  const featuresLower = (property.features || []).map(f => f.toLowerCase());
+  const isPetFriendly = featuresLower.some(f => f.includes('pet') || f.includes('dog') || f.includes('cat'));
+  const isFurnished = featuresLower.some(f => f.includes('furnished'));
+  const weeklyRent = property.rentalWeekly || property.price;
+  const bondAmount = weeklyRent * 4;
+
+  const statusConfig: Record<string, { label: string; className: string }> = {
+    'off-market': { label: 'Off-Market', className: 'bg-amber-500/90 text-white' },
+    'coming-soon': { label: 'Coming Soon', className: 'bg-blue-500/90 text-white' },
+    'new': { label: 'New', className: 'bg-emerald-500/90 text-white' },
+  };
+  const badge = property.status && property.status !== 'listed' ? statusConfig[property.status] : null;
+
+  const handleCtaClick = () => {
+    if (isRental) {
+      setRentalEnquiryOpen(true);
+    } else {
+      setContactOpen(true);
+    }
+  };
+
+  const ctaLabel = isRental ? 'Enquire / Apply' : t('property.contact');
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      <PropertySEOHead property={{
+        ...property,
+        images: property.images,
+        image_url: property.imageUrl,
+        price: property.price,
+        price_formatted: property.priceFormatted,
+        beds: property.beds,
+        baths: property.baths,
+        property_type: property.propertyType,
+        suburb: property.suburb,
+        state: property.state,
+        description: property.description,
+        listing_type: property.listingType,
+        title: property.title,
+        address: property.address,
+        id: property.id,
+      }} agent={property.agent} />
+      {/* Back button */}
+      <div className="max-w-6xl mx-auto w-full px-4 pt-4">
+        <button
+          onClick={() => navigate(-1)}
+          className="w-10 h-10 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors mb-4"
+        >
+          <ArrowLeft size={18} />
+        </button>
+      </div>
+
+      <main className="flex-1 max-w-6xl mx-auto w-full px-4 pb-24 md:pb-12">
+        {/* Hero image gallery */}
+        <div className="relative rounded-2xl overflow-hidden aspect-[16/9] md:aspect-[2.4/1] mb-4">
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={imageIndex}
+              src={images[imageIndex]}
+              alt={`${property.title} - Photo ${imageIndex + 1}`}
+              className="w-full h-full object-cover cursor-pointer"
+              onClick={() => setLightboxOpen(true)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            />
+          </AnimatePresence>
+
+          {images.length > 1 && (
+            <>
+              <button onClick={prevImage} className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors shadow-md">
+                <ChevronLeft size={20} />
+              </button>
+              <button onClick={nextImage} className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors shadow-md">
+                <ChevronRight size={20} />
+              </button>
+            </>
+          )}
+
+          <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-full bg-card/80 backdrop-blur-sm text-xs font-medium text-foreground">
+            {imageIndex + 1}/{images.length}
+          </div>
+
+          {/* Badges */}
+          <div className="absolute top-4 left-4 flex gap-2">
+            {badge && (
+              <span className={`px-3 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase shadow-sm ${badge.className}`}>
+                {badge.label}
+              </span>
+            )}
+            <span className="px-3 py-1.5 rounded-full bg-card/80 backdrop-blur-sm text-xs font-bold tracking-wide uppercase text-foreground">
+              {property.propertyType}
+            </span>
+            {isRental && property.contactClicks > 0 && (
+              <span className="px-3 py-1.5 rounded-full bg-primary/90 text-primary-foreground text-xs font-bold tracking-wide uppercase shadow-sm flex items-center gap-1">
+                <Users size={12} />
+                {property.contactClicks} application{property.contactClicks !== 1 ? 's' : ''}
+              </span>
+            )}
+          </div>
+
+          {/* Action buttons */}
+          <div className="absolute top-4 right-4 flex gap-2">
+            <button
+              onClick={() => toggleSaved(property.id)}
+              className="w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center transition-transform active:scale-90 shadow-md"
+            >
+              <Heart size={18} className={saved ? 'fill-destructive text-destructive' : 'text-foreground/70'} />
+            </button>
+            <button
+              onClick={async () => {
+                const url = window.location.href;
+                const title = property.title;
+                const text = `${property.title} — ${property.address}, ${property.suburb}`;
+                if (navigator.share) {
+                  try { await navigator.share({ title, text, url }); } catch {}
+                } else {
+                  await navigator.clipboard.writeText(url);
+                  toast.success('Link copied to clipboard!');
+                }
+              }}
+              className="w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center shadow-md"
+            >
+              <Share2 size={18} className="text-foreground/70" />
+            </button>
+          </div>
+        </div>
+
+        {/* Thumbnail strip */}
+        {images.length > 1 && (
+          <div className="flex gap-2 mb-6 overflow-x-auto pb-1 snap-x snap-mandatory scroll-smooth">
+            {images.map((img, i) => (
+              <button
+                key={i}
+                onClick={() => setImageIndex(i)}
+                className={`shrink-0 w-20 h-14 rounded-lg overflow-hidden border-2 transition-all snap-start ${
+                  i === imageIndex ? 'border-primary shadow-md' : 'border-transparent opacity-60 hover:opacity-100'
+                }`}
+              >
+                <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" />
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Content grid */}
+        <div className="grid md:grid-cols-3 gap-6">
+          {/* Main content - 2 cols */}
+          <div className="md:col-span-2 space-y-6">
+            {/* Price + title */}
+            <div>
+              {isRental ? (
+                <>
+                  <div className="flex items-baseline gap-2">
+                    <p className="font-display text-3xl md:text-4xl font-bold text-foreground">
+                      {formatPrice(weeklyRent, 'rent')}
+                    </p>
+                    <span className="text-lg text-muted-foreground font-medium">per week</span>
+                  </div>
+                  {currency.code !== 'AUD' && (
+                    <p className="text-sm text-muted-foreground mt-0.5">${weeklyRent.toLocaleString()}/wk AUD</p>
+                  )}
+                </>
+              ) : (
+                <>
+                  <p className="font-display text-3xl md:text-4xl font-bold text-foreground">{formatPrice(property.price)}</p>
+                  {currency.code !== 'AUD' && (
+                    <p className="text-sm text-muted-foreground mt-0.5">{property.priceFormatted} AUD</p>
+                  )}
+                </>
+              )}
+              <div className="flex items-center gap-2 mt-2">
+                <h1 className="font-display text-xl md:text-2xl font-semibold text-foreground">{property.title}</h1>
+                {(property as any).listing_mode && (property as any).listing_mode !== 'public' && (
+                  <OffMarketBadge mode={(property as any).listing_mode} closeDate={(property as any).eoi_close_date} />
+                )}
+              </div>
+              <p className="flex items-center gap-1.5 text-muted-foreground mt-1.5">
+                <MapPin size={16} />
+                {(property as any).address_hidden
+                  ? `${property.suburb}, ${property.state}`
+                  : `${property.address}, ${property.suburb}, ${property.state}`}
+                {property.country && property.country !== 'Australia' ? `, ${property.country}` : ''}
+              </p>
+              {property.suburb && property.state && (
+                <Link
+                  to={`/suburb/${property.state.toLowerCase()}/${property.suburb.toLowerCase().replace(/\s+/g, '-')}`}
+                  className="inline-flex items-center gap-1.5 mt-2 text-xs text-primary hover:underline font-medium"
+                >
+                  📊 {property.suburb} Suburb Report →
+                </Link>
+              )}
+              {((property as any).listing_mode === 'eoi' || (property as any).listing_mode === 'off_market') && (
+                <div className="mt-4">
+                  <EOISubmitPanel
+                    propertyId={property.id}
+                    listingMode={(property as any).listing_mode}
+                    guidePrice={(property as any).eoi_guide_price}
+                    closeDate={(property as any).eoi_close_date}
+                    agentName={property.agent?.name}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Key stats */}
+            <div className="grid grid-cols-4 gap-3">
+              {[
+                { icon: Bed, value: property.beds, label: t('property.beds') },
+                { icon: Bath, value: property.baths, label: t('property.baths') },
+                { icon: Car, value: property.parking, label: t('property.parking') },
+                { icon: Ruler, value: `${property.sqm}m²`, label: 'Size' },
+              ].map(stat => (
+                <div key={stat.label} className="flex flex-col items-center p-4 rounded-xl bg-secondary">
+                  <stat.icon size={20} className="text-primary mb-1.5" />
+                  <span className="font-display font-bold text-foreground">{stat.value}</span>
+                  <span className="text-xs text-muted-foreground">{stat.label}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Rental Info Section */}
+            {isRental && (
+              <div className="p-5 rounded-2xl bg-card border border-border shadow-card">
+                <h2 className="font-display text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <FileText size={18} className="text-primary" />
+                  Rental Information
+                </h2>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 rounded-xl bg-secondary">
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Available From</p>
+                    <p className="text-sm font-semibold text-foreground mt-1 flex items-center gap-1.5">
+                      <Calendar size={14} className="text-primary" />
+                      Available Now
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-secondary">
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Lease Term</p>
+                    <p className="text-sm font-semibold text-foreground mt-1 flex items-center gap-1.5">
+                      <Clock size={14} className="text-primary" />
+                      6 – 12 months
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-secondary">
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Bond</p>
+                    <p className="text-sm font-semibold text-foreground mt-1">
+                      {formatPrice(bondAmount, 'sale')} <span className="text-xs text-muted-foreground font-normal">(4 weeks)</span>
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-secondary">
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Pet Policy</p>
+                    <p className="text-sm font-semibold mt-1 flex items-center gap-1.5">
+                      <PawPrint size={14} className={isPetFriendly ? 'text-emerald-500' : 'text-muted-foreground'} />
+                      <span className={isPetFriendly ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}>
+                        {isPetFriendly ? 'Pets Allowed' : 'On Application'}
+                      </span>
+                    </p>
+                  </div>
+                  {isFurnished && (
+                    <div className="col-span-2 p-3 rounded-xl bg-primary/5 border border-primary/10">
+                      <p className="text-sm font-semibold text-primary flex items-center gap-1.5">
+                        <Sofa size={14} />
+                        This property is furnished
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Inspection Times — for all property types */}
+            <div className="p-5 rounded-2xl bg-card border border-border shadow-card">
+              <h2 className="font-display text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                <Eye size={18} className="text-primary" />
+                Inspection Times
+              </h2>
+              {(() => {
+                const upcoming = inspectionTimes.filter(s => new Date(`${s.date}T${s.start}`) > new Date());
+                if (upcoming.length === 0) {
+                  return (
+                    <>
+                      <p className="text-sm text-muted-foreground">
+                        No scheduled inspections. Contact agent for inspection times.
+                      </p>
+                      <button
+                        onClick={handleCtaClick}
+                        className="mt-3 px-5 py-2.5 rounded-xl bg-secondary text-foreground font-medium text-sm hover:bg-accent transition-colors"
+                      >
+                        Request Inspection
+                      </button>
+                    </>
+                  );
+                }
+                return (
+                  <div className="space-y-2">
+                    {upcoming.map((slot, i) => {
+                      const dayStr = new Date(slot.date).toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
+                      return (
+                        <button
+                          key={`${slot.date}-${slot.start}`}
+                          onClick={() => setInspectionBookingOpen(true)}
+                          className="w-full flex items-center gap-3 p-3 rounded-xl border border-border bg-secondary hover:border-primary/40 text-left transition-all group"
+                        >
+                          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                            <Calendar size={16} className="text-primary group-hover:text-primary-foreground" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-foreground">{dayStr}</p>
+                            <p className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Clock size={10} /> {slot.start} – {slot.end}
+                            </p>
+                          </div>
+                          <span className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                            Book
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Detail chips */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {property.estimatedValue && !isRental && (
+                <div className="col-span-2 sm:col-span-3 p-4 rounded-xl bg-primary/5 border border-primary/10">
+                  <p className="text-xs text-primary font-medium uppercase tracking-wider">{t('property.estimated')}</p>
+                  <p className="font-display font-bold text-foreground text-lg mt-1">{property.estimatedValue}</p>
+                </div>
+              )}
+              {property.listedDate && (
+                <div className="p-3 rounded-xl bg-secondary flex items-center gap-3">
+                  <Calendar size={16} className="text-muted-foreground shrink-0" />
+                  <div>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Listed</p>
+                    <p className="text-sm font-semibold text-foreground">{new Date(property.listedDate).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                  </div>
+                </div>
+              )}
+              {property.views > 0 && (
+                <div className="p-3 rounded-xl bg-secondary flex items-center gap-3">
+                  <Eye size={16} className="text-muted-foreground shrink-0" />
+                  <div>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Views</p>
+                    <p className="text-sm font-semibold text-foreground">{property.views.toLocaleString()}</p>
+                  </div>
+                </div>
+              )}
+              <div className="p-3 rounded-xl bg-secondary flex items-center gap-3">
+                <Home size={16} className="text-muted-foreground shrink-0" />
+                <div>
+                  <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Type</p>
+                  <p className="text-sm font-semibold text-foreground">{property.propertyType}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Virtual Tour / Video / Floor Plan */}
+            {((property as any).virtual_tour_url || (property as any).video_url || (property as any).floor_plan_url) && (
+              <TourTabStrip
+                virtualTourUrl={(property as any).virtual_tour_url ?? null}
+                videoUrl={(property as any).video_url ?? null}
+                floorPlanUrl={(property as any).floor_plan_url ?? null}
+                propertyAddress={property.address}
+              />
+            )}
+
+            {/* Description */}
+            {property.description && (
+              <div>
+                <h2 className="font-display text-lg font-semibold text-foreground mb-3">Description</h2>
+                <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{property.description}</p>
+              </div>
+            )}
+
+            {/* Stamp Duty Calculator (sale properties only) */}
+            {!isRental && (
+              <StampDutyCalculator
+                propertyPrice={property.price}
+                propertyAddress={`${property.address ?? ''}, ${property.suburb ?? ''}, ${property.state ?? ''}`}
+                propertyState={detectStateFromAddress(`${property.address ?? ''}, ${property.state ?? ''}`)}
+              />
+            )}
+
+            {/* Investment Calculator (sale properties, investor mode) */}
+            {!isRental && investorMode && (
+              <InvestorCalculatorPanel
+                propertyId={property.id}
+                price={property.price}
+                estimatedWeeklyRent={(property as any).estimated_weekly_rent ?? property.rentalWeekly ?? null}
+                suburb={property.suburb}
+                state={property.state}
+                isNewBuild={(property as any).is_new_build ?? false}
+                propertyAgeYears={(property as any).property_age_years ?? null}
+              />
+            )}
+
+            {/* Auction Intelligence */}
+            <AuctionResultBadge propertyId={property.id} agentId={property.agent?.id} />
+
+            {(property as any).auction_date && (
+              <SuburbClearanceRate suburb={property.suburb} state={property.state} />
+            )}
+
+            {((property as any).price_guide_low || (property as any).price_guide_high) && (
+              <div className="p-4 rounded-2xl bg-card border border-border">
+                <p className="text-sm font-medium text-foreground">Price guide</p>
+                <p className="text-xl font-bold text-foreground mt-1">
+                  {(property as any).price_guide_low && `$${Number((property as any).price_guide_low).toLocaleString()}`}
+                  {(property as any).price_guide_low && (property as any).price_guide_high && (property as any).price_guide_low !== (property as any).price_guide_high
+                    ? ` – $${Number((property as any).price_guide_high).toLocaleString()}` : ''}
+                </p>
+                <PriceGuideHistory propertyId={property.id} currentLow={(property as any).price_guide_low} currentHigh={(property as any).price_guide_high} />
+              </div>
+            )}
+
+            {(property as any).auction_date && (
+              <AuctionRegisterPanel
+                propertyId={property.id}
+                auctionDate={(property as any).auction_date ?? null}
+                registrationCount={0}
+              />
+            )}
+
+            {/* Open Homes */}
+            <OpenHomeSection propertyId={property.id} propertyAddress={property.address} />
+
+            {/* Document Vault */}
+            <div id="documents">
+              <DocumentVault
+                propertyId={property.id}
+                viewerRole={user ? 'buyer' : 'public'}
+                canUpload={false}
+              />
+            </div>
+
+            {/* Comparable Sales */}
+            {!isRental && (
+              <ComparableSales
+                propertyId={property.id}
+                lat={property.lat ?? null}
+                lng={property.lng ?? null}
+                bedrooms={property.beds ?? 2}
+                price={property.price ?? null}
+                suburb={property.suburb}
+                state={property.state}
+                subjectAddress={property.address}
+              />
+            )}
+
+            {/* What Sold Nearby */}
+            {!isRental && property.suburb && property.state && (
+              <WhatSoldNearby propertyId={property.id} suburb={property.suburb} state={property.state} />
+            )}
+
+            {/* Suburb Market Snapshot */}
+            {!isRental && property.suburb && property.state && (
+              <SuburbMarketSnapshot
+                suburb={property.suburb}
+                state={property.state}
+                propertyType={property.propertyType || 'house'}
+              />
+            )}
+
+            {/* Schools Nearby */}
+            <SchoolsNearby propertyId={property.id} />
+
+            {/* Price History */}
+            <PriceHistoryChart
+              propertyId={property.id}
+              currentPrice={property.price}
+              listedDate={property.listedDate}
+              priceFormatted={property.priceFormatted}
+              suburb={property.suburb}
+              state={property.state}
+              propertyType={property.propertyType}
+            />
+
+            {/* Features */}
+            {property.features.length > 0 && (
+              <div>
+                <h2 className="font-display text-lg font-semibold text-foreground mb-3">Features</h2>
+                <div className="flex flex-wrap gap-2">
+                  {property.features.map(f => (
+                    <span key={f} className="px-3 py-1.5 rounded-full bg-secondary text-sm font-medium text-secondary-foreground">
+                      {f}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-4">
+            {/* Investment Insights (hide for rentals) */}
+            {!isRental && <InvestmentInsightsCard property={property} />}
+
+            <div className="p-5 rounded-2xl bg-card border border-border shadow-card sticky top-4">
+              <h3 className="font-display font-semibold text-foreground mb-4">{t('property.agent')}</h3>
+              <Link to={property.agent.id ? `/agent/${property.agent.id}` : '#'} className="flex items-center gap-3 mb-5 group/agent cursor-pointer">
+                <div className="relative">
+                  <Avatar className="w-16 h-16 border-2 border-primary transition-transform group-hover/agent:scale-105">
+                    <AvatarImage src={property.agent.avatarUrl} alt={property.agent.name} className="object-cover" />
+                    <AvatarFallback className="text-lg font-bold">{property.agent.name[0]}</AvatarFallback>
+                  </Avatar>
+                  {property.agent.isSubscribed && (
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                      <BadgeCheck size={14} className="text-primary-foreground" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className="font-display font-semibold text-foreground text-lg group-hover/agent:text-primary transition-colors">{property.agent.name}</p>
+                  <p className="text-sm text-muted-foreground">{property.agent.agency}</p>
+                  {property.agent.rating ? (
+                    <div className="flex items-center gap-1 mt-1">
+                      <Star size={14} className="fill-yellow-400 text-yellow-400" />
+                      <span className="text-sm font-medium text-foreground">{property.agent.rating.toFixed(1)}</span>
+                      {property.agent.reviewCount ? (
+                        <span className="text-xs text-muted-foreground">({property.agent.reviewCount} review{property.agent.reviewCount !== 1 ? 's' : ''})</span>
+                      ) : null}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground mt-1">No reviews yet</p>
+                  )}
+                  <span className="text-xs text-primary font-medium mt-1 inline-block">View profile →</span>
+                </div>
+              </Link>
+
+              {property.agent.isSubscribed && (
+                <span className="inline-block px-3 py-1 rounded-md bg-success text-success-foreground text-xs font-medium mb-4">
+                  {t('agent.subscribed')}
+                </span>
+              )}
+
+              <button
+                onClick={handleCtaClick}
+                className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors"
+              >
+               {ctaLabel}
+              </button>
+
+              {isRental && (
+                <button
+                  onClick={() => setRentalApplicationOpen(true)}
+                  className="w-full mt-3 py-3.5 rounded-xl border-2 border-primary text-primary font-semibold text-sm hover:bg-primary hover:text-primary-foreground transition-colors"
+                >
+                  Apply Now
+                </button>
+              )}
+
+              {property.agent.phone && (
+                <a
+                  href={`tel:${property.agent.phone}`}
+                  className="w-full mt-3 py-3 rounded-xl border border-border bg-secondary text-foreground font-medium text-sm flex items-center justify-center gap-2 hover:bg-accent transition-colors"
+                >
+                  📞 {property.agent.phone}
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Mobile sticky CTA */}
+      {isMobile && (
+        <div className="fixed bottom-16 left-0 right-0 p-4 bg-card/95 backdrop-blur-sm border-t border-border z-30">
+          <button
+            onClick={handleCtaClick}
+            className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm"
+          >
+            {ctaLabel}
+          </button>
+        </div>
+      )}
+
+      {/* Lightbox */}
+      <AnimatePresence>
+        {lightboxOpen && (
+          <motion.div
+            className="fixed inset-0 z-[60] bg-black/95 flex items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <button onClick={() => setLightboxOpen(false)} className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white z-10">
+              <X size={20} />
+            </button>
+            <button onClick={prevImage} className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white">
+              <ChevronLeft size={24} />
+            </button>
+            <button onClick={nextImage} className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white">
+              <ChevronRight size={24} />
+            </button>
+            <img src={images[imageIndex]} alt="" className="max-w-[90vw] max-h-[85vh] object-contain rounded-lg" />
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/80 text-sm font-medium">
+              {imageIndex + 1} / {images.length}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+
+      <AgentContactModal
+        property={property}
+        open={contactOpen}
+        onClose={() => setContactOpen(false)}
+      />
+
+      {isRental && (
+        <RentalEnquiryForm
+          property={property}
+          open={rentalEnquiryOpen}
+          onClose={() => setRentalEnquiryOpen(false)}
+        />
+      )}
+
+      <InspectionBookingModal
+        property={property}
+        inspectionTimes={inspectionTimes}
+        open={inspectionBookingOpen}
+        onClose={() => setInspectionBookingOpen(false)}
+      />
+
+      {isRental && (
+        <RentalApplicationModal
+          property={property}
+          open={rentalApplicationOpen}
+          onClose={() => setRentalApplicationOpen(false)}
+        />
+      )}
+    </div>
+  );
+}

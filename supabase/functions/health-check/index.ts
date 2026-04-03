@@ -1,0 +1,60 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+};
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  const requiredEnvVars = [
+    "SUPABASE_URL",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "ADMIN_EMAIL",
+    "RESEND_API_KEY",
+  ];
+
+  const optionalEnvVars = [
+    "STRIPE_SECRET_KEY",
+    "FIRECRAWL_API_KEY",
+    "GOOGLE_MAPS_API_KEY",
+    "LOVABLE_API_KEY",
+    "MANUS_API_KEY",
+  ];
+
+  const missing = requiredEnvVars.filter((v) => !Deno.env.get(v));
+  const missingOptional = optionalEnvVars.filter((v) => !Deno.env.get(v));
+
+  // Test database connectivity
+  let dbStatus = "ok";
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, serviceRoleKey);
+    const { error } = await supabase.from("properties").select("id").limit(1);
+    if (error) dbStatus = `error: ${error.message}`;
+  } catch (e) {
+    dbStatus = `error: ${(e as Error).message}`;
+  }
+
+  const status = missing.length > 0 ? "error" : "ok";
+  const statusCode = missing.length > 0 ? 500 : 200;
+
+  return new Response(
+    JSON.stringify({
+      status,
+      database: dbStatus,
+      timestamp: new Date().toISOString(),
+      missing_required: missing.length > 0 ? missing : undefined,
+      missing_optional: missingOptional.length > 0 ? missingOptional : undefined,
+    }),
+    {
+      status: statusCode,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    }
+  );
+});

@@ -1,0 +1,550 @@
+import { useState, useEffect, useRef } from 'react';
+import { useBuyerMatching } from '@/features/agents/hooks/useBuyerMatching';
+import { motion } from 'framer-motion';
+import { ArrowLeft, ArrowRight, Save, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/features/auth/AuthProvider';
+import { toast } from 'sonner';
+import StepAddress from './StepAddress';
+import StepBasics from './StepBasics';
+import StepPhotos from './StepPhotos';
+import StepVoice from './StepVoice';
+import StepSettings from './StepSettings';
+import StepPreview from './StepPreview';
+
+export interface ListingDraft {
+  address: string;
+  suburb: string;
+  state: string;
+  listingType: 'sale' | 'rent';
+  priceMin: number;
+  priceMax: number;
+  priceDisplay: 'exact' | 'range' | 'eoi' | 'contact';
+  propertyType: string;
+  beds: number;
+  baths: number;
+  cars: number;
+  photos: string[];
+  primaryPhoto: number;
+  voiceTranscript: string;
+  generatedTitle: string;
+  generatedBullets: string[];
+  features: string[];
+  visibility: 'whisper' | 'coming-soon' | 'public';
+  exclusiveDays: number;
+  buyerRequirements: string;
+  showContact: boolean;
+  allowCoBroke: boolean;
+  autoDeclineBelow: number;
+  scheduledAt: string | null;
+  sqm: number;
+  landSize: number;
+  lat?: number;
+  lng?: number;
+  estimatedRentalWeekly: number;
+  rentalWeekly: number;
+  rentalBondWeeks: number;
+  // Rental-specific
+  availableFrom: string;
+  leaseTerm: string;
+  furnished: boolean;
+  petsAllowed: boolean;
+  screeningLevel: string;
+
+  // Sale — additional details
+  ensuites: number;
+  studyRooms: number;
+  garageType: string;
+  hasPool: boolean;
+  hasOutdoorEnt: boolean;
+  hasAlfresco: boolean;
+  hasSolar: boolean;
+  airConType: string;
+  heatingType: string;
+  auctionDate: string;
+  auctionTime: string;
+  yearBuilt: string;
+  councilRates: number;
+  waterRates: number;
+  strataFees: number;
+
+  // Rental — additional details
+  waterIncluded: boolean;
+  electricityIncluded: boolean;
+  internetIncluded: boolean;
+  hasInternalLaundry: boolean;
+  hasDishwasher: boolean;
+  hasWashingMachine: boolean;
+  hasAirCon: boolean;
+  hasBalcony: boolean;
+  hasPoolAccess: boolean;
+  hasGymAccess: boolean;
+  smokingAllowed: boolean;
+  maxOccupants: number;
+  rentalParkingType: string;
+  commissionRate: number;
+  lettingFeeWeeks: number;
+
+  // Owner / Vendor
+  vendorName: string;
+  vendorEmail: string;
+  vendorPhone: string;
+}
+
+const DEFAULT_DRAFT: ListingDraft = {
+  address: '',
+  suburb: '',
+  state: '',
+  listingType: 'sale',
+  priceMin: 500000,
+  priceMax: 800000,
+  priceDisplay: 'range',
+  propertyType: 'House',
+  beds: 3,
+  baths: 2,
+  cars: 2,
+  sqm: 0,
+  landSize: 0,
+  photos: [],
+  primaryPhoto: 0,
+  voiceTranscript: '',
+  generatedTitle: '',
+  generatedBullets: [],
+  features: [],
+  visibility: 'whisper',
+  exclusiveDays: 14,
+  buyerRequirements: 'none',
+  showContact: true,
+  allowCoBroke: true,
+  autoDeclineBelow: 0,
+  scheduledAt: null,
+  estimatedRentalWeekly: 0,
+  rentalWeekly: 0,
+  rentalBondWeeks: 4,
+  availableFrom: '',
+  leaseTerm: '12 months',
+  furnished: false,
+  petsAllowed: false,
+  screeningLevel: 'Basic',
+
+  ensuites: 0,
+  studyRooms: 0,
+  garageType: '',
+  hasPool: false,
+  hasOutdoorEnt: false,
+  hasAlfresco: false,
+  hasSolar: false,
+  airConType: '',
+  heatingType: '',
+  auctionDate: '',
+  auctionTime: '',
+  yearBuilt: '',
+  councilRates: 0,
+  waterRates: 0,
+  strataFees: 0,
+  waterIncluded: false,
+  electricityIncluded: false,
+  internetIncluded: false,
+  hasInternalLaundry: false,
+  hasDishwasher: false,
+  hasWashingMachine: false,
+  hasAirCon: false,
+  hasBalcony: false,
+  hasPoolAccess: false,
+  hasGymAccess: false,
+  smokingAllowed: false,
+  maxOccupants: 0,
+  rentalParkingType: '',
+  commissionRate: 0,
+  lettingFeeWeeks: 0,
+
+  vendorName: '',
+  vendorEmail: '',
+  vendorPhone: '',
+};
+
+const STEPS = ['Address', 'Basics', 'Photos', 'Voice', 'Settings', 'Preview'];
+
+interface Props {
+  onPublish: (title: string) => void;
+  onCancel: () => void;
+  initialListingType?: ListingDraft['listingType'];
+  /** When provided, the form loads this property for editing */
+  editPropertyId?: string | null;
+  /** When provided, the form loads this property's data but creates a new listing */
+  duplicatePropertyId?: string | null;
+}
+
+const formatPriceForDB = (draft: ListingDraft): string => {
+  if (draft.listingType === 'rent') {
+    return draft.rentalWeekly > 0 ? `$${draft.rentalWeekly.toLocaleString('en-AU')}/wk` : 'Contact Agent';
+  }
+  const fmt = (v: number) => v >= 1000000 ? `$${(v / 1000000).toFixed(1)}M` : `$${(v / 1000).toFixed(0)}K`;
+  switch (draft.priceDisplay) {
+    case 'exact': return fmt(draft.priceMax);
+    case 'range': return `${fmt(draft.priceMin)} – ${fmt(draft.priceMax)}`;
+    case 'eoi': return 'Expressions of Interest';
+    case 'contact': return 'Contact Agent';
+  }
+};
+
+const PocketListingForm = ({ onPublish, onCancel, initialListingType, editPropertyId, duplicatePropertyId }: Props) => {
+  const loadPropertyId = editPropertyId || duplicatePropertyId;
+  const [step, setStep] = useState(0);
+  const [draft, setDraft] = useState<ListingDraft>(() => ({
+    ...DEFAULT_DRAFT,
+    listingType: initialListingType ?? DEFAULT_DRAFT.listingType,
+  }));
+  const [publishing, setPublishing] = useState(false);
+  const [loadingEdit, setLoadingEdit] = useState(!!loadPropertyId);
+  const autoSaveRef = useRef<ReturnType<typeof setInterval>>();
+  const { user } = useAuth();
+  const { matchBuyersToListing } = useBuyerMatching();
+
+  const update = (partial: Partial<ListingDraft>) =>
+    setDraft((d) => ({ ...d, ...partial }));
+
+  // Load existing property for editing
+  useEffect(() => {
+    if (!loadPropertyId) return;
+    const loadProperty = async () => {
+      setLoadingEdit(true);
+      const { data: prop, error } = await supabase
+        .from('properties')
+        .select('*')
+        .eq('id', loadPropertyId)
+        .maybeSingle();
+
+      if (error || !prop) {
+        toast.error('Could not load listing');
+        setLoadingEdit(false);
+        return;
+      }
+
+      let priceDisplay: ListingDraft['priceDisplay'] = 'exact';
+      if (prop.price_formatted.includes('–')) priceDisplay = 'range';
+      else if (prop.price_formatted.toLowerCase().includes('expression')) priceDisplay = 'eoi';
+      else if (prop.price_formatted.toLowerCase().includes('contact')) priceDisplay = 'contact';
+
+      const descLines = (prop.description || '').split('\n').filter(Boolean);
+      const bulletLines = descLines.filter(l => l.startsWith('•')).map(l => l.replace(/^•\s*/, ''));
+      const transcriptLines = descLines.filter(l => !l.startsWith('•') && l !== 'Key Features:');
+
+      setDraft({
+        ...DEFAULT_DRAFT,
+        address: duplicatePropertyId ? '' : prop.address,
+        suburb: duplicatePropertyId ? '' : prop.suburb,
+        state: duplicatePropertyId ? '' : prop.state,
+        listingType: prop.listing_type === 'rent' ? 'rent' : 'sale',
+        priceMin: prop.listing_type === 'rent' ? (prop.rental_weekly || prop.price) : Math.round(prop.price * 0.9),
+        priceMax: prop.listing_type === 'rent' ? (prop.rental_weekly || prop.price) : prop.price,
+        priceDisplay,
+        propertyType: prop.property_type || 'House',
+        beds: prop.beds,
+        baths: prop.baths,
+        cars: prop.parking,
+        photos: duplicatePropertyId ? [] : (prop.images || (prop.image_url ? [prop.image_url] : [])),
+        primaryPhoto: 0,
+        voiceTranscript: transcriptLines.join('\n'),
+        generatedTitle: duplicatePropertyId ? '' : prop.title,
+        generatedBullets: bulletLines,
+        features: prop.features || [],
+        visibility: ((prop as any).status === 'whisper' || (prop as any).status === 'coming-soon') ? (prop as any).status : (prop as any).status === 'sold' ? 'whisper' : 'public',
+        exclusiveDays: 14,
+        buyerRequirements: 'none',
+        showContact: true,
+        allowCoBroke: true,
+        autoDeclineBelow: 0,
+        sqm: prop.sqm || 0,
+        landSize: (prop as any).land_size || 0,
+        scheduledAt: null,
+        estimatedRentalWeekly: prop.rental_weekly || 0,
+        rentalWeekly: prop.listing_type === 'rent' ? (prop.rental_weekly || 0) : 0,
+        rentalBondWeeks: 4,
+        availableFrom: (prop as any).available_from || '',
+        leaseTerm: (prop as any).lease_term || '12 months',
+        furnished: (prop as any).furnished || false,
+        petsAllowed: (prop as any).pets_allowed || false,
+        screeningLevel: 'Basic',
+        commissionRate: prop.commission_rate || 0,
+        lettingFeeWeeks: prop.agent_split_percent || 0,
+
+        vendorName: (prop as any).vendor_name || '',
+        vendorEmail: (prop as any).vendor_email || '',
+        vendorPhone: (prop as any).vendor_phone || '',
+      });
+      setLoadingEdit(false);
+    };
+    loadProperty();
+  }, [loadPropertyId]);
+
+  // Auto-save every 10 seconds (only for new listings)
+  useEffect(() => {
+    if (editPropertyId) return;
+    autoSaveRef.current = setInterval(() => {
+      localStorage.setItem('pocket-listing-draft', JSON.stringify(draft));
+    }, 10000);
+    return () => clearInterval(autoSaveRef.current);
+  }, [draft, editPropertyId]);
+
+  // Load draft on mount (only for new listings)
+  useEffect(() => {
+    if (editPropertyId) return;
+    const saved = localStorage.getItem('pocket-listing-draft');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved) as Partial<ListingDraft>;
+        setDraft({
+          ...DEFAULT_DRAFT,
+          ...parsed,
+          listingType: initialListingType ?? parsed.listingType ?? DEFAULT_DRAFT.listingType,
+        });
+      } catch {}
+    }
+  }, [editPropertyId, initialListingType]);
+
+  const progress = ((step + 1) / STEPS.length) * 100;
+
+  const canNext = () => {
+    if (step === 0) return draft.address.length > 0;
+    return true;
+  };
+
+  const handlePublish = async () => {
+    if (publishing) return;
+    setPublishing(true);
+
+    try {
+      if (!user) {
+        toast.error('You must be logged in to publish');
+        setPublishing(false);
+        return;
+      }
+
+      const { data: agent } = await supabase
+        .from('agents')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      const agentId = agent?.id ?? null;
+
+      if (!agentId) {
+        toast.error('Agent profile not found — Please complete your agent registration first.');
+        setPublishing(false);
+        return;
+      }
+
+      const title = draft.generatedTitle || `${draft.propertyType} in ${draft.suburb || 'Location'}`;
+      const description = [
+        draft.voiceTranscript,
+        ...(draft.generatedBullets.length > 0 ? ['', 'Key Features:', ...draft.generatedBullets.map(b => `• ${b}`)] : []),
+      ].filter(Boolean).join('\n') || null;
+
+      const mainPhoto = draft.photos[draft.primaryPhoto] || draft.photos[0] || null;
+
+      const payload = {
+        title,
+        address: draft.address,
+        suburb: draft.suburb || 'Unknown',
+        state: draft.state || 'Unknown',
+        country: 'Australia',
+        price: draft.listingType === 'rent' ? (draft.rentalWeekly || draft.priceMax) : draft.priceMax,
+        price_formatted: formatPriceForDB(draft),
+        beds: draft.beds,
+        baths: draft.baths,
+        parking: draft.cars,
+        sqm: draft.sqm || 0,
+        land_size: draft.landSize || null,
+        property_type: draft.propertyType,
+        listing_type: draft.listingType,
+        description,
+        features: draft.features,
+        image_url: mainPhoto,
+        images: draft.photos.length > 0 ? draft.photos : [],
+        cover_index: draft.primaryPhoto,
+        is_active: editPropertyId ? draft.visibility === 'public' : false,
+        status: editPropertyId
+          ? (draft.visibility === 'public' ? 'public' : draft.visibility)
+          : 'pending',
+        lat: draft.lat || null,
+        lng: draft.lng || null,
+        rental_weekly: draft.listingType === 'rent' ? (draft.rentalWeekly || null) : (draft.estimatedRentalWeekly || null),
+        available_from: draft.availableFrom || null,
+        lease_term: draft.leaseTerm || null,
+        furnished: draft.furnished,
+        pets_allowed: draft.petsAllowed,
+        ensuites: draft.ensuites || 0,
+        study_rooms: draft.studyRooms || 0,
+        garage_type: draft.garageType || '',
+        has_pool: draft.hasPool || false,
+        has_outdoor_ent: draft.hasOutdoorEnt || false,
+        has_alfresco: draft.hasAlfresco || false,
+        has_solar: draft.hasSolar || false,
+        air_con_type: draft.airConType || '',
+        heating_type: draft.heatingType || '',
+        auction_date: draft.auctionDate || null,
+        auction_time: draft.auctionTime || '',
+        water_included: draft.waterIncluded || false,
+        electricity_included: draft.electricityIncluded || false,
+        internet_included: draft.internetIncluded || false,
+        has_internal_laundry: draft.hasInternalLaundry || false,
+        has_dishwasher: draft.hasDishwasher || false,
+        has_washing_machine: draft.hasWashingMachine || false,
+        has_air_con: draft.hasAirCon || false,
+        has_balcony: draft.hasAlfresco || false,
+        has_pool_access: draft.hasPoolAccess || false,
+        has_gym_access: draft.hasGymAccess || false,
+        smoking_allowed: draft.smokingAllowed || false,
+        max_occupants: draft.maxOccupants || 0,
+        rental_parking_type: draft.rentalParkingType || '',
+        commission_rate: draft.commissionRate || null,
+        agent_split_percent: draft.lettingFeeWeeks || null,
+        vendor_name: draft.vendorName || null,
+        vendor_email: draft.vendorEmail || null,
+        vendor_phone: draft.vendorPhone || null,
+      } as any;
+
+      // Add 'Pets considered' to features if applicable
+      if (draft.petsAllowed && !payload.features?.includes('Pets considered')) {
+        payload.features = [...(payload.features || []), 'Pets considered'];
+      }
+
+      if (editPropertyId) {
+        // UPDATE existing listing
+        const { error } = await supabase
+          .from('properties')
+          .update(payload)
+          .eq('id', editPropertyId);
+        if (error) throw error;
+        toast.success('Listing updated! — Your changes have been saved.');
+      } else {
+        const { data: inserted, error } = await supabase
+          .from('properties')
+          .insert({
+            ...payload,
+            agent_id: agentId,
+          })
+          .select('id')
+          .single();
+        if (error) throw error;
+        localStorage.removeItem('pocket-listing-draft');
+
+        const matched = await matchBuyersToListing({
+          id: inserted.id,
+          agent_id: agentId,
+          suburb: draft.suburb || '',
+          state: draft.state || '',
+          price: draft.priceMax,
+          beds: draft.beds,
+          baths: draft.baths,
+          listing_type: draft.listingType,
+          title,
+          address: draft.address,
+        });
+
+        if (matched.length > 0) {
+          toast.success(
+            `Listing saved! ${matched.length} buyer${matched.length > 1 ? 's' : ''} on your list match this suburb — check your notifications.`,
+            { duration: 6000 }
+          );
+        } else {
+          toast.success('Listing saved! — Your property is in draft. Publish it from your dashboard to make it visible to buyers.');
+        }
+      }
+
+      onPublish(title);
+    } catch (err: any) {
+      console.error('Publish error:', err);
+      toast.error(editPropertyId ? 'Failed to update' : 'Failed to publish');
+    } finally {
+      setPublishing(false);
+    }
+  };
+
+  if (loadingEdit) {
+    return (
+      <div className="bg-card border border-border rounded-2xl p-12 flex items-center justify-center">
+        <Loader2 className="animate-spin text-primary mr-2" size={20} />
+        <span className="text-sm text-muted-foreground">Loading listing...</span>
+      </div>
+    );
+  }
+
+  const stepContent = () => {
+    switch (step) {
+      case 0: return <StepAddress draft={draft} update={update} />;
+      case 1: return <StepBasics draft={draft} update={update} />;
+      case 2: return <StepPhotos draft={draft} update={update} />;
+      case 3: return <StepVoice draft={draft} update={update} />;
+      case 4: return <StepSettings draft={draft} update={update} />;
+      case 5: return <StepPreview draft={draft} onPublish={handlePublish} publishing={publishing} isEdit={!!editPropertyId} />;
+      default: return null;
+    }
+  };
+
+  return (
+    <div className="bg-card border border-border rounded-2xl">
+      {/* Progress */}
+      <div className="px-4 pt-4 pb-2">
+        <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+          <span>Step {step + 1} of {STEPS.length}: <strong className="text-foreground">{STEPS[step]}</strong></span>
+           {!editPropertyId && !duplicatePropertyId && (
+            <span className="flex items-center gap-1 text-success">
+              <Save size={12} /> Auto-saved
+            </span>
+          )}
+          {editPropertyId && (
+            <span className="flex items-center gap-1 text-primary">
+              <Save size={12} /> Editing
+            </span>
+          )}
+          {duplicatePropertyId && (
+            <span className="flex items-center gap-1 text-primary">
+              <Save size={12} /> Duplicating
+            </span>
+          )}
+        </div>
+        <Progress value={progress} className="h-1.5" />
+      </div>
+
+      {/* Step content */}
+      <motion.div
+        key={step}
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -20 }}
+        transition={{ duration: 0.25 }}
+        className="p-5"
+      >
+        {stepContent()}
+      </motion.div>
+
+      {/* Nav */}
+      <div className="flex items-center justify-between p-4 border-t border-border bg-secondary/30">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => (step === 0 ? onCancel() : setStep(step - 1))}
+          disabled={publishing}
+        >
+          <ArrowLeft size={14} className="mr-1" /> {step === 0 ? 'Cancel' : 'Back'}
+        </Button>
+
+        {step < STEPS.length - 1 && (
+          <Button
+            size="sm"
+            disabled={!canNext()}
+            onClick={() => setStep(step + 1)}
+          >
+            Next <ArrowRight size={14} className="ml-1" />
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default PocketListingForm;

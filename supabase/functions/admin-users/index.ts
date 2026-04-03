@@ -1,0 +1,343 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, serviceRoleKey);
+
+    // Verify caller is admin
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const anonClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!);
+    const { data: { user: caller } } = await anonClient.auth.getUser(authHeader.replace("Bearer ", ""));
+    if (!caller) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { data: roleCheck } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", caller.id)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    if (!roleCheck) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const url = new URL(req.url);
+    const action = url.searchParams.get("action");
+
+    if (action === "list_users") {
+      const page = parseInt(url.searchParams.get("page") || "1");
+      const perPage = 50;
+      const { data, error } = await supabase.auth.admin.listUsers({ page, perPage });
+      if (error) throw error;
+
+      // Fetch all agents with subscription info
+      const { data: agents } = await supabase
+        .from("agents")
+        .select("user_id, is_demo, is_subscribed, support_pin, agent_subscriptions(plan_type)");
+
+      // Fetch demo requests (approved/redeemed)
+      const { data: demoRequests } = await supabase
+        .from("demo_requests")
+        .select("*")
+        .in("status", ["approved", "redeemed", "pending"])
+        .order("created_at", { ascending: false });
+
+      // Fetch partners
+      const { data: partners } = await supabase
+        .from("partners")
+        .select("user_id, is_verified");
+
+      const partnerMap = new Map<string, any>();
+      for (const p of (partners || [])) {
+        partnerMap.set(p.user_id, p);
+      }
+
+      // Build agent lookup by user_id
+      const agentMap = new Map<string, any>();
+      for (const a of (agents || [])) {
+        agentMap.set(a.user_id, a);
+      }
+
+      // Map auth users
+      const authUsers = data.users.map((u: any) => {
+        const agent = agentMap.get(u.id);
+        const partnerRecord = partnerMap.get(u.id);
+        const isPartner = !!partnerRecord;
+        const isDemo = agent?.is_demo || false;
+        const isSubscribed = agent?.is_subscribed || false;
+        const subscription = agent?.agent_subscriptions;
+        const planType = subscription?.plan_type || null;
+
+        return {
+          id: u.id,
+          email: u.email,
+          created_at: u.created_at,
+          last_sign_in_at: u.last_sign_in_at,
+          email_confirmed_at: u.email_confirmed_at,
+          banned_until: u.banned_until,
+          display_name: u.user_metadata?.display_name || u.user_metadata?.full_name || u.email,
+          provider: u.app_metadata?.provider || 'email',
+          user_type: isPartner ? 'partner' : (isDemo ? 'demo' : (agent ? 'agent' : 'seeker')),
+          is_subscribed: isSubscribed,
+          plan_type: planType,
+          is_partner_verified: partnerRecord?.is_verified || false,
+          support_pin: agent?.support_pin || null,
+        };
+      });
+
+      // Map demo request users that are NOT auth users (people who requested demo access)
+      const authEmails = new Set(data.users.map((u: any) => (u.email || '').toLowerCase()));
+      const demoUsers = (demoRequests || [])
+        .filter((dr: any) => !authEmails.has((dr.email || '').toLowerCase()))
+        .map((dr: any) => ({
+          id: `demo-${dr.id}`,
+          email: dr.email,
+          created_at: dr.created_at,
+          last_sign_in_at: null,
+          email_confirmed_at: null,
+          banned_until: null,
+          display_name: dr.full_name,
+          provider: 'demo_request',
+          user_type: 'demo_request',
+          is_subscribed: false,
+          plan_type: null,
+          demo_status: dr.status,
+          agency_name: dr.agency_name,
+        }));
+
+      return new Response(JSON.stringify({
+        users: [...authUsers, ...demoUsers],
+        total: data.total + demoUsers.length,
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "ban_user") {
+      const { user_id, ban } = await req.json();
+      if (ban) {
+        const { error } = await supabase.auth.admin.updateUserById(user_id, { ban_duration: "876000h" });
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.auth.admin.updateUserById(user_id, { ban_duration: "none" });
+        if (error) throw error;
+      }
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "set_subscription") {
+      const { user_id, plan_type, listing_limit, seat_limit, founding_member } = await req.json();
+
+      const { data: agent, error: agentErr } = await supabase
+        .from("agents")
+        .select("id")
+        .eq("user_id", user_id)
+        .maybeSingle();
+
+      if (agentErr || !agent) {
+        return new Response(
+          JSON.stringify({ error: "Agent not found" }),
+          { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const { error: subErr } = await supabase
+        .from("agent_subscriptions")
+        .upsert({
+          agent_id: agent.id,
+          plan_type,
+          listing_limit,
+          seat_limit,
+          founding_member,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: "agent_id" });
+
+      if (subErr) throw subErr;
+
+      const { error: agentUpdateErr } = await supabase
+        .from("agents")
+        .update({ is_subscribed: plan_type !== "demo" })
+        .eq("id", agent.id);
+      if (agentUpdateErr) throw agentUpdateErr;
+
+      return new Response(
+        JSON.stringify({ success: true }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (action === "verify_partner") {
+      const { user_id, verify } = await req.json();
+      const { data: partner, error: findErr } = await supabase
+        .from("partners")
+        .select("id")
+        .eq("user_id", user_id)
+        .maybeSingle();
+
+      if (findErr || !partner) {
+        return new Response(
+          JSON.stringify({ error: "Partner record not found" }),
+          { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const { error: updateErr } = await supabase
+        .from("partners")
+        .update({
+          is_verified: verify,
+          verified_at: verify ? new Date().toISOString() : null,
+        })
+        .eq("id", partner.id);
+
+      if (updateErr) throw updateErr;
+
+      return new Response(
+        JSON.stringify({ success: true }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (action === "delete_demo_request") {
+      const { request_id } = await req.json();
+      if (!request_id) {
+        return new Response(JSON.stringify({ error: "Missing request_id" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { error } = await supabase.from("demo_requests").delete().eq("id", request_id);
+      if (error) throw error;
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "delete_user") {
+      const { user_id } = await req.json();
+
+      const { error: rpcError } = await supabase.rpc("delete_user_cascade", {
+        p_user_id: user_id,
+      });
+
+      if (rpcError) {
+        console.error("delete_user_cascade error:", rpcError);
+        return new Response(
+          JSON.stringify({ error: "User deletion failed. No data was deleted. Please try again." }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const { error: deleteAuthError } = await supabase.auth.admin.deleteUser(user_id);
+      if (deleteAuthError) {
+        console.error("delete auth user error:", deleteAuthError);
+        return new Response(
+          JSON.stringify({ error: "Data deleted but auth account removal failed. Contact support." }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "reset_password") {
+      const { email } = await req.json();
+      const { error } = await anonClient.auth.resetPasswordForEmail(email, {
+        redirectTo: (Deno.env.get("SITE_URL") || "https://listhq.lovable.app") + "/reset-password",
+      });
+      if (error) throw error;
+      return new Response(JSON.stringify({ success: true, message: `Recovery email sent to ${email}` }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "table_stats") {
+      const tables = ['profiles', 'properties', 'agents', 'leads', 'voice_searches', 'saved_properties', 'user_roles', 'lead_events'];
+      const stats: Record<string, number> = {};
+      for (const table of tables) {
+        const { count } = await supabase.from(table).select('id', { count: 'exact', head: true });
+        stats[table] = count || 0;
+      }
+      return new Response(JSON.stringify({ stats }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "browse_table") {
+      const table = url.searchParams.get("table") || "profiles";
+      const limit = parseInt(url.searchParams.get("limit") || "50");
+      const offset = parseInt(url.searchParams.get("offset") || "0");
+      const allowedTables = ['profiles', 'properties', 'agents', 'leads', 'voice_searches', 'saved_properties', 'user_roles', 'lead_events', 'user_preferences'];
+      if (!allowedTables.includes(table)) {
+        return new Response(JSON.stringify({ error: "Table not allowed" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { data, count, error } = await supabase
+        .from(table)
+        .select('*', { count: 'exact' })
+        .range(offset, offset + limit - 1)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return new Response(JSON.stringify({ data, total: count }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "delete_record") {
+      const { table, record_id } = await req.json();
+      const allowedTables = ['properties', 'leads', 'voice_searches', 'saved_properties', 'lead_events'];
+      if (!allowedTables.includes(table)) {
+        return new Response(JSON.stringify({ error: "Delete not allowed on this table" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { error } = await supabase.from(table).delete().eq('id', record_id);
+      if (error) throw error;
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(JSON.stringify({ error: "Unknown action" }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});

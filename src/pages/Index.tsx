@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence, useMotionValue, useSpring, PanInfo } from 'framer-motion';
 import { ArrowRight, MapPin, Sparkles, Map, List, Mic, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users } from 'lucide-react';
 import { VoiceSearchHero } from '@/features/search/components/VoiceSearchHero';
+import { LandingHero } from '@/features/search/components/LandingHero';
 
 import { VirtualizedPropertyList } from '@/features/properties/components/VirtualizedPropertyList';
 import { MapSkeleton } from '@/features/properties/components/PropertyCardSkeleton';
@@ -677,6 +678,19 @@ const Index = () => {
       </Suspense>
     </MapErrorBoundary>
   );
+
+  // ── Landing hero: shown until first search ───────────────────
+  if (!hasSearched) {
+    return (
+      <LandingHero
+        onSearch={wrappedHandleSearch}
+        onListingModeChange={(mode) => {
+          window.dispatchEvent(new CustomEvent('listing-mode-changed'));
+          // listingMode state is managed inside LandingHero via useCurrency
+        }}
+      />
+    );
+  }
 
   return (
     <div className={`flex flex-col bg-background ${!isMobile ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>

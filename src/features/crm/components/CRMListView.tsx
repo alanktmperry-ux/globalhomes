@@ -8,6 +8,9 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
+const fmtLabel = (s: string) =>
+  s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
 const STAGE_BADGE: Record<string, string> = {
   new: 'bg-muted text-muted-foreground',
   contacted: 'bg-blue-500/10 text-blue-700',
@@ -44,7 +47,7 @@ export function CRMListView() {
         >
           <option value="all">All Stages</option>
           {['new', 'contacted', 'qualified', 'offer_stage', 'under_contract', 'settled', 'lost'].map(s => (
-            <option key={s} value={s}>{s.replace('_', ' ')}</option>
+            <option key={s} value={s}>{fmtLabel(s)}</option>
           ))}
         </select>
         <Button
@@ -89,7 +92,7 @@ export function CRMListView() {
                   <td className="py-2.5 px-3 text-muted-foreground">{lead.property?.address ?? '—'}</td>
                   <td className="py-2.5 px-3">
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STAGE_BADGE[lead.stage]}`}>
-                      {lead.stage.replace('_', ' ')}
+                      {fmtLabel(lead.stage)}
                     </span>
                   </td>
                   <td className="py-2.5 px-3 text-muted-foreground">
@@ -98,8 +101,8 @@ export function CRMListView() {
                   <td className={`py-2.5 px-3 text-xs ${daysAgo !== null && daysAgo > 7 ? 'text-destructive' : 'text-muted-foreground'}`}>
                     {daysAgo === null ? 'Never' : `${daysAgo}d ago`}
                   </td>
-                  <td className="py-2.5 px-3 text-xs text-muted-foreground capitalize">
-                    {lead.source.replace('_', ' ')}
+                  <td className="py-2.5 px-3 text-xs text-muted-foreground">
+                    {fmtLabel(lead.source)}
                   </td>
                 </tr>
               );

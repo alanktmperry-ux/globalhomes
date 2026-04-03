@@ -295,6 +295,22 @@ Return ONLY this JSON:
       if (!insertErr) {
         matchedCount++;
         console.log(`[Concierge] Lead created → agent=${agentId} suburb=${wantedSuburb} score=${best.score}`);
+
+        // Mirror into crm_leads so agent sees voice search buyer in their CRM pipeline
+        const crmPriority = best.score >= 70 ? "high" : best.score >= 40 ? "medium" : "low";
+        await supabase.from("crm_leads").insert({
+          agent_id: agentId,
+          property_id: String(best.p.id),
+          first_name: "Voice Searcher",
+          stage: "new",
+          priority: crmPriority,
+          source: "portal",
+          pre_approved: false,
+          budget_min: wantedMinPrice || null,
+          budget_max: wantedMaxPrice || null,
+          notes: `Voice search: "${transcript.slice(0, 200)}"`,
+          tags: ["voice-search"],
+        });
       } else {
         console.error("[Concierge] Insert error:", insertErr.message);
       }

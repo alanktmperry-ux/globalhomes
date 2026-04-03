@@ -17,6 +17,9 @@ const STAGES: LeadStage[] = [
   'new', 'contacted', 'qualified', 'offer_stage', 'under_contract', 'settled', 'lost'
 ];
 
+const fmtLabel = (s: string) =>
+  s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
 const ACT_ICON: Record<string, string> = {
   note: '📝', call: '📞', email: '✉️', meeting: '🤝', task: '✅'
 };
@@ -91,7 +94,7 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
               className="text-sm border border-border rounded-lg px-2 py-1 bg-background focus:outline-none"
             >
               {STAGES.map(s => (
-                <option key={s} value={s}>{s.replace('_', ' ')}</option>
+                <option key={s} value={s}>{fmtLabel(s)}</option>
               ))}
             </select>
           </div>

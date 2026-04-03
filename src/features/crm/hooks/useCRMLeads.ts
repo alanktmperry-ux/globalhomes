@@ -22,7 +22,7 @@ export function useCRMLeads(filters: Filters = {}) {
 
     let q = supabase
       .from('crm_leads')
-      .select('*')
+      .select('*, properties(address, suburb, state)')
       .eq('agent_id', agentId)
       .order('updated_at', { ascending: false });
 

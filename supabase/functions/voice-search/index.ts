@@ -102,6 +102,26 @@ Deno.serve(async (req) => {
       console.error("Supabase insert error:", error);
     }
 
+    // Fire concierge in the background — matches this search to properties/agents and creates leads
+    if (searchRecord?.id) {
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+      fetch(`${supabaseUrl}/functions/v1/orchestrate-buyer-concierge`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${supabaseAnonKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          voice_search_id: searchRecord.id,
+          parsed_query: parsedQuery,
+          user_location: userLocation || null,
+        }),
+      }).catch(() => {
+        // Non-blocking — search results are not dependent on concierge completing
+      });
+    }
+
     return new Response(
       JSON.stringify({
         success: true,

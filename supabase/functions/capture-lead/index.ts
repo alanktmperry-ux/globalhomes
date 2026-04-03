@@ -99,6 +99,29 @@ Deno.serve(async (req) => {
       event_type: "lead_captured",
     }]);
 
+    // Mirror into crm_leads so the agent sees this enquiry in their CRM pipeline
+    const nameParts = userName.trim().split(' ');
+    const firstName = nameParts[0] || userName;
+    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : null;
+    const crmPriority =
+      urgency === 'immediate' ? 'high' :
+      urgency === 'this_week' ? 'medium' : 'low';
+
+    await supabase.from("crm_leads").insert([{
+      agent_id: agentId,
+      property_id: propertyId,
+      first_name: firstName,
+      last_name: lastName,
+      email: userEmail,
+      phone: userPhone || null,
+      stage: 'new',
+      priority: crmPriority,
+      source: 'enquiry_form',
+      pre_approved: preApprovalStatus === 'approved',
+      notes: message || null,
+      tags: [],
+    }]);
+
     return new Response(
       JSON.stringify({
         success: true,

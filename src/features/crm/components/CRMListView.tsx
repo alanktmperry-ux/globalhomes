@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useCRMLeads } from '../hooks/useCRMLeads';
 import { LeadDetailModal } from './LeadDetailModal';
+import { AddLeadModal } from './AddLeadModal';
 import type { CRMLead, LeadStage } from '../types';
 import { Search, UserPlus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +22,7 @@ export function CRMListView() {
   const [search, setSearch] = useState('');
   const [stageFilter, setStage] = useState<LeadStage | 'all'>('all');
   const [selectedLead, setSelected] = useState<CRMLead | null>(null);
+  const [showAddLead, setShowAddLead] = useState(false);
   const { leads, loading, createLead } = useCRMLeads({ search, stage: stageFilter });
 
   return (
@@ -47,7 +49,7 @@ export function CRMListView() {
         </select>
         <Button
           size="sm"
-          onClick={() => createLead({ first_name: 'New Lead' })}
+          onClick={() => setShowAddLead(true)}
           className="gap-2"
         >
           <UserPlus size={14} /> Add Lead
@@ -111,6 +113,16 @@ export function CRMListView() {
           lead={selectedLead}
           onClose={() => setSelected(null)}
           onUpdate={() => setSelected(null)}
+        />
+      )}
+
+      {showAddLead && (
+        <AddLeadModal
+          onClose={() => setShowAddLead(false)}
+          onSave={async (data) => {
+            await createLead(data);
+            setShowAddLead(false);
+          }}
         />
       )}
     </div>

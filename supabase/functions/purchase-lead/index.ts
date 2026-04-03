@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
     // Verify agent belongs to calling user
     const { data: agent } = await adminClient
       .from("agents")
-      .select("id, name, email")
+      .select("id, name, email, stripe_customer_id")
       .eq("id", agent_id)
       .eq("user_id", user.id)
       .single();

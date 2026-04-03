@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect, useMemo, lazy, Suspense } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence, useMotionValue, useSpring, PanInfo } from 'framer-motion';
 import { ArrowRight, MapPin, Sparkles, Map, List, Mic, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users } from 'lucide-react';
@@ -29,6 +30,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { geocode } from '@/shared/lib/googleMapsService';
 
 const Index = () => {
+  const navigate = useNavigate();
   const { t } = useI18n();
   const { addSearch, lastSearch } = useSearchHistory();
   const { savedIds, isSaved, toggleSaved } = useSavedProperties();
@@ -677,9 +679,9 @@ const Index = () => {
   );
 
   return (
-    <div className="flex flex-col bg-background min-h-screen">
+    <div className={`flex flex-col bg-background ${!isMobile ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
     {/* ── Top: Voice Search Bar ─────────────────────────────── */}
-    <div>
+    <div className="shrink-0">
         <VoiceSearchErrorBoundary>
           <VoiceSearchHero
             onSearch={wrappedHandleSearch}
@@ -702,7 +704,6 @@ const Index = () => {
     {!isMobile ? (
       <div
         className="flex overflow-hidden flex-1 min-h-0"
-        style={{ height: 'calc(100vh - 56px)' }}
       >
           {/* LEFT: fixed map panel */}
           <div
@@ -760,10 +761,7 @@ const Index = () => {
                       <div
                         key={prop.id}
                         className="group relative rounded-xl overflow-hidden border border-border cursor-pointer hover:border-primary/40 hover:shadow-md transition-all"
-                        onClick={() => {
-                          handleSelectProperty(prop as any);
-                          if (prop.lat && prop.lng) setMapCenter({ lat: prop.lat, lng: prop.lng, key: `${prop.lat}-${prop.lng}` });
-                        }}
+                        onClick={() => navigate(`/property/${prop.id}`)}
                       >
                         <div className="relative h-40 bg-muted overflow-hidden">
                           {img ? (
@@ -818,10 +816,7 @@ const Index = () => {
                   isMobile={false}
                   isSaved={isSaved}
                   onToggleSave={toggleSaved}
-                  onSelect={(p) => {
-                    handleSelectProperty(p);
-                    if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: `${p.lat}-${p.lng}` });
-                  }}
+                  onSelect={(p) => navigate(`/property/${p.id}`)}
                   cardRefs={cardRefs}
                   isCollab={isCollab}
                   getPropertyReactions={isCollab ? getPropertyReactions : undefined}
@@ -884,10 +879,7 @@ const Index = () => {
                       isMobile={true}
                       isSaved={isSaved}
                       onToggleSave={toggleSaved}
-                      onSelect={(p) => {
-                        handleSelectProperty(p);
-                        if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: `${p.lat}-${p.lng}` });
-                      }}
+                      onSelect={(p) => navigate(`/property/${p.id}`)}
                       cardRefs={cardRefs}
                       isCollab={isCollab}
                       getPropertyReactions={isCollab ? getPropertyReactions : undefined}
@@ -928,10 +920,7 @@ const Index = () => {
                   isMobile={true}
                   isSaved={isSaved}
                   onToggleSave={toggleSaved}
-                  onSelect={(p) => {
-                    handleSelectProperty(p);
-                    if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: `${p.lat}-${p.lng}` });
-                  }}
+                  onSelect={(p) => navigate(`/property/${p.id}`)}
                   cardRefs={cardRefs}
                   isCollab={isCollab}
                   getPropertyReactions={isCollab ? getPropertyReactions : undefined}

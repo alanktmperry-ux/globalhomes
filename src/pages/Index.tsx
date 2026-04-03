@@ -923,10 +923,7 @@ const Index = () => {
                   isMobile={true}
                   isSaved={isSaved}
                   onToggleSave={toggleSaved}
-                  onSelect={(p) => {
-                    handleSelectProperty(p);
-                    if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: `${p.lat}-${p.lng}` });
-                  }}
+                  onSelect={(p) => navigate(`/property/${p.id}`)}
                   cardRefs={cardRefs}
                   isCollab={isCollab}
                   getPropertyReactions={isCollab ? getPropertyReactions : undefined}

@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Database, Table2, Trash2, ChevronLeft, ChevronRight, Loader2, RefreshCw } from 'lucide-react';
+import { Database, Table2, Trash2, ChevronLeft, ChevronRight, Loader2, RefreshCw, Sprout } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/shared/hooks/use-toast';
+import { seedProperties } from '@/features/admin/utils/seedProperties';
+import { toast as sonnerToast } from 'sonner';
 
 const TABLES = [
   { name: 'profiles', deletable: false },
@@ -98,9 +100,26 @@ const AdminDatabase = () => {
           <Database size={14} className="text-primary" />
           {selectedTable} <span className="text-muted-foreground font-normal">({total} records)</span>
         </h3>
-        <button onClick={fetchTable} className="p-2 rounded-lg bg-secondary hover:bg-accent transition-colors">
-          <RefreshCw size={14} className="text-muted-foreground" />
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={async () => {
+              try {
+                const count = await seedProperties();
+                sonnerToast.success(`Seeded ${count} properties successfully!`);
+                if (selectedTable === 'properties') fetchTable();
+                fetchStats();
+              } catch (e: any) {
+                sonnerToast.error(e.message || 'Seed failed');
+              }
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-xs font-medium"
+          >
+            <Sprout size={14} /> Seed Properties
+          </button>
+          <button onClick={fetchTable} className="p-2 rounded-lg bg-secondary hover:bg-accent transition-colors">
+            <RefreshCw size={14} className="text-muted-foreground" />
+          </button>
+        </div>
       </div>
 
       {loading ? (

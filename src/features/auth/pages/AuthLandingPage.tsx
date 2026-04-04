@@ -1,119 +1,129 @@
 import { motion } from 'framer-motion';
-import { Home, Building2, Search, Mic, Heart, BarChart3, Users, Megaphone } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 
 const AuthLandingPage = () => {
   const navigate = useNavigate();
 
-  const roleCards = [
-    {
-      icon: Home,
-      title: "I'm Looking for a Property",
-      description: 'Search, save, and enquire on properties worldwide.',
-      cta: 'Continue as Property Seeker →',
-      route: '/login',
-      features: [
-        { icon: Search, text: 'Search thousands of properties' },
-        { icon: Mic, text: 'AI voice search in any language' },
-        { icon: Heart, text: 'Save favourites & get alerts' },
-      ],
-    },
-    {
-      icon: Building2,
-      title: "I'm a Real Estate Agent",
-      description: 'List properties, manage leads, and grow your business.',
-      cta: 'Continue as Agent →',
-      route: '/agents/login',
-      badge: 'Pro',
-      features: [
-        { icon: BarChart3, text: 'Manage listings & analytics' },
-        { icon: Users, text: 'Build your team & network' },
-        { icon: Megaphone, text: 'Capture leads automatically' },
-      ],
-    },
-  ];
-
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <header className="px-6 py-5 flex items-center justify-center">
-        <Link to="/" className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-cyan-accent flex items-center justify-center">
-            <span className="text-primary-foreground text-sm font-bold">W</span>
+    <div className="min-h-screen flex flex-col md:flex-row" style={{ background: '#020817' }}>
+
+      {/* ListHQ wordmark — centred top */}
+      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+        <div className="w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold text-white" style={{ background: 'linear-gradient(135deg, #2563eb, #06b6d4)' }}>L</div>
+        <span className="text-sm font-semibold text-white/90 tracking-tight">ListHQ</span>
+      </div>
+
+      {/* ── LEFT: Buyer — light, warm ── */}
+      <motion.div
+        initial={{ opacity: 0, x: -16 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+        className="flex-1 bg-white flex flex-col justify-center px-14 py-20 relative overflow-hidden"
+      >
+        {/* Subtle ambient */}
+        <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 70%)' }} />
+
+        <div className="relative z-10 max-w-sm">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-200 bg-slate-50 mb-7">
+            <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+            <span className="text-[10px] font-medium tracking-widest uppercase text-slate-400">Property Seeker</span>
           </div>
-          <span className="font-display text-xl font-bold text-foreground">ListHQ</span>
-        </Link>
-      </header>
 
-      {/* Main */}
-      <main className="flex-1 flex flex-col items-center justify-center px-4 pb-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-10"
-        >
-          <h1 className="font-display text-3xl sm:text-4xl font-bold text-foreground mb-2">
-            Welcome to ListHQ
+          {/* Headline */}
+          <h1 className="text-[46px] font-light text-slate-900 leading-[1.05] mb-4" style={{ letterSpacing: '-2px' }}>
+            Find your<br /><strong className="font-semibold">next home.</strong>
           </h1>
-          <p className="text-muted-foreground text-base max-w-md mx-auto">
-            How would you like to get started?
+
+          <p className="text-[15px] text-slate-400 leading-relaxed mb-10 max-w-xs">
+            Search in 24 languages, see prices in your currency, and get AI-powered recommendations.
           </p>
-        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full max-w-2xl">
-          {roleCards.map(({ icon: Icon, title, description, cta, route, badge, features }) => (
-            <button
-              key={title}
-              type="button"
-              onClick={() => navigate(route)}
-              style={{ opacity: 1, visibility: 'visible', animation: 'none' }}
-              className="group relative flex min-h-[24rem] flex-col overflow-hidden rounded-2xl border border-border bg-card p-7 text-left !opacity-100 visible shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:border-primary hover:bg-primary/5 hover:shadow-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-            >
-              {badge ? (
-                <div className="absolute right-4 top-4">
-                  <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-primary">
-                    {badge}
-                  </span>
-                </div>
-              ) : null}
-
-              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 transition-colors group-hover:bg-primary/15">
-                <Icon size={28} className="text-primary" />
+          {/* Features */}
+          <div className="space-y-3 mb-11">
+            {[
+              'Search thousands of properties',
+              'AI voice search in any language',
+              'Save favourites & get alerts',
+            ].map(f => (
+              <div key={f} className="flex items-center gap-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
+                <span className="text-[13px] text-slate-500">{f}</span>
               </div>
+            ))}
+          </div>
 
-              <h2 className="mb-1.5 font-display text-xl font-bold text-foreground">
-                {title}
-              </h2>
-
-              <p className="mb-5 text-sm leading-7 text-muted-foreground">
-                {description}
-              </p>
-
-              <div className="space-y-3">
-                {features.map((feature) => (
-                  <div key={feature.text} className="flex items-center gap-2.5">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-secondary">
-                      <feature.icon size={14} className="text-muted-foreground" />
-                    </div>
-                    <span className="text-xs font-medium text-muted-foreground">{feature.text}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-auto pt-6">
-                <div className="rounded-full bg-primary/10 px-4 py-3 text-center text-sm font-semibold text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                  {cta}
-                </div>
-              </div>
-            </button>
-          ))}
+          <button
+            onClick={() => navigate('/login')}
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-slate-900 text-white text-sm font-medium hover:bg-slate-700 transition-colors"
+          >
+            Search properties
+            <span>→</span>
+          </button>
         </div>
+      </motion.div>
 
-        <p className="text-xs text-muted-foreground mt-8">
+      {/* ── AGENT side — dark, premium ── */}
+      <motion.div
+        initial={{ opacity: 0, x: 16 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+        className="flex-1 flex flex-col justify-center px-14 py-20 relative overflow-hidden"
+        style={{ background: '#020817' }}
+      >
+        {/* Ambient glows */}
+        <div className="absolute -top-24 -right-24 w-[400px] h-[400px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(37,99,235,0.15) 0%, transparent 70%)' }} />
+        <div className="absolute -bottom-16 -left-16 w-[280px] h-[280px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%)' }} />
+        {/* Left accent line */}
+        <div className="absolute top-0 left-0 bottom-0 w-px hidden md:block" style={{ background: 'linear-gradient(to bottom, transparent, rgba(37,99,235,0.4) 30%, rgba(37,99,235,0.4) 70%, transparent)' }} />
+
+        <div className="relative z-10 max-w-sm">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full mb-7" style={{ border: '1px solid rgba(37,99,235,0.3)', background: 'rgba(37,99,235,0.08)' }}>
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+            <span className="text-[10px] font-medium tracking-widest uppercase text-blue-400">Agent Portal</span>
+          </div>
+
+          {/* Headline */}
+          <h1 className="text-[46px] font-light text-white leading-[1.05] mb-4" style={{ letterSpacing: '-2px' }}>
+            Built for agents<br />who move <strong className="font-semibold text-blue-400">fast.</strong>
+          </h1>
+
+          <p className="text-[15px] leading-relaxed mb-10 max-w-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            Pocket listings, AI buyer matching, trust accounting, and live lead alerts — one platform.
+          </p>
+
+          {/* Features */}
+          <div className="space-y-3 mb-11">
+            {[
+              'Manage listings & analytics',
+              'AI buyer concierge & matching',
+              'Trust accounting & rent roll',
+            ].map(f => (
+              <div key={f} className="flex items-center gap-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
+                <span className="text-[13px]" style={{ color: 'rgba(255,255,255,0.5)' }}>{f}</span>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={() => navigate('/agents/login')}
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white text-slate-900 text-sm font-medium hover:bg-slate-100 transition-colors"
+          >
+            Agent sign in
+            <span>→</span>
+          </button>
+        </div>
+      </motion.div>
+
+      {/* "Already have an account" — pinned bottom centre */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-20">
+        <div className="flex items-center gap-1.5 text-xs text-slate-400 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full border border-slate-200 shadow-sm whitespace-nowrap">
           Already have an account?{' '}
-          <Link to="/login" className="text-primary font-medium underline underline-offset-2">Sign in</Link>
-        </p>
-      </main>
+          <Link to="/login" className="text-blue-600 font-medium hover:underline ml-1">Sign in</Link>
+        </div>
+      </div>
     </div>
   );
 };

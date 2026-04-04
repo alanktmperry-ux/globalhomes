@@ -213,6 +213,11 @@ export default function AgentPublicProfilePage() {
 
         // Increment profile views
         supabase.rpc('increment_agent_profile_views', { p_agent_id: data.id });
+
+        // Auto-switch to Sold tab if no active listings but sold ones exist
+        if ((!props || props.length === 0) && soldProps && soldProps.length > 0) {
+          setListingTab('sold');
+        }
       }
       setLoading(false);
     };
@@ -382,17 +387,19 @@ export default function AgentPublicProfilePage() {
 
         <AgentPublicPerformanceCard agentId={agent.id} />
 
-        <ReputationScoreCard score={calcReputationScore({
-          rating: agent.avgRating || agent.reviewCount ? (agent.avgRating || 0) : null,
-          reviewCount: agent.reviewCount || 0,
-          totalListings: listings.length,
-          soldListings: soldListings.length,
-          hasAvatar: !!agent.avatarUrl,
-          hasBio: !!agent.bio,
-          hasPhone: !!agent.phone,
-          hasSpecialization: !!agent.specialization,
-          hasServiceAreas: agent.serviceAreas.length > 0,
-        })} />
+        {(listings.length > 0 || soldListings.length > 0 || (agent.reviewCount ?? 0) > 0) && (
+          <ReputationScoreCard score={calcReputationScore({
+            rating: agent.avgRating || agent.reviewCount ? (agent.avgRating || 0) : null,
+            reviewCount: agent.reviewCount || 0,
+            totalListings: listings.length,
+            soldListings: soldListings.length,
+            hasAvatar: !!agent.avatarUrl,
+            hasBio: !!agent.bio,
+            hasPhone: !!agent.phone,
+            hasSpecialization: !!agent.specialization,
+            hasServiceAreas: agent.serviceAreas.length > 0,
+          })} />
+        )}
 
         {/* Listing tabs */}
         <div className="mb-8">

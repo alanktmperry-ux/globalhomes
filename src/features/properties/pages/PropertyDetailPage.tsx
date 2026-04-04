@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { PropertySEOHead } from '@/features/seo/components/PropertySEOHead';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Calendar, Eye, Home, BadgeCheck, Star, X, PawPrint, Sofa, Clock, FileText, Users } from 'lucide-react';
+import { ArrowLeft, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Calendar, Eye, Home, BadgeCheck, Star, X, PawPrint, Sofa, Clock, FileText, Users, Phone, MessageCircle } from 'lucide-react';
 import { Property } from '@/shared/lib/types';
 import { useI18n } from '@/shared/lib/i18n';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
@@ -407,17 +407,17 @@ export default function PropertyDetailPage() {
             </div>
 
             {/* Key stats */}
-            <div className="grid grid-cols-4 gap-3">
+            <div className="flex border border-slate-200 rounded-2xl overflow-hidden">
               {[
                 { icon: Bed, value: property.beds, label: t('property.beds') },
                 { icon: Bath, value: property.baths, label: t('property.baths') },
                 { icon: Car, value: property.parking, label: t('property.parking') },
                 { icon: Ruler, value: `${property.sqm}m²`, label: 'Size' },
-              ].map(stat => (
-                <div key={stat.label} className="flex flex-col items-center p-4 rounded-xl bg-secondary">
-                  <stat.icon size={20} className="text-primary mb-1.5" />
-                  <span className="font-display font-bold text-foreground">{stat.value}</span>
-                  <span className="text-xs text-muted-foreground">{stat.label}</span>
+              ].map((stat, i) => (
+                <div key={stat.label} className={`flex-1 flex flex-col items-center py-3.5 gap-0.5 bg-white ${i < 3 ? 'border-r border-slate-200' : ''}`}>
+                  <stat.icon size={15} className="text-slate-400 mb-1" strokeWidth={1.8} />
+                  <span className="text-[15px] font-bold text-slate-900 leading-none">{stat.value}</span>
+                  <span className="text-[10px] text-slate-400 font-medium">{stat.label}</span>
                 </div>
               ))}
             </div>
@@ -572,7 +572,7 @@ export default function PropertyDetailPage() {
             {/* Description */}
             {property.description && (
               <div>
-                <h2 className="font-display text-lg font-semibold text-foreground mb-3">Description</h2>
+                <h2 className="text-[15px] font-bold text-slate-900 mb-3 flex items-center gap-2.5 before:content-[''] before:w-[3px] before:h-4 before:rounded-full before:bg-blue-600 before:shrink-0">Description</h2>
                 <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{property.description}</p>
               </div>
             )}
@@ -683,10 +683,10 @@ export default function PropertyDetailPage() {
             {/* Features */}
             {property.features.length > 0 && (
               <div>
-                <h2 className="font-display text-lg font-semibold text-foreground mb-3">Features</h2>
+                <h2 className="text-[15px] font-bold text-slate-900 mb-3 flex items-center gap-2.5 before:content-[''] before:w-[3px] before:h-4 before:rounded-full before:bg-blue-600 before:shrink-0">Features</h2>
                 <div className="flex flex-wrap gap-2">
                   {property.features.map(f => (
-                    <span key={f} className="px-3 py-1.5 rounded-full bg-secondary text-sm font-medium text-secondary-foreground">
+                    <span key={f} className="px-3 py-1.5 rounded-full border border-slate-200 bg-slate-50 text-sm font-medium text-slate-600">
                       {f}
                     </span>
                   ))}
@@ -700,67 +700,74 @@ export default function PropertyDetailPage() {
             {/* Investment Insights (hide for rentals) */}
             {!isRental && <InvestmentInsightsCard property={property} />}
 
-            <div className="p-5 rounded-2xl bg-card border border-border shadow-card sticky top-4">
-              <h3 className="font-display font-semibold text-foreground mb-4">{t('property.agent')}</h3>
-              <Link to={property.agent.id ? `/agent/${property.agent.id}` : '#'} className="flex items-center gap-3 mb-5 group/agent cursor-pointer">
-                <div className="relative">
-                  <Avatar className="w-16 h-16 border-2 border-primary transition-transform group-hover/agent:scale-105">
+            <div className="rounded-2xl overflow-hidden sticky top-4" style={{ background: '#020817' }}>
+              {/* Agent info */}
+              <Link to={property.agent.id ? `/agent/${property.agent.id}` : '#'} className="flex items-center gap-3.5 p-5 pb-4 group/agent">
+                <div className="relative shrink-0">
+                  <Avatar className="w-14 h-14 rounded-[14px] border-2 transition-transform group-hover/agent:scale-105" style={{ borderColor: 'rgba(255,255,255,0.12)' }}>
                     <AvatarImage src={property.agent.avatarUrl} alt={property.agent.name} className="object-cover" />
-                    <AvatarFallback className="text-lg font-bold">{property.agent.name[0]}</AvatarFallback>
+                    <AvatarFallback className="text-base font-bold rounded-[14px]" style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)', color: '#fff' }}>
+                      {property.agent.name.slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
                   </Avatar>
-                  {property.agent.isSubscribed && (
-                    <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                      <BadgeCheck size={14} className="text-primary-foreground" />
-                    </div>
-                  )}
                 </div>
-                <div className="flex-1">
-                  <p className="font-display font-semibold text-foreground text-lg group-hover/agent:text-primary transition-colors">{property.agent.name}</p>
-                  <p className="text-sm text-muted-foreground">{property.agent.agency}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-white text-[15px] leading-tight group-hover/agent:text-blue-400 transition-colors">{property.agent.name}</p>
+                  <p className="text-[12px] mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>{property.agent.agency}</p>
+                  {property.agent.isSubscribed && (
+                    <p className="text-[11px] font-semibold text-emerald-400 mt-1.5 flex items-center gap-1">
+                      <BadgeCheck size={12} /> {t('agent.subscribed')}
+                    </p>
+                  )}
                   {property.agent.rating ? (
                     <div className="flex items-center gap-1 mt-1">
-                      <Star size={14} className="fill-yellow-400 text-yellow-400" />
-                      <span className="text-sm font-medium text-foreground">{property.agent.rating.toFixed(1)}</span>
+                      <Star size={12} className="fill-yellow-400 text-yellow-400" />
+                      <span className="text-[12px] font-medium text-white">{property.agent.rating.toFixed(1)}</span>
                       {property.agent.reviewCount ? (
-                        <span className="text-xs text-muted-foreground">({property.agent.reviewCount} review{property.agent.reviewCount !== 1 ? 's' : ''})</span>
+                        <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>({property.agent.reviewCount})</span>
                       ) : null}
                     </div>
-                  ) : (
-                    <p className="text-xs text-muted-foreground mt-1">No reviews yet</p>
-                  )}
-                  <span className="text-xs text-primary font-medium mt-1 inline-block">View profile →</span>
+                  ) : null}
                 </div>
               </Link>
 
-              {property.agent.isSubscribed && (
-                <span className="inline-block px-3 py-1 rounded-md bg-success text-success-foreground text-xs font-medium mb-4">
-                  {t('agent.subscribed')}
-                </span>
-              )}
-
-              <button
-                onClick={handleCtaClick}
-                className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors"
-              >
-               {ctaLabel}
-              </button>
+              {/* Action buttons */}
+              <div className="flex gap-2 px-5 pb-5">
+                {property.agent.phone ? (
+                  <a
+                    href={`tel:${property.agent.phone}`}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[13px] font-semibold text-white transition-colors"
+                    style={{ border: '1.5px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)' }}
+                  >
+                    <Phone size={13} strokeWidth={2} /> Call
+                  </a>
+                ) : (
+                  <button
+                    onClick={handleCtaClick}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[13px] font-semibold text-white transition-colors"
+                    style={{ border: '1.5px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)' }}
+                  >
+                    <Phone size={13} strokeWidth={2} /> Call
+                  </button>
+                )}
+                <button
+                  onClick={handleCtaClick}
+                  className="flex-1 py-2.5 rounded-xl text-[13px] font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                >
+                  {ctaLabel}
+                </button>
+              </div>
 
               {isRental && (
-                <button
-                  onClick={() => setRentalApplicationOpen(true)}
-                  className="w-full mt-3 py-3.5 rounded-xl border-2 border-primary text-primary font-semibold text-sm hover:bg-primary hover:text-primary-foreground transition-colors"
-                >
-                  Apply Now
-                </button>
-              )}
-
-              {property.agent.phone && (
-                <a
-                  href={`tel:${property.agent.phone}`}
-                  className="w-full mt-3 py-3 rounded-xl border border-border bg-secondary text-foreground font-medium text-sm flex items-center justify-center gap-2 hover:bg-accent transition-colors"
-                >
-                  📞 {property.agent.phone}
-                </a>
+                <div className="px-5 pb-5 -mt-2">
+                  <button
+                    onClick={() => setRentalApplicationOpen(true)}
+                    className="w-full py-2.5 rounded-xl text-[13px] font-semibold transition-colors"
+                    style={{ border: '1.5px solid rgba(255,255,255,0.12)', color: '#fff', background: 'transparent' }}
+                  >
+                    Apply Now
+                  </button>
+                </div>
               )}
             </div>
           </div>
@@ -769,10 +776,19 @@ export default function PropertyDetailPage() {
 
       {/* Mobile sticky CTA */}
       {isMobile && (
-        <div className="fixed bottom-16 left-0 right-0 p-4 bg-card/95 backdrop-blur-sm border-t border-border z-30">
+        <div className="fixed bottom-16 left-0 right-0 px-4 py-3 bg-white/95 backdrop-blur-sm border-t border-slate-100 z-30 flex gap-2.5">
+          {property.agent.phone && (
+            <a
+              href={`tel:${property.agent.phone}`}
+              className="w-12 h-12 flex items-center justify-center rounded-xl border border-slate-200 bg-white shrink-0"
+            >
+              <Phone size={18} className="text-slate-600" strokeWidth={1.8} />
+            </a>
+          )}
           <button
             onClick={handleCtaClick}
-            className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm"
+            className="flex-1 py-3 rounded-xl font-semibold text-sm text-white"
+            style={{ background: '#1e293b' }}
           >
             {ctaLabel}
           </button>

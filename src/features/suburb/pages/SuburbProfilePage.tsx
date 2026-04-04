@@ -103,15 +103,6 @@ export default function SuburbProfilePage() {
       <SuburbHero suburb={suburb} suburbName={suburbName} stateUpper={stateUpper} stats={houseStats} />
 
       <div className="max-w-6xl mx-auto px-4 py-8 space-y-10">
-        {/* Breadcrumb */}
-        <nav className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
-          <span>/</span>
-          <span>{stateUpper}</span>
-          <span>/</span>
-          <span className="text-foreground font-medium">{suburbName}</span>
-        </nav>
-
         {/* Price Chart */}
         {priceHistory.length > 0 && (
           <section>

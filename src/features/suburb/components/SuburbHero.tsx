@@ -30,49 +30,47 @@ export function SuburbHero({ suburb, suburbName, stateUpper, stats }: Props) {
           <p className="text-base text-muted-foreground mt-3 max-w-2xl leading-relaxed">{suburb.description}</p>
         )}
 
-        {stats && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-            {[
-              {
-                label: 'Median House Price',
-                value: stats.median_sale_price
-                  ? `$${(stats.median_sale_price / 1000).toFixed(0)}k`
-                  : '—',
-                sub: yoy != null ? (
-                  <span className={`flex items-center gap-1 ${yoyColor}`}>
-                    <YoyIcon size={12} />
-                    {Math.abs(yoy).toFixed(1)}% YoY
-                  </span>
-                ) : null,
-              },
-              {
-                label: 'Annual Sales',
-                value: stats.total_sales ?? '—',
-                sub: <span className="text-muted-foreground">last 12 months</span>,
-              },
-              {
-                label: 'Median Days on Market',
-                value: stats.avg_days_on_market
-                  ? `${Math.round(stats.avg_days_on_market)}d`
-                  : '—',
-                sub: <span className="text-muted-foreground">houses</span>,
-              },
-              {
-                label: 'Gross Rental Yield',
-                value: stats.gross_yield ? `${stats.gross_yield.toFixed(1)}%` : '—',
-                sub: stats.median_rent_pw ? (
-                  <span className="text-muted-foreground">${stats.median_rent_pw}/wk median</span>
-                ) : null,
-              },
-            ].map(({ label, value, sub }) => (
-              <div key={label} className="p-4 rounded-xl bg-card border border-border">
-                <p className="font-display text-2xl font-bold text-foreground">{value}</p>
-                <p className="text-xs text-muted-foreground mt-1">{label}</p>
-                {sub && <p className="text-xs mt-1">{sub}</p>}
-              </div>
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+          {[
+            {
+              label: 'Median House Price',
+              value: stats?.median_sale_price
+                ? `$${(stats.median_sale_price / 1000).toFixed(0)}k`
+                : '—',
+              sub: yoy != null ? (
+                <span className={`flex items-center gap-1 ${yoyColor}`}>
+                  <YoyIcon size={12} />
+                  {Math.abs(yoy).toFixed(1)}% YoY
+                </span>
+              ) : <span className="text-muted-foreground">market data</span>,
+            },
+            {
+              label: 'Annual Sales',
+              value: stats?.total_sales ?? '—',
+              sub: <span className="text-muted-foreground">last 12 months</span>,
+            },
+            {
+              label: 'Median Days on Market',
+              value: stats?.avg_days_on_market
+                ? `${Math.round(stats.avg_days_on_market)}d`
+                : '—',
+              sub: <span className="text-muted-foreground">houses</span>,
+            },
+            {
+              label: 'Gross Rental Yield',
+              value: stats?.gross_yield ? `${stats.gross_yield.toFixed(1)}%` : '—',
+              sub: stats?.median_rent_pw ? (
+                <span className="text-muted-foreground">${stats.median_rent_pw}/wk median</span>
+              ) : <span className="text-muted-foreground">rental data</span>,
+            },
+          ].map(({ label, value, sub }) => (
+            <div key={label} className="p-4 rounded-xl bg-card border border-border">
+              <p className="font-display text-2xl font-bold text-foreground">{value}</p>
+              <p className="text-xs text-muted-foreground mt-1">{label}</p>
+              {sub && <p className="text-xs mt-1">{sub}</p>}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

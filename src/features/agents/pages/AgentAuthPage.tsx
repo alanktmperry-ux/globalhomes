@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Building2, KeyRound, BarChart3, Users, Megaphone, MapPin, CheckCircle2, Home, Zap, ChevronRight } from 'lucide-react';
+import { Building2, KeyRound, MapPin, CheckCircle2, Home, Zap, ChevronRight } from 'lucide-react';
 import { autocomplete } from '@/shared/lib/googleMapsService';
 import PhoneInput from '@/shared/components/PhoneInput';
 import { useNavigate, Link } from 'react-router-dom';
@@ -8,7 +8,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
 import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/AuthProvider';
-import agentHero from '@/assets/agent-auth-hero.jpg';
 
 type Step = 'email' | 'password' | 'choose' | 'create-agency' | 'join-agency';
 
@@ -213,70 +212,77 @@ const AgentAuthPage = () => {
     else navigate('/for-agents');
   };
 
-  const inputClass = "w-full px-4 py-3.5 rounded-full border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40";
+  const inputClass = "w-full px-4 py-3.5 rounded-[14px] border border-stone-200 bg-stone-50 text-stone-900 text-sm placeholder:text-stone-300 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:bg-white transition-all";
 
-  const features = [
-    { icon: Building2, text: 'Manage all your property listings' },
-    { icon: BarChart3, text: 'Track views, leads & analytics' },
-    { icon: Users, text: 'Build your team & grow your network' },
-    { icon: Megaphone, text: 'Capture voice-search leads automatically' },
-  ];
+  const AGENT_PILLS = ['Pocket listings', 'Pre-market period', 'AI buyer matching', 'Pipeline kanban', 'Rent roll', 'Trust accounting', '24 languages'];
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left hero panel */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        <img src={agentHero} alt="Real estate professional" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[hsl(222,47%,8%)]/95 via-[hsl(222,47%,11%)]/70 to-[hsl(222,47%,11%)]/30" />
-        <div className="relative z-10 flex flex-col justify-between p-12 text-white h-full">
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center">
-              <Building2 size={20} />
-            </div>
-            <div>
-              <span className="text-sm font-bold uppercase tracking-wider">Agent Portal</span>
-              <p className="text-white/50 text-[10px] uppercase tracking-widest">For Real Estate Professionals</p>
-            </div>
+    <div className="min-h-screen flex" style={{ background: '#020817' }}>
+
+      {/* ── LEFT: Dark premium panel ── */}
+      <div className="hidden lg:flex lg:w-[48%] shrink-0 flex-col justify-between p-11 relative overflow-hidden">
+        {/* Ambient glow top-right */}
+        <div className="absolute -top-28 -right-16 w-[380px] h-[380px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(37,99,235,0.18) 0%, transparent 70%)' }} />
+        {/* Ambient glow bottom-left */}
+        <div className="absolute -bottom-16 -left-12 w-[280px] h-[280px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(37,99,235,0.10) 0%, transparent 70%)' }} />
+        {/* Top accent line */}
+        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(37,99,235,0.6), rgba(99,179,237,0.4), transparent)' }} />
+
+        {/* Brand */}
+        <div className="relative z-10 flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center text-[11px] font-bold text-white">L</div>
+          <span className="text-[15px] font-semibold text-white tracking-tight">ListHQ</span>
+        </div>
+
+        {/* Hero content */}
+        <div className="relative z-10">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border mb-7" style={{ borderColor: 'rgba(37,99,235,0.3)', background: 'rgba(37,99,235,0.08)' }}>
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+            <span className="text-[11px] font-medium tracking-widest uppercase text-blue-400">Agent Portal</span>
           </div>
-          <div>
-            <h2 className="font-display text-4xl font-bold leading-tight mb-4">Grow your<br />business</h2>
-            <p className="text-white/70 text-base mb-6 max-w-sm">The complete platform for real estate agents and agencies.</p>
-            <div className="space-y-3">
-              {features.map((f, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
-                    <f.icon size={15} />
-                  </div>
-                  <span className="text-white/80 text-sm">{f.text}</span>
-                </div>
-              ))}
-            </div>
+
+          <h2 className="text-[42px] font-light text-white leading-[1.05] tracking-tight mb-9" style={{ letterSpacing: '-1.5px' }}>
+            Built for agents<br />who move <span className="font-semibold text-blue-400">fast.</span>
+          </h2>
+
+          <div className="flex flex-wrap gap-2 mb-10">
+            {AGENT_PILLS.map(p => (
+              <span key={p} className="px-3.5 py-1.5 rounded-full text-xs text-white/60" style={{ border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)' }}>
+                {p}
+              </span>
+            ))}
+          </div>
+
+          <div className="flex gap-8 pt-7" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+            {[{ val: 'Free', lbl: 'First listing' }, { val: 'Live', lbl: 'Lead alerts' }, { val: 'AI', lbl: 'Buyer matching' }].map(s => (
+              <div key={s.lbl}>
+                <div className="text-xl font-semibold text-white tracking-tight leading-none">{s.val}</div>
+                <div className="text-[11px] mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{s.lbl}</div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Right form panel */}
-      <main className="flex-1 bg-background flex flex-col justify-center max-w-sm mx-auto w-full px-6 py-12 lg:max-w-md lg:px-12">
+      {/* ── RIGHT: White form panel ── */}
+      <div className="flex-1 bg-white flex flex-col min-h-screen">
+        <div className="flex-1 flex flex-col justify-center px-10 lg:px-20 py-12 overflow-y-auto max-w-lg mx-auto w-full">
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
 
-          {/* Brand */}
-          <div className="mb-6">
-            <Link to="/" className="inline-flex items-center gap-2">
-              <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground text-xs font-bold">L</span>
-              </div>
-              <span className="font-display text-lg font-bold text-foreground">ListHQ</span>
-            </Link>
+          {/* Form badge */}
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-stone-200 bg-stone-50 mb-5">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+            <span className="text-[10px] font-medium tracking-widest uppercase text-stone-400">Agent sign in</span>
           </div>
 
-          <h1 className="font-display text-2xl font-bold text-foreground mb-1">
-            {step === 'email' && 'Agent Sign In'}
-            {step === 'password' && 'Welcome back'}
-            {step === 'choose' && 'Join ListHQ'}
-            {step === 'create-agency' && 'Create your account'}
-            {step === 'join-agency' && 'Join an Agency'}
+          <h1 className="text-[38px] font-light text-stone-900 leading-[1.08] mb-8" style={{ letterSpacing: '-1.5px' }}>
+            {(step === 'email' || step === 'password') && <>Welcome<br /><strong className="font-semibold">back.</strong></>}
+            {step === 'choose' && <>Join<br /><strong className="font-semibold">ListHQ.</strong></>}
+            {step === 'create-agency' && <>Create your<br /><strong className="font-semibold">account.</strong></>}
+            {step === 'join-agency' && <>Join your<br /><strong className="font-semibold">agency.</strong></>}
           </h1>
-          <p className="text-sm text-muted-foreground mb-6">
+
+          <p className="text-sm text-stone-400 mb-6 -mt-4">
             {step === 'email' && 'Access your dashboard, listings, and leads.'}
             {step === 'password' && email}
             {step === 'choose' && 'Start your free 60-day trial. No credit card required.'}
@@ -650,21 +656,19 @@ const AgentAuthPage = () => {
             </>
           )}
 
-          {/* Buyer link */}
-          <div className="mt-6 pt-5 border-t border-border">
-            <Link to="/login" className="flex items-center gap-3 p-3.5 rounded-xl border border-border hover:border-primary/40 hover:bg-accent/50 transition-colors group">
-              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <Home size={16} className="text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">Looking to buy a property?</p>
-                <p className="text-xs text-muted-foreground">Search properties as a buyer →</p>
-              </div>
-            </Link>
-          </div>
-
         </motion.div>
-      </main>
+        </div>
+
+        {/* Portal whisper footer */}
+        <div className="px-10 lg:px-20 py-5 border-t border-stone-100 shrink-0 max-w-lg mx-auto w-full">
+          <p className="text-[11px] text-stone-300">
+            Looking for the buyer portal?{' '}
+            <Link to="/login" className="text-stone-400 hover:text-blue-600 transition-colors">Property Seeker sign in</Link>
+            <span className="mx-1.5 text-stone-200">·</span>
+            <Link to="/partner/login" className="text-stone-400 hover:text-blue-600 transition-colors">Trust Accounting Partner</Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

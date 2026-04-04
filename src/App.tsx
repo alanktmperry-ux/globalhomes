@@ -4,7 +4,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { I18nProvider } from "@/shared/lib/i18n";
 import { ConsentProvider } from "@/shared/components/CookieConsent";
 import { CurrencyProvider } from "@/shared/lib/CurrencyContext";
@@ -154,6 +154,12 @@ const ScrollToTop = () => {
   return null;
 };
 
+/** Redirects /search?q=foo to /?q=foo so shared/bookmarked search URLs don't 404 */
+function SearchRedirect() {
+  const { search } = useLocation();
+  return <Navigate to={`/${search}`} replace />;
+}
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -177,6 +183,8 @@ const App = () => (
                 {/* Public with shared navbar/footer */}
                 <Route element={<PublicLayout />}>
                   <Route path="/" element={<Index />} />
+                  {/* /search?q=... redirects to /?q=... so bookmarked/shared search URLs don't 404 */}
+                  <Route path="/search" element={<SearchRedirect />} />
                   <Route path="/property/:id" element={<PropertyDetailPage />} />
                   <Route path="/agent/:id" element={<AgentPublicProfilePage />} />
                   <Route path="/agents" element={<FindAgentPage />} />

@@ -19,7 +19,12 @@ export function HelpWidget() {
   const { pathname } = useLocation();
   const contextLinks = useMemo(() => getContextLinks(pathname), [pathname]);
 
-  if (pathname.startsWith('/help')) return null;
+  // Hide on pages that have their own sticky CTAs to avoid overlap
+  if (
+    pathname.startsWith('/help') ||
+    pathname.startsWith('/property/') ||
+    pathname.startsWith('/agent/')
+  ) return null;
 
   return (
     <>

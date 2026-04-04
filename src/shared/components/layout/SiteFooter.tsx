@@ -1,120 +1,115 @@
-import { Globe, Instagram, Linkedin, Twitter, ShieldCheck, Scale, FileCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { DarkModeToggle } from './DarkModeToggle';
-import { useConsent } from '@/shared/components/CookieConsent';
-
-const footerLinks = [
-  { label: 'Home', to: '/' },
-  { label: 'Search', to: '/' },
-  { label: 'Saved', to: '/saved' },
-  { label: 'Stamp Duty Calculator', to: '/stamp-duty-calculator' },
-  { label: 'Profile', to: '/profile' },
-];
-
-const legalLinks = [
-  { label: 'About', to: '/for-agents' },
-  { label: 'Privacy Policy', to: '/privacy' },
-  { label: 'Terms of Service', to: '/terms' },
-  { label: 'Agent Login', to: '/agents/login' },
-  { label: 'Partner Portal', to: '/partner/login' },
-  { label: 'Contact', to: 'mailto:support@listhq.com.au' },
-];
-
-const supportLinks = [
-  { label: 'Help Centre', to: '/help' },
-  { label: 'FAQ', to: '/help/faq' },
-  { label: 'Contact Us', to: '/help/contact' },
-];
-
-const socialLinks = [
-  { icon: Instagram, href: 'https://instagram.com/listhq', label: 'Instagram' },
-  { icon: Linkedin, href: 'https://linkedin.com/company/listhq', label: 'LinkedIn' },
-  { icon: Twitter, href: 'https://x.com/listhq', label: 'Twitter' },
-];
-
-const complianceBadges = [
-  {
-    icon: ShieldCheck,
-    title: 'Trust Account Compliant',
-    description: 'All deposits held in auditable trust accounts per state regulations.',
-  },
-  {
-    icon: Scale,
-    title: 'Licensed Agents Only',
-    description: 'Every agent is licence-verified before listing on the platform.',
-  },
-  {
-    icon: FileCheck,
-    title: 'Digital Audit Trail',
-    description: 'Full compliance trail from lead capture through to settlement.',
-  },
-];
+import { Instagram, Linkedin, Twitter } from 'lucide-react';
 
 export function SiteFooter() {
-  const { resetConsent } = useConsent();
   return (
-    <footer className="bg-card border-t border-border pb-20 md:pb-0">
-      {/* Compliance banner */}
-      <div className="border-b border-border bg-secondary/30">
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {complianceBadges.map((badge) => (
-              <div key={badge.title} className="flex items-start gap-3">
-                <div className="mt-0.5 w-9 h-9 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <badge.icon size={18} className="text-primary" />
-                </div>
-                <div>
-                  <p className="font-display text-sm font-semibold text-foreground">{badge.title}</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed mt-0.5">{badge.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+    <footer style={{ background: '#020817' }} className="relative overflow-hidden">
+      {/* Top accent line */}
+      <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(37,99,235,0.5), transparent)' }} />
 
-      <div className="max-w-6xl mx-auto px-4 py-10">
-        {/* Top row */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 mb-8">
-          <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-cyan-accent flex items-center justify-center">
-              <Globe size={20} className="text-primary-foreground" />
+      <div className="max-w-6xl mx-auto px-6 pt-12 pb-8">
+
+        {/* Main grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-10 pb-10" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+
+          {/* Brand col */}
+          <div className="col-span-2 md:col-span-1">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center text-[11px] font-bold text-white">L</div>
+              <span className="text-[15px] font-semibold text-white tracking-tight">ListHQ</span>
             </div>
-            <span className="font-display text-lg font-bold text-foreground tracking-tight">
-              ListHQ
-            </span>
+            <p className="text-[13px] leading-relaxed mb-5 max-w-[200px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              Australia's AI-powered property platform. Search in 24 languages.
+            </p>
+            <div className="flex gap-2">
+              {[
+                { icon: Instagram, href: 'https://instagram.com/listhq', label: 'Instagram' },
+                { icon: Linkedin, href: 'https://linkedin.com/company/listhq', label: 'LinkedIn' },
+                { icon: Twitter, href: 'https://x.com/listhq', label: 'Twitter' },
+              ].map(({ icon: Icon, href, label }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
+                  style={{ border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.4)' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#3b82f6'; (e.currentTarget as HTMLElement).style.borderColor = '#3b82f6'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)'; }}
+                >
+                  <Icon size={14} />
+                </a>
+              ))}
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">Theme</span>
-            <DarkModeToggle />
-          </div>
-        </div>
 
-        {/* Links grid */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
+          {/* Platform col */}
           <div>
-            <h4 className="font-display text-sm font-semibold text-foreground mb-3">Navigate</h4>
-            <ul className="space-y-2">
-              {footerLinks.map((link) => (
+            <h4 className="text-[11px] font-semibold tracking-widest uppercase mb-4" style={{ color: 'rgba(255,255,255,0.3)' }}>Platform</h4>
+            <ul className="space-y-2.5">
+              {[
+                { label: 'Search Properties', to: '/' },
+                { label: 'Stamp Duty Calculator', to: '/stamp-duty-calculator' },
+                { label: 'Saved Properties', to: '/saved' },
+                { label: 'Voice Search', to: '/' },
+              ].map(link => (
                 <li key={link.label}>
-                  <Link to={link.to} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <Link to={link.to} className="text-[13px] transition-colors" style={{ color: 'rgba(255,255,255,0.5)' }}
+                    onMouseEnter={e => ((e.target as HTMLElement).style.color = '#fff')}
+                    onMouseLeave={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.5)')}
+                  >
                     {link.label}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
+
+          {/* Legal col */}
           <div>
-            <h4 className="font-display text-sm font-semibold text-foreground mb-3">Legal &amp; Compliance</h4>
-            <ul className="space-y-2">
-              {legalLinks.map((link) => (
+            <h4 className="text-[11px] font-semibold tracking-widest uppercase mb-4" style={{ color: 'rgba(255,255,255,0.3)' }}>Legal</h4>
+            <ul className="space-y-2.5">
+              {[
+                { label: 'Privacy Policy', to: '/privacy' },
+                { label: 'Terms of Service', to: '/terms' },
+                { label: 'Agent Portal', to: '/agents/login' },
+                { label: 'Partner Portal', to: '/partner/login' },
+              ].map(link => (
                 <li key={link.label}>
-                  {link.to.startsWith('mailto:') ? (
-                    <a href={link.to} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <Link to={link.to} className="text-[13px] transition-colors" style={{ color: 'rgba(255,255,255,0.5)' }}
+                    onMouseEnter={e => ((e.target as HTMLElement).style.color = '#fff')}
+                    onMouseLeave={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.5)')}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Support col */}
+          <div>
+            <h4 className="text-[11px] font-semibold tracking-widest uppercase mb-4" style={{ color: 'rgba(255,255,255,0.3)' }}>Support</h4>
+            <ul className="space-y-2.5">
+              {[
+                { label: 'Help Centre', to: '/help' },
+                { label: 'Contact Us', to: 'mailto:support@listhq.com.au', external: true },
+                { label: 'Agent Login', to: '/agents/login' },
+              ].map(link => (
+                <li key={link.label}>
+                  {link.external ? (
+                    <a href={link.to} className="text-[13px] transition-colors" style={{ color: 'rgba(255,255,255,0.5)' }}
+                      onMouseEnter={e => ((e.target as HTMLElement).style.color = '#fff')}
+                      onMouseLeave={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.5)')}
+                    >
                       {link.label}
                     </a>
                   ) : (
-                    <Link to={link.to} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    <Link to={link.to} className="text-[13px] transition-colors" style={{ color: 'rgba(255,255,255,0.5)' }}
+                      onMouseEnter={e => ((e.target as HTMLElement).style.color = '#fff')}
+                      onMouseLeave={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.5)')}
+                    >
                       {link.label}
                     </Link>
                   )}
@@ -122,73 +117,19 @@ export function SiteFooter() {
               ))}
             </ul>
           </div>
-          <div>
-            <h4 className="font-display text-sm font-semibold text-foreground mb-3">Popular Suburbs</h4>
-            <ul className="space-y-2">
-              {[
-                { name: 'Surry Hills', state: 'nsw', slug: 'surry-hills' },
-                { name: 'St Kilda', state: 'vic', slug: 'st-kilda' },
-                { name: 'New Farm', state: 'qld', slug: 'new-farm' },
-                { name: 'Cottesloe', state: 'wa', slug: 'cottesloe' },
-                { name: 'Bondi', state: 'nsw', slug: 'bondi' },
-                { name: 'Fitzroy', state: 'vic', slug: 'fitzroy' },
-              ].map((s) => (
-                <li key={s.slug}>
-                  <Link to={`/suburb/${s.state}/${s.slug}`} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                    {s.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-display text-sm font-semibold text-foreground mb-3">Support</h4>
-            <ul className="space-y-2">
-              {supportLinks.map((link) => (
-                <li key={link.label}>
-                  <Link to={link.to} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-display text-sm font-semibold text-foreground mb-3">Connect</h4>
-            <div className="flex items-center gap-3">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={social.label}
-                  className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                >
-                  <social.icon size={18} />
-                </a>
-              ))}
-            </div>
-          </div>
+
         </div>
 
-        {/* Divider + compliance fine print */}
-        <div className="border-t border-border pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-muted-foreground">
+        {/* Bottom bar */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 pt-6">
+          <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.2)' }}>
             ListHQ © {new Date().getFullYear()} · ABN 00 000 000 000
-          </p>
-          <div className="flex items-center gap-3">
-            <p className="text-xs text-muted-foreground text-center md:text-right max-w-md leading-relaxed">
-              ListHQ operates under Australian property law. All trust funds are held in compliance with state fair trading regulations.
-            </p>
-            <button
-              onClick={resetConsent}
-              className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 whitespace-nowrap transition-colors"
-            >
-              Reset cookie preferences
-            </button>
-          </div>
+          </span>
+          <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.2)' }}>
+            Licensed agents only · Trust account compliant · Australian property law
+          </span>
         </div>
+
       </div>
     </footer>
   );

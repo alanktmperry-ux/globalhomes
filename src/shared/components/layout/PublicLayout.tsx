@@ -13,7 +13,7 @@ const PublicLayout = () => {
       <main className="flex-1 flex flex-col">
         <Outlet />
       </main>
-      {!isHome && <SiteFooter />}
+      <SiteFooter />
       <BottomNav />
     </div>
   );

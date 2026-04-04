@@ -382,7 +382,7 @@ export default function PropertyDetailPage() {
                 <MapPin size={16} />
                 {(property as any).address_hidden
                   ? `${property.suburb}, ${property.state}`
-                  : `${property.address}, ${property.suburb}, ${property.state}`}
+                  : property.address}
                 {property.country && property.country !== 'Australia' ? `, ${property.country}` : ''}
               </p>
               {property.suburb && property.state && (
@@ -412,7 +412,7 @@ export default function PropertyDetailPage() {
                 { icon: Bed, value: property.beds, label: t('property.beds') },
                 { icon: Bath, value: property.baths, label: t('property.baths') },
                 { icon: Car, value: property.parking, label: t('property.parking') },
-                { icon: Ruler, value: `${property.sqm}m²`, label: 'Size' },
+                { icon: Ruler, value: property.sqm ? `${property.sqm}m²` : '—', label: 'Size' },
               ].map((stat, i) => (
                 <div key={stat.label} className={`flex-1 flex flex-col items-center py-3.5 gap-0.5 bg-white ${i < 3 ? 'border-r border-slate-200' : ''}`}>
                   <stat.icon size={15} className="text-slate-400 mb-1" strokeWidth={1.8} />

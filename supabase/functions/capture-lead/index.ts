@@ -122,6 +122,42 @@ Deno.serve(async (req) => {
       tags: [],
     }]);
 
+    // ── Drip: enroll agent in lead follow-up sequence ──────────
+    try {
+      const { data: leadSeq } = await supabase
+        .from('drip_sequences')
+        .select('id')
+        .eq('trigger_event', 'lead_contact')
+        .eq('is_active', true)
+        .single();
+
+      if (leadSeq) {
+        // Get property address for the template
+        const { data: property } = await supabase
+          .from('properties')
+          .select('address')
+          .eq('id', propertyId)
+          .single();
+
+        await supabase.from('drip_enrollments').upsert({
+          agent_id:    agentId,
+          sequence_id: leadSeq.id,
+          enrolled_at: new Date().toISOString(),
+          next_step_order: 1,
+          completed:   false,
+          metadata: {
+            buyer_name:       userName,
+            property_address: property?.address ?? 'your listing',
+            property_id:      propertyId,
+          },
+        }, { onConflict: 'agent_id,sequence_id', ignoreDuplicates: false });
+      }
+    } catch (dripErr) {
+      // Non-fatal — log and continue
+      console.warn('Drip enroll failed (non-fatal):', dripErr);
+    }
+    // ────────────────────────────────────────────────────────────
+
     return new Response(
       JSON.stringify({
         success: true,

@@ -3,6 +3,29 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Mic, ArrowRight, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
+import { supabase } from '@/integrations/supabase/client';
+
+const AVATAR_COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
+const AVATAR_INITIALS = ['A', 'M', 'S', 'J', 'R'];
+
+function usePlatformStats() {
+  const [stats, setStats] = useState<{ properties: number | null; agents: number | null; searching: number }>({
+    properties: null, agents: null, searching: 12,
+  });
+
+  useEffect(() => {
+    async function load() {
+      const [{ count: propCount }, { count: agentCount }] = await Promise.all([
+        supabase.from('properties').select('*', { count: 'exact', head: true }).eq('is_active', true),
+        supabase.from('agents').select('*', { count: 'exact', head: true }),
+      ]);
+      setStats(s => ({ ...s, properties: propCount ?? 0, agents: agentCount ?? 0 }));
+    }
+    load();
+  }, []);
+
+  return stats;
+}
 
 const ROTATING_WORDS = [
   { text: 'next home.', color: 'text-foreground' },
@@ -35,6 +58,7 @@ interface Props {
 export function LandingHero({ onSearch, onListingModeChange }: Props) {
   const navigate = useNavigate();
   const { listingMode, setListingMode } = useCurrency();
+  const platformStats = usePlatformStats();
   const [query, setQuery] = useState('');
   const [wordIndex, setWordIndex] = useState(0);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
@@ -178,24 +202,72 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
 
         </motion.div>
 
-        {/* Stats strip */}
+        {/* Social proof strip */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.6 }}
-          className="relative z-10 mt-16 grid grid-cols-4 gap-px bg-slate-100 rounded-2xl overflow-hidden max-w-2xl w-full mx-auto"
+          className="relative z-10 mt-16 max-w-2xl w-full mx-auto"
         >
-          {[
-            { num: '24', label: 'Languages' },
-            { num: 'Live', label: 'Exchange rates' },
-            { num: 'AI', label: 'Voice search' },
-            { num: 'Free', label: 'To search' },
-          ].map(stat => (
-            <div key={stat.label} className="bg-white px-6 py-5 text-center">
-              <div className="text-xl font-bold text-slate-900">{stat.num}</div>
-              <div className="text-xs text-slate-400 mt-0.5">{stat.label}</div>
+          {/* Live badge */}
+          <div className="flex justify-center mb-3">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-semibold tracking-widest uppercase">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Live data
+            </span>
+          </div>
+
+          <div className="bg-white border border-slate-100 rounded-2xl shadow-sm shadow-slate-100 px-8 py-6 flex flex-wrap items-center justify-center gap-6 sm:gap-8">
+
+            {/* Properties */}
+            <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
+              <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">
+                {platformStats.properties === null ? <span className="text-slate-300">—</span> : platformStats.properties}
+                <span className="text-xl font-semibold text-blue-500">+</span>
+              </span>
+              <span className="text-[11px] text-slate-400 font-medium">Properties listed</span>
             </div>
-          ))}
+
+            <div className="w-px h-9 bg-slate-100 hidden sm:block" />
+
+            {/* Agents */}
+            <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
+              <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">
+                {platformStats.agents === null ? <span className="text-slate-300">—</span> : platformStats.agents}
+                <span className="text-xl font-semibold text-blue-500">+</span>
+              </span>
+              <span className="text-[11px] text-slate-400 font-medium">Active agents</span>
+            </div>
+
+            <div className="w-px h-9 bg-slate-100 hidden sm:block" />
+
+            {/* Languages */}
+            <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
+              <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">24</span>
+              <span className="text-[11px] text-slate-400 font-medium">Languages</span>
+            </div>
+
+            <div className="w-px h-9 bg-slate-100 hidden sm:block" />
+
+            {/* Searching now — avatar stack */}
+            <div className="flex items-center gap-3">
+              <div className="flex">
+                {AVATAR_INITIALS.map((init, i) => (
+                  <div
+                    key={init}
+                    className="w-7 h-7 rounded-full border-2 border-white flex items-center justify-center text-[11px] font-bold text-white"
+                    style={{ background: AVATAR_COLORS[i], marginLeft: i === 0 ? 0 : -8 }}
+                  >
+                    {init}
+                  </div>
+                ))}
+              </div>
+              <span className="text-sm text-slate-500 font-medium">
+                <span className="font-bold text-slate-900">{platformStats.searching}</span> searching now
+              </span>
+            </div>
+
+          </div>
         </motion.div>
 
         {/* Scroll indicator */}

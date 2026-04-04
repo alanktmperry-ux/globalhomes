@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e3a5f"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2563eb"/>
+      <stop offset="100%" style="stop-color:#7c3aed"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle grid pattern -->
+  <g opacity="0.04" stroke="#ffffff" stroke-width="1">
+    <line x1="0" y1="105" x2="1200" y2="105"/>
+    <line x1="0" y1="210" x2="1200" y2="210"/>
+    <line x1="0" y1="315" x2="1200" y2="315"/>
+    <line x1="0" y1="420" x2="1200" y2="420"/>
+    <line x1="0" y1="525" x2="1200" y2="525"/>
+    <line x1="150" y1="0" x2="150" y2="630"/>
+    <line x1="300" y1="0" x2="300" y2="630"/>
+    <line x1="450" y1="0" x2="450" y2="630"/>
+    <line x1="600" y1="0" x2="600" y2="630"/>
+    <line x1="750" y1="0" x2="750" y2="630"/>
+    <line x1="900" y1="0" x2="900" y2="630"/>
+    <line x1="1050" y1="0" x2="1050" y2="630"/>
+  </g>
+
+  <!-- Blue accent bar top -->
+  <rect x="0" y="0" width="1200" height="6" fill="url(#accent)"/>
+
+  <!-- Logo mark — house icon -->
+  <g transform="translate(96, 200)">
+    <!-- House shape -->
+    <polygon points="52,8 96,44 88,44 88,88 16,88 16,44 8,44" fill="none" stroke="#2563eb" stroke-width="4" stroke-linejoin="round"/>
+    <rect x="36" y="60" width="20" height="28" fill="#2563eb" rx="2"/>
+  </g>
+
+  <!-- ListHQ wordmark -->
+  <text x="96" y="348" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="800" fill="#ffffff" letter-spacing="-2">List</text>
+  <text x="252" y="348" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="800" fill="#2563eb" letter-spacing="-2">HQ</text>
+
+  <!-- Tagline -->
+  <text x="96" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="400" fill="#94a3b8" letter-spacing="0">Australia's AI-powered property platform</text>
+
+  <!-- Divider line -->
+  <rect x="96" y="432" width="80" height="3" fill="#2563eb" rx="2"/>
+
+  <!-- Feature pills -->
+  <g transform="translate(96, 464)">
+    <!-- Pill 1 -->
+    <rect x="0" y="0" width="200" height="44" rx="22" fill="#ffffff" fill-opacity="0.06" stroke="#ffffff" stroke-opacity="0.12" stroke-width="1"/>
+    <text x="100" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="500" fill="#e2e8f0" text-anchor="middle">Search in 24 languages</text>
+    <!-- Pill 2 -->
+    <rect x="216" y="0" width="164" height="44" rx="22" fill="#ffffff" fill-opacity="0.06" stroke="#ffffff" stroke-opacity="0.12" stroke-width="1"/>
+    <text x="298" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="500" fill="#e2e8f0" text-anchor="middle">AI voice search</text>
+    <!-- Pill 3 -->
+    <rect x="396" y="0" width="172" height="44" rx="22" fill="#ffffff" fill-opacity="0.06" stroke="#ffffff" stroke-opacity="0.12" stroke-width="1"/>
+    <text x="482" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="500" fill="#e2e8f0" text-anchor="middle">Live property data</text>
+  </g>
+
+  <!-- Right side — decorative stat cards -->
+  <g transform="translate(740, 160)">
+    <!-- Card 1 -->
+    <rect x="0" y="0" width="380" height="120" rx="16" fill="#ffffff" fill-opacity="0.05" stroke="#ffffff" stroke-opacity="0.1" stroke-width="1"/>
+    <text x="32" y="48" font-family="system-ui, -apple-system, sans-serif" font-size="42" font-weight="800" fill="#ffffff">35+</text>
+    <text x="32" y="80" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="400" fill="#94a3b8">Properties listed</text>
+    <!-- Blue dot -->
+    <circle cx="340" cy="60" r="8" fill="#2563eb"/>
+
+    <!-- Card 2 -->
+    <rect x="0" y="140" width="380" height="120" rx="16" fill="#ffffff" fill-opacity="0.05" stroke="#ffffff" stroke-opacity="0.1" stroke-width="1"/>
+    <text x="32" y="188" font-family="system-ui, -apple-system, sans-serif" font-size="42" font-weight="800" fill="#ffffff">24</text>
+    <text x="32" y="220" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="400" fill="#94a3b8">Languages supported</text>
+    <circle cx="340" cy="200" r="8" fill="#7c3aed"/>
+
+    <!-- Card 3 -->
+    <rect x="0" y="280" width="380" height="120" rx="16" fill="#2563eb" fill-opacity="0.15" stroke="#2563eb" stroke-opacity="0.4" stroke-width="1"/>
+    <text x="32" y="328" font-family="system-ui, -apple-system, sans-serif" font-size="42" font-weight="800" fill="#60a5fa">Free</text>
+    <text x="32" y="360" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="400" fill="#94a3b8">to search &amp; save properties</text>
+  </g>
+
+  <!-- Bottom URL -->
+  <text x="96" y="580" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="500" fill="#475569">listhq.com.au</text>
+</svg>

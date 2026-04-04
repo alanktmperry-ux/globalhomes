@@ -420,7 +420,7 @@ const Index = () => {
       <meta property="og:description" content={pageDescription} />
       <meta property="og:type" content="website" />
       <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
-      <meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e03445df-ae8d-4409-ad19-f79bb31f115f/id-preview-f7448776--e9567c16-58f4-471e-a308-10aa6a28e781.lovable.app-1772935204685.png" />
+      <meta property="og:image" content="https://listhq.com.au/og-image.svg" />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta name="twitter:card" content="summary_large_image" />

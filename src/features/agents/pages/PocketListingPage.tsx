@@ -157,8 +157,8 @@ const PocketListingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="bg-background text-foreground min-h-screen">
+    <div className="bg-background text-foreground">
+      <div className="bg-background text-foreground">
         {/* Header */}
         <header className="border-b border-border sticky top-0 z-30 bg-background/80 backdrop-blur-xl">
           <div className="container mx-auto px-4 py-3 flex items-center justify-between">

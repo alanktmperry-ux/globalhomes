@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { Globe, ChevronDown, User, LogIn, Home, Building2, Plus, List, LayoutDashboard, ShieldCheck } from 'lucide-react';
-// ChevronDown retained for agent dropdown
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { NotificationBell } from '@/features/agents/components/dashboard/NotificationBell';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { LanguageSwitcher } from '@/shared/components/layout/LanguageSwitcher';
+import { DarkModeToggle } from '@/shared/components/layout/DarkModeToggle';
 import { useI18n } from '@/shared/lib/i18n';
 
 export function SiteHeader() {
@@ -72,6 +72,7 @@ export function SiteHeader() {
 
         {/* Right side actions */}
         <div className="flex items-center gap-2 shrink-0">
+          <DarkModeToggle />
           <LanguageSwitcher />
 
           {/* Agent dashboard shortcut – always visible for agents */}

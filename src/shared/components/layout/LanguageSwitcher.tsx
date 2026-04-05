@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Globe, Check } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Languages, ChevronDown } from 'lucide-react';
 import { useI18n, languageNames, type Language } from '@/shared/lib/i18n';
 
 export function LanguageSwitcher() {
@@ -23,50 +22,35 @@ export function LanguageSwitcher() {
     <div className="relative" ref={containerRef}>
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground text-sm font-medium transition-colors hover:bg-accent"
+        className="flex items-center gap-1.5 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white px-2 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
       >
-        <Globe size={15} />
+        <Languages size={16} />
         <span className="hidden sm:inline">{languageNames[language]}</span>
+        <ChevronDown size={14} />
       </button>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            className="absolute right-0 top-full mt-2 z-50 w-52 rounded-xl shadow-xl overflow-hidden"
-            style={{ backgroundColor: '#1e293b' }}
-            initial={{ opacity: 0, scale: 0.95, y: -4 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -4 }}
-            transition={{ duration: 0.15 }}
-          >
-            <div className="max-h-80 overflow-y-auto py-1 scrollbar-thin">
-              {(Object.entries(languageNames) as [Language, string][]).map(([code, name]) => {
-                const isActive = code === language;
-                return (
-                  <button
-                    key={code}
-                    onClick={() => { setLanguage(code); setOpen(false); }}
-                    className="w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors"
-                    style={{
-                      color: '#fff',
-                      backgroundColor: isActive ? '#334155' : 'transparent',
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isActive) e.currentTarget.style.backgroundColor = '#334155';
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
-                    }}
-                  >
-                    <span className={isActive ? 'font-medium' : ''}>{name}</span>
-                    {isActive && <Check size={15} className="text-green-400 shrink-0" />}
-                  </button>
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {open && (
+        <div className="absolute right-0 top-full mt-2 z-50 min-w-[200px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg p-2">
+          <div className="grid grid-cols-2 gap-0.5 max-h-80 overflow-y-auto scrollbar-thin">
+            {(Object.entries(languageNames) as [Language, string][]).map(([code, name]) => {
+              const isActive = code === language;
+              return (
+                <button
+                  key={code}
+                  onClick={() => { setLanguage(code); setOpen(false); }}
+                  className={`text-sm px-3 py-2 rounded-lg text-left cursor-pointer transition-colors ${
+                    isActive
+                      ? 'bg-slate-100 dark:bg-slate-700 font-medium text-slate-900 dark:text-white'
+                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                  }`}
+                >
+                  {name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

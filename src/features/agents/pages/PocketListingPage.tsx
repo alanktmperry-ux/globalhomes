@@ -48,7 +48,6 @@ const PocketListingPage = () => {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const [listingTitle, setListingTitle] = useState('');
   const [showLimitDialog, setShowLimitDialog] = useState(false);
   const { listings, agentId } = useAgentListings();
   const { toast } = useToast();

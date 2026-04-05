@@ -554,7 +554,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
   }
 
   return (
-    <div className="bg-card border border-border rounded-2xl">
+    <div className="bg-card border border-border rounded-2xl flex flex-col max-h-[calc(100vh-12rem)] min-h-0">
       {/* Progress */}
       <div className="px-4 pt-4 pb-2">
         <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
@@ -579,12 +579,12 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
       </div>
 
       {/* Step content */}
-      <div className="p-5">
+      <div className="p-5 flex-1 overflow-y-auto min-h-0">
         {stepContent()}
       </div>
 
-      {/* Nav */}
-      <div className="flex items-center justify-between p-4 border-t border-border bg-secondary/30">
+      {/* Nav — always visible */}
+      <div className="flex items-center justify-between p-4 border-t border-border bg-secondary/30 shrink-0">
         <Button
           variant="ghost"
           size="sm"

@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Plus, Zap, Eye, MessageSquare, TrendingUp, Copy, Sparkles, Key, Link } from 'lucide-react';
 import { ImportListingDialog } from '@/features/agents/components/pocket-listing/ImportListingDialog';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';

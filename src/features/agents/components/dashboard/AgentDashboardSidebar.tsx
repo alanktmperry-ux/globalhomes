@@ -3,8 +3,11 @@ import {
   LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, LogOut, Building2, UserPlus, Home,
   User, FileText, CreditCard, Star, MapPinned, Shield, Contact, Kanban, Scale, Landmark,
   ClipboardCheck, CalendarDays, Search, TrendingUp, Receipt, PartyPopper, Calculator, HelpCircle, ClipboardList, Settings2, Flame,
-  Handshake, Sparkles, Target, ShoppingBag,
+  Handshake, Sparkles, Target, ShoppingBag, ChevronDown,
 } from 'lucide-react';
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/shared/hooks/use-mobile';

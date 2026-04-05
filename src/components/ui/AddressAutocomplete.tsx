@@ -55,28 +55,43 @@ export function AddressAutocomplete({
         const ac = new google.maps.places.Autocomplete(inputRef.current, {
           componentRestrictions: { country: 'au' },
           types: ['address'],
-          fields: ['address_components', 'formatted_address', 'geometry'],
+          fields: ['place_id', 'address_components', 'formatted_address', 'geometry'],
         });
+
+        const placesService = new google.maps.places.PlacesService(
+          document.createElement('div')
+        );
 
         ac.addListener('place_changed', () => {
           const place = ac.getPlace();
-          if (!place.address_components) return;
+          if (!place.place_id || !place.address_components) return;
 
-          const { suburb, state, postcode } = parseComponents(place.address_components);
+          // Use PlacesService.getDetails with the place_id for exact coordinates
+          placesService.getDetails(
+            { placeId: place.place_id, fields: ['geometry', 'address_components', 'formatted_address'] },
+            (detail, status) => {
+              const src = (status === google.maps.places.PlacesServiceStatus.OK && detail)
+                ? detail
+                : place;
 
-          const streetNumber = place.address_components.find(c => c.types.includes('street_number'))?.long_name ?? '';
-          const route = place.address_components.find(c => c.types.includes('route'))?.long_name ?? '';
-          const streetAddress = [streetNumber, route].filter(Boolean).join(' ');
+              const components = src.address_components || place.address_components!;
+              const { suburb, state, postcode } = parseComponents(components);
 
-          onChange(streetAddress || place.formatted_address || '');
-          onSelect({
-            address: streetAddress || place.formatted_address || '',
-            suburb,
-            state,
-            postcode,
-            lat: place.geometry?.location?.lat(),
-            lng: place.geometry?.location?.lng(),
-          });
+              const streetNumber = components.find(c => c.types.includes('street_number'))?.long_name ?? '';
+              const route = components.find(c => c.types.includes('route'))?.long_name ?? '';
+              const streetAddress = [streetNumber, route].filter(Boolean).join(' ');
+
+              onChange(streetAddress || src.formatted_address || '');
+              onSelect({
+                address: streetAddress || src.formatted_address || '',
+                suburb,
+                state,
+                postcode,
+                lat: src.geometry?.location?.lat(),
+                lng: src.geometry?.location?.lng(),
+              });
+            }
+          );
         });
 
         acRef.current = ac;

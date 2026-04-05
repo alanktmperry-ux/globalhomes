@@ -210,6 +210,8 @@ const AgentAuthPage = () => {
   };
 
   const goBack = () => {
+    setCaptchaToken(null);
+    captchaRef.current?.resetCaptcha();
     if (step === 'password') { setStep('email'); setPassword(''); }
     else if (step === 'create-agency' || step === 'join-agency') setStep('choose');
     else if (step === 'choose') setStep('email');

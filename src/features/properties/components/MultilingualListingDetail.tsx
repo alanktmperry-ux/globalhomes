@@ -73,7 +73,7 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
     if (detected !== 'en' && translations[detected]) {
       setLanguage(detected);
     }
-    safeCapture('listing_viewed', {
+    capture('listing_viewed', {
       listing_id: listing.id,
       language: detected !== 'en' && translations[detected] ? detected : 'en',
       has_translations: hasTranslations,
@@ -85,7 +85,7 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
     (to: LanguageKey) => {
       const from = language;
       setLanguage(to);
-      safeCapture('listing_language_switched', {
+      capture('listing_language_switched', {
         listing_id: listing.id,
         from_language: from,
         to_language: to,

@@ -72,6 +72,7 @@ export function SiteHeader() {
 
         {/* Right side actions */}
         <div className="flex items-center gap-2 shrink-0">
+          <DarkModeToggle />
           <LanguageSwitcher />
 
           {/* Agent dashboard shortcut – always visible for agents */}

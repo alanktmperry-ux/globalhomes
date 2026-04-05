@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Search, Mic, MapPin, Loader2 } from 'lucide-react';
+import { capture } from '@/shared/lib/posthog';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useI18n } from '@/shared/lib/i18n';
 import { useVoiceSearch } from '@/features/search/hooks/useVoiceSearch';

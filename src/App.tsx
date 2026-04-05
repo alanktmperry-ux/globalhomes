@@ -168,7 +168,6 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <I18nProvider>
       <BrowserRouter>
-      <ConsentProvider>
       <CurrencyProvider>
       <AuthProvider>
         <TooltipProvider>

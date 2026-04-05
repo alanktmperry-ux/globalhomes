@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ChevronDown, ChevronUp, AlertTriangle, Sparkles, Globe } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { capture } from '@/shared/lib/posthog';
 
 type LanguageKey = 'en' | 'zh_simplified' | 'zh_traditional' | 'vi';
 

@@ -2,8 +2,6 @@ import { Helmet } from 'react-helmet-async';
 
 const PrivacyPage = () => {
   return (
-
-  return (
     <>
       <Helmet>
         <title>Privacy Policy</title>

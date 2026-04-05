@@ -808,6 +808,13 @@ export type Database = {
             foreignKeyName: "alert_sends_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alert_sends_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
@@ -816,6 +823,62 @@ export type Database = {
             columns: ["saved_search_id"]
             isOneToOne: false
             referencedRelation: "saved_searches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      analytics_events: {
+        Row: {
+          agent_id: string | null
+          created_at: string
+          event_name: string
+          id: string
+          listing_id: string | null
+          properties: Json | null
+        }
+        Insert: {
+          agent_id?: string | null
+          created_at?: string
+          event_name: string
+          id?: string
+          listing_id?: string | null
+          properties?: Json | null
+        }
+        Update: {
+          agent_id?: string | null
+          created_at?: string
+          event_name?: string
+          id?: string
+          listing_id?: string | null
+          properties?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analytics_events_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analytics_events_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analytics_events_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analytics_events_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
             referencedColumns: ["id"]
           },
         ]
@@ -1068,6 +1131,13 @@ export type Database = {
             foreignKeyName: "auction_registrations_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auction_registrations_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
@@ -1155,6 +1225,13 @@ export type Database = {
             foreignKeyName: "auction_result_records_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auction_result_records_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
@@ -1223,6 +1300,13 @@ export type Database = {
           sold_price?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "auction_results_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "auction_results_property_id_fkey"
             columns: ["property_id"]
@@ -1397,6 +1481,13 @@ export type Database = {
             foreignKeyName: "auctions_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auctions_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
@@ -1509,6 +1600,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      buyer_language_preferences: {
+        Row: {
+          created_at: string
+          id: string
+          preferred_language: string | null
+          session_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          preferred_language?: string | null
+          session_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          preferred_language?: string | null
+          session_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       buyer_pre_approvals: {
         Row: {
@@ -1725,6 +1840,13 @@ export type Database = {
             foreignKeyName: "cma_reports_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cma_reports_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
@@ -1756,6 +1878,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "collab_reactions_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "collab_reactions_property_id_fkey"
             columns: ["property_id"]
@@ -1814,6 +1943,13 @@ export type Database = {
             foreignKeyName: "collab_sessions_selected_property_id_fkey"
             columns: ["selected_property_id"]
             isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collab_sessions_selected_property_id_fkey"
+            columns: ["selected_property_id"]
+            isOneToOne: false
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
@@ -1842,6 +1978,13 @@ export type Database = {
           viewed_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "collab_views_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "collab_views_property_id_fkey"
             columns: ["property_id"]
@@ -1977,6 +2120,13 @@ export type Database = {
             columns: ["agent_id"]
             isOneToOne: false
             referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comparable_sales_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
             referencedColumns: ["id"]
           },
           {
@@ -2324,6 +2474,13 @@ export type Database = {
             foreignKeyName: "conversations_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
@@ -2447,6 +2604,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "crm_leads_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "crm_leads_property_id_fkey"
             columns: ["property_id"]
@@ -2666,6 +2830,13 @@ export type Database = {
             foreignKeyName: "document_requests_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_requests_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
@@ -2769,6 +2940,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "expressions_of_interest_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "expressions_of_interest_property_id_fkey"
             columns: ["property_id"]
@@ -2913,6 +3091,13 @@ export type Database = {
             columns: ["agent_id"]
             isOneToOne: false
             referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_events_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
             referencedColumns: ["id"]
           },
           {
@@ -3090,6 +3275,13 @@ export type Database = {
             foreignKeyName: "leads_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
@@ -3145,6 +3337,13 @@ export type Database = {
           uploaded_by?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "listing_documents_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "listing_documents_property_id_fkey"
             columns: ["property_id"]
@@ -3222,6 +3421,13 @@ export type Database = {
             columns: ["agent_id"]
             isOneToOne: false
             referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_jobs_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
             referencedColumns: ["id"]
           },
           {
@@ -3368,6 +3574,13 @@ export type Database = {
             foreignKeyName: "notifications_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
@@ -3414,6 +3627,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "off_market_shares_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "off_market_shares_property_id_fkey"
             columns: ["property_id"]
@@ -3530,6 +3750,13 @@ export type Database = {
             columns: ["lead_id"]
             isOneToOne: false
             referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "offers_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
             referencedColumns: ["id"]
           },
           {
@@ -3680,6 +3907,13 @@ export type Database = {
             columns: ["agent_id"]
             isOneToOne: false
             referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "open_homes_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
             referencedColumns: ["id"]
           },
           {
@@ -3960,6 +4194,13 @@ export type Database = {
             foreignKeyName: "pre_auction_offers_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pre_auction_offers_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
@@ -4008,6 +4249,13 @@ export type Database = {
           property_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "price_guide_history_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "price_guide_history_property_id_fkey"
             columns: ["property_id"]
@@ -4098,6 +4346,7 @@ export type Database = {
           address_hidden: boolean
           agency_authority: string | null
           agent_id: string | null
+          agent_insights: Json | null
           agent_split_percent: number | null
           air_con_type: string | null
           auction_date: string | null
@@ -4197,6 +4446,9 @@ export type Database = {
           study_rooms: number | null
           suburb: string
           title: string
+          translation_status: string | null
+          translations: Json | null
+          translations_generated_at: string | null
           updated_at: string
           utilities_included: string[] | null
           vendor_email: string | null
@@ -4215,6 +4467,7 @@ export type Database = {
           address_hidden?: boolean
           agency_authority?: string | null
           agent_id?: string | null
+          agent_insights?: Json | null
           agent_split_percent?: number | null
           air_con_type?: string | null
           auction_date?: string | null
@@ -4314,6 +4567,9 @@ export type Database = {
           study_rooms?: number | null
           suburb: string
           title: string
+          translation_status?: string | null
+          translations?: Json | null
+          translations_generated_at?: string | null
           updated_at?: string
           utilities_included?: string[] | null
           vendor_email?: string | null
@@ -4332,6 +4588,7 @@ export type Database = {
           address_hidden?: boolean
           agency_authority?: string | null
           agent_id?: string | null
+          agent_insights?: Json | null
           agent_split_percent?: number | null
           air_con_type?: string | null
           auction_date?: string | null
@@ -4431,6 +4688,9 @@ export type Database = {
           study_rooms?: number | null
           suburb?: string
           title?: string
+          translation_status?: string | null
+          translations?: Json | null
+          translations_generated_at?: string | null
           updated_at?: string
           utilities_included?: string[] | null
           vendor_email?: string | null
@@ -4490,6 +4750,13 @@ export type Database = {
           views?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "property_daily_stats_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "property_daily_stats_property_id_fkey"
             columns: ["property_id"]
@@ -4584,6 +4851,13 @@ export type Database = {
             foreignKeyName: "property_documents_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_documents_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
@@ -4619,6 +4893,13 @@ export type Database = {
             foreignKeyName: "property_price_changes_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_price_changes_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
@@ -4647,6 +4928,13 @@ export type Database = {
           school_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "property_schools_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "property_schools_property_id_fkey"
             columns: ["property_id"]
@@ -4698,6 +4986,13 @@ export type Database = {
           viewer_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "property_view_events_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "property_view_events_property_id_fkey"
             columns: ["property_id"]
@@ -4908,6 +5203,13 @@ export type Database = {
             foreignKeyName: "rental_applications_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rental_applications_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
@@ -5025,6 +5327,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "saved_properties_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "saved_properties_property_id_fkey"
             columns: ["property_id"]
@@ -5282,6 +5591,13 @@ export type Database = {
             foreignKeyName: "seller_likelihood_scores_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seller_likelihood_scores_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
@@ -5325,6 +5641,13 @@ export type Database = {
           total_quarterly_levy?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "strata_listing_data_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: true
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "strata_listing_data_listing_id_fkey"
             columns: ["listing_id"]
@@ -6181,6 +6504,13 @@ export type Database = {
             foreignKeyName: "tenancies_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenancies_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
@@ -6265,6 +6595,13 @@ export type Database = {
             columns: ["office_id"]
             isOneToOne: false
             referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
             referencedColumns: ["id"]
           },
           {
@@ -6854,6 +7191,13 @@ export type Database = {
             foreignKeyName: "trust_transactions_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_transactions_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
@@ -6965,6 +7309,13 @@ export type Database = {
             foreignKeyName: "vendor_report_tokens_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_report_tokens_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
@@ -7020,6 +7371,13 @@ export type Database = {
             columns: ["agent_id"]
             isOneToOne: false
             referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_reports_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
             referencedColumns: ["id"]
           },
           {
@@ -7299,6 +7657,39 @@ export type Database = {
         }
         Relationships: []
       }
+      listings_translation_summary: {
+        Row: {
+          address: string | null
+          has_cantonese: boolean | null
+          has_mandarin: boolean | null
+          has_translations: boolean | null
+          has_vietnamese: boolean | null
+          id: string | null
+          translation_status: string | null
+          translations_generated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          has_cantonese?: never
+          has_mandarin?: never
+          has_translations?: never
+          has_vietnamese?: never
+          id?: string | null
+          translation_status?: string | null
+          translations_generated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          has_cantonese?: never
+          has_mandarin?: never
+          has_translations?: never
+          has_vietnamese?: never
+          id?: string | null
+          translation_status?: string | null
+          translations_generated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       compute_agent_stats: { Args: { p_agent_id: string }; Returns: undefined }
@@ -7522,6 +7913,7 @@ export type Database = {
           address_hidden: boolean
           agency_authority: string | null
           agent_id: string | null
+          agent_insights: Json | null
           agent_split_percent: number | null
           air_con_type: string | null
           auction_date: string | null
@@ -7621,6 +8013,9 @@ export type Database = {
           study_rooms: number | null
           suburb: string
           title: string
+          translation_status: string | null
+          translations: Json | null
+          translations_generated_at: string | null
           updated_at: string
           utilities_included: string[] | null
           vendor_email: string | null

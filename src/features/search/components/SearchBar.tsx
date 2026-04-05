@@ -39,6 +39,7 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (query.length < 2) { setSuggestions([]); return; }
     debounceRef.current = setTimeout(async () => {
+      if (!localStorage.getItem("maps_consent_given")) return;
       const results = await autocomplete(query);
       setSuggestions(results);
       setShowSuggestions(results.length > 0);

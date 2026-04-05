@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { useBuyerMatching } from '@/features/agents/hooks/useBuyerMatching';
-import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Save, Loader2, FileText, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -555,7 +554,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
   }
 
   return (
-    <div className="bg-card border border-border rounded-2xl overflow-visible">
+    <div className="bg-card border border-border rounded-2xl">
       {/* Progress */}
       <div className="px-4 pt-4 pb-2">
         <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
@@ -580,17 +579,9 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
       </div>
 
       {/* Step content */}
-      <motion.div
-        key={step}
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -20 }}
-        transition={{ duration: 0.25 }}
-        className="p-5"
-        style={{ overflow: 'visible' }}
-      >
+      <div className="p-5">
         {stepContent()}
-      </motion.div>
+      </div>
 
       {/* Nav */}
       <div className="flex items-center justify-between p-4 border-t border-border bg-secondary/30">

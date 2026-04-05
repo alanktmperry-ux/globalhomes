@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { motion } from 'framer-motion';
 import { Building2, KeyRound, MapPin, CheckCircle2, Home, Zap, ChevronRight } from 'lucide-react';
 import { autocomplete } from '@/shared/lib/googleMapsService';
@@ -44,14 +45,17 @@ const AgentAuthPage = () => {
   const [loading, setLoading] = useState(false);
   const [officeSuggestions, setOfficeSuggestions] = useState<{ description: string; place_id: string }[]>([]);
   const [officeConfirmed, setOfficeConfirmed] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   // ── All useRef hooks ──
   const officeDebounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const captchaRef = useRef<HCaptcha>(null);
 
   // ── Derived values (not hooks) ──
   const strength = getPasswordStrength(password);
   const passwordsMatch = password === confirmPassword;
   const canSubmit = !loading;
+  const hcaptchaSiteKey = import.meta.env.VITE_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001';
 
   // ── useEffect hooks ──
   useEffect(() => {
@@ -206,6 +210,8 @@ const AgentAuthPage = () => {
   };
 
   const goBack = () => {
+    setCaptchaToken(null);
+    captchaRef.current?.resetCaptcha();
     if (step === 'password') { setStep('email'); setPassword(''); }
     else if (step === 'create-agency' || step === 'join-agency') setStep('choose');
     else if (step === 'choose') setStep('email');
@@ -602,9 +608,19 @@ const AgentAuthPage = () => {
                   <p className="text-xs text-muted-foreground text-center">You must agree to the terms before creating your account</p>
                 )}
 
+                <div className="flex justify-center">
+                  <HCaptcha
+                    ref={captchaRef}
+                    sitekey={hcaptchaSiteKey}
+                    onVerify={(token) => setCaptchaToken(token)}
+                    onExpire={() => setCaptchaToken(null)}
+                    onError={() => setCaptchaToken(null)}
+                  />
+                </div>
+
                 <button
                   type="submit"
-                  disabled={loading || !agreedToTerms || password !== confirmPassword || password.length < 6}
+                  disabled={loading || !agreedToTerms || !captchaToken || password !== confirmPassword || password.length < 6}
                   className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50"
                 >
                   {loading ? 'Setting up your account…' : 'Create Account'}
@@ -642,7 +658,16 @@ const AgentAuthPage = () => {
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Password<span className="text-destructive">*</span></label>
                   <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
                 </div>
-                <button type="submit" disabled={loading} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
+                <div className="flex justify-center">
+                  <HCaptcha
+                    ref={captchaRef}
+                    sitekey={hcaptchaSiteKey}
+                    onVerify={(token) => setCaptchaToken(token)}
+                    onExpire={() => setCaptchaToken(null)}
+                    onError={() => setCaptchaToken(null)}
+                  />
+                </div>
+                <button type="submit" disabled={loading || !captchaToken} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
                   {loading ? 'Joining…' : 'Join Agency'}
                 </button>
               </form>

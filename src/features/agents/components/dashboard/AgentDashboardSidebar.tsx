@@ -298,11 +298,11 @@ const AgentDashboardSidebar = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-48">
-              <DropdownMenuItem onClick={() => { navigate('/pocket-listing?type=sale'); if (isMobile) setOpenMobile(false); }}>
+              <DropdownMenuItem onClick={() => { localStorage.removeItem('pocket-listing-draft'); navigate('/pocket-listing?type=sale&t=' + Date.now()); if (isMobile) setOpenMobile(false); }}>
                 <Home size={14} className="mr-2 text-primary" />
                 Sale Listing
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => { navigate('/pocket-listing?type=rent'); if (isMobile) setOpenMobile(false); }}>
+              <DropdownMenuItem onClick={() => { localStorage.removeItem('pocket-listing-draft'); navigate('/pocket-listing?type=rent&t=' + Date.now()); if (isMobile) setOpenMobile(false); }}>
                 <Building2 size={14} className="mr-2 text-primary" />
                 Rental Listing
               </DropdownMenuItem>

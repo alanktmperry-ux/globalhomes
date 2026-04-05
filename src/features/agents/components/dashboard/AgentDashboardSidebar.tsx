@@ -298,11 +298,29 @@ const AgentDashboardSidebar = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-48">
-              <DropdownMenuItem onClick={() => { localStorage.removeItem('pocket-listing-draft'); navigate('/pocket-listing?type=sale&t=' + Date.now()); if (isMobile) setOpenMobile(false); }}>
+              <DropdownMenuItem
+                onSelect={(event) => {
+                  event.preventDefault();
+                  localStorage.removeItem('pocket-listing-draft');
+                  window.setTimeout(() => {
+                    navigate('/dashboard/listings/new', { state: { type: 'sale' } });
+                    if (isMobile) setOpenMobile(false);
+                  }, 10);
+                }}
+              >
                 <Home size={14} className="mr-2 text-primary" />
                 Sale Listing
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => { localStorage.removeItem('pocket-listing-draft'); navigate('/pocket-listing?type=rent&t=' + Date.now()); if (isMobile) setOpenMobile(false); }}>
+              <DropdownMenuItem
+                onSelect={(event) => {
+                  event.preventDefault();
+                  localStorage.removeItem('pocket-listing-draft');
+                  window.setTimeout(() => {
+                    navigate('/dashboard/listings/new', { state: { type: 'rental' } });
+                    if (isMobile) setOpenMobile(false);
+                  }, 10);
+                }}
+              >
                 <Building2 size={14} className="mr-2 text-primary" />
                 Rental Listing
               </DropdownMenuItem>

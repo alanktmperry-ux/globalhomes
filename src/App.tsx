@@ -248,6 +248,7 @@ const App = () => (
                   <Route path="profile" element={<AgentProfilePage />} />
                   <Route path="territory" element={<TerritoryPage />} />
                   <Route path="listings" element={<ListingsPage />} />
+                  <Route path="listings/new" element={<PocketListingPage />} />
                   <Route path="listings/:listingId" element={<ListingDetailPage />} />
                   <Route path="listings/:listingId/eoi" element={<AgentEOIPage />} />
                   <Route path="listings/:propertyId/performance" element={<ListingPerformancePage />} />

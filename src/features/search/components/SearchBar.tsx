@@ -202,6 +202,21 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
           </motion.p>
         )}
       </AnimatePresence>
+
+      <AnimatePresence>
+        {detectedLang && (
+          <motion.div
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="mt-2 flex justify-center"
+          >
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent text-accent-foreground text-xs font-medium">
+              🌐 Searching in English
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

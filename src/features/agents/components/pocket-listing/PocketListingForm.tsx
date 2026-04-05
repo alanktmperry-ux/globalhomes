@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useBuyerMatching } from '@/features/agents/hooks/useBuyerMatching';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Save, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Save, Loader2, FileText, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
@@ -289,21 +289,42 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
     return () => clearInterval(autoSaveRef.current);
   }, [draft, editPropertyId]);
 
-  // Load draft on mount (only for new listings)
+  // Offer to resume a saved draft (only for new listings)
+  const [pendingDraft, setPendingDraft] = useState<Partial<ListingDraft> | null>(null);
+
   useEffect(() => {
     if (editPropertyId) return;
     const saved = localStorage.getItem('pocket-listing-draft');
     if (saved) {
       try {
         const parsed = JSON.parse(saved) as Partial<ListingDraft>;
-        setDraft({
-          ...DEFAULT_DRAFT,
-          ...parsed,
-          listingType: initialListingType ?? parsed.listingType ?? DEFAULT_DRAFT.listingType,
-        });
-      } catch {}
+        // Only offer to resume if there's meaningful data
+        if (parsed.address && parsed.address.length > 0) {
+          setPendingDraft(parsed);
+        } else {
+          localStorage.removeItem('pocket-listing-draft');
+        }
+      } catch {
+        localStorage.removeItem('pocket-listing-draft');
+      }
     }
-  }, [editPropertyId, initialListingType]);
+  }, [editPropertyId]);
+
+  const resumeDraft = () => {
+    if (pendingDraft) {
+      setDraft({
+        ...DEFAULT_DRAFT,
+        ...pendingDraft,
+        listingType: initialListingType ?? pendingDraft.listingType ?? DEFAULT_DRAFT.listingType,
+      });
+    }
+    setPendingDraft(null);
+  };
+
+  const discardDraft = () => {
+    localStorage.removeItem('pocket-listing-draft');
+    setPendingDraft(null);
+  };
 
   const progress = ((step + 1) / STEPS.length) * 100;
 
@@ -505,6 +526,33 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
       default: return null;
     }
   };
+
+  if (pendingDraft) {
+    return (
+      <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+        <div className="flex items-start gap-3">
+          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+            <FileText size={18} className="text-primary" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold">You have an unsaved draft</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {pendingDraft.address}{pendingDraft.suburb ? `, ${pendingDraft.suburb}` : ''} — {pendingDraft.listingType === 'rent' ? 'Rental' : 'Sale'} listing
+            </p>
+          </div>
+        </div>
+        <p className="text-sm text-muted-foreground">Resume it?</p>
+        <div className="flex gap-2">
+          <Button size="sm" onClick={resumeDraft} className="gap-1.5">
+            <FileText size={14} /> Yes, resume draft
+          </Button>
+          <Button size="sm" variant="outline" onClick={discardDraft} className="gap-1.5">
+            <Trash2 size={14} /> No, start fresh
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-card border border-border rounded-2xl">

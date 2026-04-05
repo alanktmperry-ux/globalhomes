@@ -463,6 +463,23 @@ const StepBasics = ({ draft, update }: Props) => {
         </div>
       )}
 
+      {/* ── DESCRIPTION ── */}
+      <div className="space-y-2">
+        <SectionLabel>Description</SectionLabel>
+        <Textarea
+          value={draft.voiceTranscript}
+          onChange={(e) => update({ voiceTranscript: e.target.value })}
+          placeholder="Describe the property — key selling points, lifestyle, neighbourhood highlights…"
+          className="min-h-[120px] resize-y"
+          rows={5}
+        />
+        <p className="text-xs text-muted-foreground">
+          {draft.voiceTranscript.length > 0
+            ? `${draft.voiceTranscript.length} characters`
+            : 'You can also dictate this in the Voice step'}
+        </p>
+      </div>
+
     </div>
   );
 };

@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.send-marketing-email]
 verify_jwt = false
+
+[functions.generate-translations]
+verify_jwt = false

@@ -1,8 +1,7 @@
 import { Helmet } from 'react-helmet-async';
-import { useConsent } from '@/shared/components/CookieConsent';
 
 const PrivacyPage = () => {
-  const { resetConsent } = useConsent();
+  return (
 
   return (
     <>

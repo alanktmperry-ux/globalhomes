@@ -20,14 +20,34 @@ const PocketListingPage = () => {
   const editId = searchParams.get('edit');
   const duplicateId = searchParams.get('duplicate');
   const typeParam = searchParams.get('type');
+  const timestampParam = searchParams.get('t');
   // Clear saved draft when explicitly starting a new listing via ?type= param
   const isNewFromType = typeParam === 'sale' || typeParam === 'rent';
-  if (isNewFromType && typeof window !== 'undefined') {
-    localStorage.removeItem('pocket-listing-draft');
-  }
+
   const [showForm, setShowForm] = useState(!!editId || !!duplicateId || isNewFromType);
   const [showSuccess, setShowSuccess] = useState(false);
   const [createListingType, setCreateListingType] = useState<'sale' | 'rent'>(typeParam === 'rent' ? 'rent' : 'sale');
+  const [listingTitle, setListingTitle] = useState('');
+
+  // React to navigation from sidebar / header even when already on this page
+  const prevTimestamp = useRef(timestampParam);
+  useEffect(() => {
+    if (isNewFromType && timestampParam && timestampParam !== prevTimestamp.current) {
+      prevTimestamp.current = timestampParam;
+      localStorage.removeItem('pocket-listing-draft');
+      setCreateListingType(typeParam === 'rent' ? 'rent' : 'sale');
+      setShowForm(true);
+      setShowSuccess(false);
+    }
+  }, [timestampParam, typeParam, isNewFromType]);
+
+  // Initial mount: clear draft for new listing
+  useEffect(() => {
+    if (isNewFromType) {
+      localStorage.removeItem('pocket-listing-draft');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [listingTitle, setListingTitle] = useState('');
   const [showLimitDialog, setShowLimitDialog] = useState(false);
   const { listings, agentId } = useAgentListings();

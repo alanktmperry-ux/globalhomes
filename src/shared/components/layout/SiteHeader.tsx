@@ -132,11 +132,18 @@ export function SiteHeader() {
                     className="absolute right-0 top-full mt-1 w-48 bg-popover border border-border rounded-xl shadow-elevated overflow-hidden z-50"
                   >
                     <button
-                      onClick={() => { navigate('/pocket-listing'); setShowAgentMenu(false); }}
+                      onClick={() => { navigate('/pocket-listing?type=sale'); setShowAgentMenu(false); }}
                       className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors"
                     >
                       <Plus size={14} className="text-primary" />
-                      {t('header.listProperty')}
+                      Sale Listing
+                    </button>
+                    <button
+                      onClick={() => { navigate('/pocket-listing?type=rent'); setShowAgentMenu(false); }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors"
+                    >
+                      <Plus size={14} className="text-primary" />
+                      Rental Listing
                     </button>
                     <button
                       onClick={() => { navigate('/dashboard/listings'); setShowAgentMenu(false); }}

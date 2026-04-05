@@ -92,20 +92,28 @@ export function AddressAutocomplete({
   }, []);
 
   return (
-    <div className="relative">
+    <div
+      className="relative"
+      onClick={() => inputRef.current?.focus()}
+    >
       {!fallback && (
-        <MapPin size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+        <MapPin size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none z-10" />
       )}
       {loading && !fallback && (
-        <Loader2 size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 animate-spin text-muted-foreground pointer-events-none" />
+        <Loader2 size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 animate-spin text-muted-foreground pointer-events-none z-10" />
       )}
       <Input
         ref={inputRef}
         id={id}
         value={value}
         onChange={e => onChange(e.target.value)}
+        onMouseDown={(e) => {
+          // Ensure the native input receives focus even if Google's
+          // Autocomplete widget intercepts pointer events
+          e.currentTarget.focus();
+        }}
         placeholder={placeholder ?? 'Start typing an address…'}
-        className={`${!fallback ? 'pl-8' : ''} ${className ?? ''}`}
+        className={`${!fallback ? 'pl-8' : ''} ${className ?? ''} relative z-0`}
         autoComplete="off"
         disabled={disabled}
       />

@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { AuctionBid, AuctionUpdate, PreAuctionOffer } from '@/types/auction';
+import { toast } from 'sonner';
+import { t, getPreferredLang } from '../lib/auctionI18n';
+import { capture } from '@/shared/lib/posthog';
 
 export function useLiveAuction(auctionId: string | undefined) {
   const [bids, setBids] = useState<AuctionBid[]>([]);
@@ -51,6 +54,14 @@ export function useLiveAuction(auctionId: string | undefined) {
           setLastBid(newBid.bid_amount);
           setReserveMet(newBid.reserve_met_at_this_bid);
         }
+        // Multilingual toast
+        const lang = getPreferredLang();
+        const formatted = `$${newBid.bid_amount.toLocaleString('en-AU')}`;
+        toast(`${t('new_bid', lang)} ${formatted}`);
+        capture('bid_received_realtime', { auction_id: auctionId, bid_amount: newBid.bid_amount, language: lang });
+        if (newBid.reserve_met_at_this_bid) {
+          toast.success(t('reserve_met', lang));
+        }
       })
       .on('postgres_changes', {
         event: 'INSERT',
@@ -58,7 +69,12 @@ export function useLiveAuction(auctionId: string | undefined) {
         table: 'auction_updates',
         filter: `auction_id=eq.${auctionId}`,
       }, (payload) => {
-        setUpdates(prev => [payload.new as unknown as AuctionUpdate, ...prev]);
+        const update = payload.new as unknown as AuctionUpdate;
+        setUpdates(prev => [update, ...prev]);
+        if (update.update_type === 'sold' && update.bid_amount) {
+          const lang = getPreferredLang();
+          toast.success(`${t('sold', lang)} $${update.bid_amount.toLocaleString('en-AU')}`);
+        }
       })
       .subscribe();
 

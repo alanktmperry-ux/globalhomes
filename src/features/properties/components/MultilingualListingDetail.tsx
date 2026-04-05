@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ChevronDown, ChevronUp, AlertTriangle, Sparkles, Globe } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { capture } from '@/shared/lib/posthog';
 
 type LanguageKey = 'en' | 'zh_simplified' | 'zh_traditional' | 'vi';
 
@@ -55,14 +56,6 @@ function detectBrowserLanguage(): LanguageKey {
   return 'en';
 }
 
-function safeCapture(event: string, props: Record<string, unknown>) {
-  try {
-    if (typeof window !== 'undefined' && (window as any).posthog?.capture) {
-      (window as any).posthog.capture(event, props);
-    }
-  } catch {}
-}
-
 const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
   const translations = (listing.translations ?? {}) as Record<string, Translation>;
   const agentInsights = (listing.agent_insights ?? null) as AgentInsights | null;
@@ -80,7 +73,7 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
     if (detected !== 'en' && translations[detected]) {
       setLanguage(detected);
     }
-    safeCapture('listing_viewed', {
+    capture('listing_viewed', {
       listing_id: listing.id,
       language: detected !== 'en' && translations[detected] ? detected : 'en',
       has_translations: hasTranslations,
@@ -92,7 +85,7 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
     (to: LanguageKey) => {
       const from = language;
       setLanguage(to);
-      safeCapture('listing_language_switched', {
+      capture('listing_language_switched', {
         listing_id: listing.id,
         from_language: from,
         to_language: to,

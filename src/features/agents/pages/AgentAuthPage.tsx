@@ -55,6 +55,7 @@ const AgentAuthPage = () => {
   const strength = getPasswordStrength(password);
   const passwordsMatch = password === confirmPassword;
   const canSubmit = !loading;
+  const hcaptchaSiteKey = import.meta.env.VITE_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001';
 
   // ── useEffect hooks ──
   useEffect(() => {

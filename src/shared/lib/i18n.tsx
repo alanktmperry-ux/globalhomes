@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-export type Language = 'en' | 'zh' | 'ko' | 'ms' | 'es' | 'ar' | 'hi' | 'fr' | 'pt' | 'bn' | 'ru' | 'ja';
+export type Language = 'en' | 'zh' | 'zh-TW' | 'ko' | 'ms' | 'es' | 'ar' | 'hi' | 'fr' | 'pt' | 'bn' | 'ru' | 'ja' | 'de' | 'id' | 'nl' | 'pl' | 'vi' | 'th' | 'tr' | 'sv' | 'da' | 'no' | 'fil' | 'it';
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
@@ -831,21 +831,47 @@ const translations: Record<Language, Record<string, string>> = {
     'property.featured': 'おすすめ', 'search.searching': 'オーストラリア全土を検索中…',
     'header.listProperty': '物件を掲載する', 'header.myListings': 'マイ物件',
   },
+  'zh-TW': { 'app.name': 'ListHQ', 'search.placeholder': '搜尋 "墨爾本4臥室房屋 85萬"', 'nav.search': '搜尋', 'nav.saved': '已儲存', 'nav.messages': '訊息', 'nav.agents': '經紀人', 'nav.profile': '個人資料' },
+  de: { 'app.name': 'ListHQ', 'search.placeholder': 'Suche "4-Zimmer-Haus in Melbourne für $850k"', 'nav.search': 'Suche', 'nav.saved': 'Gespeichert', 'nav.messages': 'Nachrichten', 'nav.agents': 'Makler', 'nav.profile': 'Profil' },
+  id: { 'app.name': 'ListHQ', 'search.placeholder': 'Cari "rumah 4 kamar di Melbourne $850rb"', 'nav.search': 'Cari', 'nav.saved': 'Tersimpan', 'nav.messages': 'Pesan', 'nav.agents': 'Agen', 'nav.profile': 'Profil' },
+  nl: { 'app.name': 'ListHQ', 'search.placeholder': 'Zoek "4-kamerwoning in Melbourne voor $850k"', 'nav.search': 'Zoeken', 'nav.saved': 'Opgeslagen', 'nav.messages': 'Berichten', 'nav.agents': 'Makelaars', 'nav.profile': 'Profiel' },
+  pl: { 'app.name': 'ListHQ', 'search.placeholder': 'Szukaj "dom 4-pokojowy w Melbourne za $850k"', 'nav.search': 'Szukaj', 'nav.saved': 'Zapisane', 'nav.messages': 'Wiadomości', 'nav.agents': 'Agenci', 'nav.profile': 'Profil' },
+  vi: { 'app.name': 'ListHQ', 'search.placeholder': 'Tìm "nhà 4 phòng ngủ ở Melbourne giá $850k"', 'nav.search': 'Tìm kiếm', 'nav.saved': 'Đã lưu', 'nav.messages': 'Tin nhắn', 'nav.agents': 'Đại lý', 'nav.profile': 'Hồ sơ' },
+  th: { 'app.name': 'ListHQ', 'search.placeholder': 'ค้นหา "บ้าน 4 ห้องนอนในเมลเบิร์น $850k"', 'nav.search': 'ค้นหา', 'nav.saved': 'บันทึกแล้ว', 'nav.messages': 'ข้อความ', 'nav.agents': 'ตัวแทน', 'nav.profile': 'โปรไฟล์' },
+  tr: { 'app.name': 'ListHQ', 'search.placeholder': 'Ara "Melbourne\'de 4 yatak odalı ev $850k"', 'nav.search': 'Ara', 'nav.saved': 'Kaydedilenler', 'nav.messages': 'Mesajlar', 'nav.agents': 'Acenteler', 'nav.profile': 'Profil' },
+  sv: { 'app.name': 'ListHQ', 'search.placeholder': 'Sök "4 sovrum hus i Melbourne för $850k"', 'nav.search': 'Sök', 'nav.saved': 'Sparat', 'nav.messages': 'Meddelanden', 'nav.agents': 'Mäklare', 'nav.profile': 'Profil' },
+  da: { 'app.name': 'ListHQ', 'search.placeholder': 'Søg "4 værelses hus i Melbourne for $850k"', 'nav.search': 'Søg', 'nav.saved': 'Gemt', 'nav.messages': 'Beskeder', 'nav.agents': 'Mæglere', 'nav.profile': 'Profil' },
+  no: { 'app.name': 'ListHQ', 'search.placeholder': 'Søk "4 soverom hus i Melbourne for $850k"', 'nav.search': 'Søk', 'nav.saved': 'Lagret', 'nav.messages': 'Meldinger', 'nav.agents': 'Meglere', 'nav.profile': 'Profil' },
+  fil: { 'app.name': 'ListHQ', 'search.placeholder': 'Maghanap "4 na silid bahay sa Melbourne $850k"', 'nav.search': 'Maghanap', 'nav.saved': 'Nai-save', 'nav.messages': 'Mga Mensahe', 'nav.agents': 'Mga Ahente', 'nav.profile': 'Profile' },
+  it: { 'app.name': 'ListHQ', 'search.placeholder': 'Cerca "casa 4 camere a Melbourne per $850k"', 'nav.search': 'Cerca', 'nav.saved': 'Salvati', 'nav.messages': 'Messaggi', 'nav.agents': 'Agenti', 'nav.profile': 'Profilo' },
 };
 
 export const languageNames: Record<Language, string> = {
-  en: '🇦🇺 English',
-  zh: '🇨🇳 中文',
-  ko: '🇰🇷 한국어',
-  ms: '🇲🇾 Melayu',
-  es: '🇪🇸 Español',
-  ar: '🇦🇪 العربية',
-  hi: '🇮🇳 हिन्दी',
-  fr: '🇫🇷 Français',
-  pt: '🇧🇷 Português',
-  bn: '🇧🇩 বাংলা',
-  ru: '🇷🇺 Русский',
-  ja: '🇯🇵 日本語',
+  en: 'English',
+  zh: '简体中文',
+  'zh-TW': '繁體中文',
+  es: 'Español',
+  fr: 'Français',
+  de: 'Deutsch',
+  ru: 'Русский',
+  ja: '日本語',
+  ar: 'العربية',
+  pt: 'Português',
+  it: 'Italiano',
+  id: 'Bahasa Indonesia',
+  nl: 'Nederlands',
+  pl: 'Polski',
+  vi: 'Tiếng Việt',
+  ko: '한국어',
+  hi: 'हिन्दी',
+  th: 'ภาษาไทย',
+  tr: 'Türkçe',
+  sv: 'Svenska',
+  da: 'Dansk',
+  no: 'Norsk',
+  fil: 'Filipino',
+  ms: 'Bahasa Melayu',
+  bn: 'বাংলা',
 };
 
 interface I18nContextType {

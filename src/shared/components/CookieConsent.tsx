@@ -73,7 +73,7 @@ function ConsentBanner({
     setVisible(false);
     if (isAuthPage) return;
 
-    const t = setTimeout(() => setVisible(true), 800);
+    const t = setTimeout(() => { if (!localStorage.getItem("maps_consent_given") && !localStorage.getItem("maps_consent_declined")) { setVisible(true); } }, 800);
     return () => clearTimeout(t);
   }, [pathname]);
 

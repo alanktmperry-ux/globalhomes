@@ -19,9 +19,10 @@ const PocketListingPage = () => {
   const [searchParams] = useSearchParams();
   const editId = searchParams.get('edit');
   const duplicateId = searchParams.get('duplicate');
-  const [showForm, setShowForm] = useState(!!editId || !!duplicateId);
+  const typeParam = searchParams.get('type');
+  const [showForm, setShowForm] = useState(!!editId || !!duplicateId || typeParam === 'sale' || typeParam === 'rent');
   const [showSuccess, setShowSuccess] = useState(false);
-  const [createListingType, setCreateListingType] = useState<'sale' | 'rent'>('sale');
+  const [createListingType, setCreateListingType] = useState<'sale' | 'rent'>(typeParam === 'rent' ? 'rent' : 'sale');
   const [listingTitle, setListingTitle] = useState('');
   const [showLimitDialog, setShowLimitDialog] = useState(false);
   const { listings, agentId } = useAgentListings();

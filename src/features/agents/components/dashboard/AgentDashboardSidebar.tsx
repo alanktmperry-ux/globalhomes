@@ -3,8 +3,11 @@ import {
   LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, LogOut, Building2, UserPlus, Home,
   User, FileText, CreditCard, Star, MapPinned, Shield, Contact, Kanban, Scale, Landmark,
   ClipboardCheck, CalendarDays, Search, TrendingUp, Receipt, PartyPopper, Calculator, HelpCircle, ClipboardList, Settings2, Flame,
-  Handshake, Sparkles, Target, ShoppingBag,
+  Handshake, Sparkles, Target, ShoppingBag, ChevronDown,
 } from 'lucide-react';
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/shared/hooks/use-mobile';
@@ -278,18 +281,33 @@ const AgentDashboardSidebar = () => {
       <SidebarContent>
         {/* Quick actions */}
         <div className="px-3 mb-2 flex gap-1.5">
-          <Button
-            size="sm"
-            onClick={() => {
-              navigate('/pocket-listing');
-              if (isMobile) setOpenMobile(false);
-            }}
-            className={`flex-1 gap-1.5 text-xs font-bold relative ${collapsed ? 'px-0 justify-center' : ''}`}
-          >
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-success rounded-full animate-pulse" />
-            <Plus size={14} />
-            {!collapsed && 'New Listing'}
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                size="sm"
+                className={`flex-1 gap-1.5 text-xs font-bold relative ${collapsed ? 'px-0 justify-center' : ''}`}
+              >
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-success rounded-full animate-pulse" />
+                <Plus size={14} />
+                {!collapsed && (
+                  <>
+                    New Listing
+                    <ChevronDown size={12} className="ml-auto" />
+                  </>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuItem onClick={() => { navigate('/pocket-listing?type=sale'); if (isMobile) setOpenMobile(false); }}>
+                <Home size={14} className="mr-2 text-primary" />
+                Sale Listing
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => { navigate('/pocket-listing?type=rent'); if (isMobile) setOpenMobile(false); }}>
+                <Building2 size={14} className="mr-2 text-primary" />
+                Rental Listing
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           {!collapsed && (
             <Button
               size="sm"

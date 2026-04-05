@@ -580,17 +580,9 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
       </div>
 
       {/* Step content */}
-      <motion.div
-        key={step}
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -20 }}
-        transition={{ duration: 0.25 }}
-        className="p-5"
-        style={{ overflow: 'visible' }}
-      >
+      <div className="p-5">
         {stepContent()}
-      </motion.div>
+      </div>
 
       {/* Nav */}
       <div className="flex items-center justify-between p-4 border-t border-border bg-secondary/30">

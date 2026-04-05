@@ -50,6 +50,8 @@ const PocketListingPage = () => {
       setShowLimitDialog(true);
       return;
     }
+    // Clear any previous auto-saved draft so the form starts blank
+    localStorage.removeItem('pocket-listing-draft');
     setCreateListingType(type);
     setShowForm(true);
     setShowSuccess(false);

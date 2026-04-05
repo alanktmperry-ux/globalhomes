@@ -289,21 +289,42 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
     return () => clearInterval(autoSaveRef.current);
   }, [draft, editPropertyId]);
 
-  // Load draft on mount (only for new listings)
+  // Offer to resume a saved draft (only for new listings)
+  const [pendingDraft, setPendingDraft] = useState<Partial<ListingDraft> | null>(null);
+
   useEffect(() => {
     if (editPropertyId) return;
     const saved = localStorage.getItem('pocket-listing-draft');
     if (saved) {
       try {
         const parsed = JSON.parse(saved) as Partial<ListingDraft>;
-        setDraft({
-          ...DEFAULT_DRAFT,
-          ...parsed,
-          listingType: initialListingType ?? parsed.listingType ?? DEFAULT_DRAFT.listingType,
-        });
-      } catch {}
+        // Only offer to resume if there's meaningful data
+        if (parsed.address && parsed.address.length > 0) {
+          setPendingDraft(parsed);
+        } else {
+          localStorage.removeItem('pocket-listing-draft');
+        }
+      } catch {
+        localStorage.removeItem('pocket-listing-draft');
+      }
     }
-  }, [editPropertyId, initialListingType]);
+  }, [editPropertyId]);
+
+  const resumeDraft = () => {
+    if (pendingDraft) {
+      setDraft({
+        ...DEFAULT_DRAFT,
+        ...pendingDraft,
+        listingType: initialListingType ?? pendingDraft.listingType ?? DEFAULT_DRAFT.listingType,
+      });
+    }
+    setPendingDraft(null);
+  };
+
+  const discardDraft = () => {
+    localStorage.removeItem('pocket-listing-draft');
+    setPendingDraft(null);
+  };
 
   const progress = ((step + 1) / STEPS.length) * 100;
 

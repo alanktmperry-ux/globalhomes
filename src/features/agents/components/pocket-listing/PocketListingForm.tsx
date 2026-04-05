@@ -587,6 +587,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         exit={{ opacity: 0, x: -20 }}
         transition={{ duration: 0.25 }}
         className="p-5"
+        style={{ overflow: 'visible' }}
       >
         {stepContent()}
       </motion.div>

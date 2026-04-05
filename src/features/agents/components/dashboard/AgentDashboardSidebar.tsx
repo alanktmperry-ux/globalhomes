@@ -302,8 +302,9 @@ const AgentDashboardSidebar = () => {
                 onSelect={(event) => {
                   event.preventDefault();
                   localStorage.removeItem('pocket-listing-draft');
+                  const ts = Date.now();
                   window.setTimeout(() => {
-                    navigate('/dashboard/listings/new', { state: { type: 'sale' } });
+                    navigate('/dashboard/listings/new', { state: { type: 'sale', _ts: ts } });
                     if (isMobile) setOpenMobile(false);
                   }, 10);
                 }}
@@ -315,8 +316,9 @@ const AgentDashboardSidebar = () => {
                 onSelect={(event) => {
                   event.preventDefault();
                   localStorage.removeItem('pocket-listing-draft');
+                  const ts = Date.now();
                   window.setTimeout(() => {
-                    navigate('/dashboard/listings/new', { state: { type: 'rental' } });
+                    navigate('/dashboard/listings/new', { state: { type: 'rental', _ts: ts } });
                     if (isMobile) setOpenMobile(false);
                   }, 10);
                 }}

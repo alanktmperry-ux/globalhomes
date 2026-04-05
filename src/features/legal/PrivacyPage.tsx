@@ -98,13 +98,7 @@ const PrivacyPage = () => {
             explicit consent before loading.
           </p>
           <p>
-            You can manage cookie preferences through your browser settings.{' '}
-            <button
-              onClick={resetConsent}
-              className="text-primary underline underline-offset-2 hover:opacity-80 transition-opacity font-medium"
-            >
-              Reset cookie &amp; Maps preferences
-            </button>
+            You can manage cookie preferences through your browser settings.
           </p>
 
           <h2>10. Your Rights</h2>

@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { AuctionBid, AuctionUpdate, PreAuctionOffer } from '@/types/auction';
+import { toast } from 'sonner';
+import { t, getPreferredLang } from '../lib/auctionI18n';
+import { capture } from '@/shared/lib/posthog';
 
 export function useLiveAuction(auctionId: string | undefined) {
   const [bids, setBids] = useState<AuctionBid[]>([]);

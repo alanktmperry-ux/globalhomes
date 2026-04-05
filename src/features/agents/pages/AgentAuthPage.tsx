@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { motion } from 'framer-motion';
 import { Building2, KeyRound, MapPin, CheckCircle2, Home, Zap, ChevronRight } from 'lucide-react';
 import { autocomplete } from '@/shared/lib/googleMapsService';

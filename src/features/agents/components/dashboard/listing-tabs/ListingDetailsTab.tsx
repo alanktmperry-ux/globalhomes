@@ -66,6 +66,8 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
 
   return (
     <div className="space-y-6">
+      <ListingCompleteness listing={listing} />
+
       {/* Hero image */}
       {listing.image_url && (
         <img src={listing.image_url} alt="" className="w-full h-48 object-cover rounded-xl" />

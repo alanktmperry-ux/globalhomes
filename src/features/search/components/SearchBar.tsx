@@ -73,10 +73,56 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setShowSuggestions(false);
-    if (query.trim()) onSearch(query.trim());
+    const trimmed = query.trim();
+    if (!trimmed) return;
+
+    setIsTranslating(true);
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 3000);
+
+      const resp = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-translations`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ type: 'translate_search', search_query: trimmed }),
+          signal: controller.signal,
+        }
+      );
+      clearTimeout(timeout);
+
+      if (resp.ok) {
+        const data = await resp.json();
+        const lang = data.detected_language;
+        const englishQuery = data.english_query || trimmed;
+
+        capture('search_translated', {
+          original_query: trimmed,
+          english_query: englishQuery,
+          detected_language: lang,
+        });
+
+        if (lang && lang !== 'en' && lang !== 'English') {
+          setDetectedLang(lang);
+          setTimeout(() => setDetectedLang(null), 3000);
+        }
+
+        onSearch(englishQuery);
+      } else {
+        onSearch(trimmed);
+      }
+    } catch {
+      onSearch(trimmed);
+    } finally {
+      setIsTranslating(false);
+    }
   };
 
   return (

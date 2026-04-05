@@ -21,7 +21,7 @@ const PocketListingPage = () => {
   const editId = searchParams.get('edit');
   const duplicateId = searchParams.get('duplicate');
   const typeParam = searchParams.get('type');
-  const routeState = location.state as { type?: 'sale' | 'rent' | 'rental' } | null;
+  const routeState = location.state as { type?: 'sale' | 'rent' | 'rental', _ts?: number } | null;
   const stateType = routeState?.type === 'rental'
     ? 'rent'
     : routeState?.type === 'sale' || routeState?.type === 'rent'
@@ -35,18 +35,22 @@ const PocketListingPage = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [createListingType, setCreateListingType] = useState<'sale' | 'rent'>(requestedListingType ?? 'sale');
   const [listingTitle, setListingTitle] = useState('');
-  const lastStartKeyRef = useRef<string | null>(null);
+  const [formKey, setFormKey] = useState(0);
+  const lastTsRef = useRef<number | null>(null);
 
+  // React to navigation state changes (including same-route re-navigations)
   useEffect(() => {
     if (!isExplicitNewListing) return;
-    if (lastStartKeyRef.current === location.key) return;
+    const ts = routeState?._ts ?? 0;
+    if (lastTsRef.current === ts && ts !== 0) return;
+    lastTsRef.current = ts;
 
-    lastStartKeyRef.current = location.key;
     localStorage.removeItem('pocket-listing-draft');
     setCreateListingType(requestedListingType ?? 'sale');
     setShowForm(true);
     setShowSuccess(false);
-  }, [isExplicitNewListing, location.key, requestedListingType]);
+    setFormKey(k => k + 1); // force form remount for blank state
+  }, [isExplicitNewListing, routeState?._ts, requestedListingType]);
 
   const [showLimitDialog, setShowLimitDialog] = useState(false);
   const { listings, agentId } = useAgentListings();

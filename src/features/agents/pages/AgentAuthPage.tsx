@@ -608,9 +608,19 @@ const AgentAuthPage = () => {
                   <p className="text-xs text-muted-foreground text-center">You must agree to the terms before creating your account</p>
                 )}
 
+                <div className="flex justify-center">
+                  <HCaptcha
+                    ref={captchaRef}
+                    sitekey={hcaptchaSiteKey}
+                    onVerify={(token) => setCaptchaToken(token)}
+                    onExpire={() => setCaptchaToken(null)}
+                    onError={() => setCaptchaToken(null)}
+                  />
+                </div>
+
                 <button
                   type="submit"
-                  disabled={loading || !agreedToTerms || password !== confirmPassword || password.length < 6}
+                  disabled={loading || !agreedToTerms || !captchaToken || password !== confirmPassword || password.length < 6}
                   className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50"
                 >
                   {loading ? 'Setting up your account…' : 'Create Account'}

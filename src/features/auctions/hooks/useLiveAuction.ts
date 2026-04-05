@@ -54,6 +54,14 @@ export function useLiveAuction(auctionId: string | undefined) {
           setLastBid(newBid.bid_amount);
           setReserveMet(newBid.reserve_met_at_this_bid);
         }
+        // Multilingual toast
+        const lang = getPreferredLang();
+        const formatted = `$${newBid.bid_amount.toLocaleString('en-AU')}`;
+        toast(`${t('new_bid', lang)} ${formatted}`);
+        capture('bid_received_realtime', { auction_id: auctionId, bid_amount: newBid.bid_amount, language: lang });
+        if (newBid.reserve_met_at_this_bid) {
+          toast.success(t('reserve_met', lang));
+        }
       })
       .on('postgres_changes', {
         event: 'INSERT',

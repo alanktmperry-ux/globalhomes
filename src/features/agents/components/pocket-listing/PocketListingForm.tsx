@@ -443,6 +443,16 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         if (error) throw error;
         localStorage.removeItem('pocket-listing-draft');
 
+        // Track listing creation
+        try {
+          const { capture } = await import('@/shared/lib/posthog');
+          capture('listing_created', {
+            listing_id: inserted.id,
+            property_type: draft.propertyType,
+            has_images: (draft.photos?.length ?? 0) > 0,
+          });
+        } catch {}
+
         const matched = await matchBuyersToListing({
           id: inserted.id,
           agent_id: agentId,
@@ -464,18 +474,6 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         } else {
           toast.success('Listing saved! — Your property is in draft. Publish it from your dashboard to make it visible to buyers.');
         }
-      }
-
-      // Track listing creation
-      if (!editPropertyId) {
-        try {
-          const { capture } = await import('@/shared/lib/posthog');
-          capture('listing_created', {
-            listing_id: inserted?.id,
-            property_type: draft.propertyType,
-            has_images: (draft.photos?.length ?? 0) > 0,
-          });
-        } catch {}
       }
 
       onPublish(title);

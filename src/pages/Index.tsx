@@ -100,7 +100,7 @@ const Index = () => {
     // Track search
     try {
       if (typeof window !== 'undefined' && (window as any).posthog?.capture) {
-        (window as any).posthog.capture('search_performed', { query, detected_language: 'en', result_count: properties?.length ?? 0 });
+        (window as any).posthog.capture('search_performed', { query, detected_language: 'en', result_count: propertyList?.length ?? 0 });
       }
     } catch {}
 

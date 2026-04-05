@@ -215,6 +215,9 @@ const App = () => (
                   <Route path="/help/contact" element={<HelpContactPage />} />
                 </Route>
 
+                {/* Public standalone pages (no shared layout) */}
+                <Route path="/auctions/:id/live" element={<LiveAuctionPage />} />
+
                 {/* Auth pages (no shared layout) */}
                 <Route path="/auth" element={<AuthLandingPage />} />
                 <Route path="/login" element={<SeekerAuthPage />} />

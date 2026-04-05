@@ -11,6 +11,9 @@ function getContextLinks(pathname: string) {
   if (pathname.startsWith('/property/')) {
     return FAQ_ITEMS.filter((i) => ['buyers', 'auctions'].includes(i.category)).slice(0, 4);
   }
+  if (pathname.startsWith('/auctions/')) {
+    return FAQ_ITEMS.filter((i) => i.category === 'auctions').slice(0, 4);
+  }
   return FAQ_ITEMS.filter((i) => i.category === 'general').slice(0, 4);
 }
 

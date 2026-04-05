@@ -375,6 +375,27 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: 'auctions',
     tags: ['live', 'watch', 'online', 'auction feed'],
   },
+  {
+    id: 'auction-multilingual',
+    question: 'Can I watch the auction live in my language?',
+    answer: 'Yes. On the live auction page, use the language selector at the top to switch between English, Mandarin (普通话), Cantonese (廣東話), and Vietnamese (Tiếng Việt). All bid notifications, reserve announcements, and auction results will appear in your selected language in real time. Your language preference is saved automatically for future visits.',
+    category: 'auctions',
+    tags: ['multilingual', 'language', 'mandarin', 'cantonese', 'vietnamese', 'live'],
+  },
+  {
+    id: 'auction-watch-public',
+    question: 'Do I need an account to watch a live auction?',
+    answer: 'No. The public live auction feed at /auctions/[id]/live is accessible without signing in. You can watch all bids in real time, see when the reserve is met, and follow the auction result. To register as a bidder and place bids yourself, you will need to create an account and complete the registration process at least 24 hours before the auction.',
+    category: 'auctions',
+    tags: ['watch', 'live', 'public', 'no account', 'register'],
+  },
+  {
+    id: 'auction-bid-realtime',
+    question: 'How does the real-time bid feed work?',
+    answer: 'The live bid feed uses Supabase Realtime to push each new bid to your screen the instant it is recorded by the auctioneer — no page refresh needed. You will see the bid amount, whether it is a genuine or vendor bid, and whether the reserve has been met. A notification toast appears in your chosen language with each new bid. The feed also shows if the property has SOLD or been Passed In.',
+    category: 'auctions',
+    tags: ['realtime', 'bid feed', 'live', 'technology', 'how it works'],
+  },
 
   // BILLING
   {

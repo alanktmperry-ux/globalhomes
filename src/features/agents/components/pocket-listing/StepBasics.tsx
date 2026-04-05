@@ -1,6 +1,7 @@
 import { Home, Building2, Warehouse, Mountain, Store, Minus, Plus, DollarSign, Key, Flame, Sun, Wind, Zap, Waves, ChevronDown, Gavel, Info } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import type { ListingDraft } from './PocketListingForm';
 
@@ -461,6 +462,23 @@ const StepBasics = ({ draft, update }: Props) => {
           </div>
         </div>
       )}
+
+      {/* ── DESCRIPTION ── */}
+      <div className="space-y-2">
+        <SectionLabel>Description</SectionLabel>
+        <Textarea
+          value={draft.voiceTranscript}
+          onChange={(e) => update({ voiceTranscript: e.target.value })}
+          placeholder="Describe the property — key selling points, lifestyle, neighbourhood highlights…"
+          className="min-h-[120px] resize-y"
+          rows={5}
+        />
+        <p className="text-xs text-muted-foreground">
+          {draft.voiceTranscript.length > 0
+            ? `${draft.voiceTranscript.length} characters`
+            : 'You can also dictate this in the Voice step'}
+        </p>
+      </div>
 
     </div>
   );

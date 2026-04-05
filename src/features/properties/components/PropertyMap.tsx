@@ -40,34 +40,6 @@ interface PropertyMapProps {
 export function PropertyMap({
   properties, onPropertySelect, selectedPropertyId, onAreaSearch, centerOn, onMapMoved, onScrollToProperty, formatPrice, onGeolocate,
 }: PropertyMapProps) {
-  const { consent } = useConsent();
-
-  // If user hasn't consented to maps, show a placeholder
-  if (!consent.maps) {
-    return (
-      <div className="w-full h-full min-h-[300px] flex flex-col items-center justify-center bg-secondary/50 rounded-xl border border-border text-center p-6 gap-3">
-        <MapPin size={32} className="text-muted-foreground/40" />
-        <div>
-          <p className="text-sm font-medium text-foreground mb-1">Enable map view</p>
-          <p className="text-xs text-muted-foreground max-w-[240px] mb-3">
-            Browse properties on an interactive map. Requires accepting map cookies.
-          </p>
-          <button
-            onClick={() => {
-              try {
-                const existing = JSON.parse(localStorage.getItem('listhq-cookie-consent') || '{}');
-                localStorage.setItem('listhq-cookie-consent', JSON.stringify({ ...existing, maps: true }));
-                window.location.reload();
-              } catch {}
-            }}
-            className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
-          >
-            Enable map
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);

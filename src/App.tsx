@@ -307,7 +307,6 @@ const App = () => (
         </TooltipProvider>
       </AuthProvider>
       </CurrencyProvider>
-    </ConsentProvider>
       </BrowserRouter>
     </I18nProvider>
   </QueryClientProvider>

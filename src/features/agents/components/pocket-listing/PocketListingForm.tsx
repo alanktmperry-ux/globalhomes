@@ -101,9 +101,9 @@ const DEFAULT_DRAFT: ListingDraft = {
   priceMax: 800000,
   priceDisplay: 'range',
   propertyType: 'House',
-  beds: 3,
-  baths: 2,
-  cars: 2,
+  beds: 0,
+  baths: 0,
+  cars: 0,
   sqm: 0,
   landSize: 0,
   photos: [],
@@ -293,6 +293,10 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
 
   useEffect(() => {
     if (editPropertyId) return;
+    if (initialListingType) {
+      localStorage.removeItem('pocket-listing-draft');
+      return;
+    }
     const saved = localStorage.getItem('pocket-listing-draft');
     if (saved) {
       try {
@@ -307,7 +311,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         localStorage.removeItem('pocket-listing-draft');
       }
     }
-  }, [editPropertyId]);
+  }, [editPropertyId, initialListingType]);
 
   const resumeDraft = () => {
     if (pendingDraft) {
@@ -579,7 +583,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
       </div>
 
       {/* Step content */}
-      <div className="p-5 flex-1 overflow-y-auto min-h-0">
+      <div className="p-5 overflow-y-auto max-h-[70vh]">
         {stepContent()}
       </div>
 

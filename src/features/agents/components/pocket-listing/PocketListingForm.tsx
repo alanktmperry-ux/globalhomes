@@ -527,6 +527,33 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
     }
   };
 
+  if (pendingDraft) {
+    return (
+      <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+        <div className="flex items-start gap-3">
+          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+            <FileText size={18} className="text-primary" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold">You have an unsaved draft</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {pendingDraft.address}{pendingDraft.suburb ? `, ${pendingDraft.suburb}` : ''} — {pendingDraft.listingType === 'rent' ? 'Rental' : 'Sale'} listing
+            </p>
+          </div>
+        </div>
+        <p className="text-sm text-muted-foreground">Resume it?</p>
+        <div className="flex gap-2">
+          <Button size="sm" onClick={resumeDraft} className="gap-1.5">
+            <FileText size={14} /> Yes, resume draft
+          </Button>
+          <Button size="sm" variant="outline" onClick={discardDraft} className="gap-1.5">
+            <Trash2 size={14} /> No, start fresh
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-card border border-border rounded-2xl">
       {/* Progress */}

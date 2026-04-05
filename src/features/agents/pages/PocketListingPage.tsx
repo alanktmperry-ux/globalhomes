@@ -20,7 +20,12 @@ const PocketListingPage = () => {
   const editId = searchParams.get('edit');
   const duplicateId = searchParams.get('duplicate');
   const typeParam = searchParams.get('type');
-  const [showForm, setShowForm] = useState(!!editId || !!duplicateId || typeParam === 'sale' || typeParam === 'rent');
+  // Clear saved draft when explicitly starting a new listing via ?type= param
+  const isNewFromType = typeParam === 'sale' || typeParam === 'rent';
+  if (isNewFromType && typeof window !== 'undefined') {
+    localStorage.removeItem('pocket-listing-draft');
+  }
+  const [showForm, setShowForm] = useState(!!editId || !!duplicateId || isNewFromType);
   const [showSuccess, setShowSuccess] = useState(false);
   const [createListingType, setCreateListingType] = useState<'sale' | 'rent'>(typeParam === 'rent' ? 'rent' : 'sale');
   const [listingTitle, setListingTitle] = useState('');

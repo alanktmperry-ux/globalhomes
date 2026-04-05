@@ -398,26 +398,11 @@ const BuyerSettingsPage = () => {
             <div>
               <p className="text-sm font-medium text-foreground">Google Maps</p>
               <p className="text-xs text-muted-foreground">
-                Used for address autocomplete and property map display.
+                Google Maps is used for address autocomplete and property map display. Location data is sent to Google.{' '}
+                <a href="/privacy" className="underline underline-offset-2 hover:text-foreground transition-colors">Privacy Policy</a>
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <span className={`text-xs font-medium ${consent.maps ? 'text-green-600' : 'text-muted-foreground'}`}>
-                {consent.maps ? 'Enabled' : 'Disabled'}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => (consent.maps ? declineMaps() : acceptAll())}
-                className="text-xs h-7 px-2.5"
-              >
-                {consent.maps ? 'Disable' : 'Enable'}
-              </Button>
-            </div>
           </div>
-          <button onClick={resetConsent} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors">
-            Reset all cookie preferences
-          </button>
         </div>
 
         <Button onClick={handleSave} disabled={saving} className="w-full">

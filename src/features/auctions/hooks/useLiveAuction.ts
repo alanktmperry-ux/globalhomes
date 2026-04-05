@@ -69,7 +69,12 @@ export function useLiveAuction(auctionId: string | undefined) {
         table: 'auction_updates',
         filter: `auction_id=eq.${auctionId}`,
       }, (payload) => {
-        setUpdates(prev => [payload.new as unknown as AuctionUpdate, ...prev]);
+        const update = payload.new as unknown as AuctionUpdate;
+        setUpdates(prev => [update, ...prev]);
+        if (update.update_type === 'sold' && update.bid_amount) {
+          const lang = getPreferredLang();
+          toast.success(`${t('sold', lang)} $${update.bid_amount.toLocaleString('en-AU')}`);
+        }
       })
       .subscribe();
 

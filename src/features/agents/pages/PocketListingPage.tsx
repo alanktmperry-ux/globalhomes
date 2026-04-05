@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Plus, Zap, Eye, MessageSquare, TrendingUp, Copy, Sparkles, Key, Link } from 'lucide-react';
 import { ImportListingDialog } from '@/features/agents/components/pocket-listing/ImportListingDialog';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
@@ -16,38 +16,38 @@ import { useAuth } from '@/features/auth/AuthProvider';
 
 const PocketListingPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const editId = searchParams.get('edit');
   const duplicateId = searchParams.get('duplicate');
   const typeParam = searchParams.get('type');
-  const timestampParam = searchParams.get('t');
-  // Clear saved draft when explicitly starting a new listing via ?type= param
-  const isNewFromType = typeParam === 'sale' || typeParam === 'rent';
+  const routeState = location.state as { type?: 'sale' | 'rent' | 'rental' } | null;
+  const stateType = routeState?.type === 'rental'
+    ? 'rent'
+    : routeState?.type === 'sale' || routeState?.type === 'rent'
+      ? routeState.type
+      : null;
+  const isDashboardNewRoute = location.pathname === '/dashboard/listings/new';
+  const requestedListingType = stateType ?? (typeParam === 'sale' || typeParam === 'rent' ? typeParam : null);
+  const isExplicitNewListing = !editId && !duplicateId && (isDashboardNewRoute || requestedListingType !== null);
 
-  const [showForm, setShowForm] = useState(!!editId || !!duplicateId || isNewFromType);
+  const [showForm, setShowForm] = useState(!!editId || !!duplicateId || isExplicitNewListing);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [createListingType, setCreateListingType] = useState<'sale' | 'rent'>(typeParam === 'rent' ? 'rent' : 'sale');
+  const [createListingType, setCreateListingType] = useState<'sale' | 'rent'>(requestedListingType ?? 'sale');
   const [listingTitle, setListingTitle] = useState('');
+  const lastStartKeyRef = useRef<string | null>(null);
 
-  // React to navigation from sidebar / header even when already on this page
-  const prevTimestamp = useRef(timestampParam);
   useEffect(() => {
-    if (isNewFromType && timestampParam && timestampParam !== prevTimestamp.current) {
-      prevTimestamp.current = timestampParam;
-      localStorage.removeItem('pocket-listing-draft');
-      setCreateListingType(typeParam === 'rent' ? 'rent' : 'sale');
-      setShowForm(true);
-      setShowSuccess(false);
-    }
-  }, [timestampParam, typeParam, isNewFromType]);
+    if (!isExplicitNewListing) return;
+    if (lastStartKeyRef.current === location.key) return;
 
-  // Initial mount: clear draft for new listing
-  useEffect(() => {
-    if (isNewFromType) {
-      localStorage.removeItem('pocket-listing-draft');
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    lastStartKeyRef.current = location.key;
+    localStorage.removeItem('pocket-listing-draft');
+    setCreateListingType(requestedListingType ?? 'sale');
+    setShowForm(true);
+    setShowSuccess(false);
+  }, [isExplicitNewListing, location.key, requestedListingType]);
+
   const [showLimitDialog, setShowLimitDialog] = useState(false);
   const { listings, agentId } = useAgentListings();
   const { toast } = useToast();

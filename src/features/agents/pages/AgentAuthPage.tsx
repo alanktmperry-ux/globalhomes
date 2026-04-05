@@ -49,6 +49,7 @@ const AgentAuthPage = () => {
 
   // ── All useRef hooks ──
   const officeDebounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const captchaRef = useRef<HCaptcha>(null);
 
   // ── Derived values (not hooks) ──
   const strength = getPasswordStrength(password);

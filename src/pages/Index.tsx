@@ -97,6 +97,13 @@ const Index = () => {
   const wrappedHandleSearch = useCallback((query: string) => {
     handleSearch(query);
 
+    // Track search
+    try {
+      if (typeof window !== 'undefined' && (window as any).posthog?.capture) {
+        (window as any).posthog.capture('search_performed', { query, detected_language: 'en', result_count: properties?.length ?? 0 });
+      }
+    } catch {}
+
     // Fire-and-forget: log every search to voice_searches for AI Buyer Concierge pipeline
     supabase
       .from('voice_searches')

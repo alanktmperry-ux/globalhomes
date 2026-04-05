@@ -287,6 +287,13 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
       }
 
       setStep(3);
+
+      // Track buyer enquiry
+      try {
+        const { capture } = await import('@/shared/lib/posthog');
+        capture('buyer_enquiry_sent', { listing_id: property.id, agent_id: agent.id });
+      } catch {}
+
       toast.success(depositAmount ? `Qualified lead submitted — Lead score: ${score}` : `Lead submitted — Score: ${score}`);
     } catch (err) {
       console.error('Lead submission error:', err);

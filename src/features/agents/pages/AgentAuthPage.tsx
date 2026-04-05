@@ -187,6 +187,12 @@ const AgentAuthPage = () => {
 
       const { data: sessionData } = await supabase.auth.getSession();
 
+      // Track agent signup
+      try {
+        const { capture } = await import('@/shared/lib/posthog');
+        capture('agent_signed_up', { plan: 'starter', referral_source: inviteCode ? 'invite_code' : 'direct' });
+      } catch {}
+
       if (sessionData?.session) {
         toast.success('🎉 Account created!');
         setPendingRedirect('dashboard');

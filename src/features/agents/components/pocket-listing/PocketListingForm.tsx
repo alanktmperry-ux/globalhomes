@@ -466,6 +466,18 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         }
       }
 
+      // Track listing creation
+      if (!editPropertyId) {
+        try {
+          const { capture } = await import('@/shared/lib/posthog');
+          capture('listing_created', {
+            listing_id: inserted?.id,
+            property_type: draft.propertyType,
+            has_images: (draft.photos?.length ?? 0) > 0,
+          });
+        } catch {}
+      }
+
       onPublish(title);
     } catch (err: any) {
       console.error('Publish error:', err);

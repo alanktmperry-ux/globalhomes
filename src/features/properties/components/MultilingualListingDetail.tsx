@@ -56,14 +56,6 @@ function detectBrowserLanguage(): LanguageKey {
   return 'en';
 }
 
-function safeCapture(event: string, props: Record<string, unknown>) {
-  try {
-    if (typeof window !== 'undefined' && (window as any).posthog?.capture) {
-      (window as any).posthog.capture(event, props);
-    }
-  } catch {}
-}
-
 const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
   const translations = (listing.translations ?? {}) as Record<string, Translation>;
   const agentInsights = (listing.agent_insights ?? null) as AgentInsights | null;

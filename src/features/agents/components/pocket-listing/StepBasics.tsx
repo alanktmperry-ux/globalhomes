@@ -244,6 +244,44 @@ const StepBasics = ({ draft, update }: Props) => {
         )}
       </div>
 
+      <div className="space-y-4">
+        <SectionLabel>Property Details</SectionLabel>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <Counter label={isCommercial ? 'Offices / Rooms' : 'Bedrooms'} value={draft.beds} onChange={(v) => update({ beds: v })} />
+          <Counter label={isCommercial ? 'Washrooms' : 'Bathrooms'} value={draft.baths} onChange={(v) => update({ baths: v })} />
+          <Counter label="Car Spaces" value={draft.cars} onChange={(v) => update({ cars: v })} />
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">
+              Land Size (sqm) <span className="text-muted-foreground/70">optional</span>
+            </Label>
+            <Input
+              type="text"
+              inputMode="decimal"
+              value={draft.landSize ? String(draft.landSize) : ''}
+              onChange={(e) => update({ landSize: Number(e.target.value.replace(/,/g, '')) || 0 })}
+              placeholder="e.g. 650"
+              className="h-10"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label className="text-sm font-semibold block">Description</Label>
+          <Textarea
+            value={draft.voiceTranscript}
+            onChange={(e) => update({ voiceTranscript: e.target.value })}
+            placeholder="Describe the property — key selling points, lifestyle, neighbourhood highlights…"
+            className="min-h-[140px] resize-y"
+            rows={6}
+          />
+          <p className="text-xs text-muted-foreground">
+            {draft.voiceTranscript.length > 0
+              ? `${draft.voiceTranscript.length} characters`
+              : 'You can also dictate this in the Voice step'}
+          </p>
+        </div>
+      </div>
+
       {/* ── AUCTION DATE (EOI) ── */}
       {!isRental && showAuction && (
         <div className="bg-secondary/50 rounded-xl p-4 space-y-3">
@@ -319,26 +357,19 @@ const StepBasics = ({ draft, update }: Props) => {
         </div>
       )}
 
-      {/* ── BEDROOMS / BATHROOMS ── */}
-      {!isLand && (
+      {/* ── EXTRA ROOM DETAILS ── */}
+      {!isLand && !isCommercial && (
         <div className="space-y-2">
-          <SectionLabel>Rooms</SectionLabel>
-          <Counter label={isCommercial ? 'Offices / Rooms' : 'Bedrooms'} value={draft.beds} onChange={(v) => update({ beds: v })} />
-          <Counter label={isCommercial ? 'Washrooms' : 'Bathrooms'} value={draft.baths} onChange={(v) => update({ baths: v })} />
-          {!isCommercial && (
-            <Counter label="Ensuites" value={draft.ensuites} onChange={(v) => update({ ensuites: v })} />
-          )}
-          {!isCommercial && (
-            <Counter label="Study / Home Office" value={draft.studyRooms} onChange={(v) => update({ studyRooms: v })} />
-          )}
+          <SectionLabel>Extra Room Details</SectionLabel>
+          <Counter label="Ensuites" value={draft.ensuites} onChange={(v) => update({ ensuites: v })} />
+          <Counter label="Study / Home Office" value={draft.studyRooms} onChange={(v) => update({ studyRooms: v })} />
         </div>
       )}
 
-      {/* ── PARKING ── */}
+      {/* ── PARKING DETAILS ── */}
       {!isLand && (
         <div className="space-y-2">
-          <SectionLabel>Parking</SectionLabel>
-          <Counter label="Car Spaces" value={draft.cars} onChange={(v) => update({ cars: v })} />
+          <SectionLabel>Parking Details</SectionLabel>
           {isRental ? (
             <SelectRow label="Parking Type" value={draft.rentalParkingType} onChange={(v) => update({ rentalParkingType: v })} options={PARKING_TYPES} />
           ) : (
@@ -419,22 +450,16 @@ const StepBasics = ({ draft, update }: Props) => {
         </div>
       )}
 
-      {/* ── PROPERTY SIZE ── */}
-      <div className="space-y-2">
-        <SectionLabel>Property Size</SectionLabel>
-        <div className="grid grid-cols-2 gap-3">
-          {!isLand && (
-            <div>
-              <Label className="text-xs text-muted-foreground mb-1 block">Floor Area (sqm)</Label>
-              <Input type="number" min={0} value={draft.sqm || ''} onChange={(e) => update({ sqm: Number(e.target.value) || 0 })} placeholder="e.g. 180" className="h-9" />
-            </div>
-          )}
-          <div className={isLand ? 'col-span-2' : ''}>
-            <Label className="text-xs text-muted-foreground mb-1 block">Land Size (sqm)</Label>
-            <Input type="number" min={0} value={draft.landSize || ''} onChange={(e) => update({ landSize: Number(e.target.value) || 0 })} placeholder="e.g. 650" className="h-9" />
+      {/* ── FLOOR AREA ── */}
+      {!isLand && (
+        <div className="space-y-2">
+          <SectionLabel>Floor Area</SectionLabel>
+          <div>
+            <Label className="text-xs text-muted-foreground mb-1 block">Floor Area (sqm)</Label>
+            <Input type="number" min={0} value={draft.sqm || ''} onChange={(e) => update({ sqm: Number(e.target.value) || 0 })} placeholder="e.g. 180" className="h-9" />
           </div>
         </div>
-      </div>
+      )}
 
       {/* ── FINANCIAL DETAILS (sale) ── */}
       {!isRental && !isLand && (
@@ -462,23 +487,6 @@ const StepBasics = ({ draft, update }: Props) => {
           </div>
         </div>
       )}
-
-      {/* ── DESCRIPTION ── */}
-      <div className="space-y-2">
-        <SectionLabel>Description</SectionLabel>
-        <Textarea
-          value={draft.voiceTranscript}
-          onChange={(e) => update({ voiceTranscript: e.target.value })}
-          placeholder="Describe the property — key selling points, lifestyle, neighbourhood highlights…"
-          className="min-h-[120px] resize-y"
-          rows={5}
-        />
-        <p className="text-xs text-muted-foreground">
-          {draft.voiceTranscript.length > 0
-            ? `${draft.voiceTranscript.length} characters`
-            : 'You can also dictate this in the Voice step'}
-        </p>
-      </div>
 
     </div>
   );

@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Search, Mic, MapPin, Loader2 } from 'lucide-react';
+import { capture } from '@/shared/lib/posthog';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useI18n } from '@/shared/lib/i18n';
 import { useVoiceSearch } from '@/features/search/hooks/useVoiceSearch';
@@ -14,6 +15,8 @@ interface SearchBarProps {
 
 export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: SearchBarProps) {
   const [query, setQuery] = useState(initialValue);
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [detectedLang, setDetectedLang] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<{ description: string; place_id: string }[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
@@ -70,17 +73,67 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setShowSuggestions(false);
-    if (query.trim()) onSearch(query.trim());
+    const trimmed = query.trim();
+    if (!trimmed) return;
+
+    setIsTranslating(true);
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 3000);
+
+      const resp = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-translations`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ type: 'translate_search', search_query: trimmed }),
+          signal: controller.signal,
+        }
+      );
+      clearTimeout(timeout);
+
+      if (resp.ok) {
+        const data = await resp.json();
+        const lang = data.detected_language;
+        const englishQuery = data.english_query || trimmed;
+
+        capture('search_translated', {
+          original_query: trimmed,
+          english_query: englishQuery,
+          detected_language: lang,
+        });
+
+        if (lang && lang !== 'en' && lang !== 'English') {
+          setDetectedLang(lang);
+          setTimeout(() => setDetectedLang(null), 3000);
+        }
+
+        onSearch(englishQuery);
+      } else {
+        onSearch(trimmed);
+      }
+    } catch {
+      onSearch(trimmed);
+    } finally {
+      setIsTranslating(false);
+    }
   };
 
   return (
     <div ref={wrapperRef} className="relative w-full">
       <form onSubmit={handleSubmit}>
         <div className="relative flex items-center rounded-2xl bg-secondary border border-border shadow-card transition-shadow focus-within:shadow-elevated focus-within:border-primary/30">
-          <Search className="absolute left-4 text-muted-foreground" size={20} />
+          {isTranslating ? (
+            <Loader2 className="absolute left-4 text-primary animate-spin" size={20} />
+          ) : (
+            <Search className="absolute left-4 text-muted-foreground" size={20} />
+          )}
           <input
             type="text"
             value={query}
@@ -147,6 +200,21 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
           >
             {isTranscribing ? 'Transcribing…' : t('search.voice.listening')}
           </motion.p>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {detectedLang && (
+          <motion.div
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="mt-2 flex justify-center"
+          >
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent text-accent-foreground text-xs font-medium">
+              🌐 Searching in English
+            </span>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

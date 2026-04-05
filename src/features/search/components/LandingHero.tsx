@@ -281,6 +281,73 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
         </motion.div>
       </section>
 
+      {/* Featured Listings */}
+      <section className="bg-white py-12 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-baseline justify-between mb-6">
+            <div>
+              <h2 className="text-xl font-semibold text-slate-900">Featured listings</h2>
+              <p className="text-sm text-slate-500 mt-1">Hand-picked properties across Sydney and Melbourne</p>
+            </div>
+            <a href="/search" className="text-sm text-blue-600 hover:text-blue-700 font-medium">View all &rarr;</a>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { price: '$1,250,000', addr: '32 Harbour St, Sydney NSW', beds: 3, baths: 2, cars: 1, badge: 'AI Translated', color: 'blue' },
+              { price: '$850,000', addr: '14 Chapel St, Melbourne VIC', beds: 2, baths: 1, cars: 1, badge: 'New', color: 'blue' },
+              { price: '$720,000', addr: '8 Bridge Rd, Richmond VIC', beds: 2, baths: 2, cars: 0, badge: 'Hot', color: 'blue' },
+            ].map((p, i) => (
+              <div key={i} className="rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
+                <div className="h-40 bg-blue-50 flex items-center justify-center relative">
+                  <span className="absolute top-3 left-3 text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full font-medium">{p.badge}</span>
+                  <span className="text-slate-300 text-sm">Photo</span>
+                </div>
+                <div className="p-4">
+                  <div className="text-base font-semibold text-slate-900">{p.price}</div>
+                  <div className="text-xs text-slate-500 mt-0.5 mb-2">{p.addr}</div>
+                  <div className="flex gap-3 text-xs text-slate-400">
+                    <span>{p.beds} bed</span><span>{p.baths} bath</span><span>{p.cars} car</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="bg-slate-50 py-12 px-6">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-xl font-semibold text-slate-900 mb-1">How ListHQ works</h2>
+          <p className="text-sm text-slate-500 mb-8">Find your next home in 3 steps &mdash; in any language</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { num: '1', title: 'Search in your language', desc: 'Type or speak in Mandarin, Vietnamese, Hindi — AI understands you' },
+              { num: '2', title: 'Browse translated listings', desc: 'Every listing is AI-translated. See prices in your currency.' },
+              { num: '3', title: 'Connect with an agent', desc: 'Multilingual agents ready to help you through the whole process' },
+            ].map((step) => (
+              <div key={step.num} className="bg-white rounded-xl border border-slate-200 p-6 text-center">
+                <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 text-sm font-semibold flex items-center justify-center mx-auto mb-4">{step.num}</div>
+                <h3 className="text-sm font-semibold text-slate-900 mb-2">{step.title}</h3>
+                <p className="text-xs text-slate-500 leading-relaxed">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Agent CTA */}
+      <section className="bg-slate-900 py-16 px-6 text-center">
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-2xl font-semibold text-white mb-3">Are you a real estate agent?</h2>
+          <p className="text-sm text-slate-400 mb-8">Reach buyers from China, India, Vietnam and 21 more markets. List your properties in 24 languages today.</p>
+          <div className="flex gap-4 justify-center flex-wrap">
+            <a href="/agents/login" className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-full px-6 py-3 transition-colors">Start free 60-day trial</a>
+            <a href="/agents/login" className="border border-slate-600 text-slate-300 hover:text-white text-sm font-medium rounded-full px-6 py-3 transition-colors">See how it works</a>
+          </div>
+        </div>
+      </section>
+
       {/* ── AGENT STRIP — Dark, premium, powerful ── */}
       <section className="relative bg-slate-950 py-24 px-6 overflow-hidden">
 

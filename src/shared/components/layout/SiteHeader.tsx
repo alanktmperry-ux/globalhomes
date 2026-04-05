@@ -132,14 +132,14 @@ export function SiteHeader() {
                     className="absolute right-0 top-full mt-1 w-48 bg-popover border border-border rounded-xl shadow-elevated overflow-hidden z-50"
                   >
                     <button
-                      onClick={() => { navigate('/pocket-listing?type=sale'); setShowAgentMenu(false); }}
+                      onClick={() => { localStorage.removeItem('pocket-listing-draft'); navigate('/pocket-listing?type=sale&t=' + Date.now()); setShowAgentMenu(false); }}
                       className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors"
                     >
                       <Plus size={14} className="text-primary" />
                       Sale Listing
                     </button>
                     <button
-                      onClick={() => { navigate('/pocket-listing?type=rent'); setShowAgentMenu(false); }}
+                      onClick={() => { localStorage.removeItem('pocket-listing-draft'); navigate('/pocket-listing?type=rent&t=' + Date.now()); setShowAgentMenu(false); }}
                       className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors"
                     >
                       <Plus size={14} className="text-primary" />

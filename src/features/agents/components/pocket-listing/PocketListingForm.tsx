@@ -554,7 +554,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
   }
 
   return (
-    <div className="bg-card border border-border rounded-2xl overflow-visible">
+    <div className="bg-card border border-border rounded-2xl">
       {/* Progress */}
       <div className="px-4 pt-4 pb-2">
         <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">

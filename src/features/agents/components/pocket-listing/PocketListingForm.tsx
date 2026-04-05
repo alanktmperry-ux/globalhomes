@@ -555,7 +555,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
   }
 
   return (
-    <div className="bg-card border border-border rounded-2xl">
+    <div className="bg-card border border-border rounded-2xl overflow-visible">
       {/* Progress */}
       <div className="px-4 pt-4 pb-2">
         <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
@@ -587,6 +587,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         exit={{ opacity: 0, x: -20 }}
         transition={{ duration: 0.25 }}
         className="p-5"
+        style={{ overflow: 'visible' }}
       >
         {stepContent()}
       </motion.div>

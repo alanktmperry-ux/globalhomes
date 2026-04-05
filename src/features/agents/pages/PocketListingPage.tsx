@@ -226,20 +226,14 @@ const PocketListingPage = () => {
             ))}
           </div>
 
-          <AnimatePresence mode="wait">
-            {showSuccess ? (
+          {showSuccess ? (
               <ListingSuccess
                 key="success"
                 title={listingTitle}
                 onDone={() => setShowSuccess(false)}
               />
             ) : showForm ? (
-              <motion.div
-                key="form"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-              >
+              <div>
                 {!editId && !duplicateId && (
                   <h2 className="text-xl font-bold font-display mb-4 text-foreground">
                     {createListingType === 'rent' ? 'New Rental Listing' : 'New Sale Listing'}
@@ -253,13 +247,9 @@ const PocketListingPage = () => {
                   duplicatePropertyId={duplicateId}
                   initialListingType={createListingType}
                 />
-              </motion.div>
+              </div>
             ) : (
-              <motion.div
-                key="listings"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
+              <div>
                 <Tabs defaultValue="whisper">
                   <TabsList className="w-full bg-secondary mb-4">
                     <TabsTrigger value="whisper" className="flex-1 text-xs">
@@ -281,9 +271,8 @@ const PocketListingPage = () => {
                     </TabsContent>
                   ))}
                 </Tabs>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
 
           {/* Listing Limit Dialog */}
           <Dialog open={showLimitDialog} onOpenChange={setShowLimitDialog}>

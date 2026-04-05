@@ -240,7 +240,13 @@ const PocketListingPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
               >
+                {!editId && !duplicateId && (
+                  <h2 className="text-xl font-bold font-display mb-4 text-foreground">
+                    {createListingType === 'rent' ? 'New Rental Listing' : 'New Sale Listing'}
+                  </h2>
+                )}
                 <PocketListingForm
+                  key={formKey}
                   onPublish={handlePublish}
                   onCancel={() => { setShowForm(false); if (editId || duplicateId) navigate('/pocket-listing'); }}
                   editPropertyId={editId}

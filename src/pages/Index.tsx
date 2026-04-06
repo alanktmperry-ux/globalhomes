@@ -686,14 +686,19 @@ const Index = () => {
     </MapErrorBoundary>
   );
 
-  // ── Landing hero: shown until first search ───────────────────
-  if (!hasSearched) {
+  // ── Check if URL has search params (skip hero entirely) ──────
+  const hasUrlSearchParams = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    return !!(params.get('location') || params.get('beds') || params.get('maxPrice') || params.get('type'));
+  }, []);
+
+  // ── Landing hero: shown until first search, hidden if URL has params ──
+  if (!hasSearched && !hasUrlSearchParams) {
     return (
       <LandingHero
         onSearch={wrappedHandleSearch}
         onListingModeChange={(mode) => {
           window.dispatchEvent(new CustomEvent('listing-mode-changed'));
-          // listingMode state is managed inside LandingHero via useCurrency
         }}
       />
     );

@@ -99,11 +99,11 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
       <section className="relative flex flex-col items-center justify-center flex-1 min-h-[92vh] bg-white overflow-hidden px-6 text-center">
 
         {/* Subtle warm gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-blue-50/40 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-[#1E3A8A]/5 pointer-events-none" />
 
         {/* Soft ambient circles */}
-        <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-100/30 blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-violet-100/20 blur-[100px] pointer-events-none" />
+        <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-[#1E3A8A]/[0.06] blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-[#7c6fad]/[0.08] blur-[100px] pointer-events-none" />
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}

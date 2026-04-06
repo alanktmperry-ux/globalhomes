@@ -17,7 +17,7 @@ export function useCRMLeads(filters: Filters = {}) {
   const [loading, setLoading] = useState(true);
 
   const fetchLeads = useCallback(async () => {
-    if (!agentId) return;
+    if (!agentId) { setLoading(false); return; }
     setLoading(true);
 
     let q = supabase

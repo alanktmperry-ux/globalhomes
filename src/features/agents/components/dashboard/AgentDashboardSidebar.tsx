@@ -79,7 +79,7 @@ const AgentDashboardSidebar = () => {
   useEffect(() => {
     if (!user) return;
     const fetchArrears = async () => {
-      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
+      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
       if (!agent) return;
       const { data: tenancies } = await supabase
         .from('tenancies').select('id, rent_amount, lease_start').eq('agent_id', agent.id).eq('status', 'active');
@@ -112,7 +112,7 @@ const AgentDashboardSidebar = () => {
         .from('agents')
         .select('company_logo_url, name, agency, agency_id')
         .eq('user_id', user.id)
-        .single()
+        .maybeSingle()
         .then(async ({ data }) => {
           if (data) {
             setAgentLogo(data.company_logo_url || null);
@@ -141,7 +141,7 @@ const AgentDashboardSidebar = () => {
   useEffect(() => {
     if (!user) return;
     const checkOnboarding = async () => {
-      const { data: agent } = await supabase.from('agents').select('onboarding_complete').eq('user_id', user.id).single();
+      const { data: agent } = await supabase.from('agents').select('onboarding_complete').eq('user_id', user.id).maybeSingle();
       if (agent) setOnboardingComplete(!!(agent as any).onboarding_complete);
     };
     checkOnboarding();

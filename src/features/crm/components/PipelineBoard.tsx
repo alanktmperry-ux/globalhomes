@@ -40,6 +40,12 @@ export function PipelineBoard() {
     </div>
   );
 
+  if (!loading && leads.length === 0) return (
+    <div className="flex flex-col items-center justify-center py-16 text-center">
+      <p className="text-muted-foreground text-sm">No leads yet — leads appear here when buyers enquire or attend open homes</p>
+    </div>
+  );
+
   return (
     <>
       <div className="flex items-center justify-between mb-3">

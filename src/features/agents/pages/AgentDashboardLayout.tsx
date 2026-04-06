@@ -19,7 +19,7 @@ const AgentDashboardLayout = () => {
     const effectiveUserId = impersonatedUserId || user?.id;
     if (!effectiveUserId || checked) return;
     const checkOnboarding = async () => {
-      const { data: agent } = await supabase.from('agents').select('onboarding_complete').eq('user_id', effectiveUserId).single();
+      const { data: agent } = await supabase.from('agents').select('onboarding_complete').eq('user_id', effectiveUserId).maybeSingle();
       if (agent) {
         const complete = !!(agent as any).onboarding_complete;
         setOnboardingComplete(complete);

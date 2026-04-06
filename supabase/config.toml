@@ -47,3 +47,6 @@ verify_jwt = false
 
 [functions.agent-help]
 verify_jwt = false
+
+[functions.send-broker-lead]
+verify_jwt = false

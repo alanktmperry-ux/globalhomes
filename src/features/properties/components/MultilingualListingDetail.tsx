@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ChevronDown, ChevronUp, AlertTriangle, Sparkles, Globe } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { MortgageBrokerCard } from './MortgageBrokerCard';
 import { capture } from '@/shared/lib/posthog';
 
 type LanguageKey = 'en' | 'zh_simplified' | 'zh_traditional' | 'vi';
@@ -155,7 +156,12 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
         </div>
       )}
 
-      {/* Cultural highlights */}
+      {/* Mortgage Broker Card */}
+      <MortgageBrokerCard
+        propertyId={listing.id}
+        propertyAddress={listing.address ?? listing.suburb ?? undefined}
+        propertyPrice={listing.price ? `$${Number(listing.price).toLocaleString()}` : undefined}
+      />
       {culturalHighlights.length > 0 && (
         <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-900/20">
           <h3 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-amber-800 dark:text-amber-300">

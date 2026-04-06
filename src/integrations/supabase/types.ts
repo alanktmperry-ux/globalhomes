@@ -1538,6 +1538,78 @@ export type Database = {
         }
         Relationships: []
       }
+      broker_leads: {
+        Row: {
+          broker_email: string
+          broker_name: string
+          buyer_email: string
+          buyer_message: string | null
+          buyer_name: string
+          buyer_phone: string | null
+          created_at: string
+          id: string
+          invoice_amount: number | null
+          invoice_month: string | null
+          invoiced_at: string | null
+          is_duplicate: boolean
+          is_qualified: boolean
+          property_address: string | null
+          property_id: string | null
+          property_price: string | null
+        }
+        Insert: {
+          broker_email?: string
+          broker_name?: string
+          buyer_email: string
+          buyer_message?: string | null
+          buyer_name: string
+          buyer_phone?: string | null
+          created_at?: string
+          id?: string
+          invoice_amount?: number | null
+          invoice_month?: string | null
+          invoiced_at?: string | null
+          is_duplicate?: boolean
+          is_qualified?: boolean
+          property_address?: string | null
+          property_id?: string | null
+          property_price?: string | null
+        }
+        Update: {
+          broker_email?: string
+          broker_name?: string
+          buyer_email?: string
+          buyer_message?: string | null
+          buyer_name?: string
+          buyer_phone?: string | null
+          created_at?: string
+          id?: string
+          invoice_amount?: number | null
+          invoice_month?: string | null
+          invoiced_at?: string | null
+          is_duplicate?: boolean
+          is_qualified?: boolean
+          property_address?: string | null
+          property_id?: string | null
+          property_price?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broker_leads_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "broker_leads_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       buyer_briefs: {
         Row: {
           agent_id: string

@@ -79,7 +79,7 @@ export default function AgentOpenHomeManager() {
     </div>
   );
 
-  if (!agentId) return null;
+  if (!user) return null;
 
   return (
     <div>

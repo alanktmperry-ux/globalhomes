@@ -20,7 +20,7 @@ export function HelpSearch({ className = '', placeholder }: Props) {
   const abortRef = useRef<AbortController | null>(null);
 
   const askQuestion = useCallback(async (question: string) => {
-    if (!question.trim() || loading) return;
+    if (!question.trim()) return;
 
     abortRef.current?.abort();
     const controller = new AbortController();
@@ -36,6 +36,7 @@ export function HelpSearch({ className = '', placeholder }: Props) {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
         },
         body: JSON.stringify({ question }),
         signal: controller.signal,
@@ -111,7 +112,7 @@ export function HelpSearch({ className = '', placeholder }: Props) {
     } finally {
       setLoading(false);
     }
-  }, [loading]);
+  }, []);
 
   const handleChange = useCallback((val: string) => {
     setQuery(val);
@@ -161,7 +162,13 @@ export function HelpSearch({ className = '', placeholder }: Props) {
         />
         {query && (
           <button
-            onClick={() => { setQuery(''); setAnswer(''); setHasAsked(false); }}
+            onClick={() => {
+              abortRef.current?.abort();
+              setLoading(false);
+              setQuery('');
+              setAnswer('');
+              setHasAsked(false);
+            }}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
           >
             <X size={16} />

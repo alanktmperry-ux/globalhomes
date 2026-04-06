@@ -170,52 +170,30 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
 
           <div className="bg-white border border-slate-100 rounded-2xl shadow-sm shadow-slate-100 px-8 py-6 flex flex-wrap items-center justify-center gap-6 sm:gap-8">
 
-            {/* Properties */}
+            {/* Faster listings */}
             <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
               <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">
-                {platformStats.properties === null ? <span className="text-slate-300">—</span> : platformStats.properties}
-                <span className="text-xl font-semibold text-blue-500">+</span>
+                6x
               </span>
-              <span className="text-[11px] text-slate-400 font-medium">Properties listed</span>
+              <span className="text-[11px] text-slate-400 font-medium">Faster listings</span>
             </div>
 
             <div className="w-px h-9 bg-slate-100 hidden sm:block" />
 
-            {/* Agents */}
+            {/* More enquiries */}
             <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
               <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">
-                {platformStats.agents === null ? <span className="text-slate-300">—</span> : platformStats.agents}
-                <span className="text-xl font-semibold text-blue-500">+</span>
+                2.5x
               </span>
-              <span className="text-[11px] text-slate-400 font-medium">Active agents</span>
+              <span className="text-[11px] text-slate-400 font-medium">More enquiries</span>
             </div>
 
             <div className="w-px h-9 bg-slate-100 hidden sm:block" />
 
-            {/* Languages */}
+            {/* Multilingual reach */}
             <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
               <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">24</span>
-              <span className="text-[11px] text-slate-400 font-medium">Languages</span>
-            </div>
-
-            <div className="w-px h-9 bg-slate-100 hidden sm:block" />
-
-            {/* Searching now — avatar stack */}
-            <div className="flex items-center gap-3">
-              <div className="flex">
-                {AVATAR_INITIALS.map((init, i) => (
-                  <div
-                    key={init}
-                    className="w-7 h-7 rounded-full border-2 border-white flex items-center justify-center text-[11px] font-bold text-white"
-                    style={{ background: AVATAR_COLORS[i], marginLeft: i === 0 ? 0 : -8 }}
-                  >
-                    {init}
-                  </div>
-                ))}
-              </div>
-              <span className="text-sm text-slate-500 font-medium">
-                <span className="font-bold text-slate-900">{platformStats.searching}</span> searching now
-              </span>
+              <span className="text-[11px] text-slate-400 font-medium">Multilingual reach</span>
             </div>
 
           </div>

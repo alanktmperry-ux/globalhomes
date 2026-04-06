@@ -116,9 +116,16 @@ export function HelpSearch({ className = '', placeholder }: Props) {
   const handleChange = useCallback((val: string) => {
     setQuery(val);
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (val.trim().length > 5) {
-      debounceRef.current = setTimeout(() => askQuestion(val), 900);
+
+    if (!val.trim()) {
+      abortRef.current?.abort();
+      setLoading(false);
+      setAnswer('');
+      setHasAsked(false);
+      return;
     }
+
+    debounceRef.current = setTimeout(() => askQuestion(val), 900);
   }, [askQuestion]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

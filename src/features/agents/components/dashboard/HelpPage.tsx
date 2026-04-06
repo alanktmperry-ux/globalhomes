@@ -128,13 +128,20 @@ const HelpPage = () => {
     }
   }, [loading]);
 
-  // Auto-ask after 1s pause
+  // Auto-ask after a short pause
   const handleChange = useCallback((value: string) => {
     setQuery(value);
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (value.trim().length > 5) {
-      debounceRef.current = setTimeout(() => askQuestion(value), 1000);
+
+    if (!value.trim()) {
+      abortRef.current?.abort();
+      setLoading(false);
+      setAnswer('');
+      setHasAsked(false);
+      return;
     }
+
+    debounceRef.current = setTimeout(() => askQuestion(value), 900);
   }, [askQuestion]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

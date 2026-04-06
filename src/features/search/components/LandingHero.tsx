@@ -126,7 +126,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
           {/* Headline */}
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-slate-900 leading-[1.05] mb-6">
             Multilingual listings{' '}
-            <span className="block text-blue-500">for Australian agents</span>
+            <span className="block text-[#1E3A8A]">for Australian agents</span>
           </h1>
 
           {/* Subheadline */}

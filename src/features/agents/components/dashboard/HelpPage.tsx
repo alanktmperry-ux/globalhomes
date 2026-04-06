@@ -3,7 +3,7 @@ import { Search, Loader2, Send, HelpCircle, Sparkles } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import ReactMarkdown from 'react-markdown';
+
 
 const HELP_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/agent-help`;
 
@@ -208,7 +208,7 @@ const HelpPage = () => {
                   <Sparkles size={12} />
                   AI Answer
                 </div>
-                <ReactMarkdown>{answer}</ReactMarkdown>
+                <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{answer}</p>
               </div>
             )}
           </CardContent>

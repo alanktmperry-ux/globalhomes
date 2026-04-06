@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Search, X, Loader2, Sparkles } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import ReactMarkdown from 'react-markdown';
+
 
 const HELP_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/agent-help`;
 
@@ -176,7 +176,7 @@ export function HelpSearch({ className = '', placeholder }: Props) {
                 <Sparkles size={12} />
                 AI Answer
               </div>
-              <ReactMarkdown>{answer}</ReactMarkdown>
+              <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{answer}</p>
             </div>
           )}
           <p className="text-xs text-muted-foreground mt-3 pt-2 border-t border-border">

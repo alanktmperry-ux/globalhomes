@@ -224,7 +224,7 @@ export default function PropertyDetailPage() {
   const ctaLabel = isRental ? 'Enquire / Apply' : t('property.contact');
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="bg-background overflow-y-auto">
       <PropertySEOHead property={{
         ...property,
         images: property.images,

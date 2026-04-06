@@ -1,201 +1,247 @@
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import {
-  Rocket, CreditCard, Home, Users, Landmark, Shield, Wrench,
-} from 'lucide-react';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { Search, Loader2, Send, HelpCircle, Sparkles } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import ReactMarkdown from 'react-markdown';
 
-interface FaqSection {
-  icon: React.ElementType;
-  title: string;
-  items: { q: string; a: string }[];
-}
+const HELP_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/agent-help`;
 
-const FAQ_SECTIONS: FaqSection[] = [
-  {
-    icon: Rocket,
-    title: 'Getting Started',
-    items: [
-      {
-        q: 'How do I create my agent account?',
-        a: 'Click "For Agents" on the homepage, then select your plan and complete registration. You\'ll need a valid email address and Australian real estate licence number. Once registered, your account enters a brief verification period before full activation.',
-      },
-      {
-        q: 'How do I add my first property listing?',
-        a: 'From your dashboard, go to Listings → New Listing. Fill in the property details, upload photos, and set your price. Listings go live immediately once saved.',
-      },
-      {
-        q: 'How do I connect my agency?',
-        a: 'Go to Dashboard → Agencies and either create a new agency or join an existing one using an invite code from your principal.',
-      },
-    ],
-  },
-  {
-    icon: CreditCard,
-    title: 'Subscriptions & Billing',
-    items: [
-      {
-        q: 'What plans are available?',
-        a: 'ListHQ offers Demo, Basic, and Pro plans. Demo gives you limited access to explore the platform. Basic and Pro unlock full listing and lead management features. Visit your Billing page for current pricing.',
-      },
-      {
-        q: 'How do I upgrade or change my plan?',
-        a: 'Go to Dashboard → Billing and select a new plan. Upgrades take effect immediately. Downgrades apply at the end of your current billing period.',
-      },
-      {
-        q: 'How do I cancel my subscription?',
-        a: 'Go to Dashboard → Billing → Cancel Subscription. You\'ll retain access until the end of your paid period. Your data is preserved for 30 days after cancellation.',
-      },
-      {
-        q: 'Why was my payment declined?',
-        a: 'Check that your card details are up to date in Billing settings. If the problem persists, contact your bank or reach out to support@listhq.com.au.',
-      },
-    ],
-  },
-  {
-    icon: Home,
-    title: 'Listings & Properties',
-    items: [
-      {
-        q: 'How many listings can I have active at once?',
-        a: 'This depends on your plan. Basic plans include up to 10 active listings. Pro plans have no listing limit. Your current allowance is shown at the top of your Listings page.',
-      },
-      {
-        q: 'Can I mark a listing as off-market or pre-market?',
-        a: 'Yes. When creating or editing a listing, toggle the "Pre-Market" option. Pre-market listings are visible only to registered buyers who have saved a matching search.',
-      },
-      {
-        q: 'How do I deactivate a listing?',
-        a: 'Open the listing from Dashboard → Listings and click "Deactivate". Note: listings with active tenancies cannot be deactivated until the tenancy is resolved.',
-      },
-      {
-        q: 'Can I upload my own property photos?',
-        a: 'Yes. You can upload multiple photos per listing. We recommend at least 8 photos in landscape orientation at 1600px wide or larger for best results.',
-      },
-    ],
-  },
-  {
-    icon: Users,
-    title: 'Leads & CRM',
-    items: [
-      {
-        q: 'Where do my leads come from?',
-        a: 'Leads are generated when buyers submit enquiries on your listings, use voice search that matches your properties, or contact you via your public agent profile.',
-      },
-      {
-        q: 'How do I manage my lead pipeline?',
-        a: 'Go to Dashboard → Pipeline to view all leads in a Kanban-style board. Drag leads between stages (New, Contacted, Qualified, Offer, Closed) to track progress.',
-      },
-      {
-        q: 'Can I set reminders or tasks for leads?',
-        a: 'Yes. Open any lead or contact and use the Tasks tab to add follow-up reminders with due dates and notes.',
-      },
-      {
-        q: 'How do I export my contacts?',
-        a: 'Go to Dashboard → Contacts and use the Export button to download a CSV of all your contacts.',
-      },
-    ],
-  },
-  {
-    icon: Landmark,
-    title: 'Trust Accounting',
-    items: [
-      {
-        q: 'Does ListHQ manage trust funds?',
-        a: 'No. ListHQ provides trust accounting record-keeping tools only. All trust funds are held and managed by you in accordance with the Estate Agents Act 1980 (Vic) and applicable regulations. ListHQ does not hold, process, or guarantee any trust money.',
-      },
-      {
-        q: 'How do I record a trust receipt?',
-        a: 'Go to Dashboard → Trust → Trust Ledger → New Receipt. Enter the amount, payer details, and property reference. All entries are timestamped and auditable.',
-      },
-      {
-        q: 'Can I reconcile my trust account in ListHQ?',
-        a: 'Yes. Dashboard → Trust → Reconciliation provides a monthly reconciliation workflow. You\'ll need to match entries against your bank statement.',
-      },
-    ],
-  },
-  {
-    icon: Shield,
-    title: 'Privacy & Data',
-    items: [
-      {
-        q: 'Does ListHQ sell my data?',
-        a: 'No. We do not sell personal information to third parties. See our Privacy Policy for full details.',
-      },
-      {
-        q: 'How do I delete my account?',
-        a: 'Go to Dashboard → Settings → Account and select "Delete Account". This permanently removes your data within 30 days. Active subscriptions must be cancelled first.',
-      },
-      {
-        q: 'How do I manage cookie preferences?',
-        a: 'Click "Without Maps" on the cookie banner to use the platform without Google Maps data collection, or visit Settings → Privacy to update your preference at any time.',
-      },
-    ],
-  },
-  {
-    icon: Wrench,
-    title: 'Technical Support',
-    items: [
-      {
-        q: 'The platform isn\'t loading correctly. What should I do?',
-        a: 'Try clearing your browser cache and reloading. ListHQ works best on the latest versions of Chrome, Safari, Firefox, and Edge. If the issue persists, email support@listhq.com.au with a description and screenshot.',
-      },
-      {
-        q: 'How do I report a bug?',
-        a: 'Email support@listhq.com.au with the subject line "Bug Report" and include what you were doing, what you expected to happen, and what actually happened. Screenshots are helpful.',
-      },
-      {
-        q: 'Who do I contact for urgent support?',
-        a: 'Email support@listhq.com.au. We aim to respond to all queries within one business day (AEST).',
-      },
-    ],
-  },
+const QUICK_QUESTIONS = [
+  'How do I create a new listing?',
+  'How do I schedule an open home?',
+  'How does the CRM work?',
+  'How do I set up an auction?',
+  'How do I add a co-agent?',
+  'How do I create a CMA report?',
+  'How do agent reviews work?',
+  'How do I manage my billing?',
+  'How do off-market listings work?',
+  'How do I share documents with buyers?',
+  'How does the vendor report work?',
+  'How do I record a trust receipt?',
 ];
 
-const HelpPage = () => (
-  <div className="space-y-8 max-w-3xl mx-auto py-8 px-4">
-    <div>
-      <h1 className="text-3xl font-bold text-foreground">Help & FAQ</h1>
-      <p className="text-muted-foreground mt-1">
-        Find answers to the most common questions about ListHQ.
-      </p>
-    </div>
+const HelpPage = () => {
+  const [query, setQuery] = useState('');
+  const [answer, setAnswer] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [hasAsked, setHasAsked] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const abortRef = useRef<AbortController | null>(null);
 
-    {FAQ_SECTIONS.map((section) => {
-      const Icon = section.icon;
-      return (
-        <Card key={section.title}>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Icon className="h-5 w-5 text-primary" />
-              {section.title}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Accordion type="multiple" className="w-full">
-              {section.items.map((item, idx) => (
-                <AccordionItem key={idx} value={`${section.title}-${idx}`}>
-                  <AccordionTrigger className="text-left text-sm font-medium">
-                    {item.q}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
-                    {item.a}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
+  const askQuestion = useCallback(async (question: string) => {
+    if (!question.trim() || loading) return;
+
+    // Cancel any in-flight request
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    setLoading(true);
+    setHasAsked(true);
+    setAnswer('');
+
+    try {
+      const resp = await fetch(HELP_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ question }),
+        signal: controller.signal,
+      });
+
+      if (!resp.ok || !resp.body) {
+        const err = await resp.json().catch(() => ({ error: 'Something went wrong' }));
+        setAnswer(err.error || 'Something went wrong. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let textBuffer = '';
+      let accumulated = '';
+      let streamDone = false;
+
+      while (!streamDone) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        textBuffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex: number;
+        while ((newlineIndex = textBuffer.indexOf('\n')) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
+
+          if (line.endsWith('\r')) line = line.slice(0, -1);
+          if (line.startsWith(':') || line.trim() === '') continue;
+          if (!line.startsWith('data: ')) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === '[DONE]') {
+            streamDone = true;
+            break;
+          }
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            if (content) {
+              accumulated += content;
+              setAnswer(accumulated);
+            }
+          } catch {
+            textBuffer = line + '\n' + textBuffer;
+            break;
+          }
+        }
+      }
+
+      // Final flush
+      if (textBuffer.trim()) {
+        for (let raw of textBuffer.split('\n')) {
+          if (!raw) continue;
+          if (raw.endsWith('\r')) raw = raw.slice(0, -1);
+          if (raw.startsWith(':') || raw.trim() === '') continue;
+          if (!raw.startsWith('data: ')) continue;
+          const jsonStr = raw.slice(6).trim();
+          if (jsonStr === '[DONE]') continue;
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            if (content) {
+              accumulated += content;
+              setAnswer(accumulated);
+            }
+          } catch { /* ignore */ }
+        }
+      }
+    } catch (e: any) {
+      if (e.name !== 'AbortError') {
+        setAnswer('Something went wrong. Please try again or email support@listhq.com.au.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [loading]);
+
+  // Auto-ask after 1s pause
+  const handleChange = useCallback((value: string) => {
+    setQuery(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (value.trim().length > 5) {
+      debounceRef.current = setTimeout(() => askQuestion(value), 1000);
+    }
+  }, [askQuestion]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      askQuestion(query);
+    }
+  };
+
+  const handleChipClick = (q: string) => {
+    setQuery(q);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    askQuestion(q);
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      abortRef.current?.abort();
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
+
+  return (
+    <div className="space-y-6 max-w-3xl mx-auto">
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Help & Support</h1>
+        <p className="text-muted-foreground text-sm mt-1">
+          Ask anything about ListHQ — powered by AI
+        </p>
+      </div>
+
+      {/* Search input */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+        <Input
+          value={query}
+          onChange={(e) => handleChange(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Ask anything — e.g. how do I add a co-agent?"
+          className="pl-10 pr-12 h-12 text-sm"
+        />
+        <Button
+          size="icon"
+          variant="ghost"
+          className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10"
+          onClick={() => {
+            if (debounceRef.current) clearTimeout(debounceRef.current);
+            askQuestion(query);
+          }}
+          disabled={!query.trim() || loading}
+        >
+          {loading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+        </Button>
+      </div>
+
+      {/* Answer panel */}
+      {hasAsked && (
+        <Card className="border-primary/20">
+          <CardContent className="pt-5">
+            {loading && !answer && (
+              <div className="flex items-center gap-2 text-muted-foreground text-sm py-4">
+                <Loader2 size={16} className="animate-spin" />
+                <span>Thinking…</span>
+              </div>
+            )}
+            {answer && (
+              <div className="prose prose-sm max-w-none text-foreground dark:prose-invert">
+                <div className="flex items-center gap-1.5 text-xs text-primary font-medium mb-3">
+                  <Sparkles size={12} />
+                  AI Answer
+                </div>
+                <ReactMarkdown>{answer}</ReactMarkdown>
+              </div>
+            )}
           </CardContent>
         </Card>
-      );
-    })}
+      )}
 
-    <p className="text-center text-sm text-muted-foreground pb-4">
-      Can't find what you're looking for? Email{' '}
-      <a href="mailto:support@listhq.com.au" className="text-primary hover:underline">
-        support@listhq.com.au
-      </a>{' '}
-      — we respond within one business day.
-    </p>
-  </div>
-);
+      {/* Quick question chips */}
+      <div>
+        <p className="text-xs font-medium text-muted-foreground mb-3 flex items-center gap-1.5">
+          <HelpCircle size={12} />
+          Common questions
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {QUICK_QUESTIONS.map((q) => (
+            <button
+              key={q}
+              onClick={() => handleChipClick(q)}
+              className="px-3 py-1.5 text-xs rounded-full border border-border bg-card text-foreground hover:bg-accent hover:border-primary/30 transition-colors"
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <p className="text-center text-xs text-muted-foreground pb-4">
+        Can't find what you need?{' '}
+        <a href="mailto:support@listhq.com.au" className="text-primary hover:underline">
+          Email support@listhq.com.au
+        </a>
+      </p>
+    </div>
+  );
+};
 
 export default HelpPage;

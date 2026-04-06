@@ -131,7 +131,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
 
           {/* Subheadline */}
           <p className="text-lg text-slate-500 font-normal mb-10 max-w-lg mx-auto leading-relaxed">
-            Search in 24 languages. See prices in your currency. Powered by AI voice search.
+            Reach more buyers. Convert multicultural demand. No extra admin.
           </p>
 
           {/* Sale / Rent toggle */}

@@ -1541,6 +1541,7 @@ export type Database = {
       broker_leads: {
         Row: {
           broker_email: string
+          broker_id: string | null
           broker_name: string
           buyer_email: string
           buyer_message: string | null
@@ -1559,6 +1560,7 @@ export type Database = {
         }
         Insert: {
           broker_email?: string
+          broker_id?: string | null
           broker_name?: string
           buyer_email: string
           buyer_message?: string | null
@@ -1577,6 +1579,7 @@ export type Database = {
         }
         Update: {
           broker_email?: string
+          broker_id?: string | null
           broker_name?: string
           buyer_email?: string
           buyer_message?: string | null
@@ -1595,6 +1598,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "broker_leads_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "brokers"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "broker_leads_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
@@ -1609,6 +1619,66 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      brokers: {
+        Row: {
+          acl_number: string
+          auth_user_id: string | null
+          calendar_url: string | null
+          cap_expires_at: string | null
+          company: string | null
+          created_at: string
+          email: string
+          id: string
+          is_active: boolean
+          is_founding_partner: boolean
+          languages: string[]
+          lead_fee_aud: number
+          monthly_cap_aud: number | null
+          name: string
+          phone: string | null
+          photo_url: string | null
+          tagline: string | null
+        }
+        Insert: {
+          acl_number: string
+          auth_user_id?: string | null
+          calendar_url?: string | null
+          cap_expires_at?: string | null
+          company?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          is_active?: boolean
+          is_founding_partner?: boolean
+          languages?: string[]
+          lead_fee_aud?: number
+          monthly_cap_aud?: number | null
+          name: string
+          phone?: string | null
+          photo_url?: string | null
+          tagline?: string | null
+        }
+        Update: {
+          acl_number?: string
+          auth_user_id?: string | null
+          calendar_url?: string | null
+          cap_expires_at?: string | null
+          company?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          is_active?: boolean
+          is_founding_partner?: boolean
+          languages?: string[]
+          lead_fee_aud?: number
+          monthly_cap_aud?: number | null
+          name?: string
+          phone?: string | null
+          photo_url?: string | null
+          tagline?: string | null
+        }
+        Relationships: []
       }
       buyer_briefs: {
         Row: {
@@ -7684,6 +7754,34 @@ export type Database = {
           },
         ]
       }
+      broker_leads_view: {
+        Row: {
+          broker_id: string | null
+          buyer_email: string | null
+          buyer_message: string | null
+          buyer_name: string | null
+          buyer_phone: string | null
+          created_at: string | null
+          id: string | null
+          invoice_month: string | null
+          invoiced_at: string | null
+          is_duplicate: boolean | null
+          is_qualified: boolean | null
+          lead_fee_aud: number | null
+          property_address: string | null
+          property_price: string | null
+          within_cap_window: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broker_leads_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "brokers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       consumer_profiles_marketplace: {
         Row: {
           budget_max: number | null
@@ -7959,6 +8057,10 @@ export type Database = {
       is_partner_for_agency: {
         Args: { _agency_id: string; _user_id: string }
         Returns: boolean
+      }
+      link_broker_auth_user: {
+        Args: { p_email: string; p_user_id: string }
+        Returns: undefined
       }
       log_document_download: {
         Args: { p_document_id: string; p_session_id?: string }

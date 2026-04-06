@@ -1,6 +1,8 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { Search, X, Loader2, Sparkles } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
+import { FAQ_ITEMS } from '@/data/faq';
 
 
 const HELP_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/agent-help`;
@@ -18,6 +20,29 @@ export function HelpSearch({ className = '', placeholder }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const abortRef = useRef<AbortController | null>(null);
+
+  const faqMatches = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    if (!normalized) return [];
+
+    return FAQ_ITEMS
+      .map((item) => {
+        const question = item.question.toLowerCase();
+        const answerText = item.answer.toLowerCase();
+        const tags = item.tags.join(' ').toLowerCase();
+
+        let score = 0;
+        if (question.includes(normalized)) score += 5;
+        if (tags.includes(normalized)) score += 3;
+        if (answerText.includes(normalized)) score += 1;
+
+        return score > 0 ? { item, score } : null;
+      })
+      .filter((entry): entry is { item: (typeof FAQ_ITEMS)[number]; score: number } => Boolean(entry))
+      .sort((a, b) => b.score - a.score || a.item.question.localeCompare(b.item.question))
+      .slice(0, 6)
+      .map(({ item }) => item);
+  }, [query]);
 
   const askQuestion = useCallback(async (question: string) => {
     if (!question.trim()) return;
@@ -176,14 +201,32 @@ export function HelpSearch({ className = '', placeholder }: Props) {
         )}
       </div>
 
-      {hasAsked && (
+      {(query.trim() || hasAsked) && (
         <div className="mt-3 bg-card border border-border rounded-xl shadow-lg p-4 max-h-[400px] overflow-y-auto">
+          {query.trim() && faqMatches.length > 0 && (
+            <div className="mb-4">
+              <div className="text-xs text-primary font-medium mb-2">Matching FAQs</div>
+              <div className="space-y-1.5">
+                {faqMatches.map((item) => (
+                  <Link
+                    key={item.id}
+                    to={`/help/faq#faq-${item.id}`}
+                    className="block rounded-lg border border-border px-3 py-2 text-sm text-foreground hover:bg-accent transition-colors"
+                  >
+                    {item.question}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
           {loading && !answer && (
             <div className="flex items-center gap-2 text-muted-foreground text-sm py-2">
               <Loader2 size={16} className="animate-spin" />
               <span>Thinking…</span>
             </div>
           )}
+
           {answer && (
             <div className="prose prose-sm max-w-none text-foreground dark:prose-invert">
               <div className="flex items-center gap-1.5 text-xs text-primary font-medium mb-2">
@@ -193,6 +236,11 @@ export function HelpSearch({ className = '', placeholder }: Props) {
               <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{answer}</p>
             </div>
           )}
+
+          {query.trim() && !loading && !answer && faqMatches.length === 0 && (
+            <p className="text-sm text-muted-foreground">No matching FAQs found yet. Try a more specific question.</p>
+          )}
+
           <p className="text-xs text-muted-foreground mt-3 pt-2 border-t border-border">
             Can't find what you need?{' '}
             <a href="/help/contact" className="text-primary hover:underline">Contact support</a>.

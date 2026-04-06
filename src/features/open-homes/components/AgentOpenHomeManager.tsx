@@ -83,10 +83,10 @@ export default function AgentOpenHomeManager() {
     <div>
       <DashboardHeader
         title="Open Homes"
-        subtitle="Schedule and manage open home inspections"
+        subtitle="Manage your property inspections"
         actions={
-          <Button onClick={() => setShowCreate(true)} size="sm" className="gap-1.5 text-xs">
-            <Plus size={14} /> Schedule open home
+          <Button onClick={() => setShowCreate(true)} size="sm" className="gap-1.5 text-xs" disabled={!agentId}>
+            <Plus size={14} /> Schedule Open Home
           </Button>
         }
       />

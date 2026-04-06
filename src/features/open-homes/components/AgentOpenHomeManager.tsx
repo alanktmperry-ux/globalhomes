@@ -79,8 +79,6 @@ export default function AgentOpenHomeManager() {
     </div>
   );
 
-  if (!user) return null;
-
   return (
     <div>
       <DashboardHeader

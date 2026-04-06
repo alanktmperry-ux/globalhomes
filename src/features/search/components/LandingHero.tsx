@@ -125,21 +125,8 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
 
           {/* Headline */}
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-slate-900 leading-[1.05] mb-6">
-            Find your{' '}
-            <span className="block">
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={wordIndex}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -16 }}
-                  transition={{ duration: 0.35, ease: 'easeInOut' }}
-                  className={`inline-block ${ROTATING_WORDS[wordIndex].color}`}
-                >
-                  {ROTATING_WORDS[wordIndex].text}
-                </motion.span>
-              </AnimatePresence>
-            </span>
+            Multilingual listings{' '}
+            <span className="block text-blue-500">for Australian agents</span>
           </h1>
 
           {/* Subheadline */}

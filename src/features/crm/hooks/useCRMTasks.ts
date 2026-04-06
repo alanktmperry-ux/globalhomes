@@ -11,7 +11,7 @@ export function useCRMTasks(leadId?: string) {
   useEffect(() => { fetchTasks(); }, [leadId, agentId]);
 
   const fetchTasks = async () => {
-    if (!agentId) return;
+    if (!agentId) { setLoading(false); return; }
     setLoading(true);
     let q = supabase
       .from('crm_tasks')

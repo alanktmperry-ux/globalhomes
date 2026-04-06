@@ -34,7 +34,7 @@ const AgentDashboardLayout = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background text-foreground">
+      <div className="h-screen flex w-full bg-background text-foreground">
         <AgentDashboardSidebar />
         <main className="flex-1 flex flex-col min-w-0 overflow-y-auto pb-[env(safe-area-inset-bottom)]">
           {isMobile && (

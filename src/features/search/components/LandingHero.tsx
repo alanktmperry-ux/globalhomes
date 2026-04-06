@@ -138,7 +138,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
               onClick={() => navigate('/agents')}
-              className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white px-8 py-3.5 rounded-xl text-base font-semibold transition-colors"
+              className="flex items-center gap-2 bg-[#00A89B] hover:bg-[#009088] active:bg-[#00807a] text-white px-8 py-3.5 rounded-xl text-base font-semibold transition-colors"
             >
               Start listing
               <ArrowRight size={16} />

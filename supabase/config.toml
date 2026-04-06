@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.generate-translations]
 verify_jwt = false
+
+[functions.agent-help]
+verify_jwt = false

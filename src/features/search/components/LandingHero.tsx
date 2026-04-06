@@ -99,11 +99,11 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
       <section className="relative flex flex-col items-center justify-center flex-1 min-h-[92vh] bg-white overflow-hidden px-6 text-center">
 
         {/* Subtle warm gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-blue-50/40 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-[#1E3A8A]/5 pointer-events-none" />
 
         {/* Soft ambient circles */}
-        <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-100/30 blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-violet-100/20 blur-[100px] pointer-events-none" />
+        <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-[#1E3A8A]/[0.06] blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-[#7c6fad]/[0.08] blur-[100px] pointer-events-none" />
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -126,7 +126,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
           {/* Headline */}
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-slate-900 leading-[1.05] mb-6">
             Multilingual listings{' '}
-            <span className="block text-blue-500">for Australian agents</span>
+            <span className="block text-[#1E3A8A]">for Australian agents</span>
           </h1>
 
           {/* Subheadline */}
@@ -138,7 +138,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
               onClick={() => navigate('/agents')}
-              className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white px-8 py-3.5 rounded-xl text-base font-semibold transition-colors"
+              className="flex items-center gap-2 bg-[#00A89B] hover:bg-[#009088] active:bg-[#00807a] text-white px-8 py-3.5 rounded-xl text-base font-semibold transition-colors"
             >
               Start listing
               <ArrowRight size={16} />

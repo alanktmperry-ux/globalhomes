@@ -112,7 +112,7 @@ const AgentDashboardSidebar = () => {
         .from('agents')
         .select('company_logo_url, name, agency, agency_id')
         .eq('user_id', user.id)
-        .single()
+        .maybeSingle()
         .then(async ({ data }) => {
           if (data) {
             setAgentLogo(data.company_logo_url || null);

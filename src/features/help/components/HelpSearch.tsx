@@ -176,7 +176,7 @@ export function HelpSearch({ className = '', placeholder }: Props) {
                 <Sparkles size={12} />
                 AI Answer
               </div>
-              <ReactMarkdown>{answer}</ReactMarkdown>
+              <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{answer}</p>
             </div>
           )}
           <p className="text-xs text-muted-foreground mt-3 pt-2 border-t border-border">

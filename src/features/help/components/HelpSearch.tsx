@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Search, X, Loader2, Sparkles } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import ReactMarkdown from 'react-markdown';
+
 
 const HELP_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/agent-help`;
 

@@ -142,7 +142,7 @@ const DashboardOverview = () => {
     if (!user) return;
     const fetchTrust = async () => {
       const { data: agent } = await supabase
-        .from('agents').select('id').eq('user_id', user.id).single();
+        .from('agents').select('id').eq('user_id', user.id).maybeSingle();
       if (!agent) return;
       const { data } = await (supabase as any)
         .from('trust_transactions').select('amount, transaction_type').eq('agent_id', agent.id);

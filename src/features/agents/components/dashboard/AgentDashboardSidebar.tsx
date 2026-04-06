@@ -79,7 +79,7 @@ const AgentDashboardSidebar = () => {
   useEffect(() => {
     if (!user) return;
     const fetchArrears = async () => {
-      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
+      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
       if (!agent) return;
       const { data: tenancies } = await supabase
         .from('tenancies').select('id, rent_amount, lease_start').eq('agent_id', agent.id).eq('status', 'active');

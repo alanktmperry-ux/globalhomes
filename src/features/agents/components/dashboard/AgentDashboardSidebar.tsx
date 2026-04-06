@@ -141,7 +141,7 @@ const AgentDashboardSidebar = () => {
   useEffect(() => {
     if (!user) return;
     const checkOnboarding = async () => {
-      const { data: agent } = await supabase.from('agents').select('onboarding_complete').eq('user_id', user.id).single();
+      const { data: agent } = await supabase.from('agents').select('onboarding_complete').eq('user_id', user.id).maybeSingle();
       if (agent) setOnboardingComplete(!!(agent as any).onboarding_complete);
     };
     checkOnboarding();

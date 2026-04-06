@@ -31,7 +31,7 @@ const HelpPage = () => {
   const abortRef = useRef<AbortController | null>(null);
 
   const askQuestion = useCallback(async (question: string) => {
-    if (!question.trim() || loading) return;
+    if (!question.trim()) return;
 
     // Cancel any in-flight request
     abortRef.current?.abort();
@@ -48,6 +48,7 @@ const HelpPage = () => {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
         },
         body: JSON.stringify({ question }),
         signal: controller.signal,
@@ -126,7 +127,7 @@ const HelpPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [loading]);
+  }, []);
 
   // Auto-ask after a short pause
   const handleChange = useCallback((value: string) => {

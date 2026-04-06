@@ -19,8 +19,8 @@ export default function AgentOpenHomeManager() {
 
   useEffect(() => {
     if (!user) return;
-    supabase.from('agents').select('id').eq('user_id', user.id).single()
-      .then(({ data }) => { if (data) setAgentId(data.id); });
+    supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle()
+      .then(({ data }) => { setAgentId(data?.id ?? null); });
   }, [user]);
 
   useEffect(() => {

@@ -208,7 +208,7 @@ const HelpPage = () => {
                   <Sparkles size={12} />
                   AI Answer
                 </div>
-                <ReactMarkdown>{answer}</ReactMarkdown>
+                <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{answer}</p>
               </div>
             )}
           </CardContent>

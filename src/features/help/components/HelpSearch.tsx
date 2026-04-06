@@ -10,9 +10,11 @@ const HELP_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/agent-help`;
 interface Props {
   className?: string;
   placeholder?: string;
+  externalQuery?: string;
+  externalQueryToken?: number;
 }
 
-export function HelpSearch({ className = '', placeholder }: Props) {
+export function HelpSearch({ className = '', placeholder, externalQuery, externalQueryToken }: Props) {
   const [query, setQuery] = useState('');
   const [answer, setAnswer] = useState('');
   const [loading, setLoading] = useState(false);
@@ -173,6 +175,13 @@ export function HelpSearch({ className = '', placeholder }: Props) {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (!externalQueryToken || !externalQuery?.trim()) return;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    setQuery(externalQuery);
+    askQuestion(externalQuery);
+  }, [askQuestion, externalQuery, externalQueryToken]);
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { HelpCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { HelpSearch } from '@/features/help/components/HelpSearch';
@@ -17,6 +18,9 @@ const QUICK_QUESTIONS = [
 ];
 
 const HelpPage = () => {
+  const [externalQuery, setExternalQuery] = useState('');
+  const [externalQueryToken, setExternalQueryToken] = useState(0);
+
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
       <div>
@@ -26,7 +30,11 @@ const HelpPage = () => {
         </p>
       </div>
 
-      <HelpSearch placeholder="Ask anything — e.g. how do I add a co-agent?" />
+      <HelpSearch
+        placeholder="Ask anything — e.g. how do I add a co-agent?"
+        externalQuery={externalQuery}
+        externalQueryToken={externalQueryToken}
+      />
 
       {/* Quick question chips */}
       <div>
@@ -39,12 +47,8 @@ const HelpPage = () => {
             <button
               key={q}
               onClick={() => {
-                const input = document.querySelector('input[placeholder="Ask anything — e.g. how do I add a co-agent?"]') as HTMLInputElement | null;
-                input?.focus();
-                if (!input) return;
-                const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
-                setter?.call(input, q);
-                input.dispatchEvent(new Event('input', { bubbles: true }));
+                setExternalQuery(q);
+                setExternalQueryToken((value) => value + 1);
               }}
               className="px-3 py-1.5 text-xs rounded-full border border-border bg-card text-foreground hover:bg-accent hover:border-primary/30 transition-colors"
             >

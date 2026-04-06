@@ -198,7 +198,7 @@ export function MortgageBrokerCard({
   propertyPrice,
 }: MortgageBrokerCardProps) {
   const [modalOpen, setModalOpen] = useState(false);
-  const hasCalendar = BROKER.calendarUrl && !BROKER.calendarUrl.startsWith("[FILL");
+  const hasCalendar = BROKER.calendarUrl.length > 0 && !BROKER.calendarUrl.startsWith("[FILL");
 
   return (
     <>

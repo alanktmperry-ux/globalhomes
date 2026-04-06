@@ -218,18 +218,51 @@ const Index = () => {
     }
   }, [searchCenter]);
 
-  // Fetch featured/boosted listings
+  // Fetch featured/boosted listings, deduplicated, with fallback
   useEffect(() => {
-    supabase
-      .from('properties')
-      .select('id, title, address, suburb, state, price, price_formatted, images, image_url, property_type, beds, baths, parking, lat, lng, boost_tier, is_featured, listing_type')
-      .eq('is_active', true)
-      .or('is_featured.eq.true,boost_tier.not.is.null')
-      .order('created_at', { ascending: false })
-      .limit(6)
-      .then(({ data }) => {
-        if (data && data.length > 0) setFeaturedListings(data);
+    const cols = 'id, title, address, suburb, state, price, price_formatted, images, image_url, property_type, beds, baths, parking, lat, lng, boost_tier, is_featured, listing_type';
+    const MIN_FEATURED = 4;
+
+    (async () => {
+      const { data: featured } = await supabase
+        .from('properties')
+        .select(cols)
+        .eq('is_active', true)
+        .or('is_featured.eq.true,boost_tier.not.is.null')
+        .order('created_at', { ascending: false })
+        .limit(12);
+
+      // Deduplicate by id
+      const seen = new Set<string>();
+      const unique = (featured ?? []).filter(p => {
+        if (seen.has(p.id)) return false;
+        seen.add(p.id);
+        return true;
       });
+
+      if (unique.length >= MIN_FEATURED) {
+        setFeaturedListings(unique.slice(0, 6));
+        return;
+      }
+
+      // Fallback: fill with recent active listings
+      const { data: fallback } = await supabase
+        .from('properties')
+        .select(cols)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(12);
+
+      for (const p of fallback ?? []) {
+        if (!seen.has(p.id)) {
+          seen.add(p.id);
+          unique.push(p);
+        }
+        if (unique.length >= 6) break;
+      }
+
+      if (unique.length > 0) setFeaturedListings(unique);
+    })();
   }, []);
 
   // ── Push search state to URL ─────────────────────────────────

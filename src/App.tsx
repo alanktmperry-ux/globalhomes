@@ -124,6 +124,8 @@ const VendorReportPage = React.lazy(() => import("./pages/VendorReportPage"));
 const ListingPerformancePage = React.lazy(() => import("./pages/ListingPerformancePage"));
 const RentalPropertyPage = React.lazy(() => import("./features/rental/pages/RentalPropertyPage"));
 const LiveAuctionPage = React.lazy(() => import("./features/auctions/pages/LiveAuctionPage"));
+const BrokerLogin = React.lazy(() => import("./pages/broker/BrokerLogin"));
+const BrokerPortal = React.lazy(() => import("./pages/broker/BrokerPortal"));
 const PageLoader = () => (
   <div className="flex h-screen w-full items-center justify-center bg-background">
     <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />

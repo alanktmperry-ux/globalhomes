@@ -234,6 +234,8 @@ const App = () => (
                 <Route path="/vendor-report/:token" element={<VendorReportPage />} />
                 <Route path="/review/:token" element={<ReviewSubmitPage />} />
                 <Route path="/strata/login" element={<StrataAuthPage />} />
+                <Route path="/broker/login" element={<BrokerLogin />} />
+                <Route path="/broker/portal" element={<BrokerPortal />} />
 
                 {/* Authenticated */}
                 <Route path="/saved" element={<ProtectedRoute><SavedSearchesPage /></ProtectedRoute>} />

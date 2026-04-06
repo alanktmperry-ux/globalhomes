@@ -19,8 +19,8 @@ export default function AgentOpenHomeManager() {
 
   useEffect(() => {
     if (!user) return;
-    supabase.from('agents').select('id').eq('user_id', user.id).single()
-      .then(({ data }) => { if (data) setAgentId(data.id); });
+    supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle()
+      .then(({ data }) => { setAgentId(data?.id ?? null); });
   }, [user]);
 
   useEffect(() => {
@@ -79,7 +79,7 @@ export default function AgentOpenHomeManager() {
     </div>
   );
 
-  if (!agentId) return null;
+  if (!user) return null;
 
   return (
     <div>
@@ -121,8 +121,13 @@ export default function AgentOpenHomeManager() {
         {!loading && sessions.length === 0 && (
           <div className="text-center py-12">
             <Calendar size={40} className="mx-auto text-muted-foreground mb-3" />
-            <p className="font-semibold text-foreground">No open homes yet</p>
-            <p className="text-sm text-muted-foreground mt-1">Schedule your first open home to start collecting registrations</p>
+            <p className="font-semibold text-foreground">No open homes scheduled yet</p>
+            <p className="text-sm text-muted-foreground mt-1">Create your first inspection to start collecting registrations</p>
+            {agentId && (
+              <Button onClick={() => setShowCreate(true)} size="sm" className="mt-4 gap-1.5 text-xs">
+                <Plus size={14} /> Schedule Open Home
+              </Button>
+            )}
           </div>
         )}
       </div>

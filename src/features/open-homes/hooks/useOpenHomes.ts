@@ -89,7 +89,7 @@ export function useAgentOpenHomes(agentId: string | undefined) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!agentId) return;
+    if (!agentId) { setLoading(false); return; }
     (async () => {
       const { data: openHomes } = await supabase
         .from('open_homes')

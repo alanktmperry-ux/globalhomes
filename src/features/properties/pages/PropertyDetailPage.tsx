@@ -224,7 +224,7 @@ export default function PropertyDetailPage() {
   const ctaLabel = isRental ? 'Enquire / Apply' : t('property.contact');
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="bg-background overflow-y-auto">
       <PropertySEOHead property={{
         ...property,
         images: property.images,
@@ -252,7 +252,7 @@ export default function PropertyDetailPage() {
         </button>
       </div>
 
-      <main className="flex-1 max-w-6xl mx-auto w-full px-4 pb-24 md:pb-12">
+      <main className="max-w-6xl mx-auto w-full px-4 pb-24 md:pb-12">
         {/* Hero image gallery */}
         <div className="relative rounded-2xl overflow-hidden aspect-[16/9] md:aspect-[2.4/1] mb-4">
           <AnimatePresence mode="wait">

@@ -117,10 +117,10 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1, duration: 0.5 }}
-            className="inline-flex items-center gap-2 mb-8 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-xs font-medium tracking-wide"
+            className="flex items-center justify-end gap-2 mb-8 text-slate-400 text-xs font-medium tracking-wide"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-            Australia's AI-powered property platform
+            <span>🇦🇺</span>
+            The multilingual conversion layer for Australian agents
           </motion.div>
 
           {/* Headline */}

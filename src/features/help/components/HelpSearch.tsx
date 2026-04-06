@@ -2,7 +2,7 @@ import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { Search, X, Loader2, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
-import { FAQ_ITEMS } from '@/data/faq';
+import { getFaqMatches } from '@/features/help/utils/faqSearch';
 
 
 const HELP_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/agent-help`;
@@ -23,28 +23,7 @@ export function HelpSearch({ className = '', placeholder, externalQuery, externa
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const abortRef = useRef<AbortController | null>(null);
 
-  const faqMatches = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    if (!normalized) return [];
-
-    return FAQ_ITEMS
-      .map((item) => {
-        const question = item.question.toLowerCase();
-        const answerText = item.answer.toLowerCase();
-        const tags = item.tags.join(' ').toLowerCase();
-
-        let score = 0;
-        if (question.includes(normalized)) score += 5;
-        if (tags.includes(normalized)) score += 3;
-        if (answerText.includes(normalized)) score += 1;
-
-        return score > 0 ? { item, score } : null;
-      })
-      .filter((entry): entry is { item: (typeof FAQ_ITEMS)[number]; score: number } => Boolean(entry))
-      .sort((a, b) => b.score - a.score || a.item.question.localeCompare(b.item.question))
-      .slice(0, 6)
-      .map(({ item }) => item);
-  }, [query]);
+  const faqMatches = useMemo(() => getFaqMatches(query), [query]);
 
   const askQuestion = useCallback(async (question: string) => {
     if (!question.trim()) return;

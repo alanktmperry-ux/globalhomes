@@ -39,7 +39,7 @@ const CATEGORY_KEYWORDS: Record<FaqItem['category'], string[]> = {
   technical: ['browser', 'notifications', 'privacy', 'account'],
 };
 
-const RENTAL_INTENT_TERMS = new Set(SYNONYM_GROUPS[0]);
+const RENTAL_INTENT_TERMS: Set<string> = new Set(SYNONYM_GROUPS[0]);
 
 function normalizeText(text: string) {
   return text

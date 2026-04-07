@@ -148,7 +148,7 @@ const VoiceLeadsPage = () => {
             preferredContact: 'call',
             keywords: extractKeywords(vs.transcript || ''),
             matchedProperty: parsed?.location || 'No match',
-            propertyId: null,
+            propertyId: null as string | null,
             userName: 'Voice Searcher',
             userEmail: '',
             userPhone: null,

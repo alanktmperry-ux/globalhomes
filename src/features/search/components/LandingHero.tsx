@@ -185,7 +185,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
               </button>
             </div>
             <p className="text-xs text-slate-400 mt-3 text-center">
-              Describe what you're looking for — our AI does the rest
+              {t('hero.searchHint')}
             </p>
           </form>
 
@@ -202,7 +202,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
           <div className="flex justify-center mb-3">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-semibold tracking-widest uppercase">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Live data
+              {t('hero.liveData')}
             </span>
           </div>
 
@@ -214,7 +214,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
                 {platformStats.properties === null ? <span className="text-slate-300">—</span> : platformStats.properties}
                 <span className="text-xl font-semibold text-blue-500">+</span>
               </span>
-              <span className="text-[11px] text-slate-400 font-medium">Properties listed</span>
+              <span className="text-[11px] text-slate-400 font-medium">{t('hero.propertiesListed')}</span>
             </div>
 
             <div className="w-px h-9 bg-slate-100 hidden sm:block" />
@@ -225,7 +225,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
                 {platformStats.agents === null ? <span className="text-slate-300">—</span> : platformStats.agents}
                 <span className="text-xl font-semibold text-blue-500">+</span>
               </span>
-              <span className="text-[11px] text-slate-400 font-medium">Active agents</span>
+              <span className="text-[11px] text-slate-400 font-medium">{t('hero.activeAgents')}</span>
             </div>
 
             <div className="w-px h-9 bg-slate-100 hidden sm:block" />
@@ -233,7 +233,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
             {/* Languages */}
             <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
               <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">24</span>
-              <span className="text-[11px] text-slate-400 font-medium">Languages</span>
+              <span className="text-[11px] text-slate-400 font-medium">{t('hero.languages')}</span>
             </div>
 
             <div className="w-px h-9 bg-slate-100 hidden sm:block" />
@@ -252,7 +252,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
                 ))}
               </div>
               <span className="text-sm text-slate-500 font-medium">
-                <span className="font-bold text-slate-900">{platformStats.searching}</span> searching now
+                <span className="font-bold text-slate-900">{platformStats.searching}</span> {t('hero.searchingNow')}
               </span>
             </div>
 
@@ -275,10 +275,10 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
         <div className="max-w-5xl mx-auto">
           <div className="flex items-baseline justify-between mb-6">
             <div>
-              <h2 className="text-xl font-semibold text-slate-900">Featured listings</h2>
-              <p className="text-sm text-slate-500 mt-1">Hand-picked properties across Sydney and Melbourne</p>
+              <h2 className="text-xl font-semibold text-slate-900">{t('hero.featuredListings')}</h2>
+              <p className="text-sm text-slate-500 mt-1">{t('hero.featuredSub')}</p>
             </div>
-            <a href="/search" className="text-sm text-blue-600 hover:text-blue-700 font-medium">View all &rarr;</a>
+            <a href="/search" className="text-sm text-blue-600 hover:text-blue-700 font-medium">{t('hero.viewAll')} →</a>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
@@ -307,13 +307,13 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
       {/* How it works */}
       <section className="bg-slate-50 py-12 px-6">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-xl font-semibold text-slate-900 mb-1">How ListHQ works</h2>
-          <p className="text-sm text-slate-500 mb-8">Find your next home in 3 steps &mdash; in any language</p>
+          <h2 className="text-xl font-semibold text-slate-900 mb-1">{t('hero.howItWorks')}</h2>
+          <p className="text-sm text-slate-500 mb-8">{t('hero.howItWorksSub')}</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { num: '1', title: 'Search in your language', desc: 'Type or speak in Mandarin, Vietnamese, Hindi — AI understands you' },
-              { num: '2', title: 'Browse translated listings', desc: 'Every listing is AI-translated. See prices in your currency.' },
-              { num: '3', title: 'Connect with an agent', desc: 'Multilingual agents ready to help you through the whole process' },
+              { num: '1', title: '{t('hero.step1Title')}', desc: '{t('hero.step1Desc')}' },
+              { num: '2', title: '{t('hero.step2Title')}', desc: '{t('hero.step2Desc')}' },
+              { num: '3', title: '{t('hero.step3Title')}', desc: '{t('hero.step3Desc')}' },
             ].map((step) => (
               <div key={step.num} className="bg-white rounded-xl border border-slate-200 p-6 text-center">
                 <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 text-sm font-semibold flex items-center justify-center mx-auto mb-4">{step.num}</div>
@@ -328,11 +328,11 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
       {/* Agent CTA */}
       <section className="bg-slate-900 py-16 px-6 text-center">
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-2xl font-semibold text-white mb-3">Are you a real estate agent?</h2>
-          <p className="text-sm text-slate-400 mb-8">Reach buyers from China, India, Vietnam and 21 more markets. List your properties in 24 languages today.</p>
+          <h2 className="text-2xl font-semibold text-white mb-3">{t('hero.agentCTA')}</h2>
+          <p className="text-sm text-slate-400 mb-8">{t('hero.agentCTASub')}</p>
           <div className="flex gap-4 justify-center flex-wrap">
-            <a href="/agents/login" className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-full px-6 py-3 transition-colors">Start free 60-day trial</a>
-            <a href="/agents/login" className="border border-slate-600 text-slate-300 hover:text-white text-sm font-medium rounded-full px-6 py-3 transition-colors">See how it works</a>
+            <a href="/agents/login" className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-full px-6 py-3 transition-colors">{t('hero.startTrial')}</a>
+            <a href="/agents/login" className="border border-slate-600 text-slate-300 hover:text-white text-sm font-medium rounded-full px-6 py-3 transition-colors">{t('hero.seeHow')}</a>
           </div>
         </div>
       </section>
@@ -355,23 +355,23 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
           className="relative z-10 max-w-3xl mx-auto text-center"
         >
           <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium tracking-wide">
-            For real estate professionals
+            {t('hero.agentStrip')}
           </div>
 
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white tracking-tight leading-tight mb-5">
-            Built for agents<br />
-            <span className="text-blue-400">who move fast.</span>
+            {t('hero.builtForAgents')}<br />
+            <span className="text-blue-400">{t('hero.whoMoveFast')}</span>
           </h2>
 
           <p className="text-lg text-slate-400 leading-relaxed max-w-xl mx-auto mb-10">
-            Pocket listings. AI buyer concierge. Pipeline management. Trust accounting. One platform — no compromises.
+            {t('hero.agentStripSub')}
           </p>
 
           <button
             onClick={() => navigate('/agents/login')}
             className="inline-flex items-center gap-2 bg-white text-slate-900 hover:bg-slate-100 px-8 py-4 rounded-full text-[15px] font-semibold transition-all duration-200 hover:scale-105 active:scale-100 shadow-lg shadow-white/10"
           >
-            List your first property free
+            {t('hero.listFree')}
             <ArrowRight size={16} />
           </button>
 

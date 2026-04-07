@@ -59,6 +59,7 @@ interface Props {
 export function LandingHero({ onSearch, onListingModeChange }: Props) {
   const navigate = useNavigate();
   const { listingMode, setListingMode } = useCurrency();
+  const { t } = useI18n();
   const platformStats = usePlatformStats();
   const [query, setQuery] = useState('');
   const [wordIndex, setWordIndex] = useState(0);

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { motion, AnimatePresence } from 'framer-motion';
 import PhoneInput from '@/shared/components/PhoneInput';
 import { useNavigate, Link } from 'react-router-dom';
@@ -40,8 +41,8 @@ const SeekerAuthPage = () => {
       }
       toast('Welcome back!');
       navigate('/');
-    } catch (err: any) {
-      toast.error('Something went wrong', { description: err?.message || 'Please try again.' });
+    } catch (err: unknown) {
+      toast.error('Something went wrong', { description: getErrorMessage(err) });
     } finally {
       setLoading(false);
     }
@@ -86,8 +87,8 @@ const SeekerAuthPage = () => {
         toast.success('🎉 Account created!');
         setStep('prefs');
       }
-    } catch (err: any) {
-      toast.error('Something went wrong', { description: err?.message || 'Please try again.' });
+    } catch (err: unknown) {
+      toast.error('Something went wrong', { description: getErrorMessage(err) });
     } finally {
       setLoading(false);
     }

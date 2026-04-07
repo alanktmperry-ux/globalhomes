@@ -16,6 +16,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
 import TrustImportWizard from '@/features/agents/components/dashboard/TrustImportWizard';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 type OnboardingPath = 'fresh' | 'migration';
 
@@ -144,8 +145,8 @@ export default function AgencyOnboardingPage() {
 
       toast.success('Agency created successfully');
       setStep(3);
-    } catch (e: any) {
-      toast.error(e.message || 'Failed to create agency');
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e) || 'Failed to create agency');
     } finally {
       setLoading(false);
     }
@@ -176,8 +177,8 @@ export default function AgencyOnboardingPage() {
       } else {
         setStep(4); // goes to step 4 content (cut-over date)
       }
-    } catch (e: any) {
-      toast.error(e.message || 'Failed to create trust account');
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e) || 'Failed to create trust account');
     } finally {
       setLoading(false);
     }

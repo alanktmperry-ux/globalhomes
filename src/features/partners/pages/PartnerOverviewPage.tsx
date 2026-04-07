@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, CheckCircle, Clock, Building2, Inbox, Mail, Users, AlertTriangle, Activity } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface PartnerProfile {
   id: string;
@@ -133,8 +134,8 @@ const PartnerOverviewPage = () => {
       if (data?.error) throw new Error(data.error);
       toast.success(`You now have access to ${invite.agencies?.name || 'the agency'}`);
       await fetchData();
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     }
     setAcceptingId(null);
   };

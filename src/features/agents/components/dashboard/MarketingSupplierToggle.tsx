@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import type { PropertyRow } from '@/features/agents/types/listing';
 import { Send, Loader2, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
@@ -30,11 +31,11 @@ interface Supplier {
 }
 
 interface Props {
-  listing: any;
+  listing: PropertyRow;
   onSent?: () => void;
 }
 
-function generateBrief(listing: any, supplier: Supplier, agent: any): string {
+function generateBrief(listing: PropertyRow, supplier: Supplier, agent: { name?: string; agency?: string; phone?: string; email?: string } | null): string {
   const priceText = listing.price
     ? `$${Number(listing.price).toLocaleString()}`
     : 'Contact Agent';

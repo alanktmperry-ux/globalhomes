@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/shared/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 import {
   Dialog,
   DialogContent,
@@ -86,8 +87,8 @@ const ProfilePage = () => {
 
       setAvatarUrl(publicUrl);
       toast({ title: 'Avatar updated', description: 'Your profile picture has been changed.' });
-    } catch (err: any) {
-      toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
+    } catch (err: unknown) {
+      toast({ title: 'Upload failed', description: getErrorMessage(err), variant: 'destructive' });
     } finally {
       setAvatarLoading(false);
     }
@@ -98,9 +99,9 @@ const ProfilePage = () => {
       await signOut();
       toast({ title: 'Signed out', description: 'You have been logged out successfully.' });
       navigate('/');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Sign out error:', err);
-      toast({ title: 'Error signing out', description: err?.message || 'Please try again.', variant: 'destructive' });
+      toast({ title: 'Error signing out', description: getErrorMessage(err), variant: 'destructive' });
       // Navigate anyway since state was cleared
       navigate('/');
     }
@@ -121,8 +122,8 @@ const ProfilePage = () => {
       });
       setEmailDialogOpen(false);
       setNewEmail('');
-    } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    } catch (err: unknown) {
+      toast({ title: 'Error', description: getErrorMessage(err), variant: 'destructive' });
     } finally {
       setEmailLoading(false);
     }
@@ -359,8 +360,8 @@ const ProfilePage = () => {
                     setPasswordDialogOpen(false);
                     setNewPassword('');
                     setConfirmPassword('');
-                  } catch (err: any) {
-                    toast({ title: 'Error', description: err.message, variant: 'destructive' });
+                  } catch (err: unknown) {
+                    toast({ title: 'Error', description: getErrorMessage(err), variant: 'destructive' });
                   } finally {
                     setPasswordLoading(false);
                   }

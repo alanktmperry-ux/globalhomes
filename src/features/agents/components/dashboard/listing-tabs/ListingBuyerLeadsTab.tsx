@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import type { PropertyRow } from '@/features/agents/types/listing';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
@@ -11,7 +12,7 @@ const AU_DATE = (d: string) => {
 };
 
 interface Props {
-  listing: any;
+  listing: PropertyRow;
 }
 
 const URGENCY_MAP: Record<string, { icon: React.ReactNode; color: string; label: string }> = {

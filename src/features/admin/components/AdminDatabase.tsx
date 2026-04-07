@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/shared/hooks/use-toast';
 import { seedProperties } from '@/features/admin/utils/seedProperties';
 import { toast as sonnerToast } from 'sonner';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 const TABLES = [
   { name: 'profiles', deletable: false },
@@ -108,8 +109,8 @@ const AdminDatabase = () => {
                 sonnerToast.success(`Seeded ${count} properties successfully!`);
                 if (selectedTable === 'properties') fetchTable();
                 fetchStats();
-              } catch (e: any) {
-                sonnerToast.error(e.message || 'Seed failed');
+              } catch (e: unknown) {
+                sonnerToast.error(getErrorMessage(e) || 'Seed failed');
               }
             }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-xs font-medium"

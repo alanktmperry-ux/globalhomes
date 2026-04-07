@@ -11,6 +11,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 
 import { BottomNav } from '@/shared/components/layout/BottomNav';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 const PROPERTY_TYPES = ['House', 'Apartment', 'Townhouse', 'Land', 'Villa', 'Unit'];
 
@@ -108,8 +109,8 @@ const BuyerSettingsPage = () => {
       await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('user_id', user.id);
       setAvatarUrl(publicUrl);
       toast({ title: 'Avatar updated' });
-    } catch (err: any) {
-      toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
+    } catch (err: unknown) {
+      toast({ title: 'Upload failed', description: getErrorMessage(err), variant: 'destructive' });
     } finally {
       setAvatarLoading(false);
     }
@@ -182,8 +183,8 @@ const BuyerSettingsPage = () => {
       }));
 
       toast({ title: 'Settings saved', description: 'Your preferences have been updated.' });
-    } catch (err: any) {
-      toast({ title: 'Error saving', description: err.message, variant: 'destructive' });
+    } catch (err: unknown) {
+      toast({ title: 'Error saving', description: getErrorMessage(err), variant: 'destructive' });
     } finally {
       setSaving(false);
     }

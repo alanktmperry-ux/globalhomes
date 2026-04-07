@@ -15,6 +15,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/AuthProvider';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 2 });
 const DATE_AU = new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: 'long', year: 'numeric' });
@@ -494,8 +495,8 @@ ${matterRows.length > 0 ? `
 
       setMigrationComplete(true);
       toast.success('Trust account migration completed!');
-    } catch (e: any) {
-      toast.error(e.message || 'Migration failed');
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e) || 'Migration failed');
     } finally {
       setMigrating(false);
     }

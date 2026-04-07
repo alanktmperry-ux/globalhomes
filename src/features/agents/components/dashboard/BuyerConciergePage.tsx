@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2, Bot, MapPin, DollarSign, BedDouble, Clock, AlertCircle, Sparkles, Archive, Mail, Phone, Home, ExternalLink, Trash2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface ConciergeLead {
   id: string;
@@ -85,8 +86,8 @@ const BuyerConciergePage = () => {
       }
 
       setLeads((rows || []) as ConciergeLead[]);
-    } catch (err: any) {
-      setError(err.message || 'Unknown error');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err) || 'Unknown error');
     } finally {
       setLoading(false);
     }

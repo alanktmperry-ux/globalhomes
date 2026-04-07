@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 const PartnerJoinPage = () => {
   const [searchParams] = useSearchParams();
@@ -41,8 +42,8 @@ const PartnerJoinPage = () => {
           if (data?.error) throw new Error(data.error);
           setStatus('success');
           setTimeout(() => navigate('/partner/dashboard'), 2000);
-        } catch (err: any) {
-          setErrorMsg(err.message || 'Failed to accept invitation.');
+        } catch (err: unknown) {
+          setErrorMsg(getErrorMessage(err) || 'Failed to accept invitation.');
           setStatus('error');
         }
       };
@@ -74,8 +75,8 @@ const PartnerJoinPage = () => {
       await supabase.auth.signInWithPassword({ email, password });
       setStatus('success');
       setTimeout(() => navigate('/partner/dashboard'), 2000);
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to accept invitation.');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err) || 'Failed to accept invitation.');
     }
     setSubmitting(false);
   };

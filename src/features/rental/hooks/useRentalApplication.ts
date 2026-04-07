@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { RentalApplication, CoApplicant } from '../types';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 export interface ApplicationFormData {
   full_name: string;
@@ -67,8 +68,8 @@ export function useRentalApplication(propertyId: string) {
         });
       if (err) throw err;
       setSubmitted(true);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(getErrorMessage(e));
     } finally {
       setLoading(false);
     }

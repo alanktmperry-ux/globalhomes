@@ -24,6 +24,7 @@ import TrustReceiptModal from './TrustReceiptModal';
 import { useTrustAccounting, TrustTransaction } from '@/features/agents/hooks/useTrustAccounting';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 2 });
 const DATE_FMT = new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -282,8 +283,8 @@ const TrustAccountingPage = () => {
       toast.success('Transaction recorded');
       setShowNewTx(false);
       resetTxForm();
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     }
   };
 
@@ -291,8 +292,8 @@ const TrustAccountingPage = () => {
     try {
       await markAsCleared(id);
       toast.success('Marked as cleared');
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     }
   };
 
@@ -303,8 +304,8 @@ const TrustAccountingPage = () => {
       toast.success('Transaction voided (audit trail preserved)');
       setShowDeleteConfirm(false);
       setDeletingTxId(null);
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     }
   };
 
@@ -312,8 +313,8 @@ const TrustAccountingPage = () => {
     try {
       await bulkMarkCleared();
       toast.success('All pending entries marked as cleared');
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     }
   };
 
@@ -349,8 +350,8 @@ const TrustAccountingPage = () => {
       toast.success('Transaction updated');
       setShowEditTx(false);
       setEditingTx(null);
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     }
   };
 
@@ -371,8 +372,8 @@ const TrustAccountingPage = () => {
       toast.success('Account created');
       setShowNewAccount(false);
       setNewAccName(''); setNewAccBsb(''); setNewAccNumber(''); setNewAccBank('');
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     }
   };
 
@@ -800,8 +801,8 @@ const TrustAccountingPage = () => {
                         toast.success(`ABA file downloaded with ${selected.length} payments. Marked as cleared.`);
                         setSelectedPaymentIds(new Set());
                         await fetchPendingPayments();
-                      } catch (e: any) {
-                        toast.error(e.message);
+                      } catch (e: unknown) {
+                        toast.error(getErrorMessage(e));
                       } finally {
                         setBulkLoading(false);
                       }

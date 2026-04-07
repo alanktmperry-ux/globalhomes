@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -257,10 +258,10 @@ const ContactFormModal = ({ onClose, onSave, initialData }: Props) => {
       } as any);
       toast({ title: '✅ Contact saved', description: `${form.first_name} ${form.last_name}`.trim() });
       onClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast({
         title: '❌ Failed to save contact',
-        description: err?.message || 'An unexpected error occurred.',
+        description: getErrorMessage(err),
         variant: 'destructive',
       });
     } finally {

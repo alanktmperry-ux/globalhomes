@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { SuburbRecord, SuburbMarketStats, SuburbAmenities, SuburbPricePoint, PropertyType } from '../types';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 export function useSuburbProfile(slug: string, state: string) {
   const [suburb, setSuburb] = useState<SuburbRecord | null>(null);
@@ -53,8 +54,8 @@ export function useSuburbProfile(slug: string, state: string) {
       setStats((statsRes.data ?? []) as unknown as SuburbMarketStats[]);
       setAmenities(amenitiesRes.data as unknown as SuburbAmenities | null);
       setHistory((historyRes.data ?? []) as unknown as SuburbPricePoint[]);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(getErrorMessage(e));
     } finally {
       setLoading(false);
     }

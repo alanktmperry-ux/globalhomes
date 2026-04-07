@@ -11,6 +11,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { useSubscription, getPlanFeatures } from '@/features/agents/hooks/useSubscription';
 import { useNavigate } from 'react-router-dom';
 import DashboardHeader from './DashboardHeader';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface PlanFeature {
   text: string;
@@ -173,8 +174,8 @@ const BillingPage = () => {
       toast.success("Plan updated! Stripe billing coming soon — we'll email you when payment is ready. Your founding rate is reserved.");
       // Force reload to update subscription state
       window.location.reload();
-    } catch (err: any) {
-      toast.error(err.message || 'Upgrade failed');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err) || 'Upgrade failed');
     } finally {
       setUpgrading(null);
     }

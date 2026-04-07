@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import type { PropertyRow } from '@/features/agents/types/listing';
 import MarketingSupplierToggle from '../MarketingSupplierToggle';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -46,7 +47,7 @@ const URGENCY_LABEL: Record<string, { label: string; className: string }> = {
 };
 
 interface Props {
-  listing: any;
+  listing: PropertyRow;
   onViewAllLeads?: () => void;
 }
 
@@ -351,7 +352,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
       }
 
       toast.success(`Report sent to ${vendorEmail}`);
-    } catch (e: any) {
+    } catch (e: unknown) {
       toast.error('Failed to send report — please try again');
       console.error(e);
     }

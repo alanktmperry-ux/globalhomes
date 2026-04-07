@@ -4,6 +4,7 @@ import { Building2, Landmark, Users, FileText, CheckCircle } from 'lucide-react'
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 const partnerHero = 'https://images.unsplash.com/photo-1556761175-4b46a572b786?w=800&q=80';
 
 type Step = 'email' | 'password' | 'register';
@@ -62,8 +63,8 @@ const PartnerAuthPage = () => {
       }
 
       navigate('/partner/dashboard');
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     }
     setLoading(false);
   };
@@ -100,8 +101,8 @@ const PartnerAuthPage = () => {
       if (setupError) throw setupError;
 
       setRegistered(true);
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     }
     setLoading(false);
   };

@@ -22,6 +22,7 @@ import TrustStatementModal from './TrustStatementModal';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/AuthProvider';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 2 });
 const DATE_FMT = new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -204,8 +205,8 @@ const TrustLedgerPage = () => {
         reference: '',
         entryDate: new Date().toISOString().slice(0, 10),
       });
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     } finally {
       setJournalSaving(false);
     }
@@ -240,8 +241,8 @@ const TrustLedgerPage = () => {
         receivedDate: new Date().toISOString().slice(0, 10),
       });
       fetchSuspense();
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     } finally {
       setSuspenseSaving(false);
     }

@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { Property } from '@/shared/lib/types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 /* ── Validation schemas per step ── */
 const step1Schema = z.object({
@@ -83,7 +84,7 @@ export function RentalApplicationModal({ property, open, onClose }: Props) {
       if (step === 4) step5Schema.parse(form);
       setErrors({});
       return true;
-    } catch (e: any) {
+    } catch (e: unknown) {
       if (e instanceof z.ZodError) {
         const errs: Record<string, string> = {};
         e.errors.forEach(err => { if (err.path[0]) errs[err.path[0] as string] = err.message; });
@@ -165,8 +166,8 @@ export function RentalApplicationModal({ property, open, onClose }: Props) {
           },
         }).catch(() => {});
       }
-    } catch (err: any) {
-      toast.error(`Application failed — ${(err.message || 'Please try again')}`);
+    } catch (err: unknown) {
+      toast.error(`Application failed — ${(getErrorMessage(err) || 'Please try again')}`);
     } finally {
       setSubmitting(false);
     }

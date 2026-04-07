@@ -501,7 +501,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
       }
 
       onPublish(title);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Publish error:', err);
       toast.error(editPropertyId ? 'Failed to update' : 'Failed to publish');
     } finally {

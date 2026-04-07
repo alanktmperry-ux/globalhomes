@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
 const AU_DATE = (d: string) => new Date(d).toLocaleDateString('en-AU');
@@ -113,8 +114,8 @@ const RentalApplicationsPage = () => {
 
       toast.success(`Application approved — tenancy created for ${app.full_name}`);
       fetchApplications();
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to approve');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err) || 'Failed to approve');
     } finally {
       setActing(null);
     }
@@ -143,8 +144,8 @@ const RentalApplicationsPage = () => {
 
       toast.success(`Application declined`);
       fetchApplications();
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to decline');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err) || 'Failed to decline');
     } finally {
       setActing(null);
     }

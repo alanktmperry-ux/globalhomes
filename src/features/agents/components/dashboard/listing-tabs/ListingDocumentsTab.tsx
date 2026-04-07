@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import type { PropertyRow } from '@/features/agents/types/listing';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
@@ -32,7 +33,7 @@ const ESIGN_STATUS: Record<string, { icon: React.ReactNode; color: string; label
 };
 
 interface Props {
-  listing: any;
+  listing: PropertyRow;
 }
 
 const ListingDocumentsTab = ({ listing }: Props) => {

@@ -6,6 +6,7 @@ import { useI18n } from '@/shared/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useToast } from '@/shared/hooks/use-toast';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface PortalListing {
   id: string;
@@ -97,8 +98,8 @@ const AgentPortalPage = () => {
 
       setIsSubscribed(true);
       toast({ title: 'Subscribed!', description: 'You now have Pro Agent access.' });
-    } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    } catch (err: unknown) {
+      toast({ title: 'Error', description: getErrorMessage(err), variant: 'destructive' });
     } finally {
       setSubscribing(false);
     }

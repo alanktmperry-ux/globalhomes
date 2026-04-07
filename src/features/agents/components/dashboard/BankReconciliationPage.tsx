@@ -18,6 +18,7 @@ import DashboardHeader from './DashboardHeader';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/AuthProvider';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 2 });
 const DATE_FMT = new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -203,8 +204,8 @@ const BankReconciliationPage = () => {
       setCurrentBalance(bankBalance);
       toast.success(`Reconciliation complete. Balance: ${AUD.format(bankBalance)}`);
       await fetchData();
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     } finally {
       setReconcileAllRunning(false);
     }
@@ -341,8 +342,8 @@ const BankReconciliationPage = () => {
       setShowAdd(false);
       setAddDesc(''); setAddAmount(''); setAddBalance('');
       await fetchData();
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     } finally {
       setAddSaving(false);
     }
@@ -366,8 +367,8 @@ const BankReconciliationPage = () => {
       setShowMatch(false);
       setMatchingItem(null);
       await fetchData();
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     } finally {
       setMatchSaving(false);
     }
@@ -382,8 +383,8 @@ const BankReconciliationPage = () => {
       if (error) throw error;
       toast.success('Unmatched successfully');
       await fetchData();
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     }
   };
 
@@ -396,8 +397,8 @@ const BankReconciliationPage = () => {
       if (error) throw error;
       toast.success('Marked as manually reconciled');
       await fetchData();
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     }
   };
 
@@ -437,8 +438,8 @@ const BankReconciliationPage = () => {
       setShowImport(false);
       setCsvText('');
       await fetchData();
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     } finally {
       setImportSaving(false);
     }

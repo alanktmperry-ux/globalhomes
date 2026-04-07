@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
 import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 type Step = 'email' | 'password' | 'choose' | 'create-agency' | 'join-agency';
 
@@ -122,8 +123,8 @@ const AgentAuthPage = () => {
       }
       toast('Welcome back!');
       setPendingRedirect('dashboard');
-    } catch (err: any) {
-      toast.error('Sign in failed', { description: err.message });
+    } catch (err: unknown) {
+      toast.error('Sign in failed', { description: getErrorMessage(err) });
       setLoading(false);
     }
   };
@@ -201,7 +202,7 @@ const AgentAuthPage = () => {
         setStep('email');
         setLoading(false);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[handleSignup]', err);
       toast.error('Registration failed', { duration: 8000 });
       setLoading(false);

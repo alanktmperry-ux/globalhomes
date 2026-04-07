@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 const PartnerAcceptPage = () => {
   const [searchParams] = useSearchParams();
@@ -32,8 +33,8 @@ const PartnerAcceptPage = () => {
 
         setAgencyName(data.agencyName || 'the agency');
         setStatus('success');
-      } catch (err: any) {
-        setErrorMsg(err.message || 'Failed to accept invitation.');
+      } catch (err: unknown) {
+        setErrorMsg(getErrorMessage(err) || 'Failed to accept invitation.');
         setStatus('error');
       }
     };

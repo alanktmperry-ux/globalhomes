@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { PropertyDocument, UploadDocumentInput } from '../types';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 export function usePropertyDocuments(propertyId: string | undefined) {
   const [documents, setDocuments] = useState<PropertyDocument[]>([]);
@@ -18,7 +19,7 @@ export function usePropertyDocuments(propertyId: string | undefined) {
       .eq('is_current', true)
       .order('created_at', { ascending: false });
     if (!err) setDocuments((data ?? []) as unknown as PropertyDocument[]);
-    else setError(err.message);
+    else setError(getErrorMessage(err));
     setLoading(false);
   }, [propertyId]);
 
@@ -69,8 +70,8 @@ export function usePropertyDocuments(propertyId: string | undefined) {
       if (dbErr) throw dbErr;
       await fetchDocs();
       return docRecord as PropertyDocument;
-    } catch (e: any) {
-      setError(e.message ?? 'Upload failed');
+    } catch (e: unknown) {
+      setError(getErrorMessage(e) ?? 'Upload failed');
       return null;
     } finally {
       setUploading(false);

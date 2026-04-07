@@ -74,7 +74,7 @@ const DemoAccessPage = () => {
 
       toast.success('Welcome to the demo!');
       navigate('/dashboard');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Demo access error:', err);
       setError('Something went wrong. Please try again.');
     } finally {

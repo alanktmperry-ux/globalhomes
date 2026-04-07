@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { PropertyRow } from '@/features/agents/types/listing';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -7,7 +8,7 @@ import { DollarSign, Calculator } from 'lucide-react';
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 2 });
 
 interface Props {
-  listing: any;
+  listing: PropertyRow;
 }
 
 const ListingAccountingTab = ({ listing }: Props) => {

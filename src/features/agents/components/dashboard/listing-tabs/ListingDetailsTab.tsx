@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge';
+import type { PropertyRow } from '@/features/agents/types/listing';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,8 +17,8 @@ interface InspectionSlot {
 }
 
 interface Props {
-  listing: any;
-  onUpdate: (updates: Record<string, any>) => void;
+  listing: PropertyRow;
+  onUpdate: (updates: Partial<PropertyRow>) => void;
 }
 
 const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
@@ -35,7 +36,7 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
   });
 
   // Inspection times management
-  const inspectionTimes: InspectionSlot[] = listing.inspection_times || [];
+  const inspectionTimes: InspectionSlot[] = (listing.inspection_times as unknown as InspectionSlot[]) || [];
   const [newSlot, setNewSlot] = useState<InspectionSlot>({ date: '', start: '10:00', end: '10:30' });
   const [showAddSlot, setShowAddSlot] = useState(false);
 
@@ -54,14 +55,14 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
     const updated = [...inspectionTimes, { ...newSlot }].sort((a, b) =>
       `${a.date}${a.start}`.localeCompare(`${b.date}${b.start}`)
     );
-    onUpdate({ inspection_times: updated });
+    onUpdate({ inspection_times: updated as unknown as PropertyRow['inspection_times'] });
     setNewSlot({ date: '', start: '10:00', end: '10:30' });
     setShowAddSlot(false);
   };
 
   const handleRemoveInspection = (index: number) => {
     const updated = inspectionTimes.filter((_, i) => i !== index);
-    onUpdate({ inspection_times: updated });
+    onUpdate({ inspection_times: updated as unknown as PropertyRow['inspection_times'] });
   };
 
   return (

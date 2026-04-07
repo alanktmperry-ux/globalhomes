@@ -6,6 +6,7 @@ import { useToast } from '@/shared/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import DashboardHeader from './DashboardHeader';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface Credential {
   id: string;
@@ -55,8 +56,8 @@ const DocumentsPage = () => {
       await supabase.from('agent_credentials').insert({ agent_id: agentId, document_type: docType, document_url: publicUrl });
       toast({ title: 'Document uploaded successfully' });
       loadDocs();
-    } catch (err: any) {
-      toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
+    } catch (err: unknown) {
+      toast({ title: 'Upload failed', description: getErrorMessage(err), variant: 'destructive' });
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = '';

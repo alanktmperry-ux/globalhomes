@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import type { PropertyRow } from '@/features/agents/types/listing';
 import { Send, Loader2, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';

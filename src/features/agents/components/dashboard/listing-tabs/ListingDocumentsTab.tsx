@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import type { PropertyRow } from '@/features/agents/types/listing';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Button } from '@/components/ui/button';

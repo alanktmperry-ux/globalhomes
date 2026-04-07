@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import type { PropertyRow } from '@/features/agents/types/listing';
 import { Button } from '@/components/ui/button';
 import { BarChart3 } from 'lucide-react';
 import { SuburbMarketSnapshot } from '@/features/market/components/SuburbMarketSnapshot';

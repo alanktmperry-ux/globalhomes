@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import type { PropertyRow } from '@/features/agents/types/listing';
 import MarketingSupplierToggle from '../MarketingSupplierToggle';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';

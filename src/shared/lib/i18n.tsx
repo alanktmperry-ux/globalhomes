@@ -1179,7 +1179,7 @@ const translations: Record<Language, Record<string, string>> = {
     'hero.searchingNow': '名が検索中',
     'hero.liveData': 'リアルタイムデータ',
   },
-  'zh-TW': { 'app.name': 'ListHQ', 'search.placeholder': '搜尋 "墨爾本4臥室房屋 85萬"', 'nav.search': '搜尋', 'nav.saved': '已儲存', 'nav.messages': '訊息', 'nav.agents': '經紀人', 'nav.profile': '個人資料' 
+  'zh-TW': { 'app.name': 'ListHQ', 'search.placeholder': '搜尋 "墨爾本4臥室房屋 85萬"', 'nav.search': '搜尋', 'nav.saved': '已儲存', 'nav.messages': '訊息', 'nav.agents': '經紀人', 'nav.profile': '個人資料',
     'hero.eyebrow': '澳洲AI驅動的房產平台',
     'hero.headline': '多語言房源',
     'hero.headline2': '為澳洲經紀人打造',

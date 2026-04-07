@@ -137,7 +137,7 @@ const VoiceLeadsPage = () => {
 
           return {
             id: `voice-${vs.id}`,
-            leadId: null,
+            leadId: null as string | null,
             transcript: vs.transcript || '',
             urgency: 'cold' as const,
             score: 20,
@@ -148,10 +148,10 @@ const VoiceLeadsPage = () => {
             preferredContact: 'call',
             keywords: extractKeywords(vs.transcript || ''),
             matchedProperty: parsed?.location || 'No match',
-            propertyId: null,
+            propertyId: null as string | null,
             userName: 'Voice Searcher',
             userEmail: '',
-            userPhone: null,
+            userPhone: null as string | null,
           };
         });
 

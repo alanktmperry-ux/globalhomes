@@ -83,7 +83,7 @@ const MessagesPage = () => {
           participants: [{
             user_id: l.user_id || '',
             display_name: l.user_name,
-            avatar_url: null,
+            avatar_url: null as string | null,
           }],
         }));
 

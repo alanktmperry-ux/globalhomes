@@ -103,7 +103,7 @@ const SettlementConcierge = () => {
           buyerName: tx.payee_name || 'Unknown buyer',
           settlementDate: parseISO(tx.created_at),
           propertyId: tx.property_id,
-          contactId: null,
+          contactId: null as string | null,
         }));
 
       setSettlements([...fromContacts, ...fromTrust]);

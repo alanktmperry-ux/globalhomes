@@ -172,7 +172,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
           }
           return data;
         })
-        .catch(err => {
+        .catch((err: unknown): null => {
           console.warn('[handleSearch] AI parse error:', err);
           return null;
         });

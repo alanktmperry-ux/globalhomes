@@ -106,7 +106,7 @@ function PartnerRowComponent({ partner }: { partner: PartnerRow }) {
 
       const tenanciesRes = allAgentIdsHere.length > 0
         ? await supabase.from('tenancies').select('agent_id, status').in('agent_id', allAgentIdsHere)
-        : { data: [] };
+        : { data: [] as { agent_id: string; current_balance: number; last_reconciled_date: string | null }[] };
 
       const trustByAgency = new Map<string, { balance: number; lastRec: string | null }>();
       (balancesRes.data || []).forEach((b: any) => {
@@ -311,18 +311,18 @@ export default function PartnerPerformance() {
 
       const agentsRes = allAgencyIds.length > 0
         ? await supabase.from('agents').select('id, agency_id').in('agency_id', allAgencyIds)
-        : { data: [] };
+        : { data: [] as { id: string; agency_id: string }[] };
 
       const allAgents = agentsRes.data || [];
       const agentIds = allAgents.map((a: any) => a.id);
 
       const balancesRes = agentIds.length > 0
         ? await supabase.from('trust_account_balances').select('agent_id, current_balance, last_reconciled_date').in('agent_id', agentIds)
-        : { data: [] };
+        : { data: [] as { agent_id: string; current_balance: number; last_reconciled_date: string | null }[] };
 
       const tenanciesRes = agentIds.length > 0
         ? await supabase.from('tenancies').select('agent_id, status').in('agent_id', agentIds)
-        : { data: [] };
+        : { data: [] as { agent_id: string; status: string }[] };
 
       const agentToAgency = new Map<string, string>();
       const agentsByAgency = new Map<string, string[]>();

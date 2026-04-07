@@ -151,7 +151,7 @@ const ImpersonationBanner = () => {
   );
 };
 
-const ScrollToTop = () => {
+const ScrollToTop = (): null => {
   const { pathname } = useLocation();
   React.useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return null;

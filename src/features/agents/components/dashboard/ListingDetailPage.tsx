@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import type { PropertyRow } from '@/features/agents/types/listing';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Loader2, Zap, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';

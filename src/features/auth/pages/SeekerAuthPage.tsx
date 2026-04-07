@@ -40,7 +40,7 @@ const SeekerAuthPage = () => {
       }
       toast('Welcome back!');
       navigate('/');
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.error('Something went wrong', { description: err?.message || 'Please try again.' });
     } finally {
       setLoading(false);
@@ -86,7 +86,7 @@ const SeekerAuthPage = () => {
         toast.success('🎉 Account created!');
         setStep('prefs');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.error('Something went wrong', { description: err?.message || 'Please try again.' });
     } finally {
       setLoading(false);

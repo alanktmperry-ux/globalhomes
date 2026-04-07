@@ -17,6 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { autocomplete } from '@/shared/lib/googleMapsService';
 import DashboardHeader from './DashboardHeader';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface AgentData {
   id: string;
@@ -171,8 +172,8 @@ const ProfilePage = () => {
       await supabase.from('agents').update({ avatar_url: publicUrl }).eq('id', agent.id);
       setAgent(prev => prev ? { ...prev, avatar_url: publicUrl } : null);
       toast.success('Photo updated');
-    } catch (err: any) {
-      toast.error(`Upload failed — ${(err.message)}`);
+    } catch (err: unknown) {
+      toast.error(`Upload failed — ${(getErrorMessage(err))}`);
     } finally {
       setUploadingAvatar(false);
     }
@@ -200,8 +201,8 @@ const ProfilePage = () => {
       await supabase.from('agents').update({ company_logo_url: publicUrl } as any).eq('id', agent.id);
       setAgent(prev => prev ? { ...prev, company_logo_url: publicUrl } : null);
       toast.success('Company logo updated');
-    } catch (err: any) {
-      toast.error(`Upload failed — ${(err.message)}`);
+    } catch (err: unknown) {
+      toast.error(`Upload failed — ${(getErrorMessage(err))}`);
     } finally {
       setUploadingLogo(false);
     }
@@ -213,8 +214,8 @@ const ProfilePage = () => {
       await supabase.from('agents').update({ company_logo_url: null } as any).eq('id', agent.id);
       setAgent(prev => prev ? { ...prev, company_logo_url: null } : null);
       toast.success('Logo removed');
-    } catch (err: any) {
-      toast.error(`Error — ${(err.message)}`);
+    } catch (err: unknown) {
+      toast.error(`Error — ${(getErrorMessage(err))}`);
     }
   };
 
@@ -243,8 +244,8 @@ const ProfilePage = () => {
 
       toast.success('Document uploaded');
       loadData();
-    } catch (err: any) {
-      toast.error(`Upload failed — ${(err.message)}`);
+    } catch (err: unknown) {
+      toast.error(`Upload failed — ${(getErrorMessage(err))}`);
     } finally {
       setUploadingDoc(false);
       if (docInputRef.current) docInputRef.current.value = '';
@@ -289,8 +290,8 @@ const ProfilePage = () => {
       if (error) throw error;
       toast.success('Profile saved — All changes have been saved successfully.');
       loadData();
-    } catch (err: any) {
-      toast.error(`Error saving — ${(err.message)}`);
+    } catch (err: unknown) {
+      toast.error(`Error saving — ${(getErrorMessage(err))}`);
     } finally {
       setSaving(false);
     }

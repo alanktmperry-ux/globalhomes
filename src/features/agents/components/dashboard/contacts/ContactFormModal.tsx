@@ -257,7 +257,7 @@ const ContactFormModal = ({ onClose, onSave, initialData }: Props) => {
       } as any);
       toast({ title: '✅ Contact saved', description: `${form.first_name} ${form.last_name}`.trim() });
       onClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast({
         title: '❌ Failed to save contact',
         description: err?.message || 'An unexpected error occurred.',

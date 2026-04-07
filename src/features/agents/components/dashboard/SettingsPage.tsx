@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import DashboardHeader from './DashboardHeader';
 import SuppliersSettings from './SuppliersSettings';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface AgentProfile {
   id: string;
@@ -103,8 +104,8 @@ const SettingsPage = () => {
 
       setAgentData(prev => prev ? { ...prev, avatar_url: publicUrl } : null);
       toast.success('Avatar updated — Your profile photo has been uploaded.');
-    } catch (err: any) {
-      toast.error(`Upload failed — ${(err.message)}`);
+    } catch (err: unknown) {
+      toast.error(`Upload failed — ${(getErrorMessage(err))}`);
     } finally {
       setUploadingAvatar(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -129,8 +130,8 @@ const SettingsPage = () => {
       
       toast.success('Profile updated — Your changes have been saved.');
       await loadAgentData(); // Refresh data
-    } catch (err: any) {
-      toast.error(`Error — ${(err.message)}`);
+    } catch (err: unknown) {
+      toast.error(`Error — ${(getErrorMessage(err))}`);
     } finally {
       setSaving(false);
     }

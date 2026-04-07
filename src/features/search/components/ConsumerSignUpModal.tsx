@@ -8,6 +8,7 @@ import { Sparkles, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
 import { toast } from '@/hooks/use-toast';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface ConsumerSignUpModalProps {
   open: boolean;
@@ -65,8 +66,8 @@ const ConsumerSignUpModal = ({ open, onOpenChange, lastQuery }: ConsumerSignUpMo
       localStorage.setItem('listhq_consumer_signed_up', 'true');
       onOpenChange(false);
       toast({ title: "You're matched!", description: 'A specialist will be in touch shortly.' });
-    } catch (err: any) {
-      toast({ title: 'Error', description: err.message || 'Something went wrong', variant: 'destructive' });
+    } catch (err: unknown) {
+      toast({ title: 'Error', description: getErrorMessage(err) || 'Something went wrong', variant: 'destructive' });
     } finally {
       setLoading(false);
     }

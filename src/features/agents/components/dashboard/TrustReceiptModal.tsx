@@ -11,6 +11,7 @@ import { Receipt, Download, CheckCircle2, FileText, Calendar, User, Home, Dollar
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/AuthProvider';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 2 });
 const DATE_DISPLAY = new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -167,8 +168,8 @@ export default function TrustReceiptModal({ open, onOpenChange, onCreated, agent
       toast.success(`Trust Receipt ${nextReceiptNumber} issued successfully`);
       onOpenChange(false);
       onCreated?.();
-    } catch (e: any) {
-      toast.error(e.message || 'Failed to issue receipt');
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e) || 'Failed to issue receipt');
     } finally {
       setSaving(false);
     }

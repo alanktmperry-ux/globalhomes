@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { AlertTriangle, CheckCircle, Building2, Loader2, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import { differenceInDays } from 'date-fns';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface OverdueTenancy {
   id: string;
@@ -130,8 +131,8 @@ const PartnerArrearsPage = () => {
       }
 
       toast.success(`Reminder sent to ${t.tenant_email}`);
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to send reminder');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err) || 'Failed to send reminder');
     }
     setSendingId(null);
   };

@@ -351,7 +351,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
       }
 
       toast.success(`Report sent to ${vendorEmail}`);
-    } catch (e: any) {
+    } catch (e: unknown) {
       toast.error('Failed to send report — please try again');
       console.error(e);
     }

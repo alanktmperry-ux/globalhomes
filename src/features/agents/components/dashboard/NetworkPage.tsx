@@ -26,6 +26,7 @@ import DashboardHeader from './DashboardHeader';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
 
@@ -344,8 +345,8 @@ const NetworkPage = () => {
       setContactTarget(null);
       setContactMessage('');
       await fetchNetworkListings();
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     } finally {
       setContactSending(false);
     }
@@ -372,8 +373,8 @@ const NetworkPage = () => {
       await fetchBuyerBriefs();
       setShowBriefForm(false);
       setBriefForm({ property_type: 'House', min_beds: 1, max_beds: 5, min_price: 400000, max_price: 1000000, suburbs: '', notes: '', urgency: 'active' });
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     } finally {
       setBriefSubmitting(false);
     }

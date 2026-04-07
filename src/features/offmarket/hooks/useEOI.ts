@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { ExpressionOfInterest, FinanceStatus } from '../types';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface SubmitEOIPayload {
   property_id: string;
@@ -47,8 +48,8 @@ export function useEOI(propertyId: string) {
       if (err) throw err;
       setMyEOI(data as ExpressionOfInterest);
       return data;
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(getErrorMessage(e));
     } finally {
       setLoading(false);
     }
@@ -63,8 +64,8 @@ export function useEOI(propertyId: string) {
         .update({ status: 'withdrawn' } as any)
         .eq('id', eoiId);
       setMyEOI(prev => prev ? { ...prev, status: 'withdrawn' } : null);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(getErrorMessage(e));
     } finally {
       setLoading(false);
     }

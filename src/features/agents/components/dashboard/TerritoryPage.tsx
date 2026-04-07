@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { autocomplete, getPlaceDetails, loadGoogleMapsScript } from '@/shared/lib/googleMapsService';
 import DashboardHeader from './DashboardHeader';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface AgentLocation {
   id?: string;
@@ -168,8 +169,8 @@ const TerritoryPage = () => {
       setSearchQuery('');
       setShowForm(false);
       toast.success('Location added');
-    } catch (err: any) {
-      toast.error(`Error — ${(err.message)}`);
+    } catch (err: unknown) {
+      toast.error(`Error — ${(getErrorMessage(err))}`);
     } finally {
       setSaving(false);
     }
@@ -181,8 +182,8 @@ const TerritoryPage = () => {
       if (error) throw error;
       setLocations(prev => prev.filter(l => l.id !== id));
       toast.success('Location removed');
-    } catch (err: any) {
-      toast.error(`Error — ${(err.message)}`);
+    } catch (err: unknown) {
+      toast.error(`Error — ${(getErrorMessage(err))}`);
     }
   };
 

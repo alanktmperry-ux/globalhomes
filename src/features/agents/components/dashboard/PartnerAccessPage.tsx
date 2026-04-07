@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { Loader2, Handshake, Send, UserX, Inbox } from 'lucide-react';
 import { format } from 'date-fns';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface PartnerAgencyRow {
   id: string;
@@ -99,8 +100,8 @@ const PartnerAccessPage = () => {
       toast.success(`Invitation sent to ${partnerEmail}`);
       setPartnerEmail('');
       await fetchPartners();
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     }
     setSending(false);
   };
@@ -119,8 +120,8 @@ const PartnerAccessPage = () => {
       if (error) throw error;
       toast.success(`Access revoked for ${companyName}`);
       await fetchPartners();
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     }
   };
 

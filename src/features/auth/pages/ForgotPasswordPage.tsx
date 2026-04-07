@@ -4,6 +4,7 @@ import { Mail, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/shared/hooks/use-toast';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();
@@ -28,8 +29,8 @@ const ForgotPasswordPage = () => {
       if (error) throw error;
       setSent(true);
       toast({ title: 'Check your email', description: 'We sent a password reset link.' });
-    } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    } catch (err: unknown) {
+      toast({ title: 'Error', description: getErrorMessage(err), variant: 'destructive' });
     } finally {
       setLoading(false);
     }

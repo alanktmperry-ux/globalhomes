@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface ImportedListing {
   address: string;
@@ -59,8 +60,8 @@ export function ImportListingDialog({ open, onClose, onImport }: Props) {
       if (data?.error) throw new Error(data.error);
       if (!data?.listing) throw new Error('No listing data returned');
       setPreview(data.listing);
-    } catch (err: any) {
-      setError(err.message || 'Failed to import listing. Check the URL and try again.');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err) || 'Failed to import listing. Check the URL and try again.');
     } finally {
       setLoading(false);
     }

@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Loader2, UserPlus, Trash2, Users, Mail, Clock, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface TeamMember {
   id: string;
@@ -87,8 +88,8 @@ const PartnerTeamPage = () => {
       setShowInvite(false);
       setInviteEmail('');
       fetchData();
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     }
     setInviting(false);
   };
@@ -103,8 +104,8 @@ const PartnerTeamPage = () => {
       toast.success('Team member removed.');
       setDeletingId(null);
       fetchData();
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     }
   };
 

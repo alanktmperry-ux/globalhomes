@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface Props {
   open: boolean;
@@ -106,8 +107,8 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
       }
 
       setStep('success');
-    } catch (err: any) {
-      toast.error(`Error — ${(err.message)}`);
+    } catch (err: unknown) {
+      toast.error(`Error — ${(getErrorMessage(err))}`);
     } finally {
       setLoading(false);
     }

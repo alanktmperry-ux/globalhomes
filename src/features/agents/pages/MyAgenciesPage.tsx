@@ -7,6 +7,7 @@ import { useToast } from '@/shared/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
+import { getErrorMessage } from '@/shared/lib/errorUtils';
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
@@ -102,8 +103,8 @@ const MyAgenciesPage = () => {
       if (error) throw error;
       setAgencies(prev => prev.filter(a => a.id !== deleteTarget.id));
       toast({ title: 'Agency deleted', description: `${deleteTarget.name} has been removed.` });
-    } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    } catch (err: unknown) {
+      toast({ title: 'Error', description: getErrorMessage(err), variant: 'destructive' });
     } finally {
       setDeleting(false);
       setDeleteTarget(null);

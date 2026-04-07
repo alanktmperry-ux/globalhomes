@@ -11,6 +11,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface ConsumerLead {
   id: string;
@@ -100,8 +101,8 @@ const LeadMarketplacePage = () => {
         setLeads(prev => prev.filter(l => l.id !== lead.id));
         toast({ title: 'Lead purchased!', description: `You now have access to ${data.buyer.name}'s contact details.` });
       }
-    } catch (err: any) {
-      toast({ title: 'Purchase failed', description: err.message || 'Please try again', variant: 'destructive' });
+    } catch (err: unknown) {
+      toast({ title: 'Purchase failed', description: getErrorMessage(err) || 'Please try again', variant: 'destructive' });
     } finally {
       setPurchasing(null);
     }

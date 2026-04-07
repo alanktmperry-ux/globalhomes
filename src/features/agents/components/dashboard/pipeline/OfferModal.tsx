@@ -8,6 +8,7 @@ import { Sparkles, Loader2, Copy, Send, FileDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { generateOfferPdf } from '@/features/agents/lib/generateOfferPdf';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
 
@@ -42,8 +43,8 @@ const OfferModal = ({ open, onOpenChange, card, propertyId, agentId, onSent }: O
       setComparableSales(data.comparableSales || []);
       setSuburbMedian(data.suburbMedian || null);
       setOfferId(data.offerId || null);
-    } catch (err: any) {
-      toast({ title: 'Generation failed', description: err.message, variant: 'destructive' });
+    } catch (err: unknown) {
+      toast({ title: 'Generation failed', description: getErrorMessage(err), variant: 'destructive' });
     } finally {
       setGenerating(false);
     }

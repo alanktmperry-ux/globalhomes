@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface AuthUser {
   id: string;
@@ -140,8 +141,8 @@ const AdminUsers = () => {
       toast({ title: 'Subscription updated', description: `${subModal.email} is now on the ${subForm.plan_type} plan.` });
       setSubModal(m => ({ ...m, open: false }));
       fetchUsers();
-    } catch (err: any) {
-      toast({ title: 'Failed', description: err.message, variant: 'destructive' });
+    } catch (err: unknown) {
+      toast({ title: 'Failed', description: getErrorMessage(err), variant: 'destructive' });
     }
     setSavingSub(false);
   };
@@ -192,8 +193,8 @@ const AdminUsers = () => {
       const data = await callAdminApi('list_users');
       setUsers(data.users || []);
       setSelected(new Set());
-    } catch (err: any) {
-      toast({ title: 'Failed to load users', description: err.message, variant: 'destructive' });
+    } catch (err: unknown) {
+      toast({ title: 'Failed to load users', description: getErrorMessage(err), variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -207,8 +208,8 @@ const AdminUsers = () => {
     try {
       await callAdminApi('ban_user', { user_id: userId, ban });
       toast({ title: ban ? 'User banned' : 'User unbanned' });
-    } catch (err: any) {
-      toast({ title: 'Failed', description: err.message, variant: 'destructive' });
+    } catch (err: unknown) {
+      toast({ title: 'Failed', description: getErrorMessage(err), variant: 'destructive' });
     }
     setActionLoading(null);
     fetchUsers();
@@ -226,8 +227,8 @@ const AdminUsers = () => {
       const bodyId = isDemoRequest ? userId.replace('demo-', '') : userId;
       await callAdminApi(action, { [isDemoRequest ? 'request_id' : 'user_id']: bodyId });
       toast({ title: isDemoRequest ? 'Demo request deleted.' : 'User and all data permanently deleted.' });
-    } catch (err: any) {
-      toast({ title: 'Failed', description: err.message, variant: 'destructive' });
+    } catch (err: unknown) {
+      toast({ title: 'Failed', description: getErrorMessage(err), variant: 'destructive' });
     }
     setActionLoading(null);
     fetchUsers();
@@ -243,8 +244,8 @@ const AdminUsers = () => {
           ? 'They can now accept agency invitations.'
           : 'Their access has been suspended.',
       });
-    } catch (err: any) {
-      toast({ title: 'Failed', description: err.message, variant: 'destructive' });
+    } catch (err: unknown) {
+      toast({ title: 'Failed', description: getErrorMessage(err), variant: 'destructive' });
     }
     setActionLoading(null);
     fetchUsers();

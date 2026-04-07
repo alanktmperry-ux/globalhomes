@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Check, X, Mail, Loader2, Send } from 'lucide-react';
 import { format } from 'date-fns';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface DemoRequest {
   id: string;
@@ -71,8 +72,8 @@ const AdminDemoRequests = ({ onPendingCountChange }: Props) => {
 
       toast.success(`Demo access code sent to ${req.email}`);
       fetchRequests();
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to approve');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err) || 'Failed to approve');
     } finally {
       setActionLoading(null);
     }
@@ -88,8 +89,8 @@ const AdminDemoRequests = ({ onPendingCountChange }: Props) => {
       if (error) throw error;
       toast.success('Request declined');
       fetchRequests();
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to decline');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err) || 'Failed to decline');
     } finally {
       setActionLoading(null);
     }

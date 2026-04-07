@@ -82,7 +82,7 @@ export function useVoiceSearch(
           } else {
             onError?.('No speech detected. Please try again.');
           }
-        } catch (err: any) {
+        } catch (err: unknown) {
           console.error('[Whisper]', err);
           onError?.('Transcription failed. Please try again.');
         } finally {
@@ -94,7 +94,7 @@ export function useVoiceSearch(
       recorder.start();
       setIsListening(true);
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (err.name === 'NotAllowedError') {
         onError?.('Microphone access denied. Please allow microphone permissions and try again.');
       } else {

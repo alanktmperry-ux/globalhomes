@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { PropertyPerformance, SuburbBenchmarks } from '../types';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 export function usePropertyPerformance(propertyId: string | undefined, days = 30) {
   const [performance, setPerformance] = useState<PropertyPerformance | null>(null);
@@ -32,8 +33,8 @@ export function usePropertyPerformance(propertyId: string | undefined, days = 30
           setPerformance(perfResult.data as unknown as PropertyPerformance);
           setBenchmarks(benchResult.data as unknown as SuburbBenchmarks);
         }
-      } catch (e: any) {
-        if (!cancelled) setError(e.message);
+      } catch (e: unknown) {
+        if (!cancelled) setError(getErrorMessage(e));
       } finally {
         if (!cancelled) setLoading(false);
       }

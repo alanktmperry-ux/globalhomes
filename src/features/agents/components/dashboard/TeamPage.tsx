@@ -16,6 +16,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from '@/components/ui/dialog';
 import {
+import { getErrorMessage } from '@/shared/lib/errorUtils';
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 
@@ -194,8 +195,8 @@ const TeamPage = () => {
       toast.success(`Invite code created — Code: ${code}`);
       setInviteDialogOpen(false);
       loadData();
-    } catch (err: any) {
-      toast.error('Error — err.message');
+    } catch (err: unknown) {
+      toast.error('Error — getErrorMessage(err)');
     } finally {
       setCreating(false);
     }
@@ -235,8 +236,8 @@ const TeamPage = () => {
       setInviteRole('agent');
       setInviteAccessLevel('full');
       loadData();
-    } catch (err: any) {
-      toast.error('Error — err.message');
+    } catch (err: unknown) {
+      toast.error('Error — getErrorMessage(err)');
     } finally {
       setSendingInvite(false);
     }
@@ -266,8 +267,8 @@ const TeamPage = () => {
       if (error) throw error;
       toast.success(`Role updated — Member role changed to ${newRole}`);
       loadData();
-    } catch (err: any) {
-      toast.error('Error — err.message');
+    } catch (err: unknown) {
+      toast.error('Error — getErrorMessage(err)');
     }
   };
 
@@ -280,8 +281,8 @@ const TeamPage = () => {
       if (error) throw error;
       toast.success(`Access updated — Access changed to ${newAccess}`);
       loadData();
-    } catch (err: any) {
-      toast.error('Error — err.message');
+    } catch (err: unknown) {
+      toast.error('Error — getErrorMessage(err)');
     }
   };
 
@@ -325,8 +326,8 @@ const TeamPage = () => {
 
       setAgencyLogo(publicUrl);
       toast.success('Logo updated');
-    } catch (err: any) {
-      toast.error('Upload failed — err.message');
+    } catch (err: unknown) {
+      toast.error('Upload failed — getErrorMessage(err)');
     } finally {
       setUploadingLogo(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -350,8 +351,8 @@ const TeamPage = () => {
       if (error) throw error;
       toast.success('Agency details saved');
       setEditingBranding(false);
-    } catch (err: any) {
-      toast.error('Error — err.message');
+    } catch (err: unknown) {
+      toast.error('Error — getErrorMessage(err)');
     } finally {
       setSavingBranding(false);
     }
@@ -461,8 +462,8 @@ const TeamPage = () => {
       setNewAgencyLogoFile(null);
       setNewAgencyLogoPreview(null);
       loadData();
-    } catch (err: any) {
-      toast.error('Error creating agency — err.message');
+    } catch (err: unknown) {
+      toast.error('Error creating agency — getErrorMessage(err)');
     } finally {
       setCreatingAgency(false);
     }
@@ -542,8 +543,8 @@ const TeamPage = () => {
 
       toast.success(`Joined agency! — Welcome to the team as ${invite.role}.`);
       loadData();
-    } catch (err: any) {
-      toast.error('Error joining — err.message');
+    } catch (err: unknown) {
+      toast.error('Error joining — getErrorMessage(err)');
     } finally {
       setJoiningAgency(false);
     }

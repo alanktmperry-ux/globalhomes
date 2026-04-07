@@ -9,6 +9,7 @@ import { FileText, Download, Printer, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 2 });
 const DATE_FMT = new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -341,8 +342,8 @@ export default function TrustStatementModal({ open, onOpenChange }: TrustStateme
 
       toast.success(`Statement emailed to ${emailTo.trim()}`);
       setEmailTo('');
-    } catch (err: any) {
-      toast.error(`Email failed — ${err.message || 'Please try again'}`);
+    } catch (err: unknown) {
+      toast.error(`Email failed — ${getErrorMessage(err) || 'Please try again'}`);
     } finally {
       setEmailing(false);
     }

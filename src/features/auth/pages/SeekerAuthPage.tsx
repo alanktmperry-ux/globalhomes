@@ -41,7 +41,7 @@ const SeekerAuthPage = () => {
       toast('Welcome back!');
       navigate('/');
     } catch (err: unknown) {
-      toast.error('Something went wrong', { description: err?.message || 'Please try again.' });
+      toast.error('Something went wrong', { description: getErrorMessage(err) });
     } finally {
       setLoading(false);
     }

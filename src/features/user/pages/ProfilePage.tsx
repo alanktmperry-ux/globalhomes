@@ -101,7 +101,7 @@ const ProfilePage = () => {
       navigate('/');
     } catch (err: unknown) {
       console.error('Sign out error:', err);
-      toast({ title: 'Error signing out', description: err?.message || 'Please try again.', variant: 'destructive' });
+      toast({ title: 'Error signing out', description: getErrorMessage(err), variant: 'destructive' });
       // Navigate anyway since state was cleared
       navigate('/');
     }

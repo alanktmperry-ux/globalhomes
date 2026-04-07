@@ -95,7 +95,7 @@ export function useVoiceSearch(
       setIsListening(true);
 
     } catch (err: unknown) {
-      if (err.name === 'NotAllowedError') {
+      if (err instanceof DOMException && err.name === 'NotAllowedError') {
         onError?.('Microphone access denied. Please allow microphone permissions and try again.');
       } else {
         onError?.('Could not access microphone. Please try again.');

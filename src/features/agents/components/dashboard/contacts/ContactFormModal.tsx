@@ -260,7 +260,7 @@ const ContactFormModal = ({ onClose, onSave, initialData }: Props) => {
     } catch (err: unknown) {
       toast({
         title: '❌ Failed to save contact',
-        description: err?.message || 'An unexpected error occurred.',
+        description: getErrorMessage(err),
         variant: 'destructive',
       });
     } finally {

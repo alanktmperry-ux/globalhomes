@@ -322,7 +322,7 @@ export default function PartnerPerformance() {
 
       const tenanciesRes = agentIds.length > 0
         ? await supabase.from('tenancies').select('agent_id, status').in('agent_id', agentIds)
-        : { data: [] };
+        : { data: [] as { agent_id: string; status: string }[] };
 
       const agentToAgency = new Map<string, string>();
       const agentsByAgency = new Map<string, string[]>();

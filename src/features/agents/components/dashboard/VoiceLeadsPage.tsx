@@ -151,7 +151,7 @@ const VoiceLeadsPage = () => {
             propertyId: null as string | null,
             userName: 'Voice Searcher',
             userEmail: '',
-            userPhone: null,
+            userPhone: null as string | null,
           };
         });
 

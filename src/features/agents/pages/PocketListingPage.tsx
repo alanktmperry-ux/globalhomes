@@ -111,7 +111,7 @@ const PocketListingPage = () => {
       showContact: true,
       allowCoBroke: true,
       autoDeclineBelow: 0,
-      scheduledAt: null,
+      scheduledAt: null as string | null,
       estimatedRentalWeekly: 0,
       rentalWeekly: 0,
       rentalBondWeeks: 4,

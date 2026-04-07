@@ -4,6 +4,7 @@ import { Search, Mic, ArrowRight, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { supabase } from '@/integrations/supabase/client';
+import { useI18n } from '@/shared/lib/i18n';
 
 const AVATAR_COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
 const AVATAR_INITIALS = ['A', 'M', 'S', 'J', 'R'];

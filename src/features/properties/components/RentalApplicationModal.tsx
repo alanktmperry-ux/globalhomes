@@ -87,7 +87,7 @@ export function RentalApplicationModal({ property, open, onClose }: Props) {
     } catch (e: unknown) {
       if (e instanceof z.ZodError) {
         const errs: Record<string, string> = {};
-        e.errors.forEach(err => { if (err.path[0]) errs[err.path[0] as string] = getErrorMessage(err); });
+        e.errors.forEach(err => { if (err.path[0]) errs[err.path[0] as string] = err.message; });
         setErrors(errs);
       }
       return false;

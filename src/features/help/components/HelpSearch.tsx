@@ -112,7 +112,7 @@ export function HelpSearch({ className = '', placeholder, externalQuery, externa
         }
       }
     } catch (e: unknown) {
-      if (e.name !== 'AbortError') {
+      if (!(e instanceof DOMException && e.name === 'AbortError')) {
         setAnswer('Something went wrong. Please try again or [contact support](/help/contact).');
       }
     } finally {

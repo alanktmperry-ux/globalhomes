@@ -311,9 +311,9 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
           <p className="text-sm text-slate-500 mb-8">{t('hero.howItWorksSub')}</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { num: '1', title: '{t('hero.step1Title')}', desc: '{t('hero.step1Desc')}' },
-              { num: '2', title: '{t('hero.step2Title')}', desc: '{t('hero.step2Desc')}' },
-              { num: '3', title: '{t('hero.step3Title')}', desc: '{t('hero.step3Desc')}' },
+                { num: '1', title: t('hero.step1Title'), desc: t('hero.step1Desc') },
+                { num: '2', title: t('hero.step2Title'), desc: t('hero.step2Desc') },
+                { num: '3', title: t('hero.step3Title'), desc: t('hero.step3Desc') },
             ].map((step) => (
               <div key={step.num} className="bg-white rounded-xl border border-slate-200 p-6 text-center">
                 <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 text-sm font-semibold flex items-center justify-center mx-auto mb-4">{step.num}</div>

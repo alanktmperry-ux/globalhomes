@@ -8,8 +8,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/shared/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import {
   Dialog,
   DialogContent,
   DialogHeader,

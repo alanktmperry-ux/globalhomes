@@ -106,7 +106,7 @@ function PartnerRowComponent({ partner }: { partner: PartnerRow }) {
 
       const tenanciesRes = allAgentIdsHere.length > 0
         ? await supabase.from('tenancies').select('agent_id, status').in('agent_id', allAgentIdsHere)
-        : { data: [] };
+        : { data: [] as { agent_id: string; current_balance: number; last_reconciled_date: string | null }[] };
 
       const trustByAgency = new Map<string, { balance: number; lastRec: string | null }>();
       (balancesRes.data || []).forEach((b: any) => {

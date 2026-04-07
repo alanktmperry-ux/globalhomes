@@ -17,7 +17,7 @@ import ListingMarketTab from './listing-tabs/ListingMarketTab';
 const ListingDetailPage = () => {
   const { listingId } = useParams<{ listingId: string }>();
   const navigate = useNavigate();
-  const [listing, setListing] = useState<any>(null);
+  const [listing, setListing] = useState<PropertyRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'details');

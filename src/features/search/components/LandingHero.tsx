@@ -147,7 +147,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
                     : 'text-slate-500 hover:text-slate-700'
                 }`}
               >
-                For Sale
+                {t('hero.forSale')}
               </button>
               <button
                 onClick={() => handleModeChange('rent')}
@@ -157,7 +157,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
                     : 'text-slate-500 hover:text-slate-700'
                 }`}
               >
-                For Rent
+                {t('hero.forRent')}
               </button>
             </div>
           </div>

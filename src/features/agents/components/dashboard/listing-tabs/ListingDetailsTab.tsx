@@ -36,7 +36,7 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
   });
 
   // Inspection times management
-  const inspectionTimes: InspectionSlot[] = listing.inspection_times || [];
+  const inspectionTimes: InspectionSlot[] = (listing.inspection_times as unknown as InspectionSlot[]) || [];
   const [newSlot, setNewSlot] = useState<InspectionSlot>({ date: '', start: '10:00', end: '10:30' });
   const [showAddSlot, setShowAddSlot] = useState(false);
 

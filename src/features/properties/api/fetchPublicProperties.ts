@@ -1,10 +1,19 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Property } from '@/shared/lib/types';
+import type { Database } from '@/integrations/supabase/types';
+
+type PropertyDbRow = Database['public']['Tables']['properties']['Row'];
+type AgentDbRow = Database['public']['Tables']['agents']['Row'];
+
+/** A property row with the joined agent relation from a select query. */
+type PropertyWithAgent = PropertyDbRow & {
+  agents: Pick<AgentDbRow, 'name' | 'agency' | 'phone' | 'email' | 'avatar_url' | 'is_subscribed' | 'verification_badge_level' | 'specialization' | 'years_experience' | 'rating' | 'review_count'> | null;
+};
 
 /**
  * Maps a raw Supabase property row (with joined agents) to a Property.
  */
-export function mapDbProperty(p: any): Property {
+export function mapDbProperty(p: PropertyWithAgent): Property {
   return {
     id: p.id,
     title: p.title,

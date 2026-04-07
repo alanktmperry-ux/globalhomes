@@ -137,7 +137,7 @@ const VoiceLeadsPage = () => {
 
           return {
             id: `voice-${vs.id}`,
-            leadId: null,
+            leadId: null as string | null,
             transcript: vs.transcript || '',
             urgency: 'cold' as const,
             score: 20,

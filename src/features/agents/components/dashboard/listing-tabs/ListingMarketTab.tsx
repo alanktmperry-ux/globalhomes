@@ -28,9 +28,9 @@ export default function ListingMarketTab({ listing }: Props) {
                 subject_suburb: listing.suburb,
                 subject_state: listing.state,
                 subject_postcode: listing.postcode,
-                subject_bedrooms: listing.bedrooms ?? listing.beds,
-                subject_bathrooms: listing.bathrooms ?? listing.baths,
-                subject_car_spaces: listing.car_spaces ?? listing.parking,
+                subject_bedrooms: listing.beds,
+                subject_bathrooms: listing.baths,
+                subject_car_spaces: listing.parking,
                 subject_land_sqm: listing.land_size_sqm,
                 subject_property_type: listing.property_type,
               }

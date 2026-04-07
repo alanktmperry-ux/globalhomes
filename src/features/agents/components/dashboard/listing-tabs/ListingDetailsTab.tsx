@@ -62,7 +62,7 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
 
   const handleRemoveInspection = (index: number) => {
     const updated = inspectionTimes.filter((_, i) => i !== index);
-    onUpdate({ inspection_times: updated });
+    onUpdate({ inspection_times: updated as unknown as PropertyRow['inspection_times'] });
   };
 
   return (

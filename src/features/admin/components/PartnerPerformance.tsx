@@ -311,7 +311,7 @@ export default function PartnerPerformance() {
 
       const agentsRes = allAgencyIds.length > 0
         ? await supabase.from('agents').select('id, agency_id').in('agency_id', allAgencyIds)
-        : { data: [] };
+        : { data: [] as { id: string; agency_id: string }[] };
 
       const allAgents = agentsRes.data || [];
       const agentIds = allAgents.map((a: any) => a.id);

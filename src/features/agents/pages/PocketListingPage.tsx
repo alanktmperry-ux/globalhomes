@@ -104,7 +104,7 @@ const PocketListingPage = () => {
       features: imported.features || [],
       voiceTranscript: imported.description || '',
       generatedTitle: imported.address ? `${imported.propertyType || 'Property'} at ${imported.address}` : '',
-      generatedBullets: [],
+      generatedBullets: [] as string[],
       visibility: 'whisper' as const,
       exclusiveDays: 14,
       buyerRequirements: 'none',

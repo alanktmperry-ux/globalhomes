@@ -122,18 +122,18 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
             className="inline-flex items-center gap-2 mb-8 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-xs font-medium tracking-wide"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-            Australia's AI-powered property platform
+            {t('hero.eyebrow')}
           </motion.div>
 
           {/* Headline */}
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-slate-900 leading-[1.05] mb-6">
-            Multilingual listings{' '}
-            <span className="block text-blue-500">for Australian agents</span>
+            {t('hero.headline')}{' '}
+            <span className="block text-blue-500">{t('hero.headline2')}</span>
           </h1>
 
           {/* Subheadline */}
           <p className="text-lg text-slate-500 font-normal mb-10 max-w-lg mx-auto leading-relaxed">
-            Search in 24 languages. See prices in your currency. Powered by AI voice search.
+            {t('hero.subheadline')}
           </p>
 
           {/* Sale / Rent toggle */}

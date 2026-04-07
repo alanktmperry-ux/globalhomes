@@ -55,7 +55,7 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
     const updated = [...inspectionTimes, { ...newSlot }].sort((a, b) =>
       `${a.date}${a.start}`.localeCompare(`${b.date}${b.start}`)
     );
-    onUpdate({ inspection_times: updated });
+    onUpdate({ inspection_times: updated as unknown as PropertyRow['inspection_times'] });
     setNewSlot({ date: '', start: '10:00', end: '10:30' });
     setShowAddSlot(false);
   };

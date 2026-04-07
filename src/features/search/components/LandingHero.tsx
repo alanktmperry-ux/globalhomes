@@ -99,11 +99,11 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
       <section className="relative flex flex-col items-center justify-center flex-1 min-h-[92vh] bg-white overflow-hidden px-6 text-center">
 
         {/* Subtle warm gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-[#1E3A8A]/5 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-blue-50/40 pointer-events-none" />
 
         {/* Soft ambient circles */}
-        <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-[#1E3A8A]/[0.06] blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-[#7c6fad]/[0.08] blur-[100px] pointer-events-none" />
+        <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-100/30 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-violet-100/20 blur-[100px] pointer-events-none" />
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -117,39 +117,75 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1, duration: 0.5 }}
-            className="flex items-center justify-end gap-2 mb-8 text-slate-400 text-xs font-medium tracking-wide"
+            className="inline-flex items-center gap-2 mb-8 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-xs font-medium tracking-wide"
           >
-            <span>🇦🇺</span>
-            The multilingual conversion layer for Australian agents
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+            Australia's AI-powered property platform
           </motion.div>
 
           {/* Headline */}
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-slate-900 leading-[1.05] mb-6">
             Multilingual listings{' '}
-            <span className="block text-[#1E3A8A]">for Australian agents</span>
+            <span className="block text-blue-500">for Australian agents</span>
           </h1>
 
           {/* Subheadline */}
           <p className="text-lg text-slate-500 font-normal mb-10 max-w-lg mx-auto leading-relaxed">
-            Reach more buyers. Convert multicultural demand. No extra admin.
+            Search in 24 languages. See prices in your currency. Powered by AI voice search.
           </p>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <button
-              onClick={() => navigate('/agents')}
-              className="flex items-center gap-2 bg-[#00A89B] hover:bg-[#009088] active:bg-[#00807a] text-white px-8 py-3.5 rounded-xl text-base font-semibold transition-colors"
-            >
-              Start listing
-              <ArrowRight size={16} />
-            </button>
-            <button
-              onClick={() => navigate('/agents/demo')}
-              className="flex items-center gap-2 border border-slate-300 text-slate-700 hover:bg-slate-50 px-8 py-3.5 rounded-xl text-base font-semibold transition-colors"
-            >
-              See demo
-            </button>
+          {/* Sale / Rent toggle */}
+          <div className="flex justify-center mb-6">
+            <div className="inline-flex items-center bg-slate-100 rounded-full p-1 gap-1">
+              <button
+                onClick={() => handleModeChange('sale')}
+                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
+                  listingMode === 'sale'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                For Sale
+              </button>
+              <button
+                onClick={() => handleModeChange('rent')}
+                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
+                  listingMode === 'rent'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                For Rent
+              </button>
+            </div>
           </div>
+
+          {/* Search bar */}
+          <form onSubmit={handleSubmit} className="relative max-w-2xl mx-auto">
+            <div className="flex items-center bg-white border border-slate-200 rounded-2xl shadow-lg shadow-slate-100/80 px-4 py-2 gap-3 hover:border-slate-300 hover:shadow-xl transition-all duration-200 focus-within:border-blue-300 focus-within:shadow-blue-50/80 focus-within:shadow-xl">
+              <Mic size={18} className="text-slate-400 shrink-0" />
+              <AnimatePresence mode="wait">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  placeholder={PLACEHOLDERS[placeholderIndex]}
+                  className="flex-1 bg-transparent outline-none text-slate-800 text-[15px] placeholder:text-slate-400 min-w-0"
+                />
+              </AnimatePresence>
+              <button
+                type="submit"
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shrink-0"
+              >
+                <Search size={14} />
+                Search
+              </button>
+            </div>
+            <p className="text-xs text-slate-400 mt-3 text-center">
+              Describe what you're looking for — our AI does the rest
+            </p>
+          </form>
 
         </motion.div>
 
@@ -170,30 +206,52 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
 
           <div className="bg-white border border-slate-100 rounded-2xl shadow-sm shadow-slate-100 px-8 py-6 flex flex-wrap items-center justify-center gap-6 sm:gap-8">
 
-            {/* Faster listings */}
+            {/* Properties */}
             <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
               <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">
-                6x
+                {platformStats.properties === null ? <span className="text-slate-300">—</span> : platformStats.properties}
+                <span className="text-xl font-semibold text-blue-500">+</span>
               </span>
-              <span className="text-[11px] text-slate-400 font-medium">Faster listings</span>
+              <span className="text-[11px] text-slate-400 font-medium">Properties listed</span>
             </div>
 
             <div className="w-px h-9 bg-slate-100 hidden sm:block" />
 
-            {/* More enquiries */}
+            {/* Agents */}
             <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
               <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">
-                2.5x
+                {platformStats.agents === null ? <span className="text-slate-300">—</span> : platformStats.agents}
+                <span className="text-xl font-semibold text-blue-500">+</span>
               </span>
-              <span className="text-[11px] text-slate-400 font-medium">More enquiries</span>
+              <span className="text-[11px] text-slate-400 font-medium">Active agents</span>
             </div>
 
             <div className="w-px h-9 bg-slate-100 hidden sm:block" />
 
-            {/* Multilingual reach */}
+            {/* Languages */}
             <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
               <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">24</span>
-              <span className="text-[11px] text-slate-400 font-medium">Multilingual reach</span>
+              <span className="text-[11px] text-slate-400 font-medium">Languages</span>
+            </div>
+
+            <div className="w-px h-9 bg-slate-100 hidden sm:block" />
+
+            {/* Searching now — avatar stack */}
+            <div className="flex items-center gap-3">
+              <div className="flex">
+                {AVATAR_INITIALS.map((init, i) => (
+                  <div
+                    key={init}
+                    className="w-7 h-7 rounded-full border-2 border-white flex items-center justify-center text-[11px] font-bold text-white"
+                    style={{ background: AVATAR_COLORS[i], marginLeft: i === 0 ? 0 : -8 }}
+                  >
+                    {init}
+                  </div>
+                ))}
+              </div>
+              <span className="text-sm text-slate-500 font-medium">
+                <span className="font-bold text-slate-900">{platformStats.searching}</span> searching now
+              </span>
             </div>
 
           </div>

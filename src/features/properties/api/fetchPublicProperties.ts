@@ -7,7 +7,7 @@ type AgentDbRow = Database['public']['Tables']['agents']['Row'];
 
 /** A property row with the joined agent relation from a select query. */
 type PropertyWithAgent = PropertyDbRow & {
-  agents: Pick<AgentDbRow, 'name' | 'agency' | 'phone' | 'email' | 'avatar_url' | 'is_subscribed' | 'verification_badge_level' | 'specialization' | 'years_experience' | 'rating' | 'review_count'> | null;
+  agents: Partial<AgentDbRow> | null;
 };
 
 /**

@@ -318,7 +318,7 @@ export default function PartnerPerformance() {
 
       const balancesRes = agentIds.length > 0
         ? await supabase.from('trust_account_balances').select('agent_id, current_balance, last_reconciled_date').in('agent_id', agentIds)
-        : { data: [] };
+        : { data: [] as { agent_id: string; current_balance: number; last_reconciled_date: string | null }[] };
 
       const tenanciesRes = agentIds.length > 0
         ? await supabase.from('tenancies').select('agent_id, status').in('agent_id', agentIds)

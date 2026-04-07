@@ -16,8 +16,8 @@ interface InspectionSlot {
 }
 
 interface Props {
-  listing: any;
-  onUpdate: (updates: Record<string, any>) => void;
+  listing: PropertyRow;
+  onUpdate: (updates: Partial<PropertyRow>) => void;
 }
 
 const ListingDetailsTab = ({ listing, onUpdate }: Props) => {

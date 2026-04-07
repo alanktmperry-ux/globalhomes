@@ -11,7 +11,7 @@ const AU_DATE = (d: string) => {
 };
 
 interface Props {
-  listing: any;
+  listing: PropertyRow;
 }
 
 const URGENCY_MAP: Record<string, { icon: React.ReactNode; color: string; label: string }> = {

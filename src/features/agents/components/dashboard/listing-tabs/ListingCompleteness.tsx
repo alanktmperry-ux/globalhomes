@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
+import type { PropertyRow } from '@/features/agents/types/listing';
 
 interface Props {
-  listing: any;
+  listing: PropertyRow;
 }
 
 const fields = [

@@ -6,7 +6,7 @@ import { PriceTrendChart } from '@/features/market/components/PriceTrendChart';
 import { ComparableSalesList } from '@/features/market/components/ComparableSalesList';
 
 interface Props {
-  listing: any;
+  listing: PropertyRow;
 }
 
 export default function ListingMarketTab({ listing }: Props) {

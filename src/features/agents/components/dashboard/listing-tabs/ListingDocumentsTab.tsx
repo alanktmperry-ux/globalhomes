@@ -32,7 +32,7 @@ const ESIGN_STATUS: Record<string, { icon: React.ReactNode; color: string; label
 };
 
 interface Props {
-  listing: any;
+  listing: PropertyRow;
 }
 
 const ListingDocumentsTab = ({ listing }: Props) => {

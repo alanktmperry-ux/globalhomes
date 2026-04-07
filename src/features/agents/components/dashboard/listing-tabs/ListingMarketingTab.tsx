@@ -46,7 +46,7 @@ const URGENCY_LABEL: Record<string, { label: string; className: string }> = {
 };
 
 interface Props {
-  listing: any;
+  listing: PropertyRow;
   onViewAllLeads?: () => void;
 }
 

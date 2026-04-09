@@ -103,7 +103,7 @@ const RentRollPage = () => {
       .eq('user_id', user.id)
       .maybeSingle();
 
-    if (!agentData) { setLoading(false); return; }
+    if (!agentData) { setNoAgent(true); setLoading(false); return; }
     setAgentId(agentData.id);
 
     const [tenancyRes, paymentRes, propRes] = await Promise.all([

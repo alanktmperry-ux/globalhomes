@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import AdminReports from '@/features/admin/components/AdminReports';
-import { CreditCard, Check, Loader2, Zap, Crown, Building2, Flame, Mail, Lock, Users } from 'lucide-react';
+import { CreditCard, Check, Loader2, Zap, Crown, Building2, Flame, Mail, Lock, Users, UserMinus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -9,6 +9,8 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useSubscription, getPlanFeatures } from '@/features/agents/hooks/useSubscription';
+import { useTeamAgents } from '@/features/agents/hooks/useTeamAgents';
+import { logAction } from '@/shared/lib/auditLog';
 import { useNavigate } from 'react-router-dom';
 import DashboardHeader from './DashboardHeader';
 import { getErrorMessage } from '@/shared/lib/errorUtils';

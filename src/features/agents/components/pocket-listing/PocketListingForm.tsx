@@ -123,6 +123,7 @@ const DEFAULT_DRAFT: ListingDraft = {
   estimatedRentalWeekly: 0,
   rentalWeekly: 0,
   rentalBondWeeks: 4,
+  bondAmount: 0,
   availableFrom: '',
   leaseTerm: '12 months',
   furnished: false,

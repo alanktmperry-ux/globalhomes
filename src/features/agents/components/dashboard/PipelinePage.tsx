@@ -77,7 +77,7 @@ const PipelinePage = () => {
         .from('agents')
         .select('id')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
       if (!agent) return;
       setAgentId(agent.id);
 

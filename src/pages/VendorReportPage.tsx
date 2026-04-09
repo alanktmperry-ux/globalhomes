@@ -25,28 +25,26 @@ export default function VendorReportPage() {
   useEffect(() => {
     if (!token) return;
     (async () => {
-      const { data: tokenRow } = await supabase
-        .from('vendor_report_tokens' as any)
-        .select('*')
-        .eq('token', token)
-        .gt('expires_at', new Date().toISOString())
-        .maybeSingle();
+      const { data: tokenResults } = await supabase
+        .rpc('lookup_vendor_report_token', { p_token: token });
 
-      if (!tokenRow) { setExpired(true); setLoading(false); return; }
+      if (!tokenResults || tokenResults.length === 0) { setExpired(true); setLoading(false); return; }
 
-      const row = tokenRow as any;
+      const row = tokenResults[0];
+      const propertyId = row.property_id as string;
+      const agentId = row.agent_id as string;
 
-      // Update view count
+      // Update view count (fire and forget)
       supabase.from('vendor_report_tokens' as any)
-        .update({ last_viewed: new Date().toISOString(), view_count: (row.view_count ?? 0) + 1 } as any)
-        .eq('id', row.id)
+        .update({ last_viewed: new Date().toISOString() } as any)
+        .eq('id', row.id as string)
         .then(() => {});
 
       const [{ data: prop }, { data: ag }, perfResult, benchResult] = await Promise.all([
-        supabase.from('properties').select('id, title, address, suburb, state, price, price_formatted, beds, baths, parking, sqm, property_type, image_url, images, description, listing_type, listed_date, views, contact_clicks, is_active').eq('id', row.property_id).single(),
-        supabase.from('agents').select('name, avatar_url, phone, email').eq('id', row.agent_id).single(),
-        supabase.rpc('get_property_performance', { p_property_id: row.property_id, p_days: 30 }),
-        supabase.rpc('get_suburb_benchmarks', { p_property_id: row.property_id }),
+        supabase.from('properties').select('id, title, address, suburb, state, price, price_formatted, beds, baths, parking, sqm, property_type, image_url, images, description, listing_type, listed_date, views, contact_clicks, is_active').eq('id', propertyId).single(),
+        supabase.from('agents').select('name, avatar_url, phone, email').eq('id', agentId).single(),
+        supabase.rpc('get_property_performance', { p_property_id: propertyId, p_days: 30 }),
+        supabase.rpc('get_suburb_benchmarks', { p_property_id: propertyId }),
       ]);
 
       setProperty(prop);

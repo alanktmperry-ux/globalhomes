@@ -473,22 +473,13 @@ const TeamPage = () => {
     if (!user || !joinCode.trim()) return;
     setJoiningAgency(true);
     try {
-      const { data: invite, error: inviteError } = await supabase
-        .from('agency_invite_codes')
-        .select('*')
-        .eq('code', joinCode.trim().toUpperCase())
-        .eq('is_active', true)
-        .maybeSingle();
+      const { data: lookupResults, error: inviteError } = await supabase
+        .rpc('lookup_invite_code', { p_code: joinCode.trim() });
 
       if (inviteError) throw inviteError;
+      const invite = lookupResults?.[0];
       if (!invite) {
         toast.error('Invalid code — This invite code is invalid or has been deactivated.');
-        setJoiningAgency(false);
-        return;
-      }
-
-      if (invite.max_uses && invite.uses >= invite.max_uses) {
-        toast.error('Code expired — This invite code has reached its max usage.');
         setJoiningAgency(false);
         return;
       }
@@ -508,18 +499,13 @@ const TeamPage = () => {
 
       const { error: joinError } = await supabase
         .from('agency_members')
-        .insert({
-          agency_id: invite.agency_id,
+        .insert([{
+          agency_id: invite.agency_id as string,
           user_id: user.id,
-          role: invite.role as any,
+          role: invite.role as 'agent' | 'admin' | 'principal' | 'owner',
           access_level: 'full',
-        });
+        }]);
       if (joinError) throw joinError;
-
-      await supabase
-        .from('agency_invite_codes')
-        .update({ uses: invite.uses + 1 })
-        .eq('id', invite.id);
 
       const { data: agentRecord } = await supabase
         .from('agents')

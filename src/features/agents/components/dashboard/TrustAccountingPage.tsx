@@ -38,6 +38,9 @@ const TYPE_OPTIONS = [
 
 const STATUS_MAP: Record<string, { variant: 'default' | 'secondary' | 'outline' | 'destructive'; label: string }> = {
   pending: { variant: 'outline', label: 'Pending' },
+  received: { variant: 'outline', label: 'Received' },
+  deposited: { variant: 'default', label: 'Deposited' },
+  cleared: { variant: 'default', label: 'Cleared' },
   completed: { variant: 'default', label: 'Cleared' },
   reconciled: { variant: 'secondary', label: 'Reconciled' },
   voided: { variant: 'destructive', label: 'Voided' },

@@ -55,9 +55,16 @@ export default function RentalPropertyPage() {
         {/* Header */}
         <div className="space-y-2">
           <div className="flex items-baseline justify-between flex-wrap gap-2">
-            <h1 className="text-2xl md:text-3xl font-extrabold text-foreground">
-              ${property.rental_weekly?.toLocaleString()}<span className="text-lg font-normal text-muted-foreground">/wk</span>
-            </h1>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-extrabold text-foreground">
+                ${property.rental_weekly?.toLocaleString()}<span className="text-lg font-normal text-muted-foreground">/wk</span>
+              </h1>
+              {property.rental_weekly > 0 && (
+                <p className="text-sm text-muted-foreground">
+                  ${(property.rental_weekly * 2).toLocaleString('en-AU')} per fortnight
+                </p>
+              )}
+            </div>
             {property.bond_amount && (
               <span className="text-sm text-muted-foreground">Bond: ${property.bond_amount.toLocaleString()}</span>
             )}

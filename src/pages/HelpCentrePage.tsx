@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
 const categories = [
-  { title: 'Agents', description: 'Listing, CRM, auctions, CMA reports, and billing', icon: 'Building2', href: '/help/agents' },
+  { title: 'Agents', description: 'Listing, CRM, auctions, and billing', icon: 'Building2', href: '/help/agents' },
   { title: 'Buyers', description: 'Searching, saving, open homes, auctions, and finance tools', icon: 'Home', href: '/help/buyers' },
   { title: 'Renters', description: 'Finding rentals, applying, tracking applications', icon: 'Key', href: '/help/renters' },
   { title: 'Vendors', description: 'Performance reports, CMA, auctions, and documents', icon: 'BarChart3', href: '/help/vendors' },

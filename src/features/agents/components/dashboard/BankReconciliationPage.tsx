@@ -66,6 +66,7 @@ const BankReconciliationPage = () => {
   const [addDate, setAddDate] = useState(new Date().toISOString().split('T')[0]);
   const [addDesc, setAddDesc] = useState('');
   const [addAmount, setAddAmount] = useState('');
+  const [addType, setAddType] = useState<'credit' | 'debit'>('credit');
   const [addBalance, setAddBalance] = useState('');
   const [addSaving, setAddSaving] = useState(false);
 
@@ -119,13 +120,23 @@ const BankReconciliationPage = () => {
 
     // Fetch current balance from trust_accounts
     if (agentId) {
+      // Try trust_accounts first, fall back to trust_account_balances view
       const { data: accountData } = await supabase
         .from('trust_accounts')
         .select('current_balance')
         .eq('agent_id', agentId)
         .limit(1)
         .maybeSingle();
-      setCurrentBalance(accountData?.current_balance ?? null);
+      if (accountData?.current_balance != null) {
+        setCurrentBalance(accountData.current_balance);
+      } else {
+        const { data: viewData } = await supabase
+          .from('trust_account_balances' as any)
+          .select('current_balance')
+          .eq('agent_id', agentId)
+          .maybeSingle();
+        setCurrentBalance((viewData as any)?.current_balance ?? null);
+      }
     }
 
     setLoading(false);
@@ -346,11 +357,14 @@ const BankReconciliationPage = () => {
       const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
       if (!agent) { toast.error('Agent profile not found'); return; }
 
+      const rawAmount = Math.abs(parseFloat(addAmount));
+      const finalAmount = addType === 'debit' ? -rawAmount : rawAmount;
+
       const { error } = await supabase.from('trust_reconciliations').insert({
         agent_id: agent.id,
         bank_date: addDate,
         description: addDesc || null,
-        amount: parseFloat(addAmount),
+        amount: finalAmount,
         bank_balance: parseFloat(addBalance) || 0,
         status: 'unmatched',
       } as any);
@@ -358,7 +372,7 @@ const BankReconciliationPage = () => {
 
       toast.success('Bank statement entry added');
       setShowAdd(false);
-      setAddDesc(''); setAddAmount(''); setAddBalance('');
+      setAddDesc(''); setAddAmount(''); setAddBalance(''); setAddType('credit');
       await fetchData();
     } catch (e: unknown) {
       toast.error(getErrorMessage(e));
@@ -795,14 +809,24 @@ const BankReconciliationPage = () => {
               <Input type="date" value={addDate} onChange={e => setAddDate(e.target.value)} className="h-9" />
             </div>
             <div>
-              <Label className="text-xs">Description</Label>
+              <Label className="text-xs">Description <span className="text-destructive">*</span></Label>
               <Input value={addDesc} onChange={e => setAddDesc(e.target.value)}
                 placeholder="e.g. Direct Deposit — John Smith" className="h-9" />
             </div>
+            <div>
+              <Label className="text-xs">Type</Label>
+              <Select value={addType} onValueChange={v => setAddType(v as 'credit' | 'debit')}>
+                <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="credit">Credit (money in)</SelectItem>
+                  <SelectItem value="debit">Debit (money out)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs">Amount (+ credit / - debit)</Label>
-                <Input type="number" step="0.01" value={addAmount} onChange={e => setAddAmount(e.target.value)}
+                <Label className="text-xs">Amount</Label>
+                <Input type="number" step="0.01" min="0" value={addAmount} onChange={e => setAddAmount(e.target.value)}
                   placeholder="25000.00" className="h-9" />
               </div>
               <div>
@@ -814,7 +838,7 @@ const BankReconciliationPage = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAdd(false)}>Cancel</Button>
-            <Button onClick={handleAddEntry} disabled={!addAmount || addSaving}>
+            <Button onClick={handleAddEntry} disabled={!addAmount || !addDesc.trim() || addSaving}>
               {addSaving ? 'Adding…' : 'Add Entry'}
             </Button>
           </DialogFooter>

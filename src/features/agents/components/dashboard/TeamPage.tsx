@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import UpgradeGate from '@/features/agents/components/shared/UpgradeGate';
-import { Copy, Plus, Trash2, UserPlus, Building2, Shield, Users, RefreshCw, Loader2, Camera, Upload, LogIn, ArrowRight, Mail, MapPin, Eye, Lock, Kanban, ClipboardList } from 'lucide-react';
+import { Copy, Plus, Trash2, UserPlus, Building2, Shield, Users, RefreshCw, Loader2, Camera, Upload, LogIn, ArrowRight, Mail, MapPin, Eye, Lock, Kanban, ClipboardList, AlertTriangle, CheckCircle2, UserMinus, ArrowRightLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useSearchParams } from 'react-router-dom';
@@ -16,10 +16,18 @@ import { Switch } from '@/components/ui/switch';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
+import { logAction } from '@/shared/lib/auditLog';
+import PipelineTab from './team/PipelineTab';
+import ComplianceTab from './team/ComplianceTab';
+import AuditLogTab from './team/AuditLogTab';
 
 interface AgencyMember {
   id: string;
@@ -28,7 +36,10 @@ interface AgencyMember {
   access_level: string;
   joined_at: string;
   profiles?: { display_name: string | null; avatar_url: string | null } | null;
-  agents?: { name: string; email: string | null; phone: string | null } | null;
+  agents?: { name: string; email: string | null; phone: string | null; avatar_url: string | null; agency_role: string | null; license_number: string | null; licence_expiry_date: string | null } | null;
+  agentId?: string;
+  contactCount?: number;
+  activeListings?: number;
 }
 
 interface InviteCode {
@@ -54,8 +65,16 @@ const accessBadgeClass: Record<string, string> = {
   read: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
 };
 
+function getComplianceColor(dateStr: string | null): string {
+  if (!dateStr) return 'text-muted-foreground';
+  const days = Math.ceil((new Date(dateStr).getTime() - Date.now()) / 86400000);
+  if (days < 0 || days < 30) return 'text-destructive';
+  if (days < 90) return 'text-amber-600';
+  return 'text-emerald-600';
+}
+
 const TeamPage = () => {
-  const { user, isPrincipal: authIsPrincipal, isAdmin } = useAuth();
+  const { user, isPrincipal: authIsPrincipal, isAdmin, agencyId: authAgencyId } = useAuth();
   const { canAccessTeam, seatLimit, loading: subLoading } = useSubscription();
   const [searchParams] = useSearchParams();
   const initialTab = searchParams.get('tab') || 'team';
@@ -101,6 +120,12 @@ const TeamPage = () => {
   // Join agency form
   const [joinCode, setJoinCode] = useState('');
   const [joiningAgency, setJoiningAgency] = useState(false);
+
+  // Deactivate / Reassign modals
+  const [deactivateTarget, setDeactivateTarget] = useState<AgencyMember | null>(null);
+  const [reassignTarget, setReassignTarget] = useState<{ member: AgencyMember; type: 'contacts' | 'listings' } | null>(null);
+  const [reassignTo, setReassignTo] = useState<string>('');
+  const [reassigning, setReassigning] = useState(false);
 
   const isPrincipalOrOwner = myRole === 'principal' || myRole === 'owner';
   const isOwnerOrAdmin = isPrincipalOrOwner || myRole === 'admin';
@@ -149,10 +174,36 @@ const TeamPage = () => {
           membersData.map(async (m) => {
             const { data: agentData } = await supabase
               .from('agents')
-              .select('name, email, phone')
+              .select('id, name, email, phone, avatar_url, agency_role, license_number, licence_expiry_date')
               .eq('user_id', m.user_id)
-              .single();
-            return { ...m, agents: agentData } as AgencyMember;
+              .maybeSingle();
+
+            let contactCount = 0;
+            let activeListings = 0;
+            if (agentData) {
+              const [cRes, lRes] = await Promise.all([
+                supabase.from('contacts').select('id', { count: 'exact', head: true }).eq('assigned_agent_id', agentData.id),
+                supabase.from('properties').select('id', { count: 'exact', head: true }).eq('agent_id', agentData.id).eq('is_active', true),
+              ]);
+              contactCount = cRes.count || 0;
+              activeListings = lRes.count || 0;
+            }
+
+            return {
+              ...m,
+              agents: agentData ? {
+                name: agentData.name,
+                email: agentData.email,
+                phone: agentData.phone,
+                avatar_url: agentData.avatar_url,
+                agency_role: (agentData as any).agency_role,
+                license_number: agentData.license_number,
+                licence_expiry_date: (agentData as any).licence_expiry_date,
+              } : null,
+              agentId: agentData?.id || undefined,
+              contactCount,
+              activeListings,
+            } as AgencyMember;
           })
         );
         setMembers(enriched);
@@ -199,7 +250,7 @@ const TeamPage = () => {
       setInviteDialogOpen(false);
       loadData();
     } catch (err: unknown) {
-      toast.error('Error — getErrorMessage(err)');
+      toast.error('Error — ' + getErrorMessage(err));
     } finally {
       setCreating(false);
     }
@@ -223,13 +274,11 @@ const TeamPage = () => {
       if (data.isExisting) {
         toast.success(`Member added — ${inviteEmail} has been added to your agency.`);
       } else if (data.inviteCode) {
-        // Show invite code prominently — email may not have been delivered
         toast.success(
           data.emailSent
             ? `Invite sent — Email sent to ${inviteEmail}. Backup code: ${data.inviteCode}`
             : `Invite code generated — Share this code with ${inviteEmail} to join: ${data.inviteCode}`
         );
-        // Copy code to clipboard for easy sharing
         try { await navigator.clipboard.writeText(data.inviteCode); } catch {}
       } else {
         toast.success(`Invitation sent — An invite has been sent to ${inviteEmail}.`);
@@ -240,7 +289,7 @@ const TeamPage = () => {
       setInviteAccessLevel('full');
       loadData();
     } catch (err: unknown) {
-      toast.error('Error — getErrorMessage(err)');
+      toast.error('Error — ' + getErrorMessage(err));
     } finally {
       setSendingInvite(false);
     }
@@ -268,10 +317,17 @@ const TeamPage = () => {
         .update({ role: newRole as any })
         .eq('id', memberId);
       if (error) throw error;
+
+      // Also update agents.agency_role
+      const member = members.find(m => m.id === memberId);
+      if (member?.agentId) {
+        await supabase.from('agents').update({ agency_role: newRole } as any).eq('id', member.agentId);
+      }
+
       toast.success(`Role updated — Member role changed to ${newRole}`);
       loadData();
     } catch (err: unknown) {
-      toast.error('Error — getErrorMessage(err)');
+      toast.error('Error — ' + getErrorMessage(err));
     }
   };
 
@@ -285,7 +341,69 @@ const TeamPage = () => {
       toast.success(`Access updated — Access changed to ${newAccess}`);
       loadData();
     } catch (err: unknown) {
-      toast.error('Error — getErrorMessage(err)');
+      toast.error('Error — ' + getErrorMessage(err));
+    }
+  };
+
+  const handleDeactivateAgent = async () => {
+    if (!deactivateTarget?.agentId || !user) return;
+    try {
+      await supabase.from('agents').update({ is_subscribed: false } as any).eq('id', deactivateTarget.agentId);
+      
+      logAction({
+        agencyId: agencyId,
+        agentId: null,
+        userId: user.id,
+        actionType: 'deactivated',
+        entityType: 'agent',
+        entityId: deactivateTarget.agentId,
+        description: `Deactivated agent ${deactivateTarget.agents?.name || 'Unknown'}`,
+      });
+
+      toast.success(`${deactivateTarget.agents?.name || 'Agent'} has been deactivated`);
+      setDeactivateTarget(null);
+      loadData();
+    } catch (err: unknown) {
+      toast.error('Error — ' + getErrorMessage(err));
+    }
+  };
+
+  const handleReassign = async () => {
+    if (!reassignTarget || !reassignTo || !user) return;
+    setReassigning(true);
+    try {
+      const fromAgentId = reassignTarget.member.agentId;
+      const toAgent = members.find(m => m.agentId === reassignTo);
+
+      if (reassignTarget.type === 'contacts') {
+        await supabase
+          .from('contacts')
+          .update({ assigned_agent_id: reassignTo } as any)
+          .eq('assigned_agent_id', fromAgentId);
+      } else {
+        await supabase
+          .from('properties')
+          .update({ agent_id: reassignTo } as any)
+          .eq('agent_id', fromAgentId);
+      }
+
+      logAction({
+        agencyId,
+        agentId: null,
+        userId: user.id,
+        actionType: 'reassigned',
+        entityType: reassignTarget.type,
+        description: `Reassigned ${reassignTarget.type} from ${reassignTarget.member.agents?.name || 'Unknown'} to ${toAgent?.agents?.name || 'Unknown'}`,
+      });
+
+      toast.success(`${reassignTarget.type === 'contacts' ? 'Contacts' : 'Listings'} reassigned successfully`);
+      setReassignTarget(null);
+      setReassignTo('');
+      loadData();
+    } catch (err: unknown) {
+      toast.error('Error — ' + getErrorMessage(err));
+    } finally {
+      setReassigning(false);
     }
   };
 
@@ -297,40 +415,21 @@ const TeamPage = () => {
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !agencyId) return;
-
-    if (!file.type.startsWith('image/')) {
-      toast.error('Invalid file — Please upload an image file.');
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('File too large — Max file size is 5MB.');
-      return;
-    }
-
+    if (!file.type.startsWith('image/')) { toast.error('Invalid file — Please upload an image file.'); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error('File too large — Max file size is 5MB.'); return; }
     setUploadingLogo(true);
     try {
       const ext = file.name.split('.').pop();
       const filePath = `${agencyId}/logo.${ext}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('agency-logos')
-        .upload(filePath, file, { upsert: true });
+      const { error: uploadError } = await supabase.storage.from('agency-logos').upload(filePath, file, { upsert: true });
       if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('agency-logos')
-        .getPublicUrl(filePath);
-
-      const { error: updateError } = await supabase
-        .from('agencies')
-        .update({ logo_url: publicUrl })
-        .eq('id', agencyId);
+      const { data: { publicUrl } } = supabase.storage.from('agency-logos').getPublicUrl(filePath);
+      const { error: updateError } = await supabase.from('agencies').update({ logo_url: publicUrl }).eq('id', agencyId);
       if (updateError) throw updateError;
-
       setAgencyLogo(publicUrl);
       toast.success('Logo updated');
     } catch (err: unknown) {
-      toast.error('Upload failed — getErrorMessage(err)');
+      toast.error('Upload failed — ' + getErrorMessage(err));
     } finally {
       setUploadingLogo(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -341,21 +440,15 @@ const TeamPage = () => {
     if (!agencyId) return;
     setSavingBranding(true);
     try {
-      const { error } = await supabase
-        .from('agencies')
-        .update({
-          name: agencyName,
-          address: agencyAddress || null,
-          email: agencyEmail || null,
-          phone: agencyPhone || null,
-          description: agencyDescription || null,
-        })
-        .eq('id', agencyId);
+      const { error } = await supabase.from('agencies').update({
+        name: agencyName, address: agencyAddress || null, email: agencyEmail || null,
+        phone: agencyPhone || null, description: agencyDescription || null,
+      }).eq('id', agencyId);
       if (error) throw error;
       toast.success('Agency details saved');
       setEditingBranding(false);
     } catch (err: unknown) {
-      toast.error('Error — getErrorMessage(err)');
+      toast.error('Error — ' + getErrorMessage(err));
     } finally {
       setSavingBranding(false);
     }
@@ -364,14 +457,8 @@ const TeamPage = () => {
   const handleNewAgencyLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      toast.error('Invalid file — Please upload an image file.');
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('File too large — Max 5MB.');
-      return;
-    }
+    if (!file.type.startsWith('image/')) { toast.error('Invalid file — Please upload an image file.'); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error('File too large — Max 5MB.'); return; }
     setNewAgencyLogoFile(file);
     setNewAgencyLogoPreview(URL.createObjectURL(file));
   };
@@ -395,19 +482,13 @@ const TeamPage = () => {
       const { data: agency, error: agencyError } = await supabase
         .from('agencies')
         .insert({
-          name: newAgencyName.trim(),
-          slug,
-          owner_user_id: user.id,
-          email: newAgencyEmail || null,
-          phone: newAgencyPhone || null,
-          description: newAgencyDescription || null,
-          address: newAgencyAddress || null,
+          name: newAgencyName.trim(), slug, owner_user_id: user.id,
+          email: newAgencyEmail || null, phone: newAgencyPhone || null,
+          description: newAgencyDescription || null, address: newAgencyAddress || null,
         })
         .select('id')
         .single();
       if (agencyError) throw agencyError;
-
-      // Upload logo if selected
       if (newAgencyLogoFile) {
         const ext = newAgencyLogoFile.name.split('.').pop();
         const filePath = `${agency.id}/logo.${ext}`;
@@ -415,58 +496,27 @@ const TeamPage = () => {
         const { data: { publicUrl } } = supabase.storage.from('agency-logos').getPublicUrl(filePath);
         await supabase.from('agencies').update({ logo_url: publicUrl }).eq('id', agency.id);
       }
-
-      // Add self as principal (master admin)
-      const { error: memberError } = await supabase
-        .from('agency_members')
-        .insert({
-          agency_id: agency.id,
-          user_id: user.id,
-          role: 'principal' as any,
-          access_level: 'full',
-        });
+      const { error: memberError } = await supabase.from('agency_members').insert({
+        agency_id: agency.id, user_id: user.id, role: 'principal' as any, access_level: 'full',
+      });
       if (memberError) throw memberError;
-
-      // Link or create agent record
-      const { data: agentRecord } = await supabase
-        .from('agents')
-        .select('id')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      const { data: agentRecord } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
       if (agentRecord) {
-        await supabase
-          .from('agents')
-          .update({ agency_id: agency.id, agency: newAgencyName.trim() })
-          .eq('id', agentRecord.id);
+        await supabase.from('agents').update({ agency_id: agency.id, agency: newAgencyName.trim() }).eq('id', agentRecord.id);
       } else {
-        // Create agent record if it doesn't exist (e.g. admin user creating agency)
-        await supabase
-          .from('agents')
-          .insert({
-            user_id: user.id,
-            name: user.email || 'Principal',
-            email: user.email || newAgencyEmail || null,
-            agency_id: agency.id,
-            agency: newAgencyName.trim(),
-          });
-        // Ensure agent role exists
-        await supabase
-          .from('user_roles')
-          .insert({ user_id: user.id, role: 'agent' as any })
-          .then(() => {});
+        await supabase.from('agents').insert({
+          user_id: user.id, name: user.email || 'Principal',
+          email: user.email || newAgencyEmail || null, agency_id: agency.id, agency: newAgencyName.trim(),
+        });
+        await supabase.from('user_roles').insert({ user_id: user.id, role: 'agent' as any }).then(() => {});
       }
-
       toast.success(`Agency created! — ${newAgencyName} is ready. You are the Principal.`);
-      setNewAgencyName('');
-      setNewAgencyEmail('');
-      setNewAgencyPhone('');
-      setNewAgencyDescription('');
-      setNewAgencyAddress('');
-      setNewAgencyLogoFile(null);
-      setNewAgencyLogoPreview(null);
+      setNewAgencyName(''); setNewAgencyEmail(''); setNewAgencyPhone('');
+      setNewAgencyDescription(''); setNewAgencyAddress('');
+      setNewAgencyLogoFile(null); setNewAgencyLogoPreview(null);
       loadData();
     } catch (err: unknown) {
-      toast.error('Error creating agency — getErrorMessage(err)');
+      toast.error('Error creating agency — ' + getErrorMessage(err));
     } finally {
       setCreatingAgency(false);
     }
@@ -478,7 +528,6 @@ const TeamPage = () => {
     try {
       const { data: lookupResults, error: inviteError } = await supabase
         .rpc('lookup_invite_code', { p_code: joinCode.trim() });
-
       if (inviteError) throw inviteError;
       const invite = lookupResults?.[0];
       if (!invite) {
@@ -486,54 +535,29 @@ const TeamPage = () => {
         setJoiningAgency(false);
         return;
       }
-
       const { data: existing } = await supabase
-        .from('agency_members')
-        .select('id')
-        .eq('agency_id', invite.agency_id)
-        .eq('user_id', user.id)
-        .maybeSingle();
-
+        .from('agency_members').select('id').eq('agency_id', invite.agency_id).eq('user_id', user.id).maybeSingle();
       if (existing) {
         toast.error('Already a member — You are already part of this agency.');
         setJoiningAgency(false);
         return;
       }
-
-      const { error: joinError } = await supabase
-        .from('agency_members')
-        .insert([{
-          agency_id: invite.agency_id as string,
-          user_id: user.id,
-          role: invite.role as 'agent' | 'admin' | 'principal' | 'owner',
-          access_level: 'full',
-        }]);
+      const { error: joinError } = await supabase.from('agency_members').insert([{
+        agency_id: invite.agency_id as string, user_id: user.id,
+        role: invite.role as 'agent' | 'admin' | 'principal' | 'owner', access_level: 'full',
+      }]);
       if (joinError) throw joinError;
-
-      const { data: agentRecord } = await supabase
-        .from('agents')
-        .select('id')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
+      const { data: agentRecord } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
       if (agentRecord) {
-        const { data: agencyData } = await supabase
-          .from('agencies')
-          .select('id, name')
-          .eq('id', invite.agency_id)
-          .single();
+        const { data: agencyData } = await supabase.from('agencies').select('id, name').eq('id', invite.agency_id).single();
         if (agencyData) {
-          await supabase
-            .from('agents')
-            .update({ agency_id: agencyData.id, agency: agencyData.name })
-            .eq('id', agentRecord.id);
+          await supabase.from('agents').update({ agency_id: agencyData.id, agency: agencyData.name }).eq('id', agentRecord.id);
         }
       }
-
       toast.success(`Joined agency! — Welcome to the team as ${invite.role}.`);
       loadData();
     } catch (err: unknown) {
-      toast.error('Error joining — getErrorMessage(err)');
+      toast.error('Error joining — ' + getErrorMessage(err));
     } finally {
       setJoiningAgency(false);
     }
@@ -563,19 +587,9 @@ const TeamPage = () => {
 
           <TabsContent value="create">
             <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
-              {/* Logo upload */}
               <div className="flex items-center gap-4">
-                <input
-                  ref={newLogoInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleNewAgencyLogoSelect}
-                />
-                <button
-                  onClick={() => newLogoInputRef.current?.click()}
-                  className="w-16 h-16 rounded-2xl border-2 border-dashed border-border hover:border-primary/50 flex items-center justify-center transition-colors shrink-0 overflow-hidden"
-                >
+                <input ref={newLogoInputRef} type="file" accept="image/*" className="hidden" onChange={handleNewAgencyLogoSelect} />
+                <button onClick={() => newLogoInputRef.current?.click()} className="w-16 h-16 rounded-2xl border-2 border-dashed border-border hover:border-primary/50 flex items-center justify-center transition-colors shrink-0 overflow-hidden">
                   {newAgencyLogoPreview ? (
                     <img src={newAgencyLogoPreview} alt="Logo preview" className="w-full h-full object-cover" />
                   ) : (
@@ -587,72 +601,32 @@ const TeamPage = () => {
                   <p className="text-[11px] text-muted-foreground">Upload your agency branding (max 5MB)</p>
                 </div>
               </div>
-
               <div>
                 <Label className="text-xs font-medium">Agency Name *</Label>
-                <Input
-                  placeholder="e.g. Elite Property Group"
-                  value={newAgencyName}
-                  onChange={(e) => setNewAgencyName(e.target.value)}
-                  className="mt-1.5"
-                />
+                <Input placeholder="e.g. Elite Property Group" value={newAgencyName} onChange={(e) => setNewAgencyName(e.target.value)} className="mt-1.5" />
               </div>
-
               <div>
                 <Label className="text-xs font-medium">Office Address</Label>
-                <Input
-                  placeholder="e.g. 123 Collins St, Melbourne VIC 3000"
-                  value={newAgencyAddress}
-                  onChange={(e) => setNewAgencyAddress(e.target.value)}
-                  className="mt-1.5"
-                />
+                <Input placeholder="e.g. 123 Collins St, Melbourne VIC 3000" value={newAgencyAddress} onChange={(e) => setNewAgencyAddress(e.target.value)} className="mt-1.5" />
               </div>
-
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label className="text-xs font-medium">Email</Label>
-                  <Input
-                    type="email"
-                    placeholder="office@agency.com"
-                    value={newAgencyEmail}
-                    onChange={(e) => setNewAgencyEmail(e.target.value)}
-                    className="mt-1.5"
-                  />
+                  <Input type="email" placeholder="office@agency.com" value={newAgencyEmail} onChange={(e) => setNewAgencyEmail(e.target.value)} className="mt-1.5" />
                 </div>
                 <div>
                   <Label className="text-xs font-medium">Phone</Label>
-                  <Input
-                    placeholder="+61 4xx xxx xxx"
-                    value={newAgencyPhone}
-                    onChange={(e) => setNewAgencyPhone(e.target.value)}
-                    className="mt-1.5"
-                  />
+                  <Input placeholder="+61 4xx xxx xxx" value={newAgencyPhone} onChange={(e) => setNewAgencyPhone(e.target.value)} className="mt-1.5" />
                 </div>
               </div>
               <div>
                 <Label className="text-xs font-medium">Description</Label>
-                <Textarea
-                  placeholder="Tell clients about your agency..."
-                  value={newAgencyDescription}
-                  onChange={(e) => setNewAgencyDescription(e.target.value)}
-                  className="mt-1.5 resize-none"
-                  rows={3}
-                />
+                <Textarea placeholder="Tell clients about your agency..." value={newAgencyDescription} onChange={(e) => setNewAgencyDescription(e.target.value)} className="mt-1.5 resize-none" rows={3} />
               </div>
-              <Button
-                onClick={handleCreateAgency}
-                disabled={creatingAgency || !newAgencyName.trim()}
-                className="w-full"
-              >
-                {creatingAgency ? (
-                  <><Loader2 size={14} className="animate-spin mr-2" /> Creating...</>
-                ) : (
-                  <><Building2 size={14} className="mr-2" /> Create Agency</>
-                )}
+              <Button onClick={handleCreateAgency} disabled={creatingAgency || !newAgencyName.trim()} className="w-full">
+                {creatingAgency ? <><Loader2 size={14} className="animate-spin mr-2" /> Creating...</> : <><Building2 size={14} className="mr-2" /> Create Agency</>}
               </Button>
-              <p className="text-[11px] text-muted-foreground text-center">
-                You'll be set as the <strong>Principal</strong> (master admin) with full control.
-              </p>
+              <p className="text-[11px] text-muted-foreground text-center">You'll be set as the <strong>Principal</strong> (master admin) with full control.</p>
             </div>
           </TabsContent>
 
@@ -660,27 +634,11 @@ const TeamPage = () => {
             <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
               <div>
                 <Label className="text-xs font-medium">Invite Code</Label>
-                <Input
-                  placeholder="e.g. ABCD1234"
-                  value={joinCode}
-                  onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                  className="mt-1.5 font-mono tracking-widest text-center text-lg"
-                  maxLength={8}
-                />
-                <p className="text-[11px] text-muted-foreground mt-1.5">
-                  Ask your agency principal or admin for an invite code.
-                </p>
+                <Input placeholder="e.g. ABCD1234" value={joinCode} onChange={(e) => setJoinCode(e.target.value.toUpperCase())} className="mt-1.5 font-mono tracking-widest text-center text-lg" maxLength={8} />
+                <p className="text-[11px] text-muted-foreground mt-1.5">Ask your agency principal or admin for an invite code.</p>
               </div>
-              <Button
-                onClick={handleJoinAgency}
-                disabled={joiningAgency || joinCode.trim().length < 4}
-                className="w-full"
-              >
-                {joiningAgency ? (
-                  <><Loader2 size={14} className="animate-spin mr-2" /> Joining...</>
-                ) : (
-                  <><ArrowRight size={14} className="mr-2" /> Join Agency</>
-                )}
+              <Button onClick={handleJoinAgency} disabled={joiningAgency || joinCode.trim().length < 4} className="w-full">
+                {joiningAgency ? <><Loader2 size={14} className="animate-spin mr-2" /> Joining...</> : <><ArrowRight size={14} className="mr-2" /> Join Agency</>}
               </Button>
             </div>
           </TabsContent>
@@ -693,19 +651,14 @@ const TeamPage = () => {
     return <UpgradeGate requiredPlan="Agency plan" message="Team management is available on the Agency plan. Invite up to 8 agents under one account with separate logins and centralised billing." />;
   }
 
+  const showPrincipalTabs = isPrincipalOrOwner || isAdmin || authIsPrincipal;
+
   return (
-    <div className="max-w-4xl mx-auto space-y-8 p-4 sm:p-6">
+    <div className="max-w-5xl mx-auto space-y-6 p-4 sm:p-6">
       {/* Header with Logo */}
       <div className="flex items-center gap-5">
         <div className="relative group shrink-0">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleLogoUpload}
-            disabled={!isOwnerOrAdmin}
-          />
+          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} disabled={!isOwnerOrAdmin} />
           {agencyLogo ? (
             <img src={agencyLogo} alt={agencyName} className="w-16 h-16 rounded-2xl object-cover border border-border shadow-sm" />
           ) : (
@@ -714,175 +667,197 @@ const TeamPage = () => {
             </div>
           )}
           {isOwnerOrAdmin && (
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploadingLogo}
-              className="absolute inset-0 rounded-2xl bg-foreground/0 group-hover:bg-foreground/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
-            >
-              {uploadingLogo ? (
-                <Loader2 size={18} className="text-background animate-spin" />
-              ) : (
-                <Camera size={18} className="text-background" />
-              )}
+            <button onClick={() => fileInputRef.current?.click()} disabled={uploadingLogo} className="absolute inset-0 rounded-2xl bg-foreground/0 group-hover:bg-foreground/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+              {uploadingLogo ? <Loader2 size={18} className="text-background animate-spin" /> : <Camera size={18} className="text-background" />}
             </button>
           )}
         </div>
-
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <h1 className="font-display text-2xl font-bold text-foreground truncate">{agencyName}</h1>
-            {isPrincipalOrOwner && (
-              <Badge variant="outline" className={roleBadgeClass['principal']}>Principal</Badge>
-            )}
+            {isPrincipalOrOwner && <Badge variant="outline" className={roleBadgeClass['principal']}>Principal</Badge>}
           </div>
           <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mt-0.5">
             <span>{members.length} member{members.length !== 1 ? 's' : ''}</span>
-            {agencyAddress && (
-              <span className="flex items-center gap-1">
-                <MapPin size={12} className="shrink-0" /> {agencyAddress}
-              </span>
-            )}
+            {agencyAddress && <span className="flex items-center gap-1"><MapPin size={12} className="shrink-0" /> {agencyAddress}</span>}
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0 flex-wrap">
-          {isOwnerOrAdmin && (
-            <Button variant="outline" size="sm" onClick={() => setEditingBranding(true)}>
-              Edit Details
-            </Button>
-          )}
-          <Button variant="outline" size="sm" onClick={loadData}>
-            <RefreshCw size={14} className="mr-1.5" /> Refresh
-          </Button>
+          {isOwnerOrAdmin && <Button variant="outline" size="sm" onClick={() => setEditingBranding(true)}>Edit Details</Button>}
+          <Button variant="outline" size="sm" onClick={loadData}><RefreshCw size={14} className="mr-1.5" /> Refresh</Button>
         </div>
       </div>
 
-      {/* Team Members */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Team Members</h2>
-          {isOwnerOrAdmin && (
-            <div className="flex flex-col gap-2">
-              {members.length >= seatLimit && (
-                <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 text-xs text-foreground">
-                  Your Agency plan includes up to {seatLimit} agent logins. You have used {members.length} of {seatLimit} seats. To add more agents, contact us at sales@listhq.com.au for Enterprise pricing.
-                </div>
-              )}
-              <div className="flex gap-2">
-              <Button size="sm" variant="outline" onClick={() => setEmailInviteDialogOpen(true)} disabled={members.length >= seatLimit}>
-                <Mail size={14} className="mr-1.5" /> Invite by Email
-              </Button>
-              <Button size="sm" onClick={() => setInviteDialogOpen(true)}>
-                <UserPlus size={14} className="mr-1.5" /> Create Code
-              </Button>
-              </div>
-            </div>
-          )}
-        </div>
-        <div className="space-y-2">
-          {members.map((m) => (
-            <div key={m.id} className="flex items-center gap-4 p-4 rounded-2xl bg-card border border-border">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                <Users size={18} className="text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-foreground text-sm truncate">
-                  {m.agents?.name || 'Unknown'}
-                  {m.user_id === user?.id && <span className="text-muted-foreground ml-1">(you)</span>}
-                </p>
-                <p className="text-xs text-muted-foreground truncate">{m.agents?.email || ''}</p>
-              </div>
-              {/* Access level badge */}
-              <Badge variant="outline" className={`text-[10px] ${accessBadgeClass[m.access_level] || accessBadgeClass['full']}`}>
-                {m.access_level === 'read' ? (
-                  <><Eye size={10} className="mr-1" /> Read</>
-                ) : (
-                  <><Lock size={10} className="mr-1" /> Full</>
-                )}
-              </Badge>
-              {/* Role badge or selector */}
-              {isOwnerOrAdmin && m.user_id !== user?.id && m.role !== 'principal' && m.role !== 'owner' ? (
-                <div className="flex items-center gap-2">
-                  <Select
-                    value={m.role}
-                    onValueChange={(newRole) => handleChangeRole(m.id, newRole)}
-                  >
-                    <SelectTrigger className="w-[110px] h-8 text-xs">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="agent">Agent</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select
-                    value={m.access_level || 'full'}
-                    onValueChange={(newAccess) => handleChangeAccess(m.id, newAccess)}
-                  >
-                    <SelectTrigger className="w-[90px] h-8 text-xs">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="full">Full Access</SelectItem>
-                      <SelectItem value="read">Read Only</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              ) : (
-                <Badge variant="outline" className={`text-[10px] ${roleBadgeClass[m.role] || ''}`}>
-                  {m.role === 'principal' ? 'Principal' : m.role}
-                </Badge>
-              )}
-              {isOwnerOrAdmin && m.user_id !== user?.id && m.role !== 'principal' && m.role !== 'owner' && (
-                <button
-                  onClick={() => handleRemoveMember(m.id, m.user_id)}
-                  className="w-8 h-8 rounded-lg hover:bg-destructive/10 flex items-center justify-center transition-colors"
-                >
-                  <Trash2 size={14} className="text-destructive" />
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Tabs */}
+      <Tabs defaultValue={initialTab} className="w-full">
+        <TabsList className={`${showPrincipalTabs ? 'grid grid-cols-4' : ''}`}>
+          <TabsTrigger value="team" className="gap-1.5 text-xs"><Users size={14} /> Team</TabsTrigger>
+          {showPrincipalTabs && <TabsTrigger value="pipeline" className="gap-1.5 text-xs"><Kanban size={14} /> Pipeline</TabsTrigger>}
+          {showPrincipalTabs && <TabsTrigger value="compliance" className="gap-1.5 text-xs"><Shield size={14} /> Compliance</TabsTrigger>}
+          {showPrincipalTabs && <TabsTrigger value="audit" className="gap-1.5 text-xs"><ClipboardList size={14} /> Audit Log</TabsTrigger>}
+        </TabsList>
 
-      {/* Invite Codes */}
-      {isOwnerOrAdmin && inviteCodes.length > 0 && (
-        <div>
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Invite Codes</h2>
-          <div className="space-y-2">
-            {inviteCodes.map((code) => (
-              <div key={code.id} className={`flex items-center gap-4 p-4 rounded-2xl bg-card border border-border ${!code.is_active ? 'opacity-50' : ''}`}>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <code className="font-mono text-sm font-bold tracking-widest text-foreground">{code.code}</code>
-                    <button onClick={() => copyCode(code.code)} className="text-muted-foreground hover:text-foreground transition-colors">
-                      <Copy size={12} />
-                    </button>
+        {/* TAB 1 — Team */}
+        <TabsContent value="team" className="space-y-6 mt-4">
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Team Members</h2>
+              {isOwnerOrAdmin && (
+                <div className="flex flex-col gap-2">
+                  {members.length >= seatLimit && (
+                    <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 text-xs text-foreground">
+                      Your Agency plan includes up to {seatLimit} agent logins. You have used {members.length} of {seatLimit} seats.
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="outline" onClick={() => setEmailInviteDialogOpen(true)} disabled={members.length >= seatLimit}>
+                      <Mail size={14} className="mr-1.5" /> Invite by Email
+                    </Button>
+                    <Button size="sm" onClick={() => setInviteDialogOpen(true)}>
+                      <UserPlus size={14} className="mr-1.5" /> Create Code
+                    </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Role: {code.role} · Used {code.uses}/{code.max_uses ?? '∞'} times
-                    {!code.is_active && ' · Deactivated'}
-                  </p>
                 </div>
-                {code.is_active && (
-                  <Button variant="ghost" size="sm" onClick={() => handleDeactivateCode(code.id)} className="text-xs text-destructive hover:text-destructive">
-                    Deactivate
-                  </Button>
-                )}
-              </div>
-            ))}
+              )}
+            </div>
+            <div className="space-y-2">
+              {members.map((m) => (
+                <div key={m.id} className="flex items-center gap-4 p-4 rounded-2xl bg-card border border-border">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden">
+                    {m.agents?.avatar_url ? (
+                      <img src={m.agents.avatar_url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <Users size={18} className="text-primary" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-foreground text-sm truncate">
+                      {m.agents?.name || 'Unknown'}
+                      {m.user_id === user?.id && <span className="text-muted-foreground ml-1">(you)</span>}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">{m.agents?.email || ''}</p>
+                    {/* Stats */}
+                    <div className="flex items-center gap-3 mt-1">
+                      <span className="text-[10px] text-muted-foreground">{m.contactCount ?? 0} contacts</span>
+                      <span className="text-[10px] text-muted-foreground">{m.activeListings ?? 0} listings</span>
+                      {m.agents?.licence_expiry_date && (
+                        <span className={`text-[10px] font-medium ${getComplianceColor(m.agents.licence_expiry_date)}`}>
+                          {(() => {
+                            const d = Math.ceil((new Date(m.agents.licence_expiry_date).getTime() - Date.now()) / 86400000);
+                            if (d < 0) return '⚠ Licence expired';
+                            if (d < 30) return `⚠ ${d}d to expiry`;
+                            if (d < 90) return `${d}d to expiry`;
+                            return '✓ Compliant';
+                          })()}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Access level badge */}
+                  <Badge variant="outline" className={`text-[10px] ${accessBadgeClass[m.access_level] || accessBadgeClass['full']}`}>
+                    {m.access_level === 'read' ? <><Eye size={10} className="mr-1" /> Read</> : <><Lock size={10} className="mr-1" /> Full</>}
+                  </Badge>
+
+                  {/* Role badge or selector */}
+                  {isOwnerOrAdmin && m.user_id !== user?.id && m.role !== 'principal' && m.role !== 'owner' ? (
+                    <div className="flex items-center gap-2">
+                      <Select value={m.role} onValueChange={(newRole) => handleChangeRole(m.id, newRole)}>
+                        <SelectTrigger className="w-[110px] h-8 text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="agent">Agent</SelectItem>
+                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="principal">Principal</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Select value={m.access_level || 'full'} onValueChange={(newAccess) => handleChangeAccess(m.id, newAccess)}>
+                        <SelectTrigger className="w-[90px] h-8 text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="full">Full Access</SelectItem>
+                          <SelectItem value="read">Read Only</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  ) : (
+                    <Badge variant="outline" className={`text-[10px] ${roleBadgeClass[m.role] || ''}`}>
+                      {m.role === 'principal' ? 'Principal' : m.role}
+                    </Badge>
+                  )}
+
+                  {/* Action buttons for principals */}
+                  {isOwnerOrAdmin && m.user_id !== user?.id && m.role !== 'principal' && m.role !== 'owner' && (
+                    <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={() => setReassignTarget({ member: m, type: 'contacts' })} title="Reassign contacts">
+                        <ArrowRightLeft size={14} />
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-destructive hover:text-destructive" onClick={() => setDeactivateTarget(m)} title="Deactivate agent">
+                        <UserMinus size={14} />
+                      </Button>
+                      <button onClick={() => handleRemoveMember(m.id, m.user_id)} className="w-8 h-8 rounded-lg hover:bg-destructive/10 flex items-center justify-center transition-colors">
+                        <Trash2 size={14} className="text-destructive" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+
+          {/* Invite Codes */}
+          {isOwnerOrAdmin && inviteCodes.length > 0 && (
+            <div>
+              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Invite Codes</h2>
+              <div className="space-y-2">
+                {inviteCodes.map((code) => (
+                  <div key={code.id} className={`flex items-center gap-4 p-4 rounded-2xl bg-card border border-border ${!code.is_active ? 'opacity-50' : ''}`}>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <code className="font-mono text-sm font-bold tracking-widest text-foreground">{code.code}</code>
+                        <button onClick={() => copyCode(code.code)} className="text-muted-foreground hover:text-foreground transition-colors"><Copy size={12} /></button>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Role: {code.role} · Used {code.uses}/{code.max_uses ?? '∞'} times
+                        {!code.is_active && ' · Deactivated'}
+                      </p>
+                    </div>
+                    {code.is_active && (
+                      <Button variant="ghost" size="sm" onClick={() => handleDeactivateCode(code.id)} className="text-xs text-destructive hover:text-destructive">Deactivate</Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </TabsContent>
+
+        {/* TAB 2 — Pipeline */}
+        {showPrincipalTabs && (
+          <TabsContent value="pipeline" className="mt-4">
+            <PipelineTab />
+          </TabsContent>
+        )}
+
+        {/* TAB 3 — Compliance */}
+        {showPrincipalTabs && (
+          <TabsContent value="compliance" className="mt-4">
+            <ComplianceTab />
+          </TabsContent>
+        )}
+
+        {/* TAB 4 — Audit Log */}
+        {showPrincipalTabs && (
+          <TabsContent value="audit" className="mt-4">
+            <AuditLogTab />
+          </TabsContent>
+        )}
+      </Tabs>
 
       {/* Create Invite Code Dialog */}
       <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Create Invite Code</DialogTitle>
-            <DialogDescription>
-              Generate a code that staff can use to join your agency.
-            </DialogDescription>
+            <DialogDescription>Generate a code that staff can use to join your agency.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 mt-2">
             <div>
@@ -897,13 +872,7 @@ const TeamPage = () => {
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Max uses</label>
-              <Input
-                type="number"
-                min="1"
-                value={newInviteMaxUses}
-                onChange={(e) => setNewInviteMaxUses(e.target.value)}
-                placeholder="10"
-              />
+              <Input type="number" min="1" value={newInviteMaxUses} onChange={(e) => setNewInviteMaxUses(e.target.value)} placeholder="10" />
               <p className="text-xs text-muted-foreground mt-1">How many people can use this code</p>
             </div>
             <Button onClick={handleCreateInvite} disabled={creating} className="w-full">
@@ -918,19 +887,12 @@ const TeamPage = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Invite Team Member</DialogTitle>
-            <DialogDescription>
-              Send an email invitation to add someone to your agency.
-            </DialogDescription>
+            <DialogDescription>Send an email invitation to add someone to your agency.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 mt-2">
             <div>
               <Label className="text-sm font-medium mb-1.5 block">Email Address *</Label>
-              <Input
-                type="email"
-                placeholder="agent@example.com"
-                value={inviteEmail}
-                onChange={(e) => setInviteEmail(e.target.value)}
-              />
+              <Input type="email" placeholder="agent@example.com" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} />
             </div>
             <div>
               <Label className="text-sm font-medium mb-1.5 block">Role</Label>
@@ -946,32 +908,16 @@ const TeamPage = () => {
               <Label className="text-sm font-medium mb-1.5 block">Access Level</Label>
               <div className="flex items-center gap-4 p-3 rounded-xl bg-muted/50 border border-border">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-foreground">
-                    {inviteAccessLevel === 'full' ? 'Full Access' : 'Read Only'}
-                  </p>
+                  <p className="text-sm font-medium text-foreground">{inviteAccessLevel === 'full' ? 'Full Access' : 'Read Only'}</p>
                   <p className="text-xs text-muted-foreground">
-                    {inviteAccessLevel === 'full'
-                      ? 'Can create, edit, and delete listings, leads, and settings'
-                      : 'Can view listings, leads, and analytics only'
-                    }
+                    {inviteAccessLevel === 'full' ? 'Can create, edit, and delete listings, leads, and settings' : 'Can view listings, leads, and analytics only'}
                   </p>
                 </div>
-                <Switch
-                  checked={inviteAccessLevel === 'full'}
-                  onCheckedChange={(checked) => setInviteAccessLevel(checked ? 'full' : 'read')}
-                />
+                <Switch checked={inviteAccessLevel === 'full'} onCheckedChange={(checked) => setInviteAccessLevel(checked ? 'full' : 'read')} />
               </div>
             </div>
-            <Button
-              onClick={handleSendEmailInvite}
-              disabled={sendingInvite || !inviteEmail.trim()}
-              className="w-full"
-            >
-              {sendingInvite ? (
-                <><Loader2 size={14} className="animate-spin mr-2" /> Sending...</>
-              ) : (
-                <><Mail size={14} className="mr-2" /> Send Invitation</>
-              )}
+            <Button onClick={handleSendEmailInvite} disabled={sendingInvite || !inviteEmail.trim()} className="w-full">
+              {sendingInvite ? <><Loader2 size={14} className="animate-spin mr-2" /> Sending...</> : <><Mail size={14} className="mr-2" /> Send Invitation</>}
             </Button>
           </div>
         </DialogContent>
@@ -982,58 +928,79 @@ const TeamPage = () => {
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Edit Agency Details</DialogTitle>
-            <DialogDescription>
-              Update your agency branding, address, and contact information.
-            </DialogDescription>
+            <DialogDescription>Update your agency branding, address, and contact information.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 mt-2">
             <div>
               <Label className="text-xs font-medium">Agency Name</Label>
-              <Input
-                value={agencyName}
-                onChange={(e) => setAgencyName(e.target.value)}
-                className="mt-1.5"
-              />
+              <Input value={agencyName} onChange={(e) => setAgencyName(e.target.value)} className="mt-1.5" />
             </div>
             <div>
               <Label className="text-xs font-medium">Office Address</Label>
-              <Input
-                placeholder="123 Collins St, Melbourne VIC 3000"
-                value={agencyAddress}
-                onChange={(e) => setAgencyAddress(e.target.value)}
-                className="mt-1.5"
-              />
+              <Input placeholder="123 Collins St, Melbourne VIC 3000" value={agencyAddress} onChange={(e) => setAgencyAddress(e.target.value)} className="mt-1.5" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label className="text-xs font-medium">Email</Label>
-                <Input
-                  type="email"
-                  value={agencyEmail}
-                  onChange={(e) => setAgencyEmail(e.target.value)}
-                  className="mt-1.5"
-                />
+                <Input type="email" value={agencyEmail} onChange={(e) => setAgencyEmail(e.target.value)} className="mt-1.5" />
               </div>
               <div>
                 <Label className="text-xs font-medium">Phone</Label>
-                <Input
-                  value={agencyPhone}
-                  onChange={(e) => setAgencyPhone(e.target.value)}
-                  className="mt-1.5"
-                />
+                <Input value={agencyPhone} onChange={(e) => setAgencyPhone(e.target.value)} className="mt-1.5" />
               </div>
             </div>
             <div>
               <Label className="text-xs font-medium">Description</Label>
-              <Textarea
-                value={agencyDescription}
-                onChange={(e) => setAgencyDescription(e.target.value)}
-                className="mt-1.5 resize-none"
-                rows={3}
-              />
+              <Textarea value={agencyDescription} onChange={(e) => setAgencyDescription(e.target.value)} className="mt-1.5 resize-none" rows={3} />
             </div>
             <Button onClick={handleSaveBranding} disabled={savingBranding} className="w-full">
               {savingBranding ? <><Loader2 size={14} className="animate-spin mr-2" /> Saving...</> : 'Save Changes'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Deactivate Agent Dialog */}
+      <AlertDialog open={!!deactivateTarget} onOpenChange={() => setDeactivateTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Deactivate {deactivateTarget?.agents?.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will hide {deactivateTarget?.agents?.name}'s listings and prevent login. Their data will be preserved. You can reassign their contacts and listings before deactivating.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeactivateAgent} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Deactivate
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Reassign Dialog */}
+      <Dialog open={!!reassignTarget} onOpenChange={() => { setReassignTarget(null); setReassignTo(''); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Reassign {reassignTarget?.type === 'contacts' ? 'Contacts' : 'Listings'}</DialogTitle>
+            <DialogDescription>
+              Move all {reassignTarget?.type} from {reassignTarget?.member.agents?.name || 'this agent'} to another team member.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 mt-2">
+            <div>
+              <Label className="text-sm font-medium mb-1.5 block">Transfer to</Label>
+              <Select value={reassignTo} onValueChange={setReassignTo}>
+                <SelectTrigger><SelectValue placeholder="Select agent..." /></SelectTrigger>
+                <SelectContent>
+                  {members.filter(m => m.agentId && m.agentId !== reassignTarget?.member.agentId).map(m => (
+                    <SelectItem key={m.agentId!} value={m.agentId!}>{m.agents?.name || 'Unknown'}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button onClick={handleReassign} disabled={reassigning || !reassignTo} className="w-full">
+              {reassigning ? <><Loader2 size={14} className="animate-spin mr-2" /> Reassigning...</> : 'Confirm Reassignment'}
             </Button>
           </div>
         </DialogContent>

@@ -9591,6 +9591,13 @@ export type Database = {
         Returns: string
       }
       get_auction_public: { Args: { p_property_id: string }; Returns: Json }
+      get_auction_sensitive: {
+        Args: { p_auction_id: string }
+        Returns: {
+          reserve_price: number
+          vendor_bid_limit: number
+        }[]
+      }
       get_comparable_sales: {
         Args: {
           p_bedrooms?: number

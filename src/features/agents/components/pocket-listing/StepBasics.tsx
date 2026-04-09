@@ -92,14 +92,14 @@ const StepBasics = ({ draft, update }: Props) => {
   // ── RENTAL: single source of truth is rentalWeekly; sync to priceMin/priceMax + auto-populate bond
   const handleRentChange = (raw: string) => {
     const val = Number(raw.replace(/,/g, '')) || 0;
-    const prevBondAuto = (draft.rentalWeekly || 0) * (draft.rentalBondWeeks || 4);
-    const currentBond = (draft.rentalBondWeeks || 4) * (draft.rentalWeekly || 0);
-    const isStillAuto = !draft.rentalWeekly || currentBond === prevBondAuto;
+    const prevAutoBond = (draft.rentalWeekly || 0) * 4;
+    const currentBond = draft.bondAmount ?? 0;
+    const isStillAuto = !draft.rentalWeekly || currentBond === 0 || currentBond === prevAutoBond;
     update({
       rentalWeekly: val,
       priceMin: val,
       priceMax: val,
-      ...(isStillAuto ? { rentalBondWeeks: draft.rentalBondWeeks || 4 } : {}),
+      ...(isStillAuto ? { bondAmount: val * 4 } : {}),
     });
   };
 
@@ -316,15 +316,26 @@ const StepBasics = ({ draft, update }: Props) => {
           <Label className="text-sm font-semibold block">Rental Details</Label>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label className="text-xs text-muted-foreground mb-1 block">Bond (weeks)</Label>
-              <Input type="number" min={1} max={8} value={draft.rentalBondWeeks || 4} onChange={(e) => update({ rentalBondWeeks: Number(e.target.value) || 4 })} placeholder="4" className="h-9" />
+              <Label className="text-xs text-muted-foreground mb-1 block">Bond Amount ($)</Label>
+              <Input
+                type="text"
+                inputMode="numeric"
+                value={draft.bondAmount ? draft.bondAmount.toLocaleString('en-AU') : ''}
+                onChange={(e) => update({ bondAmount: Number(e.target.value.replace(/,/g, '')) || 0 })}
+                placeholder={draft.rentalWeekly ? `${(draft.rentalWeekly * 4).toLocaleString('en-AU')}` : 'e.g. 2,600'}
+                className="h-9"
+              />
               <p className="text-[11px] text-muted-foreground mt-1">
-                Bond is typically 4 weeks rent. Adjust if required.
+                Standard bond is 4 weeks rent{draft.rentalWeekly > 0 ? ` ($${(draft.rentalWeekly * 4).toLocaleString('en-AU')})` : ''}. Adjust only if required by state law.
               </p>
-              {draft.rentalWeekly > 0 && (
-                <p className="text-xs font-medium text-foreground mt-1">
-                  = ${((draft.rentalBondWeeks || 4) * draft.rentalWeekly).toLocaleString('en-AU')} bond
-                </p>
+              {draft.bondAmount > 0 && draft.rentalWeekly > 0 && draft.bondAmount !== draft.rentalWeekly * 4 && (
+                <button
+                  type="button"
+                  onClick={() => update({ bondAmount: draft.rentalWeekly * 4 })}
+                  className="text-[11px] font-medium text-primary hover:opacity-70 transition-opacity mt-1"
+                >
+                  Reset to 4 weeks (${(draft.rentalWeekly * 4).toLocaleString('en-AU')})
+                </button>
               )}
             </div>
             <div>

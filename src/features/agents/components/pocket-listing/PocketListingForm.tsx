@@ -45,6 +45,7 @@ export interface ListingDraft {
   estimatedRentalWeekly: number;
   rentalWeekly: number;
   rentalBondWeeks: number;
+  bondAmount: number;
   // Rental-specific
   availableFrom: string;
   leaseTerm: string;
@@ -122,6 +123,7 @@ const DEFAULT_DRAFT: ListingDraft = {
   estimatedRentalWeekly: 0,
   rentalWeekly: 0,
   rentalBondWeeks: 4,
+  bondAmount: 0,
   availableFrom: '',
   leaseTerm: '12 months',
   furnished: false,
@@ -262,6 +264,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         estimatedRentalWeekly: prop.rental_weekly || 0,
         rentalWeekly: prop.listing_type === 'rent' ? (prop.rental_weekly || 0) : 0,
         rentalBondWeeks: 4,
+        bondAmount: (prop as any).bond_amount || ((prop.listing_type === 'rent' ? (prop.rental_weekly || 0) : 0) * 4),
         availableFrom: (prop as any).available_from || '',
         leaseTerm: (prop as any).lease_term || '12 months',
         furnished: (prop as any).furnished || false,

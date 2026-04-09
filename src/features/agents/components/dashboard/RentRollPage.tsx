@@ -72,6 +72,7 @@ const RentRollPage = () => {
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [step, setStep] = useState(1);
 
   const [form, setForm] = useState({
     property_id: '',

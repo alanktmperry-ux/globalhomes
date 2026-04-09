@@ -11,7 +11,8 @@ export interface TrustAccount {
   bsb: string | null;
   account_number: string | null;
   bank_name: string | null;
-  balance: number;
+  current_balance: number;
+  opening_balance: number;
   is_active: boolean;
   created_at: string;
   updated_at: string;

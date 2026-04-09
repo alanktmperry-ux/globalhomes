@@ -183,8 +183,8 @@ const ReportsPage = () => {
       });
     }
 
-    const trustBalance = accounts.filter(a => a.account_type === 'trust').reduce((s, a) => s + a.balance, 0);
-    const operatingBalance = accounts.filter(a => a.account_type === 'operating').reduce((s, a) => s + a.balance, 0);
+    const trustBalance = accounts.filter(a => a.account_type === 'trust').reduce((s, a) => s + a.current_balance, 0);
+    const operatingBalance = accounts.filter(a => a.account_type === 'operating').reduce((s, a) => s + a.current_balance, 0);
 
     return { periodTx, totalDeposits, totalWithdrawals, totalGst, reconciledCount, pendingCount, categoryData, monthlyFlow, trustBalance, operatingBalance };
   }, [transactions, accounts, range]);

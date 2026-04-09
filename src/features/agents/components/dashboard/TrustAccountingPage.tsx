@@ -196,7 +196,7 @@ const TrustAccountingPage = () => {
 
   // Computed
   const trustAccounts = accounts.filter(a => a.account_type === 'trust');
-  const totalInTrust = trustAccounts.reduce((s, a) => s + a.balance, 0);
+  const totalInTrust = trustAccounts.reduce((s, a) => s + a.current_balance, 0);
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
@@ -367,7 +367,8 @@ const TrustAccountingPage = () => {
         bsb: newAccBsb,
         account_number: newAccNumber,
         bank_name: newAccBank,
-        balance: openingBalance,
+        opening_balance: openingBalance,
+        current_balance: openingBalance,
       } as any);
       // Also update opening_balance and current_balance via direct update
       toast.success('Trust account created successfully.');
@@ -1025,7 +1026,7 @@ const TrustAccountingPage = () => {
                     </Badge>
                   </div>
                   <p className="text-xs font-semibold truncate">{acc.account_name}</p>
-                  <p className="text-sm font-bold">{AUD.format(acc.balance)}</p>
+                  <p className="text-sm font-bold">{AUD.format(acc.current_balance)}</p>
                   {acc.bank_name && (
                     <p className="text-[10px] text-muted-foreground">{acc.bank_name}</p>
                   )}

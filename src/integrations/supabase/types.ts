@@ -7643,7 +7643,6 @@ export type Database = {
           account_type: string
           agency_id: string | null
           agent_id: string | null
-          balance: number
           bank_name: string | null
           bsb: string | null
           created_at: string
@@ -7659,7 +7658,6 @@ export type Database = {
           account_type?: string
           agency_id?: string | null
           agent_id?: string | null
-          balance?: number
           bank_name?: string | null
           bsb?: string | null
           created_at?: string
@@ -7675,7 +7673,6 @@ export type Database = {
           account_type?: string
           agency_id?: string | null
           agent_id?: string | null
-          balance?: number
           bank_name?: string | null
           bsb?: string | null
           created_at?: string

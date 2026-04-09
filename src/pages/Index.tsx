@@ -2,9 +2,8 @@ import { useState, useCallback, useRef, useEffect, useMemo, lazy, Suspense } fro
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence, useMotionValue, useSpring, PanInfo } from 'framer-motion';
-import { ArrowRight, MapPin, Sparkles, Map, List, Mic, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users } from 'lucide-react';
+import { ArrowRight, MapPin, Sparkles, Map, List, Mic, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users, Search, Home, Check } from 'lucide-react';
 import { VoiceSearchHero } from '@/features/search/components/VoiceSearchHero';
-import { LandingHero } from '@/features/search/components/LandingHero';
 
 import { VirtualizedPropertyList } from '@/features/properties/components/VirtualizedPropertyList';
 import { MapSkeleton } from '@/features/properties/components/PropertyCardSkeleton';

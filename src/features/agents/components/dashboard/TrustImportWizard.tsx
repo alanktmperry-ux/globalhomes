@@ -428,7 +428,7 @@ ${matterRows.length > 0 ? `
     if (!user) return;
     setMigrating(true);
     try {
-      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
+      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
       if (!agent) throw new Error('Agent profile not found');
 
       const { data: account, error: accErr } = await supabase

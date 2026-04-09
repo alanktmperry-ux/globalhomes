@@ -53,7 +53,7 @@ const PartnerAccessPage = () => {
       .from('agents')
       .select('id, agency_id')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
     if (agent) {
       setAgentId(agent.id);
       setAgencyId(agent.agency_id);

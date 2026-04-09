@@ -24,7 +24,7 @@ const AnalyticsPage = () => {
         .from('agents')
         .select('id')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (!agent) { setLoading(false); return; }
 

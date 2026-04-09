@@ -359,7 +359,7 @@ const TrustAccountingPage = () => {
     if (!newAccName || !user) return;
     try {
       const { data: agent } = await (await import('@/integrations/supabase/client')).supabase
-        .from('agents').select('id').eq('user_id', user.id).single();
+        .from('agents').select('id').eq('user_id', user.id).maybeSingle();
       if (!agent) { toast.error('Agent profile not found'); return; }
       await createAccount({
         agent_id: agent.id,

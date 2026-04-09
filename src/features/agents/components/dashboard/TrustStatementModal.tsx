@@ -76,7 +76,7 @@ export default function TrustStatementModal({ open, onOpenChange }: TrustStateme
     setLoading(true);
 
     const [{ data: agent }, { data: recs }, { data: pays }] = await Promise.all([
-      supabase.from('agents').select('name, agency, license_number').eq('user_id', user.id).single(),
+      supabase.from('agents').select('name, agency, license_number').eq('user_id', user.id).maybeSingle(),
       supabase.from('trust_receipts')
         .select('receipt_number, client_name, property_address, amount, payment_method, purpose, date_received, status')
         .gte('date_received', startDate)

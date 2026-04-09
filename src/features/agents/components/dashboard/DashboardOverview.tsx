@@ -163,7 +163,7 @@ const DashboardOverview = () => {
       .from('agents')
       .select('id')
       .eq('user_id', user.id)
-      .single()
+      .maybeSingle()
       .then(({ data: agent }) => {
         if (!agent) return;
         supabase
@@ -309,7 +309,7 @@ const DashboardOverview = () => {
         .from('agents')
         .select('id')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
       if (!agent) return;
 
       const { data: props } = await supabase

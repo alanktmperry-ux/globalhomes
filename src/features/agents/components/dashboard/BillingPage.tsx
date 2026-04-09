@@ -131,7 +131,7 @@ const BillingPage = () => {
   useEffect(() => {
     if (!user) return;
     const countListings = async () => {
-      const { data: agentData } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
+      const { data: agentData } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
       if (!agentData) return;
       const { count } = await supabase.from('properties').select('id', { count: 'exact', head: true }).eq('agent_id', agentData.id).neq('status', 'sold');
       setListingsUsed(count || 0);
@@ -144,7 +144,7 @@ const BillingPage = () => {
     if (!user) return;
     setUpgrading(planId);
     try {
-      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
+      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
       if (!agent) throw new Error('Agent not found');
 
       const planDef = PLANS.find(p => p.id === planId);

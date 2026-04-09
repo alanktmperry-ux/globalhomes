@@ -125,7 +125,7 @@ const TeamPage = () => {
         .from('agencies')
         .select('name, logo_url, address, email, phone, description')
         .eq('id', membership.agency_id)
-        .single();
+        .maybeSingle();
       if (agency) {
         setAgencyName(agency.name);
         setAgencyLogo(agency.logo_url);

@@ -110,8 +110,9 @@ const ProfilePage = () => {
         .from('agents')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
       if (error) throw error;
+      if (!data) { setLoading(false); return; }
 
       setAgent(data as unknown as AgentData);
       const social = (data.social_links as Record<string, string>) || {};

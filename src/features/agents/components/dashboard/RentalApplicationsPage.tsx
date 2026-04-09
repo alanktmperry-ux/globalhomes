@@ -56,7 +56,7 @@ const RentalApplicationsPage = () => {
 
   const fetchApplications = async () => {
     if (!user) return;
-    const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
+    const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
     if (!agent) { setLoading(false); return; }
 
     const { data } = await (supabase as any)

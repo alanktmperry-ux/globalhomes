@@ -114,6 +114,7 @@ const translations: Record<Language, Record<string, string>> = {
     'card.bath': 'bath',
     'card.car': 'car',
     'card.viewProperty': 'View Property',
+    'banner.languageSet': "We've set your language to {language}. Change it anytime →",
   },
   zh: {
     'app.name': 'ListHQ',

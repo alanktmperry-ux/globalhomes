@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { ChevronDown, ChevronUp, AlertTriangle, Sparkles, Globe } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { MortgageBrokerCard } from './MortgageBrokerCard';
 import { capture } from '@/shared/lib/posthog';
+import { useI18n, type Language } from '@/shared/lib/i18n';
 
 type LanguageKey = 'en' | 'zh_simplified' | 'zh_traditional' | 'vi';
 
@@ -49,14 +50,6 @@ const LANGUAGES: { key: LanguageKey; flag: string; label: string }[] = [
   { key: 'vi', flag: '🇻🇳', label: 'Tiếng Việt' },
 ];
 
-function detectBrowserLanguage(): LanguageKey {
-  const lang = navigator.language?.toLowerCase() || 'en';
-  if (lang.startsWith('vi')) return 'vi';
-  if (lang === 'zh-tw' || lang === 'zh-hk' || lang === 'zh-hant') return 'zh_traditional';
-  if (lang.startsWith('zh')) return 'zh_simplified';
-  return 'en';
-}
-
 const TRANSLATABLE_LANGS: LanguageKey[] = ['zh_simplified', 'zh_traditional', 'vi'];
 
 const LANGUAGE_DISPLAY_NAMES: Record<LanguageKey, string> = {
@@ -66,19 +59,17 @@ const LANGUAGE_DISPLAY_NAMES: Record<LanguageKey, string> = {
   vi: 'Vietnamese',
 };
 
-function getPreferredLanguage(): LanguageKey | null {
-  try {
-    const stored = localStorage.getItem('gh-lang');
-    if (stored && TRANSLATABLE_LANGS.includes(stored as LanguageKey)) {
-      return stored as LanguageKey;
-    }
-  } catch {
-    // localStorage unavailable
-  }
-  return null;
+/** Map the i18n Language codes to this component's LanguageKey */
+function i18nLangToListingLang(lang: Language): LanguageKey {
+  if (lang === 'zh') return 'zh_simplified';
+  if (lang === 'zh-TW') return 'zh_traditional';
+  if (lang === 'vi') return 'vi';
+  return 'en';
 }
 
 const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
+  const { language: i18nLang } = useI18n();
+
   const [liveTranslations, setLiveTranslations] = useState<Record<string, Translation>>(
     () => (listing.translations ?? {}) as Record<string, Translation>
   );
@@ -93,76 +84,97 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
   const [insightsOpen, setInsightsOpen] = useState(false);
   const [autoTranslating, setAutoTranslating] = useState(false);
   const [autoTranslateLang, setAutoTranslateLang] = useState<LanguageKey | null>(null);
+  const translationAbortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    // Sync if listing.translations changes externally
     setLiveTranslations((listing.translations ?? {}) as Record<string, Translation>);
   }, [listing.translations]);
 
+  // React to i18n language changes (including on mount)
   useEffect(() => {
-    const preferred = getPreferredLanguage();
-    const detected = detectBrowserLanguage();
-    const targetLang = preferred || (detected !== 'en' ? detected : null);
+    const targetLang = i18nLangToListingLang(i18nLang);
 
-    if (targetLang && TRANSLATABLE_LANGS.includes(targetLang)) {
-      if (liveTranslations[targetLang]) {
-        // Translation available — auto-display
-        setLanguage(targetLang);
-      } else {
-        // Translation missing — trigger auto-translation
-        setLanguage(targetLang);
-        setAutoTranslateLang(targetLang);
-        setAutoTranslating(true);
-
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 30000);
-
-        supabase.functions
-          .invoke('generate-translations', {
-            body: { listing_id: listing.id },
-          })
-          .then(({ data, error }) => {
-            clearTimeout(timeout);
-            if (error || !data) {
-              // Fall back to English
-              setLanguage('en');
-            } else {
-              // Fetch updated listing translations
-              return supabase
-                .from('properties')
-                .select('translations')
-                .eq('id', listing.id)
-                .single();
-            }
-          })
-          .then((result) => {
-            if (result && result.data?.translations) {
-              const newTranslations = result.data.translations as unknown as Record<string, Translation>;
-              setLiveTranslations(newTranslations);
-              if (newTranslations[targetLang]) {
-                setLanguage(targetLang);
-              } else {
-                setLanguage('en');
-              }
-            }
-          })
-          .catch(() => {
-            setLanguage('en');
-          })
-          .finally(() => {
-            setAutoTranslating(false);
-            setAutoTranslateLang(null);
-          });
-      }
+    // Cancel any in-flight translation request
+    if (translationAbortRef.current) {
+      translationAbortRef.current.abort();
+      translationAbortRef.current = null;
     }
+
+    if (!TRANSLATABLE_LANGS.includes(targetLang)) {
+      // Not a supported translation language — show English
+      setLanguage('en');
+      setAutoTranslating(false);
+      setAutoTranslateLang(null);
+      return;
+    }
+
+    if (liveTranslations[targetLang]) {
+      // Translation already available
+      setLanguage(targetLang);
+      setAutoTranslating(false);
+      setAutoTranslateLang(null);
+      return;
+    }
+
+    // Translation missing — trigger auto-translation
+    setLanguage(targetLang);
+    setAutoTranslateLang(targetLang);
+    setAutoTranslating(true);
+
+    const controller = new AbortController();
+    translationAbortRef.current = controller;
+
+    supabase.functions
+      .invoke('generate-translations', {
+        body: { listing_id: listing.id },
+      })
+      .then(({ data, error }) => {
+        if (controller.signal.aborted) return;
+        if (error || !data) {
+          setLanguage('en');
+          setAutoTranslating(false);
+          setAutoTranslateLang(null);
+          return;
+        }
+        return supabase
+          .from('properties')
+          .select('translations')
+          .eq('id', listing.id)
+          .maybeSingle();
+      })
+      .then((result) => {
+        if (!result || controller.signal.aborted) return;
+        if (result.data?.translations) {
+          const newTranslations = result.data.translations as unknown as Record<string, Translation>;
+          setLiveTranslations(newTranslations);
+          setLanguage(newTranslations[targetLang] ? targetLang : 'en');
+        } else {
+          setLanguage('en');
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setLanguage('en');
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) {
+          setAutoTranslating(false);
+          setAutoTranslateLang(null);
+        }
+      });
 
     capture('listing_viewed', {
       listing_id: listing.id,
-      language: targetLang && liveTranslations[targetLang] ? targetLang : 'en',
+      language: targetLang,
       has_translations: hasTranslations,
     });
+
+    return () => {
+      controller.abort();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listing.id]);
+  }, [i18nLang, listing.id]);
 
   const switchLanguage = useCallback(
     (to: LanguageKey) => {
@@ -189,8 +201,8 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
     <div className="space-y-6">
       {/* Auto-translation banner */}
       {autoTranslating && autoTranslateLang && (
-        <div className="flex items-center gap-2 rounded-lg border border-border bg-secondary px-4 py-3 text-sm text-foreground">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent shrink-0" />
+        <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm text-primary animate-pulse">
+          <span>✨</span>
           <span>
             Translating this listing into {LANGUAGE_DISPLAY_NAMES[autoTranslateLang]}…
           </span>

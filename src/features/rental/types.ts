@@ -37,6 +37,10 @@ export interface RentalApplication {
   pm_notes?: string;
   submitted_at: string;
   updated_at: string;
+  bond_amount?: number;
+  bond_collected_at?: string;
+  bond_lodgement_ref?: string;
+  bond_lodged_at?: string;
 }
 
 export interface CoApplicant {

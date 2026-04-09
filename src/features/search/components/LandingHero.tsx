@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Mic, ArrowRight, ChevronDown } from 'lucide-react';
+import { Search, Mic, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -292,7 +292,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
       </section>
 
       {/* Featured Listings */}
-      <section className="bg-white py-12 px-6">
+      <section id="featured" className="bg-white py-12 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-baseline justify-between mb-6">
             <div>

@@ -115,6 +115,7 @@ export default function TrustImportWizard({ onComplete, onCancel }: TrustImportW
   const [lastReconciled, setLastReconciled] = useState('');
   const [certFile, setCertFile] = useState<File | null>(null);
   const [accountName, setAccountName] = useState('');
+  const [bankName, setBankName] = useState('');
   const [bsb, setBsb] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
 
@@ -440,6 +441,7 @@ ${matterRows.length > 0 ? `
           balance: parsedBalance,
           bsb: bsb || null,
           account_number: accountNumber || null,
+          bank_name: bankName || null,
         } as any)
         .select()
         .single();
@@ -599,6 +601,11 @@ ${matterRows.length > 0 ? `
               <div>
                 <Label className="text-xs font-medium">Account name</Label>
                 <Input value={accountName} onChange={e => setAccountName(e.target.value)} placeholder="e.g. Smith & Co Trust Account" className="mt-1.5 h-10" />
+              </div>
+
+              <div>
+                <Label className="text-xs font-medium">Bank name</Label>
+                <Input value={bankName} onChange={e => setBankName(e.target.value)} placeholder="e.g. Commonwealth Bank" className="mt-1.5 h-10" />
               </div>
 
               <div className="grid grid-cols-2 gap-3">

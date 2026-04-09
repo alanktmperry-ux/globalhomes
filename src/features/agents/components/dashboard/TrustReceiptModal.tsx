@@ -45,58 +45,86 @@ export default function TrustReceiptModal({ open, onOpenChange, onCreated, agent
   const { user } = useAuth();
   const [saving, setSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
-  const [nextReceiptNumber, setNextReceiptNumber] = useState('REC-001');
+  const [nextReceiptNumber, setNextReceiptNumber] = useState('TR-00000000-001');
+
+  // Agent's properties for dropdown
+  const [agentProperties, setAgentProperties] = useState<{ id: string; title: string; address: string }[]>([]);
 
   // Form state
   const [clientName, setClientName] = useState('');
   const [propertyAddress, setPropertyAddress] = useState('');
+  const [selectedPropertyId, setSelectedPropertyId] = useState('');
   const [amount, setAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('eft');
-  const [purpose, setPurpose] = useState('deposit');
+  const [purpose, setPurpose] = useState('rent_receipt');
   const [ledger, setLedger] = useState('sales_trust');
   const [dateReceived, setDateReceived] = useState(new Date().toISOString().split('T')[0]);
   const [dateDeposited, setDateDeposited] = useState('');
-  const [notes, setNotes] = useState('');
+  const [description, setDescription] = useState('');
   const [matterRef, setMatterRef] = useState('');
 
-  // Fetch next sequential receipt number
-  const fetchNextNumber = useCallback(async () => {
+  // Generate TR-YYYYMMDD-XXX reference number
+  const generateReceiptNumber = useCallback(async () => {
+    const today = new Date().toISOString().split('T')[0].replace(/-/g, '');
+    const prefix = `TR-${today}-`;
     const { data } = await supabase
       .from('trust_receipts')
       .select('receipt_number')
-      .order('created_at', { ascending: false })
+      .like('receipt_number', `${prefix}%`)
+      .order('receipt_number', { ascending: false })
       .limit(1);
     if (data && data.length > 0) {
       const last = data[0].receipt_number;
       const match = last.match(/(\d+)$/);
       if (match) {
         const next = String(parseInt(match[1], 10) + 1).padStart(3, '0');
-        setNextReceiptNumber(`REC-${next}`);
+        setNextReceiptNumber(`${prefix}${next}`);
       } else {
-        setNextReceiptNumber('REC-002');
+        setNextReceiptNumber(`${prefix}001`);
       }
     } else {
-      setNextReceiptNumber('REC-001');
+      setNextReceiptNumber(`${prefix}001`);
     }
   }, []);
 
+  // Fetch agent's properties
+  const fetchProperties = useCallback(async () => {
+    if (!user) return;
+    let agentId = agentIdProp;
+    if (!agentId) {
+      const { data: agentData } = await supabase
+        .from('agents').select('id').eq('user_id', user.id).maybeSingle();
+      agentId = agentData?.id;
+    }
+    if (!agentId) return;
+    const { data } = await supabase
+      .from('properties')
+      .select('id, title, address')
+      .eq('agent_id', agentId)
+      .eq('is_active', true)
+      .order('title');
+    if (data) setAgentProperties(data);
+  }, [user, agentIdProp]);
+
   useEffect(() => {
     if (open) {
-      fetchNextNumber();
+      generateReceiptNumber();
+      fetchProperties();
       // Reset form
       setClientName('');
       setPropertyAddress('');
+      setSelectedPropertyId('');
       setAmount('');
       setPaymentMethod('eft');
-      setPurpose('deposit');
+      setPurpose('rent_receipt');
       setLedger('sales_trust');
       setDateReceived(new Date().toISOString().split('T')[0]);
       setDateDeposited('');
-      setNotes('');
+      setDescription('');
       setMatterRef('');
       setShowPreview(false);
     }
-  }, [open, fetchNextNumber]);
+  }, [open, generateReceiptNumber, fetchProperties]);
 
   const parsedAmount = parseFloat(amount) || 0;
   const gstAmount = parsedAmount / 11; // GST-inclusive calculation

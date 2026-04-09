@@ -333,6 +333,55 @@ Deno.serve(async (req) => {
       });
     }
 
+    if (action === "extend_grace") {
+      const { user_id, grace_until } = await req.json();
+      const { data: agent, error: findErr } = await supabase
+        .from("agents")
+        .select("id, subscription_status")
+        .eq("user_id", user_id)
+        .maybeSingle();
+      if (findErr || !agent) {
+        return new Response(JSON.stringify({ error: "Agent not found" }), {
+          status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const updates: Record<string, any> = { admin_grace_until: grace_until, updated_at: new Date().toISOString() };
+      if (agent.subscription_status === "locked") {
+        updates.subscription_status = "payment_failed";
+      }
+      const { error } = await supabase.from("agents").update(updates).eq("id", agent.id);
+      if (error) throw error;
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "mark_active") {
+      const { user_id } = await req.json();
+      const { data: agent, error: findErr } = await supabase
+        .from("agents")
+        .select("id")
+        .eq("user_id", user_id)
+        .maybeSingle();
+      if (findErr || !agent) {
+        return new Response(JSON.stringify({ error: "Agent not found" }), {
+          status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { error } = await supabase.from("agents").update({
+        subscription_status: "active",
+        payment_failed_at: null,
+        admin_grace_until: null,
+        updated_at: new Date().toISOString(),
+      }).eq("id", agent.id);
+      if (error) throw error;
+      // Reactivate listings
+      await supabase.from("properties").update({ is_active: true }).eq("agent_id", agent.id);
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     return new Response(JSON.stringify({ error: "Unknown action" }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

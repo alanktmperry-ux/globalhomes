@@ -374,7 +374,7 @@ const TrustAccountingPage = () => {
         balance: openingBalance,
       } as any);
       // Also update opening_balance and current_balance via direct update
-      toast.success('Trust account created');
+      toast.success('Trust account created successfully.');
       setShowNewAccount(false);
       setNewAccName(''); setNewAccBsb(''); setNewAccNumber(''); setNewAccBank(''); setNewAccOpeningBalance('0');
       await fetchAccounts();
@@ -549,7 +549,7 @@ const TrustAccountingPage = () => {
           <div className="space-y-3">
             <div>
               <Label className="text-xs">Account Name <span className="text-destructive">*</span></Label>
-              <Input value={newAccName} onChange={e => setNewAccName(e.target.value)} placeholder="e.g. Main Trust Account" required />
+              <Input value={newAccName} onChange={e => setNewAccName(e.target.value)} placeholder="e.g. Rental Trust Account" required />
             </div>
             <div>
               <Label className="text-xs">Bank Name <span className="text-destructive">*</span></Label>

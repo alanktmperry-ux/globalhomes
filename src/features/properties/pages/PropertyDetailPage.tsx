@@ -626,7 +626,33 @@ export default function PropertyDetailPage() {
               </div>
             )}
 
-            {/* Stamp Duty Calculator (sale properties only) */}
+            {/* Multilingual Translations */}
+            {rawProperty && (rawProperty.translations || isOwnerAgent) && (
+              <div className="space-y-3">
+                {isOwnerAgent && !rawProperty.translations && (
+                  <Button
+                    onClick={handleGenerateTranslations}
+                    disabled={translating}
+                    variant="outline"
+                    className="gap-2"
+                  >
+                    {translating ? (
+                      <><Loader2 size={14} className="animate-spin" /> Generating translations…</>
+                    ) : (
+                      <><Globe size={14} /> Generate Translations</>
+                    )}
+                  </Button>
+                )}
+                {rawProperty.translations && (
+                  <MultilingualListingDetail
+                    listing={rawProperty}
+                    isAgent={isOwnerAgent}
+                  />
+                )}
+              </div>
+            )}
+
+
             {!isRental && (
               <StampDutyCalculator
                 propertyPrice={property.price}

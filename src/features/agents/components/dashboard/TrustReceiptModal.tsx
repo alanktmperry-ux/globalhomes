@@ -26,7 +26,7 @@ const PURPOSE_OPTIONS = [
   { value: 'rent_receipt', label: 'Rent Receipt' },
   { value: 'bond_receipt', label: 'Bond Receipt' },
   { value: 'disbursement', label: 'Disbursement' },
-  { value: 'refund', label: 'Refund' },
+  { value: 'journal_adjustment', label: 'Journal Adjustment' },
 ];
 
 const LEDGER_OPTIONS = [
@@ -63,28 +63,10 @@ export default function TrustReceiptModal({ open, onOpenChange, onCreated, agent
   const [description, setDescription] = useState('');
   const [matterRef, setMatterRef] = useState('');
 
-  // Generate TR-YYYYMMDD-XXX reference number
+  // Generate TR- + Date.now base36 reference number
   const generateReceiptNumber = useCallback(async () => {
-    const today = new Date().toISOString().split('T')[0].replace(/-/g, '');
-    const prefix = `TR-${today}-`;
-    const { data } = await supabase
-      .from('trust_receipts')
-      .select('receipt_number')
-      .like('receipt_number', `${prefix}%`)
-      .order('receipt_number', { ascending: false })
-      .limit(1);
-    if (data && data.length > 0) {
-      const last = data[0].receipt_number;
-      const match = last.match(/(\d+)$/);
-      if (match) {
-        const next = String(parseInt(match[1], 10) + 1).padStart(3, '0');
-        setNextReceiptNumber(`${prefix}${next}`);
-      } else {
-        setNextReceiptNumber(`${prefix}001`);
-      }
-    } else {
-      setNextReceiptNumber(`${prefix}001`);
-    }
+    const ref = 'TR-' + Date.now().toString(36).toUpperCase();
+    setNextReceiptNumber(ref);
   }, []);
 
   // Fetch agent's properties
@@ -139,7 +121,6 @@ export default function TrustReceiptModal({ open, onOpenChange, onCreated, agent
     setSaving(true);
 
     try {
-      // Get agent_id
       let agentQuery = supabase
         .from('agents')
         .select('id, name, agency, license_number');
@@ -148,7 +129,7 @@ export default function TrustReceiptModal({ open, onOpenChange, onCreated, agent
       } else {
         agentQuery = agentQuery.eq('user_id', user?.id || '');
       }
-      const { data: agent } = await agentQuery.single();
+      const { data: agent } = await agentQuery.maybeSingle();
 
       if (!agent) {
         toast.error('Agent profile not found');
@@ -156,43 +137,61 @@ export default function TrustReceiptModal({ open, onOpenChange, onCreated, agent
         return;
       }
 
-      // Insert into trust_receipts
-      const { error } = await supabase.from('trust_receipts').insert({
-        receipt_number: nextReceiptNumber,
-        agent_id: agent.id,
-        client_name: clientName.trim(),
-        property_address: propertyAddress.trim(),
-        amount: parsedAmount,
-        payment_method: paymentMethod,
-        purpose,
-        date_received: dateReceived,
-        date_deposited: dateDeposited || null,
-        ledger_account: ledger,
-        status: dateDeposited ? 'deposited' : 'received',
-      } as any);
+      const isDisbursement = purpose === 'disbursement';
 
-      if (error) throw error;
+      if (isDisbursement) {
+        // Insert into trust_payments for disbursements
+        const { error } = await supabase.from('trust_payments').insert({
+          payment_number: nextReceiptNumber,
+          agent_id: agent.id,
+          client_name: clientName.trim(),
+          property_address: propertyAddress.trim(),
+          amount: parsedAmount,
+          payment_method: paymentMethod,
+          purpose,
+          date_paid: dateReceived,
+          status: 'paid',
+          reference: matterRef.trim() || null,
+        } as any);
+        if (error) throw error;
+      } else {
+        // Insert into trust_receipts for receipts / journal adjustments
+        const { error } = await supabase.from('trust_receipts').insert({
+          receipt_number: nextReceiptNumber,
+          agent_id: agent.id,
+          client_name: clientName.trim(),
+          property_address: propertyAddress.trim(),
+          amount: parsedAmount,
+          payment_method: paymentMethod,
+          purpose,
+          date_received: dateReceived,
+          date_deposited: dateDeposited || null,
+          ledger_account: ledger,
+          status: dateDeposited ? 'deposited' : 'received',
+        } as any);
+        if (error) throw error;
 
-      // Generate PDF
-      generateReceiptPdf({
-        receiptNumber: nextReceiptNumber,
-        dateReceived,
-        dateDeposited: dateDeposited || null,
-        clientName: clientName.trim(),
-        propertyAddress: propertyAddress.trim(),
-        amount: parsedAmount,
-        gstAmount,
-        paymentMethod: methodLabel,
-        purpose: purposeLabel,
-        ledger: ledgerLabel,
-        notes: description.trim(),
-        matterRef: matterRef.trim(),
-        agentName: agent.name,
-        agency: agent.agency || '',
-        licenseNumber: agent.license_number || '',
-      });
+        // Generate PDF for receipts
+        generateReceiptPdf({
+          receiptNumber: nextReceiptNumber,
+          dateReceived,
+          dateDeposited: dateDeposited || null,
+          clientName: clientName.trim(),
+          propertyAddress: propertyAddress.trim(),
+          amount: parsedAmount,
+          gstAmount,
+          paymentMethod: methodLabel,
+          purpose: purposeLabel,
+          ledger: ledgerLabel,
+          notes: description.trim(),
+          matterRef: matterRef.trim(),
+          agentName: agent.name,
+          agency: agent.agency || '',
+          licenseNumber: agent.license_number || '',
+        });
+      }
 
-      toast.success(`Trust Receipt ${nextReceiptNumber} issued successfully`);
+      toast.success('Receipt recorded');
       onOpenChange(false);
       onCreated?.();
     } catch (e: unknown) {

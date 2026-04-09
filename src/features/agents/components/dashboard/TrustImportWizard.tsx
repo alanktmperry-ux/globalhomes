@@ -441,6 +441,7 @@ ${matterRows.length > 0 ? `
           balance: parsedBalance,
           bsb: bsb || null,
           account_number: accountNumber || null,
+          bank_name: bankName || null,
         } as any)
         .select()
         .single();

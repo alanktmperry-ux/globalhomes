@@ -275,6 +275,7 @@ const RentalApplicationsPage = () => {
           </Table>
         </div>
       </div>
+      )}
     </div>
   );
 };

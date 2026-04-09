@@ -440,7 +440,6 @@ ${matterRows.length > 0 ? `
           account_type: 'trust',
           opening_balance: parsedBalance,
           current_balance: parsedBalance,
-          balance: parsedBalance,
           bsb: bsb || null,
           account_number: accountNumber || null,
           bank_name: bankName || null,

@@ -185,7 +185,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
                 className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shrink-0"
               >
                 <Search size={14} />
-                Search
+                {t('hero.search')}
               </button>
             </div>
             <p className="text-xs text-slate-400 mt-3 text-center">
@@ -229,7 +229,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
                 {platformStats.buyersSearching}
                 <span className="text-xl font-semibold text-blue-500">+</span>
               </span>
-              <span className="text-[11px] text-slate-400 font-medium">Buyers searching</span>
+              <span className="text-[11px] text-slate-400 font-medium">{t('hero.buyersSearching')}</span>
             </div>
 
             <div className="w-px h-9 bg-slate-100 hidden sm:block" />

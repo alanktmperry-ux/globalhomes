@@ -55,6 +55,7 @@ export default function PropertyDetailPage() {
 
   const [property, setProperty] = useState<Property | null>(null);
   useLogPropertyView(property?.id);
+  const [rawProperty, setRawProperty] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [imageIndex, setImageIndex] = useState(0);
   const [contactOpen, setContactOpen] = useState(false);
@@ -63,7 +64,8 @@ export default function PropertyDetailPage() {
   const [inspectionBookingOpen, setInspectionBookingOpen] = useState(false);
   const [rentalApplicationOpen, setRentalApplicationOpen] = useState(false);
   const [inspectionTimes, setInspectionTimes] = useState<InspectionSlot[]>([]);
-  useEffect(() => {
+  const [isOwnerAgent, setIsOwnerAgent] = useState(false);
+  const [translating, setTranslating] = useState(false);
     const fetchProperty = async () => {
       setLoading(true);
 

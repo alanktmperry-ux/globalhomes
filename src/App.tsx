@@ -203,7 +203,7 @@ const App = () => (
                   <Route path="/rent" element={<RentSearchPage />} />
                   <Route path="/rent/property/:id" element={<RentalPropertyPage />} />
                   <Route path="/suburb/:state/:slug/sold" element={<SuburbSoldPage />} />
-                  <Route path="/cma/:shareToken" element={<CmaSharedPage />} />
+                  
                   <Route path="/help" element={<HelpCentrePage />} />
                   <Route path="/help/faq" element={<FaqPage />} />
                   <Route path="/help/agents" element={<HelpAgentsPage />} />

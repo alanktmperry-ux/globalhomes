@@ -19,7 +19,7 @@ export function LanguageSwitcher() {
   }, [open]);
 
   return (
-    <div className="relative z-50" ref={containerRef}>
+    <div className="relative z-[100]" ref={containerRef}>
       <button
         onClick={() => setOpen(!open)}
         className="flex items-center gap-1.5 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white px-2 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"

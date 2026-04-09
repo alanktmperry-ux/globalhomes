@@ -2,9 +2,8 @@ import { useState, useCallback, useRef, useEffect, useMemo, lazy, Suspense } fro
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence, useMotionValue, useSpring, PanInfo } from 'framer-motion';
-import { ArrowRight, MapPin, Sparkles, Map, List, Mic, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users } from 'lucide-react';
+import { ArrowRight, MapPin, Sparkles, Map, List, Mic, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users, Search, Home, Check } from 'lucide-react';
 import { VoiceSearchHero } from '@/features/search/components/VoiceSearchHero';
-import { LandingHero } from '@/features/search/components/LandingHero';
 
 import { VirtualizedPropertyList } from '@/features/properties/components/VirtualizedPropertyList';
 import { MapSkeleton } from '@/features/properties/components/PropertyCardSkeleton';
@@ -30,13 +29,28 @@ import ConsumerSignUpModal from '@/features/search/components/ConsumerSignUpModa
 import { supabase } from '@/integrations/supabase/client';
 import { geocode } from '@/shared/lib/googleMapsService';
 
+const HERO_ROTATING_LANGUAGES = [
+  'in Mandarin.',
+  'in Vietnamese.',
+  'in Cantonese.',
+  'in Arabic.',
+  'in any language.',
+];
+
+const HERO_PLACEHOLDERS = [
+  'e.g. 3 bed house in Doncaster under $1.3M',
+  'e.g. apartment in Bondi under $800k',
+  'e.g. rental near Melbourne CBD under $500pw',
+  'e.g. family home with pool in Brisbane',
+];
+
 const Index = () => {
   const navigate = useNavigate();
   const { t } = useI18n();
   const { addSearch, lastSearch } = useSearchHistory();
   const { savedIds, isSaved, toggleSaved } = useSavedProperties();
   const isMobile = useIsMobile();
-  const { formatPrice, listingMode } = useCurrency();
+  const { formatPrice, listingMode, setListingMode } = useCurrency();
   const { savedSearches, saveSearch, removeSearch } = useSavedSearches();
   const { user } = useAuth();
   const {
@@ -64,7 +78,7 @@ const Index = () => {
   const [viewportHeight, setViewportHeight] = useState(() => window.innerHeight);
   const resultsRef = useRef<HTMLDivElement>(null);
   const SNAP_POINTS = [0.35, 0.65, 0.85];
-  const [sheetSnap, setSheetSnap] = useState(0); // index into SNAP_POINTS
+  const [sheetSnap, setSheetSnap] = useState(0);
   const sheetHeightMV = useMotionValue(viewportHeight * SNAP_POINTS[0]);
   const sheetHeightSpring = useSpring(sheetHeightMV, { stiffness: 300, damping: 30 });
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -72,7 +86,40 @@ const Index = () => {
   const isDragging = useRef(false);
   const cardRefs = useRef<globalThis.Map<string, HTMLDivElement>>(new globalThis.Map());
 
-  // ── Search hook (filters & sort internalized) ────────────────
+  // Hero state
+  const [heroQuery, setHeroQuery] = useState('');
+  const [heroLangIndex, setHeroLangIndex] = useState(0);
+  const [heroPlaceholderIndex, setHeroPlaceholderIndex] = useState(0);
+  const [heroPlatformStats, setHeroPlatformStats] = useState<{ properties: number | null; buyerCount: number | null }>({ properties: null, buyerCount: null });
+  const heroInputRef = useRef<HTMLInputElement>(null);
+
+  // Hero rotating language animation
+  useEffect(() => {
+    const interval = setInterval(() => setHeroLangIndex(i => (i + 1) % HERO_ROTATING_LANGUAGES.length), 2800);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Hero placeholder rotation
+  useEffect(() => {
+    const interval = setInterval(() => setHeroPlaceholderIndex(i => (i + 1) % HERO_PLACEHOLDERS.length), 3500);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Hero platform stats
+  useEffect(() => {
+    (async () => {
+      const [{ count: propCount }, { count: profileCount }] = await Promise.all([
+        supabase.from('properties').select('*', { count: 'exact', head: true }).eq('is_active', true),
+        supabase.from('profiles').select('*', { count: 'exact', head: true }),
+      ]);
+      setHeroPlatformStats({
+        properties: propCount ?? 0,
+        buyerCount: (profileCount && profileCount > 0) ? profileCount : null,
+      });
+    })();
+  }, []);
+
+
   const {
     filteredProperties,
     displayProperties,
@@ -221,7 +268,7 @@ const Index = () => {
 
   // Fetch featured/boosted listings, deduplicated, with fallback
   useEffect(() => {
-    const cols = 'id, title, address, suburb, state, price, price_formatted, images, image_url, property_type, beds, baths, parking, lat, lng, boost_tier, is_featured, listing_type';
+    const cols = 'id, title, address, suburb, state, price, price_formatted, images, image_url, property_type, beds, baths, parking, lat, lng, boost_tier, is_featured, listing_type, translations';
     const MIN_FEATURED = 4;
 
     (async () => {
@@ -741,15 +788,317 @@ const Index = () => {
     }
   }, [hasUrlSearchParams]);
 
+  // ── Hero submit handler ──
+  const handleHeroSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!heroQuery.trim()) return;
+    wrappedHandleSearch(heroQuery.trim());
+  };
+
+  const handleHeroModeChange = (mode: 'sale' | 'rent') => {
+    setListingMode(mode);
+    window.dispatchEvent(new CustomEvent('listing-mode-changed'));
+  };
+
+  // ── Scroll animation config ──
+  const sectionAnim = {
+    initial: { opacity: 0, y: 24 } as const,
+    whileInView: { opacity: 1, y: 0 } as const,
+    viewport: { once: true, margin: '-80px' } as const,
+    transition: { duration: 0.5, ease: 'easeOut' as const },
+  };
+
   // ── Landing hero: shown until first search, hidden if URL has params ──
   if (!hasSearched && !hasUrlSearchParams) {
     return (
-      <LandingHero
-        onSearch={wrappedHandleSearch}
-        onListingModeChange={(mode) => {
-          window.dispatchEvent(new CustomEvent('listing-mode-changed'));
-        }}
-      />
+      <div className="flex flex-col">
+        {/* ── HERO SECTION ── */}
+        <section className="relative flex flex-col items-center justify-center py-20 md:py-28 bg-white overflow-hidden px-6 text-center">
+          {/* Background accents */}
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-blue-50/40 pointer-events-none" />
+          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-100/30 blur-[120px] pointer-events-none" />
+          <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-violet-100/20 blur-[100px] pointer-events-none" />
+
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="relative z-10 max-w-3xl w-full"
+          >
+            {/* Eyebrow */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1, duration: 0.5 }}
+              className="inline-flex items-center gap-2 mb-8 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-xs font-medium tracking-wide"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+              {t('hero.eyebrow')}
+            </motion.div>
+
+            {/* Headline */}
+            <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-slate-900 leading-[1.05] mb-4">
+              Find your home.
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={heroLangIndex}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -16 }}
+                  transition={{ duration: 0.4 }}
+                  className="block text-blue-500"
+                >
+                  {HERO_ROTATING_LANGUAGES[heroLangIndex]}
+                </motion.span>
+              </AnimatePresence>
+            </h1>
+
+            {/* Subheadline */}
+            <p className="text-lg text-slate-500 font-normal mb-10 max-w-lg mx-auto leading-relaxed">
+              Australia's first multilingual property platform. Search in 24 languages, see prices in your currency.
+            </p>
+
+            {/* Sale / Rent toggle */}
+            <div className="flex justify-center mb-6">
+              <div className="inline-flex items-center bg-slate-100 rounded-full p-1 gap-1">
+                <button
+                  onClick={() => handleHeroModeChange('sale')}
+                  className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
+                    listingMode === 'sale' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  {t('hero.forSale')}
+                </button>
+                <button
+                  onClick={() => handleHeroModeChange('rent')}
+                  className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
+                    listingMode === 'rent' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  {t('hero.forRent')}
+                </button>
+              </div>
+            </div>
+
+            {/* Search bar */}
+            <form onSubmit={handleHeroSubmit} className="relative max-w-2xl mx-auto">
+              <div className="flex items-center bg-white border border-slate-200 rounded-2xl shadow-lg shadow-slate-100/80 px-4 py-2 gap-3 hover:border-slate-300 hover:shadow-xl transition-all duration-200 focus-within:border-blue-300 focus-within:shadow-blue-50/80 focus-within:shadow-xl">
+                <Mic size={18} className="text-slate-400 shrink-0" />
+                <input
+                  ref={heroInputRef}
+                  type="text"
+                  value={heroQuery}
+                  onChange={e => setHeroQuery(e.target.value)}
+                  placeholder={HERO_PLACEHOLDERS[heroPlaceholderIndex]}
+                  className="flex-1 bg-transparent outline-none text-slate-800 text-[15px] placeholder:text-slate-400 min-w-0"
+                />
+                <button
+                  type="submit"
+                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shrink-0"
+                >
+                  <Search size={14} />
+                  {t('hero.search')}
+                </button>
+              </div>
+              <p className="text-xs text-slate-400 mt-3 text-center">
+                {t('hero.searchHint')}
+              </p>
+            </form>
+
+            {/* Dual Entry CTA */}
+            <div className="flex items-center justify-center gap-3 mt-6">
+              <button
+                onClick={() => document.querySelector('#featured-listings')?.scrollIntoView({ behavior: 'smooth' })}
+                className="rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:border-slate-400 hover:text-slate-900 transition-all cursor-pointer bg-white/80 backdrop-blur-sm"
+              >
+                🔍 Browse properties
+              </button>
+              <button
+                onClick={() => navigate('/auth?mode=agent')}
+                className="rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:border-slate-400 hover:text-slate-900 transition-all cursor-pointer bg-white/80 backdrop-blur-sm"
+              >
+                🏠 List as an agent →
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Stats strip */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.6 }}
+            className="relative z-10 mt-12 max-w-2xl w-full mx-auto"
+          >
+            <div className="bg-white border border-slate-100 rounded-2xl shadow-sm shadow-slate-100 px-8 py-5 flex flex-wrap items-center justify-center gap-6 sm:gap-10">
+              {/* Properties */}
+              <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
+                <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">
+                  {heroPlatformStats.properties === null ? <span className="text-slate-300">—</span> : heroPlatformStats.properties}
+                  <span className="text-xl font-semibold text-blue-500">+</span>
+                </span>
+                <span className="text-[11px] text-slate-400 font-medium">{t('hero.propertiesListed')}</span>
+              </div>
+              <div className="w-px h-9 bg-slate-100 hidden sm:block" />
+              {/* Languages */}
+              <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
+                <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">24</span>
+                <span className="text-[11px] text-slate-400 font-medium">{t('hero.languages')}</span>
+              </div>
+              <div className="w-px h-9 bg-slate-100 hidden sm:block" />
+              {/* Real buyer count or "Free to search" */}
+              <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
+                {heroPlatformStats.buyerCount && heroPlatformStats.buyerCount > 0 ? (
+                  <>
+                    <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">
+                      {heroPlatformStats.buyerCount}<span className="text-xl font-semibold text-blue-500">+</span>
+                    </span>
+                    <span className="text-[11px] text-slate-400 font-medium">Active buyers</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-2xl font-extrabold text-emerald-600 tracking-tight leading-none">✓</span>
+                    <span className="text-[11px] text-slate-400 font-medium">Free to search</span>
+                  </>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        </section>
+
+        {/* ── FEATURED LISTINGS ── */}
+        <motion.section {...sectionAnim} id="featured-listings" className="bg-white py-12 px-6">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex items-baseline justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-semibold text-slate-900">Properties available now</h2>
+                <p className="text-sm text-slate-500 mt-1">{t('hero.featuredSub')}</p>
+              </div>
+              <a href="/search" className="text-sm text-blue-600 hover:text-blue-700 font-medium">{t('hero.viewAll')} →</a>
+            </div>
+            {featuredListings.length >= 3 ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {featuredListings.slice(0, 6).map((p) => {
+                  const img = (p.images && p.images[0]) || p.image_url;
+                  const hasTranslations = p.translations && Object.keys(p.translations).length > 0;
+                  return (
+                    <div
+                      key={p.id}
+                      onClick={() => navigate(`/property/${p.id}`)}
+                      className="rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                    >
+                      <div className="h-40 bg-slate-100 flex items-center justify-center relative">
+                        {img ? (
+                          <img src={img} alt={p.title || p.address} className="w-full h-full object-cover" />
+                        ) : (
+                          <Home size={32} className="text-slate-300" />
+                        )}
+                        {hasTranslations && (
+                          <span className="absolute top-3 left-3 text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full font-medium">AI Translated</span>
+                        )}
+                      </div>
+                      <div className="p-4">
+                        <div className="text-base font-semibold text-slate-900">{formatPrice(p.price, p.listing_type)}</div>
+                        <div className="text-xs text-slate-500 mt-0.5 mb-2">{p.address || `${p.suburb}, ${p.state}`}</div>
+                        <div className="flex gap-3 text-xs text-slate-400">
+                          {p.beds > 0 && <span>{p.beds} {t('card.beds')}</span>}
+                          {p.baths > 0 && <span>{p.baths} {t('card.bath')}</span>}
+                          {p.parking > 0 && <span>{p.parking} {t('card.car')}</span>}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[0, 1, 2].map(i => (
+                  <div key={i} className="rounded-xl border border-slate-200 overflow-hidden">
+                    <div className="h-40 bg-slate-100 flex items-center justify-center">
+                      <Home size={32} className="text-slate-300" />
+                    </div>
+                    <div className="p-4">
+                      <div className="h-4 bg-slate-100 rounded w-24 mb-2" />
+                      <div className="h-3 bg-slate-50 rounded w-40 mb-3" />
+                      <p className="text-xs text-slate-400 italic">More listings coming soon — be the first to list in your suburb.</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </motion.section>
+
+        {/* ── HOW IT WORKS ── */}
+        <motion.section {...sectionAnim} className="bg-slate-50 py-12 px-6">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-xl font-semibold text-slate-900 mb-1">How ListHQ works</h2>
+            <p className="text-sm text-slate-500 mb-8">Three steps to finding your next home</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[
+                { num: '1', title: 'Search in your language', desc: 'Type naturally in Mandarin, Vietnamese, English or any of 24 languages. Our AI understands you.' },
+                { num: '2', title: 'See prices your way', desc: 'View AUD prices alongside CNY, VND, or your home currency in real time.' },
+                { num: '3', title: 'Connect with your agent', desc: 'Every listing connects you directly to a licensed Australian agent who speaks your language.' },
+              ].map((step) => (
+                <div key={step.num} className="bg-white rounded-xl border border-slate-200 p-6 text-center">
+                  <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 text-sm font-semibold flex items-center justify-center mx-auto mb-4">{step.num}</div>
+                  <h3 className="text-sm font-semibold text-slate-900 mb-2">{step.title}</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">{step.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.section>
+
+        {/* ── AGENT CTA ── */}
+        <motion.section {...sectionAnim} className="bg-slate-900 py-16 px-6 text-center">
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-2xl font-semibold text-white mb-3">Reach buyers who speak your listings' language.</h2>
+            <p className="text-sm text-slate-400 mb-8">Join agents across Sydney and Melbourne already listing on ListHQ.</p>
+            <button
+              onClick={() => navigate('/auth?mode=agent')}
+              className="inline-flex items-center gap-2 bg-white text-slate-900 hover:bg-slate-100 px-8 py-4 rounded-full text-[15px] font-semibold transition-all duration-200 hover:scale-105 active:scale-100 shadow-lg"
+            >
+              Start listing for free →
+            </button>
+          </div>
+        </motion.section>
+
+        {/* ── FOR AGENTS — Compact 2-column ── */}
+        <motion.section {...sectionAnim} className="bg-slate-950 py-16 px-6">
+          <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+            {/* Left: bullets */}
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-6">For agents</h2>
+              <ul className="space-y-4">
+                {[
+                  'AI-powered multilingual listings',
+                  'Built-in CRM & pipeline',
+                  'Access multilingual buyer pool',
+                  'Off-market network',
+                ].map(item => (
+                  <li key={item} className="flex items-center gap-3 text-slate-300 text-sm">
+                    <Check size={16} className="text-blue-400 shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            {/* Right: founding agent card */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center">
+              <div className="text-xs text-blue-400 font-semibold uppercase tracking-widest mb-2">Founding Agent</div>
+              <div className="text-3xl font-bold text-white mb-1">Free for 3 months</div>
+              <p className="text-sm text-slate-400 mb-6">No credit card required. Full access.</p>
+              <button
+                onClick={() => navigate('/auth?mode=agent')}
+                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full text-sm font-semibold transition-colors"
+              >
+                Get early access
+                <ArrowRight size={14} />
+              </button>
+            </div>
+          </div>
+        </motion.section>
+      </div>
     );
   }
 

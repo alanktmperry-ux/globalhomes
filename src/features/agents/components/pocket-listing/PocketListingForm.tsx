@@ -264,6 +264,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         estimatedRentalWeekly: prop.rental_weekly || 0,
         rentalWeekly: prop.listing_type === 'rent' ? (prop.rental_weekly || 0) : 0,
         rentalBondWeeks: 4,
+        bondAmount: (prop as any).bond_amount || ((prop.listing_type === 'rent' ? (prop.rental_weekly || 0) : 0) * 4),
         availableFrom: (prop as any).available_from || '',
         leaseTerm: (prop as any).lease_term || '12 months',
         furnished: (prop as any).furnished || false,

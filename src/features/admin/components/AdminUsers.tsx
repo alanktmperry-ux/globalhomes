@@ -523,6 +523,7 @@ const AdminUsers = () => {
                 <th className="text-left p-3 text-muted-foreground font-medium">User</th>
                 <th className="text-left p-3 text-muted-foreground font-medium">Type</th>
                 <th className="text-left p-3 text-muted-foreground font-medium hidden md:table-cell">Plan</th>
+                <th className="text-left p-3 text-muted-foreground font-medium hidden lg:table-cell">Subscription</th>
                 <th className="text-left p-3 text-muted-foreground font-medium">Status</th>
                 <th className="text-left p-3 text-muted-foreground font-medium hidden sm:table-cell">Last Active / Requested</th>
                 <th className="text-left p-3 text-muted-foreground font-medium">Actions</th>
@@ -569,6 +570,19 @@ const AdminUsers = () => {
                       <span className="text-xs text-muted-foreground">Free</span>
                     )}
                   </td>
+                  <td className="p-3 hidden lg:table-cell">
+                    {u.user_type === 'agent' ? (
+                      <div className="space-y-1">
+                        <SubscriptionStatusBadge status={u.subscription_status} />
+                        {u.admin_grace_until && (
+                          <p className="text-[10px] text-muted-foreground">
+                            Grace: {new Date(u.admin_grace_until).toLocaleDateString()}
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
                   <td className="p-3">
                     {u.user_type === 'demo_request' ? (
                       <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-600 dark:text-violet-400 font-medium">

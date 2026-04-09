@@ -6,6 +6,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { useIsMobile } from '@/shared/hooks/use-mobile';
 import { NotificationBell } from '@/features/agents/components/dashboard/NotificationBell';
 import AgentDashboardSidebar from '@/features/agents/components/dashboard/AgentDashboardSidebar';
+import { PaymentStatusBanner } from '@/features/agents/components/PaymentStatusBanner';
 
 const AgentDashboardLayout = () => {
   const { user, impersonatedUserId } = useAuth();
@@ -44,6 +45,7 @@ const AgentDashboardLayout = () => {
       <div className="h-screen flex w-full bg-background text-foreground">
         <AgentDashboardSidebar />
         <main className="flex-1 flex flex-col min-w-0 overflow-y-auto pb-[env(safe-area-inset-bottom)]">
+          <PaymentStatusBanner />
           {isMobile && (
             <div className="sticky top-0 z-30 flex items-center justify-between px-3 h-12 border-b border-border bg-background/95 backdrop-blur-sm">
               <SidebarTrigger />

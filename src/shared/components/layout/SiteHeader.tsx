@@ -180,7 +180,7 @@ export function SiteHeader() {
           ) : (
             <button
               onClick={() => navigate('/auth')}
-              className="rounded-full border border-border px-3 py-1.5 text-sm flex items-center gap-1.5 text-foreground hover:bg-accent transition-colors"
+              className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
             >
               <User size={14} />
               {t('common.signin')}

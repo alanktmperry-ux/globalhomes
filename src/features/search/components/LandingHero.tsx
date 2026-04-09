@@ -99,10 +99,10 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col">
 
       {/* ── BUYER HERO — Light, warm, aspirational ── */}
-      <section className="relative flex flex-col items-center justify-center flex-1 min-h-[92vh] bg-white overflow-hidden px-6 text-center">
+      <section className="relative flex flex-col items-center justify-center min-h-[calc(100vh-64px)] bg-white overflow-hidden px-6 text-center">
 
         {/* Subtle warm gradient background */}
         <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-blue-50/40 pointer-events-none" />

@@ -162,12 +162,13 @@ export default function AgencyOnboardingPage() {
       const cleanBsb = bsb.replace(/-/g, '');
       await supabase.from('trust_accounts').insert({
         agent_id: agent.id,
-        account_name: trustAccountName,
+        account_name: trustAccountName || "Trust Account",
         account_type: 'trust',
-        bsb: cleanBsb,
-        account_number: accountNumber,
         bank_name: bankName,
-        balance: 0,
+        bsb: cleanBsb || null,
+        account_number: accountNumber || null,
+        opening_balance: 0,
+        current_balance: 0,
       } as any);
 
       toast.success('Trust account created');

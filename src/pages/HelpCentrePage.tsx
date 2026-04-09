@@ -18,7 +18,7 @@ const popularArticles = [
   { question: 'How do I create my first listing?', id: 'agent-create-listing' },
   { question: 'How does auction registration work?', id: 'buyer-auction-register' },
   { question: 'How do I apply for a rental property?', id: 'renter-apply' },
-  { question: 'What is a Comparative Market Analysis (CMA)?', id: 'agent-cma' },
+  { question: 'How do I set up saved search alerts?', id: 'buyer-saved-search' },
   { question: 'How do I set up saved search alerts?', id: 'buyer-saved-search' },
   { question: 'How do I track my vendor performance report?', id: 'vendor-report' },
 ];

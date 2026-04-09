@@ -5,7 +5,7 @@ import { FAQ_ITEMS } from '@/data/faq';
 import { HelpSearch } from './HelpSearch';
 
 function getContextLinks(pathname: string) {
-  if (pathname.startsWith('/dashboard/listings') || pathname.startsWith('/dashboard/cma')) {
+  if (pathname.startsWith('/dashboard/listings')) {
     return FAQ_ITEMS.filter((i) => i.category === 'agents').slice(0, 4);
   }
   if (pathname.startsWith('/property/')) {

@@ -1089,6 +1089,14 @@ const Index = () => {
 
   return (
     <div className={`flex flex-col bg-background ${!isMobile ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
+    {/* Results header when coming from search params */}
+    {hasSearchParams && new URLSearchParams(window.location.search).get('location') && (
+      <div className="px-6 pt-6 pb-2">
+        <p className="text-sm text-slate-500">
+          Showing results for <span className="font-medium text-slate-800">"{new URLSearchParams(window.location.search).get('location')}"</span>
+        </p>
+      </div>
+    )}
     {/* ── Top: Voice Search Bar ─────────────────────────────── */}
     <div className="shrink-0">
         <VoiceSearchErrorBoundary>

@@ -90,11 +90,21 @@ const BankReconciliationPage = () => {
     if (!user) return;
     setLoading(true);
 
-    const [{ data: recon }, { data: recs }, { data: pays }, { data: balData }] = await Promise.all([
-      supabase.from('trust_reconciliations').select('*').order('bank_date', { ascending: false }),
+    // Get agent ID first
+    const { data: agentData } = await supabase
+      .from('agents')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    const agentId = agentData?.id;
+
+    const [{ data: recon }, { data: recs }, { data: pays }] = await Promise.all([
+      agentId
+        ? supabase.from('trust_reconciliations').select('*').eq('agent_id', agentId).order('bank_date', { ascending: false })
+        : Promise.resolve({ data: [] }),
       supabase.from('trust_receipts').select('id, receipt_number, client_name, amount, date_received, payment_method'),
       supabase.from('trust_payments').select('id, payment_number, client_name, amount, date_paid, payment_method'),
-      supabase.from('trust_account_balances').select('current_balance').limit(1).single(),
     ]);
 
     if (recon) setItems(recon as unknown as Reconciliation[]);
@@ -106,7 +116,17 @@ const BankReconciliationPage = () => {
       id: p.id, type: 'payment' as const, number: p.payment_number,
       client: p.client_name, amount: p.amount, date: p.date_paid, method: p.payment_method,
     })));
-    if (balData) setCurrentBalance((balData as any).current_balance ?? null);
+
+    // Fetch current balance from trust_accounts
+    if (agentId) {
+      const { data: accountData } = await supabase
+        .from('trust_accounts')
+        .select('current_balance')
+        .eq('agent_id', agentId)
+        .limit(1)
+        .maybeSingle();
+      setCurrentBalance(accountData?.current_balance ?? null);
+    }
 
     setLoading(false);
   }, [user]);
@@ -177,20 +197,18 @@ const BankReconciliationPage = () => {
         : null;
       const bankBalance = latestItem?.bank_balance ?? 0;
 
-      // Upsert trust_account_balances
-      const { data: existing } = await supabase
-        .from('trust_account_balances')
+      // Update trust_accounts current_balance
+      const { data: existingAccount } = await supabase
+        .from('trust_accounts')
         .select('id')
         .eq('agent_id', agent.id)
-        .single();
+        .limit(1)
+        .maybeSingle();
 
-      if (existing) {
-        await supabase.from('trust_account_balances')
-          .update({ current_balance: bankBalance, last_reconciled_date: new Date().toISOString().split('T')[0] } as any)
-          .eq('id', existing.id);
-      } else {
-        await supabase.from('trust_account_balances')
-          .insert({ agent_id: agent.id, current_balance: bankBalance, opening_balance: bankBalance, last_reconciled_date: new Date().toISOString().split('T')[0] } as any);
+      if (existingAccount) {
+        await supabase.from('trust_accounts')
+          .update({ current_balance: bankBalance, balance: bankBalance } as any)
+          .eq('id', existingAccount.id);
       }
 
       // Mark all matched as reconciled (keep manual as-is)

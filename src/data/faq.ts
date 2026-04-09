@@ -130,13 +130,6 @@ export const FAQ_ITEMS: FaqItem[] = [
     tags: ['documents', 'contract', 'section 32', 'vault'],
   },
   {
-    id: 'agent-cma',
-    question: 'How do I create a Comparative Market Analysis (CMA)?',
-    answer: 'Go to Dashboard → CMA Reports → New CMA. Step 1: enter the subject property\'s details (address, type, bedrooms). Step 2: select comparable sales from the suggested list — these are real sold properties in the same suburb, ranked by similarity. Step 3: set your valuation range, recommended price, sale method, and add your commentary. Share the CMA with the vendor via a secure link or email it directly.',
-    category: 'agents',
-    tags: ['cma', 'valuation', 'comparable sales', 'vendor presentation'],
-  },
-  {
     id: 'agent-saved-searches',
     question: 'How does the Saved Search Alerts system work?',
     answer: 'Buyers who save a search on ListHQ are automatically notified when a new listing matches their criteria. As an agent, when you publish a new listing, it is automatically matched against all saved searches and alert emails are sent to matching buyers within minutes. You can also see how many buyers have matching saved searches for a suburb before you list.',

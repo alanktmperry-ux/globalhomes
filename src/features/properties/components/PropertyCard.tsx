@@ -160,13 +160,13 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
 
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <span className="flex items-center gap-1.5">
-              <Bed size={15} /> {property.beds}
+              <Bed size={15} /> {property.beds} {t('card.beds')}
             </span>
             <span className="flex items-center gap-1.5">
-              <Bath size={15} /> {property.baths}
+              <Bath size={15} /> {property.baths} {t('card.bath')}
             </span>
             <span className="flex items-center gap-1.5">
-              <Car size={15} /> {property.parking}
+              <Car size={15} /> {property.parking} {t('card.car')}
             </span>
             {investorMode && !isRental && (property as any).estimatedWeeklyRent ? (
               <QuickYieldBadge price={property.price} weeklyRent={(property as any).estimatedWeeklyRent} />

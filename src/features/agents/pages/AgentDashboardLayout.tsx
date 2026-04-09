@@ -20,12 +20,19 @@ const AgentDashboardLayout = () => {
     if (!effectiveUserId || checked) return;
     const checkOnboarding = async () => {
       const { data: agent } = await supabase.from('agents').select('onboarding_complete').eq('user_id', effectiveUserId).maybeSingle();
-      if (agent) {
-        const complete = !!(agent as any).onboarding_complete;
-        setOnboardingComplete(complete);
-        if (!complete && !impersonatedUserId && !location.pathname.includes('/dashboard/onboarding')) {
+      if (!agent) {
+        // No agent profile yet — send to onboarding
+        if (!impersonatedUserId && !location.pathname.includes('/dashboard/onboarding')) {
           navigate('/dashboard/onboarding', { replace: true });
         }
+        setOnboardingComplete(false);
+        setChecked(true);
+        return;
+      }
+      const complete = !!(agent as any).onboarding_complete;
+      setOnboardingComplete(complete);
+      if (!complete && !impersonatedUserId && !location.pathname.includes('/dashboard/onboarding')) {
+        navigate('/dashboard/onboarding', { replace: true });
       }
       setChecked(true);
     };

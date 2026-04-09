@@ -526,6 +526,16 @@ const TenancyDetailPage = () => {
                   <Field label="Bond" value={AUD.format(tenancy.bond_amount)} />
                   <Field label="Bond Lodgement #" value={tenancy.bond_lodgement_number} />
                   <Field label="Bond Authority" value={tenancy.bond_authority} />
+                  {(!tenancy.bond_lodgement_number || tenancy.bond_lodgement_number.trim() === '' || /^\d{1,4}$/.test(tenancy.bond_lodgement_number.trim())) && tenancy.bond_amount > 0 && (
+                    <div className="col-span-full">
+                      <div className="flex items-start gap-2 rounded-lg border border-yellow-300 bg-yellow-50 dark:border-yellow-600 dark:bg-yellow-950/30 px-3 py-2">
+                        <span className="text-sm mt-0.5">⚠️</span>
+                        <p className="text-xs text-yellow-800 dark:text-yellow-300">
+                          Bond lodgement reference missing — must be lodged with <strong>{tenancy.bond_authority || 'the relevant bond authority'}</strong> within 10 business days of receipt.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                   <Field label="Management Fee" value={`${tenancy.management_fee_percent}%`} />
                   <Field label="Owner" value={tenancy.owner_name} />
                   <Field label="Owner Email" value={tenancy.owner_email} />

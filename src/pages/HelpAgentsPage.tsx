@@ -11,7 +11,7 @@ const sections = [
   { title: 'Auctions', ids: ['agent-auction-setup', 'agent-auction-registration'] },
   { title: 'CRM & Leads', ids: ['agent-crm', 'agent-saved-searches'] },
   { title: 'Rentals & Property Management', ids: ['agent-rental-pm'] },
-  { title: 'Market Tools', ids: ['agent-suburb-intelligence', 'agent-cma'] },
+  { title: 'Market Tools', ids: ['agent-suburb-intelligence'] },
   { title: 'Client Reporting', ids: ['agent-vendor-dashboard', 'agent-documents'] },
   { title: 'Reviews & Profile', ids: ['agent-reviews'] },
   { title: 'Billing & Support', ids: ['agent-billing', 'billing-plans', 'billing-cancel', 'billing-invoices', 'billing-update-card'] },

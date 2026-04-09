@@ -31,16 +31,17 @@ export function RentalKeyFacts({ property: p }: Props) {
   const bondWeeks = p.rental_weekly && bondAmount ? Math.round(bondAmount / p.rental_weekly) : 4;
 
   const facts = [
-    ...(p.rental_weekly ? [{
-      icon: <DollarSign className="w-4 h-4" />,
-      label: 'Rent',
-      value: `${p.rental_weekly.toLocaleString('en-AU', { style: 'currency', currency: 'AUD' })}/wk · ${(p.rental_weekly * 2).toLocaleString('en-AU', { style: 'currency', currency: 'AUD' })}/fn`,
-    }] : []),
-    ...(bondAmount != null ? [{
+    {
       icon: <DollarSign className="w-4 h-4" />,
       label: 'Bond',
-      value: `${bondAmount.toLocaleString('en-AU', { style: 'currency', currency: 'AUD' })} bond · ${bondWeeks} week${bondWeeks !== 1 ? 's' : ''}`,
-    }] : []),
+      value: p.bond_amount
+        ? `$${p.bond_amount.toLocaleString('en-AU')} (${
+            p.rental_weekly ? Math.round(p.bond_amount / p.rental_weekly) + ' weeks' : ''
+          })`
+        : p.rental_weekly
+        ? `$${(p.rental_weekly * 4).toLocaleString('en-AU')} est. · 4 weeks`
+        : 'Contact agent',
+    },
     {
       icon: <Calendar className="w-4 h-4" />,
       label: 'Available',

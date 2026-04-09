@@ -173,8 +173,9 @@ export function useTrustAccounting() {
       .from('trust_accounts')
       .insert(account as any)
       .select()
-      .single();
+      .maybeSingle();
     if (error) throw error;
+    if (!data) throw new Error('Failed to create trust account — no data returned');
     await fetchAccounts();
     return data;
   };
@@ -211,8 +212,9 @@ export function useTrustAccounting() {
           property_id: tx.property_id || null,
         } as any)
         .select()
-        .single();
+        .maybeSingle();
       if (error) throw error;
+      if (!data) throw new Error('Failed to create trust receipt — no data returned');
       await Promise.all([fetchAccounts(), fetchTransactions()]);
       return data;
     } else {
@@ -232,8 +234,9 @@ export function useTrustAccounting() {
           property_id: tx.property_id || null,
         } as any)
         .select()
-        .single();
+        .maybeSingle();
       if (error) throw error;
+      if (!data) throw new Error('Failed to create trust payment — no data returned');
       await Promise.all([fetchAccounts(), fetchTransactions()]);
       return data;
     }

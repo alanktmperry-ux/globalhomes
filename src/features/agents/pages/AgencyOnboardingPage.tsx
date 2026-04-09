@@ -85,7 +85,7 @@ export default function AgencyOnboardingPage() {
       .from('agents')
       .select('agency, office_address, email, phone, name, license_number')
       .eq('user_id', user.id)
-      .single()
+      .maybeSingle()
       .then(({ data }) => {
         if (!data) return;
         if (data.agency) setAgencyName(data.agency);

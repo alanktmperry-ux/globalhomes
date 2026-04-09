@@ -211,6 +211,7 @@ const translations: Record<Language, Record<string, string>> = {
     'card.bath': '浴',
     'card.car': '车',
     'card.viewProperty': '查看房产',
+    'banner.languageSet': '我们已将语言设置为{language}。随时更改 →',
   },
   ko: {
     'app.name': 'ListHQ',

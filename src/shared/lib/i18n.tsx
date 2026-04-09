@@ -217,6 +217,12 @@ const translations: Record<Language, Record<string, string>> = {
     'card.car': '车',
     'card.viewProperty': '查看房产',
     'banner.languageSet': '我们已将语言设置为{language}。随时更改 →',
+    'nav.forSale': '出售',
+    'nav.forRent': '出租',
+    'search.button': '搜索',
+    'search.hint': '描述您的需求，AI 来完成其余工作',
+    'search.placeholder': '例如：布里斯班带泳池的家庭住宅',
+    'property.viewProperty': '查看房源',
   },
   ko: {
     'app.name': 'ListHQ',

@@ -123,7 +123,7 @@ const PartnerTrustPage = () => {
     );
   }
 
-  const totalBalance = accounts.reduce((s, a) => s + a.balance, 0);
+  const totalBalance = accounts.reduce((s, a) => s + a.current_balance, 0);
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
   const receiptsThisMonth = transactions.filter(t => t.transaction_type === 'deposit' && t.transaction_date >= monthStart).reduce((s, t) => s + t.amount, 0);
@@ -205,7 +205,7 @@ const PartnerTrustPage = () => {
                       <CardContent className="p-4">
                         <p className="text-sm font-medium text-foreground">{a.account_name}</p>
                         <p className="text-xs text-muted-foreground">{a.bank_name || 'No bank'} · {a.bsb || '—'} / {a.account_number || '—'}</p>
-                        <p className="text-lg font-bold text-foreground mt-1">{AUD.format(a.balance)}</p>
+                        <p className="text-lg font-bold text-foreground mt-1">{AUD.format(a.current_balance)}</p>
                       </CardContent>
                     </Card>
                   ))}

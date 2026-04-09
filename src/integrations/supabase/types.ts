@@ -7833,6 +7833,7 @@ export type Database = {
           reference: string | null
           status: string
           type: string | null
+          updated_at: string | null
         }
         Insert: {
           account_number?: string | null
@@ -7853,6 +7854,7 @@ export type Database = {
           reference?: string | null
           status?: string
           type?: string | null
+          updated_at?: string | null
         }
         Update: {
           account_number?: string | null
@@ -7873,6 +7875,7 @@ export type Database = {
           reference?: string | null
           status?: string
           type?: string | null
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -7944,6 +7947,7 @@ export type Database = {
           receipt_number: string
           status: string
           type: string | null
+          updated_at: string | null
         }
         Insert: {
           agent_id: string
@@ -7962,6 +7966,7 @@ export type Database = {
           receipt_number: string
           status?: string
           type?: string | null
+          updated_at?: string | null
         }
         Update: {
           agent_id?: string
@@ -7980,6 +7985,7 @@ export type Database = {
           receipt_number?: string
           status?: string
           type?: string | null
+          updated_at?: string | null
         }
         Relationships: [
           {

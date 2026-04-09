@@ -9666,6 +9666,7 @@ export type Database = {
         Args: { p_property_type?: string; p_state: string; p_suburb: string }
         Returns: Json
       }
+      get_user_agency_id: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

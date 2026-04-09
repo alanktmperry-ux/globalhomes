@@ -726,6 +726,17 @@ const Index = () => {
     return !!(params.get('location') || params.get('beds') || params.get('maxPrice') || params.get('type'));
   }, []);
 
+  // ── Auto-scroll to results when URL has search params ──────
+  useEffect(() => {
+    if (hasUrlSearchParams && resultsRef.current) {
+      // Small delay to let the DOM settle after mount
+      const timer = setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [hasUrlSearchParams]);
+
   // ── Landing hero: shown until first search, hidden if URL has params ──
   if (!hasSearched && !hasUrlSearchParams) {
     return (

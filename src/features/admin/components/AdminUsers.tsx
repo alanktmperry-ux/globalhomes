@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
+import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Ban, Trash2, UserCheck, Loader2, Mail, Clock, Shield, Rocket, Eye, CheckSquare, Square, MinusSquare, UserCog, Settings, X, Check, Landmark, ShieldCheck } from 'lucide-react';
+import { Search, Ban, Trash2, UserCheck, Loader2, Mail, Clock, Shield, Rocket, Eye, CheckSquare, Square, MinusSquare, UserCog, Settings, X, Check, Landmark, ShieldCheck, CalendarClock, CircleDollarSign } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/shared/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +10,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
@@ -29,6 +33,9 @@ interface AuthUser {
   demo_status?: string;
   agency_name?: string;
   support_pin?: string | null;
+  subscription_status?: string | null;
+  payment_failed_at?: string | null;
+  admin_grace_until?: string | null;
 }
 
 const UserTypeBadge = ({ user }: { user: AuthUser }) => {
@@ -99,6 +106,22 @@ const PlanBadge = ({ user }: { user: AuthUser }) => {
   );
 };
 
+const SubscriptionStatusBadge = ({ status }: { status?: string | null }) => {
+  if (!status) return null;
+  const config: Record<string, { bg: string; text: string; label: string }> = {
+    active: { bg: 'bg-emerald-500/15', text: 'text-emerald-600 dark:text-emerald-400', label: 'Active' },
+    payment_failed: { bg: 'bg-amber-500/15', text: 'text-amber-600 dark:text-amber-400', label: 'Payment Failed' },
+    locked: { bg: 'bg-red-500/15', text: 'text-red-600 dark:text-red-400', label: 'Locked' },
+    cancelled: { bg: 'bg-muted', text: 'text-muted-foreground', label: 'Cancelled' },
+  };
+  const c = config[status] || config.cancelled;
+  return (
+    <Badge variant="outline" className={`${c.bg} ${c.text} border-transparent text-[10px] font-medium`}>
+      {c.label}
+    </Badge>
+  );
+};
+
 const AdminUsers = () => {
   const { toast } = useToast();
   const { startImpersonation } = useAuth();
@@ -113,6 +136,9 @@ const AdminUsers = () => {
   const [subModal, setSubModal] = useState<{ open: boolean; userId: string; email: string; currentPlan: string }>({ open: false, userId: '', email: '', currentPlan: 'demo' });
   const [subForm, setSubForm] = useState({ plan_type: 'demo', listing_limit: 3, seat_limit: 1, founding_member: false });
   const [savingSub, setSavingSub] = useState(false);
+  const [graceModal, setGraceModal] = useState<{ open: boolean; userId: string; email: string; currentGrace: string | null }>({ open: false, userId: '', email: '', currentGrace: null });
+  const [graceDate, setGraceDate] = useState<Date | undefined>(undefined);
+  const [savingGrace, setSavingGrace] = useState(false);
 
   const handleImpersonate = async (userId: string, userEmail: string) => {
     if (!confirm(`View the platform as ${userEmail}? You will see exactly what they see. An orange banner will let you exit.`)) return;
@@ -145,6 +171,33 @@ const AdminUsers = () => {
       toast({ title: 'Failed', description: getErrorMessage(err), variant: 'destructive' });
     }
     setSavingSub(false);
+  };
+
+  const handleExtendGrace = async () => {
+    if (!graceDate) return;
+    setSavingGrace(true);
+    try {
+      await callAdminApi('extend_grace', { user_id: graceModal.userId, grace_until: graceDate.toISOString() });
+      toast({ title: 'Grace period extended', description: `${graceModal.email} has grace until ${format(graceDate, 'PPP')}.` });
+      setGraceModal(m => ({ ...m, open: false }));
+      fetchUsers();
+    } catch (err: unknown) {
+      toast({ title: 'Failed', description: getErrorMessage(err), variant: 'destructive' });
+    }
+    setSavingGrace(false);
+  };
+
+  const handleMarkActive = async (userId: string, email: string) => {
+    if (!confirm(`Mark ${email} as active and clear payment failure? This reactivates all their listings.`)) return;
+    setActionLoading(userId);
+    try {
+      await callAdminApi('mark_active', { user_id: userId });
+      toast({ title: 'Subscription activated', description: `${email} is now active.` });
+      fetchUsers();
+    } catch (err: unknown) {
+      toast({ title: 'Failed', description: getErrorMessage(err), variant: 'destructive' });
+    }
+    setActionLoading(null);
   };
 
   const handlePlanChange = (plan: string) => {
@@ -470,6 +523,7 @@ const AdminUsers = () => {
                 <th className="text-left p-3 text-muted-foreground font-medium">User</th>
                 <th className="text-left p-3 text-muted-foreground font-medium">Type</th>
                 <th className="text-left p-3 text-muted-foreground font-medium hidden md:table-cell">Plan</th>
+                <th className="text-left p-3 text-muted-foreground font-medium hidden lg:table-cell">Subscription</th>
                 <th className="text-left p-3 text-muted-foreground font-medium">Status</th>
                 <th className="text-left p-3 text-muted-foreground font-medium hidden sm:table-cell">Last Active / Requested</th>
                 <th className="text-left p-3 text-muted-foreground font-medium">Actions</th>
@@ -514,6 +568,20 @@ const AdminUsers = () => {
                     <PlanBadge user={u} />
                     {!u.is_subscribed && u.user_type === 'agent' && (
                       <span className="text-xs text-muted-foreground">Free</span>
+                    )}
+                  </td>
+                  <td className="p-3 hidden lg:table-cell">
+                    {u.user_type === 'agent' ? (
+                      <div className="space-y-1">
+                        <SubscriptionStatusBadge status={u.subscription_status} />
+                        {u.admin_grace_until && (
+                          <p className="text-[10px] text-muted-foreground">
+                            Grace: {new Date(u.admin_grace_until).toLocaleDateString()}
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
                     )}
                   </td>
                   <td className="p-3">
@@ -604,6 +672,27 @@ const AdminUsers = () => {
                             >
                               <Settings size={14} />
                             </button>
+                            {(u.subscription_status === 'payment_failed' || u.subscription_status === 'locked') && (
+                              <button
+                                onClick={() => {
+                                  setGraceDate(u.admin_grace_until ? new Date(u.admin_grace_until) : undefined);
+                                  setGraceModal({ open: true, userId: u.id, email: u.email, currentGrace: u.admin_grace_until || null });
+                                }}
+                                className="p-1.5 rounded-lg bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 transition-colors"
+                                title="Extend grace period"
+                              >
+                                <CalendarClock size={14} />
+                              </button>
+                            )}
+                            {u.subscription_status !== 'active' && u.subscription_status && (
+                              <button
+                                onClick={() => handleMarkActive(u.id, u.email)}
+                                className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 transition-colors"
+                                title="Mark subscription active"
+                              >
+                                <CircleDollarSign size={14} />
+                              </button>
+                            )}
                             <button
                               onClick={() => handleImpersonate(u.id, u.email)}
                               className="p-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
@@ -728,6 +817,55 @@ const AdminUsers = () => {
                 {savingSub ? <><Loader2 className="h-4 w-4 animate-spin mr-1" /> Saving…</> : <><Check className="h-4 w-4 mr-1" /> Save changes</>}
               </Button>
               <Button variant="ghost" size="icon" onClick={() => setSubModal(m => ({ ...m, open: false }))}>
+                <X size={16} />
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={graceModal.open} onOpenChange={(o) => setGraceModal(m => ({ ...m, open: o }))}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Extend Grace Period</DialogTitle>
+            <p className="text-sm text-muted-foreground">{graceModal.email}</p>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="space-y-1.5">
+              <Label>Grace until</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !graceDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarClock className="mr-2 h-4 w-4" />
+                    {graceDate ? format(graceDate, 'PPP') : 'Pick a date'}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={graceDate}
+                    onSelect={setGraceDate}
+                    disabled={(date) => date < new Date()}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
+              <p className="text-xs text-muted-foreground">
+                If the agent is currently locked, this will restore dashboard access and set status back to "payment_failed".
+              </p>
+            </div>
+            <div className="flex gap-2 pt-2">
+              <Button onClick={handleExtendGrace} disabled={savingGrace || !graceDate} className="flex-1">
+                {savingGrace ? <><Loader2 className="h-4 w-4 animate-spin mr-1" /> Saving…</> : <><Check className="h-4 w-4 mr-1" /> Set grace period</>}
+              </Button>
+              <Button variant="ghost" size="icon" onClick={() => setGraceModal(m => ({ ...m, open: false }))}>
                 <X size={16} />
               </Button>
             </div>

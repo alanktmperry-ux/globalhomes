@@ -59,7 +59,7 @@ Deno.serve(async (req) => {
       // Fetch all agents with subscription info
       const { data: agents } = await supabase
         .from("agents")
-        .select("user_id, is_demo, is_subscribed, support_pin, agent_subscriptions(plan_type)");
+        .select("user_id, is_demo, is_subscribed, support_pin, subscription_status, payment_failed_at, admin_grace_until, agent_subscriptions(plan_type)");
 
       // Fetch demo requests (approved/redeemed)
       const { data: demoRequests } = await supabase
@@ -108,6 +108,9 @@ Deno.serve(async (req) => {
           plan_type: planType,
           is_partner_verified: partnerRecord?.is_verified || false,
           support_pin: agent?.support_pin || null,
+          subscription_status: agent?.subscription_status || null,
+          payment_failed_at: agent?.payment_failed_at || null,
+          admin_grace_until: agent?.admin_grace_until || null,
         };
       });
 
@@ -325,6 +328,55 @@ Deno.serve(async (req) => {
       }
       const { error } = await supabase.from(table).delete().eq('id', record_id);
       if (error) throw error;
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "extend_grace") {
+      const { user_id, grace_until } = await req.json();
+      const { data: agent, error: findErr } = await supabase
+        .from("agents")
+        .select("id, subscription_status")
+        .eq("user_id", user_id)
+        .maybeSingle();
+      if (findErr || !agent) {
+        return new Response(JSON.stringify({ error: "Agent not found" }), {
+          status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const updates: Record<string, any> = { admin_grace_until: grace_until, updated_at: new Date().toISOString() };
+      if (agent.subscription_status === "locked") {
+        updates.subscription_status = "payment_failed";
+      }
+      const { error } = await supabase.from("agents").update(updates).eq("id", agent.id);
+      if (error) throw error;
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "mark_active") {
+      const { user_id } = await req.json();
+      const { data: agent, error: findErr } = await supabase
+        .from("agents")
+        .select("id")
+        .eq("user_id", user_id)
+        .maybeSingle();
+      if (findErr || !agent) {
+        return new Response(JSON.stringify({ error: "Agent not found" }), {
+          status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { error } = await supabase.from("agents").update({
+        subscription_status: "active",
+        payment_failed_at: null,
+        admin_grace_until: null,
+        updated_at: new Date().toISOString(),
+      }).eq("id", agent.id);
+      if (error) throw error;
+      // Reactivate listings
+      await supabase.from("properties").update({ is_active: true }).eq("agent_id", agent.id);
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

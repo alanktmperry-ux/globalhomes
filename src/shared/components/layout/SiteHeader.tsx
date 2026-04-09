@@ -60,7 +60,7 @@ export function SiteHeader() {
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            {t('listing.forsale')}
+            {t('nav.forSale')}
           </button>
           <button
             onClick={() => {
@@ -73,7 +73,7 @@ export function SiteHeader() {
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            {t('listing.forrent')}
+            {t('nav.forRent')}
           </button>
         </div>
 

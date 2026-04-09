@@ -941,11 +941,9 @@ const TrustAccountingPage = () => {
               onClick={() => openNewTx('rent')}>
               <DollarSign size={14} /> New Rent Payment
             </Button>
-            <Button className="w-full justify-start gap-2 text-sm" variant="outline" size="sm"
-              onClick={handleBulkClear}
-              disabled={transactions.filter(t => t.status === 'pending' || t.status === 'received').length === 0}>
-              <CheckCircle2 size={14} /> Mark All Pending as Cleared
-            </Button>
+            <p className="text-[10px] text-muted-foreground italic mt-2">
+              Trust entries are immutable per audit regulations. Use Void to create a correction entry.
+            </p>
 
             {/* Account summaries */}
             <div className="pt-3 border-t border-border space-y-2">

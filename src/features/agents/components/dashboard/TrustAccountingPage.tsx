@@ -1010,7 +1010,7 @@ const TrustAccountingPage = () => {
             </Button>
             <Button className="w-full justify-start gap-2 text-sm" variant="outline" size="sm"
               onClick={handleBulkClear}
-              disabled={transactions.filter(t => t.status === 'pending').length === 0}>
+              disabled={transactions.filter(t => t.status === 'pending' || t.status === 'received').length === 0}>
               <CheckCircle2 size={14} /> Mark All Pending as Cleared
             </Button>
 

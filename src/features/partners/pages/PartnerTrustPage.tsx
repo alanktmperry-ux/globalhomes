@@ -24,7 +24,8 @@ interface TrustAccount {
   id: string;
   account_name: string;
   account_type: string;
-  balance: number;
+  current_balance: number;
+  opening_balance: number;
   bsb: string | null;
   account_number: string | null;
   bank_name: string | null;

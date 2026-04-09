@@ -3603,6 +3603,13 @@ export type Database = {
             foreignKeyName: "lead_purchases_lead_id_fkey"
             columns: ["lead_id"]
             isOneToOne: false
+            referencedRelation: "consumer_profiles_browse"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_purchases_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
             referencedRelation: "consumer_profiles_marketplace"
             referencedColumns: ["id"]
           },
@@ -8531,6 +8538,132 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      cma_reports_shared: {
+        Row: {
+          agent_commentary: string | null
+          agent_recommended_method: string | null
+          agent_recommended_price: number | null
+          created_at: string | null
+          estimated_price_high: number | null
+          estimated_price_low: number | null
+          estimated_price_mid: number | null
+          id: string | null
+          is_shared: boolean | null
+          months_back: number | null
+          radius_km: number | null
+          report_title: string | null
+          selected_comparable_ids: string[] | null
+          share_token: string | null
+          subject_address: string | null
+          subject_bathrooms: number | null
+          subject_bedrooms: number | null
+          subject_car_spaces: number | null
+          subject_land_sqm: number | null
+          subject_postcode: string | null
+          subject_property_type: string | null
+          subject_state: string | null
+          subject_suburb: string | null
+          updated_at: string | null
+          view_count: number | null
+          viewed_at: string | null
+        }
+        Insert: {
+          agent_commentary?: string | null
+          agent_recommended_method?: string | null
+          agent_recommended_price?: number | null
+          created_at?: string | null
+          estimated_price_high?: number | null
+          estimated_price_low?: number | null
+          estimated_price_mid?: number | null
+          id?: string | null
+          is_shared?: boolean | null
+          months_back?: number | null
+          radius_km?: number | null
+          report_title?: string | null
+          selected_comparable_ids?: string[] | null
+          share_token?: string | null
+          subject_address?: string | null
+          subject_bathrooms?: number | null
+          subject_bedrooms?: number | null
+          subject_car_spaces?: number | null
+          subject_land_sqm?: number | null
+          subject_postcode?: string | null
+          subject_property_type?: string | null
+          subject_state?: string | null
+          subject_suburb?: string | null
+          updated_at?: string | null
+          view_count?: number | null
+          viewed_at?: string | null
+        }
+        Update: {
+          agent_commentary?: string | null
+          agent_recommended_method?: string | null
+          agent_recommended_price?: number | null
+          created_at?: string | null
+          estimated_price_high?: number | null
+          estimated_price_low?: number | null
+          estimated_price_mid?: number | null
+          id?: string | null
+          is_shared?: boolean | null
+          months_back?: number | null
+          radius_km?: number | null
+          report_title?: string | null
+          selected_comparable_ids?: string[] | null
+          share_token?: string | null
+          subject_address?: string | null
+          subject_bathrooms?: number | null
+          subject_bedrooms?: number | null
+          subject_car_spaces?: number | null
+          subject_land_sqm?: number | null
+          subject_postcode?: string | null
+          subject_property_type?: string | null
+          subject_state?: string | null
+          subject_suburb?: string | null
+          updated_at?: string | null
+          view_count?: number | null
+          viewed_at?: string | null
+        }
+        Relationships: []
+      }
+      consumer_profiles_browse: {
+        Row: {
+          budget_max: number | null
+          budget_min: number | null
+          buying_situation: string | null
+          created_at: string | null
+          id: string | null
+          is_purchasable: boolean | null
+          lead_score: number | null
+          min_bedrooms: number | null
+          preferred_suburbs: string[] | null
+          preferred_type: string | null
+        }
+        Insert: {
+          budget_max?: number | null
+          budget_min?: number | null
+          buying_situation?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_purchasable?: boolean | null
+          lead_score?: number | null
+          min_bedrooms?: number | null
+          preferred_suburbs?: string[] | null
+          preferred_type?: string | null
+        }
+        Update: {
+          budget_max?: number | null
+          budget_min?: number | null
+          buying_situation?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_purchasable?: boolean | null
+          lead_score?: number | null
+          min_bedrooms?: number | null
+          preferred_suburbs?: string[] | null
+          preferred_type?: string | null
+        }
+        Relationships: []
       }
       consumer_profiles_marketplace: {
         Row: {

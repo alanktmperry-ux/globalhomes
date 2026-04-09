@@ -448,7 +448,7 @@ ${matterRows.length > 0 ? `
         .select()
         .maybeSingle();
       if (accErr) throw accErr;
-      if (!accData) throw new Error('Failed to create trust account — no data returned');
+      if (!account) throw new Error('Failed to create trust account — no data returned');
 
       await supabase.from('trust_account_balances').insert({
         agent_id: agent.id,

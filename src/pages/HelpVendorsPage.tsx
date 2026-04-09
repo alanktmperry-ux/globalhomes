@@ -15,7 +15,7 @@ export default function HelpVendorsPage() {
     <>
       <Helmet>
         <title>Vendor Guide</title>
-        <meta name="description" content="Guide for home sellers using ListHQ — performance reports, CMA, auctions, documents, and legal overview." />
+        <meta name="description" content="Guide for home sellers using ListHQ — performance reports, auctions, documents, and legal overview." />
         <link rel="canonical" href="https://listhq.com.au/help/vendors" />
       </Helmet>
       <div className="min-h-screen bg-background">

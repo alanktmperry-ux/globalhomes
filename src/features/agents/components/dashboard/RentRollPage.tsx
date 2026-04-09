@@ -120,6 +120,7 @@ const RentRollPage = () => {
         .from('properties')
         .select('id, address, suburb')
         .eq('agent_id', agentData.id)
+        .in('listing_category', ['rent'])
         .order('address'),
     ]);
 

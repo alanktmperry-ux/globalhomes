@@ -51,6 +51,7 @@ const RentalApplicationsPage = () => {
   const { user } = useAuth();
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
+  const [noAgent, setNoAgent] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [acting, setActing] = useState<string | null>(null);
 

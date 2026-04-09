@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import AdminReports from '@/features/admin/components/AdminReports';
-import { CreditCard, Check, Loader2, Zap, Crown, Building2, Flame, Mail, Lock, Users } from 'lucide-react';
+import { CreditCard, Check, Loader2, Zap, Crown, Building2, Flame, Mail, Lock, Users, UserMinus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -9,6 +9,8 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useSubscription, getPlanFeatures } from '@/features/agents/hooks/useSubscription';
+import { useTeamAgents } from '@/features/agents/hooks/useTeamAgents';
+import { logAction } from '@/shared/lib/auditLog';
 import { useNavigate } from 'react-router-dom';
 import DashboardHeader from './DashboardHeader';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
@@ -121,9 +123,10 @@ const formatAUD = (cents: number) => `$${(cents / 100).toLocaleString('en-AU')}`
 const PLAN_ORDER = ['demo', 'starter', 'pro', 'agency', 'enterprise'];
 
 const BillingPage = () => {
-  const { user } = useAuth();
+  const { user, isPrincipal, isAdmin, agencyId } = useAuth();
   const navigate = useNavigate();
   const sub = useSubscription();
+  const { agents: teamAgents, refetch: refetchTeam } = useTeamAgents();
   const [listingsUsed, setListingsUsed] = useState(0);
   const [upgrading, setUpgrading] = useState<string | null>(null);
   const [agentId, setAgentId] = useState<string | null>(null);
@@ -335,6 +338,48 @@ const BillingPage = () => {
         <p className="text-[11px] text-muted-foreground text-center">
           All prices in AUD + GST · No lock-in contracts, cancel anytime · Founding rate locked for life while subscribed · Annual billing available — save an additional 15% on any plan
         </p>
+
+        {/* Team Seats — Principal only */}
+        {(isPrincipal || isAdmin) && agencyId && teamAgents.length > 0 && (
+          <div className="bg-card border border-border rounded-xl p-5 space-y-4">
+            <h3 className="text-sm font-bold flex items-center gap-1.5">
+              <Users size={14} /> Team Seats
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              You have <strong>{teamAgents.length}</strong> active agent{teamAgents.length !== 1 ? 's' : ''} on your plan.
+            </p>
+            <div className="space-y-2">
+              {teamAgents.map(agent => (
+                <div key={agent.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-border/50">
+                  <div>
+                    <p className="text-sm font-medium">{agent.name}</p>
+                    <p className="text-xs text-muted-foreground">{agent.email || '—'} · {agent.agency_role}</p>
+                  </div>
+                  {agent.agency_role !== 'principal' && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs text-destructive hover:text-destructive gap-1"
+                      onClick={async () => {
+                        await supabase.from('agents').update({ is_subscribed: false } as any).eq('id', agent.id);
+                        if (user) {
+                          logAction({ agencyId, agentId: null, userId: user.id, actionType: 'deactivated', entityType: 'agent', entityId: agent.id, description: `Removed seat for ${agent.name}` });
+                        }
+                        toast.success(`${agent.name} seat removed`);
+                        refetchTeam();
+                      }}
+                    >
+                      <UserMinus size={12} /> Remove seat
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+            <Button variant="outline" size="sm" onClick={() => navigate('/dashboard/team')}>
+              <Users size={14} className="mr-1.5" /> Manage Team
+            </Button>
+          </div>
+        )}
 
         {/* Payment Method */}
         <div className="bg-card border border-border rounded-xl p-5 space-y-3">

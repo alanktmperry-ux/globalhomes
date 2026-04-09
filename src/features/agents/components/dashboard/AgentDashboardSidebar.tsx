@@ -58,6 +58,11 @@ const INSIGHTS_NAV: NavItem[] = [
   { title: 'Commission', url: '/dashboard/commission', icon: Calculator },
 ];
 
+const PRINCIPAL_NAV: NavItem[] = [
+  { title: 'Compliance', url: '/dashboard/team?tab=compliance', icon: Shield },
+  { title: 'Audit Log', url: '/dashboard/team?tab=audit', icon: ClipboardCheck },
+];
+
 
 
 
@@ -377,6 +382,7 @@ const AgentDashboardSidebar = () => {
         {renderGroup('Sales', SALES_NAV)}
         {renderGroup('Property Management', PROPERTY_NAV)}
         {renderGroup('Insights', INSIGHTS_NAV)}
+        {(isPrincipal || isAdmin) && renderGroup('Principal', PRINCIPAL_NAV)}
         {renderGroup('Account', ACCOUNT_NAV)}
         {ADMIN_NAV.length > 0 && renderGroup('Admin', ADMIN_NAV)}
       </SidebarContent>

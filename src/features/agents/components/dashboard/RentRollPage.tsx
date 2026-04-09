@@ -255,12 +255,12 @@ const RentRollPage = () => {
     // Auto-link CRM contact by email if available
     let tenantContactId: string | null = null;
     if (form.tenant_email) {
-      const { data: contactMatch } = await supabase
-        .from('contacts')
+      const { data: contactMatch } = await (supabase
+        .from('contacts' as any)
         .select('id')
         .eq('agent_id', agentId)
         .eq('email', form.tenant_email.trim().toLowerCase())
-        .maybeSingle();
+        .maybeSingle() as any) as { data: { id: string } | null };
       if (contactMatch) tenantContactId = contactMatch.id;
     }
 

@@ -151,13 +151,59 @@ serve(async (req) => {
   }
 
   try {
+    // --- Authentication check ---
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return jsonResponse({ error: "Authentication required" }, 401);
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const supabaseAnon = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!
+    );
+    const { data: { user: caller }, error: authError } = await supabaseAnon.auth.getUser(token);
+    if (authError || !caller) {
+      return jsonResponse({ error: "Unauthorized" }, 401);
+    }
+    // --- End authentication check ---
+
     const body = await req.json();
 
     if (body.type === "translate_search" && body.search_query) {
+      // Any authenticated user can translate search queries
       return await handleSearchTranslation(body.search_query);
     }
 
     if (body.listing_id) {
+      // --- Ownership / admin authorization check ---
+      const supabaseAdmin = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      );
+
+      const { data: ownedListing } = await supabaseAdmin
+        .from("properties")
+        .select("id, agents!inner(user_id)")
+        .eq("id", body.listing_id)
+        .eq("agents.user_id", caller.id)
+        .maybeSingle();
+
+      if (!ownedListing) {
+        // Check for admin role as fallback
+        const { data: adminRole } = await supabaseAdmin
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", caller.id)
+          .eq("role", "admin")
+          .maybeSingle();
+
+        if (!adminRole) {
+          return jsonResponse({ error: "You do not have permission to translate this listing" }, 403);
+        }
+      }
+      // --- End authorization check ---
+
       return await handleListingTranslation(body.listing_id);
     }
 

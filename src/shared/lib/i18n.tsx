@@ -123,7 +123,7 @@ const translations: Record<Language, Record<string, string>> = {
   },
   zh: {
     'app.name': 'ListHQ',
-    'search.placeholder': '搜索 "墨尔本4卧室房屋 85万"',
+    'search.placeholder': '例如：布里斯班带泳池的家庭住宅',
     'search.voice.listening': '正在聆听...',
     'search.resume': '继续上次搜索',
     'search.recommended': '为您推荐',

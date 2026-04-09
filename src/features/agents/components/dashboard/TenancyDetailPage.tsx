@@ -761,7 +761,17 @@ const TenancyDetailPage = () => {
               <div><Label>Bond Lodgement #</Label><Input value={editForm.bond_lodgement_number || ''} onChange={e => setEditForm(f => ({ ...f, bond_lodgement_number: e.target.value }))} /></div>
               <div><Label>Bond Authority</Label><Input value={editForm.bond_authority || ''} onChange={e => setEditForm(f => ({ ...f, bond_authority: e.target.value }))} /></div>
             </div>
-            <div><Label>Management Fee %</Label><Input type="number" step="0.01" value={editForm.management_fee_percent || ''} onChange={e => setEditForm(f => ({ ...f, management_fee_percent: parseFloat(e.target.value) || 0 }))} /></div>
+            <div>
+              <Label>Management Fee %</Label>
+              <Input type="number" step="0.01" value={editForm.management_fee_percent || ''} onChange={e => setEditForm(f => ({ ...f, management_fee_percent: parseFloat(e.target.value) || 0 }))} />
+              {(() => {
+                const v = editForm.management_fee_percent;
+                if (v <= 0) return <p className="text-xs text-destructive mt-1">Management fee cannot be zero or negative.</p>;
+                if (v < 5) return <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">Below typical AU range (5–15%). Confirm with landlord.</p>;
+                if (v > 15) return <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">Above typical AU range. Confirm this is correct.</p>;
+                return null;
+              })()}
+            </div>
             <div>
               <Label>Status</Label>
               <Select value={editForm.status || 'active'} onValueChange={v => setEditForm(f => ({ ...f, status: v }))}>

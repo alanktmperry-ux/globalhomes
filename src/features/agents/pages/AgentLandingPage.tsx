@@ -86,14 +86,12 @@ const AgentLandingPage = () => {
                 >
                   List Off-Market Now <ArrowRight size={18} className="ml-1" />
                 </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="text-base px-8 py-6 rounded-xl font-semibold border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
+                <button
+                  className="inline-flex items-center justify-center text-base px-8 py-3 rounded-xl font-semibold border border-white/30 text-white bg-transparent hover:bg-white/10 transition-colors"
                   onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   <Play size={16} className="mr-1.5" /> See How It Works
-                </Button>
+                </button>
               </motion.div>
 
               {/* ─── DEMO & LOGIN CTAs ─── */}
@@ -105,15 +103,13 @@ const AgentLandingPage = () => {
                 >
                   🎯 Try the Demo
                 </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
+                <button
                   onClick={() => navigate('/agents/login')}
-                  className="text-base px-8 py-5 rounded-xl font-bold border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 transition-all"
+                  className="inline-flex items-center justify-center text-base px-8 py-3 rounded-xl font-bold border border-white/30 text-white bg-transparent hover:bg-white/10 transition-all"
                 >
                   <Lock size={18} className="mr-2" />
                   Login to Your Agency
-                </Button>
+                </button>
               </motion.div>
             </motion.div>
           </div>

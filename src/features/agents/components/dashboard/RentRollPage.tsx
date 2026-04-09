@@ -210,10 +210,11 @@ const RentRollPage = () => {
     } else {
       toast.success('Tenancy created');
       setShowAddModal(false);
+      setStep(1);
       setForm({
         property_id: '', tenant_name: '', tenant_email: '', tenant_phone: '',
         lease_start: '', lease_end: '', rent_amount: '', rent_frequency: 'weekly',
-        bond_amount: '', management_fee_percent: '8.00', owner_name: '', owner_email: '',
+        bond_amount: '', bond_manual: false, management_fee_percent: '8.80', owner_name: '', owner_email: '',
         owner_bsb: '', owner_account_number: '',
       });
       fetchData();

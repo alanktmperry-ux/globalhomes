@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { X } from 'lucide-react';
 
 export type Language = 'en' | 'zh' | 'zh-TW' | 'ko' | 'ms' | 'es' | 'ar' | 'hi' | 'fr' | 'pt' | 'bn' | 'ru' | 'ja' | 'de' | 'id' | 'nl' | 'pl' | 'vi' | 'th' | 'tr' | 'sv' | 'da' | 'no' | 'fil' | 'it';
 
@@ -113,6 +114,7 @@ const translations: Record<Language, Record<string, string>> = {
     'card.bath': 'bath',
     'card.car': 'car',
     'card.viewProperty': 'View Property',
+    'banner.languageSet': "We've set your language to {language}. Change it anytime →",
   },
   zh: {
     'app.name': 'ListHQ',
@@ -209,6 +211,7 @@ const translations: Record<Language, Record<string, string>> = {
     'card.bath': '浴',
     'card.car': '车',
     'card.viewProperty': '查看房产',
+    'banner.languageSet': '我们已将语言设置为{language}。随时更改 →',
   },
   ko: {
     'app.name': 'ListHQ',
@@ -1228,12 +1231,13 @@ const translations: Record<Language, Record<string, string>> = {
     'card.bath': '浴',
     'card.car': '車',
     'card.viewProperty': '查看房產',
+    'banner.languageSet': '我們已將語言設置為{language}。隨時更改 →',
   },
   de: { 'app.name': 'ListHQ', 'search.placeholder': 'Suche "4-Zimmer-Haus in Melbourne für $850k"', 'nav.search': 'Suche', 'nav.saved': 'Gespeichert', 'nav.messages': 'Nachrichten', 'nav.agents': 'Makler', 'nav.profile': 'Profil' , 'hero.eyebrow': 'Australiens KI-gestützte Immobilienplattform', 'hero.headline': 'Mehrsprachige Angebote', 'hero.headline2': 'für australische Makler', 'hero.subheadline': 'Suchen Sie in 24 Sprachen. Preise in Ihrer Währung.', 'hero.forSale': 'Kaufen', 'hero.forRent': 'Mieten', 'hero.search': 'Suchen', 'hero.searchHint': 'Beschreiben Sie, was Sie suchen — unsere KI erledigt den Rest', 'hero.propertiesListed': 'Gelistete Immobilien', 'hero.activeAgents': 'Aktive Makler', 'hero.languages': 'Sprachen', 'hero.searchingNow': 'suchen gerade', 'hero.liveData': 'Live-Daten' },
   id: { 'app.name': 'ListHQ', 'search.placeholder': 'Cari "rumah 4 kamar di Melbourne $850rb"', 'nav.search': 'Cari', 'nav.saved': 'Tersimpan', 'nav.messages': 'Pesan', 'nav.agents': 'Agen', 'nav.profile': 'Profil' , 'hero.eyebrow': 'Platform properti AI Australia', 'hero.headline': 'Daftar multibahasa', 'hero.headline2': 'untuk agen Australia', 'hero.subheadline': 'Cari dalam 24 bahasa. Lihat harga dalam mata uang Anda.', 'hero.forSale': 'Dijual', 'hero.forRent': 'Disewa', 'hero.search': 'Cari', 'hero.searchHint': 'Jelaskan yang Anda cari — AI kami mengurus sisanya', 'hero.propertiesListed': 'Properti terdaftar', 'hero.activeAgents': 'Agen aktif', 'hero.languages': 'Bahasa', 'hero.searchingNow': 'sedang mencari', 'hero.liveData': 'Data langsung' },
   nl: { 'app.name': 'ListHQ', 'search.placeholder': 'Zoek "4-kamerwoning in Melbourne voor $850k"', 'nav.search': 'Zoeken', 'nav.saved': 'Opgeslagen', 'nav.messages': 'Berichten', 'nav.agents': 'Makelaars', 'nav.profile': 'Profiel' , 'hero.eyebrow': 'Australië\'s AI-vastgoedplatform', 'hero.headline': 'Meertalige aanbiedingen', 'hero.headline2': 'voor Australische makelaars', 'hero.subheadline': 'Zoek in 24 talen. Bekijk prijzen in uw valuta.', 'hero.forSale': 'Te Koop', 'hero.forRent': 'Te Huur', 'hero.search': 'Zoeken', 'hero.searchHint': 'Beschrijf wat u zoekt — onze AI doet de rest', 'hero.propertiesListed': 'Geregistreerde panden', 'hero.activeAgents': 'Actieve makelaars', 'hero.languages': 'Talen', 'hero.searchingNow': 'zoeken nu', 'hero.liveData': 'Live data' },
   pl: { 'app.name': 'ListHQ', 'search.placeholder': 'Szukaj "dom 4-pokojowy w Melbourne za $850k"', 'nav.search': 'Szukaj', 'nav.saved': 'Zapisane', 'nav.messages': 'Wiadomości', 'nav.agents': 'Agenci', 'nav.profile': 'Profil' , 'hero.eyebrow': 'Australijska platforma nieruchomości z AI', 'hero.headline': 'Wielojęzyczne oferty', 'hero.headline2': 'dla australijskich agentów', 'hero.subheadline': 'Szukaj w 24 językach. Ceny w Twojej walucie.', 'hero.forSale': 'Na Sprzedaż', 'hero.forRent': 'Do Wynajęcia', 'hero.search': 'Szukaj', 'hero.searchHint': 'Opisz, czego szukasz — nasze AI zrobi resztę', 'hero.propertiesListed': 'Zarejestrowanych nieruchomości', 'hero.activeAgents': 'Aktywnych agentów', 'hero.languages': 'Języków', 'hero.searchingNow': 'szuka teraz', 'hero.liveData': 'Dane na żywo' },
-  vi: { 'app.name': 'ListHQ', 'search.placeholder': 'Tìm "nhà 4 phòng ngủ ở Melbourne giá $850k"', 'nav.search': 'Tìm kiếm', 'nav.saved': 'Đã lưu', 'nav.messages': 'Tin nhắn', 'nav.agents': 'Đại lý', 'nav.profile': 'Hồ sơ' , 'hero.eyebrow': 'Nền tảng bất động sản AI của Úc', 'hero.headline': 'Tin đăng đa ngôn ngữ', 'hero.headline2': 'cho đại lý Úc', 'hero.subheadline': 'Tìm kiếm bằng 24 ngôn ngữ. Xem giá bằng tiền tệ của bạn.', 'hero.forSale': 'Bán', 'hero.forRent': 'Cho thuê', 'hero.search': 'Tìm kiếm', 'hero.searchHint': 'Mô tả những gì bạn tìm — AI của chúng tôi lo phần còn lại', 'hero.propertiesListed': 'Bất động sản đã đăng', 'hero.activeAgents': 'Đại lý hoạt động', 'hero.languages': 'Ngôn ngữ', 'hero.searchingNow': 'đang tìm kiếm', 'hero.liveData': 'Dữ liệu trực tiếp', 'hero.buyersSearching': 'Người mua đang tìm', 'card.beds': 'PN', 'card.bath': 'PT', 'card.car': 'xe', 'card.viewProperty': 'Xem bất động sản', 'hero.featuredListings': 'Tin đăng nổi bật', 'hero.featuredSub': 'Bất động sản được chọn lọc tại Sydney và Melbourne', 'hero.viewAll': 'Xem tất cả', 'hero.howItWorks': 'ListHQ hoạt động như thế nào', 'hero.howItWorksSub': 'Tìm nhà mới trong 3 bước', 'hero.step1Title': 'Tìm kiếm bằng ngôn ngữ của bạn', 'hero.step1Desc': 'Nhập hoặc nói bằng tiếng Hoa, Việt, Hindi', 'hero.step2Title': 'Duyệt tin đăng đã dịch', 'hero.step2Desc': 'Mọi tin đăng được AI dịch.', 'hero.step3Title': 'Kết nối với đại lý', 'hero.step3Desc': 'Đại lý đa ngôn ngữ sẵn sàng hỗ trợ bạn', 'hero.agentCTA': 'Bạn là đại lý bất động sản?', 'hero.agentCTASub': 'Tiếp cận người mua từ Trung Quốc, Ấn Độ, Việt Nam.', 'hero.startTrial': 'Dùng thử miễn phí 60 ngày', 'hero.seeHow': 'Xem cách hoạt động', 'hero.agentStrip': 'Cho chuyên gia bất động sản', 'hero.builtForAgents': 'Xây dựng cho đại lý', 'hero.whoMoveFast': 'hành động nhanh.', 'hero.agentStripSub': 'Tin đăng độc quyền. Trợ lý AI người mua. Quản lý pipeline.', 'hero.listFree': 'Đăng bất động sản đầu tiên miễn phí' },
+  vi: { 'app.name': 'ListHQ', 'search.placeholder': 'Tìm "nhà 4 phòng ngủ ở Melbourne giá $850k"', 'nav.search': 'Tìm kiếm', 'nav.saved': 'Đã lưu', 'nav.messages': 'Tin nhắn', 'nav.agents': 'Đại lý', 'nav.profile': 'Hồ sơ' , 'hero.eyebrow': 'Nền tảng bất động sản AI của Úc', 'hero.headline': 'Tin đăng đa ngôn ngữ', 'hero.headline2': 'cho đại lý Úc', 'hero.subheadline': 'Tìm kiếm bằng 24 ngôn ngữ. Xem giá bằng tiền tệ của bạn.', 'hero.forSale': 'Bán', 'hero.forRent': 'Cho thuê', 'hero.search': 'Tìm kiếm', 'hero.searchHint': 'Mô tả những gì bạn tìm — AI của chúng tôi lo phần còn lại', 'hero.propertiesListed': 'Bất động sản đã đăng', 'hero.activeAgents': 'Đại lý hoạt động', 'hero.languages': 'Ngôn ngữ', 'hero.searchingNow': 'đang tìm kiếm', 'hero.liveData': 'Dữ liệu trực tiếp', 'hero.buyersSearching': 'Người mua đang tìm', 'card.beds': 'PN', 'card.bath': 'PT', 'card.car': 'xe', 'card.viewProperty': 'Xem bất động sản', 'hero.featuredListings': 'Tin đăng nổi bật', 'hero.featuredSub': 'Bất động sản được chọn lọc tại Sydney và Melbourne', 'hero.viewAll': 'Xem tất cả', 'hero.howItWorks': 'ListHQ hoạt động như thế nào', 'hero.howItWorksSub': 'Tìm nhà mới trong 3 bước', 'hero.step1Title': 'Tìm kiếm bằng ngôn ngữ của bạn', 'hero.step1Desc': 'Nhập hoặc nói bằng tiếng Hoa, Việt, Hindi', 'hero.step2Title': 'Duyệt tin đăng đã dịch', 'hero.step2Desc': 'Mọi tin đăng được AI dịch.', 'hero.step3Title': 'Kết nối với đại lý', 'hero.step3Desc': 'Đại lý đa ngôn ngữ sẵn sàng hỗ trợ bạn', 'hero.agentCTA': 'Bạn là đại lý bất động sản?', 'hero.agentCTASub': 'Tiếp cận người mua từ Trung Quốc, Ấn Độ, Việt Nam.', 'hero.startTrial': 'Dùng thử miễn phí 60 ngày', 'hero.seeHow': 'Xem cách hoạt động', 'hero.agentStrip': 'Cho chuyên gia bất động sản', 'hero.builtForAgents': 'Xây dựng cho đại lý', 'hero.whoMoveFast': 'hành động nhanh.', 'hero.agentStripSub': 'Tin đăng độc quyền. Trợ lý AI người mua. Quản lý pipeline.', 'hero.listFree': 'Đăng bất động sản đầu tiên miễn phí', 'banner.languageSet': 'Chúng tôi đã đặt ngôn ngữ của bạn thành {language}. Thay đổi bất cứ lúc nào →' },
   th: { 'app.name': 'ListHQ', 'search.placeholder': 'ค้นหา "บ้าน 4 ห้องนอนในเมลเบิร์น $850k"', 'nav.search': 'ค้นหา', 'nav.saved': 'บันทึกแล้ว', 'nav.messages': 'ข้อความ', 'nav.agents': 'ตัวแทน', 'nav.profile': 'โปรไฟล์' , 'hero.eyebrow': 'แพลตฟอร์มอสังหาริมทรัพย์ AI ของออสเตรเลีย', 'hero.headline': 'รายการหลายภาษา', 'hero.headline2': 'สำหรับตัวแทนออสเตรเลีย', 'hero.subheadline': 'ค้นหาใน 24 ภาษา ดูราคาในสกุลเงินของคุณ', 'hero.forSale': 'ขาย', 'hero.forRent': 'ให้เช่า', 'hero.search': 'ค้นหา', 'hero.searchHint': 'อธิบายสิ่งที่คุณกำลังมองหา — AI ของเราจัดการที่เหลือ', 'hero.propertiesListed': 'อสังหาริมทรัพย์ที่ลงทะเบียน', 'hero.activeAgents': 'ตัวแทนที่ใช้งาน', 'hero.languages': 'ภาษา', 'hero.searchingNow': 'กำลังค้นหา', 'hero.liveData': 'ข้อมูลสด' },
   tr: { 'app.name': 'ListHQ', 'search.placeholder': 'Ara "Melbourne\'de 4 yatak odalı ev $850k"', 'nav.search': 'Ara', 'nav.saved': 'Kaydedilenler', 'nav.messages': 'Mesajlar', 'nav.agents': 'Acenteler', 'nav.profile': 'Profil' , 'hero.eyebrow': 'Avustralya\'nın AI destekli emlak platformu', 'hero.headline': 'Çok dilli ilanlar', 'hero.headline2': 'Avustralya acenteleri için', 'hero.subheadline': '24 dilde arayın. Fiyatları kendi para biriminizde görün.', 'hero.forSale': 'Satılık', 'hero.forRent': 'Kiralık', 'hero.search': 'Ara', 'hero.searchHint': 'Ne aradığınızı açıklayın — AI\'mız gerisini halleder', 'hero.propertiesListed': 'Kayıtlı mülk', 'hero.activeAgents': 'Aktif acente', 'hero.languages': 'Dil', 'hero.searchingNow': 'şu an arıyor', 'hero.liveData': 'Canlı veri' },
   sv: { 'app.name': 'ListHQ', 'search.placeholder': 'Sök "4 sovrum hus i Melbourne för $850k"', 'nav.search': 'Sök', 'nav.saved': 'Sparat', 'nav.messages': 'Meddelanden', 'nav.agents': 'Mäklare', 'nav.profile': 'Profil' , 'hero.eyebrow': 'Australiens AI-drivna fastighetsplattform', 'hero.headline': 'Flerspråkiga annonser', 'hero.headline2': 'för australiska mäklare', 'hero.subheadline': 'Sök på 24 språk. Se priser i din valuta.', 'hero.forSale': 'Till Salu', 'hero.forRent': 'Att Hyra', 'hero.search': 'Sök', 'hero.searchHint': 'Beskriv vad du söker — vår AI gör resten', 'hero.propertiesListed': 'Registrerade fastigheter', 'hero.activeAgents': 'Aktiva mäklare', 'hero.languages': 'Språk', 'hero.searchingNow': 'söker nu', 'hero.liveData': 'Livedata' },
@@ -1279,29 +1283,90 @@ interface I18nContextType {
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
+const BROWSER_LANG_MAP: Record<string, Language> = {
+  'zh': 'zh',
+  'zh-cn': 'zh',
+  'zh-hans': 'zh',
+  'zh-tw': 'zh-TW',
+  'zh-hant': 'zh-TW',
+  'vi': 'vi',
+};
+
 function detectBrowserLanguage(): Language {
-  const browserLang = navigator.language.slice(0, 2);
-  if (browserLang in translations) return browserLang as Language;
+  const raw = navigator.language.toLowerCase();
+  if (BROWSER_LANG_MAP[raw]) return BROWSER_LANG_MAP[raw];
+  const short = raw.slice(0, 2);
+  if (BROWSER_LANG_MAP[short]) return BROWSER_LANG_MAP[short];
+  if (short in translations) return short as Language;
   return 'en';
 }
 
+const AUTO_DETECT_LANGS: Language[] = ['zh', 'zh-TW', 'vi'];
+const FIRST_VISIT_KEY = 'gh-lang-first-visit-shown';
+
 export function I18nProvider({ children }: { children: ReactNode }) {
+  const [showBanner, setShowBanner] = useState(false);
   const [language, setLanguage] = useState<Language>(() => {
     const saved = localStorage.getItem('gh-lang');
     if (saved && saved in translations) return saved as Language;
-    return detectBrowserLanguage();
+    const detected = detectBrowserLanguage();
+    return detected;
   });
+
+  useEffect(() => {
+    const wasSaved = localStorage.getItem('gh-lang');
+    const alreadyShown = localStorage.getItem(FIRST_VISIT_KEY);
+    if (!wasSaved && !alreadyShown && language !== 'en' && AUTO_DETECT_LANGS.includes(language)) {
+      localStorage.setItem('gh-lang', language);
+      localStorage.setItem(FIRST_VISIT_KEY, '1');
+      setShowBanner(true);
+    } else if (!wasSaved) {
+      localStorage.setItem('gh-lang', language);
+    }
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('gh-lang', language);
   }, [language]);
 
+  const dismissBanner = useCallback(() => setShowBanner(false), []);
+
   const t = (key: string) => translations[language]?.[key] || translations.en[key] || key;
 
   return (
     <I18nContext.Provider value={{ language, setLanguage, t }}>
+      {showBanner && (
+        <LanguageDetectedBanner
+          languageName={languageNames[language]}
+          message={t('banner.languageSet')}
+          onDismiss={dismissBanner}
+        />
+      )}
       {children}
     </I18nContext.Provider>
+  );
+}
+
+function LanguageDetectedBanner({
+  languageName,
+  message,
+  onDismiss,
+}: {
+  languageName: string;
+  message: string;
+  onDismiss: () => void;
+}) {
+  return (
+    <div className="fixed top-0 left-0 right-0 z-[200] bg-primary text-primary-foreground px-4 py-2.5 text-center text-sm flex items-center justify-center gap-3 shadow-md">
+      <span>{message.replace('{language}', languageName)}</span>
+      <button
+        onClick={onDismiss}
+        className="ml-2 p-0.5 rounded hover:bg-primary-foreground/20 transition-colors"
+        aria-label="Dismiss"
+      >
+        <X size={16} />
+      </button>
+    </div>
   );
 }
 

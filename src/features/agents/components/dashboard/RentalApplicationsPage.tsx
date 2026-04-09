@@ -51,13 +51,14 @@ const RentalApplicationsPage = () => {
   const { user } = useAuth();
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
+  const [noAgent, setNoAgent] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [acting, setActing] = useState<string | null>(null);
 
   const fetchApplications = async () => {
     if (!user) return;
     const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
-    if (!agent) { setLoading(false); return; }
+    if (!agent) { setNoAgent(true); setLoading(false); return; }
 
     const { data } = await (supabase as any)
       .from('rental_applications')
@@ -157,6 +158,15 @@ const RentalApplicationsPage = () => {
     <div>
       <DashboardHeader title="Rental Applications" subtitle="Review and manage incoming tenant applications" />
 
+      {loading ? (
+        <div className="flex justify-center py-20"><FileText className="animate-pulse text-muted-foreground" size={28} /></div>
+      ) : noAgent ? (
+        <div className="bg-card border border-border rounded-xl p-12 text-center">
+          <FileText size={40} className="mx-auto text-muted-foreground mb-4" />
+          <h3 className="text-lg font-semibold text-foreground mb-1">Agent profile required</h3>
+          <p className="text-sm text-muted-foreground max-w-md mx-auto">Set up your agent profile to manage rental applications.</p>
+        </div>
+      ) : (
       <div className="p-4 sm:p-6 max-w-7xl">
         <div className="bg-card border border-border rounded-xl overflow-hidden">
           <Table>
@@ -265,6 +275,7 @@ const RentalApplicationsPage = () => {
           </Table>
         </div>
       </div>
+      )}
     </div>
   );
 };

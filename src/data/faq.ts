@@ -387,7 +387,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     id: 'billing-plans',
     question: 'What are the agent subscription plans?',
-    answer: 'ListHQ offers monthly subscription plans for agents. Visit our pricing page or contact hello@listhq.com.au for current pricing. All plans include unlimited property listings, access to the full CRM, open home management, auction tools, vendor reporting, document vault, and CMA reports.',
+    answer: 'ListHQ offers monthly subscription plans for agents. Visit our pricing page or contact hello@listhq.com.au for current pricing. All plans include unlimited property listings, access to the full CRM, open home management, auction tools, vendor reporting, and document vault.',
     category: 'billing',
     tags: ['plans', 'pricing', 'subscription'],
   },

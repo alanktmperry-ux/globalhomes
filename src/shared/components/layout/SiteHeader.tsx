@@ -169,13 +169,23 @@ export function SiteHeader() {
             </div>
           )}
 
-          <button
-            onClick={() => navigate(user ? '/profile' : '/auth')}
-            className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-            aria-label={user ? t('nav.profile') : t('common.signin')}
-          >
-            {user ? <User size={18} /> : <LogIn size={18} />}
-          </button>
+          {user ? (
+            <button
+              onClick={() => navigate('/profile')}
+              className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              aria-label={t('nav.profile')}
+            >
+              <User size={18} />
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate('/auth')}
+              className="rounded-full border border-border px-3 py-1.5 text-sm flex items-center gap-1.5 text-foreground hover:bg-accent transition-colors"
+            >
+              <User size={14} />
+              {t('common.signin')}
+            </button>
+          )}
         </div>
 
         {/* ─── Mobile hamburger (visible below md) ─── */}

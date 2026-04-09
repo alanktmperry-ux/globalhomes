@@ -216,7 +216,7 @@ const TrustAccountingPage = () => {
   }, [transactions]);
 
   const lastEntryText = lastEntry
-    ? `${lastEntry.category === 'deposit' ? 'Deposit' : lastEntry.category === 'rent' ? 'Rent' : lastEntry.category} from ${lastEntry.payee_name || lastEntry.contact?.first_name || 'Unknown'} — ${DATE_FMT.format(new Date(lastEntry.transaction_date))}`
+    ? `${lastEntry.category === 'deposit' ? 'Deposit' : lastEntry.category === 'rent' ? 'Rent' : lastEntry.category} from ${lastEntry.client_name || lastEntry.payee_name || 'Unknown'} — ${DATE_FMT.format(new Date(lastEntry.transaction_date))}`
     : 'No entries yet';
 
   // Filtered transactions
@@ -378,14 +378,13 @@ const TrustAccountingPage = () => {
 
   // CSV export
   const exportCsv = () => {
-    const headers = ['Date', 'Client Name', 'Property Address', 'Type', 'Amount', 'GST', 'Status', 'Balance Impact', 'Description', 'Reference'];
+    const headers = ['Date', 'Client Name', 'Property Address', 'Type', 'Amount', 'Status', 'Balance Impact', 'Description', 'Reference'];
     const rows = txWithBalance.map(tx => [
       tx.transaction_date,
-      tx.contact ? `${tx.contact.first_name} ${tx.contact.last_name || ''}`.trim() : tx.payee_name || '',
-      tx.property?.address || '',
+      tx.client_name || tx.payee_name || '',
+      tx.property_address || '',
       tx.category,
       tx.amount.toFixed(2),
-      tx.gst_amount.toFixed(2),
       STATUS_MAP[tx.status]?.label || tx.status,
       (tx.transaction_type === 'deposit' ? '+' : '-') + tx.amount.toFixed(2),
       tx.description || '',

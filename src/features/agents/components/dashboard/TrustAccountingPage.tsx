@@ -38,6 +38,9 @@ const TYPE_OPTIONS = [
 
 const STATUS_MAP: Record<string, { variant: 'default' | 'secondary' | 'outline' | 'destructive'; label: string }> = {
   pending: { variant: 'outline', label: 'Pending' },
+  received: { variant: 'outline', label: 'Received' },
+  deposited: { variant: 'default', label: 'Deposited' },
+  cleared: { variant: 'default', label: 'Cleared' },
   completed: { variant: 'default', label: 'Cleared' },
   reconciled: { variant: 'secondary', label: 'Reconciled' },
   voided: { variant: 'destructive', label: 'Voided' },
@@ -68,7 +71,7 @@ const TrustAccountingPage = () => {
   const [showNewReceipt, setShowNewReceipt] = useState(false);
   const [showImportWizard, setShowImportWizard] = useState(false);
   const [editingTx, setEditingTx] = useState<TrustTransaction | null>(null);
-  const [deletingTxId, setDeletingTxId] = useState<string | null>(null);
+  const [deletingTx, setDeletingTx] = useState<TrustTransaction | null>(null);
 
   // Bulk payments
   interface PendingPayment {
@@ -148,15 +151,10 @@ const TrustAccountingPage = () => {
 
   const checkOverdrawn = useCallback(async () => {
     if (!agent?.id) return;
-    const { data } = await supabase
-      .from('trust_transactions')
-      .select('payee_name, amount, transaction_type, status')
-      .eq('status', 'completed')
-      .in('trust_account_id', accounts.map(a => a.id));
-    if (!data) return;
+    // Use the unified transactions from receipts/payments
     const ledgers = new Map<string, number>();
-    data.forEach((tx: any) => {
-      const key = tx.payee_name || 'Unknown';
+    transactions.filter(t => t.status !== 'voided').forEach(tx => {
+      const key = tx.client_name || tx.payee_name || 'Unknown';
       const current = ledgers.get(key) || 0;
       const impact = tx.transaction_type === 'deposit' ? tx.amount : -tx.amount;
       ledgers.set(key, current + impact);
@@ -174,7 +172,7 @@ const TrustAccountingPage = () => {
         }
       );
     }
-  }, [agent?.id, accounts]);
+  }, [agent?.id, transactions]);
 
   useEffect(() => { fetchPendingPayments(); fetchDashboardStats(); checkOverdrawn(); }, [fetchPendingPayments, fetchDashboardStats, checkOverdrawn]);
 
@@ -204,12 +202,12 @@ const TrustAccountingPage = () => {
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
 
   const pendingTotal = useMemo(() =>
-    transactions.filter(t => t.status === 'pending').reduce((s, t) => s + t.amount, 0),
+    transactions.filter(t => t.status === 'pending' || t.status === 'received').reduce((s, t) => s + t.amount, 0),
     [transactions]);
 
   const clearedThisMonth = useMemo(() =>
     transactions
-      .filter(t => t.status === 'completed' && t.transaction_date >= monthStart)
+      .filter(t => (t.status === 'deposited' || t.status === 'cleared' || t.status === 'completed') && t.transaction_date >= monthStart)
       .reduce((s, t) => s + t.amount, 0),
     [transactions, monthStart]);
 
@@ -221,7 +219,7 @@ const TrustAccountingPage = () => {
   }, [transactions]);
 
   const lastEntryText = lastEntry
-    ? `${lastEntry.category === 'deposit' ? 'Deposit' : lastEntry.category === 'rent' ? 'Rent' : lastEntry.category} from ${lastEntry.payee_name || lastEntry.contact?.first_name || 'Unknown'} — ${DATE_FMT.format(new Date(lastEntry.transaction_date))}`
+    ? `${lastEntry.category === 'deposit' ? 'Deposit' : lastEntry.category === 'rent' ? 'Rent' : lastEntry.category} from ${lastEntry.client_name || lastEntry.payee_name || 'Unknown'} — ${DATE_FMT.format(new Date(lastEntry.transaction_date))}`
     : 'No entries yet';
 
   // Filtered transactions
@@ -261,25 +259,21 @@ const TrustAccountingPage = () => {
   };
 
   const handleCreateTx = async () => {
-    if (!txAmount || !txAccountId) return;
+    if (!txAmount || !agent) return;
     const amount = parseFloat(txAmount);
     if (isNaN(amount) || amount <= 0) { toast.error('Enter a valid amount'); return; }
-    const gstAmount = txGst ? amount * 0.1 : 0;
     const isDeposit = txCategory === 'deposit' || txCategory === 'rent';
 
     try {
       await createTransaction({
-        trust_account_id: txAccountId,
-        transaction_type: isDeposit ? 'deposit' : 'withdrawal',
-        category: txCategory,
+        type: isDeposit ? 'receipt' : 'payment',
+        agent_id: agent.id,
+        client_name: txPayee || 'Unknown',
+        property_address: properties.find(p => p.id === txPropertyId)?.address || '',
         amount,
-        gst_amount: gstAmount,
-        description: txDesc || null,
-        payee_name: txPayee || null,
-        contact_id: txContactId || null,
+        purpose: txCategory,
+        description: txDesc || undefined,
         property_id: txPropertyId || null,
-        status: 'pending',
-        transaction_date: new Date().toISOString().split('T')[0],
       });
       toast.success('Transaction recorded');
       setShowNewTx(false);
@@ -289,9 +283,9 @@ const TrustAccountingPage = () => {
     }
   };
 
-  const handleMarkCleared = async (id: string) => {
+  const handleMarkCleared = async (tx: TrustTransaction) => {
     try {
-      await markAsCleared(id);
+      await markAsCleared(tx.id, tx.source_table);
       toast.success('Marked as cleared');
     } catch (e: unknown) {
       toast.error(getErrorMessage(e));
@@ -299,12 +293,12 @@ const TrustAccountingPage = () => {
   };
 
   const handleDeleteTx = async () => {
-    if (!deletingTxId) return;
+    if (!deletingTx) return;
     try {
-      await deleteTransaction(deletingTxId);
+      await deleteTransaction(deletingTx.id, deletingTx.source_table);
       toast.success('Transaction voided (audit trail preserved)');
       setShowDeleteConfirm(false);
-      setDeletingTxId(null);
+      setDeletingTx(null);
     } catch (e: unknown) {
       toast.error(getErrorMessage(e));
     }
@@ -324,7 +318,7 @@ const TrustAccountingPage = () => {
     setTxCategory(tx.category);
     setTxAmount(String(tx.amount));
     setTxDesc(tx.description || '');
-    setTxPayee(tx.payee_name || '');
+    setTxPayee(tx.payee_name || tx.client_name || '');
     setTxContactId(tx.contact_id || '');
     setTxPropertyId(tx.property_id || '');
     setShowEditTx(true);
@@ -334,20 +328,22 @@ const TrustAccountingPage = () => {
     if (!editingTx) return;
     const amount = parseFloat(txAmount);
     if (isNaN(amount) || amount <= 0) { toast.error('Enter a valid amount'); return; }
-    const gstAmount = txGst ? amount * 0.1 : 0;
-    const isDeposit = txCategory === 'deposit' || txCategory === 'rent';
 
     try {
-      await updateTransaction(editingTx.id, {
-        category: txCategory,
-        transaction_type: isDeposit ? 'deposit' : 'withdrawal',
+      const updates: Record<string, any> = {
         amount,
-        gst_amount: gstAmount,
         description: txDesc || null,
-        payee_name: txPayee || null,
-        contact_id: txContactId || null,
         property_id: txPropertyId || null,
-      } as any);
+      };
+      if (editingTx.source_table === 'trust_receipts') {
+        updates.client_name = txPayee || null;
+        updates.purpose = txCategory;
+      } else {
+        updates.client_name = txPayee || null;
+        updates.payee_name = txPayee || null;
+        updates.purpose = txCategory;
+      }
+      await updateTransaction(editingTx.id, editingTx.source_table, updates);
       toast.success('Transaction updated');
       setShowEditTx(false);
       setEditingTx(null);
@@ -385,14 +381,13 @@ const TrustAccountingPage = () => {
 
   // CSV export
   const exportCsv = () => {
-    const headers = ['Date', 'Client Name', 'Property Address', 'Type', 'Amount', 'GST', 'Status', 'Balance Impact', 'Description', 'Reference'];
+    const headers = ['Date', 'Client Name', 'Property Address', 'Type', 'Amount', 'Status', 'Balance Impact', 'Description', 'Reference'];
     const rows = txWithBalance.map(tx => [
       tx.transaction_date,
-      tx.contact ? `${tx.contact.first_name} ${tx.contact.last_name || ''}`.trim() : tx.payee_name || '',
-      tx.property?.address || '',
+      tx.client_name || tx.payee_name || '',
+      tx.property_address || '',
       tx.category,
       tx.amount.toFixed(2),
-      tx.gst_amount.toFixed(2),
       STATUS_MAP[tx.status]?.label || tx.status,
       (tx.transaction_type === 'deposit' ? '+' : '-') + tx.amount.toFixed(2),
       tx.description || '',
@@ -950,14 +945,12 @@ const TrustAccountingPage = () => {
                     txWithBalance.map(tx => {
                       const isDeposit = tx.transaction_type === 'deposit';
                       const badge = STATUS_MAP[tx.status] || STATUS_MAP.pending;
-                      const clientName = tx.contact
-                        ? `${tx.contact.first_name} ${tx.contact.last_name || ''}`.trim()
-                        : tx.payee_name || '—';
+                      const clientName = tx.client_name || tx.payee_name || '—';
                       return (
                         <TableRow key={tx.id}>
                           <TableCell className="text-xs whitespace-nowrap">{DATE_FMT.format(new Date(tx.transaction_date))}</TableCell>
                           <TableCell className="text-xs">{clientName}</TableCell>
-                          <TableCell className="text-xs max-w-[180px] truncate">{tx.property?.address || '—'}</TableCell>
+                          <TableCell className="text-xs max-w-[180px] truncate">{tx.property_address || '—'}</TableCell>
                           <TableCell>
                             <Badge variant="outline" className="text-[10px] capitalize">{tx.category}</Badge>
                           </TableCell>
@@ -975,9 +968,9 @@ const TrustAccountingPage = () => {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-0.5 justify-end">
-                              {tx.status === 'pending' && (
+                              {(tx.status === 'pending' || tx.status === 'received') && (
                                 <Button size="sm" variant="ghost" className="h-7 px-1.5 text-[10px] gap-1"
-                                  onClick={() => handleMarkCleared(tx.id)} title="Mark as Cleared">
+                                  onClick={() => handleMarkCleared(tx)} title="Mark as Cleared">
                                   <CheckCircle2 size={12} className="text-green-500" />
                                 </Button>
                               )}
@@ -986,7 +979,7 @@ const TrustAccountingPage = () => {
                                 <Pencil size={12} />
                               </Button>
                               <Button size="sm" variant="ghost" className="h-7 px-1.5 text-destructive"
-                                onClick={() => { setDeletingTxId(tx.id); setShowDeleteConfirm(true); }} title="Delete">
+                                onClick={() => { setDeletingTx(tx); setShowDeleteConfirm(true); }} title="Delete">
                                 <Trash2 size={12} />
                               </Button>
                             </div>
@@ -1017,7 +1010,7 @@ const TrustAccountingPage = () => {
             </Button>
             <Button className="w-full justify-start gap-2 text-sm" variant="outline" size="sm"
               onClick={handleBulkClear}
-              disabled={transactions.filter(t => t.status === 'pending').length === 0}>
+              disabled={transactions.filter(t => t.status === 'pending' || t.status === 'received').length === 0}>
               <CheckCircle2 size={14} /> Mark All Pending as Cleared
             </Button>
 

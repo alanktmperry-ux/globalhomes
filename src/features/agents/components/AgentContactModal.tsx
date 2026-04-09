@@ -269,21 +269,21 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
       if (trustAccountId && user) {
         const amount = depositAmount && depositAmount > 0 ? depositAmount : 0;
         const isDeposit = amount > 0;
-        await supabase.from('trust_transactions').insert({
-          trust_account_id: trustAccountId,
-          transaction_type: isDeposit ? 'deposit' : 'journal',
-          category: isDeposit ? 'holding_deposit' : 'lead_audit',
-          amount,
-          gst_amount: isDeposit ? Math.round(amount / 11 * 100) / 100 : 0,
-          description: isDeposit
-            ? `Holding deposit – ${property.title} – ${formData.name}`
-            : `Qualified lead audit – ${property.title} – ${formData.name} (score: ${score})`,
-          status: 'pending',
-          property_id: property.id,
-          payee_name: formData.name,
-          reference: leadRow?.id ? `LEAD-${leadRow.id.slice(0, 8).toUpperCase()}` : null,
-          created_by: user.id,
-        });
+        if (isDeposit) {
+          const ref = `TR-${Date.now().toString(36).toUpperCase()}`;
+          await supabase.from('trust_receipts').insert({
+            agent_id: agent.id,
+            receipt_number: ref,
+            client_name: formData.name,
+            property_address: property.title || '',
+            amount,
+            payment_method: 'eft',
+            purpose: 'holding_deposit',
+            date_received: new Date().toISOString().split('T')[0],
+            description: `Holding deposit – ${property.title} – ${formData.name}`,
+            property_id: property.id,
+          } as any);
+        }
       }
 
       setStep(3);

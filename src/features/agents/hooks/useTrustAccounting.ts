@@ -17,31 +17,26 @@ export interface TrustAccount {
   updated_at: string;
 }
 
+/** Unified ledger entry derived from trust_receipts (money in) or trust_payments (money out). */
 export interface TrustTransaction {
   id: string;
-  trust_account_id: string;
-  property_id: string | null;
-  contact_id: string | null;
-  created_by: string;
-  transaction_type: string;
+  source_table: 'trust_receipts' | 'trust_payments';
+  transaction_type: 'deposit' | 'withdrawal';
   category: string;
   amount: number;
   gst_amount: number;
   description: string | null;
-  reference: string | null;
   payee_name: string | null;
+  client_name: string | null;
+  property_address: string | null;
+  property_id: string | null;
+  contact_id: string | null;
+  reference: string | null;
   status: string;
   transaction_date: string;
-  due_date: string | null;
-  invoice_number: string | null;
-  receipt_number: string | null;
-  reconciled_at: string | null;
-  reconciled_by: string | null;
-  aba_exported: boolean;
-  aba_exported_at: string | null;
+  payment_method: string | null;
   created_at: string;
-  updated_at: string;
-  // joined data
+  // joined
   contact?: { first_name: string; last_name: string | null } | null;
   property?: { title: string; address: string } | null;
 }
@@ -75,21 +70,74 @@ export function useTrustAccounting() {
     if (data) setAccounts(data as unknown as TrustAccount[]);
   }, [user]);
 
-  const fetchTransactions = useCallback(async (accountId?: string) => {
+  const fetchTransactions = useCallback(async () => {
     if (!user) return;
-    let query = supabase
-      .from('trust_transactions')
-      .select('*, contacts(first_name, last_name), properties(title, address)')
-      .order('transaction_date', { ascending: false });
-    if (accountId) query = query.eq('trust_account_id', accountId);
-    const { data } = await query;
-    if (data) {
-      setTransactions(data.map((t: any) => ({
-        ...t,
-        contact: t.contacts || null,
-        property: t.properties || null,
-      })) as TrustTransaction[]);
+
+    // Fetch receipts (money in)
+    const { data: receipts } = await supabase
+      .from('trust_receipts')
+      .select('*')
+      .order('date_received', { ascending: false });
+
+    // Fetch payments (money out)
+    const { data: payments } = await supabase
+      .from('trust_payments')
+      .select('*')
+      .order('date_paid', { ascending: false });
+
+    const mapped: TrustTransaction[] = [];
+
+    if (receipts) {
+      for (const r of receipts as any[]) {
+        mapped.push({
+          id: r.id,
+          source_table: 'trust_receipts',
+          transaction_type: 'deposit',
+          category: r.purpose || r.type || 'deposit',
+          amount: Number(r.amount) || 0,
+          gst_amount: 0,
+          description: r.description || null,
+          payee_name: r.client_name || null,
+          client_name: r.client_name || null,
+          property_address: r.property_address || null,
+          property_id: r.property_id || null,
+          contact_id: null,
+          reference: r.receipt_number || null,
+          status: r.status || 'received',
+          transaction_date: r.date_received || r.created_at?.split('T')[0] || '',
+          payment_method: r.payment_method || null,
+          created_at: r.created_at,
+        });
+      }
     }
+
+    if (payments) {
+      for (const p of payments as any[]) {
+        mapped.push({
+          id: p.id,
+          source_table: 'trust_payments',
+          transaction_type: 'withdrawal',
+          category: p.purpose || p.type || 'disbursement',
+          amount: Number(p.amount) || 0,
+          gst_amount: 0,
+          description: p.description || null,
+          payee_name: p.payee_name || p.client_name || null,
+          client_name: p.client_name || null,
+          property_address: p.property_address || null,
+          property_id: p.property_id || null,
+          contact_id: null,
+          reference: p.payment_number || p.reference || null,
+          status: p.status || 'pending',
+          transaction_date: p.date_paid || p.created_at?.split('T')[0] || '',
+          payment_method: p.payment_method || null,
+          created_at: p.created_at,
+        });
+      }
+    }
+
+    // Sort by date descending
+    mapped.sort((a, b) => b.transaction_date.localeCompare(a.transaction_date));
+    setTransactions(mapped);
   }, [user]);
 
   const fetchContacts = useCallback(async () => {
@@ -130,74 +178,108 @@ export function useTrustAccounting() {
     return data;
   };
 
-  const createTransaction = async (tx: Partial<TrustTransaction>) => {
+  /** Create a receipt (money in) or payment (money out). */
+  const createTransaction = async (tx: {
+    type: 'receipt' | 'payment';
+    agent_id: string;
+    client_name: string;
+    property_address: string;
+    amount: number;
+    payment_method?: string;
+    purpose?: string;
+    description?: string;
+    property_id?: string | null;
+    reference?: string;
+  }) => {
     if (!user) return null;
-    const { data, error } = await supabase
-      .from('trust_transactions')
-      .insert({ ...tx, created_by: user.id } as any)
-      .select()
-      .single();
-    if (error) throw error;
-    if (tx.trust_account_id && tx.status === 'completed') {
-      const account = accounts.find(a => a.id === tx.trust_account_id);
-      if (account) {
-        const delta = tx.transaction_type === 'deposit' ? (tx.amount || 0) : -(tx.amount || 0);
-        await supabase
-          .from('trust_accounts')
-          .update({ balance: account.balance + delta } as any)
-          .eq('id', tx.trust_account_id);
-      }
+
+    if (tx.type === 'receipt') {
+      const ref = tx.reference || `TR-${Date.now().toString(36).toUpperCase()}`;
+      const { data, error } = await supabase
+        .from('trust_receipts')
+        .insert({
+          agent_id: tx.agent_id,
+          receipt_number: ref,
+          client_name: tx.client_name,
+          property_address: tx.property_address,
+          amount: tx.amount,
+          payment_method: tx.payment_method || 'eft',
+          purpose: tx.purpose || 'deposit',
+          date_received: new Date().toISOString().split('T')[0],
+          description: tx.description || null,
+          property_id: tx.property_id || null,
+        } as any)
+        .select()
+        .single();
+      if (error) throw error;
+      await Promise.all([fetchAccounts(), fetchTransactions()]);
+      return data;
+    } else {
+      const ref = tx.reference || `TP-${Date.now().toString(36).toUpperCase()}`;
+      const { data, error } = await supabase
+        .from('trust_payments')
+        .insert({
+          agent_id: tx.agent_id,
+          payment_number: ref,
+          client_name: tx.client_name,
+          property_address: tx.property_address,
+          amount: tx.amount,
+          payment_method: tx.payment_method || 'eft',
+          purpose: tx.purpose || 'refund',
+          date_paid: new Date().toISOString().split('T')[0],
+          description: tx.description || null,
+          property_id: tx.property_id || null,
+        } as any)
+        .select()
+        .single();
+      if (error) throw error;
+      await Promise.all([fetchAccounts(), fetchTransactions()]);
+      return data;
     }
-    await fetchAccounts();
-    await fetchTransactions();
-    return data;
   };
 
-  const updateTransaction = async (id: string, updates: Partial<TrustTransaction>) => {
+  const updateTransaction = async (id: string, sourceTable: 'trust_receipts' | 'trust_payments', updates: Record<string, any>) => {
     const { error } = await supabase
-      .from('trust_transactions')
+      .from(sourceTable)
       .update(updates as any)
       .eq('id', id);
     if (error) throw error;
     await fetchTransactions();
   };
 
-  const deleteTransaction = async (id: string) => {
-    // We void instead of hard-delete (audit trail)
+  const deleteTransaction = async (id: string, sourceTable: 'trust_receipts' | 'trust_payments') => {
+    // Void instead of hard-delete for audit trail
     const { error } = await supabase
-      .from('trust_transactions')
+      .from(sourceTable)
       .update({ status: 'voided' } as any)
       .eq('id', id);
     if (error) throw error;
     await fetchTransactions();
   };
 
-  const markAsCleared = async (id: string) => {
-    if (!user) return;
-    await updateTransaction(id, {
-      status: 'completed',
-    } as any);
+  const markAsCleared = async (id: string, sourceTable: 'trust_receipts' | 'trust_payments') => {
+    const statusValue = sourceTable === 'trust_receipts' ? 'deposited' : 'cleared';
+    await updateTransaction(id, sourceTable, { status: statusValue });
   };
 
   const bulkMarkCleared = async () => {
     if (!user) return;
-    const pendingIds = transactions.filter(t => t.status === 'pending').map(t => t.id);
-    if (pendingIds.length === 0) return;
-    const { error } = await supabase
-      .from('trust_transactions')
-      .update({ status: 'completed' } as any)
-      .in('id', pendingIds);
-    if (error) throw error;
-    await Promise.all([fetchTransactions(), fetchAccounts()]);
+    const pendingReceipts = transactions.filter(t => t.source_table === 'trust_receipts' && t.status === 'received');
+    const pendingPayments = transactions.filter(t => t.source_table === 'trust_payments' && t.status === 'pending');
+
+    if (pendingReceipts.length > 0) {
+      await supabase.from('trust_receipts').update({ status: 'deposited' } as any).in('id', pendingReceipts.map(t => t.id));
+    }
+    if (pendingPayments.length > 0) {
+      await supabase.from('trust_payments').update({ status: 'cleared' } as any).in('id', pendingPayments.map(t => t.id));
+    }
+    if (pendingReceipts.length > 0 || pendingPayments.length > 0) {
+      await Promise.all([fetchTransactions(), fetchAccounts()]);
+    }
   };
 
-  const reconcileTransaction = async (id: string) => {
-    if (!user) return;
-    await updateTransaction(id, {
-      status: 'reconciled',
-      reconciled_at: new Date().toISOString(),
-      reconciled_by: user.id,
-    } as any);
+  const reconcileTransaction = async (id: string, sourceTable: 'trust_receipts' | 'trust_payments') => {
+    await updateTransaction(id, sourceTable, { status: 'reconciled' });
   };
 
   return {

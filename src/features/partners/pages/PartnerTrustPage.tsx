@@ -64,14 +64,47 @@ const PartnerTrustPage = () => {
       setAccounts(accts as unknown as TrustAccount[]);
       const accountIds = accts.map((a: any) => a.id);
       if (accountIds.length > 0) {
-        const { data: txs } = await supabase
-          .from('trust_transactions')
-          .select('id, trust_account_id, transaction_type, category, amount, description, payee_name, status, transaction_date')
-          .in('trust_account_id', accountIds)
+        // Fetch from both trust_receipts and trust_payments
+        const { data: receipts } = await supabase
+          .from('trust_receipts')
+          .select('id, agent_id, purpose, amount, description, client_name, status, date_received')
+          .eq('agent_id', activeAgency.agentId)
           .neq('status', 'voided')
-          .order('transaction_date', { ascending: false })
-          .limit(20);
-        if (txs) setTransactions(txs as unknown as TrustTx[]);
+          .order('date_received', { ascending: false })
+          .limit(10);
+        const { data: payments } = await supabase
+          .from('trust_payments')
+          .select('id, agent_id, purpose, amount, description, client_name, payee_name, status, date_paid')
+          .eq('agent_id', activeAgency.agentId)
+          .neq('status', 'voided')
+          .order('date_paid', { ascending: false })
+          .limit(10);
+        const mapped: TrustTx[] = [
+          ...(receipts || []).map((r: any) => ({
+            id: r.id,
+            trust_account_id: '',
+            transaction_type: 'deposit' as const,
+            category: r.purpose || 'deposit',
+            amount: Number(r.amount),
+            description: r.description,
+            payee_name: r.client_name,
+            status: r.status,
+            transaction_date: r.date_received,
+          })),
+          ...(payments || []).map((p: any) => ({
+            id: p.id,
+            trust_account_id: '',
+            transaction_type: 'withdrawal' as const,
+            category: p.purpose || 'disbursement',
+            amount: Number(p.amount),
+            description: p.description,
+            payee_name: p.payee_name || p.client_name,
+            status: p.status,
+            transaction_date: p.date_paid,
+          })),
+        ];
+        mapped.sort((a, b) => (b.transaction_date || '').localeCompare(a.transaction_date || ''));
+        setTransactions(mapped.slice(0, 20));
       } else {
         setTransactions([]);
       }

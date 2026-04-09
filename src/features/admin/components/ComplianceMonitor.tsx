@@ -348,26 +348,18 @@ export default function ComplianceMonitor() {
           .select('id, name, email, agency, license_number, licence_expiry_date, handles_trust_accounting'),
         supabase.from('trust_account_balances').select('agent_id, current_balance, last_reconciled_date'),
         supabase
-          .from('trust_transactions')
-          .select('id, trust_account_id, amount, description, created_at')
+          .from('trust_receipts')
+          .select('id, agent_id, amount, description, created_at')
           .gte('amount', AML_THRESHOLD)
           .order('created_at', { ascending: false }),
       ]);
 
-      const trustAccRes = await supabase.from('trust_accounts').select('id, agent_id');
-
-      const trustAccountToAgent = new Map<string, string>();
-      (trustAccRes.data || []).forEach((ta: any) => {
-        if (ta.agent_id) trustAccountToAgent.set(ta.id, ta.agent_id);
-      });
-
       const amlByAgent = new Map<string, any[]>();
       (transactionsRes.data || []).forEach((t: any) => {
-        const agentId = trustAccountToAgent.get(t.trust_account_id);
-        if (!agentId) return;
-        const arr = amlByAgent.get(agentId) || [];
+        if (!t.agent_id) return;
+        const arr = amlByAgent.get(t.agent_id) || [];
         arr.push(t);
-        amlByAgent.set(agentId, arr);
+        amlByAgent.set(t.agent_id, arr);
       });
 
       const balanceByAgent = new Map<string, { balance: number; lastRec: string | null }>();

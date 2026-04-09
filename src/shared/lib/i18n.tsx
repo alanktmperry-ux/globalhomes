@@ -108,6 +108,11 @@ const translations: Record<Language, Record<string, string>> = {
     'hero.whoMoveFast': 'who move fast.',
     'hero.agentStripSub': 'Pocket listings. AI buyer concierge. Pipeline management. Trust accounting. One platform — no compromises.',
     'hero.listFree': 'List your first property free',
+    'hero.buyersSearching': 'Buyers searching',
+    'card.beds': 'bed',
+    'card.bath': 'bath',
+    'card.car': 'car',
+    'card.viewProperty': 'View Property',
   },
   zh: {
     'app.name': 'ListHQ',

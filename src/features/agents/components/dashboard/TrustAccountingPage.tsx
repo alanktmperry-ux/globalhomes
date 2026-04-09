@@ -968,9 +968,9 @@ const TrustAccountingPage = () => {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-0.5 justify-end">
-                              {tx.status === 'pending' && (
+                              {(tx.status === 'pending' || tx.status === 'received') && (
                                 <Button size="sm" variant="ghost" className="h-7 px-1.5 text-[10px] gap-1"
-                                  onClick={() => handleMarkCleared(tx.id)} title="Mark as Cleared">
+                                  onClick={() => handleMarkCleared(tx)} title="Mark as Cleared">
                                   <CheckCircle2 size={12} className="text-green-500" />
                                 </Button>
                               )}
@@ -979,7 +979,7 @@ const TrustAccountingPage = () => {
                                 <Pencil size={12} />
                               </Button>
                               <Button size="sm" variant="ghost" className="h-7 px-1.5 text-destructive"
-                                onClick={() => { setDeletingTxId(tx.id); setShowDeleteConfirm(true); }} title="Delete">
+                                onClick={() => { setDeletingTx(tx); setShowDeleteConfirm(true); }} title="Delete">
                                 <Trash2 size={12} />
                               </Button>
                             </div>

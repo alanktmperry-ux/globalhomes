@@ -52,8 +52,7 @@ const TrustAccountingPage = () => {
   const {
     accounts, transactions, contacts, properties, loading,
     fetchAccounts, fetchTransactions,
-    createAccount, createTransaction, updateTransaction,
-    deleteTransaction, markAsCleared, bulkMarkCleared,
+    createAccount, createTransaction, voidTransaction,
   } = useTrustAccounting();
 
   // Filters

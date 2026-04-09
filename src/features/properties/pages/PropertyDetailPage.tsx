@@ -3,7 +3,9 @@ import { Helmet } from 'react-helmet-async';
 import { PropertySEOHead } from '@/features/seo/components/PropertySEOHead';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Calendar, Eye, Home, BadgeCheck, Star, X, PawPrint, Sofa, Clock, FileText, Users, Phone, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Calendar, Eye, Home, BadgeCheck, Star, X, PawPrint, Sofa, Clock, FileText, Users, Phone, MessageCircle, Globe, Loader2 } from 'lucide-react';
+import MultilingualListingDetail from '@/features/properties/components/MultilingualListingDetail';
+import { Button } from '@/components/ui/button';
 import { Property } from '@/shared/lib/types';
 import { useI18n } from '@/shared/lib/i18n';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
@@ -53,6 +55,7 @@ export default function PropertyDetailPage() {
 
   const [property, setProperty] = useState<Property | null>(null);
   useLogPropertyView(property?.id);
+  const [rawProperty, setRawProperty] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [imageIndex, setImageIndex] = useState(0);
   const [contactOpen, setContactOpen] = useState(false);
@@ -61,6 +64,8 @@ export default function PropertyDetailPage() {
   const [inspectionBookingOpen, setInspectionBookingOpen] = useState(false);
   const [rentalApplicationOpen, setRentalApplicationOpen] = useState(false);
   const [inspectionTimes, setInspectionTimes] = useState<InspectionSlot[]>([]);
+  const [isOwnerAgent, setIsOwnerAgent] = useState(false);
+  const [translating, setTranslating] = useState(false);
   useEffect(() => {
     const fetchProperty = async () => {
       setLoading(true);
@@ -75,7 +80,7 @@ export default function PropertyDetailPage() {
       const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
       const query = supabase
         .from('properties')
-        .select('*, agents(id, name, agency, phone, email, avatar_url, is_subscribed)')
+        .select('*, agents(id, name, agency, phone, email, avatar_url, is_subscribed, user_id)')
         .eq(isUuid ? 'id' : 'slug', id)
         .single();
 
@@ -87,6 +92,7 @@ export default function PropertyDetailPage() {
 
       if (data) {
         const p: any = data;
+        setRawProperty(p);
         setProperty({
           id: p.id,
           title: p.title,
@@ -152,7 +158,50 @@ export default function PropertyDetailPage() {
     fetchProperty();
   }, [id]);
 
-  // ── Increment view count (fire-and-forget, once per page load) ──
+  // ── Check if logged-in user is the listing agent ──
+  useEffect(() => {
+    if (!user || !rawProperty?.agents?.user_id) {
+      setIsOwnerAgent(false);
+      return;
+    }
+    setIsOwnerAgent(rawProperty.agents.user_id === user.id);
+  }, [user, rawProperty]);
+
+  const handleGenerateTranslations = async () => {
+    if (!property) return;
+    setTranslating(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const resp = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-translations`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session?.access_token}`,
+            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({ listing_id: property.id }),
+        }
+      );
+      const result = await resp.json();
+      if (!resp.ok) throw new Error(result.error || 'Translation failed');
+      toast.success('Translations generated! Refreshing…');
+      // Refresh raw property data
+      const { data: refreshed } = await supabase
+        .from('properties')
+        .select('*, agents(id, name, agency, phone, email, avatar_url, is_subscribed, user_id)')
+        .eq('id', property.id)
+        .single();
+      if (refreshed) setRawProperty(refreshed);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to generate translations');
+    } finally {
+      setTranslating(false);
+    }
+  };
+
+
   const viewTracked = useRef(false);
   useEffect(() => {
     if (!property || viewTracked.current) return;
@@ -577,7 +626,33 @@ export default function PropertyDetailPage() {
               </div>
             )}
 
-            {/* Stamp Duty Calculator (sale properties only) */}
+            {/* Multilingual Translations */}
+            {rawProperty && (rawProperty.translations || isOwnerAgent) && (
+              <div className="space-y-3">
+                {isOwnerAgent && !rawProperty.translations && (
+                  <Button
+                    onClick={handleGenerateTranslations}
+                    disabled={translating}
+                    variant="outline"
+                    className="gap-2"
+                  >
+                    {translating ? (
+                      <><Loader2 size={14} className="animate-spin" /> Generating translations…</>
+                    ) : (
+                      <><Globe size={14} /> Generate Translations</>
+                    )}
+                  </Button>
+                )}
+                {rawProperty.translations && (
+                  <MultilingualListingDetail
+                    listing={rawProperty}
+                    isAgent={isOwnerAgent}
+                  />
+                )}
+              </div>
+            )}
+
+
             {!isRental && (
               <StampDutyCalculator
                 propertyPrice={property.price}

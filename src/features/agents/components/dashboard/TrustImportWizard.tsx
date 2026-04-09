@@ -115,6 +115,7 @@ export default function TrustImportWizard({ onComplete, onCancel }: TrustImportW
   const [lastReconciled, setLastReconciled] = useState('');
   const [certFile, setCertFile] = useState<File | null>(null);
   const [accountName, setAccountName] = useState('');
+  const [bankName, setBankName] = useState('');
   const [bsb, setBsb] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
 

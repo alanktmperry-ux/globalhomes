@@ -204,6 +204,11 @@ const translations: Record<Language, Record<string, string>> = {
     'hero.whoMoveFast': '高效行动。',
     'hero.agentStripSub': '独家房源。AI买家匹配。管道管理。信托会计。一个平台——毫不妥协。',
     'hero.listFree': '免费发布您的第一个房源',
+    'hero.buyersSearching': '买家搜索中',
+    'card.beds': '卧',
+    'card.bath': '浴',
+    'card.car': '车',
+    'card.viewProperty': '查看房产',
   },
   ko: {
     'app.name': 'ListHQ',

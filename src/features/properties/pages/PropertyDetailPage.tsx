@@ -66,6 +66,7 @@ export default function PropertyDetailPage() {
   const [inspectionTimes, setInspectionTimes] = useState<InspectionSlot[]>([]);
   const [isOwnerAgent, setIsOwnerAgent] = useState(false);
   const [translating, setTranslating] = useState(false);
+  useEffect(() => {
     const fetchProperty = async () => {
       setLoading(true);
 

@@ -27,7 +27,15 @@ export function RentalKeyFacts({ property: p }: Props) {
   const utilities = getUtilities(p);
   const appliances = getAppliances(p);
 
+  const bondAmount = p.bond_amount ?? (p.rental_weekly ? p.rental_weekly * 4 : null);
+  const bondWeeks = p.rental_weekly && bondAmount ? Math.round(bondAmount / p.rental_weekly) : 4;
+
   const facts = [
+    ...(bondAmount != null ? [{
+      icon: <DollarSign className="w-4 h-4" />,
+      label: 'Bond',
+      value: `$${bondAmount.toLocaleString('en-AU')} bond · ${bondWeeks} week${bondWeeks !== 1 ? 's' : ''}`,
+    }] : []),
     {
       icon: <Calendar className="w-4 h-4" />,
       label: 'Available',

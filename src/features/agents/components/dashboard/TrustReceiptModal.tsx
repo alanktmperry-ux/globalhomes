@@ -366,11 +366,11 @@ export default function TrustReceiptModal({ open, onOpenChange, onCreated, agent
                 placeholder="e.g. SMITH-2026-001" className="h-9" />
             </div>
 
-            {/* Notes */}
+            {/* Description */}
             <div>
-              <Label className="text-xs mb-1.5">Notes</Label>
+              <Label className="text-xs mb-1.5">Description</Label>
               <Textarea value={description} onChange={e => setDescription(e.target.value)}
-                placeholder="e.g. Buyer deposit for 123 Beach Rd purchase"
+                placeholder="e.g. Monthly rent payment for unit 4"
                 rows={2} />
             </div>
           </div>

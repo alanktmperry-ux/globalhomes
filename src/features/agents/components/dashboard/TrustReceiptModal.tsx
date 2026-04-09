@@ -63,28 +63,10 @@ export default function TrustReceiptModal({ open, onOpenChange, onCreated, agent
   const [description, setDescription] = useState('');
   const [matterRef, setMatterRef] = useState('');
 
-  // Generate TR-YYYYMMDD-XXX reference number
+  // Generate TR- + Date.now base36 reference number
   const generateReceiptNumber = useCallback(async () => {
-    const today = new Date().toISOString().split('T')[0].replace(/-/g, '');
-    const prefix = `TR-${today}-`;
-    const { data } = await supabase
-      .from('trust_receipts')
-      .select('receipt_number')
-      .like('receipt_number', `${prefix}%`)
-      .order('receipt_number', { ascending: false })
-      .limit(1);
-    if (data && data.length > 0) {
-      const last = data[0].receipt_number;
-      const match = last.match(/(\d+)$/);
-      if (match) {
-        const next = String(parseInt(match[1], 10) + 1).padStart(3, '0');
-        setNextReceiptNumber(`${prefix}${next}`);
-      } else {
-        setNextReceiptNumber(`${prefix}001`);
-      }
-    } else {
-      setNextReceiptNumber(`${prefix}001`);
-    }
+    const ref = 'TR-' + Date.now().toString(36).toUpperCase();
+    setNextReceiptNumber(ref);
   }, []);
 
   // Fetch agent's properties

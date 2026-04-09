@@ -7419,8 +7419,10 @@ export type Database = {
           bank_name: string | null
           bsb: string | null
           created_at: string
+          current_balance: number | null
           id: string
           is_active: boolean
+          opening_balance: number | null
           updated_at: string
         }
         Insert: {
@@ -7433,8 +7435,10 @@ export type Database = {
           bank_name?: string | null
           bsb?: string | null
           created_at?: string
+          current_balance?: number | null
           id?: string
           is_active?: boolean
+          opening_balance?: number | null
           updated_at?: string
         }
         Update: {
@@ -7447,8 +7451,10 @@ export type Database = {
           bank_name?: string | null
           bsb?: string | null
           created_at?: string
+          current_balance?: number | null
           id?: string
           is_active?: boolean
+          opening_balance?: number | null
           updated_at?: string
         }
         Relationships: [

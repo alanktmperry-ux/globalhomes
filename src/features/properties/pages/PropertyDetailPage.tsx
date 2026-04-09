@@ -80,7 +80,7 @@ export default function PropertyDetailPage() {
       const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
       const query = supabase
         .from('properties')
-        .select('*, agents(id, name, agency, phone, email, avatar_url, is_subscribed)')
+        .select('*, agents(id, name, agency, phone, email, avatar_url, is_subscribed, user_id)')
         .eq(isUuid ? 'id' : 'slug', id)
         .single();
 

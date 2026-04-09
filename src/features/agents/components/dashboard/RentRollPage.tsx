@@ -223,6 +223,13 @@ const RentRollPage = () => {
     return { label: `${daysBehind}d ($${owed.toFixed(0)})`, variant: 'destructive' as const, days: daysBehind, owed };
   };
 
+  // In arrears = latest payment period_to is >14 days ago
+  const overdueCount = activeTenancies.filter(t => {
+    const latest = latestPaymentMap.get(t.id);
+    if (!latest) return false;
+    return differenceInDays(today, new Date(latest.period_to)) > 14;
+  }).length;
+
   const getNextDue = (t: Tenancy) => {
     const latest = latestPaymentMap.get(t.id);
     if (!latest) return format(parseISO(t.lease_start), 'dd MMM yyyy');

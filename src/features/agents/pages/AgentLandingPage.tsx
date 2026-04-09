@@ -109,7 +109,7 @@ const AgentLandingPage = () => {
                   size="lg"
                   variant="outline"
                   onClick={() => navigate('/agents/login')}
-                  className="text-base px-8 py-5 rounded-xl font-bold border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 transition-all"
+                  className="text-base px-8 py-5 rounded-xl font-bold border-white/30 text-white hover:bg-white/10 hover:text-white transition-all"
                 >
                   <Lock size={18} className="mr-2" />
                   Login to Your Agency

@@ -47,35 +47,3 @@ export interface SuburbPriceTrendPoint {
   clearance_rate?: number;
 }
 
-export interface CmaReport {
-  id: string;
-  agent_id: string;
-  property_id?: string;
-  subject_address: string;
-  subject_suburb: string;
-  subject_state: string;
-  subject_postcode: string;
-  subject_bedrooms?: number;
-  subject_bathrooms?: number;
-  subject_car_spaces?: number;
-  subject_land_sqm?: number;
-  subject_property_type: string;
-  radius_km: number;
-  months_back: number;
-  selected_comparable_ids: string[];
-  estimated_price_low?: number;
-  estimated_price_mid?: number;
-  estimated_price_high?: number;
-  agent_recommended_price?: number;
-  agent_recommended_method?: string;
-  agent_commentary?: string;
-  report_title: string;
-  vendor_name?: string;
-  prepared_for_email?: string;
-  is_shared: boolean;
-  share_token: string;
-  viewed_at?: string;
-  view_count: number;
-  created_at: string;
-  updated_at: string;
-}

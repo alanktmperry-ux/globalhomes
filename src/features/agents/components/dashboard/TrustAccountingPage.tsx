@@ -199,12 +199,12 @@ const TrustAccountingPage = () => {
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
 
   const pendingTotal = useMemo(() =>
-    transactions.filter(t => t.status === 'pending').reduce((s, t) => s + t.amount, 0),
+    transactions.filter(t => t.status === 'pending' || t.status === 'received').reduce((s, t) => s + t.amount, 0),
     [transactions]);
 
   const clearedThisMonth = useMemo(() =>
     transactions
-      .filter(t => t.status === 'completed' && t.transaction_date >= monthStart)
+      .filter(t => (t.status === 'deposited' || t.status === 'cleared' || t.status === 'completed') && t.transaction_date >= monthStart)
       .reduce((s, t) => s + t.amount, 0),
     [transactions, monthStart]);
 

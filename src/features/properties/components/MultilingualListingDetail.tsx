@@ -201,8 +201,8 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
     <div className="space-y-6">
       {/* Auto-translation banner */}
       {autoTranslating && autoTranslateLang && (
-        <div className="flex items-center gap-2 rounded-lg border border-border bg-secondary px-4 py-3 text-sm text-foreground">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent shrink-0" />
+        <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm text-primary animate-pulse">
+          <span>✨</span>
           <span>
             Translating this listing into {LANGUAGE_DISPLAY_NAMES[autoTranslateLang]}…
           </span>

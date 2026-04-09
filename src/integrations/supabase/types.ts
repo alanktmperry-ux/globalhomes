@@ -9511,6 +9511,7 @@ export type Database = {
         Args: { p_auction_id: string; p_limit?: number }
         Returns: Json
       }
+      get_my_agent_id: { Args: never; Returns: string }
       get_own_agent_sensitive: {
         Args: { p_user_id: string }
         Returns: {

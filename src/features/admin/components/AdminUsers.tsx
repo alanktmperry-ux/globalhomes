@@ -693,6 +693,7 @@ const AdminUsers = () => {
                                 <CircleDollarSign size={14} />
                               </button>
                             )}
+                            <button
                               onClick={() => handleImpersonate(u.id, u.email)}
                               className="p-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
                               title="Act as this user"

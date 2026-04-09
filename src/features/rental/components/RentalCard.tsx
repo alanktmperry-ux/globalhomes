@@ -41,7 +41,12 @@ export function RentalCard({ property: p }: Props) {
       <div className="p-4">
         <div className="flex items-baseline justify-between mb-1">
           <span className="text-lg font-bold text-foreground">
-            ${p.rental_weekly?.toLocaleString()}/wk
+            {p.rental_weekly?.toLocaleString('en-AU', { style: 'currency', currency: 'AUD' })}/wk
+            {p.rental_weekly && (
+              <span className="text-xs font-normal text-muted-foreground ml-1">
+                · {(p.rental_weekly * 2).toLocaleString('en-AU', { style: 'currency', currency: 'AUD' })}/fn
+              </span>
+            )}
           </span>
           <span className="text-[10px] font-medium text-muted-foreground bg-secondary px-2 py-0.5 rounded-full uppercase">
             {p.property_type ?? 'Property'}

@@ -33,7 +33,7 @@ const DocumentsPage = () => {
 
   const loadDocs = async () => {
     if (!user) return;
-    const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
+    const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
     if (!agent) { setLoading(false); return; }
     setAgentId(agent.id);
     const { data } = await supabase.from('agent_credentials').select('*').eq('agent_id', agent.id).order('uploaded_at', { ascending: false });

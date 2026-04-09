@@ -69,7 +69,7 @@ const LeadMarketplacePage = () => {
 
   useEffect(() => {
     if (!user) return;
-    supabase.from('agents').select('id').eq('user_id', user.id).single().then(({ data }) => {
+    supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle().then(({ data }) => {
       if (data) setAgentId(data.id);
     });
   }, [user]);

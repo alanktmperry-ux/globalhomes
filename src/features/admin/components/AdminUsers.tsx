@@ -10,6 +10,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
@@ -99,6 +102,22 @@ const PlanBadge = ({ user }: { user: AuthUser }) => {
   return (
     <Badge variant="outline" className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 text-[10px] font-medium">
       Standard
+    </Badge>
+  );
+};
+
+const SubscriptionStatusBadge = ({ status }: { status?: string | null }) => {
+  if (!status) return null;
+  const config: Record<string, { bg: string; text: string; label: string }> = {
+    active: { bg: 'bg-emerald-500/15', text: 'text-emerald-600 dark:text-emerald-400', label: 'Active' },
+    payment_failed: { bg: 'bg-amber-500/15', text: 'text-amber-600 dark:text-amber-400', label: 'Payment Failed' },
+    locked: { bg: 'bg-red-500/15', text: 'text-red-600 dark:text-red-400', label: 'Locked' },
+    cancelled: { bg: 'bg-muted', text: 'text-muted-foreground', label: 'Cancelled' },
+  };
+  const c = config[status] || config.cancelled;
+  return (
+    <Badge variant="outline" className={`${c.bg} ${c.text} border-transparent text-[10px] font-medium`}>
+      {c.label}
     </Badge>
   );
 };

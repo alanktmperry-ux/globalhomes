@@ -505,6 +505,13 @@ const RentRollPage = () => {
               <div>
                 <Label>Management Fee % (AU standard 8.8%)</Label>
                 <Input type="number" step="0.01" value={form.management_fee_percent} onChange={e => setForm(f => ({ ...f, management_fee_percent: e.target.value }))} />
+                {(() => {
+                  const v = parseFloat(form.management_fee_percent);
+                  if (v <= 0) return <p className="text-xs text-destructive mt-1">Management fee cannot be zero or negative.</p>;
+                  if (v < 5) return <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">Below typical AU range (5–15%). Confirm with landlord.</p>;
+                  if (v > 15) return <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">Above typical AU range. Confirm this is correct.</p>;
+                  return null;
+                })()}
               </div>
               <div className="flex gap-2 mt-1">
                 <Button variant="outline" onClick={() => setStep(1)}>← Back</Button>

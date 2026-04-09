@@ -468,6 +468,7 @@ export type Database = {
           reviewer_email: string | null
           reviewer_name: string
           status: string
+          submitted_by: string | null
           suburb: string | null
           title: string | null
           verified: boolean | null
@@ -487,6 +488,7 @@ export type Database = {
           reviewer_email?: string | null
           reviewer_name: string
           status?: string
+          submitted_by?: string | null
           suburb?: string | null
           title?: string | null
           verified?: boolean | null
@@ -506,6 +508,7 @@ export type Database = {
           reviewer_email?: string | null
           reviewer_name?: string
           status?: string
+          submitted_by?: string | null
           suburb?: string | null
           title?: string | null
           verified?: boolean | null

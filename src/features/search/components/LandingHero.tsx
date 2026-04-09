@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Mic, ArrowRight, ChevronDown } from 'lucide-react';
+import { Search, Mic, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,20 +10,20 @@ const AVATAR_COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
 const AVATAR_INITIALS = ['A', 'M', 'S', 'J', 'R'];
 
 function usePlatformStats() {
-  const [stats, setStats] = useState<{ properties: number | null; buyersSearching: number; searching: number }>({
-    properties: null, buyersSearching: 150, searching: 12,
+  const [stats, setStats] = useState<{ properties: number | null; buyerCount: number | null; searching: number }>({
+    properties: null, buyerCount: null, searching: 12,
   });
 
   useEffect(() => {
     async function load() {
-      const [{ count: propCount }, { count: searchCount }] = await Promise.all([
+      const [{ count: propCount }, { count: profileCount }] = await Promise.all([
         supabase.from('properties').select('*', { count: 'exact', head: true }).eq('is_active', true),
-        supabase.from('voice_searches').select('*', { count: 'exact', head: true }),
+        supabase.from('profiles').select('*', { count: 'exact', head: true }),
       ]);
       setStats(s => ({
         ...s,
         properties: propCount ?? 0,
-        buyersSearching: Math.max(150, searchCount ?? 150),
+        buyerCount: (profileCount && profileCount > 0) ? profileCount : null,
       }));
     }
     load();
@@ -102,7 +102,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
     <div className="flex flex-col">
 
       {/* ── BUYER HERO — Light, warm, aspirational ── */}
-      <section className="relative flex flex-col items-center justify-center min-h-[calc(100vh-64px)] bg-white overflow-hidden px-6 text-center">
+      <section className="relative flex flex-col items-center justify-center py-16 md:py-24 bg-white overflow-hidden px-6 text-center">
 
         {/* Subtle warm gradient background */}
         <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-blue-50/40 pointer-events-none" />
@@ -193,6 +193,22 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
             </p>
           </form>
 
+          {/* Dual CTA pills */}
+          <div className="flex flex-wrap justify-center gap-4 mt-5">
+            <a
+              href="#featured"
+              className="text-sm text-slate-500 underline underline-offset-2 hover:text-slate-800 transition-colors"
+            >
+              🔍 Searching for a property? Start here
+            </a>
+            <a
+              href="/auth?mode=agent"
+              className="text-sm text-slate-500 underline underline-offset-2 hover:text-slate-800 transition-colors"
+            >
+              🏠 Are you an agent? List for free →
+            </a>
+          </div>
+
         </motion.div>
 
         {/* Social proof strip */}
@@ -200,7 +216,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.6 }}
-          className="relative z-10 mt-16 max-w-2xl w-full mx-auto"
+          className="relative z-10 mt-12 max-w-2xl w-full mx-auto"
         >
           {/* Live badge */}
           <div className="flex justify-center mb-3">
@@ -223,24 +239,34 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
 
             <div className="w-px h-9 bg-slate-100 hidden sm:block" />
 
-            {/* Buyers searching */}
-            <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
-              <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">
-                {platformStats.buyersSearching}
-                <span className="text-xl font-semibold text-blue-500">+</span>
-              </span>
-              <span className="text-[11px] text-slate-400 font-medium">{t('hero.buyersSearching')}</span>
-            </div>
+            {/* Buyers or Languages — show real buyer count if > 0, otherwise "24 Languages" */}
+            {platformStats.buyerCount && platformStats.buyerCount > 0 ? (
+              <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
+                <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">
+                  {platformStats.buyerCount}
+                  <span className="text-xl font-semibold text-blue-500">+</span>
+                </span>
+                <span className="text-[11px] text-slate-400 font-medium">{t('hero.buyersSearching')}</span>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
+                <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">24</span>
+                <span className="text-[11px] text-slate-400 font-medium">{t('hero.languages')}</span>
+              </div>
+            )}
 
             <div className="w-px h-9 bg-slate-100 hidden sm:block" />
 
-            {/* Languages */}
-            <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
-              <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">24</span>
-              <span className="text-[11px] text-slate-400 font-medium">{t('hero.languages')}</span>
-            </div>
-
-            <div className="w-px h-9 bg-slate-100 hidden sm:block" />
+            {/* Languages (always shown if buyer count is shown) */}
+            {platformStats.buyerCount && platformStats.buyerCount > 0 && (
+              <>
+                <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
+                  <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">24</span>
+                  <span className="text-[11px] text-slate-400 font-medium">{t('hero.languages')}</span>
+                </div>
+                <div className="w-px h-9 bg-slate-100 hidden sm:block" />
+              </>
+            )}
 
             {/* Searching now — avatar stack */}
             <div className="flex items-center gap-3">
@@ -263,19 +289,10 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
           </div>
         </motion.div>
 
-        {/* Scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1, duration: 0.6 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-slate-400"
-        >
-          <ChevronDown size={20} className="animate-bounce" />
-        </motion.div>
       </section>
 
       {/* Featured Listings */}
-      <section className="bg-white py-12 px-6">
+      <section id="featured" className="bg-white py-12 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-baseline justify-between mb-6">
             <div>

@@ -77,8 +77,8 @@ const translations: Record<Language, Record<string, string>> = {
     'header.listProperty': 'List a property', 'header.myListings': 'My listings',
   
     'hero.eyebrow': 'Australia\'s AI-powered property platform',
-    'hero.headline': 'Multilingual listings',
-    'hero.headline2': 'for Australian agents',
+    'hero.headline': 'Find your home.',
+    'hero.headline2': 'In your language.',
     'hero.subheadline': 'Search in 24 languages. See prices in your currency. Powered by AI voice search.',
     'hero.forSale': 'For Sale',
     'hero.forRent': 'For Rent',

@@ -299,7 +299,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
                   <div className="text-base font-semibold text-slate-900">{p.price}</div>
                   <div className="text-xs text-slate-500 mt-0.5 mb-2">{p.addr}</div>
                   <div className="flex gap-3 text-xs text-slate-400">
-                    <span>{p.beds} bed</span><span>{p.baths} bath</span><span>{p.cars} car</span>
+                    <span>{p.beds} {t('card.beds')}</span><span>{p.baths} {t('card.bath')}</span><span>{p.cars} {t('card.car')}</span>
                   </div>
                 </div>
               </div>

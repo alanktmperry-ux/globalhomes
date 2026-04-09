@@ -49,21 +49,29 @@ export interface ContactActivity {
 }
 
 export function useContacts() {
-  const { user } = useAuth();
+  const { user, isPrincipal, agencyId } = useAuth();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchContacts = useCallback(async () => {
     if (!user) return;
     setLoading(true);
-    const { data, error } = await supabase
+
+    let query = supabase
       .from('contacts')
       .select('*')
       .order('updated_at', { ascending: false });
 
+    // Principals see all agency contacts; regular agents see only their own
+    if (isPrincipal && agencyId) {
+      query = query.eq('agency_id', agencyId);
+    }
+
+    const { data, error } = await query;
+
     if (!error && data) setContacts(data as unknown as Contact[]);
     setLoading(false);
-  }, [user]);
+  }, [user, isPrincipal, agencyId]);
 
   useEffect(() => {
     fetchContacts();

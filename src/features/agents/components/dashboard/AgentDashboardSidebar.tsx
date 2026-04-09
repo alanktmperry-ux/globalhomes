@@ -67,7 +67,7 @@ const AgentDashboardSidebar = () => {
   const isMobile = useIsMobile();
   const location = useLocation();
   const navigate = useNavigate();
-  const { signOut, isAdmin, user } = useAuth();
+  const { signOut, isAdmin, isPrincipal, user } = useAuth();
   const { listings } = useAgentListings();
   const { plan, foundingMember } = useSubscription();
   const [arrearsCount, setArrearsCount] = useState(0);
@@ -340,6 +340,24 @@ const AgentDashboardSidebar = () => {
             </Button>
           )}
         </div>
+
+        {/* Team Overview — principals/admins only */}
+        {(isPrincipal || isAdmin) && (
+          <div
+            onClick={() => {
+              navigate('/dashboard/team-overview');
+              if (isMobile) setOpenMobile(false);
+            }}
+            className={`flex items-center gap-2.5 px-3 py-2 mx-2 rounded-lg text-sm cursor-pointer transition-colors mb-1 ${
+              location.pathname === '/dashboard/team-overview'
+                ? 'bg-secondary text-foreground font-medium'
+                : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground'
+            }`}
+          >
+            <Users size={16} />
+            {!collapsed && 'Team Overview'}
+          </div>
+        )}
 
         <div
           onClick={() => {

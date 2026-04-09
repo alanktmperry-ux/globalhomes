@@ -59,6 +59,7 @@ const AnalyticsPage = React.lazy(() => import("@/features/agents/components/dash
 const NetworkPage = React.lazy(() => import("@/features/agents/components/dashboard/NetworkPage"));
 const SettingsPage = React.lazy(() => import("@/features/agents/components/dashboard/SettingsPage"));
 const TeamPage = React.lazy(() => import("@/features/agents/components/dashboard/TeamPage"));
+const TeamOverviewPage = React.lazy(() => import("@/features/agents/pages/TeamOverviewPage"));
 const AgentProfilePage = React.lazy(() => import("@/features/agents/components/dashboard/ProfilePage"));
 const DocumentsPage = React.lazy(() => import("@/features/agents/components/dashboard/DocumentsPage"));
 const BillingPage = React.lazy(() => import("@/features/agents/components/dashboard/BillingPage"));
@@ -266,6 +267,7 @@ const App = () => (
                   <Route path="analytics" element={<AnalyticsPage />} />
                   <Route path="network" element={<NetworkPage />} />
                   <Route path="team" element={<TeamPage />} />
+                  <Route path="team-overview" element={<TeamOverviewPage />} />
                   <Route path="agencies" element={<MyAgenciesPage />} />
                   <Route path="documents" element={<DocumentsPage />} />
                   <Route path="billing" element={<BillingPage />} />

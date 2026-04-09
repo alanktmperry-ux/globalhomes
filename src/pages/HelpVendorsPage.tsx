@@ -5,7 +5,6 @@ import { FAQ_ITEMS } from '@/data/faq';
 
 const sections = [
   { title: 'Understanding Your Performance Report', ids: ['vendor-report'] },
-  { title: 'Viewing Your CMA', ids: ['vendor-cma'] },
   { title: 'Auction — What to Expect', ids: ['vendor-auction', 'auction-reserve', 'auction-vendor-bid'] },
   { title: 'Documents & Contracts', ids: ['vendor-documents'] },
   { title: 'Cooling-Off & Legal Overview', ids: ['vendor-cooling-off', 'auction-cooling-off'] },

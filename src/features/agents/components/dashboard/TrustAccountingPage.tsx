@@ -52,8 +52,7 @@ const TrustAccountingPage = () => {
   const {
     accounts, transactions, contacts, properties, loading,
     fetchAccounts, fetchTransactions,
-    createAccount, createTransaction, updateTransaction,
-    deleteTransaction, markAsCleared, bulkMarkCleared,
+    createAccount, createTransaction, voidTransaction,
   } = useTrustAccounting();
 
   // Filters
@@ -283,70 +282,13 @@ const TrustAccountingPage = () => {
     }
   };
 
-  const handleMarkCleared = async (tx: TrustTransaction) => {
-    try {
-      await markAsCleared(tx.id, tx.source_table);
-      toast.success('Marked as cleared');
-    } catch (e: unknown) {
-      toast.error(getErrorMessage(e));
-    }
-  };
-
-  const handleDeleteTx = async () => {
+  const handleVoidTx = async () => {
     if (!deletingTx) return;
     try {
-      await deleteTransaction(deletingTx.id, deletingTx.source_table);
-      toast.success('Transaction voided (audit trail preserved)');
+      await voidTransaction(deletingTx.id, deletingTx.source_table);
+      toast.success('Transaction voided (correction entry created)');
       setShowDeleteConfirm(false);
       setDeletingTx(null);
-    } catch (e: unknown) {
-      toast.error(getErrorMessage(e));
-    }
-  };
-
-  const handleBulkClear = async () => {
-    try {
-      await bulkMarkCleared();
-      toast.success('All pending entries marked as cleared');
-    } catch (e: unknown) {
-      toast.error(getErrorMessage(e));
-    }
-  };
-
-  const openEdit = (tx: TrustTransaction) => {
-    setEditingTx(tx);
-    setTxCategory(tx.category);
-    setTxAmount(String(tx.amount));
-    setTxDesc(tx.description || '');
-    setTxPayee(tx.payee_name || tx.client_name || '');
-    setTxContactId(tx.contact_id || '');
-    setTxPropertyId(tx.property_id || '');
-    setShowEditTx(true);
-  };
-
-  const handleEditTx = async () => {
-    if (!editingTx) return;
-    const amount = parseFloat(txAmount);
-    if (isNaN(amount) || amount <= 0) { toast.error('Enter a valid amount'); return; }
-
-    try {
-      const updates: Record<string, any> = {
-        amount,
-        description: txDesc || null,
-        property_id: txPropertyId || null,
-      };
-      if (editingTx.source_table === 'trust_receipts') {
-        updates.client_name = txPayee || null;
-        updates.purpose = txCategory;
-      } else {
-        updates.client_name = txPayee || null;
-        updates.payee_name = txPayee || null;
-        updates.purpose = txCategory;
-      }
-      await updateTransaction(editingTx.id, editingTx.source_table, updates);
-      toast.success('Transaction updated');
-      setShowEditTx(false);
-      setEditingTx(null);
     } catch (e: unknown) {
       toast.error(getErrorMessage(e));
     }
@@ -969,18 +911,8 @@ const TrustAccountingPage = () => {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-0.5 justify-end">
-                              {(tx.status === 'pending' || tx.status === 'received') && (
-                                <Button size="sm" variant="ghost" className="h-7 px-1.5 text-[10px] gap-1"
-                                  onClick={() => handleMarkCleared(tx)} title="Mark as Cleared">
-                                  <CheckCircle2 size={12} className="text-green-500" />
-                                </Button>
-                              )}
-                              <Button size="sm" variant="ghost" className="h-7 px-1.5"
-                                onClick={() => openEdit(tx)} title="Edit">
-                                <Pencil size={12} />
-                              </Button>
                               <Button size="sm" variant="ghost" className="h-7 px-1.5 text-destructive"
-                                onClick={() => { setDeletingTx(tx); setShowDeleteConfirm(true); }} title="Delete">
+                                onClick={() => { setDeletingTx(tx); setShowDeleteConfirm(true); }} title="Void">
                                 <Trash2 size={12} />
                               </Button>
                             </div>
@@ -1009,11 +941,9 @@ const TrustAccountingPage = () => {
               onClick={() => openNewTx('rent')}>
               <DollarSign size={14} /> New Rent Payment
             </Button>
-            <Button className="w-full justify-start gap-2 text-sm" variant="outline" size="sm"
-              onClick={handleBulkClear}
-              disabled={transactions.filter(t => t.status === 'pending' || t.status === 'received').length === 0}>
-              <CheckCircle2 size={14} /> Mark All Pending as Cleared
-            </Button>
+            <p className="text-[10px] text-muted-foreground italic mt-2">
+              Trust entries are immutable per audit regulations. Use Void to create a correction entry.
+            </p>
 
             {/* Account summaries */}
             <div className="pt-3 border-t border-border space-y-2">
@@ -1062,33 +992,18 @@ const TrustAccountingPage = () => {
         </DialogContent>
       </Dialog>
 
-      {/* ── Edit Transaction Dialog ── */}
-      <Dialog open={showEditTx} onOpenChange={setShowEditTx}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Transaction</DialogTitle>
-            <DialogDescription>Update this trust entry.</DialogDescription>
-          </DialogHeader>
-          {renderTxFormFields()}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowEditTx(false)}>Cancel</Button>
-            <Button onClick={handleEditTx}>Save Changes</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* ── Delete Confirmation ── */}
+      {/* ── Void Confirmation ── */}
       <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Void Transaction</DialogTitle>
             <DialogDescription>
-              This will mark the transaction as voided. It won't be deleted — the audit trail is preserved per Australian trust accounting regulations.
+              This will create a correction entry that reverses the original amount. The original entry is preserved per Australian trust accounting regulations.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={handleDeleteTx}>Void Transaction</Button>
+            <Button variant="destructive" onClick={handleVoidTx}>Void Transaction</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

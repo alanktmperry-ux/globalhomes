@@ -242,54 +242,57 @@ export function useTrustAccounting() {
     }
   };
 
-  const updateTransaction = async (id: string, sourceTable: 'trust_receipts' | 'trust_payments', updates: Record<string, any>) => {
-    const { error } = await supabase
-      .from(sourceTable)
-      .update(updates as any)
-      .eq('id', id);
-    if (error) throw error;
-    await fetchTransactions();
-  };
-
-  const deleteTransaction = async (id: string, sourceTable: 'trust_receipts' | 'trust_payments') => {
-    // Void instead of hard-delete for audit trail
-    const { error } = await supabase
-      .from(sourceTable)
-      .update({ status: 'voided' } as any)
-      .eq('id', id);
-    if (error) throw error;
-    await fetchTransactions();
-  };
-
-  const markAsCleared = async (id: string, sourceTable: 'trust_receipts' | 'trust_payments') => {
-    const statusValue = sourceTable === 'trust_receipts' ? 'deposited' : 'cleared';
-    await updateTransaction(id, sourceTable, { status: statusValue });
-  };
-
-  const bulkMarkCleared = async () => {
+  /** Trust entries are immutable. To "void" a receipt/payment, insert a correction entry that reverses the original amount. */
+  const voidTransaction = async (id: string, sourceTable: 'trust_receipts' | 'trust_payments') => {
     if (!user) return;
-    const pendingReceipts = transactions.filter(t => t.source_table === 'trust_receipts' && t.status === 'received');
-    const pendingPayments = transactions.filter(t => t.source_table === 'trust_payments' && t.status === 'pending');
+    // Find the original transaction
+    const original = transactions.find(t => t.id === id && t.source_table === sourceTable);
+    if (!original) throw new Error('Transaction not found');
 
-    if (pendingReceipts.length > 0) {
-      await supabase.from('trust_receipts').update({ status: 'deposited' } as any).in('id', pendingReceipts.map(t => t.id));
+    // Insert a reversal entry with negative amount
+    if (sourceTable === 'trust_receipts') {
+      const ref = `TR-VOID-${Date.now().toString(36).toUpperCase()}`;
+      const { error } = await supabase
+        .from('trust_receipts')
+        .insert({
+          agent_id: (await supabase.from('trust_receipts').select('agent_id').eq('id', id).maybeSingle()).data?.agent_id,
+          receipt_number: ref,
+          client_name: original.client_name || '',
+          property_address: original.property_address || '',
+          amount: -(original.amount),
+          payment_method: original.payment_method || 'eft',
+          purpose: 'voided',
+          date_received: new Date().toISOString().split('T')[0],
+          description: `Void of ${original.reference || id}`,
+          property_id: original.property_id || null,
+        } as any);
+      if (error) throw error;
+    } else {
+      const ref = `TP-VOID-${Date.now().toString(36).toUpperCase()}`;
+      const { error } = await supabase
+        .from('trust_payments')
+        .insert({
+          agent_id: (await supabase.from('trust_payments').select('agent_id').eq('id', id).maybeSingle()).data?.agent_id,
+          payment_number: ref,
+          client_name: original.client_name || '',
+          property_address: original.property_address || '',
+          amount: -(original.amount),
+          payment_method: original.payment_method || 'eft',
+          purpose: 'voided',
+          date_paid: new Date().toISOString().split('T')[0],
+          description: `Void of ${original.reference || id}`,
+          property_id: original.property_id || null,
+        } as any);
+      if (error) throw error;
     }
-    if (pendingPayments.length > 0) {
-      await supabase.from('trust_payments').update({ status: 'cleared' } as any).in('id', pendingPayments.map(t => t.id));
-    }
-    if (pendingReceipts.length > 0 || pendingPayments.length > 0) {
-      await Promise.all([fetchTransactions(), fetchAccounts()]);
-    }
-  };
 
-  const reconcileTransaction = async (id: string, sourceTable: 'trust_receipts' | 'trust_payments') => {
-    await updateTransaction(id, sourceTable, { status: 'reconciled' });
+    await Promise.all([fetchTransactions(), fetchAccounts()]);
   };
 
   return {
     accounts, transactions, contacts, properties, loading,
     fetchAccounts, fetchTransactions,
-    createAccount, createTransaction, updateTransaction,
-    deleteTransaction, markAsCleared, bulkMarkCleared, reconcileTransaction,
+    createAccount, createTransaction,
+    voidTransaction,
   };
 }

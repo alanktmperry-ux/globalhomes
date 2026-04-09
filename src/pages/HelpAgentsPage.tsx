@@ -22,7 +22,7 @@ export default function HelpAgentsPage() {
     <>
       <Helmet>
         <title>Agent Guide</title>
-        <meta name="description" content="Complete guide for real estate agents using ListHQ — listings, auctions, CRM, CMA reports, vendor dashboards, and more." />
+        <meta name="description" content="Complete guide for real estate agents using ListHQ — listings, auctions, CRM, vendor dashboards, and more." />
         <link rel="canonical" href="https://listhq.com.au/help/agents" />
       </Helmet>
       <div className="min-h-screen bg-background">

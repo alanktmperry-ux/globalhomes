@@ -158,7 +158,50 @@ export default function PropertyDetailPage() {
     fetchProperty();
   }, [id]);
 
-  // ── Increment view count (fire-and-forget, once per page load) ──
+  // ── Check if logged-in user is the listing agent ──
+  useEffect(() => {
+    if (!user || !rawProperty?.agents?.user_id) {
+      setIsOwnerAgent(false);
+      return;
+    }
+    setIsOwnerAgent(rawProperty.agents.user_id === user.id);
+  }, [user, rawProperty]);
+
+  const handleGenerateTranslations = async () => {
+    if (!property) return;
+    setTranslating(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const resp = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-translations`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session?.access_token}`,
+            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({ listing_id: property.id }),
+        }
+      );
+      const result = await resp.json();
+      if (!resp.ok) throw new Error(result.error || 'Translation failed');
+      toast.success('Translations generated! Refreshing…');
+      // Refresh raw property data
+      const { data: refreshed } = await supabase
+        .from('properties')
+        .select('*, agents(id, name, agency, phone, email, avatar_url, is_subscribed, user_id)')
+        .eq('id', property.id)
+        .single();
+      if (refreshed) setRawProperty(refreshed);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to generate translations');
+    } finally {
+      setTranslating(false);
+    }
+  };
+
+
   const viewTracked = useRef(false);
   useEffect(() => {
     if (!property || viewTracked.current) return;

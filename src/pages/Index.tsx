@@ -723,7 +723,11 @@ const Index = () => {
   // ── Check if URL has search params (skip hero entirely) ──────
   const hasUrlSearchParams = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return !!(params.get('location') || params.get('beds') || params.get('maxPrice') || params.get('type'));
+    return !!(
+      params.get('location') || params.get('beds') || params.get('maxPrice') ||
+      params.get('minPrice') || params.get('type') || params.get('radius') ||
+      params.get('baths') || params.get('sort')
+    );
   }, []);
 
   // ── Auto-scroll to results when URL has search params ──────

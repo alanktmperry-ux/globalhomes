@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, Home, Loader2, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
@@ -48,6 +48,18 @@ interface PropertyOption {
   suburb: string;
 }
 
+const BOND_AUTHORITIES = [
+  'RTBA (VIC)',
+  'NSW Fair Trading',
+  'RTA (QLD)',
+  'Consumer Protection WA',
+  'CBS (SA)',
+  'REIACT',
+  'NTCAT',
+] as const;
+
+const BSB_REGEX = /^\d{3}-?\d{3}$/;
+
 const toWeekly = (amount: number, freq: string): number => {
   if (freq === 'weekly') return amount;
   if (freq === 'fortnightly') return amount / 2;
@@ -86,12 +98,55 @@ const RentRollPage = () => {
     rent_frequency: 'weekly',
     bond_amount: '',
     bond_manual: false,
+    bond_authority: '',
+    bond_lodgement_number: '',
     management_fee_percent: '8.80',
     owner_name: '',
     owner_email: '',
     owner_bsb: '',
     owner_account_number: '',
   });
+
+  const initialForm = {
+    property_id: '', tenant_name: '', tenant_email: '', tenant_phone: '',
+    lease_start: '', lease_end: '', rent_amount: '', rent_frequency: 'weekly',
+    bond_amount: '', bond_manual: false, bond_authority: '', bond_lodgement_number: '',
+    management_fee_percent: '8.80', owner_name: '', owner_email: '',
+    owner_bsb: '', owner_account_number: '',
+  };
+
+  // --- Validation helpers ---
+  const bondExceedsFourWeeks = useMemo(() => {
+    const rent = parseFloat(form.rent_amount);
+    const bond = parseFloat(form.bond_amount);
+    if (!rent || !bond || rent <= 0) return false;
+    return bond > rent * 4;
+  }, [form.rent_amount, form.bond_amount]);
+
+  const fourWeeksAmount = useMemo(() => {
+    const rent = parseFloat(form.rent_amount);
+    return rent > 0 ? (rent * 4).toFixed(2) : '0.00';
+  }, [form.rent_amount]);
+
+  const leaseDateError = useMemo(() => {
+    if (!form.lease_start || !form.lease_end) return null;
+    if (form.lease_end <= form.lease_start) return 'Lease end date must be after start date';
+    return null;
+  }, [form.lease_start, form.lease_end]);
+
+  const bsbError = useMemo(() => {
+    if (!form.owner_bsb) return null;
+    if (!BSB_REGEX.test(form.owner_bsb)) return 'BSB must be 6 digits (e.g. 062-000)';
+    return null;
+  }, [form.owner_bsb]);
+
+  const step2Valid = useMemo(() => {
+    return !!(form.rent_amount && form.bond_amount && form.lease_start && form.lease_end && !leaseDateError);
+  }, [form.rent_amount, form.bond_amount, form.lease_start, form.lease_end, leaseDateError]);
+
+  const step3Valid = useMemo(() => {
+    return !bsbError;
+  }, [bsbError]);
 
   const fetchData = useCallback(async () => {
     if (!user) return;
@@ -186,38 +241,59 @@ const RentRollPage = () => {
       toast.error('Please fill required fields');
       return;
     }
+    if (leaseDateError) {
+      toast.error(leaseDateError);
+      return;
+    }
+    if (bsbError) {
+      toast.error(bsbError);
+      return;
+    }
+
     setSaving(true);
-    const { error } = await supabase.from('tenancies').insert({
+
+    // Auto-link CRM contact by email if available
+    let tenantContactId: string | null = null;
+    if (form.tenant_email) {
+      const { data: contactMatch } = await (supabase
+        .from('contacts' as any)
+        .select('id')
+        .eq('agent_id', agentId)
+        .eq('email', form.tenant_email.trim().toLowerCase())
+        .maybeSingle() as any) as { data: { id: string } | null };
+      if (contactMatch) tenantContactId = contactMatch.id;
+    }
+
+    const insertPayload = {
       agent_id: agentId,
       property_id: form.property_id,
       tenant_name: form.tenant_name,
       tenant_email: form.tenant_email || null,
       tenant_phone: form.tenant_phone || null,
+      tenant_contact_id: tenantContactId,
       lease_start: form.lease_start,
       lease_end: form.lease_end,
       rent_amount: parseFloat(form.rent_amount),
       rent_frequency: form.rent_frequency,
       bond_amount: parseFloat(form.bond_amount),
+      bond_authority: form.bond_authority || null,
+      bond_lodgement_number: form.bond_lodgement_number || null,
       management_fee_percent: parseFloat(form.management_fee_percent),
       owner_name: form.owner_name || null,
       owner_email: form.owner_email || null,
       owner_bsb: form.owner_bsb || null,
       owner_account_number: form.owner_account_number || null,
-    } as any);
+    };
+    const { error } = await supabase.from('tenancies').insert(insertPayload as any);
     setSaving(false);
 
     if (error) {
-      toast.error('Error creating tenancy — error.message');
+      toast.error(`Error creating tenancy — ${error.message}`);
     } else {
       toast.success('Tenancy created');
       setShowAddModal(false);
       setStep(1);
-      setForm({
-        property_id: '', tenant_name: '', tenant_email: '', tenant_phone: '',
-        lease_start: '', lease_end: '', rent_amount: '', rent_frequency: 'weekly',
-        bond_amount: '', bond_manual: false, management_fee_percent: '8.80', owner_name: '', owner_email: '',
-        owner_bsb: '', owner_account_number: '',
-      });
+      setForm(initialForm);
       fetchData();
     }
   };
@@ -496,11 +572,50 @@ const RentRollPage = () => {
                       Reset to 4 weeks
                     </button>
                   )}
+                  {bondExceedsFourWeeks && (
+                    <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                      ⚠️ Bond exceeds 4 weeks rent (${fourWeeksAmount}). Confirm this is correct.
+                    </p>
+                  )}
                 </div>
               </div>
+
+              {/* Bond Authority & Lodgement */}
               <div className="grid grid-cols-2 gap-3">
-                <div><Label>Lease Start *</Label><Input type="date" value={form.lease_start} onChange={e => setForm(f => ({ ...f, lease_start: e.target.value }))} /></div>
-                <div><Label>Lease End *</Label><Input type="date" value={form.lease_end} onChange={e => setForm(f => ({ ...f, lease_end: e.target.value }))} /></div>
+                <div>
+                  <Label>Bond Authority</Label>
+                  <Select value={form.bond_authority} onValueChange={v => setForm(f => ({ ...f, bond_authority: v }))}>
+                    <SelectTrigger><SelectValue placeholder="Select authority" /></SelectTrigger>
+                    <SelectContent>
+                      {BOND_AUTHORITIES.map(auth => (
+                        <SelectItem key={auth} value={auth}>{auth}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Bond Lodgement Ref</Label>
+                  <Input
+                    value={form.bond_lodgement_number}
+                    onChange={e => setForm(f => ({ ...f, bond_lodgement_number: e.target.value }))}
+                    placeholder="e.g. BL-2024-123456"
+                  />
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Enter the reference number from the bond authority receipt</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Lease Start *</Label>
+                  <Input type="date" value={form.lease_start} onChange={e => setForm(f => ({ ...f, lease_start: e.target.value }))} />
+                </div>
+                <div>
+                  <Label>Lease End *</Label>
+                  <Input type="date" value={form.lease_end} onChange={e => setForm(f => ({ ...f, lease_end: e.target.value }))} />
+                  {leaseDateError && (
+                    <p className="text-xs text-destructive mt-1">{leaseDateError}</p>
+                  )}
+                </div>
               </div>
               <div>
                 <Label>Management Fee % (AU standard 8.8%)</Label>
@@ -518,7 +633,7 @@ const RentRollPage = () => {
                 <Button
                   className="flex-1"
                   onClick={() => setStep(3)}
-                  disabled={!form.rent_amount || !form.bond_amount || !form.lease_start || !form.lease_end}
+                  disabled={!step2Valid}
                 >
                   Next →
                 </Button>
@@ -533,7 +648,28 @@ const RentRollPage = () => {
             const mgmt = parseFloat(form.management_fee_percent || '0');
             return (
               <div className="grid gap-3 py-2">
-                <p className="text-sm font-medium text-foreground">Confirm Details</p>
+                <p className="text-sm font-medium text-foreground">Owner / Payment Details</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><Label>Owner Name</Label><Input value={form.owner_name} onChange={e => setForm(f => ({ ...f, owner_name: e.target.value }))} /></div>
+                  <div><Label>Owner Email</Label><Input type="email" value={form.owner_email} onChange={e => setForm(f => ({ ...f, owner_email: e.target.value }))} /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>Owner BSB</Label>
+                    <Input
+                      value={form.owner_bsb}
+                      onChange={e => setForm(f => ({ ...f, owner_bsb: e.target.value }))}
+                      placeholder="e.g. 062-000"
+                    />
+                    {bsbError && <p className="text-xs text-destructive mt-1">{bsbError}</p>}
+                  </div>
+                  <div>
+                    <Label>Account Number</Label>
+                    <Input value={form.owner_account_number} onChange={e => setForm(f => ({ ...f, owner_account_number: e.target.value }))} placeholder="e.g. 12345678" />
+                  </div>
+                </div>
+
+                <p className="text-sm font-medium text-foreground mt-3">Confirm Details</p>
                 <div className="rounded-lg border bg-muted/30 p-4 text-sm space-y-2">
                   <div className="flex justify-between"><span className="text-muted-foreground">Property</span><span className="font-medium">{prop ? `${prop.address}, ${prop.suburb}` : '—'}</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Tenant</span><span className="font-medium">{form.tenant_name}</span></div>
@@ -542,12 +678,23 @@ const RentRollPage = () => {
                   <div className="border-t my-2" />
                   <div className="flex justify-between"><span className="text-muted-foreground">Weekly Rent</span><span className="font-medium">${weeklyRent.toFixed(2)}</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Bond</span><span>${bond.toFixed(2)} ({(bond / (weeklyRent || 1)).toFixed(1)} weeks)</span></div>
+                  {form.bond_authority && <div className="flex justify-between"><span className="text-muted-foreground">Bond Authority</span><span>{form.bond_authority}</span></div>}
+                  {form.bond_lodgement_number && <div className="flex justify-between"><span className="text-muted-foreground">Bond Ref</span><span>{form.bond_lodgement_number}</span></div>}
                   <div className="flex justify-between"><span className="text-muted-foreground">Lease</span><span>{form.lease_start} → {form.lease_end}</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Management %</span><span>{mgmt}%</span></div>
+                  {form.owner_name && <div className="flex justify-between"><span className="text-muted-foreground">Owner</span><span>{form.owner_name}</span></div>}
                 </div>
+
+                {bondExceedsFourWeeks && (
+                  <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                    <AlertTriangle size={14} className="text-amber-600 shrink-0 mt-0.5" />
+                    <p className="text-xs text-amber-700 dark:text-amber-400">Bond exceeds 4 weeks rent (${fourWeeksAmount}). Please confirm this is intentional.</p>
+                  </div>
+                )}
+
                 <div className="flex gap-2 mt-1">
                   <Button variant="outline" onClick={() => setStep(2)}>← Back</Button>
-                  <Button className="flex-1" onClick={handleSubmit} disabled={saving}>
+                  <Button className="flex-1" onClick={handleSubmit} disabled={saving || !step3Valid}>
                     {saving ? <Loader2 className="animate-spin mr-2" size={14} /> : null}
                     Create Tenancy
                   </Button>

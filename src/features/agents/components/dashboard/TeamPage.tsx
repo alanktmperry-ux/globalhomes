@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import UpgradeGate from '@/features/agents/components/shared/UpgradeGate';
-import { Copy, Plus, Trash2, UserPlus, Building2, Shield, Users, RefreshCw, Loader2, Camera, Upload, LogIn, ArrowRight, Mail, MapPin, Eye, Lock } from 'lucide-react';
+import { Copy, Plus, Trash2, UserPlus, Building2, Shield, Users, RefreshCw, Loader2, Camera, Upload, LogIn, ArrowRight, Mail, MapPin, Eye, Lock, Kanban, ClipboardList } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -54,8 +55,10 @@ const accessBadgeClass: Record<string, string> = {
 };
 
 const TeamPage = () => {
-  const { user } = useAuth();
+  const { user, isPrincipal: authIsPrincipal, isAdmin } = useAuth();
   const { canAccessTeam, seatLimit, loading: subLoading } = useSubscription();
+  const [searchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab') || 'team';
 
   const [agencyId, setAgencyId] = useState<string | null>(null);
   const [agencyName, setAgencyName] = useState('');

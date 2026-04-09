@@ -729,6 +729,8 @@ export type Database = {
           avg_rating: number | null
           bio: string | null
           company_logo_url: string | null
+          cpd_hours_completed: number | null
+          cpd_hours_required: number | null
           created_at: string
           email: string | null
           founding_member: boolean | null
@@ -753,6 +755,7 @@ export type Database = {
           onboarding_complete: boolean | null
           payment_failed_at: string | null
           phone: string | null
+          professional_indemnity_expiry: string | null
           profile_banner_url: string | null
           profile_photo_url: string | null
           profile_views: number | null
@@ -784,6 +787,8 @@ export type Database = {
           avg_rating?: number | null
           bio?: string | null
           company_logo_url?: string | null
+          cpd_hours_completed?: number | null
+          cpd_hours_required?: number | null
           created_at?: string
           email?: string | null
           founding_member?: boolean | null
@@ -808,6 +813,7 @@ export type Database = {
           onboarding_complete?: boolean | null
           payment_failed_at?: string | null
           phone?: string | null
+          professional_indemnity_expiry?: string | null
           profile_banner_url?: string | null
           profile_photo_url?: string | null
           profile_views?: number | null
@@ -839,6 +845,8 @@ export type Database = {
           avg_rating?: number | null
           bio?: string | null
           company_logo_url?: string | null
+          cpd_hours_completed?: number | null
+          cpd_hours_required?: number | null
           created_at?: string
           email?: string | null
           founding_member?: boolean | null
@@ -863,6 +871,7 @@ export type Database = {
           onboarding_complete?: boolean | null
           payment_failed_at?: string | null
           phone?: string | null
+          professional_indemnity_expiry?: string | null
           profile_banner_url?: string | null
           profile_photo_url?: string | null
           profile_views?: number | null
@@ -1743,6 +1752,81 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "properties_public_safe"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_log: {
+        Row: {
+          action_type: string
+          agency_id: string | null
+          agent_id: string | null
+          created_at: string | null
+          description: string | null
+          entity_id: string | null
+          entity_type: string
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          agency_id?: string | null
+          agent_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          agency_id?: string | null
+          agent_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_log_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_log_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_log_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_log_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_log_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
           },
         ]
       }

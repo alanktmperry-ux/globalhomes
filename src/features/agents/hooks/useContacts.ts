@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { logAction } from '@/shared/lib/auditLog';
 
 export interface Contact {
   id: string;
@@ -36,6 +37,8 @@ export interface Contact {
   tags: string[];
   created_at: string;
   updated_at: string;
+  // Joined agent data (when isPrincipal)
+  assigned_agent?: { name: string; avatar_url: string | null } | null;
 }
 
 export interface ContactActivity {
@@ -49,7 +52,7 @@ export interface ContactActivity {
 }
 
 export function useContacts() {
-  const { user, isPrincipal, agencyId } = useAuth();
+  const { user, isPrincipal, isAdmin, agencyId } = useAuth();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -57,21 +60,31 @@ export function useContacts() {
     if (!user) return;
     setLoading(true);
 
-    let query = supabase
-      .from('contacts')
-      .select('*')
-      .order('updated_at', { ascending: false });
+    // Principals/admins see all agency contacts with assigned agent name
+    if ((isPrincipal || isAdmin) && agencyId) {
+      const { data, error } = await supabase
+        .from('contacts')
+        .select('*, agents:assigned_agent_id(name, avatar_url)')
+        .eq('agency_id', agencyId)
+        .order('updated_at', { ascending: false });
 
-    // Principals see all agency contacts; regular agents see only their own
-    if (isPrincipal && agencyId) {
-      query = query.eq('agency_id', agencyId);
+      if (!error && data) {
+        setContacts(data.map((d: any) => ({
+          ...d,
+          assigned_agent: d.agents || null,
+          agents: undefined,
+        })) as unknown as Contact[]);
+      }
+    } else {
+      const { data, error } = await supabase
+        .from('contacts')
+        .select('*')
+        .order('updated_at', { ascending: false });
+
+      if (!error && data) setContacts(data as unknown as Contact[]);
     }
-
-    const { data, error } = await query;
-
-    if (!error && data) setContacts(data as unknown as Contact[]);
     setLoading(false);
-  }, [user, isPrincipal, agencyId]);
+  }, [user, isPrincipal, isAdmin, agencyId]);
 
   useEffect(() => {
     fetchContacts();
@@ -88,13 +101,17 @@ export function useContacts() {
     return () => { supabase.removeChannel(channel); };
   }, [fetchContacts]);
 
+  const getAgentContext = async () => {
+    if (!user) return { agentId: null, agencyId: null };
+    const { data } = await supabase.from('agents').select('id, agency_id').eq('user_id', user.id).maybeSingle();
+    return { agentId: data?.id || null, agencyId: data?.agency_id || null };
+  };
+
   const createContact = async (contact: Partial<Contact>) => {
     if (!user) throw new Error('You must be logged in to create a contact.');
 
-    // Verify we have an active Supabase session (JWT token)
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
-      // Try refreshing the session
       const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
       if (refreshError || !refreshData.session) {
         throw new Error('Your session has expired. Please log out and log back in.');
@@ -113,6 +130,19 @@ export function useContacts() {
       }
       throw error;
     }
+
+    // Audit log
+    const ctx = await getAgentContext();
+    logAction({
+      agencyId: ctx.agencyId,
+      agentId: ctx.agentId,
+      userId: user.id,
+      actionType: 'created',
+      entityType: 'contact',
+      entityId: data?.id,
+      description: `Created contact ${contact.first_name || ''} ${contact.last_name || ''}`.trim(),
+    });
+
     return data;
   };
 
@@ -122,6 +152,19 @@ export function useContacts() {
       .update(updates as any)
       .eq('id', id);
     if (error) throw error;
+
+    if (user) {
+      const ctx = await getAgentContext();
+      logAction({
+        agencyId: ctx.agencyId,
+        agentId: ctx.agentId,
+        userId: user.id,
+        actionType: 'updated',
+        entityType: 'contact',
+        entityId: id,
+        description: `Updated contact`,
+      });
+    }
   };
 
   const deleteContact = async (id: string) => {

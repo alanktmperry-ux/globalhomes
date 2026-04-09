@@ -943,14 +943,12 @@ const TrustAccountingPage = () => {
                     txWithBalance.map(tx => {
                       const isDeposit = tx.transaction_type === 'deposit';
                       const badge = STATUS_MAP[tx.status] || STATUS_MAP.pending;
-                      const clientName = tx.contact
-                        ? `${tx.contact.first_name} ${tx.contact.last_name || ''}`.trim()
-                        : tx.payee_name || '—';
+                      const clientName = tx.client_name || tx.payee_name || '—';
                       return (
                         <TableRow key={tx.id}>
                           <TableCell className="text-xs whitespace-nowrap">{DATE_FMT.format(new Date(tx.transaction_date))}</TableCell>
                           <TableCell className="text-xs">{clientName}</TableCell>
-                          <TableCell className="text-xs max-w-[180px] truncate">{tx.property?.address || '—'}</TableCell>
+                          <TableCell className="text-xs max-w-[180px] truncate">{tx.property_address || '—'}</TableCell>
                           <TableCell>
                             <Badge variant="outline" className="text-[10px] capitalize">{tx.category}</Badge>
                           </TableCell>

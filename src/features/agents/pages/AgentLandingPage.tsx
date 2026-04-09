@@ -86,14 +86,12 @@ const AgentLandingPage = () => {
                 >
                   List Off-Market Now <ArrowRight size={18} className="ml-1" />
                 </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="text-base px-8 py-6 rounded-xl font-semibold border-white/30 text-white hover:bg-white/10 hover:text-white"
+                <button
+                  className="inline-flex items-center justify-center text-base px-8 py-3 rounded-xl font-semibold border border-white/30 text-white bg-transparent hover:bg-white/10 transition-colors"
                   onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   <Play size={16} className="mr-1.5" /> See How It Works
-                </Button>
+                </button>
               </motion.div>
 
               {/* ─── DEMO & LOGIN CTAs ─── */}

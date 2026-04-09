@@ -89,7 +89,7 @@ const AgentLandingPage = () => {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="text-base px-8 py-6 rounded-xl font-semibold border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
+                  className="text-base px-8 py-6 rounded-xl font-semibold border-white/30 text-white hover:bg-white/10 hover:text-white"
                   onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   <Play size={16} className="mr-1.5" /> See How It Works

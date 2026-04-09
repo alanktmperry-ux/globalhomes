@@ -93,7 +93,33 @@ const Index = () => {
   const [heroPlatformStats, setHeroPlatformStats] = useState<{ properties: number | null; buyerCount: number | null }>({ properties: null, buyerCount: null });
   const heroInputRef = useRef<HTMLInputElement>(null);
 
-  // ── Search hook (filters & sort internalized) ────────────────
+  // Hero rotating language animation
+  useEffect(() => {
+    const interval = setInterval(() => setHeroLangIndex(i => (i + 1) % HERO_ROTATING_LANGUAGES.length), 2800);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Hero placeholder rotation
+  useEffect(() => {
+    const interval = setInterval(() => setHeroPlaceholderIndex(i => (i + 1) % HERO_PLACEHOLDERS.length), 3500);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Hero platform stats
+  useEffect(() => {
+    (async () => {
+      const [{ count: propCount }, { count: profileCount }] = await Promise.all([
+        supabase.from('properties').select('*', { count: 'exact', head: true }).eq('is_active', true),
+        supabase.from('profiles').select('*', { count: 'exact', head: true }),
+      ]);
+      setHeroPlatformStats({
+        properties: propCount ?? 0,
+        buyerCount: (profileCount && profileCount > 0) ? profileCount : null,
+      });
+    })();
+  }, []);
+
+
   const {
     filteredProperties,
     displayProperties,

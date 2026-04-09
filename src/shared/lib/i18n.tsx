@@ -6,7 +6,7 @@ export type Language = 'en' | 'zh' | 'zh-TW' | 'ko' | 'ms' | 'es' | 'ar' | 'hi' 
 const translations: Record<Language, Record<string, string>> = {
   en: {
     'app.name': 'ListHQ',
-    'search.placeholder': 'Search "4 bed house in Berwick for $850k"',
+    'search.placeholder': 'e.g. family home with pool in Brisbane',
     'search.voice.listening': 'Listening...',
     'search.resume': 'Resume Your Search',
     'search.recommended': 'Recommended for You',

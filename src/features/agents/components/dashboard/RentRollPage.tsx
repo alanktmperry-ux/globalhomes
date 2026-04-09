@@ -250,6 +250,15 @@ const RentRollPage = () => {
 
       {loading ? (
         <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" size={28} /></div>
+      ) : noAgent ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+            <Home size={40} className="text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold text-foreground mb-1">Agent profile required</h3>
+            <p className="text-sm text-muted-foreground max-w-md">Set up your agent profile to manage tenancies and rental income.</p>
+            <Button className="mt-4" onClick={() => navigate('/onboarding')}>Set Up Profile</Button>
+          </CardContent>
+        </Card>
       ) : (
         <>
           {/* Stats */}

@@ -178,7 +178,7 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
   );
 
   const isEnglish = language === 'en';
-  const t = isEnglish ? null : translations[language];
+  const t = isEnglish ? null : liveTranslations[language];
 
   const title = t?.title || listing.title || listing.address || 'Untitled';
   const description = t?.description || listing.description || '';
@@ -187,8 +187,18 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
 
   return (
     <div className="space-y-6">
+      {/* Auto-translation banner */}
+      {autoTranslating && autoTranslateLang && (
+        <div className="flex items-center gap-2 rounded-lg border border-border bg-secondary px-4 py-3 text-sm text-foreground">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent shrink-0" />
+          <span>
+            Translating this listing into {LANGUAGE_DISPLAY_NAMES[autoTranslateLang]}…
+          </span>
+        </div>
+      )}
+
       {/* Translation status warning */}
-      {listing.translation_status && listing.translation_status !== 'complete' && (
+      {!autoTranslating && listing.translation_status && listing.translation_status !== 'complete' && (
         <div className="flex items-center gap-2 rounded-lg border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-800 dark:border-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300">
           <AlertTriangle size={16} className="shrink-0" />
           <span>

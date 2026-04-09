@@ -256,25 +256,21 @@ const TrustAccountingPage = () => {
   };
 
   const handleCreateTx = async () => {
-    if (!txAmount || !txAccountId) return;
+    if (!txAmount || !agent) return;
     const amount = parseFloat(txAmount);
     if (isNaN(amount) || amount <= 0) { toast.error('Enter a valid amount'); return; }
-    const gstAmount = txGst ? amount * 0.1 : 0;
     const isDeposit = txCategory === 'deposit' || txCategory === 'rent';
 
     try {
       await createTransaction({
-        trust_account_id: txAccountId,
-        transaction_type: isDeposit ? 'deposit' : 'withdrawal',
-        category: txCategory,
+        type: isDeposit ? 'receipt' : 'payment',
+        agent_id: agent.id,
+        client_name: txPayee || 'Unknown',
+        property_address: properties.find(p => p.id === txPropertyId)?.address || '',
         amount,
-        gst_amount: gstAmount,
-        description: txDesc || null,
-        payee_name: txPayee || null,
-        contact_id: txContactId || null,
+        purpose: txCategory,
+        description: txDesc || undefined,
         property_id: txPropertyId || null,
-        status: 'pending',
-        transaction_date: new Date().toISOString().split('T')[0],
       });
       toast.success('Transaction recorded');
       setShowNewTx(false);
@@ -284,9 +280,9 @@ const TrustAccountingPage = () => {
     }
   };
 
-  const handleMarkCleared = async (id: string) => {
+  const handleMarkCleared = async (tx: TrustTransaction) => {
     try {
-      await markAsCleared(id);
+      await markAsCleared(tx.id, tx.source_table);
       toast.success('Marked as cleared');
     } catch (e: unknown) {
       toast.error(getErrorMessage(e));
@@ -294,12 +290,12 @@ const TrustAccountingPage = () => {
   };
 
   const handleDeleteTx = async () => {
-    if (!deletingTxId) return;
+    if (!deletingTx) return;
     try {
-      await deleteTransaction(deletingTxId);
+      await deleteTransaction(deletingTx.id, deletingTx.source_table);
       toast.success('Transaction voided (audit trail preserved)');
       setShowDeleteConfirm(false);
-      setDeletingTxId(null);
+      setDeletingTx(null);
     } catch (e: unknown) {
       toast.error(getErrorMessage(e));
     }
@@ -319,7 +315,7 @@ const TrustAccountingPage = () => {
     setTxCategory(tx.category);
     setTxAmount(String(tx.amount));
     setTxDesc(tx.description || '');
-    setTxPayee(tx.payee_name || '');
+    setTxPayee(tx.payee_name || tx.client_name || '');
     setTxContactId(tx.contact_id || '');
     setTxPropertyId(tx.property_id || '');
     setShowEditTx(true);
@@ -329,20 +325,22 @@ const TrustAccountingPage = () => {
     if (!editingTx) return;
     const amount = parseFloat(txAmount);
     if (isNaN(amount) || amount <= 0) { toast.error('Enter a valid amount'); return; }
-    const gstAmount = txGst ? amount * 0.1 : 0;
-    const isDeposit = txCategory === 'deposit' || txCategory === 'rent';
 
     try {
-      await updateTransaction(editingTx.id, {
-        category: txCategory,
-        transaction_type: isDeposit ? 'deposit' : 'withdrawal',
+      const updates: Record<string, any> = {
         amount,
-        gst_amount: gstAmount,
         description: txDesc || null,
-        payee_name: txPayee || null,
-        contact_id: txContactId || null,
         property_id: txPropertyId || null,
-      } as any);
+      };
+      if (editingTx.source_table === 'trust_receipts') {
+        updates.client_name = txPayee || null;
+        updates.purpose = txCategory;
+      } else {
+        updates.client_name = txPayee || null;
+        updates.payee_name = txPayee || null;
+        updates.purpose = txCategory;
+      }
+      await updateTransaction(editingTx.id, editingTx.source_table, updates);
       toast.success('Transaction updated');
       setShowEditTx(false);
       setEditingTx(null);

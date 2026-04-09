@@ -268,7 +268,7 @@ const Index = () => {
 
   // Fetch featured/boosted listings, deduplicated, with fallback
   useEffect(() => {
-    const cols = 'id, title, address, suburb, state, price, price_formatted, images, image_url, property_type, beds, baths, parking, lat, lng, boost_tier, is_featured, listing_type';
+    const cols = 'id, title, address, suburb, state, price, price_formatted, images, image_url, property_type, beds, baths, parking, lat, lng, boost_tier, is_featured, listing_type, translations';
     const MIN_FEATURED = 4;
 
     (async () => {

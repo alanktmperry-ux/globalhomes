@@ -723,6 +723,7 @@ export type Database = {
           admin_grace_until: string | null
           agency: string | null
           agency_id: string | null
+          agency_role: string | null
           aml_ctf_acknowledged: boolean | null
           avatar_url: string | null
           avg_rating: number | null
@@ -777,6 +778,7 @@ export type Database = {
           admin_grace_until?: string | null
           agency?: string | null
           agency_id?: string | null
+          agency_role?: string | null
           aml_ctf_acknowledged?: boolean | null
           avatar_url?: string | null
           avg_rating?: number | null
@@ -831,6 +833,7 @@ export type Database = {
           admin_grace_until?: string | null
           agency?: string | null
           agency_id?: string | null
+          agency_role?: string | null
           aml_ctf_acknowledged?: boolean | null
           avatar_url?: string | null
           avg_rating?: number | null

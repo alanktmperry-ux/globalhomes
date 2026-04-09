@@ -123,9 +123,10 @@ const formatAUD = (cents: number) => `$${(cents / 100).toLocaleString('en-AU')}`
 const PLAN_ORDER = ['demo', 'starter', 'pro', 'agency', 'enterprise'];
 
 const BillingPage = () => {
-  const { user } = useAuth();
+  const { user, isPrincipal, isAdmin, agencyId } = useAuth();
   const navigate = useNavigate();
   const sub = useSubscription();
+  const { agents: teamAgents, refetch: refetchTeam } = useTeamAgents();
   const [listingsUsed, setListingsUsed] = useState(0);
   const [upgrading, setUpgrading] = useState<string | null>(null);
   const [agentId, setAgentId] = useState<string | null>(null);

@@ -55,7 +55,12 @@ export function RentalKeyFacts({ property: p }: Props) {
     {
       icon: <Sofa className="w-4 h-4" />,
       label: 'Furnishings',
-      value: p.furnished ? 'Furnished' : 'Unfurnished',
+      value: p.furnished === 'furnished' ? 'Furnished'
+           : p.furnished === 'partially_furnished' ? 'Partially furnished'
+           : p.furnished === 'unfurnished' ? 'Unfurnished'
+           : p.furnished === true ? 'Furnished'
+           : p.furnished === false ? 'Unfurnished'
+           : 'Ask agent',
     },
     {
       icon: <PawPrint className="w-4 h-4" />,

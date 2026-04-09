@@ -56,7 +56,7 @@ export interface RentalProperty {
   available_from?: string;
   lease_term?: string;
   pets_allowed: boolean;
-  furnished: boolean | null;
+  furnished: FurnishedStatus | boolean | null;
   smoking_allowed: boolean;
   utilities_included: string[];
   beds?: number;

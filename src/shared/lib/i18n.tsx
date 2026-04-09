@@ -221,7 +221,6 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.forRent': '出租',
     'search.button': '搜索',
     'search.hint': '描述您的需求，AI 来完成其余工作',
-    'search.placeholder': '例如：布里斯班带泳池的家庭住宅',
     'property.viewProperty': '查看房源',
   },
   ko: {

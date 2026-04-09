@@ -89,7 +89,7 @@ export function useSubscription(): SubscriptionState {
           .from('agents')
           .select('id')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         if (!agent || cancelled) {
           if (!cancelled) setState(prev => ({ ...prev, loading: false }));

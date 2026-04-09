@@ -261,10 +261,25 @@ export default function TrustReceiptModal({ open, onOpenChange, onCreated, agent
               </div>
               <div>
                 <Label className="text-xs flex items-center gap-1.5 mb-1.5">
-                  <Home size={12} className="text-muted-foreground" /> Property Address *
+                  <Home size={12} className="text-muted-foreground" /> Property *
                 </Label>
-                <Input value={propertyAddress} onChange={e => setPropertyAddress(e.target.value)}
-                  placeholder="e.g. 123 Beach Rd, Gold Coast" className="h-9" />
+                {agentProperties.length > 0 ? (
+                  <Select value={selectedPropertyId} onValueChange={v => {
+                    setSelectedPropertyId(v);
+                    const prop = agentProperties.find(p => p.id === v);
+                    setPropertyAddress(prop?.address || '');
+                  }}>
+                    <SelectTrigger className="h-9"><SelectValue placeholder="Select property" /></SelectTrigger>
+                    <SelectContent>
+                      {agentProperties.map(p => (
+                        <SelectItem key={p.id} value={p.id}>{p.title || p.address}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input value={propertyAddress} onChange={e => setPropertyAddress(e.target.value)}
+                    placeholder="e.g. 123 Beach Rd, Gold Coast" className="h-9" />
+                )}
               </div>
             </div>
 

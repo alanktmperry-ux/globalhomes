@@ -137,7 +137,7 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
           })
           .then((result) => {
             if (result && result.data?.translations) {
-              const newTranslations = result.data.translations as Record<string, Translation>;
+              const newTranslations = result.data.translations as unknown as Record<string, Translation>;
               setLiveTranslations(newTranslations);
               if (newTranslations[targetLang]) {
                 setLanguage(targetLang);

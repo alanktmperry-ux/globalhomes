@@ -602,6 +602,11 @@ ${matterRows.length > 0 ? `
                 <Input value={accountName} onChange={e => setAccountName(e.target.value)} placeholder="e.g. Smith & Co Trust Account" className="mt-1.5 h-10" />
               </div>
 
+              <div>
+                <Label className="text-xs font-medium">Bank name</Label>
+                <Input value={bankName} onChange={e => setBankName(e.target.value)} placeholder="e.g. Commonwealth Bank" className="mt-1.5 h-10" />
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label className="text-xs font-medium">BSB</Label>

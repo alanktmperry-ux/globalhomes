@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Globe, ChevronDown, User, LogIn, Home, Building2, Plus, List, LayoutDashboard, ShieldCheck } from 'lucide-react';
+import { Globe, ChevronDown, User, LogIn, Home, Building2, Plus, List, LayoutDashboard, ShieldCheck, Menu } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
@@ -8,6 +8,7 @@ import { NotificationBell } from '@/features/agents/components/dashboard/Notific
 import { LanguageSwitcher } from '@/shared/components/layout/LanguageSwitcher';
 import { DarkModeToggle } from '@/shared/components/layout/DarkModeToggle';
 import { useI18n } from '@/shared/lib/i18n';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 export function SiteHeader() {
   const { listingMode, setListingMode } = useCurrency();
@@ -15,6 +16,7 @@ export function SiteHeader() {
   const { t } = useI18n();
   const navigate = useNavigate();
   const [showAgentMenu, setShowAgentMenu] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const agentMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -26,6 +28,11 @@ export function SiteHeader() {
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
+
+  const navTo = (path: string) => {
+    setMobileOpen(false);
+    navigate(path);
+  };
 
   return (
     <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-md border-b border-border/50">
@@ -40,7 +47,7 @@ export function SiteHeader() {
           </span>
         </Link>
         
-        {/* Sale / Rent toggle */}
+        {/* Sale / Rent toggle — visible on all sizes */}
         <div className="flex items-center bg-secondary rounded-full p-0.5 shrink-0">
           <button
             onClick={() => {
@@ -70,12 +77,11 @@ export function SiteHeader() {
           </button>
         </div>
 
-        {/* Right side actions */}
-        <div className="flex items-center gap-2 shrink-0">
+        {/* ─── Desktop right side actions (hidden below md) ─── */}
+        <div className="hidden md:flex items-center gap-2 shrink-0">
           <DarkModeToggle />
           <LanguageSwitcher />
 
-          {/* Agent dashboard shortcut – always visible for agents */}
           {user && isAgent && (
             <>
               <NotificationBell />
@@ -90,7 +96,6 @@ export function SiteHeader() {
             </>
           )}
 
-          {/* Admin shortcut – only for admins */}
           {user && isAdmin && (
             <button
               onClick={() => navigate('/admin')}
@@ -102,7 +107,6 @@ export function SiteHeader() {
             </button>
           )}
 
-          {/* Mode-aware role badge with agent quick actions */}
           {user && userRole && (
             <div ref={agentMenuRef} className="relative">
               <button
@@ -122,7 +126,6 @@ export function SiteHeader() {
                 {isAgent && <ChevronDown size={12} />}
               </button>
 
-              {/* Agent quick-action dropdown */}
               <AnimatePresence>
                 {isAgent && showAgentMenu && (
                   <motion.div
@@ -166,7 +169,6 @@ export function SiteHeader() {
             </div>
           )}
 
-          {/* User button */}
           <button
             onClick={() => navigate(user ? '/profile' : '/auth')}
             className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
@@ -174,6 +176,69 @@ export function SiteHeader() {
           >
             {user ? <User size={18} /> : <LogIn size={18} />}
           </button>
+        </div>
+
+        {/* ─── Mobile hamburger (visible below md) ─── */}
+        <div className="flex md:hidden items-center gap-1 shrink-0">
+          {user && isAgent && <NotificationBell />}
+          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+            <SheetTrigger asChild>
+              <button
+                className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                aria-label="Open menu"
+              >
+                <Menu size={20} />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-72 p-0">
+              <nav className="flex flex-col gap-1 p-4 pt-10">
+                {/* Theme & language */}
+                <div className="flex items-center gap-2 px-3 pb-3 border-b border-border mb-2">
+                  <DarkModeToggle />
+                  <LanguageSwitcher />
+                </div>
+
+                {/* Agent links */}
+                {user && isAgent && (
+                  <>
+                    <button onClick={() => navTo('/dashboard')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
+                      <LayoutDashboard size={16} className="text-primary" /> Dashboard
+                    </button>
+                    <button onClick={() => { localStorage.removeItem('pocket-listing-draft'); navTo('/pocket-listing?type=sale&t=' + Date.now()); }} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
+                      <Plus size={16} className="text-primary" /> Sale Listing
+                    </button>
+                    <button onClick={() => { localStorage.removeItem('pocket-listing-draft'); navTo('/pocket-listing?type=rent&t=' + Date.now()); }} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
+                      <Plus size={16} className="text-primary" /> Rental Listing
+                    </button>
+                    <button onClick={() => navTo('/dashboard/listings')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
+                      <List size={16} className="text-muted-foreground" /> {t('header.myListings')}
+                    </button>
+                    <div className="border-t border-border my-1" />
+                  </>
+                )}
+
+                {/* Admin link */}
+                {user && isAdmin && (
+                  <button onClick={() => navTo('/admin')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
+                    <ShieldCheck size={16} className="text-primary" /> Admin
+                  </button>
+                )}
+
+                {/* Buyer links */}
+                {user && !isAgent && (
+                  <button onClick={() => navTo('/saved')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
+                    <Home size={16} className="text-primary" /> {t('nav.search')}
+                  </button>
+                )}
+
+                {/* Profile / Sign in */}
+                <button onClick={() => navTo(user ? '/profile' : '/auth')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
+                  {user ? <User size={16} className="text-muted-foreground" /> : <LogIn size={16} className="text-muted-foreground" />}
+                  {user ? t('nav.profile') : t('common.signin')}
+                </button>
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>

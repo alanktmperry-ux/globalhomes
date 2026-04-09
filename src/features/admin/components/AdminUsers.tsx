@@ -200,7 +200,7 @@ const AdminUsers = () => {
     setActionLoading(null);
   };
 
-
+  const handlePlanChange = (plan: string) => {
     const limits: Record<string, { listings: number; seats: number }> = {
       demo: { listings: 3, seats: 1 },
       starter: { listings: 10, seats: 1 },

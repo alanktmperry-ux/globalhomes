@@ -62,6 +62,7 @@ const Index = () => {
   const [mapFullscreen, setMapFullscreen] = useState(false);
   const [mapCollapsed, setMapCollapsed] = useState(false);
   const [viewportHeight, setViewportHeight] = useState(() => window.innerHeight);
+  const resultsRef = useRef<HTMLDivElement>(null);
   const SNAP_POINTS = [0.35, 0.65, 0.85];
   const [sheetSnap, setSheetSnap] = useState(0); // index into SNAP_POINTS
   const sheetHeightMV = useMotionValue(viewportHeight * SNAP_POINTS[0]);

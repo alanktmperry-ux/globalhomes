@@ -47,9 +47,12 @@ export function PMApplicationsDashboard({ propertyId, rentPw }: Props) {
       )}
 
       {apps.map(app => {
-        const rentToIncomeOk = rentPw && app.annual_income
-          ? app.annual_income >= rentPw * 52 * 3
+        const rentToIncomePct = rentPw && app.annual_income
+          ? Math.round((rentPw * 52 / app.annual_income) * 100)
           : null;
+        const incomeRatioColor = rentToIncomePct != null
+          ? rentToIncomePct <= 33 ? 'text-green-600' : rentToIncomePct <= 40 ? 'text-amber-600' : 'text-red-600'
+          : '';
         return (
           <div key={app.id} className="bg-card border border-border rounded-2xl p-4 space-y-3">
             {/* Header */}
@@ -60,11 +63,14 @@ export function PMApplicationsDashboard({ propertyId, rentPw }: Props) {
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${STATUS_COLORS[app.status]}`}>
                     {app.status.replace('_', ' ')}
                   </span>
-                  {rentToIncomeOk === true && (
+                  {rentPw && rentToIncomePct != null && rentToIncomePct <= 33 && (
                     <span className="text-[10px] text-green-600 font-medium">✓ Income ratio OK</span>
                   )}
-                  {rentToIncomeOk === false && (
-                    <span className="text-[10px] text-amber-600 font-medium">⚠ Low income ratio</span>
+                  {rentPw && rentToIncomePct != null && rentToIncomePct > 33 && (
+                    <span className={`text-[10px] font-medium ${rentToIncomePct <= 40 ? 'text-amber-600' : 'text-red-600'}`}>⚠ {rentToIncomePct > 40 ? 'High' : 'Low'} income ratio</span>
+                  )}
+                  {rentPw && app.annual_income == null && (
+                    <span className="text-[10px] text-muted-foreground font-medium bg-secondary px-2 py-0.5 rounded-full">⚠ No income provided</span>
                   )}
                 </div>
                 <div className="flex gap-3 mt-1 text-xs text-muted-foreground">
@@ -78,16 +84,17 @@ export function PMApplicationsDashboard({ propertyId, rentPw }: Props) {
             </div>
 
             {/* Details grid */}
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-5 gap-2">
               {[
                 { label: 'Income', value: app.annual_income ? `$${(app.annual_income / 1000).toFixed(0)}k/yr` : '—' },
                 { label: 'Employment', value: EMP_LABELS[app.employment_status ?? ''] ?? '—' },
                 { label: 'Move in', value: app.move_in_date ? new Date(app.move_in_date).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' }) : '—' },
                 { label: 'Occupants', value: `${app.occupants ?? 1}${app.has_pets ? ' · Pets' : ''}` },
-              ].map(({ label, value }) => (
+                { label: 'Rent/Income', value: rentToIncomePct != null ? `${rentToIncomePct}%` : '—', color: incomeRatioColor },
+              ].map(({ label, value, color }) => (
                 <div key={label} className="bg-secondary rounded-lg p-2">
                   <p className="text-[10px] text-muted-foreground">{label}</p>
-                  <p className="text-xs font-medium text-foreground">{value}</p>
+                  <p className={`text-xs font-medium ${color || 'text-foreground'}`}>{value}</p>
                 </div>
               ))}
             </div>

@@ -7356,58 +7356,6 @@ export type Database = {
           },
         ]
       }
-      trust_account_balances: {
-        Row: {
-          agent_id: string
-          created_at: string
-          current_balance: number
-          id: string
-          last_reconciled_date: string | null
-          opening_balance: number
-          updated_at: string
-        }
-        Insert: {
-          agent_id: string
-          created_at?: string
-          current_balance?: number
-          id?: string
-          last_reconciled_date?: string | null
-          opening_balance?: number
-          updated_at?: string
-        }
-        Update: {
-          agent_id?: string
-          created_at?: string
-          current_balance?: number
-          id?: string
-          last_reconciled_date?: string | null
-          opening_balance?: number
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "trust_account_balances_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: true
-            referencedRelation: "agents"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trust_account_balances_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: true
-            referencedRelation: "agents_public"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trust_account_balances_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: true
-            referencedRelation: "agents_public_safe"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       trust_accounts: {
         Row: {
           account_name: string
@@ -9032,6 +8980,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      trust_account_balances: {
+        Row: {
+          agent_id: string | null
+          current_balance: number | null
+        }
+        Relationships: []
       }
     }
     Functions: {

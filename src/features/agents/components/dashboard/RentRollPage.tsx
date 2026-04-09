@@ -70,6 +70,7 @@ const RentRollPage = () => {
   const [payments, setPayments] = useState<RentPayment[]>([]);
   const [properties, setProperties] = useState<PropertyOption[]>([]);
   const [loading, setLoading] = useState(true);
+  const [noAgent, setNoAgent] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [step, setStep] = useState(1);

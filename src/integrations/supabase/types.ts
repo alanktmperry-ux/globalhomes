@@ -7825,14 +7825,17 @@ export type Database = {
           client_name: string
           created_at: string
           date_paid: string
+          description: string | null
           id: string
           payee_name: string | null
           payment_method: string
           payment_number: string
           property_address: string
+          property_id: string | null
           purpose: string
           reference: string | null
           status: string
+          type: string | null
         }
         Insert: {
           account_number?: string | null
@@ -7842,14 +7845,17 @@ export type Database = {
           client_name: string
           created_at?: string
           date_paid?: string
+          description?: string | null
           id?: string
           payee_name?: string | null
           payment_method?: string
           payment_number: string
           property_address: string
+          property_id?: string | null
           purpose?: string
           reference?: string | null
           status?: string
+          type?: string | null
         }
         Update: {
           account_number?: string | null
@@ -7859,14 +7865,17 @@ export type Database = {
           client_name?: string
           created_at?: string
           date_paid?: string
+          description?: string | null
           id?: string
           payee_name?: string | null
           payment_method?: string
           payment_number?: string
           property_address?: string
+          property_id?: string | null
           purpose?: string
           reference?: string | null
           status?: string
+          type?: string | null
         }
         Relationships: [
           {
@@ -7896,6 +7905,27 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "trust_account_balances"
             referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "trust_payments_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_payments_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_payments_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -7907,13 +7937,16 @@ export type Database = {
           created_at: string
           date_deposited: string | null
           date_received: string
+          description: string | null
           id: string
           ledger_account: string | null
           payment_method: string
           property_address: string
+          property_id: string | null
           purpose: string
           receipt_number: string
           status: string
+          type: string | null
         }
         Insert: {
           agent_id: string
@@ -7922,13 +7955,16 @@ export type Database = {
           created_at?: string
           date_deposited?: string | null
           date_received?: string
+          description?: string | null
           id?: string
           ledger_account?: string | null
           payment_method?: string
           property_address: string
+          property_id?: string | null
           purpose?: string
           receipt_number: string
           status?: string
+          type?: string | null
         }
         Update: {
           agent_id?: string
@@ -7937,13 +7973,16 @@ export type Database = {
           created_at?: string
           date_deposited?: string | null
           date_received?: string
+          description?: string | null
           id?: string
           ledger_account?: string | null
           payment_method?: string
           property_address?: string
+          property_id?: string | null
           purpose?: string
           receipt_number?: string
           status?: string
+          type?: string | null
         }
         Relationships: [
           {
@@ -7973,6 +8012,27 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "trust_account_balances"
             referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "trust_receipts_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_receipts_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_receipts_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
           },
         ]
       }

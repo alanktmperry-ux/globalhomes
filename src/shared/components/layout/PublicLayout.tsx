@@ -11,6 +11,7 @@ const PublicLayout = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SiteHeader />
+      <PaymentStatusBanner />
       <main className="flex-1 flex flex-col">
         <Outlet />
       </main>

@@ -45,6 +45,7 @@ export interface ListingDraft {
   estimatedRentalWeekly: number;
   rentalWeekly: number;
   rentalBondWeeks: number;
+  bondAmount: number;
   // Rental-specific
   availableFrom: string;
   leaseTerm: string;

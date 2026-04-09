@@ -99,6 +99,32 @@ export function PMApplicationsDashboard({ propertyId, rentPw }: Props) {
               ))}
             </div>
 
+            {/* Bond tracking – approved apps only */}
+            {app.status === 'approved' && (
+              <div className="grid grid-cols-3 gap-2">
+                <div className="bg-secondary rounded-lg p-2">
+                  <p className="text-[10px] text-muted-foreground">Bond collected</p>
+                  <p className="text-xs font-medium text-foreground">
+                    {app.bond_collected_at
+                      ? new Date(app.bond_collected_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })
+                      : 'Not yet collected'}
+                  </p>
+                </div>
+                <div className="bg-secondary rounded-lg p-2">
+                  <p className="text-[10px] text-muted-foreground">Lodgement ref</p>
+                  <p className="text-xs font-medium text-foreground">{app.bond_lodgement_ref || '—'}</p>
+                </div>
+                <div className="bg-secondary rounded-lg p-2">
+                  <p className="text-[10px] text-muted-foreground">Bond lodged</p>
+                  <p className="text-xs font-medium text-foreground">
+                    {app.bond_lodged_at
+                      ? new Date(app.bond_lodged_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })
+                      : 'Not yet lodged'}
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Actions */}
             <div className="flex gap-2 flex-wrap">
               {[

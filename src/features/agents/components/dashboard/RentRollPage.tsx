@@ -402,65 +402,142 @@ const RentRollPage = () => {
         </>
       )}
 
-      {/* Add Tenancy Modal */}
-      <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
+      <Dialog open={showAddModal} onOpenChange={(open) => { setShowAddModal(open); if (!open) setStep(1); }}>
         <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Add Tenancy</DialogTitle>
+            <DialogTitle>Add Tenancy — Step {step} of 3</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-2">
-            <div>
-              <Label>Property *</Label>
-              <Select value={form.property_id} onValueChange={v => setForm(f => ({ ...f, property_id: v }))}>
-                <SelectTrigger><SelectValue placeholder="Select property" /></SelectTrigger>
-                <SelectContent>
-                  {properties.map(p => (
-                    <SelectItem key={p.id} value={p.id}>{p.address}, {p.suburb}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div><Label>Tenant Name *</Label><Input value={form.tenant_name} onChange={e => setForm(f => ({ ...f, tenant_name: e.target.value }))} /></div>
-              <div><Label>Tenant Email</Label><Input type="email" value={form.tenant_email} onChange={e => setForm(f => ({ ...f, tenant_email: e.target.value }))} /></div>
-            </div>
-            <div><Label>Tenant Phone</Label><Input value={form.tenant_phone} onChange={e => setForm(f => ({ ...f, tenant_phone: e.target.value }))} /></div>
-            <div className="grid grid-cols-2 gap-3">
-              <div><Label>Lease Start *</Label><Input type="date" value={form.lease_start} onChange={e => setForm(f => ({ ...f, lease_start: e.target.value }))} /></div>
-              <div><Label>Lease End *</Label><Input type="date" value={form.lease_end} onChange={e => setForm(f => ({ ...f, lease_end: e.target.value }))} /></div>
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              <div><Label>Rent Amount *</Label><Input type="number" step="0.01" value={form.rent_amount} onChange={e => setForm(f => ({ ...f, rent_amount: e.target.value }))} /></div>
+
+          {/* Step indicators */}
+          <div className="flex items-center gap-2 mb-2">
+            {[1, 2, 3].map(s => (
+              <div key={s} className={`h-1.5 flex-1 rounded-full ${s <= step ? 'bg-primary' : 'bg-muted'}`} />
+            ))}
+          </div>
+
+          {step === 1 && (
+            <div className="grid gap-4 py-2">
               <div>
-                <Label>Frequency</Label>
-                <Select value={form.rent_frequency} onValueChange={v => setForm(f => ({ ...f, rent_frequency: v }))}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                <Label>Property (Rental) *</Label>
+                <Select value={form.property_id} onValueChange={v => setForm(f => ({ ...f, property_id: v }))}>
+                  <SelectTrigger><SelectValue placeholder="Select rental property" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="weekly">Weekly</SelectItem>
-                    <SelectItem value="fortnightly">Fortnightly</SelectItem>
-                    <SelectItem value="monthly">Monthly</SelectItem>
+                    {properties.map(p => (
+                      <SelectItem key={p.id} value={p.id}>{p.address}, {p.suburb}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
+                {properties.length === 0 && (
+                  <p className="text-xs text-muted-foreground mt-1">No rental properties found. Add a listing with category "Rent" first.</p>
+                )}
               </div>
-              <div><Label>Bond *</Label><Input type="number" step="0.01" value={form.bond_amount} onChange={e => setForm(f => ({ ...f, bond_amount: e.target.value }))} /></div>
-            </div>
-            <div><Label>Management Fee %</Label><Input type="number" step="0.01" value={form.management_fee_percent} onChange={e => setForm(f => ({ ...f, management_fee_percent: e.target.value }))} /></div>
-            <div className="border-t pt-3 mt-1">
-              <p className="text-xs font-medium text-muted-foreground mb-3">Owner Details</p>
+              <div>
+                <Label>Tenant Name *</Label>
+                <Input value={form.tenant_name} onChange={e => setForm(f => ({ ...f, tenant_name: e.target.value }))} />
+              </div>
               <div className="grid grid-cols-2 gap-3">
-                <div><Label>Owner Name</Label><Input value={form.owner_name} onChange={e => setForm(f => ({ ...f, owner_name: e.target.value }))} /></div>
-                <div><Label>Owner Email</Label><Input type="email" value={form.owner_email} onChange={e => setForm(f => ({ ...f, owner_email: e.target.value }))} /></div>
+                <div><Label>Tenant Email</Label><Input type="email" value={form.tenant_email} onChange={e => setForm(f => ({ ...f, tenant_email: e.target.value }))} /></div>
+                <div><Label>Tenant Phone</Label><Input value={form.tenant_phone} onChange={e => setForm(f => ({ ...f, tenant_phone: e.target.value }))} /></div>
               </div>
-              <div className="grid grid-cols-2 gap-3 mt-3">
-                <div><Label>Owner BSB</Label><Input value={form.owner_bsb} onChange={e => setForm(f => ({ ...f, owner_bsb: e.target.value }))} /></div>
-                <div><Label>Owner Account #</Label><Input value={form.owner_account_number} onChange={e => setForm(f => ({ ...f, owner_account_number: e.target.value }))} /></div>
+              <Button
+                onClick={() => setStep(2)}
+                disabled={!form.property_id || !form.tenant_name}
+              >
+                Next →
+              </Button>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="grid gap-4 py-2">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Weekly Rent *</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    placeholder="e.g. 550"
+                    value={form.rent_amount}
+                    onChange={e => {
+                      const val = e.target.value;
+                      setForm(f => ({
+                        ...f,
+                        rent_amount: val,
+                        rent_frequency: 'weekly',
+                        bond_amount: !f.bond_manual && val ? (parseFloat(val) * 4).toFixed(2) : f.bond_amount,
+                      }));
+                    }}
+                  />
+                </div>
+                <div>
+                  <Label>Bond Amount *</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={form.bond_amount}
+                    onChange={e => setForm(f => ({ ...f, bond_amount: e.target.value, bond_manual: true }))}
+                  />
+                  {form.bond_manual && form.rent_amount && (
+                    <button
+                      type="button"
+                      className="text-xs text-primary mt-1 hover:underline"
+                      onClick={() => setForm(f => ({ ...f, bond_amount: (parseFloat(f.rent_amount || '0') * 4).toFixed(2), bond_manual: false }))}
+                    >
+                      Reset to 4 weeks
+                    </button>
+                  )}
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Lease Start *</Label><Input type="date" value={form.lease_start} onChange={e => setForm(f => ({ ...f, lease_start: e.target.value }))} /></div>
+                <div><Label>Lease End *</Label><Input type="date" value={form.lease_end} onChange={e => setForm(f => ({ ...f, lease_end: e.target.value }))} /></div>
+              </div>
+              <div>
+                <Label>Management Fee % (AU standard 8.8%)</Label>
+                <Input type="number" step="0.01" value={form.management_fee_percent} onChange={e => setForm(f => ({ ...f, management_fee_percent: e.target.value }))} />
+              </div>
+              <div className="flex gap-2 mt-1">
+                <Button variant="outline" onClick={() => setStep(1)}>← Back</Button>
+                <Button
+                  className="flex-1"
+                  onClick={() => setStep(3)}
+                  disabled={!form.rent_amount || !form.bond_amount || !form.lease_start || !form.lease_end}
+                >
+                  Next →
+                </Button>
               </div>
             </div>
-            <Button onClick={handleSubmit} disabled={saving} className="mt-2">
-              {saving ? <Loader2 className="animate-spin mr-2" size={14} /> : null}
-              Create Tenancy
-            </Button>
-          </div>
+          )}
+
+          {step === 3 && (() => {
+            const prop = properties.find(p => p.id === form.property_id);
+            const weeklyRent = parseFloat(form.rent_amount || '0');
+            const bond = parseFloat(form.bond_amount || '0');
+            const mgmt = parseFloat(form.management_fee_percent || '0');
+            return (
+              <div className="grid gap-3 py-2">
+                <p className="text-sm font-medium text-foreground">Confirm Details</p>
+                <div className="rounded-lg border bg-muted/30 p-4 text-sm space-y-2">
+                  <div className="flex justify-between"><span className="text-muted-foreground">Property</span><span className="font-medium">{prop ? `${prop.address}, ${prop.suburb}` : '—'}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Tenant</span><span className="font-medium">{form.tenant_name}</span></div>
+                  {form.tenant_email && <div className="flex justify-between"><span className="text-muted-foreground">Email</span><span>{form.tenant_email}</span></div>}
+                  {form.tenant_phone && <div className="flex justify-between"><span className="text-muted-foreground">Phone</span><span>{form.tenant_phone}</span></div>}
+                  <div className="border-t my-2" />
+                  <div className="flex justify-between"><span className="text-muted-foreground">Weekly Rent</span><span className="font-medium">${weeklyRent.toFixed(2)}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Bond</span><span>${bond.toFixed(2)} ({(bond / (weeklyRent || 1)).toFixed(1)} weeks)</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Lease</span><span>{form.lease_start} → {form.lease_end}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Management %</span><span>{mgmt}%</span></div>
+                </div>
+                <div className="flex gap-2 mt-1">
+                  <Button variant="outline" onClick={() => setStep(2)}>← Back</Button>
+                  <Button className="flex-1" onClick={handleSubmit} disabled={saving}>
+                    {saving ? <Loader2 className="animate-spin mr-2" size={14} /> : null}
+                    Create Tenancy
+                  </Button>
+                </div>
+              </div>
+            );
+          })()}
         </DialogContent>
       </Dialog>
     </div>

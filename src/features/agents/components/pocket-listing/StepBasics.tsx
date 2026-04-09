@@ -89,10 +89,18 @@ const StepBasics = ({ draft, update }: Props) => {
   const showRange = draft.priceDisplay === 'range';
   const showAuction = draft.priceDisplay === 'eoi';
 
-  // ── RENTAL: single source of truth is rentalWeekly; sync to priceMin/priceMax
+  // ── RENTAL: single source of truth is rentalWeekly; sync to priceMin/priceMax + auto-populate bond
   const handleRentChange = (raw: string) => {
     const val = Number(raw.replace(/,/g, '')) || 0;
-    update({ rentalWeekly: val, priceMin: val, priceMax: val });
+    const prevBondAuto = (draft.rentalWeekly || 0) * (draft.rentalBondWeeks || 4);
+    const currentBond = (draft.rentalBondWeeks || 4) * (draft.rentalWeekly || 0);
+    const isStillAuto = !draft.rentalWeekly || currentBond === prevBondAuto;
+    update({
+      rentalWeekly: val,
+      priceMin: val,
+      priceMax: val,
+      ...(isStillAuto ? { rentalBondWeeks: draft.rentalBondWeeks || 4 } : {}),
+    });
   };
 
   // ── SALE: track whether agent has manually overridden priceMax away from the auto-10%
@@ -310,6 +318,14 @@ const StepBasics = ({ draft, update }: Props) => {
             <div>
               <Label className="text-xs text-muted-foreground mb-1 block">Bond (weeks)</Label>
               <Input type="number" min={1} max={8} value={draft.rentalBondWeeks || 4} onChange={(e) => update({ rentalBondWeeks: Number(e.target.value) || 4 })} placeholder="4" className="h-9" />
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Bond is typically 4 weeks rent. Adjust if required.
+              </p>
+              {draft.rentalWeekly > 0 && (
+                <p className="text-xs font-medium text-foreground mt-1">
+                  = ${((draft.rentalBondWeeks || 4) * draft.rentalWeekly).toLocaleString('en-AU')} bond
+                </p>
+              )}
             </div>
             <div>
               <Label className="text-xs text-muted-foreground mb-1 block">Available From</Label>

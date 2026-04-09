@@ -35,7 +35,7 @@ export default function FaqPage() {
     <>
       <Helmet>
         <title>FAQ — Frequently Asked Questions</title>
-        <meta name="description" content="Find answers to frequently asked questions about ListHQ — property listings, auctions, rentals, CMA reports, and more." />
+        <meta name="description" content="Find answers to frequently asked questions about ListHQ — property listings, auctions, rentals, and more." />
         <link rel="canonical" href="https://listhq.com.au/help/faq" />
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>

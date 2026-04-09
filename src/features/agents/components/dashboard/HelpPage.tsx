@@ -8,7 +8,7 @@ const QUICK_QUESTIONS = [
   'How does the CRM work?',
   'How do I set up an auction?',
   'How do I add a co-agent?',
-  'How do I create a CMA report?',
+  'How do agent reviews work?',
   'How do agent reviews work?',
   'How do I manage my billing?',
   'How do off-market listings work?',

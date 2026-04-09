@@ -102,10 +102,6 @@ const StrataDashboardLayout = React.lazy(() => import("./features/strata/pages/S
 const StrataAuthPage = React.lazy(() => import("./features/strata/pages/StrataAuthPage"));
 const SuburbPage = React.lazy(() => import("./pages/SuburbPage"));
 const SuburbSoldPage = React.lazy(() => import("./pages/SuburbSoldPage"));
-const CmaDashboardPage = React.lazy(() => import("./pages/CmaDashboardPage"));
-const CmaNewPage = React.lazy(() => import("./pages/CmaNewPage"));
-const CmaDetailPage = React.lazy(() => import("./pages/CmaDetailPage"));
-const CmaSharedPage = React.lazy(() => import("./pages/CmaSharedPage"));
 const SuburbProfilePage = React.lazy(() => import("./features/suburb/pages/SuburbProfilePage"));
 const HelpCentrePage = React.lazy(() => import("./pages/HelpCentrePage"));
 const FaqPage = React.lazy(() => import("./pages/FaqPage"));
@@ -207,7 +203,7 @@ const App = () => (
                   <Route path="/rent" element={<RentSearchPage />} />
                   <Route path="/rent/property/:id" element={<RentalPropertyPage />} />
                   <Route path="/suburb/:state/:slug/sold" element={<SuburbSoldPage />} />
-                  <Route path="/cma/:shareToken" element={<CmaSharedPage />} />
+                  
                   <Route path="/help" element={<HelpCentrePage />} />
                   <Route path="/help/faq" element={<FaqPage />} />
                   <Route path="/help/agents" element={<HelpAgentsPage />} />
@@ -287,9 +283,6 @@ const App = () => (
                   <Route path="help" element={<HelpPage />} />
                   <Route path="partner-access" element={<PartnerAccessPage />} />
                   <Route path="onboarding" element={<AgencyOnboardingPage />} />
-                  <Route path="cma" element={<CmaDashboardPage />} />
-                  <Route path="cma/new" element={<CmaNewPage />} />
-                  <Route path="cma/:id" element={<CmaDetailPage />} />
                 </Route>
 
                 {/* Partner */}

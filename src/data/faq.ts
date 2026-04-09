@@ -130,13 +130,6 @@ export const FAQ_ITEMS: FaqItem[] = [
     tags: ['documents', 'contract', 'section 32', 'vault'],
   },
   {
-    id: 'agent-cma',
-    question: 'How do I create a Comparative Market Analysis (CMA)?',
-    answer: 'Go to Dashboard → CMA Reports → New CMA. Step 1: enter the subject property\'s details (address, type, bedrooms). Step 2: select comparable sales from the suggested list — these are real sold properties in the same suburb, ranked by similarity. Step 3: set your valuation range, recommended price, sale method, and add your commentary. Share the CMA with the vendor via a secure link or email it directly.',
-    category: 'agents',
-    tags: ['cma', 'valuation', 'comparable sales', 'vendor presentation'],
-  },
-  {
     id: 'agent-saved-searches',
     question: 'How does the Saved Search Alerts system work?',
     answer: 'Buyers who save a search on ListHQ are automatically notified when a new listing matches their criteria. As an agent, when you publish a new listing, it is automatically matched against all saved searches and alert emails are sent to matching buyers within minutes. You can also see how many buyers have matching saved searches for a suburb before you list.',
@@ -311,13 +304,6 @@ export const FAQ_ITEMS: FaqItem[] = [
     tags: ['vendor', 'report', 'performance', 'analytics'],
   },
   {
-    id: 'vendor-cma',
-    question: 'What is the CMA report my agent sent me?',
-    answer: 'A Comparative Market Analysis (CMA) is a report your agent prepares to help you understand what your property is worth in the current market. It includes recent sales of comparable properties in your suburb, a price estimate range (low, mid, high), the agent\'s recommended sale price and method, and a commentary on current market conditions. The CMA link is unique to you and tracks when you open it.',
-    category: 'vendors',
-    tags: ['cma', 'valuation', 'price', 'comparable sales'],
-  },
-  {
     id: 'vendor-auction',
     question: 'What happens if my property is passed in at auction?',
     answer: 'If your property does not reach the reserve price at auction, it is "passed in". The highest genuine bidder typically has the first right of negotiation — the agent will contact them immediately after the auction to try to negotiate a sale. If no agreement is reached, the property will be listed for private treaty or another sale method. Cooling-off does NOT apply to sales negotiated on auction day.',
@@ -401,7 +387,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     id: 'billing-plans',
     question: 'What are the agent subscription plans?',
-    answer: 'ListHQ offers monthly subscription plans for agents. Visit our pricing page or contact hello@listhq.com.au for current pricing. All plans include unlimited property listings, access to the full CRM, open home management, auction tools, vendor reporting, document vault, and CMA reports.',
+    answer: 'ListHQ offers monthly subscription plans for agents. Visit our pricing page or contact hello@listhq.com.au for current pricing. All plans include unlimited property listings, access to the full CRM, open home management, auction tools, vendor reporting, and document vault.',
     category: 'billing',
     tags: ['plans', 'pricing', 'subscription'],
   },

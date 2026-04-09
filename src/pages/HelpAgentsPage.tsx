@@ -11,7 +11,7 @@ const sections = [
   { title: 'Auctions', ids: ['agent-auction-setup', 'agent-auction-registration'] },
   { title: 'CRM & Leads', ids: ['agent-crm', 'agent-saved-searches'] },
   { title: 'Rentals & Property Management', ids: ['agent-rental-pm'] },
-  { title: 'Market Tools', ids: ['agent-suburb-intelligence', 'agent-cma'] },
+  { title: 'Market Tools', ids: ['agent-suburb-intelligence'] },
   { title: 'Client Reporting', ids: ['agent-vendor-dashboard', 'agent-documents'] },
   { title: 'Reviews & Profile', ids: ['agent-reviews'] },
   { title: 'Billing & Support', ids: ['agent-billing', 'billing-plans', 'billing-cancel', 'billing-invoices', 'billing-update-card'] },
@@ -22,7 +22,7 @@ export default function HelpAgentsPage() {
     <>
       <Helmet>
         <title>Agent Guide</title>
-        <meta name="description" content="Complete guide for real estate agents using ListHQ — listings, auctions, CRM, CMA reports, vendor dashboards, and more." />
+        <meta name="description" content="Complete guide for real estate agents using ListHQ — listings, auctions, CRM, vendor dashboards, and more." />
         <link rel="canonical" href="https://listhq.com.au/help/agents" />
       </Helmet>
       <div className="min-h-screen bg-background">

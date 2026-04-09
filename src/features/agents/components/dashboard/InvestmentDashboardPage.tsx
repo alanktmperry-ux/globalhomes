@@ -133,20 +133,24 @@ const InvestmentDashboardPage = () => {
         leadCounts[l.property_id] = (leadCounts[l.property_id] || 0) + 1;
       });
 
-      // Fetch trust transaction summaries per property
-      const { data: trustTx } = await supabase
-        .from('trust_transactions')
+      // Fetch trust receipts and payments per property
+      const { data: trustReceipts } = await supabase
+        .from('trust_receipts')
+        .select('property_id, amount, status')
+        .in('property_id', propIds);
+      const { data: trustPayments } = await supabase
+        .from('trust_payments')
         .select('property_id, amount, status')
         .in('property_id', propIds);
 
       const trustDeposits: Record<string, number> = {};
       const trustPending: Record<string, number> = {};
-      (trustTx || []).forEach(t => {
+      (trustReceipts || []).forEach((t: any) => {
         if (!t.property_id) return;
-        if (t.status === 'completed' || t.status === 'reconciled') {
-          trustDeposits[t.property_id] = (trustDeposits[t.property_id] || 0) + t.amount;
-        } else if (t.status === 'pending') {
-          trustPending[t.property_id] = (trustPending[t.property_id] || 0) + t.amount;
+        if (t.status === 'deposited' || t.status === 'reconciled') {
+          trustDeposits[t.property_id] = (trustDeposits[t.property_id] || 0) + Number(t.amount);
+        } else if (t.status === 'received') {
+          trustPending[t.property_id] = (trustPending[t.property_id] || 0) + Number(t.amount);
         }
       });
 

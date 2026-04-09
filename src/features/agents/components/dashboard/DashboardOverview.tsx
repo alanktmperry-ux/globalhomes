@@ -144,13 +144,13 @@ const DashboardOverview = () => {
       const { data: agent } = await supabase
         .from('agents').select('id').eq('user_id', user.id).maybeSingle();
       if (!agent) return;
-      const { data } = await (supabase as any)
-        .from('trust_transactions').select('amount, transaction_type').eq('agent_id', agent.id);
-      if (!data) return;
-      const balance = (data as { amount: number; transaction_type: string }[]).reduce((sum: number, t) => {
-        return sum + (t.transaction_type === 'deposit' ? Number(t.amount) : -Number(t.amount));
-      }, 0);
-      setTrustBalance(Math.max(0, balance));
+      // Use trust_account_balances view for accurate balance
+      const { data } = await supabase
+        .from('trust_account_balances')
+        .select('current_balance')
+        .eq('agent_id', agent.id)
+        .maybeSingle();
+      if (data) setTrustBalance(Math.max(0, Number(data.current_balance) || 0));
     };
     fetchTrust();
   }, [user]);

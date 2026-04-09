@@ -66,11 +66,11 @@ const SettlementConcierge = () => {
         .eq('created_by', agent.id)
         .or('seller_pipeline_stage.in.(under_offer,settled),buyer_pipeline_stage.in.(under_offer,settled)');
 
-      // Also check trust_transactions for settlement-related entries
+      // Check trust_receipts for settlement-related entries
       const { data: trustTx } = await supabase
-        .from('trust_transactions')
-        .select('property_id, payee_name, created_at, status, category')
-        .in('category', ['settlement', 'holding_deposit', 'deposit'])
+        .from('trust_receipts')
+        .select('property_id, client_name, created_at, status, purpose')
+        .in('purpose', ['settlement', 'holding_deposit', 'deposit'])
         .order('created_at', { ascending: false })
         .limit(20);
 

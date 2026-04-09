@@ -348,8 +348,8 @@ export default function ComplianceMonitor() {
           .select('id, name, email, agency, license_number, licence_expiry_date, handles_trust_accounting'),
         supabase.from('trust_account_balances').select('agent_id, current_balance, last_reconciled_date'),
         supabase
-          .from('trust_transactions')
-          .select('id, trust_account_id, amount, description, created_at')
+          .from('trust_receipts')
+          .select('id, agent_id, amount, description, created_at')
           .gte('amount', AML_THRESHOLD)
           .order('created_at', { ascending: false }),
       ]);

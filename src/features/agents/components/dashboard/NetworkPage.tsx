@@ -316,18 +316,18 @@ const NetworkPage = () => {
       const { data: trustAccounts } = await supabase.from('trust_accounts').select('id').limit(1);
       if (trustAccounts && trustAccounts.length > 0) {
         const referralAmount = (contactTarget.price * (contactTarget.commission_rate || 2) / 100) * (contactTarget.referral_split_pct / 100);
-        await supabase.from('trust_transactions').insert({
-          trust_account_id: trustAccounts[0].id,
-          transaction_type: 'deposit',
-          category: 'commission',
+        const ref = `TR-${Date.now().toString(36).toUpperCase()}`;
+        await supabase.from('trust_receipts').insert({
+          agent_id: agent.id,
+          receipt_number: ref,
+          client_name: contactTarget.sharing_agent_name,
+          property_address: contactTarget.address || '',
           amount: referralAmount,
-          gst_amount: referralAmount * 0.1,
+          payment_method: 'eft',
+          purpose: 'commission',
+          date_received: new Date().toISOString().split('T')[0],
           description: `Referral deposit – ${contactTarget.address} (via ${contactTarget.sharing_agent_name})`,
-          payee_name: contactTarget.sharing_agent_name,
           property_id: contactTarget.property_id,
-          status: 'pending',
-          transaction_date: new Date().toISOString().split('T')[0],
-          created_by: user.id,
         } as any);
         toast.success('Trust entry created for referral deposit');
       }

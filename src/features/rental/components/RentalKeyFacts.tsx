@@ -1,4 +1,4 @@
-import { Calendar, PawPrint, Sofa, Clock, Zap, Cigarette, Car, WashingMachine, Wind, Users } from 'lucide-react';
+import { Calendar, PawPrint, Sofa, Clock, Zap, Cigarette, Car, WashingMachine, Wind, Users, DollarSign } from 'lucide-react';
 
 interface Props { property: any; }
 

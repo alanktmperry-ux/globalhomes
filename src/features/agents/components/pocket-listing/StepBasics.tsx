@@ -89,10 +89,18 @@ const StepBasics = ({ draft, update }: Props) => {
   const showRange = draft.priceDisplay === 'range';
   const showAuction = draft.priceDisplay === 'eoi';
 
-  // ── RENTAL: single source of truth is rentalWeekly; sync to priceMin/priceMax
+  // ── RENTAL: single source of truth is rentalWeekly; sync to priceMin/priceMax + auto-populate bond
   const handleRentChange = (raw: string) => {
     const val = Number(raw.replace(/,/g, '')) || 0;
-    update({ rentalWeekly: val, priceMin: val, priceMax: val });
+    const prevBondAuto = (draft.rentalWeekly || 0) * (draft.rentalBondWeeks || 4);
+    const currentBond = (draft.rentalBondWeeks || 4) * (draft.rentalWeekly || 0);
+    const isStillAuto = !draft.rentalWeekly || currentBond === prevBondAuto;
+    update({
+      rentalWeekly: val,
+      priceMin: val,
+      priceMax: val,
+      ...(isStillAuto ? { rentalBondWeeks: draft.rentalBondWeeks || 4 } : {}),
+    });
   };
 
   // ── SALE: track whether agent has manually overridden priceMax away from the auto-10%

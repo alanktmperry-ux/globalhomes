@@ -92,14 +92,14 @@ const StepBasics = ({ draft, update }: Props) => {
   // ── RENTAL: single source of truth is rentalWeekly; sync to priceMin/priceMax + auto-populate bond
   const handleRentChange = (raw: string) => {
     const val = Number(raw.replace(/,/g, '')) || 0;
-    const prevBondAuto = (draft.rentalWeekly || 0) * (draft.rentalBondWeeks || 4);
-    const currentBond = (draft.rentalBondWeeks || 4) * (draft.rentalWeekly || 0);
-    const isStillAuto = !draft.rentalWeekly || currentBond === prevBondAuto;
+    const prevAutoBond = (draft.rentalWeekly || 0) * 4;
+    const currentBond = draft.bondAmount ?? 0;
+    const isStillAuto = !draft.rentalWeekly || currentBond === 0 || currentBond === prevAutoBond;
     update({
       rentalWeekly: val,
       priceMin: val,
       priceMax: val,
-      ...(isStillAuto ? { rentalBondWeeks: draft.rentalBondWeeks || 4 } : {}),
+      ...(isStillAuto ? { bondAmount: val * 4 } : {}),
     });
   };
 

@@ -62,6 +62,7 @@ const Index = () => {
   const [mapFullscreen, setMapFullscreen] = useState(false);
   const [mapCollapsed, setMapCollapsed] = useState(false);
   const [viewportHeight, setViewportHeight] = useState(() => window.innerHeight);
+  const resultsRef = useRef<HTMLDivElement>(null);
   const SNAP_POINTS = [0.35, 0.65, 0.85];
   const [sheetSnap, setSheetSnap] = useState(0); // index into SNAP_POINTS
   const sheetHeightMV = useMotionValue(viewportHeight * SNAP_POINTS[0]);
@@ -725,6 +726,17 @@ const Index = () => {
     return !!(params.get('location') || params.get('beds') || params.get('maxPrice') || params.get('type'));
   }, []);
 
+  // ── Auto-scroll to results when URL has search params ──────
+  useEffect(() => {
+    if (hasUrlSearchParams && resultsRef.current) {
+      // Small delay to let the DOM settle after mount
+      const timer = setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [hasUrlSearchParams]);
+
   // ── Landing hero: shown until first search, hidden if URL has params ──
   if (!hasSearched && !hasUrlSearchParams) {
     return (
@@ -762,6 +774,7 @@ const Index = () => {
     {/* ── Desktop: Zillow-style split ────────────────────────── */}
     {!isMobile ? (
       <div
+        ref={resultsRef}
         className="flex overflow-hidden flex-1 min-h-0"
       >
           {/* LEFT: fixed map panel */}

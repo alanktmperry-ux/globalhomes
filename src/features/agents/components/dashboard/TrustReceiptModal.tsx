@@ -23,11 +23,10 @@ const PAYMENT_METHODS = [
 ];
 
 const PURPOSE_OPTIONS = [
-  { value: 'deposit', label: 'Deposit' },
-  { value: 'rent', label: 'Rent' },
-  { value: 'bond', label: 'Bond' },
-  { value: 'holding_fee', label: 'Holding Fee' },
-  { value: 'commission', label: 'Commission' },
+  { value: 'rent_receipt', label: 'Rent Receipt' },
+  { value: 'bond_receipt', label: 'Bond Receipt' },
+  { value: 'disbursement', label: 'Disbursement' },
+  { value: 'refund', label: 'Refund' },
 ];
 
 const LEDGER_OPTIONS = [

@@ -92,6 +92,7 @@ export default function PropertyDetailPage() {
 
       if (data) {
         const p: any = data;
+        setRawProperty(p);
         setProperty({
           id: p.id,
           title: p.title,

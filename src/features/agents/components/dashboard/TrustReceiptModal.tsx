@@ -185,7 +185,7 @@ export default function TrustReceiptModal({ open, onOpenChange, onCreated, agent
         paymentMethod: methodLabel,
         purpose: purposeLabel,
         ledger: ledgerLabel,
-        notes: notes.trim(),
+        notes: description.trim(),
         matterRef: matterRef.trim(),
         agentName: agent.name,
         agency: agent.agency || '',
@@ -354,7 +354,7 @@ export default function TrustReceiptModal({ open, onOpenChange, onCreated, agent
             {/* Notes */}
             <div>
               <Label className="text-xs mb-1.5">Notes</Label>
-              <Textarea value={notes} onChange={e => setNotes(e.target.value)}
+              <Textarea value={description} onChange={e => setDescription(e.target.value)}
                 placeholder="e.g. Buyer deposit for 123 Beach Rd purchase"
                 rows={2} />
             </div>
@@ -372,7 +372,7 @@ export default function TrustReceiptModal({ open, onOpenChange, onCreated, agent
             paymentMethod={methodLabel}
             purpose={purposeLabel}
             ledger={ledgerLabel}
-            notes={notes}
+            notes={description}
             matterRef={matterRef}
           />
         )}

@@ -357,22 +357,27 @@ const TrustAccountingPage = () => {
   };
 
   const handleCreateAccount = async () => {
-    if (!newAccName || !user) return;
+    if (!newAccName || !newAccBank || !newAccBsb || !newAccNumber || !user) return;
+    if (!/^\d{6}$/.test(newAccBsb)) { toast.error('BSB must be exactly 6 digits'); return; }
+    const openingBalance = parseFloat(newAccOpeningBalance) || 0;
     try {
-      const { data: agent } = await (await import('@/integrations/supabase/client')).supabase
+      const { data: agentData } = await supabase
         .from('agents').select('id').eq('user_id', user.id).maybeSingle();
-      if (!agent) { toast.error('Agent profile not found'); return; }
+      if (!agentData) { toast.error('Agent profile not found'); return; }
       await createAccount({
-        agent_id: agent.id,
+        agent_id: agentData.id,
         account_name: newAccName,
         account_type: newAccType,
-        bsb: newAccBsb || null,
-        account_number: newAccNumber || null,
-        bank_name: newAccBank || null,
-      });
-      toast.success('Account created');
+        bsb: newAccBsb,
+        account_number: newAccNumber,
+        bank_name: newAccBank,
+        balance: openingBalance,
+      } as any);
+      // Also update opening_balance and current_balance via direct update
+      toast.success('Trust account created');
       setShowNewAccount(false);
-      setNewAccName(''); setNewAccBsb(''); setNewAccNumber(''); setNewAccBank('');
+      setNewAccName(''); setNewAccBsb(''); setNewAccNumber(''); setNewAccBank(''); setNewAccOpeningBalance('0');
+      await fetchAccounts();
     } catch (e: unknown) {
       toast.error(getErrorMessage(e));
     }

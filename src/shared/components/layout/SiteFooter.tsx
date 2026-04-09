@@ -123,7 +123,7 @@ export function SiteFooter() {
         {/* Bottom bar */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 pt-6">
           <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.2)' }}>
-            ListHQ © {new Date().getFullYear()} · ABN 00 000 000 000
+            ListHQ © {new Date().getFullYear()} · ABN 65 608 526 781
           </span>
           <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.2)' }}>
             Licensed agents only · Trust account compliant · Australian property law

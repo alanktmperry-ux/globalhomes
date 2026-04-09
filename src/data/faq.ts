@@ -304,13 +304,6 @@ export const FAQ_ITEMS: FaqItem[] = [
     tags: ['vendor', 'report', 'performance', 'analytics'],
   },
   {
-    id: 'vendor-cma',
-    question: 'What is the CMA report my agent sent me?',
-    answer: 'A Comparative Market Analysis (CMA) is a report your agent prepares to help you understand what your property is worth in the current market. It includes recent sales of comparable properties in your suburb, a price estimate range (low, mid, high), the agent\'s recommended sale price and method, and a commentary on current market conditions. The CMA link is unique to you and tracks when you open it.',
-    category: 'vendors',
-    tags: ['cma', 'valuation', 'price', 'comparable sales'],
-  },
-  {
     id: 'vendor-auction',
     question: 'What happens if my property is passed in at auction?',
     answer: 'If your property does not reach the reserve price at auction, it is "passed in". The highest genuine bidder typically has the first right of negotiation — the agent will contact them immediately after the auction to try to negotiate a sale. If no agreement is reached, the property will be listed for private treaty or another sale method. Cooling-off does NOT apply to sales negotiated on auction day.',

@@ -11,7 +11,10 @@ interface AuthContextType {
   isAdmin: boolean;
   isPartner: boolean;
   isStrataManager: boolean;
+  isPrincipal: boolean;
   userRole: 'user' | 'agent' | 'admin' | 'partner' | 'strata_manager' | null;
+  agencyRole: string | null;
+  agencyId: string | null;
   signOut: () => Promise<void>;
   impersonating: boolean;
   impersonatedUser: string | null;
@@ -28,7 +31,10 @@ const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
   isPartner: false,
   isStrataManager: false,
+  isPrincipal: false,
   userRole: null,
+  agencyRole: null,
+  agencyId: null,
   signOut: async () => {},
   impersonating: false,
   impersonatedUser: null,
@@ -47,7 +53,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isPartner, setIsPartner] = useState(false);
   const [isStrataManager, setIsStrataManager] = useState(false);
+  const [isPrincipal, setIsPrincipal] = useState(false);
   const [userRole, setUserRole] = useState<'user' | 'agent' | 'admin' | 'partner' | 'strata_manager' | null>(null);
+  const [agencyRole, setAgencyRole] = useState<string | null>(null);
+  const [agencyId, setAgencyId] = useState<string | null>(null);
   const [rolesFetched, setRolesFetched] = useState(false);
   const lastFetchedUserId = useRef<string | null>(null);
   const [impersonating, setImpersonating] = useState(false);
@@ -87,11 +96,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const applyRoles = useCallback((roles: string[]) => {
-    
     setIsAdmin(roles.includes('admin'));
     setIsAgent(roles.includes('agent') || roles.includes('admin'));
     setIsPartner(roles.includes('partner'));
     setIsStrataManager(roles.includes('strata_manager'));
+    setIsPrincipal(roles.includes('principal'));
     setUserRole(
       roles.includes('admin') ? 'admin' : roles.includes('agent') ? 'agent' : roles.includes('partner') ? 'partner' : roles.includes('strata_manager') ? 'strata_manager' : 'user'
     );
@@ -103,7 +112,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsAdmin(false);
     setIsPartner(false);
     setIsStrataManager(false);
+    setIsPrincipal(false);
     setUserRole(null);
+    setAgencyRole(null);
+    setAgencyId(null);
     setRolesFetched(false);
   }, []);
 
@@ -126,6 +138,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         
         const roles = data?.map((r) => r.role) || [];
         applyRoles(roles);
+
+        // Fetch agent agency_role and agency_id
+        const { data: agentData } = await supabase
+          .from('agents')
+          .select('agency_role, agency_id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        if (!cancelled && agentData) {
+          setAgencyRole((agentData as any).agency_role || null);
+          setAgencyId(agentData.agency_id || null);
+          // Also set isPrincipal from agency_role
+          if ((agentData as any).agency_role === 'principal') {
+            setIsPrincipal(true);
+          }
+        }
       } catch (err) {
         console.error('[Auth] fetchRoles error:', err);
       } finally {
@@ -235,7 +262,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{
-      user, session, loading, isAgent, isAdmin, isPartner, isStrataManager, userRole, signOut,
+      user, session, loading, isAgent, isAdmin, isPartner, isStrataManager, isPrincipal, userRole,
+      agencyRole, agencyId, signOut,
       impersonating, impersonatedUser, impersonatedUserId, startImpersonation, stopImpersonation,
     }}>
       {children}

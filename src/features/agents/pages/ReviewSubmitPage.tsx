@@ -105,6 +105,7 @@ export default function ReviewSubmitPage() {
     setError('');
     setSubmitting(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
       const { error: reviewErr } = await supabase
         .from('agent_reviews')
         .insert({
@@ -115,7 +116,8 @@ export default function ReviewSubmitPage() {
           review_text: reviewText.trim(),
           relationship,
           status: 'pending',
-        });
+          submitted_by: user?.id ?? null,
+        } as any);
       if (reviewErr) throw reviewErr;
       await supabase
         .from('review_requests')

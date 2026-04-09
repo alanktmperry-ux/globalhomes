@@ -28,6 +28,7 @@ export function useSubmitReview(agentId: string) {
         relationship: form.review_type,
         status: 'pending',
         verified: false,
+        submitted_by: user?.id ?? null,
       } as any);
 
     if (err) {

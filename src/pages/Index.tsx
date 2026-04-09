@@ -774,6 +774,7 @@ const Index = () => {
     {/* ── Desktop: Zillow-style split ────────────────────────── */}
     {!isMobile ? (
       <div
+        ref={resultsRef}
         className="flex overflow-hidden flex-1 min-h-0"
       >
           {/* LEFT: fixed map panel */}

@@ -282,70 +282,13 @@ const TrustAccountingPage = () => {
     }
   };
 
-  const handleMarkCleared = async (tx: TrustTransaction) => {
-    try {
-      await markAsCleared(tx.id, tx.source_table);
-      toast.success('Marked as cleared');
-    } catch (e: unknown) {
-      toast.error(getErrorMessage(e));
-    }
-  };
-
-  const handleDeleteTx = async () => {
+  const handleVoidTx = async () => {
     if (!deletingTx) return;
     try {
-      await deleteTransaction(deletingTx.id, deletingTx.source_table);
-      toast.success('Transaction voided (audit trail preserved)');
+      await voidTransaction(deletingTx.id, deletingTx.source_table);
+      toast.success('Transaction voided (correction entry created)');
       setShowDeleteConfirm(false);
       setDeletingTx(null);
-    } catch (e: unknown) {
-      toast.error(getErrorMessage(e));
-    }
-  };
-
-  const handleBulkClear = async () => {
-    try {
-      await bulkMarkCleared();
-      toast.success('All pending entries marked as cleared');
-    } catch (e: unknown) {
-      toast.error(getErrorMessage(e));
-    }
-  };
-
-  const openEdit = (tx: TrustTransaction) => {
-    setEditingTx(tx);
-    setTxCategory(tx.category);
-    setTxAmount(String(tx.amount));
-    setTxDesc(tx.description || '');
-    setTxPayee(tx.payee_name || tx.client_name || '');
-    setTxContactId(tx.contact_id || '');
-    setTxPropertyId(tx.property_id || '');
-    setShowEditTx(true);
-  };
-
-  const handleEditTx = async () => {
-    if (!editingTx) return;
-    const amount = parseFloat(txAmount);
-    if (isNaN(amount) || amount <= 0) { toast.error('Enter a valid amount'); return; }
-
-    try {
-      const updates: Record<string, any> = {
-        amount,
-        description: txDesc || null,
-        property_id: txPropertyId || null,
-      };
-      if (editingTx.source_table === 'trust_receipts') {
-        updates.client_name = txPayee || null;
-        updates.purpose = txCategory;
-      } else {
-        updates.client_name = txPayee || null;
-        updates.payee_name = txPayee || null;
-        updates.purpose = txCategory;
-      }
-      await updateTransaction(editingTx.id, editingTx.source_table, updates);
-      toast.success('Transaction updated');
-      setShowEditTx(false);
-      setEditingTx(null);
     } catch (e: unknown) {
       toast.error(getErrorMessage(e));
     }

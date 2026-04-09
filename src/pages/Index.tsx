@@ -768,25 +768,21 @@ const Index = () => {
   );
 
   // ── Check if URL has search params (skip hero entirely) ──────
-  const hasUrlSearchParams = useMemo(() => {
-    const params = new URLSearchParams(window.location.search);
-    return !!(
-      params.get('location') || params.get('beds') || params.get('maxPrice') ||
-      params.get('minPrice') || params.get('type') || params.get('radius') ||
-      params.get('baths') || params.get('sort')
-    );
-  }, []);
+  const hasSearchParams = Boolean(
+    new URLSearchParams(window.location.search).get('location') ||
+    new URLSearchParams(window.location.search).get('beds') ||
+    new URLSearchParams(window.location.search).get('query')
+  );
 
   // ── Auto-scroll to results when URL has search params ──────
   useEffect(() => {
-    if (hasUrlSearchParams && resultsRef.current) {
-      // Small delay to let the DOM settle after mount
-      const timer = setTimeout(() => {
-        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (hasSearchParams) {
+      setTimeout(() => {
+        document.getElementById('featured-listings')
+          ?.scrollIntoView({ behavior: 'smooth' });
       }, 300);
-      return () => clearTimeout(timer);
     }
-  }, [hasUrlSearchParams]);
+  }, [hasSearchParams]);
 
   // ── Hero submit handler ──
   const handleHeroSubmit = (e: React.FormEvent) => {
@@ -809,7 +805,7 @@ const Index = () => {
   };
 
   // ── Landing hero: shown until first search, hidden if URL has params ──
-  if (!hasSearched && !hasUrlSearchParams) {
+  if (!hasSearched && !hasSearchParams) {
     return (
       <div className="flex flex-col">
         {/* ── HERO SECTION ── */}
@@ -1093,6 +1089,14 @@ const Index = () => {
 
   return (
     <div className={`flex flex-col bg-background ${!isMobile ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
+    {/* Results header when coming from search params */}
+    {hasSearchParams && new URLSearchParams(window.location.search).get('location') && (
+      <div className="px-6 pt-6 pb-2">
+        <p className="text-sm text-slate-500">
+          Showing results for <span className="font-medium text-slate-800">"{new URLSearchParams(window.location.search).get('location')}"</span>
+        </p>
+      </div>
+    )}
     {/* ── Top: Voice Search Bar ─────────────────────────────── */}
     <div className="shrink-0">
         <VoiceSearchErrorBoundary>

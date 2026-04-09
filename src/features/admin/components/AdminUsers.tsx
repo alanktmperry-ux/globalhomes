@@ -823,6 +823,55 @@ const AdminUsers = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={graceModal.open} onOpenChange={(o) => setGraceModal(m => ({ ...m, open: o }))}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Extend Grace Period</DialogTitle>
+            <p className="text-sm text-muted-foreground">{graceModal.email}</p>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="space-y-1.5">
+              <Label>Grace until</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !graceDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarClock className="mr-2 h-4 w-4" />
+                    {graceDate ? format(graceDate, 'PPP') : 'Pick a date'}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={graceDate}
+                    onSelect={setGraceDate}
+                    disabled={(date) => date < new Date()}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
+              <p className="text-xs text-muted-foreground">
+                If the agent is currently locked, this will restore dashboard access and set status back to "payment_failed".
+              </p>
+            </div>
+            <div className="flex gap-2 pt-2">
+              <Button onClick={handleExtendGrace} disabled={savingGrace || !graceDate} className="flex-1">
+                {savingGrace ? <><Loader2 className="h-4 w-4 animate-spin mr-1" /> Saving…</> : <><Check className="h-4 w-4 mr-1" /> Set grace period</>}
+              </Button>
+              <Button variant="ghost" size="icon" onClick={() => setGraceModal(m => ({ ...m, open: false }))}>
+                <X size={16} />
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 };

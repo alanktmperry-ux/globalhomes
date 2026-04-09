@@ -68,7 +68,7 @@ const TrustAccountingPage = () => {
   const [showNewReceipt, setShowNewReceipt] = useState(false);
   const [showImportWizard, setShowImportWizard] = useState(false);
   const [editingTx, setEditingTx] = useState<TrustTransaction | null>(null);
-  const [deletingTxId, setDeletingTxId] = useState<string | null>(null);
+  const [deletingTx, setDeletingTx] = useState<TrustTransaction | null>(null);
 
   // Bulk payments
   interface PendingPayment {

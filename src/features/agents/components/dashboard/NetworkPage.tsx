@@ -318,7 +318,7 @@ const NetworkPage = () => {
         const referralAmount = (contactTarget.price * (contactTarget.commission_rate || 2) / 100) * (contactTarget.referral_split_pct / 100);
         const ref = `TR-${Date.now().toString(36).toUpperCase()}`;
         await supabase.from('trust_receipts').insert({
-          agent_id: agent.id,
+          agent_id: agentId,
           receipt_number: ref,
           client_name: contactTarget.sharing_agent_name,
           property_address: contactTarget.address || '',

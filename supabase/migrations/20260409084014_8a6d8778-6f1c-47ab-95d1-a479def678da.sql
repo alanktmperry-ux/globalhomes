@@ -1,0 +1,1 @@
+ALTER TABLE tenancies ADD CONSTRAINT lease_dates_valid CHECK (lease_end > lease_start);

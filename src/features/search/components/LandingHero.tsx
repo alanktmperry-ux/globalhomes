@@ -288,10 +288,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
 
           </div>
         </motion.div>
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-slate-400"
-        >
-          <ChevronDown size={20} className="animate-bounce" />
-        </motion.div>
+
       </section>
 
       {/* Featured Listings */}

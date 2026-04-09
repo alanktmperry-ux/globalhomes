@@ -66,6 +66,7 @@ const BankReconciliationPage = () => {
   const [addDate, setAddDate] = useState(new Date().toISOString().split('T')[0]);
   const [addDesc, setAddDesc] = useState('');
   const [addAmount, setAddAmount] = useState('');
+  const [addType, setAddType] = useState<'credit' | 'debit'>('credit');
   const [addBalance, setAddBalance] = useState('');
   const [addSaving, setAddSaving] = useState(false);
 

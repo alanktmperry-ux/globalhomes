@@ -538,17 +538,32 @@ const TrustAccountingPage = () => {
   }
 
   function renderNewAccountDialog() {
+    const isFormValid = newAccName && newAccBank && newAccBsb && newAccNumber && /^\d{6}$/.test(newAccBsb);
     return (
       <Dialog open={showNewAccount} onOpenChange={setShowNewAccount}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>New Account</DialogTitle>
-            <DialogDescription>Create a trust or operating account.</DialogDescription>
+            <DialogTitle>Create Trust Account</DialogTitle>
+            <DialogDescription>Set up a new trust or operating account.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             <div>
-              <Label className="text-xs">Account Name</Label>
-              <Input value={newAccName} onChange={e => setNewAccName(e.target.value)} placeholder="e.g. Main Trust Account" />
+              <Label className="text-xs">Account Name <span className="text-destructive">*</span></Label>
+              <Input value={newAccName} onChange={e => setNewAccName(e.target.value)} placeholder="e.g. Main Trust Account" required />
+            </div>
+            <div>
+              <Label className="text-xs">Bank Name <span className="text-destructive">*</span></Label>
+              <Input value={newAccBank} onChange={e => setNewAccBank(e.target.value)} placeholder="e.g. NAB, CBA" required />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label className="text-xs">BSB (6 digits) <span className="text-destructive">*</span></Label>
+                <Input value={newAccBsb} onChange={e => setNewAccBsb(e.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="000000" maxLength={6} required />
+              </div>
+              <div>
+                <Label className="text-xs">Account Number <span className="text-destructive">*</span></Label>
+                <Input value={newAccNumber} onChange={e => setNewAccNumber(e.target.value)} placeholder="123456789" required />
+              </div>
             </div>
             <div>
               <Label className="text-xs">Type</Label>
@@ -560,24 +575,14 @@ const TrustAccountingPage = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label className="text-xs">BSB</Label>
-                <Input value={newAccBsb} onChange={e => setNewAccBsb(e.target.value)} placeholder="000-000" />
-              </div>
-              <div>
-                <Label className="text-xs">Account Number</Label>
-                <Input value={newAccNumber} onChange={e => setNewAccNumber(e.target.value)} placeholder="123456789" />
-              </div>
-            </div>
             <div>
-              <Label className="text-xs">Bank Name</Label>
-              <Input value={newAccBank} onChange={e => setNewAccBank(e.target.value)} placeholder="e.g. NAB, CBA" />
+              <Label className="text-xs">Opening Balance ($)</Label>
+              <Input type="number" min="0" step="0.01" value={newAccOpeningBalance} onChange={e => setNewAccOpeningBalance(e.target.value)} placeholder="0.00" />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowNewAccount(false)}>Cancel</Button>
-            <Button onClick={handleCreateAccount} disabled={!newAccName}>Create Account</Button>
+            <Button onClick={handleCreateAccount} disabled={!isFormValid}>Create Account</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

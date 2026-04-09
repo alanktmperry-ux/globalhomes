@@ -283,9 +283,6 @@ const App = () => (
                   <Route path="help" element={<HelpPage />} />
                   <Route path="partner-access" element={<PartnerAccessPage />} />
                   <Route path="onboarding" element={<AgencyOnboardingPage />} />
-                  <Route path="cma" element={<CmaDashboardPage />} />
-                  <Route path="cma/new" element={<CmaNewPage />} />
-                  <Route path="cma/:id" element={<CmaDetailPage />} />
                 </Route>
 
                 {/* Partner */}

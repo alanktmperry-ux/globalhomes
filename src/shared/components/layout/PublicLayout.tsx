@@ -3,6 +3,7 @@ import { SiteHeader } from "@/shared/components/layout/SiteHeader";
 import { SiteFooter } from "@/shared/components/layout/SiteFooter";
 import { BottomNav } from "@/shared/components/layout/BottomNav";
 import MapsDisclosure from "@/shared/components/MapsDisclosure";
+import { PaymentStatusBanner } from "@/features/agents/components/PaymentStatusBanner";
 
 const PublicLayout = () => {
   const location = useLocation();

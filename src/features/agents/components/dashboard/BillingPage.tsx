@@ -339,6 +339,48 @@ const BillingPage = () => {
           All prices in AUD + GST · No lock-in contracts, cancel anytime · Founding rate locked for life while subscribed · Annual billing available — save an additional 15% on any plan
         </p>
 
+        {/* Team Seats — Principal only */}
+        {(isPrincipal || isAdmin) && agencyId && teamAgents.length > 0 && (
+          <div className="bg-card border border-border rounded-xl p-5 space-y-4">
+            <h3 className="text-sm font-bold flex items-center gap-1.5">
+              <Users size={14} /> Team Seats
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              You have <strong>{teamAgents.length}</strong> active agent{teamAgents.length !== 1 ? 's' : ''} on your plan.
+            </p>
+            <div className="space-y-2">
+              {teamAgents.map(agent => (
+                <div key={agent.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-border/50">
+                  <div>
+                    <p className="text-sm font-medium">{agent.name}</p>
+                    <p className="text-xs text-muted-foreground">{agent.email || '—'} · {agent.agency_role}</p>
+                  </div>
+                  {agent.agency_role !== 'principal' && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs text-destructive hover:text-destructive gap-1"
+                      onClick={async () => {
+                        await supabase.from('agents').update({ is_subscribed: false } as any).eq('id', agent.id);
+                        if (user) {
+                          logAction({ agencyId, agentId: null, userId: user.id, actionType: 'deactivated', entityType: 'agent', entityId: agent.id, description: `Removed seat for ${agent.name}` });
+                        }
+                        toast.success(`${agent.name} seat removed`);
+                        refetchTeam();
+                      }}
+                    >
+                      <UserMinus size={12} /> Remove seat
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+            <Button variant="outline" size="sm" onClick={() => navigate('/dashboard/team')}>
+              <Users size={14} className="mr-1.5" /> Manage Team
+            </Button>
+          </div>
+        )}
+
         {/* Payment Method */}
         <div className="bg-card border border-border rounded-xl p-5 space-y-3">
           <h3 className="text-sm font-bold flex items-center gap-1.5">

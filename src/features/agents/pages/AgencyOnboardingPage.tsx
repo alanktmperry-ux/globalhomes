@@ -156,7 +156,7 @@ export default function AgencyOnboardingPage() {
     if (!user) return;
     setLoading(true);
     try {
-      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
+      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
       if (!agent) throw new Error('Agent not found');
 
       const cleanBsb = bsb.replace(/-/g, '');

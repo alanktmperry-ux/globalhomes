@@ -355,7 +355,7 @@ const RentRollPage = () => {
                                         e.stopPropagation();
                                         const addr = t.properties?.address || 'your property';
                                         try {
-                                          const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user?.id || '').single();
+                                          const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user?.id || '').maybeSingle();
                                           if (!agent) return;
                                           await supabase.functions.invoke('send-notification-email', {
                                             body: {

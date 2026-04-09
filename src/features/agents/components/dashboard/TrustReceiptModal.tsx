@@ -26,7 +26,7 @@ const PURPOSE_OPTIONS = [
   { value: 'rent_receipt', label: 'Rent Receipt' },
   { value: 'bond_receipt', label: 'Bond Receipt' },
   { value: 'disbursement', label: 'Disbursement' },
-  { value: 'refund', label: 'Refund' },
+  { value: 'journal_adjustment', label: 'Journal Adjustment' },
 ];
 
 const LEDGER_OPTIONS = [

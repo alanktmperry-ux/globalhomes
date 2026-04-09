@@ -197,20 +197,18 @@ const BankReconciliationPage = () => {
         : null;
       const bankBalance = latestItem?.bank_balance ?? 0;
 
-      // Upsert trust_account_balances
-      const { data: existing } = await supabase
-        .from('trust_account_balances')
+      // Update trust_accounts current_balance
+      const { data: existingAccount } = await supabase
+        .from('trust_accounts')
         .select('id')
         .eq('agent_id', agent.id)
-        .single();
+        .limit(1)
+        .maybeSingle();
 
-      if (existing) {
-        await supabase.from('trust_account_balances')
-          .update({ current_balance: bankBalance, last_reconciled_date: new Date().toISOString().split('T')[0] } as any)
-          .eq('id', existing.id);
-      } else {
-        await supabase.from('trust_account_balances')
-          .insert({ agent_id: agent.id, current_balance: bankBalance, opening_balance: bankBalance, last_reconciled_date: new Date().toISOString().split('T')[0] } as any);
+      if (existingAccount) {
+        await supabase.from('trust_accounts')
+          .update({ current_balance: bankBalance, balance: bankBalance } as any)
+          .eq('id', existingAccount.id);
       }
 
       // Mark all matched as reconciled (keep manual as-is)

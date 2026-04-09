@@ -15,20 +15,10 @@ export function DarkModeToggle() {
   return (
     <button
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      className="relative w-14 h-7 rounded-full bg-secondary border border-border transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="w-9 h-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
     >
-      <span
-        className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-primary flex items-center justify-center transition-transform duration-300 ${
-          isDark ? 'translate-x-7' : 'translate-x-0'
-        }`}
-      >
-        {isDark ? (
-          <Moon size={14} className="text-primary-foreground" />
-        ) : (
-          <Sun size={14} className="text-primary-foreground" />
-        )}
-      </span>
+      {isDark ? <Sun size={18} /> : <Moon size={18} />}
     </button>
   );
 }

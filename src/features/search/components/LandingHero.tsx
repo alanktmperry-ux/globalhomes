@@ -10,20 +10,20 @@ const AVATAR_COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
 const AVATAR_INITIALS = ['A', 'M', 'S', 'J', 'R'];
 
 function usePlatformStats() {
-  const [stats, setStats] = useState<{ properties: number | null; buyersSearching: number; searching: number }>({
-    properties: null, buyersSearching: 150, searching: 12,
+  const [stats, setStats] = useState<{ properties: number | null; buyerCount: number | null; searching: number }>({
+    properties: null, buyerCount: null, searching: 12,
   });
 
   useEffect(() => {
     async function load() {
-      const [{ count: propCount }, { count: searchCount }] = await Promise.all([
+      const [{ count: propCount }, { count: profileCount }] = await Promise.all([
         supabase.from('properties').select('*', { count: 'exact', head: true }).eq('is_active', true),
-        supabase.from('voice_searches').select('*', { count: 'exact', head: true }),
+        supabase.from('profiles').select('*', { count: 'exact', head: true }),
       ]);
       setStats(s => ({
         ...s,
         properties: propCount ?? 0,
-        buyersSearching: Math.max(150, searchCount ?? 150),
+        buyerCount: (profileCount && profileCount > 0) ? profileCount : null,
       }));
     }
     load();

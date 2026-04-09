@@ -100,7 +100,7 @@ const SettlementConcierge = () => {
         .map((tx: any) => ({
           id: `trust-${tx.property_id}-${tx.created_at}`,
           address: tx.property_id,
-          buyerName: tx.payee_name || 'Unknown buyer',
+          buyerName: tx.client_name || 'Unknown buyer',
           settlementDate: parseISO(tx.created_at),
           propertyId: tx.property_id,
           contactId: null as string | null,

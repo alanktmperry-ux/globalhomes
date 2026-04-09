@@ -148,8 +148,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (!cancelled && agentData) {
           setAgencyRole((agentData as any).agency_role || null);
           setAgencyId(agentData.agency_id || null);
-          // Also set isPrincipal from agency_role
-          if ((agentData as any).agency_role === 'principal') {
+          if ((agentData as any).agency_role === 'principal' || (agentData as any).agency_role === 'admin') {
             setIsPrincipal(true);
           }
         }

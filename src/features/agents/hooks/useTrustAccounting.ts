@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { toast } from 'sonner';
 
 export interface TrustAccount {
   id: string;
@@ -64,120 +65,148 @@ export function useTrustAccounting() {
 
   const fetchAccounts = useCallback(async () => {
     if (!user) return;
-    const { data } = await supabase
-      .from('trust_accounts')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (data) setAccounts(data as unknown as TrustAccount[]);
+    try {
+      const { data, error } = await supabase
+        .from('trust_accounts')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      if (data) setAccounts(data as unknown as TrustAccount[]);
+    } catch (err: any) {
+      console.error('Failed to fetch trust accounts:', err);
+      toast.error('Failed to load trust accounts');
+    }
   }, [user]);
 
   const fetchTransactions = useCallback(async () => {
     if (!user) return;
+    try {
+      const { data: receipts, error: rErr } = await supabase
+        .from('trust_receipts')
+        .select('*')
+        .order('date_received', { ascending: false });
+      if (rErr) throw rErr;
 
-    // Fetch receipts (money in)
-    const { data: receipts } = await supabase
-      .from('trust_receipts')
-      .select('*')
-      .order('date_received', { ascending: false });
+      const { data: payments, error: pErr } = await supabase
+        .from('trust_payments')
+        .select('*')
+        .order('date_paid', { ascending: false });
+      if (pErr) throw pErr;
 
-    // Fetch payments (money out)
-    const { data: payments } = await supabase
-      .from('trust_payments')
-      .select('*')
-      .order('date_paid', { ascending: false });
+      const mapped: TrustTransaction[] = [];
 
-    const mapped: TrustTransaction[] = [];
-
-    if (receipts) {
-      for (const r of receipts as any[]) {
-        mapped.push({
-          id: r.id,
-          source_table: 'trust_receipts',
-          transaction_type: 'deposit',
-          category: r.purpose || r.type || 'deposit',
-          amount: Number(r.amount) || 0,
-          gst_amount: 0,
-          description: r.description || null,
-          payee_name: r.client_name || null,
-          client_name: r.client_name || null,
-          property_address: r.property_address || null,
-          property_id: r.property_id || null,
-          contact_id: null,
-          reference: r.receipt_number || null,
-          status: r.status || 'received',
-          transaction_date: r.date_received || r.created_at?.split('T')[0] || '',
-          payment_method: r.payment_method || null,
-          created_at: r.created_at,
-        });
+      if (receipts) {
+        for (const r of receipts as any[]) {
+          mapped.push({
+            id: r.id,
+            source_table: 'trust_receipts',
+            transaction_type: 'deposit',
+            category: r.purpose || r.type || 'deposit',
+            amount: Number(r.amount) || 0,
+            gst_amount: 0,
+            description: r.description || null,
+            payee_name: r.client_name || null,
+            client_name: r.client_name || null,
+            property_address: r.property_address || null,
+            property_id: r.property_id || null,
+            contact_id: null,
+            reference: r.receipt_number || null,
+            status: r.status || 'received',
+            transaction_date: r.date_received || r.created_at?.split('T')[0] || '',
+            payment_method: r.payment_method || null,
+            created_at: r.created_at,
+          });
+        }
       }
-    }
 
-    if (payments) {
-      for (const p of payments as any[]) {
-        mapped.push({
-          id: p.id,
-          source_table: 'trust_payments',
-          transaction_type: 'withdrawal',
-          category: p.purpose || p.type || 'disbursement',
-          amount: Number(p.amount) || 0,
-          gst_amount: 0,
-          description: p.description || null,
-          payee_name: p.payee_name || p.client_name || null,
-          client_name: p.client_name || null,
-          property_address: p.property_address || null,
-          property_id: p.property_id || null,
-          contact_id: null,
-          reference: p.payment_number || p.reference || null,
-          status: p.status || 'pending',
-          transaction_date: p.date_paid || p.created_at?.split('T')[0] || '',
-          payment_method: p.payment_method || null,
-          created_at: p.created_at,
-        });
+      if (payments) {
+        for (const p of payments as any[]) {
+          mapped.push({
+            id: p.id,
+            source_table: 'trust_payments',
+            transaction_type: 'withdrawal',
+            category: p.purpose || p.type || 'disbursement',
+            amount: Number(p.amount) || 0,
+            gst_amount: 0,
+            description: p.description || null,
+            payee_name: p.payee_name || p.client_name || null,
+            client_name: p.client_name || null,
+            property_address: p.property_address || null,
+            property_id: p.property_id || null,
+            contact_id: null,
+            reference: p.payment_number || p.reference || null,
+            status: p.status || 'pending',
+            transaction_date: p.date_paid || p.created_at?.split('T')[0] || '',
+            payment_method: p.payment_method || null,
+            created_at: p.created_at,
+          });
+        }
       }
-    }
 
-    // Sort by date descending
-    mapped.sort((a, b) => b.transaction_date.localeCompare(a.transaction_date));
-    setTransactions(mapped);
+      mapped.sort((a, b) => b.transaction_date.localeCompare(a.transaction_date));
+      setTransactions(mapped);
+    } catch (err: any) {
+      console.error('Failed to fetch trust transactions:', err);
+      toast.error('Failed to load trust transactions');
+    }
   }, [user]);
 
   const fetchContacts = useCallback(async () => {
     if (!user) return;
-    const { data } = await supabase
-      .from('contacts')
-      .select('id, first_name, last_name')
-      .order('first_name');
-    if (data) setContacts(data as ContactOption[]);
+    try {
+      const { data, error } = await supabase
+        .from('contacts')
+        .select('id, first_name, last_name')
+        .order('first_name');
+      if (error) throw error;
+      if (data) setContacts(data as ContactOption[]);
+    } catch (err: any) {
+      console.error('Failed to fetch contacts:', err);
+    }
   }, [user]);
 
   const fetchProperties = useCallback(async () => {
     if (!user) return;
-    const { data } = await supabase
-      .from('properties')
-      .select('id, title, address')
-      .order('title');
-    if (data) setProperties(data as PropertyOption[]);
+    try {
+      const { data, error } = await supabase
+        .from('properties')
+        .select('id, title, address')
+        .order('title');
+      if (error) throw error;
+      if (data) setProperties(data as PropertyOption[]);
+    } catch (err: any) {
+      console.error('Failed to fetch properties:', err);
+    }
   }, [user]);
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      await Promise.all([fetchAccounts(), fetchTransactions(), fetchContacts(), fetchProperties()]);
-      setLoading(false);
+      try {
+        await Promise.all([fetchAccounts(), fetchTransactions(), fetchContacts(), fetchProperties()]);
+      } finally {
+        setLoading(false);
+      }
     };
     load();
   }, [fetchAccounts, fetchTransactions, fetchContacts, fetchProperties]);
 
   const createAccount = async (account: Partial<TrustAccount>) => {
-    const { data, error } = await supabase
-      .from('trust_accounts')
-      .insert(account as any)
-      .select()
-      .maybeSingle();
-    if (error) throw error;
-    if (!data) throw new Error('Failed to create trust account — no data returned');
-    await fetchAccounts();
-    return data;
+    try {
+      const { data, error } = await supabase
+        .from('trust_accounts')
+        .insert(account as any)
+        .select()
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) throw new Error('Failed to create trust account — no data returned');
+      await fetchAccounts();
+      return data;
+    } catch (err: any) {
+      console.error('Create trust account failed:', err);
+      toast.error(err.message || 'Failed to create trust account');
+      throw err;
+    }
   };
 
   /** Create a receipt (money in) or payment (money out). */
@@ -195,98 +224,112 @@ export function useTrustAccounting() {
   }) => {
     if (!user) return null;
 
-    if (tx.type === 'receipt') {
-      const ref = tx.reference || `TR-${Date.now().toString(36).toUpperCase()}`;
-      const { data, error } = await supabase
-        .from('trust_receipts')
-        .insert({
-          agent_id: tx.agent_id,
-          receipt_number: ref,
-          client_name: tx.client_name,
-          property_address: tx.property_address,
-          amount: tx.amount,
-          payment_method: tx.payment_method || 'eft',
-          purpose: tx.purpose || 'deposit',
-          date_received: new Date().toISOString().split('T')[0],
-          description: tx.description || null,
-          property_id: tx.property_id || null,
-        } as any)
-        .select()
-        .maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error('Failed to create trust receipt — no data returned');
-      await Promise.all([fetchAccounts(), fetchTransactions()]);
-      return data;
-    } else {
-      const ref = tx.reference || `TP-${Date.now().toString(36).toUpperCase()}`;
-      const { data, error } = await supabase
-        .from('trust_payments')
-        .insert({
-          agent_id: tx.agent_id,
-          payment_number: ref,
-          client_name: tx.client_name,
-          property_address: tx.property_address,
-          amount: tx.amount,
-          payment_method: tx.payment_method || 'eft',
-          purpose: tx.purpose || 'refund',
-          date_paid: new Date().toISOString().split('T')[0],
-          description: tx.description || null,
-          property_id: tx.property_id || null,
-        } as any)
-        .select()
-        .maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error('Failed to create trust payment — no data returned');
-      await Promise.all([fetchAccounts(), fetchTransactions()]);
-      return data;
+    try {
+      if (tx.type === 'receipt') {
+        const ref = tx.reference || `TR-${Date.now().toString(36).toUpperCase()}`;
+        const { data, error } = await supabase
+          .from('trust_receipts')
+          .insert({
+            agent_id: tx.agent_id,
+            receipt_number: ref,
+            client_name: tx.client_name,
+            property_address: tx.property_address,
+            amount: tx.amount,
+            payment_method: tx.payment_method || 'eft',
+            purpose: tx.purpose || 'deposit',
+            date_received: new Date().toISOString().split('T')[0],
+            description: tx.description || null,
+            property_id: tx.property_id || null,
+          } as any)
+          .select()
+          .maybeSingle();
+        if (error) throw error;
+        if (!data) throw new Error('Failed to create trust receipt — no data returned');
+        await Promise.all([fetchAccounts(), fetchTransactions()]);
+        return data;
+      } else {
+        const ref = tx.reference || `TP-${Date.now().toString(36).toUpperCase()}`;
+        const { data, error } = await supabase
+          .from('trust_payments')
+          .insert({
+            agent_id: tx.agent_id,
+            payment_number: ref,
+            client_name: tx.client_name,
+            property_address: tx.property_address,
+            amount: tx.amount,
+            payment_method: tx.payment_method || 'eft',
+            purpose: tx.purpose || 'refund',
+            date_paid: new Date().toISOString().split('T')[0],
+            description: tx.description || null,
+            property_id: tx.property_id || null,
+          } as any)
+          .select()
+          .maybeSingle();
+        if (error) throw error;
+        if (!data) throw new Error('Failed to create trust payment — no data returned');
+        await Promise.all([fetchAccounts(), fetchTransactions()]);
+        return data;
+      }
+    } catch (err: any) {
+      console.error('Create trust transaction failed:', err);
+      toast.error(err.message || 'Failed to create trust transaction');
+      throw err;
     }
   };
 
   /** Trust entries are immutable. To "void" a receipt/payment, insert a correction entry that reverses the original amount. */
   const voidTransaction = async (id: string, sourceTable: 'trust_receipts' | 'trust_payments') => {
     if (!user) return;
-    // Find the original transaction
-    const original = transactions.find(t => t.id === id && t.source_table === sourceTable);
-    if (!original) throw new Error('Transaction not found');
+    try {
+      const original = transactions.find(t => t.id === id && t.source_table === sourceTable);
+      if (!original) throw new Error('Transaction not found');
 
-    // Insert a reversal entry with negative amount
-    if (sourceTable === 'trust_receipts') {
-      const ref = `TR-VOID-${Date.now().toString(36).toUpperCase()}`;
-      const { error } = await supabase
-        .from('trust_receipts')
-        .insert({
-          agent_id: (await supabase.from('trust_receipts').select('agent_id').eq('id', id).maybeSingle()).data?.agent_id,
-          receipt_number: ref,
-          client_name: original.client_name || '',
-          property_address: original.property_address || '',
-          amount: -(original.amount),
-          payment_method: original.payment_method || 'eft',
-          purpose: 'voided',
-          date_received: new Date().toISOString().split('T')[0],
-          description: `Void of ${original.reference || id}`,
-          property_id: original.property_id || null,
-        } as any);
-      if (error) throw error;
-    } else {
-      const ref = `TP-VOID-${Date.now().toString(36).toUpperCase()}`;
-      const { error } = await supabase
-        .from('trust_payments')
-        .insert({
-          agent_id: (await supabase.from('trust_payments').select('agent_id').eq('id', id).maybeSingle()).data?.agent_id,
-          payment_number: ref,
-          client_name: original.client_name || '',
-          property_address: original.property_address || '',
-          amount: -(original.amount),
-          payment_method: original.payment_method || 'eft',
-          purpose: 'voided',
-          date_paid: new Date().toISOString().split('T')[0],
-          description: `Void of ${original.reference || id}`,
-          property_id: original.property_id || null,
-        } as any);
-      if (error) throw error;
+      if (sourceTable === 'trust_receipts') {
+        const ref = `TR-VOID-${Date.now().toString(36).toUpperCase()}`;
+        const agentQuery = await supabase.from('trust_receipts').select('agent_id').eq('id', id).maybeSingle();
+        if (!agentQuery.data) throw new Error('Original receipt not found');
+        const { error } = await supabase
+          .from('trust_receipts')
+          .insert({
+            agent_id: agentQuery.data.agent_id,
+            receipt_number: ref,
+            client_name: original.client_name || '',
+            property_address: original.property_address || '',
+            amount: -(original.amount),
+            payment_method: original.payment_method || 'eft',
+            purpose: 'voided',
+            date_received: new Date().toISOString().split('T')[0],
+            description: `Void of ${original.reference || id}`,
+            property_id: original.property_id || null,
+          } as any);
+        if (error) throw error;
+      } else {
+        const ref = `TP-VOID-${Date.now().toString(36).toUpperCase()}`;
+        const agentQuery = await supabase.from('trust_payments').select('agent_id').eq('id', id).maybeSingle();
+        if (!agentQuery.data) throw new Error('Original payment not found');
+        const { error } = await supabase
+          .from('trust_payments')
+          .insert({
+            agent_id: agentQuery.data.agent_id,
+            payment_number: ref,
+            client_name: original.client_name || '',
+            property_address: original.property_address || '',
+            amount: -(original.amount),
+            payment_method: original.payment_method || 'eft',
+            purpose: 'voided',
+            date_paid: new Date().toISOString().split('T')[0],
+            description: `Void of ${original.reference || id}`,
+            property_id: original.property_id || null,
+          } as any);
+        if (error) throw error;
+      }
+
+      await Promise.all([fetchTransactions(), fetchAccounts()]);
+    } catch (err: any) {
+      console.error('Void trust transaction failed:', err);
+      toast.error(err.message || 'Failed to void transaction');
+      throw err;
     }
-
-    await Promise.all([fetchTransactions(), fetchAccounts()]);
   };
 
   return {

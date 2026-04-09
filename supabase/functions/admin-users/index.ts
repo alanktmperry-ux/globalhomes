@@ -108,6 +108,9 @@ Deno.serve(async (req) => {
           plan_type: planType,
           is_partner_verified: partnerRecord?.is_verified || false,
           support_pin: agent?.support_pin || null,
+          subscription_status: agent?.subscription_status || null,
+          payment_failed_at: agent?.payment_failed_at || null,
+          admin_grace_until: agent?.admin_grace_until || null,
         };
       });
 

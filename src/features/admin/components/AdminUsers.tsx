@@ -30,6 +30,9 @@ interface AuthUser {
   demo_status?: string;
   agency_name?: string;
   support_pin?: string | null;
+  subscription_status?: string | null;
+  payment_failed_at?: string | null;
+  admin_grace_until?: string | null;
 }
 
 const UserTypeBadge = ({ user }: { user: AuthUser }) => {

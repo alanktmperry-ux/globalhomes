@@ -173,7 +173,34 @@ const AdminUsers = () => {
     setSavingSub(false);
   };
 
-  const handlePlanChange = (plan: string) => {
+  const handleExtendGrace = async () => {
+    if (!graceDate) return;
+    setSavingGrace(true);
+    try {
+      await callAdminApi('extend_grace', { user_id: graceModal.userId, grace_until: graceDate.toISOString() });
+      toast({ title: 'Grace period extended', description: `${graceModal.email} has grace until ${format(graceDate, 'PPP')}.` });
+      setGraceModal(m => ({ ...m, open: false }));
+      fetchUsers();
+    } catch (err: unknown) {
+      toast({ title: 'Failed', description: getErrorMessage(err), variant: 'destructive' });
+    }
+    setSavingGrace(false);
+  };
+
+  const handleMarkActive = async (userId: string, email: string) => {
+    if (!confirm(`Mark ${email} as active and clear payment failure? This reactivates all their listings.`)) return;
+    setActionLoading(userId);
+    try {
+      await callAdminApi('mark_active', { user_id: userId });
+      toast({ title: 'Subscription activated', description: `${email} is now active.` });
+      fetchUsers();
+    } catch (err: unknown) {
+      toast({ title: 'Failed', description: getErrorMessage(err), variant: 'destructive' });
+    }
+    setActionLoading(null);
+  };
+
+
     const limits: Record<string, { listings: number; seats: number }> = {
       demo: { listings: 3, seats: 1 },
       starter: { listings: 10, seats: 1 },

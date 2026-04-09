@@ -41,7 +41,28 @@ Deno.serve(async (req) => {
       preferredContact,
       urgency,
       preApprovalStatus,
+      hcaptcha_token,
     } = await req.json();
+
+    // --- hCaptcha verification (if token provided) ---
+    if (hcaptcha_token) {
+      const hcaptchaSecret = Deno.env.get("HCAPTCHA_SECRET_KEY");
+      if (hcaptchaSecret) {
+        const verifyResp = await fetch("https://hcaptcha.com/siteverify", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: `secret=${encodeURIComponent(hcaptchaSecret)}&response=${encodeURIComponent(hcaptcha_token)}`,
+        });
+        const verifyResult = await verifyResp.json();
+        if (verifyResult.success !== true) {
+          return new Response(
+            JSON.stringify({ error: "CAPTCHA verification failed" }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+      }
+    }
+    // --- End hCaptcha verification ---
 
     // Validate required fields
     if (!propertyId || !agentId || !userEmail || !userName) {

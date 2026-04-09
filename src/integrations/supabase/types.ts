@@ -9089,6 +9089,7 @@ export type Database = {
           vendor_name: string
         }[]
       }
+      mark_review_request_used: { Args: { p_token: string }; Returns: boolean }
       nearby_properties: {
         Args: {
           _lat: number

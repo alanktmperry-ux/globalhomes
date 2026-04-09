@@ -473,14 +473,11 @@ const TeamPage = () => {
     if (!user || !joinCode.trim()) return;
     setJoiningAgency(true);
     try {
-      const { data: invite, error: inviteError } = await supabase
-        .from('agency_invite_codes')
-        .select('*')
-        .eq('code', joinCode.trim().toUpperCase())
-        .eq('is_active', true)
-        .maybeSingle();
+      const { data: lookupResults, error: inviteError } = await supabase
+        .rpc('lookup_invite_code', { p_code: joinCode.trim() });
 
       if (inviteError) throw inviteError;
+      const invite = lookupResults?.[0];
       if (!invite) {
         toast.error('Invalid code — This invite code is invalid or has been deactivated.');
         setJoiningAgency(false);

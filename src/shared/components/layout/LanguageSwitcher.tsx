@@ -30,7 +30,7 @@ export function LanguageSwitcher() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 z-50 min-w-[200px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg p-2">
+        <div className="absolute right-0 top-full mt-2 z-[100] min-w-[200px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg p-2">
           <div className="grid grid-cols-2 gap-0.5 max-h-80 overflow-y-auto scrollbar-thin">
             {(Object.entries(languageNames) as [Language, string][]).map(([code, name]) => {
               const isActive = code === language;

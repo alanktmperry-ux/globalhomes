@@ -992,33 +992,18 @@ const TrustAccountingPage = () => {
         </DialogContent>
       </Dialog>
 
-      {/* ── Edit Transaction Dialog ── */}
-      <Dialog open={showEditTx} onOpenChange={setShowEditTx}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Transaction</DialogTitle>
-            <DialogDescription>Update this trust entry.</DialogDescription>
-          </DialogHeader>
-          {renderTxFormFields()}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowEditTx(false)}>Cancel</Button>
-            <Button onClick={handleEditTx}>Save Changes</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* ── Delete Confirmation ── */}
+      {/* ── Void Confirmation ── */}
       <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Void Transaction</DialogTitle>
             <DialogDescription>
-              This will mark the transaction as voided. It won't be deleted — the audit trail is preserved per Australian trust accounting regulations.
+              This will create a correction entry that reverses the original amount. The original entry is preserved per Australian trust accounting regulations.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={handleDeleteTx}>Void Transaction</Button>
+            <Button variant="destructive" onClick={handleVoidTx}>Void Transaction</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

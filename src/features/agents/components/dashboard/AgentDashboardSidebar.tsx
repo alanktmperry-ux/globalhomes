@@ -382,6 +382,7 @@ const AgentDashboardSidebar = () => {
         {renderGroup('Sales', SALES_NAV)}
         {renderGroup('Property Management', PROPERTY_NAV)}
         {renderGroup('Insights', INSIGHTS_NAV)}
+        {(isPrincipal || isAdmin) && renderGroup('Principal', PRINCIPAL_NAV)}
         {renderGroup('Account', ACCOUNT_NAV)}
         {ADMIN_NAV.length > 0 && renderGroup('Admin', ADMIN_NAV)}
       </SidebarContent>

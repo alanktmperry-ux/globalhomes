@@ -59,7 +59,7 @@ Deno.serve(async (req) => {
       // Fetch all agents with subscription info
       const { data: agents } = await supabase
         .from("agents")
-        .select("user_id, is_demo, is_subscribed, support_pin, agent_subscriptions(plan_type)");
+        .select("user_id, is_demo, is_subscribed, support_pin, subscription_status, payment_failed_at, admin_grace_until, agent_subscriptions(plan_type)");
 
       // Fetch demo requests (approved/redeemed)
       const { data: demoRequests } = await supabase

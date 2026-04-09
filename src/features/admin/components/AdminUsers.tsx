@@ -672,7 +672,27 @@ const AdminUsers = () => {
                             >
                               <Settings size={14} />
                             </button>
-                            <button
+                            {(u.subscription_status === 'payment_failed' || u.subscription_status === 'locked') && (
+                              <button
+                                onClick={() => {
+                                  setGraceDate(u.admin_grace_until ? new Date(u.admin_grace_until) : undefined);
+                                  setGraceModal({ open: true, userId: u.id, email: u.email, currentGrace: u.admin_grace_until || null });
+                                }}
+                                className="p-1.5 rounded-lg bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 transition-colors"
+                                title="Extend grace period"
+                              >
+                                <CalendarClock size={14} />
+                              </button>
+                            )}
+                            {u.subscription_status !== 'active' && u.subscription_status && (
+                              <button
+                                onClick={() => handleMarkActive(u.id, u.email)}
+                                className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 transition-colors"
+                                title="Mark subscription active"
+                              >
+                                <CircleDollarSign size={14} />
+                              </button>
+                            )}
                               onClick={() => handleImpersonate(u.id, u.email)}
                               className="p-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
                               title="Act as this user"

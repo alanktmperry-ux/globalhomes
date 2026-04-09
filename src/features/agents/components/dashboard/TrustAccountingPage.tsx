@@ -549,7 +549,7 @@ const TrustAccountingPage = () => {
           <div className="space-y-3">
             <div>
               <Label className="text-xs">Account Name <span className="text-destructive">*</span></Label>
-              <Input value={newAccName} onChange={e => setNewAccName(e.target.value)} placeholder="e.g. Main Trust Account" required />
+              <Input value={newAccName} onChange={e => setNewAccName(e.target.value)} placeholder="e.g. Rental Trust Account" required />
             </div>
             <div>
               <Label className="text-xs">Bank Name <span className="text-destructive">*</span></Label>

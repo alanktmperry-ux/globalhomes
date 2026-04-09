@@ -264,7 +264,7 @@ const RentRollPage = () => {
       if (contactMatch) tenantContactId = contactMatch.id;
     }
 
-    const { error } = await supabase.from('tenancies').insert({
+    const insertPayload = {
       agent_id: agentId,
       property_id: form.property_id,
       tenant_name: form.tenant_name,
@@ -283,7 +283,8 @@ const RentRollPage = () => {
       owner_email: form.owner_email || null,
       owner_bsb: form.owner_bsb || null,
       owner_account_number: form.owner_account_number || null,
-    } as any);
+    };
+    const { error } = await supabase.from('tenancies').insert(insertPayload as any);
     setSaving(false);
 
     if (error) {

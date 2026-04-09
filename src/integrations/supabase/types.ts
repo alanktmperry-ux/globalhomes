@@ -720,6 +720,7 @@ export type Database = {
       }
       agents: {
         Row: {
+          admin_grace_until: string | null
           agency: string | null
           agency_id: string | null
           aml_ctf_acknowledged: boolean | null
@@ -749,6 +750,7 @@ export type Database = {
           name: string
           office_address: string | null
           onboarding_complete: boolean | null
+          payment_failed_at: string | null
           phone: string | null
           profile_banner_url: string | null
           profile_photo_url: string | null
@@ -762,6 +764,7 @@ export type Database = {
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           subscription_expires_at: string | null
+          subscription_status: string | null
           support_pin: string | null
           title_position: string | null
           updated_at: string
@@ -771,6 +774,7 @@ export type Database = {
           years_experience: number | null
         }
         Insert: {
+          admin_grace_until?: string | null
           agency?: string | null
           agency_id?: string | null
           aml_ctf_acknowledged?: boolean | null
@@ -800,6 +804,7 @@ export type Database = {
           name: string
           office_address?: string | null
           onboarding_complete?: boolean | null
+          payment_failed_at?: string | null
           phone?: string | null
           profile_banner_url?: string | null
           profile_photo_url?: string | null
@@ -813,6 +818,7 @@ export type Database = {
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscription_expires_at?: string | null
+          subscription_status?: string | null
           support_pin?: string | null
           title_position?: string | null
           updated_at?: string
@@ -822,6 +828,7 @@ export type Database = {
           years_experience?: number | null
         }
         Update: {
+          admin_grace_until?: string | null
           agency?: string | null
           agency_id?: string | null
           aml_ctf_acknowledged?: boolean | null
@@ -851,6 +858,7 @@ export type Database = {
           name?: string
           office_address?: string | null
           onboarding_complete?: boolean | null
+          payment_failed_at?: string | null
           phone?: string | null
           profile_banner_url?: string | null
           profile_photo_url?: string | null
@@ -864,6 +872,7 @@ export type Database = {
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscription_expires_at?: string | null
+          subscription_status?: string | null
           support_pin?: string | null
           title_position?: string | null
           updated_at?: string

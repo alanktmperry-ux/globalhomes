@@ -502,7 +502,7 @@ const TeamPage = () => {
         .insert({
           agency_id: invite.agency_id,
           user_id: user.id,
-          role: invite.role as Database['public']['Enums']['agency_member_role'],
+          role: invite.role as 'agent' | 'admin' | 'principal' | 'member',
           access_level: 'full',
         });
       if (joinError) throw joinError;

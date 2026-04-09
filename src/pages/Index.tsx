@@ -29,13 +29,28 @@ import ConsumerSignUpModal from '@/features/search/components/ConsumerSignUpModa
 import { supabase } from '@/integrations/supabase/client';
 import { geocode } from '@/shared/lib/googleMapsService';
 
+const HERO_ROTATING_LANGUAGES = [
+  'in Mandarin.',
+  'in Vietnamese.',
+  'in Cantonese.',
+  'in Arabic.',
+  'in any language.',
+];
+
+const HERO_PLACEHOLDERS = [
+  'e.g. 3 bed house in Doncaster under $1.3M',
+  'e.g. apartment in Bondi under $800k',
+  'e.g. rental near Melbourne CBD under $500pw',
+  'e.g. family home with pool in Brisbane',
+];
+
 const Index = () => {
   const navigate = useNavigate();
   const { t } = useI18n();
   const { addSearch, lastSearch } = useSearchHistory();
   const { savedIds, isSaved, toggleSaved } = useSavedProperties();
   const isMobile = useIsMobile();
-  const { formatPrice, listingMode } = useCurrency();
+  const { formatPrice, listingMode, setListingMode } = useCurrency();
   const { savedSearches, saveSearch, removeSearch } = useSavedSearches();
   const { user } = useAuth();
   const {
@@ -63,13 +78,20 @@ const Index = () => {
   const [viewportHeight, setViewportHeight] = useState(() => window.innerHeight);
   const resultsRef = useRef<HTMLDivElement>(null);
   const SNAP_POINTS = [0.35, 0.65, 0.85];
-  const [sheetSnap, setSheetSnap] = useState(0); // index into SNAP_POINTS
+  const [sheetSnap, setSheetSnap] = useState(0);
   const sheetHeightMV = useMotionValue(viewportHeight * SNAP_POINTS[0]);
   const sheetHeightSpring = useSpring(sheetHeightMV, { stiffness: 300, damping: 30 });
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [radiusSliderOpen, setRadiusSliderOpen] = useState(false);
   const isDragging = useRef(false);
   const cardRefs = useRef<globalThis.Map<string, HTMLDivElement>>(new globalThis.Map());
+
+  // Hero state
+  const [heroQuery, setHeroQuery] = useState('');
+  const [heroLangIndex, setHeroLangIndex] = useState(0);
+  const [heroPlaceholderIndex, setHeroPlaceholderIndex] = useState(0);
+  const [heroPlatformStats, setHeroPlatformStats] = useState<{ properties: number | null; buyerCount: number | null }>({ properties: null, buyerCount: null });
+  const heroInputRef = useRef<HTMLInputElement>(null);
 
   // ── Search hook (filters & sort internalized) ────────────────
   const {

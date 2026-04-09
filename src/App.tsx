@@ -102,10 +102,6 @@ const StrataDashboardLayout = React.lazy(() => import("./features/strata/pages/S
 const StrataAuthPage = React.lazy(() => import("./features/strata/pages/StrataAuthPage"));
 const SuburbPage = React.lazy(() => import("./pages/SuburbPage"));
 const SuburbSoldPage = React.lazy(() => import("./pages/SuburbSoldPage"));
-const CmaDashboardPage = React.lazy(() => import("./pages/CmaDashboardPage"));
-const CmaNewPage = React.lazy(() => import("./pages/CmaNewPage"));
-const CmaDetailPage = React.lazy(() => import("./pages/CmaDetailPage"));
-const CmaSharedPage = React.lazy(() => import("./pages/CmaSharedPage"));
 const SuburbProfilePage = React.lazy(() => import("./features/suburb/pages/SuburbProfilePage"));
 const HelpCentrePage = React.lazy(() => import("./pages/HelpCentrePage"));
 const FaqPage = React.lazy(() => import("./pages/FaqPage"));

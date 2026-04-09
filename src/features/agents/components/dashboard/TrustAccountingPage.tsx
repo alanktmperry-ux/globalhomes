@@ -194,6 +194,7 @@ const TrustAccountingPage = () => {
   const [newAccBsb, setNewAccBsb] = useState('');
   const [newAccNumber, setNewAccNumber] = useState('');
   const [newAccBank, setNewAccBank] = useState('');
+  const [newAccOpeningBalance, setNewAccOpeningBalance] = useState('0');
 
   // Computed
   const trustAccounts = accounts.filter(a => a.account_type === 'trust');

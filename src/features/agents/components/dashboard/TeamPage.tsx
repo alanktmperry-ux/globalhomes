@@ -499,12 +499,12 @@ const TeamPage = () => {
 
       const { error: joinError } = await supabase
         .from('agency_members')
-        .insert({
-          agency_id: invite.agency_id,
+        .insert([{
+          agency_id: invite.agency_id as string,
           user_id: user.id,
-          role: invite.role as 'agent' | 'admin' | 'principal' | 'member',
+          role: invite.role as 'agent' | 'admin' | 'principal' | 'owner',
           access_level: 'full',
-        });
+        }]);
       if (joinError) throw joinError;
 
       const { data: agentRecord } = await supabase

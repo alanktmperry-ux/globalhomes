@@ -374,7 +374,7 @@ const TrustAccountingPage = () => {
         balance: openingBalance,
       } as any);
       // Also update opening_balance and current_balance via direct update
-      toast.success('Trust account created');
+      toast.success('Trust account created successfully.');
       setShowNewAccount(false);
       setNewAccName(''); setNewAccBsb(''); setNewAccNumber(''); setNewAccBank(''); setNewAccOpeningBalance('0');
       await fetchAccounts();

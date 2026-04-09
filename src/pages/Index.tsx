@@ -837,25 +837,14 @@ const Index = () => {
             </motion.div>
 
             {/* Headline */}
-            <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-slate-900 leading-[1.05] mb-4">
-              Find your home.
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={heroLangIndex}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -16 }}
-                  transition={{ duration: 0.4 }}
-                  className="block text-blue-600 font-bold"
-                >
-                  {HERO_ROTATING_LANGUAGES[heroLangIndex]}
-                </motion.span>
-              </AnimatePresence>
+            <h1 className="text-5xl md:text-7xl font-black leading-tight tracking-tight text-slate-900">
+              Australian property.<br />
+              <span className="text-blue-500">Now</span> in your language.
             </h1>
 
             {/* Subheadline */}
-            <p className="text-lg text-slate-600 font-normal mb-10 max-w-lg mx-auto leading-relaxed">
-              Australia's first multilingual property platform. Search in 24 languages, see prices in your currency.
+            <p className="text-xl md:text-2xl text-slate-500 font-medium mt-4 mb-0">
+              Every listing. Every suburb. Every language.
             </p>
 
             {/* Sale / Rent toggle */}
@@ -900,8 +889,8 @@ const Index = () => {
                   {t('hero.search')}
                 </button>
               </div>
-              <p className="text-xs text-slate-400 mt-3 text-center">
-                {t('hero.searchHint')}
+              <p className="text-sm text-slate-400 mt-3 text-center">
+                Search in Mandarin, Vietnamese, Cantonese, Arabic or any of 24 languages.
               </p>
             </form>
 

@@ -136,6 +136,9 @@ const AdminUsers = () => {
   const [subModal, setSubModal] = useState<{ open: boolean; userId: string; email: string; currentPlan: string }>({ open: false, userId: '', email: '', currentPlan: 'demo' });
   const [subForm, setSubForm] = useState({ plan_type: 'demo', listing_limit: 3, seat_limit: 1, founding_member: false });
   const [savingSub, setSavingSub] = useState(false);
+  const [graceModal, setGraceModal] = useState<{ open: boolean; userId: string; email: string; currentGrace: string | null }>({ open: false, userId: '', email: '', currentGrace: null });
+  const [graceDate, setGraceDate] = useState<Date | undefined>(undefined);
+  const [savingGrace, setSavingGrace] = useState(false);
 
   const handleImpersonate = async (userId: string, userEmail: string) => {
     if (!confirm(`View the platform as ${userEmail}? You will see exactly what they see. An orange banner will let you exit.`)) return;

@@ -1302,41 +1302,48 @@ const BROWSER_LANG_MAP: Record<string, Language> = {
   'zh': 'zh',
   'zh-cn': 'zh',
   'zh-hans': 'zh',
+  'zh-sg': 'zh',
   'zh-tw': 'zh-TW',
+  'zh-hk': 'zh-TW',
   'zh-hant': 'zh-TW',
   'vi': 'vi',
+  'vi-vn': 'vi',
 };
 
 function detectBrowserLanguage(): Language {
-  const raw = navigator.language.toLowerCase();
-  if (BROWSER_LANG_MAP[raw]) return BROWSER_LANG_MAP[raw];
-  const short = raw.slice(0, 2);
+  const browserLang = (navigator.languages?.[0] || navigator.language || 'en').toLowerCase();
+  if (BROWSER_LANG_MAP[browserLang]) return BROWSER_LANG_MAP[browserLang];
+  const short = browserLang.slice(0, 2);
   if (BROWSER_LANG_MAP[short]) return BROWSER_LANG_MAP[short];
-  if (short in translations) return short as Language;
   return 'en';
 }
 
-const AUTO_DETECT_LANGS: Language[] = ['zh', 'zh-TW', 'vi'];
-const FIRST_VISIT_KEY = 'gh-lang-first-visit-shown';
+const BANNER_DISMISSED_KEY = 'gh-lang-banner-dismissed';
+
+const bannerMessages: Partial<Record<Language, string>> = {
+  zh: '🌐 已切换为简体中文。可随时在顶部导航栏更改。',
+  'zh-TW': '🌐 已切換為繁體中文。可隨時在頂部導覽列更改。',
+  vi: '🌐 Đã chuyển sang Tiếng Việt. Thay đổi bất lúc nào trong thanh điều hướng.',
+};
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [showBanner, setShowBanner] = useState(false);
   const [language, setLanguage] = useState<Language>(() => {
     const saved = localStorage.getItem('gh-lang');
     if (saved && saved in translations) return saved as Language;
+    // First visit — detect browser language
     const detected = detectBrowserLanguage();
+    localStorage.setItem('gh-lang', detected);
     return detected;
   });
 
   useEffect(() => {
-    const wasSaved = localStorage.getItem('gh-lang');
-    const alreadyShown = localStorage.getItem(FIRST_VISIT_KEY);
-    if (!wasSaved && !alreadyShown && language !== 'en' && AUTO_DETECT_LANGS.includes(language)) {
-      localStorage.setItem('gh-lang', language);
-      localStorage.setItem(FIRST_VISIT_KEY, '1');
+    // Show banner only on first visit (gh-lang didn't exist) with a non-en detected language
+    const bannerDismissed = localStorage.getItem(BANNER_DISMISSED_KEY);
+    if (!bannerDismissed && language !== 'en' && language in bannerMessages) {
+      // Check if this is genuinely first visit: gh-lang was just set by our initializer above
+      // We use the banner-dismissed key as the source of truth
       setShowBanner(true);
-    } else if (!wasSaved) {
-      localStorage.setItem('gh-lang', language);
     }
   }, []);
 
@@ -1344,44 +1351,29 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('gh-lang', language);
   }, [language]);
 
-  const dismissBanner = useCallback(() => setShowBanner(false), []);
+  const dismissBanner = useCallback(() => {
+    setShowBanner(false);
+    localStorage.setItem(BANNER_DISMISSED_KEY, '1');
+  }, []);
 
   const t = (key: string) => translations[language]?.[key] || translations.en[key] || key;
 
   return (
     <I18nContext.Provider value={{ language, setLanguage, t }}>
       {showBanner && (
-        <LanguageDetectedBanner
-          languageName={languageNames[language]}
-          message={t('banner.languageSet')}
-          onDismiss={dismissBanner}
-        />
+        <div className="fixed top-0 left-0 right-0 z-[200] bg-teal-600 text-white px-4 py-2.5 text-center text-sm flex items-center justify-center gap-3 shadow-md">
+          <span>{bannerMessages[language]}</span>
+          <button
+            onClick={dismissBanner}
+            className="ml-2 p-0.5 rounded hover:bg-white/20 transition-colors"
+            aria-label="Dismiss"
+          >
+            <X size={16} />
+          </button>
+        </div>
       )}
       {children}
     </I18nContext.Provider>
-  );
-}
-
-function LanguageDetectedBanner({
-  languageName,
-  message,
-  onDismiss,
-}: {
-  languageName: string;
-  message: string;
-  onDismiss: () => void;
-}) {
-  return (
-    <div className="fixed top-0 left-0 right-0 z-[200] bg-primary text-primary-foreground px-4 py-2.5 text-center text-sm flex items-center justify-center gap-3 shadow-md">
-      <span>{message.replace('{language}', languageName)}</span>
-      <button
-        onClick={onDismiss}
-        className="ml-2 p-0.5 rounded hover:bg-primary-foreground/20 transition-colors"
-        aria-label="Dismiss"
-      >
-        <X size={16} />
-      </button>
-    </div>
   );
 }
 

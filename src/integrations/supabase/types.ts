@@ -5682,6 +5682,10 @@ export type Database = {
           agent_id: string | null
           annual_income: number | null
           applicant_id: string | null
+          bond_amount: number | null
+          bond_collected_at: string | null
+          bond_lodged_at: string | null
+          bond_lodgement_ref: string | null
           co_applicants: Json | null
           created_at: string
           current_address: string
@@ -5720,6 +5724,10 @@ export type Database = {
           agent_id?: string | null
           annual_income?: number | null
           applicant_id?: string | null
+          bond_amount?: number | null
+          bond_collected_at?: string | null
+          bond_lodged_at?: string | null
+          bond_lodgement_ref?: string | null
           co_applicants?: Json | null
           created_at?: string
           current_address: string
@@ -5758,6 +5766,10 @@ export type Database = {
           agent_id?: string | null
           annual_income?: number | null
           applicant_id?: string | null
+          bond_amount?: number | null
+          bond_collected_at?: string | null
+          bond_lodged_at?: string | null
+          bond_lodgement_ref?: string | null
           co_applicants?: Json | null
           created_at?: string
           current_address?: string

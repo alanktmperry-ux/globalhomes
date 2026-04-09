@@ -5606,42 +5606,54 @@ export type Database = {
         Row: {
           agent_id: string
           amount: number
+          application_id: string | null
           created_at: string
           id: string
+          is_arrears: boolean | null
           notes: string | null
           payment_date: string
           payment_method: string
           period_from: string
           period_to: string
+          property_id: string | null
           receipt_number: string
+          reference: string | null
           status: string
           tenancy_id: string
         }
         Insert: {
           agent_id: string
           amount: number
+          application_id?: string | null
           created_at?: string
           id?: string
+          is_arrears?: boolean | null
           notes?: string | null
           payment_date: string
           payment_method?: string
           period_from: string
           period_to: string
+          property_id?: string | null
           receipt_number: string
+          reference?: string | null
           status?: string
           tenancy_id: string
         }
         Update: {
           agent_id?: string
           amount?: number
+          application_id?: string | null
           created_at?: string
           id?: string
+          is_arrears?: boolean | null
           notes?: string | null
           payment_date?: string
           payment_method?: string
           period_from?: string
           period_to?: string
+          property_id?: string | null
           receipt_number?: string
+          reference?: string | null
           status?: string
           tenancy_id?: string
         }
@@ -5665,6 +5677,34 @@ export type Database = {
             columns: ["agent_id"]
             isOneToOne: false
             referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rent_payments_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "rental_applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rent_payments_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rent_payments_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rent_payments_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties_public_safe"
             referencedColumns: ["id"]
           },
           {

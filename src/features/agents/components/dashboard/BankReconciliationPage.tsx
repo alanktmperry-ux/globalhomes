@@ -168,7 +168,7 @@ const BankReconciliationPage = () => {
     if (!user) return;
     setReconcileAllRunning(true);
     try {
-      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
+      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
       if (!agent) { toast.error('Agent profile not found'); return; }
 
       // Get latest bank balance from most recent entry
@@ -216,7 +216,7 @@ const BankReconciliationPage = () => {
     if (!user) return;
     const text = await file.text();
     const lines = text.trim().split('\n').slice(1);
-    const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
+    const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
     if (!agent) { toast.error('Agent profile not found'); return; }
 
     const entries = lines.map(line => {
@@ -325,7 +325,7 @@ const BankReconciliationPage = () => {
     if (!user || !addAmount || !addDate) return;
     setAddSaving(true);
     try {
-      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
+      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
       if (!agent) { toast.error('Agent profile not found'); return; }
 
       const { error } = await supabase.from('trust_reconciliations').insert({
@@ -413,7 +413,7 @@ const BankReconciliationPage = () => {
     if (!user || !csvText.trim()) return;
     setImportSaving(true);
     try {
-      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).single();
+      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
       if (!agent) { toast.error('Agent profile not found'); return; }
 
       const lines = csvText.trim().split('\n').slice(1); // skip header

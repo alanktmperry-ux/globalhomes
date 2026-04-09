@@ -8579,6 +8579,10 @@ export type Database = {
           role: string
         }[]
       }
+      lookup_review_request_by_token: {
+        Args: { p_token: string }
+        Returns: Json
+      }
       lookup_vendor_report_token: {
         Args: { p_token: string }
         Returns: {

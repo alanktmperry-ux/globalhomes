@@ -484,12 +484,6 @@ const TeamPage = () => {
         return;
       }
 
-      if (invite.max_uses && invite.uses >= invite.max_uses) {
-        toast.error('Code expired — This invite code has reached its max usage.');
-        setJoiningAgency(false);
-        return;
-      }
-
       const { data: existing } = await supabase
         .from('agency_members')
         .select('id')
@@ -508,15 +502,10 @@ const TeamPage = () => {
         .insert({
           agency_id: invite.agency_id,
           user_id: user.id,
-          role: invite.role as any,
+          role: invite.role as Database['public']['Enums']['agency_member_role'],
           access_level: 'full',
         });
       if (joinError) throw joinError;
-
-      await supabase
-        .from('agency_invite_codes')
-        .update({ uses: invite.uses + 1 })
-        .eq('id', invite.id);
 
       const { data: agentRecord } = await supabase
         .from('agents')

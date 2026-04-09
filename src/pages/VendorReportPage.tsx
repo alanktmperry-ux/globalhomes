@@ -25,16 +25,12 @@ export default function VendorReportPage() {
   useEffect(() => {
     if (!token) return;
     (async () => {
-      const { data: tokenRow } = await supabase
-        .from('vendor_report_tokens' as any)
-        .select('*')
-        .eq('token', token)
-        .gt('expires_at', new Date().toISOString())
-        .maybeSingle();
+      const { data: tokenResults } = await supabase
+        .rpc('lookup_vendor_report_token', { p_token: token });
 
-      if (!tokenRow) { setExpired(true); setLoading(false); return; }
+      if (!tokenResults || tokenResults.length === 0) { setExpired(true); setLoading(false); return; }
 
-      const row = tokenRow as any;
+      const row = tokenResults[0] as Record<string, unknown>;
 
       // Update view count
       supabase.from('vendor_report_tokens' as any)

@@ -103,15 +103,13 @@ const AgentLandingPage = () => {
                 >
                   🎯 Try the Demo
                 </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
+                <button
                   onClick={() => navigate('/agents/login')}
-                  className="text-base px-8 py-5 rounded-xl font-bold border-white/30 text-white hover:bg-white/10 hover:text-white transition-all"
+                  className="inline-flex items-center justify-center text-base px-8 py-3 rounded-xl font-bold border border-white/30 text-white bg-transparent hover:bg-white/10 transition-all"
                 >
                   <Lock size={18} className="mr-2" />
                   Login to Your Agency
-                </Button>
+                </button>
               </motion.div>
             </motion.div>
           </div>

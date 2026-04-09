@@ -15,7 +15,7 @@ export function DarkModeToggle() {
   return (
     <button
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      className="p-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+      className="w-9 h-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
     >
       {isDark ? <Sun size={18} /> : <Moon size={18} />}

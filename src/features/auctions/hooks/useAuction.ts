@@ -35,7 +35,18 @@ export function useAuctionAgent(propertyId: string | undefined) {
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
-    setAuction(data as unknown as Auction);
+    if (data) {
+      // Fetch sensitive fields (reserve_price, vendor_bid_limit) via RPC
+      const { data: sensitive } = await supabase.rpc('get_auction_sensitive', { p_auction_id: data.id } as any);
+      const row = Array.isArray(sensitive) && sensitive.length > 0 ? sensitive[0] : null;
+      setAuction({
+        ...data,
+        reserve_price: row?.reserve_price ?? null,
+        vendor_bid_limit: row?.vendor_bid_limit ?? null,
+      } as unknown as Auction);
+    } else {
+      setAuction(null);
+    }
     setLoading(false);
   }, [propertyId]);
 

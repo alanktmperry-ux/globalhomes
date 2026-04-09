@@ -554,11 +554,11 @@ const TrustAccountingPage = () => {
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <Label className="text-xs">BSB (6 digits) <span className="text-destructive">*</span></Label>
-                <Input value={newAccBsb} onChange={e => setNewAccBsb(e.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="000000" maxLength={6} required />
+                <Input value={newAccBsb} onChange={e => setNewAccBsb(e.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="e.g. 062000" maxLength={6} required />
               </div>
               <div>
                 <Label className="text-xs">Account Number <span className="text-destructive">*</span></Label>
-                <Input value={newAccNumber} onChange={e => setNewAccNumber(e.target.value)} placeholder="123456789" required />
+                <Input value={newAccNumber} onChange={e => setNewAccNumber(e.target.value)} placeholder="e.g. 12345678" required />
               </div>
             </div>
             <div>

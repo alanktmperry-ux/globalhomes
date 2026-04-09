@@ -1283,29 +1283,90 @@ interface I18nContextType {
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
+const BROWSER_LANG_MAP: Record<string, Language> = {
+  'zh': 'zh',
+  'zh-cn': 'zh',
+  'zh-hans': 'zh',
+  'zh-tw': 'zh-TW',
+  'zh-hant': 'zh-TW',
+  'vi': 'vi',
+};
+
 function detectBrowserLanguage(): Language {
-  const browserLang = navigator.language.slice(0, 2);
-  if (browserLang in translations) return browserLang as Language;
+  const raw = navigator.language.toLowerCase();
+  if (BROWSER_LANG_MAP[raw]) return BROWSER_LANG_MAP[raw];
+  const short = raw.slice(0, 2);
+  if (BROWSER_LANG_MAP[short]) return BROWSER_LANG_MAP[short];
+  if (short in translations) return short as Language;
   return 'en';
 }
 
+const AUTO_DETECT_LANGS: Language[] = ['zh', 'zh-TW', 'vi'];
+const FIRST_VISIT_KEY = 'gh-lang-first-visit-shown';
+
 export function I18nProvider({ children }: { children: ReactNode }) {
+  const [showBanner, setShowBanner] = useState(false);
   const [language, setLanguage] = useState<Language>(() => {
     const saved = localStorage.getItem('gh-lang');
     if (saved && saved in translations) return saved as Language;
-    return detectBrowserLanguage();
+    const detected = detectBrowserLanguage();
+    return detected;
   });
+
+  useEffect(() => {
+    const wasSaved = localStorage.getItem('gh-lang');
+    const alreadyShown = localStorage.getItem(FIRST_VISIT_KEY);
+    if (!wasSaved && !alreadyShown && language !== 'en' && AUTO_DETECT_LANGS.includes(language)) {
+      localStorage.setItem('gh-lang', language);
+      localStorage.setItem(FIRST_VISIT_KEY, '1');
+      setShowBanner(true);
+    } else if (!wasSaved) {
+      localStorage.setItem('gh-lang', language);
+    }
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('gh-lang', language);
   }, [language]);
 
+  const dismissBanner = useCallback(() => setShowBanner(false), []);
+
   const t = (key: string) => translations[language]?.[key] || translations.en[key] || key;
 
   return (
     <I18nContext.Provider value={{ language, setLanguage, t }}>
+      {showBanner && (
+        <LanguageDetectedBanner
+          languageName={languageNames[language]}
+          message={t('banner.languageSet')}
+          onDismiss={dismissBanner}
+        />
+      )}
       {children}
     </I18nContext.Provider>
+  );
+}
+
+function LanguageDetectedBanner({
+  languageName,
+  message,
+  onDismiss,
+}: {
+  languageName: string;
+  message: string;
+  onDismiss: () => void;
+}) {
+  return (
+    <div className="fixed top-0 left-0 right-0 z-[200] bg-primary text-primary-foreground px-4 py-2.5 text-center text-sm flex items-center justify-center gap-3 shadow-md">
+      <span>{message.replace('{language}', languageName)}</span>
+      <button
+        onClick={onDismiss}
+        className="ml-2 p-0.5 rounded hover:bg-primary-foreground/20 transition-colors"
+        aria-label="Dismiss"
+      >
+        <X size={16} />
+      </button>
+    </div>
   );
 }
 

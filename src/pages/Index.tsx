@@ -805,7 +805,7 @@ const Index = () => {
   };
 
   // ── Landing hero: shown until first search, hidden if URL has params ──
-  if (!hasSearched && !hasUrlSearchParams) {
+  if (!hasSearched && !hasSearchParams) {
     return (
       <div className="flex flex-col">
         {/* ── HERO SECTION ── */}

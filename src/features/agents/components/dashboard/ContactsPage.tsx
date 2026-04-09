@@ -140,8 +140,6 @@ const ContactsPage = () => {
             loading={loading}
             onSelect={setSelectedContact}
             onDelete={deleteContact}
-            showAgentName={!!showPrincipalControls}
-            onReassign={showPrincipalControls ? (c: Contact) => setReassignContact(c) : undefined}
           />
         ) : (
           <PipelineBoard

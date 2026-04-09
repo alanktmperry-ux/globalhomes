@@ -58,6 +58,11 @@ const INSIGHTS_NAV: NavItem[] = [
   { title: 'Commission', url: '/dashboard/commission', icon: Calculator },
 ];
 
+const PRINCIPAL_NAV: NavItem[] = [
+  { title: 'Compliance', url: '/dashboard/team?tab=compliance', icon: Shield },
+  { title: 'Audit Log', url: '/dashboard/team?tab=audit', icon: ClipboardCheck },
+];
+
 
 
 

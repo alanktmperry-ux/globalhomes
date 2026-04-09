@@ -804,7 +804,7 @@ const Index = () => {
   const sectionAnim = {
     initial: { opacity: 0, y: 24 } as const,
     whileInView: { opacity: 1, y: 0 } as const,
-    viewport: { once: true, margin: '-80px' } as const,
+    viewport: { once: true, amount: 0.05, margin: '-40px' } as const,
     transition: { duration: 0.5, ease: 'easeOut' as const },
   };
 
@@ -813,7 +813,7 @@ const Index = () => {
     return (
       <div className="flex flex-col">
         {/* ── HERO SECTION ── */}
-        <section className="relative flex flex-col items-center justify-center py-20 md:py-28 bg-white overflow-hidden px-6 text-center">
+        <section className="relative flex flex-col items-center justify-center py-12 md:py-16 bg-white overflow-hidden px-6 text-center">
           {/* Background accents */}
           <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-blue-50/40 pointer-events-none" />
           <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-100/30 blur-[120px] pointer-events-none" />
@@ -846,7 +846,7 @@ const Index = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -16 }}
                   transition={{ duration: 0.4 }}
-                  className="block text-blue-500"
+                  className="block text-blue-600 font-bold"
                 >
                   {HERO_ROTATING_LANGUAGES[heroLangIndex]}
                 </motion.span>
@@ -854,7 +854,7 @@ const Index = () => {
             </h1>
 
             {/* Subheadline */}
-            <p className="text-lg text-slate-500 font-normal mb-10 max-w-lg mx-auto leading-relaxed">
+            <p className="text-lg text-slate-600 font-normal mb-10 max-w-lg mx-auto leading-relaxed">
               Australia's first multilingual property platform. Search in 24 languages, see prices in your currency.
             </p>
 
@@ -927,7 +927,7 @@ const Index = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.6 }}
-            className="relative z-10 mt-12 max-w-2xl w-full mx-auto"
+            className="relative z-10 mt-8 max-w-2xl w-full mx-auto"
           >
             <div className="bg-white border border-slate-100 rounded-2xl shadow-sm shadow-slate-100 px-8 py-5 flex flex-wrap items-center justify-center gap-6 sm:gap-10">
               {/* Properties */}

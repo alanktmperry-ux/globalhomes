@@ -148,15 +148,10 @@ const TrustAccountingPage = () => {
 
   const checkOverdrawn = useCallback(async () => {
     if (!agent?.id) return;
-    const { data } = await supabase
-      .from('trust_transactions')
-      .select('payee_name, amount, transaction_type, status')
-      .eq('status', 'completed')
-      .in('trust_account_id', accounts.map(a => a.id));
-    if (!data) return;
+    // Use the unified transactions from receipts/payments
     const ledgers = new Map<string, number>();
-    data.forEach((tx: any) => {
-      const key = tx.payee_name || 'Unknown';
+    transactions.filter(t => t.status !== 'voided').forEach(tx => {
+      const key = tx.client_name || tx.payee_name || 'Unknown';
       const current = ledgers.get(key) || 0;
       const impact = tx.transaction_type === 'deposit' ? tx.amount : -tx.amount;
       ledgers.set(key, current + impact);
@@ -174,7 +169,7 @@ const TrustAccountingPage = () => {
         }
       );
     }
-  }, [agent?.id, accounts]);
+  }, [agent?.id, transactions]);
 
   useEffect(() => { fetchPendingPayments(); fetchDashboardStats(); checkOverdrawn(); }, [fetchPendingPayments, fetchDashboardStats, checkOverdrawn]);
 

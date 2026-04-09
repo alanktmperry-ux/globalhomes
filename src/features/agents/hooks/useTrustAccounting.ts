@@ -267,19 +267,13 @@ export function useTrustAccounting() {
     const pendingReceipts = transactions.filter(t => t.source_table === 'trust_receipts' && t.status === 'received');
     const pendingPayments = transactions.filter(t => t.source_table === 'trust_payments' && t.status === 'pending');
 
-    const promises: Promise<any>[] = [];
     if (pendingReceipts.length > 0) {
-      promises.push(
-        supabase.from('trust_receipts').update({ status: 'deposited' } as any).in('id', pendingReceipts.map(t => t.id))
-      );
+      await supabase.from('trust_receipts').update({ status: 'deposited' } as any).in('id', pendingReceipts.map(t => t.id));
     }
     if (pendingPayments.length > 0) {
-      promises.push(
-        supabase.from('trust_payments').update({ status: 'cleared' } as any).in('id', pendingPayments.map(t => t.id))
-      );
+      await supabase.from('trust_payments').update({ status: 'cleared' } as any).in('id', pendingPayments.map(t => t.id));
     }
-    if (promises.length > 0) {
-      await Promise.all(promises);
+    if (pendingReceipts.length > 0 || pendingPayments.length > 0) {
       await Promise.all([fetchTransactions(), fetchAccounts()]);
     }
   };

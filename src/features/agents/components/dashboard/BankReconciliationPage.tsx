@@ -838,7 +838,7 @@ const BankReconciliationPage = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAdd(false)}>Cancel</Button>
-            <Button onClick={handleAddEntry} disabled={!addAmount || addSaving}>
+            <Button onClick={handleAddEntry} disabled={!addAmount || !addDesc.trim() || addSaving}>
               {addSaving ? 'Adding…' : 'Add Entry'}
             </Button>
           </DialogFooter>

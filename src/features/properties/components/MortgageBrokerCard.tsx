@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from "react";
-import { Phone, Mail, Globe, CheckCircle, X, Loader2 } from "lucide-react";
+import { Globe, CheckCircle, X, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";

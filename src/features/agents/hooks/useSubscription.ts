@@ -33,6 +33,7 @@ export interface SubscriptionState extends PlanFeatures {
   subscriptionEnd: string | null;
   autoRenew: boolean;
   loading: boolean;
+  subLoadingTimeout: boolean;
 }
 
 const PRO_PLUS = ['pro', 'agency', 'enterprise'];

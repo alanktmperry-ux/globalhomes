@@ -455,6 +455,7 @@ const AdminUsers = () => {
   }
 
   return (
+    <>
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
         <div className="relative flex-1 max-w-sm">

@@ -73,6 +73,7 @@ export function useSubscription(): SubscriptionState {
     subscriptionEnd: null,
     autoRenew: false,
     loading: true,
+    subLoadingTimeout: false,
     ...getPlanFeatures(null),
   });
 

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { motion, AnimatePresence } from 'framer-motion';
 import PhoneInput from '@/shared/components/PhoneInput';
@@ -21,6 +22,18 @@ const SeekerAuthPage = () => {
   const [budgetMax, setBudgetMax] = useState('');
   const [suburbs, setSuburbs] = useState('');
   const [propertyType, setPropertyType] = useState('');
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [pendingSignIn, setPendingSignIn] = useState(false);
+  const captchaRef = useRef<HCaptcha>(null);
+  const hcaptchaSiteKey = import.meta.env.VITE_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001';
+
+  // Auto-submit sign-in after captcha verification
+  useEffect(() => {
+    if (pendingSignIn && captchaToken && step === 'password') {
+      setPendingSignIn(false);
+      handleSignIn({ preventDefault: () => {} } as React.FormEvent);
+    }
+  }, [pendingSignIn, captchaToken]);
 
   const handleEmailContinue = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,9 +43,16 @@ const SeekerAuthPage = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!captchaToken) {
+      setPendingSignIn(true);
+      captchaRef.current?.execute();
+      return;
+    }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({ email, password, options: { captchaToken } });
+      setCaptchaToken(null);
+      captchaRef.current?.resetCaptcha();
       if (error) {
         if (error.message.includes('Email not confirmed')) {
           throw new Error('Please check your email and click the confirmation link before signing in.');

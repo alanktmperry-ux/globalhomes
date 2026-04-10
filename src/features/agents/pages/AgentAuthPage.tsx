@@ -122,6 +122,7 @@ const AgentAuthPage = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!captchaToken) {
+      setPendingSignIn(true);
       captchaRef.current?.execute();
       return;
     }

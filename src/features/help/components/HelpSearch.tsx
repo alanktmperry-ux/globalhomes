@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { Search, X, Loader2, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
@@ -37,11 +38,12 @@ export function HelpSearch({ className = '', placeholder, externalQuery, externa
     setAnswer('');
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
       const resp = await fetch(HELP_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
         },
         body: JSON.stringify({ question }),

@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { Search, Mic, MapPin, Loader2 } from 'lucide-react';
 import { capture } from '@/shared/lib/posthog';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -84,12 +85,14 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 3000);
 
+      const { data: { session } } = await supabase.auth.getSession();
       const resp = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-translations`,
         {
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            Authorization: `Bearer ${session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ type: 'translate_search', search_query: trimmed }),

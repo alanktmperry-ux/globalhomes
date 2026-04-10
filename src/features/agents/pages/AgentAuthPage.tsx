@@ -47,6 +47,7 @@ const AgentAuthPage = () => {
   const [officeSuggestions, setOfficeSuggestions] = useState<{ description: string; place_id: string }[]>([]);
   const [officeConfirmed, setOfficeConfirmed] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [pendingSignIn, setPendingSignIn] = useState(false);
 
   // ── All useRef hooks ──
   const officeDebounceRef = useRef<ReturnType<typeof setTimeout>>();

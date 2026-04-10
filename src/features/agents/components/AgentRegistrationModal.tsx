@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, CheckCircle2, ShieldCheck, Ban, Clock, Download, FileText, CreditCard, Building2, Play, Info, ExternalLink, Landmark, AlertTriangle, CalendarCheck, ListChecks, PlusCircle, Globe, Users, HelpCircle } from 'lucide-react';
+import { X, CheckCircle2, ShieldCheck, Ban, Clock, Download, FileText, CreditCard, Building2, Play, Info, ExternalLink, Landmark, AlertTriangle, CalendarCheck, ListChecks, PlusCircle, Globe, Users, HelpCircle, Upload, BookOpen, Scale } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,7 +23,7 @@ const SUBURBS_OPTIONS = [
 ];
 
 const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
-  const [step, setStep] = useState<'prepare' | 'trust-info' | 'cutover' | 'form' | 'success'>('prepare');
+  const [step, setStep] = useState<'prepare' | 'trust-info' | 'cutover' | 'import-wizard' | 'form' | 'success'>('prepare');
   const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
@@ -281,6 +281,58 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                 </Button>
                 <Button variant="outline" className="flex-1" onClick={() => setStep('form')}>
                   Skip — starting fresh
+                </Button>
+                <Button className="flex-1" onClick={() => setStep('import-wizard')}>
+                  Continue
+                </Button>
+              </div>
+            </motion.div>
+          ) : step === 'import-wizard' ? (
+            <motion.div
+              key="import-wizard"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="p-6"
+            >
+              <DialogHeader className="mb-5">
+                <DialogTitle className="font-display text-2xl font-extrabold">
+                  About the Trust Import Wizard
+                </DialogTitle>
+                <DialogDescription>
+                  Bring your existing trust ledger data into ListHQ. You can also do this later.
+                </DialogDescription>
+              </DialogHeader>
+
+              <ul className="space-y-3 text-sm text-foreground mb-6">
+                <li className="flex items-start gap-3">
+                  <Upload size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>The Import Wizard brings in your existing trust ledger data — <strong>individual client balances</strong>, receipt history, and opening balance</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <BookOpen size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>Have your <strong>Client Ledger Summary</strong> export from your current system ready (PropertyMe, Console Cloud, Reapit, or TrustSoft all have export options)</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <ShieldCheck size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>The import <strong>does not affect your bank account</strong> — it only creates records in ListHQ matching your existing balances</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Clock size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>If you're not ready to import now, click "Skip for now" — you can import later from <strong>Dashboard → Trust Accounting → Import Existing Account</strong></span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Scale size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>After import, run a <strong>three-way reconciliation check</strong>: cashbook balance = bank statement = sum of all client ledgers</span>
+                </li>
+              </ul>
+
+              <div className="flex gap-3">
+                <Button variant="outline" className="flex-1" onClick={() => setStep('cutover')}>
+                  Back
+                </Button>
+                <Button variant="outline" className="flex-1" onClick={() => setStep('form')}>
+                  Skip for now
                 </Button>
                 <Button className="flex-1" onClick={() => setStep('form')}>
                   Continue

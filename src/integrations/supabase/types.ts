@@ -8722,6 +8722,68 @@ export type Database = {
       }
     }
     Views: {
+      agent_locations_public_safe: {
+        Row: {
+          address: string | null
+          agent_id: string | null
+          created_at: string | null
+          id: string | null
+          lat: number | null
+          lng: number | null
+          name: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          agent_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          lat?: number | null
+          lng?: number | null
+          name?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          agent_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          lat?: number | null
+          lng?: number | null
+          name?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_locations_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_locations_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_locations_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_locations_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+        ]
+      }
       agents_public: {
         Row: {
           agency: string | null

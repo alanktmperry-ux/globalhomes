@@ -137,12 +137,6 @@ export default function AgencyOnboardingPage() {
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || 'Setup failed');
 
-      // Also update agent record with licence and state
-      await supabase.from('agents').update({
-        license_number: licenceNumber,
-        office_address: agencyAddress,
-      } as any).eq('user_id', user.id);
-
       toast.success('Agency created successfully');
       setStep(3);
     } catch (e: unknown) {

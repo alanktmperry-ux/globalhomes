@@ -75,6 +75,15 @@ export function useSubscription(): SubscriptionState {
     ...getPlanFeatures(null),
   });
 
+  // Safety net: if loading takes longer than 3s, treat as loaded to unblock the UI
+  const [subLoadingTimeout, setSubLoadingTimeout] = useState(false);
+
+  useEffect(() => {
+    if (!state.loading) return;
+    const timer = setTimeout(() => setSubLoadingTimeout(true), 3000);
+    return () => clearTimeout(timer);
+  }, [state.loading]);
+
   useEffect(() => {
     if (!user) {
       setState(prev => ({ ...prev, loading: false }));
@@ -132,6 +141,11 @@ export function useSubscription(): SubscriptionState {
     fetch();
     return () => { cancelled = true; };
   }, [user]);
+
+  // If the timeout fired but we're still loading, return loading: false to unblock pages
+  if (subLoadingTimeout && state.loading) {
+    return { ...state, loading: false };
+  }
 
   return state;
 }

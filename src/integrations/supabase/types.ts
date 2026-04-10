@@ -1942,6 +1942,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "broker_leads_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "brokers_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "broker_leads_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
@@ -9093,7 +9100,53 @@ export type Database = {
             referencedRelation: "brokers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "broker_leads_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "brokers_public_safe"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      brokers_public_safe: {
+        Row: {
+          acl_number: string | null
+          calendar_url: string | null
+          company: string | null
+          id: string | null
+          is_active: boolean | null
+          is_founding_partner: boolean | null
+          languages: string[] | null
+          name: string | null
+          photo_url: string | null
+          tagline: string | null
+        }
+        Insert: {
+          acl_number?: string | null
+          calendar_url?: string | null
+          company?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          is_founding_partner?: boolean | null
+          languages?: string[] | null
+          name?: string | null
+          photo_url?: string | null
+          tagline?: string | null
+        }
+        Update: {
+          acl_number?: string | null
+          calendar_url?: string | null
+          company?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          is_founding_partner?: boolean | null
+          languages?: string[] | null
+          name?: string | null
+          photo_url?: string | null
+          tagline?: string | null
+        }
+        Relationships: []
       }
       cma_reports_shared: {
         Row: {

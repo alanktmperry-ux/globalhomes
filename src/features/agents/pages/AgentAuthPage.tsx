@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { motion } from 'framer-motion';
-import { Building2, KeyRound, MapPin, CheckCircle2, Home, Zap, ChevronRight } from 'lucide-react';
+import { Building2, KeyRound, MapPin, CheckCircle2, Home, Zap, ChevronRight, Mail, ListChecks, FileText, ShieldCheck, Landmark } from 'lucide-react';
 import { autocomplete } from '@/shared/lib/googleMapsService';
 import PhoneInput from '@/shared/components/PhoneInput';
 import { useNavigate, Link } from 'react-router-dom';
@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 
-type Step = 'email' | 'password' | 'choose' | 'create-agency' | 'join-agency';
+type Step = 'email' | 'password' | 'register' | 'check-email';
 
 // Password strength helper — outside component so it never breaks hook order
 function getPasswordStrength(p: string): 'weak' | 'fair' | 'strong' | null {

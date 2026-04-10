@@ -338,6 +338,12 @@ const SeekerAuthPage = () => {
                         <input type="password" required autoFocus minLength={8} value={password}
                           onChange={e => setPassword(e.target.value)} className={input} />
                       </div>
+                      <HCaptcha
+                        sitekey={hcaptchaSiteKey}
+                        size="invisible"
+                        ref={captchaRef}
+                        onVerify={setCaptchaToken}
+                      />
                       <button type="submit" disabled={loading} className={btnPrimary}>
                         {loading ? 'Signing in…' : 'Sign In'}
                       </button>

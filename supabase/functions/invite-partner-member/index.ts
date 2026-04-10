@@ -54,11 +54,9 @@ Deno.serve(async (req) => {
       companyName = partner?.company_name || "your company";
     }
 
-    // Check if user with this email already exists
-    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
-    const existingUser = existingUsers?.users?.find(
-      (u: any) => u.email?.toLowerCase() === email.toLowerCase()
-    );
+    // Fix #6/#14: Use getUserByEmail instead of full-table scan
+    const { data: existingUserData } = await supabaseAdmin.auth.admin.getUserByEmail(email.toLowerCase());
+    const existingUser = existingUserData?.user || null;
 
     const inviteToken = crypto.randomUUID();
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();

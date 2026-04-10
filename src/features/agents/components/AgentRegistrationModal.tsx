@@ -119,14 +119,14 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!registrationEmail) {
+    if (!emailInput) {
       toast.error('Please enter your email address.');
       return;
     }
     setLoading(true);
     try {
       const { error } = await supabase.auth.signInWithOtp({
-        email: registrationEmail,
+        email: emailInput,
         options: {
           shouldCreateUser: true,
           emailRedirectTo: `${window.location.origin}/dashboard`,
@@ -145,7 +145,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
     setResending(true);
     try {
       const { error } = await supabase.auth.signInWithOtp({
-        email: registrationEmail,
+        email: emailInput,
         options: {
           shouldCreateUser: true,
           emailRedirectTo: `${window.location.origin}/dashboard`,
@@ -194,8 +194,8 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                     required
                     type="email"
                     autoFocus
-                    value={registrationEmail}
-                    onChange={(e) => setRegistrationEmail(e.target.value)}
+                    value={emailInput}
+                    onChange={(e) => setEmailInput(e.target.value)}
                     placeholder="jane@agency.com.au"
                   />
                 </div>
@@ -237,7 +237,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                   Check your inbox
                 </DialogTitle>
                 <DialogDescription className="text-center">
-                  We've sent a verification link to <strong className="text-foreground">{registrationEmail}</strong>. Click the link in the email to verify your identity and continue setup.
+                  We've sent a verification link to <strong className="text-foreground">{emailInput}</strong>. Click the link in the email to verify your identity and continue setup.
                 </DialogDescription>
               </DialogHeader>
 

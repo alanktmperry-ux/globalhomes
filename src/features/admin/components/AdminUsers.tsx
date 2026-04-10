@@ -668,7 +668,7 @@ const AdminUsers = () => {
                               <Mail size={14} />
                             </a>
                             <button
-                              onClick={() => handleDelete(u.id)}
+                              onClick={() => handleDeleteClick(u)}
                               className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
                               title="Delete demo request"
                             >
@@ -695,7 +695,7 @@ const AdminUsers = () => {
                               <ShieldCheck size={14} />
                             </button>
                             <button
-                              onClick={() => handleDelete(u.id)}
+                              onClick={() => handleDeleteClick(u)}
                               className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
                               title="Delete partner"
                             >
@@ -755,7 +755,7 @@ const AdminUsers = () => {
                               {u.banned_until ? <UserCheck size={14} /> : <Ban size={14} />}
                             </button>
                             <button
-                              onClick={() => handleDelete(u.id)}
+                              onClick={() => handleDeleteClick(u)}
                               className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
                               title="Delete user"
                             >
@@ -780,7 +780,7 @@ const AdminUsers = () => {
                               {u.banned_until ? <UserCheck size={14} /> : <Ban size={14} />}
                             </button>
                             <button
-                              onClick={() => handleDelete(u.id)}
+                              onClick={() => handleDeleteClick(u)}
                               className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
                               title="Delete user"
                             >

@@ -165,9 +165,6 @@ function EnquiryModal({ broker, propertyId, propertyAddress, propertyPrice, onCl
             {status === "error" && (
               <div className="mt-3 flex items-start gap-2 text-sm text-destructive">
                 <span>{errorMsg}</span>
-                <a href={`mailto:${broker.email}`} className="underline flex-shrink-0">
-                  Email broker
-                </a>
               </div>
             )}
 
@@ -215,10 +212,9 @@ export function MortgageBrokerCard({
       // Simpler approach: call a lightweight edge function or use service role.
       // For MVP, we'll try to read and if RLS blocks it, the card won't show.
       const { data, error } = await supabase
-        .from("brokers")
-        .select("id, name, email, phone, company, acl_number, photo_url, languages, tagline, calendar_url, is_founding_partner, lead_fee_aud")
-        .eq("is_active", true)
-        .order("created_at", { ascending: true })
+        .from("brokers_public_safe" as any)
+        .select("id, name, company, acl_number, photo_url, languages, tagline, calendar_url, is_founding_partner")
+        .order("id", { ascending: true })
         .limit(1)
         .maybeSingle();
 
@@ -302,23 +298,6 @@ export function MortgageBrokerCard({
             {broker.tagline}
           </p>
         )}
-
-        <div className="flex flex-wrap gap-3 mt-3 text-sm text-muted-foreground">
-          {broker.phone && (
-            <a
-              href={`tel:${broker.phone.replace(/\s/g, "")}`}
-              className="inline-flex items-center gap-1.5 hover:text-primary transition-colors"
-            >
-              <Phone size={13} /> {broker.phone}
-            </a>
-          )}
-          <a
-            href={`mailto:${broker.email}`}
-            className="inline-flex items-center gap-1.5 hover:text-primary transition-colors"
-          >
-            <Mail size={13} /> {broker.email}
-          </a>
-        </div>
 
         <div className="flex gap-2 mt-4">
           <Button

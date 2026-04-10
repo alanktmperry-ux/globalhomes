@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, CheckCircle2, ShieldCheck, Ban, Clock, Download, FileText, CreditCard, Building2, Play } from 'lucide-react';
+import { X, CheckCircle2, ShieldCheck, Ban, Clock, Download, FileText, CreditCard, Building2, Play, Info, ExternalLink } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -193,6 +193,38 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                   Start receiving voice-qualified leads for your territory.
                 </DialogDescription>
               </DialogHeader>
+
+              {/* What you need for this step */}
+              <details className="mb-4 rounded-lg border border-border bg-muted/50 text-sm">
+                <summary className="flex cursor-pointer items-center gap-2 px-4 py-3 font-medium text-foreground select-none">
+                  <Info size={16} className="shrink-0 text-primary" />
+                  What you need for this step
+                </summary>
+                <div className="px-4 pb-4 pt-1 space-y-2.5 text-muted-foreground">
+                  <p>
+                    <strong className="text-foreground">ABN</strong> — your 11-digit Australian Business Number. Format: XX&nbsp;XXX&nbsp;XXX&nbsp;XXX.{' '}
+                    <a href="https://abr.business.gov.au" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
+                      Find it at abr.business.gov.au <ExternalLink size={12} />
+                    </a>
+                  </p>
+                  <p>
+                    <strong className="text-foreground">Real estate licence number</strong> — issued by your state regulator. This is <em>not</em> your CPD number.<br />
+                    Examples: VIC (Consumer Affairs): 6-digit number · NSW (Fair Trading): starts with 20XXXXXXXX · QLD (OFT): starts with 4XXXXXXX
+                  </p>
+                  <p>
+                    <strong className="text-foreground">Principal's full name</strong> — the Licensee in Charge (LIC) for your agency
+                  </p>
+                  <p>
+                    <strong className="text-foreground">Operating state</strong> — select your primary state of operation. You can service other states once set up.
+                  </p>
+                  <p>
+                    <strong className="text-foreground">Agency phone and email</strong> — these will appear on your public agency profile and listing enquiry forms
+                  </p>
+                  <p className="pt-1 text-xs italic text-muted-foreground/80">
+                    Your licence number is used for compliance verification. Enter it exactly as it appears on your licence certificate.
+                  </p>
+                </div>
+              </details>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Name & Agency */}

@@ -145,17 +145,10 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
   const handleResendEmail = async () => {
     setEmailSubmitting(true);
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email: emailInput,
-        options: {
-          shouldCreateUser: true,
-          emailRedirectTo: `${window.location.origin}/dashboard`,
-        },
-      });
-      if (error) throw error;
-      toast.success('Confirmation email resent!');
+      await supabase.auth.resend({ type: 'signup', email: emailInput.trim().toLowerCase() });
+      toast.success('Confirmation email resent — check your inbox');
     } catch (err: unknown) {
-      toast.error(`Error — ${getErrorMessage(err)}`);
+      toast.error(`Could not resend — ${getErrorMessage(err)}`);
     } finally {
       setEmailSubmitting(false);
     }

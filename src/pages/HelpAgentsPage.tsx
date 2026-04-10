@@ -5,16 +5,18 @@ import { HelpSearch } from '@/features/help/components/HelpSearch';
 import { FAQ_ITEMS } from '@/data/faq';
 
 const sections = [
-  { title: 'Getting Started', ids: ['agent-create-listing', 'agent-profile', 'agent-billing'] },
-  { title: 'Managing Listings', ids: ['agent-listing-types', 'agent-photos', 'agent-off-market'] },
+  { title: 'Getting Started', ids: ['agent-create-listing', 'agent-profile', 'agent-billing', 'agent-onboarding-complete'] },
+  { title: 'Managing Listings', ids: ['agent-listing-types', 'agent-photos', 'agent-off-market', 'agent-voice-listing', 'agent-cobroke'] },
+  { title: 'Multilingual & Translations', ids: ['agent-multilingual-translation', 'agent-language-toggle'] },
   { title: 'Open Homes', ids: ['agent-open-home'] },
   { title: 'Auctions', ids: ['agent-auction-setup', 'agent-auction-registration'] },
-  { title: 'CRM & Leads', ids: ['agent-crm', 'agent-saved-searches'] },
+  { title: 'CRM & Leads', ids: ['agent-crm', 'agent-saved-searches', 'agent-lead-marketplace'] },
   { title: 'Rentals & Property Management', ids: ['agent-rental-pm'] },
-  { title: 'Market Tools', ids: ['agent-suburb-intelligence'] },
-  { title: 'Client Reporting', ids: ['agent-vendor-dashboard', 'agent-documents'] },
+  { title: 'Market Tools', ids: ['agent-suburb-intelligence', 'agent-cma', 'agent-strata-health'] },
+  { title: 'Client Reporting', ids: ['agent-vendor-dashboard', 'agent-documents', 'agent-vendor-report-link'] },
+  { title: 'Team & Agency', ids: ['agent-team-invite', 'agent-team-roles', 'agent-team-access-levels'] },
   { title: 'Reviews & Profile', ids: ['agent-reviews'] },
-  { title: 'Billing & Support', ids: ['agent-billing', 'billing-plans', 'billing-cancel', 'billing-invoices', 'billing-update-card'] },
+  { title: 'Billing & Support', ids: ['agent-billing', 'billing-plans', 'billing-cancel', 'billing-invoices', 'billing-update-card', 'billing-founding-agent'] },
 ];
 
 export default function HelpAgentsPage() {

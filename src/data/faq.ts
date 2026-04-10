@@ -164,6 +164,90 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: 'agents',
     tags: ['billing', 'subscription', 'stripe', 'payment'],
   },
+  {
+    id: 'agent-multilingual-translation',
+    question: 'How does multilingual listing translation work?',
+    answer: 'ListHQ automatically translates your listing into Mandarin (Simplified), Mandarin (Traditional), and Vietnamese using AI. When you publish a listing, it is queued for translation. Once complete, a language toggle appears on the property detail page — buyers can switch between English, 中文 (Simplified), 中文 (Traditional), and Tiếng Việt with one click.\n\nEach translation includes:\n• Full title and description in the target language\n• A 1–2 sentence cultural summary\n• Cultural highlights specific to that buyer community (e.g. school proximity, feng shui orientation, garden space) — only where genuinely applicable\n• Agent insights on multicultural buyer appeal\n\nTranslations are generated automatically — you do not need to do anything after publishing. You can manually trigger a re-translation from the listing detail page if you update the description.',
+    category: 'agents',
+    tags: ['multilingual', 'translation', 'mandarin', 'vietnamese', 'cantonese', 'language', 'AI', 'chinese'],
+  },
+  {
+    id: 'agent-language-toggle',
+    question: 'How do buyers switch the listing language, and what does the agent see?',
+    answer: 'On any property detail page, buyers use the language selector in the navigation bar to switch between English, 中文 Simplified, 中文 Traditional, and Tiếng Việt. The entire listing — title, description, cultural highlights, and agent insights — switches language instantly without a page reload.\n\nAs the listing agent, you will see an "Agent Insights" panel alongside each translation. This panel summarises the property\'s multicultural appeal, suggested buyer profiles (e.g. "Mandarin-speaking families seeking school catchments"), and key selling points for diverse buyer communities. This panel is visible to you but not to buyers.',
+    category: 'agents',
+    tags: ['language', 'toggle', 'multilingual', 'buyer', 'translation', 'agent insights'],
+  },
+  {
+    id: 'agent-voice-listing',
+    question: 'How does voice listing creation work?',
+    answer: 'In the listing creation flow, Step 4 (Voice) lets you describe the property out loud instead of typing. Click the microphone button and speak naturally — describe the property\'s features, style, and standout qualities. Your speech is transcribed in real time and displayed as editable text.\n\nFrom there, click "Generate with AI" and choose a tone:\n• Standard — clear and professional\n• Luxury — aspirational, premium language\n• Family — warm, lifestyle-focused\n• Investment — yield and capital growth focused\n\nThe AI rewrites your transcript into a polished listing description in your chosen tone. You can edit the result before saving. This typically takes under 30 seconds.',
+    category: 'agents',
+    tags: ['voice', 'listing', 'AI', 'description', 'microphone', 'generate', 'tone'],
+  },
+  {
+    id: 'agent-cobroke',
+    question: 'What is the co-broke toggle and how does it work?',
+    answer: 'The co-broke toggle is in Step 5 (Settings) of the listing creation flow. When enabled, it signals to other ListHQ agents that you are open to co-agency — meaning another agent can introduce a buyer and share the commission.\n\nWhen co-broke is enabled:\n• Other agents can see the listing is co-broke eligible in their dashboard\n• You can set an auto-decline threshold — any co-broke offer below a specified commission percentage is automatically declined\n• Incoming co-broke requests appear in your CRM as leads, tagged as "Co-broke"\n\nThis is particularly useful for off-market listings where you want maximum buyer reach without going public. Co-broke arrangements are between agents — the buyer is not shown any commission information.',
+    category: 'agents',
+    tags: ['co-broke', 'cobroke', 'co-agency', 'commission', 'off-market', 'settings'],
+  },
+  {
+    id: 'agent-team-invite',
+    question: 'How do I invite a team member to my agency?',
+    answer: 'Go to Dashboard → Team. You can add team members in two ways:\n\n1. Invite by Email — Click "Invite by Email", enter their email address, select their role (Agent or Admin), and set their access level (Full Access or Read Only). They will receive an email with a link to join your agency. If they already have a ListHQ account, they are added immediately.\n\n2. Invite Code — Click "Create Code" to generate a reusable 8-character code. Share the code with your team member — they enter it at Dashboard → Team → Join with Code. You can set a maximum number of uses and deactivate the code at any time.\n\nRoles available:\n• Agent — standard access to listings, CRM, and calendar\n• Admin — can manage listings, team members, and settings\n• Principal — full control, including billing and agency branding (set during agency creation)\n\nYour plan determines how many seats are available. Each team member gets their own login.',
+    category: 'agents',
+    tags: ['team', 'invite', 'agency', 'member', 'code', 'email', 'role', 'seat', 'agent', 'admin'],
+  },
+  {
+    id: 'agent-team-roles',
+    question: 'What is the difference between Agent, Admin, and Principal roles?',
+    answer: 'ListHQ uses three team roles:\n\n• Agent — can create and manage their own listings, view their own CRM contacts and leads, schedule open homes, and access their own analytics. Cannot see other agents\' contacts or change agency settings.\n\n• Admin — all Agent permissions, plus the ability to manage all team members\' listings, view agency-wide analytics, manage invite codes, and edit agency details. Cannot change billing.\n\n• Principal — full control over everything, including billing, subscription management, team member deactivation, contact and listing reassignment, and compliance tracking. Only one Principal per agency (set during onboarding). The Principal can reassign contacts or listings from one agent to another and deactivate agents while preserving their data.',
+    category: 'agents',
+    tags: ['role', 'principal', 'admin', 'agent', 'team', 'permissions', 'access'],
+  },
+  {
+    id: 'agent-team-access-levels',
+    question: 'What is the difference between Full Access and Read Only for team members?',
+    answer: 'When inviting a team member, you set their access level in addition to their role:\n\n• Full Access — the team member can create, edit, publish, and delete listings, add and manage CRM contacts, and take all actions within their role permissions.\n\n• Read Only — the team member can view listings, contacts, analytics, and reports, but cannot create, edit, or delete anything. Useful for support staff, business development managers, or compliance reviewers who need visibility without edit rights.',
+    category: 'agents',
+    tags: ['access', 'read only', 'full access', 'team', 'permissions'],
+  },
+  {
+    id: 'agent-strata-health',
+    question: 'What is the Strata Health Score?',
+    answer: 'The Strata Health Score is a 0–100 score that assesses the financial and compliance health of a strata scheme — relevant for apartments, townhouses, and units in managed complexes.\n\nThe score is calculated across five weighted factors:\n• Sinking fund adequacy (30 points) — how well-funded the capital works reserve is relative to its target\n• Special levy history (25 points) — whether any unexpected levies have been issued in the past 5 years, and their size per lot\n• Levy-to-value ratio (20 points) — annual levies as a proportion of estimated lot value\n• Capital works plan currency (15 points) — how recently the 10-year capital works plan was updated\n• Defect disclosure (10 points) — presence of known building defects or active defect bonds\n\nA score of 80+ is considered healthy. Below 50 indicates potential financial risk for buyers.\n\nAs a listing agent, you can attach the Strata Health Score to any applicable listing. Buyers see the score on the property detail page as a trust signal. The score is computed automatically from the strata data you enter and can be regenerated if data changes.',
+    category: 'agents',
+    tags: ['strata', 'health score', 'sinking fund', 'levy', 'apartment', 'defect', 'capital works'],
+  },
+  {
+    id: 'agent-cma',
+    question: 'How do I run a Comparative Market Analysis (CMA)?',
+    answer: 'The CMA tool is available in your agent dashboard under Market → CMA. It allows you to produce a professional market analysis report to support a listing presentation or vendor appraisal.\n\nTo run a CMA:\n1. Enter the subject property address\n2. ListHQ pulls comparable sold and listed properties from the same suburb, filtered by property type, bedroom count, and sale method\n3. Review and select which comparables to include or exclude\n4. The CMA report calculates a suggested price range based on median and average comparable sale prices, adjusted for days on market\n5. Export the report as a PDF to share with your vendor\n\nThe CMA report includes a cover page, comparable property table, price per square metre analysis, and a recommended listing price range. It is designed to be presented directly to vendors at the appraisal meeting.',
+    category: 'agents',
+    tags: ['CMA', 'comparative market analysis', 'appraisal', 'valuation', 'vendor', 'report', 'market'],
+  },
+  {
+    id: 'agent-lead-marketplace',
+    question: 'What is the Lead Marketplace?',
+    answer: 'The Lead Marketplace (Dashboard → Lead Marketplace) is a curated feed of buyer and renter leads that are available for agents to claim. These leads come from buyers who have submitted enquiries or voice searches on ListHQ but have not yet been connected to a specific agent.\n\nEach lead shows:\n• Buyer type (purchaser, investor, renter)\n• Property requirements (suburb, price range, bedrooms, property type)\n• Urgency (immediate, 1–3 months, flexible)\n• Lead source (voice search, open home, enquiry)\n\nYou can claim a lead to receive the buyer\'s full contact details and add them to your CRM. Claimed leads are removed from the marketplace so other agents cannot claim the same buyer. Lead Marketplace access is included on Agency and Professional plans.',
+    category: 'agents',
+    tags: ['lead marketplace', 'leads', 'buyers', 'claim', 'enquiry', 'marketplace'],
+  },
+  {
+    id: 'agent-vendor-report-link',
+    question: 'How do I generate a shareable vendor performance report link?',
+    answer: 'On any listing detail page in your dashboard, go to the Performance tab. Click "Generate Vendor Link" to create a unique, read-only URL for your vendor.\n\nThe vendor link gives your vendor access to a live performance dashboard showing:\n• Total listing views and unique visitors\n• Number of enquiries received\n• Open home attendance numbers\n• Traffic sources (search, direct, social media, email)\n• How the listing compares to similar properties in the suburb\n\nThe link requires no login — your vendor can open it on any device at any time. The data updates in real time. You can regenerate the link at any time, which invalidates the previous one. Links can also be sent directly from the dashboard via email.',
+    category: 'agents',
+    tags: ['vendor', 'report', 'link', 'performance', 'analytics', 'shareable', 'views'],
+  },
+  {
+    id: 'agent-onboarding-complete',
+    question: 'How do I complete the agency onboarding setup?',
+    answer: 'When you first sign up as an agent, you will be prompted to complete a 5-step agency setup (Dashboard → Agency Setup):\n\n1. Choose your path — Starting fresh (new agency, $0 trust balance) or Migrating from another system (PropertyMe, Console Cloud, Reapit, or TrustSoft)\n2. Agency & Licence Details — enter your agency or trading name, ABN, real estate licence number, principal name, state of operation, phone, address, and email\n3. Trust Account — enter your trust account bank details (bank name, BSB, account number)\n4. Cut-over date (migration path only) — the date from which all trust transactions will be recorded in ListHQ\n5. Import opening balance (migration path only) — use the Trust Import Wizard to bring in existing ledger data\n\nOnce complete, you will be taken to your full agent dashboard. You can update your agency details at any time from Dashboard → Team → Edit Details.',
+    category: 'agents',
+    tags: ['onboarding', 'setup', 'agency', 'trust account', 'ABN', 'licence', 'getting started'],
+  },
 
   // BUYERS
   {
@@ -412,6 +496,22 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: 'billing',
     tags: ['payment', 'card', 'stripe', 'update'],
   },
+  {
+    id: 'billing-founding-agent',
+    question: 'What is the Founding Agent offer?',
+    answer: 'ListHQ\'s Founding Agent offer gives the first agents who join the platform 3 months of full access at no charge — no credit card required at signup.\n\nFounding Agent benefits include:\n• Full platform access for 3 months free\n• Locked-in founding pricing when you convert to a paid plan (lower than the standard public rate)\n• Founding Agent badge on your public agent profile\n• Direct input into product development — your feedback shapes what gets built next\n• Priority support during the launch period\n\nThe Founding Agent offer is available to a limited number of agents in each market. Once the founding cohort is full, new agents join at standard pricing. To claim the offer, sign up and complete your agency onboarding — no payment details are needed until the free period ends.',
+    category: 'billing',
+    tags: ['founding agent', 'free', 'trial', 'offer', 'pricing', 'badge', '3 months'],
+  },
+
+  // GENERAL
+  {
+    id: 'general-offmarket-vs-premarket',
+    question: 'What is the difference between an off-market listing and a pre-market listing?',
+    answer: 'ListHQ supports two types of private listings:\n\n• Off-Market — the property is not advertised publicly at all. It is visible only to buyers who have subscribed to off-market alerts for that suburb and price range. Off-market listings do not appear in search results. Agents use them for discreet sales where the vendor does not want public exposure.\n\n• Pre-Market (Coming Soon) — the property is publicly visible in search results but marked as "Coming Soon". Buyers can register their interest, but the property is not yet open for inspections or offers. Agents use this to build a buyer list before going live, often 1–2 weeks before the official launch date.\n\nIn both cases, the agent controls who sees the full listing details. Pre-market listings transition to a full active listing on the launch date.',
+    category: 'general',
+    tags: ['off-market', 'pre-market', 'coming soon', 'private', 'listing type', 'difference'],
+  },
 
   // TECHNICAL
   {
@@ -448,6 +548,13 @@ export const FAQ_ITEMS: FaqItem[] = [
     answer: 'Go to Account Settings → Privacy → Delete Account. For agent accounts with active listings, you must first deactivate all listings before deletion. Account deletion is permanent and cannot be undone. Alternatively, contact support@listhq.com.au and we\'ll process the deletion within 30 days as required by the Privacy Act.',
     category: 'technical',
     tags: ['delete account', 'privacy', 'data removal'],
+  },
+  {
+    id: 'tech-listing-wrong-language',
+    question: 'Why is my listing showing in the wrong language or not translating?',
+    answer: 'There are a few reasons a listing may not display correctly in a non-English language:\n\n1. Translation still processing — after publishing, translations typically complete within 1–2 minutes. If the language toggle is not yet showing, wait a moment and refresh the page.\n\n2. Description too short — the AI translation requires a minimum description length to produce a quality translation. If your listing description is under 50 words, the translation may be incomplete. Add more detail and trigger a re-translation from the listing detail page.\n\n3. Re-translation needed — if you have significantly updated your listing description after the initial translation, the translated versions may be outdated. Trigger a fresh translation from the listing detail page → Translations tab → "Regenerate Translations".\n\n4. Language selector not responding — if the language selector in the navigation bar is not opening, this may be a z-index display issue on certain pages. Try refreshing the page, or contact support@listhq.com.au.',
+    category: 'technical',
+    tags: ['translation', 'language', 'wrong language', 'multilingual', 'bug', 'not working'],
   },
 ];
 

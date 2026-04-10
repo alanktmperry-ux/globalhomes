@@ -9,12 +9,16 @@ const QUICK_QUESTIONS = [
   'How do I set up an auction?',
   'How do I add a co-agent?',
   'How do agent reviews work?',
-  'How do agent reviews work?',
   'How do I manage my billing?',
   'How do off-market listings work?',
   'How do I share documents with buyers?',
   'How does the vendor report work?',
   'How do I record a trust receipt?',
+  'How does multilingual translation work?',
+  'How do I invite a team member?',
+  'What is the Strata Health Score?',
+  'How do I use voice listing creation?',
+  'How does the co-broke toggle work?',
 ];
 
 const HelpPage = () => {

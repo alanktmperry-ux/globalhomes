@@ -205,7 +205,7 @@ export default function AgentPublicProfilePage() {
         // Fetch reviews
         const { data: reviews } = await supabase
           .from('agent_reviews')
-          .select('*')
+          .select('id, agent_id, reviewer_name, review_type, rating, title, review_text, suburb, year_of_service, verified, status, reply_text, replied_at, helpful_count, created_at, relationship')
           .eq('agent_id', data.id)
           .eq('status', 'approved')
           .order('created_at', { ascending: false });

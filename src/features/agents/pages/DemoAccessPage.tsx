@@ -58,13 +58,18 @@ const DemoAccessPage = () => {
 
       await supabase.auth.signOut();
 
-      const { error: signInErr } = await supabase.auth.signInWithPassword({
-        email: payload.demo_email || 'demo@listhq.com.au',
-        password: payload.demo_password || 'DemoAccess2024!',
-      });
-
-      if (signInErr) {
-        setError('Something went wrong. Please try again.');
+      // Fix #1: Use server-provided session token instead of hardcoded credentials
+      if (payload.access_token && payload.refresh_token) {
+        const { error: sessionErr } = await supabase.auth.setSession({
+          access_token: payload.access_token,
+          refresh_token: payload.refresh_token,
+        });
+        if (sessionErr) {
+          setError('Something went wrong. Please try again.');
+          return;
+        }
+      } else {
+        setError('Demo session could not be created. Please try again.');
         return;
       }
 

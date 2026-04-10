@@ -27,6 +27,7 @@ export function DocumentDownloadButton({ doc, onDownload, size = 'sm', label = '
         a.href = url;
         a.download = doc.file_name;
         a.target = '_blank';
+        a.rel = 'noopener noreferrer';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

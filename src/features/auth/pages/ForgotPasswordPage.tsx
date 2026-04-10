@@ -18,10 +18,7 @@ const ForgotPasswordPage = () => {
     setLoading(true);
     try {
       const origin = window.location.origin;
-      // Ensure demo request emails are provisioned as auth users so reset emails can be delivered
-      await supabase.functions.invoke('handle-demo-request', {
-        body: { action: 'ensure_auth_user', email: email.trim() },
-      });
+      // Fix #5: Removed ensure_auth_user call — was creating unauth'd users
 
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${origin}/reset-password`,

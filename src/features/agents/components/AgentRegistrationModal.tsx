@@ -237,60 +237,28 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
               </form>
             </motion.div>
           ) : step === 'check-email' ? (
-            <motion.div
-              key="check-email"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="p-6"
-            >
+            <motion.div key="check-email" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-6 text-center">
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
                 <Mail size={32} className="text-primary" />
               </div>
-
-              <DialogHeader className="mb-5">
-                <DialogTitle className="font-display text-2xl font-extrabold text-center">
-                  Check your inbox
-                </DialogTitle>
-                <DialogDescription className="text-center">
-                  We've sent a verification link to <strong className="text-foreground">{emailInput}</strong>. Click the link in the email to verify your identity and continue setup.
-                </DialogDescription>
-              </DialogHeader>
-
-              <ul className="space-y-3 text-sm text-foreground mb-6">
-                <li className="flex items-start gap-3">
-                  <Mail size={18} className="mt-0.5 shrink-0 text-primary" />
-                  <span>Check your inbox (and spam/junk folder) for an email from ListHQ</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <ArrowRight size={18} className="mt-0.5 shrink-0 text-primary" />
-                  <span>Click the verification link — it will bring you straight back here</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <Clock size={18} className="mt-0.5 shrink-0 text-primary" />
-                  <span>The link expires in <strong>1 hour</strong></span>
-                </li>
-              </ul>
-
-              <div className="flex flex-col gap-3">
-                <Button
-                  variant="outline"
-                  onClick={handleResendVerification}
-                  disabled={resending}
-                  className="w-full"
-                >
-                  {resending ? (
-                    <><RefreshCw size={14} className="animate-spin mr-1.5" /> Resending...</>
-                  ) : (
-                    <><RefreshCw size={14} className="mr-1.5" /> Resend verification email</>
-                  )}
+              <h3 className="font-display text-xl font-extrabold mb-2">Check your inbox</h3>
+              <p className="text-sm text-muted-foreground mb-2">
+                We've sent a confirmation link to:
+              </p>
+              <p className="font-semibold text-foreground text-sm mb-5">{emailInput}</p>
+              <p className="text-sm text-muted-foreground mb-6">
+                Click the link in that email to verify your address and continue setting up your agency. We've also included your <strong>Agent Quick-Start Guide</strong> in the email.
+              </p>
+              <div className="space-y-3">
+                <Button variant="outline" className="w-full" onClick={handleResendEmail} disabled={emailSubmitting}>
+                  {emailSubmitting ? 'Sending...' : 'Resend confirmation email'}
                 </Button>
-                <button
-                  onClick={() => setStep('email')}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors text-center"
-                >
-                  Use a different email address
-                </button>
+                <p className="text-xs text-muted-foreground">
+                  Wrong email?{' '}
+                  <button onClick={() => setStep('email')} className="text-primary hover:underline">
+                    Go back and change it
+                  </button>
+                </p>
               </div>
             </motion.div>
           ) : step === 'prepare' ? (

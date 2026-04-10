@@ -1,4 +1,3 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getCorsHeaders } from "../_shared/cors.ts";
 
@@ -10,7 +9,7 @@ const RESEND_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
 const EMAIL_FROM = Deno.env.get('EMAIL_FROM') ?? 'ListHQ Alerts <alerts@listhq.com.au>';
 const APP_URL = Deno.env.get('APP_URL') ?? 'https://globalhomes.lovable.app';
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req.headers.get("Origin"));
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });

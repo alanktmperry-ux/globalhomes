@@ -47,6 +47,7 @@ const AgentAuthPage = () => {
   const [officeSuggestions, setOfficeSuggestions] = useState<{ description: string; place_id: string }[]>([]);
   const [officeConfirmed, setOfficeConfirmed] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [pendingSignIn, setPendingSignIn] = useState(false);
 
   // ── All useRef hooks ──
   const officeDebounceRef = useRef<ReturnType<typeof setTimeout>>();
@@ -77,6 +78,14 @@ const AgentAuthPage = () => {
       return () => clearTimeout(timeout);
     }
   }, [pendingRedirect, user, authLoading, isAgent, isAdmin, toast]);
+
+  // Auto-submit sign-in after captcha verification
+  useEffect(() => {
+    if (pendingSignIn && captchaToken && step === 'password') {
+      setPendingSignIn(false);
+      handleSignIn({ preventDefault: () => {} } as React.FormEvent);
+    }
+  }, [pendingSignIn, captchaToken]);
 
   // ── Handlers ──
   const toggleSpecialisation = (value: string) => {
@@ -112,9 +121,16 @@ const AgentAuthPage = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!captchaToken) {
+      setPendingSignIn(true);
+      captchaRef.current?.execute();
+      return;
+    }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({ email, password, options: { captchaToken } });
+      setCaptchaToken(null);
+      captchaRef.current?.resetCaptcha();
       if (error) {
         if (error.message.includes('Email not confirmed')) {
           throw new Error('Please check your email and click the confirmation link before signing in.');
@@ -361,6 +377,12 @@ const AgentAuthPage = () => {
                 <div className="text-right">
                   <Link to="/forgot-password" className="text-xs text-primary font-medium underline underline-offset-2">Forgot password?</Link>
                 </div>
+                <HCaptcha
+                  sitekey={hcaptchaSiteKey}
+                  size="invisible"
+                  ref={captchaRef}
+                  onVerify={setCaptchaToken}
+                />
                 <button type="submit" disabled={loading} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
                   {loading ? 'Signing in…' : 'Sign In'}
                 </button>

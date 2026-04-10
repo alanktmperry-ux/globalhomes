@@ -1,13 +1,11 @@
+import { getCorsHeaders } from "../_shared/cors.ts";
 // STUB — For future Lendi API integration
 // When Lendi completes a soft assessment, they POST to this endpoint
 // with approval status and amount. We auto-verify without document upload.
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get("Origin"));
+
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }

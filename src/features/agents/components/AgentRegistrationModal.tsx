@@ -201,7 +201,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
 
                 <div className="bg-secondary/50 rounded-xl p-4 space-y-2">
                   {[
-                    { icon: <Mail size={14} />, text: 'We'll send a one-time verification link' },
+                    { icon: <Mail size={14} />, text: "We'll send a one-time verification link" },
                     { icon: <ShieldCheck size={14} />, text: 'No password needed — secure magic link sign-in' },
                     { icon: <Clock size={14} />, text: 'The whole setup takes about 5 minutes' },
                   ].map((t) => (

@@ -141,8 +141,8 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
     }
   };
 
-  const handleResendVerification = async () => {
-    setResending(true);
+  const handleResendEmail = async () => {
+    setEmailSubmitting(true);
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email: emailInput,
@@ -152,11 +152,11 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
         },
       });
       if (error) throw error;
-      toast.success('Verification email resent!');
+      toast.success('Confirmation email resent!');
     } catch (err: unknown) {
       toast.error(`Error — ${getErrorMessage(err)}`);
     } finally {
-      setResending(false);
+      setEmailSubmitting(false);
     }
   };
 

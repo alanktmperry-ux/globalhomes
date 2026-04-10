@@ -234,28 +234,28 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
               </form>
             </motion.div>
           ) : step === 'check-email' ? (
-            <motion.div key="check-email" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-6 text-center">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
-                <Mail size={32} className="text-primary" />
-              </div>
-              <h3 className="font-display text-xl font-extrabold mb-2">Check your inbox</h3>
-              <p className="text-sm text-muted-foreground mb-2">
-                We've sent a confirmation link to:
-              </p>
-              <p className="font-semibold text-foreground text-sm mb-5">{emailInput}</p>
-              <p className="text-sm text-muted-foreground mb-6">
-                Click the link in that email to verify your address and continue setting up your agency. We've also included your <strong>Agent Quick-Start Guide</strong> in the email.
-              </p>
-              <div className="space-y-3">
+            <motion.div key="check-email" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-6">
+              <div className="text-center space-y-5">
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                  <Mail size={32} className="text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-foreground">Check your inbox</h2>
+                  <p className="text-sm text-muted-foreground mt-1">We've sent a confirmation link to:</p>
+                  <p className="font-semibold text-foreground text-sm mt-1">{emailInput}</p>
+                </div>
+                <div className="bg-muted/50 border border-border rounded-xl p-4 text-xs text-muted-foreground text-left space-y-1.5">
+                  <p>· Click the link in the email to verify your address and continue setup</p>
+                  <p>· Check your spam folder if it doesn't arrive within 2 minutes</p>
+                  <p>· Your Agent Quick-Start Guide is included in the email — download it while you wait</p>
+                  <p>· The confirmation link expires after 24 hours</p>
+                </div>
                 <Button variant="outline" className="w-full" onClick={handleResendEmail} disabled={emailSubmitting}>
                   {emailSubmitting ? 'Sending...' : 'Resend confirmation email'}
                 </Button>
-                <p className="text-xs text-muted-foreground">
-                  Wrong email?{' '}
-                  <button onClick={() => setStep('email')} className="text-primary hover:underline">
-                    Go back and change it
-                  </button>
-                </p>
+                <button onClick={() => { setStep('email'); setEmailInput(''); }} className="text-xs text-muted-foreground hover:text-foreground">
+                  Wrong email? Go back and change it
+                </button>
               </div>
             </motion.div>
           ) : step === 'prepare' ? (

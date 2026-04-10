@@ -215,7 +215,7 @@ const PartnerAuthPage = () => {
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Password</label>
-                  <input type="password" required autoFocus minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
+                  <input type="password" required autoFocus minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
                 </div>
                 <div className="text-right">
                   <Link to="/forgot-password" className="text-xs text-primary font-medium underline underline-offset-2">Forgot password?</Link>
@@ -270,8 +270,14 @@ const PartnerAuthPage = () => {
                   <label className="text-sm font-medium text-foreground mb-1.5 block">
                     Password<span className="text-destructive">*</span>
                   </label>
-                  <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
+                  <input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
                 </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  By registering you agree to the{' '}
+                  <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">Terms of Service</a>
+                  {' '}and{' '}
+                  <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">Privacy Policy</a>.
+                </p>
                 <button type="submit" disabled={loading} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
                   {loading ? 'Registering…' : 'Register company'}
                 </button>

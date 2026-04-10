@@ -22,8 +22,6 @@ const LANGUAGE_FLAG: Record<string, string> = {
 interface BrokerData {
   id: string;
   name: string;
-  email: string;
-  phone: string | null;
   company: string | null;
   acl_number: string;
   photo_url: string | null;
@@ -31,7 +29,6 @@ interface BrokerData {
   tagline: string | null;
   calendar_url: string | null;
   is_founding_partner: boolean;
-  lead_fee_aud: number;
 }
 
 interface MortgageBrokerCardProps {

@@ -216,7 +216,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                   <span>All major Australian banks are supported: NAB, CBA, ANZ, Westpac, Bendigo, BOQ, Macquarie</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <AlertTriangle size={18} className="mt-0.5 shrink-0 text-amber-500" />
+                  <AlertTriangle size={18} className="mt-0.5 shrink-0 text-destructive" />
                   <span>If you don't have a trust account yet, contact your bank to open one before completing this step. Most banks can do this in 1–2 business days.</span>
                 </li>
               </ul>

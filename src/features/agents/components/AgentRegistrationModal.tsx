@@ -23,7 +23,7 @@ const SUBURBS_OPTIONS = [
 ];
 
 const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
-  const [step, setStep] = useState<'form' | 'success'>('form');
+  const [step, setStep] = useState<'prepare' | 'form' | 'success'>('prepare');
   const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({

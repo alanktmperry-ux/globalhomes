@@ -133,6 +133,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
       if (error && !error.message.toLowerCase().includes('already registered')) {
         throw error;
       }
+      sessionStorage.setItem('listhq_pending_email', emailInput.trim().toLowerCase());
       update('email', emailInput.trim().toLowerCase());
       setStep('check-email');
     } catch (err: unknown) {

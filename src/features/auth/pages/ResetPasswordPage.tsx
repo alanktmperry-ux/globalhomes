@@ -115,7 +115,7 @@ const ResetPasswordPage = () => {
             <div className="relative">
               <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input
-                type="password" placeholder="New password" required minLength={6} value={password}
+                type="password" placeholder="New password" required minLength={8} value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-secondary text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
               />

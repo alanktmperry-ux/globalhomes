@@ -241,9 +241,9 @@ const App = () => (
                 <Route path="/settings" element={<ProtectedRoute><BuyerSettingsPage /></ProtectedRoute>} />
 
                 {/* Agent */}
-                <Route path="/agent-dashboard" element={<ProtectedRoute><AgentPerformanceDashboard /></ProtectedRoute>} />
-                <Route path="/agent-portal" element={<ProtectedRoute><AgentPortalPage /></ProtectedRoute>} />
-                <Route path="/pocket-listing" element={<ProtectedRoute><PocketListingPage /></ProtectedRoute>} />
+                <Route path="/agent-dashboard" element={<ProtectedRoute requireAgent><AgentPerformanceDashboard /></ProtectedRoute>} />
+                <Route path="/agent-portal" element={<ProtectedRoute requireAgent><AgentPortalPage /></ProtectedRoute>} />
+                <Route path="/pocket-listing" element={<ProtectedRoute requireAgent><PocketListingPage /></ProtectedRoute>} />
                 <Route path="/dashboard" element={<ProtectedRoute requireAgent><AgentDashboardLayout /></ProtectedRoute>}>
                   <Route index element={<DashboardOverview />} />
                   <Route path="profile" element={<AgentProfilePage />} />
@@ -291,7 +291,7 @@ const App = () => (
                 <Route path="/partner/login" element={<PartnerAuthPage />} />
                 <Route path="/partner/accept" element={<PartnerAcceptPage />} />
                 <Route path="/partner/join" element={<PartnerJoinPage />} />
-                <Route path="/partner" element={<ProtectedRoute><PartnerDashboardLayout /></ProtectedRoute>}>
+                <Route path="/partner" element={<ProtectedRoute requirePartner><PartnerDashboardLayout /></ProtectedRoute>}>
                   <Route path="dashboard" element={<PartnerOverviewPage />} />
                   <Route path="team" element={<PartnerTeamPage />} />
                   <Route path="trust" element={<PartnerTrustPage />} />

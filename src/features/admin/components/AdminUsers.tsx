@@ -7,6 +7,10 @@ import { useToast } from '@/shared/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
@@ -139,6 +143,8 @@ const AdminUsers = () => {
   const [graceModal, setGraceModal] = useState<{ open: boolean; userId: string; email: string; currentGrace: string | null }>({ open: false, userId: '', email: '', currentGrace: null });
   const [graceDate, setGraceDate] = useState<Date | undefined>(undefined);
   const [savingGrace, setSavingGrace] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<AuthUser | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const handleImpersonate = async (userId: string, userEmail: string) => {
     if (!confirm(`View the platform as ${userEmail}? You will see exactly what they see. An orange banner will let you exit.`)) return;
@@ -268,22 +274,61 @@ const AdminUsers = () => {
     fetchUsers();
   };
 
-  const handleDelete = async (userId: string) => {
+  const handleDeleteClick = (user: AuthUser) => {
+    const isDemoRequest = user.id.startsWith('demo-');
+    if (isDemoRequest) {
+      // Demo requests use simple confirm
+      if (!confirm('Delete this demo request? This cannot be undone.')) return;
+      performDelete(user);
+    } else {
+      // Show AlertDialog for real users
+      setDeleteTarget(user);
+    }
+  };
+
+  const performDelete = async (user: AuthUser) => {
+    const userId = user.id;
     const isDemoRequest = userId.startsWith('demo-');
-    const confirmMsg = isDemoRequest
-      ? 'Delete this demo request? This cannot be undone.'
-      : 'Permanently delete this user and ALL their data? This cannot be undone.';
-    if (!confirm(confirmMsg)) return;
+    const isAgent = user.user_type === 'agent' || user.user_type === 'demo';
+
+    setDeleting(true);
     setActionLoading(userId);
     try {
-      const action = isDemoRequest ? 'delete_demo_request' : 'delete_user';
-      const bodyId = isDemoRequest ? userId.replace('demo-', '') : userId;
-      await callAdminApi(action, { [isDemoRequest ? 'request_id' : 'user_id']: bodyId });
-      toast({ title: isDemoRequest ? 'Demo request deleted.' : 'User and all data permanently deleted.' });
+      if (isDemoRequest) {
+        const bodyId = userId.replace('demo-', '');
+        await callAdminApi('delete_demo_request', { request_id: bodyId });
+        toast({ title: 'Demo request deleted.' });
+      } else if (isAgent) {
+        // Use the dedicated admin-delete-agent edge function
+        const session = await getSession();
+        if (!session?.access_token) throw new Error('Session expired');
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-delete-agent`,
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId }),
+          }
+        );
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          throw new Error(err.error || `HTTP ${response.status}`);
+        }
+        toast({ title: 'Agent permanently deleted', description: 'All agent data, listings, trust accounts, and auth account have been removed.' });
+      } else {
+        await callAdminApi('delete_user', { user_id: userId });
+        toast({ title: 'User and all data permanently deleted.' });
+      }
     } catch (err: unknown) {
       toast({ title: 'Failed', description: getErrorMessage(err), variant: 'destructive' });
     }
+    setDeleting(false);
     setActionLoading(null);
+    setDeleteTarget(null);
     fetchUsers();
   };
 

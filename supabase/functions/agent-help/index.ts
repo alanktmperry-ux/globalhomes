@@ -1,4 +1,3 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
 
 const FAQ_CONTEXT = `You have access to the following ListHQ FAQ knowledge base. Use it to answer agent questions accurately.
@@ -81,7 +80,7 @@ const SYSTEM_PROMPT = `You are the ListHQ help assistant. Answer agent questions
 
 ${FAQ_CONTEXT}`;
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

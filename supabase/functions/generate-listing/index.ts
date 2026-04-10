@@ -1,4 +1,3 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
 
 const TONE_PROMPTS: Record<string, string> = {
@@ -14,7 +13,7 @@ const TONE_PROMPTS: Record<string, string> = {
     "Tone: respectful, consultative, and compelling. You are writing a direct mail letter to a property owner who may be considering selling. Introduce yourself as a local agent, reference recent market activity in their suburb, and invite them for a no-obligation appraisal. Be personal, not salesy.",
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

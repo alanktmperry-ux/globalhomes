@@ -1,4 +1,3 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
 
 function detectPortal(url: string): string {
@@ -97,7 +96,7 @@ function parseFromMarkdown(markdown: string, url: string) {
   return { address, suburb, state, listingType, priceMin: priceData.min, priceMax: priceData.max, priceFormatted: priceData.formatted, priceDisplay: priceData.display, propertyType, beds, baths, cars, sqm, landSize, description, features, photos, sourceUrl: url, portal };
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

@@ -225,8 +225,65 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                 <Button variant="outline" className="flex-1" onClick={() => setStep('prepare')}>
                   Back
                 </Button>
+                <Button className="flex-1" onClick={() => setStep('cutover')}>
+                  Continue
+                </Button>
+              </div>
+            </motion.div>
+          ) : step === 'cutover' ? (
+            <motion.div
+              key="cutover"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="p-6"
+            >
+              <DialogHeader className="mb-5">
+                <DialogTitle className="font-display text-2xl font-extrabold">
+                  Choosing your cut-over date
+                </DialogTitle>
+                <DialogDescription>
+                  Only relevant if you're migrating from another trust accounting system. Otherwise, skip ahead.
+                </DialogDescription>
+              </DialogHeader>
+
+              <ul className="space-y-3 text-sm text-foreground mb-5">
+                <li className="flex items-start gap-3">
+                  <CalendarCheck size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>The cut-over date is the <strong>last date</strong> you will record trust transactions in your old system. From the next business day, all trust activity is recorded in ListHQ only.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>Choose a date when your trust account is <strong>fully reconciled</strong> — ideally a month-end or quarter-end</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <ListChecks size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>You will need: <strong>(1)</strong> Trust Trial Balance as at the cut-over date, <strong>(2)</strong> Client Ledger Summary from your current system, <strong>(3)</strong> Bank statement showing the closing balance, <strong>(4)</strong> Active matters list</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <AlertTriangle size={18} className="mt-0.5 shrink-0 text-destructive" />
+                  <span>Do <strong>NOT</strong> process transactions in both systems simultaneously after the cut-over date — this creates reconciliation discrepancies that are very difficult to unwind</span>
+                </li>
+              </ul>
+
+              <a
+                href="/ListHQ_Migration_Pre-Import_Checklist.xlsx"
+                download
+                className="flex items-center gap-2 rounded-lg border border-border bg-muted/50 px-4 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors mb-6"
+              >
+                <Download size={16} className="shrink-0 text-primary" />
+                Download Migration Pre-Import Checklist (.xlsx)
+              </a>
+
+              <div className="flex gap-3">
+                <Button variant="outline" className="flex-1" onClick={() => setStep('trust-info')}>
+                  Back
+                </Button>
+                <Button variant="outline" className="flex-1" onClick={() => setStep('form')}>
+                  Skip — starting fresh
+                </Button>
                 <Button className="flex-1" onClick={() => setStep('form')}>
-                  Continue to registration
+                  Continue
                 </Button>
               </div>
             </motion.div>

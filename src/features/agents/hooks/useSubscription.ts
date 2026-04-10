@@ -33,6 +33,7 @@ export interface SubscriptionState extends PlanFeatures {
   subscriptionEnd: string | null;
   autoRenew: boolean;
   loading: boolean;
+  subLoadingTimeout: boolean;
 }
 
 const PRO_PLUS = ['pro', 'agency', 'enterprise'];
@@ -72,6 +73,7 @@ export function useSubscription(): SubscriptionState {
     subscriptionEnd: null,
     autoRenew: false,
     loading: true,
+    subLoadingTimeout: false,
     ...getPlanFeatures(null),
   });
 
@@ -131,6 +133,7 @@ export function useSubscription(): SubscriptionState {
           subscriptionEnd: (sub as any)?.subscription_end ?? null,
           autoRenew: (sub as any)?.auto_renew ?? false,
           loading: false,
+          subLoadingTimeout: false,
           ...features,
         });
       } catch {
@@ -144,7 +147,7 @@ export function useSubscription(): SubscriptionState {
 
   // If the timeout fired but we're still loading, return loading: false to unblock pages
   if (subLoadingTimeout && state.loading) {
-    return { ...state, loading: false };
+    return { ...state, loading: false, subLoadingTimeout: true };
   }
 
   return state;

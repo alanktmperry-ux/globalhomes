@@ -137,7 +137,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
     } catch (err: unknown) {
       toast.error(`Error — ${getErrorMessage(err)}`);
     } finally {
-      setLoading(false);
+      setEmailSubmitting(false);
     }
   };
 

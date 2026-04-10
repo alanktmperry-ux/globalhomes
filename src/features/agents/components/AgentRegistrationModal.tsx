@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, CheckCircle2, ShieldCheck, Ban, Clock, Download, FileText, CreditCard, Building2, Play, Info, ExternalLink, Landmark, AlertTriangle } from 'lucide-react';
+import { X, CheckCircle2, ShieldCheck, Ban, Clock, Download, FileText, CreditCard, Building2, Play, Info, ExternalLink, Landmark, AlertTriangle, CalendarCheck, ListChecks } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,7 +23,7 @@ const SUBURBS_OPTIONS = [
 ];
 
 const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
-  const [step, setStep] = useState<'prepare' | 'trust-info' | 'form' | 'success'>('prepare');
+  const [step, setStep] = useState<'prepare' | 'trust-info' | 'cutover' | 'form' | 'success'>('prepare');
   const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({

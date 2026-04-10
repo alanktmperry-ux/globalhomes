@@ -6,10 +6,11 @@ interface Props {
   children: React.ReactNode;
   requireAgent?: boolean;
   requireAdmin?: boolean;
+  requirePartner?: boolean;
 }
 
-export const ProtectedRoute = ({ children, requireAgent, requireAdmin }: Props) => {
-  const { user, loading, isAgent, isAdmin } = useAuth();
+export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePartner }: Props) => {
+  const { user, loading, isAgent, isAdmin, isPartner } = useAuth();
 
   if (loading) {
     return (
@@ -22,6 +23,7 @@ export const ProtectedRoute = ({ children, requireAgent, requireAdmin }: Props) 
   if (!user) return <Navigate to="/login" replace />;
   if (requireAdmin && !isAdmin) return <Navigate to="/" replace />;
   if (requireAgent && !isAgent) return <Navigate to="/" replace />;
+  if (requirePartner && !isPartner) return <Navigate to="/" replace />;
 
   return <>{children}</>;
 };

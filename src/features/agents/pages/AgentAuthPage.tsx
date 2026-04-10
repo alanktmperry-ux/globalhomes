@@ -30,22 +30,9 @@ const AgentAuthPage = () => {
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [agencyName, setAgencyName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [agencyEmail, setAgencyEmail] = useState('');
-  const [inviteCode, setInviteCode] = useState('');
-  const [licenseNumber, setLicenseNumber] = useState('');
-  const [officeAddress, setOfficeAddress] = useState('');
-  const [yearsExperience, setYearsExperience] = useState('');
-  const [specialization, setSpecialization] = useState('Residential');
-  const [specialisations, setSpecialisations] = useState<string[]>([]);
-  const [handlesTrustAccounting, setHandlesTrustAccounting] = useState(false);
-  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [regEmail, setRegEmail] = useState('');
+  const [emailSubmitting, setEmailSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [officeSuggestions, setOfficeSuggestions] = useState<{ description: string; place_id: string }[]>([]);
-  const [officeConfirmed, setOfficeConfirmed] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [pendingSignIn, setPendingSignIn] = useState(false);
 

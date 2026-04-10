@@ -804,7 +804,7 @@ export default function AgencyOnboardingPage() {
                 <Label className="text-xs font-semibold text-foreground">
                   Agency Email <span className="text-destructive ml-0.5">*</span>
                 </Label>
-                <Input type="email" value={agencyEmail} onChange={e => setAgencyEmail(e.target.value)} placeholder="office@smithproperty.com.au" className="mt-1.5" />
+                <Input value={agencyEmail} onChange={e => setAgencyEmail(e.target.value)} placeholder="office@smithproperty.com.au" className="mt-1.5" />
               </div>
             </div>
           </div>
@@ -1078,7 +1078,7 @@ export default function AgencyOnboardingPage() {
               </Button>
             ) : <div />}
             {showNextButton && (
-              <Button size="sm" disabled={!canNext() || loading} onClick={handleNext} className="w-full sm:w-auto">
+              <Button type="button" size="sm" disabled={!canNext() || loading} onClick={handleNext} className="w-full sm:w-auto">
                 {loading && <Loader2 size={14} className="mr-1 animate-spin" />}
                 Next <ArrowRight size={14} className="ml-1" />
               </Button>

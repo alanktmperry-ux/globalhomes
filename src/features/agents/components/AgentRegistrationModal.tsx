@@ -117,25 +117,26 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
     }
   };
 
-  const handleEmailSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!emailInput) {
-      toast.error('Please enter your email address.');
-      return;
-    }
+  const handleEmailSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!emailInput.trim()) return;
     setEmailSubmitting(true);
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email: emailInput,
+      const { error } = await supabase.auth.signUp({
+        email: emailInput.trim().toLowerCase(),
+        password: crypto.randomUUID(),
         options: {
-          shouldCreateUser: true,
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${window.location.origin}/dashboard/onboarding`,
+          data: { registration_started: true },
         },
       });
-      if (error) throw error;
+      if (error && !error.message.toLowerCase().includes('already registered')) {
+        throw error;
+      }
+      update('email', emailInput.trim().toLowerCase());
       setStep('check-email');
     } catch (err: unknown) {
-      toast.error(`Error — ${getErrorMessage(err)}`);
+      toast.error(`Could not send confirmation — ${getErrorMessage(err)}`);
     } finally {
       setEmailSubmitting(false);
     }

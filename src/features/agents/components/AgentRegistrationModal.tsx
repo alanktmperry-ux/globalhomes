@@ -24,8 +24,9 @@ const SUBURBS_OPTIONS = [
 
 const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
   const [step, setStep] = useState<'email' | 'check-email' | 'prepare' | 'trust-info' | 'cutover' | 'import-wizard' | 'form' | 'success'>('email');
+  const [emailInput, setEmailInput] = useState('');
+  const [emailSubmitting, setEmailSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [registrationEmail, setRegistrationEmail] = useState('');
   const [resending, setResending] = useState(false);
 
   const [form, setForm] = useState({
@@ -118,14 +119,14 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!registrationEmail) {
+    if (!emailInput) {
       toast.error('Please enter your email address.');
       return;
     }
-    setLoading(true);
+    setEmailSubmitting(true);
     try {
       const { error } = await supabase.auth.signInWithOtp({
-        email: registrationEmail,
+        email: emailInput,
         options: {
           shouldCreateUser: true,
           emailRedirectTo: `${window.location.origin}/dashboard`,
@@ -136,7 +137,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
     } catch (err: unknown) {
       toast.error(`Error — ${getErrorMessage(err)}`);
     } finally {
-      setLoading(false);
+      setEmailSubmitting(false);
     }
   };
 
@@ -144,7 +145,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
     setResending(true);
     try {
       const { error } = await supabase.auth.signInWithOtp({
-        email: registrationEmail,
+        email: emailInput,
         options: {
           shouldCreateUser: true,
           emailRedirectTo: `${window.location.origin}/dashboard`,
@@ -193,8 +194,8 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                     required
                     type="email"
                     autoFocus
-                    value={registrationEmail}
-                    onChange={(e) => setRegistrationEmail(e.target.value)}
+                    value={emailInput}
+                    onChange={(e) => setEmailInput(e.target.value)}
                     placeholder="jane@agency.com.au"
                   />
                 </div>
@@ -212,8 +213,8 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                   ))}
                 </div>
 
-                <Button type="submit" disabled={loading} className="w-full py-5 rounded-xl text-base font-bold">
-                  {loading ? 'Sending verification...' : (
+                <Button type="submit" disabled={emailSubmitting} className="w-full py-5 rounded-xl text-base font-bold">
+                  {emailSubmitting ? 'Sending verification...' : (
                     <>Continue <ArrowRight size={16} className="ml-1.5" /></>
                   )}
                 </Button>
@@ -236,7 +237,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                   Check your inbox
                 </DialogTitle>
                 <DialogDescription className="text-center">
-                  We've sent a verification link to <strong className="text-foreground">{registrationEmail}</strong>. Click the link in the email to verify your identity and continue setup.
+                  We've sent a verification link to <strong className="text-foreground">{emailInput}</strong>. Click the link in the email to verify your identity and continue setup.
                 </DialogDescription>
               </DialogHeader>
 

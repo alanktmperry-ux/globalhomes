@@ -123,7 +123,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
       toast.error('Please enter your email address.');
       return;
     }
-    setLoading(true);
+    setEmailSubmitting(true);
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email: emailInput,

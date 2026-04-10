@@ -28,6 +28,7 @@ const AgentDashboardLayout = React.lazy(() => import("./pages/AgentDashboardLayo
 const MyAgenciesPage = React.lazy(() => import("./pages/MyAgenciesPage"));
 const SeekerAuthPage = React.lazy(() => import("./pages/SeekerAuthPage"));
 const AgentAuthPage = React.lazy(() => import("./pages/AgentAuthPage"));
+const CheckEmailPage = React.lazy(() => import("./pages/CheckEmailPage"));
 const AuthLandingPage = React.lazy(() => import("./pages/AuthLandingPage"));
 const AdminDashboard = React.lazy(() => import("./pages/AdminDashboard"));
 const ForgotPasswordPage = React.lazy(() => import("./pages/ForgotPasswordPage"));
@@ -233,6 +234,7 @@ const App = () => (
                 <Route path="/strata/login" element={<StrataAuthPage />} />
                 <Route path="/broker/login" element={<BrokerLogin />} />
                 <Route path="/broker/portal" element={<BrokerPortal />} />
+                <Route path="/check-email" element={<CheckEmailPage />} />
 
                 {/* Authenticated */}
                 <Route path="/saved" element={<ProtectedRoute><SavedSearchesPage /></ProtectedRoute>} />

@@ -21,6 +21,12 @@ export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePa
   }
 
   if (!user) return <Navigate to="/login" replace />;
+
+  // Block unverified email addresses from accessing the dashboard
+  if (user && !user.email_confirmed_at) {
+    return <Navigate to="/check-email" replace />;
+  }
+
   if (requireAdmin && !isAdmin) return <Navigate to="/" replace />;
   if (requireAgent && !isAgent) return <Navigate to="/" replace />;
   if (requirePartner && !isPartner) return <Navigate to="/" replace />;

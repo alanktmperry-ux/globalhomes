@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, CheckCircle2, ShieldCheck, Ban, Clock, Download, FileText, CreditCard, Building2, Play, Info, ExternalLink, Landmark, AlertTriangle, CalendarCheck, ListChecks } from 'lucide-react';
+import { X, CheckCircle2, ShieldCheck, Ban, Clock, Download, FileText, CreditCard, Building2, Play, Info, ExternalLink, Landmark, AlertTriangle, CalendarCheck, ListChecks, PlusCircle, Globe, Users, HelpCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -481,21 +481,40 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
               key="success"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="p-8 text-center"
+              className="p-8"
             >
               <div className="w-16 h-16 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-5">
                 <CheckCircle2 size={32} className="text-success" />
               </div>
-              <h3 className="font-display text-2xl font-extrabold mb-2">Welcome to the Network!</h3>
-              <p className="text-muted-foreground text-sm mb-6">
-                Check your email for a verification link. You'll also receive an SMS verification code shortly.
+              <h3 className="font-display text-2xl font-extrabold text-center mb-1">You're all set!</h3>
+              <p className="text-muted-foreground text-sm text-center mb-6">
+                Your trust account has been created with a $0.00 opening balance. Here's what to do next.
               </p>
+
+              <ul className="space-y-3 text-sm text-foreground mb-6">
+                <li className="flex items-start gap-3">
+                  <PlusCircle size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>Go to Dashboard and click <strong>"New Listing"</strong> to create your first property listing</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Globe size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>Enable multilingual translation on any listing by publishing it — translations generate automatically within 1–2 minutes</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Users size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>Invite your team from <strong>Dashboard → Team</strong> using email invite or an invite code</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <HelpCircle size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>Need help? Go to <strong>Dashboard → Help</strong> and ask anything — it's AI-powered and knows the full platform</span>
+                </li>
+              </ul>
+
               <Button
-                variant="outline"
-                className="rounded-xl"
+                className="w-full"
                 onClick={handleClose}
               >
-                <Download size={16} className="mr-1.5" /> Download the Agent App
+                Go to Dashboard
               </Button>
             </motion.div>
           )}

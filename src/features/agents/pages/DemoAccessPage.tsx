@@ -93,7 +93,7 @@ const DemoAccessPage = () => {
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-4">
             <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground text-sm font-bold">W</span>
+              <span className="text-primary-foreground text-sm font-bold">L</span>
             </div>
           </Link>
           <h1 className="font-display text-2xl font-bold text-foreground">ListHQ</h1>

@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { corsHeaders } from 'https://esm.sh/@supabase/supabase-js@2/cors';
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
@@ -11,6 +11,7 @@ const EMAIL_FROM = Deno.env.get('EMAIL_FROM') ?? 'ListHQ Alerts <alerts@listhq.c
 const APP_URL = Deno.env.get('APP_URL') ?? 'https://globalhomes.lovable.app';
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get("Origin"));
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }

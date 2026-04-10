@@ -116,7 +116,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
 
   const handleClose = () => {
     onOpenChange(false);
-    setTimeout(() => setStep('form'), 300);
+    setTimeout(() => setStep('prepare'), 300);
   };
 
   return (

@@ -112,9 +112,15 @@ const AgentAuthPage = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!captchaToken) {
+      captchaRef.current?.execute();
+      return;
+    }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({ email, password, options: { captchaToken } });
+      setCaptchaToken(null);
+      captchaRef.current?.resetCaptcha();
       if (error) {
         if (error.message.includes('Email not confirmed')) {
           throw new Error('Please check your email and click the confirmation link before signing in.');

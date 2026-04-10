@@ -177,10 +177,10 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
             >
               <DialogHeader className="mb-5">
                 <DialogTitle className="font-display text-2xl font-extrabold">
-                  Join ListHQ as an Agent
+                  Join ListHQ.
                 </DialogTitle>
                 <DialogDescription>
-                  Enter your email address to get started. We'll send you a confirmation link before you continue.
+                  Start your free 60-day trial. No credit card required.
                 </DialogDescription>
               </DialogHeader>
 
@@ -193,9 +193,9 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                 <div className="space-y-2">
                   {[
                     { icon: <FileText size={14} />, text: 'ABN — 11-digit Australian Business Number' },
-                    { icon: <ShieldCheck size={14} />, text: 'Real estate licence number — from your state regulator (not your CPD number)' },
+                    { icon: <ShieldCheck size={14} />, text: 'Real estate licence number — from your state regulator, not your CPD number' },
                     { icon: <Building2 size={14} />, text: 'Agency name — your trading name as registered' },
-                    { icon: <Landmark size={14} />, text: 'Trust account BSB & account number — only if migrating from another system' },
+                    { icon: <Landmark size={14} />, text: 'Trust account BSB & account number — only needed if migrating from another system' },
                   ].map((item) => (
                     <div key={item.text} className="flex items-start gap-2 text-xs text-muted-foreground">
                       <span className="text-primary mt-0.5 shrink-0">{item.icon}</span>
@@ -217,20 +217,19 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                     onChange={(e) => setEmailInput(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') handleEmailSubmit(e); }}
                     placeholder="jane@agency.com.au"
-                    className="mt-1.5"
                   />
                   <p className="text-xs text-muted-foreground mt-1.5">
-                    We'll send a confirmation link to this address. Check your spam folder if it doesn't arrive within 2 minutes.
+                    We'll send a confirmation link to this address before you continue.
                   </p>
                 </div>
 
                 <Button type="submit" disabled={emailSubmitting} className="w-full py-5 rounded-xl text-base font-bold">
-                  {emailSubmitting ? 'Sending...' : 'Continue — confirm my email'}
+                  {emailSubmitting ? 'Sending confirmation...' : 'Continue — confirm my email'}
                 </Button>
 
                 <p className="text-center text-xs text-muted-foreground">
                   Already have an account?{' '}
-                  <a href="/login" className="text-primary underline hover:no-underline">Sign in here</a>
+                  <a href="/login" className="text-primary hover:underline">Sign in here</a>
                 </p>
               </form>
             </motion.div>

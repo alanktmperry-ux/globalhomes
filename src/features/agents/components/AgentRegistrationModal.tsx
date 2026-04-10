@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, CheckCircle2, ShieldCheck, Ban, Clock, Download } from 'lucide-react';
+import { X, CheckCircle2, ShieldCheck, Ban, Clock, Download, FileText, CreditCard, Building2, Play } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,7 +23,7 @@ const SUBURBS_OPTIONS = [
 ];
 
 const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
-  const [step, setStep] = useState<'form' | 'success'>('form');
+  const [step, setStep] = useState<'prepare' | 'form' | 'success'>('prepare');
   const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
@@ -116,14 +116,68 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
 
   const handleClose = () => {
     onOpenChange(false);
-    setTimeout(() => setStep('form'), 300);
+    setTimeout(() => setStep('prepare'), 300);
   };
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto p-0">
         <AnimatePresence mode="wait">
-          {step === 'form' ? (
+          {step === 'prepare' ? (
+            <motion.div
+              key="prepare"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="p-6"
+            >
+              <DialogHeader className="mb-5">
+                <DialogTitle className="font-display text-2xl font-extrabold">
+                  Before you begin
+                </DialogTitle>
+                <DialogDescription>
+                  Have these details handy — it'll make setup quick and painless.
+                </DialogDescription>
+              </DialogHeader>
+
+              <ul className="space-y-3 text-sm text-foreground mb-6">
+                <li className="flex items-start gap-3">
+                  <FileText size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>Have your <strong>ABN</strong> ready — you'll need it in the next step</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <ShieldCheck size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>Have your <strong>real estate licence number</strong> ready (e.g. 074356 or ES-1234567 depending on your state)</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CreditCard size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>Have your <strong>trust account BSB and account number</strong> ready if you're migrating from another system</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Clock size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>The whole setup takes <strong>5 minutes</strong> for a fresh start, or <strong>15–20 minutes</strong> if you're migrating</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Building2 size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>Not sure which path to choose? Choose <strong>"Starting fresh"</strong> — you can always import trust data later from Dashboard → Trust Accounting</span>
+                </li>
+              </ul>
+
+              <a
+                href="https://listhq.com.au/setup-guide"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm text-primary hover:underline mb-6"
+              >
+                <Play size={16} />
+                Watch our 3-minute setup walkthrough →
+              </a>
+
+              <Button className="w-full" onClick={() => setStep('form')}>
+                I'm ready — let's go
+              </Button>
+            </motion.div>
+          ) : step === 'form' ? (
             <motion.div
               key="form"
               initial={{ opacity: 0 }}

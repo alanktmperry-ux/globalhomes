@@ -133,6 +133,7 @@ export function useSubscription(): SubscriptionState {
           subscriptionEnd: (sub as any)?.subscription_end ?? null,
           autoRenew: (sub as any)?.auto_renew ?? false,
           loading: false,
+          subLoadingTimeout: false,
           ...features,
         });
       } catch {

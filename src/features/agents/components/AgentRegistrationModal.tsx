@@ -27,7 +27,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
   const [emailInput, setEmailInput] = useState('');
   const [emailSubmitting, setEmailSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [resending, setResending] = useState(false);
+  
 
   const [form, setForm] = useState({
     fullName: '',

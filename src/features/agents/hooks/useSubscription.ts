@@ -147,7 +147,7 @@ export function useSubscription(): SubscriptionState {
 
   // If the timeout fired but we're still loading, return loading: false to unblock pages
   if (subLoadingTimeout && state.loading) {
-    return { ...state, loading: false };
+    return { ...state, loading: false, subLoadingTimeout: true };
   }
 
   return state;

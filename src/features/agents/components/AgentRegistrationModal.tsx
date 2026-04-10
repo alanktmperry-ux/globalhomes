@@ -24,8 +24,9 @@ const SUBURBS_OPTIONS = [
 
 const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
   const [step, setStep] = useState<'email' | 'check-email' | 'prepare' | 'trust-info' | 'cutover' | 'import-wizard' | 'form' | 'success'>('email');
+  const [emailInput, setEmailInput] = useState('');
+  const [emailSubmitting, setEmailSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [registrationEmail, setRegistrationEmail] = useState('');
   const [resending, setResending] = useState(false);
 
   const [form, setForm] = useState({

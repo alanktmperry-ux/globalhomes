@@ -179,16 +179,37 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
             >
               <DialogHeader className="mb-5">
                 <DialogTitle className="font-display text-2xl font-extrabold">
-                  Get started with ListHQ
+                  Join ListHQ as an Agent
                 </DialogTitle>
                 <DialogDescription>
-                  Enter your work email to begin. We'll send a verification link to confirm your identity.
+                  Enter your email address to get started. We'll send you a confirmation link before you continue.
                 </DialogDescription>
               </DialogHeader>
 
+              {/* "Have these ready" checklist */}
+              <div className="bg-secondary/50 rounded-xl p-4 mb-5">
+                <div className="flex items-center gap-2 text-sm font-semibold text-foreground mb-3">
+                  <ListChecks size={16} className="text-primary" />
+                  Have these ready before you begin
+                </div>
+                <div className="space-y-2">
+                  {[
+                    { icon: <FileText size={14} />, text: 'ABN — 11-digit Australian Business Number' },
+                    { icon: <ShieldCheck size={14} />, text: 'Real estate licence number — from your state regulator (not your CPD number)' },
+                    { icon: <Building2 size={14} />, text: 'Agency name — your trading name as registered' },
+                    { icon: <Landmark size={14} />, text: 'Trust account BSB & account number — only if migrating from another system' },
+                  ].map((item) => (
+                    <div key={item.text} className="flex items-start gap-2 text-xs text-muted-foreground">
+                      <span className="text-primary mt-0.5 shrink-0">{item.icon}</span>
+                      {item.text}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <form onSubmit={handleEmailSubmit} className="space-y-4">
                 <div>
-                  <Label htmlFor="regEmailStart">Work email *</Label>
+                  <Label htmlFor="regEmailStart">Your email address *</Label>
                   <Input
                     id="regEmailStart"
                     required
@@ -196,28 +217,23 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                     autoFocus
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') handleEmailSubmit(e); }}
                     placeholder="jane@agency.com.au"
+                    className="mt-1.5"
                   />
-                </div>
-
-                <div className="bg-secondary/50 rounded-xl p-4 space-y-2">
-                  {[
-                    { icon: <Mail size={14} />, text: "We'll send a one-time verification link" },
-                    { icon: <ShieldCheck size={14} />, text: 'No password needed — secure magic link sign-in' },
-                    { icon: <Clock size={14} />, text: 'The whole setup takes about 5 minutes' },
-                  ].map((t) => (
-                    <div key={t.text} className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <span className="text-primary">{t.icon}</span>
-                      {t.text}
-                    </div>
-                  ))}
+                  <p className="text-xs text-muted-foreground mt-1.5">
+                    We'll send a confirmation link to this address. Check your spam folder if it doesn't arrive within 2 minutes.
+                  </p>
                 </div>
 
                 <Button type="submit" disabled={emailSubmitting} className="w-full py-5 rounded-xl text-base font-bold">
-                  {emailSubmitting ? 'Sending verification...' : (
-                    <>Continue <ArrowRight size={16} className="ml-1.5" /></>
-                  )}
+                  {emailSubmitting ? 'Sending...' : 'Continue — confirm my email'}
                 </Button>
+
+                <p className="text-center text-xs text-muted-foreground">
+                  Already have an account?{' '}
+                  <a href="/login" className="text-primary underline hover:no-underline">Sign in here</a>
+                </p>
               </form>
             </motion.div>
           ) : step === 'check-email' ? (

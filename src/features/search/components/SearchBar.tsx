@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { Search, Mic, MapPin, Loader2 } from 'lucide-react';
 import { capture } from '@/shared/lib/posthog';
 import { motion, AnimatePresence } from 'framer-motion';

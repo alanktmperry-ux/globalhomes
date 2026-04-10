@@ -23,7 +23,7 @@ const SUBURBS_OPTIONS = [
 ];
 
 const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
-  const [step, setStep] = useState<'prepare' | 'form' | 'success'>('prepare');
+  const [step, setStep] = useState<'prepare' | 'trust-info' | 'form' | 'success'>('prepare');
   const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
@@ -173,9 +173,62 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                 Watch our 3-minute setup walkthrough →
               </a>
 
-              <Button className="w-full" onClick={() => setStep('form')}>
+              <Button className="w-full" onClick={() => setStep('trust-info')}>
                 I'm ready — let's go
               </Button>
+            </motion.div>
+          ) : step === 'trust-info' ? (
+            <motion.div
+              key="trust-info"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="p-6"
+            >
+              <DialogHeader className="mb-5">
+                <DialogTitle className="font-display text-2xl font-extrabold">
+                  About your trust account
+                </DialogTitle>
+                <DialogDescription>
+                  If your agency holds a statutory trust account, have the details ready.
+                </DialogDescription>
+              </DialogHeader>
+
+              <ul className="space-y-3 text-sm text-foreground mb-6">
+                <li className="flex items-start gap-3">
+                  <Landmark size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>Your trust account must be a <strong>dedicated bank account</strong> held in the name of your agency — it cannot be your personal or business operating account</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <FileText size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>The account name must include the word <strong>"Trust"</strong> (e.g. "Smith Property Group Trust Account")</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CreditCard size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span><strong>BSB</strong> is 6 digits — enter it with or without the dash (e.g. 062-000 or 062000)</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <ShieldCheck size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>ListHQ <strong>never processes payments</strong> through your trust account — this information is used solely for reconciliation, receipting, and audit trail purposes</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Building2 size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>All major Australian banks are supported: NAB, CBA, ANZ, Westpac, Bendigo, BOQ, Macquarie</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <AlertTriangle size={18} className="mt-0.5 shrink-0 text-amber-500" />
+                  <span>If you don't have a trust account yet, contact your bank to open one before completing this step. Most banks can do this in 1–2 business days.</span>
+                </li>
+              </ul>
+
+              <div className="flex gap-3">
+                <Button variant="outline" className="flex-1" onClick={() => setStep('prepare')}>
+                  Back
+                </Button>
+                <Button className="flex-1" onClick={() => setStep('form')}>
+                  Continue to registration
+                </Button>
+              </div>
             </motion.div>
           ) : step === 'form' ? (
             <motion.div

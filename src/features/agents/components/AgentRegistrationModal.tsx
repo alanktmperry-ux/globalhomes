@@ -156,7 +156,10 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
 
   const handleClose = () => {
     onOpenChange(false);
-    setTimeout(() => setStep('email'), 300);
+    setTimeout(() => {
+      setStep('email');
+      setEmailInput('');
+    }, 300);
   };
 
   return (

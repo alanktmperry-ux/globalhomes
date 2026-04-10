@@ -16,7 +16,7 @@ type Step = 'email' | 'password' | 'choose' | 'create-agency' | 'join-agency';
 // Password strength helper — outside component so it never breaks hook order
 function getPasswordStrength(p: string): 'weak' | 'fair' | 'strong' | null {
   if (p.length === 0) return null;
-  if (p.length < 6) return 'weak';
+  if (p.length < 8) return 'weak';
   if (p.length < 10 || !/[A-Z]/.test(p) || !/[0-9]/.test(p)) return 'fair';
   return 'strong';
 }
@@ -136,9 +136,9 @@ const AgentAuthPage = () => {
     if (!fullName.trim()) { toast.error('Full name required'); return; }
     if (step === 'create-agency' && !agencyName.trim()) { toast.error('Agency name required'); return; }
     if (step === 'join-agency' && !inviteCode.trim()) { toast.error('Invite code required'); return; }
-    if (password.length < 6) { toast.error('Password too short', { description: 'Minimum 6 characters.' }); return; }
-    if (step === 'create-agency' && password !== confirmPassword) { toast.error('Passwords do not match', { description: 'Both password fields must be identical.' }); return; }
-    if (step === 'create-agency' && !agreedToTerms) { toast.error('Please agree to the Terms of Service'); return; }
+    if (password.length < 8) { toast.error('Password too short', { description: 'Minimum 8 characters.' }); return; }
+    if (password !== confirmPassword) { toast.error('Passwords do not match', { description: 'Both password fields must be identical.' }); return; }
+    if (!agreedToTerms) { toast.error('Please agree to the Terms of Service'); return; }
 
     setLoading(true);
     try {
@@ -356,7 +356,7 @@ const AgentAuthPage = () => {
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Password</label>
-                  <input type="password" required autoFocus minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
+                  <input type="password" required autoFocus minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
                 </div>
                 <div className="text-right">
                   <Link to="/forgot-password" className="text-xs text-primary font-medium underline underline-offset-2">Forgot password?</Link>
@@ -442,7 +442,7 @@ const AgentAuthPage = () => {
                 <div className="space-y-3">
                   <div>
                     <label className="text-sm font-medium text-foreground mb-1.5 block">Password<span className="text-destructive">*</span></label>
-                    <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
+                    <input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
                     {strength && (
                       <div className="mt-2 space-y-1">
                         <div className="flex gap-1">
@@ -460,7 +460,7 @@ const AgentAuthPage = () => {
                           : strength === 'fair' ? 'text-amber-500'
                           : 'text-emerald-600'
                         }`}>
-                          {strength === 'weak' && 'Too short — minimum 6 characters'}
+                          {strength === 'weak' && 'Too short — minimum 8 characters'}
                           {strength === 'fair' && 'Fair — add uppercase and numbers for a stronger password'}
                           {strength === 'strong' && '✓ Strong password'}
                         </p>
@@ -469,7 +469,7 @@ const AgentAuthPage = () => {
                   </div>
                   <div>
                     <label className="text-sm font-medium text-foreground mb-1.5 block">Confirm Password<span className="text-destructive">*</span></label>
-                    <input type="password" required minLength={6} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={inputClass} />
+                    <input type="password" required minLength={8} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={inputClass} />
                     {confirmPassword.length > 0 && !passwordsMatch && (
                       <p className="text-[11px] text-red-500 font-medium mt-1">Passwords do not match</p>
                     )}
@@ -627,7 +627,7 @@ const AgentAuthPage = () => {
 
                 <button
                   type="submit"
-                  disabled={loading || !agreedToTerms || !captchaToken || password !== confirmPassword || password.length < 6}
+                  disabled={loading || !agreedToTerms || !captchaToken || password !== confirmPassword || password.length < 8}
                   className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50"
                 >
                   {loading ? 'Setting up your account…' : 'Create Account'}
@@ -663,8 +663,48 @@ const AgentAuthPage = () => {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Password<span className="text-destructive">*</span></label>
-                  <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
+                  <input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
                 </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Confirm Password<span className="text-destructive">*</span></label>
+                  <input type="password" required minLength={8} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={inputClass} />
+                  {confirmPassword.length > 0 && !passwordsMatch && (
+                    <p className="text-[11px] text-red-500 font-medium mt-1">Passwords do not match</p>
+                  )}
+                  {confirmPassword.length > 0 && passwordsMatch && (
+                    <p className="text-[11px] text-emerald-600 font-medium mt-1">✓ Passwords match</p>
+                  )}
+                </div>
+
+                {/* Terms checkbox — fix #19 */}
+                <div
+                  onClick={() => setAgreedToTerms(v => !v)}
+                  className={`p-3 rounded-xl border cursor-pointer select-none transition-colors ${
+                    agreedToTerms ? 'border-primary bg-primary/5' : 'border-border bg-background'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`w-5 h-5 mt-0.5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
+                      agreedToTerms ? 'bg-primary border-primary' : 'border-border'
+                    }`}>
+                      {agreedToTerms && (
+                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                          <path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-foreground">I agree to the ListHQ Terms of Service</p>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        By joining I confirm that all information provided is accurate, and that I have read and agree to the{' '}
+                        <a href="/terms" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-primary underline underline-offset-2">Terms of Service</a>
+                        {' '}and{' '}
+                        <a href="/privacy" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-primary underline underline-offset-2">Privacy Policy</a>.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="flex justify-center">
                   <HCaptcha
                     ref={captchaRef}
@@ -674,17 +714,11 @@ const AgentAuthPage = () => {
                     onError={() => setCaptchaToken(null)}
                   />
                 </div>
-                <button type="submit" disabled={loading || !captchaToken} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
+                <button type="submit" disabled={loading || !captchaToken || !agreedToTerms || !passwordsMatch || password.length < 8} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
                   {loading ? 'Joining…' : 'Join Agency'}
                 </button>
               </form>
               <button type="button" onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">← Back to options</button>
-              <p className="text-xs text-muted-foreground mt-3 text-center leading-relaxed">
-                By continuing you agree to our{' '}
-                <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">Terms of Service</a>
-                {' '}and{' '}
-                <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">Privacy Policy</a>.
-              </p>
             </>
           )}
 

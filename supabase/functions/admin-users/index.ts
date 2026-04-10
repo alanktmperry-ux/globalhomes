@@ -306,9 +306,24 @@ Deno.serve(async (req) => {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
+
+      // Fix #13: Select specific columns instead of * to limit data exposure
+      const columnMap: Record<string, string> = {
+        profiles: 'user_id, display_name, full_name, avatar_url, provider, onboarded, created_at',
+        properties: 'id, title, suburb, state, status, is_active, agent_id, created_at',
+        agents: 'id, name, email, agency, is_approved, is_subscribed, lifecycle_stage, created_at',
+        leads: 'id, name, email, property_id, created_at',
+        voice_searches: 'id, user_id, transcript, created_at',
+        saved_properties: 'id, user_id, property_id, created_at',
+        user_roles: 'id, user_id, role',
+        lead_events: 'id, property_id, agent_id, event_type, created_at',
+        user_preferences: 'user_id, budget_max, preferred_locations, created_at',
+      };
+      const columns = columnMap[table] || 'id, created_at';
+
       const { data, count, error } = await supabase
         .from(table)
-        .select('*', { count: 'exact' })
+        .select(columns, { count: 'exact' })
         .range(offset, offset + limit - 1)
         .order('created_at', { ascending: false });
       if (error) throw error;

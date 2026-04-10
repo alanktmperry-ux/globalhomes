@@ -52,11 +52,9 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Find the partner by email
-    const { data: partnerUser } = await supabaseAdmin.auth.admin.listUsers();
-    const targetUser = partnerUser?.users?.find(
-      (u: any) => u.email?.toLowerCase() === partnerEmail.toLowerCase()
-    );
+    // Fix #6: Use getUserByEmail instead of full-table scan
+    const { data: targetUserData } = await supabaseAdmin.auth.admin.getUserByEmail(partnerEmail.toLowerCase());
+    const targetUser = targetUserData?.user || null;
 
     if (!targetUser) {
       return new Response(

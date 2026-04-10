@@ -54,9 +54,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Check if user already exists in auth
-    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
-    const existingUser = existingUsers?.users?.find(u => u.email === email.toLowerCase());
+    // Fix #6/#14: Use getUserByEmail instead of full-table scan
+    const { data: existingUserData } = await supabaseAdmin.auth.admin.getUserByEmail(email.toLowerCase());
+    const existingUser = existingUserData?.user || null;
 
     if (existingUser) {
       console.log(`[invite-team-member] User ${email} already exists (${existingUser.id}), adding directly`);

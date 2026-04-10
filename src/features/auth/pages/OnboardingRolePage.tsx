@@ -43,18 +43,24 @@ const OnboardingRolePage = () => {
       .update({ onboarded: true } as any)
       .eq('user_id', user.id);
 
-    // If agent, also set up via the setup-agent edge function flow
+    // Fix #4: Use setup-agent edge function instead of direct client-side inserts
     if (selected === 'agent' || selected === 'property_manager') {
-      // Assign agent role
-      await supabase.from('user_roles').insert({ user_id: user.id, role: 'agent' } as any);
-      // Create minimal agent record
-      const profile = await supabase.from('profiles').select('display_name, phone').eq('user_id', user.id).single();
-      await supabase.from('agents').insert({
-        user_id: user.id,
-        name: profile.data?.display_name || user.email || 'Agent',
-        email: user.email,
-        phone: profile.data?.phone || null,
-      } as any);
+      const { error: setupError } = await supabase.functions.invoke('setup-agent', {
+        body: {
+          userId: user.id,
+          email: user.email,
+          fullName: user.user_metadata?.display_name || user.email,
+          phone: null,
+          mode: 'create-agency',
+          agencyName: user.user_metadata?.display_name || 'My Agency',
+          agencyEmail: user.email,
+        },
+      });
+
+      if (setupError) {
+        console.error('setup-agent error:', setupError);
+      }
+
       setSaving(false);
       navigate('/dashboard', { replace: true });
     } else {

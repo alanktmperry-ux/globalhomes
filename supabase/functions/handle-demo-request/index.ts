@@ -34,10 +34,9 @@ async function sendEmail(apiKey: string, intendedTo: string, subject: string, ht
 async function ensureDemoAuthUser(supabase: any, email: string, fullName?: string) {
   const normalizedEmail = email.trim().toLowerCase();
 
-  const { data: listData, error: listErr } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
-  if (listErr) throw listErr;
-
-  let authUser = listData.users.find((u: any) => (u.email || "").toLowerCase() === normalizedEmail);
+  // Use getUserByEmail instead of full-table scan (fix #6)
+  const { data: userData, error: getUserErr } = await supabase.auth.admin.getUserByEmail(normalizedEmail);
+  let authUser = getUserErr ? null : userData?.user || null;
 
   if (!authUser) {
     const { data: created, error: createErr } = await supabase.auth.admin.createUser({
@@ -158,13 +157,14 @@ Deno.serve(async (req) => {
 
       await ensureDemoAuthUser(supabase, demoReq.email, demoReq.full_name);
 
-      // Keep shared demo environment login behavior
+      // Generate a short-lived session token server-side (fix #1 — no credentials sent to client)
       const demoEmail = "demo@listhq.com.au";
-      const demoPassword = "DemoAccess2024!";
-      const { data: listData, error: listErr } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
-      if (listErr) throw listErr;
+      const demoPassword = Deno.env.get("DEMO_ACCOUNT_PASSWORD") || crypto.randomUUID();
 
-      let demoUser = listData.users.find((u: any) => (u.email || "").toLowerCase() === demoEmail.toLowerCase());
+      // Use getUserByEmail instead of full-table scan (fix #6)
+      const { data: demoUserData, error: demoGetErr } = await supabase.auth.admin.getUserByEmail(demoEmail);
+      let demoUser = demoGetErr ? null : demoUserData?.user || null;
+
       if (!demoUser) {
         const { data: created, error: createErr } = await supabase.auth.admin.createUser({
           email: demoEmail,
@@ -202,11 +202,42 @@ Deno.serve(async (req) => {
         .upsert({ user_id: demoUser.id, role: "agent" }, { onConflict: "user_id,role" });
       if (roleUpsertErr) throw roleUpsertErr;
 
+      // Generate a short-lived session token server-side (fix #1)
+      const { data: sessionData, error: sessionErr } = await supabase.auth.admin.generateLink({
+        type: "magiclink",
+        email: demoEmail,
+      });
+
+      // Sign in as demo user to get session tokens
+      const { data: signInData, error: signInErr } = await supabase.auth.admin.createSession({
+        user_id: demoUser.id,
+      });
+
+      // Fallback: use generateLink token if createSession unavailable
+      let accessToken = signInData?.session?.access_token;
+      let refreshToken = signInData?.session?.refresh_token;
+
+      if (!accessToken) {
+        // Generate a magic link OTP for the client to exchange
+        const { data: otpData, error: otpErr } = await supabase.auth.admin.generateLink({
+          type: "magiclink",
+          email: demoEmail,
+        });
+        if (otpErr) throw otpErr;
+
+        return new Response(JSON.stringify({
+          success: true,
+          request_id: demoReq.id,
+          magic_link_token: otpData?.properties?.hashed_token,
+          demo_user_id: demoUser.id,
+        }), { headers: corsHeaders });
+      }
+
       return new Response(JSON.stringify({
         success: true,
         request_id: demoReq.id,
-        demo_email: demoEmail,
-        demo_password: demoPassword,
+        access_token: accessToken,
+        refresh_token: refreshToken,
       }), { headers: corsHeaders });
 
     } else if (body.action === "ensure_auth_user") {

@@ -960,7 +960,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                   List your first property free — no credit card required during your 60-day trial.
                 </p>
                 <button
-                  onClick={() => window.location.href = '/agent/auth'}
+                  onClick={() => window.location.href = '/agents/login'}
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity">
                   List a property free
                 </button>
@@ -1085,7 +1085,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
               List your first property free — no credit card required during your 60-day trial.
             </p>
             <button
-              onClick={() => window.location.href = '/agent/auth'}
+              onClick={() => window.location.href = '/agents/login'}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity">
               List a property free
             </button>

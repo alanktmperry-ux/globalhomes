@@ -315,7 +315,7 @@ const SeekerAuthPage = () => {
                             Forgot?
                           </Link>
                         </div>
-                        <input type="password" required autoFocus minLength={6} value={password}
+                        <input type="password" required autoFocus minLength={8} value={password}
                           onChange={e => setPassword(e.target.value)} className={input} />
                       </div>
                       <button type="submit" disabled={loading} className={btnPrimary}>
@@ -350,7 +350,7 @@ const SeekerAuthPage = () => {
                       </div>
                       <div>
                         <label className={label}>Password <span className="text-red-400">*</span></label>
-                        <input type="password" required minLength={6} value={password}
+                        <input type="password" required minLength={8} value={password}
                           onChange={e => setPassword(e.target.value)} className={input} />
                       </div>
                       <button type="submit" disabled={loading} className={btnPrimary}>

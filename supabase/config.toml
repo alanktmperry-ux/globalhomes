@@ -50,3 +50,6 @@ verify_jwt = false
 
 [functions.send-broker-lead]
 verify_jwt = false
+
+[functions.admin-delete-agent]
+verify_jwt = false

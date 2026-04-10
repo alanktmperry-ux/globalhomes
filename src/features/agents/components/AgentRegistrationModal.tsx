@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, CheckCircle2, ShieldCheck, Ban, Clock, Download, FileText, CreditCard, Building2, Play, Info, ExternalLink, Landmark, AlertTriangle, CalendarCheck, ListChecks, PlusCircle, Globe, Users, HelpCircle, Upload, BookOpen, Scale } from 'lucide-react';
+import { X, CheckCircle2, ShieldCheck, Ban, Clock, Download, FileText, CreditCard, Building2, Play, Info, ExternalLink, Landmark, AlertTriangle, CalendarCheck, ListChecks, PlusCircle, Globe, Users, HelpCircle, Upload, BookOpen, Scale, Mail, ArrowRight, RefreshCw } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,8 +23,10 @@ const SUBURBS_OPTIONS = [
 ];
 
 const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
-  const [step, setStep] = useState<'prepare' | 'trust-info' | 'cutover' | 'import-wizard' | 'form' | 'success'>('prepare');
+  const [step, setStep] = useState<'email' | 'check-email' | 'prepare' | 'trust-info' | 'cutover' | 'import-wizard' | 'form' | 'success'>('email');
   const [loading, setLoading] = useState(false);
+  const [registrationEmail, setRegistrationEmail] = useState('');
+  const [resending, setResending] = useState(false);
 
   const [form, setForm] = useState({
     fullName: '',
@@ -114,16 +116,167 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
     }
   };
 
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!registrationEmail) {
+      toast.error('Please enter your email address.');
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email: registrationEmail,
+        options: {
+          shouldCreateUser: true,
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+        },
+      });
+      if (error) throw error;
+      setStep('check-email');
+    } catch (err: unknown) {
+      toast.error(`Error — ${getErrorMessage(err)}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    setResending(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email: registrationEmail,
+        options: {
+          shouldCreateUser: true,
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+        },
+      });
+      if (error) throw error;
+      toast.success('Verification email resent!');
+    } catch (err: unknown) {
+      toast.error(`Error — ${getErrorMessage(err)}`);
+    } finally {
+      setResending(false);
+    }
+  };
+
   const handleClose = () => {
     onOpenChange(false);
-    setTimeout(() => setStep('prepare'), 300);
+    setTimeout(() => setStep('email'), 300);
   };
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto p-0">
         <AnimatePresence mode="wait">
-          {step === 'prepare' ? (
+          {step === 'email' ? (
+            <motion.div
+              key="email"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="p-6"
+            >
+              <DialogHeader className="mb-5">
+                <DialogTitle className="font-display text-2xl font-extrabold">
+                  Get started with ListHQ
+                </DialogTitle>
+                <DialogDescription>
+                  Enter your work email to begin. We'll send a verification link to confirm your identity.
+                </DialogDescription>
+              </DialogHeader>
+
+              <form onSubmit={handleEmailSubmit} className="space-y-4">
+                <div>
+                  <Label htmlFor="regEmailStart">Work email *</Label>
+                  <Input
+                    id="regEmailStart"
+                    required
+                    type="email"
+                    autoFocus
+                    value={registrationEmail}
+                    onChange={(e) => setRegistrationEmail(e.target.value)}
+                    placeholder="jane@agency.com.au"
+                  />
+                </div>
+
+                <div className="bg-secondary/50 rounded-xl p-4 space-y-2">
+                  {[
+                    { icon: <Mail size={14} />, text: 'We'll send a one-time verification link' },
+                    { icon: <ShieldCheck size={14} />, text: 'No password needed — secure magic link sign-in' },
+                    { icon: <Clock size={14} />, text: 'The whole setup takes about 5 minutes' },
+                  ].map((t) => (
+                    <div key={t.text} className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span className="text-primary">{t.icon}</span>
+                      {t.text}
+                    </div>
+                  ))}
+                </div>
+
+                <Button type="submit" disabled={loading} className="w-full py-5 rounded-xl text-base font-bold">
+                  {loading ? 'Sending verification...' : (
+                    <>Continue <ArrowRight size={16} className="ml-1.5" /></>
+                  )}
+                </Button>
+              </form>
+            </motion.div>
+          ) : step === 'check-email' ? (
+            <motion.div
+              key="check-email"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="p-6"
+            >
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
+                <Mail size={32} className="text-primary" />
+              </div>
+
+              <DialogHeader className="mb-5">
+                <DialogTitle className="font-display text-2xl font-extrabold text-center">
+                  Check your inbox
+                </DialogTitle>
+                <DialogDescription className="text-center">
+                  We've sent a verification link to <strong className="text-foreground">{registrationEmail}</strong>. Click the link in the email to verify your identity and continue setup.
+                </DialogDescription>
+              </DialogHeader>
+
+              <ul className="space-y-3 text-sm text-foreground mb-6">
+                <li className="flex items-start gap-3">
+                  <Mail size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>Check your inbox (and spam/junk folder) for an email from ListHQ</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <ArrowRight size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>Click the verification link — it will bring you straight back here</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Clock size={18} className="mt-0.5 shrink-0 text-primary" />
+                  <span>The link expires in <strong>1 hour</strong></span>
+                </li>
+              </ul>
+
+              <div className="flex flex-col gap-3">
+                <Button
+                  variant="outline"
+                  onClick={handleResendVerification}
+                  disabled={resending}
+                  className="w-full"
+                >
+                  {resending ? (
+                    <><RefreshCw size={14} className="animate-spin mr-1.5" /> Resending...</>
+                  ) : (
+                    <><RefreshCw size={14} className="mr-1.5" /> Resend verification email</>
+                  )}
+                </Button>
+                <button
+                  onClick={() => setStep('email')}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors text-center"
+                >
+                  Use a different email address
+                </button>
+              </div>
+            </motion.div>
+          ) : step === 'prepare' ? (
             <motion.div
               key="prepare"
               initial={{ opacity: 0 }}

@@ -79,6 +79,14 @@ const AgentAuthPage = () => {
     }
   }, [pendingRedirect, user, authLoading, isAgent, isAdmin, toast]);
 
+  // Auto-submit sign-in after captcha verification
+  useEffect(() => {
+    if (pendingSignIn && captchaToken && step === 'password') {
+      setPendingSignIn(false);
+      handleSignIn({ preventDefault: () => {} } as React.FormEvent);
+    }
+  }, [pendingSignIn, captchaToken]);
+
   // ── Handlers ──
   const toggleSpecialisation = (value: string) => {
     setSpecialisations(prev =>

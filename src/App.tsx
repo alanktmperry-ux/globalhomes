@@ -234,6 +234,7 @@ const App = () => (
                 <Route path="/strata/login" element={<StrataAuthPage />} />
                 <Route path="/broker/login" element={<BrokerLogin />} />
                 <Route path="/broker/portal" element={<BrokerPortal />} />
+                <Route path="/check-email" element={<CheckEmailPage />} />
 
                 {/* Authenticated */}
                 <Route path="/saved" element={<ProtectedRoute><SavedSearchesPage /></ProtectedRoute>} />

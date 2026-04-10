@@ -213,8 +213,8 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                   ))}
                 </div>
 
-                <Button type="submit" disabled={loading} className="w-full py-5 rounded-xl text-base font-bold">
-                  {loading ? 'Sending verification...' : (
+                <Button type="submit" disabled={emailSubmitting} className="w-full py-5 rounded-xl text-base font-bold">
+                  {emailSubmitting ? 'Sending verification...' : (
                     <>Continue <ArrowRight size={16} className="ml-1.5" /></>
                   )}
                 </Button>

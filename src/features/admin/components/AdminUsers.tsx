@@ -918,6 +918,30 @@ const AdminUsers = () => {
         </DialogContent>
       </Dialog>
     </motion.div>
+
+    <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete {deleteTarget?.display_name || deleteTarget?.email}?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This will permanently delete this {deleteTarget?.user_type === 'agent' || deleteTarget?.user_type === 'demo' ? 'agent' : 'user'} and all their data
+            {(deleteTarget?.user_type === 'agent' || deleteTarget?.user_type === 'demo') && ' — listings, trust accounts, contacts, team memberships, and auth account'}. This cannot be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => deleteTarget && performDelete(deleteTarget)}
+            disabled={deleting}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {deleting ? <Loader2 size={14} className="animate-spin mr-1.5" /> : <Trash2 size={14} className="mr-1.5" />}
+            Delete Permanently
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 };
 

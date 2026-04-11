@@ -847,6 +847,15 @@ export default function AgencyOnboardingPage() {
               </div>
             </div>
           </div>
+          <GuideCard
+            title="Tips for this step"
+            items={[
+              '<strong>ABN</strong> — enter all 11 digits without spaces; we'll format it for you',
+              '<strong>Licence number</strong> — use your state-issued agent or agency licence, e.g. 6-digit for VIC, 20-series for NSW',
+              'The <strong>principal licensee</strong> must be the person named on your agency licence — not an assistant or sales agent',
+              'All fields marked with <strong>*</strong> are mandatory for compliance',
+            ]}
+          />
         </div>
       );
     }

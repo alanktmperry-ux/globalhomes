@@ -214,6 +214,13 @@ const Index = () => {
     }
   }, [handleSearch, setSearchCenter, user]);
 
+  // Hero voice search
+  const handleVoiceResult = useCallback((transcript: string) => {
+    setHeroQuery(transcript);
+    wrappedHandleSearch(transcript);
+  }, [wrappedHandleSearch]);
+  const { isListening: heroMicListening, startListening: heroMicToggle } = useHeroVoiceSearch(handleVoiceResult);
+
   const initializedFromUrl = useRef(false);
 
   // ── Restore search state from URL on mount ───────────────────

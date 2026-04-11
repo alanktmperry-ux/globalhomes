@@ -963,12 +963,12 @@ const Index = () => {
                     <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">
                       {heroPlatformStats.buyerCount}<span className="text-xl font-semibold text-blue-500">+</span>
                     </span>
-                    <span className="text-[11px] text-slate-400 font-medium">Active buyers</span>
+                    <span className="text-[11px] text-slate-400 font-medium">Buyers searching now</span>
                   </>
                 ) : (
                   <>
                     <span className="text-2xl font-extrabold text-emerald-600 tracking-tight leading-none">✓</span>
-                    <span className="text-[11px] text-slate-400 font-medium">Free to search</span>
+                    <span className="text-[11px] text-slate-400 font-medium">No sign-up required</span>
                   </>
                 )}
               </div>

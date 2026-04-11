@@ -99,7 +99,7 @@ function ComposePanel({ templates, onSent }: { templates: Template[]; onSent: ()
         try {
           const { data: s } = await supabase.auth.getSession();
           const res = await fetch(
-            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=list_users`,
+            `https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/admin-users?action=list_users`,
             { headers: { Authorization: `Bearer ${s.session?.access_token}`, 'Content-Type': 'application/json' } }
           );
           const j = await res.json();

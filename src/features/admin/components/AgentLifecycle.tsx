@@ -295,7 +295,7 @@ export default function AgentLifecycle() {
         const { data: s } = await supabase.auth.getSession();
         const token = s.session?.access_token;
         if (token) {
-          const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=list_users`, {
+          const res = await fetch(`https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/admin-users?action=list_users`, {
             headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
           });
           if (res.ok) {

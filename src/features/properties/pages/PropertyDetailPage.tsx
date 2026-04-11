@@ -273,7 +273,7 @@ export default function PropertyDetailPage() {
   const ctaLabel = isRental ? 'Enquire / Apply' : t('property.contact');
 
   return (
-    <div className="bg-background overflow-y-auto">
+    <div className="bg-background overflow-y-auto overflow-x-hidden">
       <PropertySEOHead property={{
         ...property,
         images: property.images,
@@ -396,9 +396,9 @@ export default function PropertyDetailPage() {
         )}
 
         {/* Content grid */}
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Main content - 2 cols */}
-          <div className="md:col-span-2 space-y-6">
+          <div className="md:col-span-2 space-y-6 min-w-0">
             {/* Price + title */}
             <div>
               {isRental ? (
@@ -478,7 +478,7 @@ export default function PropertyDetailPage() {
                   <FileText size={18} className="text-primary" />
                   Rental Information
                 </h2>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-3 rounded-xl bg-secondary">
                     <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Available From</p>
                     <p className="text-sm font-semibold text-foreground mt-1 flex items-center gap-1.5">
@@ -509,7 +509,7 @@ export default function PropertyDetailPage() {
                     </p>
                   </div>
                   {isFurnished && (
-                    <div className="col-span-2 p-3 rounded-xl bg-primary/5 border border-primary/10">
+                    <div className="sm:col-span-2 p-3 rounded-xl bg-primary/5 border border-primary/10">
                       <p className="text-sm font-semibold text-primary flex items-center gap-1.5">
                         <Sofa size={14} />
                         This property is furnished
@@ -574,9 +574,9 @@ export default function PropertyDetailPage() {
             </div>
 
             {/* Detail chips */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
               {property.estimatedValue && !isRental && (
-                <div className="col-span-2 sm:col-span-3 p-4 rounded-xl bg-primary/5 border border-primary/10">
+                <div className="sm:col-span-2 md:col-span-3 p-4 rounded-xl bg-primary/5 border border-primary/10">
                   <p className="text-xs text-primary font-medium uppercase tracking-wider">{t('property.estimated')}</p>
                   <p className="font-display font-bold text-foreground text-lg mt-1">{property.estimatedValue}</p>
                 </div>

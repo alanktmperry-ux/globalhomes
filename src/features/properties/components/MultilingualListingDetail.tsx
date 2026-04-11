@@ -289,13 +289,13 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
       )}
 
       {/* Agent Insights */}
-      {isAgent && agentInsights && (
+      {!isEnglish && agentInsights && (
         <div className="rounded-xl border border-blue-300 bg-blue-50 dark:border-blue-700 dark:bg-blue-900/20">
           <button
             onClick={() => setInsightsOpen(!insightsOpen)}
             className="flex w-full items-center justify-between px-4 py-3 text-sm font-semibold text-blue-800 dark:text-blue-300"
           >
-            <span>Agent Multicultural Insights</span>
+            <span>Buyer Insights for This Market</span>
             {insightsOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
 

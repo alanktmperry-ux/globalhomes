@@ -596,30 +596,21 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
                 {/* Mic button */}
                 <button
-                  onClick={() => {
-                    if (!isSupported || isSafari) {
-                      setShowTextInput(true);
-                      setTimeout(() => {
-                        const input = document.querySelector('input[data-voice-fallback]') as HTMLInputElement;
-                        input?.focus();
-                      }, 50);
-                    } else {
-                      isListening ? stopListening() : startListening();
-                    }
-                  }}
-                  className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
-                    voiceState === 'listening'
-                      ? 'bg-destructive/10 text-destructive'
+                  onClick={() => startRecording()}
+                  disabled={isProcessing}
+                  className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                    isRecording
+                      ? 'bg-destructive/10 text-destructive animate-pulse ring-2 ring-destructive/30'
+                      : isProcessing
+                      ? 'bg-secondary text-muted-foreground cursor-wait'
                       : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-accent'
                   }`}
-                  title={(!isSupported || isSafari) ? 'Type your search' : 'Voice search'}
+                  title={isRecording ? 'Stop recording' : isProcessing ? 'Transcribing...' : 'Voice search'}
                 >
-                  {voiceState === 'processing' || isSearching
+                  {isProcessing || isSearching
                     ? <Loader2 size={18} className="animate-spin" />
-                    : voiceState === 'listening'
+                    : isRecording
                     ? <MicOff size={18} />
-                    : (!isSupported || isSafari)
-                    ? <Search size={18} />
                     : <Mic size={18} />
                   }
                 </button>

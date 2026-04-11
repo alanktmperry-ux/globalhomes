@@ -730,12 +730,6 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
               Describe what you're looking for in plain English — our AI does the rest
             </p>
 
-            {/* Safari hint */}
-            {isSafari && (
-              <p className="text-[11px] text-muted-foreground text-center">
-                Voice search works best in Chrome — type your search above
-              </p>
-            )}
 
             {/* ── Example chips ── */}
             <div className="flex gap-2 overflow-x-auto sm:flex-wrap sm:justify-center pb-1 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>

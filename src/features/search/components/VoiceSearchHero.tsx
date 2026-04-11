@@ -138,7 +138,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   const [voiceState, setVoiceState] = useState<VoiceState>('idle');
   const [transcript, setTranscript] = useState('');
   const [editableTranscript, setEditableTranscript] = useState('');
-  const [showTextInput, setShowTextInput] = useState(false);
+  const [showTextInput, setShowTextInput] = useState(true);
   const [textQuery, setTextQuery] = useState('');
   const [selectedLang, setSelectedLang] = useState('en-AU');
   const [showLangDropdown, setShowLangDropdown] = useState(false);
@@ -147,11 +147,15 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   const [confidence, setConfidence] = useState<number | null>(null);
   const [suggestions, setSuggestions] = useState<{ description: string; place_id: string }[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const recognitionRef = useRef<any>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [permissionDenied, setPermissionDenied] = useState(false);
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<BlobPart[]>([]);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const suppressAutocompleteRef = useRef(false);
-  // Refs mirror state so recognition callbacks never capture stale values
+  // Refs mirror state so callbacks never capture stale values
   const voiceStateRef = useRef<VoiceState>('idle');
   const transcriptRef = useRef('');
   const syncVoiceState = (s: VoiceState) => { voiceStateRef.current = s; setVoiceState(s); };
@@ -168,19 +172,6 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   const headlineSlotRef = useRef<HTMLDivElement>(null);
 
   const isListening = voiceState === 'listening';
-
-  const isSupported = typeof window !== 'undefined' &&
-    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
-
-  const isSafari = typeof window !== 'undefined' &&
-    /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-
-  // Auto-show text input on Safari or unsupported browsers
-  useEffect(() => {
-    if (!isSupported || isSafari) {
-      setShowTextInput(true);
-    }
-  }, []);
 
   // Sync dropdown to current i18n language on mount
   useEffect(() => {

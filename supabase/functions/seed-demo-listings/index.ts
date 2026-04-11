@@ -166,7 +166,8 @@ Deno.serve(async (req: Request) => {
     ...l,
     listing_type: "rent",
     listing_category: "rent",
-    price: null,
+    price: 0,
+    price_formatted: `$${l.rental_weekly}/wk`,
     is_featured: false,
   }));
 

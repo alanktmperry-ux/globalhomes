@@ -9,11 +9,13 @@ const ALLOWED_ORIGINS = [
 
 // Lovable preview domains follow the pattern: https://*--*.lovable.app
 const LOVABLE_PREVIEW_PATTERN = /^https:\/\/[a-z0-9-]+--[a-z0-9-]+\.lovable\.app$/;
+const LOVABLE_PROJECT_PATTERN = /^https:\/\/[a-z0-9-]+\.lovableproject\.com$/;
 
 export function getAllowedOrigin(requestOrigin: string | null): string | null {
   if (!requestOrigin) return null;
   if (ALLOWED_ORIGINS.includes(requestOrigin)) return requestOrigin;
   if (LOVABLE_PREVIEW_PATTERN.test(requestOrigin)) return requestOrigin;
+  if (LOVABLE_PROJECT_PATTERN.test(requestOrigin)) return requestOrigin;
   return null;
 }
 

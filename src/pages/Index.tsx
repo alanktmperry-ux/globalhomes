@@ -219,7 +219,7 @@ const Index = () => {
     setHeroQuery(transcript);
     wrappedHandleSearch(transcript);
   }, [wrappedHandleSearch]);
-  const { isListening: heroMicListening, startListening: heroMicToggle } = useHeroVoiceSearch(handleVoiceResult);
+  const { isRecording: heroMicListening, isProcessing: heroMicProcessing, statusLabel: heroMicLabel, startRecording: heroMicToggle } = useHeroVoiceSearch(handleVoiceResult);
 
   const initializedFromUrl = useRef(false);
 

@@ -32,8 +32,8 @@ const AdminDatabase = () => {
   const fetchStats = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     const response = await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=table_stats`,
-      { headers: { Authorization: `Bearer ${session?.access_token}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY } }
+      `https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/admin-users?action=table_stats`,
+      { headers: { Authorization: `Bearer ${session?.access_token}`, apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ncmtib2hwbWt6am9uYW9mZ2JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MDcwNTAsImV4cCI6MjA1ODM4MzA1MH0.ZRs9aEaVnxBBqnYiMkFMvFBXrKEaLWCmFLnfo1j2yms' } }
     );
     const result = await response.json();
     setTableStats(result.stats || {});
@@ -43,8 +43,8 @@ const AdminDatabase = () => {
     setLoading(true);
     const { data: { session } } = await supabase.auth.getSession();
     const response = await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=browse_table&table=${selectedTable}&limit=${limit}&offset=${offset}`,
-      { headers: { Authorization: `Bearer ${session?.access_token}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY } }
+      `https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/admin-users?action=browse_table&table=${selectedTable}&limit=${limit}&offset=${offset}`,
+      { headers: { Authorization: `Bearer ${session?.access_token}`, apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ncmtib2hwbWt6am9uYW9mZ2JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MDcwNTAsImV4cCI6MjA1ODM4MzA1MH0.ZRs9aEaVnxBBqnYiMkFMvFBXrKEaLWCmFLnfo1j2yms' } }
     );
     const result = await response.json();
     setData(result.data || []);
@@ -59,10 +59,10 @@ const AdminDatabase = () => {
     if (!confirm('Delete this record?')) return;
     const { data: { session } } = await supabase.auth.getSession();
     await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=delete_record`,
+      `https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/admin-users?action=delete_record`,
       {
         method: 'POST',
-        headers: { Authorization: `Bearer ${session?.access_token}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY, 'Content-Type': 'application/json' },
+        headers: { Authorization: `Bearer ${session?.access_token}`, apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ncmtib2hwbWt6am9uYW9mZ2JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MDcwNTAsImV4cCI6MjA1ODM4MzA1MH0.ZRs9aEaVnxBBqnYiMkFMvFBXrKEaLWCmFLnfo1j2yms', 'Content-Type': 'application/json' },
         body: JSON.stringify({ table: selectedTable, record_id: recordId }),
       }
     );
@@ -122,12 +122,12 @@ const AdminDatabase = () => {
               try {
                 const { data: { session } } = await supabase.auth.getSession();
                 const res = await fetch(
-                  `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/seed-demo-listings`,
+                  `https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/seed-demo-listings`,
                   {
                     method: 'POST',
                     headers: {
                       Authorization: `Bearer ${session?.access_token}`,
-                      apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+                      apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ncmtib2hwbWt6am9uYW9mZ2JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MDcwNTAsImV4cCI6MjA1ODM4MzA1MH0.ZRs9aEaVnxBBqnYiMkFMvFBXrKEaLWCmFLnfo1j2yms',
                       'Content-Type': 'application/json',
                     },
                   }

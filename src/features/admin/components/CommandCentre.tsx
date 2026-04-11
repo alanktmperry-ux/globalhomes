@@ -218,7 +218,7 @@ export default function CommandCentre() {
         const token = s.session?.access_token;
         if (token) {
           const res = await fetch(
-            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=list_users`,
+            `https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/admin-users?action=list_users`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,

@@ -180,7 +180,7 @@ export default function RevenueBilling() {
         const { data: s } = await supabase.auth.getSession();
         if (s.session?.access_token) {
           const res = await fetch(
-            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=list_users`,
+            `https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/admin-users?action=list_users`,
             { headers: { Authorization: `Bearer ${s.session.access_token}`, 'Content-Type': 'application/json' } }
           );
           if (res.ok) {

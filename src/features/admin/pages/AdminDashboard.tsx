@@ -148,7 +148,7 @@ const AdminDashboard = () => {
     if (token) {
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=list_users`,
+          `https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/admin-users?action=list_users`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Building2, Upload, CheckCircle2, Landmark, Calendar, Loader2, Download, Settings2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Building2, Upload, CheckCircle2, Landmark, Calendar, Loader2, Download, Settings2, BookOpen, ChevronDown } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,6 +49,7 @@ export default function AgencyOnboardingPage() {
   const [loading, setLoading] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
   const [wizardCompleted, setWizardCompleted] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(true);
 
   // Step 2 — Agency details
   const [agencyName, setAgencyName] = useState('');
@@ -77,6 +78,11 @@ export default function AgencyOnboardingPage() {
       setTrustAccountName(`${agencyName} Trust Account`);
     }
   }, [agencyName]);
+
+  // Reset guide open state based on step
+  useEffect(() => {
+    setGuideOpen(step <= 1);
+  }, [step]);
 
   // Pre-fill agency details from agents table
   useEffect(() => {
@@ -613,6 +619,34 @@ export default function AgencyOnboardingPage() {
     toast.success('Compliance checklist generated — print or save as PDF');
   };
 
+  const GuideCard = ({ title, items }: { title: string; items: string[] }) => (
+    <div className="mt-6 border-t border-border pt-4">
+      <button
+        onClick={() => setGuideOpen(o => !o)}
+        className="flex items-center justify-between w-full text-left group"
+      >
+        <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+          <BookOpen size={13} className="text-primary" />
+          {title}
+        </div>
+        <ChevronDown
+          size={14}
+          className={`text-muted-foreground transition-transform duration-200 ${guideOpen ? 'rotate-180' : ''}`}
+        />
+      </button>
+      {guideOpen && (
+        <ul className="mt-3 space-y-1.5">
+          {items.map((item, i) => (
+            <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+              <span className="text-primary mt-0.5 shrink-0">·</span>
+              <span dangerouslySetInnerHTML={{ __html: item }} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+
   const renderStep = () => {
     // STEP 0 — Welcome & path selection
     if (step === 0) {
@@ -653,6 +687,17 @@ export default function AgencyOnboardingPage() {
               </CardContent>
             </Card>
           </div>
+          <GuideCard
+            title="Before you begin — have these ready"
+            items={[
+              '<strong>ABN</strong> — your 11-digit Australian Business Number',
+              '<strong>Real estate licence number</strong> — from your state regulator, not your CPD number',
+              '<strong>Agency name</strong> — your trading name as registered',
+              '<strong>Trust account BSB & account number</strong> — only needed if migrating from another system',
+              'Choose <strong>Starting fresh</strong> if you have no trust history to import — you can always import data later from Dashboard → Trust Accounting',
+              '<a href="https://listhq.com.au/setup-guide" target="_blank" class="text-primary hover:underline">Watch the 3-minute setup walkthrough →</a>',
+            ]}
+          />
         </div>
       );
     }
@@ -802,6 +847,15 @@ export default function AgencyOnboardingPage() {
               </div>
             </div>
           </div>
+          <GuideCard
+            title="Tips for this step"
+            items={[
+              "<strong>ABN</strong> \u2014 enter all 11 digits without spaces; we\u2019ll format it for you",
+              "<strong>Licence number</strong> \u2014 use your state-issued agent or agency licence, e.g. 6-digit for VIC, 20-series for NSW",
+              "The <strong>principal licensee</strong> must be the person named on your agency licence \u2014 not an assistant or sales agent",
+              "All fields marked with <strong>*</strong> are mandatory for compliance",
+            ]}
+          />
         </div>
       );
     }
@@ -852,6 +906,15 @@ export default function AgencyOnboardingPage() {
               The account name must include the word 'Trust'.
             </p>
           </div>
+          <GuideCard
+            title="Trust account tips"
+            items={[
+              "Your trust account <strong>must</strong> be a separate account from your general operating account",
+              "The account name must include the word <strong>Trust</strong> \u2014 e.g. 'Smith Property Trust Account'",
+              "BSB is 6 digits (formatted as XXX-XXX). Account number is typically 6\u20139 digits",
+              "Only <strong>ADI-approved banks</strong> (major banks, credit unions, building societies) are accepted",
+            ]}
+          />
         </div>
       );
     }
@@ -887,6 +950,15 @@ export default function AgencyOnboardingPage() {
             <Button variant="outline" size="sm" onClick={generateImportChecklist} className="w-full gap-2">
               <Download size={14} /> Download import checklist
             </Button>
+            <GuideCard
+              title="Cut-over date guidance"
+              items={[
+                "Choose a date when your <strong>three-way reconciliation</strong> is complete in your current system",
+                "Ideally pick the <strong>first day of a month</strong> \u2014 this simplifies the audit trail",
+                "All transactions <strong>before</strong> this date stay in your old system; everything from this date onwards goes into ListHQ",
+                "Download the <strong>pre-import checklist</strong> above and complete it before proceeding",
+              ]}
+            />
           </div>
         );
       }
@@ -950,6 +1022,15 @@ export default function AgencyOnboardingPage() {
               Skip for now
             </Button>
           </div>
+          <GuideCard
+            title="Import tips"
+            items={[
+              "Supported formats: <strong>CSV</strong> and <strong>Excel (.xlsx)</strong> from PropertyMe, Console Cloud, Reapit, or TrustSoft",
+              "Each row should contain <strong>client name, ledger balance, and property address</strong> at minimum",
+              "The total of all imported ledger balances must match your <strong>bank statement closing balance</strong>",
+              "Not ready? You can <strong>skip</strong> and import later from Dashboard \u2192 Trust Accounting \u2192 Import",
+            ]}
+          />
         </div>
       );
     }

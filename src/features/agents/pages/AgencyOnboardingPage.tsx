@@ -79,6 +79,11 @@ export default function AgencyOnboardingPage() {
     }
   }, [agencyName]);
 
+  // Reset guide open state based on step
+  useEffect(() => {
+    setGuideOpen(step <= 1);
+  }, [step]);
+
   // Pre-fill agency details from agents table
   useEffect(() => {
     if (!user?.id) return;

@@ -15,6 +15,7 @@ export function getAllowedOrigin(requestOrigin: string | null): string | null {
   if (!requestOrigin) return null;
   if (ALLOWED_ORIGINS.includes(requestOrigin)) return requestOrigin;
   if (LOVABLE_PREVIEW_PATTERN.test(requestOrigin)) return requestOrigin;
+  if (LOVABLE_PROJECT_PATTERN.test(requestOrigin)) return requestOrigin;
   return null;
 }
 

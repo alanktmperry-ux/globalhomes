@@ -618,13 +618,6 @@ export default function PropertyDetailPage() {
               />
             )}
 
-            {/* Description */}
-            {property.description && (
-              <div>
-                <h2 className="text-[15px] font-bold text-slate-900 mb-3 flex items-center gap-2.5 before:content-[''] before:w-[3px] before:h-4 before:rounded-full before:bg-blue-600 before:shrink-0">Description</h2>
-                <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{property.description}</p>
-              </div>
-            )}
 
             {/* Multilingual Translations */}
             {rawProperty && (rawProperty.translations || isOwnerAgent) && (

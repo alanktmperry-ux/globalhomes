@@ -993,6 +993,15 @@ export default function AgencyOnboardingPage() {
             >
               Continue to Dashboard <ArrowRight size={14} className="ml-1" />
             </Button>
+            <GuideCard
+              title="You're all set — what's next"
+              items={[
+                "Go to Dashboard \u2192 <strong>New Listing</strong> to create your first property listing",
+                "Publish any listing \u2014 <strong>multilingual translations</strong> generate automatically within 1\u20132 minutes",
+                "Invite your team from Dashboard \u2192 <strong>Team</strong> using email invite or invite code",
+                "Need help? Dashboard \u2192 <strong>Help</strong> is AI-powered and knows the full platform",
+              ]}
+            />
           </div>
         );
       }

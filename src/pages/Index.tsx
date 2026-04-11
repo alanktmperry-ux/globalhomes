@@ -944,13 +944,10 @@ const Index = () => {
             className="relative z-10 mt-8 max-w-2xl w-full mx-auto"
           >
             <div className="bg-white border border-slate-100 rounded-2xl shadow-sm shadow-slate-100 px-8 py-5 flex flex-wrap items-center justify-center gap-6 sm:gap-10">
-              {/* Properties */}
+              {/* ABS Stat */}
               <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
-                <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">
-                  {heroPlatformStats.properties === null ? <span className="text-slate-300">—</span> : heroPlatformStats.properties}
-                  <span className="text-xl font-semibold text-blue-500">+</span>
-                </span>
-                <span className="text-[11px] text-slate-400 font-medium">{t('hero.propertiesListed')}</span>
+                <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">1 in 5</span>
+                <span className="text-[11px] text-slate-400 font-medium text-center">AU buyers search in their language</span>
               </div>
               <div className="w-px h-9 bg-slate-100 hidden sm:block" />
               {/* Languages */}

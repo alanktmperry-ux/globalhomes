@@ -906,6 +906,15 @@ export default function AgencyOnboardingPage() {
               The account name must include the word 'Trust'.
             </p>
           </div>
+          <GuideCard
+            title="Trust account tips"
+            items={[
+              "Your trust account <strong>must</strong> be a separate account from your general operating account",
+              "The account name must include the word <strong>Trust</strong> \u2014 e.g. 'Smith Property Trust Account'",
+              "BSB is 6 digits (formatted as XXX-XXX). Account number is typically 6\u20139 digits",
+              "Only <strong>ADI-approved banks</strong> (major banks, credit unions, building societies) are accepted",
+            ]}
+          />
         </div>
       );
     }

@@ -889,7 +889,7 @@ const Index = () => {
                   type="button"
                   onClick={heroMicToggle}
                   disabled={heroMicProcessing}
-                  className={`shrink-0 p-2 rounded-full transition-all duration-200 ${
+                  className={`shrink-0 p-2.5 min-w-[44px] min-h-[44px] rounded-full transition-all duration-200 flex items-center justify-center ${
                     heroMicListening
                       ? 'bg-red-100 text-red-600 animate-pulse ring-2 ring-red-300 ring-offset-1'
                       : heroMicProcessing

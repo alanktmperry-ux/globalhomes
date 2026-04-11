@@ -950,6 +950,15 @@ export default function AgencyOnboardingPage() {
             <Button variant="outline" size="sm" onClick={generateImportChecklist} className="w-full gap-2">
               <Download size={14} /> Download import checklist
             </Button>
+            <GuideCard
+              title="Cut-over date guidance"
+              items={[
+                "Choose a date when your <strong>three-way reconciliation</strong> is complete in your current system",
+                "Ideally pick the <strong>first day of a month</strong> \u2014 this simplifies the audit trail",
+                "All transactions <strong>before</strong> this date stay in your old system; everything from this date onwards goes into ListHQ",
+                "Download the <strong>pre-import checklist</strong> above and complete it before proceeding",
+              ]}
+            />
           </div>
         );
       }

@@ -138,7 +138,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   const [voiceState, setVoiceState] = useState<VoiceState>('idle');
   const [transcript, setTranscript] = useState('');
   const [editableTranscript, setEditableTranscript] = useState('');
-  const [showTextInput, setShowTextInput] = useState(false);
+  const [showTextInput, setShowTextInput] = useState(true);
   const [textQuery, setTextQuery] = useState('');
   const [selectedLang, setSelectedLang] = useState('en-AU');
   const [showLangDropdown, setShowLangDropdown] = useState(false);
@@ -147,11 +147,15 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   const [confidence, setConfidence] = useState<number | null>(null);
   const [suggestions, setSuggestions] = useState<{ description: string; place_id: string }[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const recognitionRef = useRef<any>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [permissionDenied, setPermissionDenied] = useState(false);
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<BlobPart[]>([]);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const suppressAutocompleteRef = useRef(false);
-  // Refs mirror state so recognition callbacks never capture stale values
+  // Refs mirror state so callbacks never capture stale values
   const voiceStateRef = useRef<VoiceState>('idle');
   const transcriptRef = useRef('');
   const syncVoiceState = (s: VoiceState) => { voiceStateRef.current = s; setVoiceState(s); };
@@ -168,19 +172,6 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   const headlineSlotRef = useRef<HTMLDivElement>(null);
 
   const isListening = voiceState === 'listening';
-
-  const isSupported = typeof window !== 'undefined' &&
-    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
-
-  const isSafari = typeof window !== 'undefined' &&
-    /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-
-  // Auto-show text input on Safari or unsupported browsers
-  useEffect(() => {
-    if (!isSupported || isSafari) {
-      setShowTextInput(true);
-    }
-  }, []);
 
   // Sync dropdown to current i18n language on mount
   useEffect(() => {
@@ -394,100 +385,113 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       });
   }, [onSearch, geocodeLocation, user?.id, selectedLang]);
 
-  const startListening = useCallback(() => {
-    if (!isSupported) {
-      setShowTextInput(true);
+  const startRecording = useCallback(async () => {
+    if (isRecording) {
+      // Stop current recording
+      if (recorderRef.current && recorderRef.current.state === 'recording') {
+        recorderRef.current.stop();
+      }
       return;
     }
 
     try {
-      const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      const recognition = new SR();
-      recognition.continuous = false;
-      recognition.interimResults = true;
-      recognition.lang = selectedLang;
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mimeType = (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported('audio/webm;codecs=opus'))
+        ? 'audio/webm;codecs=opus'
+        : (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported('audio/mp4'))
+        ? 'audio/mp4'
+        : 'audio/ogg';
 
-      let silenceTimer: ReturnType<typeof setTimeout> | null = null;
+      const recorder = new MediaRecorder(stream, { mimeType });
+      chunksRef.current = [];
 
-      recognition.onresult = (event: any) => {
-        let interim = '';
-        let final = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const t = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            final += t;
-            setConfidence(Math.round(event.results[i][0].confidence * 100));
-          } else {
-            interim += t;
-          }
-        }
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
 
-        if (interim) {
-          syncTranscript(interim);
-        }
-        if (final) {
-          syncTranscript(final);
-          if (silenceTimer) clearTimeout(silenceTimer);
-          recognition.stop();
+      recorder.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop());
+        const blob = new Blob(chunksRef.current, { type: mimeType });
+
+        if (blob.size < 1000) {
+          setIsRecording(false);
+          syncVoiceState('idle');
+          syncTranscript('');
+          toast({ title: "🎙️ I didn't catch that", description: 'Please try again and speak clearly.' });
           return;
         }
 
-        // Auto-stop after 750ms of silence (helps iOS Safari)
-        if (silenceTimer) clearTimeout(silenceTimer);
-        silenceTimer = setTimeout(() => {
-          recognition.stop();
-        }, 750);
-      };
+        setIsProcessing(true);
+        syncVoiceState('processing');
+        syncTranscript('Transcribing...');
 
-      recognition.onerror = (event: any) => {
-        if (silenceTimer) clearTimeout(silenceTimer);
-        syncVoiceState('idle');
-        if (event.error === 'not-allowed') {
-          toast({ title: '🎙️ Microphone Access', description: 'Please allow microphone permissions and try again.', variant: 'destructive' });
-        } else if (event.error === 'no-speech') {
-          toast({ title: "🎙️ I didn't catch that", description: 'Please try again and speak clearly.' });
-        } else if (event.error !== 'aborted') {
-          toast({ title: '🎙️ Voice Error', description: 'Try again or type your search instead.', variant: 'destructive' });
-        }
-      };
+        try {
+          const base64 = await new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
+            reader.readAsDataURL(blob);
+          });
 
-      recognition.onend = () => {
-        if (silenceTimer) clearTimeout(silenceTimer);
-        // Read refs — not stale closure values
-        if (voiceStateRef.current === 'listening') {
-          if (transcriptRef.current) {
-            processTranscript(transcriptRef.current);
-          } else {
+          const { data, error } = await supabase.functions.invoke('voice-search', {
+            body: { audio: base64, mimeType },
+          });
+
+          if (error) throw error;
+
+          if (data?.success && data.transcript) {
+            syncTranscript(data.transcript);
+            setTextQuery(data.transcript);
+            processTranscript(data.transcript);
+          } else if (data?.error) {
+            toast({ title: '🎙️ Voice Error', description: data.error, variant: 'destructive' });
             syncVoiceState('idle');
+            syncTranscript('');
+          } else {
+            toast({ title: "🎙️ I didn't catch that", description: 'No speech detected. Please try again.' });
+            syncVoiceState('idle');
+            syncTranscript('');
           }
+        } catch (err) {
+          console.error('Voice search error:', err);
+          toast({ title: '🎙️ Voice Error', description: 'Voice search failed. Please try again.', variant: 'destructive' });
+          syncVoiceState('idle');
+          syncTranscript('');
+        } finally {
+          setIsProcessing(false);
+          setIsRecording(false);
         }
       };
 
-      recognitionRef.current = recognition;
-      recognition.start();
+      recorder.start(250);
+      recorderRef.current = recorder;
+      setIsRecording(true);
       syncVoiceState('listening');
       syncTranscript('');
       setConfidence(null);
       setFilterChips([]);
-    } catch (err) {
-      console.error('[VoiceSearch] Failed to start:', err);
-      toast({
-        title: '🎙️ Voice Unavailable',
-        description: 'Voice search requires microphone access. Please use the published site in Chrome, or type your search below.',
-        variant: 'destructive',
-      });
-      setShowTextInput(true);
-    }
-  }, [isSupported, selectedLang, processTranscript, toast, voiceState, transcript]);
+      setPermissionDenied(false);
 
-  const stopListening = useCallback(() => {
-    recognitionRef.current?.stop();
-    if (voiceStateRef.current === 'listening' && transcriptRef.current) {
-      processTranscript(transcriptRef.current);
-    } else {
-      syncVoiceState('idle');
+      // Auto-stop after 10 seconds
+      setTimeout(() => {
+        if (recorderRef.current && recorderRef.current.state === 'recording') {
+          recorderRef.current.stop();
+        }
+      }, 10000);
+    } catch (err: any) {
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        setPermissionDenied(true);
+        toast({ title: '🎙️ Microphone Access Denied', description: 'Please enable microphone access in your browser settings.', variant: 'destructive' });
+      } else {
+        toast({ title: '🎙️ Voice Unavailable', description: 'Could not start voice search. Please type your search instead.', variant: 'destructive' });
+      }
     }
-  }, [processTranscript]);
+  }, [isRecording, processTranscript, toast]);
+
+  const stopRecording = useCallback(() => {
+    if (recorderRef.current && recorderRef.current.state === 'recording') {
+      recorderRef.current.stop();
+    }
+  }, []);
 
   const handleTextSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -592,30 +596,21 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
                 {/* Mic button */}
                 <button
-                  onClick={() => {
-                    if (!isSupported || isSafari) {
-                      setShowTextInput(true);
-                      setTimeout(() => {
-                        const input = document.querySelector('input[data-voice-fallback]') as HTMLInputElement;
-                        input?.focus();
-                      }, 50);
-                    } else {
-                      isListening ? stopListening() : startListening();
-                    }
-                  }}
-                  className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
-                    voiceState === 'listening'
-                      ? 'bg-destructive/10 text-destructive'
+                  onClick={() => startRecording()}
+                  disabled={isProcessing}
+                  className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                    isRecording
+                      ? 'bg-destructive/10 text-destructive animate-pulse ring-2 ring-destructive/30'
+                      : isProcessing
+                      ? 'bg-secondary text-muted-foreground cursor-wait'
                       : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-accent'
                   }`}
-                  title={(!isSupported || isSafari) ? 'Type your search' : 'Voice search'}
+                  title={isRecording ? 'Stop recording' : isProcessing ? 'Transcribing...' : 'Voice search'}
                 >
-                  {voiceState === 'processing' || isSearching
+                  {isProcessing || isSearching
                     ? <Loader2 size={18} className="animate-spin" />
-                    : voiceState === 'listening'
+                    : isRecording
                     ? <MicOff size={18} />
-                    : (!isSupported || isSafari)
-                    ? <Search size={18} />
                     : <Mic size={18} />
                   }
                 </button>
@@ -649,7 +644,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                             setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
                           }
                         }}
-                        autoFocus={showTextInput && (!isSupported || isSafari)}
+                        autoFocus
                         className="w-full text-[16px] md:text-[17px] text-foreground bg-transparent focus:outline-none relative z-10"
                         placeholder=" "
                       />
@@ -735,12 +730,6 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
               Describe what you're looking for in plain English — our AI does the rest
             </p>
 
-            {/* Safari hint */}
-            {isSafari && (
-              <p className="text-[11px] text-muted-foreground text-center">
-                Voice search works best in Chrome — type your search above
-              </p>
-            )}
 
             {/* ── Example chips ── */}
             <div className="flex gap-2 overflow-x-auto sm:flex-wrap sm:justify-center pb-1 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>

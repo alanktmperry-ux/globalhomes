@@ -94,12 +94,6 @@ const Index = () => {
   const [heroPlatformStats, setHeroPlatformStats] = useState<{ properties: number | null; buyerCount: number | null }>({ properties: null, buyerCount: null });
   const heroInputRef = useRef<HTMLInputElement>(null);
 
-  // Hero voice search
-  const handleVoiceResult = useCallback((transcript: string) => {
-    setHeroQuery(transcript);
-    wrappedHandleSearch(transcript);
-  }, []);
-  const { isListening: heroMicListening, startListening: heroMicToggle } = useHeroVoiceSearch(handleVoiceResult);
 
   // Hero rotating language animation
   useEffect(() => {

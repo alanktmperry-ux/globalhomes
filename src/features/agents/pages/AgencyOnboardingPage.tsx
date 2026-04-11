@@ -848,12 +848,14 @@ export default function AgencyOnboardingPage() {
             </div>
           </div>
           <GuideCard
-            title="Tips for this step"
+            title="What you need for this step"
             items={[
-              "<strong>ABN</strong> \u2014 enter all 11 digits without spaces; we\u2019ll format it for you",
-              "<strong>Licence number</strong> \u2014 use your state-issued agent or agency licence, e.g. 6-digit for VIC, 20-series for NSW",
-              "The <strong>principal licensee</strong> must be the person named on your agency licence \u2014 not an assistant or sales agent",
-              "All fields marked with <strong>*</strong> are mandatory for compliance",
+              '<strong>ABN</strong> \u2014 11 digits, format: XX XXX XXX XXX. Find yours at <a href="https://abr.business.gov.au" target="_blank" class="text-primary hover:underline">abr.business.gov.au</a>',
+              '<strong>Licence number</strong> \u2014 issued by your state regulator. Examples: VIC (Consumer Affairs) 6-digit number \u00b7 NSW (Fair Trading) starts with 20XXXXXXXX \u00b7 QLD (OFT) starts with 4XXXXXXX',
+              "<strong>Principal's full name</strong> \u2014 the Licensee in Charge (LIC) for your agency",
+              '<strong>State of operation</strong> \u2014 select your primary state. You can service other states once set up',
+              '<strong>Agency phone & email</strong> \u2014 these appear on your public profile and listing enquiry forms',
+              'Enter your licence number exactly as it appears on your licence certificate',
             ]}
           />
         </div>

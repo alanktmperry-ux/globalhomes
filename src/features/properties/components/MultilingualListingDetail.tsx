@@ -242,9 +242,17 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
       )}
 
       {/* Title */}
-      <h1 className="font-display text-2xl font-bold text-foreground leading-tight">
-        {title}
-      </h1>
+      <div className="flex items-start gap-3 flex-wrap">
+        <h1 className="font-display text-2xl font-bold text-foreground leading-tight flex-1">
+          {title}
+        </h1>
+        {!isEnglish && hasTranslations && (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-500/10 border border-teal-500/30 px-3 py-1 text-xs font-semibold text-teal-600 dark:text-teal-400 shrink-0 mt-1">
+            <Globe size={12} />
+            AI Translated
+          </span>
+        )}
+      </div>
 
       {/* Summary */}
       {summary && (

@@ -117,6 +117,34 @@ const AdminDatabase = () => {
           >
             <Sprout size={14} /> Seed Properties
           </button>
+          <button
+            onClick={async () => {
+              try {
+                const { data: { session } } = await supabase.auth.getSession();
+                const res = await fetch(
+                  `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/seed-demo-listings`,
+                  {
+                    method: 'POST',
+                    headers: {
+                      Authorization: `Bearer ${session?.access_token}`,
+                      apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+                      'Content-Type': 'application/json',
+                    },
+                  }
+                );
+                const result = await res.json();
+                if (!res.ok) throw new Error(result.error || 'Seed failed');
+                sonnerToast.success(`Seeded ${result.total} listings (${result.sale_count} sale, ${result.rental_count} rental)`);
+                if (selectedTable === 'properties') fetchTable();
+                fetchStats();
+              } catch (e: unknown) {
+                sonnerToast.error(getErrorMessage(e) || 'Seed failed');
+              }
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-xs font-medium"
+          >
+            <Landmark size={14} /> Seed Demo Listings
+          </button>
           <button onClick={fetchTable} className="p-2 rounded-lg bg-secondary hover:bg-accent transition-colors">
             <RefreshCw size={14} className="text-muted-foreground" />
           </button>

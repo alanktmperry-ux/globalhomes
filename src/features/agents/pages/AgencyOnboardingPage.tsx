@@ -1037,12 +1037,12 @@ export default function AgencyOnboardingPage() {
             </Button>
           </div>
           <GuideCard
-            title="Import tips"
+            title="About the Trust Import Wizard"
             items={[
-              "Supported formats: <strong>CSV</strong> and <strong>Excel (.xlsx)</strong> from PropertyMe, Console Cloud, Reapit, or TrustSoft",
-              "Each row should contain <strong>client name, ledger balance, and property address</strong> at minimum",
-              "The total of all imported ledger balances must match your <strong>bank statement closing balance</strong>",
-              "Not ready? You can <strong>skip</strong> and import later from Dashboard \u2192 Trust Accounting \u2192 Import",
+              "Have your <strong>Client Ledger Summary</strong> export from your current system ready before starting",
+              "The import does <strong>not affect your bank account</strong> \u2014 it only creates matching records in ListHQ",
+              "Not ready? Click <strong>Skip for now</strong> \u2014 import later from Dashboard \u2192 Trust Accounting \u2192 Import Existing Account",
+              "After import, run a three-way reconciliation check: cashbook balance = bank statement = sum of all client ledgers",
             ]}
           />
         </div>

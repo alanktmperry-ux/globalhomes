@@ -2,8 +2,9 @@ import { useState, useCallback, useRef, useEffect, useMemo, lazy, Suspense } fro
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence, useMotionValue, useSpring, PanInfo } from 'framer-motion';
-import { ArrowRight, MapPin, Sparkles, Map, List, Mic, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users, Search, Home, Check } from 'lucide-react';
+import { ArrowRight, MapPin, Sparkles, Map, List, Mic, MicOff, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users, Search, Home, Check } from 'lucide-react';
 import { VoiceSearchHero } from '@/features/search/components/VoiceSearchHero';
+import { useHeroVoiceSearch } from '@/features/search/hooks/useHeroVoiceSearch';
 
 import { VirtualizedPropertyList } from '@/features/properties/components/VirtualizedPropertyList';
 import { MapSkeleton } from '@/features/properties/components/PropertyCardSkeleton';
@@ -92,6 +93,7 @@ const Index = () => {
   const [heroPlaceholderIndex, setHeroPlaceholderIndex] = useState(0);
   const [heroPlatformStats, setHeroPlatformStats] = useState<{ properties: number | null; buyerCount: number | null }>({ properties: null, buyerCount: null });
   const heroInputRef = useRef<HTMLInputElement>(null);
+
 
   // Hero rotating language animation
   useEffect(() => {
@@ -211,6 +213,13 @@ const Index = () => {
       })();
     }
   }, [handleSearch, setSearchCenter, user]);
+
+  // Hero voice search
+  const handleVoiceResult = useCallback((transcript: string) => {
+    setHeroQuery(transcript);
+    wrappedHandleSearch(transcript);
+  }, [wrappedHandleSearch]);
+  const { isListening: heroMicListening, startListening: heroMicToggle } = useHeroVoiceSearch(handleVoiceResult);
 
   const initializedFromUrl = useRef(false);
 
@@ -868,7 +877,6 @@ const Index = () => {
             {/* Search bar */}
             <form onSubmit={handleHeroSubmit} className="relative max-w-2xl mx-auto">
               <div className="flex items-center bg-white border border-slate-200 rounded-2xl shadow-lg shadow-slate-100/80 px-4 py-2 gap-3 hover:border-slate-300 hover:shadow-xl transition-all duration-200 focus-within:border-blue-300 focus-within:shadow-blue-50/80 focus-within:shadow-xl">
-                <Mic size={18} className="text-slate-400 shrink-0" />
                 <input
                   ref={heroInputRef}
                   type="text"
@@ -877,6 +885,18 @@ const Index = () => {
                   placeholder={HERO_PLACEHOLDERS[heroPlaceholderIndex]}
                   className="flex-1 bg-transparent outline-none text-slate-800 text-[15px] placeholder:text-slate-400 min-w-0"
                 />
+                <button
+                  type="button"
+                  onClick={heroMicToggle}
+                  className={`shrink-0 p-2 rounded-full transition-all duration-200 ${
+                    heroMicListening
+                      ? 'bg-red-100 text-red-600 animate-pulse'
+                      : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
+                  }`}
+                  title={heroMicListening ? 'Stop listening' : 'Voice search'}
+                >
+                  {heroMicListening ? <MicOff size={18} /> : <Mic size={18} />}
+                </button>
                 <button
                   type="submit"
                   className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shrink-0"

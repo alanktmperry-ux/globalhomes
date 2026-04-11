@@ -955,12 +955,13 @@ export default function AgencyOnboardingPage() {
               <Download size={14} /> Download import checklist
             </Button>
             <GuideCard
-              title="Cut-over date guidance"
+              title="Choosing your cut-over date"
               items={[
-                "Choose a date when your <strong>three-way reconciliation</strong> is complete in your current system",
-                "Ideally pick the <strong>first day of a month</strong> \u2014 this simplifies the audit trail",
-                "All transactions <strong>before</strong> this date stay in your old system; everything from this date onwards goes into ListHQ",
-                "Download the <strong>pre-import checklist</strong> above and complete it before proceeding",
+                "The cut-over date is the <strong>last date</strong> you will record trust transactions in your old system",
+                "Choose a date when your trust account is <strong>fully reconciled</strong> \u2014 ideally a month-end or quarter-end",
+                "You will need: Trust Trial Balance \u00b7 Client Ledger Summary \u00b7 Bank statement \u00b7 Active matters list",
+                "<strong>Do not</strong> process transactions in both systems after the cut-over date \u2014 this causes reconciliation errors that are very hard to unwind",
+                "Download the Migration Checklist using the button above before proceeding",
               ]}
             />
           </div>

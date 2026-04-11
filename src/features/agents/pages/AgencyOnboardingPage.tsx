@@ -909,12 +909,14 @@ export default function AgencyOnboardingPage() {
             </p>
           </div>
           <GuideCard
-            title="Trust account tips"
+            title="About your trust account"
             items={[
-              "Your trust account <strong>must</strong> be a separate account from your general operating account",
-              "The account name must include the word <strong>Trust</strong> \u2014 e.g. 'Smith Property Trust Account'",
-              "BSB is 6 digits (formatted as XXX-XXX). Account number is typically 6\u20139 digits",
-              "Only <strong>ADI-approved banks</strong> (major banks, credit unions, building societies) are accepted",
+              "Your trust account must be a <strong>dedicated bank account</strong> in your agency's name \u2014 not your personal or operating account",
+              'The account name must include the word <strong>"Trust"</strong> \u2014 e.g. "Smith Property Group Trust Account"',
+              "<strong>BSB</strong> is 6 digits \u2014 enter with or without the dash (062-000 or 062000)",
+              "ListHQ <strong>never processes payments</strong> through your trust account \u2014 used only for reconciliation and audit trail",
+              "All major Australian banks supported: NAB, CBA, ANZ, Westpac, Bendigo, BOQ, Macquarie",
+              "Don't have a trust account yet? Contact your bank \u2014 most open one within 1\u20132 business days",
             ]}
           />
         </div>

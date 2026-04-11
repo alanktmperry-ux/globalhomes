@@ -228,12 +228,12 @@ const AdminUsers = () => {
     if (!session?.access_token) throw new Error('Session expired');
     const method = body ? 'POST' : 'GET';
     const response = await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=${action}`,
+      `https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/admin-users?action=${action}`,
       {
         method,
         headers: {
           Authorization: `Bearer ${session.access_token}`,
-          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ncmtib2hwbWt6am9uYW9mZ2JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MDcwNTAsImV4cCI6MjA1ODM4MzA1MH0.ZRs9aEaVnxBBqnYiMkFMvFBXrKEaLWCmFLnfo1j2yms',
           'Content-Type': 'application/json',
         },
         ...(body ? { body: JSON.stringify(body) } : {}),
@@ -303,12 +303,12 @@ const AdminUsers = () => {
         const session = await getSession();
         if (!session?.access_token) throw new Error('Session expired');
         const response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-delete-agent`,
+          `https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/admin-delete-agent`,
           {
             method: 'POST',
             headers: {
               Authorization: `Bearer ${session.access_token}`,
-              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+              apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ncmtib2hwbWt6am9uYW9mZ2JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MDcwNTAsImV4cCI6MjA1ODM4MzA1MH0.ZRs9aEaVnxBBqnYiMkFMvFBXrKEaLWCmFLnfo1j2yms',
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({ userId }),

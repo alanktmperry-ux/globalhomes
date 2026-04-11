@@ -687,6 +687,17 @@ export default function AgencyOnboardingPage() {
               </CardContent>
             </Card>
           </div>
+          <GuideCard
+            title="Before you begin — have these ready"
+            items={[
+              '<strong>ABN</strong> — your 11-digit Australian Business Number',
+              '<strong>Real estate licence number</strong> — from your state regulator, not your CPD number',
+              '<strong>Agency name</strong> — your trading name as registered',
+              '<strong>Trust account BSB & account number</strong> — only needed if migrating from another system',
+              'Choose <strong>Starting fresh</strong> if you have no trust history to import — you can always import data later from Dashboard → Trust Accounting',
+              '<a href="https://listhq.com.au/setup-guide" target="_blank" class="text-primary hover:underline">Watch the 3-minute setup walkthrough →</a>',
+            ]}
+          />
         </div>
       );
     }

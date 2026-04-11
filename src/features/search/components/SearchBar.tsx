@@ -87,12 +87,12 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
 
       const { data: { session } } = await supabase.auth.getSession();
       const resp = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-translations`,
+        'https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/generate-translations',
         {
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${session?.access_token ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ncmtib2hwbWt6am9uYW9mZ2JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MDcwNTAsImV4cCI6MjA1ODM4MzA1MH0.ZRs9aEaVnxBBqnYiMkFMvFBXrKEaLWCmFLnfo1j2yms'}`,
+            apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ncmtib2hwbWt6am9uYW9mZ2JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MDcwNTAsImV4cCI6MjA1ODM4MzA1MH0.ZRs9aEaVnxBBqnYiMkFMvFBXrKEaLWCmFLnfo1j2yms',
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ type: 'translate_search', search_query: trimmed }),

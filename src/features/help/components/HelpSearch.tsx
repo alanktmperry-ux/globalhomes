@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { getFaqMatches } from '@/features/help/utils/faqSearch';
 
 
-const HELP_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/agent-help`;
+const HELP_URL = 'https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/agent-help';
 
 interface Props {
   className?: string;
@@ -43,8 +43,8 @@ export function HelpSearch({ className = '', placeholder, externalQuery, externa
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${session?.access_token ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ncmtib2hwbWt6am9uYW9mZ2JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MDcwNTAsImV4cCI6MjA1ODM4MzA1MH0.ZRs9aEaVnxBBqnYiMkFMvFBXrKEaLWCmFLnfo1j2yms'}`,
+          apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ncmtib2hwbWt6am9uYW9mZ2JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MDcwNTAsImV4cCI6MjA1ODM4MzA1MH0.ZRs9aEaVnxBBqnYiMkFMvFBXrKEaLWCmFLnfo1j2yms',
         },
         body: JSON.stringify({ question }),
         signal: controller.signal,

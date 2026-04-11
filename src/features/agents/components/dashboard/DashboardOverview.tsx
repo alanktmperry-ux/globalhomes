@@ -339,7 +339,7 @@ const DashboardOverview = () => {
     try {
       const address = tenancy.properties?.address || 'your property';
       const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-notification-email`,
+        'https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/send-notification-email',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}` },

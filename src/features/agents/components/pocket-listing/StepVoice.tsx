@@ -26,7 +26,7 @@ const TONES = [
 
 type Tone = typeof TONES[number]['key'];
 
-const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-listing`;
+const GENERATE_URL = 'https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/generate-listing';
 
 const StepVoice = ({ draft, update }: Props) => {
   const [countdown, setCountdown] = useState(30);

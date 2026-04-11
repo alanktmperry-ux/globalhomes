@@ -150,12 +150,15 @@ Deno.serve(async (req: Request) => {
     { title: "Bayside 3 Bedroom Home for Rent in Williamstown", address: "22 Nelson Place", suburb: "Williamstown", state: "VIC", postcode: "3016", rental_weekly: 750, beds: 3, baths: 2, parking: 2, property_type: "house", lat: -37.8668, lng: 144.8997, description: "Charming three-bedroom home in Williamstown's village precinct with polished timber floors and updated kitchen. Sunny rear garden, walk to Williamstown Beach and Nelson Place restaurants. Gas heating and air conditioning included." },
   ];
 
+  const formatPrice = (p: number) => `$${p.toLocaleString("en-AU")}`;
+
   const saleRows = saleListings.map((l, i) => ({
     ...common,
     ...l,
     listing_type: "sale",
     listing_category: "sale",
     is_featured: i < 20,
+    price_formatted: formatPrice(l.price),
   }));
 
   const rentalRows = rentalListings.map((l) => ({

@@ -644,7 +644,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                             setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
                           }
                         }}
-                        autoFocus={showTextInput && (!isSupported || isSafari)}
+                        autoFocus
                         className="w-full text-[16px] md:text-[17px] text-foreground bg-transparent focus:outline-none relative z-10"
                         placeholder=" "
                       />

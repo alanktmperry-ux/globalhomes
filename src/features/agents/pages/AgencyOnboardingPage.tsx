@@ -1022,6 +1022,15 @@ export default function AgencyOnboardingPage() {
               Skip for now
             </Button>
           </div>
+          <GuideCard
+            title="Import tips"
+            items={[
+              "Supported formats: <strong>CSV</strong> and <strong>Excel (.xlsx)</strong> from PropertyMe, Console Cloud, Reapit, or TrustSoft",
+              "Each row should contain <strong>client name, ledger balance, and property address</strong> at minimum",
+              "The total of all imported ledger balances must match your <strong>bank statement closing balance</strong>",
+              "Not ready? You can <strong>skip</strong> and import later from Dashboard \u2192 Trust Accounting \u2192 Import",
+            ]}
+          />
         </div>
       );
     }

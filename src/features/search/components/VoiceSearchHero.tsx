@@ -385,100 +385,113 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       });
   }, [onSearch, geocodeLocation, user?.id, selectedLang]);
 
-  const startListening = useCallback(() => {
-    if (!isSupported) {
-      setShowTextInput(true);
+  const startRecording = useCallback(async () => {
+    if (isRecording) {
+      // Stop current recording
+      if (recorderRef.current && recorderRef.current.state === 'recording') {
+        recorderRef.current.stop();
+      }
       return;
     }
 
     try {
-      const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      const recognition = new SR();
-      recognition.continuous = false;
-      recognition.interimResults = true;
-      recognition.lang = selectedLang;
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mimeType = (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported('audio/webm;codecs=opus'))
+        ? 'audio/webm;codecs=opus'
+        : (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported('audio/mp4'))
+        ? 'audio/mp4'
+        : 'audio/ogg';
 
-      let silenceTimer: ReturnType<typeof setTimeout> | null = null;
+      const recorder = new MediaRecorder(stream, { mimeType });
+      chunksRef.current = [];
 
-      recognition.onresult = (event: any) => {
-        let interim = '';
-        let final = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const t = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            final += t;
-            setConfidence(Math.round(event.results[i][0].confidence * 100));
-          } else {
-            interim += t;
-          }
-        }
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
 
-        if (interim) {
-          syncTranscript(interim);
-        }
-        if (final) {
-          syncTranscript(final);
-          if (silenceTimer) clearTimeout(silenceTimer);
-          recognition.stop();
+      recorder.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop());
+        const blob = new Blob(chunksRef.current, { type: mimeType });
+
+        if (blob.size < 1000) {
+          setIsRecording(false);
+          syncVoiceState('idle');
+          syncTranscript('');
+          toast({ title: "🎙️ I didn't catch that", description: 'Please try again and speak clearly.' });
           return;
         }
 
-        // Auto-stop after 750ms of silence (helps iOS Safari)
-        if (silenceTimer) clearTimeout(silenceTimer);
-        silenceTimer = setTimeout(() => {
-          recognition.stop();
-        }, 750);
-      };
+        setIsProcessing(true);
+        syncVoiceState('processing');
+        syncTranscript('Transcribing...');
 
-      recognition.onerror = (event: any) => {
-        if (silenceTimer) clearTimeout(silenceTimer);
-        syncVoiceState('idle');
-        if (event.error === 'not-allowed') {
-          toast({ title: '🎙️ Microphone Access', description: 'Please allow microphone permissions and try again.', variant: 'destructive' });
-        } else if (event.error === 'no-speech') {
-          toast({ title: "🎙️ I didn't catch that", description: 'Please try again and speak clearly.' });
-        } else if (event.error !== 'aborted') {
-          toast({ title: '🎙️ Voice Error', description: 'Try again or type your search instead.', variant: 'destructive' });
-        }
-      };
+        try {
+          const base64 = await new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
+            reader.readAsDataURL(blob);
+          });
 
-      recognition.onend = () => {
-        if (silenceTimer) clearTimeout(silenceTimer);
-        // Read refs — not stale closure values
-        if (voiceStateRef.current === 'listening') {
-          if (transcriptRef.current) {
-            processTranscript(transcriptRef.current);
-          } else {
+          const { data, error } = await supabase.functions.invoke('voice-search', {
+            body: { audio: base64, mimeType },
+          });
+
+          if (error) throw error;
+
+          if (data?.success && data.transcript) {
+            syncTranscript(data.transcript);
+            setTextQuery(data.transcript);
+            processTranscript(data.transcript);
+          } else if (data?.error) {
+            toast({ title: '🎙️ Voice Error', description: data.error, variant: 'destructive' });
             syncVoiceState('idle');
+            syncTranscript('');
+          } else {
+            toast({ title: "🎙️ I didn't catch that", description: 'No speech detected. Please try again.' });
+            syncVoiceState('idle');
+            syncTranscript('');
           }
+        } catch (err) {
+          console.error('Voice search error:', err);
+          toast({ title: '🎙️ Voice Error', description: 'Voice search failed. Please try again.', variant: 'destructive' });
+          syncVoiceState('idle');
+          syncTranscript('');
+        } finally {
+          setIsProcessing(false);
+          setIsRecording(false);
         }
       };
 
-      recognitionRef.current = recognition;
-      recognition.start();
+      recorder.start(250);
+      recorderRef.current = recorder;
+      setIsRecording(true);
       syncVoiceState('listening');
       syncTranscript('');
       setConfidence(null);
       setFilterChips([]);
-    } catch (err) {
-      console.error('[VoiceSearch] Failed to start:', err);
-      toast({
-        title: '🎙️ Voice Unavailable',
-        description: 'Voice search requires microphone access. Please use the published site in Chrome, or type your search below.',
-        variant: 'destructive',
-      });
-      setShowTextInput(true);
-    }
-  }, [isSupported, selectedLang, processTranscript, toast, voiceState, transcript]);
+      setPermissionDenied(false);
 
-  const stopListening = useCallback(() => {
-    recognitionRef.current?.stop();
-    if (voiceStateRef.current === 'listening' && transcriptRef.current) {
-      processTranscript(transcriptRef.current);
-    } else {
-      syncVoiceState('idle');
+      // Auto-stop after 10 seconds
+      setTimeout(() => {
+        if (recorderRef.current && recorderRef.current.state === 'recording') {
+          recorderRef.current.stop();
+        }
+      }, 10000);
+    } catch (err: any) {
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        setPermissionDenied(true);
+        toast({ title: '🎙️ Microphone Access Denied', description: 'Please enable microphone access in your browser settings.', variant: 'destructive' });
+      } else {
+        toast({ title: '🎙️ Voice Unavailable', description: 'Could not start voice search. Please type your search instead.', variant: 'destructive' });
+      }
     }
-  }, [processTranscript]);
+  }, [isRecording, processTranscript, toast]);
+
+  const stopRecording = useCallback(() => {
+    if (recorderRef.current && recorderRef.current.state === 'recording') {
+      recorderRef.current.stop();
+    }
+  }, []);
 
   const handleTextSubmit = (e: React.FormEvent) => {
     e.preventDefault();

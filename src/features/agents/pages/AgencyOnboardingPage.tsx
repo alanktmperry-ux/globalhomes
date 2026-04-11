@@ -122,7 +122,7 @@ export default function AgencyOnboardingPage() {
     setLoading(true);
     try {
       // Call setup-agent edge function
-      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/setup-agent`, {
+      const res = await fetch('https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/setup-agent', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

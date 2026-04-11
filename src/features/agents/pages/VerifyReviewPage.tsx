@@ -19,7 +19,7 @@ export default function VerifyReviewPage() {
       setStatus('error');
     } else {
       // Direct call to edge function
-      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-review?token=${token}`;
+      const url = `https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/verify-review?token=${token}`;
       window.location.href = url;
     }
   }, [token, params]);

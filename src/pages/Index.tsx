@@ -888,12 +888,15 @@ const Index = () => {
                 <button
                   type="button"
                   onClick={heroMicToggle}
+                  disabled={heroMicProcessing}
                   className={`shrink-0 p-2 rounded-full transition-all duration-200 ${
                     heroMicListening
-                      ? 'bg-red-100 text-red-600 animate-pulse'
-                      : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
+                      ? 'bg-red-100 text-red-600 animate-pulse ring-2 ring-red-300 ring-offset-1'
+                      : heroMicProcessing
+                        ? 'bg-blue-50 text-blue-400 cursor-wait'
+                        : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
                   }`}
-                  title={heroMicListening ? 'Stop listening' : 'Voice search'}
+                  title={heroMicListening ? 'Stop recording' : heroMicProcessing ? 'Transcribing...' : 'Voice search'}
                 >
                   {heroMicListening ? <MicOff size={18} /> : <Mic size={18} />}
                 </button>
@@ -905,6 +908,12 @@ const Index = () => {
                   {t('hero.search')}
                 </button>
               </div>
+              {heroMicLabel && (
+                <div className="flex items-center justify-center gap-2 mt-2">
+                  <span className={`inline-block w-2 h-2 rounded-full ${heroMicListening ? 'bg-red-500 animate-pulse' : 'bg-blue-500 animate-pulse'}`} />
+                  <span className="text-sm text-slate-500 font-medium">{heroMicLabel}</span>
+                </div>
+              )}
               <p className="text-sm text-slate-400 mt-3 text-center">
                 Search in Mandarin, Vietnamese, Cantonese, Arabic or any of 24 languages.
               </p>

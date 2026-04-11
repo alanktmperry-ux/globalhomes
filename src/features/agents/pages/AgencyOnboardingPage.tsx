@@ -619,6 +619,34 @@ export default function AgencyOnboardingPage() {
     toast.success('Compliance checklist generated — print or save as PDF');
   };
 
+  const GuideCard = ({ title, items }: { title: string; items: string[] }) => (
+    <div className="mt-6 border-t border-border pt-4">
+      <button
+        onClick={() => setGuideOpen(o => !o)}
+        className="flex items-center justify-between w-full text-left group"
+      >
+        <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+          <BookOpen size={13} className="text-primary" />
+          {title}
+        </div>
+        <ChevronDown
+          size={14}
+          className={`text-muted-foreground transition-transform duration-200 ${guideOpen ? 'rotate-180' : ''}`}
+        />
+      </button>
+      {guideOpen && (
+        <ul className="mt-3 space-y-1.5">
+          {items.map((item, i) => (
+            <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+              <span className="text-primary mt-0.5 shrink-0">·</span>
+              <span dangerouslySetInnerHTML={{ __html: item }} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+
   const renderStep = () => {
     // STEP 0 — Welcome & path selection
     if (step === 0) {

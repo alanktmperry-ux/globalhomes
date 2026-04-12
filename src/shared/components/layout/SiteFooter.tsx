@@ -46,7 +46,7 @@ export function SiteFooter() {
 
           {/* Platform col */}
           <div>
-            <h4 className="text-[11px] font-semibold tracking-widest uppercase mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>Platform</h4>
+            <p className="text-[11px] font-semibold tracking-widest uppercase mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>Platform</p>
             <ul className="space-y-2.5">
               {[
                 { label: 'Search Properties', to: '/' },
@@ -68,7 +68,7 @@ export function SiteFooter() {
 
           {/* Legal col */}
           <div>
-            <h4 className="text-[11px] font-semibold tracking-widest uppercase mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>Legal</h4>
+            <p className="text-[11px] font-semibold tracking-widest uppercase mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>Legal</p>
             <ul className="space-y-2.5">
               {[
                 { label: 'Privacy Policy', to: '/privacy' },
@@ -90,7 +90,7 @@ export function SiteFooter() {
 
           {/* Support col */}
           <div>
-            <h4 className="text-[11px] font-semibold tracking-widest uppercase mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>Support</h4>
+            <p className="text-[11px] font-semibold tracking-widest uppercase mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>Support</p>
             <ul className="space-y-2.5">
               {[
                 { label: 'Help Centre', to: '/help' },

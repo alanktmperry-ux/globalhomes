@@ -66,8 +66,8 @@ const AgentLandingPage = () => {
                 custom={1}
                 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold text-primary-foreground leading-[1.08] mb-5"
               >
-                Sell Properties{' '}
-                <span className="text-primary">Before They Hit</span> The Market
+                Join Our Founding{' '}
+                <span className="text-primary">Agent Cohort</span>
               </motion.h1>
 
               <motion.p
@@ -75,7 +75,7 @@ const AgentLandingPage = () => {
                 custom={2}
                 className="text-lg text-primary-foreground/70 mb-8 max-w-md mx-auto lg:mx-0"
               >
-                Join our founding agent cohort
+                We're accepting 50 founding agents across Sydney and Melbourne. Lock in your rate for life.
               </motion.p>
 
               <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">

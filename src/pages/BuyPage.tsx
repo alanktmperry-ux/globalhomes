@@ -17,6 +17,11 @@ const BuyPage = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const { setListingMode } = useCurrency();
+
+  useEffect(() => {
+    setListingMode('sale');
+  }, []);
 
   const { data: properties, isLoading } = useQuery({
     queryKey: ['buy-properties'],

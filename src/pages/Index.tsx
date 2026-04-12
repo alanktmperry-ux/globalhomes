@@ -957,21 +957,9 @@ const Index = () => {
                 <span className="text-[11px] text-slate-500 font-medium">{t('hero.languages')}</span>
               </div>
               <div className="w-px h-9 bg-slate-100 hidden sm:block" />
-              {/* Real buyer count or "Free to search" */}
               <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
-                {heroPlatformStats.buyerCount && heroPlatformStats.buyerCount > 0 ? (
-                  <>
-                    <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">
-                      {heroPlatformStats.buyerCount}<span className="text-xl font-semibold text-blue-500">+</span>
-                    </span>
-                    <span className="text-[11px] text-slate-500 font-medium">Buyers searching now</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="text-2xl font-extrabold text-emerald-600 tracking-tight leading-none">✓</span>
-                    <span className="text-[11px] text-slate-500 font-medium">No sign-up required</span>
-                  </>
-                )}
+                <span className="text-2xl font-extrabold text-slate-900 tracking-tight leading-none">50+</span>
+                <span className="text-[11px] text-slate-500 font-medium">AI tools</span>
               </div>
             </div>
           </motion.div>
@@ -982,8 +970,8 @@ const Index = () => {
           <div className="max-w-5xl mx-auto">
             <div className="flex items-baseline justify-between mb-6">
               <div>
-                <h2 className="text-xl font-semibold text-slate-900">Properties available now</h2>
-                <p className="text-sm text-slate-500 mt-1">{t('hero.featuredSub')}</p>
+                <h2 className="text-xl font-semibold text-slate-900">Properties on ListHQ</h2>
+                <p className="text-sm text-slate-500 mt-1">Browse what's currently listed</p>
               </div>
               <a href="/search" className="text-sm text-blue-600 hover:text-blue-700 font-medium">{t('hero.viewAll')} →</a>
             </div>
@@ -1052,7 +1040,7 @@ const Index = () => {
         <motion.section {...sectionAnim} className="bg-slate-900 py-16 px-6 text-center">
           <div className="max-w-2xl mx-auto">
             <h2 className="text-2xl font-semibold text-white mb-3">1 in 5 Australian buyers searches in a language other than English. Are your listings ready?</h2>
-            <p className="text-sm text-slate-400 mb-8">ListHQ automatically translates every listing into 24 languages. Free for 60 days. No credit card.</p>
+            <p className="text-sm text-slate-400 mb-8">ListHQ automatically translates every listing into 24 languages. Free for 3 months. No credit card.</p>
             <button
               onClick={() => navigate('/for-agents')}
               className="inline-flex items-center gap-2 bg-white text-slate-900 hover:bg-slate-100 px-8 py-4 rounded-full text-[15px] font-semibold transition-all duration-200 hover:scale-105 active:scale-100 shadow-lg"

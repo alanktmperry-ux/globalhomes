@@ -90,7 +90,7 @@ const translations: Record<Language, Record<string, string>> = {
     'hero.searchingNow': 'searching now',
     'hero.liveData': 'Live data',
     'hero.featuredListings': 'Featured listings',
-    'hero.featuredSub': 'Hand-picked properties across Sydney and Melbourne',
+    'hero.featuredSub': 'Properties on ListHQ',
     'hero.viewAll': 'View all',
     'hero.howItWorks': 'How ListHQ works',
     'hero.howItWorksSub': 'Find your next home in 3 steps — in any language',

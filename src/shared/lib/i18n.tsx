@@ -1328,23 +1328,22 @@ const bannerMessages: Partial<Record<Language, string>> = {
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [showBanner, setShowBanner] = useState(false);
-  const [language, setLanguage] = useState<Language>(() => {
+  const [language, setLanguageState] = useState<Language>(() => {
     const saved = localStorage.getItem('gh-lang');
     if (saved && saved in translations) return saved as Language;
-    // First visit — detect browser language
-    const detected = detectBrowserLanguage();
-    localStorage.setItem('gh-lang', detected);
-    return detected;
+    // First visit — default to English (no browser detection)
+    localStorage.setItem('gh-lang', 'en');
+    return 'en';
   });
 
-  useEffect(() => {
-    // Show banner only on first visit (gh-lang didn't exist) with a non-en detected language
-    const bannerDismissed = localStorage.getItem(BANNER_DISMISSED_KEY);
-    if (!bannerDismissed && language !== 'en' && language in bannerMessages) {
-      // Check if this is genuinely first visit: gh-lang was just set by our initializer above
-      // We use the banner-dismissed key as the source of truth
-      setShowBanner(true);
-    }
+  // Wrap setLanguage to show banner only on active user language changes
+  const setLanguage = useCallback((newLang: Language) => {
+    setLanguageState(prev => {
+      if (newLang !== prev && newLang !== 'en' && newLang in bannerMessages) {
+        setShowBanner(true);
+      }
+      return newLang;
+    });
   }, []);
 
   useEffect(() => {

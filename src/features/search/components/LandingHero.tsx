@@ -21,7 +21,7 @@ function usePlatformStats() {
       setStats(s => ({
         ...s,
         properties: propCount ?? 0,
-        buyerCount: (profileCount && profileCount > 0) ? profileCount : null,
+        buyerCount: null,
       }));
     }
     load();

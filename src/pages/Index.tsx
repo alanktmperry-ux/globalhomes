@@ -114,7 +114,7 @@ const Index = () => {
         .from('properties').select('id', { count: 'exact', head: true }).eq('is_active', true);
       setHeroPlatformStats({
         properties: propCount ?? 0,
-        buyerCount: (profileCount && profileCount > 0) ? profileCount : null,
+        buyerCount: null,
       });
     })();
   }, []);

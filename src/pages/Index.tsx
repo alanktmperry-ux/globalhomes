@@ -924,9 +924,8 @@ const Index = () => {
             <div className="flex items-center justify-center gap-3 mt-6">
               <button
                 onClick={() => {
-                  const searchInput = document.getElementById('search-bar') || document.querySelector('input[type="text"]');
-                  searchInput?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  setTimeout(() => (searchInput as HTMLElement)?.focus(), 500);
+                  const el = document.getElementById('featured-listings');
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }}
                 className="rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:border-slate-400 hover:text-slate-900 transition-all cursor-pointer bg-white/80 backdrop-blur-sm"
               >

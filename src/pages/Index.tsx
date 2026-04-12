@@ -878,6 +878,7 @@ const Index = () => {
             <form onSubmit={handleHeroSubmit} className="relative max-w-2xl mx-auto">
               <div className="flex items-center bg-white border border-slate-200 rounded-2xl shadow-lg shadow-slate-100/80 px-4 py-2 gap-3 hover:border-slate-300 hover:shadow-xl transition-all duration-200 focus-within:border-blue-300 focus-within:shadow-blue-50/80 focus-within:shadow-xl">
                 <input
+                  id="search-bar"
                   ref={heroInputRef}
                   type="text"
                   value={heroQuery}
@@ -922,7 +923,11 @@ const Index = () => {
             {/* Dual Entry CTA */}
             <div className="flex items-center justify-center gap-3 mt-6">
               <button
-                onClick={() => navigate('/search')}
+                onClick={() => {
+                  const searchInput = document.getElementById('search-bar') || document.querySelector('input[type="text"]');
+                  searchInput?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  setTimeout(() => (searchInput as HTMLElement)?.focus(), 500);
+                }}
                 className="rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:border-slate-400 hover:text-slate-900 transition-all cursor-pointer bg-white/80 backdrop-blur-sm"
               >
                 🔍 Browse properties

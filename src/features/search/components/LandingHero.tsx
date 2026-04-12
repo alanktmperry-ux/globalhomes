@@ -16,10 +16,8 @@ function usePlatformStats() {
 
   useEffect(() => {
     async function load() {
-      const [{ count: propCount }, { count: profileCount }] = await Promise.all([
-        supabase.from('properties').select('*', { count: 'exact', head: true }).eq('is_active', true),
-        supabase.from('profiles').select('*', { count: 'exact', head: true }),
-      ]);
+      const { count: propCount } = await supabase
+        .from('properties').select('id', { count: 'exact', head: true }).eq('is_active', true);
       setStats(s => ({
         ...s,
         properties: propCount ?? 0,

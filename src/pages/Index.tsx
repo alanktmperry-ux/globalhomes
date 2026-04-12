@@ -1097,8 +1097,7 @@ const Index = () => {
             </div>
             {/* Right: founding agent card */}
             <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center">
-              <div className="text-xs text-blue-400 font-semibold uppercase tracking-widest mb-2">Founding Agent</div>
-              <div className="text-3xl font-bold text-white mb-1">Zee is a girl</div>
+              <div className="text-3xl font-bold text-white mb-1">Free for 3 months</div>
               <p className="text-sm text-slate-400 mb-6">No credit card required. Full access.</p>
               <button
                 onClick={() => navigate('/for-agents')}

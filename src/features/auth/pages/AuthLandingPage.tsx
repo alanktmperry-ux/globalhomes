@@ -1,11 +1,13 @@
 import { motion } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 
 const AuthLandingPage = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row" style={{ background: '#020817' }}>
+      <Helmet><title>Sign In</title></Helmet>
 
       {/* ListHQ wordmark — centred top */}
       <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
@@ -27,7 +29,7 @@ const AuthLandingPage = () => {
           {/* Badge */}
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-200 bg-slate-50 mb-7">
             <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-            <span className="text-[10px] font-medium tracking-widest uppercase text-slate-400">Property Seeker</span>
+            <span className="text-[10px] font-medium tracking-widest uppercase text-slate-400">Find your next home</span>
           </div>
 
           {/* Headline */}
@@ -57,7 +59,7 @@ const AuthLandingPage = () => {
             onClick={() => navigate('/login')}
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-slate-900 text-white text-sm font-medium hover:bg-slate-700 transition-colors"
           >
-            Search properties
+            Browse properties
             <span>→</span>
           </button>
         </div>
@@ -121,7 +123,7 @@ const AuthLandingPage = () => {
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-20">
         <div className="flex items-center gap-1.5 text-xs text-slate-400 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full border border-slate-200 shadow-sm whitespace-nowrap">
           Already have an account?{' '}
-          <Link to="/login" className="text-blue-600 font-medium hover:underline ml-1">Sign in</Link>
+          <Link to="/agents/login" className="text-blue-600 font-medium hover:underline ml-1">Sign in</Link>
         </div>
       </div>
     </div>

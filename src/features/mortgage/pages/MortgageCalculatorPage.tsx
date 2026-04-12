@@ -140,7 +140,7 @@ export default function MortgageCalculatorPage() {
         {/* Disclaimer */}
         <p className="text-[10px] text-muted-foreground text-center max-w-2xl mx-auto">
           This calculator provides estimates only and does not constitute financial advice.
-          Calculations are based on 2024–25 Australian tax rates, APRA guidelines, and simplified LMI scales.
+          Calculations are based on 2025–26 Australian tax rates, APRA guidelines, and simplified LMI scales.
           Your actual borrowing capacity may differ based on individual lender policies, credit history,
           and other factors. Always consult a licensed mortgage broker or financial adviser before making
           financial decisions.

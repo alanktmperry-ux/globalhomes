@@ -253,7 +253,7 @@ export function BorrowingPowerCalculator() {
         )}
 
         <p className="text-[10px] text-muted-foreground text-center">
-          * Estimate only. Based on 2024–25 tax rates and APRA guidelines. Individual lender policies vary.
+          * Estimate only. Based on 2025–26 tax rates and APRA guidelines. Individual lender policies vary.
         </p>
       </div>
     </div>

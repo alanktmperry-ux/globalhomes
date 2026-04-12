@@ -3,7 +3,7 @@ const MapsDisclosure = () => (
     <p className="text-xs text-slate-500 text-center">
       This site uses Google Maps for property search and address suggestions.
       Location data is sent to Google.{' '}
-      <a href="/privacy" className="text-blue-500 hover:underline">
+      <a href="/privacy" className="text-blue-700 hover:underline">
         Privacy Policy
       </a>
     </p>

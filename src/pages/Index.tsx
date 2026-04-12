@@ -858,7 +858,7 @@ const Index = () => {
                 <button
                   onClick={() => handleHeroModeChange('sale')}
                   className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
-                    listingMode === 'sale' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                    listingMode === 'sale' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-700'
                   }`}
                 >
                   {t('hero.forSale')}
@@ -866,7 +866,7 @@ const Index = () => {
                 <button
                   onClick={() => handleHeroModeChange('rent')}
                   className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
-                    listingMode === 'rent' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                    listingMode === 'rent' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-700'
                   }`}
                 >
                   {t('hero.forRent')}
@@ -948,13 +948,13 @@ const Index = () => {
               {/* ABS Stat */}
               <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
                 <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">1 in 5</span>
-                <span className="text-[11px] text-slate-400 font-medium text-center">AU buyers search in their language</span>
+                <span className="text-[11px] text-slate-500 font-medium text-center">AU buyers search in their language</span>
               </div>
               <div className="w-px h-9 bg-slate-100 hidden sm:block" />
               {/* Languages */}
               <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
                 <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">24</span>
-                <span className="text-[11px] text-slate-400 font-medium">{t('hero.languages')}</span>
+                <span className="text-[11px] text-slate-500 font-medium">{t('hero.languages')}</span>
               </div>
               <div className="w-px h-9 bg-slate-100 hidden sm:block" />
               {/* Real buyer count or "Free to search" */}
@@ -964,12 +964,12 @@ const Index = () => {
                     <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">
                       {heroPlatformStats.buyerCount}<span className="text-xl font-semibold text-blue-500">+</span>
                     </span>
-                    <span className="text-[11px] text-slate-400 font-medium">Buyers searching now</span>
+                    <span className="text-[11px] text-slate-500 font-medium">Buyers searching now</span>
                   </>
                 ) : (
                   <>
                     <span className="text-2xl font-extrabold text-emerald-600 tracking-tight leading-none">✓</span>
-                    <span className="text-[11px] text-slate-400 font-medium">No sign-up required</span>
+                    <span className="text-[11px] text-slate-500 font-medium">No sign-up required</span>
                   </>
                 )}
               </div>

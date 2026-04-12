@@ -87,7 +87,7 @@ export function BottomNav() {
           className="flex flex-col items-center gap-1 py-1.5 px-3 rounded-2xl transition-all text-slate-400 hover:text-slate-600"
         >
           <Globe size={22} strokeWidth={1.8} />
-          <span className="text-[10px] font-medium leading-none text-slate-400">{language.toUpperCase()}</span>
+          <span className="text-[10px] font-medium leading-none text-slate-500">{language.toUpperCase()}</span>
         </button>
 
         {/* Admin shortcut */}

@@ -18,7 +18,7 @@ export function SiteFooter() {
               <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center text-[11px] font-bold text-white">L</div>
               <span className="text-[15px] font-semibold text-white tracking-tight">ListHQ</span>
             </div>
-            <p className="text-[13px] leading-relaxed mb-5 max-w-[200px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+            <p className="text-[13px] leading-relaxed mb-5 max-w-[200px]" style={{ color: 'rgba(255,255,255,0.55)' }}>
               Australia's AI-powered property platform. Search in 24 languages.
             </p>
             <div className="flex gap-2">
@@ -34,9 +34,9 @@ export function SiteFooter() {
                   rel="noopener noreferrer"
                   aria-label={label}
                   className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
-                  style={{ border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.4)' }}
+                  style={{ border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.55)' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#3b82f6'; (e.currentTarget as HTMLElement).style.borderColor = '#3b82f6'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.55)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.15)'; }}
                 >
                   <Icon size={14} />
                 </a>
@@ -46,7 +46,7 @@ export function SiteFooter() {
 
           {/* Platform col */}
           <div>
-            <h4 className="text-[11px] font-semibold tracking-widest uppercase mb-4" style={{ color: 'rgba(255,255,255,0.3)' }}>Platform</h4>
+            <h4 className="text-[11px] font-semibold tracking-widest uppercase mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>Platform</h4>
             <ul className="space-y-2.5">
               {[
                 { label: 'Search Properties', to: '/' },
@@ -55,9 +55,9 @@ export function SiteFooter() {
                 { label: 'Voice Search', to: '/' },
               ].map(link => (
                 <li key={link.label}>
-                  <Link to={link.to} className="text-[13px] transition-colors" style={{ color: 'rgba(255,255,255,0.5)' }}
+                  <Link to={link.to} className="text-[13px] transition-colors" style={{ color: 'rgba(255,255,255,0.6)' }}
                     onMouseEnter={e => ((e.target as HTMLElement).style.color = '#fff')}
-                    onMouseLeave={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.5)')}
+                    onMouseLeave={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.6)')}
                   >
                     {link.label}
                   </Link>
@@ -68,7 +68,7 @@ export function SiteFooter() {
 
           {/* Legal col */}
           <div>
-            <h4 className="text-[11px] font-semibold tracking-widest uppercase mb-4" style={{ color: 'rgba(255,255,255,0.3)' }}>Legal</h4>
+            <h4 className="text-[11px] font-semibold tracking-widest uppercase mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>Legal</h4>
             <ul className="space-y-2.5">
               {[
                 { label: 'Privacy Policy', to: '/privacy' },
@@ -77,9 +77,9 @@ export function SiteFooter() {
                 { label: 'Partner Portal', to: '/partner/login' },
               ].map(link => (
                 <li key={link.label}>
-                  <Link to={link.to} className="text-[13px] transition-colors" style={{ color: 'rgba(255,255,255,0.5)' }}
+                  <Link to={link.to} className="text-[13px] transition-colors" style={{ color: 'rgba(255,255,255,0.6)' }}
                     onMouseEnter={e => ((e.target as HTMLElement).style.color = '#fff')}
-                    onMouseLeave={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.5)')}
+                    onMouseLeave={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.6)')}
                   >
                     {link.label}
                   </Link>
@@ -90,7 +90,7 @@ export function SiteFooter() {
 
           {/* Support col */}
           <div>
-            <h4 className="text-[11px] font-semibold tracking-widest uppercase mb-4" style={{ color: 'rgba(255,255,255,0.3)' }}>Support</h4>
+            <h4 className="text-[11px] font-semibold tracking-widest uppercase mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>Support</h4>
             <ul className="space-y-2.5">
               {[
                 { label: 'Help Centre', to: '/help' },
@@ -99,16 +99,16 @@ export function SiteFooter() {
               ].map(link => (
                 <li key={link.label}>
                   {link.external ? (
-                    <a href={link.to} className="text-[13px] transition-colors" style={{ color: 'rgba(255,255,255,0.5)' }}
+                    <a href={link.to} className="text-[13px] transition-colors" style={{ color: 'rgba(255,255,255,0.6)' }}
                       onMouseEnter={e => ((e.target as HTMLElement).style.color = '#fff')}
-                      onMouseLeave={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.5)')}
+                      onMouseLeave={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.6)')}
                     >
                       {link.label}
                     </a>
                   ) : (
-                    <Link to={link.to} className="text-[13px] transition-colors" style={{ color: 'rgba(255,255,255,0.5)' }}
+                    <Link to={link.to} className="text-[13px] transition-colors" style={{ color: 'rgba(255,255,255,0.6)' }}
                       onMouseEnter={e => ((e.target as HTMLElement).style.color = '#fff')}
-                      onMouseLeave={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.5)')}
+                      onMouseLeave={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.6)')}
                     >
                       {link.label}
                     </Link>
@@ -122,10 +122,10 @@ export function SiteFooter() {
 
         {/* Bottom bar */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 pt-6">
-          <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.2)' }}>
+          <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
             ListHQ © {new Date().getFullYear()} · ABN 65 608 526 781
           </span>
-          <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.2)' }}>
+          <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
             Licensed agents only · Trust account compliant · Australian property law
           </span>
         </div>

@@ -123,7 +123,7 @@ export default function AgentPublicProfilePage() {
       setLoading(true);
       const { data } = await supabase
         .from('agents')
-        .select('*')
+        .select('id, name, agency, phone, email, avatar_url, profile_photo_url, is_subscribed, bio, title_position, license_number, years_experience, specialization, office_address, website_url, social_links, languages_spoken, service_areas, verification_badge_level, agency_id, investment_niche, handles_trust_accounting, rating, review_count, headline, profile_banner_url, slug, linkedin_url, instagram_url, agency_role')
         .eq('id', id || '')
         .single();
 

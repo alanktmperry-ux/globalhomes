@@ -75,7 +75,7 @@ export interface AmortisationRow {
   balance: number;
 }
 
-// ─── Tax tables (2024-25 Australian resident) ────────────────────────
+// ─── Tax tables (2025-26 Australian resident) ────────────────────────
 function incomeTax(gross: number): number {
   if (gross <= 18_200)  return 0;
   if (gross <= 45_000)  return (gross - 18_200) * 0.19;

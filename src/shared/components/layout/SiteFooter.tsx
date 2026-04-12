@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Instagram, Linkedin, Twitter } from 'lucide-react';
+import { Instagram, Youtube } from 'lucide-react';
 
 export function SiteFooter() {
   return (
@@ -24,8 +24,7 @@ export function SiteFooter() {
             <div className="flex gap-2">
               {[
                 { icon: Instagram, href: 'https://instagram.com/listhq', label: 'Instagram' },
-                { icon: Linkedin, href: 'https://linkedin.com/company/listhq', label: 'LinkedIn' },
-                { icon: Twitter, href: 'https://x.com/listhq', label: 'Twitter' },
+                { icon: Youtube, href: 'https://youtube.com/@listhq', label: 'YouTube' },
               ].map(({ icon: Icon, href, label }) => (
                 <a
                   key={label}

@@ -300,11 +300,12 @@ const Index = () => {
         return;
       }
 
-      // Fallback: fill with recent active listings
+      // Fallback: fill with recent active sale listings (exclude rentals)
       const { data: fallback } = await supabase
         .from('properties')
         .select(cols)
         .eq('is_active', true)
+        .or('listing_type.eq.sale,listing_type.is.null')
         .order('created_at', { ascending: false })
         .limit(12);
 

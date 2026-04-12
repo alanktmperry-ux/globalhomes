@@ -42,11 +42,11 @@ export function RentalCard({ property: p }: Props) {
         <div className="flex items-baseline justify-between mb-1">
           <div>
             <span className="text-lg font-bold text-foreground">
-              {p.rental_weekly?.toLocaleString('en-AU', { style: 'currency', currency: 'AUD' })}/wk
+              ${p.rental_weekly?.toLocaleString('en-AU', { style: 'decimal', maximumFractionDigits: 0 })}/wk
             </span>
             {p.rental_weekly > 0 && (
               <p className="text-xs text-muted-foreground">
-                {(p.rental_weekly * 2).toLocaleString('en-AU', { style: 'currency', currency: 'AUD' })} per fortnight
+                ${(p.rental_weekly * 2).toLocaleString('en-AU', { style: 'decimal', maximumFractionDigits: 0 })}/fortnight
               </p>
             )}
           </div>

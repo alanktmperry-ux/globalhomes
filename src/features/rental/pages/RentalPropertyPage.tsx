@@ -61,7 +61,7 @@ export default function RentalPropertyPage() {
               </h1>
               {property.rental_weekly > 0 && (
                 <p className="text-sm text-muted-foreground">
-                  ${(property.rental_weekly * 2).toLocaleString('en-AU')} per fortnight
+                  ${(property.rental_weekly * 2).toLocaleString('en-AU', { maximumFractionDigits: 0 })}/fortnight
                 </p>
               )}
             </div>

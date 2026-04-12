@@ -48,6 +48,7 @@ const AuthConfirmPage = React.lazy(() => import("./features/auth/pages/AuthConfi
 const AuthCallbackPage = React.lazy(() => import("./features/auth/pages/AuthCallbackPage"));
 const OnboardingRolePage = React.lazy(() => import("./features/auth/pages/OnboardingRolePage"));
 const PublicLayout = React.lazy(() => import("@/shared/components/layout/PublicLayout"));
+const BuyPage = React.lazy(() => import("./pages/BuyPage"));
 
 // Lazy-loaded dashboard sub-pages
 const DashboardOverview = React.lazy(() => import("@/features/agents/components/dashboard/DashboardOverview"));
@@ -202,6 +203,7 @@ const App = () => (
                   <Route path="/mortgage-calculator" element={<MortgageCalculatorPage />} />
                   <Route path="/school/:state/:slug" element={<SchoolPage />} />
                   <Route path="/suburb/:state/:slug" element={<SuburbProfilePage />} />
+                  <Route path="/buy" element={<BuyPage />} />
                   <Route path="/rent" element={<RentSearchPage />} />
                   <Route path="/rent/property/:id" element={<RentalPropertyPage />} />
                   <Route path="/suburb/:state/:slug/sold" element={<SuburbSoldPage />} />

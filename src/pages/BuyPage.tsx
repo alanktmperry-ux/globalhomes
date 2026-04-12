@@ -4,7 +4,7 @@ import { useI18n } from '@/shared/lib/i18n';
 import { Helmet } from 'react-helmet-async';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import PropertyCard from '@/components/PropertyCard';
+import { PropertyCard } from '@/components/PropertyCard';
 import { Loader2 } from 'lucide-react';
 
 const BuyPage = () => {

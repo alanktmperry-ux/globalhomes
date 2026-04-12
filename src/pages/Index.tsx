@@ -971,7 +971,7 @@ const Index = () => {
             <div className="flex items-baseline justify-between mb-6">
               <div>
                 <h2 className="text-xl font-semibold text-slate-900">Properties on ListHQ</h2>
-                <p className="text-sm text-slate-500 mt-1">{t('hero.featuredSub')}</p>
+                <p className="text-sm text-slate-500 mt-1">Browse what's currently listed</p>
               </div>
               <a href="/search" className="text-sm text-blue-600 hover:text-blue-700 font-medium">{t('hero.viewAll')} →</a>
             </div>

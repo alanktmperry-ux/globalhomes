@@ -23,7 +23,7 @@ export default function RentSearchPage() {
             Properties for Rent
           </h1>
           <p className="text-muted-foreground mt-1">
-            {loading ? 'Searching…' : `${total.toLocaleString()} rental properties found`}
+            {loading ? 'Searching…' : `${total.toLocaleString()} rental ${total === 1 ? 'property' : 'properties'} found`}
           </p>
         </div>
 

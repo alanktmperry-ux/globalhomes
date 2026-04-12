@@ -32,7 +32,7 @@ export function BottomNav() {
   const iconStroke = (path: string) => (isActive(path) ? 2 : 1.8);
 
   const labelClass = (path: string) =>
-    `text-[10px] font-medium leading-none ${isActive(path) ? 'text-blue-600' : 'text-slate-400'}`;
+    `text-[10px] font-medium leading-none ${isActive(path) ? 'text-blue-600' : 'text-slate-500'}`;
 
   return (
     <nav className="fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-100 safe-area-bottom md:hidden">

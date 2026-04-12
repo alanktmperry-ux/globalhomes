@@ -267,8 +267,8 @@ const SeekerAuthPage = () => {
               >
                 {/* Headline */}
                 <h1 className="text-[38px] font-light tracking-[-1.5px] text-stone-900 leading-[1.08] mb-8">
-                  {step === 'email' && <>Welcome<br /><strong className="font-semibold">back.</strong></>}
-                  {step === 'password' && <>Sign<br /><strong className="font-semibold">in.</strong></>}
+                  {step === 'email' && <>Welcome<br /><strong className="font-semibold">to ListHQ.</strong></>}
+                  {step === 'password' && <>Welcome<br /><strong className="font-semibold">back.</strong></>}
                   {step === 'create' && <>Create<br /><strong className="font-semibold">account.</strong></>}
                 </h1>
 

@@ -107,22 +107,27 @@ export function useRealtimeProperties({
     refetchOnWindowFocus: false,
   });
 
-  // Subscribe to realtime changes and invalidate cache
+  // Subscribe to realtime changes only for authenticated users (agents)
+  // to avoid unnecessary WebSocket connections for anonymous visitors
   useEffect(() => {
-    const channel = supabase
-      .channel('properties-realtime')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'properties' },
-        (payload) => {
-          // Invalidate all property queries to refetch
-          queryClient.invalidateQueries({ queryKey: ['properties'] });
-        }
-      )
-      .subscribe();
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) return; // Skip realtime for anonymous visitors
+      channel = supabase
+        .channel('properties-realtime')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'properties' },
+          () => {
+            queryClient.invalidateQueries({ queryKey: ['properties'] });
+          }
+        )
+        .subscribe();
+    });
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) supabase.removeChannel(channel);
     };
   }, [queryClient]);
 

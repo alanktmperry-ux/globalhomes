@@ -55,7 +55,7 @@ const BuyPage = () => {
   return (
     <>
       <Helmet>
-        <title>Buy Property | ListHQ</title>
+        <title>Properties for Sale in Australia</title>
         <meta name="description" content="Browse properties for sale across Australia on ListHQ." />
       </Helmet>
 

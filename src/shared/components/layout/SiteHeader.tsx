@@ -38,7 +38,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-md border-b border-border/50">
       <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 shrink-0">
+        <Link to="/" className="flex items-center gap-2 shrink-0" aria-label="ListHQ home">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-cyan-accent flex items-center justify-center">
             <Globe size={18} className="text-primary-foreground" />
           </div>

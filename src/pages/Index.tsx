@@ -1100,7 +1100,7 @@ const Index = () => {
               <div className="text-3xl font-bold text-white mb-1">Zee is a girl</div>
               <p className="text-sm text-slate-400 mb-6">No credit card required. Full access.</p>
               <button
-                onClick={() => navigate('/auth?mode=agent')}
+                onClick={() => navigate('/for-agents')}
                 className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full text-sm font-semibold transition-colors"
               >
                 Get early access

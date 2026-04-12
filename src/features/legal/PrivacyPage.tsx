@@ -11,7 +11,7 @@ const PrivacyPage = () => {
         <article className="max-w-3xl mx-auto px-4 py-16 prose prose-neutral dark:prose-invert">
           <h1 className="font-display text-3xl font-extrabold text-foreground">Privacy Policy</h1>
           <p className="text-sm text-muted-foreground">Last updated: 29 March 2026</p>
-          <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">⚠️ This document is pending solicitor review before final publication.</p>
+          
 
           <h2>1. Overview</h2>
           <p>
@@ -66,7 +66,7 @@ const PrivacyPage = () => {
             <li><strong>Supabase</strong> — database hosting and authentication (servers in AWS ap-southeast-2, Sydney, Australia).</li>
             <li><strong>Stripe</strong> — payment processing (United States). Card data is handled exclusively by Stripe and is never stored by ListHQ.</li>
             <li><strong>Google Maps Platform</strong> — property location display and address autocomplete (United States). Google Maps usage data is collected per Google's privacy policy. You can opt out of Google Maps via our consent mechanism.</li>
-            <li><strong>Firecrawl</strong> — web scraping of publicly available property listings for import. No personal data is transmitted to Firecrawl.</li>
+            
             <li><strong>OpenAI</strong> — AI text generation for offer letters and buyer matching. Only anonymised, non-identifying queries are sent to OpenAI.</li>
             <li><strong>Resend</strong> — transactional email delivery.</li>
           </ul>

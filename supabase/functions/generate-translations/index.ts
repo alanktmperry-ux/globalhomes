@@ -4,6 +4,8 @@ import { getCorsHeaders } from "../_shared/cors.ts";
 const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-2.5-pro";
 
+let corsHeaders: Record<string, string> = getCorsHeaders(null);
+
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -140,6 +142,8 @@ Return ONLY valid JSON.`;
 }
 
 Deno.serve(async (req) => {
+  corsHeaders = getCorsHeaders(req.headers.get("Origin"));
+
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }

@@ -207,15 +207,6 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
             </p>
           )}
 
-          {/* Rental badge */}
-          {isRental && (
-            <div className="mt-2.5 flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1 text-[11px] font-medium text-accent-foreground bg-accent/50 px-2 py-0.5 rounded-full">
-                <TrendingUp size={11} />
-                {socialProof.rentedNearby} similar rented this week
-              </span>
-            </div>
-          )}
 
           {/* Collab: partner viewed indicator */}
           {isCollab && partnerViewed && (

@@ -151,13 +151,6 @@ export const FAQ_ITEMS: FaqItem[] = [
     tags: ['rental', 'property management', 'applications', 'pm'],
   },
   {
-    id: 'agent-suburb-intelligence',
-    question: 'What is the Suburb Intelligence feature?',
-    answer: 'Suburb Intelligence (Dashboard → Suburb Intelligence) gives you market data for any suburb: median sale price, median days on market, auction clearance rate, price trend chart, demographic breakdown, and lifestyle amenity scores. Use it to prepare for listing presentations or advise buyers on suburb comparisons.',
-    category: 'agents',
-    tags: ['suburb', 'market data', 'intelligence', 'analytics'],
-  },
-  {
     id: 'agent-billing',
     question: 'How does agent billing work?',
     answer: 'Agent subscriptions are billed monthly via Stripe. Go to Dashboard → Billing to view your plan, update your payment method, download invoices, or cancel. If your subscription lapses, your listings remain visible but you cannot publish new listings or access premium features until renewed.',
@@ -326,13 +319,6 @@ export const FAQ_ITEMS: FaqItem[] = [
     answer: 'On the property page, scroll to the "Documents" section. Public documents (like floor plans) are immediately downloadable. Restricted documents (like the Contract of Sale or Section 32) require you to be a registered and verified buyer. Click "Request Access" to ask the agent to grant you access. You\'ll receive an email once access is approved.',
     category: 'buyers',
     tags: ['documents', 'contract', 'section 32', 'download'],
-  },
-  {
-    id: 'buyer-suburb-research',
-    question: 'How do I research a suburb before buying?',
-    answer: 'Visit the suburb page (search for the suburb and click its name, or navigate to listhq.com.au/suburb/vic/richmond for example). The suburb page shows median prices, price trends over 24 months, auction clearance rates, days on market, active listings count, demographic data, and lifestyle amenity scores (walk score, transport, schools).',
-    category: 'buyers',
-    tags: ['suburb', 'research', 'market data', 'demographics'],
   },
 
   // RENTERS

@@ -12,7 +12,7 @@ export function PropertySEOHead({ property, agent }: PropertySEOHeadProps) {
   const price = property.price_formatted ?? (property.price ? `$${Number(property.price).toLocaleString('en-AU')}` : 'Price on request');
   const isRent = property.listing_type === 'rent' || property.listing_type === 'rental';
 
-  const title = `${price}${isRent ? '/wk' : ''} · ${property.beds > 0 ? property.beds + ' bed ' : ''}${property.property_type ?? 'Property'} in ${property.suburb ?? ''} ${property.state ?? ''} | ListHQ`;
+  const title = `${price}${isRent ? '/wk' : ''} · ${property.beds > 0 ? property.beds + ' bed ' : ''}${property.property_type ?? 'Property'} in ${property.suburb ?? ''} ${property.state ?? ''}`;
   const description = property.description
     ? property.description.slice(0, 160)
     : `${price} · ${[property.beds && property.beds + ' bed', property.baths && property.baths + ' bath', property.suburb, property.state].filter(Boolean).join(' · ')}. View on ListHQ.`;

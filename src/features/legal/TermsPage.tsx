@@ -10,7 +10,7 @@ const TermsPage = () => (
       <article className="max-w-3xl mx-auto px-4 py-16 prose prose-neutral dark:prose-invert">
         <h1 className="font-display text-3xl font-extrabold text-foreground">Terms of Service</h1>
         <p className="text-sm text-muted-foreground">Last updated: 29 March 2026 · Version 1.0</p>
-        <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">⚠️ This document is pending solicitor review before final publication.</p>
+        
 
         <h2>1. About ListHQ</h2>
         <p>

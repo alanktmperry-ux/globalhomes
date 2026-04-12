@@ -516,14 +516,15 @@ const Index = () => {
       <meta property="og:title" content={pageTitle} />
       <meta property="og:description" content={pageDescription} />
       <meta property="og:type" content="website" />
-      <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
-      <meta property="og:image" content="https://listhq.com.au/og-image.svg" />
+      <meta property="og:url" content="https://globalhomes.lovable.app" />
+      <meta property="og:image" content="https://globalhomes.lovable.app/listhq-og.png" />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={pageTitle} />
       <meta name="twitter:description" content={pageDescription} />
-      <link rel="canonical" href={typeof window !== 'undefined' ? window.location.origin + window.location.pathname : ''} />
+      <meta name="twitter:image" content="https://globalhomes.lovable.app/listhq-og.png" />
+      <link rel="canonical" href="https://globalhomes.lovable.app" />
     </Helmet>
     <div className="flex items-center justify-between mb-3 gap-2">
       <div className="flex items-center gap-2 min-w-0">

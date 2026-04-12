@@ -1022,13 +1022,8 @@ const Index = () => {
                     );
                   })}
                 </div>
-                {featuredListings.filter(p => p.listing_type !== 'rent' && p.listing_type !== 'rental').length < 3 && (
-                  <p className="text-xs text-slate-400 italic text-center mt-4">More listings coming soon — be the first to list in your suburb.</p>
-                )}
-              </>
-            ) : (
-              <p className="text-xs text-slate-400 italic text-center">More listings coming soon — be the first to list in your suburb.</p>
-            )}
+               </>
+             ) : null}
           </div>
         </motion.section>
 

@@ -142,6 +142,8 @@ Return ONLY valid JSON.`;
 }
 
 Deno.serve(async (req) => {
+  corsHeaders = getCorsHeaders(req.headers.get("Origin"));
+
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }

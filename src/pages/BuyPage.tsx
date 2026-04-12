@@ -6,7 +6,11 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { PropertyCard } from '@/components/PropertyCard';
 import { mapDbProperty } from '@/features/properties/api/fetchPublicProperties';
+import { Property } from '@/shared/lib/types';
 import { Loader2 } from 'lucide-react';
+
+const PROPERTIES_WITH_AGENTS =
+  '*, agents(name, agency, phone, email, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count)';
 
 const BuyPage = () => {
   const { t } = useI18n();
@@ -15,21 +19,21 @@ const BuyPage = () => {
 
   const { data: properties, isLoading } = useQuery({
     queryKey: ['buy-properties'],
-    queryFn: async () => {
+    queryFn: async (): Promise<Property[]> => {
       const { data, error } = await supabase
         .from('properties')
-        .select('*, agents!properties_agent_id_fkey(id, name, email, phone, avatar_url, agency, slug)')
+        .select(PROPERTIES_WITH_AGENTS)
         .eq('is_active', true)
         .eq('listing_type', 'sale')
         .order('created_at', { ascending: false })
         .limit(50);
 
       if (error) throw error;
-      return (data ?? []).map(mapDbProperty);
+      return (data ?? []).map((p: any) => mapDbProperty(p));
     },
   });
 
-  const handleSelect = useCallback((property: { id: string }) => {
+  const handleSelect = useCallback((property: Property) => {
     navigate(`/property/${property.id}`);
   }, [navigate]);
 

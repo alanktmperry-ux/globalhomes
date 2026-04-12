@@ -300,11 +300,12 @@ const Index = () => {
         return;
       }
 
-      // Fallback: fill with recent active listings
+      // Fallback: fill with recent active sale listings (exclude rentals)
       const { data: fallback } = await supabase
         .from('properties')
         .select(cols)
         .eq('is_active', true)
+        .or('listing_type.eq.sale,listing_type.is.null')
         .order('created_at', { ascending: false })
         .limit(12);
 
@@ -989,7 +990,7 @@ const Index = () => {
             {featuredListings.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {featuredListings.slice(0, 6).map((p) => {
+                  {featuredListings.filter(p => p.listing_type !== 'rent' && p.listing_type !== 'rental').slice(0, 6).map((p) => {
                     const img = (p.images && p.images[0]) || p.image_url;
                     const hasTranslations = p.translations && Object.keys(p.translations).length > 0;
                     return (
@@ -1021,7 +1022,7 @@ const Index = () => {
                     );
                   })}
                 </div>
-                {featuredListings.length < 3 && (
+                {featuredListings.filter(p => p.listing_type !== 'rent' && p.listing_type !== 'rental').length < 3 && (
                   <p className="text-xs text-slate-400 italic text-center mt-4">More listings coming soon — be the first to list in your suburb.</p>
                 )}
               </>

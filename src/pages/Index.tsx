@@ -987,55 +987,47 @@ const Index = () => {
               </div>
               <a href="/search" className="text-sm text-blue-600 hover:text-blue-700 font-medium">{t('hero.viewAll')} →</a>
             </div>
-            {featuredListings.length >= 3 ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {featuredListings.slice(0, 6).map((p) => {
-                  const img = (p.images && p.images[0]) || p.image_url;
-                  const hasTranslations = p.translations && Object.keys(p.translations).length > 0;
-                  return (
-                    <div
-                      key={p.id}
-                      onClick={() => navigate(`/property/${p.id}`)}
-                      className="rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-                    >
-                      <div className="h-40 bg-slate-100 flex items-center justify-center relative">
-                        {img ? (
-                          <img src={img} alt={p.title || p.address} className="w-full h-full object-cover" />
-                        ) : (
-                          <Home size={32} className="text-slate-300" />
-                        )}
-                        {hasTranslations && (
-                          <span className="absolute top-3 left-3 text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full font-medium">AI Translated</span>
-                        )}
-                      </div>
-                      <div className="p-4">
-                        <div className="text-base font-semibold text-slate-900">{formatPrice(p.price, p.listing_type)}</div>
-                        <div className="text-xs text-slate-500 mt-0.5 mb-2">{p.address || `${p.suburb}, ${p.state}`}</div>
-                        <div className="flex gap-3 text-xs text-slate-400">
-                          {p.beds > 0 && <span>{p.beds} {t('card.beds')}</span>}
-                          {p.baths > 0 && <span>{p.baths} {t('card.bath')}</span>}
-                          {p.parking > 0 && <span>{p.parking} {t('card.car')}</span>}
+            {featuredListings.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {featuredListings.slice(0, 6).map((p) => {
+                    const img = (p.images && p.images[0]) || p.image_url;
+                    const hasTranslations = p.translations && Object.keys(p.translations).length > 0;
+                    return (
+                      <div
+                        key={p.id}
+                        onClick={() => navigate(`/property/${p.id}`)}
+                        className="rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                      >
+                        <div className="h-40 bg-slate-100 flex items-center justify-center relative">
+                          {img ? (
+                            <img src={img} alt={p.title || p.address} className="w-full h-full object-cover" />
+                          ) : (
+                            <Home size={32} className="text-slate-300" />
+                          )}
+                          {hasTranslations && (
+                            <span className="absolute top-3 left-3 text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full font-medium">AI Translated</span>
+                          )}
+                        </div>
+                        <div className="p-4">
+                          <div className="text-base font-semibold text-slate-900">{formatPrice(p.price, p.listing_type)}</div>
+                          <div className="text-xs text-slate-500 mt-0.5 mb-2">{p.address || `${p.suburb}, ${p.state}`}</div>
+                          <div className="flex gap-3 text-xs text-slate-400">
+                            {p.beds > 0 && <span>{p.beds} {t('card.beds')}</span>}
+                            {p.baths > 0 && <span>{p.baths} {t('card.bath')}</span>}
+                            {p.parking > 0 && <span>{p.parking} {t('card.car')}</span>}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+                {featuredListings.length < 6 && (
+                  <p className="text-xs text-slate-400 italic text-center mt-4">More listings coming soon — be the first to list in your suburb.</p>
+                )}
+              </>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[0, 1, 2].map(i => (
-                  <div key={i} className="rounded-xl border border-slate-200 overflow-hidden">
-                    <div className="h-40 bg-slate-100 flex items-center justify-center">
-                      <Home size={32} className="text-slate-300" />
-                    </div>
-                    <div className="p-4">
-                      <div className="h-4 bg-slate-100 rounded w-24 mb-2" />
-                      <div className="h-3 bg-slate-50 rounded w-40 mb-3" />
-                      <p className="text-xs text-slate-400 italic">More listings coming soon — be the first to list in your suburb.</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <p className="text-xs text-slate-400 italic text-center">More listings coming soon — be the first to list in your suburb.</p>
             )}
           </div>
         </motion.section>

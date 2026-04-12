@@ -1021,7 +1021,7 @@ const Index = () => {
                     );
                   })}
                 </div>
-                {featuredListings.length < 6 && (
+                {featuredListings.length < 3 && (
                   <p className="text-xs text-slate-400 italic text-center mt-4">More listings coming soon — be the first to list in your suburb.</p>
                 )}
               </>

@@ -103,9 +103,6 @@ const StrataDirectoryPage = React.lazy(() => import("./features/strata/pages/Str
 const SchemeProfilePage = React.lazy(() => import("./features/strata/pages/SchemeProfilePage"));
 const StrataDashboardLayout = React.lazy(() => import("./features/strata/pages/StrataDashboardLayout"));
 const StrataAuthPage = React.lazy(() => import("./features/strata/pages/StrataAuthPage"));
-const SuburbPage = React.lazy(() => import("./pages/SuburbPage"));
-const SuburbSoldPage = React.lazy(() => import("./pages/SuburbSoldPage"));
-const SuburbProfilePage = React.lazy(() => import("./features/suburb/pages/SuburbProfilePage"));
 const HelpCentrePage = React.lazy(() => import("./pages/HelpCentrePage"));
 const FaqPage = React.lazy(() => import("./pages/FaqPage"));
 const HelpAgentsPage = React.lazy(() => import("./pages/HelpAgentsPage"));
@@ -197,16 +194,14 @@ const App = () => (
                   <Route path="/privacy" element={<PrivacyPage />} />
                   <Route path="/strata" element={<StrataDirectoryPage />} />
                   <Route path="/schemes/:id" element={<SchemeProfilePage />} />
-                  <Route path="/buy/:state/:suburb" element={<SuburbPage />} />
-                  <Route path="/rent/:state/:suburb" element={<SuburbPage />} />
                   <Route path="/stamp-duty-calculator" element={<StampDutyPage />} />
                   <Route path="/mortgage-calculator" element={<MortgageCalculatorPage />} />
                   <Route path="/school/:state/:slug" element={<SchoolPage />} />
-                  <Route path="/suburb/:state/:slug" element={<SuburbProfilePage />} />
+                  
                   <Route path="/buy" element={<BuyPage />} />
                   <Route path="/rent" element={<RentSearchPage />} />
                   <Route path="/rent/property/:id" element={<RentalPropertyPage />} />
-                  <Route path="/suburb/:state/:slug/sold" element={<SuburbSoldPage />} />
+                  
                   
                   <Route path="/help" element={<HelpCentrePage />} />
                   <Route path="/help/faq" element={<FaqPage />} />

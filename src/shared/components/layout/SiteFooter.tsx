@@ -19,7 +19,7 @@ export function SiteFooter() {
               <span className="text-[15px] font-semibold text-white tracking-tight">ListHQ</span>
             </div>
             <p className="text-[13px] leading-relaxed mb-5 max-w-[200px]" style={{ color: 'rgba(255,255,255,0.55)' }}>
-              Australia's AI-powered property platform. Search in 24 languages.
+              List once. Speak every language. Australia's AI-powered property platform.
             </p>
             <div className="flex gap-2">
               {[
@@ -51,8 +51,10 @@ export function SiteFooter() {
               {[
                 { label: 'Search Properties', to: '/' },
                 { label: 'Stamp Duty Calculator', to: '/stamp-duty-calculator' },
-                { label: 'Saved Properties', to: '/saved' },
+                { label: 'Browse Properties', to: '/buy' },
                 { label: 'Voice Search', to: '/' },
+                { label: 'Agent Portal', to: '/agents/login' },
+                { label: 'Partner Portal', to: '/partner/login' },
               ].map(link => (
                 <li key={link.label}>
                   <Link to={link.to} className="text-[13px] transition-colors" style={{ color: 'rgba(255,255,255,0.6)' }}
@@ -73,8 +75,6 @@ export function SiteFooter() {
               {[
                 { label: 'Privacy Policy', to: '/privacy' },
                 { label: 'Terms of Service', to: '/terms' },
-                { label: 'Agent Portal', to: '/agents/login' },
-                { label: 'Partner Portal', to: '/partner/login' },
               ].map(link => (
                 <li key={link.label}>
                   <Link to={link.to} className="text-[13px] transition-colors" style={{ color: 'rgba(255,255,255,0.6)' }}

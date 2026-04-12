@@ -1063,8 +1063,8 @@ const Index = () => {
         {/* ── AGENT CTA ── */}
         <motion.section {...sectionAnim} className="bg-slate-900 py-16 px-6 text-center">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-2xl font-semibold text-white mb-3">Reach buyers who speak your listings' language.</h2>
-            <p className="text-sm text-slate-400 mb-8">Join agents across Sydney and Melbourne already listing on ListHQ.</p>
+            <h2 className="text-2xl font-semibold text-white mb-3">1 in 5 Australian buyers searches in a language other than English. Are your listings ready?</h2>
+            <p className="text-sm text-slate-400 mb-8">ListHQ automatically translates every listing into 24 languages. Free for 60 days. No credit card.</p>
             <button
               onClick={() => navigate('/for-agents')}
               className="inline-flex items-center gap-2 bg-white text-slate-900 hover:bg-slate-100 px-8 py-4 rounded-full text-[15px] font-semibold transition-all duration-200 hover:scale-105 active:scale-100 shadow-lg"

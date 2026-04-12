@@ -24,7 +24,7 @@ export function SiteFooter() {
             <div className="flex gap-2">
               {[
                 { icon: Instagram, href: 'https://instagram.com/listhq', label: 'Instagram' },
-                { icon: Youtube, href: 'https://youtube.com/@listhq', label: 'YouTube' },
+                { icon: Youtube, href: 'https://www.youtube.com/@ListHQ-u8w', label: 'YouTube' },
               ].map(({ icon: Icon, href, label }) => (
                 <a
                   key={label}

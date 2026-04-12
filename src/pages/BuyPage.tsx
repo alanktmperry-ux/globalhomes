@@ -1,6 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useI18n } from '@/shared/lib/i18n';
+import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { Helmet } from 'react-helmet-async';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,6 +17,11 @@ const BuyPage = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const { setListingMode } = useCurrency();
+
+  useEffect(() => {
+    setListingMode('sale');
+  }, []);
 
   const { data: properties, isLoading } = useQuery({
     queryKey: ['buy-properties'],

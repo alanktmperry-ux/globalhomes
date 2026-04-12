@@ -54,6 +54,9 @@ interface EnquiryModalProps {
   onClose: () => void;
 }
 
+const isStandalonePlaceholder = (value?: string | null) =>
+  typeof value === "string" && value.trim().toLowerCase() === "test";
+
 function EnquiryModal({ broker, propertyId, propertyAddress, propertyPrice, onClose }: EnquiryModalProps) {
   const [form, setForm] = useState<FormState>({ name: "", email: "", phone: "", message: "" });
   const [status, setStatus] = useState<SubmitStatus>("idle");
@@ -231,6 +234,9 @@ export function MortgageBrokerCard({
   if (loading || !broker) return null;
 
   const hasCalendar = broker.calendar_url && broker.calendar_url.length > 0;
+  const company = isStandalonePlaceholder(broker.company) ? null : broker.company;
+  const tagline = isStandalonePlaceholder(broker.tagline) ? null : broker.tagline;
+  const visibleLanguages = broker.languages.filter((lang) => !isStandalonePlaceholder(lang));
 
   return (
     <>
@@ -276,26 +282,28 @@ export function MortgageBrokerCard({
             <h3 className="font-semibold text-foreground text-base leading-tight">
               {broker.name}
             </h3>
-            {broker.company && (
-              <p className="text-sm text-muted-foreground">{broker.company}</p>
+            {company && (
+              <p className="text-sm text-muted-foreground">{company}</p>
             )}
 
-            <div className="flex flex-wrap gap-1.5 mt-2">
-              {broker.languages.map((lang) => (
-                <span
-                  key={lang}
-                  className="inline-flex items-center gap-1 text-[11px] font-medium bg-background border border-border rounded-full px-2 py-0.5 text-muted-foreground"
-                >
-                  {LANGUAGE_FLAG[lang] ?? "🌐"} {lang}
-                </span>
-              ))}
-            </div>
+            {visibleLanguages.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {visibleLanguages.map((lang) => (
+                  <span
+                    key={lang}
+                    className="inline-flex items-center gap-1 text-[11px] font-medium bg-background border border-border rounded-full px-2 py-0.5 text-muted-foreground"
+                  >
+                    {LANGUAGE_FLAG[lang] ?? "🌐"} {lang}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
-        {broker.tagline && (
+        {tagline && (
           <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
-            {broker.tagline}
+            {tagline}
           </p>
         )}
 

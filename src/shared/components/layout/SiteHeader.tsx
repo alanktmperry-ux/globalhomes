@@ -6,7 +6,7 @@ import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { NotificationBell } from '@/features/agents/components/dashboard/NotificationBell';
 import { LanguageSwitcher } from '@/shared/components/layout/LanguageSwitcher';
-import { DarkModeToggle } from '@/shared/components/layout/DarkModeToggle';
+
 import { useI18n } from '@/shared/lib/i18n';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
@@ -79,7 +79,6 @@ export function SiteHeader() {
 
         {/* ─── Desktop right side actions (hidden below md) ─── */}
         <div className="hidden md:flex items-center gap-2 shrink-0">
-          <DarkModeToggle />
           <LanguageSwitcher />
 
           {user && isAgent && (
@@ -204,7 +203,6 @@ export function SiteHeader() {
               <nav className="flex flex-col gap-1 p-4 pt-10">
                 {/* Theme & language */}
                 <div className="flex items-center gap-2 px-3 pb-3 border-b border-border mb-2">
-                  <DarkModeToggle />
                   <LanguageSwitcher />
                 </div>
 

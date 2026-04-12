@@ -75,7 +75,7 @@ const AgentLandingPage = () => {
                 custom={2}
                 className="text-lg text-primary-foreground/70 mb-8 max-w-md mx-auto lg:mx-0"
               >
-                Join {agentCount !== null ? `${agentCount.toLocaleString()}+` : ''} agents using voice search data to find qualified buyers in 48&nbsp;hours
+                Join our founding agent cohort
               </motion.p>
 
               <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
@@ -116,33 +116,6 @@ const AgentLandingPage = () => {
         </div>
       </section>
 
-      {/* ─── SOCIAL PROOF BAR ─── */}
-      <section className="bg-secondary border-y border-border">
-        <div className="container mx-auto px-6 py-8">
-          <p className="text-center text-xs font-semibold text-muted-foreground tracking-widest uppercase mb-5">
-            As featured in
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-8 mb-8">
-            {['REA News', 'Domain Times', 'Property Investor Magazine'].map((pub) => (
-              <span key={pub} className="font-display text-lg font-bold text-muted-foreground/60">
-                {pub}
-              </span>
-            ))}
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-            {[
-              { value: '12,000+', label: 'Off-Market Listings' },
-              { value: '$4.2B', label: 'In Silent Sales' },
-              { value: '3-Day', label: 'Average Time to Offer' },
-            ].map((s) => (
-              <div key={s.label}>
-                <p className="font-display text-3xl font-extrabold text-primary">{s.value}</p>
-                <p className="text-sm text-muted-foreground mt-1">{s.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ─── VALUE PROPOSITION GRID ─── */}
       <section className="py-24 bg-background">

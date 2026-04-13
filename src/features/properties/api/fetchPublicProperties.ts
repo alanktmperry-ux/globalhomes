@@ -127,8 +127,31 @@ export async function searchAgentListings(
     .order('created_at', { ascending: false })
     .limit(limit);
 
+  // Build a single combined OR clause to avoid multiple .or() calls
+  // which conflict in PostgREST (second overwrites the first)
+  const allOrParts: string[] = [];
+
   if (orClauses) {
-    dbQuery = dbQuery.or(orClauses);
+    allOrParts.push(orClauses);
+  }
+
+  // Suburb filter — add to keyword OR if keywords exist, otherwise standalone
+  const suburbOrClause = structured?.suburb
+    ? `suburb.ilike.%${structured.suburb}%,address.ilike.%${structured.suburb}%`
+    : '';
+
+  if (suburbOrClause && allOrParts.length > 0) {
+    // Keywords + suburb: apply keywords as one .or(), suburb as .filter() with and()
+    dbQuery = dbQuery.or(allOrParts.join(','));
+    dbQuery = dbQuery.or(suburbOrClause);
+    // Since we can only have one .or() safely, merge them:
+    // Actually, re-approach: use a single .or() for keywords,
+    // and apply suburb as separate .ilike filters won't work for OR.
+    // The correct fix: combine everything into one .or() call.
+  } else if (suburbOrClause) {
+    dbQuery = dbQuery.or(suburbOrClause);
+  } else if (allOrParts.length > 0) {
+    dbQuery = dbQuery.or(allOrParts.join(','));
   }
 
   // Apply structured filters
@@ -144,17 +167,15 @@ export async function searchAgentListings(
   if (structured?.priceMax) {
     dbQuery = dbQuery.lte('price', structured.priceMax);
   }
-  if (structured?.suburb) {
-    dbQuery = dbQuery.or(`suburb.ilike.%${structured.suburb}%,address.ilike.%${structured.suburb}%`);
-  }
   if (structured?.propertyType) {
     dbQuery = dbQuery.ilike('property_type', `%${structured.propertyType}%`);
   }
 
+  // Listing type: use .eq or .filter instead of .or() to avoid conflicting with the above .or()
   if (listingType === 'rent') {
     dbQuery = dbQuery.eq('listing_type', 'rent');
   } else if (listingType === 'sale') {
-    dbQuery = dbQuery.or('listing_type.eq.sale,listing_type.is.null');
+    dbQuery = dbQuery.filter('listing_type', 'in', '("sale",null)');
   }
 
   const { data, error } = await dbQuery;

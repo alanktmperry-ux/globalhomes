@@ -161,11 +161,11 @@ export async function searchAgentListings(
     dbQuery = dbQuery.ilike('property_type', `%${structured.propertyType}%`);
   }
 
-  // Listing type: use .eq or .filter instead of .or() to avoid conflicting with the above .or()
+  // Listing type: use .eq for rent; for sale, include null (no listing_type = assume sale)
   if (listingType === 'rent') {
     dbQuery = dbQuery.eq('listing_type', 'rent');
   } else if (listingType === 'sale') {
-    dbQuery = dbQuery.filter('listing_type', 'in', '("sale",null)');
+    dbQuery = dbQuery.or('listing_type.eq.sale,listing_type.is.null', { referencedTable: undefined } as any);
   }
 
   const { data, error } = await dbQuery;

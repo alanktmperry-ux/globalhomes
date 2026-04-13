@@ -47,7 +47,7 @@ const HERO_PLACEHOLDERS = [
 
 const Index = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const hasSearch = !!searchParams.get('location');
   const hasSearchParams = !!(searchParams.get('location') || searchParams.get('beds') || searchParams.get('maxPrice') || searchParams.get('type') || searchParams.get('radius'));
 
@@ -163,6 +163,7 @@ const Index = () => {
   // Consumer sign-up modal trigger after 3rd anonymous search
   const wrappedHandleSearch = useCallback((query: string) => {
     handleSearch(query);
+    setSearchParams({ location: query }, { replace: false });
 
     // Track search
     try {
@@ -783,9 +784,19 @@ const Index = () => {
   // ── Auto-scroll to top when search results load ──────
   useEffect(() => {
     if (hasSearch || hasSearched) {
+      if (listsPanelRef.current) listsPanelRef.current.scrollTop = 0;
       window.scrollTo(0, 0);
     }
   }, [hasSearch, hasSearched]);
+
+  // Trigger search on mount if URL already has a location param
+  useEffect(() => {
+    const loc = searchParams.get('location');
+    if (loc && !hasSearched) {
+      handleSearch(loc);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Reset listings panel scroll to top when search params change
   useEffect(() => {

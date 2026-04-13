@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, CheckCircle2, ShieldCheck, Ban, Clock, Download, FileText, CreditCard, Building2, Play, Info, ExternalLink, Landmark, AlertTriangle, CalendarCheck, ListChecks, PlusCircle, Globe, Users, HelpCircle, Upload, BookOpen, Scale, Mail, ArrowRight } from 'lucide-react';
+import { X, CheckCircle2, ShieldCheck, Ban, Clock, Download, FileText, CreditCard, Building2, Play, Info, ExternalLink, Landmark, AlertTriangle, CalendarCheck, ListChecks, PlusCircle, Globe, Users, HelpCircle, Upload, BookOpen, Scale, Mail, ArrowRight, Lock, Eye, EyeOff } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,11 +22,24 @@ const SUBURBS_OPTIONS = [
   'CBD', 'Docklands', 'Southbank', 'Kew', 'Camberwell',
 ];
 
+const PASSWORD_REQUIREMENTS = [
+  { key: 'length', label: 'At least 8 characters', test: (p: string) => p.length >= 8 },
+  { key: 'upper', label: 'At least one uppercase letter', test: (p: string) => /[A-Z]/.test(p) },
+  { key: 'number', label: 'At least one number', test: (p: string) => /[0-9]/.test(p) },
+  { key: 'special', label: 'At least one special character (!@#$%^&*)', test: (p: string) => /[!@#$%^&*]/.test(p) },
+];
+
 const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
-  const [step, setStep] = useState<'email' | 'check-email' | 'prepare' | 'trust-info' | 'cutover' | 'import-wizard' | 'form' | 'success'>('email');
+  const [step, setStep] = useState<'email' | 'check-email' | 'set-password' | 'prepare' | 'trust-info' | 'cutover' | 'import-wizard' | 'form' | 'success'>('email');
   const [emailInput, setEmailInput] = useState('');
   const [emailSubmitting, setEmailSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Password step state
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordLoading, setPasswordLoading] = useState(false);
   
 
   const [form, setForm] = useState({
@@ -51,6 +64,30 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
     }
   };
 
+  const handleSetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const unmet = PASSWORD_REQUIREMENTS.filter((r) => !r.test(newPassword));
+    if (unmet.length > 0) {
+      toast.error(`Password requirements not met: ${unmet.map((r) => r.label).join(', ')}`);
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    setPasswordLoading(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      toast.success('Password set successfully');
+      setStep('prepare');
+    } catch (err: unknown) {
+      toast.error(`Could not set password — ${getErrorMessage(err)}`);
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.fullName || !form.email || !form.licenseNumber || !form.mobile) {
@@ -60,21 +97,15 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
     setLoading(true);
 
     try {
-      // Sign up the agent
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: form.email,
-        password: crypto.randomUUID().slice(0, 16), // temp password, agent resets via email
-        options: {
-          emailRedirectTo: window.location.origin,
-          data: { display_name: form.fullName },
-        },
-      });
-      if (authError) throw authError;
+      // Get current authenticated user — password was already set in the set-password step
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) throw new Error('You must be signed in to complete registration');
+      const authUser = currentUser;
 
-      if (authData.user) {
+      if (authUser) {
         // Create agent record
         await supabase.from('agents').insert({
-          user_id: authData.user.id,
+          user_id: authUser.id,
           name: form.fullName,
           agency: form.agencyName || null,
           email: form.email,
@@ -83,7 +114,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
 
         // Add agent role
         await supabase.from('user_roles').insert({
-          user_id: authData.user.id,
+          user_id: authUser.id,
           role: 'agent' as any,
         });
 
@@ -270,6 +301,81 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                   Wrong email? Go back and change it
                 </button>
               </div>
+            </motion.div>
+          ) : step === 'set-password' ? (
+            <motion.div key="set-password" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-6">
+              <DialogHeader className="mb-5">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                  <Lock size={28} className="text-primary" />
+                </div>
+                <DialogTitle className="font-display text-2xl font-extrabold text-center">
+                  Create your password
+                </DialogTitle>
+                <DialogDescription className="text-center">
+                  Set a secure password for your ListHQ account.
+                </DialogDescription>
+              </DialogHeader>
+
+              <form onSubmit={handleSetPassword} className="space-y-4">
+                <div>
+                  <Label htmlFor="newPassword">Password *</Label>
+                  <div className="relative">
+                    <Input
+                      id="newPassword"
+                      required
+                      type={showPassword ? 'text' : 'password'}
+                      autoFocus
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Enter your password"
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+
+                  {/* Inline requirements */}
+                  <div className="mt-2 space-y-1">
+                    {PASSWORD_REQUIREMENTS.map((req) => {
+                      const met = req.test(newPassword);
+                      return (
+                        <div key={req.key} className="flex items-center gap-2 text-xs">
+                          <CheckCircle2 size={14} className={met ? 'text-green-500' : 'text-muted-foreground/40'} />
+                          <span className={met ? 'text-green-600' : 'text-muted-foreground'}>{req.label}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="confirmPassword">Confirm password *</Label>
+                  <Input
+                    id="confirmPassword"
+                    required
+                    type={showPassword ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Re-enter your password"
+                  />
+                  {confirmPassword && newPassword !== confirmPassword && (
+                    <p className="text-xs text-destructive mt-1">Passwords do not match</p>
+                  )}
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={passwordLoading}
+                  className="w-full py-5 rounded-xl text-base font-bold"
+                >
+                  {passwordLoading ? 'Setting password...' : 'Set password & continue'}
+                </Button>
+              </form>
             </motion.div>
           ) : step === 'prepare' ? (
             <motion.div

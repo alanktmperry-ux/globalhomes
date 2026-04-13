@@ -806,7 +806,7 @@ const Index = () => {
   };
 
   // ── Landing hero: shown until first search, hidden if URL has params ──
-  if (!hasSearched && !hasSearchParams) {
+  if (!hasSearched && !hasSearch) {
     return (
       <div className="flex flex-col">
         {/* ── HERO SECTION ── */}
@@ -1077,7 +1077,7 @@ const Index = () => {
   return (
     <div className={`flex flex-col bg-background ${!isMobile ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
     {/* Results header when coming from search params */}
-    {hasSearchParams && new URLSearchParams(window.location.search).get('location') && (
+    {hasSearch && searchParams.get('location') && (
       <div className="px-6 pt-6 pb-2">
         <p className="text-sm text-slate-500">
           Showing results for <span className="font-medium text-slate-800">"{new URLSearchParams(window.location.search).get('location')}"</span>

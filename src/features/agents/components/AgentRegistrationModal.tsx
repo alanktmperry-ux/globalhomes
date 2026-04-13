@@ -102,10 +102,10 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
       if (!currentUser) throw new Error('You must be signed in to complete registration');
       const authUser = currentUser;
 
-      if (authData.user) {
+      if (authUser) {
         // Create agent record
         await supabase.from('agents').insert({
-          user_id: authData.user.id,
+          user_id: authUser.id,
           name: form.fullName,
           agency: form.agencyName || null,
           email: form.email,
@@ -114,7 +114,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
 
         // Add agent role
         await supabase.from('user_roles').insert({
-          user_id: authData.user.id,
+          user_id: authUser.id,
           role: 'agent' as any,
         });
 

@@ -122,19 +122,32 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
     if (!emailInput.trim()) return;
     setEmailSubmitting(true);
     try {
-      const { error } = await supabase.auth.signUp({
-        email: emailInput.trim().toLowerCase(),
+      const email = emailInput.trim().toLowerCase();
+      const { data, error } = await supabase.auth.signUp({
+        email,
         password: crypto.randomUUID(),
         options: {
           emailRedirectTo: `${window.location.origin}/dashboard/onboarding`,
           data: { registration_started: true },
         },
       });
+      // If user already exists (identities=[]), send magic link instead
+      if (!error && data.user && data.user.identities?.length === 0) {
+        await supabase.auth.signInWithOtp({
+          email,
+          options: { emailRedirectTo: `${window.location.origin}/dashboard/onboarding` },
+        });
+        sessionStorage.setItem('listhq_pending_email', email);
+        update('email', email);
+        setStep('check-email');
+        toast.info('An account with this email already exists — we sent you a sign-in link');
+        return;
+      }
       if (error && !error.message.toLowerCase().includes('already registered')) {
         throw error;
       }
-      sessionStorage.setItem('listhq_pending_email', emailInput.trim().toLowerCase());
-      update('email', emailInput.trim().toLowerCase());
+      sessionStorage.setItem('listhq_pending_email', email);
+      update('email', email);
       setStep('check-email');
     } catch (err: unknown) {
       toast.error(`Could not send confirmation — ${getErrorMessage(err)}`);

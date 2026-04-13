@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Building2, Upload, CheckCircle2, Landmark, Calendar, Loader2, Download, Settings2, BookOpen, ChevronDown } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Building2, Upload, CheckCircle2, Landmark, Calendar, Loader2, Download, Settings2, BookOpen, ChevronDown, Lock } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -50,6 +50,49 @@ export default function AgencyOnboardingPage() {
   const [showWizard, setShowWizard] = useState(false);
   const [wizardCompleted, setWizardCompleted] = useState(false);
   const [guideOpen, setGuideOpen] = useState(true);
+
+  // Password step state
+  const [needsPassword, setNeedsPassword] = useState<boolean | null>(null);
+  const [passwordDone, setPasswordDone] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordLoading, setPasswordLoading] = useState(false);
+
+  // Detect if user signed up via email (needs password) vs OAuth
+  useEffect(() => {
+    if (!user) return;
+    const provider = user.app_metadata?.provider;
+    if (provider === 'google' || provider === 'apple') {
+      setNeedsPassword(false);
+      setPasswordDone(true);
+    } else {
+      setNeedsPassword(true);
+    }
+  }, [user]);
+
+  const handleSetPassword = async () => {
+    setPasswordError('');
+    if (newPassword.length < 8) {
+      setPasswordError('Password must be at least 8 characters');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError('Passwords do not match');
+      return;
+    }
+    setPasswordLoading(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      setPasswordDone(true);
+      toast.success('Password set successfully');
+    } catch (err: unknown) {
+      setPasswordError(getErrorMessage(err) || 'Failed to set password');
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
 
   // Step 2 — Agency details
   const [agencyName, setAgencyName] = useState('');
@@ -648,7 +691,58 @@ export default function AgencyOnboardingPage() {
     </div>
   );
 
+  const showPasswordStep = needsPassword && !passwordDone;
+
   const renderStep = () => {
+    // PASSWORD STEP — shown before step 0 for email-signup users
+    if (showPasswordStep) {
+      return (
+        <div className="space-y-6">
+          <div className="text-center space-y-2">
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+              <Lock size={28} className="text-primary" />
+            </div>
+            <h2 className="text-xl font-bold">Create your password</h2>
+            <p className="text-sm text-muted-foreground">Set a password so you can sign in anytime</p>
+          </div>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="new-password" className="text-xs font-semibold">Password</Label>
+              <Input
+                id="new-password"
+                type="password"
+                placeholder="Minimum 8 characters"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div>
+              <Label htmlFor="confirm-password" className="text-xs font-semibold">Confirm password</Label>
+              <Input
+                id="confirm-password"
+                type="password"
+                placeholder="Re-enter your password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+            </div>
+            {passwordError && (
+              <p className="text-sm text-destructive">{passwordError}</p>
+            )}
+          </div>
+          <Button
+            className="w-full"
+            disabled={newPassword.length < 8 || !confirmPassword || passwordLoading}
+            onClick={handleSetPassword}
+          >
+            {passwordLoading && <Loader2 size={14} className="mr-1 animate-spin" />}
+            Set password & continue
+          </Button>
+        </div>
+      );
+    }
+
     // STEP 0 — Welcome & path selection
     if (step === 0) {
       return (
@@ -1114,8 +1208,8 @@ export default function AgencyOnboardingPage() {
     setStep(s => s + 1);
   };
 
-  const showBackButton = step > 0 && step < 4;
-  const showNextButton = step < 3 || (step === 3 && path === 'migration');
+  const showBackButton = step > 0 && step < 4 && !showPasswordStep;
+  const showNextButton = !showPasswordStep && (step < 3 || (step === 3 && path === 'migration'));
 
   const stepLabels = path === 'migration'
     ? ['Welcome', 'Agency', 'Trust Account', 'Cut-over', 'Import', 'Complete']
@@ -1138,7 +1232,7 @@ export default function AgencyOnboardingPage() {
               Agency Setup
             </h1>
             <p className="text-sm text-muted-foreground">
-              Step {step + 1} of {totalSteps}
+              {showPasswordStep ? 'Secure your account' : `Step ${step + 1} of ${totalSteps}`}
             </p>
           </div>
           <Progress value={progressPct} className="h-2" />

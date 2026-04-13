@@ -95,16 +95,29 @@ const AgentAuthPage = () => {
     if (!regEmail.trim()) return;
     setEmailSubmitting(true);
     try {
-      const { error } = await supabase.auth.signUp({
-        email: regEmail.trim().toLowerCase(),
+      const email = regEmail.trim().toLowerCase();
+      // Try to sign up first
+      const { data, error } = await supabase.auth.signUp({
+        email,
         password: crypto.randomUUID(),
         options: {
           emailRedirectTo: `${window.location.origin}/dashboard/onboarding`,
           data: { registration_started: true },
         },
       });
+      // If user already exists (signUp returns user with identities=[]), send magic link instead
+      if (!error && data.user && data.user.identities?.length === 0) {
+        await supabase.auth.signInWithOtp({
+          email,
+          options: { emailRedirectTo: `${window.location.origin}/dashboard/onboarding` },
+        });
+        sessionStorage.setItem('listhq_pending_email', email);
+        setStep('check-email');
+        toast.info('An account with this email already exists — we sent you a sign-in link');
+        return;
+      }
       if (error && !error.message.toLowerCase().includes('already registered')) throw error;
-      sessionStorage.setItem('listhq_pending_email', regEmail.trim().toLowerCase());
+      sessionStorage.setItem('listhq_pending_email', email);
       setStep('check-email');
     } catch (err: unknown) {
       toast.error(`Could not send confirmation — ${getErrorMessage(err)}`);

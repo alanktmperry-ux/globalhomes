@@ -71,10 +71,22 @@ export default function AgencyOnboardingPage() {
     }
   }, [user]);
 
+  // Password requirements
+  const pwReqs = [
+    { label: 'At least 8 characters', met: newPassword.length >= 8 },
+    { label: 'At least one uppercase letter (A–Z)', met: /[A-Z]/.test(newPassword) },
+    { label: 'At least one number (0–9)', met: /[0-9]/.test(newPassword) },
+    { label: 'At least one special character (!@#$%^&*)', met: /[!@#$%^&*]/.test(newPassword) },
+  ];
+  const allPwReqsMet = pwReqs.every(r => r.met);
+
   const handleSetPassword = async () => {
     setPasswordError('');
-    if (newPassword.length < 8) {
-      setPasswordError('Password must be at least 8 characters');
+    const missing = pwReqs.filter(r => !r.met).map(r => r.label);
+    if (missing.length > 0) {
+      toast.error('Password requirements not met', {
+        description: missing.join(' · '),
+      });
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -733,6 +745,15 @@ export default function AgencyOnboardingPage() {
                 onChange={(e) => setNewPassword(e.target.value)}
                 autoFocus
               />
+              {/* Live requirements checklist */}
+              <ul className="space-y-1 mt-2">
+                {pwReqs.map((req, i) => (
+                  <li key={i} className={`flex items-center gap-1.5 text-xs transition-colors ${req.met ? 'text-emerald-600' : 'text-muted-foreground'}`}>
+                    <span>{req.met ? '✓' : '✗'}</span>
+                    <span>{req.label}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
             <div>
               <Label htmlFor="confirm-password" className="text-xs font-semibold">Confirm password</Label>
@@ -750,7 +771,7 @@ export default function AgencyOnboardingPage() {
           </div>
           <Button
             className="w-full"
-            disabled={newPassword.length < 8 || !confirmPassword || passwordLoading}
+            disabled={!allPwReqsMet || !confirmPassword || newPassword !== confirmPassword || passwordLoading}
             onClick={handleSetPassword}
           >
             {passwordLoading && <Loader2 size={14} className="mr-1 animate-spin" />}

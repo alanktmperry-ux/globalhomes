@@ -23,14 +23,47 @@ interface Props {
   disabled?: boolean;
 }
 
-function parseComponents(components: google.maps.GeocoderAddressComponent[]): Omit<AddressParts, 'address'> {
+/** Try to extract suburb from a formatted address string like "10 High St, Berwick VIC 3806" */
+function parseSuburbFromAddress(formatted: string): string {
+  // Split by comma, take the second-last segment which usually contains "Suburb STATE POSTCODE"
+  const segments = formatted.split(',').map(s => s.trim());
+  for (let i = segments.length - 1; i >= 0; i--) {
+    // Match pattern: "Suburb VIC 3000" or just "Suburb VIC"
+    const match = segments[i].match(/^([A-Za-z\s'-]+?)\s+(?:VIC|NSW|QLD|SA|WA|TAS|NT|ACT)\b/i);
+    if (match) return match[1].trim();
+  }
+  // Fallback: second segment often is just the suburb name
+  if (segments.length >= 2) {
+    const candidate = segments[segments.length - 2].replace(/\d+/g, '').trim();
+    if (candidate.length >= 3 && candidate.length <= 40) return candidate;
+  }
+  return '';
+}
+
+function parseStateFromAddress(formatted: string): string {
+  const match = formatted.match(/\b(VIC|NSW|QLD|SA|WA|TAS|NT|ACT)\b/i);
+  return match ? match[1].toUpperCase() : '';
+}
+
+function parseComponents(components: google.maps.GeocoderAddressComponent[], formattedAddress?: string): Omit<AddressParts, 'address'> {
   const get = (type: string, short = false) => {
     const c = components.find(c => c.types.includes(type));
     return c ? (short ? c.short_name : c.long_name) : '';
   };
+  let suburb = get('locality') || get('sublocality_level_1') || get('sublocality');
+  let state = get('administrative_area_level_1', true);
+
+  // Fallback: parse from formatted address if geocoder didn't return locality
+  if (!suburb && formattedAddress) {
+    suburb = parseSuburbFromAddress(formattedAddress);
+  }
+  if (!state && formattedAddress) {
+    state = parseStateFromAddress(formattedAddress);
+  }
+
   return {
-    suburb: get('locality') || get('sublocality_level_1') || get('sublocality'),
-    state: get('administrative_area_level_1', true),
+    suburb,
+    state,
     postcode: get('postal_code'),
   };
 }
@@ -75,7 +108,8 @@ export function AddressAutocomplete({
                 : place;
 
               const components = src.address_components || place.address_components!;
-              const { suburb, state, postcode } = parseComponents(components);
+              const formatted = src.formatted_address || place.formatted_address || '';
+              const { suburb, state, postcode } = parseComponents(components, formatted);
 
               const streetNumber = components.find(c => c.types.includes('street_number'))?.long_name ?? '';
               const route = components.find(c => c.types.includes('route'))?.long_name ?? '';

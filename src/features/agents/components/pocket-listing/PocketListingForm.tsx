@@ -375,8 +375,8 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
       const payload = {
         title,
         address: draft.address,
-        suburb: draft.suburb || 'Unknown',
-        state: draft.state || 'Unknown',
+        suburb: draft.suburb && draft.suburb !== 'Unknown' ? draft.suburb : parseSuburbFallback(draft.address),
+        state: draft.state && draft.state !== 'Unknown' ? draft.state : parseStateFallback(draft.address),
         country: 'Australia',
         price: draft.listingType === 'rent' ? (draft.rentalWeekly || draft.priceMax) : draft.priceMax,
         price_formatted: formatPriceForDB(draft),

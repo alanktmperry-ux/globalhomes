@@ -1232,7 +1232,8 @@ export default function AgencyOnboardingPage() {
               Agency Setup
             </h1>
             <p className="text-sm text-muted-foreground">
-              Step {step + 1} of {totalSteps}
+              {showPasswordStep ? 'Secure your account' : `Step ${step + 1} of ${totalSteps}`}
+            </p>
             </p>
           </div>
           <Progress value={progressPct} className="h-2" />

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Building2, Upload, CheckCircle2, Landmark, Calendar, Loader2, Download, Settings2, BookOpen, ChevronDown, Lock, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Building2, Upload, CheckCircle2, Landmark, Calendar, Loader2, Download, Settings2, BookOpen, ChevronDown, Lock, Eye, EyeOff, PlusCircle, Globe, Users, HelpCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -1074,40 +1074,28 @@ export default function AgencyOnboardingPage() {
     if (step === 3) {
       if (path === 'fresh') {
         return (
-          <div className="space-y-5">
-            <div className="text-center space-y-3">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                <CheckCircle2 size={32} className="text-primary" />
-              </div>
-              <h3 className="text-lg font-bold">You're all set and ready to go!</h3>
-              <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-                Your agency is set up. Here's what to do next.
-              </p>
+          <div className="flex flex-col items-center text-center gap-6 p-6">
+            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+              <CheckCircle2 className="w-8 h-8 text-green-600" />
             </div>
-            <div className="space-y-2">
-              {[
-                { label: 'Create your first listing', detail: 'Dashboard → New Listing' },
-                { label: 'Enable multilingual translation', detail: 'Publish any listing — translations generate automatically' },
-                { label: 'Invite your team', detail: 'Dashboard → Team' },
-                { label: 'Get help anytime', detail: 'Dashboard → Help' },
-              ].map((item) => (
-                <div key={item.label} className="flex items-start gap-2.5 p-3 rounded-lg bg-muted/50 border border-border">
-                  <CheckCircle2 size={16} className="text-primary shrink-0 mt-0.5" />
-                  <div>
-                    <span className="text-sm font-medium">{item.label}</span>
-                    <p className="text-xs text-muted-foreground">{item.detail}</p>
-                  </div>
-                </div>
-              ))}
+            <div>
+              <h2 className="text-2xl font-bold">You're all set!</h2>
+              <p className="text-muted-foreground mt-1">Your agency is set up. Here's what to do next.</p>
             </div>
+            <ul className="text-left space-y-3 w-full">
+              <li className="flex items-start gap-3"><PlusCircle className="mt-0.5 shrink-0 text-primary" size={18} /><span>Create your first listing — go to <strong>Dashboard → New Listing</strong></span></li>
+              <li className="flex items-start gap-3"><Globe className="mt-0.5 shrink-0 text-primary" size={18} /><span>Enable multilingual translation — publish any listing and translations generate automatically</span></li>
+              <li className="flex items-start gap-3"><Users className="mt-0.5 shrink-0 text-primary" size={18} /><span>Invite your team — go to <strong>Dashboard → Team</strong></span></li>
+              <li className="flex items-start gap-3"><HelpCircle className="mt-0.5 shrink-0 text-primary" size={18} /><span>Get help anytime — go to <strong>Dashboard → Help</strong></span></li>
+            </ul>
             <Button
-              className="w-full"
+              className="w-full py-5 text-base font-bold"
               onClick={async () => {
                 await completeOnboarding();
                 navigate('/dashboard');
               }}
             >
-              Go to Dashboard <ArrowRight size={14} className="ml-1" />
+              Go to Dashboard →
             </Button>
           </div>
         );

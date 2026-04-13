@@ -802,6 +802,13 @@ const Index = () => {
     }
   }, [hasSearch, hasSearched]);
 
+  // Reset listings panel scroll to top when search params change
+  useEffect(() => {
+    if (listsPanelRef.current) {
+      listsPanelRef.current.scrollTop = 0;
+    }
+  }, [searchParams]);
+
   // ── Hero submit handler ──
   const handleHeroSubmit = (e: React.FormEvent) => {
     e.preventDefault();

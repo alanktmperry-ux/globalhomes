@@ -177,7 +177,7 @@ export default function AgencyOnboardingPage() {
     })();
   }, [user?.id, prefillLoaded]);
 
-  const totalSteps = path === 'migration' ? 6 : 5;
+  const totalSteps = path === 'migration' ? 6 : 4;
   const progressPct = ((step + 1) / totalSteps) * 100;
 
   // Calculate effective step index — skip step 4 for 'fresh' path

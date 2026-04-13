@@ -8,10 +8,10 @@ const formatDate = (d: string) =>
   new Date(d).toLocaleDateString('en-AU', { month: 'short', year: 'numeric' });
 
 const methodLabel: Record<string, { label: string; className: string }> = {
-  auction: { label: 'Auction', className: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300' },
-  private_treaty: { label: 'Private Treaty', className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' },
-  expression_of_interest: { label: 'EOI', className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' },
-  set_date_sale: { label: 'Set Date', className: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300' },
+  auction: { label: 'Auction', className: 'bg-orange-100 text-orange-700' },
+  private_treaty: { label: 'Private Treaty', className: 'bg-blue-100 text-blue-700' },
+  expression_of_interest: { label: 'EOI', className: 'bg-purple-100 text-purple-700' },
+  set_date_sale: { label: 'Set Date', className: 'bg-teal-100 text-teal-700' },
 };
 
 interface Props {

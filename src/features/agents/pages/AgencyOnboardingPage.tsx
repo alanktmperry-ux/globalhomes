@@ -127,7 +127,7 @@ export default function AgencyOnboardingPage() {
     setGuideOpen(step <= 1);
   }, [step]);
 
-  // Pre-fill agency details from agents table
+  // Pre-fill agency details from agents table + auth user
   useEffect(() => {
     if (!user?.id) return;
     supabase
@@ -136,13 +136,18 @@ export default function AgencyOnboardingPage() {
       .eq('user_id', user.id)
       .maybeSingle()
       .then(({ data }) => {
-        if (!data) return;
-        if (data.agency) setAgencyName(data.agency);
-        if (data.office_address) setAgencyAddress(data.office_address);
-        if (data.email) setAgencyEmail(data.email);
-        if (data.phone) setAgencyPhone(data.phone);
-        if (data.name) setPrincipalName(data.name);
-        if (data.license_number) setLicenceNumber(data.license_number);
+        if (data) {
+          if (data.agency) setAgencyName(data.agency);
+          if (data.office_address) setAgencyAddress(data.office_address);
+          if (data.email) setAgencyEmail(data.email);
+          if (data.phone) setAgencyPhone(data.phone);
+          if (data.name) setPrincipalName(data.name);
+          if (data.license_number) setLicenceNumber(data.license_number);
+        }
+        // Fallback: use auth email if agent email wasn't set
+        if (!data?.email && user.email) {
+          setAgencyEmail(prev => prev || user.email || '');
+        }
       });
   }, [user?.id]);
 

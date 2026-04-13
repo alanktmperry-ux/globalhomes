@@ -16,6 +16,7 @@ interface AuthContextType {
   agencyRole: string | null;
   agencyId: string | null;
   signOut: () => Promise<void>;
+  refreshRoles: () => Promise<void>;
   impersonating: boolean;
   impersonatedUser: string | null;
   impersonatedUserId: string | null;
@@ -36,6 +37,7 @@ const AuthContext = createContext<AuthContextType>({
   agencyRole: null,
   agencyId: null,
   signOut: async () => {},
+  refreshRoles: async () => {},
   impersonating: false,
   impersonatedUser: null,
   impersonatedUserId: null,

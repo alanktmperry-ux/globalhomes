@@ -302,6 +302,81 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                 </button>
               </div>
             </motion.div>
+          ) : step === 'set-password' ? (
+            <motion.div key="set-password" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-6">
+              <DialogHeader className="mb-5">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                  <Lock size={28} className="text-primary" />
+                </div>
+                <DialogTitle className="font-display text-2xl font-extrabold text-center">
+                  Create your password
+                </DialogTitle>
+                <DialogDescription className="text-center">
+                  Set a secure password for your ListHQ account.
+                </DialogDescription>
+              </DialogHeader>
+
+              <form onSubmit={handleSetPassword} className="space-y-4">
+                <div>
+                  <Label htmlFor="newPassword">Password *</Label>
+                  <div className="relative">
+                    <Input
+                      id="newPassword"
+                      required
+                      type={showPassword ? 'text' : 'password'}
+                      autoFocus
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Enter your password"
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+
+                  {/* Inline requirements */}
+                  <div className="mt-2 space-y-1">
+                    {PASSWORD_REQUIREMENTS.map((req) => {
+                      const met = req.test(newPassword);
+                      return (
+                        <div key={req.key} className="flex items-center gap-2 text-xs">
+                          <CheckCircle2 size={14} className={met ? 'text-green-500' : 'text-muted-foreground/40'} />
+                          <span className={met ? 'text-green-600' : 'text-muted-foreground'}>{req.label}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="confirmPassword">Confirm password *</Label>
+                  <Input
+                    id="confirmPassword"
+                    required
+                    type={showPassword ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Re-enter your password"
+                  />
+                  {confirmPassword && newPassword !== confirmPassword && (
+                    <p className="text-xs text-destructive mt-1">Passwords do not match</p>
+                  )}
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={passwordLoading}
+                  className="w-full py-5 rounded-xl text-base font-bold"
+                >
+                  {passwordLoading ? 'Setting password...' : 'Set password & continue'}
+                </Button>
+              </form>
+            </motion.div>
           ) : step === 'prepare' ? (
             <motion.div
               key="prepare"

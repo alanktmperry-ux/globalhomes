@@ -134,9 +134,9 @@ export default function LiveAuctionPage() {
 
           {/* Sold banner */}
           {isSold && auction.sold_price && (
-            <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-center">
-              <p className="text-sm font-medium text-emerald-700 dark:text-emerald-400">{t('sold', lang)}</p>
-              <p className="text-3xl font-bold text-emerald-800 dark:text-emerald-300 mt-1">
+            <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
+              <p className="text-sm font-medium text-emerald-700">{t('sold', lang)}</p>
+              <p className="text-3xl font-bold text-emerald-800 mt-1">
                 ${auction.sold_price.toLocaleString('en-AU')}
               </p>
             </div>

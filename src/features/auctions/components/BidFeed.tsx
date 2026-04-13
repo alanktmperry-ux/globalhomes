@@ -11,12 +11,12 @@ function BidRow({ bid }: { bid: AuctionBid }) {
   return (
     <div className={`flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-all ${
       bid.is_winning
-        ? 'bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800'
+        ? 'bg-emerald-50 border border-emerald-200'
         : 'bg-secondary/50'
     }`}>
       <span className="text-xs text-muted-foreground w-6 text-right shrink-0">#{bid.bid_number}</span>
       {isVendor && (
-        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-100 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400">
+        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-100 text-amber-700">
           Vendor
         </span>
       )}
@@ -25,11 +25,11 @@ function BidRow({ bid }: { bid: AuctionBid }) {
           Opening
         </span>
       )}
-      <span className={`font-semibold flex-1 ${bid.is_winning ? 'text-emerald-700 dark:text-emerald-400' : 'text-foreground'}`}>
+      <span className={`font-semibold flex-1 ${bid.is_winning ? 'text-emerald-700' : 'text-foreground'}`}>
         ${bid.bid_amount.toLocaleString('en-AU')}
       </span>
       {bid.reserve_met_at_this_bid && (
-        <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">On Market</span>
+        <span className="text-[10px] font-bold text-emerald-600 uppercase">On Market</span>
       )}
       {bid.is_winning && <span className="text-emerald-600">✓</span>}
     </div>
@@ -50,7 +50,7 @@ export function BidFeed({ auctionId, readOnly }: Props) {
   return (
     <div className="space-y-2">
       {reserveMet && (
-        <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-950/30 text-center text-sm font-bold text-emerald-700 dark:text-emerald-400 animate-in slide-in-from-bottom">
+        <div className="p-2 rounded-lg bg-emerald-100 text-center text-sm font-bold text-emerald-700 animate-in slide-in-from-bottom">
           🟢 Reserve met — ON THE MARKET!
         </div>
       )}

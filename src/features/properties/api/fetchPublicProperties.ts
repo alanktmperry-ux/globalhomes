@@ -127,30 +127,20 @@ export async function searchAgentListings(
     .order('created_at', { ascending: false })
     .limit(limit);
 
-  // Build a single combined OR clause to avoid multiple .or() calls
-  // which conflict in PostgREST (second overwrites the first)
+  // Combine all OR conditions into a single .or() call to avoid
+  // PostgREST conflicts where a second .or() silently overwrites the first.
   const allOrParts: string[] = [];
 
   if (orClauses) {
     allOrParts.push(orClauses);
   }
 
-  // Suburb filter — add to keyword OR if keywords exist, otherwise standalone
-  const suburbOrClause = structured?.suburb
-    ? `suburb.ilike.%${structured.suburb}%,address.ilike.%${structured.suburb}%`
-    : '';
+  if (structured?.suburb) {
+    allOrParts.push(`suburb.ilike.%${structured.suburb}%`);
+    allOrParts.push(`address.ilike.%${structured.suburb}%`);
+  }
 
-  if (suburbOrClause && allOrParts.length > 0) {
-    // Keywords + suburb: apply keywords as one .or(), suburb as .filter() with and()
-    dbQuery = dbQuery.or(allOrParts.join(','));
-    dbQuery = dbQuery.or(suburbOrClause);
-    // Since we can only have one .or() safely, merge them:
-    // Actually, re-approach: use a single .or() for keywords,
-    // and apply suburb as separate .ilike filters won't work for OR.
-    // The correct fix: combine everything into one .or() call.
-  } else if (suburbOrClause) {
-    dbQuery = dbQuery.or(suburbOrClause);
-  } else if (allOrParts.length > 0) {
+  if (allOrParts.length > 0) {
     dbQuery = dbQuery.or(allOrParts.join(','));
   }
 

@@ -17,7 +17,7 @@ Sentry.init({
 });
 
 createRoot(document.getElementById("root")!).render(
-  <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+  <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} forcedTheme="light">
     <InvestorModeProvider>
       <Sentry.ErrorBoundary
         fallback={

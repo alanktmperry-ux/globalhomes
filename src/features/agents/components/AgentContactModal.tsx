@@ -166,17 +166,20 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
         }
       }
 
-      // Create notification for the agent
-      await supabase.functions.invoke('send-notification-email', {
-        body: {
+      // Create notification for the agent (non-blocking — lead is already saved)
+      try {
+        await supabase.from('notifications').insert({
           agent_id: agent.id,
           type: 'lead',
           title: `New enquiry from ${formData.name}`,
           message: formData.message || `Interested in ${property.title}`,
           property_id: property.id,
           lead_id: leadRow?.id || null,
-        },
-      });
+          is_read: false,
+        });
+      } catch (notifErr) {
+        console.warn('Notification insert failed (non-blocking):', notifErr);
+      }
 
       setSubmitted(true);
 

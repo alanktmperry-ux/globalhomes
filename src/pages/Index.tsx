@@ -49,6 +49,7 @@ const Index = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const hasSearch = !!searchParams.get('location');
+  const hasSearchParams = !!(searchParams.get('location') || searchParams.get('beds') || searchParams.get('maxPrice') || searchParams.get('type') || searchParams.get('radius'));
 
   // Lock body scroll when search is active so inner card column captures scroll events
   useEffect(() => {
@@ -95,6 +96,7 @@ const Index = () => {
   const [mapCollapsed, setMapCollapsed] = useState(false);
   const [viewportHeight, setViewportHeight] = useState(() => window.innerHeight);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const listsPanelRef = useRef<HTMLDivElement>(null);
   const SNAP_POINTS = [0.35, 0.65, 0.85];
   const [sheetSnap, setSheetSnap] = useState(0);
   const sheetHeightMV = useMotionValue(viewportHeight * SNAP_POINTS[0]);

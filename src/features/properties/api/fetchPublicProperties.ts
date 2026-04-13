@@ -127,8 +127,21 @@ export async function searchAgentListings(
     .order('created_at', { ascending: false })
     .limit(limit);
 
+  // Combine all OR conditions into a single .or() call to avoid
+  // PostgREST conflicts where a second .or() silently overwrites the first.
+  const allOrParts: string[] = [];
+
   if (orClauses) {
-    dbQuery = dbQuery.or(orClauses);
+    allOrParts.push(orClauses);
+  }
+
+  if (structured?.suburb) {
+    allOrParts.push(`suburb.ilike.%${structured.suburb}%`);
+    allOrParts.push(`address.ilike.%${structured.suburb}%`);
+  }
+
+  if (allOrParts.length > 0) {
+    dbQuery = dbQuery.or(allOrParts.join(','));
   }
 
   // Apply structured filters
@@ -144,13 +157,12 @@ export async function searchAgentListings(
   if (structured?.priceMax) {
     dbQuery = dbQuery.lte('price', structured.priceMax);
   }
-  if (structured?.suburb) {
-    dbQuery = dbQuery.or(`suburb.ilike.%${structured.suburb}%,address.ilike.%${structured.suburb}%`);
-  }
   if (structured?.propertyType) {
     dbQuery = dbQuery.ilike('property_type', `%${structured.propertyType}%`);
   }
 
+  // Listing type filter — separate from keyword/suburb .or() above.
+  // In supabase-js v2, multiple .or() calls are AND-ed together (each becomes a separate query param).
   if (listingType === 'rent') {
     dbQuery = dbQuery.eq('listing_type', 'rent');
   } else if (listingType === 'sale') {

@@ -111,6 +111,22 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
           : prev.propertyTypes,
       }));
 
+      // Phase 0a: Immediately geocode any detected location so radius filter activates
+      if (parsedFilters.location) {
+        const locQuery = parsedFilters.location + ', Australia';
+        geocode(locQuery)
+          .then((coords) => {
+            if (coords) {
+              setSearchCenter(coords);
+              // Default radius to 10km if not already set
+              setSearchRadius(prev => prev ?? 10);
+            }
+          })
+          .catch(() => {
+            console.warn('[handleSearch] Location geocode failed for:', parsedFilters.location);
+          });
+      }
+
       setIsSearching(true);
 
       // Phase 0: AI-powered query parsing (runs in parallel with other phases)

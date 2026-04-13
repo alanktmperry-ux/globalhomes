@@ -161,11 +161,12 @@ export async function searchAgentListings(
     dbQuery = dbQuery.ilike('property_type', `%${structured.propertyType}%`);
   }
 
-  // Listing type: use .eq for rent; for sale, include null (no listing_type = assume sale)
+  // Listing type filter — separate from keyword/suburb .or() above.
+  // In supabase-js v2, multiple .or() calls are AND-ed together (each becomes a separate query param).
   if (listingType === 'rent') {
     dbQuery = dbQuery.eq('listing_type', 'rent');
   } else if (listingType === 'sale') {
-    dbQuery = dbQuery.or('listing_type.eq.sale,listing_type.is.null', { referencedTable: undefined } as any);
+    dbQuery = dbQuery.or('listing_type.eq.sale,listing_type.is.null');
   }
 
   const { data, error } = await dbQuery;

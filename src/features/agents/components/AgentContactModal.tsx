@@ -327,19 +327,9 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
     <AnimatePresence>
       {open && (
         <>
-          <motion.div
-            className="fixed inset-0 bg-foreground/30 backdrop-blur-sm z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-          />
-          <motion.div
+          <div className="fixed inset-0 bg-foreground/30 backdrop-blur-sm z-50" onClick={onClose} />
+          <div
             className="fixed inset-x-0 top-4 bottom-[calc(env(safe-area-inset-bottom)+4.5rem)] z-50 bg-card rounded-t-3xl shadow-drawer flex flex-col md:inset-x-auto md:left-1/2 md:top-1/2 md:bottom-auto md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md md:rounded-2xl md:max-h-[80vh]"
-            initial={{ y: '100vh', opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: '100vh', opacity: 0 }}
-            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
           >
             {/* Drag indicator (mobile) */}
             <div className="sticky top-0 z-10 flex justify-center pt-3 pb-1 bg-card rounded-t-3xl md:hidden">
@@ -593,7 +583,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
                 )}
               </AnimatePresence>
             </div>
-          </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>,

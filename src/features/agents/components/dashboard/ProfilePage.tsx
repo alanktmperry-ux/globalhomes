@@ -15,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { autocomplete } from '@/shared/lib/googleMapsService';
+import { AddressAutocomplete } from '@/components/ui/AddressAutocomplete';
 import DashboardHeader from './DashboardHeader';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 

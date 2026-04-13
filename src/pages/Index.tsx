@@ -830,7 +830,7 @@ const Index = () => {
   };
 
   // ── Landing hero: shown until first search, hidden if URL has params ──
-  if (!hasSearched && !hasSearch) {
+  if (!hasSearched && !hasSearchParams) {
     return (
       <div className="flex flex-col">
         {/* ── HERO SECTION ── */}
@@ -1169,15 +1169,16 @@ const Index = () => {
 
           {/* RIGHT: scrollable list panel */}
           <div
+            ref={listsPanelRef}
            className="flex flex-col overflow-y-auto border-l border-border bg-background overscroll-contain"
-             style={{
-               width: `${mapExpanded ? 15 : 100 - splitPercent}%`,
-               minWidth: mapExpanded ? 0 : 300,
-               transition: 'width 0.3s ease',
-               WebkitOverflowScrolling: 'touch',
-               overflowAnchor: 'none',
-             }}
-          >
+              style={{
+                width: `${mapExpanded ? 15 : 100 - splitPercent}%`,
+                minWidth: mapExpanded ? 0 : 300,
+                transition: 'width 0.3s ease',
+                WebkitOverflowScrolling: 'touch',
+                overflowAnchor: 'none',
+              }}
+           >
             {/* Featured/Boosted Listings Hero — shown only before search */}
             {!hasSearched && featuredListings.length > 0 && (
               <div className="px-4 pt-4 pb-2 shrink-0">

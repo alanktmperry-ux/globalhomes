@@ -127,29 +127,41 @@ export default function AgencyOnboardingPage() {
     setGuideOpen(step <= 1);
   }, [step]);
 
-  // Pre-fill agency details from agents table + auth user
+  // Pre-fill agency details from agents table + auth user metadata
+  const [prefillLoaded, setPrefillLoaded] = useState(false);
   useEffect(() => {
-    if (!user?.id) return;
-    supabase
-      .from('agents')
-      .select('agency, office_address, email, phone, name, license_number')
-      .eq('user_id', user.id)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data) {
-          if (data.agency) setAgencyName(data.agency);
-          if (data.office_address) setAgencyAddress(data.office_address);
-          if (data.email) setAgencyEmail(data.email);
-          if (data.phone) setAgencyPhone(data.phone);
-          if (data.name) setPrincipalName(data.name);
-          if (data.license_number) setLicenceNumber(data.license_number);
-        }
-        // Fallback: use auth email if agent email wasn't set
-        if (!data?.email && user.email) {
-          setAgencyEmail(prev => prev || user.email || '');
-        }
-      });
-  }, [user?.id]);
+    if (!user?.id || prefillLoaded) return;
+    (async () => {
+      const { data } = await supabase
+        .from('agents')
+        .select('agency, office_address, email, phone, name, license_number')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      // Pull from agent record
+      if (data?.agency) setAgencyName(data.agency);
+      if (data?.office_address) setAgencyAddress(data.office_address);
+      if (data?.phone) setAgencyPhone(data.phone);
+      if (data?.license_number) setLicenceNumber(data.license_number);
+
+      // Principal name: agent.name → user metadata full_name → user email
+      const agentName = data?.name;
+      const metaName = user.user_metadata?.full_name || user.user_metadata?.name;
+      setPrincipalName(agentName || metaName || '');
+
+      // Email: agent.email → auth user email
+      const agentEmail = data?.email;
+      setAgencyEmail(agentEmail || user.email || '');
+
+      // Phone fallback from user metadata
+      if (!data?.phone) {
+        const metaPhone = user.user_metadata?.phone || user.phone;
+        if (metaPhone) setAgencyPhone(metaPhone);
+      }
+
+      setPrefillLoaded(true);
+    })();
+  }, [user?.id, prefillLoaded]);
 
   const totalSteps = path === 'migration' ? 6 : 5;
   const progressPct = ((step + 1) / totalSteps) * 100;

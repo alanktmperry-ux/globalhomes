@@ -163,7 +163,11 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
                 : prev.propertyTypes,
             }));
 
-            // Geocode the parsed location so the map centres on it
+            // Update suburb filter from AI-parsed intent (more accurate)
+            if (intent.suburb) {
+              setSearchSuburb(intent.suburb);
+            }
+
             const locationParts = [
               intent.suburb,
               intent.state,

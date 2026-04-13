@@ -9,7 +9,7 @@ import { useI18n } from '@/shared/lib/i18n';
 const CARD_HEIGHT_MOBILE = 520;
 const CARD_HEIGHT_DESKTOP = 540;
 const GRID_GAP = 16;
-const VIRTUALIZE_THRESHOLD = 20;
+const VIRTUALIZE_THRESHOLD = 100;
 
 interface VirtualizedPropertyListProps {
   properties: Property[];

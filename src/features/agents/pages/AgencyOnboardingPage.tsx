@@ -1294,12 +1294,12 @@ export default function AgencyOnboardingPage() {
     setStep(s => s + 1);
   };
 
-  const showBackButton = step > 0 && step < 4 && !showPasswordStep;
-  const showNextButton = !showPasswordStep && (step < 3 || (step === 3 && path === 'migration'));
+  const showBackButton = step > 0 && step < 3 && !showPasswordStep;
+  const showNextButton = !showPasswordStep && step < 3 && !(path === 'fresh' && step === 3);
 
   const stepLabels = path === 'migration'
     ? ['Welcome', 'Agency', 'Trust Account', 'Cut-over', 'Import', 'Complete']
-    : ['Welcome', 'Agency', 'Trust Account', 'Ready', 'Complete'];
+    : ['Welcome', 'Agency', 'Trust Account', 'Ready'];
 
   return (
     <div className="h-screen bg-background flex flex-col overflow-hidden">

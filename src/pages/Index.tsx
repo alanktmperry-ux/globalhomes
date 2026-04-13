@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect, useMemo, lazy, Suspense } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence, useMotionValue, useSpring, PanInfo } from 'framer-motion';
 import { ArrowRight, MapPin, Sparkles, Map, List, Mic, MicOff, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users, Search, Home, Check } from 'lucide-react';
@@ -777,21 +777,20 @@ const Index = () => {
   );
 
   // ── Check if URL has search params (skip hero entirely) ──────
+  const [searchParams] = useSearchParams();
   const hasSearchParams = Boolean(
-    new URLSearchParams(window.location.search).get('location') ||
-    new URLSearchParams(window.location.search).get('beds') ||
-    new URLSearchParams(window.location.search).get('query')
+    searchParams.get('location') ||
+    searchParams.get('suburb') ||
+    searchParams.get('beds') ||
+    searchParams.get('query')
   );
 
-  // ── Auto-scroll to results when URL has search params ──────
+  // ── Auto-scroll to top when search results load ──────
   useEffect(() => {
-    if (hasSearchParams) {
-      setTimeout(() => {
-        document.getElementById('featured-listings')
-          ?.scrollIntoView({ behavior: 'smooth' });
-      }, 300);
+    if (hasSearchParams || hasSearched) {
+      window.scrollTo(0, 0);
     }
-  }, [hasSearchParams]);
+  }, [hasSearchParams, hasSearched]);
 
   // ── Hero submit handler ──
   const handleHeroSubmit = (e: React.FormEvent) => {

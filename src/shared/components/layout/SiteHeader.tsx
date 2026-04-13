@@ -184,7 +184,7 @@ export function SiteHeader() {
                 onClick={() => navigate('/login')}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                Agent login
+                Sign in
               </button>
               <button
                 onClick={() => setShowAgentModal(true)}
@@ -262,7 +262,7 @@ export function SiteHeader() {
                     </button>
                     <button onClick={() => navTo('/login')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                       <LogIn size={16} />
-                      Agent login
+                      Sign in
                     </button>
                   </>
                 )}

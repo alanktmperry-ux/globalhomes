@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   User, Building2, Mail, Phone, Globe, Camera, Loader2, Shield, Star,
   CheckCircle2, Clock, Upload, Trash2, Plus, Briefcase, MapPin, Languages,

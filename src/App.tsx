@@ -243,6 +243,9 @@ const App = () => (
                 <Route path="/agent-dashboard" element={<ProtectedRoute requireAgent><AgentPerformanceDashboard /></ProtectedRoute>} />
                 <Route path="/agent-portal" element={<ProtectedRoute requireAgent><AgentPortalPage /></ProtectedRoute>} />
                 <Route path="/pocket-listing" element={<ProtectedRoute requireAgent><PocketListingPage /></ProtectedRoute>} />
+                {/* Onboarding — accessible to any authenticated user (no requireAgent) */}
+                <Route path="/dashboard/onboarding" element={<ProtectedRoute><AgencyOnboardingPage /></ProtectedRoute>} />
+
                 <Route path="/dashboard" element={<ProtectedRoute requireAgent><AgentDashboardLayout /></ProtectedRoute>}>
                   <Route index element={<DashboardOverview />} />
                   <Route path="profile" element={<AgentProfilePage />} />
@@ -283,7 +286,6 @@ const App = () => (
                   <Route path="settings" element={<SettingsPage />} />
                   <Route path="help" element={<HelpPage />} />
                   <Route path="partner-access" element={<PartnerAccessPage />} />
-                  <Route path="onboarding" element={<AgencyOnboardingPage />} />
                 </Route>
 
                 {/* Partner */}

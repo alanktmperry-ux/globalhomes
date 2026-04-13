@@ -1128,7 +1128,7 @@ const Index = () => {
     {!isMobile ? (
       <div
         ref={resultsRef}
-        className="flex overflow-hidden flex-1 min-h-0"
+        className="flex overflow-clip flex-1 min-h-0"
       >
           {/* LEFT: fixed map panel */}
           <div
@@ -1166,7 +1166,7 @@ const Index = () => {
           {/* RIGHT: scrollable list panel */}
           <div
             ref={listsPanelRef}
-           className="flex flex-col overflow-y-auto border-l border-border bg-background overscroll-contain"
+           className="flex flex-col overflow-y-auto border-l border-border bg-background"
               style={{
                 width: `${mapExpanded ? 15 : 100 - splitPercent}%`,
                 minWidth: mapExpanded ? 0 : 300,

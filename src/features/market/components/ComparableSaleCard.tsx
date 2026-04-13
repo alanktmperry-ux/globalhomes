@@ -61,12 +61,12 @@ export function ComparableSaleCard({ sale, compact }: Props) {
           {method.label}
         </span>
         {sale.discount_pct != null && sale.discount_pct > 0 && (
-          <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700 dark:bg-red-900/30 dark:text-red-300">
+          <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700">
             {sale.discount_pct.toFixed(1)}% below asking
           </span>
         )}
         {sale.is_verified && (
-          <span className="inline-flex items-center gap-0.5 text-[10px] text-emerald-600 dark:text-emerald-400">
+          <span className="inline-flex items-center gap-0.5 text-[10px] text-emerald-600">
             <CheckCircle size={10} /> Verified
           </span>
         )}

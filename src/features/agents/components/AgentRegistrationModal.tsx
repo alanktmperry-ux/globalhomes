@@ -64,6 +64,30 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
     }
   };
 
+  const handleSetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const unmet = PASSWORD_REQUIREMENTS.filter((r) => !r.test(newPassword));
+    if (unmet.length > 0) {
+      toast.error(`Password requirements not met: ${unmet.map((r) => r.label).join(', ')}`);
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    setPasswordLoading(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      toast.success('Password set successfully');
+      setStep('prepare');
+    } catch (err: unknown) {
+      toast.error(`Could not set password — ${getErrorMessage(err)}`);
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.fullName || !form.email || !form.licenseNumber || !form.mobile) {
@@ -73,16 +97,10 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
     setLoading(true);
 
     try {
-      // Sign up the agent
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: form.email,
-        password: crypto.randomUUID().slice(0, 16), // temp password, agent resets via email
-        options: {
-          emailRedirectTo: window.location.origin,
-          data: { display_name: form.fullName },
-        },
-      });
-      if (authError) throw authError;
+      // Get current authenticated user — password was already set in the set-password step
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) throw new Error('You must be signed in to complete registration');
+      const authUser = currentUser;
 
       if (authData.user) {
         // Create agent record

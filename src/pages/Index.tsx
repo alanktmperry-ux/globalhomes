@@ -1085,7 +1085,7 @@ const Index = () => {
       </div>
     )}
     {/* ── Top: Voice Search Bar ─────────────────────────────── */}
-    <div className="shrink-0">
+    <div className="shrink-0" style={{ display: searchParams.get('location') ? 'none' : undefined }}>
         <VoiceSearchErrorBoundary>
           <VoiceSearchHero
             onSearch={wrappedHandleSearch}

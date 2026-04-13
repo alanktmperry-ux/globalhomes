@@ -86,7 +86,7 @@ const PROPERTIES_WITH_AGENTS =
  */
 export async function searchAgentListings(
   query: string,
-  limit = 20,
+  limit = 50,
   listingType?: 'sale' | 'rent',
   structured?: {
     beds?: number;
@@ -94,6 +94,7 @@ export async function searchAgentListings(
     priceMin?: number;
     priceMax?: number;
     suburb?: string;
+    propertyType?: string;
     features?: string[];
   }
 ): Promise<Property[]> {
@@ -144,7 +145,10 @@ export async function searchAgentListings(
     dbQuery = dbQuery.lte('price', structured.priceMax);
   }
   if (structured?.suburb) {
-    dbQuery = dbQuery.ilike('suburb', `%${structured.suburb}%`);
+    dbQuery = dbQuery.or(`suburb.ilike.%${structured.suburb}%,address.ilike.%${structured.suburb}%`);
+  }
+  if (structured?.propertyType) {
+    dbQuery = dbQuery.ilike('property_type', `%${structured.propertyType}%`);
   }
 
   if (listingType === 'rent') {

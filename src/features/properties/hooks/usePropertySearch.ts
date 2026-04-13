@@ -42,6 +42,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
   const [searchRadius, setSearchRadius] = useState<number | null>(5);
   const [areaSearch, setAreaSearch] = useState<AreaSearch | null>(null);
   const [searchSummary, setSearchSummary] = useState<string>('');
+  const [searchSuburb, setSearchSuburb] = useState<string | null>(null);
 
   // ── Realtime properties with React Query caching ─────────────
   const {
@@ -53,6 +54,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
     nearbyCenter: searchCenter,
     nearbyRadiusKm: searchRadius,
     listingType: listingMode,
+    suburb: searchSuburb,
   });
 
   // ── Build human-readable summary from parsed intent ─────────

@@ -778,21 +778,12 @@ const Index = () => {
     </MapErrorBoundary>
   );
 
-  // ── Check if URL has search params (skip hero entirely) ──────
-  const [searchParams] = useSearchParams();
-  const hasSearchParams = Boolean(
-    searchParams.get('location') ||
-    searchParams.get('suburb') ||
-    searchParams.get('beds') ||
-    searchParams.get('query')
-  );
-
   // ── Auto-scroll to top when search results load ──────
   useEffect(() => {
-    if (hasSearchParams || hasSearched) {
+    if (hasSearch || hasSearched) {
       window.scrollTo(0, 0);
     }
-  }, [hasSearchParams, hasSearched]);
+  }, [hasSearch, hasSearched]);
 
   // ── Hero submit handler ──
   const handleHeroSubmit = (e: React.FormEvent) => {

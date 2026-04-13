@@ -49,6 +49,21 @@ const Index = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const hasSearch = !!searchParams.get('location');
+
+  // Lock body scroll when search is active so inner card column captures scroll events
+  useEffect(() => {
+    if (hasSearch) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    };
+  }, [hasSearch]);
   const { t } = useI18n();
   const { addSearch, lastSearch } = useSearchHistory();
   const { savedIds, isSaved, toggleSaved } = useSavedProperties();

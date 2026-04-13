@@ -53,7 +53,7 @@ const AuthLandingPage = () => {
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
               <span className="text-[13px] font-semibold text-slate-900">Save favourites & get alerts</span>
             </div>
-            <p className="text-[11px] text-slate-400 pl-4 -mt-1">Create a free account to unlock this</p>
+            <p className="text-[11px] italic text-slate-400 pl-4 -mt-1">Sign in to unlock this</p>
           </div>
 
           <div className="flex flex-col gap-3">
@@ -66,9 +66,9 @@ const AuthLandingPage = () => {
             </button>
             <button
               onClick={() => navigate('/')}
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-slate-300 text-slate-500 text-xs font-medium hover:bg-slate-50 transition-colors"
             >
-              Browse properties
+              Browse without signing in
               <span>→</span>
             </button>
           </div>

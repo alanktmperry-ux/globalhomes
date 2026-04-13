@@ -118,13 +118,11 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
           .then((coords) => {
             if (coords) {
               setSearchCenter(coords);
-              // Default radius to 10km if not already set
+              // Ensure a radius is set so the nearby_properties RPC is used
               setSearchRadius(prev => prev ?? 10);
             }
           })
-          .catch(() => {
-            console.warn('[handleSearch] Location geocode failed for:', parsedFilters.location);
-          });
+          .catch(() => {});
       }
 
       setIsSearching(true);

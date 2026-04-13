@@ -181,7 +181,7 @@ export function SiteHeader() {
           ) : (
             <>
               <button
-                onClick={() => navigate('/login')}
+                onClick={() => navigate('/auth')}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 Sign in
@@ -260,7 +260,7 @@ export function SiteHeader() {
                       <Building2 size={16} />
                       List as an agent →
                     </button>
-                    <button onClick={() => navTo('/login')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+                    <button onClick={() => navTo('/auth')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                       <LogIn size={16} />
                       Sign in
                     </button>

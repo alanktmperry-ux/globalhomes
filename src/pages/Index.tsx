@@ -1144,11 +1144,12 @@ const Index = () => {
 
           {/* RIGHT: scrollable list panel */}
           <div
-            className="flex flex-col overflow-y-auto border-l border-border bg-background"
+           className="flex flex-col overflow-y-auto border-l border-border bg-background overscroll-contain"
             style={{
               width: `${mapExpanded ? 15 : 100 - splitPercent}%`,
               minWidth: mapExpanded ? 0 : 300,
               transition: 'width 0.3s ease',
+              WebkitOverflowScrolling: 'touch',
             }}
           >
             {/* Featured/Boosted Listings Hero — shown only before search */}
@@ -1239,7 +1240,7 @@ const Index = () => {
         </div>
       ) : (
         /* ── Mobile layout ────────────────────────────────────── */
-        <div className="flex-1 relative overflow-hidden">
+        <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
           {mobileView === 'map' ? (
             <>
               <div className="absolute inset-0">{mapComponent}</div>
@@ -1308,7 +1309,7 @@ const Index = () => {
               </motion.button>
             </>
           ) : (
-            <div className="p-4 overflow-y-auto h-full pb-24">
+            <div className="p-4 overflow-y-auto flex-1 min-h-0 pb-24 overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-medium text-foreground">{filteredProperties.length} properties</span>
                 <div className="flex items-center gap-2">

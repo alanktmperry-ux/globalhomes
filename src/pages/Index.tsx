@@ -49,6 +49,7 @@ const Index = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const hasSearch = !!searchParams.get('location');
+  const hasSearchParams = !!(searchParams.get('location') || searchParams.get('beds') || searchParams.get('maxPrice') || searchParams.get('type') || searchParams.get('radius'));
 
   // Lock body scroll when search is active so inner card column captures scroll events
   useEffect(() => {
@@ -95,6 +96,7 @@ const Index = () => {
   const [mapCollapsed, setMapCollapsed] = useState(false);
   const [viewportHeight, setViewportHeight] = useState(() => window.innerHeight);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const listsPanelRef = useRef<HTMLDivElement>(null);
   const SNAP_POINTS = [0.35, 0.65, 0.85];
   const [sheetSnap, setSheetSnap] = useState(0);
   const sheetHeightMV = useMotionValue(viewportHeight * SNAP_POINTS[0]);
@@ -560,46 +562,31 @@ const Index = () => {
             <Sparkles size={12} className="text-primary" /> Recommended
           </span>
         )}
-        {searchRadius && (
-          <div className="relative shrink-0">
-            <button
-              onClick={() => setRadiusSliderOpen(o => !o)}
-              className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium hover:bg-primary/20 transition-colors inline-flex items-center gap-1"
-            >
-              Within {searchRadius} km
-              <X size={10} className="opacity-60 hover:opacity-100" onClick={(e) => { e.stopPropagation(); clearSearchRadius(); setRadiusSliderOpen(false); }} />
-            </button>
-            <AnimatePresence>
-              {radiusSliderOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
-                  className="absolute top-full left-0 mt-2 z-30 bg-card border border-border rounded-xl shadow-elevated p-3 w-56"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium text-foreground">Radius: {searchRadius} km</span>
-                    <button onClick={() => setRadiusSliderOpen(false)} className="text-muted-foreground hover:text-foreground">
-                      <X size={14} />
-                    </button>
-                  </div>
-                  <Slider
-                    value={[searchRadius]}
-                    onValueChange={([v]) => setSearchRadius(v)}
-                    min={5}
-                    max={100}
-                    step={5}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between mt-1 text-[10px] text-muted-foreground">
-                    <span>5 km</span>
-                    <span>100 km</span>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        )}
+        {/* Always-visible radius pills */}
+        <div className="flex items-center gap-1 shrink-0">
+          {[
+            { label: 'Any', value: null },
+            { label: '5 km', value: 5 },
+            { label: '10 km', value: 10 },
+            { label: '25 km', value: 25 },
+            { label: '50 km', value: 50 },
+          ].map(({ label, value }) => {
+            const isActive = value === null ? !searchRadius : searchRadius === value;
+            return (
+              <button
+                key={label}
+                onClick={() => value === null ? clearSearchRadius() : setSearchRadius(value)}
+                className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                  isActive
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary text-muted-foreground hover:bg-accent hover:text-foreground'
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
         {areaSearch && (
           <button
             onClick={() => handleAreaSearch(null)}
@@ -800,6 +787,13 @@ const Index = () => {
     }
   }, [hasSearch, hasSearched]);
 
+  // Reset listings panel scroll to top when search params change
+  useEffect(() => {
+    if (listsPanelRef.current) {
+      listsPanelRef.current.scrollTop = 0;
+    }
+  }, [searchParams]);
+
   // ── Hero submit handler ──
   const handleHeroSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -821,7 +815,7 @@ const Index = () => {
   };
 
   // ── Landing hero: shown until first search, hidden if URL has params ──
-  if (!hasSearched && !hasSearch) {
+  if (!hasSearched && !hasSearchParams) {
     return (
       <div className="flex flex-col">
         {/* ── HERO SECTION ── */}
@@ -1160,15 +1154,16 @@ const Index = () => {
 
           {/* RIGHT: scrollable list panel */}
           <div
+            ref={listsPanelRef}
            className="flex flex-col overflow-y-auto border-l border-border bg-background overscroll-contain"
-             style={{
-               width: `${mapExpanded ? 15 : 100 - splitPercent}%`,
-               minWidth: mapExpanded ? 0 : 300,
-               transition: 'width 0.3s ease',
-               WebkitOverflowScrolling: 'touch',
-               overflowAnchor: 'none',
-             }}
-          >
+              style={{
+                width: `${mapExpanded ? 15 : 100 - splitPercent}%`,
+                minWidth: mapExpanded ? 0 : 300,
+                transition: 'width 0.3s ease',
+                WebkitOverflowScrolling: 'touch',
+                overflowAnchor: 'none',
+              }}
+           >
             {/* Featured/Boosted Listings Hero — shown only before search */}
             {!hasSearched && featuredListings.length > 0 && (
               <div className="px-4 pt-4 pb-2 shrink-0">

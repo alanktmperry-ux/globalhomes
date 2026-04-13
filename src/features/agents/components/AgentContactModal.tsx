@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, Phone, Mail, MessageCircle, Calendar, CheckCircle2, BadgeCheck,
@@ -322,7 +323,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
 
   const scoreColor = leadScore >= 70 ? 'text-emerald-500' : leadScore >= 40 ? 'text-amber-500' : 'text-muted-foreground';
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {open && (
         <>
@@ -595,6 +596,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

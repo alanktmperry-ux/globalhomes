@@ -111,6 +111,20 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
           : prev.propertyTypes,
       }));
 
+      // Phase 0a: Immediately geocode any detected location so radius filter activates
+      if (parsedFilters.location) {
+        const locQuery = parsedFilters.location + ', Australia';
+        geocode(locQuery)
+          .then((coords) => {
+            if (coords) {
+              setSearchCenter(coords);
+              // Ensure a radius is set so the nearby_properties RPC is used
+              setSearchRadius(prev => prev ?? 10);
+            }
+          })
+          .catch(() => {});
+      }
+
       setIsSearching(true);
 
       // Phase 0: AI-powered query parsing (runs in parallel with other phases)

@@ -51,6 +51,49 @@ export default function AgencyOnboardingPage() {
   const [wizardCompleted, setWizardCompleted] = useState(false);
   const [guideOpen, setGuideOpen] = useState(true);
 
+  // Password step state
+  const [needsPassword, setNeedsPassword] = useState<boolean | null>(null);
+  const [passwordDone, setPasswordDone] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordLoading, setPasswordLoading] = useState(false);
+
+  // Detect if user signed up via email (needs password) vs OAuth
+  useEffect(() => {
+    if (!user) return;
+    const provider = user.app_metadata?.provider;
+    if (provider === 'google' || provider === 'apple') {
+      setNeedsPassword(false);
+      setPasswordDone(true);
+    } else {
+      setNeedsPassword(true);
+    }
+  }, [user]);
+
+  const handleSetPassword = async () => {
+    setPasswordError('');
+    if (newPassword.length < 8) {
+      setPasswordError('Password must be at least 8 characters');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError('Passwords do not match');
+      return;
+    }
+    setPasswordLoading(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      setPasswordDone(true);
+      toast.success('Password set successfully');
+    } catch (err: unknown) {
+      setPasswordError(getErrorMessage(err) || 'Failed to set password');
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
   // Step 2 — Agency details
   const [agencyName, setAgencyName] = useState('');
   const [abn, setAbn] = useState('');

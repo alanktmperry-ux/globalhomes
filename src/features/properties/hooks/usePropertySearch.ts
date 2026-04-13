@@ -204,13 +204,14 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
       // Phase 1 (agent listings) + Phase 2 (Firecrawl) in parallel
       const agentListingsPromise = searchAgentListings(
         query,
-        20,
+        50,
         listingMode,
         {
           beds: parsedFilters.beds || undefined,
           priceMin: parsedFilters.priceMin || undefined,
           priceMax: parsedFilters.priceMax || undefined,
           suburb: parsedFilters.location || undefined,
+          propertyType: parsedFilters.propertyType || undefined,
           features: parsedFilters.features.length > 0
             ? parsedFilters.features
             : undefined,

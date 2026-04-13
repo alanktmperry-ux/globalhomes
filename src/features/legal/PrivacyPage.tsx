@@ -8,7 +8,7 @@ const PrivacyPage = () => {
         <meta name="description" content="Privacy Policy for ListHQ — how we collect, use, and protect your personal information." />
       </Helmet>
       <main className="bg-background">
-        <article className="max-w-3xl mx-auto px-4 py-16 prose prose-neutral dark:prose-invert">
+        <article className="max-w-3xl mx-auto px-4 py-16 prose prose-neutral">
           <h1 className="font-display text-3xl font-extrabold text-foreground">Privacy Policy</h1>
           <p className="text-sm text-muted-foreground">Last updated: 29 March 2026</p>
           

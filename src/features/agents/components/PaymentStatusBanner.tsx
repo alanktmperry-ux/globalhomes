@@ -125,7 +125,7 @@ export function PaymentStatusBanner() {
 
 function LockedOverlay() {
   return (
-    <div className="fixed inset-0 z-50 bg-white dark:bg-background flex items-center justify-center p-6">
+    <div className="fixed inset-0 z-50 bg-white flex items-center justify-center p-6">
       <div className="max-w-md text-center space-y-6">
         <div className="flex justify-center">
           <span className="text-2xl font-bold tracking-tight text-foreground">ListHQ</span>

@@ -42,7 +42,7 @@ const DATE_AU = new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: 'long'
 
 export default function AgencyOnboardingPage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, refreshRoles } = useAuth();
 
   const [step, setStep] = useState(0);
   const [path, setPath] = useState<OnboardingPath | null>(null);
@@ -115,6 +115,7 @@ export default function AgencyOnboardingPage() {
   const completeOnboarding = async () => {
     if (!user) return;
     await supabase.from('agents').update({ onboarding_complete: true } as any).eq('user_id', user.id);
+    await refreshRoles();
   };
 
   const handleStep2Next = async () => {

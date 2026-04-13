@@ -16,6 +16,7 @@ interface AuthContextType {
   agencyRole: string | null;
   agencyId: string | null;
   signOut: () => Promise<void>;
+  refreshRoles: () => Promise<void>;
   impersonating: boolean;
   impersonatedUser: string | null;
   impersonatedUserId: string | null;
@@ -36,6 +37,7 @@ const AuthContext = createContext<AuthContextType>({
   agencyRole: null,
   agencyId: null,
   signOut: async () => {},
+  refreshRoles: async () => {},
   impersonating: false,
   impersonatedUser: null,
   impersonatedUserId: null,
@@ -118,6 +120,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setAgencyId(null);
     setRolesFetched(false);
   }, []);
+
+  const refreshRoles = useCallback(async () => {
+    if (!user) return;
+    lastFetchedUserId.current = null;
+    setRolesFetched(false);
+    // Re-fetch roles inline
+    const { data } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
+    const roles = data?.map((r) => r.role) || [];
+    applyRoles(roles);
+    const { data: agentData } = await supabase
+      .from('agents')
+      .select('agency_role, agency_id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    if (agentData) {
+      setAgencyRole((agentData as any).agency_role || null);
+      setAgencyId(agentData.agency_id || null);
+      if ((agentData as any).agency_role === 'principal' || (agentData as any).agency_role === 'admin') {
+        setIsPrincipal(true);
+      }
+    }
+    lastFetchedUserId.current = user.id;
+    setRolesFetched(true);
+  }, [user, applyRoles]);
 
   // Fetch roles
   useEffect(() => {
@@ -262,7 +288,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   return (
     <AuthContext.Provider value={{
       user, session, loading, isAgent, isAdmin, isPartner, isStrataManager, isPrincipal, userRole,
-      agencyRole, agencyId, signOut,
+      agencyRole, agencyId, signOut, refreshRoles,
       impersonating, impersonatedUser, impersonatedUserId, startImpersonation, stopImpersonation,
     }}>
       {children}

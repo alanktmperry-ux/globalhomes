@@ -8,6 +8,8 @@ import { PaymentStatusBanner } from "@/features/agents/components/PaymentStatusB
 const PublicLayout = () => {
   const location = useLocation();
   const isHome = location.pathname === '/';
+  const searchParams = new URLSearchParams(location.search);
+  const hasSearch = isHome && !!searchParams.get('location');
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -16,8 +18,8 @@ const PublicLayout = () => {
       <main className="flex-1 flex flex-col">
         <Outlet />
       </main>
-      <MapsDisclosure />
-      <SiteFooter />
+      {!hasSearch && <MapsDisclosure />}
+      {!hasSearch && <SiteFooter />}
       <BottomNav />
     </div>
   );

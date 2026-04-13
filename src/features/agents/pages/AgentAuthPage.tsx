@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
-import HCaptcha from '@hcaptcha/react-hcaptcha';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Building2, Zap, Mail, ListChecks, FileText, ShieldCheck, Landmark } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';

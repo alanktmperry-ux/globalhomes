@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
-import HCaptcha from '@hcaptcha/react-hcaptcha';
+import { useState, useEffect } from 'react';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { motion, AnimatePresence } from 'framer-motion';
 import PhoneInput from '@/shared/components/PhoneInput';

@@ -6,8 +6,8 @@ import { PropertyCardSkeleton } from '@/features/properties/components/PropertyC
 import { Property } from '@/shared/lib/types';
 import { useI18n } from '@/shared/lib/i18n';
 
-const CARD_HEIGHT_MOBILE = 520;
-const CARD_HEIGHT_DESKTOP = 540;
+const CARD_HEIGHT_MOBILE = 300;
+const CARD_HEIGHT_DESKTOP = 320;
 const GRID_GAP = 16;
 const VIRTUALIZE_THRESHOLD = 100;
 

@@ -4,7 +4,6 @@ import {
   X, Phone, MessageCircle, CheckCircle2,
   Loader2
 } from 'lucide-react';
-import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { Property } from '@/shared/lib/types';
 import type { SearchContext } from '@/features/properties/components/PropertyDrawer';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -41,7 +40,6 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
   const [honeypot, setHoneypot] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
-  const captchaRef = useRef<HCaptcha>(null);
 
   // ── Increment contact_clicks once per modal open ──────────
   const contactTracked = useRef(false);
@@ -99,20 +97,11 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
       return;
     }
 
+    // Honeypot check
+    if (honeypot) return;
+
     setSubmitting(true);
     try {
-      // Execute invisible hCaptcha
-      let hcaptchaToken = '';
-      if (captchaRef.current) {
-        try {
-          const res = await captchaRef.current.execute({ async: true });
-          hcaptchaToken = res?.response || '';
-        } catch {
-          // Captcha challenge closed or failed — allow submission to proceed
-          // The edge function will still validate if a token is provided
-        }
-      }
-
       const { data: { user } } = await supabase.auth.getUser();
 
       // Build search context payload
@@ -127,30 +116,23 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
         listingMode: searchContext.listingMode,
       } : null;
 
-      // Submit via capture-lead Edge Function
-      const { data, error } = await supabase.functions.invoke('capture-lead', {
-        body: {
-          propertyId: property.id,
-          agentId: agent.id,
-          userName: formData.name,
-          userEmail: formData.email,
-          userPhone: formData.phone,
+      // Insert lead directly
+      const { data: leadRow, error } = await supabase
+        .from('leads')
+        .insert({
+          property_id: property.id,
+          agent_id: agent.id,
+          user_name: formData.name,
+          user_email: formData.email,
+          user_phone: formData.phone,
           message: formData.message || null,
-          searchContext: contextPayload,
-          hcaptcha_token: hcaptchaToken,
-          website: honeypot, // honeypot field
-        },
-      });
+          search_context: contextPayload,
+          user_id: user?.id || null,
+        })
+        .select('id')
+        .maybeSingle();
 
-      if (error) {
-        const msg = (data as any)?.error || error.message;
-        if (msg?.includes('Too many')) {
-          toast.error('Please wait a few minutes before submitting again.');
-        } else {
-          throw new Error(msg);
-        }
-        return;
-      }
+      if (error) throw error;
 
       // Create conversation so agent & buyer can chat (client-side, needs user auth)
       if (user?.id) {
@@ -158,7 +140,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
           .from('agents')
           .select('user_id')
           .eq('id', agent.id)
-          .single();
+          .maybeSingle();
 
         if (agentRow?.user_id) {
           const p1 = user.id < agentRow.user_id ? user.id : agentRow.user_id;
@@ -172,7 +154,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
               property_id: property.id,
             }, { onConflict: 'participant_1,participant_2,property_id' })
             .select('id')
-            .single();
+            .maybeSingle();
 
           if (convo) {
             await supabase.from('messages').insert({
@@ -185,14 +167,13 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
       }
 
       // Create notification for the agent
-      const leadId = (data as any)?.id || null;
       await supabase.from('notifications').insert({
         agent_id: agent.id,
         type: 'lead',
         title: `New enquiry from ${formData.name}`,
         message: formData.message || `Interested in ${property.title}`,
         property_id: property.id,
-        lead_id: leadId,
+        lead_id: leadRow?.id || null,
         is_read: false,
       });
 
@@ -210,8 +191,6 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
       toast.error('Error — Failed to submit. Please try again.');
     } finally {
       setSubmitting(false);
-      // Reset captcha for next attempt
-      captchaRef.current?.resetCaptcha();
     }
   };
 
@@ -311,13 +290,6 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
               <textarea placeholder="Message (optional)" value={formData.message}
                 onChange={e => setFormData(p => ({ ...p, message: e.target.value }))} rows={3}
                 className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 resize-none" />
-
-              {/* Invisible hCaptcha */}
-              <HCaptcha
-                sitekey={import.meta.env.VITE_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001'}
-                ref={captchaRef}
-                size="invisible"
-              />
 
               <button onClick={handleSubmit} disabled={submitting}
                 className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors disabled:opacity-50">

@@ -43,25 +43,35 @@ const AuthLandingPage = () => {
 
           {/* Features */}
           <div className="space-y-3 mb-11">
-            {[
-              'Search thousands of properties',
-              'AI voice search in any language',
-              'Save favourites & get alerts',
-            ].map(f => (
+            {['Search thousands of properties', 'AI voice search in any language'].map(f => (
               <div key={f} className="flex items-center gap-2.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
                 <span className="text-[13px] text-slate-500">{f}</span>
               </div>
             ))}
+            <div className="flex items-center gap-2.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
+              <span className="text-[13px] font-semibold text-slate-900">Save favourites & get alerts</span>
+            </div>
+            <p className="text-[11px] text-slate-400 pl-4 -mt-1">Create a free account to unlock this</p>
           </div>
 
-          <button
-            onClick={() => navigate('/login')}
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-slate-900 text-white text-sm font-medium hover:bg-slate-700 transition-colors"
-          >
-            Browse properties
-            <span>→</span>
-          </button>
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={() => navigate('/login')}
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-slate-900 text-white text-sm font-medium hover:bg-slate-700 transition-colors"
+            >
+              Sign in or create account
+              <span>→</span>
+            </button>
+            <button
+              onClick={() => navigate('/')}
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors"
+            >
+              Browse properties
+              <span>→</span>
+            </button>
+          </div>
         </div>
       </motion.div>
 

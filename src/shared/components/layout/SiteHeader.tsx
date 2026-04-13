@@ -6,6 +6,7 @@ import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { NotificationBell } from '@/features/agents/components/dashboard/NotificationBell';
 import { LanguageSwitcher } from '@/shared/components/layout/LanguageSwitcher';
+import AgentRegistrationModal from '@/features/agents/components/AgentRegistrationModal';
 
 import { useI18n } from '@/shared/lib/i18n';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -17,6 +18,7 @@ export function SiteHeader() {
   const navigate = useNavigate();
   const [showAgentMenu, setShowAgentMenu] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showAgentModal, setShowAgentModal] = useState(false);
   const agentMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -177,13 +179,20 @@ export function SiteHeader() {
               <User size={18} />
             </button>
           ) : (
-            <button
-              onClick={() => navigate('/auth')}
-              className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
-            >
-              <User size={14} />
-              {t('common.signin')}
-            </button>
+            <>
+              <button
+                onClick={() => navigate('/login')}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Agent login
+              </button>
+              <button
+                onClick={() => setShowAgentModal(true)}
+                className="rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+              >
+                List as an agent →
+              </button>
+            </>
           )}
         </div>
 
@@ -239,16 +248,30 @@ export function SiteHeader() {
                   </button>
                 )}
 
-                {/* Profile / Sign in */}
-                <button onClick={() => navTo(user ? '/profile' : '/auth')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                  {user ? <User size={16} className="text-muted-foreground" /> : <LogIn size={16} className="text-muted-foreground" />}
-                  {user ? t('nav.profile') : t('common.signin')}
-                </button>
+                {/* Profile / Sign in / Agent CTA */}
+                {user ? (
+                  <button onClick={() => navTo('/profile')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
+                    <User size={16} className="text-muted-foreground" />
+                    {t('nav.profile')}
+                  </button>
+                ) : (
+                  <>
+                    <button onClick={() => { setMobileOpen(false); setShowAgentModal(true); }} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-primary-foreground bg-primary hover:bg-primary/90 transition-colors">
+                      <Building2 size={16} />
+                      List as an agent →
+                    </button>
+                    <button onClick={() => navTo('/login')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+                      <LogIn size={16} />
+                      Agent login
+                    </button>
+                  </>
+                )}
               </nav>
             </SheetContent>
           </Sheet>
         </div>
       </div>
+      <AgentRegistrationModal open={showAgentModal} onOpenChange={setShowAgentModal} />
     </header>
   );
 }

@@ -345,7 +345,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
               <div className="w-10 h-1 rounded-full bg-border" />
             </div>
 
-            <div className="p-5 pb-40 md:pb-6 space-y-5">
+            <div className="p-5 pb-8 md:pb-6 space-y-5">
               <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-secondary flex items-center justify-center hover:bg-accent transition-colors">
                 <X size={16} />
               </button>

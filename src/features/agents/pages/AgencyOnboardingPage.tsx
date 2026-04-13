@@ -127,7 +127,7 @@ export default function AgencyOnboardingPage() {
     setGuideOpen(step <= 1);
   }, [step]);
 
-  // Pre-fill agency details from agents table
+  // Pre-fill agency details from agents table + auth user
   useEffect(() => {
     if (!user?.id) return;
     supabase
@@ -136,13 +136,18 @@ export default function AgencyOnboardingPage() {
       .eq('user_id', user.id)
       .maybeSingle()
       .then(({ data }) => {
-        if (!data) return;
-        if (data.agency) setAgencyName(data.agency);
-        if (data.office_address) setAgencyAddress(data.office_address);
-        if (data.email) setAgencyEmail(data.email);
-        if (data.phone) setAgencyPhone(data.phone);
-        if (data.name) setPrincipalName(data.name);
-        if (data.license_number) setLicenceNumber(data.license_number);
+        if (data) {
+          if (data.agency) setAgencyName(data.agency);
+          if (data.office_address) setAgencyAddress(data.office_address);
+          if (data.email) setAgencyEmail(data.email);
+          if (data.phone) setAgencyPhone(data.phone);
+          if (data.name) setPrincipalName(data.name);
+          if (data.license_number) setLicenceNumber(data.license_number);
+        }
+        // Fallback: use auth email if agent email wasn't set
+        if (!data?.email && user.email) {
+          setAgencyEmail(prev => prev || user.email || '');
+        }
       });
   }, [user?.id]);
 
@@ -1216,8 +1221,8 @@ export default function AgencyOnboardingPage() {
     : ['Welcome', 'Agency', 'Trust Account', 'Ready', 'Complete'];
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-2xl mx-auto p-4 sm:p-8 space-y-6">
+    <div className="min-h-screen bg-background flex flex-col">
+      <div className="max-w-2xl mx-auto w-full p-4 sm:px-8 sm:pt-4 sm:pb-6 space-y-3 flex-1 flex flex-col">
         {/* Brand */}
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center">
@@ -1226,21 +1231,21 @@ export default function AgencyOnboardingPage() {
           <span className="font-display text-lg font-bold text-foreground">ListHQ</span>
         </div>
         {/* Progress */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div>
-            <h1 className="text-xl font-bold text-foreground">
+            <h1 className="text-lg font-bold text-foreground">
               Agency Setup
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               {showPasswordStep ? 'Secure your account' : `Step ${step + 1} of ${totalSteps}`}
             </p>
           </div>
-          <Progress value={progressPct} className="h-2" />
+          <Progress value={progressPct} className="h-1.5" />
           <div className="flex justify-between">
             {stepLabels.map((label, i) => (
               <span
                 key={i}
-                className={`text-[11px] font-medium transition-colors ${i < step ? 'text-primary' : i === step ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}
+                className={`text-[10px] font-medium transition-colors ${i < step ? 'text-primary' : i === step ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}
               >
                 {i < step ? '✓ ' : ''}{label}
               </span>
@@ -1249,8 +1254,8 @@ export default function AgencyOnboardingPage() {
         </div>
 
         {/* Step content */}
-        <Card>
-          <CardContent className="p-6">
+        <Card className="flex-1 min-h-0 overflow-y-auto">
+          <CardContent className="p-4 sm:p-6">
             <motion.div
               key={step}
               initial={{ opacity: 0, x: 20 }}
@@ -1264,7 +1269,7 @@ export default function AgencyOnboardingPage() {
 
         {/* Navigation */}
         {(showBackButton || showNextButton) && (
-          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-1 pb-2 shrink-0">
             {showBackButton ? (
               <Button variant="ghost" size="sm" onClick={() => setStep(s => s - 1)} disabled={loading} className="w-full sm:w-auto">
                 <ArrowLeft size={14} className="mr-1" /> Back

@@ -1208,8 +1208,8 @@ export default function AgencyOnboardingPage() {
     setStep(s => s + 1);
   };
 
-  const showBackButton = step > 0 && step < 4;
-  const showNextButton = step < 3 || (step === 3 && path === 'migration');
+  const showBackButton = step > 0 && step < 4 && !showPasswordStep;
+  const showNextButton = !showPasswordStep && (step < 3 || (step === 3 && path === 'migration'));
 
   const stepLabels = path === 'migration'
     ? ['Welcome', 'Agency', 'Trust Account', 'Cut-over', 'Import', 'Complete']

@@ -47,6 +47,8 @@ const HERO_PLACEHOLDERS = [
 
 const Index = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const hasSearch = !!searchParams.get('location');
   const { t } = useI18n();
   const { addSearch, lastSearch } = useSearchHistory();
   const { savedIds, isSaved, toggleSaved } = useSavedProperties();
@@ -776,21 +778,12 @@ const Index = () => {
     </MapErrorBoundary>
   );
 
-  // ── Check if URL has search params (skip hero entirely) ──────
-  const [searchParams] = useSearchParams();
-  const hasSearchParams = Boolean(
-    searchParams.get('location') ||
-    searchParams.get('suburb') ||
-    searchParams.get('beds') ||
-    searchParams.get('query')
-  );
-
   // ── Auto-scroll to top when search results load ──────
   useEffect(() => {
-    if (hasSearchParams || hasSearched) {
+    if (hasSearch || hasSearched) {
       window.scrollTo(0, 0);
     }
-  }, [hasSearchParams, hasSearched]);
+  }, [hasSearch, hasSearched]);
 
   // ── Hero submit handler ──
   const handleHeroSubmit = (e: React.FormEvent) => {
@@ -813,7 +806,7 @@ const Index = () => {
   };
 
   // ── Landing hero: shown until first search, hidden if URL has params ──
-  if (!hasSearched && !hasSearchParams) {
+  if (!hasSearched && !hasSearch) {
     return (
       <div className="flex flex-col">
         {/* ── HERO SECTION ── */}
@@ -1084,7 +1077,7 @@ const Index = () => {
   return (
     <div className={`flex flex-col bg-background ${!isMobile ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
     {/* Results header when coming from search params */}
-    {hasSearchParams && new URLSearchParams(window.location.search).get('location') && (
+    {hasSearch && searchParams.get('location') && (
       <div className="px-6 pt-6 pb-2">
         <p className="text-sm text-slate-500">
           Showing results for <span className="font-medium text-slate-800">"{new URLSearchParams(window.location.search).get('location')}"</span>

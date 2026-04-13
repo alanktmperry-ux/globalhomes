@@ -1128,10 +1128,11 @@ const Index = () => {
           {/* LEFT: fixed map panel */}
           <div
             className="relative overflow-hidden"
-            style={{
-              width: `${mapExpanded ? 85 : splitPercent}%`,
-              transition: 'width 0.3s ease',
-            }}
+             style={{
+               width: `${mapExpanded ? 85 : splitPercent}%`,
+               transition: 'width 0.3s ease',
+               overflowAnchor: 'none',
+             }}
           >
             {/* Expand/collapse toggle — sits on right edge of map */}
             <button
@@ -1160,12 +1161,13 @@ const Index = () => {
           {/* RIGHT: scrollable list panel */}
           <div
            className="flex flex-col overflow-y-auto border-l border-border bg-background overscroll-contain"
-            style={{
-              width: `${mapExpanded ? 15 : 100 - splitPercent}%`,
-              minWidth: mapExpanded ? 0 : 300,
-              transition: 'width 0.3s ease',
-              WebkitOverflowScrolling: 'touch',
-            }}
+             style={{
+               width: `${mapExpanded ? 15 : 100 - splitPercent}%`,
+               minWidth: mapExpanded ? 0 : 300,
+               transition: 'width 0.3s ease',
+               WebkitOverflowScrolling: 'touch',
+               overflowAnchor: 'none',
+             }}
           >
             {/* Featured/Boosted Listings Hero — shown only before search */}
             {!hasSearched && featuredListings.length > 0 && (

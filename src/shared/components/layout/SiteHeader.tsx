@@ -186,12 +186,6 @@ export function SiteHeader() {
               >
                 Sign in
               </button>
-              <button
-                onClick={() => setShowAgentModal(true)}
-                className="rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
-              >
-                List as an agent →
-              </button>
             </>
           )}
         </div>
@@ -256,10 +250,6 @@ export function SiteHeader() {
                   </button>
                 ) : (
                   <>
-                    <button onClick={() => { setMobileOpen(false); setShowAgentModal(true); }} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-primary-foreground bg-primary hover:bg-primary/90 transition-colors">
-                      <Building2 size={16} />
-                      List as an agent →
-                    </button>
                     <button onClick={() => navTo('/auth')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                       <LogIn size={16} />
                       Sign in

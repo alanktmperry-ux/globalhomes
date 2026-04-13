@@ -147,6 +147,21 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searc
     };
   }, [zoomScale]);
 
+  // Lock body scroll when contact modal is open (Safari fix)
+  useEffect(() => {
+    if (contactOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+    };
+  }, [contactOpen]);
+
   const trackLeadEvent = async (eventType: string) => {
     if (!property?.agent.id) return;
     try {

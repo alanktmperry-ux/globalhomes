@@ -1221,8 +1221,8 @@ export default function AgencyOnboardingPage() {
     : ['Welcome', 'Agency', 'Trust Account', 'Ready', 'Complete'];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <div className="max-w-2xl mx-auto w-full p-4 sm:px-8 sm:pt-4 sm:pb-6 space-y-3 flex-1 flex flex-col">
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
+      <div className="max-w-2xl mx-auto w-full px-4 sm:px-8 pt-4 pb-2 space-y-2 flex-1 flex flex-col min-h-0">
         {/* Brand */}
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center">

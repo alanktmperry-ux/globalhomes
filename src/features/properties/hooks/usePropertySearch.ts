@@ -42,6 +42,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
   const [searchRadius, setSearchRadius] = useState<number | null>(5);
   const [areaSearch, setAreaSearch] = useState<AreaSearch | null>(null);
   const [searchSummary, setSearchSummary] = useState<string>('');
+  const [searchSuburb, setSearchSuburb] = useState<string | null>(null);
 
   // ── Realtime properties with React Query caching ─────────────
   const {
@@ -53,6 +54,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
     nearbyCenter: searchCenter,
     nearbyRadiusKm: searchRadius,
     listingType: listingMode,
+    suburb: searchSuburb,
   });
 
   // ── Build human-readable summary from parsed intent ─────────
@@ -93,6 +95,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
       setResults([]);
       addSearch(query);
       setSearchSummary('');
+      setSearchSuburb(null);
 
       // Parse structured filters from the query (local fallback)
       const parsedFilters = parsePropertyQuery(query);
@@ -113,6 +116,9 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
 
       // Phase 0a: Immediately geocode any detected location so radius filter activates
       if (parsedFilters.location) {
+        // Set suburb filter immediately so DB query narrows results
+        setSearchSuburb(parsedFilters.location);
+
         const locQuery = parsedFilters.location + ', Australia';
         geocode(locQuery)
           .then((coords) => {
@@ -157,7 +163,11 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
                 : prev.propertyTypes,
             }));
 
-            // Geocode the parsed location so the map centres on it
+            // Update suburb filter from AI-parsed intent (more accurate)
+            if (intent.suburb) {
+              setSearchSuburb(intent.suburb);
+            }
+
             const locationParts = [
               intent.suburb,
               intent.state,

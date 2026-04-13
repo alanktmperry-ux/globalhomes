@@ -101,15 +101,19 @@ const DashboardOverview = () => {
 
       const { data: agent } = await supabase
         .from('agents')
-        .select('name, phone, avatar_url, bio, agency_id, stripe_customer_id, onboarding_complete')
+        .select('id, name, phone, avatar_url, bio, agency_id, stripe_customer_id, onboarding_complete')
         .eq('user_id', user.id)
         .maybeSingle();
       setOnboardingAgent(agent);
-      const { count } = await supabase
-        .from('properties')
-        .select('id', { count: 'exact', head: true })
-        .eq('agent_id', (agent as any)?.id ?? '');
-      setOnboardingHasListing((count || 0) > 0);
+      if (agent?.id) {
+        const { count } = await supabase
+          .from('properties')
+          .select('id', { count: 'exact', head: true })
+          .eq('agent_id', agent.id);
+        setOnboardingHasListing((count || 0) > 0);
+      } else {
+        setOnboardingHasListing(false);
+      }
     };
     fetchOnboarding();
   }, [user]);

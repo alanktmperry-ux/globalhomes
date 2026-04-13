@@ -47,6 +47,8 @@ const HERO_PLACEHOLDERS = [
 
 const Index = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const hasSearch = !!searchParams.get('location');
   const { t } = useI18n();
   const { addSearch, lastSearch } = useSearchHistory();
   const { savedIds, isSaved, toggleSaved } = useSavedProperties();

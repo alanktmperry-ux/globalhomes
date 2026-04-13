@@ -1070,50 +1070,84 @@ export default function AgencyOnboardingPage() {
       );
     }
 
-    // STEP 3 — Cut-over date (migration only) OR Fresh confirmation (index 3)
+    // STEP 3 — Fresh: "All set" final screen / Migration: cut-over date
     if (step === 3) {
       if (path === 'fresh') {
-        // For fresh path, step 3 is actually the trust bank details next handler result
-        // This shouldn't render — step goes to 4 directly
-      }
-      // For migration: cut-over date (step index 3 → visual step 4)
-      if (path === 'migration') {
         return (
           <div className="space-y-5">
-            <div className="text-center space-y-1 mb-4">
-              <Calendar size={32} className="mx-auto text-primary" />
-              <h3 className="text-base font-bold">When are you switching to ListHQ?</h3>
-              <p className="text-xs text-muted-foreground">All transactions from this date will be recorded in ListHQ</p>
+            <div className="text-center space-y-3">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                <CheckCircle2 size={32} className="text-primary" />
+              </div>
+              <h3 className="text-lg font-bold">You're all set and ready to go!</h3>
+              <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+                Your agency is set up. Here's what to do next.
+              </p>
             </div>
-            <div>
-              <Label className="text-xs font-medium">Cut-over date *</Label>
-              <Input type="date" value={cutoverDate} onChange={e => setCutoverDate(e.target.value)} className="mt-1.5" />
+            <div className="space-y-2">
+              {[
+                { label: 'Create your first listing', detail: 'Dashboard → New Listing' },
+                { label: 'Enable multilingual translation', detail: 'Publish any listing — translations generate automatically' },
+                { label: 'Invite your team', detail: 'Dashboard → Team' },
+                { label: 'Get help anytime', detail: 'Dashboard → Help' },
+              ].map((item) => (
+                <div key={item.label} className="flex items-start gap-2.5 p-3 rounded-lg bg-muted/50 border border-border">
+                  <CheckCircle2 size={16} className="text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <span className="text-sm font-medium">{item.label}</span>
+                    <p className="text-xs text-muted-foreground">{item.detail}</p>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="bg-muted/50 border border-border rounded-lg p-4 space-y-2">
-              <p className="text-xs font-medium text-foreground">Before proceeding, your trust account must be reconciled to this date in your current system. You will need:</p>
-              <ul className="text-xs text-muted-foreground space-y-1.5 list-disc list-inside">
-                <li>Trust Trial Balance as at cut-over date</li>
-                <li>Client Ledger Summary (from Reports in your current system)</li>
-                <li>Last bank statement showing the closing balance</li>
-                <li>Active matters list (clients with funds in trust)</li>
-              </ul>
-            </div>
-            <Button variant="outline" size="sm" onClick={generateImportChecklist} className="w-full gap-2">
-              <Download size={14} /> Download import checklist
+            <Button
+              className="w-full"
+              onClick={async () => {
+                await completeOnboarding();
+                navigate('/dashboard');
+              }}
+            >
+              Go to Dashboard <ArrowRight size={14} className="ml-1" />
             </Button>
-            <GuideCard
-              title="Choosing your cut-over date"
-              items={[
-                "The cut-over date is the <strong>last date</strong> you will record trust transactions in your old system",
-                "Choose a date when your trust account is <strong>fully reconciled</strong> \u2014 ideally a month-end or quarter-end",
-                "You will need: Trust Trial Balance \u00b7 Client Ledger Summary \u00b7 Bank statement \u00b7 Active matters list",
-                "<strong>Do not</strong> process transactions in both systems after the cut-over date \u2014 this causes reconciliation errors that are very hard to unwind",
-                "Download the Migration Checklist using the button above before proceeding",
-              ]}
-            />
           </div>
         );
       }
+      // Migration path: cut-over date
+      return (
+        <div className="space-y-5">
+          <div className="text-center space-y-1 mb-4">
+            <Calendar size={32} className="mx-auto text-primary" />
+            <h3 className="text-base font-bold">When are you switching to ListHQ?</h3>
+            <p className="text-xs text-muted-foreground">All transactions from this date will be recorded in ListHQ</p>
+          </div>
+          <div>
+            <Label className="text-xs font-medium">Cut-over date *</Label>
+            <Input type="date" value={cutoverDate} onChange={e => setCutoverDate(e.target.value)} className="mt-1.5" />
+          </div>
+          <div className="bg-muted/50 border border-border rounded-lg p-4 space-y-2">
+            <p className="text-xs font-medium text-foreground">Before proceeding, your trust account must be reconciled to this date in your current system. You will need:</p>
+            <ul className="text-xs text-muted-foreground space-y-1.5 list-disc list-inside">
+              <li>Trust Trial Balance as at cut-over date</li>
+              <li>Client Ledger Summary (from Reports in your current system)</li>
+              <li>Last bank statement showing the closing balance</li>
+              <li>Active matters list (clients with funds in trust)</li>
+            </ul>
+          </div>
+          <Button variant="outline" size="sm" onClick={generateImportChecklist} className="w-full gap-2">
+            <Download size={14} /> Download import checklist
+          </Button>
+          <GuideCard
+            title="Choosing your cut-over date"
+            items={[
+              "The cut-over date is the <strong>last date</strong> you will record trust transactions in your old system",
+              "Choose a date when your trust account is <strong>fully reconciled</strong> \u2014 ideally a month-end or quarter-end",
+              "You will need: Trust Trial Balance \u00b7 Client Ledger Summary \u00b7 Bank statement \u00b7 Active matters list",
+              "<strong>Do not</strong> process transactions in both systems after the cut-over date \u2014 this causes reconciliation errors that are very hard to unwind",
+              "Download the Migration Checklist using the button above before proceeding",
+            ]}
+          />
+        </div>
+      );
     }
 
     // STEP 4 — Opening balance import (index 4)

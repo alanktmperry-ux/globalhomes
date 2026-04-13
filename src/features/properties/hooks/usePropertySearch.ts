@@ -95,6 +95,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
       setResults([]);
       addSearch(query);
       setSearchSummary('');
+      setSearchSuburb(null);
 
       // Parse structured filters from the query (local fallback)
       const parsedFilters = parsePropertyQuery(query);

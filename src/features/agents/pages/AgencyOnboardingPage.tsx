@@ -691,7 +691,58 @@ export default function AgencyOnboardingPage() {
     </div>
   );
 
+  const showPasswordStep = needsPassword && !passwordDone;
+
   const renderStep = () => {
+    // PASSWORD STEP — shown before step 0 for email-signup users
+    if (showPasswordStep) {
+      return (
+        <div className="space-y-6">
+          <div className="text-center space-y-2">
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+              <Lock size={28} className="text-primary" />
+            </div>
+            <h2 className="text-xl font-bold">Create your password</h2>
+            <p className="text-sm text-muted-foreground">Set a password so you can sign in anytime</p>
+          </div>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="new-password" className="text-xs font-semibold">Password</Label>
+              <Input
+                id="new-password"
+                type="password"
+                placeholder="Minimum 8 characters"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div>
+              <Label htmlFor="confirm-password" className="text-xs font-semibold">Confirm password</Label>
+              <Input
+                id="confirm-password"
+                type="password"
+                placeholder="Re-enter your password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+            </div>
+            {passwordError && (
+              <p className="text-sm text-destructive">{passwordError}</p>
+            )}
+          </div>
+          <Button
+            className="w-full"
+            disabled={newPassword.length < 8 || !confirmPassword || passwordLoading}
+            onClick={handleSetPassword}
+          >
+            {passwordLoading && <Loader2 size={14} className="mr-1 animate-spin" />}
+            Set password & continue
+          </Button>
+        </div>
+      );
+    }
+
     // STEP 0 — Welcome & path selection
     if (step === 0) {
       return (

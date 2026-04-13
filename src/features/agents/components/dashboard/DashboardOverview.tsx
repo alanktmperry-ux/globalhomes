@@ -60,7 +60,7 @@ const DashboardOverview = () => {
   // Onboarding checklist state
   const [onboardingDismissed, setOnboardingDismissed] = useState(false);
   const [onboardingAgent, setOnboardingAgent] = useState<{
-    name?: string; phone?: string; avatar_url?: string; bio?: string; agency_id?: string; stripe_customer_id?: string;
+    name?: string; phone?: string; avatar_url?: string; bio?: string; agency_id?: string; stripe_customer_id?: string; onboarding_complete?: boolean;
   } | null>(null);
   const [onboardingHasListing, setOnboardingHasListing] = useState(false);
   const [onboardingSteps, setOnboardingSteps] = useState<Record<string, boolean>>({});
@@ -101,7 +101,7 @@ const DashboardOverview = () => {
 
       const { data: agent } = await supabase
         .from('agents')
-        .select('name, phone, avatar_url, bio, agency_id, stripe_customer_id')
+        .select('name, phone, avatar_url, bio, agency_id, stripe_customer_id, onboarding_complete')
         .eq('user_id', user.id)
         .maybeSingle();
       setOnboardingAgent(agent);
@@ -476,7 +476,7 @@ const DashboardOverview = () => {
         {!onboardingDismissed && (() => {
           const step1 = !!(onboardingAgent?.name && onboardingAgent?.phone && onboardingAgent?.avatar_url && onboardingAgent?.bio);
           const step2 = onboardingHasListing || listings.length > 0;
-          const step3 = !!onboardingAgent?.agency_id;
+          const step3 = !!onboardingAgent?.agency_id || !!onboardingAgent?.onboarding_complete;
           const step4 = !!onboardingAgent?.stripe_customer_id;
           const step5 = !!onboardingSteps.dashboard;
           const steps = [

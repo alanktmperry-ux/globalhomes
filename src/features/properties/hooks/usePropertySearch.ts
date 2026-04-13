@@ -116,6 +116,9 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
 
       // Phase 0a: Immediately geocode any detected location so radius filter activates
       if (parsedFilters.location) {
+        // Set suburb filter immediately so DB query narrows results
+        setSearchSuburb(parsedFilters.location);
+
         const locQuery = parsedFilters.location + ', Australia';
         geocode(locQuery)
           .then((coords) => {

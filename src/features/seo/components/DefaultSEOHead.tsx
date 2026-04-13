@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 
 const SITE_URL = 'https://globalhomes.lovable.app';
-const OG_IMAGE = `${SITE_URL}/listhq-og.png`;
+const OG_IMAGE = `${SITE_URL}/og-image.png`;
 
 export function DefaultSEOHead() {
   return (

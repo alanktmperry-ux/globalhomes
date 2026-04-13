@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Building2, Upload, CheckCircle2, Landmark, Calendar, Loader2, Download, Settings2, BookOpen, ChevronDown, Lock } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Building2, Upload, CheckCircle2, Landmark, Calendar, Loader2, Download, Settings2, BookOpen, ChevronDown, Lock, Eye, EyeOff } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -58,6 +58,8 @@ export default function AgencyOnboardingPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [passwordLoading, setPasswordLoading] = useState(false);
+  const [showPw, setShowPw] = useState(false);
+  const [showConfirmPw, setShowConfirmPw] = useState(false);
 
   // Detect if user signed up via email (needs password) vs OAuth
   useEffect(() => {
@@ -737,14 +739,20 @@ export default function AgencyOnboardingPage() {
           <div className="space-y-4">
             <div>
               <Label htmlFor="new-password" className="text-xs font-semibold">Password</Label>
-              <Input
-                id="new-password"
-                type="password"
-                placeholder="Minimum 8 characters"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                autoFocus
-              />
+              <div className="relative">
+                <Input
+                  id="new-password"
+                  type={showPw ? 'text' : 'password'}
+                  placeholder="Minimum 8 characters"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  autoFocus
+                  className="pr-10"
+                />
+                <button type="button" onClick={() => setShowPw(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" tabIndex={-1}>
+                  {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
               {/* Live requirements checklist */}
               <ul className="space-y-1 mt-2">
                 {pwReqs.map((req, i) => (
@@ -757,13 +765,19 @@ export default function AgencyOnboardingPage() {
             </div>
             <div>
               <Label htmlFor="confirm-password" className="text-xs font-semibold">Confirm password</Label>
-              <Input
-                id="confirm-password"
-                type="password"
-                placeholder="Re-enter your password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
+              <div className="relative">
+                <Input
+                  id="confirm-password"
+                  type={showConfirmPw ? 'text' : 'password'}
+                  placeholder="Re-enter your password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="pr-10"
+                />
+                <button type="button" onClick={() => setShowConfirmPw(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" tabIndex={-1}>
+                  {showConfirmPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
             </div>
             {passwordError && (
               <p className="text-sm text-destructive">{passwordError}</p>

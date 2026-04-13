@@ -15,14 +15,25 @@ async function fetchProperties(limit = 50, listingType?: 'sale' | 'rent', suburb
     .order('created_at', { ascending: false })
     .limit(limit);
 
-  if (suburb) {
-    query = query.or(`suburb.ilike.%${suburb}%,address.ilike.%${suburb}%`);
-  }
+  const suburbFilter = suburb
+    ? `suburb.ilike.%${suburb}%,address.ilike.%${suburb}%`
+    : null;
 
   if (listingType === 'rent') {
+    if (suburbFilter) {
+      query = query.or(suburbFilter);
+    }
     query = query.eq('listing_type', 'rent');
   } else if (listingType === 'sale') {
-    query = query.or('listing_type.eq.sale,listing_type.is.null');
+    if (suburbFilter) {
+      query = query.or(
+        `and(or(${suburbFilter}),or(listing_type.eq.sale,listing_type.is.null))`
+      );
+    } else {
+      query = query.or('listing_type.eq.sale,listing_type.is.null');
+    }
+  } else if (suburbFilter) {
+    query = query.or(suburbFilter);
   }
 
   const { data, error } = await query;

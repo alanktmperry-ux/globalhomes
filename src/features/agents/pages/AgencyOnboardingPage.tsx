@@ -1234,7 +1234,6 @@ export default function AgencyOnboardingPage() {
             <p className="text-sm text-muted-foreground">
               {showPasswordStep ? 'Secure your account' : `Step ${step + 1} of ${totalSteps}`}
             </p>
-            </p>
           </div>
           <Progress value={progressPct} className="h-2" />
           <div className="flex justify-between">

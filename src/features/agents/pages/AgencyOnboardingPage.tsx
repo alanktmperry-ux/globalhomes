@@ -745,6 +745,15 @@ export default function AgencyOnboardingPage() {
                 onChange={(e) => setNewPassword(e.target.value)}
                 autoFocus
               />
+              {/* Live requirements checklist */}
+              <ul className="space-y-1 mt-2">
+                {pwReqs.map((req, i) => (
+                  <li key={i} className={`flex items-center gap-1.5 text-xs transition-colors ${req.met ? 'text-emerald-600' : 'text-muted-foreground'}`}>
+                    <span>{req.met ? '✓' : '✗'}</span>
+                    <span>{req.label}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
             <div>
               <Label htmlFor="confirm-password" className="text-xs font-semibold">Confirm password</Label>
@@ -762,7 +771,7 @@ export default function AgencyOnboardingPage() {
           </div>
           <Button
             className="w-full"
-            disabled={newPassword.length < 8 || !confirmPassword || passwordLoading}
+            disabled={!allPwReqsMet || !confirmPassword || newPassword !== confirmPassword || passwordLoading}
             onClick={handleSetPassword}
           >
             {passwordLoading && <Loader2 size={14} className="mr-1 animate-spin" />}

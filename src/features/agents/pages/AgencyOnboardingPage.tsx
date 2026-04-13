@@ -49,7 +49,7 @@ export default function AgencyOnboardingPage() {
   const [loading, setLoading] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
   const [wizardCompleted, setWizardCompleted] = useState(false);
-  const [guideOpen, setGuideOpen] = useState(true);
+  const [guideOpen, setGuideOpen] = useState(false);
 
   // Password step state
   const [needsPassword, setNeedsPassword] = useState<boolean | null>(null);
@@ -138,7 +138,7 @@ export default function AgencyOnboardingPage() {
 
   // Reset guide open state based on step
   useEffect(() => {
-    setGuideOpen(step <= 1);
+    setGuideOpen(false);
   }, [step]);
 
   // Pre-fill agency details from agents table + auth user metadata

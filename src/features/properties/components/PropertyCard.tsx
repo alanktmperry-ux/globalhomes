@@ -268,22 +268,36 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
                   {reviewCount > 0 && <span className="text-[10px] text-muted-foreground">({reviewCount})</span>}
                 </div>
               ) : null}
-              <button
-                onClick={(e) => { e.stopPropagation(); setContactOpen(true); }}
-                className="px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors whitespace-nowrap"
-              >
-                {isRental ? t('property.enquire') : t('property.contact')}
-              </button>
+              {property.id.startsWith('google-') ? (
+                <a
+                  href={(property as any).url || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors whitespace-nowrap"
+                >
+                  View on REA →
+                </a>
+              ) : (
+                <button
+                  onClick={(e) => { e.stopPropagation(); setContactOpen(true); }}
+                  className="px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors whitespace-nowrap"
+                >
+                  {isRental ? t('property.enquire') : t('property.contact')}
+                </button>
+              )}
             </div>
           </div>
         </div>
       </motion.div>
 
-      <AgentContactModal
-        property={property}
-        open={contactOpen}
-        onClose={() => setContactOpen(false)}
-      />
+      {!property.id.startsWith('google-') && (
+        <AgentContactModal
+          property={property}
+          open={contactOpen}
+          onClose={() => setContactOpen(false)}
+        />
+      )}
     </>
   );
 }

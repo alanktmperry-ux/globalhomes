@@ -146,3 +146,11 @@
   .chart-panel { page-break-inside: avoid; }
   .agent-footer { display: block !important; }
 }
+
+/* Prevent Google Maps tile divs from intercepting scroll events on the property card list */
+.gm-style {
+  pointer-events: none !important;
+}
+.gm-style > div:first-child {
+  pointer-events: auto !important;
+}

@@ -66,9 +66,9 @@ function calcInvestmentScore(p: InvestmentProperty): { grade: InvestmentGrade; s
 }
 
 const GRADE_STYLES: Record<InvestmentGrade, string> = {
-  A: 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30',
+  A: 'bg-green-500/10 text-green-700 border-green-500/30',
   B: 'bg-primary/10 text-primary border-primary/30',
-  C: 'bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/30',
+  C: 'bg-orange-500/10 text-orange-700 border-orange-500/30',
 };
 
 const YIELD_RANGES = [

@@ -81,10 +81,10 @@ export function LiveAuctionConsole({ propertyId, auctionId }: Props) {
               <span className="px-3 py-1 rounded-full text-xs font-semibold bg-destructive/10 text-destructive">Below Reserve</span>
             )}
             {reserveStatus === 'near' && (
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 animate-pulse">AT RESERVE</span>
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 animate-pulse">AT RESERVE</span>
             )}
             {reserveStatus === 'met' && (
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400">🟢 ON THE MARKET</span>
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">🟢 ON THE MARKET</span>
             )}
           </div>
         </div>

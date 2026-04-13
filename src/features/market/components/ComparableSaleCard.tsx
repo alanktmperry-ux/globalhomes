@@ -8,10 +8,10 @@ const formatDate = (d: string) =>
   new Date(d).toLocaleDateString('en-AU', { month: 'short', year: 'numeric' });
 
 const methodLabel: Record<string, { label: string; className: string }> = {
-  auction: { label: 'Auction', className: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300' },
-  private_treaty: { label: 'Private Treaty', className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' },
-  expression_of_interest: { label: 'EOI', className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' },
-  set_date_sale: { label: 'Set Date', className: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300' },
+  auction: { label: 'Auction', className: 'bg-orange-100 text-orange-700' },
+  private_treaty: { label: 'Private Treaty', className: 'bg-blue-100 text-blue-700' },
+  expression_of_interest: { label: 'EOI', className: 'bg-purple-100 text-purple-700' },
+  set_date_sale: { label: 'Set Date', className: 'bg-teal-100 text-teal-700' },
 };
 
 interface Props {
@@ -61,12 +61,12 @@ export function ComparableSaleCard({ sale, compact }: Props) {
           {method.label}
         </span>
         {sale.discount_pct != null && sale.discount_pct > 0 && (
-          <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700 dark:bg-red-900/30 dark:text-red-300">
+          <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700">
             {sale.discount_pct.toFixed(1)}% below asking
           </span>
         )}
         {sale.is_verified && (
-          <span className="inline-flex items-center gap-0.5 text-[10px] text-emerald-600 dark:text-emerald-400">
+          <span className="inline-flex items-center gap-0.5 text-[10px] text-emerald-600">
             <CheckCircle size={10} /> Verified
           </span>
         )}

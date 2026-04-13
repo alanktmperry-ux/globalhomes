@@ -191,7 +191,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
                 </span>
               )}
               {isPetFriendly && (
-                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full">
                   <PawPrint size={11} />
                   {t('filter.petFriendly')}
                 </span>

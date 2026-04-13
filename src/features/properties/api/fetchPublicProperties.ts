@@ -161,14 +161,12 @@ export async function searchAgentListings(
     dbQuery = dbQuery.ilike('property_type', `%${structured.propertyType}%`);
   }
 
-  // Listing type: use .eq for exact match, .filter for sale+null to avoid a second .or()
+  // Listing type: use .eq/.is for exact match to avoid a second .or() that conflicts
   if (listingType === 'rent') {
     dbQuery = dbQuery.eq('listing_type', 'rent');
   } else if (listingType === 'sale') {
-    // Cannot use .or() here — would conflict with the keyword/suburb .or() above.
-    // Instead, filter client-side or use PostgREST and() grouping in the main .or().
-    // Safest: just filter to not-rent, since only sale and null are non-rent values.
-    dbQuery = dbQuery.neq('listing_type', 'rent');
+    // Include sale + null (legacy rows). Use .not() to exclude rent instead of a conflicting .or()
+    dbQuery = dbQuery.not('listing_type', 'eq', 'rent');
   }
 
   const { data, error } = await dbQuery;

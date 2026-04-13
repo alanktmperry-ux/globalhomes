@@ -1226,21 +1226,21 @@ export default function AgencyOnboardingPage() {
           <span className="font-display text-lg font-bold text-foreground">ListHQ</span>
         </div>
         {/* Progress */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div>
-            <h1 className="text-xl font-bold text-foreground">
+            <h1 className="text-lg font-bold text-foreground">
               Agency Setup
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               {showPasswordStep ? 'Secure your account' : `Step ${step + 1} of ${totalSteps}`}
             </p>
           </div>
-          <Progress value={progressPct} className="h-2" />
+          <Progress value={progressPct} className="h-1.5" />
           <div className="flex justify-between">
             {stepLabels.map((label, i) => (
               <span
                 key={i}
-                className={`text-[11px] font-medium transition-colors ${i < step ? 'text-primary' : i === step ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}
+                className={`text-[10px] font-medium transition-colors ${i < step ? 'text-primary' : i === step ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}
               >
                 {i < step ? '✓ ' : ''}{label}
               </span>
@@ -1249,8 +1249,8 @@ export default function AgencyOnboardingPage() {
         </div>
 
         {/* Step content */}
-        <Card>
-          <CardContent className="p-6">
+        <Card className="flex-1 min-h-0 overflow-y-auto">
+          <CardContent className="p-4 sm:p-6">
             <motion.div
               key={step}
               initial={{ opacity: 0, x: 20 }}

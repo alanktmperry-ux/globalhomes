@@ -56,6 +56,7 @@ const DashboardOverview = () => {
   const [sendingReminder, setSendingReminder] = useState<string | null>(null);
   const [reportsDue, setReportsDue] = useState<any[]>([]);
   const [sendingReport, setSendingReport] = useState<string | null>(null);
+  const [agencyConnected, setAgencyConnected] = useState(false);
 
   // Onboarding checklist state
   const [onboardingDismissed, setOnboardingDismissed] = useState(false);
@@ -86,6 +87,21 @@ const DashboardOverview = () => {
   };
 
   // Fetch onboarding agent data + persisted steps
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+
+      supabase
+        .from('agents')
+        .select('onboarding_complete')
+        .eq('user_id', user.id)
+        .maybeSingle()
+        .then(({ data }) => {
+          setAgencyConnected(data?.onboarding_complete === true);
+        });
+    });
+  }, []);
+
   useEffect(() => {
     if (!user) return;
     const fetchOnboarding = async () => {
@@ -480,7 +496,7 @@ const DashboardOverview = () => {
         {!onboardingDismissed && (() => {
           const step1 = !!(onboardingAgent?.name && onboardingAgent?.phone && onboardingAgent?.avatar_url && onboardingAgent?.bio);
           const step2 = onboardingHasListing || listings.length > 0;
-          const step3 = !!onboardingAgent?.agency_id || !!onboardingAgent?.onboarding_complete;
+          const step3 = agencyConnected;
           const step4 = !!onboardingAgent?.stripe_customer_id;
           const step5 = !!onboardingSteps.dashboard;
           const steps = [

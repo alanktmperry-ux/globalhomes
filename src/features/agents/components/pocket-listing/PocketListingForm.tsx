@@ -13,6 +13,24 @@ import StepVoice from './StepVoice';
 import StepSettings from './StepSettings';
 import StepPreview from './StepPreview';
 
+function parseSuburbFallback(address: string): string {
+  const segments = address.split(',').map(s => s.trim());
+  for (let i = segments.length - 1; i >= 0; i--) {
+    const match = segments[i].match(/^([A-Za-z\s'-]+?)\s+(?:VIC|NSW|QLD|SA|WA|TAS|NT|ACT)\b/i);
+    if (match) return match[1].trim();
+  }
+  if (segments.length >= 2) {
+    const candidate = segments[segments.length - 2].replace(/\d+/g, '').trim();
+    if (candidate.length >= 3 && candidate.length <= 40) return candidate;
+  }
+  return 'Unknown';
+}
+
+function parseStateFallback(address: string): string {
+  const match = address.match(/\b(VIC|NSW|QLD|SA|WA|TAS|NT|ACT)\b/i);
+  return match ? match[1].toUpperCase() : 'Unknown';
+}
+
 export interface ListingDraft {
   address: string;
   suburb: string;
@@ -375,8 +393,8 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
       const payload = {
         title,
         address: draft.address,
-        suburb: draft.suburb || 'Unknown',
-        state: draft.state || 'Unknown',
+        suburb: draft.suburb && draft.suburb !== 'Unknown' ? draft.suburb : parseSuburbFallback(draft.address),
+        state: draft.state && draft.state !== 'Unknown' ? draft.state : parseStateFallback(draft.address),
         country: 'Australia',
         price: draft.listingType === 'rent' ? (draft.rentalWeekly || draft.priceMax) : draft.priceMax,
         price_formatted: formatPriceForDB(draft),

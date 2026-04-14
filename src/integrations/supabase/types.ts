@@ -5267,6 +5267,7 @@ export type Database = {
           land_value: number | null
           lat: number | null
           lease_term: string | null
+          letting_fee_weeks: number | null
           listed_at: string | null
           listed_date: string | null
           listing_category: string
@@ -5294,6 +5295,7 @@ export type Database = {
           rental_parking_type: string | null
           rental_weekly: number | null
           rental_yield_pct: number | null
+          screening_level: string
           slug: string | null
           smoking_allowed: boolean | null
           sold_at: string | null
@@ -5388,6 +5390,7 @@ export type Database = {
           land_value?: number | null
           lat?: number | null
           lease_term?: string | null
+          letting_fee_weeks?: number | null
           listed_at?: string | null
           listed_date?: string | null
           listing_category?: string
@@ -5415,6 +5418,7 @@ export type Database = {
           rental_parking_type?: string | null
           rental_weekly?: number | null
           rental_yield_pct?: number | null
+          screening_level?: string
           slug?: string | null
           smoking_allowed?: boolean | null
           sold_at?: string | null
@@ -5509,6 +5513,7 @@ export type Database = {
           land_value?: number | null
           lat?: number | null
           lease_term?: string | null
+          letting_fee_weeks?: number | null
           listed_at?: string | null
           listed_date?: string | null
           listing_category?: string
@@ -5536,6 +5541,7 @@ export type Database = {
           rental_parking_type?: string | null
           rental_weekly?: number | null
           rental_yield_pct?: number | null
+          screening_level?: string
           slug?: string | null
           smoking_allowed?: boolean | null
           sold_at?: string | null
@@ -9923,6 +9929,7 @@ export type Database = {
           land_value: number | null
           lat: number | null
           lease_term: string | null
+          letting_fee_weeks: number | null
           listed_at: string | null
           listed_date: string | null
           listing_category: string
@@ -9950,6 +9957,7 @@ export type Database = {
           rental_parking_type: string | null
           rental_weekly: number | null
           rental_yield_pct: number | null
+          screening_level: string
           slug: string | null
           smoking_allowed: boolean | null
           sold_at: string | null

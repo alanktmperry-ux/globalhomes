@@ -19,9 +19,13 @@ const SeekerAuthPage = () => {
   const [displayName, setDisplayName] = useState('');
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
+  const [seekingType, setSeekingType] = useState<'buy' | 'rent' | ''>('');
   const [budgetMax, setBudgetMax] = useState('');
+  const [weeklyBudget, setWeeklyBudget] = useState('');
   const [suburbs, setSuburbs] = useState('');
   const [propertyType, setPropertyType] = useState('');
+  const [petsRequired, setPetsRequired] = useState(false);
+  const [furnishedRequired, setFurnishedRequired] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [pendingSignIn, setPendingSignIn] = useState(false);
   const captchaRef = useRef<HCaptcha>(null);
@@ -117,12 +121,16 @@ const SeekerAuthPage = () => {
   const handleSavePrefs = async () => {
     try {
       const { data: { user: u } } = await supabase.auth.getUser();
-      if (u && (budgetMax || suburbs)) {
+      if (u) {
         await supabase
           .from('user_preferences')
           .update({
-            budget_max: budgetMax ? parseInt(budgetMax.replace(/[^0-9]/g, '')) : null,
+            budget_max: seekingType === 'buy' && budgetMax ? parseInt(budgetMax.replace(/[^0-9]/g, '')) : null,
             preferred_locations: suburbs ? suburbs.split(',').map(s => s.trim()).filter(Boolean) : [],
+            seeking_type: seekingType || null,
+            weekly_budget: seekingType === 'rent' && weeklyBudget ? parseInt(weeklyBudget) : null,
+            pets_required: seekingType === 'rent' ? petsRequired : false,
+            furnished_required: seekingType === 'rent' ? furnishedRequired : false,
           } as any)
           .eq('user_id', u.id);
       }
@@ -206,45 +214,90 @@ const SeekerAuthPage = () => {
                     Help us show you the right properties. Change this anytime.
                   </p>
                 </div>
-                <div>
-                  <label className={label}>Max budget (optional)</label>
-                  <select value={budgetMax} onChange={e => setBudgetMax(e.target.value)}
-                    className="w-full h-[52px] px-4 rounded-2xl border border-stone-200 bg-stone-50 text-[15px] text-stone-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all">
-                    <option value="">No preference</option>
-                    <option value="500000">Up to $500k</option>
-                    <option value="750000">Up to $750k</option>
-                    <option value="1000000">Up to $1M</option>
-                    <option value="1500000">Up to $1.5M</option>
-                    <option value="2000000">Up to $2M</option>
-                    <option value="3000000">Up to $3M</option>
-                    <option value="5000000">Up to $5M</option>
-                  </select>
+
+                {/* Buy / Rent selector */}
+                <div className="grid grid-cols-2 gap-3">
+                  {([['buy', '🏡', 'Buy a Property'], ['rent', '🔑', 'Rent a Property']] as const).map(([val, icon, lbl]) => (
+                    <button key={val} type="button" onClick={() => setSeekingType(val)}
+                      className={`p-5 rounded-2xl border-2 text-center transition-all ${
+                        seekingType === val
+                          ? 'border-blue-600 bg-blue-50 shadow-sm'
+                          : 'border-stone-200 bg-white hover:border-stone-300'
+                      }`}>
+                      <span className="text-2xl block mb-1.5">{icon}</span>
+                      <span className={`text-[14px] font-medium ${seekingType === val ? 'text-blue-700' : 'text-stone-600'}`}>{lbl}</span>
+                    </button>
+                  ))}
                 </div>
-                <div>
-                  <label className={label}>Preferred suburbs (optional)</label>
-                  <input type="text" value={suburbs} onChange={e => setSuburbs(e.target.value)}
-                    placeholder="e.g. Richmond, Fitzroy, Collingwood" className={input} />
-                  <p className="text-[11px] text-stone-300 mt-1.5">Separate with commas</p>
-                </div>
-                <div>
-                  <label className={label}>Property type (optional)</label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {['House', 'Apartment', 'Townhouse', 'Land', 'Any'].map(type => (
-                      <button key={type} type="button"
-                        onClick={() => setPropertyType(type === 'Any' ? '' : type)}
-                        className={`h-10 rounded-xl text-[13px] font-medium border transition-all ${
-                          (type === 'Any' ? !propertyType : propertyType === type)
-                            ? 'bg-blue-600 text-white border-blue-600'
-                            : 'bg-white text-stone-500 border-stone-200 hover:border-stone-300'
-                        }`}
-                      >
-                        {type}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+
+                {/* Conditional fields after selection */}
+                {seekingType && (
+                  <>
+                    {seekingType === 'buy' && (
+                      <div>
+                        <label className={label}>Max Purchase Budget (optional)</label>
+                        <select value={budgetMax} onChange={e => setBudgetMax(e.target.value)}
+                          className="w-full h-[52px] px-4 rounded-2xl border border-stone-200 bg-stone-50 text-[15px] text-stone-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all">
+                          <option value="">No preference</option>
+                          <option value="500000">Up to $500k</option>
+                          <option value="750000">Up to $750k</option>
+                          <option value="1000000">Up to $1M</option>
+                          <option value="1500000">Up to $1.5M</option>
+                          <option value="2000000">Up to $2M</option>
+                          <option value="3000000">Up to $3M</option>
+                          <option value="5000000">Up to $5M</option>
+                        </select>
+                      </div>
+                    )}
+                    {seekingType === 'rent' && (
+                      <div>
+                        <label className={label}>Max Weekly Rent $ (optional)</label>
+                        <input type="number" value={weeklyBudget} onChange={e => setWeeklyBudget(e.target.value)}
+                          placeholder="e.g. 650" className={input} />
+                      </div>
+                    )}
+                    <div>
+                      <label className={label}>Preferred suburbs (optional)</label>
+                      <input type="text" value={suburbs} onChange={e => setSuburbs(e.target.value)}
+                        placeholder="e.g. Richmond, Fitzroy, Collingwood" className={input} />
+                      <p className="text-[11px] text-stone-300 mt-1.5">Separate with commas</p>
+                    </div>
+                    <div>
+                      <label className={label}>Property type (optional)</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {['House', 'Apartment', 'Townhouse', 'Land', 'Any'].map(type => (
+                          <button key={type} type="button"
+                            onClick={() => setPropertyType(type === 'Any' ? '' : type)}
+                            className={`h-10 rounded-xl text-[13px] font-medium border transition-all ${
+                              (type === 'Any' ? !propertyType : propertyType === type)
+                                ? 'bg-blue-600 text-white border-blue-600'
+                                : 'bg-white text-stone-500 border-stone-200 hover:border-stone-300'
+                            }`}
+                          >
+                            {type}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    {seekingType === 'rent' && (
+                      <div className="space-y-3">
+                        <label className="flex items-center gap-3 cursor-pointer">
+                          <input type="checkbox" checked={petsRequired} onChange={e => setPetsRequired(e.target.checked)}
+                            className="w-4 h-4 rounded accent-blue-600" />
+                          <span className="text-[14px] text-stone-700">Pet friendly only</span>
+                        </label>
+                        <label className="flex items-center gap-3 cursor-pointer">
+                          <input type="checkbox" checked={furnishedRequired} onChange={e => setFurnishedRequired(e.target.checked)}
+                            className="w-4 h-4 rounded accent-blue-600" />
+                          <span className="text-[14px] text-stone-700">Furnished only</span>
+                        </label>
+                      </div>
+                    )}
+                  </>
+                )}
+
                 <div className="flex flex-col gap-2 pt-1">
-                  <button type="button" onClick={handleSavePrefs} className={btnPrimary}>
+                  <button type="button" onClick={handleSavePrefs} disabled={!seekingType} className={btnPrimary}>
                     Start searching
                   </button>
                   <button type="button" onClick={() => navigate('/')}

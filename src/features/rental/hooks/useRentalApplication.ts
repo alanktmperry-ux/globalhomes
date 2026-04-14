@@ -7,6 +7,9 @@ export interface ApplicationFormData {
   full_name: string;
   email: string;
   phone: string;
+  id_document_number: string;
+  emergency_contact_name: string;
+  emergency_contact_phone: string;
   date_of_birth: string;
   current_address: string;
   time_at_address: string;
@@ -48,6 +51,9 @@ export function useRentalApplication(propertyId: string) {
           email: formData.email,
           phone: formData.phone,
           date_of_birth: formData.date_of_birth || null,
+          id_document_number: formData.id_document_number || null,
+          emergency_contact_name: formData.emergency_contact_name || null,
+          emergency_contact_phone: formData.emergency_contact_phone || null,
           current_address: formData.current_address,
           time_at_address: formData.time_at_address,
           employment_status: formData.employment_status,

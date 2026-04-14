@@ -6048,12 +6048,15 @@ export type Database = {
           date_of_birth: string
           declaration_accepted: boolean
           email: string
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
           employer_name: string | null
           employment_length: string | null
           employment_status: string
           full_name: string
           has_pets: boolean | null
           id: string
+          id_document_number: string | null
           identity_document_type: string | null
           identity_document_url: string | null
           income_verified: boolean | null
@@ -6091,12 +6094,15 @@ export type Database = {
           date_of_birth: string
           declaration_accepted?: boolean
           email: string
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
           employer_name?: string | null
           employment_length?: string | null
           employment_status: string
           full_name: string
           has_pets?: boolean | null
           id?: string
+          id_document_number?: string | null
           identity_document_type?: string | null
           identity_document_url?: string | null
           income_verified?: boolean | null
@@ -6134,12 +6140,15 @@ export type Database = {
           date_of_birth?: string
           declaration_accepted?: boolean
           email?: string
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
           employer_name?: string | null
           employment_length?: string | null
           employment_status?: string
           full_name?: string
           has_pets?: boolean | null
           id?: string
+          id_document_number?: string | null
           identity_document_type?: string | null
           identity_document_url?: string | null
           income_verified?: boolean | null

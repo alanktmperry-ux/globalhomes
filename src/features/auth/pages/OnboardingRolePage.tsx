@@ -34,7 +34,13 @@ const OnboardingRolePage = () => {
   const [selected, setSelected] = useState<Role | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const handleContinue = async () => {
+  useEffect(() => {
+    if (user?.user_metadata?.registered_as === 'agent') {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
+
+
     if (!selected || !user) return;
     setSaving(true);
 

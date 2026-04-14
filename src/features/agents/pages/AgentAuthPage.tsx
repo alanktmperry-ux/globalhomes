@@ -102,7 +102,7 @@ const AgentAuthPage = () => {
         password: crypto.randomUUID(),
         options: {
           emailRedirectTo: `${window.location.origin}/dashboard/onboarding`,
-          data: { registration_started: true },
+          data: { registration_started: true, registered_as: 'agent' },
         },
       });
       // If user already exists (signUp returns user with identities=[]), send magic link instead

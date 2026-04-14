@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -33,6 +33,12 @@ const OnboardingRolePage = () => {
   const navigate = useNavigate();
   const [selected, setSelected] = useState<Role | null>(null);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (user?.user_metadata?.registered_as === 'agent') {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
 
   const handleContinue = async () => {
     if (!selected || !user) return;

@@ -172,7 +172,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
           title: `New enquiry from ${formData.name}`,
           message: formData.message || `Interested in ${property.title}`,
           property_id: property.id,
-          lead_id: leadRow?.id || null,
+          lead_id: null,
           is_read: false,
         });
       } catch (notifErr) {

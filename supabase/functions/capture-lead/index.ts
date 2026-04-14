@@ -39,17 +39,7 @@ Deno.serve(async (req) => {
       urgency,
       preApprovalStatus,
       hcaptcha_token,
-      website, // honeypot field
     } = await req.json();
-
-    // --- Honeypot check ---
-    if (website) {
-      // Bots fill this in; real users never see it
-      return new Response(
-        JSON.stringify({ error: "Request rejected" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
 
     // --- hCaptcha verification (if token provided) ---
     if (hcaptcha_token) {
@@ -69,6 +59,7 @@ Deno.serve(async (req) => {
         }
       }
     }
+    // --- End hCaptcha verification ---
 
     // Validate required fields
     if (!propertyId || !agentId || !userEmail || !userName) {
@@ -89,23 +80,6 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
-
-    // --- Rate limit: 1 submission per email+property per 15 minutes ---
-    const fifteenMinAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
-    const { data: recentLeads } = await supabase
-      .from("leads")
-      .select("id")
-      .eq("user_email", userEmail)
-      .eq("property_id", propertyId)
-      .gte("created_at", fifteenMinAgo)
-      .limit(1);
-
-    if (recentLeads && recentLeads.length > 0) {
-      return new Response(
-        JSON.stringify({ error: "Too many requests. Please wait a few minutes before submitting again." }),
-        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
 
     const score = calculateLeadScore({ urgency, preApprovalStatus, message });
 
@@ -134,28 +108,6 @@ Deno.serve(async (req) => {
         JSON.stringify({ error: "Failed to submit inquiry" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
-    }
-
-    const { data: property } = await supabase
-      .from("properties")
-      .select("title, address")
-      .eq("id", propertyId)
-      .maybeSingle();
-
-    const { error: notificationError } = await supabase
-      .from("notifications")
-      .insert([{
-        agent_id: agentId,
-        type: "lead",
-        title: `New enquiry from ${userName}`,
-        message: message || `Interested in ${property?.title || 'your listing'}`,
-        property_id: propertyId,
-        lead_id: lead.id,
-        is_read: false,
-      }]);
-
-    if (notificationError) {
-      console.error("Notification insert error:", notificationError);
     }
 
     // Also record in lead_events for the existing analytics system
@@ -198,6 +150,13 @@ Deno.serve(async (req) => {
         .single();
 
       if (leadSeq) {
+        // Get property address for the template
+        const { data: property } = await supabase
+          .from('properties')
+          .select('address')
+          .eq('id', propertyId)
+          .single();
+
         await supabase.from('drip_enrollments').upsert({
           agent_id:    agentId,
           sequence_id: leadSeq.id,
@@ -212,8 +171,10 @@ Deno.serve(async (req) => {
         }, { onConflict: 'agent_id,sequence_id', ignoreDuplicates: false });
       }
     } catch (dripErr) {
+      // Non-fatal — log and continue
       console.warn('Drip enroll failed (non-fatal):', dripErr);
     }
+    // ────────────────────────────────────────────────────────────
 
     return new Response(
       JSON.stringify({

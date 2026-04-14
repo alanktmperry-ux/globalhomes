@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useRentalApplication, type ApplicationFormData } from '../hooks/useRentalApplication';
 import type { CoApplicant } from '../types';
 import { CheckCircle, Plus, Trash2 } from 'lucide-react';
-import { AddressAutocomplete } from '@/components/ui/AddressAutocomplete';
 
 const INITIAL: ApplicationFormData = {
   full_name: '', email: '', phone: '',
@@ -82,18 +81,7 @@ export function RentalApplicationForm({ propertyId, rentPw }: Props) {
             <InputField label="Phone" field="phone" type="tel" required />
           </div>
           <InputField label="Date of Birth" field="date_of_birth" type="date" />
-          <div>
-            <label className="block text-xs font-medium text-muted-foreground mb-1">
-              Current Address<span className="text-destructive">*</span>
-            </label>
-            <AddressAutocomplete
-              value={String(form.current_address ?? '')}
-              onChange={val => set('current_address', val)}
-              onSelect={() => {}}
-              placeholder="Start typing your address…"
-              className="w-full"
-            />
-          </div>
+          <InputField label="Current Address" field="current_address" required />
           <div>
             <label className="block text-xs font-medium text-muted-foreground mb-1">Time at current address</label>
             <select value={form.time_at_address}

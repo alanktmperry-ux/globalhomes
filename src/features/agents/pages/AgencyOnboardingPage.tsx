@@ -5,7 +5,6 @@ import { ArrowLeft, ArrowRight, Building2, Upload, CheckCircle2, Landmark, Calen
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { AddressAutocomplete } from '@/components/ui/AddressAutocomplete';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -980,7 +979,7 @@ export default function AgencyOnboardingPage() {
                 <Label className="text-xs font-semibold text-foreground">
                   Agency Street Address <span className="text-destructive ml-0.5">*</span>
                 </Label>
-                <AddressAutocomplete value={agencyAddress} onChange={setAgencyAddress} onSelect={() => {}} placeholder="123 High Street, Richmond VIC 3121" className="mt-1.5" />
+                <Input value={agencyAddress} onChange={e => setAgencyAddress(e.target.value)} placeholder={isAustralia ? '123 High Street, Richmond VIC 3121' : 'Office street address'} className="mt-1.5" />
                 {agencyAddress && (
                   <p className="text-[11px] text-muted-foreground mt-1">Pre-filled from your registration — edit if needed</p>
                 )}

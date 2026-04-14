@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { motion } from 'framer-motion';
 import { Building2, Landmark, Users, FileText, CheckCircle } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -21,7 +22,10 @@ const PartnerAuthPage = () => {
   const [website, setWebsite] = useState('');
   const [loading, setLoading] = useState(false);
   const [registered, setRegistered] = useState(false);
-
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [pendingSignIn, setPendingSignIn] = useState(false);
+  const captchaRef = useRef<HCaptcha>(null);
+  const hcaptchaSiteKey = import.meta.env.VITE_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001';
 
   const inputClass = "w-full px-4 py-3.5 rounded-full border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40";
 
@@ -31,8 +35,13 @@ const PartnerAuthPage = () => {
     { icon: FileText, text: 'Full audit trail for every transaction' },
   ];
 
-
-
+  // Auto-submit sign-in after captcha verification
+  useEffect(() => {
+    if (pendingSignIn && captchaToken && step === 'password') {
+      setPendingSignIn(false);
+      handleSignIn({ preventDefault: () => {} } as React.FormEvent);
+    }
+  }, [pendingSignIn, captchaToken]);
 
   const handleEmailContinue = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,9 +51,16 @@ const PartnerAuthPage = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!captchaToken) {
+      setPendingSignIn(true);
+      captchaRef.current?.execute();
+      return;
+    }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({ email, password, options: { captchaToken } });
+      setCaptchaToken(null);
+      captchaRef.current?.resetCaptcha();
       if (error) {
         if (error.message.includes('Email not confirmed')) {
           throw new Error('Please check your email and click the confirmation link before signing in.');
@@ -224,6 +240,12 @@ const PartnerAuthPage = () => {
                 <div className="text-right">
                   <Link to="/forgot-password" className="text-xs text-primary font-medium underline underline-offset-2">Forgot password?</Link>
                 </div>
+                <HCaptcha
+                  sitekey={hcaptchaSiteKey}
+                  size="invisible"
+                  ref={captchaRef}
+                  onVerify={setCaptchaToken}
+                />
                 <button type="submit" disabled={loading} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
                   {loading ? 'Signing in…' : 'Sign in'}
                 </button>

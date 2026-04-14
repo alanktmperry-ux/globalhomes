@@ -439,7 +439,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         has_dishwasher: draft.hasDishwasher || false,
         has_washing_machine: draft.hasWashingMachine || false,
         has_air_con: draft.hasAirCon || false,
-        has_balcony: draft.hasAlfresco || false,
+        has_balcony: draft.hasBalcony || false,
         has_pool_access: draft.hasPoolAccess || false,
         has_gym_access: draft.hasGymAccess || false,
         smoking_allowed: draft.smokingAllowed || false,

@@ -285,7 +285,14 @@ Deno.serve(async (req) => {
       }
 
       // Also clean audit_log by user_id (covers non-agent entries)
-      await supabase.from("audit_log").delete().eq("user_id", user_id);
+      const { error: auditUserErr } = await supabase
+        .from("audit_log")
+        .delete()
+        .eq("user_id", user_id);
+      if (auditUserErr) {
+        console.error("audit_log user cleanup error:", auditUserErr);
+        warnings.push(`audit_log_user: ${auditUserErr.message}`);
+      }
 
       const { error: rpcError } = await supabase.rpc("delete_user_cascade", {
         p_user_id: user_id,
@@ -443,8 +450,9 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
+    console.error("admin-users unhandled error:", err);
     return new Response(JSON.stringify({ error: (err as Error).message }), {
-      status: 500,
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }

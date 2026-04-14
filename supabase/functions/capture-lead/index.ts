@@ -136,6 +136,28 @@ Deno.serve(async (req) => {
       );
     }
 
+    const { data: property } = await supabase
+      .from("properties")
+      .select("title, address")
+      .eq("id", propertyId)
+      .maybeSingle();
+
+    const { error: notificationError } = await supabase
+      .from("notifications")
+      .insert([{
+        agent_id: agentId,
+        type: "lead",
+        title: `New enquiry from ${userName}`,
+        message: message || `Interested in ${property?.title || 'your listing'}`,
+        property_id: propertyId,
+        lead_id: lead.id,
+        is_read: false,
+      }]);
+
+    if (notificationError) {
+      console.error("Notification insert error:", notificationError);
+    }
+
     // Also record in lead_events for the existing analytics system
     await supabase.from("lead_events").insert([{
       property_id: propertyId,
@@ -176,12 +198,6 @@ Deno.serve(async (req) => {
         .single();
 
       if (leadSeq) {
-        const { data: property } = await supabase
-          .from('properties')
-          .select('address')
-          .eq('id', propertyId)
-          .single();
-
         await supabase.from('drip_enrollments').upsert({
           agent_id:    agentId,
           sequence_id: leadSeq.id,

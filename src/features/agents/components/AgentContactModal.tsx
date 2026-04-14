@@ -116,21 +116,24 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
         listingMode: searchContext.listingMode,
       } : null;
 
-      // Insert lead directly
-      const { error } = await supabase
-        .from('leads')
-        .insert({
-          property_id: property.id,
-          agent_id: agent.id,
-          user_name: formData.name,
-          user_email: formData.email,
-          user_phone: formData.phone,
+      const { data: captureResult, error: captureError } = await supabase.functions.invoke('capture-lead', {
+        body: {
+          propertyId: property.id,
+          agentId: agent.id,
+          userEmail: formData.email,
+          userPhone: formData.phone,
+          userName: formData.name,
           message: formData.message || null,
-          search_context: contextPayload,
-          user_id: user?.id || null,
-        });
+          searchContext: contextPayload,
+          preferredContact: 'email',
+          urgency: 'just_browsing',
+          website: honeypot,
+        },
+      });
 
-      if (error) throw error;
+      if (captureError) throw captureError;
+
+      const leadId = captureResult?.leadId ?? null;
 
       // Create conversation so agent & buyer can chat (client-side, needs user auth)
       if (user?.id) {
@@ -147,6 +150,9 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
           const { data: convo } = await supabase
             .from('conversations')
             .upsert({
+              type: 'lead_reply',
+              lead_id: leadId,
+              title: `Enquiry from ${formData.name}`,
               participant_1: p1,
               participant_2: p2,
               property_id: property.id,
@@ -162,21 +168,6 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
             });
           }
         }
-      }
-
-      // Create notification for the agent (non-blocking — lead is already saved)
-      try {
-        await supabase.from('notifications').insert({
-          agent_id: agent.id,
-          type: 'lead',
-          title: `New enquiry from ${formData.name}`,
-          message: formData.message || `Interested in ${property.title}`,
-          property_id: property.id,
-          lead_id: null,
-          is_read: false,
-        });
-      } catch (notifErr) {
-        console.warn('Notification insert failed (non-blocking):', notifErr);
       }
 
       setSubmitted(true);

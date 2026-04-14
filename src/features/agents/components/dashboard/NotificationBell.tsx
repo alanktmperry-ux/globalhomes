@@ -103,7 +103,9 @@ export function NotificationBell() {
   const handleNotificationClick = (notification: Notification) => {
     markAsRead(notification.id);
     setOpen(false);
-    if (notification.lead_id) {
+    if (notification.type === 'lead') {
+      navigate('/messages');
+    } else if (notification.lead_id) {
       navigate(`/dashboard/concierge?lead=${notification.lead_id}`);
     } else if (notification.property_id) {
       navigate(`/dashboard/listings/${notification.property_id}`);

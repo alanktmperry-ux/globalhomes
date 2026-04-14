@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Bed, Bath, Car, Heart, BadgeCheck, Star, Sparkles, Shield, ShieldCheck, Eye, Users, TrendingUp, UserCheck, CalendarDays, PawPrint, Sofa } from 'lucide-react';
+import { Bed, Bath, Car, Heart, BadgeCheck, Star, Sparkles, Shield, ShieldCheck, Eye, UserCheck, CalendarDays, PawPrint, Sofa } from 'lucide-react';
 import { TourBadge } from '@/components/tour/TourBadge';
 import { OffMarketBadge } from '@/features/offmarket/components/OffMarketBadge';
 import { Property, PropertyStatus } from '@/shared/lib/types';
@@ -63,14 +63,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
   const isPetFriendly = featuresLower.some(f => f.includes('pet') || f.includes('dog') || f.includes('cat'));
   const isFurnished = featuresLower.some(f => f.includes('furnished'));
 
-  // Seeded pseudo-random for consistent demo numbers per property
-  const socialProof = useMemo(() => {
-    const hash = property.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-    const viewsToday = 5 + (hash % 16); // 5–20
-    const savedByCount = 3 + (hash % 10); // 3–12
-    const rentedNearby = 1 + (hash % 5);  // 1–5
-    return { viewsToday, savedByCount, rentedNearby };
-  }, [property.id]);
+  const realViews = typeof property.views === 'number' && property.views > 0 ? property.views : null;
 
   const statusConfig: Record<PropertyStatus, { label: string; className: string } | null> = {
     'off-market': { label: 'Off-Market', className: 'bg-amber-500/90 text-white' },

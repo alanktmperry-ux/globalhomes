@@ -55,7 +55,19 @@ Deno.serve(async (req) => {
 
     const agentId = agent?.id;
 
-    // Step 2: Deactivate all properties
+    // Step 2: Delete audit_log entries referencing this agent
+    if (agentId) {
+      const { error } = await supabase
+        .from("audit_log")
+        .delete()
+        .eq("agent_id", agentId);
+      if (error) {
+        console.error("Failed to delete audit_log:", error);
+        errors.push(`audit_log: ${error.message}`);
+      }
+    }
+
+    // Step 3: Deactivate all properties
     if (agentId) {
       const { error } = await supabase
         .from("properties")

@@ -117,7 +117,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
       } : null;
 
       // Insert lead directly
-      const { data: leadRow, error } = await supabase
+      const { error } = await supabase
         .from('leads')
         .insert({
           property_id: property.id,
@@ -128,9 +128,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
           message: formData.message || null,
           search_context: contextPayload,
           user_id: user?.id || null,
-        })
-        .select('id')
-        .maybeSingle();
+        });
 
       if (error) throw error;
 

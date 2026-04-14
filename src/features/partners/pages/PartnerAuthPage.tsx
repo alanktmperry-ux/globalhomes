@@ -21,10 +21,7 @@ const PartnerAuthPage = () => {
   const [website, setWebsite] = useState('');
   const [loading, setLoading] = useState(false);
   const [registered, setRegistered] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [pendingSignIn, setPendingSignIn] = useState(false);
-  const captchaRef = useRef<HCaptcha>(null);
-  const hcaptchaSiteKey = import.meta.env.VITE_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001';
+
 
   const inputClass = "w-full px-4 py-3.5 rounded-full border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40";
 

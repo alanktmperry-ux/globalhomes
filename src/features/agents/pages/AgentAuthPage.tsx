@@ -21,13 +21,7 @@ const AgentAuthPage = () => {
   const [regEmail, setRegEmail] = useState('');
   const [emailSubmitting, setEmailSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [pendingSignIn, setPendingSignIn] = useState(false);
 
-  // ── All useRef hooks ──
-  const captchaRef = useRef<HCaptcha>(null);
-
-  const hcaptchaSiteKey = import.meta.env.VITE_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001';
 
   // ── useEffect hooks ──
   useEffect(() => {

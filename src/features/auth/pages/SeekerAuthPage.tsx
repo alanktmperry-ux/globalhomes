@@ -21,18 +21,7 @@ const SeekerAuthPage = () => {
   const [budgetMax, setBudgetMax] = useState('');
   const [suburbs, setSuburbs] = useState('');
   const [propertyType, setPropertyType] = useState('');
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [pendingSignIn, setPendingSignIn] = useState(false);
-  const captchaRef = useRef<HCaptcha>(null);
-  const hcaptchaSiteKey = import.meta.env.VITE_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001';
 
-  // Auto-submit sign-in after captcha verification
-  useEffect(() => {
-    if (pendingSignIn && captchaToken && step === 'password') {
-      setPendingSignIn(false);
-      handleSignIn({ preventDefault: () => {} } as React.FormEvent);
-    }
-  }, [pendingSignIn, captchaToken]);
 
   const handleEmailContinue = (e: React.FormEvent) => {
     e.preventDefault();

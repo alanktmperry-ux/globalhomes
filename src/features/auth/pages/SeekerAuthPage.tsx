@@ -31,16 +31,9 @@ const SeekerAuthPage = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!captchaToken) {
-      setPendingSignIn(true);
-      captchaRef.current?.execute();
-      return;
-    }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password, options: { captchaToken } });
-      setCaptchaToken(null);
-      captchaRef.current?.resetCaptcha();
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         if (error.message.includes('Email not confirmed')) {
           throw new Error('Please check your email and click the confirmation link before signing in.');
@@ -326,12 +319,6 @@ const SeekerAuthPage = () => {
                         <input type="password" required autoFocus minLength={8} value={password}
                           onChange={e => setPassword(e.target.value)} className={input} />
                       </div>
-                      <HCaptcha
-                        sitekey={hcaptchaSiteKey}
-                        size="invisible"
-                        ref={captchaRef}
-                        onVerify={setCaptchaToken}
-                      />
                       <button type="submit" disabled={loading} className={btnPrimary}>
                         {loading ? 'Signing in…' : 'Sign In'}
                       </button>

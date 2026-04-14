@@ -19,9 +19,13 @@ const SeekerAuthPage = () => {
   const [displayName, setDisplayName] = useState('');
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
+  const [seekingType, setSeekingType] = useState<'buy' | 'rent' | ''>('');
   const [budgetMax, setBudgetMax] = useState('');
+  const [weeklyBudget, setWeeklyBudget] = useState('');
   const [suburbs, setSuburbs] = useState('');
   const [propertyType, setPropertyType] = useState('');
+  const [petsRequired, setPetsRequired] = useState(false);
+  const [furnishedRequired, setFurnishedRequired] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [pendingSignIn, setPendingSignIn] = useState(false);
   const captchaRef = useRef<HCaptcha>(null);

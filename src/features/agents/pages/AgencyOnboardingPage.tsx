@@ -242,9 +242,9 @@ export default function AgencyOnboardingPage() {
       toast.success('Trust account created');
       // Skip step 4 for fresh path
       if (path === 'fresh') {
-        setStep(4); // goes to step 5 content (fresh confirmation)
+        setStep(5);
       } else {
-        setStep(4); // goes to step 4 content (cut-over date)
+        setStep(4);
       }
     } catch (e: unknown) {
       toast.error(getErrorMessage(e) || 'Failed to create trust account');
@@ -257,7 +257,7 @@ export default function AgencyOnboardingPage() {
     if (!user) return;
     await supabase.from('agents').update({ trust_setup_pending: true } as any).eq('user_id', user.id);
     if (path === 'fresh') {
-      setStep(4);
+      setStep(5);
     } else {
       setStep(4);
     }

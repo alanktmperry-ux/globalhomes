@@ -67,7 +67,7 @@ export interface ListingDraft {
   // Rental-specific
   availableFrom: string;
   leaseTerm: string;
-  furnished: boolean;
+  furnished: 'unfurnished' | 'partially_furnished' | 'furnished';
   petsAllowed: boolean;
   screeningLevel: string;
 
@@ -144,7 +144,7 @@ const DEFAULT_DRAFT: ListingDraft = {
   bondAmount: 0,
   availableFrom: '',
   leaseTerm: '12 months',
-  furnished: false,
+  furnished: 'unfurnished',
   petsAllowed: false,
   screeningLevel: 'Basic',
 
@@ -285,7 +285,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         bondAmount: (prop as any).bond_amount || ((prop.listing_type === 'rent' ? (prop.rental_weekly || 0) : 0) * 4),
         availableFrom: (prop as any).available_from || '',
         leaseTerm: (prop as any).lease_term || '12 months',
-        furnished: (prop as any).furnished || false,
+        furnished: (prop as any).furnished || 'unfurnished',
         petsAllowed: (prop as any).pets_allowed || false,
         screeningLevel: (prop as any).screening_level || 'Basic',
         commissionRate: prop.commission_rate || 0,

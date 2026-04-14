@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRentalApplication, type ApplicationFormData } from '../hooks/useRentalApplication';
 import type { CoApplicant } from '../types';
-import { CheckCircle, Plus, Trash2, ShieldCheck } from 'lucide-react';
+import { CheckCircle, Plus, Trash2, ShieldCheck, LogIn } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
+import { supabase } from '@/integrations/supabase/client';
+import type { Session } from '@supabase/supabase-js';
 
 const INITIAL: ApplicationFormData = {
   full_name: '', email: '', phone: '',
@@ -24,9 +26,28 @@ export function RentalApplicationForm({ propertyId, rentPw }: Props) {
   const { loading, error, submitted, submitApplication } = useRentalApplication(propertyId);
   const [form, setForm] = useState<ApplicationFormData>(INITIAL);
   const [step, setStep] = useState(0);
+  const [session, setSession] = useState<Session | null>(null);
+  const [showAuthPrompt, setShowAuthPrompt] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session: s } }) => setSession(s));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+      setSession(s);
+      if (s && showAuthPrompt) setShowAuthPrompt(false);
+    });
+    return () => subscription.unsubscribe();
+  }, [showAuthPrompt]);
 
   const set = (key: keyof ApplicationFormData, val: any) =>
     setForm(prev => ({ ...prev, [key]: val }));
+
+  const handleSubmit = () => {
+    if (!session) {
+      setShowAuthPrompt(true);
+      return;
+    }
+    submitApplication(form);
+  };
 
   const InputField = ({ label, field, type = 'text', required = false, placeholder = '' }: {
     label: string; field: keyof ApplicationFormData;
@@ -59,6 +80,32 @@ export function RentalApplicationForm({ propertyId, rentPw }: Props) {
 
   return (
     <div className="space-y-6">
+      {/* Auth prompt */}
+      {showAuthPrompt && (
+        <Alert className="border-amber-500/30 bg-amber-500/5">
+          <LogIn className="h-4 w-4 text-amber-600" />
+          <AlertDescription className="space-y-3">
+            <p className="text-sm text-foreground leading-relaxed">
+              You need to create a free ListHQ account to submit a rental application. This keeps your personal information secure and lets you track your application status.
+            </p>
+            <div className="flex gap-2">
+              <a
+                href="/auth?tab=signup"
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:opacity-90 transition"
+              >
+                Sign Up
+              </a>
+              <a
+                href="/auth?tab=login"
+                className="px-4 py-2 border border-border rounded-xl text-sm font-medium text-foreground hover:border-foreground/30 transition"
+              >
+                Log In
+              </a>
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Privacy & consent notice */}
       <Alert className="border-primary/20 bg-primary/5">
         <ShieldCheck className="h-4 w-4 text-primary" />
@@ -267,7 +314,7 @@ export function RentalApplicationForm({ propertyId, rentPw }: Props) {
           </button>
         ) : (
           <button
-            onClick={() => submitApplication(form)}
+            onClick={handleSubmit}
             disabled={loading || !form.full_name || !form.email || !form.phone || !form.declaration_accepted}
             className="flex-1 bg-primary text-primary-foreground py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 transition disabled:opacity-40"
           >

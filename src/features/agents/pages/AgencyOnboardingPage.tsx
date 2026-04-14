@@ -253,6 +253,16 @@ export default function AgencyOnboardingPage() {
     }
   };
 
+  const handleSkipTrustAccount = async () => {
+    if (!user) return;
+    await supabase.from('agents').update({ trust_setup_pending: true } as any).eq('user_id', user.id);
+    if (path === 'fresh') {
+      setStep(4);
+    } else {
+      setStep(4);
+    }
+  };
+
   const generateImportChecklist = () => {
     const today = DATE_AU.format(new Date());
     const stateAct: Record<string, string> = {
@@ -1339,10 +1349,22 @@ export default function AgencyOnboardingPage() {
               </Button>
             ) : <div />}
             {showNextButton && (
-              <Button type="button" size="sm" disabled={!canNext() || loading} onClick={handleNext} className="w-full sm:w-auto">
-                {loading && <Loader2 size={14} className="mr-1 animate-spin" />}
-                Next <ArrowRight size={14} className="ml-1" />
-              </Button>
+              <div className="flex flex-col w-full sm:w-auto gap-1">
+                <Button type="button" size="sm" disabled={!canNext() || loading} onClick={handleNext} className="w-full sm:w-auto">
+                  {loading && <Loader2 size={14} className="mr-1 animate-spin" />}
+                  Next <ArrowRight size={14} className="ml-1" />
+                </Button>
+                {step === 2 && (
+                  <Button
+                    variant="ghost"
+                    className="w-full mt-1 text-muted-foreground text-xs"
+                    onClick={handleSkipTrustAccount}
+                    disabled={loading}
+                  >
+                    Skip for now — I'll add this later
+                  </Button>
+                )}
+              </div>
             )}
           </div>
         )}

@@ -15,6 +15,7 @@ const AgentDashboardLayout = () => {
   const isMobile = useIsMobile();
   const [checked, setChecked] = useState(false);
   const [onboardingComplete, setOnboardingComplete] = useState(true);
+  const [trustPending, setTrustPending] = useState(false);
 
   useEffect(() => {
     const effectiveUserId = impersonatedUserId || user?.id;

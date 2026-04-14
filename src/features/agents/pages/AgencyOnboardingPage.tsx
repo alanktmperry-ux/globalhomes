@@ -763,7 +763,7 @@ export default function AgencyOnboardingPage() {
                 ))}
               </ul>
             </div>
-            <div>
+            <div className="scroll-mt-4">
               <Label htmlFor="confirm-password" className="text-xs font-semibold">Confirm password</Label>
               <div className="relative">
                 <Input
@@ -772,6 +772,7 @@ export default function AgencyOnboardingPage() {
                   placeholder="Re-enter your password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
+                  onFocus={(e) => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' })}
                   className="pr-10"
                 />
                 <button type="button" onClick={() => setShowConfirmPw(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" tabIndex={-1}>
@@ -1326,7 +1327,7 @@ export default function AgencyOnboardingPage() {
         <Card className="flex-1 min-h-0 overflow-y-auto">
           <CardContent className="p-4 sm:p-6">
             <motion.div
-              key={step}
+              key={showPasswordStep ? 'password-step' : step}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.25 }}

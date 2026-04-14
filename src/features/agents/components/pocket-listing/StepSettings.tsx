@@ -251,9 +251,24 @@ const StepSettings = ({ draft, update }: Props) => {
               <Home size={14} className="text-primary" />
               <Label className="text-sm font-semibold">Property Options</Label>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="space-y-2">
               <span className="text-sm">Furnished</span>
-              <Switch checked={draft.furnished} onCheckedChange={(v) => update({ furnished: v })} />
+              <div className="flex rounded-xl border border-border overflow-hidden">
+                {([['unfurnished', 'Unfurnished'], ['partially_furnished', 'Partially Furnished'], ['furnished', 'Furnished']] as const).map(([val, label]) => (
+                  <button
+                    key={val}
+                    type="button"
+                    onClick={() => update({ furnished: val })}
+                    className={`flex-1 px-3 py-2 text-xs font-medium transition ${
+                      draft.furnished === val
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-card text-muted-foreground hover:bg-secondary'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">

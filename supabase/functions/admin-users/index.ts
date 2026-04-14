@@ -46,10 +46,18 @@ Deno.serve(async (req) => {
     }
 
     const url = new URL(req.url);
-    const action = url.searchParams.get("action");
+    // Support params from URL query string OR JSON body (for supabase.functions.invoke)
+    let bodyParams: Record<string, any> = {};
+    if (req.method === "POST") {
+      try { bodyParams = await req.clone().json(); } catch { bodyParams = {}; }
+    }
+    const getParam = (key: string, fallback?: string) =>
+      url.searchParams.get(key) ?? bodyParams[key]?.toString() ?? fallback ?? null;
+
+    const action = getParam("action");
 
     if (action === "list_users") {
-      const page = parseInt(url.searchParams.get("page") || "1");
+      const page = parseInt(getParam("page", "1")!);
       const perPage = 50;
       const { data, error } = await supabase.auth.admin.listUsers({ page, perPage });
       if (error) throw error;

@@ -6046,6 +6046,7 @@ export type Database = {
           created_at: string
           current_address: string
           date_of_birth: string
+          declaration_accepted: boolean
           email: string
           employer_name: string | null
           employment_length: string | null
@@ -6088,6 +6089,7 @@ export type Database = {
           created_at?: string
           current_address: string
           date_of_birth: string
+          declaration_accepted?: boolean
           email: string
           employer_name?: string | null
           employment_length?: string | null
@@ -6130,6 +6132,7 @@ export type Database = {
           created_at?: string
           current_address?: string
           date_of_birth?: string
+          declaration_accepted?: boolean
           email?: string
           employer_name?: string | null
           employment_length?: string | null

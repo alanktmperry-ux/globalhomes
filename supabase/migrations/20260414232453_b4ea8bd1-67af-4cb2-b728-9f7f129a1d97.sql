@@ -1,0 +1,1 @@
+ALTER TABLE public.rental_applications ADD COLUMN IF NOT EXISTS declaration_accepted boolean NOT NULL DEFAULT false;

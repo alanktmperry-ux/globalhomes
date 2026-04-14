@@ -1,0 +1,1 @@
+ALTER TABLE public.agents ADD COLUMN IF NOT EXISTS trust_setup_pending boolean NOT NULL DEFAULT false;

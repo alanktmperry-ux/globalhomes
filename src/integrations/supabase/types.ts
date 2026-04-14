@@ -771,6 +771,7 @@ export type Database = {
           subscription_status: string | null
           support_pin: string | null
           title_position: string | null
+          trust_setup_pending: boolean
           updated_at: string
           user_id: string
           verification_badge_level: string | null
@@ -829,6 +830,7 @@ export type Database = {
           subscription_status?: string | null
           support_pin?: string | null
           title_position?: string | null
+          trust_setup_pending?: boolean
           updated_at?: string
           user_id: string
           verification_badge_level?: string | null
@@ -887,6 +889,7 @@ export type Database = {
           subscription_status?: string | null
           support_pin?: string | null
           title_position?: string | null
+          trust_setup_pending?: boolean
           updated_at?: string
           user_id?: string
           verification_badge_level?: string | null

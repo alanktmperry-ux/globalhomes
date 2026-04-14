@@ -49,7 +49,7 @@ const StepVoice = ({ draft, update }: Props) => {
     if (wasListeningRef.current && !isListening && draft.voiceTranscript) {
       clearInterval(timerRef.current);
       setCountdown(30);
-      generateFromTranscript(draft.voiceTranscript);
+      void generateFromTranscript(draft.voiceTranscript);
     }
     wasListeningRef.current = isListening;
   }, [isListening]);
@@ -78,20 +78,45 @@ const StepVoice = ({ draft, update }: Props) => {
 
   useEffect(() => () => clearInterval(timerRef.current), []);
 
-  const generateFromTranscript = (text: string) => {
+  const generateFromTranscript = async (text: string) => {
+    if (!text.trim()) return;
     setStreamingBullets(true);
-    setTimeout(() => {
-      update({
-        generatedTitle: `Modern ${draft.propertyType} in ${draft.suburb || 'Premium Location'}`,
-        generatedBullets: [
-          'Spacious open-plan living and dining',
-          'Renovated kitchen with stone benchtops',
-          'Private north-facing courtyard',
-          'Walking distance to cafés and transport',
-        ],
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+      if (!accessToken) return;
+
+      const { data, error } = await supabase.functions.invoke('generate-listing', {
+        body: {
+          propertyType: draft.propertyType,
+          beds: draft.beds,
+          baths: draft.baths,
+          parking: draft.cars,
+          suburb: draft.suburb,
+          state: draft.state,
+          price: draft.priceMax > 0 ? `$${draft.priceMax.toLocaleString('en-AU')}` : 'Contact Agent',
+          features: draft.features,
+          tone: 'standard',
+          voiceTranscript: text,
+        },
       });
+
+      if (error) throw error;
+
+      const content = typeof data === 'string' ? data : JSON.stringify(data);
+      const lines = content.split('\n').filter((l: string) => l.trim().length > 10);
+      const bullets = lines.slice(0, 5);
+
+      update({
+        generatedTitle: `${draft.beds > 0 ? `${draft.beds}-Bed ` : ''}${draft.propertyType} in ${draft.suburb || 'Premium Location'}`,
+        generatedBullets: bullets.length > 0 ? bullets : ['See description for full details'],
+      });
+    } catch (e) {
+      console.error('generateFromTranscript error:', e);
+      toast.error('Could not generate from voice — please use the AI generator below.');
+    } finally {
       setStreamingBullets(false);
-    }, 1500);
+    }
   };
 
   // AI description generator with streaming

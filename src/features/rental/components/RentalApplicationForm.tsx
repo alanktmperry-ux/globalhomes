@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useRentalApplication, type ApplicationFormData } from '../hooks/useRentalApplication';
 import type { CoApplicant } from '../types';
-import { CheckCircle, Plus, Trash2 } from 'lucide-react';
+import { CheckCircle, Plus, Trash2, ShieldCheck } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const INITIAL: ApplicationFormData = {
   full_name: '', email: '', phone: '',
@@ -11,6 +13,7 @@ const INITIAL: ApplicationFormData = {
   move_in_date: '', lease_term_months: 12, occupants: 1,
   has_pets: false, pet_description: '', additional_notes: '',
   co_applicants: [],
+  declaration_accepted: false,
 };
 
 const STEPS = ['Personal', 'Employment', 'Rental History', 'Preferences'];
@@ -56,6 +59,13 @@ export function RentalApplicationForm({ propertyId, rentPw }: Props) {
 
   return (
     <div className="space-y-6">
+      {/* Privacy & consent notice */}
+      <Alert className="border-primary/20 bg-primary/5">
+        <ShieldCheck className="h-4 w-4 text-primary" />
+        <AlertDescription className="text-xs text-muted-foreground leading-relaxed">
+          By submitting this application you consent to ListHQ and the listing agent collecting, storing, and using the personal information you provide for the purpose of assessing your rental application. This may include sharing your details with the property owner. Your information is handled in accordance with the Australian Privacy Act 1988 and our Privacy Policy. The listing agent — not ListHQ — may independently verify your identity and conduct reference checks. ListHQ does not perform credit checks; the agent may use a third-party tenancy database at their discretion.
+        </AlertDescription>
+      </Alert>
       {/* Step indicator */}
       <div className="flex items-center gap-1">
         {STEPS.map((s, i) => (
@@ -225,6 +235,21 @@ export function RentalApplicationForm({ propertyId, rentPw }: Props) {
         </div>
       )}
 
+      {/* Declaration checkbox on final step */}
+      {step === 3 && (
+        <div className="flex items-start gap-3 p-3 rounded-xl border border-border bg-secondary/30">
+          <Checkbox
+            id="declaration"
+            checked={form.declaration_accepted}
+            onCheckedChange={(checked) => set('declaration_accepted', checked === true)}
+            className="mt-0.5"
+          />
+          <label htmlFor="declaration" className="text-xs text-foreground leading-relaxed cursor-pointer">
+            I declare that all information provided in this application is true and correct to the best of my knowledge, and I consent to my personal information being used for tenancy assessment purposes.
+          </label>
+        </div>
+      )}
+
       {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
 
       {/* Navigation */}
@@ -243,7 +268,7 @@ export function RentalApplicationForm({ propertyId, rentPw }: Props) {
         ) : (
           <button
             onClick={() => submitApplication(form)}
-            disabled={loading || !form.full_name || !form.email || !form.phone}
+            disabled={loading || !form.full_name || !form.email || !form.phone || !form.declaration_accepted}
             className="flex-1 bg-primary text-primary-foreground py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 transition disabled:opacity-40"
           >
             {loading ? 'Submitting…' : 'Submit Application →'}

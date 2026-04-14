@@ -23,6 +23,7 @@ export interface ApplicationFormData {
   pet_description: string;
   additional_notes: string;
   co_applicants: CoApplicant[];
+  declaration_accepted: boolean;
 }
 
 export function useRentalApplication(propertyId: string) {
@@ -62,6 +63,7 @@ export function useRentalApplication(propertyId: string) {
           pet_description: formData.pet_description || null,
           additional_notes: formData.additional_notes || null,
           co_applicants: formData.co_applicants,
+          declaration_accepted: true,
           pm_notes: null,
           reference_number: ref,
           status: 'submitted',

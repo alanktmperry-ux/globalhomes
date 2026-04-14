@@ -56,6 +56,12 @@ const AgentDashboardLayout = () => {
         <AgentDashboardSidebar />
         <main className="flex-1 flex flex-col min-w-0 overflow-y-auto pb-[env(safe-area-inset-bottom)]">
           <PaymentStatusBanner />
+          {trustPending && (
+            <div className="bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-sm px-4 py-3 flex items-center justify-between">
+              <span>⚠️ Complete your trust account setup to enable rent roll and disbursements.</span>
+              <a href="/dashboard/onboarding" className="underline font-semibold ml-4 shrink-0">Set up now →</a>
+            </div>
+          )}
           {isMobile && (
             <div className="sticky top-0 z-30 flex items-center justify-between px-3 h-12 border-b border-border bg-background/95 backdrop-blur-sm">
               <SidebarTrigger />

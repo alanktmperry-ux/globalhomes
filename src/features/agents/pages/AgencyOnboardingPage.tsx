@@ -196,14 +196,8 @@ export default function AgencyOnboardingPage() {
     if (!user) return;
     setLoading(true);
     try {
-      // Call setup-agent edge function
-      const res = await fetch('https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/setup-agent', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-        },
-        body: JSON.stringify({
+      const { error: setupError } = await supabase.functions.invoke('setup-agent', {
+        body: {
           userId: user.id,
           email: user.email,
           fullName: principalName,
@@ -213,10 +207,9 @@ export default function AgencyOnboardingPage() {
           agencyEmail,
           licenseNumber: licenceNumber,
           officeAddress: agencyAddress,
-        }),
+        },
       });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error || 'Setup failed');
+      if (setupError) throw new Error(setupError.message || 'Setup failed');
 
       toast.success('Agency created successfully');
       setStep(3);

@@ -314,7 +314,7 @@ const StepBasics = ({ draft, update }: Props) => {
       {isRental && (
         <div className="bg-secondary/50 rounded-xl p-4 space-y-3">
           <Label className="text-sm font-semibold block">Rental Details</Label>
-          <div className="grid grid-cols-2 gap-3">
+          <div>
             <div>
               <Label className="text-xs text-muted-foreground mb-1 block">Bond Amount ($)</Label>
               <Input
@@ -337,10 +337,6 @@ const StepBasics = ({ draft, update }: Props) => {
                   Reset to 4 weeks (${(draft.rentalWeekly * 4).toLocaleString('en-AU')})
                 </button>
               )}
-            </div>
-            <div>
-              <Label className="text-xs text-muted-foreground mb-1 block">Available From</Label>
-              <Input type="date" value={draft.availableFrom} onChange={(e) => update({ availableFrom: e.target.value })} className="h-9" />
             </div>
           </div>
         </div>

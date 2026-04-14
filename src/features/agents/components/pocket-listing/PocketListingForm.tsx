@@ -287,9 +287,9 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         leaseTerm: (prop as any).lease_term || '12 months',
         furnished: (prop as any).furnished || false,
         petsAllowed: (prop as any).pets_allowed || false,
-        screeningLevel: 'Basic',
+        screeningLevel: (prop as any).screening_level || 'Basic',
         commissionRate: prop.commission_rate || 0,
-        lettingFeeWeeks: prop.agent_split_percent || 0,
+        lettingFeeWeeks: (prop as any).letting_fee_weeks || 0,
 
         vendorName: (prop as any).vendor_name || '',
         vendorEmail: (prop as any).vendor_email || '',

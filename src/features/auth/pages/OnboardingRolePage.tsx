@@ -40,7 +40,7 @@ const OnboardingRolePage = () => {
     }
   }, [user, navigate]);
 
-
+  const handleContinue = async () => {
     if (!selected || !user) return;
     setSaving(true);
 

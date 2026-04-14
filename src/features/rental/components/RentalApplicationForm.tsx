@@ -9,6 +9,7 @@ import type { Session } from '@supabase/supabase-js';
 
 const INITIAL: ApplicationFormData = {
   full_name: '', email: '', phone: '',
+  id_document_number: '', emergency_contact_name: '', emergency_contact_phone: '',
   date_of_birth: '', current_address: '', time_at_address: '1-2 years',
   employment_status: 'full_time', employer_name: '', annual_income: 0,
   previous_landlord_name: '', previous_landlord_contact: '', reason_for_leaving: '',
@@ -138,6 +139,17 @@ export function RentalApplicationForm({ propertyId, rentPw }: Props) {
             <InputField label="Phone" field="phone" type="tel" required />
           </div>
           <InputField label="Date of Birth" field="date_of_birth" type="date" />
+          <div>
+            <InputField label="ID Number (Driver's Licence or Passport)" field="id_document_number" />
+            <p className="text-[11px] text-muted-foreground mt-1">Providing ID helps the agent verify your identity. ListHQ does not store or share this outside the application process.</p>
+          </div>
+          <div className="space-y-2">
+            <p className="text-xs font-medium text-muted-foreground">Emergency Contact</p>
+            <div className="grid grid-cols-2 gap-3">
+              <InputField label="Emergency Contact Name" field="emergency_contact_name" />
+              <InputField label="Emergency Contact Phone" field="emergency_contact_phone" type="tel" />
+            </div>
+          </div>
           <InputField label="Current Address" field="current_address" required />
           <div>
             <label className="block text-xs font-medium text-muted-foreground mb-1">Time at current address</label>

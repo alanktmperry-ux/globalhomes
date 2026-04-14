@@ -41,6 +41,15 @@ const AgentDashboardLayout = () => {
     checkOnboarding();
   }, [user, impersonatedUserId, checked, location.pathname, navigate]);
 
+  useEffect(() => {
+    const effectiveUserId = impersonatedUserId || user?.id;
+    if (!effectiveUserId) return;
+    supabase.from('agents').select('trust_setup_pending').eq('user_id', effectiveUserId).maybeSingle()
+      .then(({ data }) => {
+        if ((data as any)?.trust_setup_pending) setTrustPending(true);
+      });
+  }, [user?.id, impersonatedUserId]);
+
   return (
     <SidebarProvider>
       <div className="h-screen flex w-full bg-background text-foreground">

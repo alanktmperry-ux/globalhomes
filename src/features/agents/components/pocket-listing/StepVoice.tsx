@@ -158,6 +158,7 @@ const StepVoice = ({ draft, update }: Props) => {
           price: formatPrice(draft),
           features: draft.features,
           tone: selectedTone,
+          voiceTranscript: draft.voiceTranscript || '',
         }),
       });
 

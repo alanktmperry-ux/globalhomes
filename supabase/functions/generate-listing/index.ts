@@ -29,6 +29,7 @@ Deno.serve(async (req) => {
       price,
       features,
       tone,
+      voiceTranscript,
     } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -40,9 +41,11 @@ Deno.serve(async (req) => {
     const featureList =
       features && features.length > 0 ? features.join(", ") : "not specified";
 
-    const prompt = `Write a professional real estate listing description for a ${beds}-bedroom, ${baths}-bathroom ${propertyType} with ${parking} car spaces in ${suburb || "a premium suburb"}, ${state || "VIC"}, Australia. Price: ${price || "Contact Agent"}. Features: ${featureList}.
-${toneInstruction}
-Write 3 paragraphs. Max 180 words. No bullet points. End with a compelling call to action.`;
+    const transcriptSection = voiceTranscript
+      ? `\n\nThe agent recorded the following notes about this property — incorporate these details specifically:\n"${voiceTranscript}"`
+      : '';
+
+    const prompt = `Write a professional real estate listing description for a ${beds}-bedroom, ${baths}-bathroom ${propertyType} with ${parking} car spaces in ${suburb || "a premium suburb"}, ${state || "VIC"}, Australia. Price: ${price || "Contact Agent"}. Features: ${featureList}.${transcriptSection}\n${toneInstruction}\nWrite 3 paragraphs. Max 180 words. No bullet points. End with a compelling call to action.`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",

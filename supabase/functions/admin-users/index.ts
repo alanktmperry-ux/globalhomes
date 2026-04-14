@@ -277,7 +277,7 @@ Deno.serve(async (req) => {
         const { error: aeErr } = await supabase
           .from("analytics_events")
           .delete()
-          .eq("agent_id", aeErr ? "" : agentRow.id);
+          .eq("agent_id", agentRow.id);
         if (aeErr) {
           console.error("analytics_events cleanup error:", aeErr);
           warnings.push(`analytics_events: ${aeErr.message}`);

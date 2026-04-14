@@ -121,12 +121,16 @@ const SeekerAuthPage = () => {
   const handleSavePrefs = async () => {
     try {
       const { data: { user: u } } = await supabase.auth.getUser();
-      if (u && (budgetMax || suburbs)) {
+      if (u) {
         await supabase
           .from('user_preferences')
           .update({
-            budget_max: budgetMax ? parseInt(budgetMax.replace(/[^0-9]/g, '')) : null,
+            budget_max: seekingType === 'buy' && budgetMax ? parseInt(budgetMax.replace(/[^0-9]/g, '')) : null,
             preferred_locations: suburbs ? suburbs.split(',').map(s => s.trim()).filter(Boolean) : [],
+            seeking_type: seekingType || null,
+            weekly_budget: seekingType === 'rent' && weeklyBudget ? parseInt(weeklyBudget) : null,
+            pets_required: seekingType === 'rent' ? petsRequired : false,
+            furnished_required: seekingType === 'rent' ? furnishedRequired : false,
           } as any)
           .eq('user_id', u.id);
       }

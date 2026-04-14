@@ -352,9 +352,9 @@ Deno.serve(async (req) => {
     }
 
     if (action === "browse_table") {
-      const table = url.searchParams.get("table") || "profiles";
-      const limit = parseInt(url.searchParams.get("limit") || "50");
-      const offset = parseInt(url.searchParams.get("offset") || "0");
+      const table = getParam("table", "profiles")!;
+      const limit = parseInt(getParam("limit", "50")!);
+      const offset = parseInt(getParam("offset", "0")!);
       const allowedTables = ['profiles', 'properties', 'agents', 'leads', 'voice_searches', 'saved_properties', 'user_roles', 'lead_events', 'user_preferences'];
       if (!allowedTables.includes(table)) {
         return new Response(JSON.stringify({ error: "Table not allowed" }), {

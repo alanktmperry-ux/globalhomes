@@ -8449,37 +8449,49 @@ export type Database = {
           budget_max: number | null
           budget_min: number | null
           created_at: string
+          furnished_required: boolean
           id: string
+          pets_required: boolean
           preferred_baths: number | null
           preferred_beds: number | null
           preferred_locations: string[] | null
           search_history: Json | null
+          seeking_type: string | null
           updated_at: string
           user_id: string
+          weekly_budget: number | null
         }
         Insert: {
           budget_max?: number | null
           budget_min?: number | null
           created_at?: string
+          furnished_required?: boolean
           id?: string
+          pets_required?: boolean
           preferred_baths?: number | null
           preferred_beds?: number | null
           preferred_locations?: string[] | null
           search_history?: Json | null
+          seeking_type?: string | null
           updated_at?: string
           user_id: string
+          weekly_budget?: number | null
         }
         Update: {
           budget_max?: number | null
           budget_min?: number | null
           created_at?: string
+          furnished_required?: boolean
           id?: string
+          pets_required?: boolean
           preferred_baths?: number | null
           preferred_beds?: number | null
           preferred_locations?: string[] | null
           search_history?: Json | null
+          seeking_type?: string | null
           updated_at?: string
           user_id?: string
+          weekly_budget?: number | null
         }
         Relationships: []
       }

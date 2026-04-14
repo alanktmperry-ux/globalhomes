@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Bed, Bath, Car, Heart, BadgeCheck, Star, Sparkles, Shield, ShieldCheck, Eye, UserCheck, CalendarDays, PawPrint, Sofa } from 'lucide-react';
@@ -192,7 +192,14 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
             </div>
           )}
 
-          {/* AI annotation */}
+          {/* Real views count */}
+          {realViews && (
+            <div className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
+              <Eye size={12} />
+              <span>{realViews} views</span>
+            </div>
+          )}
+
           {property.aiSummary && (
             <p className="mt-2 flex items-start gap-1.5 text-xs text-primary/80 leading-snug">
               <Sparkles size={12} className="shrink-0 mt-0.5" />

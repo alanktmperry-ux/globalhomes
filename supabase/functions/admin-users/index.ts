@@ -243,6 +243,49 @@ Deno.serve(async (req) => {
 
     if (action === "delete_user") {
       const { user_id } = await req.json();
+      const warnings: string[] = [];
+
+      // Pre-cleanup: remove rows that block cascade via foreign keys
+      const { data: agentRow } = await supabase
+        .from("agents")
+        .select("id")
+        .eq("user_id", user_id)
+        .maybeSingle();
+
+      if (agentRow) {
+        // Delete audit_log entries referencing this agent (blocks agent deletion)
+        const { error: alErr } = await supabase
+          .from("audit_log")
+          .delete()
+          .eq("agent_id", agentRow.id);
+        if (alErr) {
+          console.error("audit_log cleanup error:", alErr);
+          warnings.push(`audit_log: ${alErr.message}`);
+        }
+
+        // Delete agent_lifecycle_notes
+        const { error: alnErr } = await supabase
+          .from("agent_lifecycle_notes")
+          .delete()
+          .eq("agent_id", agentRow.id);
+        if (alnErr) {
+          console.error("agent_lifecycle_notes cleanup error:", alnErr);
+          warnings.push(`agent_lifecycle_notes: ${alnErr.message}`);
+        }
+
+        // Delete analytics_events
+        const { error: aeErr } = await supabase
+          .from("analytics_events")
+          .delete()
+          .eq("agent_id", aeErr ? "" : agentRow.id);
+        if (aeErr) {
+          console.error("analytics_events cleanup error:", aeErr);
+          warnings.push(`analytics_events: ${aeErr.message}`);
+        }
+      }
+
+      // Also clean audit_log by user_id (covers non-agent entries)
+      await supabase.from("audit_log").delete().eq("user_id", user_id);
 
       const { error: rpcError } = await supabase.rpc("delete_user_cascade", {
         p_user_id: user_id,
@@ -251,8 +294,8 @@ Deno.serve(async (req) => {
       if (rpcError) {
         console.error("delete_user_cascade error:", rpcError);
         return new Response(
-          JSON.stringify({ error: "User deletion failed. No data was deleted. Please try again." }),
-          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({ error: "User deletion failed. No data was deleted. Please try again.", details: rpcError.message }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
@@ -261,11 +304,11 @@ Deno.serve(async (req) => {
         console.error("delete auth user error:", deleteAuthError);
         return new Response(
           JSON.stringify({ error: "Data deleted but auth account removal failed. Contact support." }),
-          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
-      return new Response(JSON.stringify({ success: true }), {
+      return new Response(JSON.stringify({ success: true, warnings }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       entity_id: userId,
       description: `Admin started impersonating user ${userEmail}`,
       metadata: { impersonated_email: userEmail, admin_email: user?.email },
-    } as any).catch(e => console.error('impersonation audit log failed:', e));
+    } as any).then(({ error }) => { if (error) console.error('impersonation audit log failed:', error); });
   };
 
   const stopImpersonation = async () => {
@@ -104,7 +104,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       entity_id: impersonatedUserId,
       description: 'Admin stopped impersonation session',
       metadata: { admin_email: user?.email },
-    } as any).catch(e => console.error('impersonation audit log failed:', e));
+    } as any).then(({ error }) => { if (error) console.error('impersonation audit log failed:', error); });
     sessionStorage.removeItem('admin_email');
     sessionStorage.removeItem('admin_impersonated_id');
     setImpersonating(false);

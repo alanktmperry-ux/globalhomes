@@ -585,3 +585,43 @@ function buildInspectionNoticeHtml(params: { tenantName: string; propertyAddress
 </div>
 </body></html>`;
 }
+
+function buildLeaseExpiryHtml({ tenantName, propertyAddress, leaseEndDate, daysRemaining, agentName, agentPhone }: { tenantName: string; propertyAddress?: string; leaseEndDate?: string; daysRemaining?: string; agentName?: string; agentPhone?: string }) {
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f4f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+<div style="max-width:560px;margin:32px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+  <div style="background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);padding:32px 32px 24px;text-align:center;">
+    <h1 style="margin:0;font-size:22px;font-weight:700;color:#fff;">Lease Expiry Notice</h1>
+    <p style="margin:8px 0 0;font-size:13px;color:#94a3b8;">Action may be required</p>
+  </div>
+  <div style="padding:32px;">
+    <p style="font-size:15px;color:#333;margin:0 0 16px;">Dear ${tenantName},</p>
+    <p style="font-size:15px;color:#333;margin:0 0 16px;">This is a formal notice regarding your lease for the property at:</p>
+    ${propertyAddress ? `<div style="background:#f8f9fa;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-bottom:24px;text-align:center;">
+      <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Property</div>
+      <div style="font-size:16px;font-weight:600;color:#1a1a2e;">${propertyAddress}</div>
+    </div>` : ''}
+    <div style="display:flex;gap:12px;margin-bottom:24px;">
+      ${leaseEndDate ? `<div style="flex:1;background:#fef3c7;border:1px solid #fde68a;border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:11px;color:#92400e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Lease Expires</div>
+        <div style="font-size:18px;font-weight:700;color:#92400e;">${leaseEndDate}</div>
+      </div>` : ''}
+      ${daysRemaining ? `<div style="flex:1;background:#fee2e2;border:1px solid #fecaca;border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:11px;color:#991b1b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Days Remaining</div>
+        <div style="font-size:18px;font-weight:700;color:#991b1b;">${daysRemaining}</div>
+      </div>` : ''}
+    </div>
+    <p style="font-size:15px;color:#333;margin:0 0 16px;">We encourage you to contact your property manager at your earliest convenience to discuss renewal options and ensure a smooth transition.</p>
+    ${agentName || agentPhone ? `<div style="background:#f8f9fa;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-bottom:24px;">
+      <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Your Property Manager</div>
+      ${agentName ? `<div style="font-size:14px;color:#333;font-weight:500;">${agentName}</div>` : ''}
+      ${agentPhone ? `<div style="font-size:14px;margin-top:4px;"><a href="tel:${agentPhone}" style="color:#3B82F6;text-decoration:none;">${agentPhone}</a></div>` : ''}
+    </div>` : ''}
+    <div style="border-top:1px solid #eee;padding-top:20px;margin-top:32px;text-align:center;">
+      <p style="font-size:11px;color:#aaa;margin:0;">This notice is sent on behalf of your property manager via ListHQ.</p>
+      <p style="font-size:11px;color:#aaa;margin:4px 0 0;">© ListHQ Pty Ltd · Melbourne, Victoria, Australia</p>
+    </div>
+  </div>
+</div>
+</body></html>`;
+}

@@ -38,7 +38,7 @@ const BuyerSettingsPage = () => {
   const [preferredLocations, setPreferredLocations] = useState('');
   const [preferredPropertyTypes, setPreferredPropertyTypes] = useState<string[]>([]);
 
-  // Notification preferences (local state, persisted via localStorage)
+  // Notification preferences (persisted to Supabase, localStorage fallback on load)
   const [notifNewListings, setNotifNewListings] = useState(true);
   const [notifPriceDrops, setNotifPriceDrops] = useState(true);
   const [notifSavedUpdates, setNotifSavedUpdates] = useState(true);

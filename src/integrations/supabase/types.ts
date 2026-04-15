@@ -8462,6 +8462,7 @@ export type Database = {
           preferred_baths: number | null
           preferred_beds: number | null
           preferred_locations: string[] | null
+          prelaunch_checklist: Json | null
           search_history: Json | null
           seeking_type: string | null
           updated_at: string
@@ -8479,6 +8480,7 @@ export type Database = {
           preferred_baths?: number | null
           preferred_beds?: number | null
           preferred_locations?: string[] | null
+          prelaunch_checklist?: Json | null
           search_history?: Json | null
           seeking_type?: string | null
           updated_at?: string
@@ -8496,6 +8498,7 @@ export type Database = {
           preferred_baths?: number | null
           preferred_beds?: number | null
           preferred_locations?: string[] | null
+          prelaunch_checklist?: Json | null
           search_history?: Json | null
           seeking_type?: string | null
           updated_at?: string

@@ -15,6 +15,7 @@ import {
   TrendingUp, TrendingDown, FileDown, Trash2, Pencil, Clock,
   AlertTriangle, CalendarIcon, Home, Users, Receipt, Upload,
   CreditCard, CheckSquare, ShieldCheck, FileText, BarChart3,
+  ExternalLink,
 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
@@ -345,6 +346,32 @@ const TrustAccountingPage = () => {
     a.click();
     URL.revokeObjectURL(url);
     toast.success('Audit-ready report exported');
+  };
+
+  // Xero bank import export
+  const exportXero = () => {
+    const headers = ['Date', 'Amount', 'Payee', 'Description', 'Reference'];
+    const rows = txWithBalance
+      .filter(tx => tx.status !== 'voided')
+      .map(tx => {
+        const d = new Date(tx.transaction_date);
+        const dateStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+        const isInflow = tx.transaction_type === 'deposit' || tx.category === 'rent';
+        const signedAmount = isInflow ? tx.amount.toFixed(2) : (-tx.amount).toFixed(2);
+        const payee = tx.client_name || tx.payee_name || '';
+        const description = [tx.property_address, tx.description].filter(Boolean).join(' — ') || tx.category;
+        const reference = tx.reference || '';
+        return [dateStr, signedAmount, payee, description, reference];
+      });
+    const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `xero_import_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('Xero import file downloaded — import via Xero > Bank Accounts > Import Statement');
   };
 
   if (loading) {
@@ -855,9 +882,12 @@ const TrustAccountingPage = () => {
                   <SelectItem value="reconciled">Reconciled</SelectItem>
                 </SelectContent>
               </Select>
-              <div className="ml-auto">
+              <div className="ml-auto flex gap-2">
                 <Button size="sm" variant="outline" onClick={exportCsv} className="gap-1.5 text-xs h-8">
                   <FileDown size={13} /> Audit-Ready Report
+                </Button>
+                <Button size="sm" variant="outline" onClick={exportXero} className="gap-1.5 text-xs h-8">
+                  <FileDown size={12} /> Export for Xero
                 </Button>
               </div>
             </div>
@@ -965,6 +995,32 @@ const TrustAccountingPage = () => {
             </div>
           </div>
         </div>
+
+        {/* ── Xero Integration Card ── */}
+        <Card className="mt-6">
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="w-10 h-10 rounded-lg bg-[hsl(var(--primary)/0.1)] flex items-center justify-center shrink-0">
+              <ExternalLink size={18} className="text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <h4 className="text-sm font-bold">Xero Integration</h4>
+                <Badge variant="secondary" className="text-[10px]">Coming Soon</Badge>
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Auto-sync trust transactions to Xero. Use the manual export above while native sync is in beta.
+              </p>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-1.5 text-xs shrink-0"
+              onClick={() => toast.info('Xero native sync is coming soon. Use Export for Xero to import manually.')}
+            >
+              <ExternalLink size={12} /> Connect Xero Account
+            </Button>
+          </CardContent>
+        </Card>
 
         {/* ── AFA Compliance Footer ── */}
         <div className="mt-6 py-3 px-4 rounded-lg bg-muted/50 border border-border flex items-center justify-center gap-3">

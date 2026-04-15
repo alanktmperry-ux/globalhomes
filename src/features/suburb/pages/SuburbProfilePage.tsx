@@ -61,7 +61,7 @@ export default function SuburbProfilePage() {
     if (!suburbName || !stateUpper) return;
     supabase
       .from('schools')
-      .select('id, name, type, sector, icsea, state')
+      .select('id, name, type, sector, icsea, state, lat, lng')
       .ilike('suburb', suburbName)
       .ilike('state', stateUpper)
       .order('enrolment', { ascending: false })

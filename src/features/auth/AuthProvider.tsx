@@ -87,24 +87,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setImpersonatedUser(userEmail);
     setImpersonatedUserId(userId);
     supabase.from('audit_log').insert({
-      user_id: user?.id,
+      user_id: user?.id ?? null,
       action_type: 'admin_start_impersonation',
       entity_type: 'user',
       entity_id: userId,
-      description: `Admin started impersonating user ${userEmail}`,
-      metadata: { impersonated_email: userEmail, admin_email: user?.email },
-    } as any).then(({ error }) => { if (error) console.error('impersonation audit log failed:', error); });
+      description: 'Admin started impersonation session',
+      metadata: { impersonated_email: userEmail },
+    } as any).then(({ error }: any) => { if (error) console.error('impersonation audit log:', error); });
   };
 
   const stopImpersonation = async () => {
     supabase.from('audit_log').insert({
-      user_id: user?.id,
+      user_id: user?.id ?? null,
       action_type: 'admin_stop_impersonation',
       entity_type: 'user',
-      entity_id: impersonatedUserId,
-      description: 'Admin stopped impersonation session',
-      metadata: { admin_email: user?.email },
-    } as any).then(({ error }) => { if (error) console.error('impersonation audit log failed:', error); });
+      entity_id: impersonatedUserId ?? null,
+      description: 'Admin ended impersonation session',
+      metadata: {},
+    } as any).then(({ error }: any) => { if (error) console.error('impersonation audit log:', error); });
     sessionStorage.removeItem('admin_email');
     sessionStorage.removeItem('admin_impersonated_id');
     setImpersonating(false);

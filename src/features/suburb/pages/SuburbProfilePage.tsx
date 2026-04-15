@@ -125,12 +125,12 @@ export default function SuburbProfilePage() {
   return (
     <>
       <Helmet>
-        <title>{suburbName}, {stateUpper} — Property Market Data</title>
-        <meta name="description" content={metaDesc} />
-        <link rel="canonical" href={`https://listhq.com.au/suburb/${state}/${slug}`} />
-        <meta property="og:title" content={`${suburbName}, ${stateUpper} — Property Market | ListHQ`} />
-        <meta property="og:description" content={metaDesc} />
+        <title>{suburbName} Real Estate — Properties for Sale & Rent | ListHQ</title>
+        <meta name="description" content={`Browse ${active.length || 'available'} properties in ${suburbName}, ${stateUpper}. Median price ${houseStats?.median_sale_price ? '$' + houseStats.median_sale_price.toLocaleString() : 'available on request'}. Search houses, apartments and rentals on ListHQ.`} />
+        <meta property="og:title" content={`${suburbName} Real Estate | ListHQ`} />
+        <meta property="og:description" content={`Properties for sale and rent in ${suburbName}, ${stateUpper}.`} />
         <meta property="og:type" content="website" />
+        <link rel="canonical" href={`https://listhq.com.au/suburb/${state}/${slug}`} />
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
 

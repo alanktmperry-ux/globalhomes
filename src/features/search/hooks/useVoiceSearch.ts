@@ -60,30 +60,36 @@ export function useVoiceSearch(
 
         try {
           const blob = new Blob(chunksRef.current, { type: mimeType });
-          const arrayBuffer = await blob.arrayBuffer();
+
+          // Convert blob to base64
+          const base64 = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              const result = reader.result as string;
+              resolve(result.split(',')[1]);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
 
           const { data, error } = await supabase.functions.invoke(
-            'transcribe-audio',
+            'voice-search',
             {
-              body: arrayBuffer,
-              headers: {
-                'Content-Type': mimeType,
-                'X-Language': language,
-              },
+              body: { audio: base64, mimeType },
             }
           );
 
           if (error) throw error;
 
-          const transcript = data?.transcript?.trim();
-
-          if (transcript) {
-            onResult(transcript);
+          if (data?.success && data?.transcript?.trim()) {
+            onResult(data.transcript.trim());
+          } else if (data?.error) {
+            onError?.(data.error);
           } else {
             onError?.('No speech detected. Please try again.');
           }
         } catch (err: unknown) {
-          console.error('[Whisper]', err);
+          console.error('[VoiceSearch]', err);
           onError?.('Transcription failed. Please try again.');
         } finally {
           setIsTranscribing(false);

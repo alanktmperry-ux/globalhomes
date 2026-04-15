@@ -361,15 +361,40 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
     }
   }, [onLocationSelect]);
 
-  const processTranscript = useCallback((text: string) => {
-    const filters = parsePropertyQuery(text);
+  const processTranscript = useCallback((text: string, serverParsedQuery?: Record<string, unknown>) => {
+    const filters = serverParsedQuery
+      ? {
+          location: serverParsedQuery.location as string | undefined,
+          priceMin: serverParsedQuery.price_min as number | undefined,
+          priceMax: serverParsedQuery.price_max as number | undefined,
+          propertyType: serverParsedQuery.property_type as string | undefined,
+          beds: serverParsedQuery.bedrooms as number | undefined,
+          features: (serverParsedQuery.features as string[]) || [],
+          intent: serverParsedQuery.transaction_type as 'sale' | 'rent' | undefined,
+        }
+      : parsePropertyQuery(text);
+
     const chips = filtersToChips(filters);
     setFilterChips(chips);
     setEditableTranscript(text);
-    setTextQuery(text);
+    const searchLocation = filters.location || text;
+    setTextQuery(searchLocation);
     syncVoiceState('processing');
-    onSearch(text);
-    geocodeLocation(text);
+
+    const params = new URLSearchParams();
+    if (searchLocation) params.set('q', searchLocation);
+    if (filters.beds) params.set('beds', String(filters.beds));
+    if (filters.priceMin) params.set('priceMin', String(filters.priceMin));
+    if (filters.priceMax) params.set('priceMax', String(filters.priceMax));
+    if (filters.propertyType) params.set('type', filters.propertyType);
+    if (filters.intent === 'rent') {
+      navigate(`/rent?${params.toString()}`);
+    } else {
+      navigate(`/buy?${params.toString()}`);
+    }
+
+    onSearch(searchLocation);
+    geocodeLocation(searchLocation);
 
     // Fire-and-forget: log to voice_searches so the AI Buyer Concierge trigger fires
     supabase
@@ -383,7 +408,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       .then(({ error }) => {
         if (error) console.warn('[VoiceSearch] Failed to log search:', error.message);
       });
-  }, [onSearch, geocodeLocation, user?.id, selectedLang]);
+  }, [onSearch, geocodeLocation, navigate, user?.id, selectedLang]);
 
   const startRecording = useCallback(async () => {
     if (isRecording) {

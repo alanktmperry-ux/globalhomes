@@ -6651,6 +6651,115 @@ export type Database = {
           },
         ]
       }
+      signature_request_parties: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: string | null
+          order_index: number
+          request_id: string
+          signature_data: string | null
+          signed_at: string | null
+          signer_email: string
+          signer_name: string
+          signing_token: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          order_index?: number
+          request_id: string
+          signature_data?: string | null
+          signed_at?: string | null
+          signer_email: string
+          signer_name: string
+          signing_token?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          order_index?: number
+          request_id?: string
+          signature_data?: string | null
+          signed_at?: string | null
+          signer_email?: string
+          signer_name?: string
+          signing_token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signature_request_parties_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "signature_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      signature_requests: {
+        Row: {
+          agent_id: string
+          created_at: string
+          document_name: string
+          document_url: string | null
+          file_path: string | null
+          id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          document_name: string
+          document_url?: string | null
+          file_path?: string | null
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          document_name?: string
+          document_url?: string | null
+          file_path?: string | null
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signature_requests_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signature_requests_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signature_requests_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signature_requests_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+        ]
+      }
       strata_listing_data: {
         Row: {
           admin_levy_per_lot: number | null
@@ -10037,6 +10146,14 @@ export type Database = {
           id: string
           name: string
         }[]
+      }
+      sign_document: {
+        Args: {
+          p_ip_address?: string
+          p_signature_data: string
+          p_token: string
+        }
+        Returns: Json
       }
       suburb_sold_stats: {
         Args: {

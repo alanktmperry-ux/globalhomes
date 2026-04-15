@@ -51,6 +51,7 @@ const MyApplicationsPage = React.lazy(() => import("./features/rental/pages/MyAp
 const PublicLayout = React.lazy(() => import("@/shared/components/layout/PublicLayout"));
 const BuyPage = React.lazy(() => import("./pages/BuyPage"));
 const SuburbsIndexPage = React.lazy(() => import("./pages/SuburbsIndexPage"));
+const SigningPage = React.lazy(() => import("./pages/SigningPage"));
 
 // Lazy-loaded dashboard sub-pages
 const DashboardOverview = React.lazy(() => import("@/features/agents/components/dashboard/DashboardOverview"));
@@ -197,6 +198,7 @@ const App = () => (
                   <Route path="/waitlist" element={<WaitlistPage />} />
                   <Route path="/agency/:slug" element={<AgencyProfilePage />} />
                   <Route path="/terms" element={<TermsPage />} />
+                  <Route path="/sign/:token" element={<SigningPage />} />
                   <Route path="/privacy" element={<PrivacyPage />} />
                   <Route path="/strata" element={<StrataDirectoryPage />} />
                   <Route path="/schemes/:id" element={<SchemeProfilePage />} />

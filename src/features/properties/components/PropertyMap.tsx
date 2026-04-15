@@ -35,10 +35,21 @@ interface PropertyMapProps {
   onScrollToProperty?: (propertyId: string) => void;
   formatPrice?: (audPrice: number, listingType?: string) => string;
   onGeolocate?: (location: { lat: number; lng: number }) => void;
+  /** Hide circle/polygon drawing tools */
+  hideDrawingTools?: boolean;
+  /** Hide the "Search this area" button */
+  hideSearchArea?: boolean;
+  /** Hide the geolocation button */
+  hideGeolocation?: boolean;
+  /** Initial zoom level */
+  initialZoom?: number;
+  /** Fixed height style */
+  height?: string;
 }
 
 export function PropertyMap({
   properties, onPropertySelect, selectedPropertyId, onAreaSearch, centerOn, onMapMoved, onScrollToProperty, formatPrice, onGeolocate,
+  hideDrawingTools, hideSearchArea, hideGeolocation, initialZoom, height,
 }: PropertyMapProps) {
 
   const mapRef = useRef<HTMLDivElement>(null);
@@ -80,7 +91,7 @@ export function PropertyMap({
 
         const map = new Map(mapRef.current, {
           center: { lat: -37.85, lng: 145.35 },
-          zoom: 11,
+          zoom: initialZoom ?? 11,
           mapId: 'property-map',
           disableDefaultUI: true,
           zoomControl: true,
@@ -94,7 +105,7 @@ export function PropertyMap({
 
         const drawingManager = new google.maps.drawing.DrawingManager({
           drawingMode: null,
-          drawingControl: true,
+          drawingControl: !hideDrawingTools,
           drawingControlOptions: {
             position: google.maps.ControlPosition.RIGHT_CENTER,
             drawingModes: [
@@ -120,7 +131,9 @@ export function PropertyMap({
           },
         });
 
-        drawingManager.setMap(map);
+        if (!hideDrawingTools) {
+          drawingManager.setMap(map);
+        }
         drawingManagerRef.current = drawingManager;
         mapInstanceRef.current = map;
 
@@ -413,17 +426,17 @@ export function PropertyMap({
 
   return (
     <TooltipProvider delayDuration={300}>
-    <div className="relative w-full h-full rounded-xl overflow-hidden border border-border">
+    <div className="relative w-full rounded-xl overflow-hidden border border-border" style={{ height: height ?? '100%' }}>
       {isLoading && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background gap-2">
           <Loader2 className="animate-spin text-primary" size={24} />
           <span className="text-xs text-muted-foreground">Mapping properties…</span>
         </div>
       )}
-      <div ref={mapRef} className="w-full h-full" />
+      <div ref={mapRef} className="w-full" style={{ height: height ?? '100%' }} />
 
       {/* Search this area button */}
-      {showSearchArea && (
+      {showSearchArea && !hideSearchArea && (
         <Tooltip>
           <TooltipTrigger asChild>
             <button
@@ -455,37 +468,41 @@ export function PropertyMap({
       )}
 
       {/* Drawing tools legend */}
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <button
-            className="absolute bottom-16 left-4 z-20 w-8 h-8 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated flex items-center justify-center hover:bg-card transition-colors"
-          >
-            <HelpCircle size={14} className="text-muted-foreground" />
-          </button>
-        </TooltipTrigger>
-        <TooltipContent side="right" className="max-w-[220px]">
-          <p className="font-medium mb-1">Map drawing tools</p>
-          <p className="text-xs">Use the icons above to draw a <strong>circle</strong> or <strong>polygon</strong> on the map to filter properties within that area. Click and drag to draw.</p>
-        </TooltipContent>
-      </Tooltip>
+      {!hideDrawingTools && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              className="absolute bottom-16 left-4 z-20 w-8 h-8 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated flex items-center justify-center hover:bg-card transition-colors"
+            >
+              <HelpCircle size={14} className="text-muted-foreground" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="right" className="max-w-[220px]">
+            <p className="font-medium mb-1">Map drawing tools</p>
+            <p className="text-xs">Use the icons above to draw a <strong>circle</strong> or <strong>polygon</strong> on the map to filter properties within that area. Click and drag to draw.</p>
+          </TooltipContent>
+        </Tooltip>
+      )}
 
       {/* Geolocation button */}
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <button
-            onClick={handleGeolocate}
-            className="absolute bottom-4 left-4 z-20 w-10 h-10 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated flex items-center justify-center hover:bg-card transition-colors"
-            aria-label="Find properties near me"
-          >
-            {locating ? (
-              <Loader2 size={16} className="animate-spin text-primary" />
-            ) : (
-              <Locate size={16} className="text-foreground" />
-            )}
-          </button>
-        </TooltipTrigger>
-        <TooltipContent>Use your current location to find nearby properties</TooltipContent>
-      </Tooltip>
+      {!hideGeolocation && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={handleGeolocate}
+              className="absolute bottom-4 left-4 z-20 w-10 h-10 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated flex items-center justify-center hover:bg-card transition-colors"
+              aria-label="Find properties near me"
+            >
+              {locating ? (
+                <Loader2 size={16} className="animate-spin text-primary" />
+              ) : (
+                <Locate size={16} className="text-foreground" />
+              )}
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Use your current location to find nearby properties</TooltipContent>
+        </Tooltip>
+      )}
     </div>
     </TooltipProvider>
   );

@@ -11,7 +11,7 @@ export function useSuburbListings(suburb: string, state: string) {
     Promise.all([
       supabase
         .from('properties')
-        .select('id, address, price, price_formatted, beds, baths, parking, property_type, images, image_url, slug, listing_type, listing_mode, sold_price, sold_at')
+        .select('id, address, price, price_formatted, beds, baths, parking, property_type, images, image_url, slug, listing_type, listing_mode, sold_price, sold_at, lat, lng')
         .ilike('suburb', suburb)
         .ilike('state', state)
         .eq('is_active', true)

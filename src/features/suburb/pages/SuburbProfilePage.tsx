@@ -44,7 +44,7 @@ export default function SuburbProfilePage() {
         description: '',
         estimatedValue: '',
         propertyType: p.property_type || 'House',
-        features: [],
+        features: [] as string[],
         agent: { id: '', name: '', agency: '', phone: '', email: '', avatarUrl: '', isSubscribed: false },
         listedDate: '',
         views: 0,

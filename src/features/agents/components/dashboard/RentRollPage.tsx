@@ -466,6 +466,40 @@ const RentRollPage = () => {
                                       Notify
                                     </Button>
                                   )}
+                                  {arrears.days > 0 && (
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="text-[10px] h-7 border-red-300 text-red-600 hover:bg-red-50"
+                                      onClick={async (e) => {
+                                        e.stopPropagation();
+                                        if (!t.tenant_email) {
+                                          toast.error('No email address on file for this tenant');
+                                          return;
+                                        }
+                                        const addr = t.properties?.address || 'your property';
+                                        try {
+                                          const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user?.id || '').maybeSingle();
+                                          if (!agent) return;
+                                          await supabase.functions.invoke('send-notification-email', {
+                                            body: {
+                                              agent_id: agent.id,
+                                              type: 'arrears_reminder',
+                                              title: `Rent arrears notice — ${addr}`,
+                                              message: `Hi ${t.tenant_name}, our records show your rent is ${arrears.days} days overdue with an outstanding balance of approximately $${arrears.owed.toFixed(0)}. Please arrange payment immediately or contact us to discuss. If you believe this is an error, please disregard this message.`,
+                                              recipient_email: t.tenant_email,
+                                              lead_name: t.tenant_name,
+                                            },
+                                          });
+                                          toast.success(`Arrears reminder sent to ${t.tenant_name}`);
+                                        } catch {
+                                          toast.error('Failed to send arrears reminder');
+                                        }
+                                      }}
+                                    >
+                                      Chase
+                                    </Button>
+                                  )}
                                   <Button
                                     variant="ghost"
                                     size="sm"

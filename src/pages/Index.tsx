@@ -305,7 +305,7 @@ const Index = () => {
       if (data.seeking_type === 'rent') {
         setListingMode('rent');
       } else {
-        setListingMode('buy');
+        setListingMode('sale');
       }
 
       setFilters(prev => ({

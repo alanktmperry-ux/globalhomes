@@ -7,6 +7,7 @@ import { useIsMobile } from '@/shared/hooks/use-mobile';
 import { NotificationBell } from '@/features/agents/components/dashboard/NotificationBell';
 import AgentDashboardSidebar from '@/features/agents/components/dashboard/AgentDashboardSidebar';
 import { PaymentStatusBanner } from '@/features/agents/components/PaymentStatusBanner';
+import { Clock, XCircle } from 'lucide-react';
 
 const AgentDashboardLayout = () => {
   const { user, impersonatedUserId } = useAuth();
@@ -16,14 +17,14 @@ const AgentDashboardLayout = () => {
   const [checked, setChecked] = useState(false);
   const [onboardingComplete, setOnboardingComplete] = useState(true);
   const [trustPending, setTrustPending] = useState(false);
+  const [approvalStatus, setApprovalStatus] = useState<string | null>(null);
 
   useEffect(() => {
     const effectiveUserId = impersonatedUserId || user?.id;
     if (!effectiveUserId || checked) return;
     const checkOnboarding = async () => {
-      const { data: agent } = await supabase.from('agents').select('onboarding_complete').eq('user_id', effectiveUserId).maybeSingle();
+      const { data: agent } = await supabase.from('agents').select('onboarding_complete, approval_status').eq('user_id', effectiveUserId).maybeSingle();
       if (!agent) {
-        // No agent profile yet — send to onboarding
         if (!impersonatedUserId && !location.pathname.includes('/dashboard/onboarding')) {
           navigate('/dashboard/onboarding', { replace: true });
         }
@@ -33,6 +34,7 @@ const AgentDashboardLayout = () => {
       }
       const complete = !!(agent as any).onboarding_complete;
       setOnboardingComplete(complete);
+      setApprovalStatus((agent as any).approval_status ?? null);
       if (!complete && !impersonatedUserId && !location.pathname.includes('/dashboard/onboarding')) {
         navigate('/dashboard/onboarding', { replace: true });
       }
@@ -49,6 +51,46 @@ const AgentDashboardLayout = () => {
         if ((data as any)?.trust_setup_pending) setTrustPending(true);
       });
   }, [user?.id, impersonatedUserId]);
+
+  // Approval gate — only for non-impersonated users after check completes
+  if (checked && !impersonatedUserId) {
+    if (approvalStatus === 'pending') {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-background px-4">
+          <div className="max-w-md text-center space-y-4">
+            <div className="mx-auto w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+              <Clock className="w-8 h-8 text-amber-600 dark:text-amber-400" />
+            </div>
+            <h1 className="text-2xl font-bold text-foreground">Account Under Review</h1>
+            <p className="text-muted-foreground">
+              Your agent account is currently being reviewed by our team. You'll receive an email once approved — usually within 1 business day.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Questions? Contact <a href="mailto:support@listhq.com.au" className="underline">support@listhq.com.au</a>
+            </p>
+          </div>
+        </div>
+      );
+    }
+    if (approvalStatus === 'rejected') {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-background px-4">
+          <div className="max-w-md text-center space-y-4">
+            <div className="mx-auto w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+              <XCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
+            </div>
+            <h1 className="text-2xl font-bold text-foreground">Application Not Approved</h1>
+            <p className="text-muted-foreground">
+              Unfortunately your agent application was not approved at this time. Please contact our support team to discuss.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Contact <a href="mailto:support@listhq.com.au" className="underline">support@listhq.com.au</a>
+            </p>
+          </div>
+        </div>
+      );
+    }
+  }
 
   return (
     <SidebarProvider>

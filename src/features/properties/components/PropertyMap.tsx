@@ -25,6 +25,16 @@ const LIGHT_MAP_STYLE: google.maps.MapTypeStyle[] = [
   { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#cbd5e1' }] },
 ];
 
+export interface SchoolMarker {
+  id: string;
+  name: string;
+  type: string;
+  sector: string;
+  icsea?: number | null;
+  lat: number;
+  lng: number;
+}
+
 interface PropertyMapProps {
   properties: Property[];
   onPropertySelect: (property: Property) => void;
@@ -35,21 +45,18 @@ interface PropertyMapProps {
   onScrollToProperty?: (propertyId: string) => void;
   formatPrice?: (audPrice: number, listingType?: string) => string;
   onGeolocate?: (location: { lat: number; lng: number }) => void;
-  /** Hide circle/polygon drawing tools */
   hideDrawingTools?: boolean;
-  /** Hide the "Search this area" button */
   hideSearchArea?: boolean;
-  /** Hide the geolocation button */
   hideGeolocation?: boolean;
-  /** Initial zoom level */
   initialZoom?: number;
-  /** Fixed height style */
   height?: string;
+  /** Optional school markers to display on the map */
+  schoolMarkers?: SchoolMarker[];
 }
 
 export function PropertyMap({
   properties, onPropertySelect, selectedPropertyId, onAreaSearch, centerOn, onMapMoved, onScrollToProperty, formatPrice, onGeolocate,
-  hideDrawingTools, hideSearchArea, hideGeolocation, initialZoom, height,
+  hideDrawingTools, hideSearchArea, hideGeolocation, initialZoom, height, schoolMarkers,
 }: PropertyMapProps) {
 
   const mapRef = useRef<HTMLDivElement>(null);
@@ -65,6 +72,7 @@ export function PropertyMap({
   const [showSearchArea, setShowSearchArea] = useState(false);
   const [locating, setLocating] = useState(false);
   const [hasDrawnArea, setHasDrawnArea] = useState(false);
+  const schoolMarkersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
   const userMovedRef = useRef(false);
 
   const clearDrawnOverlay = useCallback(() => {

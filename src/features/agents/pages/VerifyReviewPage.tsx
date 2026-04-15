@@ -18,8 +18,8 @@ export default function VerifyReviewPage() {
     } else if (reviewParam === 'expired' || reviewParam === 'invalid') {
       setStatus('error');
     } else {
-      // Direct call to edge function
-      const url = `https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/verify-review?token=${token}`;
+      // Direct redirect to edge function — cannot use supabase.functions.invoke() for navigation
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-review?token=${token}`;
       window.location.href = url;
     }
   }, [token, params]);

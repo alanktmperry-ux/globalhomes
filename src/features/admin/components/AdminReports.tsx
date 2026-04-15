@@ -358,12 +358,9 @@ const AdminReports = ({ isAdmin, currentAgentId }: Props) => {
       let signInMap = new Map<string, string | null>();
       if (isAdmin) {
         try {
-          const { data: j, error } = await supabase.functions.invoke('admin-users', {
-            body: { action: 'list_users' },
-          });
-          if (!error) {
-            (j?.users || []).forEach((u: any) => signInMap.set(u.id, u.last_sign_in_at || null));
-          }
+          const { callAdminFunction } = await import('@/features/admin/lib/adminApi');
+          const j = await callAdminFunction('list_users');
+          (j?.users || []).forEach((u: any) => signInMap.set(u.id, u.last_sign_in_at || null));
         } catch {}
       }
 

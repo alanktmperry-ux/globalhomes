@@ -30,21 +30,21 @@ const AdminDatabase = () => {
   const limit = 20;
 
   const fetchStats = async () => {
-    const { data: result, error } = await supabase.functions.invoke('admin-users', {
-      body: { action: 'table_stats' },
-    });
-    if (!error) setTableStats(result?.stats || {});
+    try {
+      const { callAdminFunction } = await import('@/features/admin/lib/adminApi');
+      const result = await callAdminFunction('table_stats');
+      setTableStats(result?.stats || {});
+    } catch {}
   };
 
   const fetchTable = async () => {
     setLoading(true);
-    const { data: result, error } = await supabase.functions.invoke('admin-users', {
-      body: { action: 'browse_table', table: selectedTable, limit, offset },
-    });
-    if (!error) {
+    try {
+      const { callAdminFunction } = await import('@/features/admin/lib/adminApi');
+      const result = await callAdminFunction('browse_table', { table: selectedTable, limit, offset });
       setData(result?.data || []);
       setTotal(result?.total || 0);
-    }
+    } catch {}
     setLoading(false);
   };
 
@@ -53,9 +53,8 @@ const AdminDatabase = () => {
 
   const handleDelete = async (recordId: string) => {
     if (!confirm('Delete this record?')) return;
-    await supabase.functions.invoke('admin-users', {
-      body: { action: 'delete_record', table: selectedTable, record_id: recordId },
-    });
+    const { callAdminFunction } = await import('@/features/admin/lib/adminApi');
+    await callAdminFunction('delete_record', { table: selectedTable, record_id: recordId });
     toast({ title: 'Record deleted' });
     fetchTable();
     fetchStats();

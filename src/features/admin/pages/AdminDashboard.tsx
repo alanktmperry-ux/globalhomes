@@ -142,21 +142,14 @@ const AdminDashboard = () => {
       roleMap.set(r.user_id, existing);
     });
 
-    const { data: sessionData } = await supabase.auth.getSession();
     const signInMap = new Map<string, string | null>();
-    const token = sessionData.session?.access_token;
-    if (token) {
-      try {
-        const { data: adminData, error } = await supabase.functions.invoke('admin-users', {
-          body: { action: 'list_users' },
-        });
-        if (!error) {
-          (adminData?.users || []).forEach((u: any) => {
-            signInMap.set(u.id, u.last_sign_in_at || null);
-          });
-        }
-      } catch {}
-    }
+    try {
+      const { callAdminFunction } = await import('@/features/admin/lib/adminApi');
+      const adminData = await callAdminFunction('list_users');
+      (adminData?.users || []).forEach((u: any) => {
+        signInMap.set(u.id, u.last_sign_in_at || null);
+      });
+    } catch {}
 
     const userRows: UserRow[] = (profileData.data || []).map((p) => ({
       id: p.user_id,

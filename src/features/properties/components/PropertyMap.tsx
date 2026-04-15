@@ -35,10 +35,21 @@ interface PropertyMapProps {
   onScrollToProperty?: (propertyId: string) => void;
   formatPrice?: (audPrice: number, listingType?: string) => string;
   onGeolocate?: (location: { lat: number; lng: number }) => void;
+  /** Hide circle/polygon drawing tools */
+  hideDrawingTools?: boolean;
+  /** Hide the "Search this area" button */
+  hideSearchArea?: boolean;
+  /** Hide the geolocation button */
+  hideGeolocation?: boolean;
+  /** Initial zoom level */
+  initialZoom?: number;
+  /** Fixed height style */
+  height?: string;
 }
 
 export function PropertyMap({
   properties, onPropertySelect, selectedPropertyId, onAreaSearch, centerOn, onMapMoved, onScrollToProperty, formatPrice, onGeolocate,
+  hideDrawingTools, hideSearchArea, hideGeolocation, initialZoom, height,
 }: PropertyMapProps) {
 
   const mapRef = useRef<HTMLDivElement>(null);
@@ -80,7 +91,7 @@ export function PropertyMap({
 
         const map = new Map(mapRef.current, {
           center: { lat: -37.85, lng: 145.35 },
-          zoom: 11,
+          zoom: initialZoom ?? 11,
           mapId: 'property-map',
           disableDefaultUI: true,
           zoomControl: true,
@@ -94,7 +105,7 @@ export function PropertyMap({
 
         const drawingManager = new google.maps.drawing.DrawingManager({
           drawingMode: null,
-          drawingControl: true,
+          drawingControl: !hideDrawingTools,
           drawingControlOptions: {
             position: google.maps.ControlPosition.RIGHT_CENTER,
             drawingModes: [
@@ -120,7 +131,9 @@ export function PropertyMap({
           },
         });
 
-        drawingManager.setMap(map);
+        if (!hideDrawingTools) {
+          drawingManager.setMap(map);
+        }
         drawingManagerRef.current = drawingManager;
         mapInstanceRef.current = map;
 

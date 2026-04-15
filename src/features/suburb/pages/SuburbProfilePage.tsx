@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Loader2, GraduationCap } from 'lucide-react';
+import { Loader2, GraduationCap, MapPin } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSuburbProfile } from '../hooks/useSuburbProfile';
 import { useSuburbListings } from '../hooks/useSuburbListings';
@@ -11,6 +11,8 @@ import { SuburbPropertyTypeTabs } from '../components/SuburbPropertyTypeTabs';
 import { SuburbAmenitiesPanel } from '../components/SuburbAmenitiesPanel';
 import { SuburbListingsPreview } from '../components/SuburbListingsPreview';
 import { SuburbInvestorSnapshot } from '../components/SuburbInvestorSnapshot';
+import { PropertyMap } from '@/features/properties/components/PropertyMap';
+import { Property } from '@/shared/lib/types';
 
 export default function SuburbProfilePage() {
   const { state, slug } = useParams<{ state: string; slug: string }>();
@@ -103,6 +105,35 @@ export default function SuburbProfilePage() {
       <SuburbHero suburb={suburb} suburbName={suburbName} stateUpper={stateUpper} stats={houseStats} />
 
       <div className="max-w-6xl mx-auto px-4 py-8 space-y-10">
+        {/* Map */}
+        {suburb?.lat && suburb?.lng && mappableListings.length > 0 && (
+          <section>
+            <h2 className="font-display text-xl font-semibold text-foreground mb-4">
+              Properties in {suburbName}
+            </h2>
+            <PropertyMap
+              properties={mappableListings}
+              onPropertySelect={() => {}}
+              centerOn={{ lat: suburb.lat, lng: suburb.lng }}
+              initialZoom={14}
+              height="400px"
+              hideDrawingTools
+              hideSearchArea
+              hideGeolocation
+            />
+            <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-[hsl(var(--primary))]" />
+                Active listings ({mappableListings.length})
+              </span>
+              <span className="flex items-center gap-1.5">
+                <GraduationCap size={14} />
+                Schools ({nearbySchools.length})
+              </span>
+            </div>
+          </section>
+        )}
+
         {/* Price Chart */}
         {priceHistory.length > 0 && (
           <section>

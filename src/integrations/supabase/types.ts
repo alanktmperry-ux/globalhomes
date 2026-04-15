@@ -5283,6 +5283,7 @@ export type Database = {
           marketing_email_sent_at: string | null
           max_occupants: number | null
           min_lease_months: number | null
+          moderation_status: string
           off_market_reason: string | null
           parking: number
           parking_notes: string | null
@@ -5406,6 +5407,7 @@ export type Database = {
           marketing_email_sent_at?: string | null
           max_occupants?: number | null
           min_lease_months?: number | null
+          moderation_status?: string
           off_market_reason?: string | null
           parking?: number
           parking_notes?: string | null
@@ -5529,6 +5531,7 @@ export type Database = {
           marketing_email_sent_at?: string | null
           max_occupants?: number | null
           min_lease_months?: number | null
+          moderation_status?: string
           off_market_reason?: string | null
           parking?: number
           parking_notes?: string | null
@@ -9960,6 +9963,7 @@ export type Database = {
           marketing_email_sent_at: string | null
           max_occupants: number | null
           min_lease_months: number | null
+          moderation_status: string
           off_market_reason: string | null
           parking: number
           parking_notes: string | null

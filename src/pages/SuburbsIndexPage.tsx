@@ -114,9 +114,6 @@ export default function SuburbsIndexPage() {
                     >
                       {s.name}
                     </Link>
-                        </span>
-                      ) : null}
-                    </Link>
                   ))}
                 </div>
               </section>

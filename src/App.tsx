@@ -50,6 +50,7 @@ const OnboardingRolePage = React.lazy(() => import("./features/auth/pages/Onboar
 const MyApplicationsPage = React.lazy(() => import("./features/rental/pages/MyApplicationsPage"));
 const PublicLayout = React.lazy(() => import("@/shared/components/layout/PublicLayout"));
 const BuyPage = React.lazy(() => import("./pages/BuyPage"));
+const SuburbsIndexPage = React.lazy(() => import("./pages/SuburbsIndexPage"));
 
 // Lazy-loaded dashboard sub-pages
 const DashboardOverview = React.lazy(() => import("@/features/agents/components/dashboard/DashboardOverview"));
@@ -191,6 +192,7 @@ const App = () => (
                   <Route path="/agent/:id" element={<AgentPublicProfilePage />} />
                   <Route path="/agents" element={<FindAgentPage />} />
                   <Route path="/for-agents" element={<AgentLandingPage />} />
+                  <Route path="/suburbs" element={<SuburbsIndexPage />} />
                   <Route path="/launch" element={<MarketingLandingPage />} />
                   <Route path="/waitlist" element={<WaitlistPage />} />
                   <Route path="/agency/:slug" element={<AgencyProfilePage />} />

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { MapPin } from 'lucide-react';
 import { Globe, ChevronDown, User, LogIn, Home, Building2, Plus, List, LayoutDashboard, ShieldCheck, Menu, FileText } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';

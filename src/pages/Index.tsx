@@ -1272,6 +1272,22 @@ const Index = () => {
             {/* Status bar + filters */}
             <div className="px-4 py-2 shrink-0">
               {statusBar}
+              {prefsBannerVisible && (
+                <div className="mt-2 flex items-center justify-between gap-2 rounded-lg bg-primary/10 border border-primary/20 px-3 py-2 text-xs text-primary">
+                  <span>Showing results based on your saved preferences.</span>
+                  <button
+                    onClick={() => {
+                      setPrefsBannerVisible(false);
+                      sessionStorage.setItem('listhq_prefs_banner_dismissed', '1');
+                      setFilters(prev => ({ ...prev, priceRange: [0, 5_000_000] as [number, number], minBeds: 0 }));
+                      setListingMode('sale');
+                    }}
+                    className="font-semibold hover:underline shrink-0"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Property list */}

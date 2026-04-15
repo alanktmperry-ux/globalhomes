@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Home, Loader2, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
+import { Plus, Home, Loader2, AlertTriangle, CheckCircle2, Clock, ClipboardCheck, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,9 +12,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import DashboardHeader from './DashboardHeader';
-import { addDays, differenceInDays, format, parseISO } from 'date-fns';
+import { addDays, differenceInDays, differenceInMonths, format, parseISO } from 'date-fns';
 
 interface Tenancy {
   id: string;
@@ -31,7 +34,15 @@ interface Tenancy {
   management_fee_percent: number;
   status: string;
   notes: string | null;
-  properties: { address: string; suburb: string } | null;
+  properties: { address: string; suburb: string; state: string | null } | null;
+}
+
+interface Inspection {
+  id: string;
+  inspection_type: string;
+  scheduled_date: string;
+  status: string;
+  conducted_date: string | null;
 }
 
 interface RentPayment {
@@ -86,6 +97,12 @@ const RentRollPage = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [step, setStep] = useState(1);
+  const [expandedTenancy, setExpandedTenancy] = useState<string | null>(null);
+  const [inspections, setInspections] = useState<Record<string, Inspection[]>>({});
+  const [loadingInspections, setLoadingInspections] = useState<string | null>(null);
+  const [showScheduleModal, setShowScheduleModal] = useState<Tenancy | null>(null);
+  const [scheduleForm, setScheduleForm] = useState({ inspection_type: 'routine', scheduled_date: undefined as Date | undefined, owner_name: '', owner_email: '', bond_lodgment_number: '' });
+  const [scheduleSaving, setScheduleSaving] = useState(false);
 
   const [form, setForm] = useState({
     property_id: '',
@@ -164,7 +181,7 @@ const RentRollPage = () => {
     const [tenancyRes, paymentRes, propRes] = await Promise.all([
       supabase
         .from('tenancies')
-        .select('*, properties(address, suburb)')
+        .select('*, properties(address, suburb, state)')
         .eq('agent_id', agentData.id)
         .order('lease_end', { ascending: true }),
       supabase
@@ -234,6 +251,97 @@ const RentRollPage = () => {
     const latest = latestPaymentMap.get(t.id);
     if (!latest) return format(parseISO(t.lease_start), 'dd MMM yyyy');
     return format(addDays(parseISO(latest.period_to), frequencyDays(t.rent_frequency)), 'dd MMM yyyy');
+  };
+
+  const fetchInspections = async (tenancyId: string) => {
+    if (inspections[tenancyId]) return;
+    setLoadingInspections(tenancyId);
+    const { data } = await supabase
+      .from('property_inspections')
+      .select('id, inspection_type, scheduled_date, status, conducted_date')
+      .eq('tenancy_id', tenancyId)
+      .order('scheduled_date', { ascending: false });
+    setInspections(prev => ({ ...prev, [tenancyId]: (data || []) as Inspection[] }));
+    setLoadingInspections(null);
+  };
+
+  const toggleExpand = (tenancyId: string) => {
+    if (expandedTenancy === tenancyId) {
+      setExpandedTenancy(null);
+    } else {
+      setExpandedTenancy(tenancyId);
+      fetchInspections(tenancyId);
+    }
+  };
+
+  const getNoticePeriodWarning = (state: string | null | undefined, scheduledDate: Date | undefined): string | null => {
+    if (!scheduledDate || !state) return null;
+    const daysUntil = differenceInDays(scheduledDate, today);
+    const s = state.toUpperCase();
+    if (['NSW', 'WA', 'ACT', 'SA', 'TAS', 'NT'].includes(s) && daysUntil < 7) {
+      return `${s} requires minimum 7 days notice. You've scheduled ${daysUntil} day(s) from today.`;
+    }
+    if (s === 'VIC' && daysUntil < 2) {
+      return `VIC requires minimum 2 days notice. You've scheduled ${daysUntil} day(s) from today.`;
+    }
+    if (s === 'QLD' && daysUntil < 1) {
+      return `QLD requires minimum 1 day notice.`;
+    }
+    return null;
+  };
+
+  const getFrequencyWarning = (state: string | null | undefined, tenancyId: string, type: string): string | null => {
+    if (type !== 'routine' || !state) return null;
+    const existing = inspections[tenancyId]?.filter(i => i.inspection_type === 'routine' && i.status !== 'cancelled') || [];
+    if (existing.length === 0) return null;
+    const latest = existing[0];
+    const months = differenceInMonths(new Date(), parseISO(latest.scheduled_date));
+    const s = state.toUpperCase();
+    if (s === 'VIC' && months < 6) return 'VIC allows routine inspections max once per 6 months.';
+    if (s === 'QLD' && months < 3) return 'QLD allows routine inspections max once per 3 months.';
+    return null;
+  };
+
+  const handleScheduleInspection = async (navigateAfter: boolean) => {
+    if (!showScheduleModal || !agentId || !scheduleForm.scheduled_date) return;
+    setScheduleSaving(true);
+    const { data, error } = await supabase.from('property_inspections').insert({
+      tenancy_id: showScheduleModal.id,
+      property_id: showScheduleModal.property_id,
+      agent_id: agentId,
+      inspection_type: scheduleForm.inspection_type,
+      scheduled_date: format(scheduleForm.scheduled_date, 'yyyy-MM-dd'),
+      owner_name: scheduleForm.owner_name || null,
+      owner_email: scheduleForm.owner_email || null,
+      bond_lodgment_number: scheduleForm.bond_lodgment_number || null,
+    } as any).select('id').maybeSingle();
+    setScheduleSaving(false);
+    if (error) { toast.error(`Failed: ${error.message}`); return; }
+    toast.success('Inspection scheduled');
+    // Refresh inspections for this tenancy
+    setInspections(prev => { const copy = { ...prev }; delete copy[showScheduleModal.id]; return copy; });
+    setShowScheduleModal(null);
+    setScheduleForm({ inspection_type: 'routine', scheduled_date: undefined, owner_name: '', owner_email: '', bond_lodgment_number: '' });
+    if (navigateAfter && data?.id) navigate(`/dashboard/inspection/${data.id}`);
+  };
+
+  const inspectionTypeBadge = (type: string) => {
+    const colors: Record<string, string> = {
+      entry: 'bg-blue-500/15 text-blue-700',
+      routine: 'bg-violet-500/15 text-violet-700',
+      exit: 'bg-orange-500/15 text-orange-700',
+    };
+    return <Badge className={cn('border-0 capitalize', colors[type] || 'bg-muted text-muted-foreground')}>{type}</Badge>;
+  };
+
+  const statusBadge = (status: string) => {
+    const colors: Record<string, string> = {
+      scheduled: 'bg-blue-500/15 text-blue-700',
+      in_progress: 'bg-amber-500/15 text-amber-700',
+      completed: 'bg-emerald-500/15 text-emerald-700',
+      cancelled: 'bg-muted text-muted-foreground',
+    };
+    return <Badge className={cn('border-0 capitalize', colors[status] || 'bg-muted')}>{status.replace('_', ' ')}</Badge>;
   };
 
   const handleSubmit = async () => {
@@ -403,7 +511,8 @@ const RentRollPage = () => {
                           const expiringSoon = daysToEnd >= 0 && daysToEnd <= 60;
 
                           return (
-                            <TableRow key={t.id} className="hover:bg-accent/50">
+                            <Fragment key={t.id}>
+                            <TableRow className="hover:bg-accent/50">
                               <TableCell className="font-medium">
                                 {t.properties?.address || '—'}
                                 <span className="block text-xs text-muted-foreground">{t.properties?.suburb}</span>
@@ -436,6 +545,16 @@ const RentRollPage = () => {
                               <TableCell className="text-right tabular-nums">{t.management_fee_percent}%</TableCell>
                               <TableCell>
                                 <div className="flex items-center gap-1 justify-end">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-[10px] h-7"
+                                    onClick={(e) => { e.stopPropagation(); toggleExpand(t.id); }}
+                                  >
+                                    <ClipboardCheck size={12} className="mr-1" />
+                                    Inspections
+                                    {expandedTenancy === t.id ? <ChevronUp size={12} className="ml-1" /> : <ChevronDown size={12} className="ml-1" />}
+                                  </Button>
                                   {expiringSoon && t.tenant_email && (
                                     <Button
                                       variant="outline"
@@ -510,6 +629,48 @@ const RentRollPage = () => {
                                 </div>
                               </TableCell>
                             </TableRow>
+                            {expandedTenancy === t.id && (
+                              <TableRow>
+                                <TableCell colSpan={8} className="bg-muted/30 p-4">
+                                  <div className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                      <h4 className="text-sm font-semibold text-foreground">Inspection History</h4>
+                                      <Button size="sm" variant="outline" onClick={() => {
+                                        setShowScheduleModal(t);
+                                        setScheduleForm({ inspection_type: 'routine', scheduled_date: undefined, owner_name: '', owner_email: '', bond_lodgment_number: '' });
+                                      }}>
+                                        <Calendar size={12} className="mr-1" /> Schedule Inspection
+                                      </Button>
+                                    </div>
+                                    {loadingInspections === t.id ? (
+                                      <div className="flex justify-center py-4"><Loader2 className="animate-spin text-primary" size={18} /></div>
+                                    ) : (inspections[t.id]?.length || 0) === 0 ? (
+                                      <p className="text-xs text-muted-foreground py-2">No inspections recorded for this tenancy.</p>
+                                    ) : (
+                                      <div className="space-y-2">
+                                        {inspections[t.id]?.map(insp => (
+                                          <div key={insp.id} className="flex items-center justify-between rounded-lg border bg-background p-3">
+                                            <div className="flex items-center gap-3">
+                                              {inspectionTypeBadge(insp.inspection_type)}
+                                              <span className="text-sm">{format(parseISO(insp.scheduled_date), 'dd MMM yyyy')}</span>
+                                              {statusBadge(insp.status)}
+                                            </div>
+                                            <Button
+                                              size="sm"
+                                              variant={insp.status === 'completed' ? 'outline' : 'default'}
+                                              onClick={() => navigate(`/dashboard/inspection/${insp.id}`)}
+                                            >
+                                              {insp.status === 'in_progress' ? 'Continue Report' : insp.status === 'completed' ? 'View Report' : 'Start Report'}
+                                            </Button>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            )}
+                            </Fragment>
                           );
                         })
                       )}
@@ -736,6 +897,93 @@ const RentRollPage = () => {
               </div>
             );
           })()}
+        </DialogContent>
+      </Dialog>
+
+      {/* Schedule Inspection Modal */}
+      <Dialog open={!!showScheduleModal} onOpenChange={(open) => { if (!open) setShowScheduleModal(null); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Schedule Inspection</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-2">
+            <div>
+              <Label>Property</Label>
+              <p className="text-sm text-muted-foreground">{showScheduleModal?.properties?.address}, {showScheduleModal?.properties?.suburb}</p>
+            </div>
+            <div>
+              <Label>Inspection Type *</Label>
+              <Select value={scheduleForm.inspection_type} onValueChange={v => setScheduleForm(f => ({ ...f, inspection_type: v }))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="entry">Entry</SelectItem>
+                  <SelectItem value="routine">Routine</SelectItem>
+                  <SelectItem value="exit">Exit</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Scheduled Date *</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className={cn('w-full justify-start text-left font-normal', !scheduleForm.scheduled_date && 'text-muted-foreground')}>
+                    <Calendar size={14} className="mr-2" />
+                    {scheduleForm.scheduled_date ? format(scheduleForm.scheduled_date, 'PPP') : 'Pick a date'}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarComponent
+                    mode="single"
+                    selected={scheduleForm.scheduled_date}
+                    onSelect={d => setScheduleForm(f => ({ ...f, scheduled_date: d || undefined }))}
+                    disabled={d => d < today}
+                    initialFocus
+                    className="p-3 pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+              {(() => {
+                const noticeWarn = getNoticePeriodWarning(showScheduleModal?.properties?.state, scheduleForm.scheduled_date);
+                const freqWarn = showScheduleModal ? getFrequencyWarning(showScheduleModal.properties?.state, showScheduleModal.id, scheduleForm.inspection_type) : null;
+                return (
+                  <>
+                    {noticeWarn && (
+                      <div className="flex items-start gap-2 mt-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                        <AlertTriangle size={12} className="text-amber-600 shrink-0 mt-0.5" />
+                        <p className="text-xs text-amber-700">{noticeWarn}</p>
+                      </div>
+                    )}
+                    {freqWarn && (
+                      <div className="flex items-start gap-2 mt-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                        <AlertTriangle size={12} className="text-amber-600 shrink-0 mt-0.5" />
+                        <p className="text-xs text-amber-700">{freqWarn}</p>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><Label>Owner Name</Label><Input value={scheduleForm.owner_name} onChange={e => setScheduleForm(f => ({ ...f, owner_name: e.target.value }))} /></div>
+              <div><Label>Owner Email</Label><Input type="email" value={scheduleForm.owner_email} onChange={e => setScheduleForm(f => ({ ...f, owner_email: e.target.value }))} /></div>
+            </div>
+            {scheduleForm.inspection_type === 'exit' && (
+              <div>
+                <Label>Bond Lodgment Number</Label>
+                <Input value={scheduleForm.bond_lodgment_number} onChange={e => setScheduleForm(f => ({ ...f, bond_lodgment_number: e.target.value }))} placeholder="e.g. BL-2024-123456" />
+              </div>
+            )}
+            <div className="flex gap-2 mt-2">
+              <Button variant="outline" className="flex-1" onClick={() => handleScheduleInspection(false)} disabled={scheduleSaving || !scheduleForm.scheduled_date}>
+                {scheduleSaving ? <Loader2 className="animate-spin mr-1" size={14} /> : null}
+                Schedule for Later
+              </Button>
+              <Button className="flex-1" onClick={() => handleScheduleInspection(true)} disabled={scheduleSaving || !scheduleForm.scheduled_date}>
+                {scheduleSaving ? <Loader2 className="animate-spin mr-1" size={14} /> : null}
+                Start Report Now
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

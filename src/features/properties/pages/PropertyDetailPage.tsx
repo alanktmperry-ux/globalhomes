@@ -423,6 +423,14 @@ export default function PropertyDetailPage() {
                   : property.address}
                 {property.country && property.country !== 'Australia' ? `, ${property.country}` : ''}
               </p>
+              {property.suburb && property.state && (
+                <Link
+                  to={`/suburb/${property.state.toLowerCase()}/${property.suburb.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`}
+                  className="inline-block text-xs text-muted-foreground hover:text-primary transition-colors mt-1"
+                >
+                  View {property.suburb} suburb profile →
+                </Link>
+              )}
               {((property as any).listing_mode === 'eoi' || (property as any).listing_mode === 'off_market') && (
                 <div className="mt-4">
                   <EOISubmitPanel

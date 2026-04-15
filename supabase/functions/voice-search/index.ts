@@ -168,6 +168,7 @@ Deno.serve(async (req) => {
         session_id: sessionId || null,
         audio_duration: audioDuration || 0,
         status: "active",
+        user_id: userId,
       }])
       .select()
       .single();

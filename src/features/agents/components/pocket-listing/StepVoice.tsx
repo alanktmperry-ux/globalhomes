@@ -134,8 +134,21 @@ const StepVoice = ({ draft, update }: Props) => {
     };
 
     try {
-      const { data, error: invokeError } = await supabase.functions.invoke('generate-listing', {
-        body: {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        toast.error('Please log in to generate descriptions');
+        setGenerating(false);
+        return;
+      }
+
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-listing`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           propertyType: draft.propertyType,
           beds: draft.beds,
           baths: draft.baths,
@@ -146,13 +159,45 @@ const StepVoice = ({ draft, update }: Props) => {
           features: draft.features,
           tone: selectedTone,
           voiceTranscript: draft.voiceTranscript || '',
-        },
+        }),
       });
 
-      if (invokeError) throw invokeError;
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(errText || `HTTP ${response.status}`);
+      }
 
-      const fullText = typeof data === 'string' ? data : (data?.content || JSON.stringify(data));
-      setAiDescription(fullText);
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error('No response body');
+
+      const decoder = new TextDecoder();
+      let fullText = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (trimmed === 'data: [DONE]') continue;
+          if (!trimmed.startsWith('data: ')) continue;
+
+          try {
+            const parsed = JSON.parse(trimmed.slice(6));
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) {
+              fullText += content;
+              setAiDescription(fullText);
+            }
+          } catch {
+            // skip unparseable lines
+          }
+        }
+      }
+
       update({ voiceTranscript: fullText });
       setAiGenerated(true);
     } catch (e) {

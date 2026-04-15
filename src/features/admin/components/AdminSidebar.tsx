@@ -156,7 +156,7 @@ export default function AdminSidebar({ tab, setTab, pendingDemoCount = 0, pendin
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetContent side="left" className="w-[280px] p-0">
             <SheetTitle className="sr-only">Admin Navigation</SheetTitle>
-            <SidebarContent tab={tab} setTab={setTab} pendingDemoCount={pendingDemoCount} onClose={() => setOpen(false)} />
+            <SidebarContent tab={tab} setTab={setTab} pendingDemoCount={pendingDemoCount} pendingApprovalCount={pendingApprovalCount} onClose={() => setOpen(false)} />
           </SheetContent>
         </Sheet>
       </>
@@ -166,7 +166,7 @@ export default function AdminSidebar({ tab, setTab, pendingDemoCount = 0, pendin
   // Desktop sidebar
   return (
     <aside className="w-[260px] flex-shrink-0 border-r border-border bg-card/50 backdrop-blur-md flex flex-col sticky top-0 h-screen">
-      <SidebarContent tab={tab} setTab={setTab} pendingDemoCount={pendingDemoCount} />
+      <SidebarContent tab={tab} setTab={setTab} pendingDemoCount={pendingDemoCount} pendingApprovalCount={pendingApprovalCount} />
     </aside>
   );
 }

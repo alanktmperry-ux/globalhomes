@@ -157,6 +157,19 @@ Deno.serve(async (req) => {
         const { error } = await supabase.auth.admin.updateUserById(user_id, { ban_duration: "none" });
         if (error) throw error;
       }
+
+      // Audit log
+      try {
+        await supabase.from("audit_log").insert({
+          user_id: caller.id,
+          action_type: ban ? "admin_ban_user" : "admin_unban_user",
+          entity_type: "user",
+          entity_id: user_id,
+          description: ban ? `Admin banned user ${user_id}` : `Admin unbanned user ${user_id}`,
+          metadata: { banned: !!ban },
+        });
+      } catch (e) { console.error("Audit log insert failed:", e); }
+
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -196,6 +209,18 @@ Deno.serve(async (req) => {
         .update({ is_subscribed: plan_type !== "demo" })
         .eq("id", agent.id);
       if (agentUpdateErr) throw agentUpdateErr;
+
+      // Audit log
+      try {
+        await supabase.from("audit_log").insert({
+          user_id: caller.id,
+          action_type: "admin_set_subscription",
+          entity_type: "user",
+          entity_id: user_id,
+          description: `Admin set subscription to ${plan_type} for user ${user_id}`,
+          metadata: { plan_type, listing_limit, seat_limit },
+        });
+      } catch (e) { console.error("Audit log insert failed:", e); }
 
       return new Response(
         JSON.stringify({ success: true }),
@@ -322,6 +347,18 @@ Deno.serve(async (req) => {
           { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
+
+      // Audit log
+      try {
+        await supabase.from("audit_log").insert({
+          user_id: caller.id,
+          action_type: "admin_delete_user",
+          entity_type: "user",
+          entity_id: user_id,
+          description: `Admin deleted user ${user_id}`,
+          metadata: { target_user_id: user_id },
+        });
+      } catch (e) { console.error("Audit log insert failed:", e); }
 
       return new Response(JSON.stringify({ success: true, warnings }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -220,13 +220,8 @@ const AdminUsers = () => {
 
 
   const callAdminApi = useCallback(async (action: string, body?: any) => {
-    const { data, error } = await supabase.functions.invoke('admin-users', {
-      body: { action, ...body },
-    });
-    if (error) {
-      throw new Error(error.message || 'Request failed');
-    }
-    return data;
+    const { callAdminFunction } = await import('@/features/admin/lib/adminApi');
+    return callAdminFunction(action, body);
   }, []);
 
   const fetchUsers = async () => {

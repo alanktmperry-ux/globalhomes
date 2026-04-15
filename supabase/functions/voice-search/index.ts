@@ -12,6 +12,35 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const { audio, mimeType, transcript: rawTranscript, detectedLanguage, userLocation, sessionId, audioDuration } = body;
 
+    // ── Input validation ──
+    if (audio && typeof audio === "string") {
+      if (audio.length < 500) {
+        return new Response(
+          JSON.stringify({ error: "Audio too short — please speak for at least 1 second." }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (audio.length > 7_000_000) {
+        return new Response(
+          JSON.stringify({ error: "Audio too large — maximum recording length is 15 seconds." }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    // ── Optional auth context ──
+    const authHeader = req.headers.get("Authorization");
+    let userId: string | null = null;
+    if (authHeader?.startsWith("Bearer ")) {
+      const anonClient = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_ANON_KEY")!,
+        { global: { headers: { Authorization: authHeader } } }
+      );
+      const { data: { user } } = await anonClient.auth.getUser();
+      userId = user?.id ?? null;
+    }
+
     let transcript = rawTranscript || "";
     let detected_language = detectedLanguage || "en";
 

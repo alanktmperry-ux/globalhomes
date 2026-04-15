@@ -47,6 +47,7 @@ const DemoAccessPage = React.lazy(() => import("./features/agents/pages/DemoAcce
 const AuthConfirmPage = React.lazy(() => import("./features/auth/pages/AuthConfirmPage"));
 const AuthCallbackPage = React.lazy(() => import("./features/auth/pages/AuthCallbackPage"));
 const OnboardingRolePage = React.lazy(() => import("./features/auth/pages/OnboardingRolePage"));
+const MyApplicationsPage = React.lazy(() => import("./features/rental/pages/MyApplicationsPage"));
 const PublicLayout = React.lazy(() => import("@/shared/components/layout/PublicLayout"));
 const BuyPage = React.lazy(() => import("./pages/BuyPage"));
 
@@ -242,6 +243,7 @@ const App = () => (
                 <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute><BuyerSettingsPage /></ProtectedRoute>} />
+                <Route path="/my-applications" element={<ProtectedRoute><MyApplicationsPage /></ProtectedRoute>} />
 
                 {/* Agent */}
                 <Route path="/agent-dashboard" element={<ProtectedRoute requireAgent><AgentPerformanceDashboard /></ProtectedRoute>} />

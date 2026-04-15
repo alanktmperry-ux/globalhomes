@@ -124,6 +124,7 @@ export async function searchAgentListings(
     .select(PROPERTIES_WITH_AGENTS)
     .eq('is_active', true)
     .eq('status', 'public')
+    .or('moderation_status.eq.approved,moderation_status.is.null')
     .order('created_at', { ascending: false })
     .limit(limit);
 
@@ -195,6 +196,7 @@ export async function fetchPublicProperties(limit = 50, listingType?: 'sale' | '
       '*, agents(name, agency, phone, email, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count)'
     )
     .eq('status', 'public')
+    .or('moderation_status.eq.approved,moderation_status.is.null')
     .order('created_at', { ascending: false })
     .limit(limit);
 

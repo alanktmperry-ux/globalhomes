@@ -189,13 +189,6 @@ const BuyerSettingsPage = () => {
         await supabase.from('buyer_profiles').insert(buyerPayload);
       }
 
-      // Save notification prefs to localStorage
-      localStorage.setItem('gh-notif-prefs', JSON.stringify({
-        newListings: notifNewListings,
-        priceDrops: notifPriceDrops,
-        savedUpdates: notifSavedUpdates,
-        weeklyDigest: notifWeeklyDigest,
-      }));
 
       toast({ title: 'Settings saved', description: 'Your preferences have been updated.' });
     } catch (err: unknown) {

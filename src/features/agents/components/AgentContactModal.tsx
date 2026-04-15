@@ -184,7 +184,65 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
     // Check authentication before submitting
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
-      setShowAuthPrompt(true);
+      // Unauthenticated: still insert lead and notify agent via email
+      setSubmitting(true);
+      try {
+        const score = calcLeadScore(formData, searchContext);
+        const contextPayload = searchContext ? {
+          currentQuery: searchContext.currentQuery,
+          filters: searchContext.currentFilters,
+          radius: searchContext.searchRadius,
+          savedPropertiesCount: searchContext.savedPropertiesCount,
+          viewedPropertiesCount: searchContext.viewedPropertiesCount,
+          savedSearchesCount: searchContext.savedSearchesCount,
+          sessionDurationMinutes: searchContext.sessionDurationMinutes,
+          listingMode: searchContext.listingMode,
+        } : null;
+
+        await supabase.from('leads').insert({
+          agent_id: agent.id,
+          property_id: property.id,
+          user_name: formData.name,
+          user_email: formData.email,
+          user_phone: formData.phone,
+          message: formData.message || null,
+          user_id: null,
+          timeframe: formData.timeframe,
+          budget_range: formData.budgetRange || null,
+          buying_purpose: formData.buyingPurpose,
+          interests: formData.interests,
+          pre_approval_status: formData.preApproval,
+          score,
+          search_context: contextPayload,
+        });
+
+        // Notify agent via email
+        const { data: agentRow } = await supabase
+          .from('agents')
+          .select('email')
+          .eq('id', agent.id)
+          .maybeSingle();
+
+        if (agentRow?.email) {
+          supabase.functions.invoke('send-notification-email', {
+            body: {
+              type: 'agent_lead',
+              recipient_email: agentRow.email,
+              lead_name: formData.name,
+              title: `New enquiry for ${property.title || property.address}`,
+              message: `${formData.name} (${formData.email}${formData.phone ? ', ' + formData.phone : ''}) sent an enquiry: "${formData.message || 'No message provided'}". Reply directly to ${formData.email}`,
+            },
+          }).catch(() => {});
+        }
+
+        toast.success(`Lead submitted — Score: ${score}`);
+        setStep(3);
+      } catch (err) {
+        console.error('Lead submission error:', err);
+        toast.error('Error — Failed to submit. Please try again.');
+      } finally {
+        setSubmitting(false);
+      }
       return;
     }
 

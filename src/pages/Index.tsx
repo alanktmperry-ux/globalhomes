@@ -592,6 +592,30 @@ const Index = () => {
       <meta name="twitter:description" content={pageDescription} />
       <meta name="twitter:image" content="https://globalhomes.lovable.app/listhq-og.png" />
       <link rel="canonical" href="https://globalhomes.lovable.app" />
+      <script type="application/ld+json">{JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "ListHQ",
+        "url": "https://listhq.com.au",
+        "logo": "https://listhq.com.au/favicon.ico",
+        "description": "Australia's AI-powered real estate platform. Search properties, manage listings, and connect with agents using voice search and AI tools.",
+        "areaServed": "AU",
+        "knowsAbout": ["Real Estate", "Property Listings", "Australian Property Market", "Rental Properties"]
+      })}</script>
+      <script type="application/ld+json">{JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "ListHQ",
+        "url": "https://listhq.com.au",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://listhq.com.au/buy?q={search_term_string}"
+          },
+          "query-input": "required name=search_term_string"
+        }
+      })}</script>
     </Helmet>
     <div className="flex items-center justify-between mb-3 gap-2">
       <div className="flex items-center gap-2 min-w-0">

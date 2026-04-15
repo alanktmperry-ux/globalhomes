@@ -12,6 +12,7 @@ async function fetchProperties(limit = 50, listingType?: 'sale' | 'rent', suburb
     .select(PROPERTIES_QUERY)
     .eq('is_active', true)
     .eq('status', 'public')
+    .eq('moderation_status', 'approved')
     .eq('agents.approval_status', 'approved')
     .order('created_at', { ascending: false })
     .limit(limit);

@@ -1,5 +1,7 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { format } from 'date-fns';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/features/auth/AuthProvider';
 import {
   ChevronDown,
   ChevronRight,
@@ -148,6 +150,7 @@ function isOverdue(dueDate: string, status: Status): boolean {
 // ── Component ──────────────────────────────────────────
 
 const PreLaunchChecklist = () => {
+  const { user } = useAuth();
   const [items, setItems] = useState<ChecklistItem[]>([]);
   const [filter, setFilter] = useState<FilterValue>('all');
   const [sort, setSort] = useState<SortValue>('category');
@@ -155,38 +158,80 @@ const PreLaunchChecklist = () => {
   const [detailItem, setDetailItem] = useState<ChecklistItem | null>(null);
   const [editNotes, setEditNotes] = useState('');
   const [editDueDate, setEditDueDate] = useState<Date | undefined>();
+  const loadedRef = useRef(false);
 
-  // Load / seed
+  // Load from Supabase (with one-time localStorage migration)
   useEffect(() => {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      try {
-        setItems(JSON.parse(raw));
+    if (!user?.id || loadedRef.current) return;
+    loadedRef.current = true;
+
+    (async () => {
+      const { data } = await supabase
+        .from('user_preferences')
+        .select('prelaunch_checklist')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      const saved = (data as any)?.prelaunch_checklist as ChecklistItem[] | null;
+
+      if (saved && Array.isArray(saved) && saved.length > 0) {
+        setItems(saved);
         return;
-      } catch { /* fall through to seed */ }
-    }
-    const now = new Date().toISOString();
-    setItems(SEED.map((s) => ({ ...s, notes: '', updatedAt: now })));
-  }, []);
+      }
 
-  // Persist
-  useEffect(() => {
-    if (items.length > 0) localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  }, [items]);
+      // One-time migration from localStorage
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw) as ChecklistItem[];
+          setItems(parsed);
+          // Persist to Supabase and clear localStorage
+          await supabase
+            .from('user_preferences')
+            .upsert({ user_id: user.id, prelaunch_checklist: parsed as any } as any, { onConflict: 'user_id' })
+            .then(({ error }) => { if (error) console.error('migration save failed:', error); });
+          localStorage.removeItem(STORAGE_KEY);
+          return;
+        } catch { /* fall through to seed */ }
+      }
+
+      // Seed fresh
+      const now = new Date().toISOString();
+      const seeded = SEED.map((s) => ({ ...s, notes: '', updatedAt: now }));
+      setItems(seeded);
+      await supabase
+        .from('user_preferences')
+        .upsert({ user_id: user.id, prelaunch_checklist: seeded as any } as any, { onConflict: 'user_id' })
+        .then(({ error }) => { if (error) console.error('seed save failed:', error); });
+    })();
+  }, [user?.id]);
+
+  // Save to Supabase helper
+  const persistToSupabase = useCallback((updatedItems: ChecklistItem[]) => {
+    if (!user?.id) return;
+    supabase
+      .from('user_preferences')
+      .upsert({ user_id: user.id, prelaunch_checklist: updatedItems as any } as any, { onConflict: 'user_id' })
+      .then(({ error }) => { if (error) console.error('checklist save failed:', error); });
+  }, [user?.id]);
 
   const updateItem = useCallback((id: string, patch: Partial<ChecklistItem>) => {
-    setItems((prev) =>
-      prev.map((it) => (it.id === id ? { ...it, ...patch, updatedAt: new Date().toISOString() } : it)),
-    );
-  }, []);
+    setItems((prev) => {
+      const updated = prev.map((it) => (it.id === id ? { ...it, ...patch, updatedAt: new Date().toISOString() } : it));
+      persistToSupabase(updated);
+      return updated;
+    });
+  }, [persistToSupabase]);
 
   const toggleStatus = useCallback((id: string) => {
-    setItems((prev) =>
-      prev.map((it) =>
+    setItems((prev) => {
+      const updated = prev.map((it) =>
         it.id === id ? { ...it, status: nextStatus(it.status), updatedAt: new Date().toISOString() } : it,
-      ),
-    );
-  }, []);
+      );
+      persistToSupabase(updated);
+      return updated;
+    });
+  }, [persistToSupabase]);
 
   // Stats
   const doneCount = useMemo(() => items.filter((i) => i.status === 'done').length, [items]);

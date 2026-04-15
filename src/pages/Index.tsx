@@ -87,6 +87,8 @@ const Index = () => {
   const viewedPropertiesRef = useRef(new Set<string>());
   const [viewedIds, setViewedIds] = useState<Set<string>>(new Set());
   const sessionStartRef = useRef(Date.now());
+  const [prefsBannerVisible, setPrefsBannerVisible] = useState(false);
+  const prefsAppliedRef = useRef(false);
   const [mobileView, setMobileView] = useState<'map' | 'list'>('map');
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key?: number | string } | null>(null);
   const [splitPercent, setSplitPercent] = useState(50);
@@ -274,7 +276,54 @@ const Index = () => {
     }
   }, []);
 
-  // ── Reset map center when listing mode toggled ───────────────
+  // ── Apply saved preferences for authenticated seekers ────────
+  useEffect(() => {
+    if (prefsAppliedRef.current) return;
+    if (!user) return;
+    if (hasSearchParams) return; // URL params take priority
+
+    const dismissed = sessionStorage.getItem('listhq_prefs_banner_dismissed');
+    if (dismissed) return;
+
+    prefsAppliedRef.current = true;
+
+    (async () => {
+      const { data } = await supabase
+        .from('user_preferences')
+        .select('budget_max, preferred_locations, preferred_beds, seeking_type')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (!data) return;
+      const hasBudget = typeof data.budget_max === 'number' && data.budget_max > 0;
+      const hasLocations = Array.isArray(data.preferred_locations) && data.preferred_locations.length > 0;
+      const hasBeds = typeof data.preferred_beds === 'number' && data.preferred_beds > 0;
+
+      if (!hasBudget && !hasLocations && !hasBeds) return;
+
+      // Apply seeking_type to listing mode
+      if (data.seeking_type === 'rent') {
+        setListingMode('rent');
+      } else {
+        setListingMode('sale');
+      }
+
+      setFilters(prev => ({
+        ...prev,
+        ...(hasBudget ? { priceRange: [prev.priceRange[0], data.budget_max!] as [number, number] } : {}),
+        ...(hasBeds ? { minBeds: data.preferred_beds! } : {}),
+      }));
+
+      if (hasLocations) {
+        const firstLocation = (data.preferred_locations as string[])[0];
+        handleSearch(firstLocation);
+      }
+
+      setPrefsBannerVisible(true);
+    })();
+  }, [user, hasSearchParams]);
+
+
   useEffect(() => {
     const handler = () => setMapCenter(null);
     window.addEventListener('listing-mode-changed', handler);
@@ -1223,6 +1272,22 @@ const Index = () => {
             {/* Status bar + filters */}
             <div className="px-4 py-2 shrink-0">
               {statusBar}
+              {prefsBannerVisible && (
+                <div className="mt-2 flex items-center justify-between gap-2 rounded-lg bg-primary/10 border border-primary/20 px-3 py-2 text-xs text-primary">
+                  <span>Showing results based on your saved preferences.</span>
+                  <button
+                    onClick={() => {
+                      setPrefsBannerVisible(false);
+                      sessionStorage.setItem('listhq_prefs_banner_dismissed', '1');
+                      setFilters(prev => ({ ...prev, priceRange: [0, 5_000_000] as [number, number], minBeds: 0 }));
+                      setListingMode('sale');
+                    }}
+                    className="font-semibold hover:underline shrink-0"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Property list */}

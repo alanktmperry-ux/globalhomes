@@ -86,6 +86,7 @@ const PerformancePage = React.lazy(() => import("@/features/agents/components/da
 const HelpPage = React.lazy(() => import("@/features/agents/components/dashboard/HelpPage"));
 const RentRollPage = React.lazy(() => import("@/features/agents/components/dashboard/RentRollPage"));
 const TenancyDetailPage = React.lazy(() => import("@/features/agents/components/dashboard/TenancyDetailPage"));
+const InspectionReportPage = React.lazy(() => import("./pages/InspectionReportPage"));
 const OpenHomesPage = React.lazy(() => import("@/features/open-homes/components/AgentOpenHomeManager"));
 const OpenHomeSignInPage = React.lazy(() => import("@/features/open-homes/pages/OpenHomeSignInPage"));
 const RentalApplicationsPage = React.lazy(() => import("@/features/agents/components/dashboard/RentalApplicationsPage"));

@@ -218,10 +218,6 @@ const AdminUsers = () => {
     setSubForm(f => ({ ...f, plan_type: plan, listing_limit: def.listings, seat_limit: def.seats }));
   };
 
-  const getSession = useCallback(async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    return session;
-  }, []);
 
   const callAdminApi = useCallback(async (action: string, body?: any) => {
     const { data, error } = await supabase.functions.invoke('admin-users', {

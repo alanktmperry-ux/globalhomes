@@ -110,6 +110,40 @@ export function useMessages(conversationId: string | null) {
       sender_id: senderId,
       content: content.trim(),
     });
+
+    // Fire-and-forget: email the other participant
+    if (!error) {
+      (async () => {
+        try {
+          const { data: otherParticipants } = await supabase
+            .from('conversation_participants')
+            .select('user_id')
+            .eq('conversation_id', conversationId)
+            .neq('user_id', senderId);
+
+          if (otherParticipants && otherParticipants.length > 0) {
+            const otherId = otherParticipants[0].user_id;
+            const { data: agentRow } = await supabase.from('agents').select('email, name').eq('user_id', otherId).maybeSingle();
+            const { data: profileRow } = await supabase.from('profiles').select('email, display_name').eq('user_id', otherId).maybeSingle();
+            const recipientEmail = agentRow?.email || (profileRow as any)?.email;
+            const recipientName = agentRow?.name || profileRow?.display_name || 'there';
+
+            if (recipientEmail) {
+              await supabase.functions.invoke('send-notification-email', {
+                body: {
+                  type: 'new_message',
+                  recipient_email: recipientEmail,
+                  lead_name: recipientName,
+                  title: 'You have a new message',
+                  message: `You have a new message on ListHQ. Log in to reply: https://listhq.com.au/messages`,
+                },
+              });
+            }
+          }
+        } catch { /* silent */ }
+      })();
+    }
+
     return error;
   }, [conversationId]);
 

@@ -511,7 +511,8 @@ const RentRollPage = () => {
                           const expiringSoon = daysToEnd >= 0 && daysToEnd <= 60;
 
                           return (
-                            <TableRow key={t.id} className="hover:bg-accent/50">
+                            <Fragment key={t.id}>
+                            <TableRow className="hover:bg-accent/50">
                               <TableCell className="font-medium">
                                 {t.properties?.address || '—'}
                                 <span className="block text-xs text-muted-foreground">{t.properties?.suburb}</span>
@@ -544,6 +545,16 @@ const RentRollPage = () => {
                               <TableCell className="text-right tabular-nums">{t.management_fee_percent}%</TableCell>
                               <TableCell>
                                 <div className="flex items-center gap-1 justify-end">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-[10px] h-7"
+                                    onClick={(e) => { e.stopPropagation(); toggleExpand(t.id); }}
+                                  >
+                                    <ClipboardCheck size={12} className="mr-1" />
+                                    Inspections
+                                    {expandedTenancy === t.id ? <ChevronUp size={12} className="ml-1" /> : <ChevronDown size={12} className="ml-1" />}
+                                  </Button>
                                   {expiringSoon && t.tenant_email && (
                                     <Button
                                       variant="outline"
@@ -618,6 +629,48 @@ const RentRollPage = () => {
                                 </div>
                               </TableCell>
                             </TableRow>
+                            {expandedTenancy === t.id && (
+                              <TableRow>
+                                <TableCell colSpan={8} className="bg-muted/30 p-4">
+                                  <div className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                      <h4 className="text-sm font-semibold text-foreground">Inspection History</h4>
+                                      <Button size="sm" variant="outline" onClick={() => {
+                                        setShowScheduleModal(t);
+                                        setScheduleForm({ inspection_type: 'routine', scheduled_date: undefined, owner_name: '', owner_email: '', bond_lodgment_number: '' });
+                                      }}>
+                                        <Calendar size={12} className="mr-1" /> Schedule Inspection
+                                      </Button>
+                                    </div>
+                                    {loadingInspections === t.id ? (
+                                      <div className="flex justify-center py-4"><Loader2 className="animate-spin text-primary" size={18} /></div>
+                                    ) : (inspections[t.id]?.length || 0) === 0 ? (
+                                      <p className="text-xs text-muted-foreground py-2">No inspections recorded for this tenancy.</p>
+                                    ) : (
+                                      <div className="space-y-2">
+                                        {inspections[t.id]?.map(insp => (
+                                          <div key={insp.id} className="flex items-center justify-between rounded-lg border bg-background p-3">
+                                            <div className="flex items-center gap-3">
+                                              {inspectionTypeBadge(insp.inspection_type)}
+                                              <span className="text-sm">{format(parseISO(insp.scheduled_date), 'dd MMM yyyy')}</span>
+                                              {statusBadge(insp.status)}
+                                            </div>
+                                            <Button
+                                              size="sm"
+                                              variant={insp.status === 'completed' ? 'outline' : 'default'}
+                                              onClick={() => navigate(`/dashboard/inspection/${insp.id}`)}
+                                            >
+                                              {insp.status === 'in_progress' ? 'Continue Report' : insp.status === 'completed' ? 'View Report' : 'Start Report'}
+                                            </Button>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            )}
+                            </Fragment>
                           );
                         })
                       )}

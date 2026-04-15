@@ -276,7 +276,54 @@ const Index = () => {
     }
   }, []);
 
-  // ── Reset map center when listing mode toggled ───────────────
+  // ── Apply saved preferences for authenticated seekers ────────
+  useEffect(() => {
+    if (prefsAppliedRef.current) return;
+    if (!user) return;
+    if (hasSearchParams) return; // URL params take priority
+
+    const dismissed = sessionStorage.getItem('listhq_prefs_banner_dismissed');
+    if (dismissed) return;
+
+    prefsAppliedRef.current = true;
+
+    (async () => {
+      const { data } = await supabase
+        .from('user_preferences')
+        .select('budget_max, preferred_locations, preferred_beds, seeking_type')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (!data) return;
+      const hasBudget = typeof data.budget_max === 'number' && data.budget_max > 0;
+      const hasLocations = Array.isArray(data.preferred_locations) && data.preferred_locations.length > 0;
+      const hasBeds = typeof data.preferred_beds === 'number' && data.preferred_beds > 0;
+
+      if (!hasBudget && !hasLocations && !hasBeds) return;
+
+      // Apply seeking_type to listing mode
+      if (data.seeking_type === 'rent') {
+        setListingMode('rent');
+      } else {
+        setListingMode('buy');
+      }
+
+      setFilters(prev => ({
+        ...prev,
+        ...(hasBudget ? { priceRange: [prev.priceRange[0], data.budget_max!] as [number, number] } : {}),
+        ...(hasBeds ? { minBeds: data.preferred_beds! } : {}),
+      }));
+
+      if (hasLocations) {
+        const firstLocation = (data.preferred_locations as string[])[0];
+        handleSearch(firstLocation);
+      }
+
+      setPrefsBannerVisible(true);
+    })();
+  }, [user, hasSearchParams]);
+
+
   useEffect(() => {
     const handler = () => setMapCenter(null);
     window.addEventListener('listing-mode-changed', handler);

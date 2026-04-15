@@ -177,16 +177,11 @@ export default function RevenueBilling() {
 
       const signInMap = new Map<string, string | null>();
       try {
-        const { data: s } = await supabase.auth.getSession();
-        if (s.session?.access_token) {
-          const res = await fetch(
-            `https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/admin-users?action=list_users`,
-            { headers: { Authorization: `Bearer ${s.session.access_token}`, 'Content-Type': 'application/json' } }
-          );
-          if (res.ok) {
-            const j = await res.json();
-            (j.users || []).forEach((u: any) => signInMap.set(u.id, u.last_sign_in_at || null));
-          }
+        const { data: j, error } = await supabase.functions.invoke('admin-users', {
+          body: { action: 'list_users' },
+        });
+        if (!error) {
+          (j?.users || []).forEach((u: any) => signInMap.set(u.id, u.last_sign_in_at || null));
         }
       } catch {}
 

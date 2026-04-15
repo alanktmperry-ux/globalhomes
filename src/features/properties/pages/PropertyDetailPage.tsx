@@ -171,21 +171,10 @@ export default function PropertyDetailPage() {
     if (!property) return;
     setTranslating(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const resp = await fetch(
-        'https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/generate-translations',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session?.access_token}`,
-            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ncmtib2hwbWt6am9uYW9mZ2JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MDcwNTAsImV4cCI6MjA1ODM4MzA1MH0.ZRs9aEaVnxBBqnYiMkFMvFBXrKEaLWCmFLnfo1j2yms',
-          },
-          body: JSON.stringify({ listing_id: property.id }),
-        }
-      );
-      const result = await resp.json();
-      if (!resp.ok) throw new Error(result.error || 'Translation failed');
+      const { data: result, error: fnError } = await supabase.functions.invoke('generate-translations', {
+        body: { listing_id: property.id },
+      });
+      if (fnError) throw new Error(fnError.message || 'Translation failed');
       toast.success('Translations generated! Refreshing…');
       // Refresh raw property data
       const { data: refreshed } = await supabase

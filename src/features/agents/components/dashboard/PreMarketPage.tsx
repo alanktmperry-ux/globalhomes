@@ -166,12 +166,13 @@ const PreMarketPage = () => {
   const handleDraftLetter = async (item: SellerOpportunity) => {
     setLetterModal({ open: true, content: '', loading: true, property: item });
     try {
-      const res = await fetch('https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/generate-listing', {
+      // TODO: Streaming call — uses ReadableStream/getReader, cannot use supabase.functions.invoke()
+      const session = (await supabase.auth.getSession()).data.session;
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-listing`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ncmtib2hwbWt6am9uYW9mZ2JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MDcwNTAsImV4cCI6MjA1ODM4MzA1MH0.ZRs9aEaVnxBBqnYiMkFMvFBXrKEaLWCmFLnfo1j2yms',
+          'Authorization': `Bearer ${session?.access_token ?? ''}`,
         },
         body: JSON.stringify({
           propertyType: item.propertyType || 'Property',

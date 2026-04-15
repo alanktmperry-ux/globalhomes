@@ -218,33 +218,16 @@ const AdminUsers = () => {
     setSubForm(f => ({ ...f, plan_type: plan, listing_limit: def.listings, seat_limit: def.seats }));
   };
 
-  const getSession = useCallback(async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    return session;
-  }, []);
 
   const callAdminApi = useCallback(async (action: string, body?: any) => {
-    const session = await getSession();
-    if (!session?.access_token) throw new Error('Session expired');
-    const method = body ? 'POST' : 'GET';
-    const response = await fetch(
-      `https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/admin-users?action=${action}`,
-      {
-        method,
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-          apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ncmtib2hwbWt6am9uYW9mZ2JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MDcwNTAsImV4cCI6MjA1ODM4MzA1MH0.ZRs9aEaVnxBBqnYiMkFMvFBXrKEaLWCmFLnfo1j2yms',
-          'Content-Type': 'application/json',
-        },
-        ...(body ? { body: JSON.stringify(body) } : {}),
-      }
-    );
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err.error || `HTTP ${response.status}`);
+    const { data, error } = await supabase.functions.invoke('admin-users', {
+      body: { action, ...body },
+    });
+    if (error) {
+      throw new Error(error.message || 'Request failed');
     }
-    return response.json();
-  }, [getSession]);
+    return data;
+  }, []);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -300,23 +283,11 @@ const AdminUsers = () => {
         toast({ title: 'Demo request deleted.' });
       } else if (isAgent) {
         // Use the dedicated admin-delete-agent edge function
-        const session = await getSession();
-        if (!session?.access_token) throw new Error('Session expired');
-        const response = await fetch(
-          `https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/admin-delete-agent`,
-          {
-            method: 'POST',
-            headers: {
-              Authorization: `Bearer ${session.access_token}`,
-              apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ncmtib2hwbWt6am9uYW9mZ2JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MDcwNTAsImV4cCI6MjA1ODM4MzA1MH0.ZRs9aEaVnxBBqnYiMkFMvFBXrKEaLWCmFLnfo1j2yms',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userId }),
-          }
-        );
-        if (!response.ok) {
-          const err = await response.json().catch(() => ({}));
-          throw new Error(err.error || `HTTP ${response.status}`);
+        const { data: delData, error: delError } = await supabase.functions.invoke('admin-delete-agent', {
+          body: { userId },
+        });
+        if (delError) {
+          throw new Error(delError.message || 'Delete failed');
         }
         toast({ title: 'Agent permanently deleted', description: 'All agent data, listings, trust accounts, and auth account have been removed.' });
       } else {

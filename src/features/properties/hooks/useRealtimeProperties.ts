@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Property } from '@/shared/lib/types';
 import { mapDbProperty } from '@/features/properties/api/fetchPublicProperties';
 
-const PROPERTIES_QUERY = '*, agents(name, agency, phone, email, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count)';
+const PROPERTIES_QUERY = '*, agents!inner(name, agency, phone, email, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count, approval_status)';
 
 async function fetchProperties(limit = 50, listingType?: 'sale' | 'rent', suburb?: string): Promise<Property[]> {
   let query = supabase
@@ -12,6 +12,7 @@ async function fetchProperties(limit = 50, listingType?: 'sale' | 'rent', suburb
     .select(PROPERTIES_QUERY)
     .eq('is_active', true)
     .eq('status', 'public')
+    .eq('agents.approval_status', 'approved')
     .order('created_at', { ascending: false })
     .limit(limit);
 

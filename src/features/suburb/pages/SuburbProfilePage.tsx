@@ -11,7 +11,7 @@ import { SuburbPropertyTypeTabs } from '../components/SuburbPropertyTypeTabs';
 import { SuburbAmenitiesPanel } from '../components/SuburbAmenitiesPanel';
 import { SuburbListingsPreview } from '../components/SuburbListingsPreview';
 import { SuburbInvestorSnapshot } from '../components/SuburbInvestorSnapshot';
-import { PropertyMap } from '@/features/properties/components/PropertyMap';
+import { PropertyMap, SchoolMarker } from '@/features/properties/components/PropertyMap';
 import { Property } from '@/shared/lib/types';
 
 export default function SuburbProfilePage() {
@@ -61,7 +61,7 @@ export default function SuburbProfilePage() {
     if (!suburbName || !stateUpper) return;
     supabase
       .from('schools')
-      .select('id, name, type, sector, icsea, state')
+      .select('id, name, type, sector, icsea, state, lat, lng')
       .ilike('suburb', suburbName)
       .ilike('state', stateUpper)
       .order('enrolment', { ascending: false })
@@ -152,6 +152,17 @@ export default function SuburbProfilePage() {
               hideDrawingTools
               hideSearchArea
               hideGeolocation
+              schoolMarkers={nearbySchools
+                .filter((s: any) => s.lat && s.lng)
+                .map((s: any): SchoolMarker => ({
+                  id: s.id,
+                  name: s.name,
+                  type: s.type ?? '',
+                  sector: s.sector ?? '',
+                  icsea: s.icsea,
+                  lat: s.lat,
+                  lng: s.lng,
+                }))}
             />
             <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
               <span className="flex items-center gap-1.5">
@@ -159,8 +170,8 @@ export default function SuburbProfilePage() {
                 Active listings ({mappableListings.length})
               </span>
               <span className="flex items-center gap-1.5">
-                <GraduationCap size={14} />
-                Schools ({nearbySchools.length})
+                <span className="w-2.5 h-2.5 rounded-full bg-[#16a34a]" />
+                Schools ({nearbySchools.filter((s: any) => s.lat && s.lng).length})
               </span>
             </div>
           </section>

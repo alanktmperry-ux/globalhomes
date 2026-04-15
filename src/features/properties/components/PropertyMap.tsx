@@ -25,6 +25,16 @@ const LIGHT_MAP_STYLE: google.maps.MapTypeStyle[] = [
   { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#cbd5e1' }] },
 ];
 
+export interface SchoolMarker {
+  id: string;
+  name: string;
+  type: string;
+  sector: string;
+  icsea?: number | null;
+  lat: number;
+  lng: number;
+}
+
 interface PropertyMapProps {
   properties: Property[];
   onPropertySelect: (property: Property) => void;
@@ -35,21 +45,18 @@ interface PropertyMapProps {
   onScrollToProperty?: (propertyId: string) => void;
   formatPrice?: (audPrice: number, listingType?: string) => string;
   onGeolocate?: (location: { lat: number; lng: number }) => void;
-  /** Hide circle/polygon drawing tools */
   hideDrawingTools?: boolean;
-  /** Hide the "Search this area" button */
   hideSearchArea?: boolean;
-  /** Hide the geolocation button */
   hideGeolocation?: boolean;
-  /** Initial zoom level */
   initialZoom?: number;
-  /** Fixed height style */
   height?: string;
+  /** Optional school markers to display on the map */
+  schoolMarkers?: SchoolMarker[];
 }
 
 export function PropertyMap({
   properties, onPropertySelect, selectedPropertyId, onAreaSearch, centerOn, onMapMoved, onScrollToProperty, formatPrice, onGeolocate,
-  hideDrawingTools, hideSearchArea, hideGeolocation, initialZoom, height,
+  hideDrawingTools, hideSearchArea, hideGeolocation, initialZoom, height, schoolMarkers,
 }: PropertyMapProps) {
 
   const mapRef = useRef<HTMLDivElement>(null);
@@ -65,6 +72,7 @@ export function PropertyMap({
   const [showSearchArea, setShowSearchArea] = useState(false);
   const [locating, setLocating] = useState(false);
   const [hasDrawnArea, setHasDrawnArea] = useState(false);
+  const schoolMarkersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
   const userMovedRef = useRef(false);
 
   const clearDrawnOverlay = useCallback(() => {
@@ -376,6 +384,62 @@ export function PropertyMap({
       });
     }
   }, [properties, selectedPropertyId, onPropertySelect, centerOn, onScrollToProperty, formatPrice]);
+
+  // School markers
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    // Clear previous school markers
+    schoolMarkersRef.current.forEach((m) => (m.map = null));
+    schoolMarkersRef.current = [];
+
+    if (!schoolMarkers || schoolMarkers.length === 0) return;
+
+    const infoWindow = new google.maps.InfoWindow();
+
+    schoolMarkers.forEach((school) => {
+      const el = document.createElement('div');
+      el.innerHTML = `<div style="
+        background: #16a34a;
+        width: 28px; height: 28px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        border: 2px solid white;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+        cursor: default;
+        font-size: 14px;
+      ">🎓</div>`;
+
+      const marker = new google.maps.marker.AdvancedMarkerElement({
+        map,
+        position: { lat: school.lat, lng: school.lng },
+        content: el.firstElementChild as HTMLElement,
+      });
+
+      const markerEl = marker.element;
+      if (markerEl) {
+        markerEl.addEventListener('mouseenter', () => {
+          const typeLabel = school.type ? school.type.charAt(0).toUpperCase() + school.type.slice(1) : '';
+          const sectorLabel = school.sector ? school.sector.charAt(0).toUpperCase() + school.sector.slice(1) : '';
+          infoWindow.setContent(`
+            <div style="font-family: 'DM Sans', sans-serif; min-width: 180px; padding: 2px;">
+              <div style="font-weight: 700; font-size: 13px; color: #0f172a;">${school.name}</div>
+              <div style="font-size: 11px; color: #64748b; margin-top: 3px;">
+                ${typeLabel}${sectorLabel ? ' · ' + sectorLabel : ''}${school.icsea ? ' · ICSEA ' + school.icsea : ''}
+              </div>
+            </div>
+          `);
+          infoWindow.open(map, marker);
+        });
+        markerEl.addEventListener('mouseleave', () => {
+          infoWindow.close();
+        });
+      }
+
+      schoolMarkersRef.current.push(marker);
+    });
+  }, [schoolMarkers]);
 
   const handleGeolocate = () => {
     if (!navigator.geolocation) return;

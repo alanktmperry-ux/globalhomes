@@ -23,6 +23,7 @@ import PreLaunchChecklist from '@/features/admin/components/PreLaunchChecklist';
 import LegalComplianceChecklist from '@/features/admin/components/LegalComplianceChecklist';
 import PressOutreachPage from '@/features/admin/components/PressOutreachPage';
 import PreApprovalReview from '@/features/admin/components/PreApprovalReview';
+import AgentApprovalQueue from '@/features/admin/components/AgentApprovalQueue';
 import AdminSidebar, { type AdminTab } from '@/features/admin/components/AdminSidebar';
 
 type Tab = AdminTab;
@@ -82,6 +83,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [pendingDemoCount, setPendingDemoCount] = useState(0);
+  const [pendingApprovalCount, setPendingApprovalCount] = useState(0);
 
   useEffect(() => {
     if (!authLoading && (!user || !isAdmin)) {
@@ -294,7 +296,7 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col md:flex-row">
 
-      <AdminSidebar tab={tab} setTab={setTab} pendingDemoCount={pendingDemoCount} />
+      <AdminSidebar tab={tab} setTab={setTab} pendingDemoCount={pendingDemoCount} pendingApprovalCount={pendingApprovalCount} />
 
       {/* ── CONTENT AREA ── */}
       <main className="flex-1 min-w-0 overflow-y-auto">
@@ -306,6 +308,7 @@ const AdminDashboard = () => {
           ) : (
             <>
               {tab === 'command-centre' && <CommandCentre />}
+              {tab === 'agent-approval' && <AgentApprovalQueue onPendingCountChange={setPendingApprovalCount} />}
               {tab === 'agent-lifecycle' && <AgentLifecycle />}
               {tab === 'compliance' && <ComplianceMonitor />}
               {tab === 'revenue' && <RevenueBilling />}

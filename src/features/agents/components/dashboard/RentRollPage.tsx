@@ -899,6 +899,93 @@ const RentRollPage = () => {
           })()}
         </DialogContent>
       </Dialog>
+
+      {/* Schedule Inspection Modal */}
+      <Dialog open={!!showScheduleModal} onOpenChange={(open) => { if (!open) setShowScheduleModal(null); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Schedule Inspection</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-2">
+            <div>
+              <Label>Property</Label>
+              <p className="text-sm text-muted-foreground">{showScheduleModal?.properties?.address}, {showScheduleModal?.properties?.suburb}</p>
+            </div>
+            <div>
+              <Label>Inspection Type *</Label>
+              <Select value={scheduleForm.inspection_type} onValueChange={v => setScheduleForm(f => ({ ...f, inspection_type: v }))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="entry">Entry</SelectItem>
+                  <SelectItem value="routine">Routine</SelectItem>
+                  <SelectItem value="exit">Exit</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Scheduled Date *</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className={cn('w-full justify-start text-left font-normal', !scheduleForm.scheduled_date && 'text-muted-foreground')}>
+                    <Calendar size={14} className="mr-2" />
+                    {scheduleForm.scheduled_date ? format(scheduleForm.scheduled_date, 'PPP') : 'Pick a date'}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarComponent
+                    mode="single"
+                    selected={scheduleForm.scheduled_date}
+                    onSelect={d => setScheduleForm(f => ({ ...f, scheduled_date: d || undefined }))}
+                    disabled={d => d < today}
+                    initialFocus
+                    className="p-3 pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+              {(() => {
+                const noticeWarn = getNoticePeriodWarning(showScheduleModal?.properties?.state, scheduleForm.scheduled_date);
+                const freqWarn = showScheduleModal ? getFrequencyWarning(showScheduleModal.properties?.state, showScheduleModal.id, scheduleForm.inspection_type) : null;
+                return (
+                  <>
+                    {noticeWarn && (
+                      <div className="flex items-start gap-2 mt-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                        <AlertTriangle size={12} className="text-amber-600 shrink-0 mt-0.5" />
+                        <p className="text-xs text-amber-700">{noticeWarn}</p>
+                      </div>
+                    )}
+                    {freqWarn && (
+                      <div className="flex items-start gap-2 mt-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                        <AlertTriangle size={12} className="text-amber-600 shrink-0 mt-0.5" />
+                        <p className="text-xs text-amber-700">{freqWarn}</p>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><Label>Owner Name</Label><Input value={scheduleForm.owner_name} onChange={e => setScheduleForm(f => ({ ...f, owner_name: e.target.value }))} /></div>
+              <div><Label>Owner Email</Label><Input type="email" value={scheduleForm.owner_email} onChange={e => setScheduleForm(f => ({ ...f, owner_email: e.target.value }))} /></div>
+            </div>
+            {scheduleForm.inspection_type === 'exit' && (
+              <div>
+                <Label>Bond Lodgment Number</Label>
+                <Input value={scheduleForm.bond_lodgment_number} onChange={e => setScheduleForm(f => ({ ...f, bond_lodgment_number: e.target.value }))} placeholder="e.g. BL-2024-123456" />
+              </div>
+            )}
+            <div className="flex gap-2 mt-2">
+              <Button variant="outline" className="flex-1" onClick={() => handleScheduleInspection(false)} disabled={scheduleSaving || !scheduleForm.scheduled_date}>
+                {scheduleSaving ? <Loader2 className="animate-spin mr-1" size={14} /> : null}
+                Schedule for Later
+              </Button>
+              <Button className="flex-1" onClick={() => handleScheduleInspection(true)} disabled={scheduleSaving || !scheduleForm.scheduled_date}>
+                {scheduleSaving ? <Loader2 className="animate-spin mr-1" size={14} /> : null}
+                Start Report Now
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

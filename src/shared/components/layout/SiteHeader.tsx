@@ -210,6 +210,10 @@ export function SiteHeader() {
                   <LanguageSwitcher />
                 </div>
 
+                <button onClick={() => navTo('/suburbs')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
+                  <MapPin size={16} className="text-muted-foreground" /> Browse Suburbs
+                </button>
+
                 {/* Agent links */}
                 {user && isAgent && (
                   <>

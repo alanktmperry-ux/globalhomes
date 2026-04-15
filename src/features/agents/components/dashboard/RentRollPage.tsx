@@ -499,7 +499,7 @@ const RentRollPage = () => {
                                     >
                                       Chase
                                     </Button>
-                                  )
+                                  )}
                                   <Button
                                     variant="ghost"
                                     size="sm"

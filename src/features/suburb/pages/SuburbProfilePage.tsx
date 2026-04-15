@@ -23,6 +23,38 @@ export default function SuburbProfilePage() {
 
   const houseStats = getStats('house');
 
+  const mappableListings = useMemo<Property[]>(() =>
+    active
+      .filter((p: any) => p.lat && p.lng)
+      .map((p: any) => ({
+        id: p.id,
+        title: p.address,
+        address: p.address,
+        suburb: suburbName,
+        state: stateUpper,
+        country: 'Australia',
+        price: p.price ?? 0,
+        priceFormatted: p.price_formatted ?? '',
+        beds: p.beds ?? 0,
+        baths: p.baths ?? 0,
+        parking: p.parking ?? 0,
+        sqm: 0,
+        imageUrl: p.image_url || p.images?.[0] || '',
+        images: p.images || [],
+        description: '',
+        estimatedValue: '',
+        propertyType: p.property_type || 'House',
+        features: [],
+        agent: { id: '', name: '', agency: '', phone: '', email: '', avatarUrl: '', isSubscribed: false },
+        listedDate: '',
+        views: 0,
+        contactClicks: 0,
+        lat: p.lat,
+        lng: p.lng,
+        listingType: p.listing_type,
+      })),
+    [active, suburbName, stateUpper],
+  );
   // Nearby schools
   const [nearbySchools, setNearbySchools] = useState<any[]>([]);
   useEffect(() => {

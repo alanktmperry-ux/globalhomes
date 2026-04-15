@@ -58,6 +58,10 @@ export function PropertySEOHead({ property, agent }: PropertySEOHeadProps) {
         image: agent.avatar_url || agent.avatarUrl,
       }
     } : {}),
+    speakable: {
+      '@type': 'SpeakableSpecification',
+      cssSelector: ['h1', '[data-speakable]'],
+    },
   };
 
   return (

@@ -99,6 +99,10 @@ export default function SuburbPage() {
               { '@type': 'ListItem', position: 3, name: suburbDisplay },
             ],
           },
+          speakable: {
+            '@type': 'SpeakableSpecification',
+            cssSelector: ['h1', '[data-speakable]'],
+          },
         })}</script>
       </Helmet>
 

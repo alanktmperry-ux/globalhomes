@@ -36,3 +36,36 @@ Allow: /
 
 User-agent: facebookexternalhit
 Allow: /
+
+User-agent: GPTBot
+Allow: /
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /partner/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /partner/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /partner/
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /partner/
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /partner/
+
+# llms.txt
+LLMs: https://listhq.com.au/llms.txt

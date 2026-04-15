@@ -331,7 +331,7 @@ export default function AgentPublicProfilePage() {
               </div>
 
               {agent.bio && (
-                <p className="text-muted-foreground mt-4 leading-relaxed whitespace-pre-line">{agent.bio}</p>
+                <p data-speakable className="text-muted-foreground mt-4 leading-relaxed whitespace-pre-line">{agent.bio}</p>
               )}
             </div>
           </div>

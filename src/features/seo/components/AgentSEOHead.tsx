@@ -25,6 +25,10 @@ export function AgentSEOHead({ agent, listingCount = 0 }: { agent: any; listingC
         addressCountry: 'AU',
       }
     } : {}),
+    speakable: {
+      '@type': 'SpeakableSpecification',
+      cssSelector: ['h1', '[data-speakable]'],
+    },
   };
 
   return (

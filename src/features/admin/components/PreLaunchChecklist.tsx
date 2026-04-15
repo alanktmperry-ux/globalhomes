@@ -185,12 +185,12 @@ const PreLaunchChecklist = () => {
         try {
           const parsed = JSON.parse(raw) as ChecklistItem[];
           setItems(parsed);
-          // Persist to Supabase and clear localStorage
+          // Persist to Supabase (keep localStorage as backup)
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
           await supabase
             .from('user_preferences')
             .upsert({ user_id: user.id, prelaunch_checklist: parsed as any } as any, { onConflict: 'user_id' })
             .then(({ error }) => { if (error) console.error('migration save failed:', error); });
-          localStorage.removeItem(STORAGE_KEY);
           return;
         } catch { /* fall through to seed */ }
       }
@@ -206,8 +206,9 @@ const PreLaunchChecklist = () => {
     })();
   }, [user?.id]);
 
-  // Save to Supabase helper
+  // Save to both Supabase and localStorage
   const persistToSupabase = useCallback((updatedItems: ChecklistItem[]) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedItems));
     if (!user?.id) return;
     supabase
       .from('user_preferences')

@@ -75,6 +75,7 @@ const InvestmentDashboardPage = React.lazy(() => import("@/features/agents/compo
 const TrustLedgerPage = React.lazy(() => import("@/features/agents/components/dashboard/TrustLedgerPage"));
 const BankReconciliationPage = React.lazy(() => import("@/features/agents/components/dashboard/BankReconciliationPage"));
 const ReportsPage = React.lazy(() => import("@/features/agents/components/dashboard/ReportsPage"));
+const SellerScoringPage = React.lazy(() => import("@/features/agents/components/dashboard/SellerScoringPage"));
 const PipelinePage = React.lazy(() => import("@/features/agents/components/dashboard/PipelinePage"));
 const InspectionModePage = React.lazy(() => import("@/features/agents/components/dashboard/InspectionModePage"));
 const SettlementConcierge = React.lazy(() => import("@/features/agents/components/dashboard/SettlementConcierge"));
@@ -274,6 +275,7 @@ const App = () => (
                   <Route path="commission" element={<CommissionCalculator />} />
                   <Route path="analytics" element={<AnalyticsPage />} />
                   <Route path="network" element={<NetworkPage />} />
+                  <Route path="opportunities" element={<SellerScoringPage />} />
                   <Route path="team" element={<TeamPage />} />
                   <Route path="team-overview" element={<TeamOverviewPage />} />
                   <Route path="agencies" element={<MyAgenciesPage />} />

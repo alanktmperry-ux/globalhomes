@@ -10147,6 +10147,14 @@ export type Database = {
           name: string
         }[]
       }
+      sign_document: {
+        Args: {
+          p_ip_address?: string
+          p_signature_data: string
+          p_token: string
+        }
+        Returns: Json
+      }
       suburb_sold_stats: {
         Args: {
           p_bedrooms: number

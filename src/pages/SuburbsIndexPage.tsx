@@ -21,7 +21,6 @@ interface SuburbRow {
   name: string;
   slug: string;
   state: string;
-  median_price: number | null;
 }
 
 export default function SuburbsIndexPage() {
@@ -32,7 +31,7 @@ export default function SuburbsIndexPage() {
   useEffect(() => {
     supabase
       .from('suburbs')
-      .select('name, slug, state, median_price')
+      .select('name, slug, state')
       .order('state', { ascending: true })
       .order('name', { ascending: true })
       .then(({ data }) => {
@@ -114,9 +113,7 @@ export default function SuburbsIndexPage() {
                       className="py-1.5 text-sm text-foreground hover:text-primary transition-colors truncate"
                     >
                       {s.name}
-                      {s.median_price ? (
-                        <span className="text-muted-foreground ml-1.5">
-                          · ${s.median_price.toLocaleString()} median
+                    </Link>
                         </span>
                       ) : null}
                     </Link>

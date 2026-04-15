@@ -86,9 +86,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setImpersonating(true);
     setImpersonatedUser(userEmail);
     setImpersonatedUserId(userId);
+    supabase.from('audit_log').insert({
+      user_id: user?.id,
+      action_type: 'admin_start_impersonation',
+      entity_type: 'user',
+      entity_id: userId,
+      description: `Admin started impersonating user ${userEmail}`,
+      metadata: { impersonated_email: userEmail, admin_email: user?.email },
+    } as any).then(({ error }) => { if (error) console.error('impersonation audit log failed:', error); });
   };
 
   const stopImpersonation = async () => {
+    supabase.from('audit_log').insert({
+      user_id: user?.id,
+      action_type: 'admin_stop_impersonation',
+      entity_type: 'user',
+      entity_id: impersonatedUserId,
+      description: 'Admin stopped impersonation session',
+      metadata: { admin_email: user?.email },
+    } as any).then(({ error }) => { if (error) console.error('impersonation audit log failed:', error); });
     sessionStorage.removeItem('admin_email');
     sessionStorage.removeItem('admin_impersonated_id');
     setImpersonating(false);

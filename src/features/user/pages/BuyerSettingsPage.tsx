@@ -164,9 +164,9 @@ const BuyerSettingsPage = () => {
       };
 
       if (existingPrefs) {
-        await supabase.from('user_preferences').update(prefsPayload).eq('user_id', user.id);
+        await (supabase.from('user_preferences').update as any)(prefsPayload).eq('user_id', user.id);
       } else {
-        await supabase.from('user_preferences').insert(prefsPayload);
+        await (supabase.from('user_preferences').insert as any)(prefsPayload);
       }
 
       // Upsert buyer profile

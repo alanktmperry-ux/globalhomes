@@ -31,3 +31,15 @@ createRoot(document.getElementById("root")!).render(
     </InvestorModeProvider>
   </ThemeProvider>
 );
+
+// Register service worker only in production (not in iframes / Lovable preview)
+const isInIframe = (() => { try { return window.self !== window.top; } catch { return true; } })();
+const isPreviewHost = window.location.hostname.includes('id-preview--') || window.location.hostname.includes('lovableproject.com');
+
+if ('serviceWorker' in navigator && !isInIframe && !isPreviewHost) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(err => console.warn('SW registration failed:', err));
+  });
+} else if (isInIframe || isPreviewHost) {
+  navigator.serviceWorker?.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
+}

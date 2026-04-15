@@ -43,12 +43,7 @@ const MessagesPage = () => {
         .maybeSingle();
       if (agentRow?.email) { setOtherEmail(agentRow.email); return; }
 
-      const { data: profileRow } = await supabase
-        .from('profiles')
-        .select('email')
-        .eq('user_id', other.user_id)
-        .maybeSingle();
-      if ((profileRow as any)?.email) { setOtherEmail((profileRow as any).email); }
+      // profiles table doesn't have email — only agents have it client-side
     })();
   }, [activeConv, user]);
 

@@ -93,6 +93,7 @@ Deno.serve(async (req) => {
       investment_niche: investmentNiche || null,
       handles_trust_accounting: handlesTrustAccounting === true,
       support_pin: supportPin,
+      approval_status: 'pending',
     };
 
     if (mode === "create-agency") {
@@ -133,6 +134,8 @@ Deno.serve(async (req) => {
       if (memberError && !memberError.message.includes("duplicate")) throw memberError;
 
       // Upsert agent record (handles re-registration attempts gracefully)
+      // On conflict, do NOT overwrite approval_status
+      const { approval_status: _discard, ...agentExtrasForUpdate } = agentExtras;
       const { error: agentError } = await supabaseAdmin
         .from("agents")
         .upsert({
@@ -143,7 +146,7 @@ Deno.serve(async (req) => {
           phone: phone || null,
           agency_id: agency.id,
           ...agentExtras,
-        }, { onConflict: "user_id" });
+        }, { onConflict: "user_id", ignoreDuplicates: false });
       if (agentError) throw agentError;
 
       return new Response(JSON.stringify({ success: true, agencyId: agency.id }), {

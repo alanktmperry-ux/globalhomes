@@ -725,6 +725,7 @@ export type Database = {
           agency_id: string | null
           agency_role: string | null
           aml_ctf_acknowledged: boolean | null
+          approval_status: string
           avatar_url: string | null
           avg_rating: number | null
           bio: string | null
@@ -784,6 +785,7 @@ export type Database = {
           agency_id?: string | null
           agency_role?: string | null
           aml_ctf_acknowledged?: boolean | null
+          approval_status?: string
           avatar_url?: string | null
           avg_rating?: number | null
           bio?: string | null
@@ -843,6 +845,7 @@ export type Database = {
           agency_id?: string | null
           agency_role?: string | null
           aml_ctf_acknowledged?: boolean | null
+          approval_status?: string
           avatar_url?: string | null
           avg_rating?: number | null
           bio?: string | null

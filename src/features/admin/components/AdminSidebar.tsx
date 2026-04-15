@@ -13,7 +13,7 @@ import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 export type AdminTab =
-  | 'command-centre' | 'agent-lifecycle' | 'compliance' | 'revenue'
+  | 'command-centre' | 'agent-lifecycle' | 'agent-approval' | 'compliance' | 'revenue'
   | 'comms' | 'partners' | 'growth' | 'support' | 'users' | 'listings'
   | 'roles' | 'database' | 'demo-requests' | 'reports' | 'ai-insights'
   | 'pre-launch' | 'ai-buyer-concierge' | 'ai-seller-score'
@@ -60,9 +60,10 @@ interface AdminSidebarProps {
   tab: AdminTab;
   setTab: (t: AdminTab) => void;
   pendingDemoCount?: number;
+  pendingApprovalCount?: number;
 }
 
-function SidebarContent({ tab, setTab, pendingDemoCount = 0, onClose }: AdminSidebarProps & { onClose?: () => void }) {
+function SidebarContent({ tab, setTab, pendingDemoCount = 0, pendingApprovalCount = 0, onClose }: AdminSidebarProps & { onClose?: () => void }) {
   const navigate = useNavigate();
 
   return (
@@ -88,6 +89,7 @@ function SidebarContent({ tab, setTab, pendingDemoCount = 0, onClose }: AdminSid
           <NavItem id="support" label="Support Inbox" icon={MessageSquare} tab={tab} setTab={setTab} onClose={onClose} />
 
           <SectionLabel>Agents</SectionLabel>
+          <NavItem id="agent-approval" label="Agent Approval" icon={UserCheck} tab={tab} setTab={setTab} badge={pendingApprovalCount} onClose={onClose} />
           <NavItem id="agent-lifecycle" label="Agent Lifecycle" icon={Users} tab={tab} setTab={setTab} onClose={onClose} />
           <NavItem id="users" label="Users" icon={UserCheck} tab={tab} setTab={setTab} onClose={onClose} />
           <NavItem id="roles" label="Roles" icon={Shield} tab={tab} setTab={setTab} onClose={onClose} />
@@ -133,7 +135,7 @@ function SidebarContent({ tab, setTab, pendingDemoCount = 0, onClose }: AdminSid
   );
 }
 
-export default function AdminSidebar({ tab, setTab, pendingDemoCount = 0 }: AdminSidebarProps) {
+export default function AdminSidebar({ tab, setTab, pendingDemoCount = 0, pendingApprovalCount = 0 }: AdminSidebarProps) {
   const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
 
@@ -154,7 +156,7 @@ export default function AdminSidebar({ tab, setTab, pendingDemoCount = 0 }: Admi
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetContent side="left" className="w-[280px] p-0">
             <SheetTitle className="sr-only">Admin Navigation</SheetTitle>
-            <SidebarContent tab={tab} setTab={setTab} pendingDemoCount={pendingDemoCount} onClose={() => setOpen(false)} />
+            <SidebarContent tab={tab} setTab={setTab} pendingDemoCount={pendingDemoCount} pendingApprovalCount={pendingApprovalCount} onClose={() => setOpen(false)} />
           </SheetContent>
         </Sheet>
       </>
@@ -164,7 +166,7 @@ export default function AdminSidebar({ tab, setTab, pendingDemoCount = 0 }: Admi
   // Desktop sidebar
   return (
     <aside className="w-[260px] flex-shrink-0 border-r border-border bg-card/50 backdrop-blur-md flex flex-col sticky top-0 h-screen">
-      <SidebarContent tab={tab} setTab={setTab} pendingDemoCount={pendingDemoCount} />
+      <SidebarContent tab={tab} setTab={setTab} pendingDemoCount={pendingDemoCount} pendingApprovalCount={pendingApprovalCount} />
     </aside>
   );
 }

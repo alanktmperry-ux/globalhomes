@@ -260,6 +260,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setSession(session);
         setUser(session?.user ?? null);
         if (!session?.user) setLoading(false);
+
+        // Request notification permission after login (non-intrusive delay)
+        if (session?.user && 'Notification' in window && Notification.permission === 'default') {
+          setTimeout(() => { Notification.requestPermission(); }, 5000);
+        }
       }
     );
 

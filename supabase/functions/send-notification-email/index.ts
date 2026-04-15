@@ -34,6 +34,8 @@ interface NotificationPayload {
   conducted_date?: string;
   report_link?: string;
   scheduled_date?: string;
+  lease_end_date?: string;
+  days_remaining?: string;
 }
 
 async function sendViaResend(to: string, subject: string, html: string) {
@@ -157,6 +159,12 @@ Deno.serve(async (req) => {
       recipientEmail = payload.recipient_email || null;
       const subject = payload.title || `Property Inspection Notice — ${payload.property_address || 'Your Rental'}`;
       if (recipientEmail) await sendViaResend(recipientEmail, subject, buildInspectionNoticeHtml({ tenantName: payload.recipient_name || 'Tenant', propertyAddress: payload.property_address, inspectionType: payload.inspection_type, scheduledDate: payload.scheduled_date, agentName: payload.agent_name, agentPhone: payload.agent_phone }));
+      return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+
+    } else if (type === 'lease_expiry') {
+      recipientEmail = payload.recipient_email || null;
+      const subject = payload.title || `Lease Expiry Notice — ${payload.property_address || 'Your Rental'}`;
+      if (recipientEmail) await sendViaResend(recipientEmail, subject, buildLeaseExpiryHtml({ tenantName: payload.recipient_name || 'Tenant', propertyAddress: payload.property_address, leaseEndDate: payload.lease_end_date, daysRemaining: payload.days_remaining, agentName: payload.agent_name, agentPhone: payload.agent_phone }));
       return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     } else {

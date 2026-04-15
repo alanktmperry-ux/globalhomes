@@ -318,6 +318,24 @@ const RentRollPage = () => {
     setScheduleSaving(false);
     if (error) { toast.error(`Failed: ${error.message}`); return; }
     toast.success('Inspection scheduled');
+    // Send tenant inspection notice email
+    const tenancy = showScheduleModal;
+    if (tenancy.tenant_email) {
+      const { data: agentData } = await supabase.from('agents').select('name, phone').eq('id', agentId).maybeSingle();
+      const addr = tenancy.properties?.address || 'your rental property';
+      await supabase.functions.invoke('send-notification-email', {
+        body: {
+          type: 'inspection_notice',
+          recipient_email: tenancy.tenant_email,
+          recipient_name: tenancy.tenant_name,
+          property_address: addr,
+          inspection_type: scheduleForm.inspection_type,
+          scheduled_date: format(scheduleForm.scheduled_date!, 'dd MMMM yyyy'),
+          agent_name: agentData?.name || '',
+          agent_phone: agentData?.phone || '',
+        },
+      }).catch(() => {});
+    }
     // Refresh inspections for this tenancy
     setInspections(prev => { const copy = { ...prev }; delete copy[showScheduleModal.id]; return copy; });
     setShowScheduleModal(null);
@@ -564,16 +582,16 @@ const RentRollPage = () => {
                                         e.stopPropagation();
                                         const addr = t.properties?.address || 'your property';
                                         try {
-                                          const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user?.id || '').maybeSingle();
-                                          if (!agent) return;
                                           await supabase.functions.invoke('send-notification-email', {
                                             body: {
-                                              agent_id: agent.id,
                                               type: 'lease_expiry',
-                                              title: `Lease expiry reminder — ${addr}`,
-                                              message: `Hi ${t.tenant_name}, this is a reminder that your lease for ${addr} expires on ${format(leaseEnd, 'dd MMM yyyy')} (${daysToEnd} days from now). Please contact us to discuss your renewal options.`,
                                               recipient_email: t.tenant_email,
-                                              lead_name: t.tenant_name,
+                                              recipient_name: t.tenant_name,
+                                              property_address: addr,
+                                              lease_end_date: format(leaseEnd, 'dd MMMM yyyy'),
+                                              days_remaining: String(daysToEnd),
+                                              agent_name: '',
+                                              agent_phone: '',
                                             },
                                           });
                                           toast.success(`Expiry reminder sent to ${t.tenant_name}`);
@@ -598,16 +616,15 @@ const RentRollPage = () => {
                                         }
                                         const addr = t.properties?.address || 'your property';
                                         try {
-                                          const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user?.id || '').maybeSingle();
-                                          if (!agent) return;
                                           await supabase.functions.invoke('send-notification-email', {
                                             body: {
-                                              agent_id: agent.id,
-                                              type: 'arrears_reminder',
-                                              title: `Rent arrears notice — ${addr}`,
-                                              message: `Hi ${t.tenant_name}, our records show your rent is ${arrears.days} days overdue with an outstanding balance of approximately $${arrears.owed.toFixed(0)}. Please arrange payment immediately or contact us to discuss. If you believe this is an error, please disregard this message.`,
+                                              type: 'arrears_chase',
                                               recipient_email: t.tenant_email,
-                                              lead_name: t.tenant_name,
+                                              recipient_name: t.tenant_name,
+                                              property_address: addr,
+                                              amount_owed: `$${arrears.owed.toFixed(0)}`,
+                                              agent_name: '',
+                                              agent_phone: '',
                                             },
                                           });
                                           toast.success(`Arrears reminder sent to ${t.tenant_name}`);

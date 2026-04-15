@@ -1,0 +1,41 @@
+# ListHQ
+
+> Australia's AI-powered real estate platform for agents, buyers, renters, and investors.
+
+ListHQ is a two-sided property marketplace built for the Australian market. It combines traditional property search with AI tools including voice search, seller likelihood scoring, buyer concierge matching, and AI-generated offer letters.
+
+## For Agents
+- List properties (sale and rental) with AI-generated descriptions in 12+ languages
+- Access seller likelihood scores to identify motivated vendors
+- Manage rent rolls, trust accounting, and arrears chasing
+- Network with other agents to share off-market listings
+- E-signature document workflows
+- Commission calculator and CRM built-in
+
+## For Buyers & Renters
+- Search properties by suburb, price, bedrooms across Australia
+- Voice search powered by Deepgram and Gemini AI
+- Save searches and receive instant alerts for new listings
+- Pre-approval integration with mortgage brokers
+- View open homes and book inspections online
+
+## For Investors
+- Off-market property access through agent network
+- Rental yield data and suburb performance metrics
+- Trust accounting transparency for landlords
+
+## Key Pages
+- [Home](https://listhq.com.au/)
+- [Buy Property](https://listhq.com.au/buy)
+- [Rent Property](https://listhq.com.au/rent)
+- [Find an Agent](https://listhq.com.au/agents)
+- [Browse Suburbs](https://listhq.com.au/suburbs)
+- [For Agents](https://listhq.com.au/for-agents)
+- [Stamp Duty Calculator](https://listhq.com.au/stamp-duty-calculator)
+- [Help Centre](https://listhq.com.au/help)
+
+## Company
+- Founded: 2025
+- Headquarters: Australia
+- Website: https://listhq.com.au
+- Coverage: All Australian states and territories

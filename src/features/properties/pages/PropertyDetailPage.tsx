@@ -389,7 +389,7 @@ export default function PropertyDetailPage() {
           {/* Main content - 2 cols */}
           <div className="md:col-span-2 space-y-6 min-w-0">
             {/* Price + title */}
-            <div>
+            <div data-speakable>
               {isRental ? (
                 <>
                   <div className="flex items-baseline gap-2">

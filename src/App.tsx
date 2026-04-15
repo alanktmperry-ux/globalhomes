@@ -295,6 +295,7 @@ const App = () => (
                   <Route path="performance" element={<PerformancePage />} />
                   <Route path="rent-roll" element={<RentRollPage />} />
                   <Route path="tenancies/:tenancyId" element={<TenancyDetailPage />} />
+                  <Route path="inspection/:inspectionId" element={<InspectionReportPage />} />
                   <Route path="open-homes" element={<OpenHomesPage />} />
                   <Route path="settings" element={<SettingsPage />} />
                   <Route path="help" element={<HelpPage />} />

@@ -358,19 +358,14 @@ const DashboardOverview = () => {
     setSendingReminder(tenancy.id);
     try {
       const address = tenancy.properties?.address || 'your property';
-      const res = await fetch(
-        'https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/send-notification-email',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}` },
-          body: JSON.stringify({
-            to: tenancy.tenant_email,
-            subject: 'Rent overdue reminder',
-            body: `Dear ${tenancy.tenant_name}, your rent for ${address} is overdue. Please arrange payment at your earliest convenience. Thank you.`,
-          }),
-        }
-      );
-      if (!res.ok) throw new Error('Failed to send');
+      const { error } = await supabase.functions.invoke('send-notification-email', {
+        body: {
+          to: tenancy.tenant_email,
+          subject: 'Rent overdue reminder',
+          body: `Dear ${tenancy.tenant_name}, your rent for ${address} is overdue. Please arrange payment at your earliest convenience. Thank you.`,
+        },
+      });
+      if (error) throw new Error('Failed to send');
       toast.success(`Reminder sent to ${tenancy.tenant_name}`);
     } catch {
       toast.error('Failed to send reminder');

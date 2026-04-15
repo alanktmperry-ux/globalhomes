@@ -30,25 +30,21 @@ const AdminDatabase = () => {
   const limit = 20;
 
   const fetchStats = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    const response = await fetch(
-      `https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/admin-users?action=table_stats`,
-      { headers: { Authorization: `Bearer ${session?.access_token}`, apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ncmtib2hwbWt6am9uYW9mZ2JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MDcwNTAsImV4cCI6MjA1ODM4MzA1MH0.ZRs9aEaVnxBBqnYiMkFMvFBXrKEaLWCmFLnfo1j2yms' } }
-    );
-    const result = await response.json();
-    setTableStats(result.stats || {});
+    const { data: result, error } = await supabase.functions.invoke('admin-users', {
+      body: { action: 'table_stats' },
+    });
+    if (!error) setTableStats(result?.stats || {});
   };
 
   const fetchTable = async () => {
     setLoading(true);
-    const { data: { session } } = await supabase.auth.getSession();
-    const response = await fetch(
-      `https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/admin-users?action=browse_table&table=${selectedTable}&limit=${limit}&offset=${offset}`,
-      { headers: { Authorization: `Bearer ${session?.access_token}`, apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ncmtib2hwbWt6am9uYW9mZ2JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MDcwNTAsImV4cCI6MjA1ODM4MzA1MH0.ZRs9aEaVnxBBqnYiMkFMvFBXrKEaLWCmFLnfo1j2yms' } }
-    );
-    const result = await response.json();
-    setData(result.data || []);
-    setTotal(result.total || 0);
+    const { data: result, error } = await supabase.functions.invoke('admin-users', {
+      body: { action: 'browse_table', table: selectedTable, limit, offset },
+    });
+    if (!error) {
+      setData(result?.data || []);
+      setTotal(result?.total || 0);
+    }
     setLoading(false);
   };
 
@@ -57,15 +53,9 @@ const AdminDatabase = () => {
 
   const handleDelete = async (recordId: string) => {
     if (!confirm('Delete this record?')) return;
-    const { data: { session } } = await supabase.auth.getSession();
-    await fetch(
-      `https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/admin-users?action=delete_record`,
-      {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${session?.access_token}`, apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ncmtib2hwbWt6am9uYW9mZ2JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MDcwNTAsImV4cCI6MjA1ODM4MzA1MH0.ZRs9aEaVnxBBqnYiMkFMvFBXrKEaLWCmFLnfo1j2yms', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ table: selectedTable, record_id: recordId }),
-      }
-    );
+    await supabase.functions.invoke('admin-users', {
+      body: { action: 'delete_record', table: selectedTable, record_id: recordId },
+    });
     toast({ title: 'Record deleted' });
     fetchTable();
     fetchStats();
@@ -120,20 +110,8 @@ const AdminDatabase = () => {
           <button
             onClick={async () => {
               try {
-                const { data: { session } } = await supabase.auth.getSession();
-                const res = await fetch(
-                  `https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/seed-demo-listings`,
-                  {
-                    method: 'POST',
-                    headers: {
-                      Authorization: `Bearer ${session?.access_token}`,
-                      apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ncmtib2hwbWt6am9uYW9mZ2JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MDcwNTAsImV4cCI6MjA1ODM4MzA1MH0.ZRs9aEaVnxBBqnYiMkFMvFBXrKEaLWCmFLnfo1j2yms',
-                      'Content-Type': 'application/json',
-                    },
-                  }
-                );
-                const result = await res.json();
-                if (!res.ok) throw new Error(result.error || 'Seed failed');
+                const { data: result, error } = await supabase.functions.invoke('seed-demo-listings');
+                if (error) throw new Error(error.message || 'Seed failed');
                 sonnerToast.success(`Seeded ${result.total} listings (${result.sale_count} sale, ${result.rental_count} rental)`);
                 if (selectedTable === 'properties') fetchTable();
                 fetchStats();

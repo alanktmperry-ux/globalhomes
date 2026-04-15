@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, Phone, Mail, MessageCircle, Calendar, CheckCircle2, BadgeCheck,
@@ -95,7 +96,10 @@ interface AgentContactModalProps {
 export function AgentContactModal({ property, open, onClose, searchContext }: AgentContactModalProps) {
   const { agent } = property;
 
+  const navigate = useNavigate();
+
   const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [showAuthPrompt, setShowAuthPrompt] = useState(false);
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', message: '',
     interests: [] as string[],
@@ -146,6 +150,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
         setDepositAmount(null);
         setErrors({});
         setSubmitting(false);
+        setShowAuthPrompt(false);
       }, 300);
     }
   }, [open]);
@@ -176,6 +181,13 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
 
   /* ── Step 2 → Step 3 (submit everything) ─────────────────── */
   const handleSubmitAll = async () => {
+    // Check authentication before submitting
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      setShowAuthPrompt(true);
+      return;
+    }
+
     setSubmitting(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -526,6 +538,35 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
                         </p>
                       </div>
                     </div>
+
+                    {/* Auth prompt */}
+                    {showAuthPrompt && (
+                      <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 space-y-2">
+                        <p className="text-xs font-medium text-foreground">
+                          Create a free ListHQ account to send your enquiry. This keeps a record of your conversation with the agent and lets you track your application.
+                        </p>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => navigate('/seeker-auth?mode=signup')}
+                            className="flex-1 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
+                          >
+                            Sign Up
+                          </button>
+                          <button
+                            onClick={() => navigate('/seeker-auth?mode=login')}
+                            className="flex-1 py-2 rounded-xl border border-border text-foreground text-xs font-medium hover:bg-secondary transition-colors"
+                          >
+                            Log In
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Privacy notice */}
+                    <p className="text-[11px] text-muted-foreground leading-snug">
+                      Your contact details will be shared with the listing agent in accordance with our{' '}
+                      <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Privacy Policy</a>.
+                    </p>
 
                     <div className="flex gap-2">
                       <button onClick={() => setStep(1)}

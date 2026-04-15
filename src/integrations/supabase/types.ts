@@ -8451,6 +8451,7 @@ export type Database = {
           created_at: string
           furnished_required: boolean
           id: string
+          notification_preferences: Json | null
           pets_required: boolean
           preferred_baths: number | null
           preferred_beds: number | null
@@ -8467,6 +8468,7 @@ export type Database = {
           created_at?: string
           furnished_required?: boolean
           id?: string
+          notification_preferences?: Json | null
           pets_required?: boolean
           preferred_baths?: number | null
           preferred_beds?: number | null
@@ -8483,6 +8485,7 @@ export type Database = {
           created_at?: string
           furnished_required?: boolean
           id?: string
+          notification_preferences?: Json | null
           pets_required?: boolean
           preferred_baths?: number | null
           preferred_beds?: number | null

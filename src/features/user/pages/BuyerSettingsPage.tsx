@@ -50,7 +50,7 @@ const BuyerSettingsPage = () => {
       // Load profile + preferences in parallel
       const [profileRes, prefsRes, buyerRes] = await Promise.all([
         supabase.from('profiles').select('avatar_url, display_name, phone, preferred_language').eq('user_id', user.id).single(),
-        supabase.from('user_preferences').select('budget_min, budget_max, preferred_beds, preferred_baths, preferred_locations').eq('user_id', user.id).single(),
+        supabase.from('user_preferences').select('budget_min, budget_max, preferred_beds, preferred_baths, preferred_locations, notification_preferences').eq('user_id', user.id).single(),
         supabase.from('buyer_profiles').select('preferred_property_types').eq('user_id', user.id).single(),
       ]);
 
@@ -73,14 +73,23 @@ const BuyerSettingsPage = () => {
         setPreferredPropertyTypes(buyerRes.data.preferred_property_types || []);
       }
 
-      // Load notification prefs from localStorage
-      try {
-        const notifs = JSON.parse(localStorage.getItem('gh-notif-prefs') || '{}');
-        if (notifs.newListings !== undefined) setNotifNewListings(notifs.newListings);
-        if (notifs.priceDrops !== undefined) setNotifPriceDrops(notifs.priceDrops);
-        if (notifs.savedUpdates !== undefined) setNotifSavedUpdates(notifs.savedUpdates);
-        if (notifs.weeklyDigest !== undefined) setNotifWeeklyDigest(notifs.weeklyDigest);
-      } catch {}
+      // Load notification prefs from DB, fall back to localStorage
+      const dbNotifs = (prefsRes.data as any)?.notification_preferences as Record<string, boolean> | null;
+      if (dbNotifs && typeof dbNotifs === 'object') {
+        if (dbNotifs.new_listings !== undefined) setNotifNewListings(dbNotifs.new_listings);
+        if (dbNotifs.price_drops !== undefined) setNotifPriceDrops(dbNotifs.price_drops);
+        if (dbNotifs.open_homes !== undefined) setNotifSavedUpdates(dbNotifs.open_homes);
+        if (dbNotifs.weekly_digest !== undefined) setNotifWeeklyDigest(dbNotifs.weekly_digest);
+      } else {
+        // Fallback: read from localStorage for existing users
+        try {
+          const notifs = JSON.parse(localStorage.getItem('gh-notif-prefs') || '{}');
+          if (notifs.newListings !== undefined) setNotifNewListings(notifs.newListings);
+          if (notifs.priceDrops !== undefined) setNotifPriceDrops(notifs.priceDrops);
+          if (notifs.savedUpdates !== undefined) setNotifSavedUpdates(notifs.savedUpdates);
+          if (notifs.weeklyDigest !== undefined) setNotifWeeklyDigest(notifs.weeklyDigest);
+        } catch {}
+      }
 
       setLoading(false);
     };
@@ -139,19 +148,25 @@ const BuyerSettingsPage = () => {
         .eq('user_id', user.id)
         .single();
 
-      const prefsPayload = {
+      const prefsPayload: Record<string, any> = {
         user_id: user.id,
         budget_min: budgetMin ? parseInt(budgetMin) : null,
         budget_max: budgetMax ? parseInt(budgetMax) : null,
         preferred_beds: preferredBeds ? parseInt(preferredBeds) : null,
         preferred_baths: preferredBaths ? parseInt(preferredBaths) : null,
         preferred_locations: locationsArr,
+        notification_preferences: {
+          new_listings: notifNewListings,
+          price_drops: notifPriceDrops,
+          open_homes: notifSavedUpdates,
+          weekly_digest: notifWeeklyDigest,
+        },
       };
 
       if (existingPrefs) {
-        await supabase.from('user_preferences').update(prefsPayload).eq('user_id', user.id);
+        await (supabase.from('user_preferences').update as any)(prefsPayload).eq('user_id', user.id);
       } else {
-        await supabase.from('user_preferences').insert(prefsPayload);
+        await (supabase.from('user_preferences').insert as any)(prefsPayload);
       }
 
       // Upsert buyer profile
@@ -174,13 +189,6 @@ const BuyerSettingsPage = () => {
         await supabase.from('buyer_profiles').insert(buyerPayload);
       }
 
-      // Save notification prefs to localStorage
-      localStorage.setItem('gh-notif-prefs', JSON.stringify({
-        newListings: notifNewListings,
-        priceDrops: notifPriceDrops,
-        savedUpdates: notifSavedUpdates,
-        weeklyDigest: notifWeeklyDigest,
-      }));
 
       toast({ title: 'Settings saved', description: 'Your preferences have been updated.' });
     } catch (err: unknown) {

@@ -167,7 +167,7 @@ export default function ListingModerationQueue({ onPendingCountChange }: Props) 
                     size="sm"
                     onClick={() => handleApprove(listing)}
                     disabled={actionLoading === listing.id}
-                    className="bg-green-600 hover:bg-green-700 text-white"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
                   >
                     <CheckCircle2 size={14} className="mr-1" /> Approve
                   </Button>

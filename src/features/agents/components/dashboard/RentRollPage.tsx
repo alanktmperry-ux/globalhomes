@@ -253,6 +253,97 @@ const RentRollPage = () => {
     return format(addDays(parseISO(latest.period_to), frequencyDays(t.rent_frequency)), 'dd MMM yyyy');
   };
 
+  const fetchInspections = async (tenancyId: string) => {
+    if (inspections[tenancyId]) return;
+    setLoadingInspections(tenancyId);
+    const { data } = await supabase
+      .from('property_inspections')
+      .select('id, inspection_type, scheduled_date, status, conducted_date')
+      .eq('tenancy_id', tenancyId)
+      .order('scheduled_date', { ascending: false });
+    setInspections(prev => ({ ...prev, [tenancyId]: (data || []) as Inspection[] }));
+    setLoadingInspections(null);
+  };
+
+  const toggleExpand = (tenancyId: string) => {
+    if (expandedTenancy === tenancyId) {
+      setExpandedTenancy(null);
+    } else {
+      setExpandedTenancy(tenancyId);
+      fetchInspections(tenancyId);
+    }
+  };
+
+  const getNoticePeriodWarning = (state: string | null | undefined, scheduledDate: Date | undefined): string | null => {
+    if (!scheduledDate || !state) return null;
+    const daysUntil = differenceInDays(scheduledDate, today);
+    const s = state.toUpperCase();
+    if (['NSW', 'WA', 'ACT', 'SA', 'TAS', 'NT'].includes(s) && daysUntil < 7) {
+      return `${s} requires minimum 7 days notice. You've scheduled ${daysUntil} day(s) from today.`;
+    }
+    if (s === 'VIC' && daysUntil < 2) {
+      return `VIC requires minimum 2 days notice. You've scheduled ${daysUntil} day(s) from today.`;
+    }
+    if (s === 'QLD' && daysUntil < 1) {
+      return `QLD requires minimum 1 day notice.`;
+    }
+    return null;
+  };
+
+  const getFrequencyWarning = (state: string | null | undefined, tenancyId: string, type: string): string | null => {
+    if (type !== 'routine' || !state) return null;
+    const existing = inspections[tenancyId]?.filter(i => i.inspection_type === 'routine' && i.status !== 'cancelled') || [];
+    if (existing.length === 0) return null;
+    const latest = existing[0];
+    const months = differenceInMonths(new Date(), parseISO(latest.scheduled_date));
+    const s = state.toUpperCase();
+    if (s === 'VIC' && months < 6) return 'VIC allows routine inspections max once per 6 months.';
+    if (s === 'QLD' && months < 3) return 'QLD allows routine inspections max once per 3 months.';
+    return null;
+  };
+
+  const handleScheduleInspection = async (navigateAfter: boolean) => {
+    if (!showScheduleModal || !agentId || !scheduleForm.scheduled_date) return;
+    setScheduleSaving(true);
+    const { data, error } = await supabase.from('property_inspections').insert({
+      tenancy_id: showScheduleModal.id,
+      property_id: showScheduleModal.property_id,
+      agent_id: agentId,
+      inspection_type: scheduleForm.inspection_type,
+      scheduled_date: format(scheduleForm.scheduled_date, 'yyyy-MM-dd'),
+      owner_name: scheduleForm.owner_name || null,
+      owner_email: scheduleForm.owner_email || null,
+      bond_lodgment_number: scheduleForm.bond_lodgment_number || null,
+    } as any).select('id').maybeSingle();
+    setScheduleSaving(false);
+    if (error) { toast.error(`Failed: ${error.message}`); return; }
+    toast.success('Inspection scheduled');
+    // Refresh inspections for this tenancy
+    setInspections(prev => { const copy = { ...prev }; delete copy[showScheduleModal.id]; return copy; });
+    setShowScheduleModal(null);
+    setScheduleForm({ inspection_type: 'routine', scheduled_date: undefined, owner_name: '', owner_email: '', bond_lodgment_number: '' });
+    if (navigateAfter && data?.id) navigate(`/dashboard/inspection/${data.id}`);
+  };
+
+  const inspectionTypeBadge = (type: string) => {
+    const colors: Record<string, string> = {
+      entry: 'bg-blue-500/15 text-blue-700',
+      routine: 'bg-violet-500/15 text-violet-700',
+      exit: 'bg-orange-500/15 text-orange-700',
+    };
+    return <Badge className={cn('border-0 capitalize', colors[type] || 'bg-muted text-muted-foreground')}>{type}</Badge>;
+  };
+
+  const statusBadge = (status: string) => {
+    const colors: Record<string, string> = {
+      scheduled: 'bg-blue-500/15 text-blue-700',
+      in_progress: 'bg-amber-500/15 text-amber-700',
+      completed: 'bg-emerald-500/15 text-emerald-700',
+      cancelled: 'bg-muted text-muted-foreground',
+    };
+    return <Badge className={cn('border-0 capitalize', colors[status] || 'bg-muted')}>{status.replace('_', ' ')}</Badge>;
+  };
+
   const handleSubmit = async () => {
     if (!agentId || !form.property_id || !form.tenant_name || !form.lease_start || !form.lease_end || !form.rent_amount || !form.bond_amount) {
       toast.error('Please fill required fields');

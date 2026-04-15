@@ -16,8 +16,7 @@ export type AdminTab =
   | 'command-centre' | 'agent-lifecycle' | 'agent-approval' | 'compliance' | 'revenue'
   | 'comms' | 'partners' | 'growth' | 'support' | 'users' | 'listings'
   | 'roles' | 'database' | 'demo-requests' | 'reports' | 'ai-insights'
-  | 'pre-launch' | 'ai-buyer-concierge' | 'ai-seller-score'
-  | 'ai-offer-generator' | 'ai-lead-marketplace' | 'legal-compliance'
+  | 'pre-launch' | 'legal-compliance'
   | 'press-outreach' | 'pre-approval-review' | 'listing-review';
 
 interface NavItemProps {

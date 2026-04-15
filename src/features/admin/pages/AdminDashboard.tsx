@@ -329,10 +329,6 @@ const AdminDashboard = () => {
               {tab === 'legal-compliance' && <LegalComplianceChecklist />}
               {tab === 'press-outreach' && <PressOutreachPage />}
               {tab === 'pre-approval-review' && <PreApprovalReview />}
-              {tab === 'ai-buyer-concierge' && <div className="text-muted-foreground text-center py-20">Buyer Concierge dashboard — coming soon</div>}
-              {tab === 'ai-seller-score' && <div className="text-muted-foreground text-center py-20">Seller Likelihood Scores — coming soon</div>}
-              {tab === 'ai-offer-generator' && <div className="text-muted-foreground text-center py-20">AI Offer Generator stats — coming soon</div>}
-              {tab === 'ai-lead-marketplace' && <div className="text-muted-foreground text-center py-20">Lead Marketplace admin — coming soon</div>}
             </>
           )}
         </div>

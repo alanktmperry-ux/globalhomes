@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Home, Loader2, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
+import { Plus, Home, Loader2, AlertTriangle, CheckCircle2, Clock, ClipboardCheck, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,9 +12,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import DashboardHeader from './DashboardHeader';
-import { addDays, differenceInDays, format, parseISO } from 'date-fns';
+import { addDays, differenceInDays, differenceInMonths, format, parseISO } from 'date-fns';
 
 interface Tenancy {
   id: string;

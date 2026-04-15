@@ -38,10 +38,10 @@ export default function ListingModerationQueue({ onPendingCountChange }: Props) 
   const [rejectReason, setRejectReason] = useState('');
 
   const fetchPending = useCallback(async () => {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase
       .from('properties')
-      .select('id, address, suburb, state, price_formatted, listing_type, beds, baths, images, created_at, agent_id, agents!inner(name, email, user_id)')
-      .eq('moderation_status' as any, 'pending')
+      .select('id, address, suburb, state, price_formatted, listing_type, beds, baths, images, created_at, agent_id, agents!inner(name, email, user_id)') as any)
+      .eq('moderation_status', 'pending')
       .order('created_at', { ascending: true });
 
     if (error) {

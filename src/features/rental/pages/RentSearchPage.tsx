@@ -1,13 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useRentalSearch, type RentalFilters } from '../hooks/useRentalSearch';
 import { RentalSearchFilters } from '../components/RentalSearchFilters';
 import { RentalCard } from '../components/RentalCard';
 
+function parseRentalFiltersFromParams(sp: URLSearchParams): RentalFilters {
+  return {
+    suburb: sp.get('q') || undefined,
+    minBedrooms: sp.get('beds') ? Number(sp.get('beds')) : undefined,
+    minRent: sp.get('priceMin') ? Number(sp.get('priceMin')) : undefined,
+    maxRent: sp.get('priceMax') ? Number(sp.get('priceMax')) : undefined,
+    propertyTypes: sp.get('type') ? [sp.get('type')!] : undefined,
+  };
+}
+
 export default function RentSearchPage() {
-  const [filters, setFilters] = useState<RentalFilters>({});
+  const [searchParams] = useSearchParams();
+  const [filters, setFilters] = useState<RentalFilters>(() => parseRentalFiltersFromParams(searchParams));
   const { properties, loading, total } = useRentalSearch(filters);
+
+  // Re-sync when URL params change (voice search navigation)
+  useEffect(() => {
+    const parsed = parseRentalFiltersFromParams(searchParams);
+    const hasUrlFilters = Object.values(parsed).some(v => v !== undefined);
+    if (hasUrlFilters) setFilters(prev => ({ ...prev, ...parsed }));
+  }, [searchParams.toString()]);
 
   return (
     <>

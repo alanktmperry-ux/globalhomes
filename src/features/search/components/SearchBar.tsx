@@ -85,26 +85,14 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 3000);
 
-      const { data: { session } } = await supabase.auth.getSession();
-      const resp = await fetch(
-        'https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/generate-translations',
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${session?.access_token ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ncmtib2hwbWt6am9uYW9mZ2JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MDcwNTAsImV4cCI6MjA1ODM4MzA1MH0.ZRs9aEaVnxBBqnYiMkFMvFBXrKEaLWCmFLnfo1j2yms'}`,
-            apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ncmtib2hwbWt6am9uYW9mZ2JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MDcwNTAsImV4cCI6MjA1ODM4MzA1MH0.ZRs9aEaVnxBBqnYiMkFMvFBXrKEaLWCmFLnfo1j2yms',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ type: 'translate_search', search_query: trimmed }),
-          signal: controller.signal,
-        }
-      );
+      const { data: translationResult, error: fnError } = await supabase.functions.invoke('generate-translations', {
+        body: { type: 'translate_search', search_query: trimmed },
+      });
       clearTimeout(timeout);
 
-      if (resp.ok) {
-        const data = await resp.json();
-        const lang = data.detected_language;
-        const englishQuery = data.english_query || trimmed;
+      if (!fnError && translationResult) {
+        const lang = translationResult.detected_language;
+        const englishQuery = translationResult.english_query || trimmed;
 
         capture('search_translated', {
           original_query: trimmed,

@@ -148,13 +148,19 @@ const BuyerSettingsPage = () => {
         .eq('user_id', user.id)
         .single();
 
-      const prefsPayload = {
+      const prefsPayload: Record<string, any> = {
         user_id: user.id,
         budget_min: budgetMin ? parseInt(budgetMin) : null,
         budget_max: budgetMax ? parseInt(budgetMax) : null,
         preferred_beds: preferredBeds ? parseInt(preferredBeds) : null,
         preferred_baths: preferredBaths ? parseInt(preferredBaths) : null,
         preferred_locations: locationsArr,
+        notification_preferences: {
+          new_listings: notifNewListings,
+          price_drops: notifPriceDrops,
+          open_homes: notifSavedUpdates,
+          weekly_digest: notifWeeklyDigest,
+        },
       };
 
       if (existingPrefs) {

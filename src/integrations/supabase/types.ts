@@ -3716,6 +3716,131 @@ export type Database = {
           },
         ]
       }
+      inspection_maintenance_items: {
+        Row: {
+          created_at: string | null
+          description: string
+          id: string
+          inspection_id: string | null
+          priority: string | null
+          room_id: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          id?: string
+          inspection_id?: string | null
+          priority?: string | null
+          room_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          id?: string
+          inspection_id?: string | null
+          priority?: string | null
+          room_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inspection_maintenance_items_inspection_id_fkey"
+            columns: ["inspection_id"]
+            isOneToOne: false
+            referencedRelation: "property_inspections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inspection_maintenance_items_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "inspection_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inspection_room_photos: {
+        Row: {
+          caption: string | null
+          created_at: string | null
+          id: string
+          inspection_id: string | null
+          photo_url: string
+          room_id: string | null
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string | null
+          id?: string
+          inspection_id?: string | null
+          photo_url: string
+          room_id?: string | null
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string | null
+          id?: string
+          inspection_id?: string | null
+          photo_url?: string
+          room_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inspection_room_photos_inspection_id_fkey"
+            columns: ["inspection_id"]
+            isOneToOne: false
+            referencedRelation: "property_inspections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inspection_room_photos_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "inspection_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inspection_rooms: {
+        Row: {
+          condition: string | null
+          created_at: string | null
+          display_order: number | null
+          id: string
+          inspection_id: string | null
+          notes: string | null
+          room_name: string
+        }
+        Insert: {
+          condition?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          inspection_id?: string | null
+          notes?: string | null
+          room_name: string
+        }
+        Update: {
+          condition?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          inspection_id?: string | null
+          notes?: string | null
+          room_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inspection_rooms_inspection_id_fkey"
+            columns: ["inspection_id"]
+            isOneToOne: false
+            referencedRelation: "property_inspections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lead_events: {
         Row: {
           agent_id: string
@@ -5762,6 +5887,144 @@ export type Database = {
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_inspections: {
+        Row: {
+          agent_id: string | null
+          bond_lodgment_number: string | null
+          conducted_date: string | null
+          created_at: string | null
+          finalised_at: string | null
+          id: string
+          inspection_type: string
+          keys_count: number | null
+          notice_sent_at: string | null
+          overall_notes: string | null
+          owner_email: string | null
+          owner_name: string | null
+          property_id: string | null
+          remotes_count: number | null
+          report_token: string | null
+          scheduled_date: string
+          status: string
+          tenancy_id: string | null
+          tenant_accepted_at: string | null
+          tenant_dispute_deadline: string | null
+          tenant_dispute_notes: string | null
+          tenant_disputed_at: string | null
+          updated_at: string | null
+          water_meter_reading: string | null
+        }
+        Insert: {
+          agent_id?: string | null
+          bond_lodgment_number?: string | null
+          conducted_date?: string | null
+          created_at?: string | null
+          finalised_at?: string | null
+          id?: string
+          inspection_type: string
+          keys_count?: number | null
+          notice_sent_at?: string | null
+          overall_notes?: string | null
+          owner_email?: string | null
+          owner_name?: string | null
+          property_id?: string | null
+          remotes_count?: number | null
+          report_token?: string | null
+          scheduled_date: string
+          status?: string
+          tenancy_id?: string | null
+          tenant_accepted_at?: string | null
+          tenant_dispute_deadline?: string | null
+          tenant_dispute_notes?: string | null
+          tenant_disputed_at?: string | null
+          updated_at?: string | null
+          water_meter_reading?: string | null
+        }
+        Update: {
+          agent_id?: string | null
+          bond_lodgment_number?: string | null
+          conducted_date?: string | null
+          created_at?: string | null
+          finalised_at?: string | null
+          id?: string
+          inspection_type?: string
+          keys_count?: number | null
+          notice_sent_at?: string | null
+          overall_notes?: string | null
+          owner_email?: string | null
+          owner_name?: string | null
+          property_id?: string | null
+          remotes_count?: number | null
+          report_token?: string | null
+          scheduled_date?: string
+          status?: string
+          tenancy_id?: string | null
+          tenant_accepted_at?: string | null
+          tenant_dispute_deadline?: string | null
+          tenant_dispute_notes?: string | null
+          tenant_disputed_at?: string | null
+          updated_at?: string | null
+          water_meter_reading?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_inspections_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_inspections_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_inspections_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_inspections_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "property_inspections_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_inspections_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_inspections_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_inspections_tenancy_id_fkey"
+            columns: ["tenancy_id"]
+            isOneToOne: false
+            referencedRelation: "tenancies"
             referencedColumns: ["id"]
           },
         ]
@@ -9854,6 +10117,7 @@ export type Database = {
         }
         Returns: Json
       }
+      get_inspection_by_token: { Args: { p_token: string }; Returns: Json }
       get_live_bids: {
         Args: { p_auction_id: string; p_limit?: number }
         Returns: Json

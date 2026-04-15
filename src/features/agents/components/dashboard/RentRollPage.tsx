@@ -34,7 +34,15 @@ interface Tenancy {
   management_fee_percent: number;
   status: string;
   notes: string | null;
-  properties: { address: string; suburb: string } | null;
+  properties: { address: string; suburb: string; state: string | null } | null;
+}
+
+interface Inspection {
+  id: string;
+  inspection_type: string;
+  scheduled_date: string;
+  status: string;
+  conducted_date: string | null;
 }
 
 interface RentPayment {

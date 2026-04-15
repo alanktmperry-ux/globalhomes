@@ -87,6 +87,8 @@ const Index = () => {
   const viewedPropertiesRef = useRef(new Set<string>());
   const [viewedIds, setViewedIds] = useState<Set<string>>(new Set());
   const sessionStartRef = useRef(Date.now());
+  const [prefsBannerVisible, setPrefsBannerVisible] = useState(false);
+  const prefsAppliedRef = useRef(false);
   const [mobileView, setMobileView] = useState<'map' | 'list'>('map');
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key?: number | string } | null>(null);
   const [splitPercent, setSplitPercent] = useState(50);

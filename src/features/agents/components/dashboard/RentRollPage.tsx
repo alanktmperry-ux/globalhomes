@@ -175,7 +175,7 @@ const RentRollPage = () => {
     const [tenancyRes, paymentRes, propRes] = await Promise.all([
       supabase
         .from('tenancies')
-        .select('*, properties(address, suburb)')
+        .select('*, properties(address, suburb, state)')
         .eq('agent_id', agentData.id)
         .order('lease_end', { ascending: true }),
       supabase

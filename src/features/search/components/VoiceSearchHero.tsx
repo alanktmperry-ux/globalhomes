@@ -466,7 +466,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
           if (data?.success && data.transcript) {
             syncTranscript(data.transcript);
             setTextQuery(data.transcript);
-            processTranscript(data.transcript);
+            processTranscript(data.transcript, data.parsedQuery);
           } else if (data?.error) {
             toast({ title: '🎙️ Voice Error', description: data.error, variant: 'destructive' });
             syncVoiceState('idle');

@@ -97,6 +97,12 @@ const RentRollPage = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [step, setStep] = useState(1);
+  const [expandedTenancy, setExpandedTenancy] = useState<string | null>(null);
+  const [inspections, setInspections] = useState<Record<string, Inspection[]>>({});
+  const [loadingInspections, setLoadingInspections] = useState<string | null>(null);
+  const [showScheduleModal, setShowScheduleModal] = useState<Tenancy | null>(null);
+  const [scheduleForm, setScheduleForm] = useState({ inspection_type: 'routine', scheduled_date: undefined as Date | undefined, owner_name: '', owner_email: '', bond_lodgment_number: '' });
+  const [scheduleSaving, setScheduleSaving] = useState(false);
 
   const [form, setForm] = useState({
     property_id: '',

@@ -6,15 +6,46 @@ import { MessageThread } from '@/features/messaging/components/MessageThread';
 import { NewConversationModal } from '@/features/messaging/components/NewConversationModal';
 import { BottomNav } from '@/shared/components/layout/BottomNav';
 import { supabase } from '@/integrations/supabase/client';
-import { PenSquare, ArrowLeft, MessageSquare } from 'lucide-react';
+import { PenSquare, ArrowLeft, MessageSquare, Mail } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 const MessagesPage = () => {
   const { user } = useAuth();
-  const { conversations, loading, markRead, totalUnread, reload } = useConversations(user?.id);
+  const { conversations, loading, markRead, totalUnread, reload, toggleArchive } = useConversations(user?.id);
   const [activeConv, setActiveConv] = useState<Conversation | null>(null);
   const [showNew, setShowNew] = useState(false);
+  const [otherEmail, setOtherEmail] = useState<string | null>(null);
   const location = useLocation();
+
+  // Browser tab title with unread count
+  useEffect(() => {
+    if (totalUnread > 0) {
+      document.title = `(${totalUnread}) Messages | ListHQ`;
+    } else {
+      document.title = 'Messages | ListHQ';
+    }
+    return () => { document.title = 'ListHQ — Australian Real Estate'; };
+  }, [totalUnread]);
+
+  // Fetch other participant's email when activeConv changes
+  useEffect(() => {
+    setOtherEmail(null);
+    if (!activeConv || !user) return;
+    const other = activeConv.participants.find(p => p.user_id !== user.id);
+    if (!other) return;
+
+    (async () => {
+      const { data: agentRow } = await supabase
+        .from('agents')
+        .select('email')
+        .eq('user_id', other.user_id)
+        .maybeSingle();
+      if (agentRow?.email) { setOtherEmail(agentRow.email); return; }
+
+      // profiles table doesn't have email — only agents have it client-side
+    })();
+  }, [activeConv, user]);
 
   // Handle openConvId from navigation state (e.g. from lead Reply button)
   useEffect(() => {
@@ -80,6 +111,7 @@ const MessagesPage = () => {
           last_message_at: l.created_at,
           last_message_text: l.message || 'New enquiry',
           unread_count: l.read ? 0 : 1,
+          archived: false,
           participants: [{
             user_id: l.user_id || '',
             display_name: l.user_name,
@@ -135,6 +167,7 @@ const MessagesPage = () => {
     setActiveConv({
       ...conv,
       unread_count: 0,
+      archived: false,
       participants: pseudoConv.participants,
       type: 'lead_reply',
       title: pseudoConv.title,
@@ -150,6 +183,14 @@ const MessagesPage = () => {
     }
   }, [handleSelect, handleLeadReply]);
 
+  const convTitle = activeConv
+    ? (activeConv.title ??
+      (activeConv.participants
+        .filter(p => p.user_id !== user?.id)
+        .map(p => p.display_name ?? 'User')
+        .join(', ') || 'Conversation'))
+    : '';
+
   return (
     <div className="flex flex-col h-[100dvh] bg-background">
       <div className="flex flex-1 min-h-0">
@@ -162,7 +203,9 @@ const MessagesPage = () => {
             <div className="flex items-center gap-2">
               <h1 className="text-lg font-bold text-foreground">Messages</h1>
               {totalUnread > 0 && (
-                <span className="text-xs text-muted-foreground">{totalUnread} unread</span>
+                <span className="min-w-[18px] h-[18px] rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center px-1.5">
+                  {totalUnread > 99 ? '99+' : totalUnread}
+                </span>
               )}
             </div>
             <button
@@ -179,6 +222,7 @@ const MessagesPage = () => {
             activeId={activeConv?.id ?? null}
             onSelect={handleConvSelect}
             loading={loading}
+            onArchiveToggle={toggleArchive}
           />
         </div>
 
@@ -196,18 +240,31 @@ const MessagesPage = () => {
                 >
                   <ArrowLeft size={18} />
                 </button>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="font-semibold text-sm text-foreground truncate">
-                    {activeConv.title ??
-                      (activeConv.participants
-                        .filter(p => p.user_id !== user?.id)
-                        .map(p => p.display_name ?? 'User')
-                        .join(', ') || 'Conversation')}
+                    {convTitle}
                   </p>
                   {activeConv.type === 'lead_reply' && (
                     <p className="text-xs text-muted-foreground">Lead enquiry thread</p>
                   )}
                 </div>
+                {otherEmail && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5 text-xs h-8"
+                    asChild
+                  >
+                    <a
+                      href={`mailto:${otherEmail}?subject=${encodeURIComponent(`Re: ${convTitle}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Mail size={14} />
+                      Email
+                    </a>
+                  </Button>
+                )}
               </div>
 
               <MessageThread

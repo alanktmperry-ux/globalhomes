@@ -16,6 +16,7 @@ export interface Conversation {
   last_message_at: string;
   last_message_text: string | null;
   unread_count: number;
+  archived: boolean;
   participants: ConversationParticipant[];
   // Legacy fields for backward compat
   participant_1?: string;
@@ -34,7 +35,7 @@ export function useConversations(userId: string | undefined) {
     // Get all conversations this user participates in (via conversation_participants)
     const { data: participantRows } = await supabase
       .from('conversation_participants')
-      .select('conversation_id, unread_count')
+      .select('conversation_id, unread_count, archived')
       .eq('user_id', userId);
 
     if (!participantRows || participantRows.length === 0) {
@@ -47,7 +48,7 @@ export function useConversations(userId: string | undefined) {
         .limit(100);
 
       if (legacyConvos && legacyConvos.length > 0) {
-        const enriched = await enrichConversations(legacyConvos, userId, {});
+        const enriched = await enrichConversations(legacyConvos, userId, {}, {});
         setConversations(enriched);
       } else {
         setConversations([]);
@@ -58,7 +59,10 @@ export function useConversations(userId: string | undefined) {
 
     const ids = participantRows.map(r => r.conversation_id);
     const unreadMap = Object.fromEntries(
-      participantRows.map(r => [r.conversation_id, r.unread_count])
+      participantRows.map(r => [r.conversation_id, (r as any).unread_count ?? 0])
+    );
+    const archivedMap = Object.fromEntries(
+      participantRows.map(r => [r.conversation_id, !!(r as any).archived])
     );
 
     const { data: convRows } = await supabase
@@ -68,7 +72,7 @@ export function useConversations(userId: string | undefined) {
       .order('last_message_at', { ascending: false });
 
     if (convRows) {
-      const enriched = await enrichConversations(convRows, userId, unreadMap);
+      const enriched = await enrichConversations(convRows, userId, unreadMap, archivedMap);
       setConversations(enriched);
     }
     setLoading(false);
@@ -77,7 +81,8 @@ export function useConversations(userId: string | undefined) {
   const enrichConversations = async (
     convRows: any[],
     currentUserId: string,
-    unreadMap: Record<string, number>
+    unreadMap: Record<string, number>,
+    archivedMap: Record<string, boolean>
   ): Promise<Conversation[]> => {
     // Get all participants for these conversations
     const convIds = convRows.map(c => c.id);
@@ -157,6 +162,7 @@ export function useConversations(userId: string | undefined) {
         last_message_at: c.last_message_at,
         last_message_text: c.last_message_text ?? null,
         unread_count: unread,
+        archived: archivedMap[c.id] ?? false,
         participants,
         participant_1: c.participant_1,
         participant_2: c.participant_2,
@@ -212,7 +218,13 @@ export function useConversations(userId: string | undefined) {
     );
   }, [userId]);
 
+  const toggleArchive = useCallback((conversationId: string, archived: boolean) => {
+    setConversations(prev =>
+      prev.map(c => c.id === conversationId ? { ...c, archived } : c)
+    );
+  }, []);
+
   const totalUnread = conversations.reduce((sum, c) => sum + c.unread_count, 0);
 
-  return { conversations, loading, reload: load, markRead, totalUnread };
+  return { conversations, loading, reload: load, markRead, totalUnread, toggleArchive };
 }

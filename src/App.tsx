@@ -115,6 +115,8 @@ const SavedSearchesPage = React.lazy(() => import("./features/alerts/pages/Saved
 const StampDutyPage = React.lazy(() => import("./pages/StampDutyPage"));
 const MortgageCalculatorPage = React.lazy(() => import("./features/mortgage/pages/MortgageCalculatorPage"));
 const SchoolPage = React.lazy(() => import("./pages/SchoolPage"));
+const SuburbProfilePage = React.lazy(() => import("./features/suburb/pages/SuburbProfilePage"));
+const SuburbPage = React.lazy(() => import("./pages/SuburbPage"));
 const RentSearchPage = React.lazy(() => import("./features/rental/pages/RentSearchPage"));
 const VendorReportPage = React.lazy(() => import("./pages/VendorReportPage"));
 const ListingPerformancePage = React.lazy(() => import("./pages/ListingPerformancePage"));
@@ -199,6 +201,8 @@ const App = () => (
                   <Route path="/school/:state/:slug" element={<SchoolPage />} />
                   
                   <Route path="/buy" element={<BuyPage />} />
+                  <Route path="/buy/:state/:suburb" element={<SuburbPage />} />
+                  <Route path="/suburb/:state/:slug" element={<SuburbProfilePage />} />
                   <Route path="/rent" element={<RentSearchPage />} />
                   <Route path="/rent/property/:id" element={<RentalPropertyPage />} />
                   

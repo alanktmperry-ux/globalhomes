@@ -173,16 +173,14 @@ Deno.serve(async (req) => {
     }
 
     // Audit log
-    try {
-      await supabase.from("audit_log").insert({
-        user_id: caller.id,
-        action_type: "admin_delete_agent",
-        entity_type: "agent",
-        entity_id: userId,
-        description: `Admin deleted agent ${userId}`,
-        metadata: { cascade: true },
-      });
-    } catch (e) { console.error("Audit log insert failed:", e); }
+    await supabase.from("audit_log").insert({
+      user_id: caller.id,
+      action_type: "admin_delete_agent",
+      entity_type: "agent",
+      entity_id: userId,
+      description: "Admin deleted agent and all associated data",
+      metadata: { cascade: true },
+    }).catch(e => console.error("audit log:", e));
 
     if (errors.length > 0) {
       console.warn("Agent deletion completed with errors:", errors);

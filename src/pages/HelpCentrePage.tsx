@@ -12,6 +12,7 @@ const categories = [
   { title: 'Buyers', description: 'Searching, saving, open homes, auctions, and finance tools', icon: 'Home', href: '/help/buyers' },
   { title: 'Renters', description: 'Finding rentals, applying, tracking applications', icon: 'Key', href: '/help/renters' },
   { title: 'Vendors', description: 'Performance reports, auctions, and documents', icon: 'BarChart3', href: '/help/vendors' },
+  { title: 'Property Managers', description: 'Rent roll, inspections, condition reports, and arrears', icon: 'ClipboardCheck', href: '/help/agents' },
 ];
 
 const popularArticles = [
@@ -21,6 +22,8 @@ const popularArticles = [
   { question: 'How do I apply for a rental property?', id: 'renter-apply' },
   { question: 'How do I set up saved search alerts?', id: 'buyer-saved-search' },
   { question: 'How do I track my vendor performance report?', id: 'vendor-report' },
+  { question: 'How do I conduct a property inspection and condition report?', id: 'agent-inspection-reports' },
+  { question: 'How does voice search work?', id: 'buyer-voice-search' },
 ];
 
 export default function HelpCentrePage() {

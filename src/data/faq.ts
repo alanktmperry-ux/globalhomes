@@ -153,7 +153,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     id: 'agent-billing',
     question: 'How does agent billing work?',
-    answer: 'Agent subscriptions are billed monthly via Stripe. Go to Dashboard → Billing to view your plan, update your payment method, download invoices, or cancel. If your subscription lapses, your listings remain visible but you cannot publish new listings or access premium features until renewed.',
+    answer: 'Agent subscriptions are managed from Dashboard → Billing. You can view your current plan, see your subscription status, and update your details. Payment processing via Stripe is launching soon — founding agents will be notified by email when billing goes live. Until then, your access continues uninterrupted.',
     category: 'agents',
     tags: ['billing', 'subscription', 'stripe', 'payment'],
   },
@@ -242,6 +242,35 @@ export const FAQ_ITEMS: FaqItem[] = [
     tags: ['onboarding', 'setup', 'agency', 'trust account', 'ABN', 'licence', 'getting started'],
   },
 
+  {
+    id: 'agent-inspection-reports',
+    question: 'How do I conduct a property inspection and condition report?',
+    answer: 'Go to Dashboard → Rent Roll, find the tenancy, and click "Inspections". From there:\n\n1. Click "Schedule Inspection" and select the type — Entry (move-in), Routine (periodic), or Exit (move-out). Enter the inspection date, owner name and email. The system checks your state\'s minimum notice period and warns you if the date is too soon.\n\n2. On the day, open the inspection from the Rent Roll. Work through each room on your phone — tap the condition (Excellent / Good / Fair / Poor / Damaged), add notes, and upload photos directly from your camera.\n\n3. Record the water meter reading, key count, and smoke alarm test results in the overview section.\n\n4. Flag any maintenance issues directly from the room — set priority (Urgent / Normal / Low) and they appear in a maintenance summary at the bottom.\n\n5. When complete, tap "Finalise Report". The system generates the report and lets you email it to the owner and the tenant simultaneously.\n\nTenants receive a link to view the report online and can formally Accept it or raise Concerns within their state\'s dispute window. All responses are recorded against the inspection.',
+    category: 'agents',
+    tags: ['inspection', 'condition report', 'entry report', 'exit report', 'routine inspection', 'property management', 'tenant', 'landlord'],
+  },
+  {
+    id: 'agent-seller-score',
+    question: 'What is the Seller Likelihood Score and how do I use it?',
+    answer: 'The Seller Likelihood Score (Dashboard → Seller Scoring) ranks your off-market and inactive listings by how likely that vendor is to be ready to sell now.\n\nEach property is scored out of 100 across three factors:\n• Time on your books — properties held longer score higher\n• Listing views — high interest with no sale suggests motivation\n• Days since last update — stale listings indicate the vendor may be reconsidering\n\nScores are colour-coded:\n• Green (70+) — Hot: proactively reach out now\n• Amber (40–69) — Warm: good time for a check-in\n• Grey (below 40) — Low: monitor for now\n\nClick any property to open the Draft Outreach panel, which pre-fills a suggested email or call script using your name, agency, and phone number. Use this as your starting point for the outreach conversation.',
+    category: 'agents',
+    tags: ['seller score', 'seller likelihood', 'off-market', 'outreach', 'vendor', 'scoring'],
+  },
+  {
+    id: 'agent-network-sharing',
+    question: 'How does the Agent Network off-market sharing work?',
+    answer: 'The Agent Network (Dashboard → Network) lets you share your off-market and pocket listings with other ListHQ agents, and view listings shared by other agents in your market.\n\nTo share a listing:\n1. Go to the "My Listings" tab in the Network section\n2. Find the listing and click "Share to Network"\n3. Set the referral split percentage — the commission share you are offering the introducing agent\n4. The listing appears in the network feed for other agents\n\nTo claim a network listing:\n1. Browse the "Network Listings" tab\n2. Click "Contact Agent" to introduce your buyer and open a message thread\n3. If a deal proceeds, the referral split you agreed on applies\n\nYou can also post Buyer Briefs — requirements from your active buyers (price range, suburb, property type, urgency). Other agents can match their listings to your briefs and contact you directly.',
+    category: 'agents',
+    tags: ['network', 'off-market', 'sharing', 'referral', 'co-broke', 'buyer brief', 'pocket listing'],
+  },
+  {
+    id: 'agent-arrears-chase',
+    question: 'How do I chase rent arrears and notify tenants?',
+    answer: 'The Rent Roll automatically calculates arrears for each tenancy based on the rent amount, frequency, and payment records.\n\nIn the Rent Roll table, tenancies with overdue rent show an orange "Arrears" badge with the number of days overdue and estimated amount owed.\n\nTo chase arrears:\n• Click the "Chase" button on the arrears badge to send an automated arrears notice directly to the tenant\'s email. The email states the property address, amount overdue, and your contact details.\n• For lease expiry reminders, click "Notify" on any tenancy approaching its end date to send the tenant a formal renewal notice.\n\nAll notices are sent from ListHQ\'s email system and logged against the tenancy record. For formal legal notices (breach notices, Notice to Vacate), use your state tenancy authority\'s prescribed forms — ListHQ notices are a courtesy first step.',
+    category: 'agents',
+    tags: ['arrears', 'rent overdue', 'chase', 'tenant notice', 'property management', 'lease expiry'],
+  },
+
   // BUYERS
   {
     id: 'buyer-search',
@@ -319,6 +348,14 @@ export const FAQ_ITEMS: FaqItem[] = [
     answer: 'On the property page, scroll to the "Documents" section. Public documents (like floor plans) are immediately downloadable. Restricted documents (like the Contract of Sale or Section 32) require you to be a registered and verified buyer. Click "Request Access" to ask the agent to grant you access. You\'ll receive an email once access is approved.',
     category: 'buyers',
     tags: ['documents', 'contract', 'section 32', 'download'],
+  },
+
+  {
+    id: 'buyer-voice-search',
+    question: 'How does voice search work?',
+    answer: 'Voice search lets you describe what you are looking for out loud instead of typing filters manually.\n\nOn the homepage, click the microphone button in the search bar. Speak naturally — for example: "Three bedroom house in Bondi under a million dollars" or "Pet-friendly apartment near the city for rent under $600 a week".\n\nListHQ transcribes your speech and uses AI to extract the key details — suburb, price range, bedrooms, property type, and whether you are buying or renting. You are then taken directly to the matching search results with all filters pre-applied.\n\nVoice search works best in a quiet environment. Make sure your browser has microphone permission enabled for listhq.com.au.',
+    category: 'buyers',
+    tags: ['voice search', 'microphone', 'speak', 'AI', 'search'],
   },
 
   // RENTERS
@@ -464,21 +501,21 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     id: 'billing-cancel',
     question: 'How do I cancel my subscription?',
-    answer: 'Go to Dashboard → Billing → Manage Subscription. Click "Cancel Subscription". Your subscription will remain active until the end of the current billing period. Your listings will remain visible to the public, but you won\'t be able to publish new listings or access premium dashboard features after cancellation.',
+    answer: 'To cancel your subscription, go to Dashboard → Billing and click "Cancel Subscription". Full subscription management including cancellation via Stripe is launching soon. In the meantime, contact hello@listhq.com.au and we will process your request within 1 business day.',
     category: 'billing',
     tags: ['cancel', 'subscription', 'billing'],
   },
   {
     id: 'billing-invoices',
     question: 'Where do I find my invoices?',
-    answer: 'Go to Dashboard → Billing → Invoice History. All invoices are listed with date, amount, and a PDF download link. Invoices are also automatically emailed to your registered email address each billing cycle.',
+    answer: 'Invoice history will be available at Dashboard → Billing once Stripe billing launches. In the meantime, contact hello@listhq.com.au to request a record of your account. Founding agents on the free trial period will receive their first invoice when the trial converts to a paid plan.',
     category: 'billing',
     tags: ['invoices', 'receipts', 'billing', 'download'],
   },
   {
     id: 'billing-update-card',
     question: 'How do I update my payment method?',
-    answer: 'Go to Dashboard → Billing → Payment Method and click "Update Card". You\'ll be redirected to the Stripe secure payment portal to enter your new card details. ListHQ never stores your card number directly.',
+    answer: 'Payment method management via Stripe is launching soon. Once live, you will be able to update your card at Dashboard → Billing → Payment Method. For any urgent billing changes before launch, contact hello@listhq.com.au.',
     category: 'billing',
     tags: ['payment', 'card', 'stripe', 'update'],
   },
@@ -490,7 +527,14 @@ export const FAQ_ITEMS: FaqItem[] = [
     tags: ['founding agent', 'free', 'trial', 'offer', 'pricing', 'badge', '3 months'],
   },
 
-  // GENERAL
+  // GENERAL (continued)
+  {
+    id: 'general-esignature',
+    question: 'How does electronic document signing work?',
+    answer: 'ListHQ includes an e-signature system that allows agents to send documents for electronic signing to buyers, vendors, and tenants.\n\nFor signatories (buyers, vendors, tenants):\n• You will receive an email with a "Sign Document" button\n• Click the link — no account or login is required\n• Read the document name and details\n• Type your full legal name in the signature field and click "Sign"\n• Your signature is recorded with a timestamp\n\nE-signatures on ListHQ are legally binding under the Electronic Transactions Act 1999 (Australia). Each signed document generates a tamper-evident record with the signatory\'s name, timestamp, and IP address.\n\nFor agents sending signature requests: go to Dashboard → Documents → Signature Requests → New Request. Enter the document name, optional document URL, and up to 5 signatories (name and email). Each signatory receives an email with their unique signing link.',
+    category: 'general',
+    tags: ['e-signature', 'electronic signature', 'signing', 'documents', 'legal', 'Electronic Transactions Act'],
+  },
   {
     id: 'general-offmarket-vs-premarket',
     question: 'What is the difference between an off-market listing and a pre-market listing?',
@@ -510,7 +554,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     id: 'tech-mobile',
     question: 'Is there a mobile app?',
-    answer: 'ListHQ is a fully responsive web application that works on all mobile browsers without needing a separate download. On iOS, you can add ListHQ to your home screen from Safari (tap Share → Add to Home Screen) for an app-like experience.',
+    answer: 'ListHQ is a Progressive Web App (PWA) — it works on all mobile browsers and can be installed on your home screen like a native app.\n\nOn iOS (Safari): tap the Share button → "Add to Home Screen"\nOn Android (Chrome): tap the three-dot menu → "Add to Home Screen" or "Install App"\n\nOnce installed, ListHQ opens full-screen without browser chrome, loads faster on repeat visits, and works as a standalone app icon on your device. No app store download required.',
     category: 'technical',
     tags: ['mobile', 'app', 'ios', 'android', 'pwa'],
   },

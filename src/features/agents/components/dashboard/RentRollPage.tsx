@@ -61,6 +61,22 @@ interface PropertyOption {
   suburb: string;
 }
 
+interface PropertyInspection {
+  id: string;
+  tenancy_id: string;
+  inspection_type: 'entry' | 'routine' | 'exit';
+  scheduled_date: string;
+  status: 'scheduled' | 'completed' | 'cancelled';
+  notice_sent_at: string | null;
+}
+
+interface SuggestedInspection {
+  type: 'entry' | 'routine' | 'exit';
+  label: string;
+  date: string;
+  selected: boolean;
+}
+
 const BOND_AUTHORITIES = [
   'RTBA (VIC)',
   'NSW Fair Trading',

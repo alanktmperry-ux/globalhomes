@@ -369,7 +369,93 @@ const RentRollPage = () => {
     if (navigateAfter && data?.id) navigate(`/dashboard/inspection/${data.id}`);
   };
 
-  const inspectionTypeBadge = (type: string) => {
+  const buildSuggestedSchedule = (leaseStart: string, leaseEnd: string): SuggestedInspection[] => {
+    const start = parseISO(leaseStart);
+    const end = parseISO(leaseEnd);
+    const suggestions: SuggestedInspection[] = [
+      { type: 'entry', label: 'Entry Inspection', date: leaseStart, selected: true },
+      { type: 'routine', label: 'Routine — 3 months', date: format(addMonths(start, 3), 'yyyy-MM-dd'), selected: true },
+    ];
+    let nextDate = addMonths(start, 9);
+    let routineCount = 2;
+    while (nextDate < end) {
+      suggestions.push({
+        type: 'routine',
+        label: `Routine — ${routineCount * 6} months`,
+        date: format(nextDate, 'yyyy-MM-dd'),
+        selected: true,
+      });
+      nextDate = addMonths(nextDate, 6);
+      routineCount++;
+    }
+    suggestions.push({ type: 'exit', label: 'Exit Inspection', date: leaseEnd, selected: false });
+    return suggestions;
+  };
+
+  const handleOpenBulkInspections = async (t: Tenancy) => {
+    setBulkInspectionTenancy(t);
+    setLoadingBulkInspections(true);
+    setShowBulkInspectionModal(true);
+    setInspectionNotes('');
+
+    const { data: agent } = await supabase.from('agents').select('id, name').eq('user_id', user?.id || '').maybeSingle();
+    if (agent) setBulkAgentName(agent.name || '');
+
+    const { data: existing } = await supabase
+      .from('property_inspections' as any)
+      .select('*')
+      .eq('tenancy_id', t.id)
+      .order('scheduled_date', { ascending: true }) as any;
+
+    setExistingInspections(existing || []);
+    setSuggestedInspections(buildSuggestedSchedule(t.lease_start, t.lease_end));
+    setLoadingBulkInspections(false);
+  };
+
+  const handleSaveBulkInspections = async () => {
+    if (!bulkInspectionTenancy || !agentId) return;
+    setSavingBulkInspections(true);
+    const toCreate = suggestedInspections.filter(s => s.selected);
+    const addr = bulkInspectionTenancy.properties?.address || 'the property';
+    const fullAddr = `${addr}${bulkInspectionTenancy.properties?.suburb ? ', ' + bulkInspectionTenancy.properties.suburb : ''}`;
+    const noticeDays = 7;
+
+    for (const s of toCreate) {
+      await supabase.from('property_inspections' as any).insert({
+        tenancy_id: bulkInspectionTenancy.id,
+        property_id: bulkInspectionTenancy.property_id,
+        agent_id: agentId,
+        inspection_type: s.type,
+        scheduled_date: s.date,
+        status: 'scheduled',
+        notes: inspectionNotes || null,
+        notice_sent_at: bulkInspectionTenancy.tenant_email ? new Date().toISOString() : null,
+      } as any);
+
+      if (bulkInspectionTenancy.tenant_email) {
+        await supabase.functions.invoke('send-notification-email', {
+          body: {
+            type: 'inspection_notice',
+            recipient_email: bulkInspectionTenancy.tenant_email,
+            tenant_name: bulkInspectionTenancy.tenant_name,
+            property_address: fullAddr,
+            inspection_type: s.type,
+            scheduled_date: format(parseISO(s.date), 'EEEE, d MMMM yyyy'),
+            agent_name: bulkAgentName,
+            notice_days: noticeDays,
+          },
+        });
+      }
+    }
+
+    toast.success(`${toCreate.length} inspection${toCreate.length !== 1 ? 's' : ''} scheduled${bulkInspectionTenancy.tenant_email ? ' — tenant notified by email' : ''}`);
+    setSavingBulkInspections(false);
+    setShowBulkInspectionModal(false);
+    setSuggestedInspections([]);
+    // Refresh inline inspections if expanded
+    setInspections(prev => { const copy = { ...prev }; delete copy[bulkInspectionTenancy.id]; return copy; });
+  };
+
     const colors: Record<string, string> = {
       entry: 'bg-blue-500/15 text-blue-700',
       routine: 'bg-violet-500/15 text-violet-700',

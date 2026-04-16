@@ -1124,6 +1124,110 @@ const RentRollPage = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Bulk Inspection Scheduling Modal */}
+      <Dialog open={showBulkInspectionModal} onOpenChange={(open) => { if (!open) setShowBulkInspectionModal(false); }}>
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Routine Inspections — {bulkInspectionTenancy?.properties?.address}</DialogTitle>
+          </DialogHeader>
+
+          {loadingBulkInspections ? (
+            <div className="flex justify-center py-8"><Loader2 className="animate-spin text-primary" size={24} /></div>
+          ) : (
+            <div className="space-y-4">
+              {/* Australian standard notice */}
+              <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-primary/5 border border-primary/10">
+                <AlertTriangle size={14} className="text-primary shrink-0 mt-0.5" />
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  AU Standard: Entry inspection on move-in, routine at 3 months, then every 6 months thereafter. 7 days minimum notice required (VIC: 48 hrs, QLD: 24 hrs). Dates can be adjusted before saving.
+                </p>
+              </div>
+
+              {/* Existing inspections */}
+              {existingInspections.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-foreground">Existing Schedule</p>
+                  <div className="space-y-1">
+                    {existingInspections.map(ins => (
+                      <div key={ins.id} className="flex items-center justify-between rounded-lg border bg-muted/30 p-2 text-sm">
+                        <div className="flex items-center gap-2">
+                          <span className="capitalize font-medium">{ins.inspection_type} Inspection</span>
+                          <span className="text-muted-foreground">{format(parseISO(ins.scheduled_date), 'd MMM yyyy')}</span>
+                        </div>
+                        <Badge variant="outline" className="text-[10px] capitalize">{ins.status}</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Suggested inspections to add */}
+              <div className="space-y-2">
+                <p className="text-sm font-semibold text-foreground">
+                  {existingInspections.length > 0 ? 'Add More Inspections' : 'Suggested Inspection Schedule'}
+                </p>
+                <div className="space-y-2">
+                  {suggestedInspections.map((s, i) => (
+                    <div key={i} className="flex items-center gap-3 rounded-lg border p-2">
+                      <input
+                        type="checkbox"
+                        checked={s.selected}
+                        onChange={(e) => setSuggestedInspections(prev => prev.map((x, xi) => xi === i ? { ...x, selected: (e.target as HTMLInputElement).checked } : x))}
+                        className="h-4 w-4 rounded"
+                      />
+                      <div className="flex-1 flex items-center gap-2">
+                        <span className="text-sm font-medium min-w-[140px]">{s.label}</span>
+                        <Input
+                          type="date"
+                          value={s.date}
+                          onChange={(e) => setSuggestedInspections(prev => prev.map((x, xi) => xi === i ? { ...x, date: e.target.value } : x))}
+                          className="h-7 text-xs"
+                          disabled={!s.selected}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div>
+                <Label className="text-sm">Notes (optional — appears on all selected inspections)</Label>
+                <Textarea
+                  value={inspectionNotes}
+                  onChange={(e) => setInspectionNotes(e.target.value)}
+                  placeholder="e.g. Please ensure back gate is unlocked"
+                  className="mt-1 text-sm h-16 resize-none"
+                />
+              </div>
+
+              {/* Tenant notice info */}
+              {bulkInspectionTenancy?.tenant_email ? (
+                <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                  ✓ Inspection notice emails will be sent to {bulkInspectionTenancy.tenant_email} for each selected inspection.
+                </p>
+              ) : (
+                <p className="text-xs text-amber-600 dark:text-amber-400">
+                  ⚠️ No tenant email on record — inspections will be saved but no email notice will be sent.
+                </p>
+              )}
+
+              <div className="flex gap-2">
+                <Button variant="outline" className="flex-1" onClick={() => setShowBulkInspectionModal(false)}>Cancel</Button>
+                <Button
+                  className="flex-1"
+                  onClick={handleSaveBulkInspections}
+                  disabled={savingBulkInspections || suggestedInspections.filter(s => s.selected).length === 0}
+                >
+                  {savingBulkInspections ? <Loader2 className="animate-spin mr-2" size={14} /> : null}
+                  Save {suggestedInspections.filter(s => s.selected).length} Inspection{suggestedInspections.filter(s => s.selected).length !== 1 ? 's' : ''}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

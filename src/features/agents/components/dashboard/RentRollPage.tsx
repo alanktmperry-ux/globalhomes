@@ -456,6 +456,7 @@ const RentRollPage = () => {
     setInspections(prev => { const copy = { ...prev }; delete copy[bulkInspectionTenancy.id]; return copy; });
   };
 
+  const inspectionTypeBadge = (type: string) => {
     const colors: Record<string, string> = {
       entry: 'bg-blue-500/15 text-blue-700',
       routine: 'bg-violet-500/15 text-violet-700',

@@ -17,7 +17,9 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import DashboardHeader from './DashboardHeader';
-import { addDays, differenceInDays, differenceInMonths, format, parseISO } from 'date-fns';
+import { addDays, addMonths, differenceInDays, differenceInMonths, format, parseISO } from 'date-fns';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface Tenancy {
   id: string;
@@ -57,6 +59,22 @@ interface PropertyOption {
   id: string;
   address: string;
   suburb: string;
+}
+
+interface PropertyInspection {
+  id: string;
+  tenancy_id: string;
+  inspection_type: 'entry' | 'routine' | 'exit';
+  scheduled_date: string;
+  status: 'scheduled' | 'completed' | 'cancelled';
+  notice_sent_at: string | null;
+}
+
+interface SuggestedInspection {
+  type: 'entry' | 'routine' | 'exit';
+  label: string;
+  date: string;
+  selected: boolean;
 }
 
 const BOND_AUTHORITIES = [
@@ -103,6 +121,14 @@ const RentRollPage = () => {
   const [showScheduleModal, setShowScheduleModal] = useState<Tenancy | null>(null);
   const [scheduleForm, setScheduleForm] = useState({ inspection_type: 'routine', scheduled_date: undefined as Date | undefined, owner_name: '', owner_email: '', bond_lodgment_number: '' });
   const [scheduleSaving, setScheduleSaving] = useState(false);
+  const [showBulkInspectionModal, setShowBulkInspectionModal] = useState(false);
+  const [bulkInspectionTenancy, setBulkInspectionTenancy] = useState<Tenancy | null>(null);
+  const [existingInspections, setExistingInspections] = useState<PropertyInspection[]>([]);
+  const [suggestedInspections, setSuggestedInspections] = useState<SuggestedInspection[]>([]);
+  const [inspectionNotes, setInspectionNotes] = useState('');
+  const [loadingBulkInspections, setLoadingBulkInspections] = useState(false);
+  const [savingBulkInspections, setSavingBulkInspections] = useState(false);
+  const [bulkAgentName, setBulkAgentName] = useState('');
 
   const [form, setForm] = useState({
     property_id: '',
@@ -341,6 +367,93 @@ const RentRollPage = () => {
     setShowScheduleModal(null);
     setScheduleForm({ inspection_type: 'routine', scheduled_date: undefined, owner_name: '', owner_email: '', bond_lodgment_number: '' });
     if (navigateAfter && data?.id) navigate(`/dashboard/inspection/${data.id}`);
+  };
+
+  const buildSuggestedSchedule = (leaseStart: string, leaseEnd: string): SuggestedInspection[] => {
+    const start = parseISO(leaseStart);
+    const end = parseISO(leaseEnd);
+    const suggestions: SuggestedInspection[] = [
+      { type: 'entry', label: 'Entry Inspection', date: leaseStart, selected: true },
+      { type: 'routine', label: 'Routine — 3 months', date: format(addMonths(start, 3), 'yyyy-MM-dd'), selected: true },
+    ];
+    let nextDate = addMonths(start, 9);
+    let routineCount = 2;
+    while (nextDate < end) {
+      suggestions.push({
+        type: 'routine',
+        label: `Routine — ${routineCount * 6} months`,
+        date: format(nextDate, 'yyyy-MM-dd'),
+        selected: true,
+      });
+      nextDate = addMonths(nextDate, 6);
+      routineCount++;
+    }
+    suggestions.push({ type: 'exit', label: 'Exit Inspection', date: leaseEnd, selected: false });
+    return suggestions;
+  };
+
+  const handleOpenBulkInspections = async (t: Tenancy) => {
+    setBulkInspectionTenancy(t);
+    setLoadingBulkInspections(true);
+    setShowBulkInspectionModal(true);
+    setInspectionNotes('');
+
+    const { data: agent } = await supabase.from('agents').select('id, name').eq('user_id', user?.id || '').maybeSingle();
+    if (agent) setBulkAgentName(agent.name || '');
+
+    const { data: existing } = await supabase
+      .from('property_inspections' as any)
+      .select('*')
+      .eq('tenancy_id', t.id)
+      .order('scheduled_date', { ascending: true }) as any;
+
+    setExistingInspections(existing || []);
+    setSuggestedInspections(buildSuggestedSchedule(t.lease_start, t.lease_end));
+    setLoadingBulkInspections(false);
+  };
+
+  const handleSaveBulkInspections = async () => {
+    if (!bulkInspectionTenancy || !agentId) return;
+    setSavingBulkInspections(true);
+    const toCreate = suggestedInspections.filter(s => s.selected);
+    const addr = bulkInspectionTenancy.properties?.address || 'the property';
+    const fullAddr = `${addr}${bulkInspectionTenancy.properties?.suburb ? ', ' + bulkInspectionTenancy.properties.suburb : ''}`;
+    const noticeDays = 7;
+
+    for (const s of toCreate) {
+      await supabase.from('property_inspections' as any).insert({
+        tenancy_id: bulkInspectionTenancy.id,
+        property_id: bulkInspectionTenancy.property_id,
+        agent_id: agentId,
+        inspection_type: s.type,
+        scheduled_date: s.date,
+        status: 'scheduled',
+        notes: inspectionNotes || null,
+        notice_sent_at: bulkInspectionTenancy.tenant_email ? new Date().toISOString() : null,
+      } as any);
+
+      if (bulkInspectionTenancy.tenant_email) {
+        await supabase.functions.invoke('send-notification-email', {
+          body: {
+            type: 'inspection_notice',
+            recipient_email: bulkInspectionTenancy.tenant_email,
+            tenant_name: bulkInspectionTenancy.tenant_name,
+            property_address: fullAddr,
+            inspection_type: s.type,
+            scheduled_date: format(parseISO(s.date), 'EEEE, d MMMM yyyy'),
+            agent_name: bulkAgentName,
+            notice_days: noticeDays,
+          },
+        });
+      }
+    }
+
+    toast.success(`${toCreate.length} inspection${toCreate.length !== 1 ? 's' : ''} scheduled${bulkInspectionTenancy.tenant_email ? ' — tenant notified by email' : ''}`);
+    setSavingBulkInspections(false);
+    setShowBulkInspectionModal(false);
+    setSuggestedInspections([]);
+    // Refresh inline inspections if expanded
+    setInspections(prev => { const copy = { ...prev }; delete copy[bulkInspectionTenancy.id]; return copy; });
   };
 
   const inspectionTypeBadge = (type: string) => {
@@ -636,6 +749,14 @@ const RentRollPage = () => {
                                       Chase
                                     </Button>
                                   )}
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-[10px] h-7"
+                                    onClick={(e) => { e.stopPropagation(); handleOpenBulkInspections(t); }}
+                                  >
+                                    <Calendar size={12} className="mr-1" /> Schedule All
+                                  </Button>
                                   <Button
                                     variant="ghost"
                                     size="sm"
@@ -1001,6 +1122,110 @@ const RentRollPage = () => {
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Inspection Scheduling Modal */}
+      <Dialog open={showBulkInspectionModal} onOpenChange={(open) => { if (!open) setShowBulkInspectionModal(false); }}>
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Routine Inspections — {bulkInspectionTenancy?.properties?.address}</DialogTitle>
+          </DialogHeader>
+
+          {loadingBulkInspections ? (
+            <div className="flex justify-center py-8"><Loader2 className="animate-spin text-primary" size={24} /></div>
+          ) : (
+            <div className="space-y-4">
+              {/* Australian standard notice */}
+              <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-primary/5 border border-primary/10">
+                <AlertTriangle size={14} className="text-primary shrink-0 mt-0.5" />
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  AU Standard: Entry inspection on move-in, routine at 3 months, then every 6 months thereafter. 7 days minimum notice required (VIC: 48 hrs, QLD: 24 hrs). Dates can be adjusted before saving.
+                </p>
+              </div>
+
+              {/* Existing inspections */}
+              {existingInspections.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-foreground">Existing Schedule</p>
+                  <div className="space-y-1">
+                    {existingInspections.map(ins => (
+                      <div key={ins.id} className="flex items-center justify-between rounded-lg border bg-muted/30 p-2 text-sm">
+                        <div className="flex items-center gap-2">
+                          <span className="capitalize font-medium">{ins.inspection_type} Inspection</span>
+                          <span className="text-muted-foreground">{format(parseISO(ins.scheduled_date), 'd MMM yyyy')}</span>
+                        </div>
+                        <Badge variant="outline" className="text-[10px] capitalize">{ins.status}</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Suggested inspections to add */}
+              <div className="space-y-2">
+                <p className="text-sm font-semibold text-foreground">
+                  {existingInspections.length > 0 ? 'Add More Inspections' : 'Suggested Inspection Schedule'}
+                </p>
+                <div className="space-y-2">
+                  {suggestedInspections.map((s, i) => (
+                    <div key={i} className="flex items-center gap-3 rounded-lg border p-2">
+                      <input
+                        type="checkbox"
+                        checked={s.selected}
+                        onChange={(e) => setSuggestedInspections(prev => prev.map((x, xi) => xi === i ? { ...x, selected: (e.target as HTMLInputElement).checked } : x))}
+                        className="h-4 w-4 rounded"
+                      />
+                      <div className="flex-1 flex items-center gap-2">
+                        <span className="text-sm font-medium min-w-[140px]">{s.label}</span>
+                        <Input
+                          type="date"
+                          value={s.date}
+                          onChange={(e) => setSuggestedInspections(prev => prev.map((x, xi) => xi === i ? { ...x, date: e.target.value } : x))}
+                          className="h-7 text-xs"
+                          disabled={!s.selected}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div>
+                <Label className="text-sm">Notes (optional — appears on all selected inspections)</Label>
+                <Textarea
+                  value={inspectionNotes}
+                  onChange={(e) => setInspectionNotes(e.target.value)}
+                  placeholder="e.g. Please ensure back gate is unlocked"
+                  className="mt-1 text-sm h-16 resize-none"
+                />
+              </div>
+
+              {/* Tenant notice info */}
+              {bulkInspectionTenancy?.tenant_email ? (
+                <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                  ✓ Inspection notice emails will be sent to {bulkInspectionTenancy.tenant_email} for each selected inspection.
+                </p>
+              ) : (
+                <p className="text-xs text-amber-600 dark:text-amber-400">
+                  ⚠️ No tenant email on record — inspections will be saved but no email notice will be sent.
+                </p>
+              )}
+
+              <div className="flex gap-2">
+                <Button variant="outline" className="flex-1" onClick={() => setShowBulkInspectionModal(false)}>Cancel</Button>
+                <Button
+                  className="flex-1"
+                  onClick={handleSaveBulkInspections}
+                  disabled={savingBulkInspections || suggestedInspections.filter(s => s.selected).length === 0}
+                >
+                  {savingBulkInspections ? <Loader2 className="animate-spin mr-2" size={14} /> : null}
+                  Save {suggestedInspections.filter(s => s.selected).length} Inspection{suggestedInspections.filter(s => s.selected).length !== 1 ? 's' : ''}
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

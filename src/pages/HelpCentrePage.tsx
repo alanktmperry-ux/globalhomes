@@ -12,7 +12,7 @@ const categories = [
   { title: 'Buyers', description: 'Searching, saving, open homes, auctions, and finance tools', icon: 'Home', href: '/help/buyers' },
   { title: 'Renters', description: 'Finding rentals, applying, tracking applications', icon: 'Key', href: '/help/renters' },
   { title: 'Vendors', description: 'Performance reports, auctions, and documents', icon: 'BarChart3', href: '/help/vendors' },
-  { title: 'Property Managers', description: 'Rent roll, inspections, condition reports, and arrears', icon: 'ClipboardCheck', href: '/help/agents' },
+  { title: 'Property Managers', description: 'Rent roll, inspections, arrears, and tenant communications', icon: 'ClipboardList', href: '/help/agents' },
 ];
 
 const popularArticles = [
@@ -24,6 +24,8 @@ const popularArticles = [
   { question: 'How do I track my vendor performance report?', id: 'vendor-report' },
   { question: 'How do I conduct a property inspection and condition report?', id: 'agent-inspection-reports' },
   { question: 'How does voice search work?', id: 'buyer-voice-search' },
+  { question: 'How does routine inspection scheduling work?', id: 'agent-inspection-schedule' },
+  { question: 'What notice do I need to give a tenant before an inspection?', id: 'agent-inspection-notice' },
 ];
 
 export default function HelpCentrePage() {

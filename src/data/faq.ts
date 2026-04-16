@@ -50,6 +50,13 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: 'general',
     tags: ['password', 'login', 'account'],
   },
+  {
+    id: 'general-mobile-app',
+    question: 'Is there a mobile app for ListHQ?',
+    answer: 'ListHQ is available as a Progressive Web App (PWA) — you can install it directly from your browser without going to the App Store or Google Play.\n\nTo install on iPhone/iPad: open ListHQ in Safari, tap the Share button, then tap "Add to Home Screen".\n\nTo install on Android: open ListHQ in Chrome, tap the three-dot menu, then tap "Add to Home Screen" or "Install App".\n\nOnce installed, ListHQ works like a native app — it opens full screen, works offline for recently viewed content, and can be found on your home screen. This works for both agents and buyers. A dedicated App Store app is on the roadmap.',
+    category: 'general',
+    tags: ['mobile', 'app', 'PWA', 'install', 'iPhone', 'Android', 'home screen'],
+  },
 
   // AGENTS
   {
@@ -269,6 +276,41 @@ export const FAQ_ITEMS: FaqItem[] = [
     answer: 'The Rent Roll automatically calculates arrears for each tenancy based on the rent amount, frequency, and payment records.\n\nIn the Rent Roll table, tenancies with overdue rent show an orange "Arrears" badge with the number of days overdue and estimated amount owed.\n\nTo chase arrears:\n• Click the "Chase" button on the arrears badge to send an automated arrears notice directly to the tenant\'s email. The email states the property address, amount overdue, and your contact details.\n• For lease expiry reminders, click "Notify" on any tenancy approaching its end date to send the tenant a formal renewal notice.\n\nAll notices are sent from ListHQ\'s email system and logged against the tenancy record. For formal legal notices (breach notices, Notice to Vacate), use your state tenancy authority\'s prescribed forms — ListHQ notices are a courtesy first step.',
     category: 'agents',
     tags: ['arrears', 'rent overdue', 'chase', 'tenant notice', 'property management', 'lease expiry'],
+  },
+  {
+    id: 'agent-inspection-schedule',
+    question: 'How does routine inspection scheduling work?',
+    answer: 'From your Rent Roll (Dashboard → Rent Roll), click the "Inspections" button on any tenancy row. The system automatically suggests an Australian-standard inspection schedule based on the lease start date:\n\n• Entry Inspection — on the move-in date\n• Routine at 3 months — first check after the tenant moves in\n• Routine every 6 months thereafter — ongoing throughout the tenancy\n• Exit Inspection — on the lease end date (optional, can be added when needed)\n\nAll dates are fully editable before saving. You can also check or uncheck individual inspections to schedule only what you need. Once you click "Save Inspections", the selected inspections are created and the tenant receives a formal inspection notice email for each scheduled date.',
+    category: 'agents',
+    tags: ['inspection', 'routine inspection', 'schedule', 'property management', 'tenant notice'],
+  },
+  {
+    id: 'agent-inspection-notice',
+    question: 'What notice do I need to give a tenant before a routine inspection?',
+    answer: 'Minimum notice requirements for routine inspections vary by state under Australian tenancy law:\n\n• NSW — minimum 7 days notice, maximum 4 inspections per year\n• VIC — minimum 48 hours notice, maximum 1 inspection per 6 months\n• QLD — minimum 24 hours notice, maximum 4 inspections per year\n• WA — minimum 7 days notice, maximum 4 inspections per year\n• SA — minimum 7 days notice, maximum 4 inspections per year\n• TAS — minimum 24 hours notice\n• ACT — minimum 7 days notice, maximum 4 inspections per year\n• NT — minimum 24 hours notice\n\nWhen you schedule an inspection in ListHQ, a formal inspection notice email is automatically sent to the tenant\'s email address on record. The email includes the property address, inspection type, scheduled date, and your name as property manager. Always schedule inspections far enough in advance to meet your state\'s minimum notice requirements.',
+    category: 'agents',
+    tags: ['inspection notice', 'tenant', 'notice period', 'routine inspection', 'state law', 'NSW', 'VIC', 'QLD'],
+  },
+  {
+    id: 'agent-inspection-frequency',
+    question: 'How many routine inspections can I conduct per year?',
+    answer: 'Australian tenancy law limits the frequency of routine inspections to protect tenant privacy. The limits vary by state:\n\n• NSW — maximum 4 per year (every 3 months)\n• VIC — maximum 1 per 6-month period (most restrictive in Australia)\n• QLD — maximum 4 per year\n• WA — maximum 4 per year\n• SA — maximum 4 per year\n• ACT — maximum 4 per year\n• TAS and NT — no legislated maximum, but inspections must be reasonable\n\nListHQ\'s suggested inspection schedule follows best practice for all states — entry at move-in, a 3-month check, then 6-monthly thereafter. This complies with all state limits and is the industry standard for professional property managers. You can adjust the schedule to suit your state\'s specific requirements.',
+    category: 'agents',
+    tags: ['inspection frequency', 'routine inspection', 'per year', 'state limits', 'property management'],
+  },
+  {
+    id: 'agent-rent-arrears',
+    question: 'How do I chase rent arrears from the Rent Roll?',
+    answer: 'When a tenant is in arrears (their rent payment period has expired), the Rent Roll table shows an arrears badge in red with the number of days overdue and the estimated amount owed.\n\nTo send a formal arrears notice:\n1. Locate the tenancy in the Rent Roll table\n2. Click the "Chase" button that appears when the tenant is overdue\n3. A pre-drafted arrears notice email is sent to the tenant\'s email address with the amount owed and a request to bring the account up to date\n\nFor tenants significantly overdue (14+ days), the arrears badge turns red. Australian tenancy law specifies the required notice periods before you can issue a Notice to Vacate for non-payment of rent — consult your state\'s residential tenancy authority for breach and termination procedures.',
+    category: 'agents',
+    tags: ['arrears', 'rent arrears', 'overdue', 'chase', 'notice', 'property management'],
+  },
+  {
+    id: 'agent-lease-expiry',
+    question: 'How do I send a lease expiry reminder to a tenant?',
+    answer: 'Leases expiring within 60 days are flagged with an "Expiring soon" badge in the Rent Roll table. A "Notify" button appears next to those tenancies.\n\nClick "Notify" to send the tenant an automated email reminder that their lease is expiring, including the lease end date and how many days remain. The email prompts the tenant to contact you to discuss renewal options.\n\nFor lease renewals, you will need to issue a new lease agreement. This is done outside of ListHQ — consult your state\'s standard lease form or use your agency\'s documentation system.',
+    category: 'agents',
+    tags: ['lease expiry', 'renewal', 'notify tenant', 'expiring', 'rent roll'],
   },
 
   // BUYERS

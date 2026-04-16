@@ -93,7 +93,7 @@ Deno.serve(async (req) => {
       investment_niche: investmentNiche || null,
       handles_trust_accounting: handlesTrustAccounting === true,
       support_pin: supportPin,
-      approval_status: 'pending',
+      approval_status: 'approved',
     };
 
     if (mode === "create-agency") {

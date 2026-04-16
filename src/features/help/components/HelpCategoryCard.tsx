@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
-import { Building2, Home, Key, BarChart3, Hammer, CreditCard, HelpCircle, Settings, type LucideIcon } from 'lucide-react';
+import { Building2, Home, Key, BarChart3, Hammer, CreditCard, HelpCircle, Settings, ClipboardCheck, type LucideIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 
 const iconMap: Record<string, LucideIcon> = {
-  Building2, Home, Key, BarChart3, Hammer, CreditCard, HelpCircle, Settings,
+  Building2, Home, Key, BarChart3, Hammer, CreditCard, HelpCircle, Settings, ClipboardCheck,
 };
 
 interface Props {

@@ -121,6 +121,14 @@ const RentRollPage = () => {
   const [showScheduleModal, setShowScheduleModal] = useState<Tenancy | null>(null);
   const [scheduleForm, setScheduleForm] = useState({ inspection_type: 'routine', scheduled_date: undefined as Date | undefined, owner_name: '', owner_email: '', bond_lodgment_number: '' });
   const [scheduleSaving, setScheduleSaving] = useState(false);
+  const [showBulkInspectionModal, setShowBulkInspectionModal] = useState(false);
+  const [bulkInspectionTenancy, setBulkInspectionTenancy] = useState<Tenancy | null>(null);
+  const [existingInspections, setExistingInspections] = useState<PropertyInspection[]>([]);
+  const [suggestedInspections, setSuggestedInspections] = useState<SuggestedInspection[]>([]);
+  const [inspectionNotes, setInspectionNotes] = useState('');
+  const [loadingBulkInspections, setLoadingBulkInspections] = useState(false);
+  const [savingBulkInspections, setSavingBulkInspections] = useState(false);
+  const [bulkAgentName, setBulkAgentName] = useState('');
 
   const [form, setForm] = useState({
     property_id: '',

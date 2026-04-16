@@ -58,6 +58,13 @@ const AgentAuthPage = () => {
     }
   }, [pendingSignIn, captchaToken]);
 
+  // Redirect already-authenticated agents straight to the dashboard
+  useEffect(() => {
+    if (!authLoading && user && (isAgent || isAdmin) && !pendingRedirect) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [authLoading, user, isAgent, isAdmin, navigate, pendingRedirect]);
+
   // ── Handlers ──
   const handleEmailContinue = (e: React.FormEvent) => {
     e.preventDefault();

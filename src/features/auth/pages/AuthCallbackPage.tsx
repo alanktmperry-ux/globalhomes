@@ -32,11 +32,24 @@ const AuthCallbackPage = () => {
     };
 
     const checkOnboarding = async (userId: string) => {
+      // Check for agent role first — agents go to their dashboard
+      const { data: agentData } = await supabase
+        .from('agents')
+        .select('id')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (agentData) {
+        navigate('/dashboard', { replace: true });
+        return;
+      }
+
+      // Non-agent users — check if onboarding is complete
       const { data: profile } = await supabase
         .from('profiles')
         .select('onboarded')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
       if (profile && !profile.onboarded) {
         navigate('/onboarding/role', { replace: true });

@@ -750,6 +750,14 @@ const RentRollPage = () => {
                                     </Button>
                                   )}
                                   <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-[10px] h-7"
+                                    onClick={(e) => { e.stopPropagation(); handleOpenBulkInspections(t); }}
+                                  >
+                                    <Calendar size={12} className="mr-1" /> Schedule All
+                                  </Button>
+                                  <Button
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => navigate(`/dashboard/tenancies/${t.id}`)}

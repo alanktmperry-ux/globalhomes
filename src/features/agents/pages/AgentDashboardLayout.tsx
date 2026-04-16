@@ -7,7 +7,7 @@ import { useIsMobile } from '@/shared/hooks/use-mobile';
 import { NotificationBell } from '@/features/agents/components/dashboard/NotificationBell';
 import AgentDashboardSidebar from '@/features/agents/components/dashboard/AgentDashboardSidebar';
 import { PaymentStatusBanner } from '@/features/agents/components/PaymentStatusBanner';
-import { Clock, XCircle } from 'lucide-react';
+
 
 const AgentDashboardLayout = () => {
   const { user, impersonatedUserId } = useAuth();

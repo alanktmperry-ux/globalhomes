@@ -36,6 +36,8 @@ interface NotificationPayload {
   scheduled_date?: string;
   lease_end_date?: string;
   days_remaining?: string;
+  notice_days?: number;
+  tenant_name?: string;
 }
 
 async function sendViaResend(to: string, subject: string, html: string) {
@@ -157,8 +159,10 @@ Deno.serve(async (req) => {
 
     } else if (type === 'inspection_notice') {
       recipientEmail = payload.recipient_email || null;
-      const subject = payload.title || `Property Inspection Notice — ${payload.property_address || 'Your Rental'}`;
-      if (recipientEmail) await sendViaResend(recipientEmail, subject, buildInspectionNoticeHtml({ tenantName: payload.recipient_name || 'Tenant', propertyAddress: payload.property_address, inspectionType: payload.inspection_type, scheduledDate: payload.scheduled_date, agentName: payload.agent_name, agentPhone: payload.agent_phone }));
+      const tenantName = payload.tenant_name || payload.recipient_name || 'Tenant';
+      const typeLabel = payload.inspection_type === 'entry' ? 'Entry/Move-in' : payload.inspection_type === 'exit' ? 'Exit/Move-out' : 'Routine';
+      const subject = payload.title || `Inspection Notice — ${payload.property_address || 'Your Rental'}`;
+      if (recipientEmail) await sendViaResend(recipientEmail, subject, buildInspectionNoticeHtml({ tenantName, propertyAddress: payload.property_address, inspectionType: typeLabel, scheduledDate: payload.scheduled_date, agentName: payload.agent_name || 'Your Property Manager', agentPhone: payload.agent_phone, noticeDays: payload.notice_days || 7 }));
       return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     } else if (type === 'lease_expiry') {
@@ -551,36 +555,42 @@ function buildInspectionReportHtml(params: { recipientName: string; propertyAddr
 }
 
 // ── Inspection notice to tenant ──
-function buildInspectionNoticeHtml(params: { tenantName: string; propertyAddress?: string; inspectionType?: string; scheduledDate?: string; agentName?: string; agentPhone?: string }) {
-  const { tenantName, propertyAddress, inspectionType, scheduledDate, agentName, agentPhone } = params;
-  const typeLabel = inspectionType ? inspectionType.charAt(0).toUpperCase() + inspectionType.slice(1) : 'Property';
+function buildInspectionNoticeHtml(params: { tenantName: string; propertyAddress?: string; inspectionType?: string; scheduledDate?: string; agentName?: string; agentPhone?: string; noticeDays?: number }) {
+  const { tenantName, propertyAddress, inspectionType, scheduledDate, agentName, agentPhone, noticeDays = 7 } = params;
+  const typeLabel = inspectionType || 'Property';
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
 <body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
 <div style="max-width:560px;margin:0 auto;padding:32px 20px;">
   <div style="text-align:center;margin-bottom:32px;">
     <div style="font-size:24px;font-weight:700;color:#1a1a2e;">ListHQ</div>
-    <div style="font-size:12px;color:#888;margin-top:4px;">Inspection Notice</div>
+    <div style="font-size:12px;color:#888;margin-top:4px;">Property Management</div>
   </div>
   <div style="background:#fefce8;border:1px solid #fde68a;border-radius:12px;padding:12px 16px;text-align:center;margin-bottom:24px;">
-    <span style="font-size:14px;font-weight:600;color:#ca8a04;">🔍 ${typeLabel} Inspection Notice</span>
+    <span style="font-size:14px;font-weight:600;color:#ca8a04;">🏠 Inspection Notice — ${noticeDays} Days Notice</span>
   </div>
   <p style="font-size:15px;color:#333;margin:0 0 16px;">Dear ${tenantName},</p>
-  <p style="font-size:15px;color:#333;margin:0 0 16px;">This is to formally notify you that a <strong>${typeLabel.toLowerCase()} inspection</strong> has been scheduled for your rental property${propertyAddress ? ` at <strong>${propertyAddress}</strong>` : ''}.</p>
-  ${scheduledDate ? `<div style="background:#f8f9fa;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-bottom:24px;text-align:center;">
-    <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Scheduled Date</div>
-    <div style="font-size:20px;font-weight:700;color:#1a1a2e;">${scheduledDate}</div>
-  </div>` : ''}
-  <p style="font-size:15px;color:#333;margin:0 0 16px;">This notice is provided in accordance with the requirements of Australian residential tenancy legislation. Please ensure access is available at the scheduled time.</p>
-  <p style="font-size:15px;color:#333;margin:0 0 24px;">If you are unable to be present, no further action is required — the inspection will proceed as scheduled. If you need to discuss alternative arrangements, please contact your property manager.</p>
-  ${agentName || agentPhone ? `<div style="background:#f8f9fa;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-bottom:24px;">
-    <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Your Property Manager</div>
+  <p style="font-size:15px;color:#333;margin:0 0 16px;">This is formal notice that a <strong>${typeLabel} Inspection</strong> has been scheduled for your property.</p>
+  <div style="background:#f8f9fa;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-bottom:24px;">
+    <table style="width:100%;border-collapse:collapse;">
+      <tr><td style="padding:6px 0;font-size:13px;color:#888;width:120px;">Property</td><td style="padding:6px 0;font-size:14px;color:#333;font-weight:500;">${propertyAddress || 'Your rental property'}</td></tr>
+      <tr><td style="padding:6px 0;font-size:13px;color:#888;">Inspection Type</td><td style="padding:6px 0;font-size:14px;color:#333;">${typeLabel} Inspection</td></tr>
+      ${scheduledDate ? `<tr><td style="padding:6px 0;font-size:13px;color:#888;">Scheduled Date</td><td style="padding:6px 0;font-size:14px;color:#333;font-weight:600;">${scheduledDate}</td></tr>` : ''}
+      ${agentName ? `<tr><td style="padding:6px 0;font-size:13px;color:#888;">Property Manager</td><td style="padding:6px 0;font-size:14px;color:#333;">${agentName}</td></tr>` : ''}
+    </table>
+  </div>
+  <p style="font-size:15px;color:#333;margin:0 0 16px;">You are not required to be present during the inspection, however you are welcome to be there. Please ensure reasonable access is provided.</p>
+  <p style="font-size:15px;color:#333;margin:0 0 24px;">If this date is inconvenient, please contact your property manager as soon as possible to arrange an alternative time.</p>
+  ${agentPhone ? `<div style="background:#f8f9fa;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-bottom:24px;">
+    <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Contact</div>
     ${agentName ? `<div style="font-size:14px;color:#333;font-weight:500;">${agentName}</div>` : ''}
-    ${agentPhone ? `<div style="font-size:14px;margin-top:4px;"><a href="tel:${agentPhone}" style="color:#3B82F6;text-decoration:none;">${agentPhone}</a></div>` : ''}
+    <div style="font-size:14px;margin-top:4px;"><a href="tel:${agentPhone}" style="color:#3B82F6;text-decoration:none;">${agentPhone}</a></div>
   </div>` : ''}
+  <div style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;margin-bottom:24px;">
+    <p style="font-size:12px;color:#92400e;margin:0;">This is an official inspection notice issued under the Residential Tenancies Act.</p>
+  </div>
   <div style="border-top:1px solid #eee;padding-top:20px;margin-top:32px;text-align:center;">
-    <p style="font-size:11px;color:#aaa;margin:0;">This is an official notice issued via ListHQ on behalf of your property manager.</p>
-    <p style="font-size:11px;color:#aaa;margin:4px 0 0;">© ListHQ Pty Ltd · Melbourne, Victoria, Australia</p>
+    <p style="font-size:11px;color:#aaa;margin:0;">© ListHQ Pty Ltd · Property Management Platform</p>
   </div>
 </div>
 </body></html>`;

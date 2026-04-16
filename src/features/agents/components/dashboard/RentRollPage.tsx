@@ -17,7 +17,9 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import DashboardHeader from './DashboardHeader';
-import { addDays, differenceInDays, differenceInMonths, format, parseISO } from 'date-fns';
+import { addDays, addMonths, differenceInDays, differenceInMonths, format, parseISO } from 'date-fns';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface Tenancy {
   id: string;

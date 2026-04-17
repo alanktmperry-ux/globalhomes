@@ -37,6 +37,8 @@ type OtherDeduction = { label: string; amount: number };
 
 export default function OwnerStatementsPage() {
   const agentId = useAgentId();
+  const [searchParams] = useSearchParams();
+  const filterPropertyId = searchParams.get('property_id');
   const [properties, setProperties] = useState<Property[]>([]);
   const [statements, setStatements] = useState<Statement[]>([]);
   const [loading, setLoading] = useState(true);

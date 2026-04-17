@@ -144,15 +144,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!user) return;
     lastFetchedUserId.current = null;
     setRolesFetched(false);
-    // Re-fetch roles inline
     const { data } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
     const roles = data?.map((r) => r.role) || [];
-    applyRoles(roles);
     const { data: agentData } = await supabase
       .from('agents')
-      .select('agency_role, agency_id')
+      .select('id, agency_role, agency_id')
       .eq('user_id', user.id)
       .maybeSingle();
+    if (agentData && !roles.includes('agent')) roles.push('agent');
+    applyRoles(roles, user.email);
     if (agentData) {
       setAgencyRole((agentData as any).agency_role || null);
       setAgencyId(agentData.agency_id || null);

@@ -183,7 +183,8 @@ const AgentDashboardSidebar = () => {
   const badgeValues: Record<string, string> = {
     listings: activeCount > 0 ? String(activeCount) : '',
     leads: '',
-    rentRoll: arrearsCount > 0 ? String(arrearsCount) : '',
+    arrears: arrearsCount > 0 ? String(arrearsCount) : '',
+    renewals: renewalsCount > 0 ? String(renewalsCount) : '',
   };
 
   const ACCOUNT_NAV: NavItem[] = [
@@ -205,10 +206,22 @@ const AgentDashboardSidebar = () => {
     navigate('/');
   };
 
-  const isActive = (path: string) =>
-    path === '/dashboard'
-      ? location.pathname === '/dashboard'
-      : location.pathname.startsWith(path);
+  const isActive = (path: string) => {
+    if (path === '/dashboard') return location.pathname === '/dashboard';
+    // For URLs with query params, match both pathname and the filter query
+    if (path.includes('?')) {
+      const [p, qs] = path.split('?');
+      const params = new URLSearchParams(qs);
+      const filter = params.get('filter');
+      const currentFilter = new URLSearchParams(location.search).get('filter');
+      return location.pathname === p && currentFilter === filter;
+    }
+    // Plain rent-roll link should NOT match when a filter is active
+    if (path === '/dashboard/rent-roll') {
+      return location.pathname === '/dashboard/rent-roll' && !new URLSearchParams(location.search).get('filter');
+    }
+    return location.pathname.startsWith(path);
+  };
 
   const renderGroup = (label: string, items: NavItem[]) => (
     <SidebarGroup key={label}>
@@ -235,17 +248,31 @@ const AgentDashboardSidebar = () => {
                         : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                   }`}
                 >
-                  <item.icon size={16} className="shrink-0" />
+                  <item.icon
+                    size={16}
+                    className={`shrink-0 ${
+                      item.alertWhenBadge && item.badgeKey && badgeValues[item.badgeKey]
+                        ? 'text-amber-600'
+                        : ''
+                    }`}
+                  />
                   {!collapsed && (
                     <>
-                      <span className="flex-1 text-left">{item.title}</span>
+                      <span className={`flex-1 text-left ${
+                        item.alertWhenBadge && item.badgeKey && badgeValues[item.badgeKey]
+                          ? 'text-amber-700 dark:text-amber-400 font-medium'
+                          : ''
+                      }`}>{item.title}</span>
                       {item.comingSoon && (
                         <Badge variant="outline" className="text-[8px] px-1 py-0 h-4 border-muted-foreground/30 text-muted-foreground/50">
                           Soon
                         </Badge>
                       )}
                       {item.badgeKey && badgeValues[item.badgeKey] && (
-                        <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-5">
+                        <Badge
+                          variant={item.alertWhenBadge ? 'destructive' : 'secondary'}
+                          className="text-[10px] px-1.5 py-0 h-5"
+                        >
                           {badgeValues[item.badgeKey]}
                         </Badge>
                       )}

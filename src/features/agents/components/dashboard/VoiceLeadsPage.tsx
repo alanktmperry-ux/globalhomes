@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-import { Mic, Flame, Thermometer, Snowflake, Phone, MessageSquare, Mail, X, MapPin, Shield, Sparkles, Loader2 } from 'lucide-react';
+import { Mic, Flame, Thermometer, Snowflake, Phone, MessageSquare, Mail, X, MapPin, Shield, Sparkles, Loader2, UserPlus, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import DashboardHeader from './DashboardHeader';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { useSaveContact } from '@/features/agents/hooks/useSaveContact';
 import { formatDistanceToNow } from 'date-fns';
 
 /* ── Types ───────────────────────────────────────────────────── */
@@ -66,6 +67,7 @@ const URGENCY_CONFIG = {
 
 const VoiceLeadsPage = () => {
   const { user } = useAuth();
+  const { saveContact, isSaved, isSaving } = useSaveContact();
   const [leads, setLeads] = useState<VoiceLead[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -353,6 +355,29 @@ const VoiceLeadsPage = () => {
                         <Mail size={14} /> Email
                       </a>
                     </Button>
+                  )}
+                  {selected.userEmail && (
+                    isSaved(selected.id) ? (
+                      <Button size="sm" disabled className="gap-1.5 flex-1 min-w-[120px] bg-success hover:bg-success text-success-foreground disabled:opacity-100">
+                        <Check size={14} /> Saved
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="gap-1.5 flex-1 min-w-[120px]"
+                        disabled={isSaving(selected.id)}
+                        onClick={() => saveContact(selected.id, {
+                          name: selected.userName,
+                          email: selected.userEmail,
+                          phone: selected.userPhone,
+                          source: 'voice_lead',
+                        })}
+                      >
+                        {isSaving(selected.id) ? <Loader2 size={14} className="animate-spin" /> : <UserPlus size={14} />}
+                        Save to Contacts
+                      </Button>
+                    )
                   )}
                 </div>
               )}

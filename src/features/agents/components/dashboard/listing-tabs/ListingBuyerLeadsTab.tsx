@@ -6,8 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
-import { Flame, Thermometer, Snowflake, Phone, Mail, UserPlus, CheckCircle2, Loader2 } from 'lucide-react';
+import { Flame, Thermometer, Snowflake, Phone, Mail, UserPlus, CheckCircle2, Loader2, Check } from 'lucide-react';
 import { calcIntentScore, getIntentTier, INTENT_TOOLTIP } from '@/features/agents/lib/intentScore';
+import { useSaveContact } from '@/features/agents/hooks/useSaveContact';
 import { toast } from 'sonner';
 
 const AU_DATE = (d: string) => {
@@ -27,6 +28,7 @@ const URGENCY_MAP: Record<string, { icon: React.ReactNode; color: string; label:
 
 const ListingBuyerLeadsTab = ({ listing }: Props) => {
   const { user } = useAuth();
+  const { saveContact, isSaved, isSaving } = useSaveContact();
   const [leads, setLeads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [savingNote, setSavingNote] = useState<string | null>(null);
@@ -173,6 +175,28 @@ const ListingBuyerLeadsTab = ({ listing }: Props) => {
                     {l.message && <p className="text-xs text-muted-foreground mt-2 italic">"{l.message}"</p>}
                   </div>
                   <div className="flex items-center gap-2">
+                    {isSaved(l.id) ? (
+                      <Button size="sm" disabled className="gap-1.5 text-xs h-8 bg-success hover:bg-success text-success-foreground disabled:opacity-100">
+                        <Check size={12} /> Saved
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="gap-1.5 text-xs h-8"
+                        onClick={() => saveContact(l.id, {
+                          name: l.user_name,
+                          email: l.user_email,
+                          phone: l.user_phone,
+                          source: 'listing_enquiry',
+                          property_id: listing.id,
+                        })}
+                        disabled={isSaving(l.id) || !l.user_email}
+                      >
+                        {isSaving(l.id) ? <Loader2 size={12} className="animate-spin" /> : <UserPlus size={12} />}
+                        Save to Contacts
+                      </Button>
+                    )}
                     {isConverted ? (
                       <Badge className="bg-primary/15 text-primary border-0 text-[10px] gap-1">
                         <CheckCircle2 size={11} /> In Contacts

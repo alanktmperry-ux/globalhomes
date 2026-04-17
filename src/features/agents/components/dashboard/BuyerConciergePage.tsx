@@ -8,9 +8,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Bot, MapPin, DollarSign, BedDouble, Clock, AlertCircle, Sparkles, Archive, Mail, Phone, Home, ExternalLink, Trash2 } from 'lucide-react';
+import { Loader2, Bot, MapPin, DollarSign, BedDouble, Clock, AlertCircle, Sparkles, Archive, Mail, Phone, Home, ExternalLink, Trash2, UserPlus, Check } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import { useSaveContact } from '@/features/agents/hooks/useSaveContact';
 
 interface ConciergeLead {
   id: string;
@@ -33,6 +34,7 @@ interface ConciergeLead {
 
 const BuyerConciergePage = () => {
   const { user } = useAuth();
+  const { saveContact, isSaved, isSaving } = useSaveContact();
   const [leads, setLeads] = useState<ConciergeLead[]>([]);
   const [loading, setLoading] = useState(true);
   const [agentId, setAgentId] = useState<string | null>(null);
@@ -616,11 +618,34 @@ const BuyerConciergePage = () => {
                       <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2">
                         Contact buyer
                       </p>
-                      <Button variant="outline" size="sm" asChild>
-                        <a href={`mailto:${email}`}>
-                          <Mail size={14} /> {email}
-                        </a>
-                      </Button>
+                      <div className="flex flex-wrap gap-2">
+                        <Button variant="outline" size="sm" asChild>
+                          <a href={`mailto:${email}`}>
+                            <Mail size={14} /> {email}
+                          </a>
+                        </Button>
+                        {isSaved(selectedLead.id) ? (
+                          <Button size="sm" disabled className="gap-1.5 bg-success hover:bg-success text-success-foreground disabled:opacity-100">
+                            <Check size={14} /> Saved
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="gap-1.5"
+                            disabled={isSaving(selectedLead.id)}
+                            onClick={() => saveContact(selectedLead.id, {
+                              name: (selectedLead.search_context as any)?.user_name || email.split('@')[0],
+                              email,
+                              phone: (selectedLead.search_context as any)?.user_phone || null,
+                              source: 'ai_concierge',
+                            })}
+                          >
+                            {isSaving(selectedLead.id) ? <Loader2 size={14} className="animate-spin" /> : <UserPlus size={14} />}
+                            Save to Contacts
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </>
                 )}

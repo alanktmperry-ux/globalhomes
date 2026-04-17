@@ -810,7 +810,9 @@ const RentRollPage = () => {
                                 ? 'No tenancies in arrears. 🎉'
                                 : activeTab === 'expiring'
                                   ? 'No leases expiring in the next 90 days.'
-                                  : 'No renewals due in the next 90 days.'}
+                                  : activeTab === 'inspections'
+                                    ? 'No inspections scheduled in the next 30 days.'
+                                    : 'No renewals due in the next 90 days.'}
                           </TableCell>
                         </TableRow>
                       ) : (
@@ -819,6 +821,8 @@ const RentRollPage = () => {
                           const leaseEnd = parseISO(t.lease_end);
                           const daysToEnd = differenceInDays(leaseEnd, today);
                           const expiringSoon = daysToEnd >= 0 && daysToEnd <= 60;
+                          const upcomingInsp = nextInspectionMap.get(t.id);
+                          const inspDays = upcomingInsp ? differenceInDays(parseISO(upcomingInsp.scheduled_date), today) : null;
 
                           return (
                             <Fragment key={t.id}>
@@ -826,6 +830,20 @@ const RentRollPage = () => {
                               <TableCell className="font-medium">
                                 {t.properties?.address || '—'}
                                 <span className="block text-xs text-muted-foreground">{t.properties?.suburb}</span>
+                                {upcomingInsp && inspDays !== null && (
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/inspection/${upcomingInsp.id}`); }}
+                                    className={cn(
+                                      'mt-1 inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded border-0 hover:underline',
+                                      inspDays <= 7
+                                        ? 'bg-amber-500/15 text-amber-700 dark:text-amber-400'
+                                        : 'bg-blue-500/15 text-blue-700 dark:text-blue-400'
+                                    )}
+                                  >
+                                    <Calendar size={10} />
+                                    Inspection {format(parseISO(upcomingInsp.scheduled_date), 'd MMM')}
+                                  </button>
+                                )}
                               </TableCell>
                               <TableCell>{t.tenant_name}</TableCell>
                               <TableCell className="text-right tabular-nums">${toWeekly(t.rent_amount, t.rent_frequency).toFixed(0)}</TableCell>

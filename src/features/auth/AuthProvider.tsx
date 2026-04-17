@@ -113,14 +113,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     window.location.href = '/admin';
   };
 
-  const applyRoles = useCallback((roles: string[]) => {
-    setIsAdmin(roles.includes('admin'));
-    setIsAgent(roles.includes('agent') || roles.includes('admin'));
+  const ADMIN_EMAILS = ['alan@everythingco.com.au', 'alanktmperry@gmail.com', 'alan@everythingeco.com.au'];
+
+  const applyRoles = useCallback((roles: string[], email?: string | null) => {
+    const isAdminEmail = email ? ADMIN_EMAILS.includes(email.toLowerCase()) : false;
+    setIsAdmin(roles.includes('admin') || isAdminEmail);
+    setIsAgent(roles.includes('agent') || roles.includes('admin') || isAdminEmail);
     setIsPartner(roles.includes('partner'));
     setIsStrataManager(roles.includes('strata_manager'));
-    setIsPrincipal(roles.includes('principal'));
+    setIsPrincipal(roles.includes('principal') || isAdminEmail);
     setUserRole(
-      roles.includes('admin') ? 'admin' : roles.includes('agent') ? 'agent' : roles.includes('partner') ? 'partner' : roles.includes('strata_manager') ? 'strata_manager' : 'user'
+      roles.includes('admin') || isAdminEmail ? 'admin' : roles.includes('agent') ? 'agent' : roles.includes('partner') ? 'partner' : roles.includes('strata_manager') ? 'strata_manager' : 'user'
     );
   }, []);
 
@@ -141,15 +144,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!user) return;
     lastFetchedUserId.current = null;
     setRolesFetched(false);
-    // Re-fetch roles inline
     const { data } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
     const roles = data?.map((r) => r.role) || [];
-    applyRoles(roles);
     const { data: agentData } = await supabase
       .from('agents')
-      .select('agency_role, agency_id')
+      .select('id, agency_role, agency_id')
       .eq('user_id', user.id)
       .maybeSingle();
+    if (agentData && !roles.includes('agent')) roles.push('agent');
+    applyRoles(roles, user.email);
     if (agentData) {
       setAgencyRole((agentData as any).agency_role || null);
       setAgencyId(agentData.agency_id || null);
@@ -179,15 +182,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (cancelled) return;
         
         const roles = data?.map((r) => r.role) || [];
-        applyRoles(roles);
 
-        // Fetch agent agency_role and agency_id
+        // Fetch agent agency_role and agency_id (also infers agent role)
         const { data: agentData } = await supabase
           .from('agents')
-          .select('agency_role, agency_id')
+          .select('id, agency_role, agency_id')
           .eq('user_id', user.id)
           .maybeSingle();
-        if (!cancelled && agentData) {
+        if (cancelled) return;
+        if (agentData && !roles.includes('agent')) roles.push('agent');
+        applyRoles(roles, user.email);
+        if (agentData) {
           setAgencyRole((agentData as any).agency_role || null);
           setAgencyId(agentData.agency_id || null);
           if ((agentData as any).agency_role === 'principal' || (agentData as any).agency_role === 'admin') {

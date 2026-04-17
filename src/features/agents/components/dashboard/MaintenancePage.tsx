@@ -160,6 +160,17 @@ export default function MaintenancePage() {
 
   return (
     <div className="space-y-4">
+      <nav className="text-sm text-muted-foreground mb-2">
+        <span>Dashboard</span>
+        <span className="mx-2">→</span>
+        <span className="font-medium text-foreground">Maintenance</span>
+        {expanded && jobs.find(j => j.id === expanded) && (
+          <>
+            <span className="mx-2">→</span>
+            <span className="font-medium text-foreground">{jobs.find(j => j.id === expanded)?.title}</span>
+          </>
+        )}
+      </nav>
       <DashboardHeader title="Maintenance" subtitle="All maintenance jobs across your managed properties." />
 
       <div className="flex items-center gap-2 flex-wrap">
@@ -182,6 +193,7 @@ export default function MaintenancePage() {
                   <TableHead>Property</TableHead>
                   <TableHead>Tenant</TableHead>
                   <TableHead>Title</TableHead>
+                  <TableHead>Days open</TableHead>
                   <TableHead>Priority</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Assigned</TableHead>
@@ -190,14 +202,21 @@ export default function MaintenancePage() {
               </TableHeader>
               <TableBody>
                 {filtered.length === 0 ? (
-                  <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-10"><Wrench size={20} className="mx-auto mb-2 opacity-40"/>No jobs</TableCell></TableRow>
-                ) : filtered.map(j => (
+                  <TableRow><TableCell colSpan={9} className="text-center text-muted-foreground py-10"><Wrench size={20} className="mx-auto mb-2 opacity-40"/>No jobs</TableCell></TableRow>
+                ) : filtered.map(j => {
+                  const daysOpen = j.completed_at
+                    ? differenceInDays(parseISO(j.completed_at), parseISO(j.created_at))
+                    : differenceInDays(new Date(), parseISO(j.created_at));
+                  return (
                   <>
                     <TableRow key={j.id} className="cursor-pointer hover:bg-accent/40" onClick={() => setExpanded(expanded === j.id ? null : j.id)}>
                       <TableCell className="text-xs">{format(parseISO(j.created_at), 'd MMM')}</TableCell>
-                      <TableCell className="text-sm">{j.property_address || '—'}</TableCell>
+                      <TableCell className="text-sm font-medium">{j.property_address || '—'}</TableCell>
                       <TableCell className="text-sm">{j.tenant_name || '—'}</TableCell>
-                      <TableCell className="text-sm font-medium">{j.title}</TableCell>
+                      <TableCell className="text-sm">{j.title}</TableCell>
+                      <TableCell className={`text-xs font-medium ${!j.completed_at && daysOpen > 7 ? 'text-red-600' : !j.completed_at && daysOpen > 3 ? 'text-amber-600' : 'text-muted-foreground'}`}>
+                        {daysOpen}d
+                      </TableCell>
                       <TableCell>{priorityBadge(j.priority)}</TableCell>
                       <TableCell>{statusBadge(j.status)}</TableCell>
                       <TableCell className="text-sm">{j.supplier_name || j.assigned_to || <span className="text-muted-foreground">Unassigned</span>}</TableCell>
@@ -205,8 +224,24 @@ export default function MaintenancePage() {
                     </TableRow>
                     {expanded === j.id && (
                       <TableRow key={j.id + '-d'}>
-                        <TableCell colSpan={8} className="bg-accent/20 px-6 py-4">
+                        <TableCell colSpan={9} className="bg-accent/20 px-6 py-4">
                           <div className="space-y-3">
+                            <div className="flex flex-wrap items-center gap-3 text-xs pb-2 border-b border-border/50">
+                              {j.property_id && (
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/rent-roll?property=${j.property_id}`); }}
+                                  className="text-primary hover:underline font-medium"
+                                >
+                                  📍 {j.property_address || 'View property'}
+                                </button>
+                              )}
+                              {j.tenant_name && (
+                                <span className="text-muted-foreground">Tenant: <span className="text-foreground font-medium">{j.tenant_name}</span></span>
+                              )}
+                              <button onClick={(e) => { e.stopPropagation(); setExpanded(null); }} className="ml-auto text-muted-foreground hover:text-foreground">
+                                ← Back to Maintenance
+                              </button>
+                            </div>
                             {j.description && <p className="text-sm text-muted-foreground whitespace-pre-line">{j.description}</p>}
                             <div className="flex flex-wrap items-center gap-2">
                               <Select value={j.status} onValueChange={(v) => updateStatus(j, v)}>
@@ -248,7 +283,8 @@ export default function MaintenancePage() {
                       </TableRow>
                     )}
                   </>
-                ))}
+                  );
+                })}
               </TableBody>
             </Table>
           </div>

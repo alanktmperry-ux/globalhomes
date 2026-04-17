@@ -115,6 +115,11 @@ export default function VacanciesPage() {
 
   return (
     <div className="space-y-4">
+      <nav className="text-sm text-muted-foreground mb-2">
+        <span>Dashboard</span>
+        <span className="mx-2">→</span>
+        <span className="font-medium text-foreground">Vacancies</span>
+      </nav>
       <DashboardHeader title="Vacancies" subtitle="Properties with notices, vacating soon or vacant." />
 
       <div className="grid grid-cols-3 gap-3">

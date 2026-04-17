@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft, Loader2, Edit, Plus, AlertTriangle, Printer,
-  CheckCircle2, Clock, Wrench, ChevronDown, ChevronUp, Copy, Mail, ExternalLink, AlertCircle, RefreshCw,
+  CheckCircle2, Clock, Wrench, ChevronDown, ChevronUp, Copy, Mail, ExternalLink, AlertCircle, RefreshCw, FileText,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -687,6 +687,15 @@ const TenancyDetailPage = () => {
                   <Field label="Owner BSB" value={tenancy.owner_bsb} />
                   <Field label="Owner Account" value={tenancy.owner_account_number} />
                   {tenancy.notes && <div className="col-span-full"><Field label="Notes" value={tenancy.notes} /></div>}
+                </div>
+                <div className="mt-4 pt-4 border-t border-border/50">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate(`/dashboard/statements?property_id=${tenancy.property_id}`)}
+                  >
+                    <FileText size={14} className="mr-2" /> View Owner Statements
+                  </Button>
                 </div>
               </CardContent>
             </Card>

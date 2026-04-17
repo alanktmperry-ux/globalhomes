@@ -44,6 +44,9 @@ export default function SupplierPortalPage() {
   const [completionNotes, setCompletionNotes] = useState('');
   const [finalCost, setFinalCost] = useState('');
   const [busy, setBusy] = useState(false);
+  const [invoiceUrl, setInvoiceUrl] = useState<string | null>(null);
+  const [invoiceName, setInvoiceName] = useState<string | null>(null);
+  const [uploadingInvoice, setUploadingInvoice] = useState(false);
 
   const load = async () => {
     if (!token) { setError('Missing token'); setLoading(false); return; }
@@ -85,10 +88,34 @@ export default function SupplierPortalPage() {
     if (await callAction(completeJob.id, 'complete', {
       p_completion_notes: completionNotes || null,
       p_final_cost: finalCost ? Number(finalCost) : null,
+      p_invoice_url: invoiceUrl || null,
     })) {
       toast.success('Job marked complete');
-      setCompleteJob(null); setCompletionNotes(''); setFinalCost(''); load();
+      setCompleteJob(null); setCompletionNotes(''); setFinalCost('');
+      setInvoiceUrl(null); setInvoiceName(null);
+      load();
     }
+  };
+
+  const uploadInvoice = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !completeJob) return;
+    setUploadingInvoice(true);
+    const ext = file.name.split('.').pop() || 'pdf';
+    const path = `${data?.supplier?.id}/${completeJob.id}/invoice.${ext}`;
+    const { error: upErr } = await supabase.storage
+      .from('maintenance-invoices')
+      .upload(path, file, { upsert: true, contentType: file.type });
+    if (upErr) {
+      setUploadingInvoice(false);
+      e.target.value = '';
+      toast.error('Invoice upload failed — you can mark complete and resend the invoice to your agent directly.');
+      return;
+    }
+    const { data: urlData } = supabase.storage.from('maintenance-invoices').getPublicUrl(path);
+    setInvoiceUrl(urlData.publicUrl);
+    setInvoiceName(file.name);
+    setUploadingInvoice(false);
   };
 
   if (loading) return <div className="flex justify-center items-center min-h-screen"><Loader2 className="animate-spin text-primary" /></div>;
@@ -246,16 +273,36 @@ export default function SupplierPortalPage() {
       </Dialog>
 
       {/* Complete dialog */}
-      <Dialog open={!!completeJob} onOpenChange={o=>!o && setCompleteJob(null)}>
+      <Dialog open={!!completeJob} onOpenChange={o=>{ if (!o) { setCompleteJob(null); setInvoiceUrl(null); setInvoiceName(null); } }}>
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>Mark Complete</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div><Label className="text-xs">Final cost (AUD)</Label><Input type="number" value={finalCost} onChange={e=>setFinalCost(e.target.value)}/></div>
             <div><Label className="text-xs">Notes</Label><Textarea rows={3} value={completionNotes} onChange={e=>setCompletionNotes(e.target.value)} placeholder="What was done…"/></div>
+            <div>
+              <Label className="text-xs">Upload invoice (optional)</Label>
+              <Input
+                type="file"
+                accept="application/pdf,image/jpeg,image/png,image/jpg"
+                onChange={uploadInvoice}
+                disabled={uploadingInvoice}
+                className="cursor-pointer"
+              />
+              {uploadingInvoice && (
+                <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
+                  <Loader2 size={11} className="animate-spin"/> Uploading…
+                </p>
+              )}
+              {invoiceName && !uploadingInvoice && (
+                <p className="text-[11px] mt-1 flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                  <CheckCircle2 size={11}/> {invoiceName}
+                </p>
+              )}
+            </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={()=>setCompleteJob(null)}>Cancel</Button>
-            <Button onClick={submitComplete} disabled={busy}>Mark Complete</Button>
+            <Button variant="outline" onClick={()=>{ setCompleteJob(null); setInvoiceUrl(null); setInvoiceName(null); }}>Cancel</Button>
+            <Button onClick={submitComplete} disabled={busy || uploadingInvoice}>Mark Complete</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

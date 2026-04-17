@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft, Loader2, Edit, Plus, AlertTriangle, Printer,
-  CheckCircle2, Clock, Wrench, ChevronDown, ChevronUp,
+  CheckCircle2, Clock, Wrench, ChevronDown, ChevronUp, Copy, Mail, ExternalLink, AlertCircle, RefreshCw,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -51,9 +51,15 @@ interface Tenancy {
   status: string;
   notes: string | null;
   tenant_portal_token: string | null;
+  renewal_status: string | null;
+  renewal_offered_at: string | null;
+  renewal_offered_rent: number | null;
+  renewal_offered_lease_end: string | null;
+  renewal_type: string | null;
+  renewal_notes: string | null;
   created_at: string;
   updated_at: string;
-  properties: { address: string; suburb: string } | null;
+  properties: { address: string; suburb: string; owner_portal_token?: string | null; owner_name?: string | null; owner_email?: string | null } | null;
 }
 
 interface RentPayment {
@@ -138,6 +144,16 @@ const TenancyDetailPage = () => {
   const [jobActualCost, setJobActualCost] = useState('');
   const [jobCompletedAt, setJobCompletedAt] = useState<Date | undefined>(undefined);
 
+  // Renewal
+  const [showRenewal, setShowRenewal] = useState(false);
+  const [renewalForm, setRenewalForm] = useState({
+    rent: '',
+    lease_end: '',
+    type: 'fixed',
+    notes: '',
+  });
+  const [emailingOwner, setEmailingOwner] = useState(false);
+
   const fetchAll = useCallback(async () => {
     if (!user || !tenancyId) return;
     setLoading(true);
@@ -154,7 +170,7 @@ const TenancyDetailPage = () => {
     const [tRes, pRes, jRes] = await Promise.all([
       supabase
         .from('tenancies')
-        .select('*, properties(address, suburb)')
+        .select('*, properties(address, suburb, owner_portal_token, owner_name, owner_email)')
         .eq('id', tenancyId)
         .eq('agent_id', agentData.id)
         .single(),
@@ -316,6 +332,85 @@ const TenancyDetailPage = () => {
     toast.success('Job marked complete');
     setExpandedJobId(null);
     fetchAll();
+  };
+
+  /* ─── Renewal handlers ─── */
+  const openRenewal = () => {
+    if (!tenancy) return;
+    setRenewalForm({
+      rent: String(tenancy.rent_amount),
+      lease_end: tenancy.lease_end || '',
+      type: 'fixed',
+      notes: '',
+    });
+    setShowRenewal(true);
+  };
+
+  const submitRenewalOffer = async () => {
+    if (!tenancy || !renewalForm.lease_end) { toast.error('Pick a new lease end date'); return; }
+    setSaving(true);
+    const { error } = await supabase.from('tenancies').update({
+      renewal_status: 'offered',
+      renewal_offered_at: new Date().toISOString(),
+      renewal_offered_rent: renewalForm.rent ? parseFloat(renewalForm.rent) : null,
+      renewal_offered_lease_end: renewalForm.lease_end,
+      renewal_type: renewalForm.type,
+      renewal_notes: renewalForm.notes || null,
+    } as any).eq('id', tenancy.id);
+    setSaving(false);
+    if (error) { toast.error('Could not record renewal offer'); return; }
+    toast.success('Renewal offer recorded');
+    setShowRenewal(false);
+    fetchAll();
+  };
+
+  const acceptRenewal = async () => {
+    if (!tenancy) return;
+    const updates: any = { renewal_status: 'accepted' };
+    if (tenancy.renewal_offered_lease_end) updates.lease_end = tenancy.renewal_offered_lease_end;
+    if (tenancy.renewal_offered_rent != null) updates.rent_amount = tenancy.renewal_offered_rent;
+    const { error } = await supabase.from('tenancies').update(updates).eq('id', tenancy.id);
+    if (error) { toast.error('Could not update'); return; }
+    toast.success('Lease renewed');
+    fetchAll();
+  };
+
+  const declineRenewal = async () => {
+    if (!tenancy) return;
+    const { error } = await supabase.from('tenancies').update({ renewal_status: 'declined' } as any).eq('id', tenancy.id);
+    if (error) { toast.error('Could not update'); return; }
+    toast.success('Tenant not renewing — consider listing for re-let');
+    fetchAll();
+  };
+
+  /* ─── Owner portal email ─── */
+  const copyOwnerLink = () => {
+    const token = tenancy?.properties?.owner_portal_token;
+    if (!token) return;
+    navigator.clipboard.writeText(`${window.location.origin}/owner/portal?token=${token}`);
+    toast.success('Copied!');
+  };
+
+  const emailOwnerPortal = async () => {
+    const token = tenancy?.properties?.owner_portal_token;
+    const ownerEmail = tenancy?.properties?.owner_email;
+    const ownerName = tenancy?.properties?.owner_name;
+    if (!token || !ownerEmail || !agentId) return;
+    setEmailingOwner(true);
+    const url = `${window.location.origin}/owner/portal?token=${token}`;
+    const { error } = await supabase.functions.invoke('send-notification-email', {
+      body: {
+        agent_id: agentId,
+        type: 'owner_portal',
+        title: 'Access your ListHQ Owner Portal',
+        message: `Hi ${ownerName || 'there'}, use this link to view your property financials, approve maintenance quotes and access owner statements: ${url} — no login required.`,
+        recipient_email: ownerEmail,
+        lead_name: ownerName || 'Owner',
+      },
+    });
+    setEmailingOwner(false);
+    if (error) { toast.error('Could not send email'); return; }
+    toast.success(`Portal link emailed to ${ownerEmail}`);
   };
 
   /* ─── Owner Statement PDF ─── */
@@ -527,8 +622,51 @@ const TenancyDetailPage = () => {
                   <Field label="Phone" value={tenancy.tenant_phone} />
                   <Field label="Status" value={statusBadge(tenancy.status)} />
                   <Field label="Lease Start" value={format(parseISO(tenancy.lease_start), 'dd MMM yyyy')} />
-                  <Field label="Lease End" value={format(parseISO(tenancy.lease_end), 'dd MMM yyyy')} />
-                  <Field label="Rent" value={`${AUD.format(tenancy.rent_amount)} ${tenancy.rent_frequency}`} />
+                  <Field label="Lease End" value={
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-medium text-foreground">{format(parseISO(tenancy.lease_end), 'dd MMM yyyy')}</span>
+                      {(() => {
+                        const days = Math.floor((parseISO(tenancy.lease_end).getTime() - Date.now()) / 86400000);
+                        const rs = tenancy.renewal_status;
+                        if (rs === 'offered') return <Badge className="bg-blue-500/15 text-blue-700 dark:text-blue-400 border-0 text-[10px]">Offer Sent</Badge>;
+                        if (rs === 'accepted') return <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-0 text-[10px]">Renewed</Badge>;
+                        if (rs === 'declined') return <Badge className="bg-red-500/15 text-red-700 dark:text-red-400 border-0 text-[10px]">Not Renewing</Badge>;
+                        if (days < 60) return <Badge className="bg-red-500/15 text-red-700 dark:text-red-400 border-0 text-[10px]">Renewal Urgent</Badge>;
+                        if (days <= 90) return <Badge className="bg-amber-500/15 text-amber-700 dark:text-amber-400 border-0 text-[10px]">Renewal Due Soon</Badge>;
+                        return null;
+                      })()}
+                    </div>
+                  } />
+                  {(() => {
+                    const days = Math.floor((parseISO(tenancy.lease_end).getTime() - Date.now()) / 86400000);
+                    const rs = tenancy.renewal_status;
+                    const showOffer = (rs === 'none' || !rs || rs === 'declined') && days <= 90;
+                    return (
+                      <div className="col-span-full flex flex-wrap gap-2">
+                        {showOffer && (
+                          <Button size="sm" variant="outline" onClick={openRenewal}>
+                            <RefreshCw size={12} className="mr-1.5" /> Offer Renewal
+                          </Button>
+                        )}
+                        {rs === 'offered' && (
+                          <>
+                            <Button size="sm" variant="outline" className="text-emerald-700 border-emerald-300 hover:bg-emerald-50" onClick={acceptRenewal}>
+                              <CheckCircle2 size={12} className="mr-1.5" /> Mark Accepted
+                            </Button>
+                            <Button size="sm" variant="outline" className="text-red-700 border-red-300 hover:bg-red-50" onClick={declineRenewal}>
+                              Mark Declined
+                            </Button>
+                            {tenancy.renewal_offered_lease_end && (
+                              <span className="text-xs text-muted-foreground self-center">
+                                Offered: {format(parseISO(tenancy.renewal_offered_lease_end), 'd MMM yyyy')}
+                                {tenancy.renewal_offered_rent != null && ` · ${AUD.format(tenancy.renewal_offered_rent)}`}
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    );
+                  })()}
                   <Field label="Bond" value={AUD.format(tenancy.bond_amount)} />
                   <Field label="Bond Lodgement #" value={tenancy.bond_lodgement_number} />
                   <Field label="Bond Authority" value={tenancy.bond_authority} />

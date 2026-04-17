@@ -159,6 +159,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if ((agentData as any).agency_role === 'principal' || (agentData as any).agency_role === 'admin') {
         setIsPrincipal(true);
       }
+      if (!roles.includes('agent') && !roles.includes('admin')) {
+        await supabase.from('user_roles').upsert(
+          { user_id: user.id, role: 'agent' as any },
+          { onConflict: 'user_id,role' }
+        );
+        setIsAgent(true);
+        setUserRole('agent');
+      }
     }
     lastFetchedUserId.current = user.id;
     setRolesFetched(true);
@@ -202,6 +210,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setAgencyId(agentData.agency_id || null);
           if ((agentData as any).agency_role === 'principal' || (agentData as any).agency_role === 'admin') {
             setIsPrincipal(true);
+          }
+          if (!roles.includes('agent') && !roles.includes('admin')) {
+            await supabase.from('user_roles').upsert(
+              { user_id: user.id, role: 'agent' as any },
+              { onConflict: 'user_id,role' }
+            );
+            setIsAgent(true);
+            setUserRole('agent');
           }
         }
 

@@ -72,8 +72,8 @@ export function SiteFooter() {
             <p className="text-[11px] font-semibold tracking-widest uppercase mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>Legal</p>
             <ul className="space-y-2.5">
               {[
-                { label: 'Privacy Policy', to: '/privacy' },
                 { label: 'Terms of Service', to: '/terms' },
+                { label: 'Privacy Policy', to: '/privacy' },
               ].map(link => (
                 <li key={link.label}>
                   <Link to={link.to} className="text-[13px] transition-colors" style={{ color: 'rgba(255,255,255,0.6)' }}
@@ -84,6 +84,21 @@ export function SiteFooter() {
                   </Link>
                 </li>
               ))}
+              <li>
+                <button
+                  type="button"
+                  onClick={() => {
+                    try { localStorage.removeItem('cookie-consent'); } catch { /* ignore */ }
+                    window.location.reload();
+                  }}
+                  className="text-[13px] transition-colors text-left"
+                  style={{ color: 'rgba(255,255,255,0.6)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+                  onMouseEnter={e => ((e.target as HTMLElement).style.color = '#fff')}
+                  onMouseLeave={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.6)')}
+                >
+                  Cookie Preferences
+                </button>
+              </li>
             </ul>
           </div>
 
@@ -120,13 +135,18 @@ export function SiteFooter() {
         </div>
 
         {/* Bottom bar */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 pt-6">
-          <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
-            ListHQ © {new Date().getFullYear()} · ABN 65 608 526 781
-          </span>
-          <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
-            Licensed agents only · Trust account compliant · Australian property law
-          </span>
+        <div className="flex flex-col gap-3 pt-6">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
+            <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
+              © 2026 ListHQ Pty Ltd. All rights reserved. · ABN 65 608 526 781
+            </span>
+            <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
+              Licensed agents only · Trust account compliant · Australian property law
+            </span>
+          </div>
+          <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            ListHQ is not a licensed financial adviser. All calculators are indicative only.
+          </p>
         </div>
 
       </div>

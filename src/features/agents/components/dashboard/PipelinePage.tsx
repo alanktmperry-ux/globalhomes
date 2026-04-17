@@ -69,6 +69,7 @@ const PipelinePage = () => {
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [agentId, setAgentId] = useState<string | null>(null);
   const [offerCard, setOfferCard] = useState<PipelineCard | null>(null);
+  const [settlementCard, setSettlementCard] = useState<{ card: PipelineCard; previousStage: string } | null>(null);
 
   useEffect(() => {
     if (!user) return;

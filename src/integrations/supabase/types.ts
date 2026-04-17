@@ -4188,12 +4188,16 @@ export type Database = {
           actual_cost: number | null
           agent_id: string
           assigned_phone: string | null
+          assigned_supplier_id: string | null
           assigned_to: string | null
           completed_at: string | null
+          completion_notes: string | null
           created_at: string
           description: string | null
           estimated_cost: number | null
+          final_cost_aud: number | null
           id: string
+          invoice_url: string | null
           owner_approval_required: boolean | null
           owner_approval_status: string | null
           owner_approved_at: string | null
@@ -4204,6 +4208,10 @@ export type Database = {
           quoted_amount_aud: number | null
           reported_by: string
           status: string
+          supplier_accepted_at: string | null
+          supplier_notified_at: string | null
+          supplier_scheduled_date: string | null
+          supplier_scheduled_time: string | null
           tenancy_id: string | null
           title: string
           updated_at: string
@@ -4212,12 +4220,16 @@ export type Database = {
           actual_cost?: number | null
           agent_id: string
           assigned_phone?: string | null
+          assigned_supplier_id?: string | null
           assigned_to?: string | null
           completed_at?: string | null
+          completion_notes?: string | null
           created_at?: string
           description?: string | null
           estimated_cost?: number | null
+          final_cost_aud?: number | null
           id?: string
+          invoice_url?: string | null
           owner_approval_required?: boolean | null
           owner_approval_status?: string | null
           owner_approved_at?: string | null
@@ -4228,6 +4240,10 @@ export type Database = {
           quoted_amount_aud?: number | null
           reported_by?: string
           status?: string
+          supplier_accepted_at?: string | null
+          supplier_notified_at?: string | null
+          supplier_scheduled_date?: string | null
+          supplier_scheduled_time?: string | null
           tenancy_id?: string | null
           title: string
           updated_at?: string
@@ -4236,12 +4252,16 @@ export type Database = {
           actual_cost?: number | null
           agent_id?: string
           assigned_phone?: string | null
+          assigned_supplier_id?: string | null
           assigned_to?: string | null
           completed_at?: string | null
+          completion_notes?: string | null
           created_at?: string
           description?: string | null
           estimated_cost?: number | null
+          final_cost_aud?: number | null
           id?: string
+          invoice_url?: string | null
           owner_approval_required?: boolean | null
           owner_approval_status?: string | null
           owner_approved_at?: string | null
@@ -4252,6 +4272,10 @@ export type Database = {
           quoted_amount_aud?: number | null
           reported_by?: string
           status?: string
+          supplier_accepted_at?: string | null
+          supplier_notified_at?: string | null
+          supplier_scheduled_date?: string | null
+          supplier_scheduled_time?: string | null
           tenancy_id?: string | null
           title?: string
           updated_at?: string
@@ -4284,6 +4308,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "trust_account_balances"
             referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "maintenance_jobs_assigned_supplier_id_fkey"
+            columns: ["assigned_supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "maintenance_jobs_property_id_fkey"
@@ -8181,6 +8212,174 @@ export type Database = {
         }
         Relationships: []
       }
+      supplier_reviews: {
+        Row: {
+          agent_id: string | null
+          created_at: string | null
+          id: string
+          maintenance_job_id: string | null
+          rating: number | null
+          review_text: string | null
+          supplier_id: string | null
+        }
+        Insert: {
+          agent_id?: string | null
+          created_at?: string | null
+          id?: string
+          maintenance_job_id?: string | null
+          rating?: number | null
+          review_text?: string | null
+          supplier_id?: string | null
+        }
+        Update: {
+          agent_id?: string | null
+          created_at?: string | null
+          id?: string
+          maintenance_job_id?: string | null
+          rating?: number | null
+          review_text?: string | null
+          supplier_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_reviews_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_reviews_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_reviews_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_reviews_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "supplier_reviews_maintenance_job_id_fkey"
+            columns: ["maintenance_job_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_reviews_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suppliers: {
+        Row: {
+          abn: string | null
+          agent_id: string | null
+          business_name: string
+          contact_name: string | null
+          created_at: string | null
+          email: string | null
+          id: string
+          insurance_document_url: string | null
+          insurance_expiry: string | null
+          jobs_cancelled: number | null
+          jobs_completed: number | null
+          license_number: string | null
+          notes: string | null
+          phone: string | null
+          portal_token: string | null
+          preferred: boolean | null
+          rating_avg: number | null
+          status: string | null
+          trade_category: string
+        }
+        Insert: {
+          abn?: string | null
+          agent_id?: string | null
+          business_name: string
+          contact_name?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          insurance_document_url?: string | null
+          insurance_expiry?: string | null
+          jobs_cancelled?: number | null
+          jobs_completed?: number | null
+          license_number?: string | null
+          notes?: string | null
+          phone?: string | null
+          portal_token?: string | null
+          preferred?: boolean | null
+          rating_avg?: number | null
+          status?: string | null
+          trade_category: string
+        }
+        Update: {
+          abn?: string | null
+          agent_id?: string | null
+          business_name?: string
+          contact_name?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          insurance_document_url?: string | null
+          insurance_expiry?: string | null
+          jobs_cancelled?: number | null
+          jobs_completed?: number | null
+          license_number?: string | null
+          notes?: string | null
+          phone?: string | null
+          portal_token?: string | null
+          preferred?: boolean | null
+          rating_avg?: number | null
+          status?: string | null
+          trade_category?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suppliers_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suppliers_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suppliers_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suppliers_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+        ]
+      }
       support_tickets: {
         Row: {
           admin_notes: string | null
@@ -10670,6 +10869,7 @@ export type Database = {
         Args: { p_property_type?: string; p_state: string; p_suburb: string }
         Returns: Json
       }
+      get_supplier_by_portal_token: { Args: { p_token: string }; Returns: Json }
       get_tenancy_by_portal_token: { Args: { p_token: string }; Returns: Json }
       get_user_agency_id: { Args: never; Returns: string }
       has_role: {
@@ -10929,6 +11129,10 @@ export type Database = {
         Args: { p_agent_id: string }
         Returns: undefined
       }
+      refresh_supplier_rating: {
+        Args: { p_supplier_id: string }
+        Returns: undefined
+      }
       schools_within_km: {
         Args: { p_km: number; p_lat: number; p_lng: number }
         Returns: {
@@ -10979,6 +11183,19 @@ export type Database = {
           median_price: number
           min_price: number
         }[]
+      }
+      supplier_action_on_job: {
+        Args: {
+          p_action: string
+          p_completion_notes?: string
+          p_final_cost?: number
+          p_invoice_url?: string
+          p_job_id: string
+          p_scheduled_date?: string
+          p_scheduled_time?: string
+          p_token: string
+        }
+        Returns: Json
       }
       track_cma_view: { Args: { p_share_token: string }; Returns: Json }
     }

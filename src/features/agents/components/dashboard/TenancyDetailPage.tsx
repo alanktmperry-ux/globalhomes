@@ -793,7 +793,14 @@ const TenancyDetailPage = () => {
                             <TableCell className="font-medium">{j.title}</TableCell>
                             <TableCell>{priorityBadge(j.priority)}</TableCell>
                             <TableCell>{jobStatusBadge(j.status)}</TableCell>
-                            <TableCell>{j.assigned_to || '—'}</TableCell>
+                            <TableCell>
+                              {j.assigned_to || '—'}
+                              {j.assigned_phone && (
+                                <span className="block text-xs text-muted-foreground tabular-nums">
+                                  Supplier phone: {j.assigned_phone}
+                                </span>
+                              )}
+                            </TableCell>
                             <TableCell className="text-right tabular-nums">{j.estimated_cost ? AUD.format(j.estimated_cost) : '—'}</TableCell>
                             <TableCell className="text-xs">{format(parseISO(j.created_at), 'dd MMM yyyy')}</TableCell>
                             <TableCell>

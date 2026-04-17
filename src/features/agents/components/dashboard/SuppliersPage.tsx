@@ -395,6 +395,43 @@ export default function SuppliersPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Assign job dialog */}
+      <Dialog open={!!assignFor} onOpenChange={o => !o && setAssignFor(null)}>
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Assign job to {assignFor?.business_name}</DialogTitle>
+          </DialogHeader>
+          {loadingJobs ? (
+            <div className="flex justify-center py-6"><Loader2 className="animate-spin text-primary"/></div>
+          ) : openJobs.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-6">No unassigned jobs at the moment.</p>
+          ) : (
+            <div className="space-y-2">
+              {openJobs.map(j => {
+                const days = Math.floor((Date.now() - new Date(j.created_at).getTime()) / 86400000);
+                return (
+                  <div key={j.id} className="flex items-center justify-between gap-3 border rounded-lg p-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{j.title}</p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {j.properties?.address || '—'}{j.properties?.suburb ? `, ${j.properties.suburb}` : ''}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge className={`text-[10px] ${j.priority === 'urgent' ? 'bg-destructive text-destructive-foreground' : j.priority === 'low' ? 'bg-muted text-muted-foreground' : 'bg-amber-500 text-white'}`}>{j.priority}</Badge>
+                        <span className="text-[10px] text-muted-foreground">{days}d open</span>
+                      </div>
+                    </div>
+                    <Button size="sm" disabled={!!assigningJobId} onClick={() => submitAssign(j.id)}>
+                      {assigningJobId === j.id ? <Loader2 size={12} className="animate-spin"/> : 'Assign'}
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

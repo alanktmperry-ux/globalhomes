@@ -22,6 +22,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { toast } from 'sonner';
 import DashboardHeader from './DashboardHeader';
 import TenantPortalCard from './TenantPortalCard';
+import OwnerPortalCard from './OwnerPortalCard';
 import { format, parseISO, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { cn } from '@/shared/lib/utils';
 
@@ -691,7 +692,7 @@ const TenancyDetailPage = () => {
             </Card>
 
             {agentId && (
-              <div className="mt-4">
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
                 <TenantPortalCard
                   tenancyId={tenancy.id}
                   tenantName={tenancy.tenant_name}
@@ -699,6 +700,7 @@ const TenancyDetailPage = () => {
                   portalToken={tenancy.tenant_portal_token}
                   agentId={agentId}
                 />
+                <OwnerPortalCard propertyId={tenancy.property_id} />
               </div>
             )}
           </TabsContent>
@@ -1007,6 +1009,31 @@ const TenancyDetailPage = () => {
             <div><Label>Assigned To</Label><Input value={jobForm.assigned_to} onChange={e => setJobForm(f => ({ ...f, assigned_to: e.target.value }))} /></div>
             <div><Label>Estimated Cost</Label><Input type="number" step="0.01" value={jobForm.estimated_cost} onChange={e => setJobForm(f => ({ ...f, estimated_cost: e.target.value }))} /></div>
             <Button onClick={handleNewJob} disabled={saving}>{saving ? <Loader2 className="animate-spin mr-2" size={14} /> : null}Create Job</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ═══ Renewal Offer Dialog ═══ */}
+      <Dialog open={showRenewal} onOpenChange={setShowRenewal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle>Offer lease renewal</DialogTitle></DialogHeader>
+          <div className="grid gap-3 py-2">
+            <div><Label>New weekly rent</Label><Input type="number" step="0.01" value={renewalForm.rent} onChange={e => setRenewalForm(f => ({ ...f, rent: e.target.value }))} /></div>
+            <div><Label>New lease end date</Label><Input type="date" value={renewalForm.lease_end} onChange={e => setRenewalForm(f => ({ ...f, lease_end: e.target.value }))} /></div>
+            <div>
+              <Label>Renewal type</Label>
+              <Select value={renewalForm.type} onValueChange={v => setRenewalForm(f => ({ ...f, type: v }))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="fixed">Fixed term</SelectItem>
+                  <SelectItem value="periodic">Periodic</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div><Label>Notes</Label><Textarea rows={2} value={renewalForm.notes} onChange={e => setRenewalForm(f => ({ ...f, notes: e.target.value }))} /></div>
+            <Button onClick={submitRenewalOffer} disabled={saving}>
+              {saving ? <Loader2 className="animate-spin mr-2" size={14} /> : null}Send renewal offer
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

@@ -101,11 +101,14 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
             </div>
 
             {/* Header */}
-            <div className="flex items-center justify-between px-5 pt-4 pb-2">
-              <h2 className="font-display text-lg font-semibold text-foreground">{t('share.title')}</h2>
+            <div className="flex items-start justify-between px-5 pt-4 pb-2 gap-3">
+              <div className="min-w-0">
+                <h2 className="font-display text-lg font-semibold text-foreground">Share this property</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">Send via WeChat, WhatsApp, Line or copy the link</p>
+              </div>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-full hover:bg-secondary flex items-center justify-center text-muted-foreground"
+                className="shrink-0 w-8 h-8 rounded-full hover:bg-secondary flex items-center justify-center text-muted-foreground"
                 aria-label="Close"
               >
                 <X size={18} />
@@ -131,10 +134,10 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
                 </div>
               </div>
 
-              {/* WeChat QR Section */}
+              {/* WeChat QR Section — primary international share */}
               <div className="p-4 rounded-xl border border-border bg-card">
                 <div className="text-center mb-3">
-                  <h3 className="font-display font-semibold text-foreground">{t('share.wechat')}</h3>
+                  <h3 className="font-display font-semibold text-foreground">WeChat — Scan to Share</h3>
                   <p className="text-xs text-muted-foreground mt-0.5">微信分享</p>
                 </div>
                 <div className="flex justify-center">
@@ -149,9 +152,9 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
                   </div>
                 </div>
                 <p className="text-center text-xs text-muted-foreground mt-3">
-                  {t('share.wechatScan')}
+                  Open WeChat → tap Scan → point at this code
                 </p>
-                <p className="text-center text-xs text-muted-foreground">用微信扫描二维码分享</p>
+                <p className="text-center text-xs text-muted-foreground">打开微信 → 点击扫一扫 → 对准二维码</p>
                 <div className="grid grid-cols-2 gap-2 mt-4">
                   <a
                     href={qrUrl}

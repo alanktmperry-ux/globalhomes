@@ -5359,6 +5359,10 @@ export type Database = {
           created_at: string
           currency_code: string | null
           description: string | null
+          description_ja: string | null
+          description_ko: string | null
+          description_zh: string | null
+          description_zh_tw: string | null
           electricity_included: boolean | null
           ensuites: number | null
           eoi_close_date: string | null
@@ -5440,6 +5444,10 @@ export type Database = {
           study_rooms: number | null
           suburb: string
           title: string
+          title_ja: string | null
+          title_ko: string | null
+          title_zh: string | null
+          title_zh_tw: string | null
           translation_status: string | null
           translations: Json | null
           translations_generated_at: string | null
@@ -5483,6 +5491,10 @@ export type Database = {
           created_at?: string
           currency_code?: string | null
           description?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_zh?: string | null
+          description_zh_tw?: string | null
           electricity_included?: boolean | null
           ensuites?: number | null
           eoi_close_date?: string | null
@@ -5564,6 +5576,10 @@ export type Database = {
           study_rooms?: number | null
           suburb: string
           title: string
+          title_ja?: string | null
+          title_ko?: string | null
+          title_zh?: string | null
+          title_zh_tw?: string | null
           translation_status?: string | null
           translations?: Json | null
           translations_generated_at?: string | null
@@ -5607,6 +5623,10 @@ export type Database = {
           created_at?: string
           currency_code?: string | null
           description?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_zh?: string | null
+          description_zh_tw?: string | null
           electricity_included?: boolean | null
           ensuites?: number | null
           eoi_close_date?: string | null
@@ -5688,6 +5708,10 @@ export type Database = {
           study_rooms?: number | null
           suburb?: string
           title?: string
+          title_ja?: string | null
+          title_ko?: string | null
+          title_zh?: string | null
+          title_zh_tw?: string | null
           translation_status?: string | null
           translations?: Json | null
           translations_generated_at?: string | null
@@ -10431,6 +10455,10 @@ export type Database = {
           created_at: string
           currency_code: string | null
           description: string | null
+          description_ja: string | null
+          description_ko: string | null
+          description_zh: string | null
+          description_zh_tw: string | null
           electricity_included: boolean | null
           ensuites: number | null
           eoi_close_date: string | null
@@ -10512,6 +10540,10 @@ export type Database = {
           study_rooms: number | null
           suburb: string
           title: string
+          title_ja: string | null
+          title_ko: string | null
+          title_zh: string | null
+          title_zh_tw: string | null
           translation_status: string | null
           translations: Json | null
           translations_generated_at: string | null

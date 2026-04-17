@@ -50,6 +50,7 @@ const PROPERTY_NAV: NavItem[] = [
   { title: 'Inspection Day', url: '/dashboard/inspection-mode', icon: CalendarDays },
   { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
   { title: 'Settlement', url: '/dashboard/settlements', icon: PartyPopper },
+  { title: 'Automation', url: '/dashboard/automation', icon: Mail },
 ];
 
 const INSIGHTS_NAV: NavItem[] = [

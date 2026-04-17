@@ -334,6 +334,85 @@ const TenancyDetailPage = () => {
     fetchAll();
   };
 
+  /* ─── Renewal handlers ─── */
+  const openRenewal = () => {
+    if (!tenancy) return;
+    setRenewalForm({
+      rent: String(tenancy.rent_amount),
+      lease_end: tenancy.lease_end || '',
+      type: 'fixed',
+      notes: '',
+    });
+    setShowRenewal(true);
+  };
+
+  const submitRenewalOffer = async () => {
+    if (!tenancy || !renewalForm.lease_end) { toast.error('Pick a new lease end date'); return; }
+    setSaving(true);
+    const { error } = await supabase.from('tenancies').update({
+      renewal_status: 'offered',
+      renewal_offered_at: new Date().toISOString(),
+      renewal_offered_rent: renewalForm.rent ? parseFloat(renewalForm.rent) : null,
+      renewal_offered_lease_end: renewalForm.lease_end,
+      renewal_type: renewalForm.type,
+      renewal_notes: renewalForm.notes || null,
+    } as any).eq('id', tenancy.id);
+    setSaving(false);
+    if (error) { toast.error('Could not record renewal offer'); return; }
+    toast.success('Renewal offer recorded');
+    setShowRenewal(false);
+    fetchAll();
+  };
+
+  const acceptRenewal = async () => {
+    if (!tenancy) return;
+    const updates: any = { renewal_status: 'accepted' };
+    if (tenancy.renewal_offered_lease_end) updates.lease_end = tenancy.renewal_offered_lease_end;
+    if (tenancy.renewal_offered_rent != null) updates.rent_amount = tenancy.renewal_offered_rent;
+    const { error } = await supabase.from('tenancies').update(updates).eq('id', tenancy.id);
+    if (error) { toast.error('Could not update'); return; }
+    toast.success('Lease renewed');
+    fetchAll();
+  };
+
+  const declineRenewal = async () => {
+    if (!tenancy) return;
+    const { error } = await supabase.from('tenancies').update({ renewal_status: 'declined' } as any).eq('id', tenancy.id);
+    if (error) { toast.error('Could not update'); return; }
+    toast.success('Tenant not renewing — consider listing for re-let');
+    fetchAll();
+  };
+
+  /* ─── Owner portal email ─── */
+  const copyOwnerLink = () => {
+    const token = tenancy?.properties?.owner_portal_token;
+    if (!token) return;
+    navigator.clipboard.writeText(`${window.location.origin}/owner/portal?token=${token}`);
+    toast.success('Copied!');
+  };
+
+  const emailOwnerPortal = async () => {
+    const token = tenancy?.properties?.owner_portal_token;
+    const ownerEmail = tenancy?.properties?.owner_email;
+    const ownerName = tenancy?.properties?.owner_name;
+    if (!token || !ownerEmail || !agentId) return;
+    setEmailingOwner(true);
+    const url = `${window.location.origin}/owner/portal?token=${token}`;
+    const { error } = await supabase.functions.invoke('send-notification-email', {
+      body: {
+        agent_id: agentId,
+        type: 'owner_portal',
+        title: 'Access your ListHQ Owner Portal',
+        message: `Hi ${ownerName || 'there'}, use this link to view your property financials, approve maintenance quotes and access owner statements: ${url} — no login required.`,
+        recipient_email: ownerEmail,
+        lead_name: ownerName || 'Owner',
+      },
+    });
+    setEmailingOwner(false);
+    if (error) { toast.error('Could not send email'); return; }
+    toast.success(`Portal link emailed to ${ownerEmail}`);
+  };
+
   /* ─── Owner Statement PDF ─── */
   const generateStatement = () => {
     if (!tenancy || !agentInfo) return;

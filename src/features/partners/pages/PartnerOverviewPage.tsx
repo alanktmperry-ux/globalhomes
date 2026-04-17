@@ -296,6 +296,35 @@ const PartnerOverviewPage = () => {
         </div>
       )}
 
+      {/* Vacancy Summary — last section above empty state / footer */}
+      <div className="mb-8">
+        <h2 className="font-display text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+          <Home size={18} className="text-primary" />
+          Vacancy Summary
+        </h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card><CardContent className="p-4">
+            <p className="text-xs text-muted-foreground">Vacant Properties</p>
+            <p className={`text-xl font-bold ${vacancyStats.vacant > 0 ? 'text-red-600' : 'text-emerald-600'}`}>{vacancyStats.vacant}</p>
+          </CardContent></Card>
+          <Card><CardContent className="p-4">
+            <p className="text-xs text-muted-foreground">Vacating This Month</p>
+            <p className="text-xl font-bold text-amber-600">{vacancyStats.vacatingMonth}</p>
+          </CardContent></Card>
+          <Card><CardContent className="p-4">
+            <p className="text-xs text-muted-foreground">Avg Days to Re-let (3mo)</p>
+            <p className="text-xl font-bold text-foreground">{vacancyStats.avgReLet ?? '—'}{vacancyStats.avgReLet != null ? ' days' : ''}</p>
+          </CardContent></Card>
+          <Card><CardContent className="p-4 flex items-center gap-2">
+            <TrendingDown size={16} className="text-red-600 shrink-0" />
+            <div>
+              <p className="text-xs text-muted-foreground">Vacancy Loss (Month)</p>
+              <p className="text-xl font-bold text-red-600">${vacancyStats.lossMonth.toLocaleString('en-AU', { maximumFractionDigits: 0 })}</p>
+            </div>
+          </CardContent></Card>
+        </div>
+      </div>
+
       {/* Empty state */}
       {activeCount === 0 && pendingInvites.length === 0 && (
         <Card className="border-dashed">

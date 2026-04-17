@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, Fragment } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Home, Loader2, AlertTriangle, CheckCircle2, Clock, ClipboardCheck, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
+import { Plus, Home, Loader2, AlertTriangle, CheckCircle2, Clock, ClipboardCheck, ChevronDown, ChevronUp, Calendar, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Card, CardContent } from '@/components/ui/card';
@@ -36,6 +36,7 @@ interface Tenancy {
   management_fee_percent: number;
   status: string;
   notes: string | null;
+  renewal_status?: string | null;
   properties: { address: string; suburb: string; state: string | null } | null;
 }
 
@@ -102,9 +103,39 @@ const frequencyDays = (freq: string): number => {
   return 30;
 };
 
+type TabKey = 'all' | 'arrears' | 'expiring' | 'renewals';
+
 const RentRollPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab: TabKey = (() => {
+    const f = searchParams.get('filter');
+    if (f === 'arrears') return 'arrears';
+    if (f === 'expiring') return 'expiring';
+    if (f === 'renewals') return 'renewals';
+    return 'all';
+  })();
+  const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
+
+  // Sync tab → URL filter param
+  useEffect(() => {
+    const current = searchParams.get('filter');
+    const want = activeTab === 'all' ? null : activeTab;
+    if (current === want) return;
+    const next = new URLSearchParams(searchParams);
+    if (want) next.set('filter', want); else next.delete('filter');
+    setSearchParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
+  // Sync URL filter param → tab (e.g. when sidebar link clicked while already on page)
+  useEffect(() => {
+    const f = searchParams.get('filter');
+    const next: TabKey = f === 'arrears' ? 'arrears' : f === 'expiring' ? 'expiring' : f === 'renewals' ? 'renewals' : 'all';
+    if (next !== activeTab) setActiveTab(next);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   const [agentId, setAgentId] = useState<string | null>(null);
   const [tenancies, setTenancies] = useState<Tenancy[]>([]);
@@ -272,6 +303,62 @@ const RentRollPage = () => {
     if (!latest) return false;
     return differenceInDays(today, new Date(latest.period_to)) > 14;
   }).length;
+
+  // Filtered tenancies for current tab
+  const displayedTenancies = useMemo(() => {
+    if (activeTab === 'all') return activeTenancies;
+
+    if (activeTab === 'arrears') {
+      return activeTenancies
+        .map(t => ({ t, info: getArrearsInfo(t) }))
+        .filter(x => x.info.days > 0)
+        .sort((a, b) => b.info.days - a.info.days)
+        .map(x => x.t);
+    }
+
+    if (activeTab === 'expiring') {
+      return activeTenancies
+        .filter(t => {
+          const days = differenceInDays(parseISO(t.lease_end), today);
+          return days >= 0 && days <= 90;
+        })
+        .sort((a, b) => parseISO(a.lease_end).getTime() - parseISO(b.lease_end).getTime());
+    }
+
+    // renewals
+    return activeTenancies
+      .filter(t => {
+        const days = differenceInDays(parseISO(t.lease_end), today);
+        if (days < 0 || days > 90) return false;
+        const rs = t.renewal_status;
+        return !rs || rs === 'none' || rs === 'declined';
+      })
+      .sort((a, b) => parseISO(a.lease_end).getTime() - parseISO(b.lease_end).getTime());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, activeTenancies, payments]);
+
+  // Arrears summary for arrears tab
+  const arrearsSummary = useMemo(() => {
+    const items = activeTenancies
+      .map(t => ({ t, info: getArrearsInfo(t) }))
+      .filter(x => x.info.days > 0);
+    const totalOwed = items.reduce((s, x) => s + x.info.owed, 0);
+    return { count: items.length, totalOwed };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTenancies, payments]);
+
+  const expiringCount = activeTenancies.filter(t => {
+    const days = differenceInDays(parseISO(t.lease_end), today);
+    return days >= 0 && days <= 90;
+  }).length;
+
+  const renewalsCount = activeTenancies.filter(t => {
+    const days = differenceInDays(parseISO(t.lease_end), today);
+    if (days < 0 || days > 90) return false;
+    const rs = t.renewal_status;
+    return !rs || rs === 'none' || rs === 'declined';
+  }).length;
+
 
   const getNextDue = (t: Tenancy) => {
     const latest = latestPaymentMap.get(t.id);
@@ -605,6 +692,50 @@ const RentRollPage = () => {
             ))}
           </motion.div>
 
+          {/* Filter tabs */}
+          <div className="flex flex-wrap items-center gap-2 border-b border-border">
+            {([
+              { key: 'all' as const, label: 'All Tenancies', count: activeTenancies.length },
+              { key: 'arrears' as const, label: 'Arrears', count: arrearsSummary.count, alert: arrearsSummary.count > 0 },
+              { key: 'expiring' as const, label: 'Expiring Soon', count: expiringCount },
+              { key: 'renewals' as const, label: 'Renewals Due', count: renewalsCount, alert: renewalsCount > 0 },
+            ]).map(tab => {
+              const isActive = activeTab === tab.key;
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={cn(
+                    'px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors flex items-center gap-2',
+                    isActive
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-muted-foreground hover:text-foreground',
+                  )}
+                >
+                  {tab.label}
+                  {tab.count > 0 && (
+                    <Badge
+                      variant={tab.alert ? 'destructive' : 'secondary'}
+                      className="text-[10px] px-1.5 py-0 h-5"
+                    >
+                      {tab.count}
+                    </Badge>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Arrears summary bar */}
+          {activeTab === 'arrears' && arrearsSummary.count > 0 && (
+            <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/20">
+              <AlertTriangle size={18} className="text-red-600 shrink-0" />
+              <p className="text-sm text-red-700 dark:text-red-400 font-medium">
+                {arrearsSummary.count} {arrearsSummary.count === 1 ? 'tenancy' : 'tenancies'} overdue — total AUD ${arrearsSummary.totalOwed.toLocaleString('en-AU', { maximumFractionDigits: 0 })} outstanding
+              </p>
+            </div>
+          )}
+
           {/* Table */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -628,14 +759,20 @@ const RentRollPage = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {activeTenancies.length === 0 ? (
+                      {displayedTenancies.length === 0 ? (
                         <TableRow>
                           <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
-                            No active tenancies yet. Click "+ Add Tenancy" to get started.
+                            {activeTab === 'all'
+                              ? 'No active tenancies yet. Click "+ Add Tenancy" to get started.'
+                              : activeTab === 'arrears'
+                                ? 'No tenancies in arrears. 🎉'
+                                : activeTab === 'expiring'
+                                  ? 'No leases expiring in the next 90 days.'
+                                  : 'No renewals due in the next 90 days.'}
                           </TableCell>
                         </TableRow>
                       ) : (
-                        activeTenancies.map(t => {
+                        displayedTenancies.map(t => {
                           const arrears = getArrearsInfo(t);
                           const leaseEnd = parseISO(t.lease_end);
                           const daysToEnd = differenceInDays(leaseEnd, today);
@@ -675,7 +812,17 @@ const RentRollPage = () => {
                               </TableCell>
                               <TableCell className="text-right tabular-nums">{t.management_fee_percent}%</TableCell>
                               <TableCell>
-                                <div className="flex items-center gap-1 justify-end">
+                                <div className="flex items-center gap-1 justify-end flex-wrap">
+                                  {activeTab === 'renewals' && (
+                                    <Button
+                                      variant="default"
+                                      size="sm"
+                                      className="text-[10px] h-7"
+                                      onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/tenancies/${t.id}#renewal`); }}
+                                    >
+                                      <RefreshCw size={12} className="mr-1" /> Offer Renewal
+                                    </Button>
+                                  )}
                                   <Button
                                     variant="outline"
                                     size="sm"

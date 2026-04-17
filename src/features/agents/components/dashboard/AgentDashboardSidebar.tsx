@@ -3,7 +3,7 @@ import {
   LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, LogOut, Building2, UserPlus, Home,
   User, FileText, CreditCard, Star, MapPinned, Shield, Contact, Kanban, Scale, Landmark,
   ClipboardCheck, CalendarDays, Search, TrendingUp, Receipt, PartyPopper, Calculator, HelpCircle, ClipboardList, Settings2, Flame,
-  Handshake, Sparkles, Target, ShoppingBag, ChevronDown, Mail, Wrench, Activity,
+  Handshake, Sparkles, Target, ShoppingBag, ChevronDown, Mail, Wrench, Activity, AlertCircle, RefreshCw,
 } from 'lucide-react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -28,6 +28,7 @@ interface NavItem {
   icon: any;
   badgeKey?: string;
   comingSoon?: boolean;
+  alertWhenBadge?: boolean; // when true, badge uses red/amber styling and icon coloring
 }
 
 const SALES_NAV: NavItem[] = [
@@ -44,8 +45,10 @@ const SALES_NAV: NavItem[] = [
 ];
 
 const PROPERTY_NAV: NavItem[] = [
+  { title: 'Arrears', url: '/dashboard/rent-roll?filter=arrears', icon: AlertCircle, badgeKey: 'arrears', alertWhenBadge: true },
+  { title: 'Renewals Due', url: '/dashboard/rent-roll?filter=renewals', icon: RefreshCw, badgeKey: 'renewals', alertWhenBadge: true },
   { title: 'Open Homes', url: '/dashboard/open-homes', icon: CalendarDays },
-  { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home, badgeKey: 'rentRoll' },
+  { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home },
   { title: 'Applications', url: '/dashboard/rental-applications', icon: ClipboardList },
   { title: 'Maintenance', url: '/dashboard/maintenance', icon: Wrench },
   { title: 'Vacancies', url: '/dashboard/vacancies', icon: Home },
@@ -84,6 +87,7 @@ const AgentDashboardSidebar = () => {
   const { listings } = useAgentListings();
   const { plan, foundingMember } = useSubscription();
   const [arrearsCount, setArrearsCount] = useState(0);
+  const [renewalsCount, setRenewalsCount] = useState(0);
   const [onboardingComplete, setOnboardingComplete] = useState(true);
   const [agentLogo, setAgentLogo] = useState<string | null>(null);
   const [agentName, setAgentName] = useState<string | null>(null);
@@ -95,13 +99,27 @@ const AgentDashboardSidebar = () => {
       const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
       if (!agent) return;
       const { data: tenancies } = await supabase
-        .from('tenancies').select('id, rent_amount, lease_start').eq('agent_id', agent.id).eq('status', 'active');
-      if (!tenancies || tenancies.length === 0) return;
+        .from('tenancies').select('id, rent_amount, lease_start, lease_end, renewal_status').eq('agent_id', agent.id).eq('status', 'active');
+      if (!tenancies || tenancies.length === 0) {
+        setArrearsCount(0);
+        setRenewalsCount(0);
+        return;
+      }
+      const today = new Date();
+      // Renewals due: lease_end within 90 days AND renewal_status none/declined/null
+      const renewals = tenancies.filter((t: any) => {
+        if (!t.lease_end) return false;
+        const days = Math.floor((new Date(t.lease_end).getTime() - today.getTime()) / 86400000);
+        if (days < 0 || days > 90) return false;
+        const rs = t.renewal_status;
+        return !rs || rs === 'none' || rs === 'declined';
+      }).length;
+      setRenewalsCount(renewals);
+
       const { data: payments } = await supabase
         .from('rent_payments').select('tenancy_id, period_to, status')
         .in('tenancy_id', tenancies.map(t => t.id))
         .order('payment_date', { ascending: false });
-      const today = new Date();
       let count = 0;
       for (const t of tenancies) {
         const latest = (payments || []).find(p => p.tenancy_id === t.id);
@@ -165,7 +183,8 @@ const AgentDashboardSidebar = () => {
   const badgeValues: Record<string, string> = {
     listings: activeCount > 0 ? String(activeCount) : '',
     leads: '',
-    rentRoll: arrearsCount > 0 ? String(arrearsCount) : '',
+    arrears: arrearsCount > 0 ? String(arrearsCount) : '',
+    renewals: renewalsCount > 0 ? String(renewalsCount) : '',
   };
 
   const ACCOUNT_NAV: NavItem[] = [
@@ -187,10 +206,22 @@ const AgentDashboardSidebar = () => {
     navigate('/');
   };
 
-  const isActive = (path: string) =>
-    path === '/dashboard'
-      ? location.pathname === '/dashboard'
-      : location.pathname.startsWith(path);
+  const isActive = (path: string) => {
+    if (path === '/dashboard') return location.pathname === '/dashboard';
+    // For URLs with query params, match both pathname and the filter query
+    if (path.includes('?')) {
+      const [p, qs] = path.split('?');
+      const params = new URLSearchParams(qs);
+      const filter = params.get('filter');
+      const currentFilter = new URLSearchParams(location.search).get('filter');
+      return location.pathname === p && currentFilter === filter;
+    }
+    // Plain rent-roll link should NOT match when a filter is active
+    if (path === '/dashboard/rent-roll') {
+      return location.pathname === '/dashboard/rent-roll' && !new URLSearchParams(location.search).get('filter');
+    }
+    return location.pathname.startsWith(path);
+  };
 
   const renderGroup = (label: string, items: NavItem[]) => (
     <SidebarGroup key={label}>
@@ -217,17 +248,31 @@ const AgentDashboardSidebar = () => {
                         : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                   }`}
                 >
-                  <item.icon size={16} className="shrink-0" />
+                  <item.icon
+                    size={16}
+                    className={`shrink-0 ${
+                      item.alertWhenBadge && item.badgeKey && badgeValues[item.badgeKey]
+                        ? 'text-amber-600'
+                        : ''
+                    }`}
+                  />
                   {!collapsed && (
                     <>
-                      <span className="flex-1 text-left">{item.title}</span>
+                      <span className={`flex-1 text-left ${
+                        item.alertWhenBadge && item.badgeKey && badgeValues[item.badgeKey]
+                          ? 'text-amber-700 dark:text-amber-400 font-medium'
+                          : ''
+                      }`}>{item.title}</span>
                       {item.comingSoon && (
                         <Badge variant="outline" className="text-[8px] px-1 py-0 h-4 border-muted-foreground/30 text-muted-foreground/50">
                           Soon
                         </Badge>
                       )}
                       {item.badgeKey && badgeValues[item.badgeKey] && (
-                        <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-5">
+                        <Badge
+                          variant={item.alertWhenBadge ? 'destructive' : 'secondary'}
+                          className="text-[10px] px-1.5 py-0 h-5"
+                        >
                           {badgeValues[item.badgeKey]}
                         </Badge>
                       )}

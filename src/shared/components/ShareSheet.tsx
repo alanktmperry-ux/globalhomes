@@ -1,0 +1,233 @@
+import { useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Copy, Link2, Share2, MessageCircle, Download } from 'lucide-react';
+import { Property } from '@/shared/lib/types';
+import { useI18n } from '@/shared/lib/i18n';
+import { useCurrency } from '@/shared/lib/CurrencyContext';
+import { toast } from 'sonner';
+
+interface ShareSheetProps {
+  property: Property;
+  open: boolean;
+  onClose: () => void;
+}
+
+export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
+  const { t } = useI18n();
+  const { formatPrice } = useCurrency();
+
+  const propertyUrl = `${window.location.origin}/property/${property.id}`;
+  const encodedUrl = encodeURIComponent(propertyUrl);
+  const qrUrl = `https://chart.googleapis.com/chart?chs=240x240&cht=qr&chl=${encodedUrl}&choe=UTF-8`;
+
+  const shareText = `${property.title} — ${property.address}, ${property.suburb}`;
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${shareText}\n${propertyUrl}`)}`;
+  const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodedUrl}`;
+
+  // Lock body scroll when open
+  useEffect(() => {
+    if (!open) return;
+    const original = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = original; };
+  }, [open]);
+
+  // ESC to close
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [open, onClose]);
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(propertyUrl);
+      toast.success(t('share.copied'));
+    } catch {
+      toast.error('Could not copy link');
+    }
+  };
+
+  const copyForWeChat = async () => {
+    try {
+      await navigator.clipboard.writeText(propertyUrl);
+      toast.success(t('share.wechatCopiedToast'));
+    } catch {
+      toast.error('Could not copy link');
+    }
+  };
+
+  const nativeShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: property.title,
+          text: shareText,
+          url: propertyUrl,
+        });
+      } catch { /* user cancelled */ }
+    } else {
+      copyLink();
+    }
+  };
+
+  const thumb = property.images?.[0] || property.imageUrl;
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <>
+          <motion.div
+            className="fixed inset-0 bg-foreground/40 backdrop-blur-sm z-[60]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+          />
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('share.title')}
+            className="fixed inset-x-0 bottom-0 z-[61] max-h-[92vh] bg-card rounded-t-3xl shadow-drawer overflow-y-auto md:inset-x-auto md:left-1/2 md:top-1/2 md:bottom-auto md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md md:rounded-2xl"
+            initial={{ y: '100%', opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: '100%', opacity: 0 }}
+            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+          >
+            {/* Drag indicator (mobile) */}
+            <div className="sticky top-0 z-10 flex justify-center pt-3 pb-1 bg-card rounded-t-3xl md:hidden">
+              <div className="w-10 h-1 rounded-full bg-border" />
+            </div>
+
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 pt-4 pb-2">
+              <h2 className="font-display text-lg font-semibold text-foreground">{t('share.title')}</h2>
+              <button
+                onClick={onClose}
+                className="w-8 h-8 rounded-full hover:bg-secondary flex items-center justify-center text-muted-foreground"
+                aria-label="Close"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="px-5 pb-6 space-y-5">
+              {/* Property preview */}
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/60 border border-border">
+                {thumb && (
+                  <img
+                    src={thumb}
+                    alt={property.title}
+                    className="w-14 h-14 rounded-lg object-cover shrink-0"
+                  />
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-foreground truncate">{property.title}</p>
+                  <p className="text-xs text-muted-foreground truncate">{property.suburb}</p>
+                  <p className="text-sm font-display font-bold text-foreground mt-0.5">
+                    {formatPrice(property.price, property.listingType ?? undefined)}
+                  </p>
+                </div>
+              </div>
+
+              {/* WeChat QR Section */}
+              <div className="p-4 rounded-xl border border-border bg-card">
+                <div className="text-center mb-3">
+                  <h3 className="font-display font-semibold text-foreground">{t('share.wechat')}</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">微信分享</p>
+                </div>
+                <div className="flex justify-center">
+                  <div className="p-3 rounded-xl bg-white border border-border">
+                    <img
+                      src={qrUrl}
+                      alt="WeChat QR Code"
+                      width={200}
+                      height={200}
+                      className="block"
+                    />
+                  </div>
+                </div>
+                <p className="text-center text-xs text-muted-foreground mt-3">
+                  {t('share.wechatScan')}
+                </p>
+                <p className="text-center text-xs text-muted-foreground">用微信扫描二维码分享</p>
+                <div className="grid grid-cols-2 gap-2 mt-4">
+                  <a
+                    href={qrUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-1.5 py-2 rounded-lg border border-border text-xs font-medium text-foreground hover:bg-secondary transition-colors"
+                  >
+                    <Download size={14} />
+                    {t('share.saveQR')}
+                  </a>
+                  <button
+                    onClick={copyForWeChat}
+                    className="flex items-center justify-center gap-1.5 py-2 rounded-lg border border-border text-xs font-medium text-foreground hover:bg-secondary transition-colors"
+                  >
+                    <Copy size={14} />
+                    {t('share.wechatCopy')}
+                  </button>
+                </div>
+              </div>
+
+              {/* Share buttons row */}
+              <div>
+                <p className="text-xs uppercase tracking-wider font-medium text-muted-foreground mb-2">
+                  {t('share.more')}
+                </p>
+                <div className="grid grid-cols-4 gap-2">
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-border hover:bg-secondary transition-colors"
+                  >
+                    <span className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white">
+                      <MessageCircle size={18} />
+                    </span>
+                    <span className="text-[11px] font-medium text-foreground">{t('share.whatsapp')}</span>
+                  </a>
+                  <a
+                    href={lineUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-border hover:bg-secondary transition-colors"
+                  >
+                    <span className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold">
+                      LINE
+                    </span>
+                    <span className="text-[11px] font-medium text-foreground">{t('share.line')}</span>
+                  </a>
+                  <button
+                    onClick={copyLink}
+                    className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-border hover:bg-secondary transition-colors"
+                  >
+                    <span className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">
+                      <Link2 size={18} />
+                    </span>
+                    <span className="text-[11px] font-medium text-foreground">{t('share.copyLink')}</span>
+                  </button>
+                  {typeof navigator !== 'undefined' && 'share' in navigator && (
+                    <button
+                      onClick={nativeShare}
+                      className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-border hover:bg-secondary transition-colors"
+                    >
+                      <span className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
+                        <Share2 size={18} />
+                      </span>
+                      <span className="text-[11px] font-medium text-foreground">{t('share.native')}</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
+
+export default ShareSheet;

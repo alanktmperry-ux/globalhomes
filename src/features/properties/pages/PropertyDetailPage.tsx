@@ -42,6 +42,7 @@ import { EOISubmitPanel } from '@/features/offmarket/components/EOISubmitPanel';
 import { useLogPropertyView } from '@/features/vendor/hooks/useLogPropertyView';
 import { DocumentVault } from '@/features/documents/components/DocumentVault';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { ShareSheet } from '@/shared/components/ShareSheet';
 
 export default function PropertyDetailPage() {
   // Support both /property/:slug and /property/:uuid for backward compat
@@ -67,6 +68,7 @@ export default function PropertyDetailPage() {
   const [inspectionTimes, setInspectionTimes] = useState<InspectionSlot[]>([]);
   const [isOwnerAgent, setIsOwnerAgent] = useState(false);
   const [translating, setTranslating] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   useEffect(() => {
     const fetchProperty = async () => {
       setLoading(true);
@@ -350,18 +352,9 @@ export default function PropertyDetailPage() {
               <Heart size={18} className={saved ? 'fill-destructive text-destructive' : 'text-foreground/70'} />
             </button>
             <button
-              onClick={async () => {
-                const url = window.location.href;
-                const title = property.title;
-                const text = `${property.title} — ${property.address}, ${property.suburb}`;
-                if (navigator.share) {
-                  try { await navigator.share({ title, text, url }); } catch {}
-                } else {
-                  await navigator.clipboard.writeText(url);
-                  toast.success('Link copied to clipboard!');
-                }
-              }}
+              onClick={() => setShareOpen(true)}
               className="w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center shadow-md"
+              aria-label={t('share.title')}
             >
               <Share2 size={18} className="text-foreground/70" />
             </button>
@@ -915,6 +908,12 @@ export default function PropertyDetailPage() {
           onClose={() => setRentalApplicationOpen(false)}
         />
       )}
+
+      <ShareSheet
+        property={property}
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+      />
     </div>
   );
 }

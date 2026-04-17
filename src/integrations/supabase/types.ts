@@ -6189,6 +6189,146 @@ export type Database = {
           },
         ]
       }
+      referral_agents: {
+        Row: {
+          agency_name: string | null
+          converted_referrals: number
+          country: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          language_preference: string | null
+          phone: string | null
+          referral_code: string
+          status: string
+          tier: string
+          total_commission_aud: number
+          total_referrals: number
+          updated_at: string
+          user_id: string | null
+          wechat_id: string | null
+        }
+        Insert: {
+          agency_name?: string | null
+          converted_referrals?: number
+          country: string
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          language_preference?: string | null
+          phone?: string | null
+          referral_code: string
+          status?: string
+          tier?: string
+          total_commission_aud?: number
+          total_referrals?: number
+          updated_at?: string
+          user_id?: string | null
+          wechat_id?: string | null
+        }
+        Update: {
+          agency_name?: string | null
+          converted_referrals?: number
+          country?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          language_preference?: string | null
+          phone?: string | null
+          referral_code?: string
+          status?: string
+          tier?: string
+          total_commission_aud?: number
+          total_referrals?: number
+          updated_at?: string
+          user_id?: string | null
+          wechat_id?: string | null
+        }
+        Relationships: []
+      }
+      referral_leads: {
+        Row: {
+          buyer_country: string | null
+          buyer_email: string | null
+          buyer_name: string | null
+          buyer_phone: string | null
+          commission_aud: number
+          created_at: string
+          id: string
+          notes: string | null
+          property_id: string | null
+          property_url: string | null
+          referral_agent_id: string
+          referred_by_code: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          buyer_country?: string | null
+          buyer_email?: string | null
+          buyer_name?: string | null
+          buyer_phone?: string | null
+          commission_aud?: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          property_id?: string | null
+          property_url?: string | null
+          referral_agent_id: string
+          referred_by_code: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          buyer_country?: string | null
+          buyer_email?: string | null
+          buyer_name?: string | null
+          buyer_phone?: string | null
+          commission_aud?: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          property_id?: string | null
+          property_url?: string | null
+          referral_agent_id?: string
+          referred_by_code?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_leads_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_leads_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_leads_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_leads_referral_agent_id_fkey"
+            columns: ["referral_agent_id"]
+            isOneToOne: false
+            referencedRelation: "referral_agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rent_payments: {
         Row: {
           agent_id: string
@@ -10097,6 +10237,7 @@ export type Database = {
         }
         Returns: string
       }
+      generate_referral_code: { Args: never; Returns: string }
       get_auction_public: { Args: { p_property_id: string }; Returns: Json }
       get_auction_sensitive: {
         Args: { p_auction_id: string }
@@ -10406,6 +10547,10 @@ export type Database = {
         Returns: Json
       }
       refresh_agent_rating: { Args: { p_agent_id: string }; Returns: undefined }
+      refresh_referral_agent_stats: {
+        Args: { p_agent_id: string }
+        Returns: undefined
+      }
       schools_within_km: {
         Args: { p_km: number; p_lat: number; p_lng: number }
         Returns: {

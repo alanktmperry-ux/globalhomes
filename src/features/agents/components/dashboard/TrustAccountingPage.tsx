@@ -24,6 +24,7 @@ import TrustImportWizard from './TrustImportWizard';
 import TrustReceiptModal from './TrustReceiptModal';
 import { useTrustAccounting, TrustTransaction } from '@/features/agents/hooks/useTrustAccounting';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 
@@ -56,12 +57,26 @@ const TrustAccountingPage = () => {
     createAccount, createTransaction, voidTransaction,
   } = useTrustAccounting();
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlPropertyId = searchParams.get('property_id');
+
   // Filters
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterClient, setFilterClient] = useState('all');
-  const [filterProperty, setFilterProperty] = useState('all');
+  const [filterProperty, setFilterProperty] = useState(urlPropertyId || 'all');
   const [filterDateFrom, setFilterDateFrom] = useState('');
   const [filterDateTo, setFilterDateTo] = useState('');
+
+  // Sync URL ?property_id → filter state
+  useEffect(() => {
+    if (urlPropertyId && filterProperty !== urlPropertyId) setFilterProperty(urlPropertyId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlPropertyId]);
+
+  const filteredPropertyAddress = useMemo(
+    () => urlPropertyId ? properties.find(p => p.id === urlPropertyId)?.address : null,
+    [urlPropertyId, properties]
+  );
 
   // Modals
   const [showNewTx, setShowNewTx] = useState(false);

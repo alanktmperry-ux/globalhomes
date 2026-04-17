@@ -3,7 +3,7 @@ import {
   LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, LogOut, Building2, UserPlus, Home,
   User, FileText, CreditCard, Star, MapPinned, Shield, Contact, Kanban, Scale, Landmark,
   ClipboardCheck, CalendarDays, Search, TrendingUp, Receipt, PartyPopper, Calculator, HelpCircle, ClipboardList, Settings2, Flame,
-  Handshake, Sparkles, Target, ShoppingBag, ChevronDown, Mail, Wrench,
+  Handshake, Sparkles, Target, ShoppingBag, ChevronDown, Mail, Wrench, Activity,
 } from 'lucide-react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -52,6 +52,7 @@ const PROPERTY_NAV: NavItem[] = [
   { title: 'Settlement', url: '/dashboard/settlements', icon: PartyPopper },
   { title: 'Automation', url: '/dashboard/automation', icon: Mail },
   { title: 'Suppliers', url: '/dashboard/suppliers', icon: Wrench },
+  { title: 'Vacancy KPIs', url: '/dashboard/vacancy-kpi', icon: Activity },
 ];
 
 const INSIGHTS_NAV: NavItem[] = [

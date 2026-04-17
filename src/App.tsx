@@ -123,6 +123,7 @@ const HelpAgentsPage = React.lazy(() => import("./pages/HelpAgentsPage"));
 const HelpBuyersPage = React.lazy(() => import("./pages/HelpBuyersPage"));
 const HelpRentersPage = React.lazy(() => import("./pages/HelpRentersPage"));
 const HelpVendorsPage = React.lazy(() => import("./pages/HelpVendorsPage"));
+const HelpPropertyManagersPage = React.lazy(() => import("./pages/HelpPropertyManagersPage"));
 const HelpContactPage = React.lazy(() => import("./pages/HelpContactPage"));
 const CRMPage = React.lazy(() => import("./features/crm/pages/CRMPage"));
 const SavedSearchesPage = React.lazy(() => import("./features/alerts/pages/SavedSearchesPage"));
@@ -232,6 +233,7 @@ const App = () => (
                   <Route path="/help/buyers" element={<HelpBuyersPage />} />
                   <Route path="/help/renters" element={<HelpRentersPage />} />
                   <Route path="/help/vendors" element={<HelpVendorsPage />} />
+                  <Route path="/help/property-managers" element={<HelpPropertyManagersPage />} />
                   <Route path="/help/contact" element={<HelpContactPage />} />
                 </Route>
 

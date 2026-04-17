@@ -2,7 +2,7 @@ export interface FaqItem {
   id: string;
   question: string;
   answer: string;
-  category: 'general' | 'agents' | 'buyers' | 'renters' | 'vendors' | 'auctions' | 'billing' | 'technical';
+  category: 'general' | 'agents' | 'buyers' | 'renters' | 'vendors' | 'auctions' | 'billing' | 'technical' | 'property-managers';
   tags: string[];
 }
 
@@ -633,7 +633,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     id: 'buyer-firb-calculator',
     question: 'How does the Buying Costs Calculator (FIRB) work?',
-    answer: 'Every property listing page includes a "Buying Costs Calculator" section that estimates your total upfront purchase costs.\n\nWhat it estimates:\n• Standard stamp duty (state-by-state)\n• FIRB application fees (foreign buyers)\n• Foreign investor surcharges\n• Legal and conveyancing costs (indicative)\n\nHow to use it: scroll to the "Buying Costs Calculator" on any listing. By default it shows costs for an Australian resident. Toggle "I am a foreign buyer" on to add FIRB application fees and the foreign investor surcharge.\n\nWho it\'s for: both overseas buyers and Australian residents — the foreign buyer toggle adjusts calculations automatically. Figures are indicative only; verify final amounts at firb.gov.au and with a solicitor.',
+    answer: 'Every property listing page includes a "Buying Costs Calculator" section that estimates your total upfront purchase costs.\n\nWhat it estimates:\n• Standard stamp duty (state-by-state)\n• FIRB application fees (foreign buyers)\n• Foreign investor duty surcharges\n• Legal and conveyancing costs (indicative)\n\nHow to use it: scroll to the "Buying Costs Calculator" on any listing. By default it shows costs for an Australian resident. Toggle "I am a foreign buyer" on and the FIRB application fee and foreign investor duty surcharge are automatically added to the total.\n\nFIRB application fees by purchase price:\n• Under $75,000 — $4,200\n• $75,000–$1M — $13,200\n• $1M–$2M — $26,400\n• $2M–$3M — $52,800\n• Over $3M — $79,200\n\nForeign investor duty surcharge by state:\n• NSW 8% • VIC 8% • QLD 7% • SA 7% • WA 7% • TAS 8% • ACT 7% • NT 0%\n\nFigures are indicative only; verify final amounts at firb.gov.au and with a solicitor.',
     category: 'buyers',
     tags: ['firb', 'stamp duty', 'foreign buyer', 'calculator', 'costs', 'overseas'],
   },
@@ -722,11 +722,163 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: 'agents',
     tags: ['referral', 'tier', 'commission', 'silver', 'gold', 'platinum'],
   },
+
+  // PROPERTY MANAGEMENT
+  {
+    id: 'pm-tenant-portal-access',
+    question: 'How do I give my tenant access to their portal?',
+    answer: 'Go to your agent dashboard → open the tenancy → find the Tenant Portal card. Click "Copy link" or "Email to tenant" to send them their personal portal link. They can view their lease, rent payments, submit maintenance requests and access documents — no login required.',
+    category: 'property-managers',
+    tags: ['tenant portal', 'tenancy', 'access', 'link'],
+  },
+  {
+    id: 'pm-owner-portal-access',
+    question: 'How do I give my landlord/owner access to their portal?',
+    answer: 'Open the property or tenancy in your dashboard → find the Owner Portal card → click "Copy link" or "Email to owner." Owners can view financials, approve maintenance quotes, download statements and view inspection reports — no login required.',
+    category: 'property-managers',
+    tags: ['owner portal', 'landlord', 'access', 'link'],
+  },
+  {
+    id: 'pm-arrears-automation',
+    question: 'How do automated arrears reminders work?',
+    answer: 'When a tenant falls overdue, the platform automatically sends reminders at day 1, 3, 7 and 14. You can turn this on or off in Dashboard → Automation Settings, and edit the email templates and merge fields such as {tenant_name}, {property_address} and {amount_overdue}.',
+    category: 'property-managers',
+    tags: ['arrears', 'automation', 'reminders', 'overdue'],
+  },
+  {
+    id: 'pm-maintenance-management',
+    question: 'How does maintenance request management work?',
+    answer: 'Tenants submit requests via their portal link. You receive them in Dashboard → Maintenance, where you can assign a tradesperson, request owner approval for large jobs, track status, and upload invoices. Tenants are automatically notified when their job status changes.',
+    category: 'property-managers',
+    tags: ['maintenance', 'jobs', 'tradesperson', 'workflow'],
+  },
+  {
+    id: 'pm-supplier-portal',
+    question: 'Can suppliers access job details without logging in?',
+    answer: 'Yes. From the Suppliers page, copy or email the supplier\'s portal link. They can view assigned jobs, accept them, propose a schedule, mark complete, and upload their invoice — all without an account.',
+    category: 'property-managers',
+    tags: ['supplier', 'portal', 'tradesperson', 'jobs'],
+  },
+  {
+    id: 'pm-share-whatsapp-line',
+    question: 'How do I share a listing on WhatsApp or Line?',
+    answer: 'Tap the share button on any property listing. Select WhatsApp to send directly with property details pre-filled, or Line to share to your Line contacts. WeChat sharing uses a QR code — open WeChat → Scan → point at the QR code.',
+    category: 'general',
+    tags: ['share', 'whatsapp', 'line', 'wechat'],
+  },
+  {
+    id: 'pm-vacancy-kpi',
+    question: 'What is the vacancy KPI dashboard?',
+    answer: 'Dashboard → Vacancy KPIs shows your portfolio occupancy rate, properties currently vacant, vacating this month, average days to re-let, and total vacancy loss in AUD. A 90-day timeline view shows all properties and their lease status at a glance.',
+    category: 'property-managers',
+    tags: ['vacancy', 'kpi', 'occupancy', 'dashboard'],
+  },
+
+  // PROPERTY MANAGEMENT — DETAILED
+  {
+    id: 'pm-getting-started',
+    question: 'How do I access property management features?',
+    answer: 'From your agent dashboard, look for the "Property Management" section in the left sidebar. It includes Rent Roll, Rental Applications, Maintenance, Vacancies, Vacancy KPIs, Suppliers, Statements and Automation. Trust accounting and inspections live alongside these tools.',
+    category: 'property-managers',
+    tags: ['getting started', 'sidebar', 'navigation'],
+  },
+  {
+    id: 'pm-rent-roll',
+    question: 'How does the rent roll work?',
+    answer: 'Dashboard → Rent Roll shows every active tenancy with lease dates, weekly rent, paid-to date and arrears status. Click any tenancy to record a payment (amount, date, method), view its full history, or send the tenant their portal link. Lease expiries within 60 days are colour-coded with amber and red warnings, and you can filter or search by suburb, tenant name or status.',
+    category: 'property-managers',
+    tags: ['rent roll', 'tenancy', 'rent payment', 'lease expiry'],
+  },
+  {
+    id: 'pm-trust-accounting',
+    question: 'How does trust accounting work?',
+    answer: 'The Trust Accounting page shows your trust account balance, BSB and account number, and every transaction. Record receipts (rent, deposits, owner contributions) and payments (owner disbursements, supplier invoices, fees). Each transaction has a status — pending, cleared, reconciled or voided — and once reconciled it cannot be edited, only voided with an audit trail.',
+    category: 'property-managers',
+    tags: ['trust accounting', 'transactions', 'reconciliation', 'compliance'],
+  },
+  {
+    id: 'pm-arrears-detail',
+    question: 'How are arrears calculated and managed?',
+    answer: 'Arrears are calculated as days overdue × daily rent based on the tenant\'s paid-to date. The Arrears dashboard groups tenants by severity (1–7, 8–14, 15+ days). Tap "Remind" to send an immediate manual email, or enable automated sequences that send at day 1, 3, 7 and 14. Toggle automation on/off in Dashboard → Automation Settings, and view every automated send in the recent sends log.',
+    category: 'property-managers',
+    tags: ['arrears', 'overdue', 'reminders', 'automation'],
+  },
+  {
+    id: 'pm-lease-renewals',
+    question: 'How do lease renewals work?',
+    answer: 'Tenancies show renewal status badges: amber "Due Soon" at 60–90 days from expiry and red "Urgent" under 60 days. Open a tenancy and click "Offer Renewal" to set the new rent, new end date and lease type (fixed or periodic). Mark the offer as accepted to update the tenancy, or declined to automatically trigger the vacancy workflow.',
+    category: 'property-managers',
+    tags: ['lease renewal', 'expiry', 'tenancy', 'vacancy'],
+  },
+  {
+    id: 'pm-inspections',
+    question: 'How do I schedule and conduct inspections?',
+    answer: 'Dashboard → Inspections lets you schedule routine, ingoing and outgoing inspections. When conducting one, walk room-by-room and record condition ratings on a 6-level scale, add photos and flag maintenance issues directly into the maintenance queue. Send entry notices to the tenant 7 days and 24 hours before. Save the report when complete — it\'s timestamped and stored against the tenancy.',
+    category: 'property-managers',
+    tags: ['inspections', 'condition report', 'entry notice', 'photos'],
+  },
+  {
+    id: 'pm-maintenance-detail',
+    question: 'How does the maintenance workflow work end-to-end?',
+    answer: 'Tenants submit requests via their portal link. You see them in Dashboard → Maintenance, filtered by status (new, quoted, scheduled, in progress, complete). Assign a tradesperson from your supplier list (filtered by trade category) and the supplier is emailed with job details and the property address. Status changes auto-notify the tenant. Upload invoices, record final costs, and request owner approval for any job above the threshold.',
+    category: 'property-managers',
+    tags: ['maintenance', 'workflow', 'suppliers', 'invoices'],
+  },
+  {
+    id: 'pm-suppliers',
+    question: 'How do I manage suppliers?',
+    answer: 'Add suppliers with trade category, ABN, license number and insurance expiry date. Insurance alerts go amber 30–60 days from expiry and red under 30 days. Assign jobs from the Suppliers page or Maintenance dashboard. Performance is tracked automatically: rate suppliers after each completed job and view their average response time. Suppliers can update job status via their secure portal link without an account.',
+    category: 'property-managers',
+    tags: ['suppliers', 'tradesperson', 'insurance', 'rating'],
+  },
+  {
+    id: 'pm-vacancies',
+    question: 'How do I manage vacancies?',
+    answer: 'Vacancies progress through five statuses: Notice Given → Vacating → Vacant → Re-listed → Re-let. Update each from the Vacancies dashboard. The Vacancy KPI dashboard shows occupancy rate, average days to re-let and total vacancy loss in AUD, with a 90-day timeline view across your whole portfolio. Automated alerts fire on day 7, 14 and 21 if a property is vacant with no active listing.',
+    category: 'property-managers',
+    tags: ['vacancy', 'kpi', 'occupancy', 'alerts'],
+  },
+  {
+    id: 'pm-owner-statements',
+    question: 'How do I create owner statements?',
+    answer: 'Go to Dashboard → Statements → New Statement. Select the property, set the period, and enter gross rent collected, your management fee percentage and any maintenance costs. Net to owner is calculated automatically. Email the statement directly to the owner from the platform. All historical statements are stored, and a monthly automated reminder fires if no statement was created for the previous month.',
+    category: 'property-managers',
+    tags: ['statements', 'owner', 'financials', 'management fee'],
+  },
+  {
+    id: 'pm-automation-settings',
+    question: 'What automations can I configure?',
+    answer: 'Dashboard → Automation Settings exposes four automation types: arrears sequences, lease renewal notices, inspection entry notices and maintenance status updates. Edit each template using merge fields such as {tenant_name}, {property_address} and {amount_overdue}. Use the "Run now" button to trigger any automation immediately for testing, and review the last 20 automated sends with delivery status in the recent sends log.',
+    category: 'property-managers',
+    tags: ['automation', 'templates', 'merge fields', 'emails'],
+  },
+  {
+    id: 'pm-tenant-portal-detail',
+    question: 'What can tenants see in their portal?',
+    answer: 'The tenant portal shows their lease summary, rent payment history, open and past maintenance requests, shared documents, and inspection reports. They can submit new maintenance requests directly. Send the link from Tenancy Detail → Tenant Portal card → Copy link or Email to tenant. The link is unique and secure — no account or login required.',
+    category: 'property-managers',
+    tags: ['tenant portal', 'lease', 'maintenance', 'documents'],
+  },
+  {
+    id: 'pm-owner-portal-detail',
+    question: 'What can owners see in their portal and how do approvals work?',
+    answer: 'The owner portal shows a property overview, financials, pending maintenance approvals, statements and inspection reports. Send the link from the property or tenancy detail → Owner Portal card → Copy link or Email to owner. Owners approve or decline maintenance jobs above the approval threshold. Set the threshold per property in property settings → maintenance approval threshold (default $500). All access is via a secure token link with no login required.',
+    category: 'property-managers',
+    tags: ['owner portal', 'approval', 'threshold', 'maintenance'],
+  },
+  {
+    id: 'pm-supplier-portal-detail',
+    question: 'What can suppliers do in their portal?',
+    answer: 'Suppliers see their assigned jobs, full job details, tenant contact for access arrangements, and scheduled dates. They can accept jobs, propose a schedule, mark them complete and upload invoices — all without an account. Send the portal link from the Suppliers page → supplier card → Copy portal link.',
+    category: 'property-managers',
+    tags: ['supplier portal', 'jobs', 'invoices', 'tradesperson'],
+  },
 ];
 
 export const FAQ_CATEGORIES = [
   { key: 'general', label: 'General', icon: 'HelpCircle' },
   { key: 'agents', label: 'Agents', icon: 'Building2' },
+  { key: 'property-managers', label: 'Property Managers', icon: 'ClipboardList' },
   { key: 'buyers', label: 'Buyers', icon: 'Home' },
   { key: 'renters', label: 'Renters', icon: 'Key' },
   { key: 'vendors', label: 'Vendors', icon: 'BarChart3' },

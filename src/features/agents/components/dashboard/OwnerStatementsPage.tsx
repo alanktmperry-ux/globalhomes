@@ -47,7 +47,7 @@ export default function OwnerStatementsPage() {
 
   const lastMonth = subMonths(new Date(), 1);
   const [form, setForm] = useState({
-    property_id: '',
+    property_id: filterPropertyId || '',
     period_start: format(startOfMonth(lastMonth), 'yyyy-MM-dd'),
     period_end: format(endOfMonth(lastMonth), 'yyyy-MM-dd'),
     gross_rent_aud: 0,
@@ -56,6 +56,16 @@ export default function OwnerStatementsPage() {
     notes: '',
   });
   const [otherDeductions, setOtherDeductions] = useState<OtherDeduction[]>([]);
+
+  // Filter statements by URL ?property_id
+  const visibleStatements = useMemo(
+    () => filterPropertyId ? statements.filter(s => s.property_id === filterPropertyId) : statements,
+    [statements, filterPropertyId]
+  );
+  const filterPropertyAddress = useMemo(
+    () => filterPropertyId ? properties.find(p => p.id === filterPropertyId)?.address : null,
+    [properties, filterPropertyId]
+  );
 
   const otherTotal = useMemo(() => otherDeductions.reduce((s, d) => s + Number(d.amount || 0), 0), [otherDeductions]);
   const netAmount = useMemo(

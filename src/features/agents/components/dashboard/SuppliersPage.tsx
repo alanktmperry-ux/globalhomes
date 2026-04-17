@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Plus, Pencil, Star, AlertTriangle, Search, Wrench, Copy, Loader2, BarChart3, LayoutGrid } from 'lucide-react';
+import { Plus, Pencil, Star, AlertTriangle, Search, Wrench, Copy, Loader2, BarChart3, LayoutGrid, Briefcase, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -144,6 +144,48 @@ export default function SuppliersPage() {
     const url = `${window.location.origin}/supplier/portal?token=${token}`;
     navigator.clipboard.writeText(url);
     toast.success('Portal link copied');
+  };
+
+  // Assign job dialog state
+  const [assignFor, setAssignFor] = useState<Supplier | null>(null);
+  const [openJobs, setOpenJobs] = useState<any[]>([]);
+  const [loadingJobs, setLoadingJobs] = useState(false);
+  const [assigningJobId, setAssigningJobId] = useState<string | null>(null);
+
+  const openAssign = async (s: Supplier) => {
+    setAssignFor(s);
+    setLoadingJobs(true);
+    const { data } = await supabase
+      .from('maintenance_jobs')
+      .select('id, title, priority, created_at, status, assigned_supplier_id, properties:property_id(address, suburb)')
+      .eq('agent_id', agentId!)
+      .in('status', ['new', 'acknowledged'])
+      .is('assigned_supplier_id', null)
+      .order('created_at', { ascending: false });
+    setOpenJobs((data as any) || []);
+    setLoadingJobs(false);
+  };
+
+  const submitAssign = async (jobId: string) => {
+    if (!assignFor) return;
+    setAssigningJobId(jobId);
+    const { error } = await supabase.from('maintenance_jobs').update({
+      assigned_supplier_id: assignFor.id,
+      status: 'assigned',
+    } as any).eq('id', jobId);
+    setAssigningJobId(null);
+    if (error) { toast.error('Could not assign'); return; }
+    toast.success('Assigned — notify them from the Maintenance dashboard');
+    setAssignFor(null);
+    setOpenJobs([]);
+  };
+
+  const removeSupplier = async (s: Supplier) => {
+    if (!confirm(`Remove ${s.business_name} from your supplier list? This won't affect jobs already assigned.`)) return;
+    const { error } = await supabase.from('suppliers' as any).update({ status: 'inactive' } as any).eq('id', s.id);
+    if (error) { toast.error('Could not remove'); return; }
+    toast.success('Supplier removed');
+    load();
   };
 
   if (loading) {

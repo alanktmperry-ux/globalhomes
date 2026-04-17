@@ -4016,9 +4016,11 @@ export type Database = {
       leads: {
         Row: {
           agent_id: string
+          agent_notes: string | null
           archived_at: string | null
           budget_range: string | null
           buying_purpose: string | null
+          converted_contact_id: string | null
           created_at: string
           id: string
           interests: string[] | null
@@ -4040,9 +4042,11 @@ export type Database = {
         }
         Insert: {
           agent_id: string
+          agent_notes?: string | null
           archived_at?: string | null
           budget_range?: string | null
           buying_purpose?: string | null
+          converted_contact_id?: string | null
           created_at?: string
           id?: string
           interests?: string[] | null
@@ -4064,9 +4068,11 @@ export type Database = {
         }
         Update: {
           agent_id?: string
+          agent_notes?: string | null
           archived_at?: string | null
           budget_range?: string | null
           buying_purpose?: string | null
+          converted_contact_id?: string | null
           created_at?: string
           id?: string
           interests?: string[] | null
@@ -4087,6 +4093,13 @@ export type Database = {
           user_phone?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "leads_converted_contact_id_fkey"
+            columns: ["converted_contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "leads_property_id_fkey"
             columns: ["property_id"]
@@ -5714,6 +5727,7 @@ export type Database = {
           lng: number | null
           maintenance_approval_threshold_aud: number | null
           marketing_budget: number | null
+          marketing_checklist: Json
           marketing_email_sent: boolean
           marketing_email_sent_at: string | null
           max_occupants: number | null
@@ -5851,6 +5865,7 @@ export type Database = {
           lng?: number | null
           maintenance_approval_threshold_aud?: number | null
           marketing_budget?: number | null
+          marketing_checklist?: Json
           marketing_email_sent?: boolean
           marketing_email_sent_at?: string | null
           max_occupants?: number | null
@@ -5988,6 +6003,7 @@ export type Database = {
           lng?: number | null
           maintenance_approval_threshold_aud?: number | null
           marketing_budget?: number | null
+          marketing_checklist?: Json
           marketing_email_sent?: boolean
           marketing_email_sent_at?: string | null
           max_occupants?: number | null
@@ -11160,6 +11176,7 @@ export type Database = {
           lng: number | null
           maintenance_approval_threshold_aud: number | null
           marketing_budget: number | null
+          marketing_checklist: Json
           marketing_email_sent: boolean
           marketing_email_sent_at: string | null
           max_occupants: number | null

@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { StampDutyCalculator } from '@/components/StampDutyCalculator';
+import { FIRBCalculator } from '@/components/FIRBCalculator';
 
 export default function StampDutyPage() {
   return (
@@ -31,6 +32,10 @@ export default function StampDutyPage() {
           </p>
 
           <StampDutyCalculator propertyPrice={null} propertyAddress="" />
+
+          <div className="mt-4">
+            <FIRBCalculator propertyPrice={null} propertyAddress="" />
+          </div>
 
           {/* SEO content */}
           <div className="mt-12 space-y-6 text-muted-foreground">

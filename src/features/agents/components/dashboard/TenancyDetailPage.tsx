@@ -144,6 +144,16 @@ const TenancyDetailPage = () => {
   const [jobActualCost, setJobActualCost] = useState('');
   const [jobCompletedAt, setJobCompletedAt] = useState<Date | undefined>(undefined);
 
+  // Renewal
+  const [showRenewal, setShowRenewal] = useState(false);
+  const [renewalForm, setRenewalForm] = useState({
+    rent: '',
+    lease_end: '',
+    type: 'fixed',
+    notes: '',
+  });
+  const [emailingOwner, setEmailingOwner] = useState(false);
+
   const fetchAll = useCallback(async () => {
     if (!user || !tenancyId) return;
     setLoading(true);

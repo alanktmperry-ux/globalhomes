@@ -247,6 +247,7 @@ const translations: Record<Language, Record<string, string>> = {
     'firb.eligibleBadge': '外国买家可购',
     'firb.checkBadge': '请核实 FIRB 资格',
   },
+  ko: {
     'app.name': 'ListHQ',
     'search.placeholder': '검색 "멜버른 4베드룸 집 $85만"',
     'search.voice.listening': '듣고 있습니다...',

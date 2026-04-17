@@ -10,6 +10,7 @@ import StepAddress from './StepAddress';
 import StepBasics from './StepBasics';
 import StepPhotos from './StepPhotos';
 import StepVoice from './StepVoice';
+import StepTranslate from './StepTranslate';
 import StepSettings from './StepSettings';
 import StepPreview from './StepPreview';
 
@@ -481,6 +482,14 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
               draft.internetIncluded ? 'internet' : null,
             ].filter(Boolean)
           : [],
+        title_zh: draft.title_zh || null,
+        description_zh: draft.description_zh || null,
+        title_zh_tw: draft.title_zh_tw || null,
+        description_zh_tw: draft.description_zh_tw || null,
+        title_ja: draft.title_ja || null,
+        description_ja: draft.description_ja || null,
+        title_ko: draft.title_ko || null,
+        description_ko: draft.description_ko || null,
       } as any;
 
       // Add 'Pets considered' to features if applicable
@@ -565,8 +574,9 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
       case 1: return <StepBasics draft={draft} update={update} />;
       case 2: return <StepPhotos draft={draft} update={update} />;
       case 3: return <StepVoice draft={draft} update={update} />;
-      case 4: return <StepSettings draft={draft} update={update} />;
-      case 5: return <StepPreview draft={draft} onPublish={handlePublish} publishing={publishing} isEdit={!!editPropertyId} />;
+      case 4: return <StepTranslate draft={draft} update={update} />;
+      case 5: return <StepSettings draft={draft} update={update} />;
+      case 6: return <StepPreview draft={draft} onPublish={handlePublish} publishing={publishing} isEdit={!!editPropertyId} />;
       default: return null;
     }
   };

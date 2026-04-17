@@ -21,6 +21,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { toast } from 'sonner';
 import DashboardHeader from './DashboardHeader';
+import TenantPortalCard from './TenantPortalCard';
 import { format, parseISO, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { cn } from '@/shared/lib/utils';
 
@@ -49,6 +50,7 @@ interface Tenancy {
   owner_account_number: string | null;
   status: string;
   notes: string | null;
+  tenant_portal_token: string | null;
   created_at: string;
   updated_at: string;
   properties: { address: string; suburb: string } | null;
@@ -549,6 +551,18 @@ const TenancyDetailPage = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {agentId && (
+              <div className="mt-4">
+                <TenantPortalCard
+                  tenancyId={tenancy.id}
+                  tenantName={tenancy.tenant_name}
+                  tenantEmail={tenancy.tenant_email}
+                  portalToken={tenancy.tenant_portal_token}
+                  agentId={agentId}
+                />
+              </div>
+            )}
           </TabsContent>
 
           {/* ═══ TAB 2: Rent Payments ═══ */}

@@ -26,6 +26,19 @@ function formatDollars(n: number): string {
   return '$' + Math.round(n).toLocaleString('en-AU');
 }
 
+function getFIRBFee(price: number): number {
+  if (price < 75000) return 4200;
+  if (price < 1000000) return 13200;
+  if (price < 2000000) return 26400;
+  if (price < 3000000) return 52800;
+  return 79200;
+}
+
+const FOREIGN_SURCHARGE: Record<AustralianState, number> = {
+  NSW: 0.08, VIC: 0.08, QLD: 0.07, SA: 0.07,
+  WA: 0.07, TAS: 0.08, ACT: 0.07, NT: 0,
+};
+
 export function StampDutyCalculator({ propertyPrice, propertyAddress, propertyState }: Props) {
   const [price, setPrice] = useState(propertyPrice ? String(propertyPrice) : '');
   const [state, setState] = useState<AustralianState>(() => {
@@ -34,6 +47,7 @@ export function StampDutyCalculator({ propertyPrice, propertyAddress, propertySt
   });
   const [buyerType, setBuyerType] = useState<BuyerType>('owner_occupier');
   const [isFirstHome, setIsFirstHome] = useState(false);
+  const [isForeignBuyer, setIsForeignBuyer] = useState(false);
   const [showBreakdown, setShowBreakdown] = useState(false);
 
   useEffect(() => {

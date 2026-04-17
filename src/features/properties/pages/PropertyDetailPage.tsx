@@ -603,30 +603,62 @@ export default function PropertyDetailPage() {
 
 
             {/* Multilingual Translations */}
-            {rawProperty && (rawProperty.translations || isOwnerAgent) && (
-              <div className="space-y-3">
-                {isOwnerAgent && !rawProperty.translations && (
-                  <Button
-                    onClick={handleGenerateTranslations}
-                    disabled={translating}
-                    variant="outline"
-                    className="gap-2"
-                  >
-                    {translating ? (
-                      <><Loader2 size={14} className="animate-spin" /> Generating translations…</>
-                    ) : (
-                      <><Globe size={14} /> Generate Translations</>
+            {(() => {
+              if (!rawProperty) return null;
+              const langMap: Record<string, { title: string; desc: string }> = {
+                'zh': { title: 'title_zh', desc: 'description_zh' },
+                'zh-TW': { title: 'title_zh_tw', desc: 'description_zh_tw' },
+                'ja': { title: 'title_ja', desc: 'description_ja' },
+                'ko': { title: 'title_ko', desc: 'description_ko' },
+              } as any;
+              const fields = langMap[String((rawProperty as any).__lang ?? '')] || (
+                (typeof window !== 'undefined' ? langMap[localStorage.getItem('gh-lang') || ''] : undefined)
+              );
+              const storedTitle = fields ? (rawProperty as any)[fields.title] : null;
+              const storedDesc = fields ? (rawProperty as any)[fields.desc] : null;
+              const hasStoredTranslation = !!(storedTitle || storedDesc);
+
+              if (hasStoredTranslation) {
+                return (
+                  <div className="bg-card border border-border rounded-2xl p-5 space-y-3">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+                      <Globe size={14} /> {storedTitle || property.title}
+                    </div>
+                    {storedDesc && (
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">
+                        {storedDesc}
+                      </p>
                     )}
-                  </Button>
-                )}
-                {rawProperty.translations && (
-                  <MultilingualListingDetail
-                    listing={rawProperty}
-                    isAgent={isOwnerAgent}
-                  />
-                )}
-              </div>
-            )}
+                  </div>
+                );
+              }
+
+              if (!(rawProperty.translations || isOwnerAgent)) return null;
+              return (
+                <div className="space-y-3">
+                  {isOwnerAgent && !rawProperty.translations && (
+                    <Button
+                      onClick={handleGenerateTranslations}
+                      disabled={translating}
+                      variant="outline"
+                      className="gap-2"
+                    >
+                      {translating ? (
+                        <><Loader2 size={14} className="animate-spin" /> Generating translations…</>
+                      ) : (
+                        <><Globe size={14} /> Generate Translations</>
+                      )}
+                    </Button>
+                  )}
+                  {rawProperty.translations && (
+                    <MultilingualListingDetail
+                      listing={rawProperty}
+                      isAgent={isOwnerAgent}
+                    />
+                  )}
+                </div>
+              );
+            })()}
 
 
             {!isRental && (

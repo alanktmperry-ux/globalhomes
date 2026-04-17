@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft, Loader2, Edit, Plus, AlertTriangle, Printer,
-  CheckCircle2, Clock, Wrench, ChevronDown, ChevronUp, Copy, Mail, ExternalLink, AlertCircle, RefreshCw,
+  CheckCircle2, Clock, Wrench, ChevronDown, ChevronUp, Copy, Mail, ExternalLink, AlertCircle, RefreshCw, FileText,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';

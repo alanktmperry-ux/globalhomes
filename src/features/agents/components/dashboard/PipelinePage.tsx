@@ -144,6 +144,12 @@ const PipelinePage = () => {
     const card = cards.find(c => c.id === cardId);
     if (!card || card.stage === targetStage) return;
 
+    // Intercept moves into 'settled' (unless already settled) — show modal
+    if (targetStage === 'settled' && card.stage !== 'settled') {
+      setSettlementCard({ card, previousStage: card.stage });
+      return;
+    }
+
     setCards(prev => prev.map(c =>
       c.id === cardId ? { ...c, stage: targetStage, movedAt: new Date().toISOString() } : c
     ));

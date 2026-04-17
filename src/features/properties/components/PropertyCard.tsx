@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Bed, Bath, Car, Heart, BadgeCheck, Star, Sparkles, Shield, ShieldCheck, Eye, UserCheck, CalendarDays, PawPrint, Sofa } from 'lucide-react';
+import { Bed, Bath, Car, Heart, BadgeCheck, Star, Sparkles, Shield, ShieldCheck, Eye, UserCheck, CalendarDays, PawPrint, Sofa, Globe2, AlertTriangle } from 'lucide-react';
 import { TourBadge } from '@/components/tour/TourBadge';
 import { OffMarketBadge } from '@/features/offmarket/components/OffMarketBadge';
 import { Property, PropertyStatus } from '@/shared/lib/types';
@@ -76,6 +76,18 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
   const isFeatured = property.agent.isSubscribed;
   const agentRating = property.agent.rating && property.agent.rating > 0 ? property.agent.rating : null;
   const reviewCount = property.agent.reviewCount || 0;
+
+  // FIRB eligibility heuristic: new builds, off-the-plan & apartments are generally
+  // eligible for foreign buyers; established dwellings need verification.
+  const ptype = (property.propertyType || '').toLowerCase();
+  const isNewOrOffPlan =
+    property.status === 'new' ||
+    ptype.includes('off-the-plan') ||
+    ptype.includes('off the plan') ||
+    ptype.includes('new');
+  const isApartment = ptype.includes('apartment') || ptype.includes('unit');
+  const firbEligible = !isRental && (isNewOrOffPlan || isApartment);
+  const firbCheckRequired = !isRental && !firbEligible;
 
   return (
     <>
@@ -207,6 +219,29 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
             </p>
           )}
 
+          {/* FIRB foreign-buyer eligibility hint (sale only) */}
+          {firbEligible && (
+            <div className="mt-2">
+              <span
+                className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-500/10 px-2 py-0.5 rounded-full"
+                title="Generally eligible for foreign buyers — verify on firb.gov.au"
+              >
+                <Globe2 size={11} />
+                {t('firb.eligibleBadge')}
+              </span>
+            </div>
+          )}
+          {firbCheckRequired && (
+            <div className="mt-2">
+              <span
+                className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-500/10 px-2 py-0.5 rounded-full"
+                title="Established dwelling — foreign buyers must check FIRB eligibility"
+              >
+                <AlertTriangle size={11} />
+                {t('firb.checkBadge')}
+              </span>
+            </div>
+          )}
 
           {/* Collab: partner viewed indicator */}
           {isCollab && partnerViewed && (

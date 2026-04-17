@@ -22,6 +22,7 @@ import { PriceHistoryChart } from '@/features/properties/components/PriceHistory
 import { RentalApplicationModal } from '@/features/properties/components/RentalApplicationModal';
 import { InspectionSlot } from '@/shared/lib/types';
 import { StampDutyCalculator } from '@/components/StampDutyCalculator';
+import { FIRBCalculator } from '@/components/FIRBCalculator';
 import { detectStateFromAddress } from '@/lib/stampDuty';
 import { SchoolsNearby } from '@/components/SchoolsNearby';
 import { SuburbClearanceRate } from '@/components/auction/SuburbClearanceRate';
@@ -636,11 +637,18 @@ export default function PropertyDetailPage() {
 
 
             {!isRental && (
-              <StampDutyCalculator
-                propertyPrice={property.price}
-                propertyAddress={`${property.address ?? ''}, ${property.suburb ?? ''}, ${property.state ?? ''}`}
-                propertyState={detectStateFromAddress(`${property.address ?? ''}, ${property.state ?? ''}`)}
-              />
+              <>
+                <StampDutyCalculator
+                  propertyPrice={property.price}
+                  propertyAddress={`${property.address ?? ''}, ${property.suburb ?? ''}, ${property.state ?? ''}`}
+                  propertyState={detectStateFromAddress(`${property.address ?? ''}, ${property.state ?? ''}`)}
+                />
+                <FIRBCalculator
+                  propertyPrice={property.price}
+                  propertyAddress={`${property.address ?? ''}, ${property.suburb ?? ''}, ${property.state ?? ''}`}
+                  propertyState={detectStateFromAddress(`${property.address ?? ''}, ${property.state ?? ''}`)}
+                />
+              </>
             )}
 
             {/* Investment Calculator (sale properties, investor mode) */}

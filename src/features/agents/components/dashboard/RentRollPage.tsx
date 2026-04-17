@@ -692,6 +692,50 @@ const RentRollPage = () => {
             ))}
           </motion.div>
 
+          {/* Filter tabs */}
+          <div className="flex flex-wrap items-center gap-2 border-b border-border">
+            {([
+              { key: 'all' as const, label: 'All Tenancies', count: activeTenancies.length },
+              { key: 'arrears' as const, label: 'Arrears', count: arrearsSummary.count, alert: arrearsSummary.count > 0 },
+              { key: 'expiring' as const, label: 'Expiring Soon', count: expiringCount },
+              { key: 'renewals' as const, label: 'Renewals Due', count: renewalsCount, alert: renewalsCount > 0 },
+            ]).map(tab => {
+              const isActive = activeTab === tab.key;
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={cn(
+                    'px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors flex items-center gap-2',
+                    isActive
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-muted-foreground hover:text-foreground',
+                  )}
+                >
+                  {tab.label}
+                  {tab.count > 0 && (
+                    <Badge
+                      variant={tab.alert ? 'destructive' : 'secondary'}
+                      className="text-[10px] px-1.5 py-0 h-5"
+                    >
+                      {tab.count}
+                    </Badge>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Arrears summary bar */}
+          {activeTab === 'arrears' && arrearsSummary.count > 0 && (
+            <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/20">
+              <AlertTriangle size={18} className="text-red-600 shrink-0" />
+              <p className="text-sm text-red-700 dark:text-red-400 font-medium">
+                {arrearsSummary.count} {arrearsSummary.count === 1 ? 'tenancy' : 'tenancies'} overdue — total AUD ${arrearsSummary.totalOwed.toLocaleString('en-AU', { maximumFractionDigits: 0 })} outstanding
+              </p>
+            </div>
+          )}
+
           {/* Table */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}

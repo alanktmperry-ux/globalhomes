@@ -7,6 +7,7 @@ import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { NotificationBell } from '@/features/agents/components/dashboard/NotificationBell';
 import { LanguageSwitcher } from '@/shared/components/layout/LanguageSwitcher';
+import { CurrencySwitcher } from '@/shared/components/layout/CurrencySwitcher';
 import AgentRegistrationModal from '@/features/agents/components/AgentRegistrationModal';
 
 import { useI18n } from '@/shared/lib/i18n';
@@ -88,6 +89,7 @@ export function SiteHeader() {
           >
             <Handshake size={13} /> Referral Program
           </Link>
+          <CurrencySwitcher />
           <LanguageSwitcher />
 
           {user && isAgent && (
@@ -213,6 +215,7 @@ export function SiteHeader() {
               <nav className="flex flex-col gap-1 p-4 pt-10">
                 {/* Theme & language */}
                 <div className="flex items-center gap-2 px-3 pb-3 border-b border-border mb-2">
+                  <CurrencySwitcher />
                   <LanguageSwitcher />
                 </div>
 

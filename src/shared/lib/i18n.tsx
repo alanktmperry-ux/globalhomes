@@ -1367,9 +1367,24 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(() => {
     const saved = localStorage.getItem('gh-lang');
     if (saved && saved in translations) return saved as Language;
-    // First visit — default to English (no browser detection)
-    localStorage.setItem('gh-lang', 'en');
-    return 'en';
+    // First visit — auto-detect from navigator.language
+    const detect = (): Language => {
+      const nav = (typeof navigator !== 'undefined' && navigator.language) ? navigator.language : 'en';
+      const lower = nav.toLowerCase();
+      if (lower.startsWith('zh-tw') || lower.startsWith('zh-hk')) return 'zh-TW';
+      if (lower.startsWith('zh')) return 'zh';
+      if (lower.startsWith('ja')) return 'ja';
+      if (lower.startsWith('ko')) return 'ko';
+      if (lower.startsWith('ms')) return 'ms';
+      if (lower.startsWith('vi')) return 'vi';
+      if (lower.startsWith('th')) return 'th';
+      if (lower.startsWith('ar')) return 'ar';
+      if (lower.startsWith('hi')) return 'hi';
+      return 'en';
+    };
+    const detected = detect();
+    localStorage.setItem('gh-lang', detected);
+    return detected;
   });
 
   // Wrap setLanguage to show banner only on active user language changes

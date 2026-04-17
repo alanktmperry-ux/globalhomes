@@ -130,6 +130,8 @@ const LiveAuctionPage = React.lazy(() => import("./features/auctions/pages/LiveA
 const InspectionReportPublic = React.lazy(() => import("./pages/InspectionReportPage_Public"));
 const BrokerLogin = React.lazy(() => import("./pages/broker/BrokerLogin"));
 const BrokerPortal = React.lazy(() => import("./pages/broker/BrokerPortal"));
+const ReferralLandingPage = React.lazy(() => import("./features/referral/pages/ReferralLandingPage"));
+const ReferralDashboardPage = React.lazy(() => import("./features/referral/pages/ReferralDashboardPage"));
 const PageLoader = () => (
   <div className="flex h-screen w-full items-center justify-center bg-background">
     <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -245,6 +247,10 @@ const App = () => (
                 <Route path="/broker/login" element={<BrokerLogin />} />
                 <Route path="/broker/portal" element={<BrokerPortal />} />
                 <Route path="/check-email" element={<CheckEmailPage />} />
+
+                {/* International Agent Referral Portal */}
+                <Route path="/refer" element={<ReferralLandingPage />} />
+                <Route path="/referral/dashboard" element={<ProtectedRoute><ReferralDashboardPage /></ProtectedRoute>} />
 
                 {/* Authenticated */}
                 <Route path="/saved" element={<ProtectedRoute><SavedSearchesPage /></ProtectedRoute>} />

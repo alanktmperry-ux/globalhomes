@@ -273,16 +273,36 @@ export default function SupplierPortalPage() {
       </Dialog>
 
       {/* Complete dialog */}
-      <Dialog open={!!completeJob} onOpenChange={o=>!o && setCompleteJob(null)}>
+      <Dialog open={!!completeJob} onOpenChange={o=>{ if (!o) { setCompleteJob(null); setInvoiceUrl(null); setInvoiceName(null); } }}>
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>Mark Complete</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div><Label className="text-xs">Final cost (AUD)</Label><Input type="number" value={finalCost} onChange={e=>setFinalCost(e.target.value)}/></div>
             <div><Label className="text-xs">Notes</Label><Textarea rows={3} value={completionNotes} onChange={e=>setCompletionNotes(e.target.value)} placeholder="What was done…"/></div>
+            <div>
+              <Label className="text-xs">Upload invoice (optional)</Label>
+              <Input
+                type="file"
+                accept="application/pdf,image/jpeg,image/png,image/jpg"
+                onChange={uploadInvoice}
+                disabled={uploadingInvoice}
+                className="cursor-pointer"
+              />
+              {uploadingInvoice && (
+                <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
+                  <Loader2 size={11} className="animate-spin"/> Uploading…
+                </p>
+              )}
+              {invoiceName && !uploadingInvoice && (
+                <p className="text-[11px] mt-1 flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                  <CheckCircle2 size={11}/> {invoiceName}
+                </p>
+              )}
+            </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={()=>setCompleteJob(null)}>Cancel</Button>
-            <Button onClick={submitComplete} disabled={busy}>Mark Complete</Button>
+            <Button variant="outline" onClick={()=>{ setCompleteJob(null); setInvoiceUrl(null); setInvoiceName(null); }}>Cancel</Button>
+            <Button onClick={submitComplete} disabled={busy || uploadingInvoice}>Mark Complete</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -167,6 +167,30 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
               </SelectContent>
             </Select>
           </div>
+          <div className="col-span-2 md:col-span-3">
+            <Label className="text-xs">Description</Label>
+            <Textarea
+              value={form.description}
+              onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+              rows={5}
+              className="text-sm"
+              placeholder="Describe the property — highlights, location, lifestyle..."
+            />
+          </div>
+          <div className="col-span-2 md:col-span-3">
+            <Label className="text-xs mb-2 block">Features</Label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {FEATURE_OPTIONS.map(f => (
+                <label key={f} className="flex items-center gap-2 text-xs cursor-pointer">
+                  <Checkbox
+                    checked={form.features.includes(f)}
+                    onCheckedChange={() => toggleFeature(f)}
+                  />
+                  <span>{f}</span>
+                </label>
+              ))}
+            </div>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

@@ -296,8 +296,21 @@ const PartnerOverviewPage = () => {
         </div>
       )}
 
-      {/* Vacancy Summary — last section above empty state / footer */}
-      <div className="mb-8">
+      {/* Empty state */}
+      {activeCount === 0 && pendingInvites.length === 0 && (
+        <Card className="border-dashed mb-8">
+          <CardContent className="py-12 text-center">
+            <Inbox className="mx-auto text-muted-foreground mb-4" size={40} />
+            <h3 className="font-semibold text-foreground text-sm mb-2">No client agencies yet</h3>
+            <p className="text-muted-foreground text-sm max-w-sm mx-auto leading-relaxed">
+              Once a client agency invites you, their account will appear here. Share your partner email with agencies to get started.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Vacancy Summary — final section */}
+      <div>
         <h2 className="font-display text-lg font-bold text-foreground mb-4 flex items-center gap-2">
           <Home size={18} className="text-primary" />
           Vacancy Summary
@@ -324,19 +337,6 @@ const PartnerOverviewPage = () => {
           </CardContent></Card>
         </div>
       </div>
-
-      {/* Empty state */}
-      {activeCount === 0 && pendingInvites.length === 0 && (
-        <Card className="border-dashed">
-          <CardContent className="py-12 text-center">
-            <Inbox className="mx-auto text-muted-foreground mb-4" size={40} />
-            <h3 className="font-semibold text-foreground text-sm mb-2">No client agencies yet</h3>
-            <p className="text-muted-foreground text-sm max-w-sm mx-auto leading-relaxed">
-              Once a client agency invites you, their account will appear here. Share your partner email with agencies to get started.
-            </p>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 };

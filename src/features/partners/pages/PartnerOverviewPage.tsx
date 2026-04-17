@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Loader2, CheckCircle, Clock, Building2, Inbox, Mail, Users, AlertTriangle, Activity } from 'lucide-react';
+import { Loader2, CheckCircle, Clock, Building2, Inbox, Mail, Users, AlertTriangle, Activity, Home, TrendingDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
@@ -49,6 +49,7 @@ const PartnerOverviewPage = () => {
   const [pendingCount, setPendingCount] = useState(0);
   const [tenancyCount, setTenancyCount] = useState(0);
   const [arrearsCount, setArrearsCount] = useState(0);
+  const [vacancyStats, setVacancyStats] = useState({ vacant: 0, vacatingMonth: 0, avgReLet: null as number | null, lossMonth: 0 });
   const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([]);
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -102,14 +103,36 @@ const PartnerOverviewPage = () => {
     if (agentIds.length > 0) {
       const { data: tenancies } = await supabase
         .from('tenancies')
-        .select('id, rent_amount, rent_frequency')
-        .in('agent_id', agentIds)
-        .eq('status', 'active');
+        .select('id, rent_amount, rent_frequency, status, lease_end, actual_vacate_date, re_let_date, days_to_re_let, vacancy_loss_aud')
+        .in('agent_id', agentIds);
 
-      setTenancyCount(tenancies?.length || 0);
+      const active = (tenancies || []).filter((t: any) => t.status === 'active');
+      setTenancyCount(active.length);
 
-      if (tenancies && tenancies.length > 0) {
-        const tIds = tenancies.map((t: any) => t.id);
+      // Vacancy KPIs
+      const today = new Date();
+      const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+      const threeMonthsAgo = new Date(); threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+      const vacant = (tenancies || []).filter((t: any) => t.status === 'ended' && !t.re_let_date);
+      const vacatingMonth = (tenancies || []).filter((t: any) => {
+        if (t.status !== 'vacating') return false;
+        if (!t.lease_end) return true;
+        const days = Math.floor((new Date(t.lease_end).getTime() - today.getTime()) / 86400000);
+        return days <= 30;
+      });
+      const recentReLet = (tenancies || []).filter((t: any) => t.re_let_date && new Date(t.re_let_date) >= threeMonthsAgo && t.days_to_re_let != null);
+      const avgReLet = recentReLet.length
+        ? Math.round(recentReLet.reduce((s: number, t: any) => s + (t.days_to_re_let || 0), 0) / recentReLet.length)
+        : null;
+      const lossMonth = (tenancies || [])
+        .filter((t: any) => t.re_let_date && new Date(t.re_let_date) >= monthStart)
+        .reduce((s: number, t: any) => s + Number(t.vacancy_loss_aud || 0), 0);
+
+      setVacancyStats({ vacant: vacant.length, vacatingMonth: vacatingMonth.length, avgReLet, lossMonth });
+
+      if (active.length > 0) {
+        const tIds = active.map((t: any) => t.id);
         const { data: payments } = await supabase
           .from('rent_payments')
           .select('tenancy_id, status')
@@ -214,6 +237,35 @@ const PartnerOverviewPage = () => {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* Vacancy Summary */}
+      <div className="mb-8">
+        <h2 className="font-display text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+          <Home size={18} className="text-primary" />
+          Vacancy Summary
+        </h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card><CardContent className="p-4">
+            <p className="text-xs text-muted-foreground">Vacant Properties</p>
+            <p className={`text-xl font-bold ${vacancyStats.vacant > 0 ? 'text-red-600' : 'text-emerald-600'}`}>{vacancyStats.vacant}</p>
+          </CardContent></Card>
+          <Card><CardContent className="p-4">
+            <p className="text-xs text-muted-foreground">Vacating This Month</p>
+            <p className="text-xl font-bold text-amber-600">{vacancyStats.vacatingMonth}</p>
+          </CardContent></Card>
+          <Card><CardContent className="p-4">
+            <p className="text-xs text-muted-foreground">Avg Days to Re-let (3mo)</p>
+            <p className="text-xl font-bold text-foreground">{vacancyStats.avgReLet ?? '—'}{vacancyStats.avgReLet != null ? ' days' : ''}</p>
+          </CardContent></Card>
+          <Card><CardContent className="p-4 flex items-center gap-2">
+            <TrendingDown size={16} className="text-red-600 shrink-0" />
+            <div>
+              <p className="text-xs text-muted-foreground">Vacancy Loss (Month)</p>
+              <p className="text-xl font-bold text-red-600">${vacancyStats.lossMonth.toLocaleString('en-AU', { maximumFractionDigits: 0 })}</p>
+            </div>
+          </CardContent></Card>
+        </div>
       </div>
 
       {/* Pending invitations */}

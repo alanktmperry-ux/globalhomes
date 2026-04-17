@@ -55,6 +55,7 @@ const SigningPage = React.lazy(() => import("./pages/SigningPage"));
 const TenantPortalPage = React.lazy(() => import("./features/tenant/pages/TenantPortalPage"));
 const SupplierPortalPage = React.lazy(() => import("./features/supplier/pages/SupplierPortalPage"));
 const SuppliersPage = React.lazy(() => import("@/features/agents/components/dashboard/SuppliersPage"));
+const VacancyKPIPage = React.lazy(() => import("@/features/agents/components/dashboard/VacancyKPIPage"));
 
 // Lazy-loaded dashboard sub-pages
 const DashboardOverview = React.lazy(() => import("@/features/agents/components/dashboard/DashboardOverview"));
@@ -313,6 +314,7 @@ const App = () => (
                   <Route path="open-homes" element={<OpenHomesPage />} />
                   <Route path="automation" element={<AutomationSettingsPage />} />
                   <Route path="suppliers" element={<SuppliersPage />} />
+                  <Route path="vacancy-kpi" element={<VacancyKPIPage />} />
                   <Route path="settings" element={<SettingsPage />} />
                   <Route path="help" element={<HelpPage />} />
                   <Route path="partner-access" element={<PartnerAccessPage />} />

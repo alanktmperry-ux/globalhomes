@@ -3,10 +3,19 @@ import type { PropertyRow } from '@/features/agents/types/listing';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useState } from 'react';
 import { Calendar, Clock, Plus, Trash2 } from 'lucide-react';
 import ListingCompleteness from './ListingCompleteness';
+
+const FEATURE_OPTIONS = [
+  'Air Conditioning', 'Heating', 'Pool', 'Spa', 'Garage', 'Built-in Wardrobes',
+  'Dishwasher', 'Balcony', 'Courtyard', 'Garden', 'Solar Panels', 'NBN Ready',
+  'Floorboards', 'Ensuite', 'Study', 'Outdoor Entertaining', 'Gym', 'Lift',
+  'Intercom', 'Pet Friendly', 'Furnished',
+];
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
 
@@ -33,6 +42,8 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
     land_size: listing.land_size || '',
     agency_authority: listing.agency_authority || 'exclusive',
     status: listing.status || 'whisper',
+    description: listing.description || '',
+    features: (listing.features || []) as string[],
   });
 
   // Inspection times management
@@ -44,8 +55,17 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
     onUpdate({
       ...form,
       land_size: form.land_size ? Number(form.land_size) : null,
-    });
+    } as Partial<PropertyRow>);
     setEditing(false);
+  };
+
+  const toggleFeature = (f: string) => {
+    setForm(prev => ({
+      ...prev,
+      features: prev.features.includes(f)
+        ? prev.features.filter(x => x !== f)
+        : [...prev.features, f],
+    }));
   };
 
   const handleAddInspection = () => {
@@ -79,6 +99,11 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
           <h2 className="font-display text-xl font-bold">{listing.title}</h2>
           <p className="text-sm text-muted-foreground">{listing.address}</p>
           <p className="text-lg font-display font-bold text-primary mt-1">{listing.price_formatted || AUD.format(listing.price)}</p>
+          {listing.updated_at && (
+            <p className="text-[11px] text-muted-foreground mt-1">
+              Last updated {new Date(listing.updated_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })} at {new Date(listing.updated_at).toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' })}
+            </p>
+          )}
         </div>
         <Button size="sm" variant={editing ? 'default' : 'outline'} onClick={() => editing ? handleSave() : setEditing(true)}>
           {editing ? 'Save' : 'Edit Details'}
@@ -146,6 +171,30 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
                 <SelectItem value="sold">Sold</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div className="col-span-2 md:col-span-3">
+            <Label className="text-xs">Description</Label>
+            <Textarea
+              value={form.description}
+              onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+              rows={5}
+              className="text-sm"
+              placeholder="Describe the property — highlights, location, lifestyle..."
+            />
+          </div>
+          <div className="col-span-2 md:col-span-3">
+            <Label className="text-xs mb-2 block">Features</Label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {FEATURE_OPTIONS.map(f => (
+                <label key={f} className="flex items-center gap-2 text-xs cursor-pointer">
+                  <Checkbox
+                    checked={form.features.includes(f)}
+                    onCheckedChange={() => toggleFeature(f)}
+                  />
+                  <span>{f}</span>
+                </label>
+              ))}
+            </div>
           </div>
         </div>
       ) : (

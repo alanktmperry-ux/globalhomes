@@ -207,6 +207,29 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
             </p>
           )}
 
+          {/* FIRB foreign-buyer eligibility hint (sale only) */}
+          {firbEligible && (
+            <div className="mt-2">
+              <span
+                className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-500/10 px-2 py-0.5 rounded-full"
+                title="Generally eligible for foreign buyers — verify on firb.gov.au"
+              >
+                <Globe2 size={11} />
+                {t('firb.eligibleBadge')}
+              </span>
+            </div>
+          )}
+          {firbCheckRequired && (
+            <div className="mt-2">
+              <span
+                className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-500/10 px-2 py-0.5 rounded-full"
+                title="Established dwelling — foreign buyers must check FIRB eligibility"
+              >
+                <AlertTriangle size={11} />
+                {t('firb.checkBadge')}
+              </span>
+            </div>
+          )}
 
           {/* Collab: partner viewed indicator */}
           {isCollab && partnerViewed && (

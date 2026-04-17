@@ -628,6 +628,100 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: 'technical',
     tags: ['translation', 'language', 'wrong language', 'multilingual', 'bug', 'not working'],
   },
+
+  // ── Buying Costs / FIRB ──
+  {
+    id: 'buyer-firb-calculator',
+    question: 'How does the Buying Costs Calculator (FIRB) work?',
+    answer: 'Every property listing page includes a "Buying Costs Calculator" section that estimates your total upfront purchase costs.\n\nWhat it estimates:\n• Standard stamp duty (state-by-state)\n• FIRB application fees (foreign buyers)\n• Foreign investor surcharges\n• Legal and conveyancing costs (indicative)\n\nHow to use it: scroll to the "Buying Costs Calculator" on any listing. By default it shows costs for an Australian resident. Toggle "I am a foreign buyer" on to add FIRB application fees and the foreign investor surcharge.\n\nWho it\'s for: both overseas buyers and Australian residents — the foreign buyer toggle adjusts calculations automatically. Figures are indicative only; verify final amounts at firb.gov.au and with a solicitor.',
+    category: 'buyers',
+    tags: ['firb', 'stamp duty', 'foreign buyer', 'calculator', 'costs', 'overseas'],
+  },
+
+  // ── Sharing properties ──
+  {
+    id: 'buyer-share-property',
+    question: 'How do I share a property with friends or family?',
+    answer: 'Tap the share button (arrow icon) on any property listing. You\'ll see four options:\n\n• Copy link — copies the property URL to your clipboard so you can paste it anywhere\n• WhatsApp — opens WhatsApp with the property details pre-filled\n• Line — opens Line messenger to share the property\n• WeChat — displays a QR code. Open WeChat on your phone → tap Scan → point your camera at the QR code to share with your contacts',
+    category: 'buyers',
+    tags: ['share', 'wechat', 'whatsapp', 'line', 'qr code', 'copy link'],
+  },
+  {
+    id: 'buyer-share-wechat',
+    question: 'How do I share a property on WeChat?',
+    answer: 'Open any property listing and tap the share button. Select WeChat and a QR code will appear — open WeChat on your phone, tap Scan, and point your camera at the code to share it with your contacts.',
+    category: 'buyers',
+    tags: ['wechat', 'share', 'qr code', 'china'],
+  },
+
+  // ── Language & Currency ──
+  {
+    id: 'buyer-language-currency',
+    question: 'How do I change the language or currency?',
+    answer: 'ListHQ supports 25 languages and 13+ currencies.\n\nLanguage:\n• On your first visit, the site automatically detects your browser language\n• To change it later, tap the language selector (globe icon) in the top navigation\n• Available in English, Chinese (Simplified & Traditional), Japanese, Korean, Vietnamese, Thai, Indonesian, Hindi, Arabic, Spanish, French, German, and many more\n\nCurrency:\n• Tap the currency selector next to the language button\n• Prices display in AUD, USD, CNY, HKD, SGD, JPY and more — converted instantly using current exchange rates\n\nYour language and currency preferences are saved automatically and remembered on every visit.',
+    category: 'buyers',
+    tags: ['language', 'currency', 'translation', 'aud', 'usd', 'cny', 'international'],
+  },
+  {
+    id: 'buyer-international',
+    question: 'Can international buyers use ListHQ?',
+    answer: 'Yes. ListHQ is built for global buyers. The site supports 25 languages, 13 currencies, and includes a FIRB (Foreign Investment Review Board) calculator to estimate all buying costs including foreign investor surcharges and application fees. Many listings also include translated titles and descriptions in Chinese, Japanese, and Korean added by the listing agent.',
+    category: 'buyers',
+    tags: ['international', 'overseas', 'foreign buyer', 'global', 'firb'],
+  },
+  {
+    id: 'buyer-currency-display',
+    question: 'Can I view listings in my own currency?',
+    answer: 'Yes — use the currency selector in the top navigation to switch between AUD, USD, CNY, HKD, SGD, JPY and more. Prices update instantly across the entire site using live exchange rates.',
+    category: 'buyers',
+    tags: ['currency', 'aud', 'usd', 'cny', 'exchange rate'],
+  },
+  {
+    id: 'buyer-listings-chinese',
+    question: 'Are listings available in Chinese?',
+    answer: 'Many listings include Chinese (Simplified and Traditional) titles and descriptions added directly by the agent during listing creation. The site also auto-translates listing content when you browse in Chinese — switch your language using the globe icon in the top navigation.',
+    category: 'buyers',
+    tags: ['chinese', 'translation', 'mandarin', 'multilingual'],
+  },
+
+  // ── Agent: Translate step in pocket listing wizard ──
+  {
+    id: 'agent-translate-step',
+    question: 'How do I add Chinese, Japanese, or Korean translations to my listing?',
+    answer: 'When creating a listing, the new "Translate" step (step 4 in the pocket listing wizard) lets you add translated versions of your title and description in:\n\n• Chinese (Simplified)\n• Chinese (Traditional)\n• Japanese\n• Korean\n\nClick "Auto-translate from English" to generate translations instantly using AI, or type them manually for full control.\n\nBuyers browsing in Chinese, Japanese, or Korean will automatically see your translated version of the listing instead of the auto-translation.\n\nThis step is optional — you can skip it and still publish. You can return to any draft and add translations later.',
+    category: 'agents',
+    tags: ['translate', 'chinese', 'japanese', 'korean', 'multilingual', 'pocket listing', 'wizard'],
+  },
+
+  // ── International Referral Program ──
+  {
+    id: 'referral-program-overview',
+    question: 'What is the International Referral Program?',
+    answer: 'The ListHQ International Referral Program lets agents and advisors anywhere in the world earn commissions by connecting international buyers with Australian property.\n\nEarnings: AUD $500–$2,000 per settled referral, depending on your tier.\n\nHow to join: visit listhq.com.au/refer, fill in your details, and receive your unique referral code instantly. There is no fee to join.\n\nWho it\'s for: international real estate agents, migration consultants, financial advisors, and anyone with networks of buyers interested in Australian property.',
+    category: 'agents',
+    tags: ['referral', 'international', 'commission', 'agents', 'overseas'],
+  },
+  {
+    id: 'referral-dashboard',
+    question: 'How do I track my referrals and commissions?',
+    answer: 'After signing up at listhq.com.au/refer, log into your Referral Dashboard to:\n\n• Track every referred buyer and their progress (new → contacted → viewing → offer → settled)\n• Monitor commission earnings in real time\n• See your current tier and progress toward the next one\n• Submit new referrals at any time using the "Submit a referral" button',
+    category: 'agents',
+    tags: ['referral', 'dashboard', 'tracking', 'commission'],
+  },
+  {
+    id: 'referral-sharing',
+    question: 'How do I share my referral code?',
+    answer: 'From your Referral Dashboard you have several sharing options:\n\n• Copy your unique referral link\n• Share via WhatsApp with a pre-filled message\n• Share via Line messenger\n• Show a WeChat QR code — buyers scan to open your link\n\nAny buyer who registers or enquires through your link is automatically attributed to you.',
+    category: 'agents',
+    tags: ['referral', 'share', 'wechat', 'whatsapp', 'line', 'qr code'],
+  },
+  {
+    id: 'referral-tiers',
+    question: 'How do referral commission tiers work?',
+    answer: 'Your tier rises automatically as your referrals settle:\n\n• Standard — AUD $500 per settled referral (default starting tier)\n• Silver — AUD $750 per settled referral\n• Gold — AUD $1,000 per settled referral\n• Platinum — AUD $2,000 per settled referral\n\nTier is based on your total count of settled referrals. Once promoted, all future settled referrals earn at the new rate.',
+    category: 'agents',
+    tags: ['referral', 'tier', 'commission', 'silver', 'gold', 'platinum'],
+  },
 ];
 
 export const FAQ_CATEGORIES = [

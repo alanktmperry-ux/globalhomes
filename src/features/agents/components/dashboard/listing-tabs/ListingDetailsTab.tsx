@@ -99,6 +99,11 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
           <h2 className="font-display text-xl font-bold">{listing.title}</h2>
           <p className="text-sm text-muted-foreground">{listing.address}</p>
           <p className="text-lg font-display font-bold text-primary mt-1">{listing.price_formatted || AUD.format(listing.price)}</p>
+          {listing.updated_at && (
+            <p className="text-[11px] text-muted-foreground mt-1">
+              Last updated {new Date(listing.updated_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })} at {new Date(listing.updated_at).toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' })}
+            </p>
+          )}
         </div>
         <Button size="sm" variant={editing ? 'default' : 'outline'} onClick={() => editing ? handleSave() : setEditing(true)}>
           {editing ? 'Save' : 'Edit Details'}

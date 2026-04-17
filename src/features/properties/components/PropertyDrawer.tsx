@@ -5,6 +5,7 @@ import { Property } from '@/shared/lib/types';
 import { useI18n } from '@/shared/lib/i18n';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { AgentContactModal } from '@/features/agents/components/AgentContactModal';
+import { ShareSheet } from '@/shared/components/ShareSheet';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { BadgeCheck, Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -66,6 +67,7 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searc
   const { t } = useI18n();
   const { formatPrice, currency } = useCurrency();
   const [contactOpen, setContactOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
 
   const images = property?.images?.length ? property.images : property ? [property.imageUrl] : [];
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, dragFree: false });
@@ -231,7 +233,10 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searc
                     <Heart size={14} className={isSaved ? 'fill-destructive text-destructive' : ''} />
                     {t('property.save')}
                   </button>
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/80 backdrop-blur-sm text-sm font-medium">
+                  <button
+                    onClick={() => setShareOpen(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/80 backdrop-blur-sm text-sm font-medium"
+                  >
                     <Share2 size={14} />
                     {t('property.share')}
                   </button>
@@ -462,12 +467,19 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searc
       </AnimatePresence>
 
       {property && (
-        <AgentContactModal
-          property={property}
-          open={contactOpen}
-          onClose={() => setContactOpen(false)}
-          searchContext={searchContext}
-        />
+        <>
+          <AgentContactModal
+            property={property}
+            open={contactOpen}
+            onClose={() => setContactOpen(false)}
+            searchContext={searchContext}
+          />
+          <ShareSheet
+            property={property}
+            open={shareOpen}
+            onClose={() => setShareOpen(false)}
+          />
+        </>
       )}
     </>
   );

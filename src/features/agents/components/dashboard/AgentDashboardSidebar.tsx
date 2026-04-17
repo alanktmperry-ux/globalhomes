@@ -49,7 +49,7 @@ const PROPERTY_NAV: NavItem[] = [
   { title: 'Renewals Due', url: '/dashboard/rent-roll?filter=renewals', icon: RefreshCw, badgeKey: 'renewals', alertWhenBadge: true },
   { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home },
   { title: 'Maintenance', url: '/dashboard/maintenance', icon: Wrench },
-  { title: 'Vacancies', url: '/dashboard/vacancies', icon: Home },
+  { title: 'Vacancies', url: '/dashboard/vacancies', icon: Building2 },
   { title: 'Inspections', url: '/dashboard/inspection-mode', icon: CalendarDays },
   { title: 'Rental Applications', url: '/dashboard/rental-applications', icon: ClipboardList },
   { title: 'Suppliers', url: '/dashboard/suppliers', icon: Wrench },

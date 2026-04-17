@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Bed, Bath, Car, Heart, BadgeCheck, Star, Sparkles, Shield, ShieldCheck, Eye, UserCheck, CalendarDays, PawPrint, Sofa } from 'lucide-react';
+import { Bed, Bath, Car, Heart, BadgeCheck, Star, Sparkles, Shield, ShieldCheck, Eye, UserCheck, CalendarDays, PawPrint, Sofa, Globe2, AlertTriangle } from 'lucide-react';
 import { TourBadge } from '@/components/tour/TourBadge';
 import { OffMarketBadge } from '@/features/offmarket/components/OffMarketBadge';
 import { Property, PropertyStatus } from '@/shared/lib/types';

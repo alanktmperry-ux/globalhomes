@@ -103,8 +103,8 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
             {/* Header */}
             <div className="flex items-start justify-between px-5 pt-4 pb-2 gap-3">
               <div className="min-w-0">
-                <h2 className="font-display text-lg font-semibold text-foreground">Share this property</h2>
-                <p className="text-xs text-muted-foreground mt-0.5">Send via WeChat, WhatsApp, Line or copy the link</p>
+                <h2 className="font-display text-lg font-semibold text-foreground">{t('share.title')}</h2>
+                <p className="text-sm text-muted-foreground mt-1">Send via WeChat, WhatsApp or Line — or copy the link</p>
               </div>
               <button
                 onClick={onClose}

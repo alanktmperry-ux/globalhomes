@@ -475,10 +475,10 @@ const DashboardOverview = () => {
   const repColors = getScoreColor(repScore);
 
   const stats = [
-    { label: 'Tasks Due', value: String(tasksDue), icon: <CheckSquare size={16} />, color: 'text-destructive', link: '/dashboard/contacts' },
+    { label: 'Tasks Due', value: String(tasksDue), icon: <CheckSquare size={16} />, color: 'text-destructive', link: '/dashboard/contacts?tab=tasks' },
     { label: 'Active Contacts', value: String(activeContacts), icon: <Users size={16} />, color: 'text-primary', link: '/dashboard/contacts' },
-    { label: 'Appraisals This Month', value: '0', icon: <ClipboardList size={16} />, color: 'text-success', link: '/dashboard/listings' },
-    { label: 'Sales This Month', value: AUD.format(0), icon: <DollarSign size={16} />, color: 'text-primary', link: '/dashboard/reports' },
+    { label: 'Appraisals This Month', value: '0', icon: <ClipboardList size={16} />, color: 'text-success', link: '/dashboard/pipeline?stage=appraisal' },
+    { label: 'Sales This Month', value: AUD.format(0), icon: <DollarSign size={16} />, color: 'text-primary', link: '/dashboard/performance' },
     { label: 'Trust Balance', value: AUD.format(trustBalance), icon: <Landmark size={16} />, color: 'text-success', link: '/dashboard/trust' },
     { label: 'Unresponded Leads', value: String(unrespondedValue), icon: <Zap size={16} />, color: unrespondedValue > 0 ? 'text-destructive' : 'text-success', link: '/dashboard/leads' },
   ];
@@ -579,8 +579,9 @@ const DashboardOverview = () => {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               onClick={() => navigate(s.link)}
-              className="bg-card border border-border rounded-xl p-4 cursor-pointer hover:border-primary/50 hover:shadow-md transition-all"
+              className="relative bg-card border border-border rounded-xl p-4 cursor-pointer hover:ring-2 hover:ring-primary/20 hover:shadow-md transition-all"
             >
+              <ChevronRight size={14} className="absolute top-2 right-2 text-muted-foreground" />
               <div className="flex items-start gap-1.5 text-muted-foreground mb-1">
                 <span className={`${s.color} shrink-0 mt-0.5`}>{s.icon}</span>
                 <span className="text-[11px] leading-tight whitespace-normal break-words">{s.label}</span>
@@ -593,8 +594,9 @@ const DashboardOverview = () => {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             onClick={() => navigate(`/agent/me`)}
-            className="bg-card border border-border rounded-xl p-4 cursor-pointer hover:border-primary/50 hover:shadow-md transition-all"
+            className="relative bg-card border border-border rounded-xl p-4 cursor-pointer hover:ring-2 hover:ring-primary/20 hover:shadow-md transition-all"
           >
+            <ChevronRight size={14} className="absolute top-2 right-2 text-muted-foreground" />
             <div className="flex items-start gap-1.5 text-muted-foreground mb-1">
               <span className={`${repColors.text} shrink-0 mt-0.5`}><Shield size={16} /></span>
               <span className="text-[11px] leading-tight">Reputation</span>
@@ -622,13 +624,17 @@ const DashboardOverview = () => {
             </h3>
             <div className="space-y-2">
               {arrearsTenancies.map((t) => (
-                <div key={t.id} className="flex items-center justify-between border border-border rounded-lg p-3">
+                <div
+                  key={t.id}
+                  onClick={() => navigate('/dashboard/rent-roll?filter=arrears')}
+                  className="flex items-center justify-between border border-border rounded-lg p-3 cursor-pointer hover:ring-2 hover:ring-primary/20 hover:shadow-md transition-all"
+                >
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium truncate">{t.tenant_name}</p>
                     <p className="text-[10px] text-muted-foreground truncate">{t.properties?.address}{t.properties?.suburb ? `, ${t.properties.suburb}` : ''}</p>
                     <p className="text-[10px] text-destructive font-medium mt-0.5">{t.daysOverdue} days overdue · {AUD.format(t.amountOwed)} owed</p>
                   </div>
-                  <div className="flex gap-1.5 ml-2 shrink-0">
+                  <div className="flex gap-1.5 ml-2 shrink-0" onClick={(e) => e.stopPropagation()}>
                     <Button
                       size="sm"
                       variant="outline"
@@ -673,7 +679,8 @@ const DashboardOverview = () => {
               {reportsDue.map((prop) => (
                 <div
                   key={prop.id}
-                  className="flex items-center justify-between border border-border rounded-lg p-3"
+                  onClick={() => navigate('/dashboard/listings')}
+                  className="flex items-center justify-between border border-border rounded-lg p-3 cursor-pointer hover:ring-2 hover:ring-primary/20 hover:shadow-md transition-all"
                 >
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium truncate">
@@ -690,7 +697,7 @@ const DashboardOverview = () => {
                       {prop.contact_clicks || 0} enquiries
                     </p>
                   </div>
-                  <div className="flex gap-1.5 ml-2 shrink-0">
+                  <div className="flex gap-1.5 ml-2 shrink-0" onClick={(e) => e.stopPropagation()}>
                     <Button
                       size="sm"
                       variant="outline"
@@ -738,7 +745,11 @@ const DashboardOverview = () => {
           ) : (
             <div className="space-y-2">
               {todayInspections.map((insp, i) => (
-                <div key={i} className="flex items-center justify-between border border-border rounded-lg p-3">
+                <div
+                  key={i}
+                  onClick={() => navigate('/dashboard/inspection-mode')}
+                  className="flex items-center justify-between border border-border rounded-lg p-3 cursor-pointer hover:ring-2 hover:ring-primary/20 hover:shadow-md transition-all"
+                >
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium truncate">{insp.address}</p>
                     <p className="text-[10px] text-muted-foreground mt-0.5">🕐 {insp.time}</p>
@@ -747,7 +758,7 @@ const DashboardOverview = () => {
                     size="sm"
                     variant="outline"
                     className="text-[10px] h-6 px-2 shrink-0 ml-2"
-                    onClick={() => navigate(`/dashboard/listings/${insp.propertyId}`)}
+                    onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/listings/${insp.propertyId}`); }}
                   >
                     View Listing
                   </Button>
@@ -811,15 +822,23 @@ const DashboardOverview = () => {
           </h3>
           {recentActivities.length > 0 ? (
             <div className="space-y-3">
-              {recentActivities.map((a) => (
-                <div key={a.id} className="flex items-start gap-3 text-sm">
-                  <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs">{a.description || a.action}</p>
-                    <p className="text-[10px] text-muted-foreground">{AU_DATE(a.created_at)}</p>
+              {recentActivities.map((a) => {
+                const isProperty = a.entity_type === 'property' && a.entity_id;
+                return (
+                  <div
+                    key={a.id}
+                    onClick={isProperty ? () => navigate(`/dashboard/listings/${a.entity_id}`) : undefined}
+                    className={`flex items-start gap-3 text-sm rounded-lg -mx-2 px-2 py-1 ${isProperty ? 'cursor-pointer hover:ring-2 hover:ring-primary/20 hover:shadow-md transition-all' : ''}`}
+                  >
+                    <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs">{a.description || a.action}</p>
+                      <p className="text-[10px] text-muted-foreground">{AU_DATE(a.created_at)}</p>
+                    </div>
+                    {isProperty && <ChevronRight size={14} className="text-muted-foreground shrink-0 mt-1" />}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <p className="text-sm text-muted-foreground py-4 text-center">No recent activity</p>

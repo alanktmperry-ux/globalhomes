@@ -306,6 +306,10 @@ const TenancyDetailPage = () => {
       actual_cost: jobActualCost ? parseFloat(jobActualCost) : null,
       completed_at: jobCompletedAt ? jobCompletedAt.toISOString() : new Date().toISOString(),
     } as any).eq('id', jobId);
+    // Fire automation: tenant completion notice
+    supabase.functions.invoke('run-pm-automations', {
+      body: { rule_type: 'maintenance_update', maintenance_job_id: jobId, new_status: 'completed' },
+    }).catch(() => {});
     setSaving(false);
     toast.success('Job marked complete');
     setExpandedJobId(null);

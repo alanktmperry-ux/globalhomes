@@ -5066,6 +5066,152 @@ export type Database = {
         }
         Relationships: []
       }
+      pm_automation_log: {
+        Row: {
+          agent_id: string | null
+          error_text: string | null
+          id: string
+          meta: Json | null
+          recipient_email: string | null
+          recipient_type: string | null
+          rule_id: string | null
+          sent_at: string
+          status: string
+          subject: string | null
+          tenancy_id: string | null
+        }
+        Insert: {
+          agent_id?: string | null
+          error_text?: string | null
+          id?: string
+          meta?: Json | null
+          recipient_email?: string | null
+          recipient_type?: string | null
+          rule_id?: string | null
+          sent_at?: string
+          status?: string
+          subject?: string | null
+          tenancy_id?: string | null
+        }
+        Update: {
+          agent_id?: string | null
+          error_text?: string | null
+          id?: string
+          meta?: Json | null
+          recipient_email?: string | null
+          recipient_type?: string | null
+          rule_id?: string | null
+          sent_at?: string
+          status?: string
+          subject?: string | null
+          tenancy_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pm_automation_log_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pm_automation_log_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pm_automation_log_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pm_automation_log_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "pm_automation_log_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "pm_automation_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pm_automation_rules: {
+        Row: {
+          agent_id: string | null
+          channel: string
+          created_at: string
+          id: string
+          is_active: boolean
+          rule_type: string
+          template_body: string | null
+          template_subject: string | null
+          trigger_day: number | null
+          trigger_event: string | null
+        }
+        Insert: {
+          agent_id?: string | null
+          channel?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          rule_type: string
+          template_body?: string | null
+          template_subject?: string | null
+          trigger_day?: number | null
+          trigger_event?: string | null
+        }
+        Update: {
+          agent_id?: string | null
+          channel?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          rule_type?: string
+          template_body?: string | null
+          template_subject?: string | null
+          trigger_day?: number | null
+          trigger_event?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pm_automation_rules_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pm_automation_rules_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pm_automation_rules_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pm_automation_rules_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+        ]
+      }
       pre_auction_offers: {
         Row: {
           accepted_at: string | null
@@ -10590,6 +10736,10 @@ export type Database = {
           id: string
           name: string
         }[]
+      }
+      seed_pm_automation_defaults: {
+        Args: { _agent_id: string }
+        Returns: undefined
       }
       sign_document: {
         Args: {

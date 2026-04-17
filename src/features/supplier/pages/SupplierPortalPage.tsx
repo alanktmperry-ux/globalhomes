@@ -44,6 +44,9 @@ export default function SupplierPortalPage() {
   const [completionNotes, setCompletionNotes] = useState('');
   const [finalCost, setFinalCost] = useState('');
   const [busy, setBusy] = useState(false);
+  const [invoiceUrl, setInvoiceUrl] = useState<string | null>(null);
+  const [invoiceName, setInvoiceName] = useState<string | null>(null);
+  const [uploadingInvoice, setUploadingInvoice] = useState(false);
 
   const load = async () => {
     if (!token) { setError('Missing token'); setLoading(false); return; }

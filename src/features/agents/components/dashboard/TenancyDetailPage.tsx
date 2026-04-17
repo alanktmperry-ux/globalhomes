@@ -51,9 +51,15 @@ interface Tenancy {
   status: string;
   notes: string | null;
   tenant_portal_token: string | null;
+  renewal_status: string | null;
+  renewal_offered_at: string | null;
+  renewal_offered_rent: number | null;
+  renewal_offered_lease_end: string | null;
+  renewal_type: string | null;
+  renewal_notes: string | null;
   created_at: string;
   updated_at: string;
-  properties: { address: string; suburb: string } | null;
+  properties: { address: string; suburb: string; owner_portal_token?: string | null; owner_name?: string | null; owner_email?: string | null } | null;
 }
 
 interface RentPayment {
@@ -154,7 +160,7 @@ const TenancyDetailPage = () => {
     const [tRes, pRes, jRes] = await Promise.all([
       supabase
         .from('tenancies')
-        .select('*, properties(address, suburb)')
+        .select('*, properties(address, suburb, owner_portal_token, owner_name, owner_email)')
         .eq('id', tenancyId)
         .eq('agent_id', agentData.id)
         .single(),

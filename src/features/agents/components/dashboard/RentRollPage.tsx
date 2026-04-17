@@ -36,6 +36,7 @@ interface Tenancy {
   management_fee_percent: number;
   status: string;
   notes: string | null;
+  renewal_status?: string | null;
   properties: { address: string; suburb: string; state: string | null } | null;
 }
 
@@ -102,9 +103,39 @@ const frequencyDays = (freq: string): number => {
   return 30;
 };
 
+type TabKey = 'all' | 'arrears' | 'expiring' | 'renewals';
+
 const RentRollPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab: TabKey = (() => {
+    const f = searchParams.get('filter');
+    if (f === 'arrears') return 'arrears';
+    if (f === 'expiring') return 'expiring';
+    if (f === 'renewals') return 'renewals';
+    return 'all';
+  })();
+  const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
+
+  // Sync tab → URL filter param
+  useEffect(() => {
+    const current = searchParams.get('filter');
+    const want = activeTab === 'all' ? null : activeTab;
+    if (current === want) return;
+    const next = new URLSearchParams(searchParams);
+    if (want) next.set('filter', want); else next.delete('filter');
+    setSearchParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
+  // Sync URL filter param → tab (e.g. when sidebar link clicked while already on page)
+  useEffect(() => {
+    const f = searchParams.get('filter');
+    const next: TabKey = f === 'arrears' ? 'arrears' : f === 'expiring' ? 'expiring' : f === 'renewals' ? 'renewals' : 'all';
+    if (next !== activeTab) setActiveTab(next);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   const [agentId, setAgentId] = useState<string | null>(null);
   const [tenancies, setTenancies] = useState<Tenancy[]>([]);

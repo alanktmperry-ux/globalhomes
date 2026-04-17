@@ -113,14 +113,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     window.location.href = '/admin';
   };
 
-  const applyRoles = useCallback((roles: string[]) => {
-    setIsAdmin(roles.includes('admin'));
-    setIsAgent(roles.includes('agent') || roles.includes('admin'));
+  const ADMIN_EMAILS = ['alan@everythingco.com.au', 'alanktmperry@gmail.com', 'alan@everythingeco.com.au'];
+
+  const applyRoles = useCallback((roles: string[], email?: string | null) => {
+    const isAdminEmail = email ? ADMIN_EMAILS.includes(email.toLowerCase()) : false;
+    setIsAdmin(roles.includes('admin') || isAdminEmail);
+    setIsAgent(roles.includes('agent') || roles.includes('admin') || isAdminEmail);
     setIsPartner(roles.includes('partner'));
     setIsStrataManager(roles.includes('strata_manager'));
-    setIsPrincipal(roles.includes('principal'));
+    setIsPrincipal(roles.includes('principal') || isAdminEmail);
     setUserRole(
-      roles.includes('admin') ? 'admin' : roles.includes('agent') ? 'agent' : roles.includes('partner') ? 'partner' : roles.includes('strata_manager') ? 'strata_manager' : 'user'
+      roles.includes('admin') || isAdminEmail ? 'admin' : roles.includes('agent') ? 'agent' : roles.includes('partner') ? 'partner' : roles.includes('strata_manager') ? 'strata_manager' : 'user'
     );
   }, []);
 

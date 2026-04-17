@@ -285,12 +285,18 @@ export default function SuppliersPage() {
                   {s.phone && <p>📞 {s.phone}</p>}
                 </div>
               )}
-              <div className="flex gap-1.5 pt-1">
-                <Button size="sm" variant="outline" className="flex-1 h-8 text-xs" onClick={()=>openEdit(s)}>
+              <div className="flex gap-1.5 pt-1 flex-wrap">
+                <Button size="sm" variant="outline" className="flex-1 h-8 text-xs min-w-[60px]" onClick={()=>openEdit(s)}>
                   <Pencil size={12} className="mr-1"/> Edit
+                </Button>
+                <Button size="sm" className="h-8 px-2 text-xs gap-1" onClick={()=>openAssign(s)} title="Assign job">
+                  <Briefcase size={12}/> Assign
                 </Button>
                 <Button size="sm" variant="outline" className="h-8 px-2" onClick={()=>copyPortal(s.portal_token)} title="Copy portal link">
                   <Copy size={12}/>
+                </Button>
+                <Button size="sm" variant="outline" className="h-8 px-2 text-destructive hover:bg-destructive/10" onClick={()=>removeSupplier(s)} title="Remove">
+                  <Trash2 size={12}/>
                 </Button>
               </div>
             </Card>

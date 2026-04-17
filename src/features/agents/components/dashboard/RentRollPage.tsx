@@ -103,7 +103,14 @@ const frequencyDays = (freq: string): number => {
   return 30;
 };
 
-type TabKey = 'all' | 'arrears' | 'expiring' | 'renewals';
+type TabKey = 'all' | 'arrears' | 'expiring' | 'renewals' | 'inspections';
+
+interface UpcomingInspection {
+  id: string;
+  tenancy_id: string;
+  inspection_type: string;
+  scheduled_date: string;
+}
 
 const RentRollPage = () => {
   const { user } = useAuth();
@@ -114,6 +121,7 @@ const RentRollPage = () => {
     if (f === 'arrears') return 'arrears';
     if (f === 'expiring') return 'expiring';
     if (f === 'renewals') return 'renewals';
+    if (f === 'inspections') return 'inspections';
     return 'all';
   })();
   const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
@@ -132,7 +140,7 @@ const RentRollPage = () => {
   // Sync URL filter param → tab (e.g. when sidebar link clicked while already on page)
   useEffect(() => {
     const f = searchParams.get('filter');
-    const next: TabKey = f === 'arrears' ? 'arrears' : f === 'expiring' ? 'expiring' : f === 'renewals' ? 'renewals' : 'all';
+    const next: TabKey = f === 'arrears' ? 'arrears' : f === 'expiring' ? 'expiring' : f === 'renewals' ? 'renewals' : f === 'inspections' ? 'inspections' : 'all';
     if (next !== activeTab) setActiveTab(next);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
@@ -141,6 +149,7 @@ const RentRollPage = () => {
   const [tenancies, setTenancies] = useState<Tenancy[]>([]);
   const [payments, setPayments] = useState<RentPayment[]>([]);
   const [properties, setProperties] = useState<PropertyOption[]>([]);
+  const [upcomingInspections, setUpcomingInspections] = useState<UpcomingInspection[]>([]);
   const [loading, setLoading] = useState(true);
   const [noAgent, setNoAgent] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -235,7 +244,7 @@ const RentRollPage = () => {
     if (!agentData) { setNoAgent(true); setLoading(false); return; }
     setAgentId(agentData.id);
 
-    const [tenancyRes, paymentRes, propRes] = await Promise.all([
+    const [tenancyRes, paymentRes, propRes, inspRes] = await Promise.all([
       supabase
         .from('tenancies')
         .select('*, properties(address, suburb, state)')
@@ -252,11 +261,19 @@ const RentRollPage = () => {
         .eq('agent_id', agentData.id)
         .in('listing_category', ['rent'])
         .order('address'),
+      supabase
+        .from('property_inspections')
+        .select('id, tenancy_id, inspection_type, scheduled_date')
+        .eq('agent_id', agentData.id)
+        .eq('status', 'scheduled')
+        .gte('scheduled_date', new Date().toISOString().slice(0, 10))
+        .order('scheduled_date', { ascending: true }),
     ]);
 
     if (tenancyRes.data) setTenancies(tenancyRes.data as unknown as Tenancy[]);
     if (paymentRes.data) setPayments(paymentRes.data as RentPayment[]);
     if (propRes.data) setProperties(propRes.data as PropertyOption[]);
+    if (inspRes.data) setUpcomingInspections(inspRes.data as UpcomingInspection[]);
     setLoading(false);
   }, [user]);
 
@@ -304,6 +321,20 @@ const RentRollPage = () => {
     return differenceInDays(today, new Date(latest.period_to)) > 14;
   }).length;
 
+  // Map tenancy_id → next upcoming inspection within 30 days
+  const nextInspectionMap = useMemo(() => {
+    const map = new Map<string, UpcomingInspection>();
+    for (const i of upcomingInspections) {
+      const days = differenceInDays(parseISO(i.scheduled_date), today);
+      if (days < 0 || days > 30) continue;
+      if (!map.has(i.tenancy_id)) map.set(i.tenancy_id, i);
+    }
+    return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [upcomingInspections]);
+
+  const inspectionsDueCount = nextInspectionMap.size;
+
   // Filtered tenancies for current tab
   const displayedTenancies = useMemo(() => {
     if (activeTab === 'all') return activeTenancies;
@@ -325,6 +356,16 @@ const RentRollPage = () => {
         .sort((a, b) => parseISO(a.lease_end).getTime() - parseISO(b.lease_end).getTime());
     }
 
+    if (activeTab === 'inspections') {
+      return activeTenancies
+        .filter(t => nextInspectionMap.has(t.id))
+        .sort((a, b) => {
+          const ia = nextInspectionMap.get(a.id)!;
+          const ib = nextInspectionMap.get(b.id)!;
+          return parseISO(ia.scheduled_date).getTime() - parseISO(ib.scheduled_date).getTime();
+        });
+    }
+
     // renewals
     return activeTenancies
       .filter(t => {
@@ -335,7 +376,7 @@ const RentRollPage = () => {
       })
       .sort((a, b) => parseISO(a.lease_end).getTime() - parseISO(b.lease_end).getTime());
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, activeTenancies, payments]);
+  }, [activeTab, activeTenancies, payments, nextInspectionMap]);
 
   // Arrears summary for arrears tab
   const arrearsSummary = useMemo(() => {
@@ -699,6 +740,7 @@ const RentRollPage = () => {
               { key: 'arrears' as const, label: 'Arrears', count: arrearsSummary.count, alert: arrearsSummary.count > 0 },
               { key: 'expiring' as const, label: 'Expiring Soon', count: expiringCount },
               { key: 'renewals' as const, label: 'Renewals Due', count: renewalsCount, alert: renewalsCount > 0 },
+              { key: 'inspections' as const, label: 'Inspections Due', count: inspectionsDueCount },
             ]).map(tab => {
               const isActive = activeTab === tab.key;
               return (
@@ -768,7 +810,9 @@ const RentRollPage = () => {
                                 ? 'No tenancies in arrears. 🎉'
                                 : activeTab === 'expiring'
                                   ? 'No leases expiring in the next 90 days.'
-                                  : 'No renewals due in the next 90 days.'}
+                                  : activeTab === 'inspections'
+                                    ? 'No inspections scheduled in the next 30 days.'
+                                    : 'No renewals due in the next 90 days.'}
                           </TableCell>
                         </TableRow>
                       ) : (
@@ -777,6 +821,8 @@ const RentRollPage = () => {
                           const leaseEnd = parseISO(t.lease_end);
                           const daysToEnd = differenceInDays(leaseEnd, today);
                           const expiringSoon = daysToEnd >= 0 && daysToEnd <= 60;
+                          const upcomingInsp = nextInspectionMap.get(t.id);
+                          const inspDays = upcomingInsp ? differenceInDays(parseISO(upcomingInsp.scheduled_date), today) : null;
 
                           return (
                             <Fragment key={t.id}>
@@ -784,6 +830,20 @@ const RentRollPage = () => {
                               <TableCell className="font-medium">
                                 {t.properties?.address || '—'}
                                 <span className="block text-xs text-muted-foreground">{t.properties?.suburb}</span>
+                                {upcomingInsp && inspDays !== null && (
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/inspection/${upcomingInsp.id}`); }}
+                                    className={cn(
+                                      'mt-1 inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded border-0 hover:underline',
+                                      inspDays <= 7
+                                        ? 'bg-amber-500/15 text-amber-700 dark:text-amber-400'
+                                        : 'bg-blue-500/15 text-blue-700 dark:text-blue-400'
+                                    )}
+                                  >
+                                    <Calendar size={10} />
+                                    Inspection {format(parseISO(upcomingInsp.scheduled_date), 'd MMM')}
+                                  </button>
+                                )}
                               </TableCell>
                               <TableCell>{t.tenant_name}</TableCell>
                               <TableCell className="text-right tabular-nums">${toWeekly(t.rent_amount, t.rent_frequency).toFixed(0)}</TableCell>

@@ -688,13 +688,20 @@ const TenancyDetailPage = () => {
                   <Field label="Owner Account" value={tenancy.owner_account_number} />
                   {tenancy.notes && <div className="col-span-full"><Field label="Notes" value={tenancy.notes} /></div>}
                 </div>
-                <div className="mt-4 pt-4 border-t border-border/50">
+                <div className="mt-4 pt-4 border-t border-border/50 flex flex-wrap gap-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => navigate(`/dashboard/statements?property_id=${tenancy.property_id}`)}
                   >
                     <FileText size={14} className="mr-2" /> View Owner Statements
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate(`/dashboard/trust?property_id=${tenancy.property_id}`)}
+                  >
+                    <FileText size={14} className="mr-2" /> View Trust Account
                   </Button>
                 </div>
               </CardContent>

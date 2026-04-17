@@ -166,7 +166,27 @@ export default function OwnerStatementsPage() {
 
   return (
     <div className="space-y-4">
+      <nav className="text-sm text-muted-foreground mb-2">
+        <span>Dashboard</span>
+        {filterPropertyAddress && (
+          <>
+            <span className="mx-2">→</span>
+            <span>Rent Roll</span>
+            <span className="mx-2">→</span>
+            <span>{filterPropertyAddress}</span>
+          </>
+        )}
+        <span className="mx-2">→</span>
+        <span className="font-medium text-foreground">Statements</span>
+      </nav>
       <DashboardHeader title="Owner Statements" subtitle="Generate and send monthly financial statements to owners." />
+
+      {filterPropertyId && filterPropertyAddress && (
+        <div className="flex items-center gap-2 text-xs bg-primary/10 text-primary rounded-md px-3 py-2">
+          <span>Filtered by property: <strong>{filterPropertyAddress}</strong></span>
+          <a href="/dashboard/statements" className="ml-auto underline">Clear filter</a>
+        </div>
+      )}
 
       <div className="flex justify-end">
         <Button onClick={() => setShowCreate(true)}><Plus size={14} className="mr-1" /> Create statement</Button>
@@ -176,10 +196,10 @@ export default function OwnerStatementsPage() {
         <CardContent className="p-0">
           {loading ? (
             <div className="p-8 flex justify-center"><Loader2 className="animate-spin h-5 w-5 text-muted-foreground" /></div>
-          ) : statements.length === 0 ? (
+          ) : visibleStatements.length === 0 ? (
             <div className="p-8 text-center text-sm text-muted-foreground">
               <FileText className="h-8 w-8 mx-auto mb-2 text-muted-foreground/60" />
-              No statements yet — create one to get started.
+              {filterPropertyId ? 'No statements yet for this property.' : 'No statements yet — create one to get started.'}
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -195,7 +215,7 @@ export default function OwnerStatementsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {statements.map((s) => (
+                  {visibleStatements.map((s) => (
                     <TableRow key={s.id}>
                       <TableCell className="font-medium">{s.properties?.address || '—'}</TableCell>
                       <TableCell>{format(parseISO(s.period_start), 'MMM yyyy')}</TableCell>

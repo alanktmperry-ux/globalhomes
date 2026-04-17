@@ -1,162 +1,165 @@
 import { Helmet } from 'react-helmet-async';
+import { useEffect, useState } from 'react';
+import { ArrowUp } from 'lucide-react';
 
-const TermsPage = () => (
-  <>
-    <Helmet>
-      <title>Terms of Service</title>
-      <meta name="description" content="Terms of Service for ListHQ, an Australian-based global real estate platform." />
-    </Helmet>
-    <main className="bg-background">
-      <article className="max-w-3xl mx-auto px-4 py-16 prose prose-neutral dark:prose-invert">
-        <h1 className="font-display text-3xl font-extrabold text-foreground">Terms of Service</h1>
-        <p className="text-sm text-muted-foreground">Last updated: 29 March 2026 · Version 1.0</p>
-        
+const sections = [
+  { id: 'about', title: '1. About ListHQ' },
+  { id: 'acceptance', title: '2. Acceptance of Terms' },
+  { id: 'accounts', title: '3. User Accounts' },
+  { id: 'agents', title: '4. Agent Obligations' },
+  { id: 'buyers', title: '5. Buyer and Renter Obligations' },
+  { id: 'ip', title: '6. Intellectual Property' },
+  { id: 'referrals', title: '7. International Referral Program' },
+  { id: 'pm', title: '8. Property Management Features' },
+  { id: 'liability', title: '9. Limitation of Liability' },
+  { id: 'privacy', title: '10. Privacy' },
+  { id: 'law', title: '11. Governing Law' },
+  { id: 'changes', title: '12. Changes to Terms' },
+  { id: 'contact', title: '13. Contact' },
+];
 
-        <h2>1. About ListHQ</h2>
-        <p>
-          ListHQ Pty Ltd (ABN 65 608 526 781) operates the ListHQ platform from Victoria, Australia.
-          By accessing or using the platform you agree to be bound by these terms.
-          ListHQ is a technology platform — it is <strong>not</strong> a licensed real estate agency and
-          does not provide legal, financial, or real estate advice.
-        </p>
+const TermsPage = () => {
+  const [showTop, setShowTop] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 600);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
-        <h2>2. Eligibility</h2>
-        <p>
-          You must be at least 18 years of age and legally capable of entering contracts under Australian law.
-          Licensed real estate agents must hold a valid licence under the <em>Estate Agents Act 1980</em> (Vic)
-          or equivalent legislation in their jurisdiction to list properties.
-        </p>
+  return (
+    <>
+      <Helmet>
+        <title>Terms of Service</title>
+        <meta name="description" content="Terms of Service for ListHQ — Australian real estate platform connecting agents, buyers, renters, vendors and property managers." />
+      </Helmet>
+      <main className="bg-background">
+        <article className="max-w-3xl mx-auto px-4 py-12 md:py-16">
+          <h1 className="font-display text-3xl font-extrabold text-foreground mb-2">Terms of Service</h1>
+          <p className="text-sm text-muted-foreground mb-8">Last updated: April 2026</p>
 
-        <h2>3. Account Registration</h2>
-        <p>
-          You agree to provide accurate, current and complete information during registration and to keep your
-          credentials secure. You are responsible for all activity under your account. By creating an account
-          you accept these Terms and our <a href="/privacy" className="text-primary hover:underline">Privacy Policy</a>.
-        </p>
+          <nav className="bg-muted/40 border border-border rounded-lg p-4 mb-10">
+            <p className="text-sm font-semibold text-foreground mb-3">Contents</p>
+            <ul className="space-y-1.5">
+              {sections.map(s => (
+                <li key={s.id}>
+                  <a href={`#${s.id}`} className="text-sm text-primary hover:underline">{s.title}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
 
-        <h2>4. Platform Use</h2>
-        <p>
-          The platform is provided for legitimate real estate search, listing, and communication purposes.
-          You must not use the platform for any unlawful purpose, to harass other users, or to transmit
-          harmful or misleading content.
-        </p>
+          <div className="prose prose-neutral max-w-none">
+            <section id="about">
+              <h2>1. About ListHQ</h2>
+              <p>ListHQ is an Australian real estate platform connecting agents, buyers, renters, vendors and property managers. Operated by ListHQ Pty Ltd, Australia.</p>
+            </section>
 
-        <h2>5. Property Listings</h2>
-        <p>
-          Agents are responsible for the accuracy and legality of all listing information, including pricing,
-          property descriptions, and photographs. All listings must comply with the <em>Australian Consumer Law</em>
-          and relevant state fair trading legislation.
-        </p>
+            <section id="acceptance">
+              <h2>2. Acceptance of Terms</h2>
+              <p>By accessing or using ListHQ, you agree to these terms. If you do not agree, do not use the platform.</p>
+            </section>
 
-        <h2>6. Agent Subscription Terms</h2>
-        <p>
-          Agent subscriptions are billed on a recurring basis via Stripe. By subscribing you
-          authorise ListHQ to charge your nominated payment method at the start of each billing
-          period. Subscriptions auto-renew unless cancelled before the renewal date.
-        </p>
-        <p>
-          Plan tiers (Starter, Professional, Agency, Enterprise) differ in listing limits, team seats,
-          and premium features. Feature access may change between plan tiers at ListHQ's discretion
-          with 30 days notice.
-        </p>
-        <p>
-          Refunds are assessed on a case-by-case basis in accordance with the{' '}
-          <em>Australian Consumer Law</em>. Where a statutory guarantee applies, ListHQ will
-          provide a remedy as required by law. No refunds are issued for partial billing periods
-          unless required by law.
-        </p>
-        <p>
-          You may cancel your subscription at any time from your billing settings. Access
-          continues until the end of the paid period.
-        </p>
+            <section id="accounts">
+              <h2>3. User Accounts</h2>
+              <ul>
+                <li>Agents must provide accurate registration information.</li>
+                <li>You are responsible for maintaining account security.</li>
+                <li>ListHQ reserves the right to suspend accounts that breach these terms.</li>
+                <li>One account per person/agency unless otherwise agreed.</li>
+              </ul>
+            </section>
 
-        <h2>7. Lead Marketplace</h2>
-        <p>
-          The Lead Marketplace allows agents to purchase buyer leads generated through the platform.
-          ListHQ does not guarantee the quality, accuracy, or conversion rate of any lead.
-          Lead data is provided as-is based on buyer search activity. Purchased leads are non-refundable
-          once accessed. Agents are responsible for their own follow-up and compliance with privacy law
-          when contacting leads.
-        </p>
+            <section id="agents">
+              <h2>4. Agent Obligations</h2>
+              <ul>
+                <li>Listings must be accurate and not misleading.</li>
+                <li>Agents must hold a valid real estate licence in their operating state.</li>
+                <li>Commission and fee structures must comply with applicable state legislation.</li>
+                <li>Agents are responsible for FIRB compliance advice — ListHQ calculators are indicative only.</li>
+              </ul>
+            </section>
 
-        <h2>8. AI-Generated Content</h2>
-        <p>
-          ListHQ provides AI-powered features including offer letter drafting, buyer matching, and
-          property descriptions. All AI-generated content is provided as an <strong>administrative aid only</strong>
-          {' '}and does not constitute legal, financial, or professional advice. Agents must review all
-          AI-generated content before use and remain solely responsible for its accuracy and legal compliance.
-        </p>
+            <section id="buyers">
+              <h2>5. Buyer and Renter Obligations</h2>
+              <ul>
+                <li>Users must not submit false enquiries or applications.</li>
+                <li>Foreign buyers are solely responsible for obtaining FIRB approval where required.</li>
+                <li>ListHQ is not a licensed financial adviser — all calculators are estimates only.</li>
+              </ul>
+            </section>
 
-        <h2>9. Trust Accounting</h2>
-        <p>
-          Where trust accounting features are used, agents remain solely responsible for compliance with the
-          trust account provisions of the <em>Estate Agents Act 1980</em> (Vic) and applicable regulations.
-          ListHQ does not hold, manage, or guarantee any trust funds.
-        </p>
+            <section id="ip">
+              <h2>6. Intellectual Property</h2>
+              <ul>
+                <li>All platform content, design and code is owned by ListHQ Pty Ltd.</li>
+                <li>Agents retain ownership of their listing content and photos.</li>
+                <li>By uploading content, agents grant ListHQ a licence to display it on the platform.</li>
+              </ul>
+            </section>
 
-        <h2>10. Intellectual Property</h2>
-        <p>
-          All platform content, design, and technology are the property of ListHQ Pty Ltd or its licensors.
-          User-submitted content (listings, images) remains the property of the submitter, with a licence granted
-          to ListHQ for display purposes on the platform.
-        </p>
+            <section id="referrals">
+              <h2>7. International Referral Program</h2>
+              <ul>
+                <li>Referral commissions are paid on settled transactions only.</li>
+                <li>Commission amounts are as displayed in the referral program tier schedule.</li>
+                <li>ListHQ reserves the right to modify commission rates with 30 days notice.</li>
+                <li>Referrals must be genuine — fraudulent referrals will result in account termination.</li>
+              </ul>
+            </section>
 
-        <h2>11. Data Collection &amp; Privacy</h2>
-        <p>
-          We collect and process personal information in accordance with our{' '}
-          <a href="/privacy" className="text-primary hover:underline">Privacy Policy</a> and the{' '}
-          <em>Privacy Act 1988</em> (Cth). By using the platform you consent to data collection as described
-          in the Privacy Policy.
-        </p>
+            <section id="pm">
+              <h2>8. Property Management Features</h2>
+              <ul>
+                <li>PM tools including trust accounting, rent roll and tenant portals are provided as software only.</li>
+                <li>Agents using trust accounting features must comply with their state's trust accounting legislation.</li>
+                <li>ListHQ is not responsible for errors in trust accounting records — agents must maintain independent records.</li>
+                <li>Tenant and owner portal access is the agent's responsibility to manage.</li>
+              </ul>
+            </section>
 
-        <h2>12. Limitation of Liability</h2>
-        <p>
-          To the maximum extent permitted by the <em>Competition and Consumer Act 2010</em> (Cth), ListHQ
-          excludes liability for indirect, incidental, or consequential damages. The platform is provided
-          "as is" without warranties of any kind.
-        </p>
+            <section id="liability">
+              <h2>9. Limitation of Liability</h2>
+              <ul>
+                <li>ListHQ provides the platform "as is" without warranty.</li>
+                <li>To the maximum extent permitted by Australian law, ListHQ's liability is limited to the subscription fees paid in the prior 3 months.</li>
+                <li>ListHQ is not liable for losses arising from reliance on property valuations, stamp duty estimates, or FIRB fee calculations.</li>
+              </ul>
+            </section>
 
-        <h2>13. Termination</h2>
-        <p>
-          We may suspend or terminate your account at any time for breach of these terms, including
-          misrepresentation of licensing status, misuse of trust accounting features, or harassment
-          of other users. You may close your account at any time by contacting support.
-        </p>
+            <section id="privacy">
+              <h2>10. Privacy</h2>
+              <p>Your use of ListHQ is also governed by our <a href="/privacy" className="text-primary hover:underline">Privacy Policy</a>.</p>
+            </section>
 
-        <h2>14. Dispute Resolution</h2>
-        <p>
-          Before commencing legal proceedings, the parties agree to attempt resolution through good faith
-          negotiation for a minimum of 14 days. If unresolved, disputes may be referred to mediation
-          administered by the Resolution Institute (Australia). Nothing in this clause limits your rights
-          under Australian Consumer Law.
-        </p>
+            <section id="law">
+              <h2>11. Governing Law</h2>
+              <p>These terms are governed by the laws of Victoria, Australia. Disputes are subject to the exclusive jurisdiction of Victorian courts.</p>
+            </section>
 
-        <h2>15. Governing Law</h2>
-        <p>
-          These terms are governed by the laws of the State of Victoria, Australia. Any disputes will be
-          subject to the exclusive jurisdiction of the courts of Victoria.
-        </p>
+            <section id="changes">
+              <h2>12. Changes to Terms</h2>
+              <p>ListHQ may update these terms at any time. Continued use after notice of changes constitutes acceptance.</p>
+            </section>
 
-        <h2>16. Changes to These Terms</h2>
-        <p>
-          We may update these terms from time to time. Material changes will be communicated via email
-          or an in-app notification at least 14 days before taking effect. Continued use after the
-          effective date constitutes acceptance.
-        </p>
+            <section id="contact">
+              <h2>13. Contact</h2>
+              <p>Legal enquiries: <a href="mailto:legal@listhq.com.au" className="text-primary hover:underline">legal@listhq.com.au</a></p>
+            </section>
+          </div>
+        </article>
 
-        <h2>17. Contact</h2>
-        <p>
-          Questions about these terms can be directed to{' '}
-          <a href="mailto:legal@listhq.com.au" className="text-primary hover:underline">
-            legal@listhq.com.au
-          </a>.
-        </p>
-        <p>
-          Legal notices may be sent to: ListHQ Pty Ltd, Victoria, Australia.
-        </p>
-      </article>
-    </main>
-  </>
-);
+        {showTop && (
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="fixed bottom-24 right-6 z-40 w-11 h-11 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:bg-primary/90 transition-colors"
+            aria-label="Back to top"
+          >
+            <ArrowUp size={18} />
+          </button>
+        )}
+      </main>
+    </>
+  );
+};
 
 export default TermsPage;

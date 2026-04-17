@@ -1,150 +1,158 @@
 import { Helmet } from 'react-helmet-async';
+import { useEffect, useState } from 'react';
+import { ArrowUp } from 'lucide-react';
+
+const sections = [
+  { id: 'introduction', title: '1. Introduction' },
+  { id: 'collect', title: '2. What Information We Collect' },
+  { id: 'use', title: '3. How We Use Your Information' },
+  { id: 'transfers', title: '4. International Data Transfers' },
+  { id: 'retention', title: '5. Data Retention' },
+  { id: 'rights', title: '6. Your Rights' },
+  { id: 'cookies', title: '7. Cookies' },
+  { id: 'security', title: '8. Security' },
+  { id: 'children', title: '9. Children' },
+  { id: 'changes', title: '10. Changes to This Policy' },
+  { id: 'contact', title: '11. Contact & Complaints' },
+];
 
 const PrivacyPage = () => {
+  const [showTop, setShowTop] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 600);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
     <>
       <Helmet>
         <title>Privacy Policy</title>
-        <meta name="description" content="Privacy Policy for ListHQ — how we collect, use, and protect your personal information." />
+        <meta name="description" content="Privacy Policy for ListHQ — how we collect, use and protect your personal information under the Australian Privacy Act and GDPR." />
       </Helmet>
       <main className="bg-background">
-        <article className="max-w-3xl mx-auto px-4 py-16 prose prose-neutral">
-          <h1 className="font-display text-3xl font-extrabold text-foreground">Privacy Policy</h1>
-          <p className="text-sm text-muted-foreground">Last updated: 29 March 2026</p>
-          
+        <article className="max-w-3xl mx-auto px-4 py-12 md:py-16">
+          <h1 className="font-display text-3xl font-extrabold text-foreground mb-2">Privacy Policy</h1>
+          <p className="text-sm text-muted-foreground mb-8">Last updated: April 2026</p>
 
-          <h2>1. Overview</h2>
-          <p>
-            ListHQ Pty Ltd (ABN 65 608 526 781) is committed to protecting your personal information in
-            accordance with the <em>Privacy Act 1988</em> (Cth) and the Australian Privacy Principles (APPs).
-            This policy explains how we collect, use, disclose, and safeguard your data. For international users,
-            we also comply with relevant provisions of the <em>General Data Protection Regulation</em> (GDPR).
-          </p>
+          <nav className="bg-muted/40 border border-border rounded-lg p-4 mb-10">
+            <p className="text-sm font-semibold text-foreground mb-3">Contents</p>
+            <ul className="space-y-1.5">
+              {sections.map(s => (
+                <li key={s.id}>
+                  <a href={`#${s.id}`} className="text-sm text-primary hover:underline">{s.title}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
 
-          <h2>2. Information We Collect</h2>
-          <ul>
-            <li><strong>Account data:</strong> name, email address, phone number, and profile photo.</li>
-            <li><strong>Agent data:</strong> licence number, licence state, agency name, ABN, office address, trust account details, and subscription details.</li>
-            <li><strong>Seeker data:</strong> search queries, location preferences, budget range, and contact details (if submitted via Lead Marketplace or property enquiries).</li>
-            <li><strong>Tenancy data:</strong> tenant names, rent amounts, payment history, lease dates, and maintenance records.</li>
-            <li><strong>Search data:</strong> search queries, voice transcripts, saved searches, and location preferences.</li>
-            <li><strong>Usage data:</strong> pages visited, features used, device type, IP address, and browser information.</li>
-            <li><strong>Transaction data:</strong> property enquiries, lead details, subscription payments, and communication history.</li>
-          </ul>
+          <div className="prose prose-neutral max-w-none">
+            <section id="introduction">
+              <h2>1. Introduction</h2>
+              <p>ListHQ Pty Ltd is committed to protecting your privacy in accordance with the Australian <em>Privacy Act 1988</em> (Cth) and the Australian Privacy Principles (APPs). This policy also addresses obligations under the GDPR for users in the European Union and equivalent international privacy laws.</p>
+            </section>
 
-          <h2>3. How We Use Your Information</h2>
-          <p>We use personal information to:</p>
-          <ul>
-            <li>Provide and improve the platform and its features.</li>
-            <li>Match buyers with relevant property listings.</li>
-            <li>Facilitate communication between agents and buyers.</li>
-            <li>Process subscription payments and manage billing.</li>
-            <li>Send service notifications and, with your consent, marketing communications.</li>
-            <li>Comply with legal obligations and regulatory requirements.</li>
-          </ul>
+            <section id="collect">
+              <h2>2. What Information We Collect</h2>
+              <p>Personal information collected includes:</p>
+              <ul>
+                <li><strong>Agents:</strong> name, email, phone, agency name, ABN, licence number, profile photo.</li>
+                <li><strong>Buyers/Renters:</strong> name, email, phone, search preferences, saved listings.</li>
+                <li><strong>Tenants:</strong> name, email, phone, tenancy details, payment history (stored by agent, accessed via tenant portal).</li>
+                <li><strong>Owners/Landlords:</strong> name, email, phone, property and financial information.</li>
+                <li><strong>Referral agents:</strong> name, email, country, WeChat ID, referral activity.</li>
+                <li><strong>Suppliers/Tradespeople:</strong> business name, ABN, licence, insurance details.</li>
+                <li><strong>All users:</strong> IP address, browser language, device type, usage data.</li>
+              </ul>
+            </section>
 
-          <h2>4. Voice Search Data</h2>
-          <p>
-            Voice searches are transcribed and processed to match you with relevant listings. Transcripts may be
-            shared with listing agents as part of lead qualification. Voice search data is retained for{' '}
-            <strong>90 days</strong> and then automatically deleted. You can delete your voice search history
-            from your account settings at any time.
-          </p>
+            <section id="use">
+              <h2>3. How We Use Your Information</h2>
+              <ul>
+                <li>To provide and improve the ListHQ platform.</li>
+                <li>To send transactional emails (rent receipts, inspection notices, arrears reminders, portal access links).</li>
+                <li>To process subscription payments via Stripe — Stripe's privacy policy applies to payment data.</li>
+                <li>To generate property translations via AI services.</li>
+                <li>To display property listings to prospective buyers and renters.</li>
+                <li>To send referral commission notifications.</li>
+              </ul>
+            </section>
 
-          <h2>5. Disclosure of Information</h2>
-          <p>We may share your personal information with:</p>
-          <ul>
-            <li>Licensed real estate agents for the purpose of property enquiries.</li>
-            <li>Service providers who assist with hosting, analytics, and communications.</li>
-            <li>Regulatory authorities when required by law.</li>
-          </ul>
-          <p>We do not sell your personal information to third parties.</p>
+            <section id="transfers">
+              <h2>4. International Data Transfers</h2>
+              <p>ListHQ serves users globally. Your data may be processed by:</p>
+              <ul>
+                <li>Supabase (database and authentication) — servers in Australia and USA.</li>
+                <li>Resend (transactional email) — USA.</li>
+                <li>Stripe (payments) — USA.</li>
+                <li>Google (QR code generation, maps) — USA.</li>
+              </ul>
+              <p>Data transfers comply with applicable international transfer mechanisms.</p>
+            </section>
 
-          <h2>6. Third-Party Service Providers</h2>
-          <p>We use the following third-party services to operate the platform, each of whom may process your personal data:</p>
-          <ul>
-            <li><strong>Supabase</strong> — database hosting and authentication (servers in AWS ap-southeast-2, Sydney, Australia).</li>
-            <li><strong>Stripe</strong> — payment processing (United States). Card data is handled exclusively by Stripe and is never stored by ListHQ.</li>
-            <li><strong>Google Maps Platform</strong> — property location display and address autocomplete (United States). Google Maps usage data is collected per Google's privacy policy. You can opt out of Google Maps via our consent mechanism.</li>
-            
-            <li><strong>OpenAI</strong> — AI text generation for offer letters and buyer matching. Only anonymised, non-identifying queries are sent to OpenAI.</li>
-            <li><strong>Resend</strong> — transactional email delivery.</li>
-          </ul>
-          <p>
-            Each provider operates under their own privacy policy and data processing agreements.
-            Cross-border transfers are conducted in accordance with APP 8 of the <em>Privacy Act 1988</em> (Cth).
-          </p>
+            <section id="retention">
+              <h2>5. Data Retention</h2>
+              <ul>
+                <li>Active account data: retained while account is active.</li>
+                <li>Tenancy records: retained for 7 years (Australian tax record requirements).</li>
+                <li>Deleted accounts: personal data removed within 30 days, financial records retained as required by law.</li>
+              </ul>
+            </section>
 
-          <h2>7. Data Retention</h2>
-          <ul>
-            <li><strong>Tenancy records:</strong> 7 years from creation (Australian legal requirement).</li>
-            <li><strong>Seeker profiles:</strong> 2 years from last activity, then anonymised.</li>
-            <li><strong>Voice search transcripts:</strong> 90 days.</li>
-            <li><strong>Payment and billing records:</strong> 7 years (taxation compliance).</li>
-            <li><strong>Agent profiles:</strong> retained while the account is active; anonymised on deletion (subject to legal retention requirements).</li>
-          </ul>
+            <section id="rights">
+              <h2>6. Your Rights</h2>
+              <p>Australian users have the right to:</p>
+              <ul>
+                <li>Access personal information we hold about you.</li>
+                <li>Correct inaccurate information.</li>
+                <li>Request deletion of your data (subject to legal retention requirements).</li>
+              </ul>
+              <p>EU/UK users additionally have rights under GDPR including data portability and the right to object to processing.</p>
+              <p>To exercise these rights: <a href="mailto:privacy@listhq.com.au" className="text-primary hover:underline">privacy@listhq.com.au</a></p>
+            </section>
 
-          <h2>8. Data Storage &amp; Security</h2>
-          <p>
-            Your data is stored on secure servers located in Australia (AWS ap-southeast-2, Sydney) with
-            encryption at rest and in transit. While we take reasonable steps to protect your information,
-            no method of electronic storage is 100% secure.
-          </p>
+            <section id="cookies">
+              <h2>7. Cookies</h2>
+              <p>We use cookies and similar technologies to keep you signed in, remember your language and currency preferences, and understand how the platform is used. You can manage your choice at any time using the "Cookie Preferences" link in the site footer.</p>
+              <ul>
+                <li><strong>Essential cookies:</strong> required for sign-in, security and portal access.</li>
+                <li><strong>Preference cookies:</strong> store your language, currency and saved listings.</li>
+                <li><strong>Analytics cookies:</strong> help us measure site usage and improve features.</li>
+              </ul>
+            </section>
 
-          <h2>9. Cookies, Google Maps &amp; Tracking</h2>
-          <p>
-            We use cookies and similar technologies to enhance your experience, remember preferences, and
-            analyse platform usage. Google Maps is used for property location features and requires your
-            explicit consent before loading.
-          </p>
-          <p>
-            You can manage cookie preferences through your browser settings.
-          </p>
+            <section id="security">
+              <h2>8. Security</h2>
+              <p>We use industry-standard security including encrypted connections (HTTPS), row-level security on all database tables, and token-based portal access. We do not store credit card numbers — all payment processing is handled by Stripe.</p>
+            </section>
 
-          <h2>10. Your Rights</h2>
-          <p>Under Australian privacy law (and GDPR for international users), you have the right to:</p>
-          <ul>
-            <li>Access personal information we hold about you.</li>
-            <li>Request correction of inaccurate or outdated information.</li>
-            <li>Request deletion of your account and associated data (subject to legal retention requirements — e.g. tenancy records must be retained for 7 years).</li>
-            <li>Opt out of marketing communications at any time.</li>
-            <li>Know what data is collected and why.</li>
-            <li>Withdraw consent for Google Maps and other optional services at any time.</li>
-          </ul>
-          <p>To exercise any of these rights, contact <a href="mailto:privacy@listhq.com.au" className="text-primary hover:underline">privacy@listhq.com.au</a>.</p>
+            <section id="children">
+              <h2>9. Children</h2>
+              <p>ListHQ is not intended for users under 18. We do not knowingly collect data from minors.</p>
+            </section>
 
-          <h2>11. International Data Transfers</h2>
-          <p>
-            As a global platform, some data may be processed in jurisdictions outside Australia (principally the
-            United States for payment processing and AI services). We ensure appropriate safeguards are in place
-            in accordance with APP 8 (cross-border disclosure).
-          </p>
+            <section id="changes">
+              <h2>10. Changes to This Policy</h2>
+              <p>We will notify users of material changes via email or platform notification. Last updated: April 2026.</p>
+            </section>
 
-          <h2>12. Data Breach Notification</h2>
-          <p>
-            In the event of an eligible data breach under the Notifiable Data Breaches (NDB) scheme, ListHQ will
-            notify the Office of the Australian Information Commissioner (OAIC) and affected individuals within
-            the timeframes required by law.
-          </p>
-
-          <h2>13. Changes to This Policy</h2>
-          <p>
-            We may update this policy from time to time. Material changes will be communicated via email or
-            an in-app notification.
-          </p>
-
-          <h2>14. Contact &amp; Complaints</h2>
-          <p>
-            For privacy enquiries or complaints, contact our Privacy Officer at{' '}
-            <a href="mailto:privacy@listhq.com.au" className="text-primary hover:underline">
-              privacy@listhq.com.au
-            </a>.
-            If you are not satisfied with our response, you may lodge a complaint with the{' '}
-            <a href="https://www.oaic.gov.au" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-              Office of the Australian Information Commissioner
-            </a>.
-          </p>
+            <section id="contact">
+              <h2>11. Contact &amp; Complaints</h2>
+              <p>Privacy Officer: <a href="mailto:privacy@listhq.com.au" className="text-primary hover:underline">privacy@listhq.com.au</a></p>
+              <p>If unsatisfied with our response, you may contact the Office of the Australian Information Commissioner (<a href="https://oaic.gov.au" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">oaic.gov.au</a>).</p>
+            </section>
+          </div>
         </article>
+
+        {showTop && (
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="fixed bottom-24 right-6 z-40 w-11 h-11 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:bg-primary/90 transition-colors"
+            aria-label="Back to top"
+          >
+            <ArrowUp size={18} />
+          </button>
+        )}
       </main>
     </>
   );

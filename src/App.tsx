@@ -14,6 +14,7 @@ import { Loader2 } from "lucide-react";
 import AppErrorBoundary from "@/components/AppErrorBoundary";
 import { DefaultSEOHead } from "@/features/seo/components/DefaultSEOHead";
 import { HelpWidget } from "@/features/help/components/HelpWidget";
+import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 
 // Lazy-loaded pages
 const Index = React.lazy(() => import("./pages/Index"));
@@ -193,9 +194,10 @@ const App = () => (
           
             <DefaultSEOHead />
             <Sonner position="top-center" richColors closeButton duration={5000} />
-            <ImpersonationBanner />
+             <ImpersonationBanner />
             <ScrollToTop />
              <HelpWidget />
+             <CookieConsentBanner />
              <Suspense fallback={<PageLoader />}>
               <Routes>
                 {/* Public with shared navbar/footer */}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Plus, Pencil, Star, AlertTriangle, Search, Wrench, Copy, Loader2, BarChart3, LayoutGrid } from 'lucide-react';
+import { Plus, Pencil, Star, AlertTriangle, Search, Wrench, Copy, Loader2, BarChart3, LayoutGrid, Briefcase, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -146,6 +146,48 @@ export default function SuppliersPage() {
     toast.success('Portal link copied');
   };
 
+  // Assign job dialog state
+  const [assignFor, setAssignFor] = useState<Supplier | null>(null);
+  const [openJobs, setOpenJobs] = useState<any[]>([]);
+  const [loadingJobs, setLoadingJobs] = useState(false);
+  const [assigningJobId, setAssigningJobId] = useState<string | null>(null);
+
+  const openAssign = async (s: Supplier) => {
+    setAssignFor(s);
+    setLoadingJobs(true);
+    const { data } = await supabase
+      .from('maintenance_jobs')
+      .select('id, title, priority, created_at, status, assigned_supplier_id, properties:property_id(address, suburb)')
+      .eq('agent_id', agentId!)
+      .in('status', ['new', 'acknowledged'])
+      .is('assigned_supplier_id', null)
+      .order('created_at', { ascending: false });
+    setOpenJobs((data as any) || []);
+    setLoadingJobs(false);
+  };
+
+  const submitAssign = async (jobId: string) => {
+    if (!assignFor) return;
+    setAssigningJobId(jobId);
+    const { error } = await supabase.from('maintenance_jobs').update({
+      assigned_supplier_id: assignFor.id,
+      status: 'assigned',
+    } as any).eq('id', jobId);
+    setAssigningJobId(null);
+    if (error) { toast.error('Could not assign'); return; }
+    toast.success('Assigned — notify them from the Maintenance dashboard');
+    setAssignFor(null);
+    setOpenJobs([]);
+  };
+
+  const removeSupplier = async (s: Supplier) => {
+    if (!confirm(`Remove ${s.business_name} from your supplier list? This won't affect jobs already assigned.`)) return;
+    const { error } = await supabase.from('suppliers' as any).update({ status: 'inactive' } as any).eq('id', s.id);
+    if (error) { toast.error('Could not remove'); return; }
+    toast.success('Supplier removed');
+    load();
+  };
+
   if (loading) {
     return <div className="flex justify-center py-16"><Loader2 className="animate-spin text-primary" /></div>;
   }
@@ -243,12 +285,18 @@ export default function SuppliersPage() {
                   {s.phone && <p>📞 {s.phone}</p>}
                 </div>
               )}
-              <div className="flex gap-1.5 pt-1">
-                <Button size="sm" variant="outline" className="flex-1 h-8 text-xs" onClick={()=>openEdit(s)}>
+              <div className="flex gap-1.5 pt-1 flex-wrap">
+                <Button size="sm" variant="outline" className="flex-1 h-8 text-xs min-w-[60px]" onClick={()=>openEdit(s)}>
                   <Pencil size={12} className="mr-1"/> Edit
+                </Button>
+                <Button size="sm" className="h-8 px-2 text-xs gap-1" onClick={()=>openAssign(s)} title="Assign job">
+                  <Briefcase size={12}/> Assign
                 </Button>
                 <Button size="sm" variant="outline" className="h-8 px-2" onClick={()=>copyPortal(s.portal_token)} title="Copy portal link">
                   <Copy size={12}/>
+                </Button>
+                <Button size="sm" variant="outline" className="h-8 px-2 text-destructive hover:bg-destructive/10" onClick={()=>removeSupplier(s)} title="Remove">
+                  <Trash2 size={12}/>
                 </Button>
               </div>
             </Card>
@@ -345,6 +393,43 @@ export default function SuppliersPage() {
               {editing ? 'Save Changes' : 'Add Supplier'}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Assign job dialog */}
+      <Dialog open={!!assignFor} onOpenChange={o => !o && setAssignFor(null)}>
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Assign job to {assignFor?.business_name}</DialogTitle>
+          </DialogHeader>
+          {loadingJobs ? (
+            <div className="flex justify-center py-6"><Loader2 className="animate-spin text-primary"/></div>
+          ) : openJobs.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-6">No unassigned jobs at the moment.</p>
+          ) : (
+            <div className="space-y-2">
+              {openJobs.map(j => {
+                const days = Math.floor((Date.now() - new Date(j.created_at).getTime()) / 86400000);
+                return (
+                  <div key={j.id} className="flex items-center justify-between gap-3 border rounded-lg p-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{j.title}</p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {j.properties?.address || '—'}{j.properties?.suburb ? `, ${j.properties.suburb}` : ''}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge className={`text-[10px] ${j.priority === 'urgent' ? 'bg-destructive text-destructive-foreground' : j.priority === 'low' ? 'bg-muted text-muted-foreground' : 'bg-amber-500 text-white'}`}>{j.priority}</Badge>
+                        <span className="text-[10px] text-muted-foreground">{days}d open</span>
+                      </div>
+                    </div>
+                    <Button size="sm" disabled={!!assigningJobId} onClick={() => submitAssign(j.id)}>
+                      {assigningJobId === j.id ? <Loader2 size={12} className="animate-spin"/> : 'Assign'}
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

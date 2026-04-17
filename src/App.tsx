@@ -97,6 +97,8 @@ const OpenHomesPage = React.lazy(() => import("@/features/open-homes/components/
 const OpenHomeSignInPage = React.lazy(() => import("@/features/open-homes/pages/OpenHomeSignInPage"));
 const RentalApplicationsPage = React.lazy(() => import("@/features/agents/components/dashboard/RentalApplicationsPage"));
 const AutomationSettingsPage = React.lazy(() => import("@/features/agents/components/dashboard/AutomationSettingsPage"));
+const MaintenancePage = React.lazy(() => import("@/features/agents/components/dashboard/MaintenancePage"));
+const VacanciesPage = React.lazy(() => import("@/features/agents/components/dashboard/VacanciesPage"));
 const AgentEOIPage = React.lazy(() => import("@/features/offmarket/pages/AgentEOIPage"));
 const AgencyOnboardingPage = React.lazy(() => import("@/features/agents/pages/AgencyOnboardingPage"));
 const PartnerAuthPage = React.lazy(() => import("./features/partners/pages/PartnerAuthPage"));
@@ -318,6 +320,8 @@ const App = () => (
                   <Route path="automation" element={<AutomationSettingsPage />} />
                   <Route path="suppliers" element={<SuppliersPage />} />
                   <Route path="vacancy-kpi" element={<VacancyKPIPage />} />
+                  <Route path="vacancies" element={<VacanciesPage />} />
+                  <Route path="maintenance" element={<MaintenancePage />} />
                   <Route path="statements" element={<OwnerStatementsPage />} />
                   <Route path="settings" element={<SettingsPage />} />
                   <Route path="help" element={<HelpPage />} />

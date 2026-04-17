@@ -3,12 +3,11 @@ import type { AustralianState } from './stampDuty';
 // FIRB application fee schedule (residential, individual buyer, 2024-25)
 // Source: firb.gov.au fee schedule
 export function firbApplicationFee(price: number): number {
-  if (price <= 75_000) return 2_000;
+  if (price < 75_000) return 4_200;
   if (price <= 1_000_000) return 13_200;
   if (price <= 2_000_000) return 26_400;
   if (price <= 3_000_000) return 52_800;
-  if (price <= 4_000_000) return 79_300;
-  return 106_100;
+  return 79_200;
 }
 
 // Foreign Investor Duty Surcharge (additional duty on top of standard stamp duty)
@@ -18,9 +17,9 @@ export const FOREIGN_SURCHARGE_RATES: Record<AustralianState, number> = {
   QLD: 0.07,
   WA: 0.07,
   SA: 0.07,
-  ACT: 0.06,
+  TAS: 0.08,
+  ACT: 0.07,
   NT: 0,
-  TAS: 0,
 };
 
 export function foreignSurcharge(price: number, state: AustralianState): number {

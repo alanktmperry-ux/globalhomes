@@ -47,6 +47,8 @@ const PROPERTY_NAV: NavItem[] = [
   { title: 'Open Homes', url: '/dashboard/open-homes', icon: CalendarDays },
   { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home, badgeKey: 'rentRoll' },
   { title: 'Applications', url: '/dashboard/rental-applications', icon: ClipboardList },
+  { title: 'Maintenance', url: '/dashboard/maintenance', icon: Wrench },
+  { title: 'Vacancies', url: '/dashboard/vacancies', icon: Home },
   { title: 'Inspection Day', url: '/dashboard/inspection-mode', icon: CalendarDays },
   { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
   { title: 'Settlement', url: '/dashboard/settlements', icon: PartyPopper },

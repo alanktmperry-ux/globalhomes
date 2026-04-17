@@ -40,6 +40,9 @@ const PartnerArrearsPage = () => {
   const [overdue, setOverdue] = useState<OverdueTenancy[]>([]);
   const [loading, setLoading] = useState(true);
   const [sendingId, setSendingId] = useState<string | null>(null);
+  const [autoOn, setAutoOn] = useState(false);
+  const [autoLogs, setAutoLogs] = useState<Record<string, string>>({}); // tenant_email -> last sent date
+  const [togglingAuto, setTogglingAuto] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!user || agencies.length === 0) { setLoading(false); return; }
@@ -169,6 +172,19 @@ const PartnerArrearsPage = () => {
         )}
       </div>
 
+      <div className="rounded-lg border bg-card p-4 flex items-center justify-between gap-3 flex-wrap">
+        <div>
+          <p className="text-sm font-semibold text-foreground">Automated arrears sequences: {autoOn ? 'ON' : 'OFF'}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {autoOn ? 'Day 1, 3, 7, 14 reminders active — running daily at 8am' : 'Manual reminders only'}
+          </p>
+        </div>
+        <Button size="sm" variant={autoOn ? 'outline' : 'default'} onClick={toggleAuto} disabled={togglingAuto}>
+          {togglingAuto && <Loader2 size={12} className="animate-spin mr-1"/>}
+          Turn {autoOn ? 'OFF' : 'ON'}
+        </Button>
+      </div>
+
       {loading ? (
         <div className="space-y-4">
           {[1,2].map(i => <Skeleton key={i} className="h-32 rounded-lg" />)}
@@ -205,36 +221,45 @@ const PartnerArrearsPage = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {tenants.map(t => (
-                      <TableRow key={t.id}>
-                        <TableCell className="font-medium">
-                          {t.properties?.address || '—'}
-                          <span className="block text-xs text-muted-foreground">{t.properties?.suburb}</span>
-                        </TableCell>
-                        <TableCell>{t.tenant_name}</TableCell>
-                        <TableCell className="text-sm text-muted-foreground">{t.tenant_phone || '—'}</TableCell>
-                        <TableCell>
-                          <Badge className="bg-red-500/15 text-red-700 dark:text-red-400 border-0 text-xs">
-                            {t.daysBehind} days
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right tabular-nums font-medium text-red-600">
-                          ${t.amountOwed.toFixed(0)}
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="gap-1"
-                            onClick={() => handleSendReminder(t)}
-                            disabled={sendingId === t.id || !t.tenant_email}
-                          >
-                            {sendingId === t.id ? <Loader2 className="animate-spin" size={12} /> : <Send size={12} />}
-                            Remind
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {tenants.map(t => {
+                      const lastAuto = t.tenant_email ? autoLogs[t.tenant_email] : null;
+                      const lastDays = lastAuto ? Math.floor((Date.now() - new Date(lastAuto).getTime()) / 86400000) : null;
+                      return (
+                        <TableRow key={t.id}>
+                          <TableCell className="font-medium">
+                            {t.properties?.address || '—'}
+                            <span className="block text-xs text-muted-foreground">{t.properties?.suburb}</span>
+                            {lastDays != null ? (
+                              <Badge className="mt-1 bg-blue-500/15 text-blue-700 border-0 text-[10px]">Auto-reminded {lastDays}d ago</Badge>
+                            ) : (
+                              <Badge className="mt-1 bg-muted text-muted-foreground border-0 text-[10px]">No auto-reminder sent</Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>{t.tenant_name}</TableCell>
+                          <TableCell className="text-sm text-muted-foreground">{t.tenant_phone || '—'}</TableCell>
+                          <TableCell>
+                            <Badge className="bg-red-500/15 text-red-700 dark:text-red-400 border-0 text-xs">
+                              {t.daysBehind} days
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums font-medium text-red-600">
+                            ${t.amountOwed.toFixed(0)}
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-1"
+                              onClick={() => handleSendReminder(t)}
+                              disabled={sendingId === t.id || !t.tenant_email}
+                            >
+                              {sendingId === t.id ? <Loader2 className="animate-spin" size={12} /> : <Send size={12} />}
+                              Remind
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </CardContent>

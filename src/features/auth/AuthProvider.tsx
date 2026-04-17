@@ -183,14 +183,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         
         const roles = data?.map((r) => r.role) || [];
 
-        // Fetch agent agency_role and agency_id (also infers agent role)
+        // Fallback: if no agent role, check agents table and auto-insert role
         const { data: agentData } = await supabase
           .from('agents')
           .select('id, agency_role, agency_id')
           .eq('user_id', user.id)
           .maybeSingle();
         if (cancelled) return;
-        if (agentData && !roles.includes('agent')) roles.push('agent');
+        if (agentData && !roles.includes('agent')) {
+          roles.push('agent');
+          // Best-effort backfill of user_roles row
+          supabase.from('user_roles').insert({ user_id: user.id, role: 'agent' as any })
+            .then(({ error }) => { if (error && !String(error.message).includes('duplicate')) console.warn('[Auth] backfill user_roles:', error.message); });
+        }
         applyRoles(roles, user.email);
         if (agentData) {
           setAgencyRole((agentData as any).agency_role || null);
@@ -198,6 +203,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           if ((agentData as any).agency_role === 'principal' || (agentData as any).agency_role === 'admin') {
             setIsPrincipal(true);
           }
+        }
+
+        // Post-login redirect: agents land on dashboard
+        const isAgentUser = roles.includes('agent') || roles.includes('admin');
+        const path = window.location.pathname;
+        const onAuthPage = path === '/login' || path === '/auth' || path === '/agent-auth' || path === '/';
+        if (isAgentUser && onAuthPage && sessionStorage.getItem('post_login_redirected') !== '1') {
+          sessionStorage.setItem('post_login_redirected', '1');
+          window.location.href = '/dashboard/rent-roll';
+          return;
         }
       } catch (err) {
         console.error('[Auth] fetchRoles error:', err);

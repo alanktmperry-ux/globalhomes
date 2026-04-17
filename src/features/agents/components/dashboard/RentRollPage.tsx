@@ -103,7 +103,14 @@ const frequencyDays = (freq: string): number => {
   return 30;
 };
 
-type TabKey = 'all' | 'arrears' | 'expiring' | 'renewals';
+type TabKey = 'all' | 'arrears' | 'expiring' | 'renewals' | 'inspections';
+
+interface UpcomingInspection {
+  id: string;
+  tenancy_id: string;
+  inspection_type: string;
+  scheduled_date: string;
+}
 
 const RentRollPage = () => {
   const { user } = useAuth();
@@ -114,6 +121,7 @@ const RentRollPage = () => {
     if (f === 'arrears') return 'arrears';
     if (f === 'expiring') return 'expiring';
     if (f === 'renewals') return 'renewals';
+    if (f === 'inspections') return 'inspections';
     return 'all';
   })();
   const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
@@ -132,7 +140,7 @@ const RentRollPage = () => {
   // Sync URL filter param → tab (e.g. when sidebar link clicked while already on page)
   useEffect(() => {
     const f = searchParams.get('filter');
-    const next: TabKey = f === 'arrears' ? 'arrears' : f === 'expiring' ? 'expiring' : f === 'renewals' ? 'renewals' : 'all';
+    const next: TabKey = f === 'arrears' ? 'arrears' : f === 'expiring' ? 'expiring' : f === 'renewals' ? 'renewals' : f === 'inspections' ? 'inspections' : 'all';
     if (next !== activeTab) setActiveTab(next);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);

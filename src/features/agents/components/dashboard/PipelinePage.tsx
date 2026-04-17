@@ -7,6 +7,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import OfferModal from './pipeline/OfferModal';
 import OfferOutcomeTracker from './pipeline/OfferOutcomeTracker';
+import SettlementModal from './pipeline/SettlementModal';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
 
@@ -68,6 +69,7 @@ const PipelinePage = () => {
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [agentId, setAgentId] = useState<string | null>(null);
   const [offerCard, setOfferCard] = useState<PipelineCard | null>(null);
+  const [settlementCard, setSettlementCard] = useState<{ card: PipelineCard; previousStage: string } | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -141,6 +143,12 @@ const PipelinePage = () => {
 
     const card = cards.find(c => c.id === cardId);
     if (!card || card.stage === targetStage) return;
+
+    // Intercept moves into 'settled' (unless already settled) — show modal
+    if (targetStage === 'settled' && card.stage !== 'settled') {
+      setSettlementCard({ card, previousStage: card.stage });
+      return;
+    }
 
     setCards(prev => prev.map(c =>
       c.id === cardId ? { ...c, stage: targetStage, movedAt: new Date().toISOString() } : c
@@ -305,6 +313,27 @@ const PipelinePage = () => {
           propertyId={offerCard.propertyId}
           agentId={agentId}
           onSent={handleOfferSent}
+        />
+      )}
+
+      {settlementCard && user && (
+        <SettlementModal
+          open={!!settlementCard}
+          onOpenChange={(open) => { if (!open) setSettlementCard(null); }}
+          propertyId={settlementCard.card.propertyId}
+          propertyAddress={settlementCard.card.address}
+          initialPrice={settlementCard.card.estimatedValue}
+          agentId={agentId}
+          userId={user.id}
+          onConfirmed={() => {
+            setCards(prev => prev.map(c =>
+              c.id === settlementCard.card.id
+                ? { ...c, stage: 'settled', movedAt: new Date().toISOString() }
+                : c
+            ));
+            setSettlementCard(null);
+          }}
+          onCancel={() => setSettlementCard(null)}
         />
       )}
     </div>

@@ -8536,6 +8536,12 @@ export type Database = {
           owner_name: string | null
           property_id: string
           re_let_date: string | null
+          renewal_notes: string | null
+          renewal_offered_at: string | null
+          renewal_offered_lease_end: string | null
+          renewal_offered_rent: number | null
+          renewal_status: string | null
+          renewal_type: string | null
           rent_amount: number
           rent_frequency: string
           status: string
@@ -8566,6 +8572,12 @@ export type Database = {
           owner_name?: string | null
           property_id: string
           re_let_date?: string | null
+          renewal_notes?: string | null
+          renewal_offered_at?: string | null
+          renewal_offered_lease_end?: string | null
+          renewal_offered_rent?: number | null
+          renewal_status?: string | null
+          renewal_type?: string | null
           rent_amount: number
           rent_frequency?: string
           status?: string
@@ -8596,6 +8608,12 @@ export type Database = {
           owner_name?: string | null
           property_id?: string
           re_let_date?: string | null
+          renewal_notes?: string | null
+          renewal_offered_at?: string | null
+          renewal_offered_lease_end?: string | null
+          renewal_offered_rent?: number | null
+          renewal_status?: string | null
+          renewal_type?: string | null
           rent_amount?: number
           rent_frequency?: string
           status?: string

@@ -8201,6 +8201,7 @@ export type Database = {
           tenant_email: string | null
           tenant_name: string
           tenant_phone: string | null
+          tenant_portal_token: string | null
           updated_at: string
         }
         Insert: {
@@ -8226,6 +8227,7 @@ export type Database = {
           tenant_email?: string | null
           tenant_name: string
           tenant_phone?: string | null
+          tenant_portal_token?: string | null
           updated_at?: string
         }
         Update: {
@@ -8251,6 +8253,7 @@ export type Database = {
           tenant_email?: string | null
           tenant_name?: string
           tenant_phone?: string | null
+          tenant_portal_token?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -8308,6 +8311,47 @@ export type Database = {
             columns: ["tenant_contact_id"]
             isOneToOne: false
             referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenant_documents: {
+        Row: {
+          document_type: string
+          file_url: string
+          id: string
+          label: string | null
+          tenancy_id: string
+          uploaded_at: string
+          uploaded_by: string | null
+          visible_to_tenant: boolean
+        }
+        Insert: {
+          document_type?: string
+          file_url: string
+          id?: string
+          label?: string | null
+          tenancy_id: string
+          uploaded_at?: string
+          uploaded_by?: string | null
+          visible_to_tenant?: boolean
+        }
+        Update: {
+          document_type?: string
+          file_url?: string
+          id?: string
+          label?: string | null
+          tenancy_id?: string
+          uploaded_at?: string
+          uploaded_by?: string | null
+          visible_to_tenant?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_documents_tenancy_id_fkey"
+            columns: ["tenancy_id"]
+            isOneToOne: false
+            referencedRelation: "tenancies"
             referencedColumns: ["id"]
           },
         ]
@@ -10485,6 +10529,7 @@ export type Database = {
         Args: { p_property_type?: string; p_state: string; p_suburb: string }
         Returns: Json
       }
+      get_tenancy_by_portal_token: { Args: { p_token: string }; Returns: Json }
       get_user_agency_id: { Args: never; Returns: string }
       has_role: {
         Args: {
@@ -10745,6 +10790,17 @@ export type Database = {
         Args: {
           p_ip_address?: string
           p_signature_data: string
+          p_token: string
+        }
+        Returns: Json
+      }
+      submit_tenant_maintenance: {
+        Args: {
+          p_category: string
+          p_description: string
+          p_photos?: string[]
+          p_priority: string
+          p_title: string
           p_token: string
         }
         Returns: Json

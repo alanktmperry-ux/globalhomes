@@ -8518,11 +8518,13 @@ export type Database = {
       }
       tenancies: {
         Row: {
+          actual_vacate_date: string | null
           agent_id: string
           bond_amount: number
           bond_authority: string | null
           bond_lodgement_number: string | null
           created_at: string
+          days_to_re_let: number | null
           id: string
           lease_end: string
           lease_start: string
@@ -8533,6 +8535,7 @@ export type Database = {
           owner_email: string | null
           owner_name: string | null
           property_id: string
+          re_let_date: string | null
           rent_amount: number
           rent_frequency: string
           status: string
@@ -8542,13 +8545,16 @@ export type Database = {
           tenant_phone: string | null
           tenant_portal_token: string | null
           updated_at: string
+          vacancy_loss_aud: number | null
         }
         Insert: {
+          actual_vacate_date?: string | null
           agent_id: string
           bond_amount: number
           bond_authority?: string | null
           bond_lodgement_number?: string | null
           created_at?: string
+          days_to_re_let?: number | null
           id?: string
           lease_end: string
           lease_start: string
@@ -8559,6 +8565,7 @@ export type Database = {
           owner_email?: string | null
           owner_name?: string | null
           property_id: string
+          re_let_date?: string | null
           rent_amount: number
           rent_frequency?: string
           status?: string
@@ -8568,13 +8575,16 @@ export type Database = {
           tenant_phone?: string | null
           tenant_portal_token?: string | null
           updated_at?: string
+          vacancy_loss_aud?: number | null
         }
         Update: {
+          actual_vacate_date?: string | null
           agent_id?: string
           bond_amount?: number
           bond_authority?: string | null
           bond_lodgement_number?: string | null
           created_at?: string
+          days_to_re_let?: number | null
           id?: string
           lease_end?: string
           lease_start?: string
@@ -8585,6 +8595,7 @@ export type Database = {
           owner_email?: string | null
           owner_name?: string | null
           property_id?: string
+          re_let_date?: string | null
           rent_amount?: number
           rent_frequency?: string
           status?: string
@@ -8594,6 +8605,7 @@ export type Database = {
           tenant_phone?: string | null
           tenant_portal_token?: string | null
           updated_at?: string
+          vacancy_loss_aud?: number | null
         }
         Relationships: [
           {
@@ -9592,6 +9604,96 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      vacancy_events: {
+        Row: {
+          agent_id: string | null
+          created_at: string | null
+          event_date: string
+          event_type: string
+          id: string
+          notes: string | null
+          property_id: string | null
+          tenancy_id: string | null
+        }
+        Insert: {
+          agent_id?: string | null
+          created_at?: string | null
+          event_date: string
+          event_type: string
+          id?: string
+          notes?: string | null
+          property_id?: string | null
+          tenancy_id?: string | null
+        }
+        Update: {
+          agent_id?: string | null
+          created_at?: string | null
+          event_date?: string
+          event_type?: string
+          id?: string
+          notes?: string | null
+          property_id?: string | null
+          tenancy_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vacancy_events_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vacancy_events_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vacancy_events_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vacancy_events_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "vacancy_events_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vacancy_events_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vacancy_events_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vacancy_events_tenancy_id_fkey"
+            columns: ["tenancy_id"]
+            isOneToOne: false
+            referencedRelation: "tenancies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vendor_report_tokens: {
         Row: {

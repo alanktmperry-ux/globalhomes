@@ -104,6 +104,52 @@ const PartnerArrearsPage = () => {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
+  const loadAutoStatus = useCallback(async () => {
+    if (agencies.length === 0) return;
+    const agentIds = agencies.map(a => a.agentId).filter(Boolean);
+    if (agentIds.length === 0) return;
+    const { data: rules } = await (supabase as any)
+      .from('pm_automation_rules')
+      .select('is_active')
+      .eq('rule_type', 'arrears_sequence')
+      .in('agent_id', agentIds);
+    setAutoOn(!!rules?.some((r: any) => r.is_active));
+
+    const { data: logs } = await (supabase as any)
+      .from('pm_automation_log')
+      .select('recipient_email, sent_at')
+      .eq('rule_type', 'arrears_sequence')
+      .gte('sent_at', new Date(Date.now() - 14 * 86400000).toISOString())
+      .order('sent_at', { ascending: false });
+    const map: Record<string, string> = {};
+    for (const l of (logs || []) as any[]) {
+      if (l.recipient_email && !map[l.recipient_email]) map[l.recipient_email] = l.sent_at;
+    }
+    setAutoLogs(map);
+  }, [agencies]);
+
+  useEffect(() => { loadAutoStatus(); }, [loadAutoStatus]);
+
+  const toggleAuto = async () => {
+    if (agencies.length === 0) return;
+    setTogglingAuto(true);
+    try {
+      const agentIds = agencies.map(a => a.agentId).filter(Boolean);
+      const newState = !autoOn;
+      const { error } = await (supabase as any)
+        .from('pm_automation_rules')
+        .update({ is_active: newState })
+        .eq('rule_type', 'arrears_sequence')
+        .in('agent_id', agentIds);
+      if (error) throw error;
+      setAutoOn(newState);
+      toast.success(`Automated arrears sequences turned ${newState ? 'ON' : 'OFF'}`);
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err) || 'Failed to update automation');
+    }
+    setTogglingAuto(false);
+  };
+
   const handleSendReminder = async (t: OverdueTenancy) => {
     if (!t.tenant_email || !user) {
       toast.error('No email address for this tenant');

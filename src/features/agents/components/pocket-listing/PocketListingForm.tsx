@@ -109,6 +109,16 @@ export interface ListingDraft {
   vendorName: string;
   vendorEmail: string;
   vendorPhone: string;
+
+  // Multilingual translations (optional)
+  title_zh: string;
+  description_zh: string;
+  title_zh_tw: string;
+  description_zh_tw: string;
+  title_ja: string;
+  description_ja: string;
+  title_ko: string;
+  description_ko: string;
 }
 
 const DEFAULT_DRAFT: ListingDraft = {
@@ -182,9 +192,18 @@ const DEFAULT_DRAFT: ListingDraft = {
   vendorName: '',
   vendorEmail: '',
   vendorPhone: '',
+
+  title_zh: '',
+  description_zh: '',
+  title_zh_tw: '',
+  description_zh_tw: '',
+  title_ja: '',
+  description_ja: '',
+  title_ko: '',
+  description_ko: '',
 };
 
-const STEPS = ['Address', 'Basics', 'Photos', 'Voice', 'Settings', 'Preview'];
+const STEPS = ['Address', 'Basics', 'Photos', 'Voice', 'Translate', 'Settings', 'Preview'];
 
 interface Props {
   onPublish: (title: string) => void;

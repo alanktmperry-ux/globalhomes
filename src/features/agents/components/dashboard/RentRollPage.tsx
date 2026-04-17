@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, Fragment } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, Home, Loader2, AlertTriangle, CheckCircle2, Clock, ClipboardCheck, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';

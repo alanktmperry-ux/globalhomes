@@ -118,6 +118,41 @@ Return ONLY valid JSON. No markdown, no code fences.`;
   });
 }
 
+const LANGUAGE_LABELS: Record<string, string> = {
+  "zh-CN": "Chinese (Simplified)",
+  "zh-TW": "Chinese (Traditional)",
+  "ja": "Japanese",
+  "ko": "Korean",
+};
+
+async function handleTextTranslation(input: {
+  title: string;
+  description: string;
+  bullets: string[];
+  target_language: string;
+}) {
+  const langLabel = LANGUAGE_LABELS[input.target_language] || input.target_language;
+  const systemPrompt = `You are a multilingual real estate translation specialist for the Australian property market. You produce culturally sensitive, natural translations (not word-for-word). Return valid JSON only.`;
+  const userPrompt = `Translate the following Australian property listing fields into ${langLabel}.
+
+ENGLISH TITLE: ${input.title || "(empty)"}
+ENGLISH DESCRIPTION: ${input.description || "(empty)"}
+${input.bullets.length > 0 ? `KEY BULLETS:\n${input.bullets.map((b) => `- ${b}`).join("\n")}` : ""}
+
+Return JSON with exactly these keys:
+- "title": translated title (concise, max 120 chars)
+- "description": translated description (natural prose, preserve key features)
+
+Return ONLY valid JSON. No markdown, no code fences.`;
+
+  const result = await callAI(systemPrompt, userPrompt);
+  return jsonResponse({
+    title: result.title || "",
+    description: result.description || "",
+    target_language: input.target_language,
+  });
+}
+
 async function handleSearchTranslation(searchQuery: string) {
   const systemPrompt = `You are a multilingual search query translator for an Australian real estate platform. Detect the input language, translate to English, and identify search intent. Return valid JSON only.`;
 
@@ -171,6 +206,17 @@ Deno.serve(async (req) => {
     if (body.type === "translate_search" && body.search_query) {
       // Any authenticated user can translate search queries
       return await handleSearchTranslation(body.search_query);
+    }
+
+    if (body.type === "translate_text" && body.target_language) {
+      // Translate ad-hoc title/description text (used by the listing wizard before
+      // a property has been persisted). No DB writes — returns translated fields.
+      return await handleTextTranslation({
+        title: typeof body.title === "string" ? body.title : "",
+        description: typeof body.description === "string" ? body.description : "",
+        bullets: Array.isArray(body.bullets) ? body.bullets : [],
+        target_language: String(body.target_language),
+      });
     }
 
     if (body.listing_id) {

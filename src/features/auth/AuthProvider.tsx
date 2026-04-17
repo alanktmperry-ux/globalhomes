@@ -182,15 +182,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (cancelled) return;
         
         const roles = data?.map((r) => r.role) || [];
-        applyRoles(roles);
 
-        // Fetch agent agency_role and agency_id
+        // Fetch agent agency_role and agency_id (also infers agent role)
         const { data: agentData } = await supabase
           .from('agents')
-          .select('agency_role, agency_id')
+          .select('id, agency_role, agency_id')
           .eq('user_id', user.id)
           .maybeSingle();
-        if (!cancelled && agentData) {
+        if (cancelled) return;
+        if (agentData && !roles.includes('agent')) roles.push('agent');
+        applyRoles(roles, user.email);
+        if (agentData) {
           setAgencyRole((agentData as any).agency_role || null);
           setAgencyId(agentData.agency_id || null);
           if ((agentData as any).agency_role === 'principal' || (agentData as any).agency_role === 'admin') {

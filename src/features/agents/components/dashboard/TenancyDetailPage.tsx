@@ -622,8 +622,51 @@ const TenancyDetailPage = () => {
                   <Field label="Phone" value={tenancy.tenant_phone} />
                   <Field label="Status" value={statusBadge(tenancy.status)} />
                   <Field label="Lease Start" value={format(parseISO(tenancy.lease_start), 'dd MMM yyyy')} />
-                  <Field label="Lease End" value={format(parseISO(tenancy.lease_end), 'dd MMM yyyy')} />
-                  <Field label="Rent" value={`${AUD.format(tenancy.rent_amount)} ${tenancy.rent_frequency}`} />
+                  <Field label="Lease End" value={
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-medium text-foreground">{format(parseISO(tenancy.lease_end), 'dd MMM yyyy')}</span>
+                      {(() => {
+                        const days = Math.floor((parseISO(tenancy.lease_end).getTime() - Date.now()) / 86400000);
+                        const rs = tenancy.renewal_status;
+                        if (rs === 'offered') return <Badge className="bg-blue-500/15 text-blue-700 dark:text-blue-400 border-0 text-[10px]">Offer Sent</Badge>;
+                        if (rs === 'accepted') return <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-0 text-[10px]">Renewed</Badge>;
+                        if (rs === 'declined') return <Badge className="bg-red-500/15 text-red-700 dark:text-red-400 border-0 text-[10px]">Not Renewing</Badge>;
+                        if (days < 60) return <Badge className="bg-red-500/15 text-red-700 dark:text-red-400 border-0 text-[10px]">Renewal Urgent</Badge>;
+                        if (days <= 90) return <Badge className="bg-amber-500/15 text-amber-700 dark:text-amber-400 border-0 text-[10px]">Renewal Due Soon</Badge>;
+                        return null;
+                      })()}
+                    </div>
+                  } />
+                  {(() => {
+                    const days = Math.floor((parseISO(tenancy.lease_end).getTime() - Date.now()) / 86400000);
+                    const rs = tenancy.renewal_status;
+                    const showOffer = (rs === 'none' || !rs || rs === 'declined') && days <= 90;
+                    return (
+                      <div className="col-span-full flex flex-wrap gap-2">
+                        {showOffer && (
+                          <Button size="sm" variant="outline" onClick={openRenewal}>
+                            <RefreshCw size={12} className="mr-1.5" /> Offer Renewal
+                          </Button>
+                        )}
+                        {rs === 'offered' && (
+                          <>
+                            <Button size="sm" variant="outline" className="text-emerald-700 border-emerald-300 hover:bg-emerald-50" onClick={acceptRenewal}>
+                              <CheckCircle2 size={12} className="mr-1.5" /> Mark Accepted
+                            </Button>
+                            <Button size="sm" variant="outline" className="text-red-700 border-red-300 hover:bg-red-50" onClick={declineRenewal}>
+                              Mark Declined
+                            </Button>
+                            {tenancy.renewal_offered_lease_end && (
+                              <span className="text-xs text-muted-foreground self-center">
+                                Offered: {format(parseISO(tenancy.renewal_offered_lease_end), 'd MMM yyyy')}
+                                {tenancy.renewal_offered_rent != null && ` · ${AUD.format(tenancy.renewal_offered_rent)}`}
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    );
+                  })()}
                   <Field label="Bond" value={AUD.format(tenancy.bond_amount)} />
                   <Field label="Bond Lodgement #" value={tenancy.bond_lodgement_number} />
                   <Field label="Bond Authority" value={tenancy.bond_authority} />

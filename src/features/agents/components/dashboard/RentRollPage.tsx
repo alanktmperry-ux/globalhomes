@@ -321,6 +321,20 @@ const RentRollPage = () => {
     return differenceInDays(today, new Date(latest.period_to)) > 14;
   }).length;
 
+  // Map tenancy_id → next upcoming inspection within 30 days
+  const nextInspectionMap = useMemo(() => {
+    const map = new Map<string, UpcomingInspection>();
+    for (const i of upcomingInspections) {
+      const days = differenceInDays(parseISO(i.scheduled_date), today);
+      if (days < 0 || days > 30) continue;
+      if (!map.has(i.tenancy_id)) map.set(i.tenancy_id, i);
+    }
+    return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [upcomingInspections]);
+
+  const inspectionsDueCount = nextInspectionMap.size;
+
   // Filtered tenancies for current tab
   const displayedTenancies = useMemo(() => {
     if (activeTab === 'all') return activeTenancies;
@@ -342,6 +356,16 @@ const RentRollPage = () => {
         .sort((a, b) => parseISO(a.lease_end).getTime() - parseISO(b.lease_end).getTime());
     }
 
+    if (activeTab === 'inspections') {
+      return activeTenancies
+        .filter(t => nextInspectionMap.has(t.id))
+        .sort((a, b) => {
+          const ia = nextInspectionMap.get(a.id)!;
+          const ib = nextInspectionMap.get(b.id)!;
+          return parseISO(ia.scheduled_date).getTime() - parseISO(ib.scheduled_date).getTime();
+        });
+    }
+
     // renewals
     return activeTenancies
       .filter(t => {
@@ -352,7 +376,7 @@ const RentRollPage = () => {
       })
       .sort((a, b) => parseISO(a.lease_end).getTime() - parseISO(b.lease_end).getTime());
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, activeTenancies, payments]);
+  }, [activeTab, activeTenancies, payments, nextInspectionMap]);
 
   // Arrears summary for arrears tab
   const arrearsSummary = useMemo(() => {

@@ -315,6 +315,27 @@ const PipelinePage = () => {
           onSent={handleOfferSent}
         />
       )}
+
+      {settlementCard && user && (
+        <SettlementModal
+          open={!!settlementCard}
+          onOpenChange={(open) => { if (!open) setSettlementCard(null); }}
+          propertyId={settlementCard.card.propertyId}
+          propertyAddress={settlementCard.card.address}
+          initialPrice={settlementCard.card.estimatedValue}
+          agentId={agentId}
+          userId={user.id}
+          onConfirmed={() => {
+            setCards(prev => prev.map(c =>
+              c.id === settlementCard.card.id
+                ? { ...c, stage: 'settled', movedAt: new Date().toISOString() }
+                : c
+            ));
+            setSettlementCard(null);
+          }}
+          onCancel={() => setSettlementCard(null)}
+        />
+      )}
     </div>
   );
 };

@@ -47,18 +47,18 @@ const SALES_NAV: NavItem[] = [
 const PROPERTY_NAV: NavItem[] = [
   { title: 'Arrears', url: '/dashboard/rent-roll?filter=arrears', icon: AlertCircle, badgeKey: 'arrears', alertWhenBadge: true },
   { title: 'Renewals Due', url: '/dashboard/rent-roll?filter=renewals', icon: RefreshCw, badgeKey: 'renewals', alertWhenBadge: true },
-  { title: 'Open Homes', url: '/dashboard/open-homes', icon: CalendarDays },
   { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home },
-  { title: 'Applications', url: '/dashboard/rental-applications', icon: ClipboardList },
   { title: 'Maintenance', url: '/dashboard/maintenance', icon: Wrench },
   { title: 'Vacancies', url: '/dashboard/vacancies', icon: Home },
-  { title: 'Inspection Day', url: '/dashboard/inspection-mode', icon: CalendarDays },
-  { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
-  { title: 'Settlement', url: '/dashboard/settlements', icon: PartyPopper },
-  { title: 'Automation', url: '/dashboard/automation', icon: Mail },
+  { title: 'Inspections', url: '/dashboard/inspection-mode', icon: CalendarDays },
+  { title: 'Rental Applications', url: '/dashboard/rental-applications', icon: ClipboardList },
   { title: 'Suppliers', url: '/dashboard/suppliers', icon: Wrench },
   { title: 'Statements', url: '/dashboard/statements', icon: Receipt },
+  { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
+  { title: 'Automation', url: '/dashboard/automation', icon: Mail },
   { title: 'Vacancy KPIs', url: '/dashboard/vacancy-kpi', icon: Activity },
+  { title: 'Open Homes', url: '/dashboard/open-homes', icon: CalendarDays },
+  { title: 'Settlement', url: '/dashboard/settlements', icon: PartyPopper },
 ];
 
 const INSIGHTS_NAV: NavItem[] = [

@@ -88,7 +88,7 @@ export function SiteFooter() {
                 <button
                   type="button"
                   onClick={() => {
-                    try { localStorage.removeItem('cookie-consent'); } catch { /* ignore */ }
+                    try { localStorage.removeItem('listhq-cookie-consent'); } catch { /* ignore */ }
                     window.location.reload();
                   }}
                   className="text-[13px] transition-colors text-left"

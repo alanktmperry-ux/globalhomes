@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const STORAGE_KEY = 'cookie-consent';
+const STORAGE_KEY = 'listhq-cookie-consent';
 
 export function CookieConsentBanner() {
   const [visible, setVisible] = useState(false);

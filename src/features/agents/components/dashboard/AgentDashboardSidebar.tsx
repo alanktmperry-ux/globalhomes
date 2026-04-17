@@ -87,6 +87,7 @@ const AgentDashboardSidebar = () => {
   const { listings } = useAgentListings();
   const { plan, foundingMember } = useSubscription();
   const [arrearsCount, setArrearsCount] = useState(0);
+  const [renewalsCount, setRenewalsCount] = useState(0);
   const [onboardingComplete, setOnboardingComplete] = useState(true);
   const [agentLogo, setAgentLogo] = useState<string | null>(null);
   const [agentName, setAgentName] = useState<string | null>(null);

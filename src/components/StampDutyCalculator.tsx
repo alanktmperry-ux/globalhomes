@@ -155,6 +155,29 @@ export function StampDutyCalculator({ propertyPrice, propertyAddress, propertySt
                 </label>
               )}
 
+              {/* Foreign buyer toggle */}
+              <div className="rounded-lg border border-border p-3 space-y-2">
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={isForeignBuyer}
+                    onChange={(e) => setIsForeignBuyer(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-border accent-primary"
+                  />
+                  <span className="text-sm text-foreground leading-snug">
+                    I am a foreign buyer (non-Australian citizen or permanent resident)
+                  </span>
+                </label>
+                {isForeignBuyer && (
+                  <p className="text-[11px] text-muted-foreground pl-7 leading-relaxed">
+                    FIRB approval required before purchasing — apply at{' '}
+                    <a href="https://firb.gov.au" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                      firb.gov.au
+                    </a>
+                  </p>
+                )}
+              </div>
+
               {/* Results */}
               {result && (
                 <div className="space-y-3 pt-2">

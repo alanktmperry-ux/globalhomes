@@ -174,7 +174,7 @@ const ListingBuyerLeadsTab = ({ listing }: Props) => {
                   </div>
                   <div className="flex items-center gap-2">
                     {isConverted ? (
-                      <Badge className="bg-emerald-500/15 text-emerald-600 border-0 text-[10px] gap-1">
+                      <Badge className="bg-primary/15 text-primary border-0 text-[10px] gap-1">
                         <CheckCircle2 size={11} /> In Contacts
                       </Badge>
                     ) : (

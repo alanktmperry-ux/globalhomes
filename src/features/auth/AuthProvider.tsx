@@ -305,6 +305,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signOut = async () => {
+    sessionStorage.removeItem('post_login_redirected');
     clearRoles();
     setUser(null);
     setSession(null);

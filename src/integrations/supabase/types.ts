@@ -4194,8 +4194,14 @@ export type Database = {
           description: string | null
           estimated_cost: number | null
           id: string
+          owner_approval_required: boolean | null
+          owner_approval_status: string | null
+          owner_approved_at: string | null
+          owner_decline_reason: string | null
           priority: string
           property_id: string
+          quote_document_url: string | null
+          quoted_amount_aud: number | null
           reported_by: string
           status: string
           tenancy_id: string | null
@@ -4212,8 +4218,14 @@ export type Database = {
           description?: string | null
           estimated_cost?: number | null
           id?: string
+          owner_approval_required?: boolean | null
+          owner_approval_status?: string | null
+          owner_approved_at?: string | null
+          owner_decline_reason?: string | null
           priority?: string
           property_id: string
+          quote_document_url?: string | null
+          quoted_amount_aud?: number | null
           reported_by?: string
           status?: string
           tenancy_id?: string | null
@@ -4230,8 +4242,14 @@ export type Database = {
           description?: string | null
           estimated_cost?: number | null
           id?: string
+          owner_approval_required?: boolean | null
+          owner_approval_status?: string | null
+          owner_approved_at?: string | null
+          owner_decline_reason?: string | null
           priority?: string
           property_id?: string
+          quote_document_url?: string | null
+          quoted_amount_aud?: number | null
           reported_by?: string
           status?: string
           tenancy_id?: string | null
@@ -4867,6 +4885,113 @@ export type Database = {
           },
           {
             foreignKeyName: "open_homes_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      owner_statements: {
+        Row: {
+          agent_id: string | null
+          created_at: string | null
+          emailed_at: string | null
+          emailed_to_owner: boolean | null
+          gross_rent_aud: number | null
+          id: string
+          maintenance_costs_aud: number | null
+          management_fee_aud: number | null
+          net_amount_aud: number | null
+          other_deductions_aud: number | null
+          other_deductions_breakdown: Json | null
+          pdf_url: string | null
+          period_end: string
+          period_start: string
+          property_id: string | null
+          statement_notes: string | null
+        }
+        Insert: {
+          agent_id?: string | null
+          created_at?: string | null
+          emailed_at?: string | null
+          emailed_to_owner?: boolean | null
+          gross_rent_aud?: number | null
+          id?: string
+          maintenance_costs_aud?: number | null
+          management_fee_aud?: number | null
+          net_amount_aud?: number | null
+          other_deductions_aud?: number | null
+          other_deductions_breakdown?: Json | null
+          pdf_url?: string | null
+          period_end: string
+          period_start: string
+          property_id?: string | null
+          statement_notes?: string | null
+        }
+        Update: {
+          agent_id?: string | null
+          created_at?: string | null
+          emailed_at?: string | null
+          emailed_to_owner?: boolean | null
+          gross_rent_aud?: number | null
+          id?: string
+          maintenance_costs_aud?: number | null
+          management_fee_aud?: number | null
+          net_amount_aud?: number | null
+          other_deductions_aud?: number | null
+          other_deductions_breakdown?: Json | null
+          pdf_url?: string | null
+          period_end?: string
+          period_start?: string
+          property_id?: string | null
+          statement_notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "owner_statements_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owner_statements_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owner_statements_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owner_statements_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "owner_statements_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owner_statements_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owner_statements_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties_public_safe"
@@ -5556,6 +5681,7 @@ export type Database = {
           listing_status: string | null
           listing_type: string | null
           lng: number | null
+          maintenance_approval_threshold_aud: number | null
           marketing_budget: number | null
           marketing_email_sent: boolean
           marketing_email_sent_at: string | null
@@ -5563,6 +5689,10 @@ export type Database = {
           min_lease_months: number | null
           moderation_status: string
           off_market_reason: string | null
+          owner_email: string | null
+          owner_name: string | null
+          owner_phone: string | null
+          owner_portal_token: string | null
           parking: number
           parking_notes: string | null
           pets_allowed: boolean | null
@@ -5688,6 +5818,7 @@ export type Database = {
           listing_status?: string | null
           listing_type?: string | null
           lng?: number | null
+          maintenance_approval_threshold_aud?: number | null
           marketing_budget?: number | null
           marketing_email_sent?: boolean
           marketing_email_sent_at?: string | null
@@ -5695,6 +5826,10 @@ export type Database = {
           min_lease_months?: number | null
           moderation_status?: string
           off_market_reason?: string | null
+          owner_email?: string | null
+          owner_name?: string | null
+          owner_phone?: string | null
+          owner_portal_token?: string | null
           parking?: number
           parking_notes?: string | null
           pets_allowed?: boolean | null
@@ -5820,6 +5955,7 @@ export type Database = {
           listing_status?: string | null
           listing_type?: string | null
           lng?: number | null
+          maintenance_approval_threshold_aud?: number | null
           marketing_budget?: number | null
           marketing_email_sent?: boolean
           marketing_email_sent_at?: string | null
@@ -5827,6 +5963,10 @@ export type Database = {
           min_lease_months?: number | null
           moderation_status?: string
           off_market_reason?: string | null
+          owner_email?: string | null
+          owner_name?: string | null
+          owner_phone?: string | null
+          owner_portal_token?: string | null
           parking?: number
           parking_notes?: string | null
           pets_allowed?: boolean | null
@@ -10486,6 +10626,7 @@ export type Database = {
           support_pin: string
         }[]
       }
+      get_property_by_owner_token: { Args: { p_token: string }; Returns: Json }
       get_property_comparables: {
         Args: {
           p_limit?: number
@@ -10697,6 +10838,7 @@ export type Database = {
           listing_status: string | null
           listing_type: string | null
           lng: number | null
+          maintenance_approval_threshold_aud: number | null
           marketing_budget: number | null
           marketing_email_sent: boolean
           marketing_email_sent_at: string | null
@@ -10704,6 +10846,10 @@ export type Database = {
           min_lease_months: number | null
           moderation_status: string
           off_market_reason: string | null
+          owner_email: string | null
+          owner_name: string | null
+          owner_phone: string | null
+          owner_portal_token: string | null
           parking: number
           parking_notes: string | null
           pets_allowed: boolean | null
@@ -10758,6 +10904,15 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      owner_decision_on_maintenance: {
+        Args: {
+          p_decision: string
+          p_decline_reason?: string
+          p_job_id: string
+          p_token: string
+        }
+        Returns: Json
+      }
       record_auction_bid: {
         Args: {
           p_auction_id: string
@@ -10781,6 +10936,10 @@ export type Database = {
           id: string
           name: string
         }[]
+      }
+      seed_owner_statement_reminder_rule: {
+        Args: { _agent_id: string }
+        Returns: undefined
       }
       seed_pm_automation_defaults: {
         Args: { _agent_id: string }

@@ -575,8 +575,23 @@ const TrustAccountingPage = () => {
 
   return (
     <div>
+      <div className="px-4 sm:px-6 pt-4">
+        <nav className="text-sm text-muted-foreground mb-2">
+          <span>Dashboard</span>
+          {filteredPropertyAddress && (
+            <>
+              <span className="mx-2">→</span>
+              <span>Rent Roll</span>
+              <span className="mx-2">→</span>
+              <span>{filteredPropertyAddress}</span>
+            </>
+          )}
+          <span className="mx-2">→</span>
+          <span className="font-medium text-foreground">Trust Accounting</span>
+        </nav>
+      </div>
       <DashboardHeader
-        title="Trust Dashboard"
+        title={filteredPropertyAddress ? `Trust transactions for ${filteredPropertyAddress}` : 'Trust Dashboard'}
         subtitle="Australian trust account management"
         actions={
           <Button size="sm" variant="outline" onClick={() => setShowNewAccount(true)} className="gap-1.5 text-xs">
@@ -584,6 +599,23 @@ const TrustAccountingPage = () => {
           </Button>
         }
       />
+
+      {urlPropertyId && filteredPropertyAddress && (
+        <div className="mx-4 mt-3 sm:mx-6 flex items-center gap-2 text-xs bg-primary/10 text-primary rounded-md px-3 py-2">
+          <span>Filtered by property: <strong>{filteredPropertyAddress}</strong></span>
+          <button
+            onClick={() => {
+              const next = new URLSearchParams(searchParams);
+              next.delete('property_id');
+              setSearchParams(next, { replace: true });
+              setFilterProperty('all');
+            }}
+            className="ml-auto underline"
+          >
+            Clear filter
+          </button>
+        </div>
+      )}
 
       {overdrawnLedgers.length > 0 && (
         <div className="mx-4 mt-4 sm:mx-6 bg-destructive/10 border border-destructive/30 rounded-xl p-4 flex items-start gap-3">

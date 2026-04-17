@@ -740,6 +740,7 @@ const RentRollPage = () => {
               { key: 'arrears' as const, label: 'Arrears', count: arrearsSummary.count, alert: arrearsSummary.count > 0 },
               { key: 'expiring' as const, label: 'Expiring Soon', count: expiringCount },
               { key: 'renewals' as const, label: 'Renewals Due', count: renewalsCount, alert: renewalsCount > 0 },
+              { key: 'inspections' as const, label: 'Inspections Due', count: inspectionsDueCount },
             ]).map(tab => {
               const isActive = activeTab === tab.key;
               return (

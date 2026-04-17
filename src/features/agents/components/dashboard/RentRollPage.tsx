@@ -304,6 +304,62 @@ const RentRollPage = () => {
     return differenceInDays(today, new Date(latest.period_to)) > 14;
   }).length;
 
+  // Filtered tenancies for current tab
+  const displayedTenancies = useMemo(() => {
+    if (activeTab === 'all') return activeTenancies;
+
+    if (activeTab === 'arrears') {
+      return activeTenancies
+        .map(t => ({ t, info: getArrearsInfo(t) }))
+        .filter(x => x.info.days > 0)
+        .sort((a, b) => b.info.days - a.info.days)
+        .map(x => x.t);
+    }
+
+    if (activeTab === 'expiring') {
+      return activeTenancies
+        .filter(t => {
+          const days = differenceInDays(parseISO(t.lease_end), today);
+          return days >= 0 && days <= 90;
+        })
+        .sort((a, b) => parseISO(a.lease_end).getTime() - parseISO(b.lease_end).getTime());
+    }
+
+    // renewals
+    return activeTenancies
+      .filter(t => {
+        const days = differenceInDays(parseISO(t.lease_end), today);
+        if (days < 0 || days > 90) return false;
+        const rs = t.renewal_status;
+        return !rs || rs === 'none' || rs === 'declined';
+      })
+      .sort((a, b) => parseISO(a.lease_end).getTime() - parseISO(b.lease_end).getTime());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, activeTenancies, payments]);
+
+  // Arrears summary for arrears tab
+  const arrearsSummary = useMemo(() => {
+    const items = activeTenancies
+      .map(t => ({ t, info: getArrearsInfo(t) }))
+      .filter(x => x.info.days > 0);
+    const totalOwed = items.reduce((s, x) => s + x.info.owed, 0);
+    return { count: items.length, totalOwed };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTenancies, payments]);
+
+  const expiringCount = activeTenancies.filter(t => {
+    const days = differenceInDays(parseISO(t.lease_end), today);
+    return days >= 0 && days <= 90;
+  }).length;
+
+  const renewalsCount = activeTenancies.filter(t => {
+    const days = differenceInDays(parseISO(t.lease_end), today);
+    if (days < 0 || days > 90) return false;
+    const rs = t.renewal_status;
+    return !rs || rs === 'none' || rs === 'declined';
+  }).length;
+
+
   const getNextDue = (t: Tenancy) => {
     const latest = latestPaymentMap.get(t.id);
     if (!latest) return format(parseISO(t.lease_start), 'dd MMM yyyy');

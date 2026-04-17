@@ -99,13 +99,27 @@ const AgentDashboardSidebar = () => {
       const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
       if (!agent) return;
       const { data: tenancies } = await supabase
-        .from('tenancies').select('id, rent_amount, lease_start').eq('agent_id', agent.id).eq('status', 'active');
-      if (!tenancies || tenancies.length === 0) return;
+        .from('tenancies').select('id, rent_amount, lease_start, lease_end, renewal_status').eq('agent_id', agent.id).eq('status', 'active');
+      if (!tenancies || tenancies.length === 0) {
+        setArrearsCount(0);
+        setRenewalsCount(0);
+        return;
+      }
+      const today = new Date();
+      // Renewals due: lease_end within 90 days AND renewal_status none/declined/null
+      const renewals = tenancies.filter((t: any) => {
+        if (!t.lease_end) return false;
+        const days = Math.floor((new Date(t.lease_end).getTime() - today.getTime()) / 86400000);
+        if (days < 0 || days > 90) return false;
+        const rs = t.renewal_status;
+        return !rs || rs === 'none' || rs === 'declined';
+      }).length;
+      setRenewalsCount(renewals);
+
       const { data: payments } = await supabase
         .from('rent_payments').select('tenancy_id, period_to, status')
         .in('tenancy_id', tenancies.map(t => t.id))
         .order('payment_date', { ascending: false });
-      const today = new Date();
       let count = 0;
       for (const t of tenancies) {
         const latest = (payments || []).find(p => p.tenancy_id === t.id);

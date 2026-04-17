@@ -908,6 +908,12 @@ export default function PropertyDetailPage() {
           onClose={() => setRentalApplicationOpen(false)}
         />
       )}
+
+      <ShareSheet
+        property={property}
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+      />
     </div>
   );
 }

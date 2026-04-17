@@ -663,6 +663,14 @@ export default function PropertyDetailPage() {
 
             {!isRental && (
               <>
+                <div>
+                  <h2 className="font-display text-xl md:text-2xl font-bold text-foreground">
+                    {t('costs.calculatorTitle')}
+                  </h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {t('costs.calculatorSubtitle')}
+                  </p>
+                </div>
                 <StampDutyCalculator
                   propertyPrice={property.price}
                   propertyAddress={`${property.address ?? ''}, ${property.suburb ?? ''}, ${property.state ?? ''}`}

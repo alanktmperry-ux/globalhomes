@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { X } from 'lucide-react';
+import { toast } from 'sonner';
 
 export type Language = 'en' | 'zh' | 'zh-TW' | 'ko' | 'ms' | 'es' | 'ar' | 'hi' | 'fr' | 'pt' | 'bn' | 'ru' | 'ja' | 'de' | 'id' | 'nl' | 'pl' | 'vi' | 'th' | 'tr' | 'sv' | 'da' | 'no' | 'fil' | 'it';
 
@@ -144,6 +145,8 @@ const translations: Record<Language, Record<string, string>> = {
     'firb.checkEligibility': 'Check FIRB eligibility →',
     'firb.eligibleBadge': 'Foreign buyer eligible',
     'firb.checkBadge': 'Check FIRB eligibility',
+    'costs.calculatorTitle': 'Buying Costs Calculator',
+    'costs.calculatorSubtitle': 'Foreign buyers: toggle on to include FIRB fees and surcharges.',
   },
   zh: {
     'app.name': 'ListHQ',
@@ -258,6 +261,8 @@ const translations: Record<Language, Record<string, string>> = {
     'firb.checkEligibility': '查询 FIRB 资格 →',
     'firb.eligibleBadge': '外国买家可购',
     'firb.checkBadge': '请核实 FIRB 资格',
+    'costs.calculatorTitle': '购房成本计算器',
+    'costs.calculatorSubtitle': '外国买家：开启以包含 FIRB 费用和附加税。',
   },
   ko: {
     'app.name': 'ListHQ',
@@ -1362,6 +1367,18 @@ const bannerMessages: Partial<Record<Language, string>> = {
   vi: '🌐 Đã chuyển sang Tiếng Việt. Thay đổi bất lúc nào trong thanh điều hướng.',
 };
 
+// "Language updated" message localized per language
+const languageUpdatedMessages: Record<Language, string> = {
+  en: 'Language updated', zh: '语言已更新', 'zh-TW': '語言已更新', ja: '言語が更新されました',
+  ko: '언어가 업데이트되었습니다', ms: 'Bahasa dikemas kini', vi: 'Đã cập nhật ngôn ngữ',
+  th: 'อัปเดตภาษาแล้ว', ar: 'تم تحديث اللغة', hi: 'भाषा अपडेट की गई',
+  es: 'Idioma actualizado', fr: 'Langue mise à jour', de: 'Sprache aktualisiert',
+  pt: 'Idioma atualizado', it: 'Lingua aggiornata', ru: 'Язык обновлён',
+  id: 'Bahasa diperbarui', nl: 'Taal bijgewerkt', pl: 'Język zaktualizowany',
+  tr: 'Dil güncellendi', sv: 'Språk uppdaterat', da: 'Sprog opdateret',
+  no: 'Språk oppdatert', fil: 'Na-update ang wika', bn: 'ভাষা আপডেট হয়েছে',
+};
+
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [showBanner, setShowBanner] = useState(false);
   const [language, setLanguageState] = useState<Language>(() => {
@@ -1387,11 +1404,17 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     return detected;
   });
 
-  // Wrap setLanguage to show banner only on active user language changes
+  // Wrap setLanguage to show banner + toast only on active user language changes
   const setLanguage = useCallback((newLang: Language) => {
     setLanguageState(prev => {
-      if (newLang !== prev && newLang !== 'en' && newLang in bannerMessages) {
-        setShowBanner(true);
+      if (newLang !== prev) {
+        if (newLang !== 'en' && newLang in bannerMessages) {
+          setShowBanner(true);
+        }
+        // Confirmation toast in the new language
+        const msg = languageUpdatedMessages[newLang] || languageUpdatedMessages.en;
+        const name = languageNames[newLang] || newLang;
+        toast.success(`${msg} — ${name}`);
       }
       return newLang;
     });

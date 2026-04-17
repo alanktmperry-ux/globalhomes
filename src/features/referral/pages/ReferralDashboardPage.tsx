@@ -159,6 +159,20 @@ export default function ReferralDashboardPage() {
             </div>
           </motion.div>
 
+          {/* Prominent Submit Referral CTA */}
+          <div className="bg-card border border-border rounded-2xl p-6 text-center">
+            <p className="text-sm md:text-base text-muted-foreground mb-4">
+              Know a buyer looking for Australian property? Submit their details and earn your commission.
+            </p>
+            <Button
+              onClick={() => setSubmitOpen(true)}
+              size="lg"
+              className="gap-2 w-full md:w-auto"
+            >
+              <Plus size={18} /> Submit a referral
+            </Button>
+          </div>
+
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <StatCard icon={Users} label="Total referrals" value={agent.total_referrals.toString()} />

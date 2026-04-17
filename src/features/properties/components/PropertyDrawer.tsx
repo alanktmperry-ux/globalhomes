@@ -235,9 +235,9 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searc
                   </button>
                   <button
                     onClick={() => setShareOpen(true)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/80 backdrop-blur-sm text-sm font-medium"
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold shadow-md whitespace-nowrap"
                   >
-                    <Share2 size={14} />
+                    <Share2 size={16} />
                     {t('property.share')}
                   </button>
                 </div>

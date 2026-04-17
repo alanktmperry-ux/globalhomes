@@ -343,22 +343,25 @@ export default function PropertyDetailPage() {
             )}
           </div>
 
-          {/* Action buttons */}
-          <div className="absolute top-4 right-4 flex gap-2">
-            <button
-              onClick={() => toggleSaved(property.id)}
-              className="w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center transition-transform active:scale-90 shadow-md"
-            >
-              <Heart size={18} className={saved ? 'fill-destructive text-destructive' : 'text-foreground/70'} />
-            </button>
-            <button
-              onClick={() => setShareOpen(true)}
-              className="w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center shadow-md"
-              aria-label={t('share.title')}
-            >
-              <Share2 size={18} className="text-foreground/70" />
-            </button>
-          </div>
+        </div>
+
+        {/* Action bar below hero */}
+        <div className="flex flex-wrap gap-2 mt-4 mb-4">
+          <button
+            onClick={() => toggleSaved(property.id)}
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 h-10 rounded-full border border-border bg-card text-sm font-medium text-foreground hover:bg-secondary transition-colors"
+          >
+            <Heart size={16} className={saved ? 'fill-destructive text-destructive' : ''} />
+            {saved ? t('property.saved') || 'Saved' : t('property.save') || 'Save'}
+          </button>
+          <button
+            onClick={() => setShareOpen(true)}
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 h-10 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors shadow-sm"
+            aria-label={t('share.title')}
+          >
+            <Share2 size={16} />
+            {t('property.share') || 'Share'}
+          </button>
         </div>
 
         {/* Thumbnail strip */}

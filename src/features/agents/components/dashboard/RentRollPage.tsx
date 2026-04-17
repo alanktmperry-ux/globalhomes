@@ -715,14 +715,20 @@ const RentRollPage = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {activeTenancies.length === 0 ? (
+                      {displayedTenancies.length === 0 ? (
                         <TableRow>
                           <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
-                            No active tenancies yet. Click "+ Add Tenancy" to get started.
+                            {activeTab === 'all'
+                              ? 'No active tenancies yet. Click "+ Add Tenancy" to get started.'
+                              : activeTab === 'arrears'
+                                ? 'No tenancies in arrears. 🎉'
+                                : activeTab === 'expiring'
+                                  ? 'No leases expiring in the next 90 days.'
+                                  : 'No renewals due in the next 90 days.'}
                           </TableCell>
                         </TableRow>
                       ) : (
-                        activeTenancies.map(t => {
+                        displayedTenancies.map(t => {
                           const arrears = getArrearsInfo(t);
                           const leaseEnd = parseISO(t.lease_end);
                           const daysToEnd = differenceInDays(leaseEnd, today);

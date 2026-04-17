@@ -149,6 +149,7 @@ const RentRollPage = () => {
   const [tenancies, setTenancies] = useState<Tenancy[]>([]);
   const [payments, setPayments] = useState<RentPayment[]>([]);
   const [properties, setProperties] = useState<PropertyOption[]>([]);
+  const [upcomingInspections, setUpcomingInspections] = useState<UpcomingInspection[]>([]);
   const [loading, setLoading] = useState(true);
   const [noAgent, setNoAgent] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -243,7 +244,7 @@ const RentRollPage = () => {
     if (!agentData) { setNoAgent(true); setLoading(false); return; }
     setAgentId(agentData.id);
 
-    const [tenancyRes, paymentRes, propRes] = await Promise.all([
+    const [tenancyRes, paymentRes, propRes, inspRes] = await Promise.all([
       supabase
         .from('tenancies')
         .select('*, properties(address, suburb, state)')
@@ -260,11 +261,19 @@ const RentRollPage = () => {
         .eq('agent_id', agentData.id)
         .in('listing_category', ['rent'])
         .order('address'),
+      supabase
+        .from('property_inspections')
+        .select('id, tenancy_id, inspection_type, scheduled_date')
+        .eq('agent_id', agentData.id)
+        .eq('status', 'scheduled')
+        .gte('scheduled_date', new Date().toISOString().slice(0, 10))
+        .order('scheduled_date', { ascending: true }),
     ]);
 
     if (tenancyRes.data) setTenancies(tenancyRes.data as unknown as Tenancy[]);
     if (paymentRes.data) setPayments(paymentRes.data as RentPayment[]);
     if (propRes.data) setProperties(propRes.data as PropertyOption[]);
+    if (inspRes.data) setUpcomingInspections(inspRes.data as UpcomingInspection[]);
     setLoading(false);
   }, [user]);
 

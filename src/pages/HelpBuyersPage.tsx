@@ -5,13 +5,15 @@ import { FAQ_ITEMS } from '@/data/faq';
 
 const sections = [
   { title: 'Searching for Properties', ids: ['buyer-search', 'buyer-suburb-research'] },
+  { title: 'Sharing Properties', ids: ['buyer-share-property', 'buyer-share-wechat'] },
   { title: 'Saving & Alerts', ids: ['buyer-save-property', 'buyer-saved-search'] },
   { title: 'Open Homes & Inspections', ids: ['buyer-open-home', 'buyer-enquire'] },
   { title: 'Auctions & Bidding', ids: ['buyer-auction-register', 'buyer-pre-auction-offer', 'auction-reserve', 'auction-vendor-bid', 'auction-cooling-off', 'auction-deposit', 'auction-live-watch'] },
-  { title: 'Research Tools', ids: ['buyer-what-sold', 'buyer-school-catchment'] },
+  { title: 'Research Tools', ids: ['buyer-what-sold', 'buyer-school-catchment', 'buyer-firb-calculator'] },
   { title: 'Documents', ids: ['buyer-documents'] },
   { title: 'Finance', ids: ['buyer-mortgage-calc'] },
-  { title: 'Account & Privacy', ids: ['create-account', 'reset-password', 'tech-notifications', 'tech-data-privacy', 'tech-delete-account'] },
+  { title: 'International Buyers', ids: ['buyer-international', 'buyer-listings-chinese', 'buyer-currency-display'] },
+  { title: 'Account & Privacy', ids: ['create-account', 'reset-password', 'buyer-language-currency', 'tech-notifications', 'tech-data-privacy', 'tech-delete-account'] },
 ];
 
 export default function HelpBuyersPage() {

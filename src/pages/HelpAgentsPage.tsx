@@ -6,8 +6,9 @@ import { FAQ_ITEMS } from '@/data/faq';
 
 const sections = [
   { title: 'Getting Started', ids: ['agent-create-listing', 'agent-profile', 'agent-billing', 'agent-onboarding-complete'] },
+  { title: 'International Referral Program', ids: ['referral-program-overview', 'referral-dashboard', 'referral-sharing', 'referral-tiers'] },
   { title: 'Managing Listings', ids: ['agent-listing-types', 'agent-photos', 'agent-off-market', 'agent-voice-listing', 'agent-cobroke'] },
-  { title: 'Multilingual & Translations', ids: ['agent-multilingual-translation', 'agent-language-toggle'] },
+  { title: 'Multilingual & Translations', ids: ['agent-translate-step', 'agent-multilingual-translation', 'agent-language-toggle'] },
   { title: 'Open Homes', ids: ['agent-open-home'] },
   { title: 'Auctions', ids: ['agent-auction-setup', 'agent-auction-registration'] },
   { title: 'CRM & Leads', ids: ['agent-crm', 'agent-saved-searches', 'agent-lead-marketplace'] },

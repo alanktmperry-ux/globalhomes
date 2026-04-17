@@ -812,7 +812,17 @@ const RentRollPage = () => {
                               </TableCell>
                               <TableCell className="text-right tabular-nums">{t.management_fee_percent}%</TableCell>
                               <TableCell>
-                                <div className="flex items-center gap-1 justify-end">
+                                <div className="flex items-center gap-1 justify-end flex-wrap">
+                                  {activeTab === 'renewals' && (
+                                    <Button
+                                      variant="default"
+                                      size="sm"
+                                      className="text-[10px] h-7"
+                                      onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/tenancies/${t.id}#renewal`); }}
+                                    >
+                                      <RefreshCw size={12} className="mr-1" /> Offer Renewal
+                                    </Button>
+                                  )}
                                   <Button
                                     variant="outline"
                                     size="sm"

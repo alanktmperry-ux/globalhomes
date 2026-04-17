@@ -354,14 +354,6 @@ export default function PropertyDetailPage() {
             <Heart size={16} className={saved ? 'fill-destructive text-destructive' : ''} />
             {saved ? t('property.saved') || 'Saved' : t('property.save') || 'Save'}
           </button>
-          <button
-            onClick={() => setShareOpen(true)}
-            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 h-10 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors shadow-sm"
-            aria-label={t('share.title')}
-          >
-            <Share2 size={16} />
-            {t('property.share') || 'Share'}
-          </button>
         </div>
 
         {/* Thumbnail strip */}
@@ -439,6 +431,14 @@ export default function PropertyDetailPage() {
                   />
                 </div>
               )}
+
+              <button
+                onClick={() => setShareOpen(true)}
+                className="mt-4 flex items-center gap-2 px-4 py-2 rounded-full border border-teal-600 text-teal-600 font-medium text-sm hover:bg-teal-50 transition-colors"
+              >
+                <Share2 size={16} />
+                Share via WeChat, WhatsApp or Line
+              </button>
             </div>
 
             {/* Key stats */}

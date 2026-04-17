@@ -7,6 +7,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import OfferModal from './pipeline/OfferModal';
 import OfferOutcomeTracker from './pipeline/OfferOutcomeTracker';
+import SettlementModal from './pipeline/SettlementModal';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
 

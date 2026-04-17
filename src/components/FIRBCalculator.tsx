@@ -44,7 +44,9 @@ export function FIRBCalculator({ propertyPrice, propertyAddress, propertyState }
             <Globe2 size={18} className="text-primary" />
           </div>
           <div>
-            <p className="font-display text-sm font-semibold text-foreground">{t('firb.title')}</p>
+            <p className="font-display text-sm font-semibold text-foreground">
+              I am a foreign buyer (non-Australian citizen or permanent resident)
+            </p>
             <p className="text-xs text-muted-foreground">
               {enabled && breakdown
                 ? `${t('firb.total')}: ${formatAUD(breakdown.totalLow)}+`

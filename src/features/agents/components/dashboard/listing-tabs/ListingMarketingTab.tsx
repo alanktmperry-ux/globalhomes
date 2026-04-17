@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { PropertyRow } from '@/features/agents/types/listing';
 import MarketingSupplierToggle from '../MarketingSupplierToggle';
+import ListingPhotoGallery from './ListingPhotoGallery';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import {
@@ -361,6 +362,9 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
 
   return (
     <div className="space-y-6">
+      {/* ── PHOTOS, CHECKLIST & DAYS ON MARKET ── */}
+      <ListingPhotoGallery listing={listing} />
+
       {/* ── SUPPLIER NOTIFICATION ── */}
       <MarketingSupplierToggle listing={listing} />
 

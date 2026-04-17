@@ -625,7 +625,7 @@ const BuyerConciergePage = () => {
                           </a>
                         </Button>
                         {isSaved(selectedLead.id) ? (
-                          <Button size="sm" disabled className="gap-1.5 bg-green-600 hover:bg-green-600 text-white disabled:opacity-100">
+                          <Button size="sm" disabled className="gap-1.5 bg-success hover:bg-success text-success-foreground disabled:opacity-100">
                             <Check size={14} /> Saved
                           </Button>
                         ) : (

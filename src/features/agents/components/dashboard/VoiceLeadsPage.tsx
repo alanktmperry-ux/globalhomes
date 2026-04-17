@@ -358,7 +358,7 @@ const VoiceLeadsPage = () => {
                   )}
                   {selected.userEmail && (
                     isSaved(selected.id) ? (
-                      <Button size="sm" disabled className="gap-1.5 flex-1 min-w-[120px] bg-green-600 hover:bg-green-600 text-white disabled:opacity-100">
+                      <Button size="sm" disabled className="gap-1.5 flex-1 min-w-[120px] bg-success hover:bg-success text-success-foreground disabled:opacity-100">
                         <Check size={14} /> Saved
                       </Button>
                     ) : (

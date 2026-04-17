@@ -176,7 +176,7 @@ const ListingBuyerLeadsTab = ({ listing }: Props) => {
                   </div>
                   <div className="flex items-center gap-2">
                     {isSaved(l.id) ? (
-                      <Button size="sm" disabled className="gap-1.5 text-xs h-8 bg-green-600 hover:bg-green-600 text-white disabled:opacity-100">
+                      <Button size="sm" disabled className="gap-1.5 text-xs h-8 bg-success hover:bg-success text-success-foreground disabled:opacity-100">
                         <Check size={12} /> Saved
                       </Button>
                     ) : (

@@ -213,10 +213,15 @@ export function SiteHeader() {
             </SheetTrigger>
             <SheetContent side="right" className="w-72 p-0">
               <nav className="flex flex-col gap-1 p-4 pt-10">
-                {/* Theme & language */}
-                <div className="flex items-center gap-2 px-3 pb-3 border-b border-border mb-2">
-                  <CurrencySwitcher />
-                  <LanguageSwitcher />
+                {/* Language & Currency */}
+                <div className="px-1 pb-3 mb-2 border-b border-border">
+                  <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground px-2 mb-2">
+                    Language & Currency
+                  </p>
+                  <div className="flex items-center gap-2 [&>div>button]:h-11 [&>div>button]:px-3 [&>div>button]:text-base [&>div>button]:bg-secondary [&>div>button]:flex-1">
+                    <CurrencySwitcher />
+                    <LanguageSwitcher />
+                  </div>
                 </div>
 
                 <button onClick={() => navTo('/suburbs')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">

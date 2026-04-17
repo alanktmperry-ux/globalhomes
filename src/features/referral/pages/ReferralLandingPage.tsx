@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { z } from 'zod';
-import { Globe, TrendingUp, BarChart3, Loader2, Copy, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Globe, TrendingUp, BarChart3, Loader2, Copy, CheckCircle2, ArrowRight, UserPlus, Share2, DollarSign } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -184,6 +184,29 @@ export default function ReferralLandingPage() {
                 <p className="text-sm text-muted-foreground">Tracking dashboard</p>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* How it works */}
+        <section className="max-w-5xl mx-auto px-4 pt-12">
+          <div className="text-center mb-8">
+            <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">How it works</h2>
+            <p className="text-sm text-muted-foreground mt-2">Get started in three simple steps</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              { icon: UserPlus, step: 1, text: 'Sign up & get your unique referral code' },
+              { icon: Share2, step: 2, text: 'Share your code with buyers interested in Australian property' },
+              { icon: DollarSign, step: 3, text: 'Earn AUD $500–$2,000 for every settled purchase' },
+            ].map(({ icon: Icon, step, text }) => (
+              <div key={step} className="bg-card border border-border rounded-2xl p-6 text-center shadow-card">
+                <div className="w-12 h-12 mx-auto rounded-full bg-primary/10 flex items-center justify-center text-primary mb-3">
+                  <Icon size={22} />
+                </div>
+                <p className="text-xs uppercase tracking-wider font-semibold text-primary mb-1">Step {step}</p>
+                <p className="text-sm text-foreground">{text}</p>
+              </div>
+            ))}
           </div>
         </section>
 

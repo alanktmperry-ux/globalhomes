@@ -200,6 +200,23 @@ export function StampDutyCalculator({ propertyPrice, propertyAddress, propertySt
                     </div>
                   )}
 
+                  {isForeignBuyer && (
+                    <>
+                      <div className="flex items-center justify-between p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
+                        <span className="text-sm text-foreground">FIRB Application Fee</span>
+                        <span className="font-semibold text-foreground">{formatDollars(getFIRBFee(numericPrice))}</span>
+                      </div>
+                      <div className="flex items-center justify-between p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
+                        <span className="text-sm text-foreground">
+                          Foreign Investor Duty Surcharge ({state} {(FOREIGN_SURCHARGE[state] * 100).toFixed(0)}%)
+                        </span>
+                        <span className="font-semibold text-foreground">
+                          {formatDollars(numericPrice * FOREIGN_SURCHARGE[state])}
+                        </span>
+                      </div>
+                    </>
+                  )}
+
                   <div className="grid grid-cols-2 gap-3">
                     <div className="p-3 rounded-xl bg-secondary text-center">
                       <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Effective rate</p>

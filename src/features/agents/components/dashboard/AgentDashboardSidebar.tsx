@@ -3,7 +3,7 @@ import {
   LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, LogOut, Building2, UserPlus, Home,
   User, FileText, CreditCard, Star, MapPinned, Shield, Contact, Kanban, Scale, Landmark,
   ClipboardCheck, CalendarDays, Search, TrendingUp, Receipt, PartyPopper, Calculator, HelpCircle, ClipboardList, Settings2, Flame,
-  Handshake, Sparkles, Target, ShoppingBag, ChevronDown, Mail, Wrench, Activity,
+  Handshake, Sparkles, Target, ShoppingBag, ChevronDown, Mail, Wrench, Activity, AlertCircle, RefreshCw,
 } from 'lucide-react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -28,6 +28,7 @@ interface NavItem {
   icon: any;
   badgeKey?: string;
   comingSoon?: boolean;
+  alertWhenBadge?: boolean; // when true, badge uses red/amber styling and icon coloring
 }
 
 const SALES_NAV: NavItem[] = [
@@ -44,8 +45,10 @@ const SALES_NAV: NavItem[] = [
 ];
 
 const PROPERTY_NAV: NavItem[] = [
+  { title: 'Arrears', url: '/dashboard/rent-roll?filter=arrears', icon: AlertCircle, badgeKey: 'arrears', alertWhenBadge: true },
+  { title: 'Renewals Due', url: '/dashboard/rent-roll?filter=renewals', icon: RefreshCw, badgeKey: 'renewals', alertWhenBadge: true },
   { title: 'Open Homes', url: '/dashboard/open-homes', icon: CalendarDays },
-  { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home, badgeKey: 'rentRoll' },
+  { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home },
   { title: 'Applications', url: '/dashboard/rental-applications', icon: ClipboardList },
   { title: 'Maintenance', url: '/dashboard/maintenance', icon: Wrench },
   { title: 'Vacancies', url: '/dashboard/vacancies', icon: Home },

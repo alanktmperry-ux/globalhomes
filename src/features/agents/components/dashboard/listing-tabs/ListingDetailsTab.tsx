@@ -42,6 +42,8 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
     land_size: listing.land_size || '',
     agency_authority: listing.agency_authority || 'exclusive',
     status: listing.status || 'whisper',
+    description: listing.description || '',
+    features: (listing.features || []) as string[],
   });
 
   // Inspection times management
@@ -53,8 +55,17 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
     onUpdate({
       ...form,
       land_size: form.land_size ? Number(form.land_size) : null,
-    });
+    } as Partial<PropertyRow>);
     setEditing(false);
+  };
+
+  const toggleFeature = (f: string) => {
+    setForm(prev => ({
+      ...prev,
+      features: prev.features.includes(f)
+        ? prev.features.filter(x => x !== f)
+        : [...prev.features, f],
+    }));
   };
 
   const handleAddInspection = () => {

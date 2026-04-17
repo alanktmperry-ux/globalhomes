@@ -54,8 +54,10 @@ const SuburbsIndexPage = React.lazy(() => import("./pages/SuburbsIndexPage"));
 const SigningPage = React.lazy(() => import("./pages/SigningPage"));
 const TenantPortalPage = React.lazy(() => import("./features/tenant/pages/TenantPortalPage"));
 const SupplierPortalPage = React.lazy(() => import("./features/supplier/pages/SupplierPortalPage"));
+const OwnerPortalPage = React.lazy(() => import("./features/owner/pages/OwnerPortalPage"));
 const SuppliersPage = React.lazy(() => import("@/features/agents/components/dashboard/SuppliersPage"));
 const VacancyKPIPage = React.lazy(() => import("@/features/agents/components/dashboard/VacancyKPIPage"));
+const OwnerStatementsPage = React.lazy(() => import("@/features/agents/components/dashboard/OwnerStatementsPage"));
 
 // Lazy-loaded dashboard sub-pages
 const DashboardOverview = React.lazy(() => import("@/features/agents/components/dashboard/DashboardOverview"));
@@ -249,6 +251,7 @@ const App = () => (
                 <Route path="/inspection-report/:token" element={<InspectionReportPublic />} />
                 <Route path="/tenant/portal" element={<TenantPortalPage />} />
                 <Route path="/supplier/portal" element={<SupplierPortalPage />} />
+                <Route path="/owner/portal" element={<OwnerPortalPage />} />
                 <Route path="/review/:token" element={<ReviewSubmitPage />} />
                 <Route path="/strata/login" element={<StrataAuthPage />} />
                 <Route path="/broker/login" element={<BrokerLogin />} />
@@ -315,6 +318,7 @@ const App = () => (
                   <Route path="automation" element={<AutomationSettingsPage />} />
                   <Route path="suppliers" element={<SuppliersPage />} />
                   <Route path="vacancy-kpi" element={<VacancyKPIPage />} />
+                  <Route path="statements" element={<OwnerStatementsPage />} />
                   <Route path="settings" element={<SettingsPage />} />
                   <Route path="help" element={<HelpPage />} />
                   <Route path="partner-access" element={<PartnerAccessPage />} />

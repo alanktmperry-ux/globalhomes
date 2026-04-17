@@ -52,6 +52,7 @@ const PROPERTY_NAV: NavItem[] = [
   { title: 'Settlement', url: '/dashboard/settlements', icon: PartyPopper },
   { title: 'Automation', url: '/dashboard/automation', icon: Mail },
   { title: 'Suppliers', url: '/dashboard/suppliers', icon: Wrench },
+  { title: 'Statements', url: '/dashboard/statements', icon: Receipt },
   { title: 'Vacancy KPIs', url: '/dashboard/vacancy-kpi', icon: Activity },
 ];
 

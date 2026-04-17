@@ -3,10 +3,19 @@ import type { PropertyRow } from '@/features/agents/types/listing';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useState } from 'react';
 import { Calendar, Clock, Plus, Trash2 } from 'lucide-react';
 import ListingCompleteness from './ListingCompleteness';
+
+const FEATURE_OPTIONS = [
+  'Air Conditioning', 'Heating', 'Pool', 'Spa', 'Garage', 'Built-in Wardrobes',
+  'Dishwasher', 'Balcony', 'Courtyard', 'Garden', 'Solar Panels', 'NBN Ready',
+  'Floorboards', 'Ensuite', 'Study', 'Outdoor Entertaining', 'Gym', 'Lift',
+  'Intercom', 'Pet Friendly', 'Furnished',
+];
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
 

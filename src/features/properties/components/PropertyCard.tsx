@@ -77,6 +77,18 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
   const agentRating = property.agent.rating && property.agent.rating > 0 ? property.agent.rating : null;
   const reviewCount = property.agent.reviewCount || 0;
 
+  // FIRB eligibility heuristic: new builds, off-the-plan & apartments are generally
+  // eligible for foreign buyers; established dwellings need verification.
+  const ptype = (property.propertyType || '').toLowerCase();
+  const isNewOrOffPlan =
+    property.status === 'new' ||
+    ptype.includes('off-the-plan') ||
+    ptype.includes('off the plan') ||
+    ptype.includes('new');
+  const isApartment = ptype.includes('apartment') || ptype.includes('unit');
+  const firbEligible = !isRental && (isNewOrOffPlan || isApartment);
+  const firbCheckRequired = !isRental && !firbEligible;
+
   return (
     <>
       <motion.div

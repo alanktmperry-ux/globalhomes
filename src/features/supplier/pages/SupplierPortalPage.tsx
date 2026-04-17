@@ -88,10 +88,34 @@ export default function SupplierPortalPage() {
     if (await callAction(completeJob.id, 'complete', {
       p_completion_notes: completionNotes || null,
       p_final_cost: finalCost ? Number(finalCost) : null,
+      p_invoice_url: invoiceUrl || null,
     })) {
       toast.success('Job marked complete');
-      setCompleteJob(null); setCompletionNotes(''); setFinalCost(''); load();
+      setCompleteJob(null); setCompletionNotes(''); setFinalCost('');
+      setInvoiceUrl(null); setInvoiceName(null);
+      load();
     }
+  };
+
+  const uploadInvoice = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !completeJob) return;
+    setUploadingInvoice(true);
+    const ext = file.name.split('.').pop() || 'pdf';
+    const path = `${data?.supplier?.id}/${completeJob.id}/invoice.${ext}`;
+    const { error: upErr } = await supabase.storage
+      .from('maintenance-invoices')
+      .upload(path, file, { upsert: true, contentType: file.type });
+    if (upErr) {
+      setUploadingInvoice(false);
+      e.target.value = '';
+      toast.error('Invoice upload failed — you can mark complete and resend the invoice to your agent directly.');
+      return;
+    }
+    const { data: urlData } = supabase.storage.from('maintenance-invoices').getPublicUrl(path);
+    setInvoiceUrl(urlData.publicUrl);
+    setInvoiceName(file.name);
+    setUploadingInvoice(false);
   };
 
   if (loading) return <div className="flex justify-center items-center min-h-screen"><Loader2 className="animate-spin text-primary" /></div>;

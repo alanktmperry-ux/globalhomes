@@ -129,6 +129,7 @@ const HelpContactPage = React.lazy(() => import("./pages/HelpContactPage"));
 const CRMPage = React.lazy(() => import("./features/crm/pages/CRMPage"));
 const SavedSearchesPage = React.lazy(() => import("./features/alerts/pages/SavedSearchesPage"));
 const StampDutyPage = React.lazy(() => import("./pages/StampDutyPage"));
+const HomeServicesPage = React.lazy(() => import("./features/services/pages/HomeServicesPage"));
 const MortgageCalculatorPage = React.lazy(() => import("./features/mortgage/pages/MortgageCalculatorPage"));
 const SchoolPage = React.lazy(() => import("./pages/SchoolPage"));
 const SuburbProfilePage = React.lazy(() => import("./features/suburb/pages/SuburbProfilePage"));
@@ -237,6 +238,7 @@ const App = () => (
                   <Route path="/help/vendors" element={<HelpVendorsPage />} />
                   <Route path="/help/property-managers" element={<HelpPropertyManagersPage />} />
                   <Route path="/help/contact" element={<HelpContactPage />} />
+                  <Route path="/home-services" element={<HomeServicesPage />} />
                 </Route>
 
                 {/* Public standalone pages (no shared layout) */}

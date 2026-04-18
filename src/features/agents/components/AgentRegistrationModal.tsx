@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { X, CheckCircle2, ShieldCheck, Ban, Clock, Download, FileText, CreditCard, Building2, Play, Info, ExternalLink, Landmark, AlertTriangle, CalendarCheck, ListChecks, PlusCircle, Globe, Users, HelpCircle, Upload, BookOpen, Scale, Mail, ArrowRight, Lock, Eye, EyeOff } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -34,6 +35,11 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
   const [emailInput, setEmailInput] = useState('');
   const [emailSubmitting, setEmailSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // hCaptcha. NOTE: set VITE_HCAPTCHA_SITE_KEY in env. Falls back to hCaptcha's public test key.
+  const hcaptchaSiteKey = import.meta.env.VITE_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001';
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<HCaptcha | null>(null);
 
   // Password step state
   const [newPassword, setNewPassword] = useState('');
@@ -151,6 +157,10 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
   const handleEmailSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!emailInput.trim()) return;
+    if (!captchaToken) {
+      toast.error('Please complete the verification');
+      return;
+    }
     setEmailSubmitting(true);
     try {
       const email = emailInput.trim().toLowerCase();
@@ -267,8 +277,27 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                   </p>
                 </div>
 
-                <Button type="submit" disabled={emailSubmitting} className="w-full py-5 rounded-xl text-base font-bold">
-                  {emailSubmitting ? 'Sending confirmation...' : 'Continue — confirm my email'}
+
+                <div className="flex justify-center">
+                  <HCaptcha
+                    ref={captchaRef}
+                    sitekey={hcaptchaSiteKey}
+                    onVerify={(token) => setCaptchaToken(token)}
+                    onExpire={() => setCaptchaToken(null)}
+                    onError={() => setCaptchaToken(null)}
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={emailSubmitting || !captchaToken}
+                  className="w-full py-5 rounded-xl text-base font-bold"
+                >
+                  {emailSubmitting
+                    ? 'Sending confirmation...'
+                    : !captchaToken
+                      ? 'Please complete the verification'
+                      : 'Continue — confirm my email'}
                 </Button>
 
                 <p className="text-center text-xs text-muted-foreground">

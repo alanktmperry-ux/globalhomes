@@ -15,19 +15,23 @@ Deno.serve(async (req) => {
     });
 
   try {
+    // --- Verify JWT first, before any other logic ---
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return respond({ error: "Unauthorized" }, 401);
+    }
+    const token = authHeader.replace("Bearer ", "").trim();
+    if (!token) return respond({ error: "Unauthorized" }, 401);
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    // --- Verify caller is admin ---
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) return respond({ error: "Unauthorized" }, 401);
-
-    const anonClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!);
-    const { data: { user: caller } } = await anonClient.auth.getUser(
-      authHeader.replace("Bearer ", "")
-    );
-    if (!caller) return respond({ error: "Unauthorized" }, 401);
+    const { data: userData, error: userError } = await supabase.auth.getUser(token);
+    const caller = userData?.user;
+    if (userError || !caller) {
+      return respond({ error: "Unauthorized" }, 401);
+    }
 
     const { data: roleCheck } = await supabase
       .from("user_roles")

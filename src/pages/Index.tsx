@@ -598,9 +598,10 @@ const Index = () => {
         "name": "ListHQ",
         "url": "https://listhq.com.au",
         "logo": "https://listhq.com.au/favicon.ico",
-        "description": "Australia's AI-powered real estate platform. Search properties, manage listings, and connect with agents using voice search and AI tools.",
+        "description": "AI-powered real estate platform for Australian agents",
         "areaServed": "AU",
-        "knowsAbout": ["Real Estate", "Property Listings", "Australian Property Market", "Rental Properties"]
+        "knowsAbout": ["Real Estate", "Property Listings", "Australian Property Market", "Rental Properties"],
+        "sameAs": ["https://twitter.com/ListHQ"]
       })}</script>
       <script type="application/ld+json">{JSON.stringify({
         "@context": "https://schema.org",

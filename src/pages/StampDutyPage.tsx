@@ -17,7 +17,7 @@ export default function StampDutyPage() {
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebApplication",
-          "name": "ListHQ Stamp Duty Calculator",
+          "name": "Stamp Duty Calculator",
           "description": "Free Australian stamp duty calculator for all states and territories, including first home buyer concessions.",
           "url": "https://listhq.com.au/stamp-duty-calculator",
           "applicationCategory": "FinanceApplication",

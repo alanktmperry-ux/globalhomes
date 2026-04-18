@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, DragEvent } from 'react';
 import { motion } from 'framer-motion';
-import { GripVertical, FileText, Plus } from 'lucide-react';
+import { GripVertical, FileText, Plus, Banknote } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import DashboardHeader from './DashboardHeader';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import OfferModal from './pipeline/OfferModal';
 import OfferOutcomeTracker from './pipeline/OfferOutcomeTracker';
 import SettlementModal from './pipeline/SettlementModal';
+import { MortgageBrokerModal } from '@/features/mortgage/components/MortgageBrokerModal';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
 
@@ -70,6 +71,7 @@ const PipelinePage = () => {
   const [agentId, setAgentId] = useState<string | null>(null);
   const [offerCard, setOfferCard] = useState<PipelineCard | null>(null);
   const [settlementCard, setSettlementCard] = useState<{ card: PipelineCard; previousStage: string } | null>(null);
+  const [brokerCard, setBrokerCard] = useState<PipelineCard | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -264,6 +266,15 @@ const PipelinePage = () => {
                                   <FileText size={12} className="text-primary" />
                                 </button>
                               )}
+                              {card.stage === 'under_offer' && (
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); setBrokerCard(card); }}
+                                  className="p-1 rounded hover:bg-primary/10 transition-colors shrink-0"
+                                  title="Refer buyer to mortgage broker"
+                                >
+                                  <Banknote size={12} className="text-primary" />
+                                </button>
+                              )}
                             </div>
                             <div className="flex items-center gap-1.5 mt-0.5">
                               <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full ${
@@ -334,6 +345,17 @@ const PipelinePage = () => {
             setSettlementCard(null);
           }}
           onCancel={() => setSettlementCard(null)}
+        />
+      )}
+
+      {brokerCard && (
+        <MortgageBrokerModal
+          open={!!brokerCard}
+          onOpenChange={(open) => { if (!open) setBrokerCard(null); }}
+          sourcePage="pipeline_under_offer"
+          defaultPrice={brokerCard.estimatedValue}
+          propertyId={brokerCard.propertyId}
+          agentId={agentId}
         />
       )}
     </div>

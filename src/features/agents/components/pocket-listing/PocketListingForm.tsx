@@ -52,6 +52,7 @@ export interface ListingDraft {
   features: string[];
   visibility: 'whisper' | 'coming-soon' | 'public';
   exclusiveDays: number;
+  isExclusive: boolean;
   buyerRequirements: string;
   showContact: boolean;
   allowCoBroke: boolean;
@@ -144,6 +145,7 @@ const DEFAULT_DRAFT: ListingDraft = {
   features: [],
   visibility: 'whisper',
   exclusiveDays: 14,
+  isExclusive: false,
   buyerRequirements: 'none',
   showContact: true,
   allowCoBroke: true,
@@ -490,6 +492,9 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         description_ja: draft.description_ja || null,
         title_ko: draft.title_ko || null,
         description_ko: draft.description_ko || null,
+        is_exclusive: draft.isExclusive || false,
+        exclusive_start_date: draft.isExclusive && !editPropertyId ? new Date().toISOString() : undefined,
+        exclusive_end_date: draft.isExclusive && !editPropertyId ? new Date(Date.now() + 14 * 86_400_000).toISOString() : undefined,
       } as any;
 
       // Add 'Pets considered' to features if applicable

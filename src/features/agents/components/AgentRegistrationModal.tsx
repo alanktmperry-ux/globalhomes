@@ -277,8 +277,27 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                   </p>
                 </div>
 
-                <Button type="submit" disabled={emailSubmitting} className="w-full py-5 rounded-xl text-base font-bold">
-                  {emailSubmitting ? 'Sending confirmation...' : 'Continue — confirm my email'}
+
+                <div className="flex justify-center">
+                  <HCaptcha
+                    ref={captchaRef}
+                    sitekey={hcaptchaSiteKey}
+                    onVerify={(token) => setCaptchaToken(token)}
+                    onExpire={() => setCaptchaToken(null)}
+                    onError={() => setCaptchaToken(null)}
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={emailSubmitting || !captchaToken}
+                  className="w-full py-5 rounded-xl text-base font-bold"
+                >
+                  {emailSubmitting
+                    ? 'Sending confirmation...'
+                    : !captchaToken
+                      ? 'Please complete the verification'
+                      : 'Continue — confirm my email'}
                 </Button>
 
                 <p className="text-center text-xs text-muted-foreground">

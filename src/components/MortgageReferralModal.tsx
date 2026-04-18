@@ -38,6 +38,7 @@ export function MortgageReferralModal({
   const [price, setPrice] = useState<string>(purchasePrice ? String(purchasePrice) : '');
   const [timeframe, setTimeframe] = useState<'buying_now' | 'within_3_months' | 'just_researching'>('buying_now');
   const [submitting, setSubmitting] = useState(false);
+  const [acknowledged, setAcknowledged] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -46,6 +47,7 @@ export function MortgageReferralModal({
       setPhone('');
       setPrice(purchasePrice ? String(purchasePrice) : '');
       setTimeframe('buying_now');
+      setAcknowledged(false);
     }
   }, [open, purchasePrice]);
 
@@ -131,7 +133,18 @@ export function MortgageReferralModal({
           <p className="text-[11px] text-muted-foreground leading-relaxed">
             By submitting, you agree to be contacted by a licensed mortgage broker. ListHQ may receive a referral fee.
           </p>
-          <Button type="submit" disabled={submitting} className="w-full">
+          <label className="flex items-start gap-2 text-xs text-foreground cursor-pointer">
+            <input
+              type="checkbox"
+              checked={acknowledged}
+              onChange={(e) => setAcknowledged(e.target.checked)}
+              className="mt-0.5 h-4 w-4 shrink-0 rounded border-input accent-primary"
+            />
+            <span className="leading-relaxed">
+              I understand that ListHQ may receive a referral fee from a broker or lender if I proceed with a loan. ListHQ is not a licensed credit adviser and is not providing financial or credit advice.
+            </span>
+          </label>
+          <Button type="submit" disabled={submitting || !acknowledged} className="w-full">
             {submitting ? (
               <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Submitting…</>
             ) : (

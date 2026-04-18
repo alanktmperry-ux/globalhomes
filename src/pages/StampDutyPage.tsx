@@ -11,8 +11,8 @@ export default function StampDutyPage() {
   return (
     <>
       <Helmet>
-        <title>Stamp Duty Calculator Australia 2026 — All States</title>
-        <meta name="description" content="Calculate stamp duty for NSW, VIC, QLD, WA, SA, TAS, ACT and NT. Includes first home buyer exemptions, grants, and upfront cost estimates for 2026." />
+        <title>Stamp Duty Calculator Australia | ListHQ</title>
+        <meta name="description" content="Calculate stamp duty costs for any Australian state. Free, instant estimates for buyers." />
         <link rel="canonical" href="https://listhq.com.au/stamp-duty-calculator" />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",

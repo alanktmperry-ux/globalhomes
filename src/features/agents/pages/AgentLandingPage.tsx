@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { Ear, Mic, Globe, Camera, Cpu, ShieldCheck, ArrowRight, CheckCircle2, Star, Play, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,10 @@ const AgentLandingPage = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+      <Helmet>
+        <title>Real Estate Agent Software Australia | ListHQ</title>
+        <meta name="description" content="CRM, property management, trust accounting and lead tools built for Australian agents." />
+      </Helmet>
       {/* ─── HERO ─── */}
       <section className="relative min-h-[92vh] flex items-center">
         {/* Split background */}

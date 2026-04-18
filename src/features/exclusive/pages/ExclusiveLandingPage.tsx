@@ -35,6 +35,24 @@ export default function ExclusiveLandingPage() {
       <Helmet>
         <title>ListHQ Exclusive — See homes 14 days before anyone else</title>
         <meta name="description" content="Join ListHQ Exclusive for 14-day early access to property listings before they hit REA or Domain. Less competition, instant alerts. $29/month, cancel anytime." />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Product",
+          "name": "ListHQ Exclusive",
+          "description": "Access pre-market properties before they're listed publicly",
+          "offers": {
+            "@type": "Offer",
+            "price": "29",
+            "priceCurrency": "AUD",
+            "priceSpecification": {
+              "@type": "UnitPriceSpecification",
+              "price": "29",
+              "priceCurrency": "AUD",
+              "billingIncrement": 1,
+              "unitCode": "MON"
+            }
+          }
+        })}</script>
       </Helmet>
 
       {/* Hero */}

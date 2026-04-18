@@ -36,6 +36,11 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
   const [emailSubmitting, setEmailSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // hCaptcha. NOTE: set VITE_HCAPTCHA_SITE_KEY in env. Falls back to hCaptcha's public test key.
+  const hcaptchaSiteKey = import.meta.env.VITE_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001';
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<HCaptcha | null>(null);
+
   // Password step state
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');

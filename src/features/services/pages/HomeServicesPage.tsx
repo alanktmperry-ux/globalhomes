@@ -81,10 +81,10 @@ export default function HomeServicesPage() {
   return (
     <>
       <Helmet>
-        <title>Home Services Marketplace — ListHQ</title>
+        <title>Home Services Marketplace | ListHQ</title>
         <meta
           name="description"
-          content="Book vetted Australian property professionals — photography, floor plans, staging, inspections, conveyancing, cleaning, removalists and more."
+          content="Find trusted tradespeople for your property. Cleaners, inspectors, removalists and more."
         />
         <link rel="canonical" href="https://listhq.com.au/home-services" />
       </Helmet>

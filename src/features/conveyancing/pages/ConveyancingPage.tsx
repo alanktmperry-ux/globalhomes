@@ -56,8 +56,8 @@ const ConveyancingPage = () => {
   return (
     <div className="bg-background">
       <Helmet>
-        <title>Conveyancing Marketplace — Find a Conveyancer | ListHQ</title>
-        <meta name="description" content="Fixed-fee conveyancing from licensed Australian professionals. Compare quotes, turnaround times, and specialties." />
+        <title>Conveyancing Services | ListHQ</title>
+        <meta name="description" content="Compare conveyancing quotes from trusted Australian solicitors. Fixed fees, fast turnaround." />
       </Helmet>
 
       {/* Hero */}

@@ -33,8 +33,8 @@ export default function ExclusiveLandingPage() {
   return (
     <>
       <Helmet>
-        <title>ListHQ Exclusive — See homes 14 days before anyone else</title>
-        <meta name="description" content="Join ListHQ Exclusive for 14-day early access to property listings before they hit REA or Domain. Less competition, instant alerts. $29/month, cancel anytime." />
+        <title>ListHQ Exclusive | Access Pre-Market Properties First</title>
+        <meta name="description" content="Join ListHQ Exclusive and see homes before they hit the market. $29/month. Cancel anytime." />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Product",

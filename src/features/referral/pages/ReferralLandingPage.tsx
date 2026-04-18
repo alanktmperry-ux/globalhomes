@@ -150,8 +150,8 @@ export default function ReferralLandingPage() {
   return (
     <>
       <Helmet>
-        <title>International Agent Referral Program | ListHQ</title>
-        <meta name="description" content="Earn commissions connecting global buyers with Australian property. Join the ListHQ international agent referral network." />
+        <title>Referral Program | ListHQ</title>
+        <meta name="description" content="Refer a property buyer or seller and earn with ListHQ's referral network." />
       </Helmet>
       <div className="min-h-screen bg-background">
         {/* Hero */}

@@ -1,13 +1,13 @@
 project_id = "ngrkbohpmkzjonaofgbb"
 
 [functions.google-maps-proxy]
-verify_jwt = false
+verify_jwt = true
 
 [functions.manus-search]
-verify_jwt = false
+verify_jwt = true
 
 [functions.manus-task-status]
-verify_jwt = false
+verify_jwt = true
 
 [functions.voice-search]
 verify_jwt = false
@@ -16,16 +16,16 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.send-notification-email]
-verify_jwt = false
+verify_jwt = true
 
 [functions.setup-agent]
-verify_jwt = false
+verify_jwt = true
 
 [functions.admin-users]
-verify_jwt = false
+verify_jwt = true
 
 [functions.match-saved-searches]
-verify_jwt = false
+verify_jwt = true
 
 [functions.get-exchange-rates]
 verify_jwt = false
@@ -34,22 +34,22 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.generate-listing]
-verify_jwt = false
+verify_jwt = true
 
 [functions.get-featured-listings]
 verify_jwt = false
 
 [functions.send-marketing-email]
-verify_jwt = false
+verify_jwt = true
 
 [functions.generate-translations]
-verify_jwt = false
+verify_jwt = true
 
 [functions.agent-help]
-verify_jwt = false
+verify_jwt = true
 
 [functions.send-broker-lead]
-verify_jwt = false
+verify_jwt = true
 
 [functions.admin-delete-agent]
-verify_jwt = false
+verify_jwt = true

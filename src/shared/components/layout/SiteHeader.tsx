@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { MapPin } from 'lucide-react';
-import { Globe, ChevronDown, User, LogIn, Home, Building2, Plus, List, LayoutDashboard, ShieldCheck, Menu, FileText, Handshake, Wrench } from 'lucide-react';
+import { Globe, ChevronDown, User, LogIn, Home, Building2, Plus, List, LayoutDashboard, ShieldCheck, Menu, FileText, Handshake, Wrench, Sparkles } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
@@ -83,6 +83,13 @@ export function SiteHeader() {
 
         {/* ─── Desktop right side actions (hidden below md) ─── */}
         <div className="hidden md:flex items-center gap-2 shrink-0">
+          <Link
+            to="/exclusive"
+            className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-foreground hover:text-primary hover:bg-primary/5 transition-colors"
+          >
+            <Sparkles size={13} className="text-primary" /> Exclusive
+            <span className="ml-0.5 text-[9px] font-bold uppercase tracking-wide bg-red-500 text-white rounded-full px-1.5 py-0.5">NEW</span>
+          </Link>
           <Link
             to="/home-services"
             className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors"
@@ -238,6 +245,10 @@ export function SiteHeader() {
 
                 <button onClick={() => navTo('/suburbs')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
                   <MapPin size={16} className="text-muted-foreground" /> Browse Suburbs
+                </button>
+                <button onClick={() => navTo('/exclusive')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
+                  <Sparkles size={16} className="text-primary" /> Exclusive
+                  <span className="ml-auto text-[9px] font-bold uppercase bg-red-500 text-white rounded-full px-1.5 py-0.5">NEW</span>
                 </button>
                 <button onClick={() => navTo('/home-services')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
                   <Wrench size={16} className="text-primary" /> Services

@@ -216,6 +216,25 @@ const StepSettings = ({ draft, update }: Props) => {
         </div>
       </div>
 
+      {/* Exclusive Pre-Market Window */}
+      <div className="rounded-2xl border-2 border-red-500/20 bg-gradient-to-br from-red-500/5 to-transparent p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wide bg-red-500 text-white rounded-full px-2 py-0.5">Exclusive</span>
+              <Label className="text-sm font-semibold">List as Exclusive first (14-day private window)</Label>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Your listing will be visible only to ListHQ Exclusive members for 14 days before going public. Included in Pro plan or $99 add-on.
+            </p>
+          </div>
+          <Switch
+            checked={!!draft.isExclusive}
+            onCheckedChange={(v) => update({ isExclusive: v })}
+          />
+        </div>
+      </div>
+
       {/* ── Owner / Vendor Details ── */}
       <VendorContactPicker draft={draft} update={update} isRental={isRental} />
 

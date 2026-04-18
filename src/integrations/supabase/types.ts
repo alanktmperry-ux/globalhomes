@@ -3640,6 +3640,51 @@ export type Database = {
         }
         Relationships: []
       }
+      exclusive_members: {
+        Row: {
+          email: string
+          id: string
+          joined_at: string
+          name: string | null
+          phone: string | null
+          search_max_price: number | null
+          search_min_beds: number | null
+          search_min_price: number | null
+          search_property_types: string[] | null
+          search_suburbs: string[] | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          email: string
+          id?: string
+          joined_at?: string
+          name?: string | null
+          phone?: string | null
+          search_max_price?: number | null
+          search_min_beds?: number | null
+          search_min_price?: number | null
+          search_property_types?: string[] | null
+          search_suburbs?: string[] | null
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          email?: string
+          id?: string
+          joined_at?: string
+          name?: string | null
+          phone?: string | null
+          search_max_price?: number | null
+          search_min_beds?: number | null
+          search_min_price?: number | null
+          search_property_types?: string[] | null
+          search_suburbs?: string[] | null
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       expressions_of_interest: {
         Row: {
           agent_notes: string | null
@@ -5982,6 +6027,10 @@ export type Database = {
           eoi_guide_price: number | null
           estimated_value: string | null
           estimated_weekly_rent: number | null
+          exclusive_end_date: string | null
+          exclusive_enquiries: number
+          exclusive_start_date: string | null
+          exclusive_views: number
           featured_until: string | null
           features: string[] | null
           flood_zone: boolean | null
@@ -6008,6 +6057,7 @@ export type Database = {
           inspection_times: Json | null
           internet_included: boolean | null
           is_active: boolean
+          is_exclusive: boolean
           is_featured: boolean
           is_new_build: boolean | null
           land_size: number | null
@@ -6120,6 +6170,10 @@ export type Database = {
           eoi_guide_price?: number | null
           estimated_value?: string | null
           estimated_weekly_rent?: number | null
+          exclusive_end_date?: string | null
+          exclusive_enquiries?: number
+          exclusive_start_date?: string | null
+          exclusive_views?: number
           featured_until?: string | null
           features?: string[] | null
           flood_zone?: boolean | null
@@ -6146,6 +6200,7 @@ export type Database = {
           inspection_times?: Json | null
           internet_included?: boolean | null
           is_active?: boolean
+          is_exclusive?: boolean
           is_featured?: boolean
           is_new_build?: boolean | null
           land_size?: number | null
@@ -6258,6 +6313,10 @@ export type Database = {
           eoi_guide_price?: number | null
           estimated_value?: string | null
           estimated_weekly_rent?: number | null
+          exclusive_end_date?: string | null
+          exclusive_enquiries?: number
+          exclusive_start_date?: string | null
+          exclusive_views?: number
           featured_until?: string | null
           features?: string[] | null
           flood_zone?: boolean | null
@@ -6284,6 +6343,7 @@ export type Database = {
           inspection_times?: Json | null
           internet_included?: boolean | null
           is_active?: boolean
+          is_exclusive?: boolean
           is_featured?: boolean
           is_new_build?: boolean | null
           land_size?: number | null
@@ -11341,6 +11401,7 @@ export type Database = {
         Args: { _agency_id: string; _user_id: string }
         Returns: boolean
       }
+      is_exclusive_member: { Args: never; Returns: boolean }
       is_partner_for_agency: {
         Args: { _agency_id: string; _user_id: string }
         Returns: boolean
@@ -11431,6 +11492,10 @@ export type Database = {
           eoi_guide_price: number | null
           estimated_value: string | null
           estimated_weekly_rent: number | null
+          exclusive_end_date: string | null
+          exclusive_enquiries: number
+          exclusive_start_date: string | null
+          exclusive_views: number
           featured_until: string | null
           features: string[] | null
           flood_zone: boolean | null
@@ -11457,6 +11522,7 @@ export type Database = {
           inspection_times: Json | null
           internet_included: boolean | null
           is_active: boolean
+          is_exclusive: boolean
           is_featured: boolean
           is_new_build: boolean | null
           land_size: number | null

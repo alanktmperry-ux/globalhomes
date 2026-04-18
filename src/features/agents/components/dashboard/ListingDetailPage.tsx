@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { PropertyRow } from '@/features/agents/types/listing';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Loader2, Zap, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Loader2, Zap, AlertTriangle, Sparkles, Eye, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import DashboardHeader from './DashboardHeader';
@@ -98,6 +98,35 @@ const ListingDetailPage = () => {
       />
 
       <div className="p-4 sm:p-6 max-w-6xl">
+        {(listing as any).is_exclusive && (listing as any).exclusive_end_date && new Date((listing as any).exclusive_end_date) > new Date() && (() => {
+          const end = new Date((listing as any).exclusive_end_date);
+          const diff = end.getTime() - Date.now();
+          const days = Math.floor(diff / 86_400_000);
+          const hours = Math.floor((diff % 86_400_000) / 3_600_000);
+          return (
+            <div className="mb-4 rounded-2xl border-2 border-red-500/30 bg-gradient-to-br from-red-500/5 via-card to-card p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide bg-red-500 text-white rounded-full px-2 py-0.5">
+                    <Sparkles size={10} /> Exclusive Active
+                  </span>
+                  <span className="text-sm font-semibold text-foreground">{days} day{days === 1 ? '' : 's'} {hours} hour{hours === 1 ? '' : 's'} remaining</span>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  Goes public on {end.toLocaleDateString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' })}
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-4 text-xs">
+                <span className="flex items-center gap-1.5 text-muted-foreground">
+                  <Eye size={13} /> <strong className="text-foreground">{(listing as any).exclusive_views ?? 0}</strong> exclusive views
+                </span>
+                <span className="flex items-center gap-1.5 text-muted-foreground">
+                  <MessageSquare size={13} /> <strong className="text-foreground">{(listing as any).exclusive_enquiries ?? 0}</strong> exclusive enquiries
+                </span>
+              </div>
+            </div>
+          );
+        })()}
         {isUnpublished && (
           <div className="flex items-center gap-2.5 mb-4 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-sm text-amber-700 dark:text-amber-400">
             <AlertTriangle size={16} className="shrink-0" />

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { PropertyRow } from '@/features/agents/types/listing';
 import MarketingSupplierToggle from '../MarketingSupplierToggle';
 import ListingPhotoGallery from './ListingPhotoGallery';
@@ -16,7 +17,8 @@ import {
   Eye, MessageCircle, Calendar,
   DollarSign, Mail, Flame, Clock,
   ChevronRight, Send, Loader2,
-  Zap, Star, CheckCircle2, AlertCircle
+  Zap, Star, CheckCircle2, AlertCircle,
+  Camera, Map as MapIcon, Sofa, Bug,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -54,6 +56,7 @@ interface Props {
 
 const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const [leads, setLeads] = useState<any[]>([]);
   const [weeklyViews, setWeeklyViews] = useState<
@@ -362,6 +365,31 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
 
   return (
     <div className="space-y-6">
+      {/* ── PREPARE YOUR LISTING — service marketplace ── */}
+      <div className="bg-card border border-border rounded-xl p-5">
+        <h3 className="text-sm font-bold text-foreground mb-1">Prepare your listing</h3>
+        <p className="text-xs text-muted-foreground mb-3">
+          Book vetted professionals to get this property market-ready.
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {[
+            { key: 'photography',     label: 'Photography', Icon: Camera },
+            { key: 'floor_plans',     label: 'Floor Plans', Icon: MapIcon },
+            { key: 'virtual_staging', label: 'Staging',     Icon: Sofa },
+            { key: 'pest_inspection', label: 'Pest',        Icon: Bug },
+          ].map(({ key, label, Icon }) => (
+            <button
+              key={key}
+              onClick={() => navigate(`/home-services?category=${key}`)}
+              className="flex flex-col items-center gap-1.5 p-3 rounded-lg border border-border bg-background hover:border-primary/40 hover:bg-primary/5 transition-colors"
+            >
+              <Icon size={18} className="text-primary" />
+              <span className="text-xs font-medium text-foreground">{label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* ── PHOTOS, CHECKLIST & DAYS ON MARKET ── */}
       <ListingPhotoGallery listing={listing} />
 

@@ -4427,6 +4427,51 @@ export type Database = {
           },
         ]
       }
+      mortgage_referrals: {
+        Row: {
+          agent_id: string | null
+          created_at: string
+          email: string
+          id: string
+          name: string
+          phone: string
+          property_id: string | null
+          purchase_price: number | null
+          source_page: string
+          status: string
+          timeframe: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          phone: string
+          property_id?: string | null
+          purchase_price?: number | null
+          source_page: string
+          status?: string
+          timeframe: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          phone?: string
+          property_id?: string | null
+          purchase_price?: number | null
+          source_page?: string
+          status?: string
+          timeframe?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           agent_id: string

@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { StampDutyCalculator } from '@/components/StampDutyCalculator';
 import { FIRBCalculator } from '@/components/FIRBCalculator';
+import { MortgageBrokerCTA } from '@/features/mortgage/components/MortgageBrokerCTA';
 
 export default function StampDutyPage() {
   return (
@@ -35,6 +36,15 @@ export default function StampDutyPage() {
 
           <div className="mt-4">
             <FIRBCalculator propertyPrice={null} propertyAddress="" />
+          </div>
+
+          <div className="mt-6">
+            <MortgageBrokerCTA
+              title="Find out your borrowing power"
+              description="Speak to a licensed mortgage broker and learn how much you can borrow."
+              buttonLabel="Connect with a broker"
+              sourcePage="stamp_duty"
+            />
           </div>
 
           {/* SEO content */}

@@ -183,6 +183,20 @@ const SettlementModal = ({
             <Row label="Agent take-home" value={AUD.format(calc.agentTakeHome)} bold />
             <Row label="Agency share" value={AUD.format(calc.agencyShare)} />
           </div>
+
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+            <p className="text-xs font-semibold text-foreground">Conveyancing</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5 mb-2">Has your vendor arranged a conveyancer?</p>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="h-8 text-xs"
+              onClick={() => { onOpenChange(false); navigate('/conveyancing?mode=selling'); }}
+            >
+              Refer to a conveyancer
+            </Button>
+          </div>
         </div>
 
         <DialogFooter className="gap-2">

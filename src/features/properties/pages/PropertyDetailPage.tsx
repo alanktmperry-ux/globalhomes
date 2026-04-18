@@ -891,6 +891,13 @@ export default function PropertyDetailPage() {
                 <Button size="sm" variant="outline" onClick={() => setMortgageOpen(true)}>Get pre-approved</Button>
               </div>
             )}
+            {!isRental && (
+              <div className="mt-3 p-4 rounded-xl border border-primary/20 bg-primary/5">
+                <p className="text-sm font-medium">Need a conveyancer?</p>
+                <p className="text-xs text-muted-foreground mb-2">Fixed-fee settlement from $990.</p>
+                <Button size="sm" variant="outline" onClick={() => navigate('/conveyancing')}>Get a fixed quote</Button>
+              </div>
+            )}
             <MortgageReferralModal
               open={mortgageOpen}
               onOpenChange={setMortgageOpen}

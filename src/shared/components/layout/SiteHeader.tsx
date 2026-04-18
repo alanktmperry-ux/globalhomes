@@ -90,6 +90,12 @@ export function SiteHeader() {
             <Wrench size={13} /> Services
           </Link>
           <Link
+            to="/conveyancing"
+            className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors"
+          >
+            <FileText size={13} /> Conveyancing
+          </Link>
+          <Link
             to="/refer"
             className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors"
           >
@@ -235,6 +241,9 @@ export function SiteHeader() {
                 </button>
                 <button onClick={() => navTo('/home-services')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
                   <Wrench size={16} className="text-primary" /> Services
+                </button>
+                <button onClick={() => navTo('/conveyancing')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
+                  <FileText size={16} className="text-primary" /> Conveyancing
                 </button>
                 <button onClick={() => navTo('/refer')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
                   <Handshake size={16} className="text-primary" /> Referral Program

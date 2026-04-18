@@ -66,6 +66,7 @@ const INSIGHTS_NAV: NavItem[] = [
   { title: 'Analytics', url: '/dashboard/analytics', icon: BarChart3 },
   { title: 'Reports', url: '/dashboard/reports', icon: FileText },
   { title: 'Commission', url: '/dashboard/commission', icon: Calculator },
+  { title: 'Conveyancing', url: '/conveyancing', icon: FileText },
   { title: 'Referral Program', url: '/refer', icon: Handshake },
 ];
 

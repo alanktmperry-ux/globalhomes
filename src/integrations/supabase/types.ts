@@ -3716,6 +3716,143 @@ export type Database = {
           },
         ]
       }
+      home_service_bookings: {
+        Row: {
+          agent_id: string | null
+          commission_amount: number | null
+          commission_rate: number | null
+          created_at: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string | null
+          id: string
+          message: string | null
+          preferred_date: string | null
+          property_address: string | null
+          property_id: string | null
+          provider_id: string | null
+          status: string
+        }
+        Insert: {
+          agent_id?: string | null
+          commission_amount?: number | null
+          commission_rate?: number | null
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          customer_phone?: string | null
+          id?: string
+          message?: string | null
+          preferred_date?: string | null
+          property_address?: string | null
+          property_id?: string | null
+          provider_id?: string | null
+          status?: string
+        }
+        Update: {
+          agent_id?: string | null
+          commission_amount?: number | null
+          commission_rate?: number | null
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string | null
+          id?: string
+          message?: string | null
+          preferred_date?: string | null
+          property_address?: string | null
+          property_id?: string | null
+          provider_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "home_service_bookings_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "home_service_bookings_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "home_service_bookings_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "home_service_bookings_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "home_service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      home_service_providers: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          email: string | null
+          id: string
+          is_active: boolean | null
+          logo_url: string | null
+          name: string
+          phone: string | null
+          price_from: number | null
+          price_to: number | null
+          price_unit: string | null
+          rating: number | null
+          state: string | null
+          suburb: string | null
+          website: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          name: string
+          phone?: string | null
+          price_from?: number | null
+          price_to?: number | null
+          price_unit?: string | null
+          rating?: number | null
+          state?: string | null
+          suburb?: string | null
+          website?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          name?: string
+          phone?: string | null
+          price_from?: number | null
+          price_to?: number | null
+          price_unit?: string | null
+          rating?: number | null
+          state?: string | null
+          suburb?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       inspection_maintenance_items: {
         Row: {
           created_at: string | null

@@ -38,7 +38,7 @@ const TermsPage = () => {
           <p className="text-sm text-muted-foreground mb-6">Last updated: April 2026</p>
 
           <div className="mb-8 rounded-lg border border-yellow-300 bg-yellow-50 p-4 text-sm text-yellow-900">
-            These terms are interim and subject to legal review. Last updated April 2026.
+            These terms are interim and under active legal review. By using this platform you agree to be bound by these terms as updated. Last updated April 2026.
           </div>
 
           <nav className="bg-muted/40 border border-border rounded-lg p-4 mb-10">

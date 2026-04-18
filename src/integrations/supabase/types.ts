@@ -3100,6 +3100,122 @@ export type Database = {
           },
         ]
       }
+      conveyancers: {
+        Row: {
+          contact_name: string | null
+          created_at: string
+          email: string | null
+          fee_from: number | null
+          fee_to: number | null
+          firm_name: string
+          id: string
+          is_active: boolean | null
+          logo_url: string | null
+          phone: string | null
+          rating: number | null
+          specialties: string[] | null
+          suburbs_covered: string[] | null
+          turnaround_days: number | null
+          website: string | null
+        }
+        Insert: {
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          fee_from?: number | null
+          fee_to?: number | null
+          firm_name: string
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          phone?: string | null
+          rating?: number | null
+          specialties?: string[] | null
+          suburbs_covered?: string[] | null
+          turnaround_days?: number | null
+          website?: string | null
+        }
+        Update: {
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          fee_from?: number | null
+          fee_to?: number | null
+          firm_name?: string
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          phone?: string | null
+          rating?: number | null
+          specialties?: string[] | null
+          suburbs_covered?: string[] | null
+          turnaround_days?: number | null
+          website?: string | null
+        }
+        Relationships: []
+      }
+      conveyancing_referrals: {
+        Row: {
+          agent_id: string | null
+          commission_amount: number | null
+          conveyancer_id: string | null
+          created_at: string
+          email: string
+          id: string
+          name: string
+          phone: string | null
+          property_address: string | null
+          property_id: string | null
+          settlement_date: string | null
+          source: string | null
+          special_circumstances: string[] | null
+          status: string
+          transaction_type: string | null
+        }
+        Insert: {
+          agent_id?: string | null
+          commission_amount?: number | null
+          conveyancer_id?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          phone?: string | null
+          property_address?: string | null
+          property_id?: string | null
+          settlement_date?: string | null
+          source?: string | null
+          special_circumstances?: string[] | null
+          status?: string
+          transaction_type?: string | null
+        }
+        Update: {
+          agent_id?: string | null
+          commission_amount?: number | null
+          conveyancer_id?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          phone?: string | null
+          property_address?: string | null
+          property_id?: string | null
+          settlement_date?: string | null
+          source?: string | null
+          special_circumstances?: string[] | null
+          status?: string
+          transaction_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conveyancing_referrals_conveyancer_id_fkey"
+            columns: ["conveyancer_id"]
+            isOneToOne: false
+            referencedRelation: "conveyancers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       crm_activities: {
         Row: {
           agent_id: string

@@ -42,6 +42,7 @@ const SALES_NAV: NavItem[] = [
   { title: 'Pre-Market', url: '/dashboard/pre-market', icon: Target },
   { title: 'Off-Market Network', url: '/dashboard/network', icon: Users },
   { title: 'Opportunities', url: '/dashboard/opportunities', icon: Target },
+  { title: 'Exclusive Program', url: '/exclusive/listings', icon: Star },
 ];
 
 const PROPERTY_NAV: NavItem[] = [

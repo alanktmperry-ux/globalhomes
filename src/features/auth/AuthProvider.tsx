@@ -81,19 +81,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!isAdmin) return;
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
+
+    // Audit log MUST succeed before impersonation proceeds
+    try {
+      const { error: auditError } = await supabase.from('audit_log').insert({
+        user_id: user?.id ?? null,
+        action_type: 'admin_start_impersonation',
+        entity_type: 'user',
+        entity_id: userId,
+        description: 'Admin started impersonation session',
+        metadata: { impersonated_email: userEmail },
+      } as any);
+      if (auditError) throw auditError;
+    } catch (err) {
+      console.error('impersonation audit log failed:', err);
+      toast.error('Impersonation blocked — audit log could not be recorded. Please try again.');
+      return;
+    }
+
     sessionStorage.setItem('admin_email', userEmail);
     sessionStorage.setItem('admin_impersonated_id', userId);
     setImpersonating(true);
     setImpersonatedUser(userEmail);
     setImpersonatedUserId(userId);
-    supabase.from('audit_log').insert({
-      user_id: user?.id ?? null,
-      action_type: 'admin_start_impersonation',
-      entity_type: 'user',
-      entity_id: userId,
-      description: 'Admin started impersonation session',
-      metadata: { impersonated_email: userEmail },
-    } as any).then(({ error }: any) => { if (error) console.error('impersonation audit log:', error); });
   };
 
   const stopImpersonation = async () => {

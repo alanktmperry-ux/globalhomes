@@ -38,6 +38,7 @@ export function MortgageReferralModal({
   const [price, setPrice] = useState<string>(purchasePrice ? String(purchasePrice) : '');
   const [timeframe, setTimeframe] = useState<'buying_now' | 'within_3_months' | 'just_researching'>('buying_now');
   const [submitting, setSubmitting] = useState(false);
+  const [acknowledged, setAcknowledged] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -46,6 +47,7 @@ export function MortgageReferralModal({
       setPhone('');
       setPrice(purchasePrice ? String(purchasePrice) : '');
       setTimeframe('buying_now');
+      setAcknowledged(false);
     }
   }, [open, purchasePrice]);
 

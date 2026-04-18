@@ -146,24 +146,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const roles = data?.map((r) => r.role) || [];
     const { data: agentData } = await supabase
       .from('agents')
-      .select('id, agency_role, agency_id')
+      .select('id, agency_role, agency_id, approval_status')
       .eq('user_id', user.id)
       .maybeSingle();
-    if (agentData && !roles.includes('agent')) roles.push('agent');
-    applyRoles(roles, user.email);
+    const isAdminUser = roles.includes('admin');
+    const isApprovedAgent = !!agentData && ((agentData as any).approval_status === 'approved' || isAdminUser);
+    // Only grant agent role if the agents row is approved (admins always pass)
+    const filteredRoles = roles.filter((r) => !(r === 'agent' && agentData && !isApprovedAgent));
+    if (isApprovedAgent && !filteredRoles.includes('agent')) filteredRoles.push('agent');
+    applyRoles(filteredRoles, user.email);
     if (agentData) {
       setAgencyRole((agentData as any).agency_role || null);
       setAgencyId(agentData.agency_id || null);
-      if ((agentData as any).agency_role === 'principal' || (agentData as any).agency_role === 'admin') {
+      if (isApprovedAgent && ((agentData as any).agency_role === 'principal' || (agentData as any).agency_role === 'admin')) {
         setIsPrincipal(true);
       }
-      if (!roles.includes('agent') && !roles.includes('admin')) {
+      if (isApprovedAgent && !roles.includes('agent') && !roles.includes('admin')) {
         await supabase.from('user_roles').upsert(
           { user_id: user.id, role: 'agent' as any },
           { onConflict: 'user_id,role' }
         );
-        setIsAgent(true);
-        setUserRole('agent');
       }
     }
     lastFetchedUserId.current = user.id;
@@ -189,38 +191,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         
         const roles = data?.map((r) => r.role) || [];
 
-        // Fallback: if no agent role, check agents table and auto-insert role
+        // Fallback: if no agent role, check agents table — only honour it when approved
         const { data: agentData } = await supabase
           .from('agents')
-          .select('id, agency_role, agency_id')
+          .select('id, agency_role, agency_id, approval_status')
           .eq('user_id', user.id)
           .maybeSingle();
         if (cancelled) return;
-        if (agentData && !roles.includes('agent')) {
-          roles.push('agent');
+        const isAdminUser = roles.includes('admin');
+        const isApprovedAgent = !!agentData && ((agentData as any).approval_status === 'approved' || isAdminUser);
+        // Strip any stale agent role if the agents row exists but isn't approved
+        const filteredRoles = roles.filter((r) => !(r === 'agent' && agentData && !isApprovedAgent));
+        if (isApprovedAgent && !filteredRoles.includes('agent')) {
+          filteredRoles.push('agent');
           // Best-effort backfill of user_roles row
           supabase.from('user_roles').insert({ user_id: user.id, role: 'agent' as any })
             .then(({ error }) => { if (error && !String(error.message).includes('duplicate')) console.warn('[Auth] backfill user_roles:', error.message); });
         }
-        applyRoles(roles, user.email);
+        applyRoles(filteredRoles, user.email);
         if (agentData) {
           setAgencyRole((agentData as any).agency_role || null);
           setAgencyId(agentData.agency_id || null);
-          if ((agentData as any).agency_role === 'principal' || (agentData as any).agency_role === 'admin') {
+          if (isApprovedAgent && ((agentData as any).agency_role === 'principal' || (agentData as any).agency_role === 'admin')) {
             setIsPrincipal(true);
           }
-          if (!roles.includes('agent') && !roles.includes('admin')) {
+          if (isApprovedAgent && !roles.includes('agent') && !roles.includes('admin')) {
             await supabase.from('user_roles').upsert(
               { user_id: user.id, role: 'agent' as any },
               { onConflict: 'user_id,role' }
             );
-            setIsAgent(true);
-            setUserRole('agent');
           }
         }
 
-        // Post-login redirect: agents land on dashboard
-        const isAgentUser = roles.includes('agent') || roles.includes('admin');
+        // Post-login redirect: only approved agents land on dashboard
+        const isAgentUser = filteredRoles.includes('agent') || filteredRoles.includes('admin');
         const path = window.location.pathname;
         const onAuthPage = path === '/login' || path === '/auth' || path === '/agent-auth' || path === '/';
         if (isAgentUser && onAuthPage && sessionStorage.getItem('post_login_redirected') !== '1') {

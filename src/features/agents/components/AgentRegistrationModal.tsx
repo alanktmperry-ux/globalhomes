@@ -157,6 +157,10 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
   const handleEmailSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!emailInput.trim()) return;
+    if (!captchaToken) {
+      toast.error('Please complete the verification');
+      return;
+    }
     setEmailSubmitting(true);
     try {
       const email = emailInput.trim().toLowerCase();

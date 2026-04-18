@@ -44,6 +44,7 @@ import { DocumentVault } from '@/features/documents/components/DocumentVault';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { ShareSheet } from '@/shared/components/ShareSheet';
 import { MortgageBrokerCTA } from '@/features/mortgage/components/MortgageBrokerCTA';
+import { MortgageReferralModal } from '@/components/MortgageReferralModal';
 
 export default function PropertyDetailPage() {
   // Support both /property/:slug and /property/:uuid for backward compat
@@ -70,6 +71,7 @@ export default function PropertyDetailPage() {
   const [isOwnerAgent, setIsOwnerAgent] = useState(false);
   const [translating, setTranslating] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [mortgageOpen, setMortgageOpen] = useState(false);
   useEffect(() => {
     const fetchProperty = async () => {
       setLoading(true);
@@ -881,6 +883,21 @@ export default function PropertyDetailPage() {
                 agentId={property.agent?.id ?? null}
               />
             )}
+
+            {!isRental && (
+              <div className="mt-4 p-4 rounded-xl border border-primary/20 bg-primary/5">
+                <p className="text-sm font-medium">Need finance?</p>
+                <p className="text-xs text-muted-foreground mb-2">Get pre-approved before you make an offer.</p>
+                <Button size="sm" variant="outline" onClick={() => setMortgageOpen(true)}>Get pre-approved</Button>
+              </div>
+            )}
+            <MortgageReferralModal
+              open={mortgageOpen}
+              onOpenChange={setMortgageOpen}
+              sourceLabel="property_detail"
+              propertyId={property?.id}
+              purchasePrice={property?.price}
+            />
           </div>
         </div>
       </main>

@@ -9,6 +9,7 @@ import OfferModal from './pipeline/OfferModal';
 import OfferOutcomeTracker from './pipeline/OfferOutcomeTracker';
 import SettlementModal from './pipeline/SettlementModal';
 import { MortgageBrokerModal } from '@/features/mortgage/components/MortgageBrokerModal';
+import { MortgageReferralModal } from '@/components/MortgageReferralModal';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
 
@@ -72,6 +73,8 @@ const PipelinePage = () => {
   const [offerCard, setOfferCard] = useState<PipelineCard | null>(null);
   const [settlementCard, setSettlementCard] = useState<{ card: PipelineCard; previousStage: string } | null>(null);
   const [brokerCard, setBrokerCard] = useState<PipelineCard | null>(null);
+  const [mortgageOpen, setMortgageOpen] = useState(false);
+  const [mortgagePrice, setMortgagePrice] = useState<number>(0);
 
   useEffect(() => {
     if (!user) return;
@@ -161,6 +164,11 @@ const PipelinePage = () => {
       .from('properties')
       .update({ status, is_active } as any)
       .eq('id', cardId);
+
+    if (targetStage === 'under_offer' && card.stage !== 'under_offer') {
+      setMortgagePrice(card.estimatedValue || 0);
+      setMortgageOpen(true);
+    }
   }, [cards]);
 
   const handleOfferSent = (sentOfferId: string) => {
@@ -358,6 +366,13 @@ const PipelinePage = () => {
           agentId={agentId}
         />
       )}
+
+      <MortgageReferralModal
+        open={mortgageOpen}
+        onOpenChange={setMortgageOpen}
+        sourceLabel="pipeline_under_offer"
+        purchasePrice={mortgagePrice}
+      />
     </div>
   );
 };

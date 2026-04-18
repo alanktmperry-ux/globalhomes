@@ -1,9 +1,13 @@
+import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { StampDutyCalculator } from '@/components/StampDutyCalculator';
 import { FIRBCalculator } from '@/components/FIRBCalculator';
 import { MortgageBrokerCTA } from '@/features/mortgage/components/MortgageBrokerCTA';
+import { MortgageReferralModal } from '@/components/MortgageReferralModal';
+import { Button } from '@/components/ui/button';
 
 export default function StampDutyPage() {
+  const [mortgageOpen, setMortgageOpen] = useState(false);
   return (
     <>
       <Helmet>
@@ -37,6 +41,17 @@ export default function StampDutyPage() {
           <div className="mt-4">
             <FIRBCalculator propertyPrice={null} propertyAddress="" />
           </div>
+
+          <div className="mt-6 p-4 rounded-xl border border-primary/20 bg-primary/5">
+            <p className="text-sm font-medium">Find out your borrowing power</p>
+            <p className="text-xs text-muted-foreground mb-2">Speak to a broker and get pre-approved today.</p>
+            <Button size="sm" onClick={() => setMortgageOpen(true)}>Speak to a broker</Button>
+          </div>
+          <MortgageReferralModal
+            open={mortgageOpen}
+            onOpenChange={setMortgageOpen}
+            sourceLabel="stamp_duty_calculator"
+          />
 
           <div className="mt-6">
             <MortgageBrokerCTA

@@ -125,6 +125,23 @@ const BuyPage = () => {
             </p>
           </div>
 
+          {/* Search mode toggle */}
+          <div className="flex items-center justify-end gap-3 text-sm">
+            <span className={`flex items-center gap-1.5 ${searchMode === 'filter' ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
+              <SlidersHorizontal className="h-3.5 w-3.5" /> {t('Filter search')}
+            </span>
+            <Switch
+              checked={searchMode === 'ai'}
+              onCheckedChange={c => setSearchMode(c ? 'ai' : 'filter')}
+            />
+            <span className={`flex items-center gap-1.5 ${searchMode === 'ai' ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
+              <Sparkles className="h-3.5 w-3.5" /> {t('AI search')}
+            </span>
+          </div>
+
+          {/* AI Search */}
+          {searchMode === 'ai' && <AIPropertySearch />}
+
           {/* Sticky filter bar */}
           <div className="sticky top-0 z-30 bg-background/95 backdrop-blur py-3 -mx-4 px-4">
             <div className="flex flex-wrap items-center gap-2">

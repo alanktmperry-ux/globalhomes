@@ -13,6 +13,7 @@ import ListingBuyerLeadsTab from './listing-tabs/ListingBuyerLeadsTab';
 import { DocumentVault } from '@/features/documents/components/DocumentVault';
 import ListingAccountingTab from './listing-tabs/ListingAccountingTab';
 import ListingMarketTab from './listing-tabs/ListingMarketTab';
+import MatchedBuyersWidget from './MatchedBuyersWidget';
 
 const ListingDetailPage = () => {
   const { listingId } = useParams<{ listingId: string }>();
@@ -171,6 +172,10 @@ const ListingDetailPage = () => {
             <ListingMarketTab listing={listing} />
           </TabsContent>
         </Tabs>
+        </div>
+        <aside className="space-y-4">
+          <MatchedBuyersWidget listingId={listing.id} />
+        </aside>
       </div>
     </div>
   );

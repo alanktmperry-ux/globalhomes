@@ -11,6 +11,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { useI18n } from '@/shared/lib/i18n';
+import { AIPropertySearch } from '@/features/properties/components/AIPropertySearch';
+import { Switch } from '@/components/ui/switch';
+import { Sparkles, SlidersHorizontal } from 'lucide-react';
 
 const PROPERTIES_WITH_AGENTS =
   '*, agents(name, agency, phone, email, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count)';
@@ -44,8 +47,16 @@ const BuyPage = () => {
   const { setListingMode } = useCurrency();
 
   const [filters, setFilters] = useState<BuyFilters>(() => parseFiltersFromParams(searchParams));
+  const [searchMode, setSearchMode] = useState<'ai' | 'filter'>(() => {
+    const stored = localStorage.getItem('search-mode');
+    if (stored === 'ai' || stored === 'filter') return stored;
+    // First-time visitor → AI search default
+    localStorage.setItem('search-mode', 'ai');
+    return 'ai';
+  });
 
   useEffect(() => { setListingMode('sale'); }, []);
+  useEffect(() => { localStorage.setItem('search-mode', searchMode); }, [searchMode]);
 
   // Re-sync filters when URL params change (e.g. new voice search navigation)
   useEffect(() => {

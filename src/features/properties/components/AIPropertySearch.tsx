@@ -8,7 +8,7 @@ import { PropertyCard } from '@/components/PropertyCard';
 import { mapDbProperty } from '@/features/properties/api/fetchPublicProperties';
 import { Property } from '@/shared/lib/types';
 import { useI18n } from '@/shared/lib/i18n';
-import { useAuth } from '@/features/auth/context/AuthContext';
+import { useAuth } from '@/features/auth';
 import { toast } from 'sonner';
 
 const FUNCTION_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-property-search`;

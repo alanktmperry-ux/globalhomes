@@ -37,7 +37,7 @@ const SALES_NAV: NavItem[] = [
   { title: 'Pipeline', url: '/dashboard/pipeline', icon: Kanban },
   { title: 'Lead CRM', url: '/dashboard/crm', icon: Flame },
   { title: 'Voice Leads', url: '/dashboard/leads', icon: Mic, badgeKey: 'leads' },
-  { title: 'AI Concierge', url: '/dashboard/concierge', icon: Sparkles },
+  { title: 'AI Concierge', url: '/dashboard/concierge', icon: Sparkles, badgeKey: 'buyerMatches', alertWhenBadge: true },
   { title: 'Lead Marketplace', url: '/dashboard/lead-marketplace', icon: ShoppingBag },
   { title: 'Pre-Market', url: '/dashboard/pre-market', icon: Target },
   { title: 'Off-Market Network', url: '/dashboard/network', icon: Users },
@@ -90,6 +90,7 @@ const AgentDashboardSidebar = () => {
   const { plan, foundingMember } = useSubscription();
   const [arrearsCount, setArrearsCount] = useState(0);
   const [renewalsCount, setRenewalsCount] = useState(0);
+  const [buyerMatchesCount, setBuyerMatchesCount] = useState(0);
   const [onboardingComplete, setOnboardingComplete] = useState(true);
   const [agentLogo, setAgentLogo] = useState<string | null>(null);
   const [agentName, setAgentName] = useState<string | null>(null);
@@ -170,6 +171,34 @@ const AgentDashboardSidebar = () => {
     return () => clearInterval(interval);
   }, [user, location.pathname]);
 
+  // Buyer-match badge count + realtime
+  useEffect(() => {
+    if (!user) return;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    let agentIdLocal: string | null = null;
+    (async () => {
+      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
+      if (!agent) return;
+      agentIdLocal = agent.id;
+      const refresh = async () => {
+        const { count } = await supabase
+          .from('listing_buyer_matches')
+          .select('id', { count: 'exact', head: true })
+          .eq('agent_id', agent.id)
+          .eq('status', 'new');
+        setBuyerMatchesCount(count || 0);
+      };
+      await refresh();
+      channel = supabase
+        .channel('sidebar-matches-' + agent.id)
+        .on('postgres_changes',
+          { event: '*', schema: 'public', table: 'listing_buyer_matches', filter: `agent_id=eq.${agent.id}` },
+          () => { refresh(); })
+        .subscribe();
+    })();
+    return () => { if (channel) supabase.removeChannel(channel); };
+  }, [user]);
+
   // Check onboarding status
   useEffect(() => {
     if (!user) return;
@@ -187,6 +216,7 @@ const AgentDashboardSidebar = () => {
     leads: '',
     arrears: arrearsCount > 0 ? String(arrearsCount) : '',
     renewals: renewalsCount > 0 ? String(renewalsCount) : '',
+    buyerMatches: buyerMatchesCount > 0 ? String(buyerMatchesCount) : '',
   };
 
   const ACCOUNT_NAV: NavItem[] = [

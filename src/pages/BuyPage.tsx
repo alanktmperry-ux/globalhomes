@@ -142,101 +142,105 @@ const BuyPage = () => {
           {/* AI Search */}
           {searchMode === 'ai' && <AIPropertySearch />}
 
-          {/* Sticky filter bar */}
-          <div className="sticky top-0 z-30 bg-background/95 backdrop-blur py-3 -mx-4 px-4">
-            <div className="flex flex-wrap items-center gap-2">
-              <Input
-                placeholder={t('Suburb')}
-                value={filters.suburb ?? ''}
-                onChange={e => setFilters(f => ({ ...f, suburb: e.target.value || undefined }))}
-                className="w-40 h-9 text-sm"
-              />
-              <select
-                value={filters.minBeds ?? ''}
-                onChange={e => setFilters(f => ({ ...f, minBeds: e.target.value ? Number(e.target.value) : undefined }))}
-                className="h-9 rounded-md border border-input bg-background px-3 text-sm"
-              >
-                <option value="">{t('Any beds')}</option>
-                {[1, 2, 3, 4, 5].map(n => (
-                  <option key={n} value={n}>{n}+ {t('beds')}</option>
-                ))}
-              </select>
-              <select
-                value={filters.maxPrice ?? ''}
-                onChange={e => setFilters(f => ({ ...f, maxPrice: e.target.value ? Number(e.target.value) : undefined }))}
-                className="h-9 rounded-md border border-input bg-background px-3 text-sm"
-              >
-                <option value="">{t('Max price')}</option>
-                {[500000, 750000, 1000000, 1500000, 2000000, 3000000, 5000000].map(p => (
-                  <option key={p} value={p}>{AUD.format(p)}</option>
-                ))}
-              </select>
-              <select
-                value={filters.propertyType ?? ''}
-                onChange={e => setFilters(f => ({ ...f, propertyType: e.target.value || undefined }))}
-                className="h-9 rounded-md border border-input bg-background px-3 text-sm"
-              >
-                <option value="">{t('Any type')}</option>
-                {['House', 'Apartment', 'Townhouse', 'Villa', 'Land', 'Unit'].map(pt => (
-                  <option key={pt} value={pt}>{t(pt)}</option>
-                ))}
-              </select>
-              {hasActiveFilters && (
-                <Button variant="ghost" size="sm" onClick={clearFilters} className="h-9 text-sm text-muted-foreground">
-                  <X className="h-3.5 w-3.5 mr-1" /> {t('Clear')}
-                </Button>
-              )}
-            </div>
+          {searchMode === 'filter' && (
+            <>
+              {/* Sticky filter bar */}
+              <div className="sticky top-0 z-30 bg-background/95 backdrop-blur py-3 -mx-4 px-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Input
+                    placeholder={t('Suburb')}
+                    value={filters.suburb ?? ''}
+                    onChange={e => setFilters(f => ({ ...f, suburb: e.target.value || undefined }))}
+                    className="w-40 h-9 text-sm"
+                  />
+                  <select
+                    value={filters.minBeds ?? ''}
+                    onChange={e => setFilters(f => ({ ...f, minBeds: e.target.value ? Number(e.target.value) : undefined }))}
+                    className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                  >
+                    <option value="">{t('Any beds')}</option>
+                    {[1, 2, 3, 4, 5].map(n => (
+                      <option key={n} value={n}>{n}+ {t('beds')}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={filters.maxPrice ?? ''}
+                    onChange={e => setFilters(f => ({ ...f, maxPrice: e.target.value ? Number(e.target.value) : undefined }))}
+                    className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                  >
+                    <option value="">{t('Max price')}</option>
+                    {[500000, 750000, 1000000, 1500000, 2000000, 3000000, 5000000].map(p => (
+                      <option key={p} value={p}>{AUD.format(p)}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={filters.propertyType ?? ''}
+                    onChange={e => setFilters(f => ({ ...f, propertyType: e.target.value || undefined }))}
+                    className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                  >
+                    <option value="">{t('Any type')}</option>
+                    {['House', 'Apartment', 'Townhouse', 'Villa', 'Land', 'Unit'].map(pt => (
+                      <option key={pt} value={pt}>{t(pt)}</option>
+                    ))}
+                  </select>
+                  {hasActiveFilters && (
+                    <Button variant="ghost" size="sm" onClick={clearFilters} className="h-9 text-sm text-muted-foreground">
+                      <X className="h-3.5 w-3.5 mr-1" /> {t('Clear')}
+                    </Button>
+                  )}
+                </div>
 
-            {/* Active filter chips */}
-            {hasActiveFilters && (
-              <div className="flex flex-wrap gap-1.5 mt-2">
-                {filters.suburb && (
-                  <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{filters.suburb}</span>
-                )}
-                {filters.minBeds && (
-                  <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{filters.minBeds}+ {t('beds')}</span>
-                )}
-                {filters.maxPrice && (
-                  <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{t('Under')} {AUD.format(filters.maxPrice)}</span>
-                )}
-                {filters.minPrice && (
-                  <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{t('Over')} {AUD.format(filters.minPrice)}</span>
-                )}
-                {filters.propertyType && (
-                  <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{t(filters.propertyType)}</span>
+                {/* Active filter chips */}
+                {hasActiveFilters && (
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {filters.suburb && (
+                      <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{filters.suburb}</span>
+                    )}
+                    {filters.minBeds && (
+                      <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{filters.minBeds}+ {t('beds')}</span>
+                    )}
+                    {filters.maxPrice && (
+                      <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{t('Under')} {AUD.format(filters.maxPrice)}</span>
+                    )}
+                    {filters.minPrice && (
+                      <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{t('Over')} {AUD.format(filters.minPrice)}</span>
+                    )}
+                    {filters.propertyType && (
+                      <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{t(filters.propertyType)}</span>
+                    )}
+                  </div>
                 )}
               </div>
-            )}
-          </div>
 
-          {/* Results */}
-          {isLoading ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          ) : properties && properties.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {properties.map((property, index) => (
-                <PropertyCard
-                  key={property.id}
-                  property={property}
-                  onSelect={handleSelect}
-                  isSaved={savedIds.has(property.id)}
-                  onToggleSave={handleToggleSave}
-                  index={index}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-20">
-              <p className="text-muted-foreground">{t('No properties match your search.')}</p>
-              {hasActiveFilters && (
-                <button onClick={clearFilters} className="mt-4 text-primary underline text-sm">
-                  {t('Clear all filters')}
-                </button>
+              {/* Results */}
+              {isLoading ? (
+                <div className="flex items-center justify-center py-20">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : properties && properties.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {properties.map((property, index) => (
+                    <PropertyCard
+                      key={property.id}
+                      property={property}
+                      onSelect={handleSelect}
+                      isSaved={savedIds.has(property.id)}
+                      onToggleSave={handleToggleSave}
+                      index={index}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-20">
+                  <p className="text-muted-foreground">{t('No properties match your search.')}</p>
+                  {hasActiveFilters && (
+                    <button onClick={clearFilters} className="mt-4 text-primary underline text-sm">
+                      {t('Clear all filters')}
+                    </button>
+                  )}
+                </div>
               )}
-            </div>
+            </>
           )}
         </div>
       </div>

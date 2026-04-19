@@ -502,6 +502,24 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         payload.features = [...(payload.features || []), 'Pets considered'];
       }
 
+      // Helper: fire the AI matching engine in the background (non-blocking)
+      const fireAIMatch = (lid: string) => {
+        toast.message('Finding matched buyers…');
+        supabase.functions
+          .invoke('match-buyers-to-listing', { body: { listing_id: lid } })
+          .then(({ data, error }) => {
+            if (error) {
+              console.error('AI match error', error);
+              return;
+            }
+            const n = data?.matches_created ?? 0;
+            if (n > 0) {
+              toast.success(`${n} buyer${n > 1 ? 's' : ''} matched to this listing`);
+            }
+          })
+          .catch((e) => console.error('AI match failed', e));
+      };
+
       if (editPropertyId) {
         // UPDATE existing listing
         const { error } = await supabase
@@ -510,6 +528,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
           .eq('id', editPropertyId);
         if (error) throw error;
         toast.success('Listing updated! — Your changes have been saved.');
+        fireAIMatch(editPropertyId);
       } else {
         const { data: inserted, error } = await supabase
           .from('properties')
@@ -553,6 +572,8 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         } else {
           toast.success('Listing saved! — Your property is in draft. Publish it from your dashboard to make it visible to buyers.');
         }
+
+        fireAIMatch(inserted.id);
       }
 
       onPublish(title);

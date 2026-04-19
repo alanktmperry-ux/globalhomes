@@ -18,6 +18,7 @@
 import { useI18n } from '@/shared/lib/i18n';
 import { en, type TranslationKey } from './locales/en';
 import { zhCN } from './locales/zh-CN';
+import { zhTW } from './locales/zh-TW';
 import {
   LANGUAGE_STORAGE_KEY,
   FROM_LEGACY_CODE_MAP,
@@ -32,6 +33,7 @@ import {
 const LOCALES: Partial<Record<SupportedLanguageCode, Record<string, string>>> = {
   'en': en,
   'zh-CN': zhCN,
+  'zh-TW': zhTW,
 };
 
 type AnyKey = TranslationKey | (string & {});

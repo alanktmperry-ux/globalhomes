@@ -2037,6 +2037,33 @@ export type Database = {
         }
         Relationships: []
       }
+      buyer_activity_events: {
+        Row: {
+          buyer_id: string | null
+          created_at: string | null
+          event_type: string | null
+          id: string
+          listing_id: string | null
+          metadata: Json | null
+        }
+        Insert: {
+          buyer_id?: string | null
+          created_at?: string | null
+          event_type?: string | null
+          id?: string
+          listing_id?: string | null
+          metadata?: Json | null
+        }
+        Update: {
+          buyer_id?: string | null
+          created_at?: string | null
+          event_type?: string | null
+          id?: string
+          listing_id?: string | null
+          metadata?: Json | null
+        }
+        Relationships: []
+      }
       buyer_briefs: {
         Row: {
           agent_id: string
@@ -2113,6 +2140,75 @@ export type Database = {
             referencedColumns: ["agent_id"]
           },
         ]
+      }
+      buyer_intent: {
+        Row: {
+          bathrooms: number | null
+          bedrooms: number | null
+          buyer_id: string | null
+          calculator_used: boolean | null
+          created_at: string | null
+          features: string[] | null
+          id: string
+          intent_summary: string | null
+          last_searched_at: string | null
+          lifestyle_keywords: string[] | null
+          listings_saved: number | null
+          max_price: number | null
+          min_price: number | null
+          property_types: string[] | null
+          raw_query: string | null
+          readiness_score: number | null
+          search_count: number | null
+          session_id: string | null
+          suburb_narrowing: boolean | null
+          suburbs: string[] | null
+        }
+        Insert: {
+          bathrooms?: number | null
+          bedrooms?: number | null
+          buyer_id?: string | null
+          calculator_used?: boolean | null
+          created_at?: string | null
+          features?: string[] | null
+          id?: string
+          intent_summary?: string | null
+          last_searched_at?: string | null
+          lifestyle_keywords?: string[] | null
+          listings_saved?: number | null
+          max_price?: number | null
+          min_price?: number | null
+          property_types?: string[] | null
+          raw_query?: string | null
+          readiness_score?: number | null
+          search_count?: number | null
+          session_id?: string | null
+          suburb_narrowing?: boolean | null
+          suburbs?: string[] | null
+        }
+        Update: {
+          bathrooms?: number | null
+          bedrooms?: number | null
+          buyer_id?: string | null
+          calculator_used?: boolean | null
+          created_at?: string | null
+          features?: string[] | null
+          id?: string
+          intent_summary?: string | null
+          last_searched_at?: string | null
+          lifestyle_keywords?: string[] | null
+          listings_saved?: number | null
+          max_price?: number | null
+          min_price?: number | null
+          property_types?: string[] | null
+          raw_query?: string | null
+          readiness_score?: number | null
+          search_count?: number | null
+          session_id?: string | null
+          suburb_narrowing?: boolean | null
+          suburbs?: string[] | null
+        }
+        Relationships: []
       }
       buyer_language_preferences: {
         Row: {
@@ -4415,6 +4511,105 @@ export type Database = {
           {
             foreignKeyName: "leads_property_id_fkey"
             columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listing_buyer_matches: {
+        Row: {
+          agent_id: string | null
+          buyer_id: string | null
+          buyer_intent_id: string | null
+          created_at: string | null
+          id: string
+          listing_id: string | null
+          match_reasoning: string | null
+          match_score: number | null
+          readiness_score: number | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          agent_id?: string | null
+          buyer_id?: string | null
+          buyer_intent_id?: string | null
+          created_at?: string | null
+          id?: string
+          listing_id?: string | null
+          match_reasoning?: string | null
+          match_score?: number | null
+          readiness_score?: number | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          agent_id?: string | null
+          buyer_id?: string | null
+          buyer_intent_id?: string | null
+          created_at?: string | null
+          id?: string
+          listing_id?: string | null
+          match_reasoning?: string | null
+          match_score?: number | null
+          readiness_score?: number | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_buyer_matches_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_buyer_matches_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_buyer_matches_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_buyer_matches_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "listing_buyer_matches_buyer_intent_id_fkey"
+            columns: ["buyer_intent_id"]
+            isOneToOne: false
+            referencedRelation: "buyer_intent"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_buyer_matches_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_buyer_matches_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_buyer_matches_listing_id_fkey"
+            columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "properties_public_safe"
             referencedColumns: ["id"]

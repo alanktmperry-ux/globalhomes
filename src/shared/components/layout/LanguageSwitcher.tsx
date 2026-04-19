@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Languages, ChevronDown } from 'lucide-react';
 import { useI18n, languageNames, type Language } from '@/shared/lib/i18n';
+import { LANGUAGE_STORAGE_KEY, FROM_LEGACY_CODE_MAP, DEFAULT_LANGUAGE } from '@/shared/lib/i18n/config';
 
 export function LanguageSwitcher() {
   const { language, setLanguage } = useI18n();
@@ -62,7 +63,16 @@ export function LanguageSwitcher() {
               return (
                 <button
                   key={code}
-                  onClick={() => { setLanguage(code); setOpen(false); }}
+                  onClick={() => {
+                    setLanguage(code);
+                    // Mirror to the new buyer-facing storage key so useTranslation()
+                    // and any future consumers stay in sync with the legacy provider.
+                    try {
+                      const canonical = FROM_LEGACY_CODE_MAP[code] ?? DEFAULT_LANGUAGE;
+                      localStorage.setItem(LANGUAGE_STORAGE_KEY, canonical);
+                    } catch { /* storage unavailable — non-fatal */ }
+                    setOpen(false);
+                  }}
                   className={`text-sm px-3 py-2 rounded-lg text-left cursor-pointer transition-colors ${
                     isActive
                       ? 'bg-slate-100 font-medium text-slate-900'

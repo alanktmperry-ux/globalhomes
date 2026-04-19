@@ -23,3 +23,4 @@ export {
   type SupportedLanguageCode,
 } from './config';
 export { en, type TranslationKey } from './locales/en';
+export { zhCN } from './locales/zh-CN';

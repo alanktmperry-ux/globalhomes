@@ -17,12 +17,22 @@
  */
 import { useI18n } from '@/shared/lib/i18n';
 import { en, type TranslationKey } from './locales/en';
+import { zhCN } from './locales/zh-CN';
 import {
   LANGUAGE_STORAGE_KEY,
   FROM_LEGACY_CODE_MAP,
   LEGACY_CODE_MAP,
   type SupportedLanguageCode,
 } from './config';
+
+/**
+ * Registry of new-style locale dictionaries keyed by canonical language code.
+ * Add new languages here as they're translated.
+ */
+const LOCALES: Partial<Record<SupportedLanguageCode, Record<string, string>>> = {
+  'en': en,
+  'zh-CN': zhCN,
+};
 
 type AnyKey = TranslationKey | (string & {});
 
@@ -56,14 +66,22 @@ export function useTranslation() {
    * from the `vars` argument.
    */
   const t = (key: AnyKey, vars?: Record<string, string | number>): string => {
-    // Try legacy first so existing translated languages keep working.
-    let value = legacyT(key);
+    // 1. New locale dictionary for the active canonical language (e.g. zh-CN)
+    const dict = LOCALES[language];
+    let value: string | undefined = dict?.[key as string];
 
-    // legacyT returns the key when missing — fall back to en base.
-    if (value === key && key in en) {
+    // 2. Legacy translation table (covers languages not yet migrated)
+    if (value === undefined) {
+      const legacy = legacyT(key);
+      if (legacy !== key) value = legacy;
+    }
+
+    // 3. English base
+    if (value === undefined && key in en) {
       value = en[key as TranslationKey];
     }
 
+    // 4. Last-resort: the key itself
     if (typeof value !== 'string') return String(key);
 
     if (vars) {

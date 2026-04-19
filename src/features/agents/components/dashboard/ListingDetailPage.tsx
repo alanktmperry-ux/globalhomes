@@ -98,7 +98,8 @@ const ListingDetailPage = () => {
         }
       />
 
-      <div className="p-4 sm:p-6 max-w-6xl">
+      <div className="p-4 sm:p-6 max-w-6xl grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
+        <div className="min-w-0">
         {(listing as any).is_exclusive && (listing as any).exclusive_end_date && new Date((listing as any).exclusive_end_date) > new Date() && (() => {
           const end = new Date((listing as any).exclusive_end_date);
           const diff = end.getTime() - Date.now();

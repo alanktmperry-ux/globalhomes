@@ -23,3 +23,18 @@ export {
   type SupportedLanguageCode,
 } from './config';
 export { en, type TranslationKey } from './locales/en';
+export { zhCN } from './locales/zh-CN';
+
+import { en } from './locales/en';
+import { zhCN } from './locales/zh-CN';
+import type { SupportedLanguageCode } from './config';
+
+/**
+ * Registry of all locale dictionaries keyed by canonical language code.
+ * useTranslation() reads from this map first before falling back to the
+ * legacy translation table in src/shared/lib/i18n.tsx.
+ */
+export const LOCALES: Partial<Record<SupportedLanguageCode, Record<string, string>>> = {
+  'en': en,
+  'zh-CN': zhCN,
+};

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Calculator, Info, ChevronDown, ChevronUp } from 'lucide-react';
 import {
   calculateStampDuty,
@@ -13,6 +13,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Props {
   propertyPrice: number | null;
@@ -56,6 +57,26 @@ export function StampDutyCalculator({ propertyPrice, propertyAddress, propertySt
 
   const numericPrice = parseFloat(price.replace(/,/g, '')) || 0;
   const result = numericPrice > 0 ? calculateStampDuty(numericPrice, state, buyerType, isFirstHome) : null;
+
+  // Track calculator usage (debounced — fires once per stable result)
+  const trackTimerRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (!result) return;
+    if (trackTimerRef.current) window.clearTimeout(trackTimerRef.current);
+    trackTimerRef.current = window.setTimeout(async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        await supabase.from('buyer_activity_events').insert({
+          buyer_id: user?.id ?? null,
+          event_type: 'stamp_duty_calculator',
+          metadata: { price: numericPrice, result: result.duty, state, isFirstHome },
+        });
+      } catch (e) {
+        console.error('stamp duty tracking failed', e);
+      }
+    }, 1500);
+    return () => { if (trackTimerRef.current) window.clearTimeout(trackTimerRef.current); };
+  }, [numericPrice, state, isFirstHome, buyerType, result?.duty]);
 
   return (
     <div className="rounded-2xl border border-border bg-card shadow-card overflow-hidden">

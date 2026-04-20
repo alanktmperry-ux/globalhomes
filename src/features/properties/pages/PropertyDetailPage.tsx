@@ -45,6 +45,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { ShareSheet } from '@/shared/components/ShareSheet';
 import { MortgageBrokerCTA } from '@/features/mortgage/components/MortgageBrokerCTA';
 import { MortgageReferralModal } from '@/components/MortgageReferralModal';
+import { useListingTranslation } from '@/features/properties/hooks/useListingTranslation';
 
 export default function PropertyDetailPage() {
   // Support both /property/:slug and /property/:uuid for backward compat
@@ -72,6 +73,7 @@ export default function PropertyDetailPage() {
   const [translating, setTranslating] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [mortgageOpen, setMortgageOpen] = useState(false);
+  const { title: translatedTitle, description: translatedDescription, isTranslating, isTranslated } = useListingTranslation(rawProperty);
   useEffect(() => {
     const fetchProperty = async () => {
       setLoading(true);
@@ -403,7 +405,11 @@ export default function PropertyDetailPage() {
                 </>
               )}
               <div className="flex items-center gap-2 mt-2">
-                <h1 className="font-display text-xl md:text-2xl font-semibold text-foreground">{property.title}</h1>
+                <h1 className="font-display text-xl md:text-2xl font-semibold text-foreground">
+                  {isTranslating ? (
+                    <span className="inline-block h-6 w-2/3 rounded bg-muted animate-pulse align-middle" aria-hidden />
+                  ) : translatedTitle}
+                </h1>
                 {(property as any).listing_mode && (property as any).listing_mode !== 'public' && (
                   <OffMarketBadge mode={(property as any).listing_mode} closeDate={(property as any).eoi_close_date} />
                 )}
@@ -459,6 +465,34 @@ export default function PropertyDetailPage() {
                 </div>
               ))}
             </div>
+
+            {/* Description (auto-translated based on language) */}
+            {(translatedDescription || isTranslating) && (
+              <div>
+                <h2 className="font-display text-lg font-semibold text-foreground mb-2">
+                  {t('property.description')}
+                </h2>
+                {isTranslating ? (
+                  <div className="space-y-2" aria-label="Loading description">
+                    <div className="h-3 w-full rounded bg-muted animate-pulse" />
+                    <div className="h-3 w-11/12 rounded bg-muted animate-pulse" />
+                    <div className="h-3 w-10/12 rounded bg-muted animate-pulse" />
+                    <div className="h-3 w-9/12 rounded bg-muted animate-pulse" />
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">
+                      {translatedDescription}
+                    </p>
+                    {isTranslated && (
+                      <p className="mt-2 text-[11px] text-muted-foreground italic">
+                        Translated by AI
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
 
             {/* Rental Info Section */}
             {isRental && (

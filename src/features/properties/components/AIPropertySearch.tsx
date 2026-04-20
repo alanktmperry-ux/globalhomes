@@ -11,6 +11,7 @@ import { useI18n } from '@/shared/lib/i18n';
 import { useAuth } from '@/features/auth';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { translateSearchQuery } from '@/features/properties/lib/translationService';
 
 const EXAMPLE_PROMPTS = [
   'Quiet family home near good schools',
@@ -37,7 +38,7 @@ interface AIIntent {
 }
 
 export function AIPropertySearch() {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth() ?? { user: null } as any;
   const [query, setQuery] = useState('');
@@ -51,9 +52,24 @@ export function AIPropertySearch() {
     setLoading(true);
     setProperties(null);
     try {
+      // If the buyer is searching in a non-English language, translate the
+      // natural-language query to English first so the AI search edge function
+      // (which expects English suburb/property-type extraction) gets clean input.
+      let searchQuery = q;
+      if (language !== 'en') {
+        try {
+          const { englishQuery } = await translateSearchQuery(q);
+          if (englishQuery && englishQuery.trim()) searchQuery = englishQuery;
+          console.log('[AIPropertySearch] translated query:', { original: q, english: searchQuery, language });
+        } catch (translateErr) {
+          // Non-fatal: fall back to original query
+          console.warn('[AIPropertySearch] query translation failed, using original:', translateErr);
+        }
+      }
+
       const { data, error } = await supabase.functions.invoke('ai-property-search', {
         body: {
-          query: q,
+          query: searchQuery,
           session_id: getSessionId(),
           buyer_id: user?.id ?? undefined,
         },
@@ -91,7 +107,7 @@ export function AIPropertySearch() {
     } finally {
       setLoading(false);
     }
-  }, [user, t]);
+  }, [user, t, language]);
 
   const handleSelect = useCallback((p: Property) => navigate(`/property/${p.id}`), [navigate]);
   const handleToggleSave = useCallback((id: string) => {

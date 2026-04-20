@@ -15,6 +15,7 @@ const AVAILABLE_LOCALES: ReadonlySet<SupportedLanguageCode> = new Set([
   'en',
   'zh-CN',
   'zh-TW',
+  'hi',
 ]);
 
 export function LanguageSwitcher() {

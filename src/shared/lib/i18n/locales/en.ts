@@ -93,9 +93,27 @@ export const en = {
 
   'stampDuty.error.invalidPrice': 'Please enter a valid property price.',
   'stampDuty.error.priceTooLow': 'Price must be greater than $0.',
+  'stampDuty.error.enterPrice': 'Enter a purchase price above to calculate',
   'stampDuty.cta.broker': 'Find out your borrowing power',
   'stampDuty.cta.brokerSub': 'Speak to a broker and get pre-approved today.',
   'stampDuty.cta.brokerButton': 'Speak to a broker',
+
+  'stampDuty.firb.required': 'FIRB approval required before purchasing — apply at',
+
+  'stampDuty.result.effectiveRate': 'Effective rate',
+  'stampDuty.result.upfrontCosts': 'Estimated total upfront costs (excl. deposit)',
+  'stampDuty.result.legalFees': 'Legal / conveyancing (est.)',
+  'stampDuty.result.inspectionFees': 'Building & pest inspection (est.)',
+  'stampDuty.result.lenderFees': 'Lender fees (est.)',
+  'stampDuty.result.showBreakdown': 'Show bracket breakdown',
+  'stampDuty.result.hideBreakdown': 'Hide bracket breakdown',
+
+  'stampDuty.seo.howItWorksTitle': 'How stamp duty works in Australia',
+  'stampDuty.seo.howItWorksText': 'Stamp duty (also called transfer duty or land transfer duty) is a state government tax paid when you purchase a property. Each state and territory sets its own rates, thresholds, and concessions. Rates are applied progressively — similar to income tax — with higher marginal rates on higher price brackets.',
+  'stampDuty.seo.concessionsTitle': 'First Home Buyer concessions by state',
+  'stampDuty.seo.concessionsText': 'Most states offer significant stamp duty relief for first home buyers purchasing below a price threshold. NSW offers full exemption up to $800,000. Victoria waives duty on purchases up to $600,000. Queensland provides concessions on the first $350,000 of the price for eligible buyers.',
+  'stampDuty.seo.whenPaidTitle': 'When is stamp duty paid?',
+  'stampDuty.seo.whenPaidText': 'Stamp duty is typically due within 30 days of settlement in most states. Your conveyancer or solicitor will handle the payment on your behalf. It must be paid before the property transfer is registered with the state land titles office.',
 
   // ──────────────────────────────────────────────────────────────────
   // Exclusive landing page

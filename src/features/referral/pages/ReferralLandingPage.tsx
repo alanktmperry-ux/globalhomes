@@ -216,23 +216,23 @@ export default function ReferralLandingPage() {
         {/* Form */}
         <section className="max-w-2xl mx-auto px-4 py-12">
           <div className="bg-card border border-border rounded-2xl shadow-card p-6 md:p-8">
-            <h2 className="font-display text-2xl font-bold text-foreground">Create your referral account</h2>
-            <p className="text-sm text-muted-foreground mt-1">Get your unique referral code and start earning today.</p>
+            <h2 className="font-display text-2xl font-bold text-foreground">{t('referral.form.createTitle')}</h2>
+            <p className="text-sm text-muted-foreground mt-1">{t('referral.form.createSubtitle')}</p>
 
             {user && (
               <div className="mt-4 p-3 rounded-lg bg-amber-50 border border-amber-200 text-sm text-amber-900 dark:bg-amber-900/20 dark:text-amber-200 dark:border-amber-700">
-                You're already signed in. If you've already registered as a referral agent, <Link to="/referral/dashboard" className="underline font-medium">go to your dashboard</Link>.
+                {t('referral.form.alreadySignedIn')} <Link to="/referral/dashboard" className="underline font-medium">{t('referral.form.goToDashboard')}</Link>.
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="full_name">Full name *</Label>
+                  <Label htmlFor="full_name">{t('referral.form.name')} *</Label>
                   <Input id="full_name" value={form.full_name} onChange={e => update('full_name', e.target.value)} required maxLength={100} />
                 </div>
                 <div>
-                  <Label htmlFor="email">Email *</Label>
+                  <Label htmlFor="email">{t('referral.form.email')} *</Label>
                   <Input id="email" type="email" value={form.email} onChange={e => update('email', e.target.value)} required maxLength={255} />
                 </div>
               </div>

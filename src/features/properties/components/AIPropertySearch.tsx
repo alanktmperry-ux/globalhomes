@@ -10,9 +10,7 @@ import { Property } from '@/shared/lib/types';
 import { useI18n } from '@/shared/lib/i18n';
 import { useAuth } from '@/features/auth';
 import { toast } from 'sonner';
-
-const FUNCTION_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-property-search`;
-const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+import { supabase } from '@/integrations/supabase/client';
 
 const EXAMPLE_PROMPTS = [
   'Quiet family home near good schools',
@@ -53,41 +51,39 @@ export function AIPropertySearch() {
     setLoading(true);
     setProperties(null);
     try {
-      const res = await fetch(FUNCTION_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${ANON_KEY}`,
-          apikey: ANON_KEY,
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('ai-property-search', {
+        body: {
           query: q,
           session_id: getSessionId(),
           buyer_id: user?.id ?? undefined,
-        }),
+        },
       });
-      if (res.status === 429) {
-        toast.error(t('Too many requests. Please wait a moment.'));
-        return;
-      }
-      if (res.status === 402) {
-        toast.error(t('AI credits exhausted. Please contact support.'));
-        return;
-      }
-      if (!res.ok) {
-        let detail = `HTTP ${res.status}`;
+      if (error) {
+        // FunctionsHttpError exposes context.status / context.json
+        const status = (error as any)?.context?.status;
+        if (status === 429) {
+          toast.error(t('Too many requests. Please wait a moment.'));
+          return;
+        }
+        if (status === 402) {
+          toast.error(t('AI credits exhausted. Please contact support.'));
+          return;
+        }
+        let detail = error.message || 'Edge function error';
         try {
-          const errBody = await res.json();
-          if (errBody?.error) detail = typeof errBody.error === 'string' ? errBody.error : JSON.stringify(errBody.error);
+          const ctx = (error as any)?.context;
+          if (ctx && typeof ctx.json === 'function') {
+            const body = await ctx.json();
+            if (body?.error) detail = typeof body.error === 'string' ? body.error : JSON.stringify(body.error);
+          }
         } catch { /* ignore */ }
         throw new Error(detail);
       }
-      const data = await res.json();
       console.log('[AIPropertySearch] raw response:', { hasProperties: Array.isArray(data?.properties), count: data?.properties?.length, firstId: data?.properties?.[0]?.id, intent: data?.intent });
-      const mapped: Property[] = (data.properties ?? []).map((p: any) => mapDbProperty(p));
+      const mapped: Property[] = (data?.properties ?? []).map((p: any) => mapDbProperty(p));
       console.log('[AIPropertySearch] mapped count:', mapped.length, 'first:', mapped[0] ? { id: mapped[0].id, suburb: mapped[0].suburb, beds: mapped[0].beds } : null);
       setProperties(mapped);
-      setIntent(data.intent ?? null);
+      setIntent(data?.intent ?? null);
     } catch (e: any) {
       console.error('AI property search failed:', e);
       const msg = e?.message ? `${t('Search failed')}: ${e.message}` : t('Search failed. Please try again.');

@@ -289,7 +289,13 @@ Deno.serve(async (req) => {
     }
 
     if (action === "delete_user") {
-      const { user_id } = await req.json();
+      const user_id = bodyParams.user_id;
+      if (!user_id) {
+        return new Response(JSON.stringify({ error: "Missing user_id" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
       const warnings: string[] = [];
 
       // Pre-cleanup: remove rows that block cascade via foreign keys

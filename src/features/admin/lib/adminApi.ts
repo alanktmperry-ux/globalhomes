@@ -22,5 +22,8 @@ export async function callAdminFunction(action: string, body?: Record<string, an
   if (error) {
     throw new Error(error.message || 'Request failed');
   }
+  if (data?.error) {
+    throw new Error(data.error);
+  }
   return data;
 }

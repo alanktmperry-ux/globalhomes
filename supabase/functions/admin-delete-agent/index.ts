@@ -15,7 +15,6 @@ Deno.serve(async (req) => {
     });
 
   try {
-    // --- Verify JWT first, before any other logic ---
     const authHeader = req.headers.get("Authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return respond({ error: "Unauthorized" }, 401);
@@ -42,198 +41,121 @@ Deno.serve(async (req) => {
 
     if (!roleCheck) return respond({ error: "Forbidden — admin role required" }, 403);
 
-    // --- Parse body ---
     const { userId } = await req.json();
-    if (!userId || typeof userId !== "string") {
-      return respond({ error: "Missing or invalid userId" }, 400);
-    }
+    if (!userId) return respond({ error: "Missing userId" }, 400);
 
-    const errors: string[] = [];
+    const log: string[] = [];
+    const del = async (table: string, col: string, val: string | string[]) => {
+      const q = Array.isArray(val)
+        ? supabase.from(table).delete().in(col, val)
+        : supabase.from(table).delete().eq(col, val);
+      const { error } = await q;
+      if (error && !/does not exist/i.test(error.message)) {
+        log.push(`${table}: ${error.message}`);
+      }
+    };
 
-    // Step 1: Get the agent record
+    // Get agent + agency + properties
     const { data: agent } = await supabase
       .from("agents")
-      .select("id")
+      .select("id,agency_id")
       .eq("user_id", userId)
       .maybeSingle();
-
     const agentId = agent?.id;
+    const agencyId = agent?.agency_id;
 
-    // Step 2: Delete audit_log entries referencing this agent
-    if (agentId) {
-      const { error } = await supabase
-        .from("audit_log")
-        .delete()
-        .eq("agent_id", agentId);
-      if (error) {
-        console.error("Failed to delete audit_log:", error);
-        errors.push(`audit_log: ${error.message}`);
-      }
-    }
+    const { data: props } = agentId
+      ? await supabase.from("properties").select("id").eq("agent_id", agentId)
+      : { data: [] as { id: string }[] };
+    const propIds = (props || []).map((p: { id: string }) => p.id);
 
-    // Step 3: Fully delete all properties and dependent records
-    if (agentId) {
-      const { data: agentProperties } = await supabase
-        .from("properties")
-        .select("id")
-        .eq("agent_id", agentId);
+    const { data: trustAccs } = agentId
+      ? await supabase.from("trust_accounts").select("id").eq("agent_id", agentId)
+      : { data: [] as { id: string }[] };
+    const trustIds = (trustAccs || []).map((t: { id: string }) => t.id);
 
-      const propertyIds = (agentProperties || []).map((p) => p.id);
-
-      if (propertyIds.length > 0) {
-        // Delete property-dependent records first (in dependency order)
-        const propertyChildTables: Array<{ table: string; column: string }> = [
-          { table: "listing_documents", column: "property_id" },
-          { table: "saved_properties", column: "property_id" },
-          { table: "lead_events", column: "property_id" },
-          { table: "leads", column: "property_id" },
-          { table: "collab_reactions", column: "property_id" },
-          { table: "collab_views", column: "property_id" },
-          { table: "rental_applications", column: "property_id" },
-          { table: "off_market_shares", column: "property_id" },
-          { table: "listing_buyer_matches", column: "listing_id" },
-        ];
-
-        for (const { table, column } of propertyChildTables) {
-          const { error } = await supabase
-            .from(table)
-            .delete()
-            .in(column, propertyIds);
-          if (error) {
-            // Ignore "table does not exist" errors so missing optional tables don't block deletion
-            if (!/does not exist|schema cache/i.test(error.message)) {
-              console.error(`Failed to delete ${table}:`, error);
-              errors.push(`${table}: ${error.message}`);
-            }
-          }
-        }
-
-        // Finally delete the properties themselves
-        const { error: propsError } = await supabase
-          .from("properties")
-          .delete()
-          .eq("agent_id", agentId);
-        if (propsError) {
-          console.error("Failed to delete properties:", propsError);
-          errors.push(`properties: ${propsError.message}`);
-        }
-      }
-    }
-
-    // Step 3: Delete trust_accounts
-    if (agentId) {
-      // Delete trust child records first
-      const { data: trustAccounts } = await supabase
-        .from("trust_accounts")
-        .select("id")
-        .eq("agent_id", agentId);
-
-      if (trustAccounts && trustAccounts.length > 0) {
-        const taIds = trustAccounts.map((t) => t.id);
-        await supabase.from("trust_transactions").delete().in("trust_account_id", taIds);
-      }
-
-      // Also clean up trust balance/receipt/payment/reconciliation records
-      for (const table of [
-        "trust_account_balances",
-        "trust_receipts",
-        "trust_payments",
-        "trust_reconciliations",
+    // 1. Property children
+    if (propIds.length) {
+      for (const t of [
+        "listing_documents", "saved_properties", "lead_events", "leads",
+        "collab_reactions", "collab_views", "rental_applications", "off_market_shares",
+        "listing_buyer_matches", "notifications", "open_home_registrations", "property_views",
+        "vendor_reports", "auction_bids", "transactions",
       ]) {
-        const { error } = await supabase.from(table).delete().eq("agent_id", agentId);
-        if (error) {
-          console.error(`Failed to delete ${table}:`, error);
-          errors.push(`${table}: ${error.message}`);
-        }
+        const col = t === "listing_buyer_matches" ? "listing_id" : "property_id";
+        await del(t, col, propIds);
       }
-
-      const { error } = await supabase
-        .from("trust_accounts")
-        .delete()
-        .eq("agent_id", agentId);
-      if (error) {
-        console.error("Failed to delete trust_accounts:", error);
-        errors.push(`trust_accounts: ${error.message}`);
-      }
+      await del("properties", "agent_id", agentId!);
     }
 
-    // Step 4: Delete agency_members
-    {
-      const { error } = await supabase
-        .from("agency_members")
-        .delete()
-        .eq("user_id", userId);
-      if (error) {
-        console.error("Failed to delete agency_members:", error);
-        errors.push(`agency_members: ${error.message}`);
-      }
-    }
-
-    // Step 5: Delete user_roles
-    {
-      const { error } = await supabase
-        .from("user_roles")
-        .delete()
-        .eq("user_id", userId);
-      if (error) {
-        console.error("Failed to delete user_roles:", error);
-        errors.push(`user_roles: ${error.message}`);
-      }
-    }
-
-    // Step 6: Delete contacts
+    // 2. Trust
+    if (trustIds.length) await del("trust_transactions", "trust_account_id", trustIds);
     if (agentId) {
-      const { error } = await supabase
-        .from("contacts")
-        .delete()
-        .eq("assigned_agent_id", agentId);
-      if (error) {
-        console.error("Failed to delete contacts:", error);
-        errors.push(`contacts: ${error.message}`);
+      for (const t of ["trust_account_balances", "trust_receipts", "trust_payments", "trust_reconciliations"]) {
+        await del(t, "agent_id", agentId);
       }
+      await del("trust_accounts", "agent_id", agentId);
     }
 
-    // Step 7: Run full cascade cleanup via existing RPC (handles all remaining child records)
-    {
-      const { error } = await supabase.rpc("delete_user_cascade", {
-        p_user_id: userId,
-      });
-      if (error) {
-        console.error("delete_user_cascade RPC error:", error);
-        errors.push(`delete_user_cascade: ${error.message}`);
-        // Continue — still delete the auth user even if cascade had errors
+    // 3. Agent-linked records
+    if (agentId) {
+      for (const t of [
+        "notifications", "lead_events", "leads", "agent_subscriptions",
+        "agent_credentials", "agent_locations", "contacts", "rental_applications",
+        "transactions", "review_requests", "agent_reviews", "audit_log",
+      ]) {
+        const col = t === "contacts" ? "assigned_agent_id" : "agent_id";
+        await del(t, col, agentId);
       }
+      await del("off_market_shares", "sharing_agent_id", agentId);
+      await del("off_market_shares", "shared_with_agent_id", agentId);
     }
 
-    // Step 8: Delete auth user (final step)
-    {
-      const { error } = await supabase.auth.admin.deleteUser(userId);
-      if (error) {
-        console.error("Failed to delete auth user:", error);
-        errors.push(`auth_user: ${error.message}`);
+    // 4. Agency
+    if (agencyId) {
+      for (const t of ["agency_invite_codes", "agency_members", "activities", "tasks", "transactions", "contacts"]) {
+        const col =
+          t === "contacts" ? "agency_id" :
+          t === "activities" || t === "tasks" ? "office_id" :
+          "agency_id";
+        await del(t, col, agencyId);
       }
+      await supabase.from("agents").update({ agency_id: null }).eq("agency_id", agencyId);
+      await del("agencies", "id", agencyId);
     }
 
-    // Audit log
+    // 5. User-level
+    await del("agency_members", "user_id", userId);
+    await del("user_roles", "user_id", userId);
+    await del("audit_log", "user_id", userId);
+    for (const t of [
+      "saved_properties", "saved_search_alerts", "buyer_profiles", "collab_reactions",
+      "collab_views", "contact_activities", "contacts", "activities", "tasks", "leads",
+      "lead_events", "user_preferences", "buyer_activity_events", "buyer_intent", "profiles",
+    ]) {
+      await del(t, "user_id", userId);
+    }
+
+    // 6. Agent record last
+    if (agentId) await del("agents", "id", agentId);
+
+    // 7. Auth user — final step
+    const { error: authErr } = await supabase.auth.admin.deleteUser(userId);
+    if (authErr) log.push(`auth_user: ${authErr.message}`);
+
+    // Audit
     try {
       await supabase.from("audit_log").insert({
         user_id: caller.id,
         action_type: "admin_delete_agent",
         entity_type: "agent",
         entity_id: userId,
-        description: "Admin deleted agent and all associated data",
-        metadata: { cascade: true },
+        description: "Admin deleted agent",
+        metadata: { errors: log },
       });
-    } catch (e) {
-      console.error("audit log:", e);
-    }
+    } catch (_) { /* ignore */ }
 
-    if (errors.length > 0) {
-      console.warn("Agent deletion completed with errors:", errors);
-      return respond({ success: true, partial: true, errors });
-    }
-
-    return respond({ success: true });
+    return respond({ success: true, errors: log });
   } catch (err) {
     console.error("admin-delete-agent error:", err);
     return respond({ error: (err as Error).message }, 200);

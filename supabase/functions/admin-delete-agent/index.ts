@@ -45,6 +45,47 @@ Deno.serve(async (req) => {
     if (!userId) return respond({ error: "Missing userId" }, 400);
 
     const log: string[] = [];
+    const ARCHIVE_EMAIL_DOMAIN = "no-reply.invalid";
+
+    const getOrCreateArchiveUserId = async (targetUserId: string) => {
+      const archiveEmail = `compliance-archive+${targetUserId}@${ARCHIVE_EMAIL_DOMAIN}`;
+
+      const findExistingUser = async () => {
+        for (let page = 1; page <= 10; page += 1) {
+          const { data, error } = await supabase.auth.admin.listUsers({ page, perPage: 1000 });
+          if (error) throw error;
+
+          const match = data.users.find((u) => u.email?.toLowerCase() === archiveEmail);
+          if (match) return match.id;
+          if (data.users.length < 1000) break;
+        }
+        return null;
+      };
+
+      const existingId = await findExistingUser();
+      if (existingId) return existingId;
+
+      const { data, error } = await supabase.auth.admin.createUser({
+        email: archiveEmail,
+        password: `${crypto.randomUUID()}Aa!1`,
+        email_confirm: true,
+        user_metadata: {
+          system_account: true,
+          compliance_archive: true,
+          source_user_id: targetUserId,
+        },
+      });
+
+      if (error) {
+        const fallbackId = await findExistingUser();
+        if (fallbackId) return fallbackId;
+        throw error;
+      }
+
+      if (!data.user?.id) throw new Error("Failed to create compliance archive user");
+      return data.user.id;
+    };
+
     const del = async (table: string, col: string, val: string | string[]) => {
       const q = Array.isArray(val)
         ? supabase.from(table).delete().in(col, val)
@@ -74,8 +115,38 @@ Deno.serve(async (req) => {
       : { data: [] as { id: string }[] };
     const trustIds = (trustAccs || []).map((t: { id: string }) => t.id);
 
+    const { data: retainedTenancies } = agentId
+      ? await supabase.from("tenancies").select("id,property_id").eq("agent_id", agentId)
+      : { data: [] as { id: string; property_id: string }[] };
+    const retainedPropertyIds = Array.from(new Set((retainedTenancies || []).map((t) => t.property_id).filter(Boolean)));
+    const deletablePropertyIds = propIds.filter((id) => !retainedPropertyIds.includes(id));
+
+    if (agentId && retainedTenancies && retainedTenancies.length > 0) {
+      const archiveUserId = await getOrCreateArchiveUserId(userId);
+
+      const { error: archiveAgentError } = await supabase
+        .from("agents")
+        .update({
+          user_id: archiveUserId,
+          name: "Archived Compliance Record",
+          email: null,
+          phone: null,
+          agency: null,
+          is_public_profile: false,
+          onboarding_complete: true,
+        })
+        .eq("id", agentId);
+
+      if (archiveAgentError) {
+        log.push(`archive_agent: ${archiveAgentError.message}`);
+      } else {
+        await supabase.from("properties").update({ is_active: false }).in("id", retainedPropertyIds);
+        log.push(`retained_records_archived: preserved ${retainedTenancies.length} tenancy record(s) for compliance`);
+      }
+    }
+
     // 1. Property children
-    if (propIds.length) {
+    if (deletablePropertyIds.length) {
       for (const t of [
         "listing_documents", "saved_properties", "lead_events", "leads",
         "collab_reactions", "collab_views", "rental_applications", "off_market_shares",
@@ -83,9 +154,9 @@ Deno.serve(async (req) => {
         "vendor_reports", "auction_bids", "transactions",
       ]) {
         const col = t === "listing_buyer_matches" ? "listing_id" : "property_id";
-        await del(t, col, propIds);
+        await del(t, col, deletablePropertyIds);
       }
-      await del("properties", "agent_id", agentId!);
+      await del("properties", "id", deletablePropertyIds);
     }
 
     // 2. Trust
@@ -137,7 +208,7 @@ Deno.serve(async (req) => {
     }
 
     // 6. Agent record last
-    if (agentId) await del("agents", "id", agentId);
+    if (agentId && retainedPropertyIds.length === 0) await del("agents", "id", agentId);
 
     // 7. Auth user — final step
     const { error: authErr } = await supabase.auth.admin.deleteUser(userId);

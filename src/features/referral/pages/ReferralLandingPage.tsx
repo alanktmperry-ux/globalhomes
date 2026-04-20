@@ -122,26 +122,26 @@ export default function ReferralLandingPage() {
             </p>
 
             <div className="mt-6 p-5 rounded-xl bg-secondary/50 border border-border">
-              <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">Your referral code</p>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">{t('referral.dashboard.yourCode')}</p>
               <p className="font-display text-4xl font-bold text-primary tracking-widest mt-2">{success.code}</p>
-              <Button variant="ghost" size="sm" onClick={() => copy(success.code, 'Code')} className="mt-2 gap-1.5">
-                <Copy size={14} /> Copy code
+              <Button variant="ghost" size="sm" onClick={() => copy(success.code, t('referral.dashboard.code'))} className="mt-2 gap-1.5">
+                <Copy size={14} /> {t('referral.dashboard.copyCode')}
               </Button>
             </div>
 
             <div className="mt-4 p-4 rounded-xl bg-primary/5 border border-primary/20 text-left">
-              <p className="text-xs text-muted-foreground mb-1">Your referral link</p>
+              <p className="text-xs text-muted-foreground mb-1">{t('referral.dashboard.yourLink')}</p>
               <p className="text-sm font-mono break-all text-foreground">{referralLink}</p>
-              <Button variant="outline" size="sm" onClick={() => copy(referralLink, 'Link')} className="mt-3 gap-1.5">
-                <Copy size={14} /> Copy link
+              <Button variant="outline" size="sm" onClick={() => copy(referralLink, t('referral.dashboard.link'))} className="mt-3 gap-1.5">
+                <Copy size={14} /> {t('referral.dashboard.copyLink')}
               </Button>
             </div>
 
             <div className="mt-6 flex flex-col gap-2">
               <Button onClick={() => navigate('/referral/dashboard')} className="gap-2">
-                Go to dashboard <ArrowRight size={16} />
+                {t('referral.dashboard.goToDashboard')} <ArrowRight size={16} />
               </Button>
-              <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">Back to home</Link>
+              <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">{t('referral.dashboard.backToHome')}</Link>
             </div>
           </motion.div>
         </div>
@@ -152,38 +152,38 @@ export default function ReferralLandingPage() {
   return (
     <>
       <Helmet>
-        <title>Referral Program | ListHQ</title>
-        <meta name="description" content="Refer a property buyer or seller and earn with ListHQ's referral network." />
+        <title>{t('referral.hero.eyebrow')} | ListHQ</title>
+        <meta name="description" content={t('referral.hero.subheadline')} />
       </Helmet>
       <div className="min-h-screen bg-background">
         {/* Hero */}
         <section className="bg-gradient-to-br from-primary/5 via-background to-cyan-accent/5 border-b border-border">
           <div className="max-w-5xl mx-auto px-4 py-14 md:py-20 text-center">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-6">
-              <Globe size={14} /> International Agent Network
+              <Globe size={14} /> {t('referral.hero.eyebrow')}
             </div>
             <h1 className="font-display text-3xl md:text-5xl font-bold text-foreground tracking-tight">
-              Join the ListHQ International Referral Network
+              {t('referral.hero.headline')}
             </h1>
             <p className="text-base md:text-lg text-muted-foreground mt-4 max-w-2xl mx-auto">
-              Earn commissions connecting global buyers with Australian property
+              {t('referral.hero.subheadline')}
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-10 max-w-3xl mx-auto">
               <div className="bg-card border border-border rounded-xl p-5">
                 <Globe className="text-primary mb-2" size={22} />
                 <p className="font-display text-2xl font-bold text-foreground">15+</p>
-                <p className="text-sm text-muted-foreground">Countries</p>
+                <p className="text-sm text-muted-foreground">{t('referral.howItWorks.countries')}</p>
               </div>
               <div className="bg-card border border-border rounded-xl p-5">
                 <TrendingUp className="text-primary mb-2" size={22} />
                 <p className="font-display text-2xl font-bold text-foreground">A$500–$2,000</p>
-                <p className="text-sm text-muted-foreground">Per settled referral</p>
+                <p className="text-sm text-muted-foreground">{t('referral.howItWorks.perReferral')}</p>
               </div>
               <div className="bg-card border border-border rounded-xl p-5">
                 <BarChart3 className="text-primary mb-2" size={22} />
-                <p className="font-display text-2xl font-bold text-foreground">Real-time</p>
-                <p className="text-sm text-muted-foreground">Tracking dashboard</p>
+                <p className="font-display text-2xl font-bold text-foreground">{t('referral.dashboard.realtime')}</p>
+                <p className="text-sm text-muted-foreground">{t('referral.dashboard.tracking')}</p>
               </div>
             </div>
           </div>
@@ -192,21 +192,22 @@ export default function ReferralLandingPage() {
         {/* How it works */}
         <section className="max-w-5xl mx-auto px-4 pt-12">
           <div className="text-center mb-8">
-            <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">How it works</h2>
-            <p className="text-sm text-muted-foreground mt-2">Get started in three simple steps</p>
+            <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">{t('referral.howItWorks.title')}</h2>
+            <p className="text-sm text-muted-foreground mt-2">{t('referral.howItWorks.subtitle')}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
-              { icon: UserPlus, step: 1, text: 'Sign up & get your unique referral code' },
-              { icon: Share2, step: 2, text: 'Share your code with buyers interested in Australian property' },
-              { icon: DollarSign, step: 3, text: 'Earn AUD $500–$2,000 for every settled purchase' },
-            ].map(({ icon: Icon, step, text }) => (
+              { icon: UserPlus, step: 1, title: t('referral.howItWorks.step1.title'), desc: t('referral.howItWorks.step1.desc') },
+              { icon: Share2, step: 2, title: t('referral.howItWorks.step2.title'), desc: t('referral.howItWorks.step2.desc') },
+              { icon: DollarSign, step: 3, title: t('referral.howItWorks.step3.title'), desc: t('referral.howItWorks.step3.desc') },
+            ].map(({ icon: Icon, step, title, desc }) => (
               <div key={step} className="bg-card border border-border rounded-2xl p-6 text-center shadow-card">
                 <div className="w-12 h-12 mx-auto rounded-full bg-primary/10 flex items-center justify-center text-primary mb-3">
                   <Icon size={22} />
                 </div>
-                <p className="text-xs uppercase tracking-wider font-semibold text-primary mb-1">Step {step}</p>
-                <p className="text-sm text-foreground">{text}</p>
+                <p className="text-xs uppercase tracking-wider font-semibold text-primary mb-1">{t('referral.howItWorks.step', { step })}</p>
+                <h3 className="font-semibold text-foreground mb-1">{title}</h3>
+                <p className="text-sm text-foreground">{desc}</p>
               </div>
             ))}
           </div>

@@ -71,15 +71,52 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Step 3: Deactivate all properties
+    // Step 3: Fully delete all properties and dependent records
     if (agentId) {
-      const { error } = await supabase
+      const { data: agentProperties } = await supabase
         .from("properties")
-        .update({ is_active: false })
+        .select("id")
         .eq("agent_id", agentId);
-      if (error) {
-        console.error("Failed to deactivate properties:", error);
-        errors.push(`deactivate_properties: ${error.message}`);
+
+      const propertyIds = (agentProperties || []).map((p) => p.id);
+
+      if (propertyIds.length > 0) {
+        // Delete property-dependent records first (in dependency order)
+        const propertyChildTables: Array<{ table: string; column: string }> = [
+          { table: "listing_documents", column: "property_id" },
+          { table: "saved_properties", column: "property_id" },
+          { table: "lead_events", column: "property_id" },
+          { table: "leads", column: "property_id" },
+          { table: "collab_reactions", column: "property_id" },
+          { table: "collab_views", column: "property_id" },
+          { table: "rental_applications", column: "property_id" },
+          { table: "off_market_shares", column: "property_id" },
+          { table: "listing_buyer_matches", column: "listing_id" },
+        ];
+
+        for (const { table, column } of propertyChildTables) {
+          const { error } = await supabase
+            .from(table)
+            .delete()
+            .in(column, propertyIds);
+          if (error) {
+            // Ignore "table does not exist" errors so missing optional tables don't block deletion
+            if (!/does not exist|schema cache/i.test(error.message)) {
+              console.error(`Failed to delete ${table}:`, error);
+              errors.push(`${table}: ${error.message}`);
+            }
+          }
+        }
+
+        // Finally delete the properties themselves
+        const { error: propsError } = await supabase
+          .from("properties")
+          .delete()
+          .eq("agent_id", agentId);
+        if (propsError) {
+          console.error("Failed to delete properties:", propsError);
+          errors.push(`properties: ${propsError.message}`);
+        }
       }
     }
 

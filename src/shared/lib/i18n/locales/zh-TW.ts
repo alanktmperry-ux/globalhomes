@@ -168,10 +168,26 @@ export const zhTW: Record<keyof typeof EnBase, string> = {
 
   'homeServices.empty.title': '未找到相關服務',
   'homeServices.empty.subtitle': '請嘗試更改篩選條件或搜尋其他地區。',
+  'homeServices.empty.noProviders': '該類別暫無服務商 — 敬請期待。',
   'homeServices.error.loadFailed': '無法載入服務列表,請重新整理頁面。',
 
   'homeServices.cta.becomeProvider': '上架您的業務',
   'homeServices.cta.becomeProviderSub': '觸達澳洲各地的買家與賣家。',
+
+  'homeServices.modal.title': '索取報價{providerName ? ` — ${providerName}` : \'\'}',
+  'homeServices.modal.description': '分享一些詳細資訊,服務商將在4小時內與您聯絡。',
+  'homeServices.modal.nameLabel': '您的姓名',
+  'homeServices.modal.emailLabel': '電郵地址',
+  'homeServices.modal.phoneLabel': '電話',
+  'homeServices.modal.addressLabel': '房產地址',
+  'homeServices.modal.addressPlaceholder': '例如:史密斯街12號,薩里山 新南威爾斯州',
+  'homeServices.modal.dateLabel': '首選日期',
+  'homeServices.modal.messageLabel': '留言',
+  'homeServices.modal.messagePlaceholder': '服務商需要了解什麼?',
+  'homeServices.modal.sending': '發送中…',
+  'homeServices.modal.sendButton': '發送請求',
+
+  'homeServices.footer.disclaimer': '所列服務商均為獨立企業。ListHQ可能會在預訂時收取推薦費。',
 
   // ──────────────────────────────────────────────────────────────────
   // Referral page

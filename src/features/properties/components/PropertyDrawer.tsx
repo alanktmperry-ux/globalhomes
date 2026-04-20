@@ -13,6 +13,7 @@ import { InvestmentInsightsCard } from './InvestmentInsightsCard';
 import { MarketInsightsCard } from './MarketInsightsCard';
 import { AffordabilityCalculator } from './AffordabilityCalculator';
 import useEmblaCarousel from 'embla-carousel-react';
+import { useListingTranslation } from '@/features/properties/hooks/useListingTranslation';
 
 function VerificationTier({ level }: { level?: string }) {
   const tiers: { key: string; label: string; icon: typeof Shield; active: boolean }[] = [
@@ -339,11 +340,24 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searc
                   )}
                 </div>
 
-                {/* Description */}
-                {property.description && (
+                {/* Description (auto-translated) */}
+                {(translatedDescription || descTranslating) && (
                   <div>
                     <h3 className="font-display font-semibold text-foreground mb-2">{t('property.description')}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{property.description}</p>
+                    {descTranslating ? (
+                      <div className="space-y-2">
+                        <div className="h-3 w-full rounded bg-muted animate-pulse" />
+                        <div className="h-3 w-11/12 rounded bg-muted animate-pulse" />
+                        <div className="h-3 w-9/12 rounded bg-muted animate-pulse" />
+                      </div>
+                    ) : (
+                      <>
+                        <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{translatedDescription}</p>
+                        {descIsTranslated && (
+                          <p className="mt-2 text-[11px] text-muted-foreground italic">Translated by AI</p>
+                        )}
+                      </>
+                    )}
                   </div>
                 )}
 

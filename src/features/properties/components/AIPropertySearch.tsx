@@ -11,6 +11,7 @@ import { useI18n } from '@/shared/lib/i18n';
 import { useAuth } from '@/features/auth';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { translateSearchQuery } from '@/features/properties/lib/translationService';
 
 const EXAMPLE_PROMPTS = [
   'Quiet family home near good schools',

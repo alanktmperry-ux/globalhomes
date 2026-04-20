@@ -1,8 +1,21 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Languages, ChevronDown } from 'lucide-react';
-import { useI18n, languageNames, type Language } from '@/shared/lib/i18n';
-import { LANGUAGE_STORAGE_KEY, FROM_LEGACY_CODE_MAP, DEFAULT_LANGUAGE } from '@/shared/lib/i18n/config';
+import { useI18n, type Language } from '@/shared/lib/i18n';
+import {
+  SUPPORTED_LANGUAGES,
+  LANGUAGE_STORAGE_KEY,
+  LEGACY_CODE_MAP,
+  FROM_LEGACY_CODE_MAP,
+  type SupportedLanguageCode,
+} from '@/shared/lib/i18n/config';
+
+// Locales with complete translation files. Others render as "Coming soon".
+const AVAILABLE_LOCALES: ReadonlySet<SupportedLanguageCode> = new Set([
+  'en',
+  'zh-CN',
+  'zh-TW',
+]);
 
 export function LanguageSwitcher() {
   const { language, setLanguage } = useI18n();
@@ -47,7 +60,9 @@ export function LanguageSwitcher() {
         className="flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 px-2 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
       >
         <Languages size={16} />
-        <span className="hidden sm:inline">{languageNames[language]}</span>
+        <span className="hidden sm:inline">
+          {SUPPORTED_LANGUAGES.find(l => l.code === (FROM_LEGACY_CODE_MAP[language] ?? 'en'))?.name ?? 'English'}
+        </span>
         <ChevronDown size={14} />
       </button>
 
@@ -55,31 +70,40 @@ export function LanguageSwitcher() {
         <div
           ref={dropdownRef}
           style={{ position: 'fixed', top: dropdownPos.top, right: dropdownPos.right }}
-          className="z-[100] min-w-[200px] bg-white border border-slate-200 rounded-xl shadow-lg p-2"
+          className="z-[100] min-w-[220px] bg-white border border-slate-200 rounded-xl shadow-lg p-2"
         >
-          <div className="grid grid-cols-2 gap-0.5 max-h-80 overflow-y-auto scrollbar-thin">
-            {(Object.entries(languageNames) as [Language, string][]).map(([code, name]) => {
-              const isActive = code === language;
+          <div className="flex flex-col gap-0.5 max-h-80 overflow-y-auto scrollbar-thin">
+            {SUPPORTED_LANGUAGES.map(({ code, name }) => {
+              const activeCanonical = FROM_LEGACY_CODE_MAP[language] ?? 'en';
+              const isActive = code === activeCanonical;
+              const isAvailable = AVAILABLE_LOCALES.has(code);
               return (
                 <button
                   key={code}
+                  disabled={!isAvailable}
                   onClick={() => {
-                    setLanguage(code);
-                    // Mirror to the new buyer-facing storage key so useTranslation()
-                    // and any future consumers stay in sync with the legacy provider.
+                    if (!isAvailable) return;
+                    const legacy = (LEGACY_CODE_MAP[code] ?? 'en') as Language;
+                    setLanguage(legacy);
                     try {
-                      const canonical = FROM_LEGACY_CODE_MAP[code] ?? DEFAULT_LANGUAGE;
-                      localStorage.setItem(LANGUAGE_STORAGE_KEY, canonical);
+                      localStorage.setItem(LANGUAGE_STORAGE_KEY, code);
                     } catch { /* storage unavailable — non-fatal */ }
                     setOpen(false);
                   }}
-                  className={`text-sm px-3 py-2 rounded-lg text-left cursor-pointer transition-colors ${
-                    isActive
-                      ? 'bg-slate-100 font-medium text-slate-900'
-                      : 'text-slate-700 hover:bg-slate-100'
+                  className={`text-sm px-3 py-2 rounded-lg text-left transition-colors flex items-center justify-between ${
+                    !isAvailable
+                      ? 'text-slate-400 cursor-not-allowed'
+                      : isActive
+                        ? 'bg-slate-100 font-medium text-slate-900 cursor-pointer'
+                        : 'text-slate-700 hover:bg-slate-100 cursor-pointer'
                   }`}
                 >
-                  {name}
+                  <span>{name}</span>
+                  {!isAvailable && (
+                    <span className="text-[10px] uppercase tracking-wide text-slate-400 ml-2">
+                      Soon
+                    </span>
+                  )}
                 </button>
               );
             })}

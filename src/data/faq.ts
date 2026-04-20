@@ -167,16 +167,16 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     id: 'agent-multilingual-translation',
     question: 'How does multilingual listing translation work?',
-    answer: 'ListHQ automatically translates your listing into Mandarin (Simplified), Mandarin (Traditional), and Vietnamese using AI. When you publish a listing, it is queued for translation. Once complete, a language toggle appears on the property detail page — buyers can switch between English, 中文 (Simplified), 中文 (Traditional), and Tiếng Việt with one click.\n\nEach translation includes:\n• Full title and description in the target language\n• A 1–2 sentence cultural summary\n• Cultural highlights specific to that buyer community (e.g. school proximity, feng shui orientation, garden space) — only where genuinely applicable\n• Agent insights on multicultural buyer appeal\n\nTranslations are generated automatically — you do not need to do anything after publishing. You can manually trigger a re-translation from the listing detail page if you update the description.',
+    answer: 'ListHQ automatically translates your listing into six languages using AI: Mandarin (Simplified), Mandarin (Traditional), Vietnamese, Korean, Arabic, and Japanese. When you publish a listing, translation is queued automatically. Once complete, a language toggle appears on the property detail page — buyers can switch languages with one click.\n\nEach translation includes:\n• Full title and description in the target language\n• A 1–2 sentence cultural summary\n• Cultural highlights specific to that buyer community (e.g. school proximity, feng shui orientation, garden space) — only where genuinely applicable\n• Agent insights on multicultural buyer appeal\n\nTranslations are generated automatically — you do not need to do anything after publishing. You can manually trigger a re-translation from the listing detail page if you update the description.',
     category: 'agents',
-    tags: ['multilingual', 'translation', 'mandarin', 'vietnamese', 'cantonese', 'language', 'AI', 'chinese'],
+    tags: ['multilingual', 'translation', 'mandarin', 'vietnamese', 'korean', 'arabic', 'japanese', 'language', 'AI', 'chinese'],
   },
   {
     id: 'agent-language-toggle',
     question: 'How do buyers switch the listing language, and what does the agent see?',
-    answer: 'On any property detail page, buyers use the language selector in the navigation bar to switch between English, 中文 Simplified, 中文 Traditional, and Tiếng Việt. The entire listing — title, description, cultural highlights, and agent insights — switches language instantly without a page reload.\n\nAs the listing agent, you will see an "Agent Insights" panel alongside each translation. This panel summarises the property\'s multicultural appeal, suggested buyer profiles (e.g. "Mandarin-speaking families seeking school catchments"), and key selling points for diverse buyer communities. This panel is visible to you but not to buyers.',
+    answer: 'On any property detail page, buyers use the language selector in the navigation bar to switch between English, 中文 Simplified, 中文 Traditional, Tiếng Việt, 한국어, العربية, and 日本語. The entire listing — title, description, cultural highlights, and agent insights — switches language instantly without a page reload.\n\nAs the listing agent, you will see an "Agent Insights" panel alongside each translation. This panel summarises the property\'s multicultural appeal, suggested buyer profiles (e.g. "Korean-speaking families seeking school catchments"), and key selling points for diverse buyer communities. This panel is visible to you but not to buyers.',
     category: 'agents',
-    tags: ['language', 'toggle', 'multilingual', 'buyer', 'translation', 'agent insights'],
+    tags: ['language', 'toggle', 'multilingual', 'buyer', 'translation', 'agent insights', 'korean', 'arabic', 'japanese'],
   },
   {
     id: 'agent-voice-listing',
@@ -248,8 +248,20 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: 'agents',
     tags: ['onboarding', 'setup', 'agency', 'trust account', 'ABN', 'licence', 'getting started'],
   },
-
   {
+    id: 'agent-buyer-concierge',
+    question: 'What is the Buyer Concierge and how do I use it?',
+    answer: 'The Buyer Concierge is your agent dashboard for AI-matched buyers. It shows you which buyers are actively searching for properties that match your listings — ranked by how closely their search intent matches what you have listed.\n\nAccess it from Dashboard → Buyer Concierge. You will see:\n• Hot Buyers — the top 10 buyers scored for readiness and intent match\n• Matches by Listing — buyers grouped against each of your active listings\n• All Matches — a searchable table of every matched buyer\n\nFor each buyer you can see their search intent (e.g. "3 bedroom house near schools under $900k in Templestowe"), readiness score, and activity history. Click any buyer to open a contact modal and send them a message via anonymous relay — protecting their privacy until they choose to respond.',
+    category: 'agents',
+    tags: ['buyer concierge', 'buyer matching', 'AI', 'leads', 'intent', 'dashboard'],
+  },
+  {
+    id: 'agent-buyer-readiness-score',
+    question: 'What is the buyer readiness score?',
+    answer: 'The buyer readiness score is a 0–100 score that estimates how close a buyer is to making a purchase decision, based on their behaviour on ListHQ.\n\nThe score is calculated from:\n• Number of searches conducted (up to 30 points)\n• Mortgage calculator use (+15 points)\n• Stamp duty calculator use (+10 points)\n• Properties saved to shortlist (up to 24 points)\n• High search frequency — more than 5 searches in 14 days (+20 points)\n• Narrowing searches to a specific suburb (+15 points)\n• Revisiting the same listing multiple times (+10 points)\n\nScore bands:\n• 71–100 — High readiness (shown in green) — actively searching, likely ready within weeks\n• 41–70 — Medium readiness (shown in amber) — engaged but still early\n• 0–40 — Low readiness (muted) — browsing, not yet committed\n\nScores update automatically as buyers use the platform. No buyer personally identifiable information is exposed — you see intent and behaviour, not names or contact details, unless the buyer chooses to respond.',
+    category: 'agents',
+    tags: ['buyer readiness', 'score', 'lead quality', 'buyer intent', 'matching'],
+  },
     id: 'agent-inspection-reports',
     question: 'How do I conduct a property inspection and condition report?',
     answer: 'Go to Dashboard → Rent Roll, find the tenancy, and click "Inspections". From there:\n\n1. Click "Schedule Inspection" and select the type — Entry (move-in), Routine (periodic), or Exit (move-out). Enter the inspection date, owner name and email. The system checks your state\'s minimum notice period and warns you if the date is too soon.\n\n2. On the day, open the inspection from the Rent Roll. Work through each room on your phone — tap the condition (Excellent / Good / Fair / Poor / Damaged), add notes, and upload photos directly from your camera.\n\n3. Record the water meter reading, key count, and smoke alarm test results in the overview section.\n\n4. Flag any maintenance issues directly from the room — set priority (Urgent / Normal / Low) and they appear in a maintenance summary at the bottom.\n\n5. When complete, tap "Finalise Report". The system generates the report and lets you email it to the owner and the tenant simultaneously.\n\nTenants receive a link to view the report online and can formally Accept it or raise Concerns within their state\'s dispute window. All responses are recorded against the inspection.',
@@ -513,9 +525,9 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     id: 'auction-multilingual',
     question: 'Can I watch the auction live in my language?',
-    answer: 'Yes. On the live auction page, use the language selector at the top to switch between English, Mandarin (普通话), Cantonese (廣東話), and Vietnamese (Tiếng Việt). All bid notifications, reserve announcements, and auction results will appear in your selected language in real time. Your language preference is saved automatically for future visits.',
+    answer: 'Yes. On the live auction page, use the language selector in the navigation bar to switch languages. Bid notifications, reserve announcements, and auction results will appear in your selected language in real time. Your language preference is saved automatically for future visits. Supported languages include English, Mandarin (Simplified and Traditional), Vietnamese, Korean, Arabic, and Japanese.',
     category: 'auctions',
-    tags: ['multilingual', 'language', 'mandarin', 'cantonese', 'vietnamese', 'live'],
+    tags: ['multilingual', 'language', 'mandarin', 'vietnamese', 'korean', 'arabic', 'japanese', 'live'],
   },
   {
     id: 'auction-watch-public',
@@ -683,8 +695,34 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: 'buyers',
     tags: ['chinese', 'translation', 'mandarin', 'multilingual'],
   },
-
-  // ── Agent: Translate step in pocket listing wizard ──
+  {
+    id: 'buyer-ai-search',
+    question: 'How does AI property search work?',
+    answer: 'AI search lets you describe what you are looking for in plain language instead of filling in filters. Toggle "AI search" on the Buy page, type a natural description into the search bar, and click "Find My Home".\n\nExamples of queries that work:\n• "3 bedroom house with a backyard near good schools under $900k"\n• "Apartment close to the city with parking, pet-friendly, under $600k"\n• "Family home in Templestowe or Doncaster with a pool"\n\nThe AI reads your description, extracts suburb, bedroom count, property type, budget, and lifestyle requirements, then searches the database to match listings. Results are returned ranked by relevance.\n\nYou can search in English or your own language — the AI will translate your query automatically before searching.',
+    category: 'buyers',
+    tags: ['AI search', 'natural language', 'search', 'find my home', 'smart search'],
+  },
+  {
+    id: 'buyer-ai-search-language',
+    question: 'Can I search for properties in Korean, Arabic, or Chinese?',
+    answer: 'Yes. The AI search bar accepts queries in any language. Type your property requirements in Korean, Arabic, Chinese, Vietnamese, Japanese, or any other language — the system will automatically translate your query into English before searching, so you get the same quality results as an English search.\n\nFor example, you can type "3개의 침실이 있는 집" (Korean for "3 bedroom house") and the AI will understand your intent and return matching listings.\n\nYou can also switch the entire site to your preferred language using the language selector in the top navigation bar. Listing titles and descriptions will display in your chosen language where translations are available.',
+    category: 'buyers',
+    tags: ['korean', 'arabic', 'chinese', 'language', 'search', 'multilingual', 'AI search'],
+  },
+  {
+    id: 'buyer-translated-listings',
+    question: 'Are property listings translated into my language?',
+    answer: 'Yes. When you switch the site language using the selector in the top navigation bar, listing titles and descriptions are automatically displayed in your chosen language.\n\nCurrently supported languages for listing translations:\n• 简体中文 — Mandarin Simplified\n• 繁體中文 — Mandarin Traditional\n• 한국어 — Korean\n• العربية — Arabic\n• 日本語 — Japanese\n• Tiếng Việt — Vietnamese\n\nTranslations are generated by AI and cached — the first time a listing is viewed in your language, it may take a few seconds to translate. Every subsequent view is instant.\n\nFor English listings, you may also see Cultural Highlights — a short section written specifically for buyers from your community, noting features like school proximity, orientation, garden space, or suburb demographics that are most relevant to your background.',
+    category: 'buyers',
+    tags: ['translation', 'language', 'korean', 'arabic', 'chinese', 'japanese', 'multilingual', 'listings'],
+  },
+  {
+    id: 'buyer-anonymous-contact',
+    question: 'How do I get contacted by an agent about a property I searched for?',
+    answer: 'When you search for a property using AI search, ListHQ anonymously records your search intent (the type of property you are looking for, not your personal details). Agents whose listings match your search may see your intent — things like "buyer looking for 3 bedrooms in Templestowe under $900k" — and may reach out.\n\nIf an agent contacts you, you will receive a message through the platform. Your name, email address, and phone number are never shared with the agent unless you choose to reply and provide them directly.\n\nYou can opt out of buyer matching at any time from your account settings.',
+    category: 'buyers',
+    tags: ['contact', 'agent', 'privacy', 'anonymous', 'buyer matching', 'AI'],
+  },
   {
     id: 'agent-translate-step',
     question: 'How do I add Chinese, Japanese, or Korean translations to my listing?',

@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { REFERRAL_COUNTRIES, REFERRAL_LANGUAGES } from '@/features/referral/lib/constants';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 const signupSchema = z.object({
   full_name: z.string().trim().min(2, 'Please enter your full name').max(100),
@@ -26,6 +27,7 @@ const signupSchema = z.object({
 export default function ReferralLandingPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState<{ code: string; needsVerification: boolean } | null>(null);
   const [form, setForm] = useState({
@@ -102,7 +104,7 @@ export default function ReferralLandingPage() {
     };
     return (
       <>
-        <Helmet><title>Welcome to ListHQ Referral Network</title></Helmet>
+        <Helmet><title>{t('referral.success.title')} | ListHQ</title></Helmet>
         <div className="min-h-screen bg-background flex items-center justify-center px-4 py-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -112,11 +114,11 @@ export default function ReferralLandingPage() {
             <div className="w-14 h-14 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
               <CheckCircle2 className="text-emerald-600" size={28} />
             </div>
-            <h1 className="font-display text-2xl font-bold text-foreground">You're in!</h1>
+            <h1 className="font-display text-2xl font-bold text-foreground">{t('referral.success.title')}</h1>
             <p className="text-muted-foreground mt-2 text-sm">
               {success.needsVerification
-                ? 'Check your email to verify your account, then log in to access your dashboard.'
-                : 'Your referral account is active. Start sharing your link to earn commissions.'}
+                ? t('referral.success.verifyEmail')
+                : t('referral.success.active')}
             </p>
 
             <div className="mt-6 p-5 rounded-xl bg-secondary/50 border border-border">

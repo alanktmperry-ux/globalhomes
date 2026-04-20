@@ -148,6 +148,9 @@ export const zhTW: Record<keyof typeof EnBase, string> = {
   'homeServices.pageTitle': '家居服務市場',
   'homeServices.pageSubtitle': '為您的物業尋找值得信賴的專業人士。包括清潔、驗樓、搬屋等服務。',
 
+  'homeServices.hero.title': '讓您的房產做好上市準備',
+  'homeServices.hero.subtitle': '預訂經過審核的專業人士 — 攝影、佈置、驗樓等更多服務。',
+
   'homeServices.search.placeholder': '搜尋服務或地區',
   'homeServices.filter.allCategories': '所有類別',
   'homeServices.category.photography': '攝影',

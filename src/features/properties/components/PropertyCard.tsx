@@ -11,6 +11,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { AgentContactModal } from '@/features/agents/components/AgentContactModal';
 import { useInvestorMode } from '@/context/InvestorModeContext';
 import { QuickYieldBadge } from '@/components/investor/QuickYieldBadge';
+import { useListingTranslation } from '@/features/properties/hooks/useListingTranslation';
 
 function VerificationBadge({ level }: { level?: string }) {
   if (!level || level === 'email') return null;

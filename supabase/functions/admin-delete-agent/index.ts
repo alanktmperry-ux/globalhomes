@@ -200,7 +200,8 @@ Deno.serve(async (req) => {
       });
       if (error) {
         console.error("delete_user_cascade RPC error:", error);
-        errors.push(`delete_user_cascade: ${error.message}`);
+        // Hard fail — don't delete auth user if cascade failed, data would be orphaned
+        return respond({ error: `Cascade deletion failed: ${error.message}. No data was deleted.` }, 500);
       }
     }
 

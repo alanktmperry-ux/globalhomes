@@ -54,6 +54,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
   const { t } = useI18n();
   const { formatPrice, currency, listingMode } = useCurrency();
   const { investorMode } = useInvestorMode();
+  const { title: translatedTitle, isTranslating: titleTranslating } = useListingTranslation(property);
   const isRental = listingMode === 'rent' || property.listingType === 'rent' || property.listingType === 'rental' || property.price < 50000;
   const [contactOpen, setContactOpen] = useState(false);
   const navigate = useNavigate();
@@ -158,7 +159,9 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
         {/* Property info */}
         <div className="p-4" onClick={() => { onSelect(property); navigate(`/property/${property.id}`); }}>
           <h3 className="font-display font-semibold text-foreground text-base leading-tight mb-1 line-clamp-1">
-            {property.title}
+            {titleTranslating ? (
+              <span className="inline-block h-4 w-3/4 rounded bg-muted animate-pulse align-middle" aria-hidden />
+            ) : translatedTitle}
           </h3>
           <p className="text-sm text-muted-foreground mb-3">
             {property.address}, {property.suburb}, {property.state}

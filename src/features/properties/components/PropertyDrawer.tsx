@@ -66,6 +66,7 @@ interface PropertyDrawerProps {
 
 export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searchContext }: PropertyDrawerProps) {
   const { t } = useI18n();
+  const { description: translatedDescription, isTranslating: descTranslating, isTranslated: descIsTranslated } = useListingTranslation(property);
   const { formatPrice, currency } = useCurrency();
   const [contactOpen, setContactOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);

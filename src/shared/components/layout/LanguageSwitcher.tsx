@@ -1,8 +1,21 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Languages, ChevronDown } from 'lucide-react';
-import { useI18n, languageNames, type Language } from '@/shared/lib/i18n';
-import { LANGUAGE_STORAGE_KEY, FROM_LEGACY_CODE_MAP, DEFAULT_LANGUAGE } from '@/shared/lib/i18n/config';
+import { useI18n, type Language } from '@/shared/lib/i18n';
+import {
+  SUPPORTED_LANGUAGES,
+  LANGUAGE_STORAGE_KEY,
+  LEGACY_CODE_MAP,
+  FROM_LEGACY_CODE_MAP,
+  type SupportedLanguageCode,
+} from '@/shared/lib/i18n/config';
+
+// Locales with complete translation files. Others render as "Coming soon".
+const AVAILABLE_LOCALES: ReadonlySet<SupportedLanguageCode> = new Set([
+  'en',
+  'zh-CN',
+  'zh-TW',
+]);
 
 export function LanguageSwitcher() {
   const { language, setLanguage } = useI18n();

@@ -209,7 +209,11 @@ export default function AgencyOnboardingPage() {
           officeAddress: agencyAddress,
         },
       });
-      if (setupError) throw new Error(setupError.message || 'Setup failed');
+      if (setupError) {
+        // Try to get actual error from response body
+        const detail = (setupError as any)?.context?.json?.error || setupError.message || 'Setup failed';
+        throw new Error(detail);
+      }
 
       toast.success('Agency created successfully');
       setStep(3);

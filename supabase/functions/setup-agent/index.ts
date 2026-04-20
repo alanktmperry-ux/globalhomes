@@ -140,7 +140,7 @@ Deno.serve(async (req) => {
           .from('agencies')
           .select('id, name')
           .eq('name', agencyName)
-          .is('owner_user_id', null)
+          .neq('owner_user_id', userId)
           .maybeSingle();
 
         if (orphanAgency) {

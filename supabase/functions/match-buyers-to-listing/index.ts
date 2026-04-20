@@ -171,13 +171,32 @@ Deno.serve(async (req) => {
       return suburbMatch || bedsMatch;
     });
 
-    // Score in parallel (cap concurrency loosely with Promise.all on the 50 max)
-    const scored = await Promise.all(
-      filtered.map(async (buyer: any) => {
-        const score = await scoreOne(LOVABLE_API_KEY, listing, buyer);
-        return score ? { buyer, ...score } : null;
-      })
-    );
+    // Score in batches of 10 with 500ms delay between batches to avoid rate limits
+    const BATCH_SIZE = 10;
+    const BATCH_DELAY_MS = 500;
+    const scored: Array<{ buyer: any; match_score: number; reasoning: string } | null> = [];
+    for (let i = 0; i < filtered.length; i += BATCH_SIZE) {
+      const batch = filtered.slice(i, i + BATCH_SIZE);
+      const results = await Promise.all(
+        batch.map(async (buyer: any) => {
+          try {
+            const score = await scoreOne(LOVABLE_API_KEY, listing, buyer);
+            if (!score) {
+              console.warn(`Score failed (null) for buyer_intent_id=${buyer.id}`);
+              return null;
+            }
+            return { buyer, ...score };
+          } catch (err) {
+            console.error(`Score errored for buyer_intent_id=${buyer.id}`, err);
+            return null;
+          }
+        })
+      );
+      scored.push(...results);
+      if (i + BATCH_SIZE < filtered.length) {
+        await new Promise((r) => setTimeout(r, BATCH_DELAY_MS));
+      }
+    }
 
     const goodMatches = scored
       .filter((m): m is NonNullable<typeof m> => m !== null && m.match_score >= 50);

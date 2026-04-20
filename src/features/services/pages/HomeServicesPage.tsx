@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { RequestQuoteModal } from '@/features/services/components/RequestQuoteModal';
-import { useTranslation } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 interface Provider {
   id: string;
@@ -25,19 +25,19 @@ interface Provider {
 }
 
 const CATEGORIES = [
-  { key: 'photography',         label: 'Photography',         icon: Camera },
-  { key: 'floor_plans',         label: 'Floor Plans',         icon: Map },
-  { key: 'virtual_staging',     label: 'Virtual Staging',     icon: Sofa },
-  { key: 'pest_inspection',     label: 'Pest Inspection',     icon: Bug },
-  { key: 'building_inspection', label: 'Building Inspection', icon: HardHat },
-  { key: 'conveyancing',        label: 'Conveyancing',        icon: Scale },
-  { key: 'cleaning',            label: 'Cleaning',            icon: Sparkles },
-  { key: 'landscaping',         label: 'Landscaping',         icon: Trees },
-  { key: 'removalists',         label: 'Removalists',         icon: Truck },
+  { key: 'photography',         labelKey: 'homeServices.category.photography',         icon: Camera },
+  { key: 'floor_plans',         labelKey: 'homeServices.category.floorPlans',         icon: Map },
+  { key: 'virtual_staging',     labelKey: 'homeServices.category.virtualStaging',     icon: Sofa },
+  { key: 'pest_inspection',     labelKey: 'homeServices.category.pestInspection',     icon: Bug },
+  { key: 'building_inspection', labelKey: 'homeServices.category.buildingInspection', icon: HardHat },
+  { key: 'conveyancing',        labelKey: 'homeServices.category.conveyancing',        icon: Scale },
+  { key: 'cleaning',            labelKey: 'homeServices.category.cleaning',            icon: Sparkles },
+  { key: 'landscaping',         labelKey: 'homeServices.category.landscaping',         icon: Trees },
+  { key: 'removalists',         labelKey: 'homeServices.category.removalists',         icon: Truck },
 ] as const;
 
-const categoryLabel = (key: string) =>
-  CATEGORIES.find(c => c.key === key)?.label ?? key;
+const categoryLabel = (key: string, t: (k: string) => string) =>
+  t(CATEGORIES.find(c => c.key === key)?.labelKey ?? key);
 
 const formatPriceRange = (p: Provider, t: (k: string) => string) => {
   if (p.price_from == null) return t('homeServices.card.contactForQuote');

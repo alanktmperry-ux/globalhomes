@@ -169,9 +169,29 @@ Deno.serve(async (req) => {
     if (intent.bedrooms) q = q.gte("beds", intent.bedrooms);
     if (intent.bathrooms) q = q.gte("baths", intent.bathrooms);
 
-    const { data: properties, error: propErr } = await q;
+    let { data: properties, error: propErr } = await q;
     if (propErr) {
       console.error("Property query error", propErr);
+    }
+
+    // Fallback: if the strict query returned nothing, retry without suburb/property_type
+    // so the user still sees listings within their price + bedroom range.
+    if ((!properties || properties.length === 0) && orParts.length > 0) {
+      console.log("Primary query empty — retrying without suburb/property_type filters");
+      let fallback = supabase
+        .from("properties")
+        .select(PROPERTIES_WITH_AGENTS)
+        .eq("is_active", true)
+        .not("listing_type", "eq", "rent")
+        .order("created_at", { ascending: false })
+        .limit(60);
+      if (intent.min_price) fallback = fallback.gte("price", intent.min_price);
+      if (intent.max_price) fallback = fallback.lte("price", intent.max_price);
+      if (intent.bedrooms) fallback = fallback.gte("beds", intent.bedrooms);
+      if (intent.bathrooms) fallback = fallback.gte("baths", intent.bathrooms);
+      const { data: fbData, error: fbErr } = await fallback;
+      if (fbErr) console.error("Fallback query error", fbErr);
+      if (fbData && fbData.length > 0) properties = fbData;
     }
 
     // 3. Upsert buyer_intent (find existing by buyer_id or session_id)

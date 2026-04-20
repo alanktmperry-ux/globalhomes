@@ -99,7 +99,7 @@ export default function ExclusiveLandingPage() {
       {/* How it works */}
       <section className="bg-secondary/30 border-y border-border">
         <div className="max-w-5xl mx-auto px-4 py-16">
-          <h2 className="font-display text-3xl font-bold text-center mb-2">How it works</h2>
+          <h2 className="font-display text-3xl font-bold text-center mb-2">{t('exclusive.howItWorks.title')}</h2>
           <p className="text-muted-foreground text-center mb-10">Three steps. Five minutes to set up.</p>
           <div className="grid sm:grid-cols-3 gap-6">
             {STEPS.map(s => (
@@ -107,7 +107,7 @@ export default function ExclusiveLandingPage() {
                 <div className="w-12 h-12 mx-auto rounded-full bg-primary text-primary-foreground font-bold text-lg flex items-center justify-center mb-3">
                   {s.n}
                 </div>
-                <h3 className="font-semibold mb-1">{s.title}</h3>
+                <h3 className="font-semibold mb-1">{t(`exclusive.howItWorks.step${s.n}`)}</h3>
                 <p className="text-sm text-muted-foreground">{s.body}</p>
               </div>
             ))}
@@ -120,13 +120,13 @@ export default function ExclusiveLandingPage() {
         <div className="bg-gradient-to-br from-primary/10 via-card to-card border-2 border-primary/30 rounded-3xl p-8 text-center">
           <Badge className="bg-primary text-primary-foreground mb-4">MEMBER PRICING</Badge>
           <p className="font-display text-5xl font-bold mb-1">$29<span className="text-xl text-muted-foreground font-normal">/month</span></p>
-          <p className="text-muted-foreground mb-6">Cancel anytime — no contracts</p>
+          <p className="text-muted-foreground mb-6">{t('exclusive.hero.ctaSub')}</p>
           <ul className="text-left max-w-sm mx-auto space-y-2 mb-7">
             {[
-              '14 days early access on every member listing',
-              'Instant SMS + email alerts on matches',
-              'Verified-buyer status with agents',
-              'Priority enquiries on hot listings',
+              t('exclusive.benefits.preMarket'),
+              t('exclusive.benefits.alerts'),
+              t('exclusive.benefits.offMarket'),
+              t('exclusive.benefits.concierge'),
             ].map(item => (
               <li key={item} className="flex items-start gap-2 text-sm">
                 <Check size={16} className="text-primary mt-0.5 shrink-0" /> {item}
@@ -134,7 +134,7 @@ export default function ExclusiveLandingPage() {
             ))}
           </ul>
           <Button size="lg" className="w-full sm:w-auto gap-2" onClick={() => setJoinOpen(true)}>
-            <Sparkles size={18} /> Join ListHQ Exclusive
+            <Sparkles size={18} /> {t('exclusive.hero.cta')}
           </Button>
         </div>
       </section>
@@ -151,7 +151,7 @@ export default function ExclusiveLandingPage() {
 
       {/* FAQ */}
       <section className="max-w-3xl mx-auto px-4 py-16">
-        <h2 className="font-display text-3xl font-bold text-center mb-8">Frequently asked</h2>
+        <h2 className="font-display text-3xl font-bold text-center mb-8">{t('exclusive.faq.title')}</h2>
         <Accordion type="single" collapsible className="w-full">
           {FAQ.map((item, i) => (
             <AccordionItem key={i} value={`q-${i}`}>
@@ -162,7 +162,7 @@ export default function ExclusiveLandingPage() {
         </Accordion>
         <div className="text-center mt-8">
           <Button size="lg" onClick={() => setJoinOpen(true)} className="gap-2">
-            <Sparkles size={18} /> Join now — $29/month
+            <Sparkles size={18} /> {t('exclusive.cta.final')} — $29/month
           </Button>
         </div>
       </section>

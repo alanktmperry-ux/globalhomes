@@ -148,23 +148,26 @@ Deno.serve(async (req) => {
       .order("created_at", { ascending: false })
       .limit(60);
 
+    // Build a single OR group for (suburb matches OR property_type matches),
+    // which is then ANDed with price/bedroom filters by PostgREST.
+    const orParts: string[] = [];
     if (Array.isArray(intent.suburbs) && intent.suburbs.length > 0) {
-      const orFilter = intent.suburbs
-        .slice(0, 20)
-        .map((s: string) => `suburb.ilike.%${s.replace(/[%,]/g, "")}%`)
-        .join(",");
-      if (orFilter) q = q.or(orFilter);
+      for (const s of intent.suburbs.slice(0, 20)) {
+        const clean = String(s).replace(/[%,()]/g, "");
+        if (clean) orParts.push(`suburb.ilike.%${clean}%`);
+      }
     }
+    if (Array.isArray(intent.property_types) && intent.property_types.length > 0) {
+      for (const p of intent.property_types) {
+        const clean = String(p).replace(/[%,()]/g, "");
+        if (clean) orParts.push(`property_type.ilike.%${clean}%`);
+      }
+    }
+    if (orParts.length > 0) q = q.or(orParts.join(","));
     if (intent.min_price) q = q.gte("price", intent.min_price);
     if (intent.max_price) q = q.lte("price", intent.max_price);
     if (intent.bedrooms) q = q.gte("beds", intent.bedrooms);
     if (intent.bathrooms) q = q.gte("baths", intent.bathrooms);
-    if (Array.isArray(intent.property_types) && intent.property_types.length > 0) {
-      const ptFilter = intent.property_types
-        .map((p: string) => `property_type.ilike.%${p.replace(/[%,]/g, "")}%`)
-        .join(",");
-      if (ptFilter) q = q.or(ptFilter);
-    }
 
     const { data: properties, error: propErr } = await q;
     if (propErr) {

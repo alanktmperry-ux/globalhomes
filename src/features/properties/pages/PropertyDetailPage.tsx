@@ -466,6 +466,34 @@ export default function PropertyDetailPage() {
               ))}
             </div>
 
+            {/* Description (auto-translated based on language) */}
+            {(translatedDescription || isTranslating) && (
+              <div>
+                <h2 className="font-display text-lg font-semibold text-foreground mb-2">
+                  {t('property.description')}
+                </h2>
+                {isTranslating ? (
+                  <div className="space-y-2" aria-label="Loading description">
+                    <div className="h-3 w-full rounded bg-muted animate-pulse" />
+                    <div className="h-3 w-11/12 rounded bg-muted animate-pulse" />
+                    <div className="h-3 w-10/12 rounded bg-muted animate-pulse" />
+                    <div className="h-3 w-9/12 rounded bg-muted animate-pulse" />
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">
+                      {translatedDescription}
+                    </p>
+                    {isTranslated && (
+                      <p className="mt-2 text-[11px] text-muted-foreground italic">
+                        Translated by AI
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+
             {/* Rental Info Section */}
             {isRental && (
               <div className="p-5 rounded-2xl bg-card border border-border shadow-card">

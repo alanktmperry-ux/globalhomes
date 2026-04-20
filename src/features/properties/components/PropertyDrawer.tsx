@@ -294,7 +294,13 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searc
                   {currency.code !== 'AUD' && (
                     <p className="text-xs text-muted-foreground">{property.priceFormatted} AUD</p>
                   )}
-                  <h2 className="font-display text-lg font-semibold text-foreground mt-1">{property.title}</h2>
+                  <h2 className="font-display text-lg font-semibold text-foreground mt-1">
+                    {descTranslating && !translatedTitle ? (
+                      <span className="inline-block h-5 w-2/3 rounded bg-muted animate-pulse align-middle" />
+                    ) : (
+                      translatedTitle || property.title
+                    )}
+                  </h2>
                   <p className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
                     <MapPin size={14} />
                     {property.address}, {property.suburb}, {property.state} {property.country && property.country !== 'Australia' ? `, ${property.country}` : ''}

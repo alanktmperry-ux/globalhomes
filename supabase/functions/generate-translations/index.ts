@@ -79,12 +79,14 @@ LISTING DATA:
 - Features: ${listing.features ? JSON.stringify(listing.features) : "None listed"}
 - Year Built: ${listing.year_built || "N/A"}
 
-TRANSLATIONS — provide for each of these language keys: "zh_simplified", "zh_traditional", "vi"
+TRANSLATIONS — provide for each of these language keys: "zh_simplified" (Simplified Chinese), "zh_traditional" (Traditional Chinese), "vi" (Vietnamese), "ko" (Korean), "ar" (Arabic), "ja" (Japanese)
 Each language must contain:
 - title: translated property title
 - description: full translated description (natural, not word-for-word)
 - summary: 1-2 sentence highlight summary
 - cultural_highlights: array of strings noting culturally relevant features ONLY if genuinely applicable (e.g. feng shui orientation, school proximity, multigenerational layout, garden space). Never fabricate cultural relevance.
+
+CRITICAL: All 6 language keys MUST be present in the "translations" object. For Arabic, ensure right-to-left natural phrasing.
 
 AGENT INSIGHTS — in English, under key "agent_insights":
 - multicultural_appeal: string describing the property's appeal to multicultural buyers

@@ -20,6 +20,7 @@ import { en, type TranslationKey } from './locales/en';
 import { zhCN } from './locales/zh-CN';
 import { zhTW } from './locales/zh-TW';
 import { hi } from './locales/hi';
+import { bn } from './locales/bn';
 import {
   LANGUAGE_STORAGE_KEY,
   FROM_LEGACY_CODE_MAP,

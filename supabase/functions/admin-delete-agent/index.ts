@@ -236,6 +236,6 @@ Deno.serve(async (req) => {
     return respond({ success: true });
   } catch (err) {
     console.error("admin-delete-agent error:", err);
-    return respond({ error: (err as Error).message }, 500);
+    return respond({ error: (err as Error).message }, 200);
   }
 });

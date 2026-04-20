@@ -42,7 +42,10 @@ export function useListingTranslation(property: any | null | undefined): Transla
   const source = refreshed ?? property;
   const translationKey = mapLanguageToTranslationKey(language);
 
-  // Read existing cached translation (defensive — translations is JSONB)
+  // Read existing cached translation (defensive — translations is JSONB).
+  // NOTE: the mapped Property type used in cards/drawers does NOT include
+  // `translations`/`translation_status`, so we must always be willing to
+  // fetch them from the DB before deciding whether to translate.
   const translations = (source?.translations ?? null) as Record<string, any> | null;
   const cached = translationKey && translations ? translations[translationKey] : null;
   const status = source?.translation_status as string | undefined;
@@ -50,33 +53,46 @@ export function useListingTranslation(property: any | null | undefined): Transla
   useEffect(() => {
     if (!property?.id || !translationKey) return;
     if (cached) return;
-    // Avoid duplicate requests per (property,language) pair
     const reqKey = `${property.id}:${translationKey}`;
     if (requestedRef.current === reqKey) return;
     if (isTranslating) return;
 
-    // Fire when missing or still pending
-    if (!cached || status === 'pending') {
-      requestedRef.current = reqKey;
-      setIsTranslating(true);
-      translateListing(property.id)
-        .then(async () => {
-          // Re-fetch fresh translations row
-          const { data } = await supabase
-            .from('properties')
-            .select('id, translations, translation_status')
-            .eq('id', property.id)
-            .maybeSingle();
-          if (data) {
-            setRefreshed({ ...source, ...data });
-          }
-        })
-        .catch((err) => {
-          console.warn('[useListingTranslation] translateListing failed:', err?.message ?? err);
-        })
-        .finally(() => setIsTranslating(false));
-    }
-  }, [property?.id, translationKey, cached, status, isTranslating, source]);
+    requestedRef.current = reqKey;
+    setIsTranslating(true);
+
+    (async () => {
+      try {
+        // 1. Always fetch the latest translations row from DB first —
+        //    the prop may be a mapped Property without translations fields.
+        const { data: existing } = await supabase
+          .from('properties')
+          .select('id, translations, translation_status')
+          .eq('id', property.id)
+          .maybeSingle();
+
+        const existingTrans = (existing?.translations ?? null) as Record<string, any> | null;
+        const existingCached = existingTrans ? existingTrans[translationKey] : null;
+
+        if (existingCached) {
+          setRefreshed({ ...source, ...existing });
+          return;
+        }
+
+        // 2. Cache miss → trigger edge function, then re-fetch.
+        await translateListing(property.id);
+        const { data: fresh } = await supabase
+          .from('properties')
+          .select('id, translations, translation_status')
+          .eq('id', property.id)
+          .maybeSingle();
+        if (fresh) setRefreshed({ ...source, ...fresh });
+      } catch (err: any) {
+        console.warn('[useListingTranslation] failed:', err?.message ?? err);
+      } finally {
+        setIsTranslating(false);
+      }
+    })();
+  }, [property?.id, translationKey, cached, status]);
 
   // English or unsupported language → return originals
   if (!translationKey) {

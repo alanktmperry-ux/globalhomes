@@ -173,6 +173,21 @@ Deno.serve(async (req) => {
     if (propErr) {
       console.error("Property query error", propErr);
     }
+    console.log(
+      "properties result:",
+      JSON.stringify({
+        count: properties?.length ?? 0,
+        suburbs_extracted: intent.suburbs,
+        property_types_extracted: intent.property_types,
+        or_filter: orParts.join(","),
+        first_three: (properties ?? []).slice(0, 3).map((p: any) => ({
+          id: p.id,
+          suburb: p.suburb,
+          property_type: p.property_type,
+          beds: p.beds,
+        })),
+      })
+    );
 
     // Fallback: if the strict query returned nothing, retry without suburb/property_type
     // so the user still sees listings within their price + bedroom range.

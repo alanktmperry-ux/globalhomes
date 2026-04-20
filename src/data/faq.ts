@@ -262,7 +262,6 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: 'agents',
     tags: ['buyer readiness', 'score', 'lead quality', 'buyer intent', 'matching'],
   },
-  },
   {
     id: 'agent-inspection-reports',
     question: 'How do I conduct a property inspection and condition report?',

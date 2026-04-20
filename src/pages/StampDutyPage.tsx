@@ -5,20 +5,22 @@ import { FIRBCalculator } from '@/components/FIRBCalculator';
 import { MortgageBrokerCTA } from '@/features/mortgage/components/MortgageBrokerCTA';
 import { MortgageReferralModal } from '@/components/MortgageReferralModal';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/shared/lib/i18n';
 
 export default function StampDutyPage() {
   const [mortgageOpen, setMortgageOpen] = useState(false);
+  const { t } = useTranslation();
   return (
     <>
       <Helmet>
-        <title>Stamp Duty Calculator Australia | ListHQ</title>
-        <meta name="description" content="Calculate stamp duty costs for any Australian state. Free, instant estimates for buyers." />
+        <title>{t('stampDuty.pageTitle')} | ListHQ</title>
+        <meta name="description" content={t('stampDuty.pageSubtitle')} />
         <link rel="canonical" href="https://listhq.com.au/stamp-duty-calculator" />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebApplication",
-          "name": "Stamp Duty Calculator",
-          "description": "Free Australian stamp duty calculator for all states and territories, including first home buyer concessions.",
+          "name": t('stampDuty.pageTitle'),
+          "description": t('stampDuty.pageSubtitle'),
           "url": "https://listhq.com.au/stamp-duty-calculator",
           "applicationCategory": "FinanceApplication",
           "operatingSystem": "Web",
@@ -29,11 +31,10 @@ export default function StampDutyPage() {
       <div className="min-h-screen bg-background">
         <div className="max-w-2xl mx-auto px-4 py-12">
           <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">
-            Stamp Duty Calculator
+            {t('stampDuty.pageTitle')}
           </h1>
           <p className="text-muted-foreground mb-8 leading-relaxed">
-            Estimate your stamp duty across all Australian states and territories.
-            Includes first home buyer concessions and grants for 2026.
+            {t('stampDuty.pageSubtitle')}
           </p>
 
           <StampDutyCalculator propertyPrice={null} propertyAddress="" />
@@ -43,9 +44,9 @@ export default function StampDutyPage() {
           </div>
 
           <div className="mt-6 p-4 rounded-xl border border-primary/20 bg-primary/5">
-            <p className="text-sm font-medium">Find out your borrowing power</p>
-            <p className="text-xs text-muted-foreground mb-2">Speak to a broker and get pre-approved today.</p>
-            <Button size="sm" onClick={() => setMortgageOpen(true)}>Speak to a broker</Button>
+            <p className="text-sm font-medium">{t('stampDuty.cta.broker')}</p>
+            <p className="text-xs text-muted-foreground mb-2">{t('stampDuty.cta.brokerSub')}</p>
+            <Button size="sm" onClick={() => setMortgageOpen(true)}>{t('stampDuty.cta.brokerButton')}</Button>
           </div>
           <MortgageReferralModal
             open={mortgageOpen}
@@ -55,9 +56,9 @@ export default function StampDutyPage() {
 
           <div className="mt-6">
             <MortgageBrokerCTA
-              title="Find out your borrowing power"
-              description="Speak to a licensed mortgage broker and learn how much you can borrow."
-              buttonLabel="Connect with a broker"
+              title={t('stampDuty.cta.broker')}
+              description={t('stampDuty.cta.brokerSub')}
+              buttonLabel={t('stampDuty.cta.brokerButton')}
               sourcePage="stamp_duty"
             />
           </div>
@@ -65,32 +66,24 @@ export default function StampDutyPage() {
           {/* SEO content */}
           <div className="mt-12 space-y-6 text-muted-foreground">
             <h2 className="font-display text-xl font-semibold text-foreground">
-              How stamp duty works in Australia
+              {t('stampDuty.seo.howItWorksTitle')}
             </h2>
             <p className="leading-relaxed">
-              Stamp duty (also called transfer duty or land transfer duty) is a state government
-              tax paid when you purchase a property. Each state and territory sets its own rates,
-              thresholds, and concessions. Rates are applied progressively — similar to income tax
-              — with higher marginal rates on higher price brackets.
+              {t('stampDuty.seo.howItWorksText')}
             </p>
 
             <h2 className="font-display text-xl font-semibold text-foreground">
-              First Home Buyer concessions by state
+              {t('stampDuty.seo.concessionsTitle')}
             </h2>
             <p className="leading-relaxed">
-              Most states offer significant stamp duty relief for first home buyers purchasing
-              below a price threshold. NSW offers full exemption up to $800,000. Victoria waives
-              duty on purchases up to $600,000. Queensland provides concessions on the first
-              $350,000 of the price for eligible buyers.
+              {t('stampDuty.seo.concessionsText')}
             </p>
 
             <h2 className="font-display text-xl font-semibold text-foreground">
-              When is stamp duty paid?
+              {t('stampDuty.seo.whenPaidTitle')}
             </h2>
             <p className="leading-relaxed">
-              Stamp duty is typically due within 30 days of settlement in most states. Your
-              conveyancer or solicitor will handle the payment on your behalf. It must be paid
-              before the property transfer is registered with the state land titles office.
+              {t('stampDuty.seo.whenPaidText')}
             </p>
           </div>
         </div>

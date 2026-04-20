@@ -102,6 +102,28 @@ Deno.serve(async (req) => {
       const slug = agencyName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") +
         "-" + Math.random().toString(36).slice(2, 6);
 
+      // Clean up orphaned records from a previous deleted account with same email
+      const { data: oldAgent } = await supabaseAdmin
+        .from('agents')
+        .select('id, agency_id')
+        .eq('email', email)
+        .neq('user_id', userId)
+        .maybeSingle();
+
+      if (oldAgent) {
+        await supabaseAdmin.from('agency_members').delete().eq('user_id', userId);
+        await supabaseAdmin.from('agents').delete().eq('id', oldAgent.id);
+        if (oldAgent.agency_id) {
+          const { count } = await supabaseAdmin
+            .from('agency_members')
+            .select('id', { count: 'exact', head: true })
+            .eq('agency_id', oldAgent.agency_id);
+          if (!count || count === 0) {
+            await supabaseAdmin.from('agencies').delete().eq('id', oldAgent.agency_id);
+          }
+        }
+      }
+
       // Check if agency already exists for this user (re-registration)
       const { data: existing } = await supabaseAdmin
         .from("agencies")
@@ -110,10 +132,27 @@ Deno.serve(async (req) => {
         .eq("name", agencyName)
         .maybeSingle();
 
-      let agency;
-      if (existing) {
-        agency = existing;
-      } else {
+      let agency = existing;
+
+      // If not owned by this user, check for an orphaned agency with no owner
+      if (!agency) {
+        const { data: orphanAgency } = await supabaseAdmin
+          .from('agencies')
+          .select('id, name')
+          .eq('name', agencyName)
+          .is('owner_user_id', null)
+          .maybeSingle();
+
+        if (orphanAgency) {
+          await supabaseAdmin
+            .from('agencies')
+            .update({ owner_user_id: userId })
+            .eq('id', orphanAgency.id);
+          agency = orphanAgency;
+        }
+      }
+
+      if (!agency) {
         const { data: newAgency, error: agencyError } = await supabaseAdmin
           .from("agencies")
           .insert({

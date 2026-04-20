@@ -188,14 +188,23 @@ export default function AgencyOnboardingPage() {
 
   const completeOnboarding = async () => {
     if (!user) return;
-    await supabase.from('agents').update({ onboarding_complete: true } as any).eq('user_id', user.id);
+    const { error } = await supabase.from('agents').update({ onboarding_complete: true } as any).eq('user_id', user.id);
+    if (error) throw error;
     await refreshRoles();
+  };
+
+  const getAuthToken = async () => {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+    if (!token) throw new Error('No active session. Please sign in again.');
+    return token;
   };
 
   const handleStep2Next = async () => {
     if (!user) return;
     setLoading(true);
     try {
+      const token = await getAuthToken();
       const { error: setupError } = await supabase.functions.invoke('setup-agent', {
         body: {
           userId: user.id,
@@ -208,6 +217,9 @@ export default function AgencyOnboardingPage() {
           licenseNumber: licenceNumber,
           officeAddress: agencyAddress,
         },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       if (setupError) {
         // Try to get actual error from response body
@@ -216,7 +228,7 @@ export default function AgencyOnboardingPage() {
       }
 
       toast.success('Agency created successfully');
-      setStep(3);
+      setStep(2);
     } catch (e: unknown) {
       toast.error(getErrorMessage(e) || 'Failed to create agency');
     } finally {
@@ -232,7 +244,7 @@ export default function AgencyOnboardingPage() {
       if (!agent) throw new Error('Agent not found');
 
       const cleanBsb = bsb.replace(/-/g, '');
-      await supabase.from('trust_accounts').insert({
+      const { error } = await supabase.from('trust_accounts').insert({
         agent_id: agent.id,
         account_name: trustAccountName || "Trust Account",
         account_type: 'trust',
@@ -242,14 +254,10 @@ export default function AgencyOnboardingPage() {
         opening_balance: 0,
         current_balance: 0,
       } as any);
+      if (error) throw error;
 
       toast.success('Trust account created');
-      // Skip step 4 for fresh path
-      if (path === 'fresh') {
-        setStep(5);
-      } else {
-        setStep(4);
-      }
+      setStep(3);
     } catch (e: unknown) {
       toast.error(getErrorMessage(e) || 'Failed to create trust account');
     } finally {
@@ -259,12 +267,12 @@ export default function AgencyOnboardingPage() {
 
   const handleSkipTrustAccount = async () => {
     if (!user) return;
-    await supabase.from('agents').update({ trust_setup_pending: true } as any).eq('user_id', user.id);
-    if (path === 'fresh') {
-      setStep(5);
-    } else {
-      setStep(4);
+    const { error } = await supabase.from('agents').update({ trust_setup_pending: true } as any).eq('user_id', user.id);
+    if (error) {
+      toast.error(getErrorMessage(error) || 'Failed to skip trust account setup');
+      return;
     }
+    setStep(3);
   };
 
   const generateImportChecklist = () => {
@@ -1290,8 +1298,8 @@ export default function AgencyOnboardingPage() {
     setStep(s => s + 1);
   };
 
-  const showBackButton = step > 0 && step < 3 && !showPasswordStep;
-  const showNextButton = !showPasswordStep && step < 3 && !(path === 'fresh' && step === 3);
+  const showBackButton = step > 0 && !showPasswordStep && (step < 3 || (path === 'migration' && step === 3));
+  const showNextButton = !showPasswordStep && (step < 3 || (path === 'migration' && step === 3));
 
   const stepLabels = path === 'migration'
     ? ['Welcome', 'Agency', 'Trust Account', 'Cut-over', 'Import', 'Complete']

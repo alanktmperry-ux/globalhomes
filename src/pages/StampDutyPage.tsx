@@ -5,7 +5,7 @@ import { FIRBCalculator } from '@/components/FIRBCalculator';
 import { MortgageBrokerCTA } from '@/features/mortgage/components/MortgageBrokerCTA';
 import { MortgageReferralModal } from '@/components/MortgageReferralModal';
 import { Button } from '@/components/ui/button';
-import { useTranslation } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 export default function StampDutyPage() {
   const [mortgageOpen, setMortgageOpen] = useState(false);

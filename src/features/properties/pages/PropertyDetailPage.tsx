@@ -45,6 +45,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { ShareSheet } from '@/shared/components/ShareSheet';
 import { MortgageBrokerCTA } from '@/features/mortgage/components/MortgageBrokerCTA';
 import { MortgageReferralModal } from '@/components/MortgageReferralModal';
+import { useListingTranslation } from '@/features/properties/hooks/useListingTranslation';
 
 export default function PropertyDetailPage() {
   // Support both /property/:slug and /property/:uuid for backward compat

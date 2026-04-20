@@ -83,7 +83,9 @@ export function AIPropertySearch() {
         throw new Error(detail);
       }
       const data = await res.json();
+      console.log('[AIPropertySearch] raw response:', { hasProperties: Array.isArray(data?.properties), count: data?.properties?.length, firstId: data?.properties?.[0]?.id, intent: data?.intent });
       const mapped: Property[] = (data.properties ?? []).map((p: any) => mapDbProperty(p));
+      console.log('[AIPropertySearch] mapped count:', mapped.length, 'first:', mapped[0] ? { id: mapped[0].id, suburb: mapped[0].suburb, beds: mapped[0].beds } : null);
       setProperties(mapped);
       setIntent(data.intent ?? null);
     } catch (e: any) {

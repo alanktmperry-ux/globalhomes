@@ -284,6 +284,12 @@ const AdminUsers = () => {
         if (delError) {
           throw new Error(delError.message || 'Delete failed');
         }
+        if (delData?.error) {
+          throw new Error(delData.error);
+        }
+        if (delData?.errors?.length > 0) {
+          console.warn('Agent deletion had partial errors:', delData.errors);
+        }
         toast({ title: 'Agent permanently deleted', description: 'All agent data, listings, trust accounts, and auth account have been removed.' });
       } else {
         await callAdminApi('delete_user', { user_id: userId });

@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import JoinExclusiveModal from '../components/JoinExclusiveModal';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 const FEATURES = [
   { icon: Eye, title: 'First access', body: 'See premium listings up to 14 days before they hit REA or Domain.' },
@@ -29,17 +30,18 @@ const FAQ = [
 export default function ExclusiveLandingPage() {
   const [joinOpen, setJoinOpen] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <>
       <Helmet>
-        <title>ListHQ Exclusive | Access Pre-Market Properties First</title>
-        <meta name="description" content="Join ListHQ Exclusive and see homes before they hit the market. $29/month. Cancel anytime." />
+        <title>{t('exclusive.hero.eyebrow')} | ListHQ</title>
+        <meta name="description" content={t('exclusive.hero.subheadline')} />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Product",
-          "name": "ListHQ Exclusive",
-          "description": "Access pre-market properties before they're listed publicly",
+          "name": t('exclusive.hero.eyebrow'),
+          "description": t('exclusive.hero.subheadline'),
           "offers": {
             "@type": "Offer",
             "price": "29",
@@ -61,25 +63,26 @@ export default function ExclusiveLandingPage() {
         <div className="max-w-5xl mx-auto px-4 py-20 sm:py-28 relative">
           <Badge className="bg-red-500 hover:bg-red-500 text-white border-0 mb-5">NEW</Badge>
           <h1 className="font-display text-4xl sm:text-6xl font-bold tracking-tight mb-5">
-            See homes before<br />anyone else.
+            {t('exclusive.hero.headline')}
           </h1>
           <p className="text-lg sm:text-xl text-slate-300 max-w-2xl mb-8">
-            Get 14-day early access to properties before they hit REA or Domain. Less competition. Better outcomes.
+            {t('exclusive.hero.subheadline')}
           </p>
           <div className="flex flex-wrap gap-3">
             <Button size="lg" className="bg-primary hover:bg-primary/90 gap-2" onClick={() => setJoinOpen(true)}>
-              <Sparkles size={18} /> Join ListHQ Exclusive
+              <Sparkles size={18} /> {t('exclusive.hero.cta')}
             </Button>
             <Button size="lg" variant="outline" className="bg-transparent border-white/30 text-white hover:bg-white/10 hover:text-white" onClick={() => navigate('/exclusive/listings')}>
-              Browse exclusive listings <ChevronRight size={16} />
+              {t('exclusive.hero.ctaSecondary')} <ChevronRight size={16} />
             </Button>
           </div>
-          <p className="text-xs text-slate-400 mt-4">$29/month — Cancel anytime</p>
+          <p className="text-xs text-slate-400 mt-4">{t('exclusive.hero.ctaSub')}</p>
         </div>
       </section>
 
       {/* Features */}
       <section className="max-w-5xl mx-auto px-4 py-16">
+        <h2 className="font-display text-2xl font-bold text-center mb-10">{t('exclusive.benefits.title')}</h2>
         <div className="grid sm:grid-cols-3 gap-4">
           {FEATURES.map(f => (
             <div key={f.title} className="bg-card border border-border rounded-2xl p-6">

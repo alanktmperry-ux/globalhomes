@@ -262,6 +262,8 @@ export const FAQ_ITEMS: FaqItem[] = [
     category: 'agents',
     tags: ['buyer readiness', 'score', 'lead quality', 'buyer intent', 'matching'],
   },
+  },
+  {
     id: 'agent-inspection-reports',
     question: 'How do I conduct a property inspection and condition report?',
     answer: 'Go to Dashboard → Rent Roll, find the tenancy, and click "Inspections". From there:\n\n1. Click "Schedule Inspection" and select the type — Entry (move-in), Routine (periodic), or Exit (move-out). Enter the inspection date, owner name and email. The system checks your state\'s minimum notice period and warns you if the date is too soon.\n\n2. On the day, open the inspection from the Rent Roll. Work through each room on your phone — tap the condition (Excellent / Good / Fair / Poor / Damaged), add notes, and upload photos directly from your camera.\n\n3. Record the water meter reading, key count, and smoke alarm test results in the overview section.\n\n4. Flag any maintenance issues directly from the room — set priority (Urgent / Normal / Low) and they appear in a maintenance summary at the bottom.\n\n5. When complete, tap "Finalise Report". The system generates the report and lets you email it to the owner and the tenant simultaneously.\n\nTenants receive a link to view the report online and can formally Accept it or raise Concerns within their state\'s dispute window. All responses are recorded against the inspection.',

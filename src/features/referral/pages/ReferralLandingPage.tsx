@@ -238,14 +238,14 @@ export default function ReferralLandingPage() {
               </div>
 
               <div>
-                <Label htmlFor="password">Password *</Label>
+                <Label htmlFor="password">{t('referral.form.password')} *</Label>
                 <Input id="password" type="password" value={form.password} onChange={e => update('password', e.target.value)} required minLength={8} maxLength={72} />
-                <p className="text-xs text-muted-foreground mt-1">At least 8 characters.</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('referral.form.passwordHint')}</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="country">Country *</Label>
+                  <Label htmlFor="country">{t('referral.form.country')} *</Label>
                   <select
                     id="country"
                     value={form.country}
@@ -253,12 +253,12 @@ export default function ReferralLandingPage() {
                     required
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   >
-                    <option value="">Select country</option>
+                    <option value="">{t('referral.form.selectCountry')}</option>
                     {REFERRAL_COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>
-                  <Label htmlFor="language_preference">Preferred language *</Label>
+                  <Label htmlFor="language_preference">{t('referral.form.language')} *</Label>
                   <select
                     id="language_preference"
                     value={form.language_preference}
@@ -273,27 +273,27 @@ export default function ReferralLandingPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="agency_name">Agency / Company name</Label>
+                  <Label htmlFor="agency_name">{t('referral.form.agency')}</Label>
                   <Input id="agency_name" value={form.agency_name} onChange={e => update('agency_name', e.target.value)} maxLength={120} />
                 </div>
                 <div>
-                  <Label htmlFor="phone">Phone</Label>
+                  <Label htmlFor="phone">{t('referral.form.phone')}</Label>
                   <Input id="phone" type="tel" value={form.phone} onChange={e => update('phone', e.target.value)} maxLength={40} />
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="wechat_id">WeChat ID</Label>
+                <Label htmlFor="wechat_id">{t('referral.form.wechat')}</Label>
                 <Input id="wechat_id" value={form.wechat_id} onChange={e => update('wechat_id', e.target.value)} maxLength={60} />
               </div>
 
               <Button type="submit" disabled={submitting} className="w-full gap-2">
                 {submitting && <Loader2 size={16} className="animate-spin" />}
-                {submitting ? 'Creating account…' : 'Create referral account'}
+                {submitting ? t('referral.form.submitting') : t('referral.form.submit')}
               </Button>
 
               <p className="text-xs text-muted-foreground text-center">
-                By signing up you agree to our <Link to="/terms" className="underline">Terms</Link> and <Link to="/privacy" className="underline">Privacy Policy</Link>.
+                {t('referral.form.terms')} <Link to="/terms" className="underline">{t('referral.form.termsLink')}</Link> {t('referral.form.and')} <Link to="/privacy" className="underline">{t('referral.form.privacyLink')}</Link>.
               </p>
             </form>
           </div>

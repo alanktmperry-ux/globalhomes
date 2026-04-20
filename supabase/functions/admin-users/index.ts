@@ -353,10 +353,8 @@ Deno.serve(async (req) => {
 
       if (rpcError) {
         console.error("delete_user_cascade error:", rpcError);
-        return new Response(
-          JSON.stringify({ error: "User deletion failed. No data was deleted. Please try again.", details: rpcError.message }),
-          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        warnings.push(`delete_user_cascade: ${rpcError.message}`);
+        // Continue — still delete the auth user even if cascade had errors
       }
 
       const { error: deleteAuthError } = await supabase.auth.admin.deleteUser(user_id);

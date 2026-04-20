@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { z } from 'zod';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 const schema = z.object({
   customer_name: z.string().trim().min(1, 'Name is required').max(100),
@@ -31,6 +32,7 @@ interface RequestQuoteModalProps {
 }
 
 export function RequestQuoteModal({ open, onOpenChange, provider }: RequestQuoteModalProps) {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -86,47 +88,47 @@ export function RequestQuoteModal({ open, onOpenChange, provider }: RequestQuote
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Request a quote{provider ? ` — ${provider.name}` : ''}</DialogTitle>
+          <DialogTitle>{t('homeServices.modal.title', { providerName: provider?.name ?? '' })}</DialogTitle>
           <DialogDescription>
-            Share a few details and the provider will get back to you within 4 hours.
+            {t('homeServices.modal.description')}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
-            <Label htmlFor="rq-name">Your name</Label>
+            <Label htmlFor="rq-name">{t('homeServices.modal.nameLabel')}</Label>
             <Input id="rq-name" value={name} onChange={(e) => setName(e.target.value)} required />
           </div>
           <div>
-            <Label htmlFor="rq-email">Email</Label>
+            <Label htmlFor="rq-email">{t('homeServices.modal.emailLabel')}</Label>
             <Input id="rq-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
           <div>
-            <Label htmlFor="rq-phone">Phone</Label>
+            <Label htmlFor="rq-phone">{t('homeServices.modal.phoneLabel')}</Label>
             <Input id="rq-phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
           </div>
           <div>
-            <Label htmlFor="rq-addr">Property address</Label>
-            <Input id="rq-addr" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="e.g. 12 Smith St, Surry Hills NSW" />
+            <Label htmlFor="rq-addr">{t('homeServices.modal.addressLabel')}</Label>
+            <Input id="rq-addr" value={address} onChange={(e) => setAddress(e.target.value)} placeholder={t('homeServices.modal.addressPlaceholder')} />
           </div>
           <div>
-            <Label htmlFor="rq-date">Preferred date</Label>
+            <Label htmlFor="rq-date">{t('homeServices.modal.dateLabel')}</Label>
             <Input id="rq-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           </div>
           <div>
-            <Label htmlFor="rq-msg">Message</Label>
+            <Label htmlFor="rq-msg">{t('homeServices.modal.messageLabel')}</Label>
             <Textarea
               id="rq-msg"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Anything the provider should know?"
+              placeholder={t('homeServices.modal.messagePlaceholder')}
               rows={3}
             />
           </div>
           <Button type="submit" disabled={submitting} className="w-full">
             {submitting ? (
-              <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Sending…</>
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t('homeServices.modal.sending')}</>
             ) : (
-              'Send request'
+              t('homeServices.modal.sendButton')
             )}
           </Button>
         </form>

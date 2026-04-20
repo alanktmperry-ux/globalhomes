@@ -147,16 +147,20 @@ export const zhCN: Record<keyof typeof EnBase, string> = {
   'homeServices.pageTitle': '家居服务市场',
   'homeServices.pageSubtitle': '为您的房产寻找值得信赖的专业人士。包括清洁、验房、搬家等服务。',
 
+  'homeServices.hero.title': '让您的房产做好上市准备',
+  'homeServices.hero.subtitle': '预订经过审核的专业人士 — 摄影、布置、验房等更多服务。',
+
   'homeServices.search.placeholder': '搜索服务或社区',
   'homeServices.filter.allCategories': '所有类别',
+  'homeServices.category.photography': '摄影',
+  'homeServices.category.floorPlans': '平面图',
+  'homeServices.category.virtualStaging': '虚拟布置',
+  'homeServices.category.pestInspection': '虫害检查',
+  'homeServices.category.buildingInspection': '建筑检查',
+  'homeServices.category.conveyancing': '产权转让',
   'homeServices.category.cleaning': '清洁',
-  'homeServices.category.inspection': '建筑及虫害检查',
-  'homeServices.category.removalist': '搬家服务',
-  'homeServices.category.handyman': '维修工',
-  'homeServices.category.gardening': '园艺',
-  'homeServices.category.electrical': '电工',
-  'homeServices.category.plumbing': '水管工',
-  'homeServices.category.painting': '油漆',
+  'homeServices.category.landscaping': '园艺',
+  'homeServices.category.removalists': '搬家服务',
 
   'homeServices.card.from': '起价',
   'homeServices.card.viewProfile': '查看资料',
@@ -164,13 +168,30 @@ export const zhCN: Record<keyof typeof EnBase, string> = {
   'homeServices.card.verified': '已认证',
   'homeServices.card.rating': '评分',
   'homeServices.card.reviews': '评价',
+  'homeServices.card.contactForQuote': '联系获取报价',
 
   'homeServices.empty.title': '未找到相关服务',
   'homeServices.empty.subtitle': '请尝试更改筛选条件或搜索其他社区。',
+  'homeServices.empty.noProviders': '该类别暂无服务商 — 敬请期待。',
   'homeServices.error.loadFailed': '无法加载服务列表,请刷新页面。',
 
   'homeServices.cta.becomeProvider': '上架您的业务',
   'homeServices.cta.becomeProviderSub': '触达澳大利亚各地的买家与卖家。',
+
+  'homeServices.modal.title': '索取报价{providerName ? ` — ${providerName}` : \'\'}',
+  'homeServices.modal.description': '分享一些详细信息,服务商将在4小时内与您联系。',
+  'homeServices.modal.nameLabel': '您的姓名',
+  'homeServices.modal.emailLabel': '电子邮箱',
+  'homeServices.modal.phoneLabel': '电话',
+  'homeServices.modal.addressLabel': '房产地址',
+  'homeServices.modal.addressPlaceholder': '例如:史密斯街12号,萨里山 新南威尔士州',
+  'homeServices.modal.dateLabel': '首选日期',
+  'homeServices.modal.messageLabel': '留言',
+  'homeServices.modal.messagePlaceholder': '服务商需要了解什么?',
+  'homeServices.modal.sending': '发送中…',
+  'homeServices.modal.sendButton': '发送请求',
+
+  'homeServices.footer.disclaimer': '所列服务商均为独立企业。ListHQ可能会在预订时收取推荐费。',
 
   // ──────────────────────────────────────────────────────────────────
   // Referral page

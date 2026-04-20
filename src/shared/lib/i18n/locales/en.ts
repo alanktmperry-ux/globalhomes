@@ -149,16 +149,20 @@ export const en = {
   'homeServices.pageTitle': 'Home Services Marketplace',
   'homeServices.pageSubtitle': 'Find trusted tradespeople for your property. Cleaners, inspectors, removalists and more.',
 
+  'homeServices.hero.title': 'Get your property market-ready',
+  'homeServices.hero.subtitle': 'Book vetted professionals — photography, styling, inspections and more.',
+
   'homeServices.search.placeholder': 'Search services or suburbs',
   'homeServices.filter.allCategories': 'All categories',
+  'homeServices.category.photography': 'Photography',
+  'homeServices.category.floorPlans': 'Floor Plans',
+  'homeServices.category.virtualStaging': 'Virtual Staging',
+  'homeServices.category.pestInspection': 'Pest Inspection',
+  'homeServices.category.buildingInspection': 'Building Inspection',
+  'homeServices.category.conveyancing': 'Conveyancing',
   'homeServices.category.cleaning': 'Cleaning',
-  'homeServices.category.inspection': 'Building & pest inspection',
-  'homeServices.category.removalist': 'Removalists',
-  'homeServices.category.handyman': 'Handyman',
-  'homeServices.category.gardening': 'Gardening',
-  'homeServices.category.electrical': 'Electrical',
-  'homeServices.category.plumbing': 'Plumbing',
-  'homeServices.category.painting': 'Painting',
+  'homeServices.category.landscaping': 'Landscaping',
+  'homeServices.category.removalists': 'Removalists',
 
   'homeServices.card.from': 'From',
   'homeServices.card.viewProfile': 'View profile',
@@ -166,13 +170,30 @@ export const en = {
   'homeServices.card.verified': 'Verified',
   'homeServices.card.rating': 'rating',
   'homeServices.card.reviews': 'reviews',
+  'homeServices.card.contactForQuote': 'Contact for quote',
 
   'homeServices.empty.title': 'No services found',
   'homeServices.empty.subtitle': 'Try changing your filters or search a different suburb.',
+  'homeServices.empty.noProviders': 'No providers found for this category yet — check back soon.',
   'homeServices.error.loadFailed': 'Could not load services. Please refresh.',
 
   'homeServices.cta.becomeProvider': 'List your business',
   'homeServices.cta.becomeProviderSub': 'Reach buyers and sellers across Australia.',
+
+  'homeServices.modal.title': 'Request a quote{providerName ? ` — ${providerName}` : \'\'}',
+  'homeServices.modal.description': 'Share a few details and the provider will get back to you within 4 hours.',
+  'homeServices.modal.nameLabel': 'Your name',
+  'homeServices.modal.emailLabel': 'Email',
+  'homeServices.modal.phoneLabel': 'Phone',
+  'homeServices.modal.addressLabel': 'Property address',
+  'homeServices.modal.addressPlaceholder': 'e.g. 12 Smith St, Surry Hills NSW',
+  'homeServices.modal.dateLabel': 'Preferred date',
+  'homeServices.modal.messageLabel': 'Message',
+  'homeServices.modal.messagePlaceholder': 'Anything the provider should know?',
+  'homeServices.modal.sending': 'Sending…',
+  'homeServices.modal.sendButton': 'Send request',
+
+  'homeServices.footer.disclaimer': 'Providers listed are independent businesses. ListHQ may receive a referral fee on bookings.',
 
   // ──────────────────────────────────────────────────────────────────
   // Referral page

@@ -148,16 +148,20 @@ export const zhTW: Record<keyof typeof EnBase, string> = {
   'homeServices.pageTitle': '家居服務市場',
   'homeServices.pageSubtitle': '為您的物業尋找值得信賴的專業人士。包括清潔、驗樓、搬屋等服務。',
 
+  'homeServices.hero.title': '讓您的房產做好上市準備',
+  'homeServices.hero.subtitle': '預訂經過審核的專業人士 — 攝影、佈置、驗樓等更多服務。',
+
   'homeServices.search.placeholder': '搜尋服務或地區',
   'homeServices.filter.allCategories': '所有類別',
+  'homeServices.category.photography': '攝影',
+  'homeServices.category.floorPlans': '平面圖',
+  'homeServices.category.virtualStaging': '虛擬佈置',
+  'homeServices.category.pestInspection': '蟲害檢查',
+  'homeServices.category.buildingInspection': '建築檢查',
+  'homeServices.category.conveyancing': '產權轉讓',
   'homeServices.category.cleaning': '清潔',
-  'homeServices.category.inspection': '建築及蟲害檢查',
-  'homeServices.category.removalist': '搬屋服務',
-  'homeServices.category.handyman': '維修工',
-  'homeServices.category.gardening': '園藝',
-  'homeServices.category.electrical': '電工',
-  'homeServices.category.plumbing': '水管工',
-  'homeServices.category.painting': '油漆',
+  'homeServices.category.landscaping': '園藝',
+  'homeServices.category.removalists': '搬屋服務',
 
   'homeServices.card.from': '起價',
   'homeServices.card.viewProfile': '查看資料',
@@ -165,13 +169,30 @@ export const zhTW: Record<keyof typeof EnBase, string> = {
   'homeServices.card.verified': '已認證',
   'homeServices.card.rating': '評分',
   'homeServices.card.reviews': '評價',
+  'homeServices.card.contactForQuote': '聯絡獲取報價',
 
   'homeServices.empty.title': '未找到相關服務',
   'homeServices.empty.subtitle': '請嘗試更改篩選條件或搜尋其他地區。',
+  'homeServices.empty.noProviders': '該類別暫無服務商 — 敬請期待。',
   'homeServices.error.loadFailed': '無法載入服務列表,請重新整理頁面。',
 
   'homeServices.cta.becomeProvider': '上架您的業務',
   'homeServices.cta.becomeProviderSub': '觸達澳洲各地的買家與賣家。',
+
+  'homeServices.modal.title': '索取報價{providerName ? ` — ${providerName}` : \'\'}',
+  'homeServices.modal.description': '分享一些詳細資訊,服務商將在4小時內與您聯絡。',
+  'homeServices.modal.nameLabel': '您的姓名',
+  'homeServices.modal.emailLabel': '電郵地址',
+  'homeServices.modal.phoneLabel': '電話',
+  'homeServices.modal.addressLabel': '房產地址',
+  'homeServices.modal.addressPlaceholder': '例如:史密斯街12號,薩里山 新南威爾斯州',
+  'homeServices.modal.dateLabel': '首選日期',
+  'homeServices.modal.messageLabel': '留言',
+  'homeServices.modal.messagePlaceholder': '服務商需要了解什麼?',
+  'homeServices.modal.sending': '發送中…',
+  'homeServices.modal.sendButton': '發送請求',
+
+  'homeServices.footer.disclaimer': '所列服務商均為獨立企業。ListHQ可能會在預訂時收取推薦費。',
 
   // ──────────────────────────────────────────────────────────────────
   // Referral page

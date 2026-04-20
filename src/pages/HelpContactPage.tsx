@@ -7,10 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Mail, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 const subjects = ['Technical Issue', 'Billing', 'Listing', 'Report Content', 'Other'];
 
 export default function HelpContactPage() {
+  const { t } = useTranslation();
   const [form, setForm] = useState({ name: '', email: '', subject: 'Technical Issue', message: '' });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -39,13 +41,13 @@ export default function HelpContactPage() {
   return (
     <>
       <Helmet>
-        <title>Contact Support</title>
+        <title>{t('help.contact.title')}</title>
         <meta name="description" content="Contact the ListHQ support team for help with your account, listings, billing, or technical issues." />
         <link rel="canonical" href="https://listhq.com.au/help/contact" />
       </Helmet>
       <div className="min-h-screen bg-background">
         <div className="max-w-lg mx-auto px-4 py-12">
-          <h1 className="font-display text-2xl font-bold text-foreground mb-2">Contact Support</h1>
+          <h1 className="font-display text-2xl font-bold text-foreground mb-2">{t('help.contact.title')}</h1>
           <p className="text-sm text-muted-foreground mb-8">We aim to respond within 1 business day.</p>
 
           {submitted ? (
@@ -58,11 +60,11 @@ export default function HelpContactPage() {
             <Card className="p-6">
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="text-xs font-medium text-foreground mb-1 block">Name *</label>
+                  <label className="text-xs font-medium text-foreground mb-1 block">{t('help.contact.name')} *</label>
                   <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} maxLength={100} required />
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-foreground mb-1 block">Email *</label>
+                  <label className="text-xs font-medium text-foreground mb-1 block">{t('help.contact.email')} *</label>
                   <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} maxLength={255} required />
                 </div>
                 <div>
@@ -76,11 +78,11 @@ export default function HelpContactPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-foreground mb-1 block">Message *</label>
+                  <label className="text-xs font-medium text-foreground mb-1 block">{t('help.contact.message')} *</label>
                   <Textarea value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} rows={5} maxLength={2000} required />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Submitting…' : 'Send Message'}
+                  {loading ? t('help.contact.submitting') : t('help.contact.submit')}
                 </Button>
               </form>
             </Card>

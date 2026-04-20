@@ -289,4 +289,20 @@ export const zhTW: Record<keyof typeof EnBase, string> = {
   'referral.dashboard.property': '房產',
   'referral.dashboard.status': '狀態',
   'referral.dashboard.commission': '佣金',
+
+  // Help Centre
+  'help.pageTitle': '幫助中心',
+  'help.buyers.title': '買家幫助',
+  'help.agents.title': '經紀人幫助',
+  'help.renters.title': '租戶幫助',
+  'help.vendors.title': '賣家幫助',
+  'help.propertyManagers.title': '物業管理幫助',
+  'help.contact.title': '聯絡我們',
+  'help.contact.name': '您的姓名',
+  'help.contact.email': '您的電子郵箱',
+  'help.contact.message': '您的留言',
+  'help.contact.submit': '發送訊息',
+  'help.contact.submitting': '發送中…',
+  'help.contact.success': '訊息已發送，我們將在1個工作日內回覆。',
+  'help.faq.title': '常見問題',
 };

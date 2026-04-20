@@ -5,8 +5,10 @@ import { HelpSearch } from '@/features/help/components/HelpSearch';
 import { FaqAccordion } from '@/features/help/components/FaqAccordion';
 import { FAQ_ITEMS, FAQ_CATEGORIES } from '@/data/faq';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 export default function FaqPage() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { hash } = useLocation();
   const activeCategory = searchParams.get('category') || 'all';
@@ -34,7 +36,7 @@ export default function FaqPage() {
   return (
     <>
       <Helmet>
-        <title>FAQ — Frequently Asked Questions</title>
+        <title>{t('help.faq.title')}</title>
         <meta name="description" content="Find answers to frequently asked questions about ListHQ — property listings, auctions, rentals, and more." />
         <link rel="canonical" href="https://listhq.com.au/help/faq" />
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
@@ -42,7 +44,7 @@ export default function FaqPage() {
 
       <div className="min-h-screen bg-background">
         <div className="max-w-3xl mx-auto px-4 py-12">
-          <h1 className="font-display text-2xl font-bold text-foreground mb-6">Frequently Asked Questions</h1>
+          <h1 className="font-display text-2xl font-bold text-foreground mb-6">{t('help.faq.title')}</h1>
 
           <HelpSearch className="mb-8" />
 

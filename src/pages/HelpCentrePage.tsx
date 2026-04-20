@@ -6,6 +6,7 @@ import { FAQ_ITEMS } from '@/data/faq';
 import { ArrowRight, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 const categories = [
   { title: 'Agents', description: 'Listing, CRM, auctions, and billing', icon: 'Building2', href: '/help/agents' },
@@ -30,10 +31,11 @@ const popularArticles = [
 ];
 
 export default function HelpCentrePage() {
+  const { t } = useTranslation();
   return (
     <>
       <Helmet>
-        <title>Help Centre</title>
+        <title>{t('help.pageTitle')}</title>
         <meta name="description" content="Find answers to common questions about using ListHQ — Australia's real estate marketplace for agents, buyers, renters, and vendors." />
         <link rel="canonical" href="https://listhq.com.au/help" />
       </Helmet>

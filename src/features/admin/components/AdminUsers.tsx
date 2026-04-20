@@ -278,8 +278,13 @@ const AdminUsers = () => {
         toast({ title: 'Demo request deleted.' });
       } else if (isAgent) {
         // Use the dedicated admin-delete-agent edge function
+        const { data: sessionData } = await supabase.auth.getSession();
+        const token = sessionData.session?.access_token;
+        if (!token) throw new Error('No active session. Please sign in again.');
+
         const { data: delData, error: delError } = await supabase.functions.invoke('admin-delete-agent', {
           body: { userId },
+          headers: { Authorization: `Bearer ${token}` },
         });
         if (delError) {
           throw new Error(delError.message || 'Delete failed');

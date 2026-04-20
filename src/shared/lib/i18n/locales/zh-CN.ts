@@ -89,12 +89,29 @@ export const zhCN: Record<keyof typeof EnBase, string> = {
   'stampDuty.result.savings': '作为首次置业者,您可节省 {amount}',
   'stampDuty.result.notEligible': '此价格不符合首次置业者优惠条件。',
   'stampDuty.result.disclaimer': '仅供参考估算。最终印花税由您的律师或产权转让师在交割时核算。',
+  'stampDuty.result.effectiveRate': '实际税率',
+  'stampDuty.result.upfrontCosts': '预估总前期费用（不含定金）',
+  'stampDuty.result.legalFees': '法律/产权转让费（预估）',
+  'stampDuty.result.inspectionFees': '建筑及虫害检查费（预估）',
+  'stampDuty.result.lenderFees': '贷款机构费用（预估）',
+  'stampDuty.result.showBreakdown': '显示税率分级明细',
+  'stampDuty.result.hideBreakdown': '隐藏税率分级明细',
 
   'stampDuty.error.invalidPrice': '请输入有效的房产价格。',
   'stampDuty.error.priceTooLow': '价格必须大于 $0。',
+  'stampDuty.error.enterPrice': '请输入购买价格以进行计算',
   'stampDuty.cta.broker': '了解您的贷款额度',
   'stampDuty.cta.brokerSub': '联系房屋贷款经纪人,今天就获得预批。',
   'stampDuty.cta.brokerButton': '联系贷款经纪人',
+
+  'stampDuty.firb.required': '购买前需获得FIRB批准——请前往申请',
+
+  'stampDuty.seo.howItWorksTitle': '澳大利亚印花税如何运作',
+  'stampDuty.seo.howItWorksText': '印花税（也称为产权转让税或土地转让税）是您在购买房产时向州政府缴纳的税款。每个州和领地都设定自己的税率、起征点和优惠政策。税率采用累进方式计算——类似于所得税——价格越高，适用的边际税率也越高。',
+  'stampDuty.seo.concessionsTitle': '各州首次置业者优惠政策',
+  'stampDuty.seo.concessionsText': '大多数州为购买低于特定价格门槛的首次置业者提供显著的印花税减免。新南威尔士州对80万澳元以下的房产提供全额豁免。维多利亚州对60万澳元以下的购买免征印花税。昆士兰州为符合条件的买家提供前35万澳元价格的优惠。',
+  'stampDuty.seo.whenPaidTitle': '印花税何时缴纳？',
+  'stampDuty.seo.whenPaidText': '在大多数州，印花税通常在交割后30天内缴纳。您的产权转让师或律师会代您处理付款事宜。必须在房产转让登记到州土地所有权办公室之前完成缴纳。',
 
   // ──────────────────────────────────────────────────────────────────
   // Exclusive landing page

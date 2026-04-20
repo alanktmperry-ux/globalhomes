@@ -90,12 +90,29 @@ export const zhTW: Record<keyof typeof EnBase, string> = {
   'stampDuty.result.savings': '作為首次置業者,您可節省 {amount}',
   'stampDuty.result.notEligible': '此價格不符合首次置業者優惠條件。',
   'stampDuty.result.disclaimer': '僅供參考估算。最終印花稅由您的律師或產權轉讓師於成交時核算。',
+  'stampDuty.result.effectiveRate': '實際稅率',
+  'stampDuty.result.upfrontCosts': '預估總前期費用（不含定金）',
+  'stampDuty.result.legalFees': '法律/產權轉讓費（預估）',
+  'stampDuty.result.inspectionFees': '建築及蟲害檢查費（預估）',
+  'stampDuty.result.lenderFees': '貸款機構費用（預估）',
+  'stampDuty.result.showBreakdown': '顯示稅率分級明細',
+  'stampDuty.result.hideBreakdown': '隱藏稅率分級明細',
 
   'stampDuty.error.invalidPrice': '請輸入有效的物業價格。',
   'stampDuty.error.priceTooLow': '價格必須大於 $0。',
+  'stampDuty.error.enterPrice': '請輸入購買價格以進行計算',
   'stampDuty.cta.broker': '了解您的貸款額度',
-  'stampDuty.cta.brokerSub': '聯絡房屋貸款經紀,今日獲得預先批核。',
+  'stampDuty.cta.brokerSub': '聯絡房屋貸款經紀，今日獲得預先批核。',
   'stampDuty.cta.brokerButton': '聯絡貸款經紀',
+
+  'stampDuty.firb.required': '購買前需獲得FIRB批准——請前往申請',
+
+  'stampDuty.seo.howItWorksTitle': '澳洲印花稅如何運作',
+  'stampDuty.seo.howItWorksText': '印花稅（亦稱為產權轉讓稅或土地轉讓稅）是您在購買物業時向州政府繳納的稅款。每個州和領地都設定自己的稅率、起徵點和優惠政策。稅率採用累進方式計算——類似於所得稅——價格越高，適用的邊際稅率也越高。',
+  'stampDuty.seo.concessionsTitle': '各州首次置業者優惠政策',
+  'stampDuty.seo.concessionsText': '大多數州為購買低於特定價格門檻的首次置業者提供顯著的印花稅減免。新南威爾斯州對80萬澳元以下的物業提供全額豁免。維多利亞州對60萬澳元以下的購買免徵印花稅。昆士蘭州為符合條件的買家提供前35萬澳元價格的優惠。',
+  'stampDuty.seo.whenPaidTitle': '印花稅何時繳納？',
+  'stampDuty.seo.whenPaidText': '在大多數州，印花稅通常在交割後30天內繳納。您的產權轉讓師或律師會代您處理付款事宜。必須在物業轉讓登記到州土地所有權辦公室之前完成繳納。',
 
   // ──────────────────────────────────────────────────────────────────
   // Exclusive landing page

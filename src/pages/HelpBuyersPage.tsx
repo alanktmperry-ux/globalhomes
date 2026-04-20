@@ -6,6 +6,7 @@ import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 const sections = [
   { title: 'Searching for Properties', ids: ['buyer-search', 'buyer-suburb-research'] },
+  { title: 'AI Search & Voice', ids: ['buyer-voice-search', 'buyer-ai-search', 'buyer-ai-search-language', 'buyer-anonymous-contact'] },
   { title: 'Sharing Properties', ids: ['buyer-share-property', 'buyer-share-wechat', 'pm-share-whatsapp-line'] },
   { title: 'Saving & Alerts', ids: ['buyer-save-property', 'buyer-saved-search'] },
   { title: 'Open Homes & Inspections', ids: ['buyer-open-home', 'buyer-enquire'] },
@@ -13,7 +14,7 @@ const sections = [
   { title: 'Research Tools', ids: ['buyer-what-sold', 'buyer-school-catchment', 'buyer-firb-calculator'] },
   { title: 'Documents', ids: ['buyer-documents'] },
   { title: 'Finance', ids: ['buyer-mortgage-calc'] },
-  { title: 'International Buyers', ids: ['buyer-international', 'buyer-listings-chinese', 'buyer-currency-display'] },
+  { title: 'International Buyers', ids: ['buyer-international', 'buyer-language-currency', 'buyer-listings-chinese', 'buyer-currency-display', 'buyer-translated-listings'] },
   { title: 'Account & Privacy', ids: ['create-account', 'reset-password', 'buyer-language-currency', 'tech-notifications', 'tech-data-privacy', 'tech-delete-account'] },
 ];
 

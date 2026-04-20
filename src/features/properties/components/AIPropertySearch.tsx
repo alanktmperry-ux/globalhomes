@@ -107,7 +107,7 @@ export function AIPropertySearch() {
     } finally {
       setLoading(false);
     }
-  }, [user, t]);
+  }, [user, t, language]);
 
   const handleSelect = useCallback((p: Property) => navigate(`/property/${p.id}`), [navigate]);
   const handleToggleSave = useCallback((id: string) => {

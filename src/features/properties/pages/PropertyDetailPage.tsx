@@ -73,6 +73,7 @@ export default function PropertyDetailPage() {
   const [translating, setTranslating] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [mortgageOpen, setMortgageOpen] = useState(false);
+  const { title: translatedTitle, description: translatedDescription, isTranslating, isTranslated } = useListingTranslation(rawProperty);
   useEffect(() => {
     const fetchProperty = async () => {
       setLoading(true);
@@ -404,7 +405,11 @@ export default function PropertyDetailPage() {
                 </>
               )}
               <div className="flex items-center gap-2 mt-2">
-                <h1 className="font-display text-xl md:text-2xl font-semibold text-foreground">{property.title}</h1>
+                <h1 className="font-display text-xl md:text-2xl font-semibold text-foreground">
+                  {isTranslating ? (
+                    <span className="inline-block h-6 w-2/3 rounded bg-muted animate-pulse align-middle" aria-hidden />
+                  ) : translatedTitle}
+                </h1>
                 {(property as any).listing_mode && (property as any).listing_mode !== 'public' && (
                   <OffMarketBadge mode={(property as any).listing_mode} closeDate={(property as any).eoi_close_date} />
                 )}

@@ -285,6 +285,22 @@ export const en = {
   'referral.dashboard.property': 'Property',
   'referral.dashboard.status': 'Status',
   'referral.dashboard.commission': 'Commission',
+
+  // Help Centre
+  'help.pageTitle': 'Help Centre',
+  'help.buyers.title': 'Help for Buyers',
+  'help.agents.title': 'Help for Agents',
+  'help.renters.title': 'Help for Renters',
+  'help.vendors.title': 'Help for Vendors',
+  'help.propertyManagers.title': 'Help for Property Managers',
+  'help.contact.title': 'Contact Us',
+  'help.contact.name': 'Your name',
+  'help.contact.email': 'Your email',
+  'help.contact.message': 'Your message',
+  'help.contact.submit': 'Send message',
+  'help.contact.submitting': 'Sending…',
+  'help.contact.success': "Message sent. We'll be in touch within 1 business day.",
+  'help.faq.title': 'Frequently Asked Questions',
 } as const;
 
 export type TranslationKey = keyof typeof en;

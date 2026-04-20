@@ -288,4 +288,20 @@ export const zhCN: Record<keyof typeof EnBase, string> = {
   'referral.dashboard.property': '房产',
   'referral.dashboard.status': '状态',
   'referral.dashboard.commission': '佣金',
+
+  // Help Centre
+  'help.pageTitle': '帮助中心',
+  'help.buyers.title': '买家帮助',
+  'help.agents.title': '经纪人帮助',
+  'help.renters.title': '租户帮助',
+  'help.vendors.title': '卖家帮助',
+  'help.propertyManagers.title': '物业管理帮助',
+  'help.contact.title': '联系我们',
+  'help.contact.name': '您的姓名',
+  'help.contact.email': '您的邮箱',
+  'help.contact.message': '您的留言',
+  'help.contact.submit': '发送消息',
+  'help.contact.submitting': '发送中…',
+  'help.contact.success': '消息已发送，我们将在1个工作日内回复。',
+  'help.faq.title': '常见问题',
 };

@@ -228,6 +228,13 @@ export const FAQ_ITEMS: FaqItem[] = [
     tags: ['CMA', 'comparative market analysis', 'appraisal', 'valuation', 'vendor', 'report', 'market'],
   },
   {
+    id: 'agent-suburb-intelligence',
+    question: 'How does the suburb intelligence tool work?',
+    answer: 'The Suburb Intelligence panel (Dashboard → Market → Suburb Intelligence) gives you a live market snapshot for any suburb you manage or prospect in.\n\nWhat it shows:\n• Median sale price and median days on market for the past 90 days\n• Active listing count vs. 90-day average — indicates whether supply is rising or falling\n• Auction clearance rate for the suburb\n• Buyer demand index — derived from saved searches and enquiry volume in the suburb\n• Price per square metre trend over the last 12 months\n\nHow to use it:\nType any suburb into the search box and the panel updates instantly. You can use this data to support your vendor appraisal conversations — showing a vendor real-time demand signals for their suburb helps justify your recommended price range and sale strategy.\n\nYou can also compare up to three suburbs side-by-side using the "Compare suburbs" button.',
+    category: 'agents',
+    tags: ['suburb intelligence', 'market data', 'median price', 'days on market', 'auction clearance', 'appraisal'],
+  },
+  {
     id: 'agent-lead-marketplace',
     question: 'What is the Lead Marketplace?',
     answer: 'The Lead Marketplace (Dashboard → Lead Marketplace) is a curated feed of buyer and renter leads that are available for agents to claim. These leads come from buyers who have submitted enquiries or voice searches on ListHQ but have not yet been connected to a specific agent.\n\nEach lead shows:\n• Buyer type (purchaser, investor, renter)\n• Property requirements (suburb, price range, bedrooms, property type)\n• Urgency (immediate, 1–3 months, flexible)\n• Lead source (voice search, open home, enquiry)\n\nYou can claim a lead to receive the buyer\'s full contact details and add them to your CRM. Claimed leads are removed from the marketplace so other agents cannot claim the same buyer. Lead Marketplace access is included on Agency and Professional plans.',
@@ -333,6 +340,13 @@ export const FAQ_ITEMS: FaqItem[] = [
     answer: 'Use the search bar on the homepage or the Search page. You can type a suburb, postcode, or address, or use the voice search button. Filter by price range, property type, bedrooms, bathrooms, land size, and features. Use the map view to browse by location. Toggle "Sold" to see recent sold results in a suburb.',
     category: 'buyers',
     tags: ['search', 'filter', 'map'],
+  },
+  {
+    id: 'buyer-suburb-research',
+    question: 'How do I research a suburb before buying?',
+    answer: 'ListHQ provides several suburb research tools on every listing page and suburb profile:\n\n• Recently Sold — scroll to "Recently Sold in [Suburb]" to see comparable sales with sold prices, days on market, and price per square metre.\n• School Catchments — the Schools section shows which primary and secondary schools include the property in their catchment zone.\n• Suburb Profile — click the suburb name on any listing to see median prices, days on market, auction clearance rates, and demographic data for that area.\n• Saved Search Alerts — set up alerts for a suburb so you are notified the moment a new listing matches your criteria. This helps you track how fast properties are moving.\n\nFor sold price history across a whole suburb, search for the suburb and select the "Sold" tab to see all recent transactions.',
+    category: 'buyers',
+    tags: ['suburb', 'research', 'sold prices', 'schools', 'demographics', 'market data'],
   },
   {
     id: 'buyer-save-property',

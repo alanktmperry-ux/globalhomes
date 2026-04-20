@@ -195,7 +195,12 @@ export default function AgencyOnboardingPage() {
 
   const getAuthToken = async () => {
     const { data: sessionData } = await supabase.auth.getSession();
-    const token = sessionData.session?.access_token;
+    let token = sessionData.session?.access_token;
+    if (!token) {
+      const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+      if (refreshError) throw refreshError;
+      token = refreshData.session?.access_token;
+    }
     if (!token) throw new Error('No active session. Please sign in again.');
     return token;
   };
@@ -205,7 +210,7 @@ export default function AgencyOnboardingPage() {
     setLoading(true);
     try {
       const token = await getAuthToken();
-      const { error: setupError } = await supabase.functions.invoke('setup-agent', {
+      const { data: setupData, error: setupError } = await supabase.functions.invoke('setup-agent', {
         body: {
           userId: user.id,
           email: user.email,
@@ -221,8 +226,10 @@ export default function AgencyOnboardingPage() {
           Authorization: `Bearer ${token}`,
         },
       });
+      if ((setupData as { success?: boolean; error?: string } | null)?.success === false) {
+        throw new Error((setupData as { error?: string }).error || 'Setup failed');
+      }
       if (setupError) {
-        // Try to get actual error from response body
         const detail = (setupError as any)?.context?.json?.error || setupError.message || 'Setup failed';
         throw new Error(detail);
       }

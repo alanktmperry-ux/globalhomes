@@ -4,6 +4,12 @@ import { getCorsHeaders } from "../_shared/cors.ts";
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req.headers.get("Origin"));
 
+  const respond = (payload: Record<string, unknown>) =>
+    new Response(JSON.stringify(payload), {
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -17,10 +23,7 @@ Deno.serve(async (req) => {
     // Fix #2: Verify caller identity from JWT
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respond({ success: false, error: "Unauthorized" });
     }
 
     const anonClient = createClient(
@@ -31,10 +34,7 @@ Deno.serve(async (req) => {
 
     const { data: { user }, error: claimsErr } = await anonClient.auth.getUser();
     if (claimsErr || !user?.id) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respond({ success: false, error: "Unauthorized" });
     }
 
     const {
@@ -46,17 +46,11 @@ Deno.serve(async (req) => {
 
     // Enforce caller.id === userId
     if (user.id !== userId) {
-      return new Response(JSON.stringify({ error: "Forbidden: caller ID mismatch" }), {
-        status: 403,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respond({ success: false, error: "Forbidden: caller ID mismatch" });
     }
 
     if (!userId || !email || !mode) {
-      return new Response(JSON.stringify({ error: "Missing required fields" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respond({ success: false, error: "Missing required fields" });
     }
 
     // 1. Insert agent role
@@ -188,9 +182,7 @@ Deno.serve(async (req) => {
         }, { onConflict: "user_id", ignoreDuplicates: false });
       if (agentError) throw agentError;
 
-      return new Response(JSON.stringify({ success: true, agencyId: agency.id }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respond({ success: true, agencyId: agency.id });
     } else if (mode === "join-agency") {
       if (!inviteCode?.trim()) throw new Error("Invite code is required");
 
@@ -228,19 +220,11 @@ Deno.serve(async (req) => {
         }, { onConflict: "user_id" });
       if (agentError) throw agentError;
 
-      return new Response(JSON.stringify({ success: true, agencyName: agencyData?.name }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respond({ success: true, agencyName: agencyData?.name });
     }
 
-    return new Response(JSON.stringify({ error: "Invalid mode" }), {
-      status: 400,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return respond({ success: false, error: "Invalid mode" });
   } catch (err) {
-    return new Response(JSON.stringify({ error: (err as Error).message }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return respond({ success: false, error: (err as Error).message });
   }
 });

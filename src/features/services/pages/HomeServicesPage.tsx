@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { RequestQuoteModal } from '@/features/services/components/RequestQuoteModal';
+import { useTranslation } from '@/shared/lib/i18n';
 
 interface Provider {
   id: string;
@@ -38,13 +39,14 @@ const CATEGORIES = [
 const categoryLabel = (key: string) =>
   CATEGORIES.find(c => c.key === key)?.label ?? key;
 
-const formatPriceRange = (p: Provider) => {
-  if (p.price_from == null) return 'Contact for quote';
+const formatPriceRange = (p: Provider, t: (k: string) => string) => {
+  if (p.price_from == null) return t('homeServices.card.contactForQuote');
   const unit = p.price_unit && p.price_unit !== 'job' ? `/${p.price_unit}` : '';
-  return `From $${Math.round(p.price_from).toLocaleString()}${unit}`;
+  return `${t('homeServices.card.from')} $${Math.round(p.price_from).toLocaleString()}${unit}`;
 };
 
 export default function HomeServicesPage() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCat = searchParams.get('category') || 'all';
   const [activeCategory, setActiveCategory] = useState<string>(initialCat);
@@ -81,10 +83,10 @@ export default function HomeServicesPage() {
   return (
     <>
       <Helmet>
-        <title>Home Services Marketplace | ListHQ</title>
+        <title>{t('homeServices.pageTitle')} | ListHQ</title>
         <meta
           name="description"
-          content="Find trusted tradespeople for your property. Cleaners, inspectors, removalists and more."
+          content={t('homeServices.pageSubtitle')}
         />
         <link rel="canonical" href="https://listhq.com.au/home-services" />
       </Helmet>
@@ -93,10 +95,10 @@ export default function HomeServicesPage() {
         <section className="border-b border-border bg-secondary/30">
           <div className="max-w-6xl mx-auto px-4 py-12 md:py-16 text-center">
             <h1 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-3">
-              Get your property market-ready
+              {t('homeServices.hero.title')}
             </h1>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-              Book vetted professionals — photography, styling, inspections and more.
+              {t('homeServices.hero.subtitle')}
             </p>
           </div>
         </section>
@@ -111,9 +113,9 @@ export default function HomeServicesPage() {
                   : 'bg-card text-foreground border-border hover:bg-secondary'
               }`}
             >
-              All services
+              {t('homeServices.filter.allCategories')}
             </button>
-            {CATEGORIES.map(({ key, label, icon: Icon }) => (
+            {CATEGORIES.map(({ key, labelKey, icon: Icon }) => (
               <button
                 key={key}
                 onClick={() => setActiveCategory(key)}
@@ -124,7 +126,7 @@ export default function HomeServicesPage() {
                 }`}
               >
                 <Icon size={14} />
-                {label}
+                {t(labelKey)}
               </button>
             ))}
           </div>
@@ -135,7 +137,7 @@ export default function HomeServicesPage() {
             </div>
           ) : filtered.length === 0 ? (
             <div className="py-16 text-center text-sm text-muted-foreground">
-              No providers found for this category yet — check back soon.
+              {t('homeServices.empty.noProviders')}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -157,7 +159,7 @@ export default function HomeServicesPage() {
                   </div>
 
                   <Badge variant="secondary" className="self-start mb-3 text-[10px]">
-                    {categoryLabel(p.category)}
+                    {categoryLabel(p.category, t)}
                   </Badge>
 
                   {p.description && (
@@ -168,7 +170,7 @@ export default function HomeServicesPage() {
 
                   <div className="mt-auto space-y-2">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-semibold text-foreground">{formatPriceRange(p)}</span>
+                      <span className="font-semibold text-foreground">{formatPriceRange(p, t)}</span>
                       {p.suburb && (
                         <span className="inline-flex items-center gap-1 text-muted-foreground">
                           <MapPin size={11} />
@@ -181,7 +183,7 @@ export default function HomeServicesPage() {
                       className="w-full"
                       onClick={() => setQuoteProvider(p)}
                     >
-                      Request Quote
+                      {t('homeServices.card.requestQuote')}
                     </Button>
                   </div>
                 </article>
@@ -190,7 +192,7 @@ export default function HomeServicesPage() {
           )}
 
           <p className="text-[11px] text-muted-foreground text-center mt-10 leading-relaxed max-w-xl mx-auto">
-            Providers listed are independent businesses. ListHQ may receive a referral fee on bookings.
+            {t('homeServices.footer.disclaimer')}
           </p>
         </main>
 

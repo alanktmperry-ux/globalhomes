@@ -14,6 +14,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { supabase } from '@/integrations/supabase/client';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 interface Props {
   propertyPrice: number | null;
@@ -41,6 +42,7 @@ const FOREIGN_SURCHARGE: Record<AustralianState, number> = {
 };
 
 export function StampDutyCalculator({ propertyPrice, propertyAddress, propertyState }: Props) {
+  const { t } = useTranslation();
   const [price, setPrice] = useState(propertyPrice ? String(propertyPrice) : '');
   const [state, setState] = useState<AustralianState>(() => {
     if (propertyState) return propertyState;
@@ -88,11 +90,11 @@ export function StampDutyCalculator({ propertyPrice, propertyAddress, propertySt
                 <Calculator size={18} className="text-primary" />
               </div>
               <div className="text-left">
-                <p className="font-display text-sm font-semibold text-foreground">Stamp Duty Calculator</p>
+                <p className="font-display text-sm font-semibold text-foreground">{t('stampDuty.calculatorTitle')}</p>
                 {result ? (
-                  <p className="text-xs text-muted-foreground">Estimated duty: {formatDollars(result.duty)}</p>
+                  <p className="text-xs text-muted-foreground">{t('stampDuty.result.total')}: {formatDollars(result.duty)}</p>
                 ) : (
-                  <p className="text-xs text-muted-foreground">Calculate your upfront costs</p>
+                  <p className="text-xs text-muted-foreground">{t('stampDuty.placeholder.price')}</p>
                 )}
               </div>
             </div>
@@ -102,7 +104,7 @@ export function StampDutyCalculator({ propertyPrice, propertyAddress, propertySt
               {/* Inputs */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">Purchase price</label>
+                  <label className="text-xs font-medium text-muted-foreground">{t('stampDuty.label.price')}</label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
                     <input
@@ -110,13 +112,13 @@ export function StampDutyCalculator({ propertyPrice, propertyAddress, propertySt
                       inputMode="numeric"
                       value={price}
                       onChange={(e) => setPrice(e.target.value.replace(/[^0-9,]/g, ''))}
-                      placeholder="1,200,000"
+                      placeholder={t('stampDuty.placeholder.price')}
                       className="w-full pl-7 pr-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
                     />
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">State / Territory</label>
+                  <label className="text-xs font-medium text-muted-foreground">{t('stampDuty.label.state')}</label>
                   <select
                     value={state}
                     onChange={(e) => setState(e.target.value as AustralianState)}
@@ -131,7 +133,7 @@ export function StampDutyCalculator({ propertyPrice, propertyAddress, propertySt
 
               {/* Buyer type toggle */}
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">I am buying as…</label>
+                <label className="text-xs font-medium text-muted-foreground">{t('stampDuty.label.buyerType')}</label>
                 <div className="flex rounded-lg border border-border overflow-hidden">
                   <button
                     onClick={() => setBuyerType('owner_occupier')}
@@ -141,7 +143,7 @@ export function StampDutyCalculator({ propertyPrice, propertyAddress, propertySt
                         : 'bg-background text-muted-foreground hover:bg-secondary'
                     }`}
                   >
-                    Owner-occupier
+                    {t('stampDuty.buyerType.ownerOccupier')}
                   </button>
                   <button
                     onClick={() => { setBuyerType('investor'); setIsFirstHome(false); }}
@@ -151,7 +153,7 @@ export function StampDutyCalculator({ propertyPrice, propertyAddress, propertySt
                         : 'bg-background text-muted-foreground hover:bg-secondary'
                     }`}
                   >
-                    Investor
+                    {t('stampDuty.buyerType.investor')}
                   </button>
                 </div>
               </div>
@@ -172,7 +174,7 @@ export function StampDutyCalculator({ propertyPrice, propertyAddress, propertySt
                       isFirstHome ? 'translate-x-5' : ''
                     }`} />
                   </button>
-                  <span className="text-sm text-foreground">I'm a first home buyer</span>
+                  <span className="text-sm text-foreground">{t('stampDuty.label.firstHome')}</span>
                 </label>
               )}
 
@@ -186,12 +188,12 @@ export function StampDutyCalculator({ propertyPrice, propertyAddress, propertySt
                     className="mt-0.5 h-4 w-4 rounded border-border accent-primary"
                   />
                   <span className="text-sm text-foreground leading-snug">
-                    I am a foreign buyer (non-Australian citizen or permanent resident)
+                    {t('stampDuty.label.foreign')}
                   </span>
                 </label>
                 {isForeignBuyer && (
                   <p className="text-[11px] text-muted-foreground pl-7 leading-relaxed">
-                    FIRB approval required before purchasing — apply at{' '}
+                    {t('stampDuty.firb.required')}{' '}
                     <a href="https://firb.gov.au" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
                       firb.gov.au
                     </a>
@@ -203,13 +205,13 @@ export function StampDutyCalculator({ propertyPrice, propertyAddress, propertySt
               {result && (
                 <div className="space-y-3 pt-2">
                   <div className="flex items-center justify-between p-4 rounded-xl bg-secondary">
-                    <span className="text-sm font-medium text-foreground">Estimated stamp duty</span>
+                    <span className="text-sm font-medium text-foreground">{t('stampDuty.result.total')}</span>
                     <span className="font-display text-xl font-bold text-foreground">{formatDollars(result.duty)}</span>
                   </div>
 
                   {result.fhbExemption > 0 && (
                     <div className="flex items-center justify-between p-3 rounded-xl bg-accent/50 border border-accent">
-                      <span className="text-sm text-accent-foreground">🎉 FHB concession saves you</span>
+                      <span className="text-sm text-accent-foreground">{t('stampDuty.result.savings', { amount: formatDollars(result.fhbExemption) })}</span>
                       <span className="font-semibold text-accent-foreground">{formatDollars(result.fhbExemption)}</span>
                     </div>
                   )}
@@ -224,12 +226,12 @@ export function StampDutyCalculator({ propertyPrice, propertyAddress, propertySt
                   {isForeignBuyer && (
                     <>
                       <div className="flex items-center justify-between p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
-                        <span className="text-sm text-foreground">FIRB Application Fee</span>
+                        <span className="text-sm text-foreground">{t('stampDuty.result.firbFee')}</span>
                         <span className="font-semibold text-foreground">{formatDollars(getFIRBFee(numericPrice))}</span>
                       </div>
                       <div className="flex items-center justify-between p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
                         <span className="text-sm text-foreground">
-                          Foreign Investor Duty Surcharge ({state} {(FOREIGN_SURCHARGE[state] * 100).toFixed(0)}%)
+                          {t('stampDuty.result.foreignSurcharge')} ({state} {(FOREIGN_SURCHARGE[state] * 100).toFixed(0)}%)
                         </span>
                         <span className="font-semibold text-foreground">
                           {formatDollars(numericPrice * FOREIGN_SURCHARGE[state])}
@@ -240,23 +242,23 @@ export function StampDutyCalculator({ propertyPrice, propertyAddress, propertySt
 
                   <div className="grid grid-cols-2 gap-3">
                     <div className="p-3 rounded-xl bg-secondary text-center">
-                      <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Effective rate</p>
+                      <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">{t('stampDuty.result.effectiveRate')}</p>
                       <p className="font-display font-bold text-foreground mt-1">{result.effectiveRate.toFixed(2)}%</p>
                     </div>
                     <div className="p-3 rounded-xl bg-secondary text-center">
-                      <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Duty payable</p>
+                      <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">{t('stampDuty.result.netCost')}</p>
                       <p className="font-display font-bold text-foreground mt-1">{formatDollars(result.totalCashNeeded)}</p>
                     </div>
                   </div>
 
                   {numericPrice > 0 && (
                     <div className="p-4 rounded-xl bg-secondary/60 border border-border">
-                      <p className="text-xs font-medium text-muted-foreground mb-2">Estimated total upfront costs (excl. deposit)</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-2">{t('stampDuty.result.upfrontCosts')}</p>
                       <div className="space-y-1.5 text-sm">
-                        <div className="flex justify-between"><span className="text-muted-foreground">Stamp duty</span><span className="font-medium text-foreground">{formatDollars(result.totalCashNeeded)}</span></div>
-                        <div className="flex justify-between"><span className="text-muted-foreground">Legal / conveyancing (est.)</span><span className="text-foreground">~$1,500–$3,000</span></div>
-                        <div className="flex justify-between"><span className="text-muted-foreground">Building & pest inspection (est.)</span><span className="text-foreground">~$500–$800</span></div>
-                        <div className="flex justify-between"><span className="text-muted-foreground">Lender fees (est.)</span><span className="text-foreground">~$500–$1,000</span></div>
+                        <div className="flex justify-between"><span className="text-muted-foreground">{t('stampDuty.result.total')}</span><span className="font-medium text-foreground">{formatDollars(result.totalCashNeeded)}</span></div>
+                        <div className="flex justify-between"><span className="text-muted-foreground">{t('stampDuty.result.legalFees')}</span><span className="text-foreground">~$1,500–$3,000</span></div>
+                        <div className="flex justify-between"><span className="text-muted-foreground">{t('stampDuty.result.inspectionFees')}</span><span className="text-foreground">~$500–$800</span></div>
+                        <div className="flex justify-between"><span className="text-muted-foreground">{t('stampDuty.result.lenderFees')}</span><span className="text-foreground">~$500–$1,000</span></div>
                       </div>
                     </div>
                   )}
@@ -266,7 +268,7 @@ export function StampDutyCalculator({ propertyPrice, propertyAddress, propertySt
                     className="text-xs text-primary hover:underline flex items-center gap-1"
                   >
                     {showBreakdown ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-                    {showBreakdown ? 'Hide' : 'Show'} bracket breakdown
+                    {showBreakdown ? t('stampDuty.result.hideBreakdown') : t('stampDuty.result.showBreakdown')}
                   </button>
                   {showBreakdown && result.breakdown && (
                     <pre className="text-xs text-muted-foreground bg-secondary p-3 rounded-lg whitespace-pre-wrap font-mono">
@@ -286,15 +288,14 @@ export function StampDutyCalculator({ propertyPrice, propertyAddress, propertySt
                   )}
 
                   <p className="text-[10px] text-muted-foreground leading-relaxed">
-                    This estimate is for general guidance only and does not constitute financial or legal advice.
-                    Rates current as of 2024. Always confirm with your solicitor or state revenue office.
+                    {t('stampDuty.result.disclaimer')}
                   </p>
                 </div>
               )}
 
               {!result && numericPrice === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-3">
-                  Enter a purchase price above to calculate
+                  {t('stampDuty.error.enterPrice')}
                 </p>
               )}
             </div>

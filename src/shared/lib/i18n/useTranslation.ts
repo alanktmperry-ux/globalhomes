@@ -37,6 +37,7 @@ const LOCALES: Partial<Record<SupportedLanguageCode, Record<string, string>>> = 
   'zh-CN': zhCN,
   'zh-TW': zhTW,
   'hi': hi,
+  'bn': bn,
 };
 
 type AnyKey = TranslationKey | (string & {});

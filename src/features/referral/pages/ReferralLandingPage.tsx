@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { REFERRAL_COUNTRIES, REFERRAL_LANGUAGES } from '@/features/referral/lib/constants';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 const signupSchema = z.object({
   full_name: z.string().trim().min(2, 'Please enter your full name').max(100),
@@ -26,6 +27,7 @@ const signupSchema = z.object({
 export default function ReferralLandingPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState<{ code: string; needsVerification: boolean } | null>(null);
   const [form, setForm] = useState({
@@ -102,7 +104,7 @@ export default function ReferralLandingPage() {
     };
     return (
       <>
-        <Helmet><title>Welcome to ListHQ Referral Network</title></Helmet>
+        <Helmet><title>{t('referral.success.title')} | ListHQ</title></Helmet>
         <div className="min-h-screen bg-background flex items-center justify-center px-4 py-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -112,34 +114,34 @@ export default function ReferralLandingPage() {
             <div className="w-14 h-14 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
               <CheckCircle2 className="text-emerald-600" size={28} />
             </div>
-            <h1 className="font-display text-2xl font-bold text-foreground">You're in!</h1>
+            <h1 className="font-display text-2xl font-bold text-foreground">{t('referral.success.title')}</h1>
             <p className="text-muted-foreground mt-2 text-sm">
               {success.needsVerification
-                ? 'Check your email to verify your account, then log in to access your dashboard.'
-                : 'Your referral account is active. Start sharing your link to earn commissions.'}
+                ? t('referral.success.verifyEmail')
+                : t('referral.success.active')}
             </p>
 
             <div className="mt-6 p-5 rounded-xl bg-secondary/50 border border-border">
-              <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">Your referral code</p>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">{t('referral.dashboard.yourCode')}</p>
               <p className="font-display text-4xl font-bold text-primary tracking-widest mt-2">{success.code}</p>
-              <Button variant="ghost" size="sm" onClick={() => copy(success.code, 'Code')} className="mt-2 gap-1.5">
-                <Copy size={14} /> Copy code
+              <Button variant="ghost" size="sm" onClick={() => copy(success.code, t('referral.dashboard.code'))} className="mt-2 gap-1.5">
+                <Copy size={14} /> {t('referral.dashboard.copyCode')}
               </Button>
             </div>
 
             <div className="mt-4 p-4 rounded-xl bg-primary/5 border border-primary/20 text-left">
-              <p className="text-xs text-muted-foreground mb-1">Your referral link</p>
+              <p className="text-xs text-muted-foreground mb-1">{t('referral.dashboard.yourLink')}</p>
               <p className="text-sm font-mono break-all text-foreground">{referralLink}</p>
-              <Button variant="outline" size="sm" onClick={() => copy(referralLink, 'Link')} className="mt-3 gap-1.5">
-                <Copy size={14} /> Copy link
+              <Button variant="outline" size="sm" onClick={() => copy(referralLink, t('referral.dashboard.link'))} className="mt-3 gap-1.5">
+                <Copy size={14} /> {t('referral.dashboard.copyLink')}
               </Button>
             </div>
 
             <div className="mt-6 flex flex-col gap-2">
               <Button onClick={() => navigate('/referral/dashboard')} className="gap-2">
-                Go to dashboard <ArrowRight size={16} />
+                {t('referral.dashboard.goToDashboard')} <ArrowRight size={16} />
               </Button>
-              <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">Back to home</Link>
+              <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">{t('referral.dashboard.backToHome')}</Link>
             </div>
           </motion.div>
         </div>
@@ -150,38 +152,38 @@ export default function ReferralLandingPage() {
   return (
     <>
       <Helmet>
-        <title>Referral Program | ListHQ</title>
-        <meta name="description" content="Refer a property buyer or seller and earn with ListHQ's referral network." />
+        <title>{t('referral.hero.eyebrow')} | ListHQ</title>
+        <meta name="description" content={t('referral.hero.subheadline')} />
       </Helmet>
       <div className="min-h-screen bg-background">
         {/* Hero */}
         <section className="bg-gradient-to-br from-primary/5 via-background to-cyan-accent/5 border-b border-border">
           <div className="max-w-5xl mx-auto px-4 py-14 md:py-20 text-center">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-6">
-              <Globe size={14} /> International Agent Network
+              <Globe size={14} /> {t('referral.hero.eyebrow')}
             </div>
             <h1 className="font-display text-3xl md:text-5xl font-bold text-foreground tracking-tight">
-              Join the ListHQ International Referral Network
+              {t('referral.hero.headline')}
             </h1>
             <p className="text-base md:text-lg text-muted-foreground mt-4 max-w-2xl mx-auto">
-              Earn commissions connecting global buyers with Australian property
+              {t('referral.hero.subheadline')}
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-10 max-w-3xl mx-auto">
               <div className="bg-card border border-border rounded-xl p-5">
                 <Globe className="text-primary mb-2" size={22} />
                 <p className="font-display text-2xl font-bold text-foreground">15+</p>
-                <p className="text-sm text-muted-foreground">Countries</p>
+                <p className="text-sm text-muted-foreground">{t('referral.howItWorks.countries')}</p>
               </div>
               <div className="bg-card border border-border rounded-xl p-5">
                 <TrendingUp className="text-primary mb-2" size={22} />
                 <p className="font-display text-2xl font-bold text-foreground">A$500–$2,000</p>
-                <p className="text-sm text-muted-foreground">Per settled referral</p>
+                <p className="text-sm text-muted-foreground">{t('referral.howItWorks.perReferral')}</p>
               </div>
               <div className="bg-card border border-border rounded-xl p-5">
                 <BarChart3 className="text-primary mb-2" size={22} />
-                <p className="font-display text-2xl font-bold text-foreground">Real-time</p>
-                <p className="text-sm text-muted-foreground">Tracking dashboard</p>
+                <p className="font-display text-2xl font-bold text-foreground">{t('referral.dashboard.realtime')}</p>
+                <p className="text-sm text-muted-foreground">{t('referral.dashboard.tracking')}</p>
               </div>
             </div>
           </div>
@@ -190,21 +192,22 @@ export default function ReferralLandingPage() {
         {/* How it works */}
         <section className="max-w-5xl mx-auto px-4 pt-12">
           <div className="text-center mb-8">
-            <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">How it works</h2>
-            <p className="text-sm text-muted-foreground mt-2">Get started in three simple steps</p>
+            <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">{t('referral.howItWorks.title')}</h2>
+            <p className="text-sm text-muted-foreground mt-2">{t('referral.howItWorks.subtitle')}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
-              { icon: UserPlus, step: 1, text: 'Sign up & get your unique referral code' },
-              { icon: Share2, step: 2, text: 'Share your code with buyers interested in Australian property' },
-              { icon: DollarSign, step: 3, text: 'Earn AUD $500–$2,000 for every settled purchase' },
-            ].map(({ icon: Icon, step, text }) => (
+              { icon: UserPlus, step: 1, title: t('referral.howItWorks.step1.title'), desc: t('referral.howItWorks.step1.desc') },
+              { icon: Share2, step: 2, title: t('referral.howItWorks.step2.title'), desc: t('referral.howItWorks.step2.desc') },
+              { icon: DollarSign, step: 3, title: t('referral.howItWorks.step3.title'), desc: t('referral.howItWorks.step3.desc') },
+            ].map(({ icon: Icon, step, title, desc }) => (
               <div key={step} className="bg-card border border-border rounded-2xl p-6 text-center shadow-card">
                 <div className="w-12 h-12 mx-auto rounded-full bg-primary/10 flex items-center justify-center text-primary mb-3">
                   <Icon size={22} />
                 </div>
-                <p className="text-xs uppercase tracking-wider font-semibold text-primary mb-1">Step {step}</p>
-                <p className="text-sm text-foreground">{text}</p>
+                <p className="text-xs uppercase tracking-wider font-semibold text-primary mb-1">{t('referral.howItWorks.step', { step })}</p>
+                <h3 className="font-semibold text-foreground mb-1">{title}</h3>
+                <p className="text-sm text-foreground">{desc}</p>
               </div>
             ))}
           </div>
@@ -213,36 +216,36 @@ export default function ReferralLandingPage() {
         {/* Form */}
         <section className="max-w-2xl mx-auto px-4 py-12">
           <div className="bg-card border border-border rounded-2xl shadow-card p-6 md:p-8">
-            <h2 className="font-display text-2xl font-bold text-foreground">Create your referral account</h2>
-            <p className="text-sm text-muted-foreground mt-1">Get your unique referral code and start earning today.</p>
+            <h2 className="font-display text-2xl font-bold text-foreground">{t('referral.form.createTitle')}</h2>
+            <p className="text-sm text-muted-foreground mt-1">{t('referral.form.createSubtitle')}</p>
 
             {user && (
               <div className="mt-4 p-3 rounded-lg bg-amber-50 border border-amber-200 text-sm text-amber-900 dark:bg-amber-900/20 dark:text-amber-200 dark:border-amber-700">
-                You're already signed in. If you've already registered as a referral agent, <Link to="/referral/dashboard" className="underline font-medium">go to your dashboard</Link>.
+                {t('referral.form.alreadySignedIn')} <Link to="/referral/dashboard" className="underline font-medium">{t('referral.form.goToDashboard')}</Link>.
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="full_name">Full name *</Label>
+                  <Label htmlFor="full_name">{t('referral.form.name')} *</Label>
                   <Input id="full_name" value={form.full_name} onChange={e => update('full_name', e.target.value)} required maxLength={100} />
                 </div>
                 <div>
-                  <Label htmlFor="email">Email *</Label>
+                  <Label htmlFor="email">{t('referral.form.email')} *</Label>
                   <Input id="email" type="email" value={form.email} onChange={e => update('email', e.target.value)} required maxLength={255} />
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="password">Password *</Label>
+                <Label htmlFor="password">{t('referral.form.password')} *</Label>
                 <Input id="password" type="password" value={form.password} onChange={e => update('password', e.target.value)} required minLength={8} maxLength={72} />
-                <p className="text-xs text-muted-foreground mt-1">At least 8 characters.</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('referral.form.passwordHint')}</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="country">Country *</Label>
+                  <Label htmlFor="country">{t('referral.form.country')} *</Label>
                   <select
                     id="country"
                     value={form.country}
@@ -250,12 +253,12 @@ export default function ReferralLandingPage() {
                     required
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   >
-                    <option value="">Select country</option>
+                    <option value="">{t('referral.form.selectCountry')}</option>
                     {REFERRAL_COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>
-                  <Label htmlFor="language_preference">Preferred language *</Label>
+                  <Label htmlFor="language_preference">{t('referral.form.language')} *</Label>
                   <select
                     id="language_preference"
                     value={form.language_preference}
@@ -270,27 +273,27 @@ export default function ReferralLandingPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="agency_name">Agency / Company name</Label>
+                  <Label htmlFor="agency_name">{t('referral.form.agency')}</Label>
                   <Input id="agency_name" value={form.agency_name} onChange={e => update('agency_name', e.target.value)} maxLength={120} />
                 </div>
                 <div>
-                  <Label htmlFor="phone">Phone</Label>
+                  <Label htmlFor="phone">{t('referral.form.phone')}</Label>
                   <Input id="phone" type="tel" value={form.phone} onChange={e => update('phone', e.target.value)} maxLength={40} />
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="wechat_id">WeChat ID</Label>
+                <Label htmlFor="wechat_id">{t('referral.form.wechat')}</Label>
                 <Input id="wechat_id" value={form.wechat_id} onChange={e => update('wechat_id', e.target.value)} maxLength={60} />
               </div>
 
               <Button type="submit" disabled={submitting} className="w-full gap-2">
                 {submitting && <Loader2 size={16} className="animate-spin" />}
-                {submitting ? 'Creating account…' : 'Create referral account'}
+                {submitting ? t('referral.form.submitting') : t('referral.form.submit')}
               </Button>
 
               <p className="text-xs text-muted-foreground text-center">
-                By signing up you agree to our <Link to="/terms" className="underline">Terms</Link> and <Link to="/privacy" className="underline">Privacy Policy</Link>.
+                {t('referral.form.terms')} <Link to="/terms" className="underline">{t('referral.form.termsLink')}</Link> {t('referral.form.and')} <Link to="/privacy" className="underline">{t('referral.form.privacyLink')}</Link>.
               </p>
             </form>
           </div>

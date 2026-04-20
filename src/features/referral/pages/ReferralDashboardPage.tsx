@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { TIER_COMMISSION_AUD, TIER_THRESHOLDS, TIER_STYLES, LEAD_STATUS_STYLES, type ReferralTier } from '@/features/referral/lib/constants';
 import { SubmitReferralModal } from '@/features/referral/components/SubmitReferralModal';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 interface ReferralAgent {
   id: string;
@@ -36,6 +37,7 @@ interface ReferralLead {
 export default function ReferralDashboardPage() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [agent, setAgent] = useState<ReferralAgent | null>(null);
   const [leads, setLeads] = useState<ReferralLead[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,17 +102,17 @@ export default function ReferralDashboardPage() {
 
   return (
     <>
-      <Helmet><title>Referral Dashboard | ListHQ</title></Helmet>
+      <Helmet><title>{t('referral.dashboard.title')} | ListHQ</title></Helmet>
       <div className="min-h-screen bg-background">
         <div className="max-w-6xl mx-auto px-4 py-8 md:py-12 space-y-8">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <div>
-              <p className="text-sm text-muted-foreground">Welcome back</p>
-              <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground">Hi {agent.full_name.split(' ')[0]} 👋</h1>
+              <p className="text-sm text-muted-foreground">{t('referral.dashboard.welcomeBack')}</p>
+              <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground">{t('referral.dashboard.hi', { name: agent.full_name.split(' ')[0] })}</h1>
               <div className="mt-2 inline-flex items-center gap-2">
                 <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${tierStyle.className}`}>
-                  {tierStyle.label} tier
+                  {tierStyle.label} {t('referral.dashboard.tier')}
                 </span>
                 {agent.status !== 'active' && (
                   <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
@@ -120,7 +122,7 @@ export default function ReferralDashboardPage() {
               </div>
             </div>
             <Button onClick={() => setSubmitOpen(true)} size="lg" className="gap-2">
-              <Plus size={18} /> Submit a referral
+              <Plus size={18} /> {t('referral.dashboard.submitReferral')}
             </Button>
           </div>
 

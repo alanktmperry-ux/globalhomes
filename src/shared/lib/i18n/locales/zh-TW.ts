@@ -166,6 +166,7 @@ export const zhTW: Record<keyof typeof EnBase, string> = {
   'homeServices.card.verified': '已認證',
   'homeServices.card.rating': '評分',
   'homeServices.card.reviews': '評價',
+  'homeServices.card.contactForQuote': '聯絡獲取報價',
 
   'homeServices.empty.title': '未找到相關服務',
   'homeServices.empty.subtitle': '請嘗試更改篩選條件或搜尋其他地區。',

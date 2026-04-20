@@ -147,6 +147,9 @@ export const zhCN: Record<keyof typeof EnBase, string> = {
   'homeServices.pageTitle': '家居服务市场',
   'homeServices.pageSubtitle': '为您的房产寻找值得信赖的专业人士。包括清洁、验房、搬家等服务。',
 
+  'homeServices.hero.title': '让您的房产做好上市准备',
+  'homeServices.hero.subtitle': '预订经过审核的专业人士 — 摄影、布置、验房等更多服务。',
+
   'homeServices.search.placeholder': '搜索服务或社区',
   'homeServices.filter.allCategories': '所有类别',
   'homeServices.category.photography': '摄影',
@@ -165,6 +168,7 @@ export const zhCN: Record<keyof typeof EnBase, string> = {
   'homeServices.card.verified': '已认证',
   'homeServices.card.rating': '评分',
   'homeServices.card.reviews': '评价',
+  'homeServices.card.contactForQuote': '联系获取报价',
 
   'homeServices.empty.title': '未找到相关服务',
   'homeServices.empty.subtitle': '请尝试更改筛选条件或搜索其他社区。',

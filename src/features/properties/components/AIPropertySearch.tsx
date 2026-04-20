@@ -74,14 +74,22 @@ export function AIPropertySearch() {
         toast.error(t('AI credits exhausted. Please contact support.'));
         return;
       }
-      if (!res.ok) throw new Error('Search failed');
+      if (!res.ok) {
+        let detail = `HTTP ${res.status}`;
+        try {
+          const errBody = await res.json();
+          if (errBody?.error) detail = typeof errBody.error === 'string' ? errBody.error : JSON.stringify(errBody.error);
+        } catch { /* ignore */ }
+        throw new Error(detail);
+      }
       const data = await res.json();
       const mapped: Property[] = (data.properties ?? []).map((p: any) => mapDbProperty(p));
       setProperties(mapped);
       setIntent(data.intent ?? null);
-    } catch (e) {
-      console.error(e);
-      toast.error(t('Search failed. Please try again.'));
+    } catch (e: any) {
+      console.error('AI property search failed:', e);
+      const msg = e?.message ? `${t('Search failed')}: ${e.message}` : t('Search failed. Please try again.');
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

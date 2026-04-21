@@ -301,6 +301,47 @@ export const en = {
   'help.contact.submitting': 'Sending…',
   'help.contact.success': "Message sent. We'll be in touch within 1 business day.",
   'help.faq.title': 'Frequently Asked Questions',
+
+  // ──────────────────────────────────────────────────────────────────
+  // Rental search page
+  // ──────────────────────────────────────────────────────────────────
+  'rental.title': 'Rental Properties',
+  'rental.subtitle': 'Find your next home across Australia',
+  'rental.searching': 'Searching…',
+  'rental.results.one': '{count} rental property found',
+  'rental.results.other': '{count} rental properties found',
+  'rental.showing': 'Showing {shown} of {total}',
+  'rental.empty': 'No rentals match your filters.',
+  'rental.clearFilters': 'Clear all filters',
+
+  // ──────────────────────────────────────────────────────────────────
+  // Mortgage calculator page
+  // ──────────────────────────────────────────────────────────────────
+  'mortgage.badge': 'Free Australian Calculator',
+  'mortgage.title': 'Mortgage Calculator Australia',
+  'mortgage.subtitle': 'Calculate your borrowing power and monthly repayments in seconds. Includes the APRA 3% serviceability buffer, LMI estimates, offset modelling, and a full amortisation chart.',
+  'mortgage.tab.borrowing': '💰 Borrowing Power',
+  'mortgage.tab.borrowing.desc': 'How much can I borrow?',
+  'mortgage.tab.repayment': '📅 Repayment Calculator',
+  'mortgage.tab.repayment.desc': 'What are my repayments?',
+  'mortgage.related.stampDuty': 'Stamp Duty Calculator',
+  'mortgage.related.stampDuty.desc': 'Calculate stamp duty for all 8 states & territories',
+  'mortgage.related.browse': 'Browse Properties',
+  'mortgage.related.browse.desc': 'Search for your next home across Australia',
+  'mortgage.related.agent': 'Find an Agent',
+  'mortgage.related.agent.desc': 'Connect with top local agents',
+  'mortgage.faq.title': 'Frequently Asked Questions',
+  'mortgage.faq.q1': 'How much can I borrow for a home loan in Australia?',
+  'mortgage.faq.a1': 'Your borrowing power depends on your income (after tax), living expenses, existing debts, deposit size, and the interest rate. Australian lenders also apply a 3% APRA serviceability buffer on top of your actual rate, which reduces your maximum borrowing capacity. Use the borrowing power calculator above to get an estimate.',
+  'mortgage.faq.q2': 'What is the APRA 3% serviceability buffer?',
+  'mortgage.faq.a2': 'Since November 2021, APRA requires Australian lenders to assess your ability to repay at your actual interest rate plus 3%. So if your home loan rate is 6.25%, lenders test whether you can afford repayments at 9.25%. This buffer ensures borrowers can still meet repayments if rates rise.',
+  'mortgage.faq.q3': "Do I need Lender's Mortgage Insurance (LMI)?",
+  'mortgage.faq.a3': 'LMI applies when your loan-to-value ratio (LVR) exceeds 80% — that is, when your deposit is less than 20% of the property value. LMI protects the lender (not you) if you default. It can cost anywhere from 0.5% to 3.5% of the loan amount and can usually be added to the loan.',
+  'mortgage.faq.q4': 'How do fortnightly repayments save money?',
+  'mortgage.faq.a4': 'Paying fortnightly rather than monthly means you make 26 half-payments per year (equivalent to 13 monthly payments). That one extra monthly payment per year reduces your principal faster, saving thousands in interest and years off your loan term.',
+  'mortgage.faq.q5': 'How does an offset account work?',
+  'mortgage.faq.a5': 'An offset account is a transaction account linked to your mortgage. The balance in your offset account reduces the principal on which interest is calculated. For example, if your loan is $600,000 and you have $50,000 in an offset account, you only pay interest on $550,000.',
+  'mortgage.disclaimer': 'This calculator provides estimates only and does not constitute financial advice. Calculations are based on 2025–26 Australian tax rates, APRA guidelines, and simplified LMI scales. Your actual borrowing capacity may differ based on individual lender policies, credit history, and other factors. Always consult a licensed mortgage broker or financial adviser before making financial decisions.',
 } as const;
 
 export type TranslationKey = keyof typeof en;

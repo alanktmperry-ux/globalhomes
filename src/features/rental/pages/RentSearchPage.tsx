@@ -40,12 +40,14 @@ export default function RentSearchPage() {
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
         <div>
           <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
-            {t('rental.title')}
+            {t('rent.pageTitle')}
           </h1>
           <p className="text-muted-foreground mt-1">
             {loading
-              ? t('rental.searching')
-              : t(total === 1 ? 'rental.results.one' : 'rental.results.other', { count: total.toLocaleString() })}
+              ? t('rent.searching')
+              : (total === 1
+                  ? t('rent.found.one', { count: total.toLocaleString() })
+                  : t('rent.found.other', { count: total.toLocaleString() }))}
           </p>
         </div>
 
@@ -57,7 +59,7 @@ export default function RentSearchPage() {
         {/* Results count */}
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            {!loading && t('rental.showing', { shown: properties.length, total })}
+            {!loading && t('rent.showing', { shown: String(properties.length), total: String(total) })}
           </p>
         </div>
 
@@ -70,7 +72,7 @@ export default function RentSearchPage() {
           </div>
         ) : properties.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-muted-foreground">{t('rental.empty')}</p>
+            <p className="text-muted-foreground">{t('rent.noResults')}</p>
             <button onClick={() => setFilters({})}
               className="mt-4 text-primary underline text-sm">
               {t('rental.clearFilters')}

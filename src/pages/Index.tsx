@@ -958,7 +958,8 @@ const Index = () => {
                   type="text"
                   value={heroQuery}
                   onChange={e => setHeroQuery(e.target.value)}
-                  placeholder={t('hero.searchPlaceholder', { example: HERO_PLACEHOLDERS[heroPlaceholderIndex] })}
+                  placeholder={HERO_PLACEHOLDERS[heroPlaceholderIndex]}
+                  aria-label={t('hero.searchPlaceholderLabel')}
                   className="flex-1 bg-transparent outline-none text-slate-800 text-[15px] placeholder:text-slate-400 min-w-0"
                 />
                 <button

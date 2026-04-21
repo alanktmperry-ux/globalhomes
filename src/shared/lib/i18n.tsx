@@ -123,6 +123,13 @@ const translations: Record<Language, Record<string, string>> = {
     'hero.agentStripSub': 'Pocket listings. AI buyer concierge. Pipeline management. Trust accounting. One platform — no compromises.',
     'hero.listFree': 'List your first property free',
     'hero.buyersSearching': 'Buyers searching',
+    'hero.headlineLine1': 'Australian property.',
+    'hero.headlineLine2Now': 'Now',
+    'hero.headlineLine2Rest': 'in your language.',
+    'hero.subTagline': 'Every listing. Every suburb. Every language.',
+    'hero.searchInLanguages': 'Search in Mandarin, Vietnamese, Cantonese, Arabic or any of 24 languages.',
+    'hero.browseProperties': 'Browse properties',
+    'hero.searchPlaceholderLabel': 'Search properties',
     'card.beds': 'bed',
     'card.bath': 'bath',
     'card.car': 'car',
@@ -239,6 +246,13 @@ const translations: Record<Language, Record<string, string>> = {
     'hero.agentStripSub': '独家房源。AI买家匹配。管道管理。信托会计。一个平台——毫不妥协。',
     'hero.listFree': '免费发布您的第一个房源',
     'hero.buyersSearching': '买家搜索中',
+    'hero.headlineLine1': '澳大利亚房产。',
+    'hero.headlineLine2Now': '现在',
+    'hero.headlineLine2Rest': '用您的语言。',
+    'hero.subTagline': '每一套房源。每一个区。每一种语言。',
+    'hero.searchInLanguages': '支持普通话、越南语、粤语、阿拉伯语等24种语言搜索。',
+    'hero.browseProperties': '浏览房产',
+    'hero.searchPlaceholderLabel': '搜索房产',
     'card.beds': '卧',
     'card.bath': '浴',
     'card.car': '车',
@@ -1386,10 +1400,13 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     if (saved && saved in translations) return saved as Language;
     // First visit — auto-detect from navigator.language
     const detect = (): Language => {
-      const nav = (typeof navigator !== 'undefined' && navigator.language) ? navigator.language : 'en';
-      const lower = nav.toLowerCase();
-      if (lower.startsWith('zh-tw') || lower.startsWith('zh-hk')) return 'zh-TW';
-      if (lower.startsWith('zh')) return 'zh';
+      const navList: string[] = (typeof navigator !== 'undefined')
+        ? [navigator.language, ...((navigator.languages as string[] | undefined) ?? [])].filter(Boolean)
+        : ['en'];
+      const lower = (navList[0] || 'en').toLowerCase();
+      const allLower = navList.map(l => l.toLowerCase());
+      if (allLower.some(l => l.startsWith('zh-tw') || l.startsWith('zh-hk') || l.includes('hant'))) return 'zh-TW';
+      if (allLower.some(l => l.startsWith('zh'))) return 'zh';
       if (lower.startsWith('ja')) return 'ja';
       if (lower.startsWith('ko')) return 'ko';
       if (lower.startsWith('ms')) return 'ms';

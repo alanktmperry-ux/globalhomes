@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Languages, ChevronDown } from 'lucide-react';
+import { Globe, ChevronDown } from 'lucide-react';
 import { useI18n, type Language } from '@/shared/lib/i18n';
 import {
   SUPPORTED_LANGUAGES,
@@ -19,6 +19,8 @@ const AVAILABLE_LOCALES: ReadonlySet<SupportedLanguageCode> = new Set([
   'bn',
 ]);
 
+const INTERACTED_KEY = 'gh-lang-switcher-interacted';
+
 export function LanguageSwitcher() {
   const { language, setLanguage } = useI18n();
   const [open, setOpen] = useState(false);
@@ -26,6 +28,9 @@ export function LanguageSwitcher() {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [hasInteracted, setHasInteracted] = useState(() => {
+    try { return localStorage.getItem(INTERACTED_KEY) === '1'; } catch { return true; }
+  });
 
   useEffect(() => {
     if (!open) return;
@@ -41,6 +46,12 @@ export function LanguageSwitcher() {
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
 
+  const markInteracted = () => {
+    if (hasInteracted) return;
+    setHasInteracted(true);
+    try { localStorage.setItem(INTERACTED_KEY, '1'); } catch { /* non-fatal */ }
+  };
+
   const handleToggle = () => {
     if (!open) {
       const rect = buttonRef.current?.getBoundingClientRect();
@@ -51,21 +62,29 @@ export function LanguageSwitcher() {
         });
       }
     }
+    markInteracted();
     setOpen(!open);
   };
+
+  const activeName = SUPPORTED_LANGUAGES.find(l => l.code === (FROM_LEGACY_CODE_MAP[language] ?? 'en'))?.name ?? 'English';
 
   return (
     <div ref={containerRef}>
       <button
         ref={buttonRef}
         onClick={handleToggle}
-        className="flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 px-2 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+        className="relative flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 px-2 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+        aria-label={`Change language (current: ${activeName})`}
       >
-        <Languages size={16} />
-        <span className="hidden sm:inline">
-          {SUPPORTED_LANGUAGES.find(l => l.code === (FROM_LEGACY_CODE_MAP[language] ?? 'en'))?.name ?? 'English'}
-        </span>
+        <Globe size={16} />
+        <span className="hidden sm:inline">{activeName}</span>
         <ChevronDown size={14} />
+        {!hasInteracted && (
+          <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5" aria-hidden="true">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75" />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-blue-500" />
+          </span>
+        )}
       </button>
 
       {open && createPortal(

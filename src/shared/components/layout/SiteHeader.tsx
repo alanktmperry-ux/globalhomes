@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { MapPin } from 'lucide-react';
-import { Globe, ChevronDown, User, LogIn, Home, Building2, Plus, List, LayoutDashboard, ShieldCheck, Menu, FileText, Handshake, Wrench, Sparkles, Search, MoreHorizontal, HelpCircle, Users } from 'lucide-react';
+import { Globe, ChevronDown, User, LogIn, Home, Building2, Plus, List, LayoutDashboard, ShieldCheck, Menu, FileText, Handshake, Wrench, Sparkles, Search, MoreHorizontal, HelpCircle, Users, Banknote } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
@@ -134,6 +134,9 @@ export function SiteHeader() {
                 >
                   <button onClick={() => { navigate('/agents'); setShowMoreMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
                     <Users size={14} className="text-muted-foreground" /> Find an Agent
+                  </button>
+                  <button onClick={() => { navigate('/brokers'); setShowMoreMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                    <Banknote size={14} className="text-muted-foreground" /> Find a Broker
                   </button>
                   <button onClick={() => { navigate('/home-services'); setShowMoreMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
                     <Wrench size={14} className="text-muted-foreground" /> Services
@@ -290,6 +293,9 @@ export function SiteHeader() {
                 </button>
                 <button onClick={() => navTo('/agents')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
                   <Users size={16} className="text-primary" /> Find an Agent
+                </button>
+                <button onClick={() => navTo('/brokers')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
+                  <Banknote size={16} className="text-primary" /> Find a Broker
                 </button>
                 <button onClick={() => navTo('/exclusive')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
                   <Sparkles size={16} className="text-primary" /> Exclusive

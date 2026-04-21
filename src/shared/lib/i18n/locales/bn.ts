@@ -419,4 +419,15 @@ export const bn: Record<keyof typeof EnBase, string> = {
   'home.agents.sub': 'CRM, লিস্টিং, সম্পত্তি ব্যবস্থাপনা, AI সরঞ্জাম — সব এক জায়গায়। ২৪টি ভাষায়।',
   'home.agents.cta': 'এজেন্ট টুলস দেখুন',
   'home.agents.founding': 'প্রতিষ্ঠাতা এজেন্ট হিসেবে যোগ দিন — প্রথম ৩ মাস বিনামূল্যে',
+
+  'badge.offMarket': 'অফ-মার্কেট',
+  'badge.comingSoon': 'শীঘ্রই আসছে',
+  'badge.new': 'নতুন',
+  'badge.phoneVerified': 'ফোন যাচাইকৃত',
+  'badge.licensed': 'লাইসেন্সপ্রাপ্ত',
+  'badge.topPerformer': 'শীর্ষ পারফর্মার',
+  'badge.forSale': 'বিক্রয়ের জন্য',
+  'badge.forRent': 'ভাড়ার জন্য',
+  'badge.sold': 'বিক্রিত',
+  'badge.underOffer': 'অফারের অধীনে',
 };

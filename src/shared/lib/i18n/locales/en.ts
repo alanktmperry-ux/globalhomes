@@ -443,6 +443,17 @@ export const en = {
   'home.agents.sub': 'CRM, listings, property management, AI tools — all in one place. In 24 languages.',
   'home.agents.cta': 'Explore agent tools',
   'home.agents.founding': 'Join as a founding agent — first 3 months free',
+
+  'badge.offMarket': 'Off-Market',
+  'badge.comingSoon': 'Coming Soon',
+  'badge.new': 'New',
+  'badge.phoneVerified': 'Phone Verified',
+  'badge.licensed': 'Licensed',
+  'badge.topPerformer': 'Top Performer',
+  'badge.forSale': 'For Sale',
+  'badge.forRent': 'For Rent',
+  'badge.sold': 'Sold',
+  'badge.underOffer': 'Under Offer',
 } as const;
 
 export type TranslationKey = keyof typeof en;

@@ -378,4 +378,11 @@ export const bn: Record<keyof typeof EnBase, string> = {
   'auth.otherPortals': 'অন্যান্য পোর্টাল:',
   'auth.agentPortal': 'এজেন্ট পোর্টাল',
   'auth.trustPartner': 'ট্রাস্ট অ্যাকাউন্টিং পার্টনার',
+
+  'rent.pageTitle': 'ভাড়ার জন্য সম্পত্তি',
+  'rent.searching': 'অনুসন্ধান হচ্ছে…',
+  'rent.found.one': '{count}টি ভাড়ার সম্পত্তি পাওয়া গেছে',
+  'rent.found.other': '{count}টি ভাড়ার সম্পত্তি পাওয়া গেছে',
+  'rent.showing': '{total}টির মধ্যে {shown}টি দেখানো হচ্ছে',
+  'rent.noResults': 'আপনার ফিল্টারের সাথে কোনো ভাড়ার সম্পত্তি মেলে না।',
 };

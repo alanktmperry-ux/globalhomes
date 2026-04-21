@@ -401,4 +401,11 @@ export const zhTW: Record<keyof typeof EnBase, string> = {
   'auth.otherPortals': '其他入口：',
   'auth.agentPortal': '仲介入口',
   'auth.trustPartner': '信託會計合作夥伴',
+
+  'rent.pageTitle': '出租房產',
+  'rent.searching': '搜尋中…',
+  'rent.found.one': '找到 {count} 處出租房產',
+  'rent.found.other': '找到 {count} 處出租房產',
+  'rent.showing': '顯示第 {shown} / 共 {total} 處',
+  'rent.noResults': '沒有符合篩選條件的出租房產。',
 };

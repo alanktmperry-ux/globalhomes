@@ -378,4 +378,11 @@ export const hi: Record<keyof typeof EnBase, string> = {
   'auth.otherPortals': 'अन्य पोर्टल:',
   'auth.agentPortal': 'एजेंट पोर्टल',
   'auth.trustPartner': 'ट्रस्ट लेखा साझेदार',
+
+  'rent.pageTitle': 'किराये के लिए संपत्तियाँ',
+  'rent.searching': 'खोज हो रही है…',
+  'rent.found.one': '{count} किराये की संपत्ति मिली',
+  'rent.found.other': '{count} किराये की संपत्तियाँ मिलीं',
+  'rent.showing': '{total} में से {shown} दिखा रहे हैं',
+  'rent.noResults': 'आपके फ़िल्टर से कोई किराये की संपत्ति मेल नहीं खाती।',
 };

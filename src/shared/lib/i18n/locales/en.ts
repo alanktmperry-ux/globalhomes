@@ -402,6 +402,13 @@ export const en = {
   'auth.otherPortals': 'Other portals:',
   'auth.agentPortal': 'Agent Portal',
   'auth.trustPartner': 'Trust Accounting Partner',
+
+  'rent.pageTitle': 'Properties for Rent',
+  'rent.searching': 'Searching…',
+  'rent.found.one': '{count} rental property found',
+  'rent.found.other': '{count} rental properties found',
+  'rent.showing': 'Showing {shown} of {total}',
+  'rent.noResults': 'No rentals match your filters.',
 } as const;
 
 export type TranslationKey = keyof typeof en;

@@ -405,4 +405,18 @@ export const hi: Record<keyof typeof EnBase, string> = {
   'filter.lease.6months': '6 महीने',
   'filter.lease.12months': '12 महीने',
   'filter.lease.monthToMonth': 'महीने-दर-महीने',
+
+  'home.howItWorks.title': 'ListHQ कैसे काम करता है',
+  'home.howItWorks.subtitle': 'अपनी भाषा में अगला घर खोजने के लिए तीन कदम।',
+  'home.howItWorks.step1.title': 'अपनी भाषा में खोजें',
+  'home.howItWorks.step1.desc': 'मंदारिन, हिंदी, वियतनामी, अरबी, या 24 भाषाओं में से किसी में भी टाइप करें या बोलें। हमारा AI आपको समझता है।',
+  'home.howItWorks.step2.title': 'अपने तरीके से कीमत देखें',
+  'home.howItWorks.step2.desc': 'हर लिस्टिंग आपकी मुद्रा में दिखती है — CNY, USD, INR, और 10 अन्य। दैनिक अपडेट होने वाली विनिमय दरें।',
+  'home.howItWorks.step3.title': 'अपने एजेंट से जुड़ें',
+  'home.howItWorks.step3.desc': 'WeChat, WhatsApp, या LINE के माध्यम से सीधे एजेंटों को संदेश भेजें। कोई भाषा बाधा नहीं।',
+  'home.agents.eyebrow': 'एजेंटों के लिए',
+  'home.agents.headline': 'बहुसांस्कृतिक ऑस्ट्रेलिया के लिए बनाया गया प्लेटफ़ॉर्म।',
+  'home.agents.sub': 'CRM, लिस्टिंग, संपत्ति प्रबंधन, AI उपकरण — सब एक ही जगह। 24 भाषाओं में।',
+  'home.agents.cta': 'एजेंट टूल्स देखें',
+  'home.agents.founding': 'फाउंडिंग एजेंट के रूप में जुड़ें — पहले 3 महीने मुफ़्त',
 };

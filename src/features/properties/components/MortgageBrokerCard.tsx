@@ -57,7 +57,7 @@ interface EnquiryModalProps {
 const isStandalonePlaceholder = (value?: string | null) =>
   typeof value === "string" && value.trim().toLowerCase() === "test";
 
-function EnquiryModal({ broker, propertyId, propertyAddress, propertyPrice, onClose }: EnquiryModalProps) {
+export function EnquiryModal({ broker, propertyId, propertyAddress, propertyPrice, onClose }: EnquiryModalProps) {
   const [form, setForm] = useState<FormState>({ name: "", email: "", phone: "", message: "" });
   const [status, setStatus] = useState<SubmitStatus>("idle");
   const [errorMsg, setErrorMsg] = useState("");

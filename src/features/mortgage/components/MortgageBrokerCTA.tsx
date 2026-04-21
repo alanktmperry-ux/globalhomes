@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Banknote } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { MortgageBrokerModal } from './MortgageBrokerModal';
 
@@ -35,9 +36,14 @@ export function MortgageBrokerCTA({
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-foreground">{title}</h3>
             <p className="text-sm text-muted-foreground mt-0.5">{description}</p>
-            <Button onClick={() => setOpen(true)} size="sm" className="mt-3">
-              {buttonLabel}
-            </Button>
+            <div className="flex flex-wrap gap-2 mt-3">
+              <Button onClick={() => setOpen(true)} size="sm">
+                {buttonLabel}
+              </Button>
+              <Button asChild size="sm" variant="outline">
+                <Link to="/brokers">Browse all brokers</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </div>

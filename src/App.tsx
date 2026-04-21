@@ -24,6 +24,7 @@ const ProfilePage = React.lazy(() => import("./pages/ProfilePage"));
 const AgentPortalPage = React.lazy(() => import("./pages/AgentPortalPage"));
 const AgentLandingPage = React.lazy(() => import("./pages/AgentLandingPage"));
 const FindAgentPage = React.lazy(() => import("./features/agents/pages/FindAgentPage"));
+const FindBrokerPage = React.lazy(() => import("./features/brokers/pages/FindBrokerPage"));
 const PocketListingPage = React.lazy(() => import("./pages/PocketListingPage"));
 const AgentDashboardLayout = React.lazy(() => import("./pages/AgentDashboardLayout"));
 const MyAgenciesPage = React.lazy(() => import("./pages/MyAgenciesPage"));
@@ -212,6 +213,7 @@ const App = () => (
                   <Route path="/property/:id" element={<PropertyDetailPage />} />
                   <Route path="/agent/:id" element={<AgentPublicProfilePage />} />
                   <Route path="/agents" element={<FindAgentPage />} />
+                  <Route path="/brokers" element={<FindBrokerPage />} />
                   <Route path="/for-agents" element={<AgentLandingPage />} />
                   <Route path="/suburbs" element={<SuburbsIndexPage />} />
                   <Route path="/launch" element={<MarketingLandingPage />} />

@@ -400,4 +400,11 @@ export const zhCN: Record<keyof typeof EnBase, string> = {
   'auth.otherPortals': '其他门户：',
   'auth.agentPortal': '中介门户',
   'auth.trustPartner': '信托会计合作伙伴',
+
+  'rent.pageTitle': '出租房产',
+  'rent.searching': '搜索中…',
+  'rent.found.one': '找到 {count} 处出租房产',
+  'rent.found.other': '找到 {count} 处出租房产',
+  'rent.showing': '显示第 {shown} / 共 {total} 处',
+  'rent.noResults': '没有符合筛选条件的出租房产。',
 };

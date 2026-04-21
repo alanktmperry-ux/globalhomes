@@ -8,10 +8,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
 import { toast } from 'sonner';
 import seekerHero from '@/assets/seeker-auth-hero.jpg';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 type Step = 'email' | 'password' | 'create' | 'prefs';
 
 const SeekerAuthPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
@@ -220,16 +222,16 @@ const SeekerAuthPage = () => {
               >
                 <div>
                   <h1 className="text-[32px] font-light tracking-[-1px] text-stone-900 leading-tight mb-1">
-                    What are you<br /><strong className="font-semibold">looking for?</strong>
+                    {t('auth.lookingFor')}<br /><strong className="font-semibold">{t('auth.lookingForBold')}</strong>
                   </h1>
                   <p className="text-[14px] text-stone-400 mt-2">
-                    Help us show you the right properties. Change this anytime.
+                    {t('auth.prefsHelp')}
                   </p>
                 </div>
 
                 {/* Buy / Rent selector */}
                 <div className="grid grid-cols-2 gap-3">
-                  {([['buy', '🏡', 'Buy a Property'], ['rent', '🔑', 'Rent a Property']] as const).map(([val, icon, lbl]) => (
+                  {([['buy', '🏡', t('auth.buyProperty')], ['rent', '🔑', t('auth.rentProperty')]] as const).map(([val, icon, lbl]) => (
                     <button key={val} type="button" onClick={() => setSeekingType(val)}
                       className={`p-5 rounded-2xl border-2 text-center transition-all ${
                         seekingType === val
@@ -247,35 +249,35 @@ const SeekerAuthPage = () => {
                   <>
                     {seekingType === 'buy' && (
                       <div>
-                        <label className={label}>Max Purchase Budget (optional)</label>
+                        <label className={label}>{t('auth.maxBudget')}</label>
                         <select value={budgetMax} onChange={e => setBudgetMax(e.target.value)}
                           className="w-full h-[52px] px-4 rounded-2xl border border-stone-200 bg-stone-50 text-[15px] text-stone-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all">
-                          <option value="">No preference</option>
-                          <option value="500000">Up to $500k</option>
-                          <option value="750000">Up to $750k</option>
-                          <option value="1000000">Up to $1M</option>
-                          <option value="1500000">Up to $1.5M</option>
-                          <option value="2000000">Up to $2M</option>
-                          <option value="3000000">Up to $3M</option>
-                          <option value="5000000">Up to $5M</option>
+                          <option value="">{t('auth.noPreference')}</option>
+                          <option value="500000">{t('auth.budgetUpTo500k')}</option>
+                          <option value="750000">{t('auth.budgetUpTo750k')}</option>
+                          <option value="1000000">{t('auth.budgetUpTo1m')}</option>
+                          <option value="1500000">{t('auth.budgetUpTo1_5m')}</option>
+                          <option value="2000000">{t('auth.budgetUpTo2m')}</option>
+                          <option value="3000000">{t('auth.budgetUpTo3m')}</option>
+                          <option value="5000000">{t('auth.budgetUpTo5m')}</option>
                         </select>
                       </div>
                     )}
                     {seekingType === 'rent' && (
                       <div>
-                        <label className={label}>Max Weekly Rent $ (optional)</label>
+                        <label className={label}>{t('auth.maxWeeklyRent')}</label>
                         <input type="number" value={weeklyBudget} onChange={e => setWeeklyBudget(e.target.value)}
                           placeholder="e.g. 650" className={input} />
                       </div>
                     )}
                     <div>
-                      <label className={label}>Preferred suburbs (optional)</label>
+                      <label className={label}>{t('auth.preferredSuburbs')}</label>
                       <input type="text" value={suburbs} onChange={e => setSuburbs(e.target.value)}
-                        placeholder="e.g. Richmond, Fitzroy, Collingwood" className={input} />
-                      <p className="text-[11px] text-stone-300 mt-1.5">Separate with commas</p>
+                        placeholder={t('auth.suburbsPlaceholder')} className={input} />
+                      <p className="text-[11px] text-stone-300 mt-1.5">{t('auth.separateCommas')}</p>
                     </div>
                     <div>
-                      <label className={label}>Property type (optional)</label>
+                      <label className={label}>{t('auth.propertyType')}</label>
                       <div className="grid grid-cols-3 gap-2">
                         {['House', 'Apartment', 'Townhouse', 'Land', 'Any'].map(type => (
                           <button key={type} type="button"
@@ -286,7 +288,7 @@ const SeekerAuthPage = () => {
                                 : 'bg-white text-stone-500 border-stone-200 hover:border-stone-300'
                             }`}
                           >
-                            {type}
+                            {type === 'House' ? t('auth.house') : type === 'Apartment' ? t('auth.apartment') : type === 'Townhouse' ? t('auth.townhouse') : type === 'Land' ? t('auth.land') : t('auth.any')}
                           </button>
                         ))}
                       </div>
@@ -296,12 +298,12 @@ const SeekerAuthPage = () => {
                         <label className="flex items-center gap-3 cursor-pointer">
                           <input type="checkbox" checked={petsRequired} onChange={e => setPetsRequired(e.target.checked)}
                             className="w-4 h-4 rounded accent-blue-600" />
-                          <span className="text-[14px] text-stone-700">Pet friendly only</span>
+                          <span className="text-[14px] text-stone-700">{t('auth.petFriendly')}</span>
                         </label>
                         <label className="flex items-center gap-3 cursor-pointer">
                           <input type="checkbox" checked={furnishedRequired} onChange={e => setFurnishedRequired(e.target.checked)}
                             className="w-4 h-4 rounded accent-blue-600" />
-                          <span className="text-[14px] text-stone-700">Furnished only</span>
+                          <span className="text-[14px] text-stone-700">{t('auth.furnished')}</span>
                         </label>
                       </div>
                     )}
@@ -310,11 +312,11 @@ const SeekerAuthPage = () => {
 
                 <div className="flex flex-col gap-2 pt-1">
                   <button type="button" onClick={handleSavePrefs} disabled={!seekingType} className={btnPrimary}>
-                    Start searching
+                    {t('auth.startSearching')}
                   </button>
                   <button type="button" onClick={() => navigate('/')}
                     className="w-full h-10 text-[13px] text-stone-400 hover:text-stone-600 transition-colors">
-                    Skip for now
+                    {t('auth.skipForNow')}
                   </button>
                 </div>
               </motion.div>
@@ -332,9 +334,9 @@ const SeekerAuthPage = () => {
               >
                 {/* Headline */}
                 <h1 className="text-[38px] font-light tracking-[-1.5px] text-stone-900 leading-[1.08] mb-8">
-                  {step === 'email' && <>Welcome<br /><strong className="font-semibold">to ListHQ.</strong></>}
-                  {step === 'password' && <>Welcome<br /><strong className="font-semibold">back.</strong></>}
-                  {step === 'create' && <>Create<br /><strong className="font-semibold">account.</strong></>}
+                  {step === 'email' && <>{t('auth.welcome')}<br /><strong className="font-semibold">{t('auth.welcomeTo')}</strong></>}
+                  {step === 'password' && <>{t('auth.welcome')}<br /><strong className="font-semibold">{t('auth.welcomeBack')}</strong></>}
+                  {step === 'create' && <>{t('auth.createAccount')}<br /><strong className="font-semibold">{t('auth.createAccountSub')}</strong></>}
                 </h1>
 
                 {/* ── Email step ── */}
@@ -342,20 +344,20 @@ const SeekerAuthPage = () => {
                   <>
                     <form onSubmit={handleEmailContinue} className="space-y-3">
                       <div>
-                        <label className={label}>Email address</label>
+                        <label className={label}>{t('auth.emailLabel')}</label>
                         <input type="email" required autoFocus value={email}
                           onChange={e => setEmail(e.target.value)}
-                          placeholder="you@example.com"
+                          placeholder={t('auth.emailPlaceholder')}
                           className={input} />
                       </div>
-                      <button type="submit" className={btnPrimary}>Continue</button>
+                      <button type="submit" className={btnPrimary}>{t('auth.continue')}</button>
                     </form>
 
                     <p className="text-[13px] text-stone-400 mt-4">
-                      New here?{' '}
+                      {t('auth.newHere')}{' '}
                       <button onClick={() => setStep('create')}
                         className="text-blue-600 font-medium hover:underline underline-offset-2">
-                        Create a free account
+                        {t('auth.createFree')}
                       </button>
                     </p>
 
@@ -368,21 +370,21 @@ const SeekerAuthPage = () => {
                     <div className="space-y-2.5">
                       <button onClick={() => handleOAuth('google')} className={btnOAuth}>
                         <svg width="18" height="18" viewBox="0 0 24 24" className="shrink-0"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                        Continue with Google
+                        {t('auth.continueGoogle')}
                       </button>
                       <button onClick={() => handleOAuth('apple')} className={btnOAuth}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="shrink-0"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
-                        Continue with Apple
+                        {t('auth.continueApple')}
                       </button>
                     </div>
 
                     <p className="text-[11px] text-stone-300 mt-7 leading-relaxed">
-                      By continuing you agree to our{' '}
+                      {t('auth.terms')}{' '}
                       <a href="/terms" target="_blank" rel="noopener noreferrer"
-                        className="text-stone-400 underline underline-offset-2">Terms of Service</a>
-                      {' '}and{' '}
+                        className="text-stone-400 underline underline-offset-2">{t('auth.termsLink')}</a>
+                      {' '}{t('auth.and')}{' '}
                       <a href="/privacy" target="_blank" rel="noopener noreferrer"
-                        className="text-stone-400 underline underline-offset-2">Privacy Policy</a>.
+                        className="text-stone-400 underline underline-offset-2">{t('auth.privacyLink')}</a>.
                     </p>
                   </>
                 )}
@@ -394,10 +396,10 @@ const SeekerAuthPage = () => {
                     <form onSubmit={handleSignIn} className="space-y-3">
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <label className={label} style={{ marginBottom: 0 }}>Password</label>
+                          <label className={label} style={{ marginBottom: 0 }}>{t('auth.passwordLabel')}</label>
                           <Link to="/forgot-password"
                             className="text-[11px] text-stone-400 hover:text-blue-600 transition-colors">
-                            Forgot?
+                            {t('auth.forgot')}
                           </Link>
                         </div>
                         <input type="password" required autoFocus minLength={8} value={password}
@@ -410,12 +412,12 @@ const SeekerAuthPage = () => {
                         onVerify={setCaptchaToken}
                       />
                       <button type="submit" disabled={loading} className={btnPrimary}>
-                        {loading ? 'Signing in…' : 'Sign In'}
+                        {loading ? t('auth.signingIn') : t('auth.signIn')}
                       </button>
                     </form>
                     <button onClick={goBack}
                       className="text-[13px] text-stone-300 mt-5 hover:text-stone-500 transition-colors">
-                      ← Different email
+                      {t('auth.differentEmail')}
                     </button>
                   </>
                 )}
@@ -425,40 +427,40 @@ const SeekerAuthPage = () => {
                   <>
                     <form onSubmit={handleCreateAccount} className="space-y-3">
                       <div>
-                        <label className={label}>Email address</label>
+                        <label className={label}>{t('auth.emailLabel')}</label>
                         <input type="email" required value={email}
                           onChange={e => setEmail(e.target.value)} className={input} />
                       </div>
                       <div>
-                        <label className={label}>Display name</label>
+                        <label className={label}>{t('auth.displayName')}</label>
                         <input type="text" autoFocus value={displayName}
                           onChange={e => setDisplayName(e.target.value)}
-                          placeholder="Your name" className={input} />
+                          placeholder={t('auth.displayNamePlaceholder')} className={input} />
                       </div>
                       <div>
-                        <label className={label}>Mobile <span className="text-red-400">*</span></label>
+                        <label className={label}>{t('auth.mobile')} <span className="text-red-400">*</span></label>
                         <PhoneInput value={phone} onChange={setPhone} />
                       </div>
                       <div>
-                        <label className={label}>Password <span className="text-red-400">*</span></label>
+                        <label className={label}>{t('auth.passwordLabel')} <span className="text-red-400">*</span></label>
                         <input type="password" required minLength={8} value={password}
                           onChange={e => setPassword(e.target.value)} className={input} />
                       </div>
                       <button type="submit" disabled={loading} className={btnPrimary}>
-                        {loading ? 'Creating account…' : 'Create Account'}
+                        {loading ? t('auth.creatingAccount') : t('auth.createAccountBtn')}
                       </button>
                     </form>
                     <button onClick={goBack}
                       className="text-[13px] text-stone-300 mt-5 hover:text-stone-500 transition-colors">
-                      ← Back to sign in
+                      {t('auth.backToSignIn')}
                     </button>
                     <p className="text-[11px] text-stone-300 mt-6 leading-relaxed">
-                      By continuing you agree to our{' '}
+                      {t('auth.terms')}{' '}
                       <a href="/terms" target="_blank" rel="noopener noreferrer"
-                        className="text-stone-400 underline underline-offset-2">Terms of Service</a>
-                      {' '}and{' '}
+                        className="text-stone-400 underline underline-offset-2">{t('auth.termsLink')}</a>
+                      {' '}{t('auth.and')}{' '}
                       <a href="/privacy" target="_blank" rel="noopener noreferrer"
-                        className="text-stone-400 underline underline-offset-2">Privacy Policy</a>.
+                        className="text-stone-400 underline underline-offset-2">{t('auth.privacyLink')}</a>.
                     </p>
                   </>
                 )}
@@ -471,15 +473,15 @@ const SeekerAuthPage = () => {
         {/* ── Portal links — whisper quiet at the very bottom ── */}
         <div className="px-16 py-6 border-t border-stone-100 shrink-0">
           <p className="text-[11px] text-stone-300">
-            Other portals:{' '}
+            {t('auth.otherPortals')}{' '}
             <Link to="/agents/login"
               className="text-stone-400 hover:text-blue-600 transition-colors">
-              Agent Portal
+              {t('auth.agentPortal')}
             </Link>
             <span className="mx-1.5 text-stone-200">·</span>
             <Link to="/partner/login"
               className="text-stone-400 hover:text-blue-600 transition-colors">
-              Trust Accounting Partner
+              {t('auth.trustPartner')}
             </Link>
           </p>
         </div>

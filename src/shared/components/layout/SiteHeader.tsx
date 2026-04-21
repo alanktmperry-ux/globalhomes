@@ -30,6 +30,9 @@ export function SiteHeader() {
       if (agentMenuRef.current && !agentMenuRef.current.contains(e.target as Node)) {
         setShowAgentMenu(false);
       }
+      if (moreMenuRef.current && !moreMenuRef.current.contains(e.target as Node)) {
+        setShowMoreMenu(false);
+      }
     }
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);

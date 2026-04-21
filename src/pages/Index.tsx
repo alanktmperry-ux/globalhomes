@@ -12,6 +12,7 @@ import { PropertyDrawer } from '@/features/properties/components/PropertyDrawer'
 import { MapErrorBoundary } from '@/features/properties/components/MapErrorBoundary';
 import { VoiceSearchErrorBoundary } from '@/features/search/components/VoiceSearchErrorBoundary';
 import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 // Lazy-load map — only initialize when needed
 const LazyPropertyMap = lazy(() => import('@/features/properties/components/PropertyMap').then(m => ({ default: m.PropertyMap })));
@@ -65,8 +66,28 @@ const Index = () => {
       document.documentElement.style.overflow = '';
     };
   }, [hasSearch]);
-  const { t } = useI18n();
+  const { t: legacyT } = useI18n();
+  const { t, setLanguage } = useTranslation();
   const { addSearch, lastSearch } = useSearchHistory();
+
+  // Browser language auto-detection on first visit
+  useEffect(() => {
+    try {
+      if (localStorage.getItem('listhq_language')) return;
+      const nav = (navigator.language || 'en').toLowerCase();
+      let detected: 'en' | 'zh-CN' | 'vi' | 'hi' | 'ar' | 'ko' | 'bn' = 'en';
+      if (nav.startsWith('zh')) detected = 'zh-CN';
+      else if (nav.startsWith('vi')) detected = 'vi';
+      else if (nav.startsWith('hi')) detected = 'hi';
+      else if (nav.startsWith('ar')) detected = 'ar';
+      else if (nav.startsWith('ko')) detected = 'ko';
+      else if (nav.startsWith('bn')) detected = 'bn';
+      setLanguage(detected);
+    } catch {
+      // localStorage unavailable — non-fatal
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const { savedIds, isSaved, toggleSaved } = useSavedProperties();
   const isMobile = useIsMobile();
   const { formatPrice, listingMode, setListingMode } = useCurrency();

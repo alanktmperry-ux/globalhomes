@@ -11,7 +11,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useCurrency } from '@/lib/CurrencyContext';
-import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 export interface Filters {
   priceRange: [number, number];
@@ -52,18 +52,7 @@ const defaultRentalFilters: Filters = {
   priceRange: [0, 3_000],
 };
 
-const PROPERTY_TYPES = ['House', 'Apartment', 'Townhouse', 'Land', 'Commercial'];
-const COMMON_FEATURES = [
-  'Pool', 'Garden', 'Garage', 'Air conditioning', 'Hardwood floors',
-  'Solar panels', 'Balcony', 'Fireplace', 'Study', 'Ensuite',
-];
-
-const LEASE_TERMS = [
-  { value: '', label: 'Any' },
-  { value: '6', label: '6 months' },
-  { value: '12', label: '12 months' },
-  { value: 'month-to-month', label: 'Month-to-month' },
-];
+// (PROPERTY_TYPES, COMMON_FEATURES, LEASE_TERMS are now defined inside the component for i18n)
 
 const SCHOOL_ZONES = [
   { value: '', label: 'Any zone' },
@@ -160,8 +149,36 @@ function Section({ title, children, defaultOpen = true }: { title: string; child
 
 export function FilterSidebar({ filters, onChange, isOpen, onToggle, totalCount, filteredCount, listingMode = 'sale' }: FilterSidebarProps) {
   const { formatPrice } = useCurrency();
-  const { t } = useI18n();
+  const { t } = useTranslation();
   const isRental = listingMode === 'rent';
+
+  const PROPERTY_TYPES = [
+    { value: 'House', label: t('filter.type.house') },
+    { value: 'Apartment', label: t('filter.type.apartment') },
+    { value: 'Townhouse', label: t('filter.type.townhouse') },
+    { value: 'Land', label: t('filter.type.land') },
+    { value: 'Commercial', label: t('filter.type.commercial') },
+  ];
+
+  const COMMON_FEATURES = [
+    { value: 'Pool', label: t('filter.feature.pool') },
+    { value: 'Garden', label: t('filter.feature.garden') },
+    { value: 'Garage', label: t('filter.feature.garage') },
+    { value: 'Air conditioning', label: t('filter.feature.airCon') },
+    { value: 'Hardwood floors', label: t('filter.feature.hardwood') },
+    { value: 'Solar panels', label: t('filter.feature.solar') },
+    { value: 'Balcony', label: t('filter.feature.balcony') },
+    { value: 'Fireplace', label: t('filter.feature.fireplace') },
+    { value: 'Study', label: t('filter.feature.study') },
+    { value: 'Ensuite', label: t('filter.feature.ensuite') },
+  ];
+
+  const LEASE_TERMS = [
+    { value: '', label: t('filter.lease.any') },
+    { value: '6', label: t('filter.lease.6months') },
+    { value: '12', label: t('filter.lease.12months') },
+    { value: 'month-to-month', label: t('filter.lease.monthToMonth') },
+  ];
 
   const priceMax = isRental ? 3_000 : 5_000_000;
   const priceStep = isRental ? 50 : 50_000;
@@ -407,12 +424,12 @@ export function FilterSidebar({ filters, onChange, isOpen, onToggle, totalCount,
                 <Section title={t('filter.propertyType')}>
                   <div className="grid grid-cols-2 gap-2">
                     {PROPERTY_TYPES.map(type => (
-                      <label key={type} className="flex items-center gap-2 cursor-pointer group">
+                      <label key={type.value} className="flex items-center gap-2 cursor-pointer group">
                         <Checkbox
-                          checked={filters.propertyTypes.includes(type)}
-                          onCheckedChange={() => toggleArrayItem('propertyTypes', type)}
+                          checked={filters.propertyTypes.includes(type.value)}
+                          onCheckedChange={() => toggleArrayItem('propertyTypes', type.value)}
                         />
-                        <span className="text-sm text-foreground group-hover:text-primary transition-colors">{type}</span>
+                        <span className="text-sm text-foreground group-hover:text-primary transition-colors">{type.label}</span>
                       </label>
                     ))}
                   </div>
@@ -500,18 +517,18 @@ export function FilterSidebar({ filters, onChange, isOpen, onToggle, totalCount,
                 <Section title={t('filter.features')} defaultOpen={false}>
                   <div className="flex flex-wrap gap-2">
                     {COMMON_FEATURES.map(feature => {
-                      const active = filters.features.includes(feature);
+                      const active = filters.features.includes(feature.value);
                       return (
                         <button
-                          key={feature}
-                          onClick={() => toggleArrayItem('features', feature)}
+                          key={feature.value}
+                          onClick={() => toggleArrayItem('features', feature.value)}
                           className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                             active
                               ? 'bg-primary text-primary-foreground border-primary'
                               : 'bg-secondary text-foreground border-border hover:border-primary/50'
                           }`}
                         >
-                          {feature}
+                          {feature.label}
                         </button>
                       );
                     })}

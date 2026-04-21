@@ -409,6 +409,26 @@ export const en = {
   'rent.found.other': '{count} rental properties found',
   'rent.showing': 'Showing {shown} of {total}',
   'rent.noResults': 'No rentals match your filters.',
+
+  'filter.type.house': 'House',
+  'filter.type.apartment': 'Apartment',
+  'filter.type.townhouse': 'Townhouse',
+  'filter.type.land': 'Land',
+  'filter.type.commercial': 'Commercial',
+  'filter.feature.pool': 'Pool',
+  'filter.feature.garden': 'Garden',
+  'filter.feature.garage': 'Garage',
+  'filter.feature.airCon': 'Air conditioning',
+  'filter.feature.hardwood': 'Hardwood floors',
+  'filter.feature.solar': 'Solar panels',
+  'filter.feature.balcony': 'Balcony',
+  'filter.feature.fireplace': 'Fireplace',
+  'filter.feature.study': 'Study',
+  'filter.feature.ensuite': 'Ensuite',
+  'filter.lease.any': 'Any',
+  'filter.lease.6months': '6 months',
+  'filter.lease.12months': '12 months',
+  'filter.lease.monthToMonth': 'Month-to-month',
 } as const;
 
 export type TranslationKey = keyof typeof en;

@@ -893,8 +893,7 @@ const Index = () => {
     return (
       <div className="flex flex-col">
         {/* ── HERO SECTION ── */}
-        {!hasSearchParams && (
-          <section className="relative flex flex-col items-center justify-center py-12 md:py-16 bg-white overflow-hidden px-6 text-center">
+        <section style={{ display: new URLSearchParams(window.location.search).get('location') ? 'none' : 'block' }} className="relative flex flex-col items-center justify-center py-12 md:py-16 bg-white overflow-hidden px-6 text-center">
           {/* Background accents */}
           <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-blue-50/40 pointer-events-none" />
           <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-100/30 blur-[120px] pointer-events-none" />

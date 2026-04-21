@@ -1386,10 +1386,13 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     if (saved && saved in translations) return saved as Language;
     // First visit — auto-detect from navigator.language
     const detect = (): Language => {
-      const nav = (typeof navigator !== 'undefined' && navigator.language) ? navigator.language : 'en';
-      const lower = nav.toLowerCase();
-      if (lower.startsWith('zh-tw') || lower.startsWith('zh-hk')) return 'zh-TW';
-      if (lower.startsWith('zh')) return 'zh';
+      const navList: string[] = (typeof navigator !== 'undefined')
+        ? [navigator.language, ...((navigator.languages as string[] | undefined) ?? [])].filter(Boolean)
+        : ['en'];
+      const lower = (navList[0] || 'en').toLowerCase();
+      const allLower = navList.map(l => l.toLowerCase());
+      if (allLower.some(l => l.startsWith('zh-tw') || l.startsWith('zh-hk') || l.includes('hant'))) return 'zh-TW';
+      if (allLower.some(l => l.startsWith('zh'))) return 'zh';
       if (lower.startsWith('ja')) return 'ja';
       if (lower.startsWith('ko')) return 'ko';
       if (lower.startsWith('ms')) return 'ms';

@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { useRentalSearch, type RentalFilters } from '../hooks/useRentalSearch';
 import { RentalSearchFilters } from '../components/RentalSearchFilters';
 import { RentalCard } from '../components/RentalCard';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 function parseRentalFiltersFromParams(sp: URLSearchParams): RentalFilters {
   return {
@@ -19,6 +20,7 @@ export default function RentSearchPage() {
   const [searchParams] = useSearchParams();
   const [filters, setFilters] = useState<RentalFilters>(() => parseRentalFiltersFromParams(searchParams));
   const { properties, loading, total } = useRentalSearch(filters);
+  const { t } = useTranslation();
 
   // Re-sync when URL params change (voice search navigation)
   useEffect(() => {
@@ -38,10 +40,12 @@ export default function RentSearchPage() {
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
         <div>
           <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
-            Properties for Rent
+            {t('rental.title')}
           </h1>
           <p className="text-muted-foreground mt-1">
-            {loading ? 'Searching…' : `${total.toLocaleString()} rental ${total === 1 ? 'property' : 'properties'} found`}
+            {loading
+              ? t('rental.searching')
+              : t(total === 1 ? 'rental.results.one' : 'rental.results.other', { count: total.toLocaleString() })}
           </p>
         </div>
 
@@ -53,7 +57,7 @@ export default function RentSearchPage() {
         {/* Results count */}
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            {!loading && `Showing ${properties.length} of ${total}`}
+            {!loading && t('rental.showing', { shown: properties.length, total })}
           </p>
         </div>
 
@@ -66,10 +70,10 @@ export default function RentSearchPage() {
           </div>
         ) : properties.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-muted-foreground">No rentals match your filters.</p>
+            <p className="text-muted-foreground">{t('rental.empty')}</p>
             <button onClick={() => setFilters({})}
               className="mt-4 text-primary underline text-sm">
-              Clear all filters
+              {t('rental.clearFilters')}
             </button>
           </div>
         ) : (

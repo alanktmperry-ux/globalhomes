@@ -4,9 +4,11 @@ import { Helmet } from 'react-helmet-async';
 import { BorrowingPowerCalculator } from '../components/BorrowingPowerCalculator';
 import { RepaymentCalculator } from '../components/RepaymentCalculator';
 import { Calculator } from 'lucide-react';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 export default function MortgageCalculatorPage() {
   const [params] = useSearchParams();
+  const { t } = useTranslation();
   const initialAmount = params.get('amount') ? Number(params.get('amount')) : undefined;
   const [tab, setTab] = useState<'repayment' | 'borrowing'>(
     initialAmount ? 'repayment' : 'borrowing'
@@ -44,32 +46,30 @@ export default function MortgageCalculatorPage() {
         <div className="text-center mb-10">
           <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full mb-4">
             <Calculator className="w-3.5 h-3.5" />
-            Free Australian Calculator
+            {t('mortgage.badge')}
           </span>
           <h1 className="text-4xl md:text-5xl font-display font-extrabold text-foreground tracking-tight">
-            Mortgage Calculator Australia
+            {t('mortgage.title')}
           </h1>
           <p className="mt-4 text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Calculate your borrowing power and monthly repayments in seconds.
-            Includes the APRA 3% serviceability buffer, LMI estimates, offset modelling,
-            and a full amortisation chart.
+            {t('mortgage.subtitle')}
           </p>
         </div>
 
         {/* Tab switcher */}
         <div className="flex flex-wrap justify-center gap-3 mb-10">
           {[
-            { value: 'borrowing' as const, label: '💰 Borrowing Power', desc: 'How much can I borrow?' },
-            { value: 'repayment' as const, label: '📅 Repayment Calculator', desc: 'What are my repayments?' },
-          ].map(t => (
-            <button key={t.value} onClick={() => setTab(t.value)}
+            { value: 'borrowing' as const, label: t('mortgage.tab.borrowing'), desc: t('mortgage.tab.borrowing.desc') },
+            { value: 'repayment' as const, label: t('mortgage.tab.repayment'), desc: t('mortgage.tab.repayment.desc') },
+          ].map(t2 => (
+            <button key={t2.value} onClick={() => setTab(t2.value)}
               className={`px-6 py-3 rounded-2xl border text-sm font-semibold transition
-                ${tab === t.value
+                ${tab === t2.value
                   ? 'bg-primary text-primary-foreground border-primary'
                   : 'bg-card text-foreground border-border hover:border-muted-foreground'
                 }`}>
-              <span className="block">{t.label}</span>
-              <span className="block text-xs opacity-70 mt-0.5">{t.desc}</span>
+              <span className="block">{t2.label}</span>
+              <span className="block text-xs opacity-70 mt-0.5">{t2.desc}</span>
             </button>
           ))}
         </div>
@@ -85,12 +85,9 @@ export default function MortgageCalculatorPage() {
         {/* Related tools */}
         <div className="grid sm:grid-cols-3 gap-4 mb-16">
           {[
-            { href: '/stamp-duty-calculator', icon: '🏛', label: 'Stamp Duty Calculator',
-              desc: 'Calculate stamp duty for all 8 states & territories' },
-            { href: '/', icon: '🔍', label: 'Browse Properties',
-              desc: 'Search for your next home across Australia' },
-            { href: '/agents', icon: '👤', label: 'Find an Agent',
-              desc: 'Connect with top local agents' },
+            { href: '/stamp-duty-calculator', icon: '🏛', label: t('mortgage.related.stampDuty'), desc: t('mortgage.related.stampDuty.desc') },
+            { href: '/', icon: '🔍', label: t('mortgage.related.browse'), desc: t('mortgage.related.browse.desc') },
+            { href: '/agents', icon: '👤', label: t('mortgage.related.agent'), desc: t('mortgage.related.agent.desc') },
           ].map(({ href, icon, label, desc }) => (
             <Link key={href} to={href}
               className="flex items-center gap-3 p-4 bg-card rounded-2xl border border-border hover:border-primary/30 transition">
@@ -106,29 +103,14 @@ export default function MortgageCalculatorPage() {
         {/* SEO FAQ */}
         <div className="max-w-3xl mx-auto mb-16">
           <h2 className="text-2xl font-display font-bold text-foreground mb-6 text-center">
-            Frequently Asked Questions
+            {t('mortgage.faq.title')}
           </h2>
           {[
-            {
-              q: 'How much can I borrow for a home loan in Australia?',
-              a: 'Your borrowing power depends on your income (after tax), living expenses, existing debts, deposit size, and the interest rate. Australian lenders also apply a 3% APRA serviceability buffer on top of your actual rate, which reduces your maximum borrowing capacity. Use the borrowing power calculator above to get an estimate.',
-            },
-            {
-              q: 'What is the APRA 3% serviceability buffer?',
-              a: 'Since November 2021, APRA requires Australian lenders to assess your ability to repay at your actual interest rate plus 3%. So if your home loan rate is 6.25%, lenders test whether you can afford repayments at 9.25%. This buffer ensures borrowers can still meet repayments if rates rise.',
-            },
-            {
-              q: 'Do I need Lender\'s Mortgage Insurance (LMI)?',
-              a: 'LMI applies when your loan-to-value ratio (LVR) exceeds 80% — that is, when your deposit is less than 20% of the property value. LMI protects the lender (not you) if you default. It can cost anywhere from 0.5% to 3.5% of the loan amount and can usually be added to the loan.',
-            },
-            {
-              q: 'How do fortnightly repayments save money?',
-              a: 'Paying fortnightly rather than monthly means you make 26 half-payments per year (equivalent to 13 monthly payments). That one extra monthly payment per year reduces your principal faster, saving thousands in interest and years off your loan term.',
-            },
-            {
-              q: 'How does an offset account work?',
-              a: 'An offset account is a transaction account linked to your mortgage. The balance in your offset account reduces the principal on which interest is calculated. For example, if your loan is $600,000 and you have $50,000 in an offset account, you only pay interest on $550,000.',
-            },
+            { q: t('mortgage.faq.q1'), a: t('mortgage.faq.a1') },
+            { q: t('mortgage.faq.q2'), a: t('mortgage.faq.a2') },
+            { q: t('mortgage.faq.q3'), a: t('mortgage.faq.a3') },
+            { q: t('mortgage.faq.q4'), a: t('mortgage.faq.a4') },
+            { q: t('mortgage.faq.q5'), a: t('mortgage.faq.a5') },
           ].map(({ q, a }) => (
             <div key={q} className="border-b border-border py-5">
               <h3 className="text-base font-semibold text-foreground mb-2">{q}</h3>
@@ -139,11 +121,7 @@ export default function MortgageCalculatorPage() {
 
         {/* Disclaimer */}
         <p className="text-[10px] text-muted-foreground text-center max-w-2xl mx-auto">
-          This calculator provides estimates only and does not constitute financial advice.
-          Calculations are based on 2025–26 Australian tax rates, APRA guidelines, and simplified LMI scales.
-          Your actual borrowing capacity may differ based on individual lender policies, credit history,
-          and other factors. Always consult a licensed mortgage broker or financial adviser before making
-          financial decisions.
+          {t('mortgage.disclaimer')}
         </p>
       </div>
     </>

@@ -918,13 +918,13 @@ const Index = () => {
 
             {/* Headline */}
             <h1 className="text-5xl md:text-7xl font-black leading-tight tracking-tight text-slate-900">
-              Australian property.<br />
-              <span className="text-blue-500">Now</span> in your language.
+              {t('hero.headlineLine1')}<br />
+              <span className="text-blue-500">{t('hero.headlineLine2Now')}</span> {t('hero.headlineLine2Rest')}
             </h1>
 
             {/* Subheadline */}
             <p className="text-xl md:text-2xl text-slate-500 font-medium mt-4 mb-0">
-              Every listing. Every suburb. Every language.
+              {t('hero.subTagline')}
             </p>
 
             {/* Sale / Rent toggle */}
@@ -958,7 +958,7 @@ const Index = () => {
                   type="text"
                   value={heroQuery}
                   onChange={e => setHeroQuery(e.target.value)}
-                  placeholder={HERO_PLACEHOLDERS[heroPlaceholderIndex]}
+                  placeholder={t('hero.searchPlaceholder', { example: HERO_PLACEHOLDERS[heroPlaceholderIndex] })}
                   className="flex-1 bg-transparent outline-none text-slate-800 text-[15px] placeholder:text-slate-400 min-w-0"
                 />
                 <button
@@ -991,7 +991,7 @@ const Index = () => {
                 </div>
               )}
               <p className="text-sm text-slate-400 mt-3 text-center">
-                Search in Mandarin, Vietnamese, Cantonese, Arabic or any of 24 languages.
+                {t('hero.searchInLanguages')}
               </p>
             </form>
 
@@ -1001,7 +1001,7 @@ const Index = () => {
                 onClick={() => navigate('/buy')}
                 className="rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:border-slate-400 hover:text-slate-900 transition-all cursor-pointer bg-white/80 backdrop-blur-sm"
               >
-                🔍 Browse properties
+                🔍 {t('hero.browseProperties')}
               </button>
             </div>
           </motion.div>

@@ -454,6 +454,21 @@ export const en = {
   'badge.forRent': 'For Rent',
   'badge.sold': 'Sold',
   'badge.underOffer': 'Under Offer',
+
+  'mortgage.pageTitle': 'Mortgage Calculator',
+  'mortgage.pageSubtitle': 'Estimate your repayments for any Australian home loan.',
+  'mortgage.label.loanAmount': 'Loan amount',
+  'mortgage.label.interestRate': 'Interest rate (% p.a.)',
+  'mortgage.label.loanTerm': 'Loan term (years)',
+  'mortgage.label.repaymentType': 'Repayment type',
+  'mortgage.repayment.principalInterest': 'Principal & Interest',
+  'mortgage.repayment.interestOnly': 'Interest Only',
+  'mortgage.result.monthly': 'Monthly repayment',
+  'mortgage.result.weekly': 'Weekly repayment',
+  'mortgage.result.fortnightly': 'Fortnightly repayment',
+  'mortgage.result.totalRepayable': 'Total repayable',
+  'mortgage.result.totalInterest': 'Total interest',
+  'mortgage.cta.broker': 'Speak to a broker',
 } as const;
 
 export type TranslationKey = keyof typeof en;

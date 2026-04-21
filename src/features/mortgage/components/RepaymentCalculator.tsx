@@ -7,6 +7,7 @@ import {
   calculateRepayments, formatCurrency, formatRate,
   type RepaymentInputs, type RepaymentFrequency,
 } from '../lib/mortgageCalcs';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 const DEFAULT: RepaymentInputs = {
   loanAmount:     600_000,
@@ -18,18 +19,19 @@ const DEFAULT: RepaymentInputs = {
   extraRepayment: 0,
 };
 
-const FREQ_LABELS: Record<RepaymentFrequency, string> = {
-  monthly:     'Monthly',
-  fortnightly: 'Fortnightly',
-  weekly:      'Weekly',
-};
-
 export function RepaymentCalculator({ initialAmount }: { initialAmount?: number }) {
+  const { t } = useTranslation();
   const [inputs, setInputs] = useState<RepaymentInputs>({
     ...DEFAULT,
     ...(initialAmount ? { loanAmount: initialAmount } : {}),
   });
   const [chartType, setChartType] = useState<'balance' | 'breakdown'>('balance');
+
+  const FREQ_LABELS: Record<RepaymentFrequency, string> = {
+    monthly:     t('mortgage.result.monthly'),
+    fortnightly: t('mortgage.result.fortnightly'),
+    weekly:      t('mortgage.result.weekly'),
+  };
 
   const result = useMemo(() => calculateRepayments(inputs), [inputs]);
   const set = (key: keyof RepaymentInputs, value: number | string) =>
@@ -51,7 +53,7 @@ export function RepaymentCalculator({ initialAmount }: { initialAmount?: number 
         {/* Loan amount */}
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="font-medium text-foreground">Loan Amount</span>
+            <span className="font-medium text-foreground">{t('mortgage.label.loanAmount')}</span>
             <span className="font-semibold text-foreground tabular-nums">{formatCurrency(inputs.loanAmount)}</span>
           </div>
           <input type="range" min={50_000} max={3_000_000} step={10_000}
@@ -62,7 +64,7 @@ export function RepaymentCalculator({ initialAmount }: { initialAmount?: number 
         {/* Interest rate */}
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="font-medium text-foreground">Interest Rate</span>
+            <span className="font-medium text-foreground">{t('mortgage.label.interestRate')}</span>
             <span className="font-semibold text-foreground tabular-nums">{formatRate(inputs.interestRate)}</span>
           </div>
           <input type="range" min={2} max={12} step={0.05}
@@ -72,7 +74,7 @@ export function RepaymentCalculator({ initialAmount }: { initialAmount?: number 
 
         {/* Loan term */}
         <div>
-          <span className="text-sm font-medium text-foreground">Loan Term</span>
+          <span className="text-sm font-medium text-foreground">{t('mortgage.label.loanTerm')}</span>
           <div className="flex gap-2 mt-2">
             {[10, 15, 20, 25, 30].map(y => (
               <button key={y} onClick={() => set('loanTermYears', y)}
@@ -139,7 +141,7 @@ export function RepaymentCalculator({ initialAmount }: { initialAmount?: number 
               </p>
             </div>
             <div className="text-center">
-              <p className="text-xs text-muted-foreground">Total Interest</p>
+              <p className="text-xs text-muted-foreground">{t('mortgage.result.totalInterest')}</p>
               <p className="text-3xl font-display font-extrabold text-muted-foreground mt-1">
                 {formatCurrency(result.totalInterest, true)}
               </p>
@@ -225,7 +227,7 @@ export function RepaymentCalculator({ initialAmount }: { initialAmount?: number 
 
         {/* Total cost pill */}
         <div className="flex items-center justify-between bg-accent rounded-xl px-5 py-3">
-          <span className="text-sm text-muted-foreground">Total cost of loan</span>
+          <span className="text-sm text-muted-foreground">{t('mortgage.result.totalRepayable')}</span>
           <span className="text-lg font-bold text-foreground">
             {formatCurrency(result.totalRepayments, true)}
           </span>

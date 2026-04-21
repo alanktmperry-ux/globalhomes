@@ -424,12 +424,12 @@ export function FilterSidebar({ filters, onChange, isOpen, onToggle, totalCount,
                 <Section title={t('filter.propertyType')}>
                   <div className="grid grid-cols-2 gap-2">
                     {PROPERTY_TYPES.map(type => (
-                      <label key={type} className="flex items-center gap-2 cursor-pointer group">
+                      <label key={type.value} className="flex items-center gap-2 cursor-pointer group">
                         <Checkbox
-                          checked={filters.propertyTypes.includes(type)}
-                          onCheckedChange={() => toggleArrayItem('propertyTypes', type)}
+                          checked={filters.propertyTypes.includes(type.value)}
+                          onCheckedChange={() => toggleArrayItem('propertyTypes', type.value)}
                         />
-                        <span className="text-sm text-foreground group-hover:text-primary transition-colors">{type}</span>
+                        <span className="text-sm text-foreground group-hover:text-primary transition-colors">{type.label}</span>
                       </label>
                     ))}
                   </div>

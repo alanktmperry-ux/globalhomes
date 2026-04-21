@@ -95,26 +95,53 @@ export function SiteHeader() {
             <Sparkles size={13} className="text-primary" /> Exclusive
             <span className="ml-0.5 text-[9px] font-bold uppercase tracking-wide bg-red-500 text-white rounded-full px-1.5 py-0.5">NEW</span>
           </Link>
-          <Link
-            to="/home-services"
-            className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors"
+
+          <button
+            onClick={() => navigate('/search')}
+            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
+            aria-label="Search"
           >
-            <Wrench size={13} /> Services
-          </Link>
-          <Link
-            to="/conveyancing"
-            className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors"
-          >
-            <FileText size={13} /> Conveyancing
-          </Link>
-          <Link
-            to="/refer"
-            className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors"
-          >
-            <Handshake size={13} /> Referral Program
-          </Link>
+            <Search size={13} /> Search
+          </button>
+
           <CurrencySwitcher />
           <LanguageSwitcher />
+
+          {/* More dropdown */}
+          <div ref={moreMenuRef} className="relative">
+            <button
+              onClick={() => setShowMoreMenu(o => !o)}
+              className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              aria-label="More"
+              title="More"
+            >
+              <MoreHorizontal size={18} />
+            </button>
+            <AnimatePresence>
+              {showMoreMenu && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  className="absolute right-0 top-full mt-1 w-52 bg-popover border border-border rounded-xl shadow-elevated overflow-hidden z-50"
+                >
+                  <button onClick={() => { navigate('/home-services'); setShowMoreMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                    <Wrench size={14} className="text-muted-foreground" /> Services
+                  </button>
+                  <button onClick={() => { navigate('/conveyancing'); setShowMoreMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                    <FileText size={14} className="text-muted-foreground" /> Conveyancing
+                  </button>
+                  <button onClick={() => { navigate('/refer'); setShowMoreMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                    <Handshake size={14} className="text-muted-foreground" /> Referral Program
+                  </button>
+                  <button onClick={() => { navigate('/help'); setShowMoreMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                    <HelpCircle size={14} className="text-muted-foreground" /> Help Centre
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
 
           {user && isAgent && (
             <>

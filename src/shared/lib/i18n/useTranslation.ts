@@ -21,6 +21,9 @@ import { zhCN } from './locales/zh-CN';
 import { zhTW } from './locales/zh-TW';
 import { hi } from './locales/hi';
 import { bn } from './locales/bn';
+import { vi } from './locales/vi';
+import { ko } from './locales/ko';
+import { ar } from './locales/ar';
 import {
   LANGUAGE_STORAGE_KEY,
   FROM_LEGACY_CODE_MAP,
@@ -38,6 +41,9 @@ const LOCALES: Partial<Record<SupportedLanguageCode, Record<string, string>>> = 
   'zh-TW': zhTW,
   'hi': hi,
   'bn': bn,
+  'vi': vi,
+  'ko': ko,
+  'ar': ar,
 };
 
 type AnyKey = TranslationKey | (string & {});

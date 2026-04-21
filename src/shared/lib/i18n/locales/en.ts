@@ -429,6 +429,20 @@ export const en = {
   'filter.lease.6months': '6 months',
   'filter.lease.12months': '12 months',
   'filter.lease.monthToMonth': 'Month-to-month',
+
+  'home.howItWorks.title': 'How ListHQ works',
+  'home.howItWorks.subtitle': 'Three steps to finding your next home — in your language.',
+  'home.howItWorks.step1.title': 'Search in your language',
+  'home.howItWorks.step1.desc': 'Type or speak in Mandarin, Hindi, Vietnamese, Arabic, or any of 24 languages. Our AI understands you.',
+  'home.howItWorks.step2.title': 'See prices your way',
+  'home.howItWorks.step2.desc': 'Every listing shows in your currency — CNY, USD, INR, and 10 more. Live exchange rates, updated daily.',
+  'home.howItWorks.step3.title': 'Connect with your agent',
+  'home.howItWorks.step3.desc': 'Message agents directly through WeChat, WhatsApp, or LINE. No language barrier.',
+  'home.agents.eyebrow': 'For agents',
+  'home.agents.headline': 'The platform built for multicultural Australia.',
+  'home.agents.sub': 'CRM, listings, property management, AI tools — all in one place. In 24 languages.',
+  'home.agents.cta': 'Explore agent tools',
+  'home.agents.founding': 'Join as a founding agent — first 3 months free',
 } as const;
 
 export type TranslationKey = keyof typeof en;

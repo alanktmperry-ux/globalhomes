@@ -1087,13 +1087,13 @@ const Index = () => {
         {/* ── HOW IT WORKS ── */}
         <motion.section {...sectionAnim} className="bg-slate-50 py-12 px-6">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-xl font-semibold text-slate-900 mb-1">How ListHQ works</h2>
-            <p className="text-sm text-slate-500 mb-8">Three steps to finding your next home</p>
+            <h2 className="text-xl font-semibold text-slate-900 mb-1">{t('home.howItWorks.title')}</h2>
+            <p className="text-sm text-slate-500 mb-8">{t('home.howItWorks.subtitle')}</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
-                { num: '1', title: 'Search in your language', desc: 'Type naturally in Mandarin, Vietnamese, English or any of 24 languages. Our AI understands you.' },
-                { num: '2', title: 'See prices your way', desc: 'View AUD prices alongside CNY, VND, or your home currency in real time.' },
-                { num: '3', title: 'Connect with your agent', desc: 'Every listing connects you directly to a licensed Australian agent who speaks your language.' },
+                { num: '1', title: t('home.howItWorks.step1.title'), desc: t('home.howItWorks.step1.desc') },
+                { num: '2', title: t('home.howItWorks.step2.title'), desc: t('home.howItWorks.step2.desc') },
+                { num: '3', title: t('home.howItWorks.step3.title'), desc: t('home.howItWorks.step3.desc') },
               ].map((step) => (
                 <div key={step.num} className="bg-white rounded-xl border border-slate-200 p-6 text-center">
                   <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 text-sm font-semibold flex items-center justify-center mx-auto mb-4">{step.num}</div>
@@ -1124,7 +1124,9 @@ const Index = () => {
           <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
             {/* Left: bullets */}
             <div>
-              <h2 className="text-2xl font-bold text-white mb-6">For agents</h2>
+              <h2 className="text-2xl font-bold text-white mb-2">{t('home.agents.eyebrow')}</h2>
+              <p className="text-lg text-white font-semibold mb-2">{t('home.agents.headline')}</p>
+              <p className="text-sm text-slate-400 mb-6">{t('home.agents.sub')}</p>
               <ul className="space-y-4">
                 {[
                   'AI-powered multilingual listings',
@@ -1141,13 +1143,13 @@ const Index = () => {
             </div>
             {/* Right: founding agent card */}
             <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center">
-              <div className="text-3xl font-bold text-white mb-1">Free for 3 months</div>
+              <div className="text-2xl font-bold text-white mb-1">{t('home.agents.founding')}</div>
               <p className="text-sm text-slate-400 mb-6">No credit card required. Full access.</p>
               <button
                 onClick={() => navigate('/for-agents')}
                 className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full text-sm font-semibold transition-colors"
               >
-                Get early access
+                {t('home.agents.cta')}
                 <ArrowRight size={14} />
               </button>
             </div>

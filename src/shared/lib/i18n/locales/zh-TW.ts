@@ -428,4 +428,18 @@ export const zhTW: Record<keyof typeof EnBase, string> = {
   'filter.lease.6months': '6個月',
   'filter.lease.12months': '12個月',
   'filter.lease.monthToMonth': '按月續租',
+
+  'home.howItWorks.title': 'ListHQ 如何運作',
+  'home.howItWorks.subtitle': '三步找到您的下一套房產——用您的語言。',
+  'home.howItWorks.step1.title': '用您的語言搜尋',
+  'home.howItWorks.step1.desc': '用普通話、印地語、越南語、阿拉伯語或24種語言中的任何一種輸入或說話。我們的AI能理解您。',
+  'home.howItWorks.step2.title': '以您的方式查看價格',
+  'home.howItWorks.step2.desc': '每個房源以您的貨幣顯示——人民幣、美元、盧比等10種以上貨幣。每日更新實時匯率。',
+  'home.howItWorks.step3.title': '與中介聯繫',
+  'home.howItWorks.step3.desc': '透過微信、WhatsApp或LINE直接與中介溝通。無語言障礙。',
+  'home.agents.eyebrow': '面向中介',
+  'home.agents.headline': '專為多元文化澳大利亞打造的平台。',
+  'home.agents.sub': 'CRM、房源、物業管理、AI工具——一站式平台。支援24種語言。',
+  'home.agents.cta': '探索中介工具',
+  'home.agents.founding': '成為創始中介——前3個月免費',
 };

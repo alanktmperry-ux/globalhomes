@@ -517,18 +517,18 @@ export function FilterSidebar({ filters, onChange, isOpen, onToggle, totalCount,
                 <Section title={t('filter.features')} defaultOpen={false}>
                   <div className="flex flex-wrap gap-2">
                     {COMMON_FEATURES.map(feature => {
-                      const active = filters.features.includes(feature);
+                      const active = filters.features.includes(feature.value);
                       return (
                         <button
-                          key={feature}
-                          onClick={() => toggleArrayItem('features', feature)}
+                          key={feature.value}
+                          onClick={() => toggleArrayItem('features', feature.value)}
                           className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                             active
                               ? 'bg-primary text-primary-foreground border-primary'
                               : 'bg-secondary text-foreground border-border hover:border-primary/50'
                           }`}
                         >
-                          {feature}
+                          {feature.label}
                         </button>
                       );
                     })}

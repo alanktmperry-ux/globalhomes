@@ -14,11 +14,12 @@ import { QuickYieldBadge } from '@/components/investor/QuickYieldBadge';
 import { useListingTranslation } from '@/features/properties/hooks/useListingTranslation';
 
 function VerificationBadge({ level }: { level?: string }) {
+  const { t } = useI18n();
   if (!level || level === 'email') return null;
   const config: Record<string, { icon: typeof Shield; className: string; label: string }> = {
-    phone: { icon: Shield, className: 'bg-blue-500', label: 'Phone Verified' },
-    license: { icon: ShieldCheck, className: 'bg-emerald-500', label: 'Licensed' },
-    top_performer: { icon: ShieldCheck, className: 'bg-amber-500', label: 'Top Performer' },
+    phone: { icon: Shield, className: 'bg-blue-500', label: t('badge.phoneVerified') },
+    license: { icon: ShieldCheck, className: 'bg-emerald-500', label: t('badge.licensed') },
+    top_performer: { icon: ShieldCheck, className: 'bg-amber-500', label: t('badge.topPerformer') },
   };
   const c = config[level] || config.phone;
   return (
@@ -68,9 +69,9 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
   const realViews = typeof property.views === 'number' && property.views > 0 ? property.views : null;
 
   const statusConfig: Record<PropertyStatus, { label: string; className: string } | null> = {
-    'off-market': { label: 'Off-Market', className: 'bg-amber-500/90 text-white' },
-    'coming-soon': { label: 'Coming Soon', className: 'bg-blue-500/90 text-white' },
-    'new': { label: 'New', className: 'bg-emerald-500/90 text-white' },
+    'off-market': { label: t('badge.offMarket'), className: 'bg-amber-500/90 text-white' },
+    'coming-soon': { label: t('badge.comingSoon'), className: 'bg-blue-500/90 text-white' },
+    'new': { label: t('badge.new'), className: 'bg-emerald-500/90 text-white' },
     'listed': null,
   };
 

@@ -419,4 +419,15 @@ export const hi: Record<keyof typeof EnBase, string> = {
   'home.agents.sub': 'CRM, लिस्टिंग, संपत्ति प्रबंधन, AI उपकरण — सब एक ही जगह। 24 भाषाओं में।',
   'home.agents.cta': 'एजेंट टूल्स देखें',
   'home.agents.founding': 'फाउंडिंग एजेंट के रूप में जुड़ें — पहले 3 महीने मुफ़्त',
+
+  'badge.offMarket': 'ऑफ़-मार्केट',
+  'badge.comingSoon': 'जल्द आ रहा है',
+  'badge.new': 'नया',
+  'badge.phoneVerified': 'फ़ोन सत्यापित',
+  'badge.licensed': 'लाइसेंसी',
+  'badge.topPerformer': 'टॉप परफ़ॉर्मर',
+  'badge.forSale': 'बिक्री के लिए',
+  'badge.forRent': 'किराये के लिए',
+  'badge.sold': 'बिक गया',
+  'badge.underOffer': 'ऑफ़र के तहत',
 };

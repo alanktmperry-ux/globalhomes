@@ -442,4 +442,15 @@ export const zhTW: Record<keyof typeof EnBase, string> = {
   'home.agents.sub': 'CRM、房源、物業管理、AI工具——一站式平台。支援24種語言。',
   'home.agents.cta': '探索中介工具',
   'home.agents.founding': '成為創始中介——前3個月免費',
+
+  'badge.offMarket': '非公開房源',
+  'badge.comingSoon': '即將上市',
+  'badge.new': '新上',
+  'badge.phoneVerified': '電話已驗證',
+  'badge.licensed': '持牌中介',
+  'badge.topPerformer': '優秀中介',
+  'badge.forSale': '出售',
+  'badge.forRent': '出租',
+  'badge.sold': '已售出',
+  'badge.underOffer': '報價中',
 };

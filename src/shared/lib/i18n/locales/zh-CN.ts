@@ -441,4 +441,15 @@ export const zhCN: Record<keyof typeof EnBase, string> = {
   'home.agents.sub': 'CRM、房源、物业管理、AI工具——一站式平台。支持24种语言。',
   'home.agents.cta': '探索中介工具',
   'home.agents.founding': '成为创始中介——前3个月免费',
+
+  'badge.offMarket': '非公开房源',
+  'badge.comingSoon': '即将上市',
+  'badge.new': '新上',
+  'badge.phoneVerified': '电话已验证',
+  'badge.licensed': '持牌中介',
+  'badge.topPerformer': '优秀中介',
+  'badge.forSale': '出售',
+  'badge.forRent': '出租',
+  'badge.sold': '已售出',
+  'badge.underOffer': '报价中',
 };

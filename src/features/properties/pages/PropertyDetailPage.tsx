@@ -86,82 +86,106 @@ export default function PropertyDetailPage() {
 
       // Support slug-based or UUID-based lookups
       const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-      const query = supabase
-        .from('properties')
-        .select('*, agents(id, name, agency, phone, email, avatar_url, is_subscribed, user_id)')
-        .eq(isUuid ? 'id' : 'slug', id)
-        .single();
 
-      const { data, error } = await query;
+      // 1. Fetch property WITHOUT joining agents (avoids agents RLS triggering)
+      const { data, error } = await supabase
+        .from('properties')
+        .select('*')
+        .eq(isUuid ? 'id' : 'slug', id)
+        .maybeSingle();
 
       if (error) {
         console.warn('[PropertyDetail] Fetch failed:', error.message);
       }
 
-      if (data) {
-        const p: any = data;
-        setRawProperty(p);
-        setProperty({
-          id: p.id,
-          title: p.title,
-          address: p.address,
-          suburb: p.suburb,
-          state: p.state,
-          country: p.country,
-          price: p.price,
-          priceFormatted: p.price_formatted,
-          beds: p.beds,
-          baths: p.baths,
-          parking: p.parking,
-          sqm: p.sqm,
-          imageUrl: p.image_url || p.images?.[0] || '',
-          images: p.images || (p.image_url ? [p.image_url] : []),
-          description: p.description || '',
-          estimatedValue: p.estimated_value || '',
-          propertyType: p.property_type || 'House',
-          features: p.features || [],
-          agent: p.agents ? {
-            id: p.agents.id || p.agent_id || '',
-            name: p.agents.name || 'Agent',
-            agency: p.agents.agency || '',
-            phone: p.agents.phone || '',
-            email: p.agents.email || '',
-            avatarUrl: p.agents.avatar_url || '',
-            isSubscribed: p.agents.is_subscribed || false,
-          } : { id: '', name: 'Private Seller', agency: '', phone: '', email: '', avatarUrl: '', isSubscribed: false },
-          listedDate: p.listed_date || p.created_at,
-          views: (p.views ?? 0) + 1,
-          contactClicks: p.contact_clicks,
-          status: 'listed',
-          rentalYieldPct: p.rental_yield_pct,
-          strPermitted: p.str_permitted,
-          yearBuilt: p.year_built,
-          councilRatesAnnual: p.council_rates_annual,
-          strataFeesQuarterly: p.strata_fees_quarterly,
-          rentalWeekly: p.rental_weekly,
-          currencyCode: p.currency_code,
-          listingType: p.listing_type || null,
-          inspectionTimes: Array.isArray(p.inspection_times) ? p.inspection_times : [],
-        });
-        setInspectionTimes(Array.isArray(p.inspection_times) ? p.inspection_times : []);
-
-        // Fire-and-forget: atomically increment view count in DB
-        supabase.rpc('increment_property_views', { property_id: p.id }).then(({ error: rpcErr }) => {
-          if (rpcErr) {
-            // Fallback: direct update if RPC doesn't exist yet
-            supabase
-              .from('properties')
-              .update({ views: (p.views ?? 0) + 1 })
-              .eq('id', p.id)
-              .then(({ error: updateErr }) => {
-                if (updateErr) console.warn('[PropertyDetail] View count update failed:', updateErr.message);
-              });
-          }
-        });
-      } else {
+      if (!data) {
         setProperty(null);
+        setRawProperty(null);
+        setLoading(false);
+        return;
       }
+
+      const p: any = data;
+
+      // 2. Fetch agent in a SEPARATE query, isolated so failure doesn't block render
+      let agentRow: any = null;
+      if (p.agent_id) {
+        try {
+          const { data: agentData, error: agentErr } = await supabase
+            .from('agents')
+            .select('id, name, agency, phone, email, avatar_url, is_subscribed, user_id')
+            .eq('id', p.agent_id)
+            .maybeSingle();
+          if (agentErr) {
+            console.warn('[PropertyDetail] Agent fetch failed:', agentErr.message);
+          } else {
+            agentRow = agentData;
+          }
+        } catch (err) {
+          console.warn('[PropertyDetail] Agent fetch threw:', err);
+        }
+      }
+
+      // Stash agent on rawProperty so downstream code (isOwnerAgent check) keeps working
+      setRawProperty({ ...p, agents: agentRow });
+      setProperty({
+        id: p.id,
+        title: p.title,
+        address: p.address,
+        suburb: p.suburb,
+        state: p.state,
+        country: p.country,
+        price: p.price,
+        priceFormatted: p.price_formatted,
+        beds: p.beds,
+        baths: p.baths,
+        parking: p.parking,
+        sqm: p.sqm,
+        imageUrl: p.image_url || p.images?.[0] || '',
+        images: p.images || (p.image_url ? [p.image_url] : []),
+        description: p.description || '',
+        estimatedValue: p.estimated_value || '',
+        propertyType: p.property_type || 'House',
+        features: p.features || [],
+        agent: agentRow ? {
+          id: agentRow.id || p.agent_id || '',
+          name: agentRow.name || 'Agent',
+          agency: agentRow.agency || '',
+          phone: agentRow.phone || '',
+          email: agentRow.email || '',
+          avatarUrl: agentRow.avatar_url || '',
+          isSubscribed: agentRow.is_subscribed || false,
+        } : { id: '', name: 'Private Seller', agency: '', phone: '', email: '', avatarUrl: '', isSubscribed: false },
+        listedDate: p.listed_date || p.created_at,
+        views: (p.views ?? 0) + 1,
+        contactClicks: p.contact_clicks,
+        status: 'listed',
+        rentalYieldPct: p.rental_yield_pct,
+        strPermitted: p.str_permitted,
+        yearBuilt: p.year_built,
+        councilRatesAnnual: p.council_rates_annual,
+        strataFeesQuarterly: p.strata_fees_quarterly,
+        rentalWeekly: p.rental_weekly,
+        currencyCode: p.currency_code,
+        listingType: p.listing_type || null,
+        inspectionTimes: Array.isArray(p.inspection_times) ? p.inspection_times : [],
+      });
+      setInspectionTimes(Array.isArray(p.inspection_times) ? p.inspection_times : []);
+
+      // Render now — fire-and-forget the view increment
       setLoading(false);
+
+      supabase.rpc('increment_property_views', { property_id: p.id }).then(({ error: rpcErr }) => {
+        if (rpcErr) {
+          supabase
+            .from('properties')
+            .update({ views: (p.views ?? 0) + 1 })
+            .eq('id', p.id)
+            .then(({ error: updateErr }) => {
+              if (updateErr) console.warn('[PropertyDetail] View count update failed:', updateErr.message);
+            });
+        }
+      });
     };
     fetchProperty();
   }, [id]);

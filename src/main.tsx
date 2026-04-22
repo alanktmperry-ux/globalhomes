@@ -5,16 +5,18 @@ import { InvestorModeProvider } from "./context/InvestorModeContext";
 import App from "./App.tsx";
 import "./index.css";
 
-Sentry.init({
-  dsn: import.meta.env.VITE_SENTRY_DSN,
-  environment: import.meta.env.MODE,
-  tracesSampleRate: 0.2,
-  replaysOnErrorSampleRate: 1.0,
-  integrations: [
-    Sentry.browserTracingIntegration(),
-    Sentry.replayIntegration({ maskAllInputs: false }),
-  ],
-});
+setTimeout(() => {
+  Sentry.init({
+    dsn: import.meta.env.VITE_SENTRY_DSN,
+    environment: import.meta.env.MODE,
+    tracesSampleRate: 0.2,
+    replaysOnErrorSampleRate: 1.0,
+    integrations: [
+      Sentry.browserTracingIntegration(),
+      Sentry.replayIntegration({ maskAllInputs: false }),
+    ],
+  });
+}, 0);
 
 createRoot(document.getElementById("root")!).render(
   <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} forcedTheme="light">

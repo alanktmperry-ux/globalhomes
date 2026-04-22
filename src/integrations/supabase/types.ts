@@ -11905,6 +11905,7 @@ export type Database = {
         Args: { p_supplier_id: string }
         Returns: undefined
       }
+      rotate_unclaimed_referral_leads: { Args: never; Returns: number }
       schools_within_km: {
         Args: { p_km: number; p_lat: number; p_lng: number }
         Returns: {

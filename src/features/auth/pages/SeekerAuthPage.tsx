@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import type HCaptchaType from '@hcaptcha/react-hcaptcha';
 const HCaptcha = lazy(() => import('@hcaptcha/react-hcaptcha'));

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Share2 } from 'lucide-react';

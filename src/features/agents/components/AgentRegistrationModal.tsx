@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import HCaptcha from '@hcaptcha/react-hcaptcha';

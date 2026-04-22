@@ -1,5 +1,6 @@
 /// <reference types="google.maps" />
 import { useEffect, useRef, useCallback, useState } from 'react';
+import DOMPurify from 'dompurify';
 import { Property } from '@/shared/lib/types';
 import { loadGoogleMapsScript } from '@/shared/lib/googleMapsService';
 import { Loader2, Locate, Search, X, HelpCircle, MapPin } from 'lucide-react';
@@ -280,7 +281,8 @@ export function PropertyMap({
       content.className = 'property-marker';
       const isRental = property.listingType === 'rent' || property.listingType === 'rental';
       const priceLabel = formatPrice ? formatPrice(property.price, property.listingType ?? undefined) : property.priceFormatted;
-      content.innerHTML = `<div style="
+      const labelEl = document.createElement('div');
+      labelEl.style.cssText = `
         background: ${isSelected ? typeColor : '#ffffff'};
         color: ${isSelected ? 'white' : typeColor};
         border: 2px solid ${typeColor};
@@ -290,12 +292,13 @@ export function PropertyMap({
         font-weight: 700;
         font-family: 'Plus Jakarta Sans', sans-serif;
         white-space: nowrap;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        box-shadow: ${isSelected ? `0 0 16px ${typeColor}60` : '0 2px 8px rgba(0,0,0,0.12)'};
         cursor: pointer;
-        transform: translateY(-100%);
+        transform: ${isSelected ? 'translateY(-100%) scale(1.15)' : 'translateY(-100%)'};
         transition: all 0.2s ease;
-        ${isSelected ? `box-shadow: 0 0 16px ${typeColor}60; transform: translateY(-100%) scale(1.15);` : ''}
-      ">${priceLabel}</div>`;
+      `;
+      labelEl.textContent = priceLabel ?? '';
+      content.appendChild(labelEl);
 
       const marker = new google.maps.marker.AdvancedMarkerElement({
         map,
@@ -307,14 +310,14 @@ export function PropertyMap({
       const markerEl = marker.element;
       if (markerEl) {
         markerEl.addEventListener('mouseenter', () => {
-          infoWindow.setContent(`
+          infoWindow.setContent(DOMPurify.sanitize(`
             <div style="font-family: 'DM Sans', sans-serif; min-width: 200px; padding: 2px;">
               <img src="${property.imageUrl}" alt="" style="width: 100%; height: 100px; object-fit: cover; border-radius: 6px; margin-bottom: 6px;" />
               <div style="font-weight: 700; font-size: 14px; color: #0f172a;">${formatPrice ? formatPrice(property.price, property.listingType ?? undefined) : property.priceFormatted}</div>
               <div style="font-size: 12px; color: #64748b; margin-top: 2px;">${property.title}</div>
               <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">🛏 ${property.beds} · 🛁 ${property.baths} · 🚗 ${property.parking}</div>
             </div>
-          `);
+          `));
           infoWindow.open(map, marker);
         });
         markerEl.addEventListener('mouseleave', () => {
@@ -348,12 +351,13 @@ export function PropertyMap({
       renderer: {
         render: ({ count, position }) => {
           const el = document.createElement('div');
-          el.innerHTML = `<div style="
+          const size = 36 + Math.min(count, 50);
+          el.style.cssText = `
             background: linear-gradient(135deg, #06b6d4, #8b5cf6);
             color: white;
             border-radius: 50%;
-            width: ${36 + Math.min(count, 50)}px;
-            height: ${36 + Math.min(count, 50)}px;
+            width: ${size}px;
+            height: ${size}px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -362,10 +366,11 @@ export function PropertyMap({
             font-family: 'Plus Jakarta Sans', sans-serif;
             box-shadow: 0 2px 12px rgba(6, 182, 212, 0.4);
             border: 2px solid rgba(255,255,255,0.3);
-          ">${count}</div>`;
+          `;
+          el.textContent = String(count);
           return new google.maps.marker.AdvancedMarkerElement({
             position,
-            content: el.firstElementChild as HTMLElement,
+            content: el,
           });
         },
       },
@@ -400,7 +405,7 @@ export function PropertyMap({
 
     schoolMarkers.forEach((school) => {
       const el = document.createElement('div');
-      el.innerHTML = `<div style="
+      el.style.cssText = `
         background: #16a34a;
         width: 28px; height: 28px;
         border-radius: 50%;
@@ -409,12 +414,13 @@ export function PropertyMap({
         box-shadow: 0 2px 6px rgba(0,0,0,0.25);
         cursor: default;
         font-size: 14px;
-      ">🎓</div>`;
+      `;
+      el.textContent = '🎓';
 
       const marker = new google.maps.marker.AdvancedMarkerElement({
         map,
         position: { lat: school.lat, lng: school.lng },
-        content: el.firstElementChild as HTMLElement,
+        content: el,
       });
 
       const markerEl = marker.element;
@@ -422,14 +428,14 @@ export function PropertyMap({
         markerEl.addEventListener('mouseenter', () => {
           const typeLabel = school.type ? school.type.charAt(0).toUpperCase() + school.type.slice(1) : '';
           const sectorLabel = school.sector ? school.sector.charAt(0).toUpperCase() + school.sector.slice(1) : '';
-          infoWindow.setContent(`
+          infoWindow.setContent(DOMPurify.sanitize(`
             <div style="font-family: 'DM Sans', sans-serif; min-width: 180px; padding: 2px;">
               <div style="font-weight: 700; font-size: 13px; color: #0f172a;">${school.name}</div>
               <div style="font-size: 11px; color: #64748b; margin-top: 3px;">
                 ${typeLabel}${sectorLabel ? ' · ' + sectorLabel : ''}${school.icsea ? ' · ICSEA ' + school.icsea : ''}
               </div>
             </div>
-          `);
+          `));
           infoWindow.open(map, marker);
         });
         markerEl.addEventListener('mouseleave', () => {

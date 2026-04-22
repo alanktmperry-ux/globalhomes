@@ -146,6 +146,8 @@ const Index = () => {
   const [heroSubLangVisible, setHeroSubLangVisible] = useState(true);
   const [heroPlaceholderIndex, setHeroPlaceholderIndex] = useState(0);
   const [heroPlatformStats, setHeroPlatformStats] = useState<{ properties: number | null; buyerCount: number | null }>({ properties: null, buyerCount: null });
+  const [statLanguagesCount, setStatLanguagesCount] = useState(0);
+  const [statToolsCount, setStatToolsCount] = useState(0);
   const heroInputRef = useRef<HTMLInputElement>(null);
 
 
@@ -171,6 +173,23 @@ const Index = () => {
       }, 300);
     }, 2500);
     return () => clearInterval(interval);
+  }, []);
+
+  // Hero stat count-up animations (easeOut)
+  useEffect(() => {
+    const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+    const start = performance.now();
+    let frame = 0;
+    const tick = (now: number) => {
+      const elapsed = now - start;
+      const pLang = Math.min(elapsed / 1200, 1);
+      const pTools = Math.min(elapsed / 1400, 1);
+      setStatLanguagesCount(Math.round(easeOut(pLang) * 24));
+      setStatToolsCount(Math.round(easeOut(pTools) * 50));
+      if (pLang < 1 || pTools < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   // Hero platform stats
@@ -1072,19 +1091,22 @@ const Index = () => {
             <div className="bg-white border border-slate-100 rounded-2xl shadow-sm shadow-slate-100 px-8 py-5 flex flex-wrap items-center justify-center gap-6 sm:gap-10">
               {/* ABS Stat */}
               <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
-                <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">1 in 5</span>
+                <span className="text-3xl font-extrabold text-blue-500 tracking-tight leading-none">1 in 5</span>
                 <span className="text-[11px] text-slate-500 font-medium text-center">{t('hero.statBuyersLabel')}</span>
+                <span className="text-[11px] text-slate-400 font-normal text-center">Source: ABS Census 2021</span>
               </div>
               <div className="w-px h-9 bg-slate-100 hidden sm:block" />
               {/* Languages */}
               <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
-                <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">24</span>
+                <span className="text-3xl font-extrabold text-blue-500 tracking-tight leading-none tabular-nums">{statLanguagesCount}</span>
                 <span className="text-[11px] text-slate-500 font-medium">{t('hero.languages')}</span>
+                <span className="text-[11px] text-slate-400 font-normal text-center">AI translated in seconds</span>
               </div>
               <div className="w-px h-9 bg-slate-100 hidden sm:block" />
               <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
-                <span className="text-2xl font-extrabold text-slate-900 tracking-tight leading-none">50+</span>
+                <span className="text-2xl font-extrabold text-blue-500 tracking-tight leading-none tabular-nums">{statToolsCount}+</span>
                 <span className="text-[11px] text-slate-500 font-medium">{t('hero.statAITools')}</span>
+                <span className="text-[11px] text-slate-400 font-normal text-center">Built for Australian agents</span>
               </div>
             </div>
           </motion.div>

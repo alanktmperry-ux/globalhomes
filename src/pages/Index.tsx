@@ -2,7 +2,7 @@ import { useState, useCallback, useRef, useEffect, useMemo, lazy, Suspense } fro
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence, useMotionValue, useSpring, PanInfo } from 'framer-motion';
-import { ArrowRight, MapPin, Sparkles, Map, List, Mic, MicOff, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users, Search, Home, Check } from 'lucide-react';
+import { ArrowRight, MapPin, Sparkles, Map, List, Mic, MicOff, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users, Search, Home, Check, ArrowLeftRight, UserCheck } from 'lucide-react';
 import { VoiceSearchHero } from '@/features/search/components/VoiceSearchHero';
 import { TranslationDemoCard } from '@/features/marketing/components/TranslationDemoCard';
 import { useHeroVoiceSearch } from '@/features/search/hooks/useHeroVoiceSearch';
@@ -1167,25 +1167,7 @@ const Index = () => {
         </motion.section>
 
         {/* ── HOW IT WORKS ── */}
-        <motion.section {...sectionAnim} className="bg-slate-50 py-12 px-6">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-xl font-semibold text-slate-900 mb-1">{t('home.howItWorks.title')}</h2>
-            <p className="text-sm text-slate-500 mb-8">{t('home.howItWorks.subtitle')}</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                { num: '1', title: t('home.howItWorks.step1.title'), desc: t('home.howItWorks.step1.desc') },
-                { num: '2', title: t('home.howItWorks.step2.title'), desc: t('home.howItWorks.step2.desc') },
-                { num: '3', title: t('home.howItWorks.step3.title'), desc: t('home.howItWorks.step3.desc') },
-              ].map((step) => (
-                <div key={step.num} className="bg-white rounded-xl border border-slate-200 p-6 text-center">
-                  <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 text-sm font-semibold flex items-center justify-center mx-auto mb-4">{step.num}</div>
-                  <h3 className="text-sm font-semibold text-slate-900 mb-2">{step.title}</h3>
-                  <p className="text-xs text-slate-500 leading-relaxed">{step.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </motion.section>
+        <HowItWorksSection t={t} />
 
         {/* ── AGENT CTA ── */}
         <motion.section {...sectionAnim} className="bg-slate-900 py-16 px-6 text-center">
@@ -1542,6 +1524,72 @@ const Index = () => {
         lastQuery={currentQuery || lastSearch?.text || ''}
       />
     </div>
+  );
+};
+
+// ── How It Works section with scroll-triggered staggered fade-in ──
+const HowItWorksSection = ({ t }: { t: (key: string) => string }) => {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const steps = [
+    { num: '1', Icon: Search, title: t('home.howItWorks.step1.title'), desc: t('home.howItWorks.step1.desc') },
+    { num: '2', Icon: ArrowLeftRight, title: t('home.howItWorks.step2.title'), desc: t('home.howItWorks.step2.desc') },
+    { num: '3', Icon: UserCheck, title: t('home.howItWorks.step3.title'), desc: t('home.howItWorks.step3.desc') },
+  ];
+
+  return (
+    <section ref={sectionRef} className="bg-gray-50 py-20 px-6">
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-10">
+          <span className="inline-block bg-blue-50 text-blue-600 uppercase tracking-wider px-3 py-1 rounded-full text-[11px] font-semibold mb-4">
+            How it works
+          </span>
+          <h2 className="text-[28px] font-medium text-slate-900">
+            The simplest way to reach every buyer
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {steps.map((step, idx) => {
+            const Icon = step.Icon;
+            return (
+              <div
+                key={step.num}
+                className="bg-white rounded-xl border border-slate-200 p-6 text-center"
+                style={{
+                  opacity: visible ? 1 : 0,
+                  transform: visible ? 'translateY(0)' : 'translateY(20px)',
+                  transition: `opacity 0.6s ease-out ${idx * 150}ms, transform 0.6s ease-out ${idx * 150}ms`,
+                }}
+              >
+                <div className="w-11 h-11 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-4">
+                  <Icon size={22} />
+                </div>
+                <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 text-sm font-semibold flex items-center justify-center mx-auto mb-4">{step.num}</div>
+                <h3 className="text-sm font-semibold text-slate-900 mb-2">{step.title}</h3>
+                <p className="text-xs text-slate-500 leading-relaxed">{step.desc}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
   );
 };
 

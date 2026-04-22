@@ -39,12 +39,13 @@ const HERO_ROTATING_LANGUAGES = [
   'in any language.',
 ];
 
-const HERO_PLACEHOLDERS = [
-  'e.g. 3 bed house in Doncaster under $1.3M',
-  'e.g. apartment in Bondi under $800k',
-  'e.g. rental near Melbourne CBD under $500pw',
-  'e.g. family home with pool in Brisbane',
-];
+// Placeholder keys — actual strings come from t() so they translate
+const HERO_PLACEHOLDER_KEYS = [
+  'hero.placeholder1',
+  'hero.placeholder2',
+  'hero.placeholder3',
+  'hero.placeholder4',
+] as const;
 
 const Index = () => {
   const navigate = useNavigate();
@@ -145,7 +146,7 @@ const Index = () => {
 
   // Hero placeholder rotation
   useEffect(() => {
-    const interval = setInterval(() => setHeroPlaceholderIndex(i => (i + 1) % HERO_PLACEHOLDERS.length), 3500);
+    const interval = setInterval(() => setHeroPlaceholderIndex(i => (i + 1) % HERO_PLACEHOLDER_KEYS.length), 3500);
     return () => clearInterval(interval);
   }, []);
 
@@ -939,13 +940,13 @@ const Index = () => {
 
             {/* Headline */}
             <h1 className="text-5xl md:text-7xl font-black leading-tight tracking-tight text-slate-900">
-              {t('hero.headlineLine1')}<br />
-              <span className="text-blue-500">{t('hero.headlineLine2Now')}</span> {t('hero.headlineLine2Rest')}
+              {t('hero.headline')}<br />
+              <span className="text-blue-500">{t('hero.headline2')}</span>
             </h1>
 
             {/* Subheadline */}
             <p className="text-xl md:text-2xl text-slate-500 font-medium mt-4 mb-0">
-              {t('hero.subTagline')}
+              {t('hero.subheadline')}
             </p>
 
             {/* Sale / Rent toggle */}
@@ -979,8 +980,8 @@ const Index = () => {
                   type="text"
                   value={heroQuery}
                   onChange={e => setHeroQuery(e.target.value)}
-                  placeholder={HERO_PLACEHOLDERS[heroPlaceholderIndex]}
-                  aria-label={t('hero.searchPlaceholderLabel')}
+                  placeholder={t(HERO_PLACEHOLDER_KEYS[heroPlaceholderIndex])}
+                  aria-label={t('search.placeholder')}
                   className="flex-1 bg-transparent outline-none text-slate-800 text-[15px] placeholder:text-slate-400 min-w-0"
                 />
                 <button
@@ -1013,7 +1014,7 @@ const Index = () => {
                 </div>
               )}
               <p className="text-sm text-slate-400 mt-3 text-center">
-                {t('hero.searchInLanguages')}
+                {t('hero.searchHint')}
               </p>
             </form>
 
@@ -1039,7 +1040,7 @@ const Index = () => {
               {/* ABS Stat */}
               <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
                 <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">1 in 5</span>
-                <span className="text-[11px] text-slate-500 font-medium text-center">AU buyers search in their language</span>
+                <span className="text-[11px] text-slate-500 font-medium text-center">{t('hero.statBuyersLabel')}</span>
               </div>
               <div className="w-px h-9 bg-slate-100 hidden sm:block" />
               {/* Languages */}
@@ -1050,7 +1051,7 @@ const Index = () => {
               <div className="w-px h-9 bg-slate-100 hidden sm:block" />
               <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
                 <span className="text-2xl font-extrabold text-slate-900 tracking-tight leading-none">50+</span>
-                <span className="text-[11px] text-slate-500 font-medium">AI tools</span>
+                <span className="text-[11px] text-slate-500 font-medium">{t('hero.statAITools')}</span>
               </div>
             </div>
           </motion.div>
@@ -1061,8 +1062,8 @@ const Index = () => {
           <div className="max-w-5xl mx-auto">
             <div className="flex items-baseline justify-between mb-6">
               <div>
-                <h2 className="text-xl font-semibold text-slate-900">Properties on ListHQ</h2>
-                <p className="text-sm text-slate-500 mt-1">Browse what's currently listed</p>
+                <h2 className="text-xl font-semibold text-slate-900">{t('hero.propertiesTitle')}</h2>
+                <p className="text-sm text-slate-500 mt-1">{t('hero.propertiesSub')}</p>
               </div>
               <a href="/search" className="text-sm text-blue-600 hover:text-blue-700 font-medium">{t('hero.viewAll')} →</a>
             </div>
@@ -1130,13 +1131,13 @@ const Index = () => {
         {/* ── AGENT CTA ── */}
         <motion.section {...sectionAnim} className="bg-slate-900 py-16 px-6 text-center">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-2xl font-semibold text-white mb-3">1 in 5 Australian buyers searches in a language other than English. Are your listings ready?</h2>
-            <p className="text-sm text-slate-400 mb-8">ListHQ automatically translates every listing into 24 languages. Free for 3 months. No credit card.</p>
+            <h2 className="text-2xl font-semibold text-white mb-3">{t('home.agentBannerHeadline')}</h2>
+            <p className="text-sm text-slate-400 mb-8">{t('home.agentBannerSub')}</p>
             <button
               onClick={() => navigate('/for-agents')}
               className="inline-flex items-center gap-2 bg-white text-slate-900 hover:bg-slate-100 px-8 py-4 rounded-full text-[15px] font-semibold transition-all duration-200 hover:scale-105 active:scale-100 shadow-lg"
             >
-              See how it works →
+              {t('home.agentBannerCta')} →
             </button>
           </div>
         </motion.section>
@@ -1151,10 +1152,10 @@ const Index = () => {
               <p className="text-sm text-slate-400 mb-6">{t('home.agents.sub')}</p>
               <ul className="space-y-4">
                 {[
-                  'AI-powered multilingual listings',
-                  'Built-in CRM & pipeline',
-                  'Access multilingual buyer pool',
-                  'Off-market network',
+                  t('home.agents.feature1'),
+                  t('home.agents.feature2'),
+                  t('home.agents.feature3'),
+                  t('home.agents.feature4'),
                 ].map(item => (
                   <li key={item} className="flex items-center gap-3 text-slate-300 text-sm">
                     <Check size={16} className="text-blue-400 shrink-0" />
@@ -1166,7 +1167,7 @@ const Index = () => {
             {/* Right: founding agent card */}
             <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center">
               <div className="text-2xl font-bold text-white mb-1">{t('home.agents.founding')}</div>
-              <p className="text-sm text-slate-400 mb-6">No credit card required. Full access.</p>
+              <p className="text-sm text-slate-400 mb-6">{t('home.agents.freeTagSub')}</p>
               <button
                 onClick={() => navigate('/for-agents')}
                 className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full text-sm font-semibold transition-colors"

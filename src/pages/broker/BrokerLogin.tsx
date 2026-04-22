@@ -22,10 +22,17 @@ export default function BrokerLogin() {
     setStatus("loading");
     setErrorMsg("");
 
+    // Preserve invite token across the magic-link round-trip
+    const params = new URLSearchParams(window.location.search);
+    const inviteToken = params.get("invite");
+    const redirect = inviteToken
+      ? `${window.location.origin}/broker/portal?invite=${inviteToken}`
+      : `${window.location.origin}/broker/portal`;
+
     const { error } = await supabase.auth.signInWithOtp({
       email: email.toLowerCase(),
       options: {
-        emailRedirectTo: `${window.location.origin}/broker/portal`,
+        emailRedirectTo: redirect,
         shouldCreateUser: true,
       },
     });

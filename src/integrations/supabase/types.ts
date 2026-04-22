@@ -1881,6 +1881,88 @@ export type Database = {
         }
         Relationships: []
       }
+      broker_agencies: {
+        Row: {
+          acl_number: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          acl_number?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          acl_number?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      broker_agency_invites: {
+        Row: {
+          accepted_at: string | null
+          agency_id: string
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          invited_by: string
+          token: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          agency_id: string
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id?: string
+          invited_by: string
+          token?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          agency_id?: string
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          invited_by?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broker_agency_invites_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "broker_agencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "broker_agency_invites_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "brokers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "broker_agency_invites_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "brokers_public_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       broker_leads: {
         Row: {
           broker_email: string
@@ -1980,6 +2062,8 @@ export type Database = {
       brokers: {
         Row: {
           acl_number: string
+          agency_id: string | null
+          agency_role: string
           auth_user_id: string | null
           calendar_url: string | null
           cap_expires_at: string | null
@@ -2003,6 +2087,8 @@ export type Database = {
         }
         Insert: {
           acl_number: string
+          agency_id?: string | null
+          agency_role?: string
           auth_user_id?: string | null
           calendar_url?: string | null
           cap_expires_at?: string | null
@@ -2026,6 +2112,8 @@ export type Database = {
         }
         Update: {
           acl_number?: string
+          agency_id?: string | null
+          agency_role?: string
           auth_user_id?: string | null
           calendar_url?: string | null
           cap_expires_at?: string | null
@@ -2047,7 +2135,15 @@ export type Database = {
           photo_url?: string | null
           tagline?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "brokers_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "broker_agencies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       buyer_activity_events: {
         Row: {
@@ -11459,6 +11555,7 @@ export type Database = {
       }
     }
     Functions: {
+      accept_broker_invite: { Args: { _token: string }; Returns: string }
       compute_agent_stats: { Args: { p_agent_id: string }; Returns: undefined }
       compute_suburb_stats: {
         Args: { p_state: string; p_suburb: string }
@@ -11474,7 +11571,9 @@ export type Database = {
         }
         Returns: Json
       }
+      current_broker_agency: { Args: never; Returns: string }
       current_broker_id: { Args: never; Returns: string }
+      current_broker_is_principal: { Args: never; Returns: boolean }
       delete_user_cascade: { Args: { p_user_id: string }; Returns: undefined }
       expire_featured_listings: { Args: never; Returns: undefined }
       expire_stale_pre_approvals: { Args: never; Returns: undefined }

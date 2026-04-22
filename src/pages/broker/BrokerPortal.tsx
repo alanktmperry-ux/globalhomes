@@ -121,12 +121,20 @@ export default function BrokerPortal() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const loadLeads = useCallback(async (brokerId: string) => {
-    const { data, error } = await supabase
+  const loadLeads = useCallback(async (b: BrokerRecord) => {
+    // Principals see all leads assigned to anyone in their agency.
+    // Associates see only their own leads. RLS enforces this too — this just
+    // skips an unnecessary filter on the principal side.
+    let q = supabase
       .from("referral_leads")
       .select("*")
-      .eq("assigned_broker_id", brokerId)
       .order("created_at", { ascending: false });
+
+    if (b.agency_role !== 'principal') {
+      q = q.eq("assigned_broker_id", b.id);
+    }
+
+    const { data, error } = await q;
     if (error) {
       console.error("[BrokerPortal] loadLeads error:", error);
       return;
@@ -142,9 +150,24 @@ export default function BrokerPortal() {
         navigate("/broker/login");
         return;
       }
+
+      // Accept invite token if present
+      const params = new URLSearchParams(window.location.search);
+      const inviteToken = params.get("invite");
+      if (inviteToken) {
+        const { error: inviteError } = await supabase.rpc("accept_broker_invite" as never, { _token: inviteToken } as never);
+        if (inviteError) {
+          toast.error("Could not accept invite: " + inviteError.message);
+        } else {
+          toast.success("You've joined the team");
+          // Strip the query param so it doesn't replay
+          window.history.replaceState({}, "", "/broker/portal");
+        }
+      }
+
       const { data: brokerRow } = await supabase
         .from("brokers")
-        .select("id, name, full_name, email, company, acl_number, loan_types, languages, is_exclusive, is_active")
+        .select("id, name, full_name, email, company, acl_number, loan_types, languages, is_exclusive, is_active, agency_id, agency_role")
         .eq("auth_user_id", session.user.id)
         .maybeSingle();
 
@@ -155,14 +178,15 @@ export default function BrokerPortal() {
         navigate("/broker/login");
         return;
       }
-      setBroker(brokerRow as BrokerRecord);
-      await loadLeads(brokerRow.id);
+      const b = brokerRow as BrokerRecord;
+      setBroker(b);
+      await loadLeads(b);
       setLoading(false);
     })();
     return () => { cancelled = true; };
   }, [navigate, loadLeads]);
 
-  // Realtime subscription scoped to this broker's leads
+  // Realtime subscription — principals listen agency-wide, associates only their own
   useEffect(() => {
     if (!broker) return;
     const channel = supabase
@@ -173,9 +197,11 @@ export default function BrokerPortal() {
           event: "*",
           schema: "public",
           table: "referral_leads",
-          filter: `assigned_broker_id=eq.${broker.id}`,
+          ...(broker.agency_role !== 'principal'
+            ? { filter: `assigned_broker_id=eq.${broker.id}` }
+            : {}),
         },
-        () => { loadLeads(broker.id); }
+        () => { loadLeads(broker); }
       )
       .subscribe();
     return () => { supabase.removeChannel(channel); };
@@ -270,7 +296,7 @@ export default function BrokerPortal() {
               key={selectedLead.id}
               lead={selectedLead}
               broker={broker}
-              onChanged={() => loadLeads(broker.id)}
+              onChanged={() => loadLeads(broker)}
             />
           ) : (
             <WelcomeCard broker={broker} />

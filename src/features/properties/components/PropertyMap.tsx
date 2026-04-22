@@ -351,12 +351,13 @@ export function PropertyMap({
       renderer: {
         render: ({ count, position }) => {
           const el = document.createElement('div');
-          el.innerHTML = `<div style="
+          const size = 36 + Math.min(count, 50);
+          el.style.cssText = `
             background: linear-gradient(135deg, #06b6d4, #8b5cf6);
             color: white;
             border-radius: 50%;
-            width: ${36 + Math.min(count, 50)}px;
-            height: ${36 + Math.min(count, 50)}px;
+            width: ${size}px;
+            height: ${size}px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -365,10 +366,11 @@ export function PropertyMap({
             font-family: 'Plus Jakarta Sans', sans-serif;
             box-shadow: 0 2px 12px rgba(6, 182, 212, 0.4);
             border: 2px solid rgba(255,255,255,0.3);
-          ">${count}</div>`;
+          `;
+          el.textContent = String(count);
           return new google.maps.marker.AdvancedMarkerElement({
             position,
-            content: el.firstElementChild as HTMLElement,
+            content: el,
           });
         },
       },

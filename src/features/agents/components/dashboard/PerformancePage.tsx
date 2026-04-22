@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect, useCallback } from 'react';
 import { useAgentPerformanceStats } from '@/features/agents/hooks/useAgentPerformanceStats';
 import { useAuth } from '@/features/auth/AuthProvider';

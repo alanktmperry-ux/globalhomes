@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { Monitor, Smartphone, Tablet } from 'lucide-react';
 

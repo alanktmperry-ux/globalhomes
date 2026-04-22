@@ -1,12 +1,14 @@
 import { supabase } from '@/integrations/supabase/client';
 
 let cachedApiKey: string | null = null;
+let keyPromise: Promise<string> | null = null;
 
 const STORAGE_KEY = 'gmaps_api_key';
 const STORAGE_EXPIRY_KEY = 'gmaps_api_key_exp';
 const CACHE_DURATION = 1000 * 60 * 60 * 24; // 24 hours
 
 export async function getGoogleMapsApiKey(): Promise<string> {
+  if (keyPromise) return keyPromise;
   if (cachedApiKey) return cachedApiKey;
 
   // Check localStorage cache
@@ -19,19 +21,20 @@ export async function getGoogleMapsApiKey(): Promise<string> {
     }
   } catch {}
 
-  const { data, error } = await supabase.functions.invoke('google-maps-proxy', {
-    body: { action: 'get_key' },
-  });
-  if (error || !data?.key) throw new Error('Failed to get Google Maps API key');
-  cachedApiKey = data.key;
+  keyPromise = supabase.functions
+    .invoke('google-maps-proxy', { body: { action: 'get_key' } })
+    .then(({ data, error }) => {
+      if (error || !data?.key) throw new Error('Failed to get Google Maps API key');
+      cachedApiKey = data.key;
+      try {
+        localStorage.setItem(STORAGE_KEY, data.key);
+        localStorage.setItem(STORAGE_EXPIRY_KEY, String(Date.now() + CACHE_DURATION));
+      } catch {}
+      return data.key as string;
+    })
+    .finally(() => { keyPromise = null; });
 
-  // Persist to localStorage
-  try {
-    localStorage.setItem(STORAGE_KEY, data.key);
-    localStorage.setItem(STORAGE_EXPIRY_KEY, String(Date.now() + CACHE_DURATION));
-  } catch {}
-
-  return data.key;
+  return keyPromise;
 }
 
 export async function autocomplete(input: string, types?: string): Promise<{ description: string; place_id: string }[]> {

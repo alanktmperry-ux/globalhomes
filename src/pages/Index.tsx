@@ -39,6 +39,15 @@ const HERO_ROTATING_LANGUAGES = [
   'in any language.',
 ];
 
+const HERO_SUBHEADLINE_LANGUAGES = [
+  '中文 (Mandarin)',
+  'Tiếng Việt',
+  'العربية',
+  'हिन्दी',
+  '한국어',
+  'English',
+];
+
 // Placeholder keys — actual strings come from t() so they translate
 const HERO_PLACEHOLDER_KEYS = [
   'hero.placeholder1',
@@ -133,6 +142,8 @@ const Index = () => {
   // Hero state
   const [heroQuery, setHeroQuery] = useState('');
   const [heroLangIndex, setHeroLangIndex] = useState(0);
+  const [heroSubLangIndex, setHeroSubLangIndex] = useState(0);
+  const [heroSubLangVisible, setHeroSubLangVisible] = useState(true);
   const [heroPlaceholderIndex, setHeroPlaceholderIndex] = useState(0);
   const [heroPlatformStats, setHeroPlatformStats] = useState<{ properties: number | null; buyerCount: number | null }>({ properties: null, buyerCount: null });
   const heroInputRef = useRef<HTMLInputElement>(null);
@@ -147,6 +158,18 @@ const Index = () => {
   // Hero placeholder rotation
   useEffect(() => {
     const interval = setInterval(() => setHeroPlaceholderIndex(i => (i + 1) % HERO_PLACEHOLDER_KEYS.length), 3500);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Hero subheadline cycling language indicator (fade out → swap → fade in)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHeroSubLangVisible(false);
+      window.setTimeout(() => {
+        setHeroSubLangIndex(i => (i + 1) % HERO_SUBHEADLINE_LANGUAGES.length);
+        setHeroSubLangVisible(true);
+      }, 300);
+    }, 2500);
     return () => clearInterval(interval);
   }, []);
 
@@ -946,7 +969,17 @@ const Index = () => {
 
             {/* Subheadline */}
             <p className="text-xl md:text-2xl text-slate-500 font-medium mt-4 mb-0">
-              {t('hero.subheadline')}
+              <noscript>{t('hero.subheadline')}</noscript>
+              <span>
+                Showing listings in{' '}
+                <span
+                  className={`text-blue-500 inline-block transition-opacity duration-300 ${
+                    heroSubLangVisible ? 'opacity-100' : 'opacity-0'
+                  }`}
+                >
+                  {HERO_SUBHEADLINE_LANGUAGES[heroSubLangIndex]}
+                </span>
+              </span>
             </p>
 
             {/* Sale / Rent toggle */}

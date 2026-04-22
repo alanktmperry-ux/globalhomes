@@ -428,14 +428,14 @@ export function PropertyMap({
         markerEl.addEventListener('mouseenter', () => {
           const typeLabel = school.type ? school.type.charAt(0).toUpperCase() + school.type.slice(1) : '';
           const sectorLabel = school.sector ? school.sector.charAt(0).toUpperCase() + school.sector.slice(1) : '';
-          infoWindow.setContent(`
+          infoWindow.setContent(DOMPurify.sanitize(`
             <div style="font-family: 'DM Sans', sans-serif; min-width: 180px; padding: 2px;">
               <div style="font-weight: 700; font-size: 13px; color: #0f172a;">${school.name}</div>
               <div style="font-size: 11px; color: #64748b; margin-top: 3px;">
                 ${typeLabel}${sectorLabel ? ' · ' + sectorLabel : ''}${school.icsea ? ' · ICSEA ' + school.icsea : ''}
               </div>
             </div>
-          `);
+          `));
           infoWindow.open(map, marker);
         });
         markerEl.addEventListener('mouseleave', () => {

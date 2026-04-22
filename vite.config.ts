@@ -13,21 +13,23 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    sourcemap: true,
+    sourcemap: false,
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-charts': ['recharts'],
-          'vendor-maps': ['leaflet'],
-          'vendor-pdf': ['jspdf'],
-          'vendor-animation': ['framer-motion'],
-          'lucide': ['lucide-react'],
+        manualChunks(id) {
+          if (id.includes('node_modules/lucide-react')) return 'lucide';
+          if (id.includes('node_modules/recharts') || id.includes('node_modules/d3')) return 'vendor-charts';
+          if (id.includes('node_modules/framer-motion')) return 'vendor-animation';
+          if (id.includes('node_modules/@radix-ui')) return 'vendor-radix';
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) return 'vendor-react';
+          if (id.includes('node_modules/')) return 'vendor-misc';
         },
       },
     },
   },
   optimizeDeps: {
-    include: ['lucide-react'],
+    include: ['lucide-react', 'react', 'react-dom', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', 'framer-motion'],
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {

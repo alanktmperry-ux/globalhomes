@@ -6,10 +6,10 @@ import { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LogOut, Inbox, Briefcase, CheckCircle2, Settings } from "lucide-react";
+import { LogOut, Inbox, Briefcase, CheckCircle2, Settings, Users } from "lucide-react";
 import type { BrokerRecord } from "./brokerPortalUtils";
 
-export type PortalTab = "new" | "pipeline" | "settled" | "settings";
+export type PortalTab = "new" | "pipeline" | "settled" | "team" | "settings";
 
 interface Props {
   broker: BrokerRecord;
@@ -18,10 +18,11 @@ interface Props {
   children: ReactNode;
 }
 
-const NAV: { id: PortalTab; label: string; icon: typeof Inbox }[] = [
+const BASE_NAV: { id: PortalTab; label: string; icon: typeof Inbox; principalOnly?: boolean }[] = [
   { id: "new", label: "New Leads", icon: Inbox },
   { id: "pipeline", label: "My Pipeline", icon: Briefcase },
   { id: "settled", label: "Settled", icon: CheckCircle2 },
+  { id: "team", label: "Team", icon: Users, principalOnly: true },
   { id: "settings", label: "Settings", icon: Settings },
 ];
 
@@ -43,7 +44,7 @@ export default function BrokerPortalLayout({ broker, active, onTabChange, childr
         </div>
 
         <nav className="flex-1 p-3 space-y-1">
-          {NAV.map((item) => {
+          {BASE_NAV.filter(i => !i.principalOnly || broker.agency_role === 'principal').map((item) => {
             const Icon = item.icon;
             const isActive = active === item.id;
             return (

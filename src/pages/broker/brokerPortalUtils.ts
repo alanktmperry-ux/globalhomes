@@ -15,6 +15,8 @@ export interface BrokerRecord {
   languages: string[] | null;
   is_exclusive: boolean | null;
   is_active: boolean;
+  agency_id: string | null;
+  agency_role: 'principal' | 'associate';
 }
 
 export interface ReferralLead {

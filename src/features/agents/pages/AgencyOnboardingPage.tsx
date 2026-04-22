@@ -737,7 +737,7 @@ export default function AgencyOnboardingPage() {
           {items.map((item, i) => (
             <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
               <span className="text-primary mt-0.5 shrink-0">·</span>
-              <span dangerouslySetInnerHTML={{ __html: item }} />
+              <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item, { ADD_ATTR: ['target'] }) }} />
             </li>
           ))}
         </ul>

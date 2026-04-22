@@ -150,6 +150,21 @@ export default function BrokerPortal() {
         navigate("/broker/login");
         return;
       }
+
+      // Accept invite token if present
+      const params = new URLSearchParams(window.location.search);
+      const inviteToken = params.get("invite");
+      if (inviteToken) {
+        const { error: inviteError } = await supabase.rpc("accept_broker_invite" as never, { _token: inviteToken } as never);
+        if (inviteError) {
+          toast.error("Could not accept invite: " + inviteError.message);
+        } else {
+          toast.success("You've joined the team");
+          // Strip the query param so it doesn't replay
+          window.history.replaceState({}, "", "/broker/portal");
+        }
+      }
+
       const { data: brokerRow } = await supabase
         .from("brokers")
         .select("id, name, full_name, email, company, acl_number, loan_types, languages, is_exclusive, is_active, agency_id, agency_role")

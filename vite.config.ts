@@ -21,9 +21,13 @@ export default defineConfig(({ mode }) => ({
           'vendor-maps': ['leaflet'],
           'vendor-pdf': ['jspdf'],
           'vendor-animation': ['framer-motion'],
+          'lucide': ['lucide-react'],
         },
       },
     },
+  },
+  optimizeDeps: {
+    include: ['lucide-react'],
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {

@@ -228,8 +228,10 @@ const TeamPage = () => {
 
   const generateCode = () => {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const bytes = new Uint8Array(8);
+    crypto.getRandomValues(bytes);
     let code = '';
-    for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
+    for (let i = 0; i < 8; i++) code += chars[bytes[i] % chars.length];
     return code;
   };
 
@@ -471,8 +473,12 @@ const TeamPage = () => {
     );
   }
 
-  const generateSlug = (name: string) =>
-    name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Math.random().toString(36).slice(2, 6);
+  const generateSlug = (name: string) => {
+    const bytes = new Uint8Array(3);
+    crypto.getRandomValues(bytes);
+    const suffix = Array.from(bytes, (b) => b.toString(36).padStart(2, '0')).join('').slice(0, 4);
+    return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + suffix;
+  };
 
   const handleCreateAgency = async () => {
     if (!user || !newAgencyName.trim()) return;

@@ -61,6 +61,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [agencyId, setAgencyId] = useState<string | null>(null);
   const [rolesFetched, setRolesFetched] = useState(false);
   const lastFetchedUserId = useRef<string | null>(null);
+  const isFetching = useRef(false);
   const [impersonating, setImpersonating] = useState(false);
   const [impersonatedUser, setImpersonatedUser] = useState<string | null>(null);
   const [impersonatedUserId, setImpersonatedUserId] = useState<string | null>(null);

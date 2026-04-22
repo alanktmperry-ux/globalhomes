@@ -211,10 +211,10 @@ export default function PropertyDetailPage() {
       // Refresh raw property data
       const { data: refreshed } = await supabase
         .from('properties')
-        .select('*, agents(id, name, agency, phone, email, avatar_url, is_subscribed, user_id)')
+        .select('*')
         .eq('id', property.id)
-        .single();
-      if (refreshed) setRawProperty(refreshed);
+        .maybeSingle();
+      if (refreshed) setRawProperty((prev: any) => ({ ...refreshed, agents: prev?.agents ?? null }));
     } catch (err: any) {
       toast.error(err.message || 'Failed to generate translations');
     } finally {

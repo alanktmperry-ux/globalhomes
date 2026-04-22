@@ -11555,6 +11555,7 @@ export type Database = {
       }
     }
     Functions: {
+      accept_broker_invite: { Args: { _token: string }; Returns: string }
       compute_agent_stats: { Args: { p_agent_id: string }; Returns: undefined }
       compute_suburb_stats: {
         Args: { p_state: string; p_suburb: string }

@@ -92,6 +92,7 @@ const SettlementConcierge = React.lazy(() => import("@/features/agents/component
 const CommissionCalculator = React.lazy(() => import("@/features/agents/components/dashboard/CommissionCalculator"));
 const PerformancePage = React.lazy(() => import("@/features/agents/components/dashboard/PerformancePage"));
 const HelpPage = React.lazy(() => import("@/features/agents/components/dashboard/HelpPage"));
+const BrokerReferralsPage = React.lazy(() => import("@/features/agents/components/dashboard/BrokerReferralsPage"));
 const RentRollPage = React.lazy(() => import("@/features/agents/components/dashboard/RentRollPage"));
 const TenancyDetailPage = React.lazy(() => import("@/features/agents/components/dashboard/TenancyDetailPage"));
 const InspectionReportPage = React.lazy(() => import("./pages/InspectionReportPage"));
@@ -343,6 +344,7 @@ const App = () => (
                   <Route path="statements" element={<OwnerStatementsPage />} />
                   <Route path="settings" element={<SettingsPage />} />
                   <Route path="help" element={<HelpPage />} />
+                  <Route path="broker-referrals" element={<BrokerReferralsPage />} />
                   <Route path="partner-access" element={<PartnerAccessPage />} />
                 </Route>
 

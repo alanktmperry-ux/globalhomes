@@ -4,6 +4,7 @@ import {
   User, FileText, CreditCard, Star, MapPinned, Shield, Contact, Kanban, Scale, Landmark,
   ClipboardCheck, CalendarDays, Search, TrendingUp, Receipt, PartyPopper, Calculator, HelpCircle, ClipboardList, Settings2, Flame,
   Handshake, Sparkles, Target, ShoppingBag, ChevronDown, Mail, Wrench, Activity, AlertCircle, RefreshCw,
+  HandCoins,
 } from 'lucide-react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -68,6 +69,7 @@ const INSIGHTS_NAV: NavItem[] = [
   { title: 'Reports', url: '/dashboard/reports', icon: FileText },
   { title: 'Commission', url: '/dashboard/commission', icon: Calculator },
   { title: 'Conveyancing', url: '/conveyancing', icon: FileText },
+  { title: 'Broker Referrals', url: '/dashboard/broker-referrals', icon: HandCoins },
   { title: 'Referral Program', url: '/refer', icon: Handshake },
 ];
 

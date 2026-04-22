@@ -98,7 +98,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
 
   const navigate = useNavigate();
 
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<1 | 3>(1);
   const [showAuthPrompt, setShowAuthPrompt] = useState(false);
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', message: '',
@@ -164,7 +164,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
     }));
   };
 
-  /* ── Step 1 → Step 2 ─────────────────────────────────────── */
+  /* ── Step 1 → Submit (deposit step removed) ──────────────── */
   const handleStep1Next = () => {
     setErrors({});
     const result = step1Schema.safeParse(formData);
@@ -176,7 +176,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
       setErrors(fieldErrors);
       return;
     }
-    setStep(2);
+    handleSubmitAll();
   };
 
   /* ── Step 2 → Step 3 (submit everything) ─────────────────── */
@@ -422,7 +422,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
 
               {/* Step indicator */}
               <div className="flex items-center gap-2">
-                {[1, 2, 3].map(s => (
+                {[1, 3].map(s => (
                   <div key={s} className="flex items-center gap-2 flex-1">
                     <div className={`w-full h-1.5 rounded-full transition-colors ${
                       s <= step ? 'bg-primary' : 'bg-border'
@@ -544,15 +544,25 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
                       onChange={e => setFormData(p => ({ ...p, message: e.target.value }))} rows={2}
                       className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 resize-none" />
 
-                    <button onClick={handleStep1Next}
-                      className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors">
-                      Continue to Deposit <ArrowRight size={16} />
+                    {/* Privacy notice */}
+                    <p className="text-[11px] text-muted-foreground leading-snug">
+                      Your contact details will be shared with the listing agent in accordance with our{' '}
+                      <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Privacy Policy</a>.
+                    </p>
+
+                    <button onClick={handleStep1Next} disabled={submitting}
+                      className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors disabled:opacity-50">
+                      {submitting ? (
+                        <><Loader2 size={16} className="animate-spin" /> Sending…</>
+                      ) : (
+                        <>Send Enquiry <ArrowRight size={16} /></>
+                      )}
                     </button>
                   </motion.div>
                 )}
 
-                {/* ─── STEP 2: Trust Deposit ────────────────────── */}
-                {step === 2 && (
+                {/* ─── STEP 2 (Holding Deposit) removed from contact flow ── */}
+                {false && step === (2 as never) && (
                   <motion.div key="step2" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-4">
                     <h4 className="font-display font-semibold text-foreground text-sm">Step 2 · Holding Deposit</h4>
                     <p className="text-xs text-muted-foreground">
@@ -653,35 +663,16 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
                       <CheckCircle2 size={56} className="text-primary" />
                     </motion.div>
                     <div>
-                      <h4 className="font-display font-bold text-foreground text-lg">Qualified Lead Submitted!</h4>
+                      <h4 className="font-display font-bold text-foreground text-lg">Enquiry Sent!</h4>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {agent.name} has been notified and will prioritize your inquiry.
+                        {agent.name} has been notified and will be in touch shortly.
                       </p>
                     </div>
 
-                    <div className="w-full grid grid-cols-2 gap-3">
-                      <div className="p-3 rounded-xl bg-secondary text-center">
-                        <p className="text-[11px] text-muted-foreground uppercase tracking-wider">Lead Score</p>
-                        <p className={`text-xl font-bold ${scoreColor}`}>{leadScore}/100</p>
-                      </div>
-                      <div className="p-3 rounded-xl bg-secondary text-center">
-                        <p className="text-[11px] text-muted-foreground uppercase tracking-wider">Deposit</p>
-                        <p className="text-xl font-bold text-foreground">
-                          {depositAmount ? `$${depositAmount.toLocaleString()}` : 'None'}
-                        </p>
-                      </div>
+                    <div className="w-full p-3 rounded-xl bg-secondary text-center">
+                      <p className="text-[11px] text-muted-foreground uppercase tracking-wider">Lead Score</p>
+                      <p className={`text-xl font-bold ${scoreColor}`}>{leadScore}/100</p>
                     </div>
-
-                    {depositAmount && (
-                      <div className="w-full p-3 rounded-xl bg-primary/5 border border-primary/10">
-                        <p className="text-xs text-primary font-medium">
-                          ✅ Pending trust entry created for ${depositAmount.toLocaleString()}
-                        </p>
-                        <p className="text-[11px] text-muted-foreground mt-0.5">
-                          The agent will confirm receipt and process the holding deposit.
-                        </p>
-                      </div>
-                    )}
 
                     <button onClick={onClose}
                       className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-colors">

@@ -561,99 +561,11 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
                   </motion.div>
                 )}
 
-                {/* ─── STEP 2 (Holding Deposit) removed from contact flow ── */}
-                {false && step === (2 as never) && (
-                  <motion.div key="step2" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-4">
-                    <h4 className="font-display font-semibold text-foreground text-sm">Step 2 · Holding Deposit</h4>
-                    <p className="text-xs text-muted-foreground">
-                      Secure your interest with a holding deposit. This creates a pending trust entry and signals serious intent to the agent.
-                    </p>
-
-                    <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Shield size={16} className="text-primary" />
-                        <p className="text-xs font-medium text-primary">Trust Account Protected</p>
-                      </div>
-                      <p className="text-[11px] text-muted-foreground">
-                        Deposits are held in the agent's regulated trust account and fully refundable until contracts are exchanged.
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      {DEPOSIT_AMOUNTS.map(amt => (
-                        <button key={amt} onClick={() => setDepositAmount(depositAmount === amt ? null : amt)}
-                          className={`p-3 rounded-xl border text-center transition-colors ${
-                            depositAmount === amt
-                              ? 'border-primary bg-primary/10 text-primary'
-                              : 'border-border bg-secondary text-foreground hover:border-primary/30'
-                          }`}>
-                          <DollarSign size={16} className="mx-auto mb-1" />
-                          <span className="text-sm font-semibold">${amt.toLocaleString()}</span>
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Lead score preview */}
-                    <div className="p-3 rounded-xl bg-secondary flex items-center justify-between">
-                      <div>
-                        <p className="text-xs text-muted-foreground">Your Lead Score</p>
-                        <p className={`text-lg font-bold ${scoreColor}`}>{leadScore}/100</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xs text-muted-foreground">Priority</p>
-                        <p className="text-sm font-semibold text-foreground">
-                          {leadScore >= 70 ? '🔥 High' : leadScore >= 40 ? '⚡ Medium' : '📋 Standard'}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Auth prompt */}
-                    {showAuthPrompt && (
-                      <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 space-y-2">
-                        <p className="text-xs font-medium text-foreground">
-                          Create a free ListHQ account to send your enquiry. This keeps a record of your conversation with the agent and lets you track your application.
-                        </p>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => navigate('/seeker-auth?mode=signup')}
-                            className="flex-1 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
-                          >
-                            Sign Up
-                          </button>
-                          <button
-                            onClick={() => navigate('/seeker-auth?mode=login')}
-                            className="flex-1 py-2 rounded-xl border border-border text-foreground text-xs font-medium hover:bg-secondary transition-colors"
-                          >
-                            Log In
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Privacy notice */}
-                    <p className="text-[11px] text-muted-foreground leading-snug">
-                      Your contact details will be shared with the listing agent in accordance with our{' '}
-                      <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Privacy Policy</a>.
-                    </p>
-
-                    <div className="flex gap-2">
-                      <button onClick={() => setStep(1)}
-                        className="flex-1 py-3 rounded-xl border border-border text-foreground font-medium text-sm flex items-center justify-center gap-2 hover:bg-secondary transition-colors">
-                        <ArrowLeft size={16} /> Back
-                      </button>
-                      <button onClick={handleSubmitAll} disabled={submitting}
-                        className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors disabled:opacity-50">
-                        {submitting ? (
-                          <><Loader2 size={16} className="animate-spin" /> Submitting…</>
-                        ) : depositAmount ? (
-                          <>Submit & Deposit</>
-                        ) : (
-                          <>Submit Without Deposit</>
-                        )}
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
+                {/* ─── STEP 2 (Holding Deposit) removed from contact flow ───
+                    The deposit step is inappropriate for first-contact enquiries
+                    and was hurting conversion. Holding-deposit UI lives elsewhere
+                    (e.g. post-viewing flow) and uses DEPOSIT_AMOUNTS / Shield /
+                    DollarSign / depositAmount state retained above. ─────────── */}
 
                 {/* ─── STEP 3: Confirmation ─────────────────────── */}
                 {step === 3 && (

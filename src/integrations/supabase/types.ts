@@ -10926,30 +10926,33 @@ export type Database = {
         Row: {
           broker_id: string | null
           buyer_email: string | null
-          buyer_message: string | null
+          buyer_language: string | null
           buyer_name: string | null
           buyer_phone: string | null
           created_at: string | null
+          estimated_loan_amount: number | null
+          fee_agreed: boolean | null
+          fee_agreed_at: string | null
           id: string | null
           invoice_month: string | null
-          invoiced_at: string | null
-          is_duplicate: boolean | null
           is_qualified: boolean | null
           lead_fee_aud: number | null
+          loan_type: string | null
+          message: string | null
           property_address: string | null
-          property_price: string | null
-          within_cap_window: boolean | null
+          property_price: number | null
+          status: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "broker_leads_broker_id_fkey"
+            foreignKeyName: "referral_leads_assigned_broker_id_fkey"
             columns: ["broker_id"]
             isOneToOne: false
             referencedRelation: "brokers"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "broker_leads_broker_id_fkey"
+            foreignKeyName: "referral_leads_assigned_broker_id_fkey"
             columns: ["broker_id"]
             isOneToOne: false
             referencedRelation: "brokers_public_safe"

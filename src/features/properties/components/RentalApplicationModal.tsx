@@ -119,7 +119,7 @@ export function RentalApplicationModal({ property, open, onClose }: Props) {
       }
 
       // Generate reference number
-      const ref = `RA-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+      const ref = `RA-${crypto.randomUUID()}`;
 
       const { error } = await supabase.from('rental_applications' as any).insert({
         property_id: property.id,

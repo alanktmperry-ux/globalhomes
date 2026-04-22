@@ -33,7 +33,36 @@ export function RepaymentCalculator({ initialAmount }: { initialAmount?: number 
     weekly:      t('mortgage.result.weekly'),
   };
 
-  const result = useMemo(() => calculateRepayments(inputs), [inputs]);
+  const sanitizedInputs = useMemo<RepaymentInputs>(() => {
+    const clamp = (n: number, min: number, max: number, fallback: number) =>
+      Number.isFinite(n) && n >= min && n <= max ? n : fallback;
+    return {
+      ...inputs,
+      loanAmount:     clamp(inputs.loanAmount, 1_000, 100_000_000, DEFAULT.loanAmount),
+      interestRate:   clamp(inputs.interestRate, 0.01, 30, DEFAULT.interestRate),
+      loanTermYears:  clamp(inputs.loanTermYears, 1, 50, DEFAULT.loanTermYears),
+      offsetBalance:  Number.isFinite(inputs.offsetBalance ?? 0) && (inputs.offsetBalance ?? 0) >= 0 ? inputs.offsetBalance : 0,
+      extraRepayment: Number.isFinite(inputs.extraRepayment ?? 0) && (inputs.extraRepayment ?? 0) >= 0 ? inputs.extraRepayment : 0,
+    };
+  }, [inputs]);
+
+  const rawResult = useMemo(() => calculateRepayments(sanitizedInputs), [sanitizedInputs]);
+  const safeNum = (n: number) => (Number.isFinite(n) ? n : 0);
+  const result = useMemo(() => ({
+    ...rawResult,
+    periodicRepayment: safeNum(rawResult.periodicRepayment),
+    totalInterest:     safeNum(rawResult.totalInterest),
+    totalRepayments:   safeNum(rawResult.totalRepayments),
+    interestSaving:    safeNum(rawResult.interestSaving),
+    yearsEarlier:      safeNum(rawResult.yearsEarlier),
+    schedule:          (rawResult.schedule || []).map(r => ({
+      ...r,
+      balance:   safeNum(r.balance),
+      interest:  safeNum(r.interest),
+      principal: safeNum(r.principal),
+    })),
+  }), [rawResult]);
+
   const set = (key: keyof RepaymentInputs, value: number | string) =>
     setInputs(prev => ({ ...prev, [key]: value }));
 

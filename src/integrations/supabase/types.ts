@@ -1986,11 +1986,15 @@ export type Database = {
           company: string | null
           created_at: string
           email: string
+          full_name: string | null
           id: string
           is_active: boolean
+          is_exclusive: boolean | null
           is_founding_partner: boolean
           languages: string[]
+          last_assigned_at: string | null
           lead_fee_aud: number
+          loan_types: string[] | null
           monthly_cap_aud: number | null
           name: string
           phone: string | null
@@ -2005,11 +2009,15 @@ export type Database = {
           company?: string | null
           created_at?: string
           email: string
+          full_name?: string | null
           id?: string
           is_active?: boolean
+          is_exclusive?: boolean | null
           is_founding_partner?: boolean
           languages?: string[]
+          last_assigned_at?: string | null
           lead_fee_aud?: number
+          loan_types?: string[] | null
           monthly_cap_aud?: number | null
           name: string
           phone?: string | null
@@ -2024,11 +2032,15 @@ export type Database = {
           company?: string | null
           created_at?: string
           email?: string
+          full_name?: string | null
           id?: string
           is_active?: boolean
+          is_exclusive?: boolean | null
           is_founding_partner?: boolean
           languages?: string[]
+          last_assigned_at?: string | null
           lead_fee_aud?: number
+          loan_types?: string[] | null
           monthly_cap_aud?: number | null
           name?: string
           phone?: string | null
@@ -7161,54 +7173,116 @@ export type Database = {
       }
       referral_leads: {
         Row: {
+          agent_id: string | null
+          assigned_broker_id: string | null
           buyer_country: string | null
           buyer_email: string | null
+          buyer_language: string | null
           buyer_name: string | null
           buyer_phone: string | null
+          calendly_booking_url: string | null
+          claimed_at: string | null
           commission_aud: number
           created_at: string
+          estimated_loan_amount: number | null
+          fee_agreed: boolean | null
+          fee_agreed_at: string | null
+          ghl_contact_id: string | null
           id: string
+          loan_type: string | null
+          message: string | null
           notes: string | null
+          platform_fee_amount: number | null
           property_id: string | null
           property_url: string | null
           referral_agent_id: string
+          referral_fee_amount: number | null
+          referral_fee_type: string | null
           referred_by_code: string
+          response_time_hours: number | null
+          settled_at: string | null
           status: string
           updated_at: string
         }
         Insert: {
+          agent_id?: string | null
+          assigned_broker_id?: string | null
           buyer_country?: string | null
           buyer_email?: string | null
+          buyer_language?: string | null
           buyer_name?: string | null
           buyer_phone?: string | null
+          calendly_booking_url?: string | null
+          claimed_at?: string | null
           commission_aud?: number
           created_at?: string
+          estimated_loan_amount?: number | null
+          fee_agreed?: boolean | null
+          fee_agreed_at?: string | null
+          ghl_contact_id?: string | null
           id?: string
+          loan_type?: string | null
+          message?: string | null
           notes?: string | null
+          platform_fee_amount?: number | null
           property_id?: string | null
           property_url?: string | null
           referral_agent_id: string
+          referral_fee_amount?: number | null
+          referral_fee_type?: string | null
           referred_by_code: string
+          response_time_hours?: number | null
+          settled_at?: string | null
           status?: string
           updated_at?: string
         }
         Update: {
+          agent_id?: string | null
+          assigned_broker_id?: string | null
           buyer_country?: string | null
           buyer_email?: string | null
+          buyer_language?: string | null
           buyer_name?: string | null
           buyer_phone?: string | null
+          calendly_booking_url?: string | null
+          claimed_at?: string | null
           commission_aud?: number
           created_at?: string
+          estimated_loan_amount?: number | null
+          fee_agreed?: boolean | null
+          fee_agreed_at?: string | null
+          ghl_contact_id?: string | null
           id?: string
+          loan_type?: string | null
+          message?: string | null
           notes?: string | null
+          platform_fee_amount?: number | null
           property_id?: string | null
           property_url?: string | null
           referral_agent_id?: string
+          referral_fee_amount?: number | null
+          referral_fee_type?: string | null
           referred_by_code?: string
+          response_time_hours?: number | null
+          settled_at?: string | null
           status?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "referral_leads_assigned_broker_id_fkey"
+            columns: ["assigned_broker_id"]
+            isOneToOne: false
+            referencedRelation: "brokers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_leads_assigned_broker_id_fkey"
+            columns: ["assigned_broker_id"]
+            isOneToOne: false
+            referencedRelation: "brokers_public_safe"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "referral_leads_property_id_fkey"
             columns: ["property_id"]
@@ -11397,6 +11471,7 @@ export type Database = {
         }
         Returns: Json
       }
+      current_broker_id: { Args: never; Returns: string }
       delete_user_cascade: { Args: { p_user_id: string }; Returns: undefined }
       expire_featured_listings: { Args: never; Returns: undefined }
       expire_stale_pre_approvals: { Args: never; Returns: undefined }
@@ -11830,6 +11905,7 @@ export type Database = {
         Args: { p_supplier_id: string }
         Returns: undefined
       }
+      rotate_unclaimed_referral_leads: { Args: never; Returns: number }
       schools_within_km: {
         Args: { p_km: number; p_lat: number; p_lng: number }
         Returns: {

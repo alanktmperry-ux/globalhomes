@@ -146,6 +146,7 @@ const LiveAuctionPage = React.lazy(() => import("./features/auctions/pages/LiveA
 const InspectionReportPublic = React.lazy(() => import("./pages/InspectionReportPage_Public"));
 const BrokerLogin = React.lazy(() => import("./pages/broker/BrokerLogin"));
 const BrokerPortal = React.lazy(() => import("./pages/broker/BrokerPortal"));
+const BrokerLeadDetailPage = React.lazy(() => import("./pages/broker/BrokerLeadDetailPage"));
 const ReferralLandingPage = React.lazy(() => import("./features/referral/pages/ReferralLandingPage"));
 const ReferralDashboardPage = React.lazy(() => import("./features/referral/pages/ReferralDashboardPage"));
 const PageLoader = () => (
@@ -272,6 +273,7 @@ const App = () => (
                 <Route path="/strata/login" element={<StrataAuthPage />} />
                 <Route path="/broker/login" element={<BrokerLogin />} />
                 <Route path="/broker/portal" element={<BrokerPortal />} />
+                <Route path="/broker/lead/:id" element={<BrokerLeadDetailPage />} />
                 <Route path="/check-email" element={<CheckEmailPage />} />
 
                 {/* International Agent Referral Portal */}

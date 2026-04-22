@@ -11,14 +11,10 @@ interface Props {
   requirePartner?: boolean;
 }
 
-const ADMIN_EMAILS = ['alan@everythingco.com.au', 'alanktmperry@gmail.com', 'alan@everythingeco.com.au'];
-
 export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePartner }: Props) => {
   const { user, loading, isAgent, isAdmin, isPartner, refreshRoles } = useAuth();
   const [provisioning, setProvisioning] = useState(false);
   const [provisionFailed, setProvisionFailed] = useState(false);
-
-  const isAdminEmail = !!user?.email && ADMIN_EMAILS.includes(user.email.toLowerCase());
 
   useEffect(() => {
     if (!user || !requireAgent || isAgent || loading || provisioning || provisionFailed) return;
@@ -63,12 +59,12 @@ export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePa
 
   if (!user) return <Navigate to="/login" replace />;
 
-  if (user && !user.email_confirmed_at && !isAdminEmail) {
+  if (user && !user.email_confirmed_at && !isAdmin) {
     return <Navigate to="/check-email" replace />;
   }
 
-  if (requireAdmin && !isAdmin && !isAdminEmail) return <Navigate to="/" replace />;
-  if (requireAgent && !isAgent && !isAdminEmail) {
+  if (requireAdmin && !isAdmin) return <Navigate to="/" replace />;
+  if (requireAgent && !isAgent && !isAdmin) {
     if (provisionFailed) return <Navigate to="/" replace />;
     // still waiting for refreshRoles to flip isAgent — show spinner
     return (

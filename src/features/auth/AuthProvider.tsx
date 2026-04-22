@@ -201,17 +201,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       lastFetchedUserId.current = user.id;
 
       try {
-        const { data } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
+        const [rolesResult, agentResult] = await Promise.all([
+          supabase.from('user_roles').select('role').eq('user_id', user.id),
+          supabase
+            .from('agents')
+            .select('id, agency_role, agency_id, approval_status')
+            .eq('user_id', user.id)
+            .maybeSingle(),
+        ]);
         if (cancelled) return;
-        
+
+        const { data } = rolesResult;
         const roles = data?.map((r) => r.role) || [];
 
         // Fallback: if no agent role, check agents table — only honour it when approved
-        const { data: agentData } = await supabase
-          .from('agents')
-          .select('id, agency_role, agency_id, approval_status')
-          .eq('user_id', user.id)
-          .maybeSingle();
+        const { data: agentData } = agentResult;
         if (cancelled) return;
         const isAdminUser = roles.includes('admin');
         const isApprovedAgent = !!agentData && ((agentData as any).approval_status === 'approved' || isAdminUser);
@@ -268,7 +272,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         
         return false;
       });
-    }, 8000);
+    }, 3000);
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {

@@ -105,21 +105,25 @@ const DashboardOverview = () => {
   useEffect(() => {
     if (!user) return;
     const fetchOnboarding = async () => {
-      // Load persisted onboarding state from profile
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('onboarding_steps_completed')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      const steps = (profile as any)?.onboarding_steps_completed || {};
+      // Fetch profile + agent in parallel
+      const [profileResult, agentResult] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('onboarding_steps_completed')
+          .eq('user_id', user.id)
+          .maybeSingle(),
+        supabase
+          .from('agents')
+          .select('id, name, phone, avatar_url, bio, agency_id, stripe_customer_id, onboarding_complete')
+          .eq('user_id', user.id)
+          .maybeSingle(),
+      ]);
+
+      const steps = (profileResult.data as any)?.onboarding_steps_completed || {};
       setOnboardingSteps(steps);
       if (steps.dismissed) { setOnboardingDismissed(true); return; }
 
-      const { data: agent } = await supabase
-        .from('agents')
-        .select('id, name, phone, avatar_url, bio, agency_id, stripe_customer_id, onboarding_complete')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      const agent = agentResult.data;
       setOnboardingAgent(agent);
       if (agent?.id) {
         const { count } = await supabase
@@ -332,22 +336,26 @@ const DashboardOverview = () => {
         .maybeSingle();
       if (!agent) return;
 
-      const { data: props } = await supabase
-        .from('properties')
-        .select('id, address, suburb, views, contact_clicks, listed_date, vendor_name, vendor_email')
-        .eq('agent_id', agent.id)
-        .eq('status', 'public')
-        .eq('is_active', true);
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      // Fetch properties + recent reports in parallel
+      const [propsResult, reportsResult] = await Promise.all([
+        supabase
+          .from('properties')
+          .select('id, address, suburb, views, contact_clicks, listed_date, vendor_name, vendor_email')
+          .eq('agent_id', agent.id)
+          .eq('status', 'public')
+          .eq('is_active', true),
+        supabase
+          .from('vendor_reports')
+          .select('property_id, sent_at')
+          .eq('agent_id', agent.id)
+          .gte('sent_at', sevenDaysAgo),
+      ]);
+
+      const props = propsResult.data;
       if (!props || props.length === 0) return;
 
-      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-      const { data: recentReports } = await supabase
-        .from('vendor_reports')
-        .select('property_id, sent_at')
-        .eq('agent_id', agent.id)
-        .gte('sent_at', sevenDaysAgo);
-
-      const recentPropertyIds = new Set((recentReports || []).map(r => r.property_id));
+      const recentPropertyIds = new Set((reportsResult.data || []).map(r => r.property_id));
       const due = props.filter(p => !recentPropertyIds.has(p.id) && p.vendor_email);
       setReportsDue(due);
     };

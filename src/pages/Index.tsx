@@ -1112,6 +1112,9 @@ const Index = () => {
           </motion.div>
         </section>
 
+        {/* ── TRANSLATION DEMO ── */}
+        <TranslationDemoCard />
+
         {/* ── FEATURED LISTINGS ── */}
         <motion.section {...sectionAnim} id="featured-listings" className="bg-white py-12 px-6">
           <div className="max-w-5xl mx-auto">

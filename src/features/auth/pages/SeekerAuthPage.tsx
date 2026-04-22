@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
-import HCaptcha from '@hcaptcha/react-hcaptcha';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import type HCaptchaType from '@hcaptcha/react-hcaptcha';
+const HCaptcha = lazy(() => import('@hcaptcha/react-hcaptcha'));
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { motion, AnimatePresence } from 'framer-motion';
 import PhoneInput from '@/shared/components/PhoneInput';
@@ -30,7 +31,7 @@ const SeekerAuthPage = () => {
   const [furnishedRequired, setFurnishedRequired] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [pendingSignIn, setPendingSignIn] = useState(false);
-  const captchaRef = useRef<HCaptcha>(null);
+  const captchaRef = useRef<HCaptchaType>(null);
   const hcaptchaSiteKey = import.meta.env.VITE_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001';
 
   // Auto-submit sign-in after captcha verification
@@ -405,12 +406,14 @@ const SeekerAuthPage = () => {
                         <input type="password" required autoFocus minLength={8} value={password}
                           onChange={e => setPassword(e.target.value)} className={input} />
                       </div>
-                      <HCaptcha
-                        sitekey={hcaptchaSiteKey}
-                        size="invisible"
-                        ref={captchaRef}
-                        onVerify={setCaptchaToken}
-                      />
+                      <Suspense fallback={null}>
+                        <HCaptcha
+                          sitekey={hcaptchaSiteKey}
+                          size="invisible"
+                          ref={captchaRef}
+                          onVerify={setCaptchaToken}
+                        />
+                      </Suspense>
                       <button type="submit" disabled={loading} className={btnPrimary}>
                         {loading ? t('auth.signingIn') : t('auth.signIn')}
                       </button>

@@ -147,6 +147,7 @@ const InspectionReportPublic = React.lazy(() => import("./pages/InspectionReport
 const BrokerLogin = React.lazy(() => import("./pages/broker/BrokerLogin"));
 const BrokerPortal = React.lazy(() => import("./pages/broker/BrokerPortal"));
 const BrokerLeadDetailPage = React.lazy(() => import("./pages/broker/BrokerLeadDetailPage"));
+const BrokerTeamPage = React.lazy(() => import("./pages/broker/BrokerTeamPage"));
 const ReferralLandingPage = React.lazy(() => import("./features/referral/pages/ReferralLandingPage"));
 const ReferralDashboardPage = React.lazy(() => import("./features/referral/pages/ReferralDashboardPage"));
 const PageLoader = () => (
@@ -274,6 +275,7 @@ const App = () => (
                 <Route path="/broker/login" element={<BrokerLogin />} />
                 <Route path="/broker/portal" element={<BrokerPortal />} />
                 <Route path="/broker/lead/:id" element={<BrokerLeadDetailPage />} />
+                <Route path="/broker/portal/team" element={<BrokerTeamPage />} />
                 <Route path="/check-email" element={<CheckEmailPage />} />
 
                 {/* International Agent Referral Portal */}

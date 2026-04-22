@@ -281,7 +281,8 @@ export function PropertyMap({
       content.className = 'property-marker';
       const isRental = property.listingType === 'rent' || property.listingType === 'rental';
       const priceLabel = formatPrice ? formatPrice(property.price, property.listingType ?? undefined) : property.priceFormatted;
-      content.innerHTML = `<div style="
+      const labelEl = document.createElement('div');
+      labelEl.style.cssText = `
         background: ${isSelected ? typeColor : '#ffffff'};
         color: ${isSelected ? 'white' : typeColor};
         border: 2px solid ${typeColor};
@@ -291,12 +292,13 @@ export function PropertyMap({
         font-weight: 700;
         font-family: 'Plus Jakarta Sans', sans-serif;
         white-space: nowrap;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        box-shadow: ${isSelected ? `0 0 16px ${typeColor}60` : '0 2px 8px rgba(0,0,0,0.12)'};
         cursor: pointer;
-        transform: translateY(-100%);
+        transform: ${isSelected ? 'translateY(-100%) scale(1.15)' : 'translateY(-100%)'};
         transition: all 0.2s ease;
-        ${isSelected ? `box-shadow: 0 0 16px ${typeColor}60; transform: translateY(-100%) scale(1.15);` : ''}
-      ">${priceLabel}</div>`;
+      `;
+      labelEl.textContent = priceLabel ?? '';
+      content.appendChild(labelEl);
 
       const marker = new google.maps.marker.AdvancedMarkerElement({
         map,

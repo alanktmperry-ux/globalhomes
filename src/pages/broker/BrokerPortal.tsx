@@ -577,7 +577,7 @@ function LeadDetail({
             <HomeIcon size={16} className="text-slate-400 mt-0.5 shrink-0" />
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium text-slate-900 truncate">{property.address || "Address unavailable"}</p>
-              <p className="text-xs text-slate-500 mt-0.5">{property.price || "Price on application"}</p>
+              <p className="text-xs text-slate-500 mt-0.5">{property.price != null ? (typeof property.price === "number" ? formatAud(property.price) : property.price) : "Price on application"}</p>
               <a
                 href={`/property/${property.id}`}
                 target="_blank"

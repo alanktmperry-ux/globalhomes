@@ -35,10 +35,13 @@ export default function BrokerPortal() {
   const [tab, setTab] = useState<PortalTab>("new");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const loadLeads = useCallback(async () => {
+  const loadLeads = useCallback(async (brokerId?: string) => {
+    const id = brokerId ?? broker?.id;
+    if (!id) return;
     const { data, error } = await supabase
       .from("referral_leads")
       .select("*")
+      .eq("assigned_broker_id", id)
       .order("created_at", { ascending: false })
       .limit(200);
     if (error) {
@@ -46,7 +49,7 @@ export default function BrokerPortal() {
       return;
     }
     setLeads((data ?? []) as ReferralLead[]);
-  }, []);
+  }, [broker?.id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -70,7 +73,7 @@ export default function BrokerPortal() {
         return;
       }
       setBroker(brokerRow as BrokerRecord);
-      await loadLeads();
+      await loadLeads(brokerRow.id);
       setLoading(false);
     })();
     return () => { cancelled = true; };

@@ -146,7 +146,7 @@ export default function BrokerReferralsPage() {
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <HandCoins className="h-6 w-6 text-primary" />
-            Broker Referrals
+            Broker Referrals 
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
             Refer your buyers to a mortgage broker and earn a share of the commission.

@@ -57,16 +57,56 @@
 
   <body>
     <div id="root">
-      <!-- Static shell for instant LCP — React replaces this on mount -->
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;padding:2rem;text-align:center">
-        <h1 style="font-size:clamp(2.5rem,7vw,4.5rem);font-weight:900;line-height:1.1;letter-spacing:-0.025em;color:#0f172a;margin:0">
+      <div id="app-loader" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem;text-align:center;background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
+        <div style="display:flex;align-items:center;gap:0.75rem;animation:fadein 0.5s ease both">
+          <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#1e40af);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px -8px rgba(59,130,246,0.5)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12 12 3l9 9"/><path d="M5 10v10h14V10"/></svg>
+          </div>
+          <span style="font-size:1.5rem;font-weight:800;color:#0f172a;letter-spacing:-0.02em">ListHQ</span>
+        </div>
+
+        <h1 style="font-size:clamp(2.5rem,7vw,4.5rem);font-weight:900;line-height:1.1;letter-spacing:-0.025em;color:#0f172a;margin:2.5rem 0 0;animation:fadein 0.6s ease 0.1s both">
           Australian property.<br/><span style="color:#3b82f6">Now</span> in your language.
         </h1>
-        <p style="font-size:clamp(1.125rem,2.5vw,1.5rem);color:#64748b;font-weight:500;margin-top:1rem">
+
+        <p style="font-size:clamp(1.125rem,2.5vw,1.5rem);color:#64748b;font-weight:500;margin-top:1rem;animation:fadein 0.6s ease 0.2s both">
           Every listing. Every suburb. Every language.
         </p>
+
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;margin-top:2rem;animation:fadein 0.6s ease 0.3s both">
+          <span style="padding:0.4rem 0.9rem;border-radius:999px;background:#f1f5f9;color:#334155;font-size:0.875rem;font-weight:500">中文</span>
+          <span style="padding:0.4rem 0.9rem;border-radius:999px;background:#f1f5f9;color:#334155;font-size:0.875rem;font-weight:500">Tiếng Việt</span>
+          <span style="padding:0.4rem 0.9rem;border-radius:999px;background:#f1f5f9;color:#334155;font-size:0.875rem;font-weight:500">العربية</span>
+          <span style="padding:0.4rem 0.9rem;border-radius:999px;background:#f1f5f9;color:#334155;font-size:0.875rem;font-weight:500">हिन्दी</span>
+          <span style="padding:0.4rem 0.9rem;border-radius:999px;background:#f1f5f9;color:#334155;font-size:0.875rem;font-weight:500">한국어</span>
+          <span style="padding:0.4rem 0.9rem;border-radius:999px;background:#dbeafe;color:#1e40af;font-size:0.875rem;font-weight:600">English</span>
+        </div>
+
+        <div style="margin-top:2.5rem;width:200px;height:3px;background:#e2e8f0;border-radius:999px;overflow:hidden">
+          <div style="height:100%;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:999px;animation:loadbar 1.6s ease-in-out infinite"></div>
+        </div>
+
+        <style>
+          @keyframes fadein { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+          @keyframes loadbar { 0% { width:0%; margin-left:0; } 60% { width:70%; } 100% { width:100%; margin-left:100%; } }
+        </style>
       </div>
     </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var observer = new MutationObserver(function() {
+          var loader = document.getElementById('app-loader');
+          var root = document.getElementById('root');
+          if (loader && root && root.children.length > 1) {
+            loader.style.transition = 'opacity 0.3s ease';
+            loader.style.opacity = '0';
+            setTimeout(function() { if (loader) loader.style.display = 'none'; }, 300);
+            observer.disconnect();
+          }
+        });
+        observer.observe(document.getElementById('root'), { childList: true });
+      });
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

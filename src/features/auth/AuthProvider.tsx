@@ -61,6 +61,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [agencyId, setAgencyId] = useState<string | null>(null);
   const [rolesFetched, setRolesFetched] = useState(false);
   const lastFetchedUserId = useRef<string | null>(null);
+  const isFetching = useRef(false);
   const [impersonating, setImpersonating] = useState(false);
   const [impersonatedUser, setImpersonatedUser] = useState<string | null>(null);
   const [impersonatedUserId, setImpersonatedUserId] = useState<string | null>(null);
@@ -191,10 +192,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Same user with roles already fetched — skip to avoid role flicker on navigation
     if (lastFetchedUserId.current === user.id && rolesFetched) return;
 
+    if (isFetching.current) return;
+
     let cancelled = false;
     const doFetch = async () => {
+      if (isFetching.current) return;
+      isFetching.current = true;
       lastFetchedUserId.current = user.id;
-      
+
       try {
         const { data } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
         if (cancelled) return;
@@ -245,6 +250,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } catch (err) {
         console.error('[Auth] fetchRoles error:', err);
       } finally {
+        isFetching.current = false;
         if (!cancelled) {
           setRolesFetched(true);
           setLoading(false);

@@ -405,7 +405,7 @@ export function PropertyMap({
 
     schoolMarkers.forEach((school) => {
       const el = document.createElement('div');
-      el.innerHTML = `<div style="
+      el.style.cssText = `
         background: #16a34a;
         width: 28px; height: 28px;
         border-radius: 50%;
@@ -414,12 +414,13 @@ export function PropertyMap({
         box-shadow: 0 2px 6px rgba(0,0,0,0.25);
         cursor: default;
         font-size: 14px;
-      ">🎓</div>`;
+      `;
+      el.textContent = '🎓';
 
       const marker = new google.maps.marker.AdvancedMarkerElement({
         map,
         position: { lat: school.lat, lng: school.lng },
-        content: el.firstElementChild as HTMLElement,
+        content: el,
       });
 
       const markerEl = marker.element;

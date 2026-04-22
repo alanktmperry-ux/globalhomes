@@ -77,7 +77,7 @@ interface Lead {
 interface PropertyMini {
   id: string;
   address: string | null;
-  price: string | null;
+  price: number | string | null;
 }
 
 const STATUS_OPTIONS: { value: LeadStatusExt; label: string }[] = [

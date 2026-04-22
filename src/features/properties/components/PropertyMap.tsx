@@ -1,5 +1,6 @@
 /// <reference types="google.maps" />
 import { useEffect, useRef, useCallback, useState } from 'react';
+import DOMPurify from 'dompurify';
 import { Property } from '@/shared/lib/types';
 import { loadGoogleMapsScript } from '@/shared/lib/googleMapsService';
 import { Loader2, Locate, Search, X, HelpCircle, MapPin } from 'lucide-react';

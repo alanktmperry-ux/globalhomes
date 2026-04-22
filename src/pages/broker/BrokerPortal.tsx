@@ -281,7 +281,7 @@ export default function BrokerPortal() {
               key={selectedLead.id}
               lead={selectedLead}
               broker={broker}
-              onChanged={() => loadLeads(broker.id)}
+              onChanged={() => loadLeads(broker)}
             />
           ) : (
             <WelcomeCard broker={broker} />

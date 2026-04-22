@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Link } from 'react-router-dom';
 import { Instagram, Youtube } from 'lucide-react';
 

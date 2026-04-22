@@ -1114,7 +1114,7 @@ const Index = () => {
         </section>
 
         {/* ── TRANSLATION DEMO ── */}
-        <TranslationDemoCard />
+        <TranslationDemoInline />
 
         {/* ── FEATURED LISTINGS ── */}
         <motion.section {...sectionAnim} id="featured-listings" className="bg-white py-12 px-6">
@@ -1587,6 +1587,134 @@ const HowItWorksSection = ({ t }: { t: (key: string) => string }) => {
               </div>
             );
           })}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ── Inline Translation Demo card with language switcher ──
+type DemoLang = 'zh' | 'vi' | 'ar' | 'en';
+
+const DEMO_CONTENT: Record<DemoLang, { title: string; subtitle: string; description: string; chips: string[]; rtl?: boolean }> = {
+  zh: {
+    title: '宽敞的家庭住宅，步行可达优质学校',
+    subtitle: '南墨尔本，维多利亚州 · ¥6,240,000',
+    description: '这套精心设计的住宅融合了现代生活与传统维多利亚风格，坐落于顶级学区...',
+    chips: ['近优质中学', '步行至亚洲超市', '华人社区活跃'],
+  },
+  vi: {
+    title: 'Ngôi nhà gia đình rộng rãi, gần trường tốt',
+    subtitle: 'South Melbourne, VIC · ₫ 28.5 tỷ',
+    description: 'Ngôi nhà được thiết kế tinh tế này kết hợp cuộc sống hiện đại với phong cách Victoria truyền thống...',
+    chips: ['Gần trường tốt', 'Cộng đồng Việt Nam', 'Chợ châu Á gần đây'],
+  },
+  ar: {
+    title: 'منزل عائلي فسيح، قريب من المدارس الجيدة',
+    subtitle: 'ساوث ملبورن، VIC · 4,200,000 د.إ',
+    description: 'هذا المنزل الفاخر يجمع بين الحياة العصرية والطراز الفيكتوري الكلاسيكي...',
+    chips: ['قريب من المدارس', 'مجتمع عربي نشط', 'أسواق حلال قريبة'],
+    rtl: true,
+  },
+  en: {
+    title: 'Spacious family home, walking distance to top schools',
+    subtitle: 'South Melbourne VIC · $1,850,000',
+    description: 'This beautifully designed home combines modern living with classic Victorian style, in a top school catchment...',
+    chips: ['Top school zone', 'Near Asian grocers', 'Active community'],
+  },
+};
+
+const DEMO_LANGS: { key: DemoLang; label: string }[] = [
+  { key: 'zh', label: '中文' },
+  { key: 'vi', label: 'Tiếng Việt' },
+  { key: 'ar', label: 'العربية' },
+  { key: 'en', label: 'English' },
+];
+
+const TranslationDemoInline = () => {
+  const [activeLang, setActiveLang] = useState<DemoLang>('zh');
+  const [cardVisible, setCardVisible] = useState(false);
+  const sectionRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setCardVisible(true);
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const data = DEMO_CONTENT[activeLang];
+
+  return (
+    <section
+      ref={sectionRef}
+      className={`max-w-3xl mx-auto px-4 py-12 transition-opacity duration-700 ${cardVisible ? 'opacity-100' : 'opacity-0'}`}
+    >
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-3">
+          <span className="text-sm font-medium text-slate-800 truncate">
+            3 bed House · South Melbourne VIC · $1.85M
+          </span>
+          <span className="bg-blue-50 text-blue-600 text-xs font-medium px-3 py-1 rounded-full shrink-0">
+            AI Translated
+          </span>
+        </div>
+
+        {/* Language switcher */}
+        <div className="px-6 py-3 border-b border-slate-100 flex gap-2 flex-wrap">
+          {DEMO_LANGS.map((l) => {
+            const isActive = l.key === activeLang;
+            return (
+              <button
+                key={l.key}
+                type="button"
+                onClick={() => setActiveLang(l.key)}
+                className={`text-sm px-4 py-1.5 rounded-full cursor-pointer transition-colors ${
+                  isActive ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                {l.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Body */}
+        <div className="px-6 py-5 flex gap-5" dir={data.rtl ? 'rtl' : 'ltr'}>
+          <div className="w-36 h-24 rounded-xl bg-slate-100 flex-shrink-0 flex items-center justify-center text-xs text-slate-400">
+            Property photo
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-base font-semibold text-slate-900">{data.title}</h3>
+            <p className="text-sm text-slate-500 mt-1">{data.subtitle}</p>
+            <p className="text-sm text-slate-600 mt-2 leading-relaxed">{data.description}</p>
+            <div className="flex flex-wrap gap-2 mt-3">
+              {data.chips.map((chip) => (
+                <span key={chip} className="bg-emerald-50 text-emerald-700 text-xs px-3 py-1 rounded-full">
+                  {chip}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-3 bg-slate-50 border-t border-slate-100 text-center">
+          <p className="text-xs text-slate-400">
+            Every listing automatically translated by AI · No agent effort required
+          </p>
         </div>
       </div>
     </section>

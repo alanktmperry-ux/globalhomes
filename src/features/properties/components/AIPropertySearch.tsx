@@ -39,7 +39,13 @@ interface AIIntent {
   intent_summary: string;
 }
 
-export function AIPropertySearch() {
+interface AIPropertySearchProps {
+  /** When provided, shows a "Refine in filters" button that hands the parsed
+   *  query off to the parent's filter UI. */
+  onRefineWithFilters?: (parsed: ParsedFilters) => void;
+}
+
+export function AIPropertySearch({ onRefineWithFilters }: AIPropertySearchProps = {}) {
   const { t, language } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth() ?? { user: null } as any;
@@ -47,12 +53,15 @@ export function AIPropertySearch() {
   const [loading, setLoading] = useState(false);
   const [properties, setProperties] = useState<Property[] | null>(null);
   const [intent, setIntent] = useState<AIIntent | null>(null);
+  const [parsed, setParsed] = useState<ParsedFilters | null>(null);
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
 
   const runSearch = useCallback(async (q: string) => {
     if (!q.trim()) return;
     setLoading(true);
     setProperties(null);
+    // Parse client-side immediately so chips can render even before AI returns
+    setParsed(parsePropertyQuery(q));
     try {
       // If the buyer is searching in a non-English language, translate the
       // natural-language query to English first so the AI search edge function

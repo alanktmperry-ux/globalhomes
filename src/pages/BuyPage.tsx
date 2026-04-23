@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { geocode } from '@/shared/lib/googleMapsService';
 import { PropertyCard } from '@/components/PropertyCard';
 import { mapDbProperty } from '@/features/properties/api/fetchPublicProperties';
 import { Property } from '@/shared/lib/types';
@@ -214,6 +215,22 @@ const BuyPage = () => {
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | undefined>();
   useEffect(() => { localStorage.setItem('buy-view-mode', viewMode); }, [viewMode]);
 
+  // Melbourne fallback
+  const FALLBACK_CENTER = { lat: -37.8136, lng: 144.9631 };
+  const FALLBACK_ZOOM = 11;
+  const SUBURB_ZOOM = 14;
+
+  // Map center + zoom, optionally cached in URL params (?lat=&lng=&z=)
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(() => {
+    const lat = parseFloat(searchParams.get('lat') || '');
+    const lng = parseFloat(searchParams.get('lng') || '');
+    return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
+  });
+  const [mapZoom, setMapZoom] = useState<number>(() => {
+    const z = parseInt(searchParams.get('z') || '', 10);
+    return Number.isFinite(z) ? z : FALLBACK_ZOOM;
+  });
+
   const [filters, setFilters] = useState<BuyFilters>(() => parseFiltersFromParams(searchParams));
   const [searchMode, setSearchMode] = useState<'ai' | 'filter'>(() => {
     const stored = localStorage.getItem('search-mode');
@@ -239,6 +256,62 @@ const BuyPage = () => {
       return next;
     });
   }, [setSearchParams]);
+
+  // Geocode the first searched suburb so the map zooms in to it (e.g. "St Kilda")
+  // Cache lat/lng/zoom in URL params so back-navigation preserves the view.
+  const primarySuburb = filters.suburbs[0];
+  useEffect(() => {
+    let cancelled = false;
+    const cachedLat = parseFloat(searchParams.get('lat') || '');
+    const cachedLng = parseFloat(searchParams.get('lng') || '');
+    const hasCached = Number.isFinite(cachedLat) && Number.isFinite(cachedLng);
+
+    if (!primarySuburb) {
+      // No suburb: fall back to Melbourne center
+      if (!hasCached) {
+        setMapCenter(FALLBACK_CENTER);
+        setMapZoom(FALLBACK_ZOOM);
+      }
+      return;
+    }
+
+    if (hasCached) {
+      // URL already has coords — use them and skip refetch
+      setMapCenter({ lat: cachedLat, lng: cachedLng });
+      const z = parseInt(searchParams.get('z') || '', 10);
+      setMapZoom(Number.isFinite(z) ? z : SUBURB_ZOOM);
+      return;
+    }
+
+    geocode(`${primarySuburb}, Australia`)
+      .then((coords) => {
+        if (cancelled) return;
+        if (coords) {
+          setMapCenter(coords);
+          setMapZoom(SUBURB_ZOOM);
+          // Persist into URL so navigating back preserves the view
+          setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            next.set('lat', coords.lat.toFixed(5));
+            next.set('lng', coords.lng.toFixed(5));
+            next.set('z', String(SUBURB_ZOOM));
+            return next;
+          }, { replace: true });
+        } else {
+          setMapCenter(FALLBACK_CENTER);
+          setMapZoom(FALLBACK_ZOOM);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setMapCenter(FALLBACK_CENTER);
+          setMapZoom(FALLBACK_ZOOM);
+        }
+      });
+
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [primarySuburb]);
 
   const { data: properties, isLoading } = useQuery({
     queryKey: ['buy-properties', filters],
@@ -523,6 +596,8 @@ const BuyPage = () => {
                       properties={properties}
                       onPropertySelect={(p) => setSelectedPropertyId(p.id)}
                       selectedPropertyId={selectedPropertyId}
+                      centerOn={mapCenter ? { ...mapCenter, key: `${primarySuburb || 'fallback'}-${mapZoom}` } : null}
+                      initialZoom={mapZoom}
                       height="calc(100vh - 280px)"
                     />
                   </div>
@@ -545,6 +620,8 @@ const BuyPage = () => {
                         properties={properties}
                         onPropertySelect={(p) => { setSelectedPropertyId(p.id); }}
                         selectedPropertyId={selectedPropertyId}
+                        centerOn={mapCenter ? { ...mapCenter, key: `${primarySuburb || 'fallback'}-${mapZoom}` } : null}
+                        initialZoom={mapZoom}
                         height="100%"
                       />
                     </div>

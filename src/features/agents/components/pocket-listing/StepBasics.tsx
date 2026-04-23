@@ -1,4 +1,4 @@
-import { Home, Building2, Warehouse, Mountain, Store, Minus, Plus, DollarSign, Key, Flame, Sun, Wind, Zap, Waves, ChevronDown, Gavel, Info } from 'lucide-react';
+import { Home, Building2, Warehouse, Mountain, Store, Minus, Plus, DollarSign, Key, Flame, Sun, Wind, Zap, Waves, ChevronDown, Gavel, Info, LayoutGrid, Star, Rows3, Columns2, Square } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -14,6 +14,11 @@ const TYPES = [
   { key: 'House', icon: <Home size={20} />, label: 'House' },
   { key: 'Apartment', icon: <Building2 size={20} />, label: 'Apt' },
   { key: 'Townhouse', icon: <Warehouse size={20} />, label: 'Town' },
+  { key: 'Unit', icon: <LayoutGrid size={20} />, label: 'Unit' },
+  { key: 'Villa', icon: <Star size={20} />, label: 'Villa' },
+  { key: 'Terrace', icon: <Rows3 size={20} />, label: 'Terrace' },
+  { key: 'Duplex', icon: <Columns2 size={20} />, label: 'Duplex' },
+  { key: 'Studio', icon: <Square size={20} />, label: 'Studio' },
   { key: 'Land', icon: <Mountain size={20} />, label: 'Land' },
   { key: 'Commercial', icon: <Store size={20} />, label: 'Comm' },
 ];
@@ -153,9 +158,9 @@ const StepBasics = ({ draft, update }: Props) => {
       {/* Property Type */}
       <div>
         <Label className="text-sm font-semibold mb-3 block">Property Type</Label>
-        <div className="grid grid-cols-5 gap-2">
+        <div className="flex flex-nowrap gap-2 overflow-x-auto -mx-1 px-1 pb-1">
           {TYPES.map(t => (
-            <button key={t.key} type="button" onClick={() => update({ propertyType: t.key })} className={`flex flex-col items-center gap-1.5 py-3 rounded-xl border transition-all text-xs font-medium ${draft.propertyType === t.key ? 'bg-primary/15 border-primary text-primary' : 'bg-secondary border-border text-muted-foreground hover:border-primary/40'}`}>
+            <button key={t.key} type="button" onClick={() => update({ propertyType: t.key })} className={`flex-shrink-0 w-[72px] flex flex-col items-center gap-1.5 py-3 rounded-xl border transition-all text-xs font-medium ${draft.propertyType === t.key ? 'bg-primary/15 border-primary text-primary' : 'bg-secondary border-border text-muted-foreground hover:border-primary/40'}`}>
               {t.icon}
               {t.label}
             </button>

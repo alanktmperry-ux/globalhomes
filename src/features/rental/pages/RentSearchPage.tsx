@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useRentalSearch, type RentalFilters } from '../hooks/useRentalSearch';
@@ -6,6 +6,9 @@ import { RentalSearchFilters } from '../components/RentalSearchFilters';
 import { RentalCard } from '../components/RentalCard';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import { SearchModeTabs } from '@/features/search/components/SearchModeTabs';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { Filter, X } from 'lucide-react';
 
 function parseRentalFiltersFromParams(sp: URLSearchParams): RentalFilters {
   return {
@@ -22,6 +25,7 @@ export default function RentSearchPage() {
   const [filters, setFilters] = useState<RentalFilters>(() => parseRentalFiltersFromParams(searchParams));
   const { properties, loading, total } = useRentalSearch(filters);
   const { t } = useTranslation();
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   // Re-sync when URL params change (voice search navigation)
   useEffect(() => {
@@ -29,6 +33,13 @@ export default function RentSearchPage() {
     const hasUrlFilters = Object.values(parsed).some(v => v !== undefined);
     if (hasUrlFilters) setFilters(prev => ({ ...prev, ...parsed }));
   }, [searchParams.toString()]);
+
+  const activeCount = useMemo(
+    () => Object.values(filters).filter(v =>
+      v !== undefined && v !== '' && !(Array.isArray(v) && v.length === 0)
+    ).length,
+    [filters],
+  );
 
   return (
     <>
@@ -55,8 +66,48 @@ export default function RentSearchPage() {
           </p>
         </div>
 
-        {/* Filters */}
-        <div className="sticky top-0 z-30 bg-background/95 backdrop-blur py-3 -mx-4 px-4">
+        {/* Mobile: filter sheet trigger */}
+        <div className="md:hidden flex items-center gap-2">
+          <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="flex-1 gap-2">
+                <Filter className="h-4 w-4" />
+                {t('rental.filters') || 'Filters'}
+                {activeCount > 0 && (
+                  <span className="ml-1 inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                    {activeCount}
+                  </span>
+                )}
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="h-[85vh] overflow-y-auto">
+              <SheetHeader className="text-left">
+                <SheetTitle>{t('rental.filters') || 'Filter rentals'}</SheetTitle>
+              </SheetHeader>
+              <div className="py-4">
+                <RentalSearchFilters value={filters} onChange={setFilters} />
+              </div>
+              <SheetFooter className="flex-row gap-2 sm:flex-row">
+                {activeCount > 0 && (
+                  <Button variant="outline" className="flex-1" onClick={() => setFilters({})}>
+                    {t('rental.clearFilters') || 'Clear all'}
+                  </Button>
+                )}
+                <Button className="flex-1" onClick={() => setMobileFiltersOpen(false)}>
+                  Show {total} results
+                </Button>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
+          {activeCount > 0 && (
+            <Button variant="ghost" size="sm" onClick={() => setFilters({})} className="text-muted-foreground">
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+
+        {/* Desktop: inline sticky filter bar */}
+        <div className="hidden md:block sticky top-0 z-30 bg-background/95 backdrop-blur py-3 -mx-4 px-4">
           <RentalSearchFilters value={filters} onChange={setFilters} />
         </div>
 

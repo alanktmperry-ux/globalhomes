@@ -35,10 +35,6 @@ const PrivacyPage = () => {
           <h1 className="font-display text-3xl font-extrabold text-foreground mb-2">Privacy Policy</h1>
           <p className="text-sm text-muted-foreground mb-6">Last updated: April 2026</p>
 
-          <div className="mb-8 rounded-lg border border-yellow-300 bg-yellow-50 p-4 text-sm text-yellow-900">
-            This policy is interim and subject to legal review. Last updated April 2026.
-          </div>
-
           <nav className="bg-muted/40 border border-border rounded-lg p-4 mb-10">
             <p className="text-sm font-semibold text-foreground mb-3">Contents</p>
             <ul className="space-y-1.5">

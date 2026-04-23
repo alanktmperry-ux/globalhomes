@@ -257,6 +257,62 @@ const BuyPage = () => {
     });
   }, [setSearchParams]);
 
+  // Geocode the first searched suburb so the map zooms in to it (e.g. "St Kilda")
+  // Cache lat/lng/zoom in URL params so back-navigation preserves the view.
+  const primarySuburb = filters.suburbs[0];
+  useEffect(() => {
+    let cancelled = false;
+    const cachedLat = parseFloat(searchParams.get('lat') || '');
+    const cachedLng = parseFloat(searchParams.get('lng') || '');
+    const hasCached = Number.isFinite(cachedLat) && Number.isFinite(cachedLng);
+
+    if (!primarySuburb) {
+      // No suburb: fall back to Melbourne center
+      if (!hasCached) {
+        setMapCenter(FALLBACK_CENTER);
+        setMapZoom(FALLBACK_ZOOM);
+      }
+      return;
+    }
+
+    if (hasCached) {
+      // URL already has coords — use them and skip refetch
+      setMapCenter({ lat: cachedLat, lng: cachedLng });
+      const z = parseInt(searchParams.get('z') || '', 10);
+      setMapZoom(Number.isFinite(z) ? z : SUBURB_ZOOM);
+      return;
+    }
+
+    geocode(`${primarySuburb}, Australia`)
+      .then((coords) => {
+        if (cancelled) return;
+        if (coords) {
+          setMapCenter(coords);
+          setMapZoom(SUBURB_ZOOM);
+          // Persist into URL so navigating back preserves the view
+          setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            next.set('lat', coords.lat.toFixed(5));
+            next.set('lng', coords.lng.toFixed(5));
+            next.set('z', String(SUBURB_ZOOM));
+            return next;
+          }, { replace: true });
+        } else {
+          setMapCenter(FALLBACK_CENTER);
+          setMapZoom(FALLBACK_ZOOM);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setMapCenter(FALLBACK_CENTER);
+          setMapZoom(FALLBACK_ZOOM);
+        }
+      });
+
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [primarySuburb]);
+
   const { data: properties, isLoading } = useQuery({
     queryKey: ['buy-properties', filters],
     queryFn: async (): Promise<Property[]> => {

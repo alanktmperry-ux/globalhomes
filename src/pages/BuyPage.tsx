@@ -6,15 +6,15 @@ import { supabase } from '@/integrations/supabase/client';
 import { PropertyCard } from '@/components/PropertyCard';
 import { mapDbProperty } from '@/features/properties/api/fetchPublicProperties';
 import { Property } from '@/shared/lib/types';
-import { Loader2, X, BellPlus } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { Loader2, X, BellPlus, Sparkles, SlidersHorizontal, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from '@/components/ui/sheet';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { useI18n } from '@/shared/lib/i18n';
 import { AIPropertySearch } from '@/features/properties/components/AIPropertySearch';
 import { Switch } from '@/components/ui/switch';
-import { Sparkles, SlidersHorizontal } from 'lucide-react';
 import { SearchModeTabs } from '@/features/search/components/SearchModeTabs';
+import { SuburbChipInput } from '@/features/search/components/SuburbChipInput';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useSavedSearchesDB } from '@/features/alerts/hooks/useSavedSearchesDB';
 import { toast } from 'sonner';
@@ -23,7 +23,7 @@ const PROPERTIES_WITH_AGENTS =
   '*, agents(name, agency, phone, email, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count)';
 
 interface BuyFilters {
-  suburb?: string;
+  suburbs: string[];
   state?: string;
   minBeds?: number;
   minBaths?: number;
@@ -31,13 +31,20 @@ interface BuyFilters {
   minPrice?: number;
   maxPrice?: number;
   propertyType?: string;
-  sort?: 'newest' | 'price_asc' | 'price_desc';
+  sort: 'newest' | 'price_asc' | 'price_desc';
 }
+
+const EMPTY_FILTERS: BuyFilters = { suburbs: [], sort: 'newest' };
 
 function parseFiltersFromParams(sp: URLSearchParams): BuyFilters {
   const sort = sp.get('sort');
+  const q = sp.get('q');
+  // Support either `?q=Toorak,Hawthorn` or repeated `?suburb=` params
+  const suburbs = q
+    ? q.split(',').map(s => s.trim()).filter(Boolean)
+    : sp.getAll('suburb').filter(Boolean);
   return {
-    suburb: sp.get('q') || undefined,
+    suburbs,
     minBeds: sp.get('beds') ? Number(sp.get('beds')) : undefined,
     minBaths: sp.get('baths') ? Number(sp.get('baths')) : undefined,
     minParking: sp.get('parking') ? Number(sp.get('parking')) : undefined,
@@ -50,7 +57,7 @@ function parseFiltersFromParams(sp: URLSearchParams): BuyFilters {
 
 function filtersToParams(f: BuyFilters): Record<string, string> {
   const out: Record<string, string> = {};
-  if (f.suburb) out.q = f.suburb;
+  if (f.suburbs.length) out.q = f.suburbs.join(',');
   if (f.minBeds) out.beds = String(f.minBeds);
   if (f.minBaths) out.baths = String(f.minBaths);
   if (f.minParking) out.parking = String(f.minParking);
@@ -63,6 +70,131 @@ function filtersToParams(f: BuyFilters): Record<string, string> {
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 });
 
+/* ---------------- Filter controls (shared by desktop + mobile sheet) ---------------- */
+
+interface FilterControlsProps {
+  filters: BuyFilters;
+  onChange: (updater: (f: BuyFilters) => BuyFilters) => void;
+  layout: 'inline' | 'stacked';
+}
+
+function FilterControls({ filters, onChange, layout }: FilterControlsProps) {
+  const { t } = useI18n();
+  const stacked = layout === 'stacked';
+  const fieldClass = 'h-9 rounded-md border border-input bg-background px-3 text-sm';
+  const wrap = stacked ? 'space-y-3' : 'flex flex-wrap items-center gap-2';
+  const fieldWrap = stacked ? 'block w-full' : '';
+
+  return (
+    <div className={wrap}>
+      <div className={stacked ? 'block' : 'min-w-[220px] max-w-md flex-1'}>
+        {stacked && <label className="text-xs font-medium text-muted-foreground mb-1 block">{t('Suburbs')}</label>}
+        <SuburbChipInput
+          values={filters.suburbs}
+          onChange={(next) => onChange(f => ({ ...f, suburbs: next }))}
+          placeholder={t('Add suburbs…')}
+        />
+      </div>
+
+      {stacked && <label className="text-xs font-medium text-muted-foreground block">{t('Property type')}</label>}
+      <select
+        value={filters.propertyType ?? ''}
+        onChange={e => onChange(f => ({ ...f, propertyType: e.target.value || undefined }))}
+        className={`${fieldClass} ${fieldWrap}`}
+      >
+        <option value="">{t('Any type')}</option>
+        <optgroup label="Residential">
+          <option value="House">House</option>
+          <option value="Apartment">Apartment</option>
+          <option value="Townhouse">Townhouse</option>
+          <option value="Unit">Unit</option>
+          <option value="Villa">Villa</option>
+          <option value="Terrace">Terrace</option>
+          <option value="Duplex">Duplex</option>
+          <option value="Studio">Studio</option>
+        </optgroup>
+        <optgroup label="Commercial">
+          <option value="Office">Office</option>
+          <option value="Retail">Retail</option>
+          <option value="Industrial">Industrial</option>
+          <option value="Warehouse">Warehouse</option>
+        </optgroup>
+        <optgroup label="Land">
+          <option value="Land">Land</option>
+        </optgroup>
+      </select>
+
+      {stacked && <label className="text-xs font-medium text-muted-foreground block">{t('Bedrooms')}</label>}
+      <select
+        value={filters.minBeds ?? ''}
+        onChange={e => onChange(f => ({ ...f, minBeds: e.target.value ? Number(e.target.value) : undefined }))}
+        className={`${fieldClass} ${fieldWrap}`}
+      >
+        <option value="">{t('Any beds')}</option>
+        {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}+ {t('beds')}</option>)}
+      </select>
+
+      {stacked && <label className="text-xs font-medium text-muted-foreground block">{t('Bathrooms')}</label>}
+      <select
+        value={filters.minBaths ?? ''}
+        onChange={e => onChange(f => ({ ...f, minBaths: e.target.value ? Number(e.target.value) : undefined }))}
+        className={`${fieldClass} ${fieldWrap}`}
+      >
+        <option value="">{t('Any baths')}</option>
+        {[1, 2, 3, 4].map(n => <option key={n} value={n}>{n}+ {t('baths')}</option>)}
+      </select>
+
+      {stacked && <label className="text-xs font-medium text-muted-foreground block">{t('Parking')}</label>}
+      <select
+        value={filters.minParking ?? ''}
+        onChange={e => onChange(f => ({ ...f, minParking: e.target.value ? Number(e.target.value) : undefined }))}
+        className={`${fieldClass} ${fieldWrap}`}
+      >
+        <option value="">{t('Any parking')}</option>
+        {[1, 2, 3, 4].map(n => <option key={n} value={n}>{n}+ {t('cars')}</option>)}
+      </select>
+
+      {stacked && <label className="text-xs font-medium text-muted-foreground block">{t('Min price')}</label>}
+      <select
+        value={filters.minPrice ?? ''}
+        onChange={e => onChange(f => ({ ...f, minPrice: e.target.value ? Number(e.target.value) : undefined }))}
+        className={`${fieldClass} ${fieldWrap}`}
+      >
+        <option value="">{t('Min price')}</option>
+        {[300000, 500000, 750000, 1000000, 1500000, 2000000].map(p => (
+          <option key={p} value={p}>{AUD.format(p)}</option>
+        ))}
+      </select>
+
+      {stacked && <label className="text-xs font-medium text-muted-foreground block">{t('Max price')}</label>}
+      <select
+        value={filters.maxPrice ?? ''}
+        onChange={e => onChange(f => ({ ...f, maxPrice: e.target.value ? Number(e.target.value) : undefined }))}
+        className={`${fieldClass} ${fieldWrap}`}
+      >
+        <option value="">{t('Max price')}</option>
+        {[500000, 750000, 1000000, 1500000, 2000000, 3000000, 5000000].map(p => (
+          <option key={p} value={p}>{AUD.format(p)}</option>
+        ))}
+      </select>
+
+      {stacked && <label className="text-xs font-medium text-muted-foreground block">{t('Sort by')}</label>}
+      <select
+        value={filters.sort}
+        onChange={e => onChange(f => ({ ...f, sort: e.target.value as BuyFilters['sort'] }))}
+        className={`${fieldClass} ${fieldWrap} ${stacked ? '' : 'ml-auto'}`}
+        aria-label={t('Sort by')}
+      >
+        <option value="newest">{t('Newest first')}</option>
+        <option value="price_asc">{t('Price: low to high')}</option>
+        <option value="price_desc">{t('Price: high to low')}</option>
+      </select>
+    </div>
+  );
+}
+
+/* ---------------- Page ---------------- */
+
 const BuyPage = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
@@ -72,6 +204,7 @@ const BuyPage = () => {
   const { user } = useAuth();
   const { saveSearch } = useSavedSearchesDB();
   const [savingSearch, setSavingSearch] = useState(false);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const [filters, setFilters] = useState<BuyFilters>(() => parseFiltersFromParams(searchParams));
   const [searchMode, setSearchMode] = useState<'ai' | 'filter'>(() => {
@@ -87,6 +220,7 @@ const BuyPage = () => {
   // Re-sync filters when URL params change (e.g. new voice search navigation)
   useEffect(() => {
     setFilters(parseFiltersFromParams(searchParams));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams.toString()]);
 
   // Push filter changes to URL so they're shareable + survive refresh
@@ -108,12 +242,17 @@ const BuyPage = () => {
         .not('listing_type', 'eq', 'rent')
         .limit(60);
 
-      // Sort
       if (filters.sort === 'price_asc') q = q.order('price', { ascending: true, nullsFirst: false });
       else if (filters.sort === 'price_desc') q = q.order('price', { ascending: false, nullsFirst: false });
       else q = q.order('created_at', { ascending: false });
 
-      if (filters.suburb) q = q.ilike('suburb', `%${filters.suburb}%`);
+      if (filters.suburbs.length === 1) {
+        q = q.ilike('suburb', `%${filters.suburbs[0]}%`);
+      } else if (filters.suburbs.length > 1) {
+        // Postgres OR filter — match any of the selected suburbs
+        const orExpr = filters.suburbs.map(s => `suburb.ilike.%${s.replace(/[%,()]/g, '')}%`).join(',');
+        q = q.or(orExpr);
+      }
       if (filters.state) q = q.eq('state', filters.state.toUpperCase());
       if (filters.minBeds) q = q.gte('beds', filters.minBeds);
       if (filters.minBaths) q = q.gte('baths', filters.minBaths);
@@ -141,16 +280,23 @@ const BuyPage = () => {
   }, []);
 
   const clearFilters = () => {
-    setFilters({ sort: 'newest' });
+    setFilters(EMPTY_FILTERS);
     setSearchParams({});
   };
 
   const activeChipCount = useMemo(
-    () => [filters.suburb, filters.minBeds, filters.minBaths, filters.minParking, filters.minPrice, filters.maxPrice, filters.propertyType]
-      .filter(v => v !== undefined && v !== '').length,
+    () => filters.suburbs.length
+      + [filters.minBeds, filters.minBaths, filters.minParking, filters.minPrice, filters.maxPrice, filters.propertyType]
+        .filter(v => v !== undefined && v !== '').length,
     [filters],
   );
   const hasActiveFilters = activeChipCount > 0;
+
+  const headerSuburbLabel = filters.suburbs.length === 1
+    ? filters.suburbs[0]
+    : filters.suburbs.length > 1
+      ? `${filters.suburbs.length} ${t('suburbs')}`
+      : null;
 
   const handleSaveSearch = useCallback(async () => {
     if (!user) {
@@ -165,11 +311,13 @@ const BuyPage = () => {
     }
     setSavingSearch(true);
     try {
-      const name = filters.suburb
-        ? `${filters.suburb}${filters.minBeds ? ` · ${filters.minBeds}+ beds` : ''}${filters.maxPrice ? ` · under ${AUD.format(filters.maxPrice)}` : ''}`
-        : t('My property search');
+      const labelParts: string[] = [];
+      if (filters.suburbs.length) labelParts.push(filters.suburbs.join(', '));
+      if (filters.minBeds) labelParts.push(`${filters.minBeds}+ beds`);
+      if (filters.maxPrice) labelParts.push(`under ${AUD.format(filters.maxPrice)}`);
+      const name = labelParts.length ? labelParts.join(' · ') : t('My property search');
       await saveSearch(name, {
-        suburbs: filters.suburb ? [filters.suburb] : [],
+        suburbs: filters.suburbs,
         min_price: filters.minPrice ?? null,
         max_price: filters.maxPrice ?? null,
         min_bedrooms: filters.minBeds ?? null,
@@ -180,7 +328,7 @@ const BuyPage = () => {
       toast.success(t("Search saved — we'll email you when new matches appear."), {
         action: { label: t('Manage'), onClick: () => navigate('/saved') },
       });
-    } catch (e) {
+    } catch {
       toast.error(t('Could not save search. Please try again.'));
     } finally {
       setSavingSearch(false);
@@ -190,7 +338,7 @@ const BuyPage = () => {
   return (
     <>
       <Helmet>
-        <title>{filters.suburb ? `Properties for Sale in ${filters.suburb}` : 'Properties for Sale in Australia'}</title>
+        <title>{headerSuburbLabel ? `Properties for Sale in ${headerSuburbLabel}` : 'Properties for Sale in Australia'}</title>
         <meta name="description" content="Browse properties for sale across Australia on ListHQ." />
       </Helmet>
 
@@ -205,7 +353,7 @@ const BuyPage = () => {
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
-                {filters.suburb ? t(`Properties for Sale in ${filters.suburb}`) : t('Properties for Sale')}
+                {headerSuburbLabel ? t(`Properties for Sale in ${headerSuburbLabel}`) : t('Properties for Sale')}
               </h1>
               <p className="text-muted-foreground mt-1">
                 {isLoading ? t('Searching…') : `${properties?.length ?? 0} ${t('properties found')}`}
@@ -243,7 +391,7 @@ const BuyPage = () => {
               onRefineWithFilters={(parsed) => {
                 setSearchMode('filter');
                 updateFilters(() => ({
-                  suburb: parsed.location,
+                  suburbs: parsed.location ? [parsed.location] : [],
                   minBeds: parsed.beds,
                   minPrice: parsed.priceMin,
                   maxPrice: parsed.priceMax,
@@ -256,114 +404,54 @@ const BuyPage = () => {
 
           {searchMode === 'filter' && (
             <>
-              {/* Sticky filter bar */}
-              <div className="sticky top-0 z-30 bg-background/95 backdrop-blur py-3 -mx-4 px-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Input
-                    placeholder={t('Suburb')}
-                    value={filters.suburb ?? ''}
-                    onChange={e => updateFilters(f => ({ ...f, suburb: e.target.value || undefined }))}
-                    className="w-40 h-9 text-sm"
-                  />
-                  <select
-                    value={filters.propertyType ?? ''}
-                    onChange={e => updateFilters(f => ({ ...f, propertyType: e.target.value || undefined }))}
-                    className="h-9 rounded-md border border-input bg-background px-3 text-sm"
-                  >
-                    <option value="">{t('Any type')}</option>
-                    <optgroup label="Residential">
-                      <option value="House">House</option>
-                      <option value="Apartment">Apartment</option>
-                      <option value="Townhouse">Townhouse</option>
-                      <option value="Unit">Unit</option>
-                      <option value="Villa">Villa</option>
-                      <option value="Terrace">Terrace</option>
-                      <option value="Duplex">Duplex</option>
-                      <option value="Studio">Studio</option>
-                    </optgroup>
-                    <optgroup label="Commercial">
-                      <option value="Office">Office</option>
-                      <option value="Retail">Retail</option>
-                      <option value="Industrial">Industrial</option>
-                      <option value="Warehouse">Warehouse</option>
-                    </optgroup>
-                    <optgroup label="Land">
-                      <option value="Land">Land</option>
-                    </optgroup>
-                  </select>
-                  <select
-                    value={filters.minBeds ?? ''}
-                    onChange={e => updateFilters(f => ({ ...f, minBeds: e.target.value ? Number(e.target.value) : undefined }))}
-                    className="h-9 rounded-md border border-input bg-background px-3 text-sm"
-                  >
-                    <option value="">{t('Any beds')}</option>
-                    {[1, 2, 3, 4, 5].map(n => (
-                      <option key={n} value={n}>{n}+ {t('beds')}</option>
-                    ))}
-                  </select>
-                  <select
-                    value={filters.minBaths ?? ''}
-                    onChange={e => updateFilters(f => ({ ...f, minBaths: e.target.value ? Number(e.target.value) : undefined }))}
-                    className="h-9 rounded-md border border-input bg-background px-3 text-sm"
-                  >
-                    <option value="">{t('Any baths')}</option>
-                    {[1, 2, 3, 4].map(n => (
-                      <option key={n} value={n}>{n}+ {t('baths')}</option>
-                    ))}
-                  </select>
-                  <select
-                    value={filters.minParking ?? ''}
-                    onChange={e => updateFilters(f => ({ ...f, minParking: e.target.value ? Number(e.target.value) : undefined }))}
-                    className="h-9 rounded-md border border-input bg-background px-3 text-sm"
-                  >
-                    <option value="">{t('Any parking')}</option>
-                    {[1, 2, 3, 4].map(n => (
-                      <option key={n} value={n}>{n}+ {t('cars')}</option>
-                    ))}
-                  </select>
-                  <select
-                    value={filters.minPrice ?? ''}
-                    onChange={e => updateFilters(f => ({ ...f, minPrice: e.target.value ? Number(e.target.value) : undefined }))}
-                    className="h-9 rounded-md border border-input bg-background px-3 text-sm"
-                  >
-                    <option value="">{t('Min price')}</option>
-                    {[300000, 500000, 750000, 1000000, 1500000, 2000000].map(p => (
-                      <option key={p} value={p}>{AUD.format(p)}</option>
-                    ))}
-                  </select>
-                  <select
-                    value={filters.maxPrice ?? ''}
-                    onChange={e => updateFilters(f => ({ ...f, maxPrice: e.target.value ? Number(e.target.value) : undefined }))}
-                    className="h-9 rounded-md border border-input bg-background px-3 text-sm"
-                  >
-                    <option value="">{t('Max price')}</option>
-                    {[500000, 750000, 1000000, 1500000, 2000000, 3000000, 5000000].map(p => (
-                      <option key={p} value={p}>{AUD.format(p)}</option>
-                    ))}
-                  </select>
-                  <select
-                    value={filters.sort ?? 'newest'}
-                    onChange={e => updateFilters(f => ({ ...f, sort: e.target.value as BuyFilters['sort'] }))}
-                    className="h-9 rounded-md border border-input bg-background px-3 text-sm ml-auto"
-                    aria-label={t('Sort by')}
-                  >
-                    <option value="newest">{t('Newest first')}</option>
-                    <option value="price_asc">{t('Price: low to high')}</option>
-                    <option value="price_desc">{t('Price: high to low')}</option>
-                  </select>
-                  {hasActiveFilters && (
-                    <Button variant="ghost" size="sm" onClick={clearFilters} className="h-9 text-sm text-muted-foreground">
-                      <X className="h-3.5 w-3.5 mr-1" /> {t('Clear')}
+              {/* Mobile: Filter button opens bottom sheet */}
+              <div className="md:hidden flex items-center gap-2">
+                <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" className="flex-1 gap-2">
+                      <Filter className="h-4 w-4" />
+                      {t('Filters')}
+                      {activeChipCount > 0 && (
+                        <span className="ml-1 inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                          {activeChipCount}
+                        </span>
+                      )}
                     </Button>
-                  )}
-                </div>
-
-                {/* Active filter chips */}
+                  </SheetTrigger>
+                  <SheetContent side="bottom" className="h-[85vh] overflow-y-auto">
+                    <SheetHeader className="text-left">
+                      <SheetTitle>{t('Filter properties')}</SheetTitle>
+                    </SheetHeader>
+                    <div className="py-4">
+                      <FilterControls filters={filters} onChange={updateFilters} layout="stacked" />
+                    </div>
+                    <SheetFooter className="flex-row gap-2 sm:flex-row">
+                      {hasActiveFilters && (
+                        <Button variant="outline" className="flex-1" onClick={clearFilters}>
+                          {t('Clear all')}
+                        </Button>
+                      )}
+                      <Button className="flex-1" onClick={() => setMobileFiltersOpen(false)}>
+                        {t('Show')} {properties?.length ?? 0} {t('results')}
+                      </Button>
+                    </SheetFooter>
+                  </SheetContent>
+                </Sheet>
                 {hasActiveFilters && (
-                  <div className="flex flex-wrap gap-1.5 mt-2">
-                    {filters.suburb && (
-                      <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{filters.suburb}</span>
-                    )}
+                  <Button variant="ghost" size="sm" onClick={clearFilters} className="text-muted-foreground">
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+
+              {/* Desktop: Inline sticky filter bar */}
+              <div className="hidden md:block sticky top-0 z-30 bg-background/95 backdrop-blur py-3 -mx-4 px-4">
+                <FilterControls filters={filters} onChange={updateFilters} layout="inline" />
+                {hasActiveFilters && (
+                  <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                    {filters.suburbs.map(s => (
+                      <span key={s} className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">📍 {s}</span>
+                    ))}
                     {filters.minBeds && (
                       <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{filters.minBeds}+ {t('beds')}</span>
                     )}
@@ -382,6 +470,9 @@ const BuyPage = () => {
                     {filters.propertyType && (
                       <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{t(filters.propertyType)}</span>
                     )}
+                    <Button variant="ghost" size="sm" onClick={clearFilters} className="h-7 text-xs text-muted-foreground ml-1">
+                      <X className="h-3 w-3 mr-1" /> {t('Clear all')}
+                    </Button>
                   </div>
                 )}
               </div>

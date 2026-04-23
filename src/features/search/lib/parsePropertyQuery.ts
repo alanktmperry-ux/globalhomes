@@ -6,6 +6,8 @@ export interface ParsedFilters {
   beds?: number;
   features: string[];
   intent?: 'sale' | 'rent';
+  floorAreaSqm?: number;
+  landSizeSqm?: number;
 }
 
 const PROPERTY_TYPES: Record<string, string> = {
@@ -15,6 +17,15 @@ const PROPERTY_TYPES: Record<string, string> = {
   casa: 'house', maison: 'house', appartement: 'apartment', wohnung: 'apartment',
   piso: 'apartment', mansión: 'villa', 'マンション': 'apartment', '家': 'house',
   '公寓': 'apartment', '别墅': 'villa', 'квартира': 'apartment', 'дом': 'house',
+  // Commercial
+  office: 'Office', 'office space': 'Office', 'commercial office': 'Office',
+  retail: 'Retail', 'shop': 'Retail', 'retail shop': 'Retail', 'shopfront': 'Retail', 'storefront': 'Retail',
+  industrial: 'Industrial', factory: 'Industrial', 'industrial unit': 'Industrial', 'industrial shed': 'Industrial',
+  warehouse: 'Warehouse', 'storage facility': 'Warehouse', shed: 'Warehouse',
+  // Land
+  land: 'Land', 'vacant land': 'Land', 'block of land': 'Land', 'land parcel': 'Land',
+  acreage: 'Land', rural: 'Land', 'rural property': 'Land', 'farm': 'Land', 'lifestyle property': 'Land',
+  'development site': 'Land', 'subdivided land': 'Land',
 };
 
 const FEATURES = [
@@ -83,6 +94,18 @@ export function parsePropertyQuery(text: string): ParsedFilters {
   if (bedMatch) filters.beds = parseInt(bedMatch[1]);
   const atLeast = lower.match(/at least\s+(\d+)\s*bed/i);
   if (atLeast) filters.beds = parseInt(atLeast[1]);
+
+  // Floor area (commercial)
+  const floorMatch = lower.match(/(\d+)\s*(?:sqm|m²|m2|square\s*met(?:re|er)s?)\s*(?:office|warehouse|retail|industrial|floor|space)?/i);
+  if (floorMatch) filters.floorAreaSqm = parseInt(floorMatch[1]);
+
+  // Land size
+  const landSizeMatch = lower.match(/(\d+(?:\.\d+)?)\s*(sqm|m²|m2|ha|hectare|acre)s?\s*(?:block|lot|land|parcel)?/i);
+  if (landSizeMatch) {
+    const val = parseFloat(landSizeMatch[1]);
+    const unit = landSizeMatch[2].toLowerCase();
+    filters.landSizeSqm = (unit === 'ha' || unit === 'hectare') ? val * 10000 : (unit === 'acre') ? val * 4047 : val;
+  }
 
   // Property type
   for (const [keyword, type] of Object.entries(PROPERTY_TYPES)) {

@@ -933,16 +933,31 @@ const Index = () => {
     }
   }, [searchParams]);
 
+  // ── Hero category tab (sale/rent reuse listingMode; commercial/land are search-only) ──
+  const [heroCategory, setHeroCategory] = useState<'sale' | 'rent' | 'commercial' | 'land'>(
+    listingMode === 'rent' ? 'rent' : 'sale'
+  );
+
   // ── Hero submit handler ──
   const handleHeroSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!heroQuery.trim()) return;
+    if (heroCategory === 'commercial' || heroCategory === 'land') {
+      const params = new URLSearchParams();
+      params.set('location', heroQuery.trim());
+      params.set('category', heroCategory);
+      navigate(`/?${params.toString()}`);
+      return;
+    }
     wrappedHandleSearch(heroQuery.trim());
   };
 
-  const handleHeroModeChange = (mode: 'sale' | 'rent') => {
-    setListingMode(mode);
-    window.dispatchEvent(new CustomEvent('listing-mode-changed'));
+  const handleHeroModeChange = (mode: 'sale' | 'rent' | 'commercial' | 'land') => {
+    setHeroCategory(mode);
+    if (mode === 'sale' || mode === 'rent') {
+      setListingMode(mode);
+      window.dispatchEvent(new CustomEvent('listing-mode-changed'));
+    }
   };
 
   // ── Scroll animation config ──
@@ -1004,11 +1019,11 @@ const Index = () => {
 
             {/* Sale / Rent toggle */}
             <div className="flex justify-center mb-6">
-              <div className="inline-flex items-center bg-slate-100 rounded-full p-1 gap-1">
+              <div className="inline-flex items-center bg-slate-100 rounded-full p-1 gap-1 flex-wrap">
                 <button
                   onClick={() => handleHeroModeChange('sale')}
                   className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
-                    listingMode === 'sale' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-700'
+                    heroCategory === 'sale' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-700'
                   }`}
                 >
                   {t('hero.forSale')}
@@ -1016,10 +1031,26 @@ const Index = () => {
                 <button
                   onClick={() => handleHeroModeChange('rent')}
                   className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
-                    listingMode === 'rent' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-700'
+                    heroCategory === 'rent' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-700'
                   }`}
                 >
                   {t('hero.forRent')}
+                </button>
+                <button
+                  onClick={() => handleHeroModeChange('commercial')}
+                  className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
+                    heroCategory === 'commercial' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-700'
+                  }`}
+                >
+                  Commercial
+                </button>
+                <button
+                  onClick={() => handleHeroModeChange('land')}
+                  className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
+                    heroCategory === 'land' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-700'
+                  }`}
+                >
+                  Land
                 </button>
               </div>
             </div>

@@ -121,6 +121,10 @@ const EXAMPLE_CHIPS = [
   { label: '🔑 Rentals under $500pw', query: 'rental property under $500 per week Melbourne' },
   { label: '🌿 4 bed family home', query: '4 bedroom family home under $1.2M' },
   { label: '🏗️ Land for sale', query: 'land for sale Victoria' },
+  { label: 'Office in Sydney CBD', query: 'office in Sydney CBD' },
+  { label: 'Warehouse Melbourne', query: 'warehouse in Melbourne' },
+  { label: 'Land Gold Coast', query: 'vacant land Gold Coast' },
+  { label: 'Retail shop Brisbane', query: 'retail shop in Brisbane' },
 ];
 
 

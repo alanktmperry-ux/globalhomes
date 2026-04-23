@@ -524,6 +524,10 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
             }
           })
           .catch((e) => console.error('AI match failed', e));
+
+      supabase.functions
+        .invoke('generate-translations', { body: { listing_id: lid } })
+        .catch((e) => console.error('Translation generation failed', e));
       };
 
       if (editPropertyId) {

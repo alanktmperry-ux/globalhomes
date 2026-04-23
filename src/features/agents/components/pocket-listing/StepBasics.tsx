@@ -281,6 +281,32 @@ const StepBasics = ({ draft, update }: Props) => {
           </div>
         </div>
 
+        {isCommercial && (
+          <div>
+            <Label className="text-sm font-semibold mb-2 block">Floor Area (m²)</Label>
+            <Input
+              type="number"
+              value={draft.floorAreaSqm ?? ''}
+              onChange={(e) => update({ floorAreaSqm: Number(e.target.value) || undefined })}
+              placeholder="e.g. 250"
+              className="bg-secondary border-border"
+            />
+          </div>
+        )}
+
+        {(isCommercial || isLand) && (
+          <div>
+            <Label className="text-sm font-semibold mb-2 block">Zoning</Label>
+            <Input
+              type="text"
+              value={draft.zoning ?? ''}
+              onChange={(e) => update({ zoning: e.target.value })}
+              placeholder="e.g. B2, IN1, R3"
+              className="bg-secondary border-border"
+            />
+          </div>
+        )}
+
         <div className="space-y-1.5">
           <Label className="text-sm font-semibold block">Description</Label>
           <Textarea

@@ -121,6 +121,10 @@ export interface ListingDraft {
   description_ja: string;
   title_ko: string;
   description_ko: string;
+
+  // Commercial / Land
+  floorAreaSqm?: number;
+  zoning?: string;
 }
 
 const DEFAULT_DRAFT: ListingDraft = {

@@ -22,12 +22,8 @@ export default function OpenHomeSignInPage() {
       .select('*')
       .eq('qr_token', token)
       .maybeSingle()
-      .then(async ({ data: oh }) => {
-        if (!oh) {
-          setError('This open home session has ended or the link is invalid.');
-          setLoading(false);
-          return;
-        }
+      .then(async ({ data: oh, error }) => {
+        if (error || !oh) { setError('This open home session has ended or the link is invalid.'); setLoading(false); return; }
         setSession(oh);
         const { data: prop } = await supabase
           .from('properties')

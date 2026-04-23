@@ -154,6 +154,32 @@ const BuyPage = () => {
                     className="w-40 h-9 text-sm"
                   />
                   <select
+                    value={filters.propertyType ?? ''}
+                    onChange={e => setFilters(f => ({ ...f, propertyType: e.target.value || undefined }))}
+                    className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                  >
+                    <option value="">Any type</option>
+                    <optgroup label="Residential">
+                      <option value="House">House</option>
+                      <option value="Apartment">Apartment</option>
+                      <option value="Townhouse">Townhouse</option>
+                      <option value="Unit">Unit</option>
+                      <option value="Villa">Villa</option>
+                      <option value="Terrace">Terrace</option>
+                      <option value="Duplex">Duplex</option>
+                      <option value="Studio">Studio</option>
+                    </optgroup>
+                    <optgroup label="Commercial">
+                      <option value="Office">Office</option>
+                      <option value="Retail">Retail</option>
+                      <option value="Industrial">Industrial</option>
+                      <option value="Warehouse">Warehouse</option>
+                    </optgroup>
+                    <optgroup label="Land">
+                      <option value="Land">Land</option>
+                    </optgroup>
+                  </select>
+                  <select
                     value={filters.minBeds ?? ''}
                     onChange={e => setFilters(f => ({ ...f, minBeds: e.target.value ? Number(e.target.value) : undefined }))}
                     className="h-9 rounded-md border border-input bg-background px-3 text-sm"
@@ -171,16 +197,6 @@ const BuyPage = () => {
                     <option value="">{t('Max price')}</option>
                     {[500000, 750000, 1000000, 1500000, 2000000, 3000000, 5000000].map(p => (
                       <option key={p} value={p}>{AUD.format(p)}</option>
-                    ))}
-                  </select>
-                  <select
-                    value={filters.propertyType ?? ''}
-                    onChange={e => setFilters(f => ({ ...f, propertyType: e.target.value || undefined }))}
-                    className="h-9 rounded-md border border-input bg-background px-3 text-sm"
-                  >
-                    <option value="">{t('Any type')}</option>
-                    {['House', 'Apartment', 'Townhouse', 'Villa', 'Land', 'Unit'].map(pt => (
-                      <option key={pt} value={pt}>{t(pt)}</option>
                     ))}
                   </select>
                   {hasActiveFilters && (

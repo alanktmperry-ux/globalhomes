@@ -6415,6 +6415,7 @@ export type Database = {
           strata_fees_quarterly: number | null
           study_rooms: number | null
           suburb: string
+          tags: string[] | null
           title: string
           title_ja: string | null
           title_ko: string | null
@@ -6558,6 +6559,7 @@ export type Database = {
           strata_fees_quarterly?: number | null
           study_rooms?: number | null
           suburb: string
+          tags?: string[] | null
           title: string
           title_ja?: string | null
           title_ko?: string | null
@@ -6701,6 +6703,7 @@ export type Database = {
           strata_fees_quarterly?: number | null
           study_rooms?: number | null
           suburb?: string
+          tags?: string[] | null
           title?: string
           title_ja?: string | null
           title_ko?: string | null
@@ -11950,6 +11953,7 @@ export type Database = {
           strata_fees_quarterly: number | null
           study_rooms: number | null
           suburb: string
+          tags: string[] | null
           title: string
           title_ja: string | null
           title_ko: string | null

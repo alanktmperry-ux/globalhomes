@@ -53,3 +53,6 @@ verify_jwt = true
 
 [functions.admin-delete-agent]
 verify_jwt = false
+
+[functions.seed-demo-listings]
+verify_jwt = false

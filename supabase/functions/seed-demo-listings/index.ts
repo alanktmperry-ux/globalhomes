@@ -123,9 +123,9 @@ const premierIdx = new Set([0, 14, 25, 27, 39, 51, 57, 63]);
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
-  const authHeader = req.headers.get('x-seed-secret');
+  const body = await req.json().catch(() => ({}));
 
-  if (authHeader !== 'listhq-seed-2026') {
+  if (body.secret !== 'listhq-seed-2026') {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

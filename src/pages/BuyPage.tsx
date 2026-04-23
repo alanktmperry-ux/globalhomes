@@ -516,18 +516,52 @@ const BuyPage = () => {
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
               ) : properties && properties.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {properties.map((property, index) => (
-                    <PropertyCard
-                      key={property.id}
-                      property={property}
-                      onSelect={handleSelect}
-                      isSaved={savedIds.has(property.id)}
-                      onToggleSave={handleToggleSave}
-                      index={index}
+                viewMode === 'map' ? (
+                  <div className="rounded-xl overflow-hidden border border-border">
+                    <PropertyMap
+                      properties={properties}
+                      onPropertySelect={(p) => setSelectedPropertyId(p.id)}
+                      selectedPropertyId={selectedPropertyId}
+                      height="calc(100vh - 280px)"
                     />
-                  ))}
-                </div>
+                  </div>
+                ) : viewMode === 'split' ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[calc(100vh-220px)] overflow-y-auto pr-1">
+                      {properties.map((property, index) => (
+                        <PropertyCard
+                          key={property.id}
+                          property={property}
+                          onSelect={handleSelect}
+                          isSaved={savedIds.has(property.id)}
+                          onToggleSave={handleToggleSave}
+                          index={index}
+                        />
+                      ))}
+                    </div>
+                    <div className="hidden lg:block sticky top-20 h-[calc(100vh-220px)] rounded-xl overflow-hidden border border-border">
+                      <PropertyMap
+                        properties={properties}
+                        onPropertySelect={(p) => { setSelectedPropertyId(p.id); }}
+                        selectedPropertyId={selectedPropertyId}
+                        height="100%"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {properties.map((property, index) => (
+                      <PropertyCard
+                        key={property.id}
+                        property={property}
+                        onSelect={handleSelect}
+                        isSaved={savedIds.has(property.id)}
+                        onToggleSave={handleToggleSave}
+                        index={index}
+                      />
+                    ))}
+                  </div>
+                )
               ) : (
                 <div className="text-center py-20 space-y-3">
                   <p className="text-muted-foreground">{t('No properties match your search.')}</p>

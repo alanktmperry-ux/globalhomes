@@ -262,24 +262,26 @@ const StepBasics = ({ draft, update }: Props) => {
 
       <div className="space-y-4">
         <SectionLabel>Property Details</SectionLabel>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <Counter label={isCommercial ? 'Offices / Rooms' : 'Bedrooms'} value={draft.beds} onChange={(v) => update({ beds: v })} />
-          <Counter label={isCommercial ? 'Washrooms' : 'Bathrooms'} value={draft.baths} onChange={(v) => update({ baths: v })} />
-          <Counter label="Car Spaces" value={draft.cars} onChange={(v) => update({ cars: v })} />
-          <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">
-              Land Size (sqm) <span className="text-muted-foreground/70">optional</span>
-            </Label>
-            <Input
-              type="text"
-              inputMode="decimal"
-              value={draft.landSize ? String(draft.landSize) : ''}
-              onChange={(e) => update({ landSize: Number(e.target.value.replace(/,/g, '')) || 0 })}
-              placeholder="e.g. 650"
-              className="h-10"
-            />
+        {!isCommercial && !isLand && (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <Counter label={isCommercial ? 'Offices / Rooms' : 'Bedrooms'} value={draft.beds} onChange={(v) => update({ beds: v })} />
+            <Counter label={isCommercial ? 'Washrooms' : 'Bathrooms'} value={draft.baths} onChange={(v) => update({ baths: v })} />
+            <Counter label="Car Spaces" value={draft.cars} onChange={(v) => update({ cars: v })} />
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">
+                Land Size (sqm) <span className="text-muted-foreground/70">optional</span>
+              </Label>
+              <Input
+                type="text"
+                inputMode="decimal"
+                value={draft.landSize ? String(draft.landSize) : ''}
+                onChange={(e) => update({ landSize: Number(e.target.value.replace(/,/g, '')) || 0 })}
+                placeholder="e.g. 650"
+                className="h-10"
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         {isCommercial && (
           <div>
@@ -304,6 +306,29 @@ const StepBasics = ({ draft, update }: Props) => {
               placeholder="e.g. B2, IN1, R3"
               className="bg-secondary border-border"
             />
+          </div>
+        )}
+
+        {isLand && (
+          <div>
+            <Label className="text-sm font-semibold mb-2 block">Land Size</Label>
+            <div className="flex gap-2">
+              <Input
+                type="number"
+                value={draft.landSizeSqm ?? ''}
+                onChange={(e) => update({ landSizeSqm: Number(e.target.value) || undefined })}
+                placeholder="e.g. 650"
+                className="bg-secondary border-border flex-1"
+              />
+              <select
+                value={draft.landSizeUnit ?? 'sqm'}
+                onChange={(e) => update({ landSizeUnit: e.target.value as 'sqm' | 'ha' })}
+                className="bg-secondary border border-border rounded-md px-3 text-sm"
+              >
+                <option value="sqm">m²</option>
+                <option value="ha">ha</option>
+              </select>
+            </div>
           </div>
         )}
 

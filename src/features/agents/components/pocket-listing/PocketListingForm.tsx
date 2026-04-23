@@ -125,6 +125,8 @@ export interface ListingDraft {
   // Commercial / Land
   floorAreaSqm?: number;
   zoning?: string;
+  landSizeSqm?: number;
+  landSizeUnit?: 'sqm' | 'ha';
 }
 
 const DEFAULT_DRAFT: ListingDraft = {

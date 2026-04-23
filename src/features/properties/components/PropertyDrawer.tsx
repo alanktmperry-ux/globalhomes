@@ -13,6 +13,7 @@ import { InvestmentInsightsCard } from './InvestmentInsightsCard';
 import { MarketInsightsCard } from './MarketInsightsCard';
 import { AffordabilityCalculator } from './AffordabilityCalculator';
 import useEmblaCarousel from 'embla-carousel-react';
+import { formatAddress } from '@/shared/lib/formatAddress';
 import { useListingTranslation } from '@/features/properties/hooks/useListingTranslation';
 
 function VerificationTier({ level }: { level?: string }) {

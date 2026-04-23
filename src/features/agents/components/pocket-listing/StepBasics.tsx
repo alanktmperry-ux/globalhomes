@@ -1,4 +1,4 @@
-import { Home, Building2, Warehouse, Mountain, Store, Minus, Plus, DollarSign, Key, Flame, Sun, Wind, Zap, Waves, ChevronDown, Gavel, Info } from 'lucide-react';
+import { Home, Building2, Warehouse, Mountain, Store, Minus, Plus, DollarSign, Key, Flame, Sun, Wind, Zap, Waves, ChevronDown, Gavel, Info, LayoutGrid, Star, Rows3, Columns2, Square } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';

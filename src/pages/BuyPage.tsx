@@ -6,12 +6,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { PropertyCard } from '@/components/PropertyCard';
 import { mapDbProperty } from '@/features/properties/api/fetchPublicProperties';
 import { Property } from '@/shared/lib/types';
-import { Loader2, X, BellPlus, Sparkles, SlidersHorizontal, Filter } from 'lucide-react';
+import { Loader2, X, BellPlus, Sparkles, SlidersHorizontal, Filter, Map as MapIcon, List as ListIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from '@/components/ui/sheet';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { useI18n } from '@/shared/lib/i18n';
 import { AIPropertySearch } from '@/features/properties/components/AIPropertySearch';
+import { PropertyMap } from '@/features/properties/components/PropertyMap';
 import { Switch } from '@/components/ui/switch';
 import { SearchModeTabs } from '@/features/search/components/SearchModeTabs';
 import { SuburbChipInput } from '@/features/search/components/SuburbChipInput';
@@ -205,6 +206,13 @@ const BuyPage = () => {
   const { saveSearch } = useSavedSearchesDB();
   const [savingSearch, setSavingSearch] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'list' | 'map' | 'split'>(() => {
+    const stored = localStorage.getItem('buy-view-mode');
+    if (stored === 'list' || stored === 'map' || stored === 'split') return stored;
+    return 'list';
+  });
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | undefined>();
+  useEffect(() => { localStorage.setItem('buy-view-mode', viewMode); }, [viewMode]);
 
   const [filters, setFilters] = useState<BuyFilters>(() => parseFiltersFromParams(searchParams));
   const [searchMode, setSearchMode] = useState<'ai' | 'filter'>(() => {
@@ -359,16 +367,41 @@ const BuyPage = () => {
                 {isLoading ? t('Searching…') : `${properties?.length ?? 0} ${t('properties found')}`}
               </p>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleSaveSearch}
-              disabled={savingSearch}
-              className="gap-1.5"
-            >
-              <BellPlus className="h-4 w-4" />
-              {savingSearch ? t('Saving…') : t('Save search & alert me')}
-            </Button>
+            <div className="flex items-center gap-2">
+              <div className="hidden sm:inline-flex rounded-md border border-input p-0.5 bg-card">
+                <button
+                  onClick={() => setViewMode('list')}
+                  aria-pressed={viewMode === 'list'}
+                  className={`px-2.5 h-8 rounded text-xs font-medium inline-flex items-center gap-1 transition ${viewMode === 'list' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                >
+                  <ListIcon className="h-3.5 w-3.5" /> {t('List')}
+                </button>
+                <button
+                  onClick={() => setViewMode('split')}
+                  aria-pressed={viewMode === 'split'}
+                  className={`px-2.5 h-8 rounded text-xs font-medium inline-flex items-center gap-1 transition ${viewMode === 'split' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                >
+                  <MapIcon className="h-3.5 w-3.5" /> {t('Split')}
+                </button>
+                <button
+                  onClick={() => setViewMode('map')}
+                  aria-pressed={viewMode === 'map'}
+                  className={`px-2.5 h-8 rounded text-xs font-medium inline-flex items-center gap-1 transition ${viewMode === 'map' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                >
+                  <MapIcon className="h-3.5 w-3.5" /> {t('Map')}
+                </button>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSaveSearch}
+                disabled={savingSearch}
+                className="gap-1.5"
+              >
+                <BellPlus className="h-4 w-4" />
+                {savingSearch ? t('Saving…') : t('Save search & alert me')}
+              </Button>
+            </div>
           </div>
 
           {/* Search mode toggle */}
@@ -483,18 +516,52 @@ const BuyPage = () => {
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
               ) : properties && properties.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {properties.map((property, index) => (
-                    <PropertyCard
-                      key={property.id}
-                      property={property}
-                      onSelect={handleSelect}
-                      isSaved={savedIds.has(property.id)}
-                      onToggleSave={handleToggleSave}
-                      index={index}
+                viewMode === 'map' ? (
+                  <div className="rounded-xl overflow-hidden border border-border">
+                    <PropertyMap
+                      properties={properties}
+                      onPropertySelect={(p) => setSelectedPropertyId(p.id)}
+                      selectedPropertyId={selectedPropertyId}
+                      height="calc(100vh - 280px)"
                     />
-                  ))}
-                </div>
+                  </div>
+                ) : viewMode === 'split' ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[calc(100vh-220px)] overflow-y-auto pr-1">
+                      {properties.map((property, index) => (
+                        <PropertyCard
+                          key={property.id}
+                          property={property}
+                          onSelect={handleSelect}
+                          isSaved={savedIds.has(property.id)}
+                          onToggleSave={handleToggleSave}
+                          index={index}
+                        />
+                      ))}
+                    </div>
+                    <div className="hidden lg:block sticky top-20 h-[calc(100vh-220px)] rounded-xl overflow-hidden border border-border">
+                      <PropertyMap
+                        properties={properties}
+                        onPropertySelect={(p) => { setSelectedPropertyId(p.id); }}
+                        selectedPropertyId={selectedPropertyId}
+                        height="100%"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {properties.map((property, index) => (
+                      <PropertyCard
+                        key={property.id}
+                        property={property}
+                        onSelect={handleSelect}
+                        isSaved={savedIds.has(property.id)}
+                        onToggleSave={handleToggleSave}
+                        index={index}
+                      />
+                    ))}
+                  </div>
+                )
               ) : (
                 <div className="text-center py-20 space-y-3">
                   <p className="text-muted-foreground">{t('No properties match your search.')}</p>

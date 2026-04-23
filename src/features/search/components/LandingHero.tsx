@@ -152,7 +152,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
               <button
                 onClick={() => handleModeChange('sale')}
                 className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
-                  listingMode === 'sale'
+                  localMode === 'sale'
                     ? 'bg-white text-slate-900 shadow-sm'
                     : 'text-slate-500 hover:text-slate-700'
                 }`}
@@ -162,7 +162,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
               <button
                 onClick={() => handleModeChange('rent')}
                 className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
-                  listingMode === 'rent'
+                  localMode === 'rent'
                     ? 'bg-white text-slate-900 shadow-sm'
                     : 'text-slate-500 hover:text-slate-700'
                 }`}
@@ -173,7 +173,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
                 type="button"
                 onClick={() => handleModeChange('commercial')}
                 className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
-                  (listingMode as string) === 'commercial'
+                  localMode === 'commercial'
                     ? 'bg-white text-slate-900 shadow-sm'
                     : 'text-slate-500 hover:text-slate-700'
                 }`}
@@ -184,7 +184,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
                 type="button"
                 onClick={() => handleModeChange('land')}
                 className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
-                  (listingMode as string) === 'land'
+                  localMode === 'land'
                     ? 'bg-white text-slate-900 shadow-sm'
                     : 'text-slate-500 hover:text-slate-700'
                 }`}

@@ -304,7 +304,7 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searc
                   </h2>
                   <p className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
                     <MapPin size={14} />
-                    {property.address}, {property.suburb}, {property.state} {property.country && property.country !== 'Australia' ? `, ${property.country}` : ''}
+                    {formatAddress(`${property.address ?? ''}, ${property.suburb ?? ''}, ${property.state ?? ''}${property.country && property.country !== 'Australia' ? `, ${property.country}` : ''}`)}
                   </p>
                 </div>
 

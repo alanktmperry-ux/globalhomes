@@ -247,6 +247,7 @@ const BuyPage = () => {
         .from('properties')
         .select(PROPERTIES_WITH_AGENTS)
         .eq('is_active', true)
+        .not('agent_id', 'is', null)
         .not('listing_type', 'eq', 'rent')
         .limit(60);
 

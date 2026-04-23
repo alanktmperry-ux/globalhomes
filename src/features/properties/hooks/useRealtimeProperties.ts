@@ -17,6 +17,7 @@ async function fetchProperties(limit = 50, listingType?: 'sale' | 'rent', suburb
     .eq('status', 'public')
     .eq('moderation_status', 'approved')
     .eq('agents.approval_status', 'approved')
+    .not('agent_id', 'is', null)
     .order('created_at', { ascending: false })
     .limit(limit);
 
@@ -77,6 +78,7 @@ async function fetchNearbyProperties(
   let query = supabase
     .from('properties')
     .select(PROPERTIES_QUERY)
+    .not('agent_id', 'is', null)
     .in('id', ids);
 
   if (listingType === 'rent') {

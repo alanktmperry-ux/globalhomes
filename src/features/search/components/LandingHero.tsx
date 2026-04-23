@@ -180,7 +180,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
                 type="button"
                 onClick={() => handleModeChange('land')}
                 className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
-                  listingMode === 'land'
+                  (listingMode as string) === 'land'
                     ? 'bg-white text-slate-900 shadow-sm'
                     : 'text-slate-500 hover:text-slate-700'
                 }`}

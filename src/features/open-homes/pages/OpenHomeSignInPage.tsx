@@ -29,7 +29,7 @@ export default function OpenHomeSignInPage() {
           .from('properties')
           .select('address, suburb, images')
           .eq('id', oh.property_id)
-          .single();
+          .maybeSingle();
         setProperty(prop);
         setLoading(false);
       });
@@ -48,7 +48,7 @@ export default function OpenHomeSignInPage() {
       .select('id')
       .eq('open_home_id', session.id)
       .eq('email', normalizedEmail)
-      .single();
+      .maybeSingle();
 
     if (existing) {
       await supabase

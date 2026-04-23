@@ -1,4 +1,4 @@
-import { Home, Building2, Warehouse, Mountain, Store, Minus, Plus, DollarSign, Key, Flame, Sun, Wind, Zap, Waves, ChevronDown, Gavel, Info, LayoutGrid, Star, Rows3, Columns2, Square } from 'lucide-react';
+import { Home, Building2, Warehouse, Mountain, Store, Minus, Plus, DollarSign, Key, Flame, Sun, Wind, Zap, Waves, ChevronDown, Gavel, Info, LayoutGrid, Star, Rows3, Columns2, Square, Briefcase as BriefcaseIcon, ShoppingBag, Factory, Package } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -20,7 +20,10 @@ const TYPES = [
   { key: 'Duplex', icon: <Columns2 size={20} />, label: 'Duplex' },
   { key: 'Studio', icon: <Square size={20} />, label: 'Studio' },
   { key: 'Land', icon: <Mountain size={20} />, label: 'Land' },
-  { key: 'Commercial', icon: <Store size={20} />, label: 'Comm' },
+  { key: 'Office', icon: <BriefcaseIcon size={20} />, label: 'Office' },
+  { key: 'Retail', icon: <ShoppingBag size={20} />, label: 'Retail' },
+  { key: 'Industrial', icon: <Factory size={20} />, label: 'Industrial' },
+  { key: 'Warehouse', icon: <Package size={20} />, label: 'Warehouse' },
 ];
 
 const LISTING_TYPES = [
@@ -88,7 +91,7 @@ const formatPrice = (v: number) =>
 
 const StepBasics = ({ draft, update }: Props) => {
   const isLand = draft.propertyType === 'Land';
-  const isCommercial = draft.propertyType === 'Commercial';
+  const isCommercial = ['Office', 'Retail', 'Industrial', 'Warehouse'].includes(draft.propertyType ?? '');
   const isApartment = draft.propertyType === 'Apartment';
   const isRental = draft.listingType === 'rent';
   const showRange = draft.priceDisplay === 'range';

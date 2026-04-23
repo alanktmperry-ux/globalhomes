@@ -215,6 +215,22 @@ const BuyPage = () => {
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | undefined>();
   useEffect(() => { localStorage.setItem('buy-view-mode', viewMode); }, [viewMode]);
 
+  // Melbourne fallback
+  const FALLBACK_CENTER = { lat: -37.8136, lng: 144.9631 };
+  const FALLBACK_ZOOM = 11;
+  const SUBURB_ZOOM = 14;
+
+  // Map center + zoom, optionally cached in URL params (?lat=&lng=&z=)
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(() => {
+    const lat = parseFloat(searchParams.get('lat') || '');
+    const lng = parseFloat(searchParams.get('lng') || '');
+    return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
+  });
+  const [mapZoom, setMapZoom] = useState<number>(() => {
+    const z = parseInt(searchParams.get('z') || '', 10);
+    return Number.isFinite(z) ? z : FALLBACK_ZOOM;
+  });
+
   const [filters, setFilters] = useState<BuyFilters>(() => parseFiltersFromParams(searchParams));
   const [searchMode, setSearchMode] = useState<'ai' | 'filter'>(() => {
     const stored = localStorage.getItem('search-mode');

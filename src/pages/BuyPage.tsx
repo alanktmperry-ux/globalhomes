@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { PropertyCard } from '@/components/PropertyCard';
 import { mapDbProperty } from '@/features/properties/api/fetchPublicProperties';
 import { Property } from '@/shared/lib/types';
-import { Loader2, X } from 'lucide-react';
+import { Loader2, X, BellPlus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
@@ -15,6 +15,9 @@ import { AIPropertySearch } from '@/features/properties/components/AIPropertySea
 import { Switch } from '@/components/ui/switch';
 import { Sparkles, SlidersHorizontal } from 'lucide-react';
 import { SearchModeTabs } from '@/features/search/components/SearchModeTabs';
+import { useAuth } from '@/features/auth/AuthProvider';
+import { useSavedSearchesDB } from '@/features/alerts/hooks/useSavedSearchesDB';
+import { toast } from 'sonner';
 
 const PROPERTIES_WITH_AGENTS =
   '*, agents(name, agency, phone, email, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count)';

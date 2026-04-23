@@ -57,6 +57,57 @@ const HERO_PLACEHOLDER_KEYS = [
   'hero.placeholder4',
 ] as const;
 
+const LANG_BANNER_DISMISSED_KEY = 'lang-banner-dismissed';
+
+function LanguageHintBanner() {
+  const [visible, setVisible] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      return sessionStorage.getItem(LANG_BANNER_DISMISSED_KEY) !== '1';
+    } catch {
+      return true;
+    }
+  });
+
+  const dismiss = useCallback(() => {
+    setVisible(false);
+    try { sessionStorage.setItem(LANG_BANNER_DISMISSED_KEY, '1'); } catch { /* non-fatal */ }
+  }, []);
+
+  const openSwitcher = useCallback(() => {
+    dismiss();
+    // Try to click the language switcher button in the header.
+    const btn = document.querySelector<HTMLButtonElement>('button[aria-label^="Change language"]');
+    btn?.click();
+  }, [dismiss]);
+
+  if (!visible) return null;
+
+  return (
+    <div className="w-full bg-blue-50 border-b border-blue-100 text-blue-900">
+      <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between gap-3 text-sm">
+        <button
+          type="button"
+          onClick={openSwitcher}
+          className="flex items-center gap-2 flex-1 text-left hover:text-blue-700 transition-colors"
+        >
+          <Globe size={16} className="shrink-0" />
+          <span>Browse in your language — tap to switch</span>
+          <ChevronRight size={16} className="shrink-0" />
+        </button>
+        <button
+          type="button"
+          onClick={dismiss}
+          className="p-1 rounded hover:bg-blue-100 transition-colors"
+          aria-label="Dismiss language hint"
+        >
+          <X size={14} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 const Index = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();

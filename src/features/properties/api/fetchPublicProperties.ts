@@ -124,6 +124,7 @@ export async function searchAgentListings(
     .select(PROPERTIES_WITH_AGENTS)
     .eq('is_active', true)
     .eq('status', 'public')
+    .not('agent_id', 'is', null)
     .or('moderation_status.eq.approved,moderation_status.is.null')
     .order('created_at', { ascending: false })
     .limit(limit);

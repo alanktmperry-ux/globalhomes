@@ -177,6 +177,31 @@ export function AIPropertySearch({ onRefineWithFilters }: AIPropertySearchProps 
         </div>
       )}
 
+      {!loading && parsed && filtersToChips(parsed).length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs text-muted-foreground">{t('We searched for')}:</span>
+          {filtersToChips(parsed).map(chip => (
+            <span
+              key={chip.key}
+              className="inline-flex items-center bg-primary/10 text-primary text-xs px-2.5 py-1 rounded-full"
+            >
+              {chip.label}
+            </span>
+          ))}
+          {onRefineWithFilters && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 text-xs ml-1"
+              onClick={() => onRefineWithFilters(parsed)}
+            >
+              <SlidersHorizontal className="h-3 w-3 mr-1" />
+              {t('Refine in filters')}
+            </Button>
+          )}
+        </div>
+      )}
+
       {!loading && properties && properties.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {properties.map((property, index) => {

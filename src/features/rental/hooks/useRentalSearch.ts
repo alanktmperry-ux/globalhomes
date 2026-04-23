@@ -44,6 +44,8 @@ export function useRentalSearch(filters: RentalFilters = {}) {
         q = q.in('property_type', filters.propertyTypes);
       if (filters.availableFrom)
         q = q.or(`available_from.is.null,available_from.lte.${filters.availableFrom}`);
+      if (filters.maxBond)
+        q = q.or(`bond_amount.is.null,bond_amount.lte.${filters.maxBond}`);
 
       const { data, count, error: queryError } = await q.limit(40);
       if (queryError) throw queryError;

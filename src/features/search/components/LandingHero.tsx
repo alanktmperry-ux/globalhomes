@@ -96,7 +96,10 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
   };
 
   const handleModeChange = (mode: 'sale' | 'rent' | 'commercial' | 'land') => {
-    setListingMode(mode as 'sale' | 'rent');
+    setLocalMode(mode);
+    if (mode === 'sale' || mode === 'rent') {
+      setListingMode(mode);
+    }
     onListingModeChange(mode);
     window.dispatchEvent(new CustomEvent('listing-mode-changed'));
   };

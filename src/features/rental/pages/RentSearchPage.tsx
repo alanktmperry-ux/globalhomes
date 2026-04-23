@@ -39,6 +39,9 @@ export default function RentSearchPage() {
       </Helmet>
 
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
+        <div className="flex justify-center sm:justify-start">
+          <SearchModeTabs />
+        </div>
         <div>
           <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
             {t('rent.pageTitle')}

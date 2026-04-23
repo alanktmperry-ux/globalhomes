@@ -12,6 +12,7 @@ import { AgentContactModal } from '@/features/agents/components/AgentContactModa
 import { useInvestorMode } from '@/context/InvestorModeContext';
 import { QuickYieldBadge } from '@/components/investor/QuickYieldBadge';
 import { useListingTranslation } from '@/features/properties/hooks/useListingTranslation';
+import { formatAddress } from '@/shared/lib/formatAddress';
 
 function VerificationBadge({ level }: { level?: string }) {
   const { t } = useI18n();
@@ -165,7 +166,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
             ) : translatedTitle}
           </h3>
           <p className="text-sm text-muted-foreground mb-3">
-            {property.address}, {property.suburb}, {property.state}
+            {formatAddress(`${property.address ?? ''}, ${property.suburb ?? ''}, ${property.state ?? ''}`)}
           </p>
 
           <div className="flex items-center gap-4 text-sm text-muted-foreground">

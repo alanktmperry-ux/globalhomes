@@ -206,6 +206,13 @@ const BuyPage = () => {
   const { saveSearch } = useSavedSearchesDB();
   const [savingSearch, setSavingSearch] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'list' | 'map' | 'split'>(() => {
+    const stored = localStorage.getItem('buy-view-mode');
+    if (stored === 'list' || stored === 'map' || stored === 'split') return stored;
+    return 'list';
+  });
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | undefined>();
+  useEffect(() => { localStorage.setItem('buy-view-mode', viewMode); }, [viewMode]);
 
   const [filters, setFilters] = useState<BuyFilters>(() => parseFiltersFromParams(searchParams));
   const [searchMode, setSearchMode] = useState<'ai' | 'filter'>(() => {

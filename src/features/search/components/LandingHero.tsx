@@ -42,6 +42,10 @@ const PLACEHOLDERS = [
   'e.g. apartment in Bondi under $800k',
   'e.g. rental near Melbourne CBD under $500pw',
   'e.g. family home with pool in Brisbane',
+  'e.g. office space in Sydney CBD 200sqm',
+  'e.g. warehouse in Melbourne under $5,000pw',
+  'e.g. vacant land Gold Coast 800sqm',
+  'e.g. retail shop in Brisbane under $3,000pw',
 ];
 
 const AGENT_FEATURES = [

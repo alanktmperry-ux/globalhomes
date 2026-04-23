@@ -1374,6 +1374,7 @@ function detectBrowserLanguage(): Language {
 }
 
 const BANNER_DISMISSED_KEY = 'gh-lang-banner-dismissed';
+const SESSION_LANGUAGE_KEY = 'i18n-language';
 
 const bannerMessages: Partial<Record<Language, string>> = {
   zh: '🌐 已切换为简体中文。可随时在顶部导航栏更改。',

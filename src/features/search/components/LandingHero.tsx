@@ -165,6 +165,28 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
               >
                 {t('hero.forRent')}
               </button>
+              <button
+                type="button"
+                onClick={() => handleModeChange('commercial')}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  listingMode === 'commercial'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                }`}
+              >
+                Commercial
+              </button>
+              <button
+                type="button"
+                onClick={() => handleModeChange('land')}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  listingMode === 'land'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                }`}
+              >
+                Land
+              </button>
             </div>
           </div>
 

@@ -169,7 +169,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
                 type="button"
                 onClick={() => handleModeChange('commercial')}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                  listingMode === 'commercial'
+                  (listingMode as string) === 'commercial'
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
                 }`}

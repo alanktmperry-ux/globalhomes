@@ -68,8 +68,14 @@ export default function LiveAuctionPage() {
 
   if (!auction) {
     return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <p className="text-muted-foreground">Auction not found</p>
+      <div className="flex h-screen flex-col items-center justify-center gap-4 bg-background px-4 text-center">
+        <p className="text-base font-medium text-foreground">Auction not found or has ended</p>
+        <a
+          href="/"
+          className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
+        >
+          Back to homepage
+        </a>
       </div>
     );
   }

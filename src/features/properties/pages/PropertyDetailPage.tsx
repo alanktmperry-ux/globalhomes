@@ -442,9 +442,8 @@ export default function PropertyDetailPage() {
               <p className="flex items-center gap-1.5 text-muted-foreground mt-1.5">
                 <MapPin size={16} />
                 {(property as any).address_hidden
-                  ? `${property.suburb}, ${property.state}`
-                  : property.address}
-                {property.country && property.country !== 'Australia' ? `, ${property.country}` : ''}
+                  ? formatAddress(`${property.suburb ?? ''}, ${property.state ?? ''}`)
+                  : formatAddress(`${property.address ?? ''}${property.country && property.country !== 'Australia' ? `, ${property.country}` : ''}`)}
               </p>
               {property.suburb && property.state && (
                 <Link

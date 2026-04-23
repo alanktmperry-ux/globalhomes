@@ -4,7 +4,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { Property } from '@/shared/lib/types';
 import { mapDbProperty } from '@/features/properties/api/fetchPublicProperties';
 
-const PROPERTIES_QUERY = '*, agents!inner(name, agency, phone, email, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count, approval_status)';
+// Only select public-safe agent columns. Do NOT add user_id, stripe_*, support_pin,
+// payment_failed_at, admin_grace_until, or any internal/admin fields here — these
+// must never be exposed to anonymous visitors via the property join.
+const PROPERTIES_QUERY = '*, agents!inner(id, name, agency, agency_id, phone, email, avatar_url, profile_photo_url, company_logo_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count, approval_status, bio, license_number, slug, headline, languages_spoken, service_areas)';
 
 async function fetchProperties(limit = 50, listingType?: 'sale' | 'rent', suburb?: string): Promise<Property[]> {
   let query = supabase

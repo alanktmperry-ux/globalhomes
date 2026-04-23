@@ -580,6 +580,10 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         }
 
         fireAIMatch(inserted.id);
+
+        supabase.functions
+          .invoke('generate-translations', { body: { listing_id: inserted.id } })
+          .catch((e) => console.error('Translation generation failed', e));
       }
 
       onPublish(title);

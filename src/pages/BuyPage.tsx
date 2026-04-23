@@ -367,16 +367,41 @@ const BuyPage = () => {
                 {isLoading ? t('Searching…') : `${properties?.length ?? 0} ${t('properties found')}`}
               </p>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleSaveSearch}
-              disabled={savingSearch}
-              className="gap-1.5"
-            >
-              <BellPlus className="h-4 w-4" />
-              {savingSearch ? t('Saving…') : t('Save search & alert me')}
-            </Button>
+            <div className="flex items-center gap-2">
+              <div className="hidden sm:inline-flex rounded-md border border-input p-0.5 bg-card">
+                <button
+                  onClick={() => setViewMode('list')}
+                  aria-pressed={viewMode === 'list'}
+                  className={`px-2.5 h-8 rounded text-xs font-medium inline-flex items-center gap-1 transition ${viewMode === 'list' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                >
+                  <ListIcon className="h-3.5 w-3.5" /> {t('List')}
+                </button>
+                <button
+                  onClick={() => setViewMode('split')}
+                  aria-pressed={viewMode === 'split'}
+                  className={`px-2.5 h-8 rounded text-xs font-medium inline-flex items-center gap-1 transition ${viewMode === 'split' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                >
+                  <MapIcon className="h-3.5 w-3.5" /> {t('Split')}
+                </button>
+                <button
+                  onClick={() => setViewMode('map')}
+                  aria-pressed={viewMode === 'map'}
+                  className={`px-2.5 h-8 rounded text-xs font-medium inline-flex items-center gap-1 transition ${viewMode === 'map' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                >
+                  <MapIcon className="h-3.5 w-3.5" /> {t('Map')}
+                </button>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSaveSearch}
+                disabled={savingSearch}
+                className="gap-1.5"
+              >
+                <BellPlus className="h-4 w-4" />
+                {savingSearch ? t('Saving…') : t('Save search & alert me')}
+              </Button>
+            </div>
           </div>
 
           {/* Search mode toggle */}

@@ -78,6 +78,7 @@ async function fetchNearbyProperties(
   let query = supabase
     .from('properties')
     .select(PROPERTIES_QUERY)
+    .not('agent_id', 'is', null)
     .in('id', ids);
 
   if (listingType === 'rent') {

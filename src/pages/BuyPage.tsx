@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { geocode } from '@/shared/lib/googleMapsService';
 import { PropertyCard } from '@/components/PropertyCard';
 import { mapDbProperty } from '@/features/properties/api/fetchPublicProperties';
 import { Property } from '@/shared/lib/types';

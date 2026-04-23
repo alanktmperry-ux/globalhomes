@@ -21,9 +21,13 @@ export default function OpenHomeSignInPage() {
       .from('open_homes')
       .select('*')
       .eq('qr_token', token)
-      .single()
+      .maybeSingle()
       .then(async ({ data: oh }) => {
-        if (!oh) { setLoading(false); return; }
+        if (!oh) {
+          setError('This open home session has ended or the link is invalid.');
+          setLoading(false);
+          return;
+        }
         setSession(oh);
         const { data: prop } = await supabase
           .from('properties')
@@ -80,7 +84,7 @@ export default function OpenHomeSignInPage() {
   if (!session) return (
     <div className="flex h-screen items-center justify-center bg-background p-6">
       <div className="text-center">
-        <p className="text-lg font-semibold text-foreground">Invalid or expired QR code</p>
+        <p className="text-lg font-semibold text-foreground">{error || 'Invalid or expired QR code'}</p>
         <p className="text-sm text-muted-foreground mt-2">Please ask the agent for the correct link.</p>
       </div>
     </div>

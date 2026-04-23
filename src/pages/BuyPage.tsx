@@ -620,6 +620,8 @@ const BuyPage = () => {
                         properties={properties}
                         onPropertySelect={(p) => { setSelectedPropertyId(p.id); }}
                         selectedPropertyId={selectedPropertyId}
+                        centerOn={mapCenter ? { ...mapCenter, key: `${primarySuburb || 'fallback'}-${mapZoom}` } : null}
+                        initialZoom={mapZoom}
                         height="100%"
                       />
                     </div>

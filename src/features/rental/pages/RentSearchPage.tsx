@@ -5,6 +5,7 @@ import { useRentalSearch, type RentalFilters } from '../hooks/useRentalSearch';
 import { RentalSearchFilters } from '../components/RentalSearchFilters';
 import { RentalCard } from '../components/RentalCard';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
+import { SearchModeTabs } from '@/features/search/components/SearchModeTabs';
 
 function parseRentalFiltersFromParams(sp: URLSearchParams): RentalFilters {
   return {

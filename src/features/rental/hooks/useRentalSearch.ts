@@ -11,6 +11,7 @@ export interface RentalFilters {
   petsAllowed?: boolean;
   furnished?: string;
   availableFrom?: string;
+  maxBond?: number;
 }
 
 export function useRentalSearch(filters: RentalFilters = {}) {

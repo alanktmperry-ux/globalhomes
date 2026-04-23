@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { MapPin } from 'lucide-react';
+import { MapPin, Bookmark } from 'lucide-react';
 import { Globe, ChevronDown, User, LogIn, Home, Building2, Plus, List, LayoutDashboard, ShieldCheck, Menu, FileText, Handshake, Wrench, Sparkles, Search, MoreHorizontal, HelpCircle, Users, Banknote } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -181,7 +181,18 @@ export function SiteHeader() {
             </button>
           )}
 
-          {user && userRole && (
+          {user && !isAgent && (
+            <button
+              onClick={() => navigate('/saved')}
+              className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              aria-label="Saved properties"
+              title="Saved"
+            >
+              <Bookmark size={17} />
+            </button>
+          )}
+
+          {user && isAgent && (
             <div ref={agentMenuRef} className="relative">
               <button
                 onClick={() => {

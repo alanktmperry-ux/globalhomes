@@ -166,7 +166,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
             ) : translatedTitle}
           </h3>
           <p className="text-sm text-muted-foreground mb-3">
-            {property.address}, {property.suburb}, {property.state}
+            {formatAddress(`${property.address ?? ''}, ${property.suburb ?? ''}, ${property.state ?? ''}`)}
           </p>
 
           <div className="flex items-center gap-4 text-sm text-muted-foreground">

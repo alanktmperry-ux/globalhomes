@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useQuery } from '@tanstack/react-query';
@@ -14,6 +14,7 @@ import { useI18n } from '@/shared/lib/i18n';
 import { AIPropertySearch } from '@/features/properties/components/AIPropertySearch';
 import { Switch } from '@/components/ui/switch';
 import { Sparkles, SlidersHorizontal } from 'lucide-react';
+import { SearchModeTabs } from '@/features/search/components/SearchModeTabs';
 
 const PROPERTIES_WITH_AGENTS =
   '*, agents(name, agency, phone, email, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count)';
@@ -22,19 +23,39 @@ interface BuyFilters {
   suburb?: string;
   state?: string;
   minBeds?: number;
+  minBaths?: number;
+  minParking?: number;
   minPrice?: number;
   maxPrice?: number;
   propertyType?: string;
+  sort?: 'newest' | 'price_asc' | 'price_desc';
 }
 
 function parseFiltersFromParams(sp: URLSearchParams): BuyFilters {
+  const sort = sp.get('sort');
   return {
     suburb: sp.get('q') || undefined,
     minBeds: sp.get('beds') ? Number(sp.get('beds')) : undefined,
+    minBaths: sp.get('baths') ? Number(sp.get('baths')) : undefined,
+    minParking: sp.get('parking') ? Number(sp.get('parking')) : undefined,
     minPrice: sp.get('priceMin') ? Number(sp.get('priceMin')) : undefined,
     maxPrice: sp.get('priceMax') ? Number(sp.get('priceMax')) : undefined,
     propertyType: sp.get('type') || undefined,
+    sort: sort === 'price_asc' || sort === 'price_desc' ? sort : 'newest',
   };
+}
+
+function filtersToParams(f: BuyFilters): Record<string, string> {
+  const out: Record<string, string> = {};
+  if (f.suburb) out.q = f.suburb;
+  if (f.minBeds) out.beds = String(f.minBeds);
+  if (f.minBaths) out.baths = String(f.minBaths);
+  if (f.minParking) out.parking = String(f.minParking);
+  if (f.minPrice) out.priceMin = String(f.minPrice);
+  if (f.maxPrice) out.priceMax = String(f.maxPrice);
+  if (f.propertyType) out.type = f.propertyType;
+  if (f.sort && f.sort !== 'newest') out.sort = f.sort;
+  return out;
 }
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 });
@@ -50,7 +71,6 @@ const BuyPage = () => {
   const [searchMode, setSearchMode] = useState<'ai' | 'filter'>(() => {
     const stored = localStorage.getItem('search-mode');
     if (stored === 'ai' || stored === 'filter') return stored;
-    // First-time visitor → AI search default
     localStorage.setItem('search-mode', 'ai');
     return 'ai';
   });
@@ -63,6 +83,15 @@ const BuyPage = () => {
     setFilters(parseFiltersFromParams(searchParams));
   }, [searchParams.toString()]);
 
+  // Push filter changes to URL so they're shareable + survive refresh
+  const updateFilters = useCallback((updater: (f: BuyFilters) => BuyFilters) => {
+    setFilters(prev => {
+      const next = updater(prev);
+      setSearchParams(filtersToParams(next), { replace: true });
+      return next;
+    });
+  }, [setSearchParams]);
+
   const { data: properties, isLoading } = useQuery({
     queryKey: ['buy-properties', filters],
     queryFn: async (): Promise<Property[]> => {
@@ -71,12 +100,18 @@ const BuyPage = () => {
         .select(PROPERTIES_WITH_AGENTS)
         .eq('is_active', true)
         .not('listing_type', 'eq', 'rent')
-        .order('created_at', { ascending: false })
         .limit(60);
+
+      // Sort
+      if (filters.sort === 'price_asc') q = q.order('price', { ascending: true, nullsFirst: false });
+      else if (filters.sort === 'price_desc') q = q.order('price', { ascending: false, nullsFirst: false });
+      else q = q.order('created_at', { ascending: false });
 
       if (filters.suburb) q = q.ilike('suburb', `%${filters.suburb}%`);
       if (filters.state) q = q.eq('state', filters.state.toUpperCase());
       if (filters.minBeds) q = q.gte('beds', filters.minBeds);
+      if (filters.minBaths) q = q.gte('baths', filters.minBaths);
+      if (filters.minParking) q = q.gte('cars', filters.minParking);
       if (filters.minPrice) q = q.gte('price', filters.minPrice);
       if (filters.maxPrice) q = q.lte('price', filters.maxPrice);
       if (filters.propertyType) q = q.ilike('property_type', `%${filters.propertyType}%`);
@@ -100,11 +135,16 @@ const BuyPage = () => {
   }, []);
 
   const clearFilters = () => {
-    setFilters({});
+    setFilters({ sort: 'newest' });
     setSearchParams({});
   };
 
-  const hasActiveFilters = Object.values(filters).some(v => v !== undefined && v !== '');
+  const activeChipCount = useMemo(
+    () => [filters.suburb, filters.minBeds, filters.minBaths, filters.minParking, filters.minPrice, filters.maxPrice, filters.propertyType]
+      .filter(v => v !== undefined && v !== '').length,
+    [filters],
+  );
+  const hasActiveFilters = activeChipCount > 0;
 
   return (
     <>
@@ -115,6 +155,11 @@ const BuyPage = () => {
 
       <div className="min-h-screen bg-background">
         <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
+          {/* Mode tabs — Buy / Rent / Sold */}
+          <div className="flex justify-center sm:justify-start">
+            <SearchModeTabs />
+          </div>
+
           {/* Header */}
           <div>
             <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
@@ -140,7 +185,21 @@ const BuyPage = () => {
           </div>
 
           {/* AI Search */}
-          {searchMode === 'ai' && <AIPropertySearch />}
+          {searchMode === 'ai' && (
+            <AIPropertySearch
+              onRefineWithFilters={(parsed) => {
+                setSearchMode('filter');
+                updateFilters(() => ({
+                  suburb: parsed.location,
+                  minBeds: parsed.beds,
+                  minPrice: parsed.priceMin,
+                  maxPrice: parsed.priceMax,
+                  propertyType: parsed.propertyType,
+                  sort: 'newest',
+                }));
+              }}
+            />
+          )}
 
           {searchMode === 'filter' && (
             <>
@@ -150,15 +209,15 @@ const BuyPage = () => {
                   <Input
                     placeholder={t('Suburb')}
                     value={filters.suburb ?? ''}
-                    onChange={e => setFilters(f => ({ ...f, suburb: e.target.value || undefined }))}
+                    onChange={e => updateFilters(f => ({ ...f, suburb: e.target.value || undefined }))}
                     className="w-40 h-9 text-sm"
                   />
                   <select
                     value={filters.propertyType ?? ''}
-                    onChange={e => setFilters(f => ({ ...f, propertyType: e.target.value || undefined }))}
+                    onChange={e => updateFilters(f => ({ ...f, propertyType: e.target.value || undefined }))}
                     className="h-9 rounded-md border border-input bg-background px-3 text-sm"
                   >
-                    <option value="">Any type</option>
+                    <option value="">{t('Any type')}</option>
                     <optgroup label="Residential">
                       <option value="House">House</option>
                       <option value="Apartment">Apartment</option>
@@ -181,7 +240,7 @@ const BuyPage = () => {
                   </select>
                   <select
                     value={filters.minBeds ?? ''}
-                    onChange={e => setFilters(f => ({ ...f, minBeds: e.target.value ? Number(e.target.value) : undefined }))}
+                    onChange={e => updateFilters(f => ({ ...f, minBeds: e.target.value ? Number(e.target.value) : undefined }))}
                     className="h-9 rounded-md border border-input bg-background px-3 text-sm"
                   >
                     <option value="">{t('Any beds')}</option>
@@ -190,14 +249,54 @@ const BuyPage = () => {
                     ))}
                   </select>
                   <select
+                    value={filters.minBaths ?? ''}
+                    onChange={e => updateFilters(f => ({ ...f, minBaths: e.target.value ? Number(e.target.value) : undefined }))}
+                    className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                  >
+                    <option value="">{t('Any baths')}</option>
+                    {[1, 2, 3, 4].map(n => (
+                      <option key={n} value={n}>{n}+ {t('baths')}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={filters.minParking ?? ''}
+                    onChange={e => updateFilters(f => ({ ...f, minParking: e.target.value ? Number(e.target.value) : undefined }))}
+                    className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                  >
+                    <option value="">{t('Any parking')}</option>
+                    {[1, 2, 3, 4].map(n => (
+                      <option key={n} value={n}>{n}+ {t('cars')}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={filters.minPrice ?? ''}
+                    onChange={e => updateFilters(f => ({ ...f, minPrice: e.target.value ? Number(e.target.value) : undefined }))}
+                    className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                  >
+                    <option value="">{t('Min price')}</option>
+                    {[300000, 500000, 750000, 1000000, 1500000, 2000000].map(p => (
+                      <option key={p} value={p}>{AUD.format(p)}</option>
+                    ))}
+                  </select>
+                  <select
                     value={filters.maxPrice ?? ''}
-                    onChange={e => setFilters(f => ({ ...f, maxPrice: e.target.value ? Number(e.target.value) : undefined }))}
+                    onChange={e => updateFilters(f => ({ ...f, maxPrice: e.target.value ? Number(e.target.value) : undefined }))}
                     className="h-9 rounded-md border border-input bg-background px-3 text-sm"
                   >
                     <option value="">{t('Max price')}</option>
                     {[500000, 750000, 1000000, 1500000, 2000000, 3000000, 5000000].map(p => (
                       <option key={p} value={p}>{AUD.format(p)}</option>
                     ))}
+                  </select>
+                  <select
+                    value={filters.sort ?? 'newest'}
+                    onChange={e => updateFilters(f => ({ ...f, sort: e.target.value as BuyFilters['sort'] }))}
+                    className="h-9 rounded-md border border-input bg-background px-3 text-sm ml-auto"
+                    aria-label={t('Sort by')}
+                  >
+                    <option value="newest">{t('Newest first')}</option>
+                    <option value="price_asc">{t('Price: low to high')}</option>
+                    <option value="price_desc">{t('Price: high to low')}</option>
                   </select>
                   {hasActiveFilters && (
                     <Button variant="ghost" size="sm" onClick={clearFilters} className="h-9 text-sm text-muted-foreground">
@@ -214,6 +313,12 @@ const BuyPage = () => {
                     )}
                     {filters.minBeds && (
                       <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{filters.minBeds}+ {t('beds')}</span>
+                    )}
+                    {filters.minBaths && (
+                      <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{filters.minBaths}+ {t('baths')}</span>
+                    )}
+                    {filters.minParking && (
+                      <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{filters.minParking}+ {t('cars')}</span>
                     )}
                     {filters.maxPrice && (
                       <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{t('Under')} {AUD.format(filters.maxPrice)}</span>
@@ -247,10 +352,13 @@ const BuyPage = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-20">
+                <div className="text-center py-20 space-y-3">
                   <p className="text-muted-foreground">{t('No properties match your search.')}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {t('Try removing some filters or broadening your price range.')}
+                  </p>
                   {hasActiveFilters && (
-                    <button onClick={clearFilters} className="mt-4 text-primary underline text-sm">
+                    <button onClick={clearFilters} className="mt-2 text-primary underline text-sm">
                       {t('Clear all filters')}
                     </button>
                   )}

@@ -12,6 +12,8 @@ import { useAuth } from '@/features/auth';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { translateSearchQuery } from '@/features/properties/lib/translationService';
+import { parsePropertyQuery, filtersToChips, type ParsedFilters } from '@/features/search/lib/parsePropertyQuery';
+import { SlidersHorizontal } from 'lucide-react';
 
 const EXAMPLE_PROMPTS = [
   'Quiet family home near good schools',
@@ -37,7 +39,13 @@ interface AIIntent {
   intent_summary: string;
 }
 
-export function AIPropertySearch() {
+interface AIPropertySearchProps {
+  /** When provided, shows a "Refine in filters" button that hands the parsed
+   *  query off to the parent's filter UI. */
+  onRefineWithFilters?: (parsed: ParsedFilters) => void;
+}
+
+export function AIPropertySearch({ onRefineWithFilters }: AIPropertySearchProps = {}) {
   const { t, language } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth() ?? { user: null } as any;
@@ -45,12 +53,15 @@ export function AIPropertySearch() {
   const [loading, setLoading] = useState(false);
   const [properties, setProperties] = useState<Property[] | null>(null);
   const [intent, setIntent] = useState<AIIntent | null>(null);
+  const [parsed, setParsed] = useState<ParsedFilters | null>(null);
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
 
   const runSearch = useCallback(async (q: string) => {
     if (!q.trim()) return;
     setLoading(true);
     setProperties(null);
+    // Parse client-side immediately so chips can render even before AI returns
+    setParsed(parsePropertyQuery(q));
     try {
       // If the buyer is searching in a non-English language, translate the
       // natural-language query to English first so the AI search edge function
@@ -163,6 +174,31 @@ export function AIPropertySearch() {
             <Sparkles className="inline h-3.5 w-3.5 text-primary mr-1.5" />
             <span className="font-medium">{t('Looking for')}:</span> {intent.intent_summary}
           </p>
+        </div>
+      )}
+
+      {!loading && parsed && filtersToChips(parsed).length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs text-muted-foreground">{t('We searched for')}:</span>
+          {filtersToChips(parsed).map(chip => (
+            <span
+              key={chip.key}
+              className="inline-flex items-center bg-primary/10 text-primary text-xs px-2.5 py-1 rounded-full"
+            >
+              {chip.label}
+            </span>
+          ))}
+          {onRefineWithFilters && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 text-xs ml-1"
+              onClick={() => onRefineWithFilters(parsed)}
+            >
+              <SlidersHorizontal className="h-3 w-3 mr-1" />
+              {t('Refine in filters')}
+            </Button>
+          )}
         </div>
       )}
 

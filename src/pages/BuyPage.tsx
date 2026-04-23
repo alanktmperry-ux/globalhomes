@@ -69,6 +69,9 @@ const BuyPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
   const { setListingMode } = useCurrency();
+  const { user } = useAuth();
+  const { saveSearch } = useSavedSearchesDB();
+  const [savingSearch, setSavingSearch] = useState(false);
 
   const [filters, setFilters] = useState<BuyFilters>(() => parseFiltersFromParams(searchParams));
   const [searchMode, setSearchMode] = useState<'ai' | 'filter'>(() => {

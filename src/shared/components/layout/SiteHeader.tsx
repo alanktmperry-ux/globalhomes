@@ -132,9 +132,6 @@ export function SiteHeader() {
                   exit={{ opacity: 0, y: -4 }}
                   className="absolute right-0 top-full mt-1 w-52 bg-popover border border-border rounded-xl shadow-elevated overflow-hidden z-50"
                 >
-                  <button onClick={() => { navigate('/agents'); setShowMoreMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                    <Users size={14} className="text-muted-foreground" /> Find an Agent
-                  </button>
                   <button onClick={() => { navigate('/brokers'); setShowMoreMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
                     <Banknote size={14} className="text-muted-foreground" /> Find a Broker
                   </button>

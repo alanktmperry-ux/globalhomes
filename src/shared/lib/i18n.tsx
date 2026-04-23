@@ -1397,29 +1397,14 @@ const languageUpdatedMessages: Record<Language, string> = {
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [showBanner, setShowBanner] = useState(false);
   const [language, setLanguageState] = useState<Language>(() => {
-    const saved = localStorage.getItem('gh-lang');
-    if (saved && saved in translations) return saved as Language;
-    // First visit — auto-detect from navigator.language
-    const detect = (): Language => {
-      const navList: string[] = (typeof navigator !== 'undefined')
-        ? [navigator.language, ...((navigator.languages as string[] | undefined) ?? [])].filter(Boolean)
-        : ['en'];
-      const lower = (navList[0] || 'en').toLowerCase();
-      const allLower = navList.map(l => l.toLowerCase());
-      if (allLower.some(l => l.startsWith('zh-tw') || l.startsWith('zh-hk') || l.includes('hant'))) return 'zh-TW';
-      if (allLower.some(l => l.startsWith('zh'))) return 'zh';
-      if (lower.startsWith('ja')) return 'ja';
-      if (lower.startsWith('ko')) return 'ko';
-      if (lower.startsWith('ms')) return 'ms';
-      if (lower.startsWith('vi')) return 'vi';
-      if (lower.startsWith('th')) return 'th';
-      if (lower.startsWith('ar')) return 'ar';
-      if (lower.startsWith('hi')) return 'hi';
-      return 'en';
-    };
-    const detected = detect();
-    localStorage.setItem('gh-lang', detected);
-    return detected;
+    // Always default to English on a new browser session.
+    // Language only persists for the current session via sessionStorage.
+    if (typeof window === 'undefined') return 'en';
+    try {
+      const saved = sessionStorage.getItem(SESSION_LANGUAGE_KEY);
+      if (saved && saved in translations) return saved as Language;
+    } catch { /* sessionStorage may be unavailable — non-fatal */ }
+    return 'en';
   });
 
   // Wrap setLanguage to show banner + toast only on active user language changes
@@ -1439,7 +1424,9 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('gh-lang', language);
+    try {
+      sessionStorage.setItem(SESSION_LANGUAGE_KEY, language);
+    } catch { /* non-fatal */ }
   }, [language]);
 
   const dismissBanner = useCallback(() => {

@@ -1172,27 +1172,10 @@ const Index = () => {
             transition={{ delay: 0.5, duration: 0.6 }}
             className="relative z-10 mt-8 max-w-2xl w-full mx-auto"
           >
-            <div className="bg-white border border-slate-100 rounded-2xl shadow-sm shadow-slate-100 px-8 py-5 flex flex-wrap items-center justify-center gap-6 sm:gap-10">
-              {/* ABS Stat */}
-              <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
-                <span className="text-3xl font-extrabold text-blue-500 tracking-tight leading-none">1 in 5</span>
-                <span className="text-[11px] text-slate-500 font-medium text-center">{t('hero.statBuyersLabel')}</span>
-                <span className="text-[11px] text-slate-400 font-normal text-center">Source: ABS Census 2021</span>
-              </div>
-              <div className="w-px h-9 bg-slate-100 hidden sm:block" />
-              {/* Languages */}
-              <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
-                <span className="text-3xl font-extrabold text-blue-500 tracking-tight leading-none tabular-nums">{statLanguagesCount}</span>
-                <span className="text-[11px] text-slate-500 font-medium">{t('hero.languages')}</span>
-                <span className="text-[11px] text-slate-400 font-normal text-center">AI translated in seconds</span>
-              </div>
-              <div className="w-px h-9 bg-slate-100 hidden sm:block" />
-              <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
-                <span className="text-2xl font-extrabold text-blue-500 tracking-tight leading-none tabular-nums">{statToolsCount}+</span>
-                <span className="text-[11px] text-slate-500 font-medium">{t('hero.statAITools')}</span>
-                <span className="text-[11px] text-slate-400 font-normal text-center">Built for Australian agents</span>
-              </div>
-            </div>
+            <p className="text-center text-lg md:text-xl font-semibold text-foreground">
+              <span className="underline decoration-blue-500 decoration-2 underline-offset-4">1 in 5</span>{' '}
+              Australian buyers doesn't search in English. ListHQ lists them all.
+            </p>
           </motion.div>
         </section>
 

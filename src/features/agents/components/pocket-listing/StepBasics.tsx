@@ -14,6 +14,11 @@ const TYPES = [
   { key: 'House', icon: <Home size={20} />, label: 'House' },
   { key: 'Apartment', icon: <Building2 size={20} />, label: 'Apt' },
   { key: 'Townhouse', icon: <Warehouse size={20} />, label: 'Town' },
+  { key: 'Unit', icon: <LayoutGrid size={20} />, label: 'Unit' },
+  { key: 'Villa', icon: <Star size={20} />, label: 'Villa' },
+  { key: 'Terrace', icon: <Rows3 size={20} />, label: 'Terrace' },
+  { key: 'Duplex', icon: <Columns2 size={20} />, label: 'Duplex' },
+  { key: 'Studio', icon: <Square size={20} />, label: 'Studio' },
   { key: 'Land', icon: <Mountain size={20} />, label: 'Land' },
   { key: 'Commercial', icon: <Store size={20} />, label: 'Comm' },
 ];

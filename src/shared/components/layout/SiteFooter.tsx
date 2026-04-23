@@ -140,8 +140,8 @@ export function SiteFooter() {
             <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
               © 2026 ListHQ Pty Ltd. All rights reserved. · ABN 65 608 526 781
             </span>
-            <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
-              Licensed agents only · Trust account compliant · Australian property law
+<span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
+              Licensed agents only · Australian property law
             </span>
           </div>
           <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.4)' }}>

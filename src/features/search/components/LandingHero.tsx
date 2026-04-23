@@ -59,7 +59,7 @@ const AGENT_FEATURES = [
 
 interface Props {
   onSearch: (query: string) => void;
-  onListingModeChange: (mode: 'sale' | 'rent') => void;
+  onListingModeChange: (mode: 'sale' | 'rent' | 'commercial' | 'land') => void;
 }
 
 export function LandingHero({ onSearch, onListingModeChange }: Props) {

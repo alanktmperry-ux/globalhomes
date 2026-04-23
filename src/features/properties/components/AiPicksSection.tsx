@@ -53,6 +53,7 @@ export function AiPicksSection({
       .from('properties')
       .select('*, agents(id, name, agency, phone, email, avatar_url, is_subscribed, rating, review_count)')
       .eq('is_active', true)
+      .not('agent_id', 'is', null)
       .order('views', { ascending: false })
       .limit(6)
       .then(({ data }) => {

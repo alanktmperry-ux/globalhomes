@@ -99,8 +99,31 @@ export function RentalSearchFilters({ value: filters, onChange }: Props) {
           >
             <option value="">Any furnishings</option>
             <option value="furnished">Furnished</option>
+            <option value="partially_furnished">Partly furnished</option>
             <option value="unfurnished">Unfurnished</option>
           </select>
+
+          <select
+            value={filters.maxBond ?? ''}
+            onChange={e => set('maxBond', e.target.value ? Number(e.target.value) : undefined)}
+            className="border border-border rounded-full px-3 py-1.5 text-sm bg-card text-foreground focus:outline-none"
+            aria-label="Max bond"
+          >
+            <option value="">Max bond</option>
+            {BOND_MAX_OPTIONS.map(b => (
+              <option key={b} value={b}>${b.toLocaleString()}</option>
+            ))}
+          </select>
+
+          <label className="inline-flex items-center gap-1.5 text-sm text-muted-foreground border border-border rounded-full px-3 py-1.5 bg-card">
+            <span>Available by</span>
+            <input
+              type="date"
+              value={filters.availableFrom ?? ''}
+              onChange={e => set('availableFrom', e.target.value || undefined)}
+              className="bg-transparent text-foreground text-sm focus:outline-none"
+            />
+          </label>
 
           {['house', 'apartment', 'townhouse', 'studio'].map(t => (
             <button

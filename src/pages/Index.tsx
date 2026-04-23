@@ -972,6 +972,7 @@ const Index = () => {
   if (!hasSearchParams) {
     return (
       <div className="flex flex-col">
+        <LanguageHintBanner />
         {/* ── HERO SECTION ── */}
         <section className="relative flex flex-col items-center justify-center py-12 md:py-16 bg-white overflow-hidden px-6 text-center">
           {/* Background accents */}

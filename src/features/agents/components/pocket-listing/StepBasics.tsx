@@ -158,9 +158,9 @@ const StepBasics = ({ draft, update }: Props) => {
       {/* Property Type */}
       <div>
         <Label className="text-sm font-semibold mb-3 block">Property Type</Label>
-        <div className="grid grid-cols-5 gap-2">
+        <div className="flex flex-nowrap gap-2 overflow-x-auto -mx-1 px-1 pb-1">
           {TYPES.map(t => (
-            <button key={t.key} type="button" onClick={() => update({ propertyType: t.key })} className={`flex flex-col items-center gap-1.5 py-3 rounded-xl border transition-all text-xs font-medium ${draft.propertyType === t.key ? 'bg-primary/15 border-primary text-primary' : 'bg-secondary border-border text-muted-foreground hover:border-primary/40'}`}>
+            <button key={t.key} type="button" onClick={() => update({ propertyType: t.key })} className={`flex-shrink-0 w-[72px] flex flex-col items-center gap-1.5 py-3 rounded-xl border transition-all text-xs font-medium ${draft.propertyType === t.key ? 'bg-primary/15 border-primary text-primary' : 'bg-secondary border-border text-muted-foreground hover:border-primary/40'}`}>
               {t.icon}
               {t.label}
             </button>

@@ -71,6 +71,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
   const [wordIndex, setWordIndex] = useState(0);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [localMode, setLocalMode] = useState<'sale' | 'rent' | 'commercial' | 'land'>(listingMode);
 
   // Rotate headline word
   useEffect(() => {

@@ -152,6 +152,41 @@ const BuyPage = () => {
   );
   const hasActiveFilters = activeChipCount > 0;
 
+  const handleSaveSearch = useCallback(async () => {
+    if (!user) {
+      toast.info(t('Sign in to save this search and get email alerts'), {
+        action: { label: t('Sign in'), onClick: () => navigate('/login') },
+      });
+      return;
+    }
+    if (!hasActiveFilters) {
+      toast.info(t('Add some filters first, then save your search.'));
+      return;
+    }
+    setSavingSearch(true);
+    try {
+      const name = filters.suburb
+        ? `${filters.suburb}${filters.minBeds ? ` · ${filters.minBeds}+ beds` : ''}${filters.maxPrice ? ` · under ${AUD.format(filters.maxPrice)}` : ''}`
+        : t('My property search');
+      await saveSearch(name, {
+        suburbs: filters.suburb ? [filters.suburb] : [],
+        min_price: filters.minPrice ?? null,
+        max_price: filters.maxPrice ?? null,
+        min_bedrooms: filters.minBeds ?? null,
+        min_bathrooms: filters.minBaths ?? null,
+        property_types: filters.propertyType ? [filters.propertyType] : [],
+        listing_mode: 'sale',
+      } as any, 'instant');
+      toast.success(t("Search saved — we'll email you when new matches appear."), {
+        action: { label: t('Manage'), onClick: () => navigate('/saved') },
+      });
+    } catch (e) {
+      toast.error(t('Could not save search. Please try again.'));
+    } finally {
+      setSavingSearch(false);
+    }
+  }, [user, hasActiveFilters, filters, saveSearch, navigate, t]);
+
   return (
     <>
       <Helmet>
@@ -167,13 +202,25 @@ const BuyPage = () => {
           </div>
 
           {/* Header */}
-          <div>
-            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
-              {filters.suburb ? t(`Properties for Sale in ${filters.suburb}`) : t('Properties for Sale')}
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              {isLoading ? t('Searching…') : `${properties?.length ?? 0} ${t('properties found')}`}
-            </p>
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
+                {filters.suburb ? t(`Properties for Sale in ${filters.suburb}`) : t('Properties for Sale')}
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                {isLoading ? t('Searching…') : `${properties?.length ?? 0} ${t('properties found')}`}
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSaveSearch}
+              disabled={savingSearch}
+              className="gap-1.5"
+            >
+              <BellPlus className="h-4 w-4" />
+              {savingSearch ? t('Saving…') : t('Save search & alert me')}
+            </Button>
           </div>
 
           {/* Search mode toggle */}

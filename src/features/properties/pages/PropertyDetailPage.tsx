@@ -24,6 +24,7 @@ import { InspectionSlot } from '@/shared/lib/types';
 import { StampDutyCalculator } from '@/components/StampDutyCalculator';
 import { FIRBCalculator } from '@/components/FIRBCalculator';
 import { detectStateFromAddress } from '@/lib/stampDuty';
+import { formatAddress } from '@/shared/lib/formatAddress';
 import { SchoolsNearby } from '@/components/SchoolsNearby';
 import { SuburbClearanceRate } from '@/components/auction/SuburbClearanceRate';
 import { DaysOnMarketBadge } from '@/components/auction/DaysOnMarketBadge';

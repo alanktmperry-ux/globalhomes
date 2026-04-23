@@ -1647,7 +1647,7 @@ const HowItWorksSection = ({ t }: { t: (key: string) => string }) => {
                 <div className="w-11 h-11 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-4">
                   <Icon size={22} />
                 </div>
-                <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 text-sm font-semibold flex items-center justify-center mx-auto mb-4">{step.num}</div>
+                <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground font-display font-bold text-xl flex items-center justify-center mx-auto mb-4">{step.num}</div>
                 <h3 className="text-sm font-semibold text-slate-900 mb-2">{step.title}</h3>
                 <p className="text-xs text-slate-500 leading-relaxed">{step.desc}</p>
               </div>

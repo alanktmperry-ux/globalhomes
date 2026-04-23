@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useCallback, useEffect, ReactNode 
 import { supabase } from '@/integrations/supabase/client';
 
 export type CurrencyCode = 'AUD' | 'USD' | 'EUR' | 'GBP' | 'JPY' | 'SGD' | 'HKD' | 'CNY' | 'AED' | 'MYR' | 'NZD' | 'CAD' | 'INR';
-export type ListingMode = 'sale' | 'rent';
+export type ListingMode = 'sale' | 'rent' | 'commercial' | 'land';
 
 interface CurrencyInfo {
   code: CurrencyCode;

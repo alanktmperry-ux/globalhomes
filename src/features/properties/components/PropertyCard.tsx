@@ -12,6 +12,7 @@ import { AgentContactModal } from '@/features/agents/components/AgentContactModa
 import { useInvestorMode } from '@/context/InvestorModeContext';
 import { QuickYieldBadge } from '@/components/investor/QuickYieldBadge';
 import { useListingTranslation } from '@/features/properties/hooks/useListingTranslation';
+import { formatAddress } from '@/shared/lib/formatAddress';
 
 function VerificationBadge({ level }: { level?: string }) {
   const { t } = useI18n();

@@ -4,6 +4,7 @@ import { Search, SlidersHorizontal, X } from 'lucide-react';
 
 const AU_STATES = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT'];
 const RENT_MAX_OPTIONS = [300, 400, 500, 600, 700, 800, 1000, 1200, 1500, 2000];
+const BOND_MAX_OPTIONS = [1000, 1500, 2000, 2500, 3000, 4000, 5000, 7500, 10000];
 
 interface Props {
   value: RentalFilters;

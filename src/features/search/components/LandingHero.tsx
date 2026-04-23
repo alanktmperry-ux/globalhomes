@@ -168,10 +168,10 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
               <button
                 type="button"
                 onClick={() => handleModeChange('commercial')}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
                   (listingMode as string) === 'commercial'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
                 }`}
               >
                 Commercial
@@ -179,10 +179,10 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
               <button
                 type="button"
                 onClick={() => handleModeChange('land')}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
                   (listingMode as string) === 'land'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
                 }`}
               >
                 Land

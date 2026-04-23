@@ -59,7 +59,7 @@ const AGENT_FEATURES = [
 
 interface Props {
   onSearch: (query: string) => void;
-  onListingModeChange: (mode: 'sale' | 'rent') => void;
+  onListingModeChange: (mode: 'sale' | 'rent' | 'commercial' | 'land') => void;
 }
 
 export function LandingHero({ onSearch, onListingModeChange }: Props) {
@@ -94,8 +94,8 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
     onSearch(query.trim());
   };
 
-  const handleModeChange = (mode: 'sale' | 'rent') => {
-    setListingMode(mode);
+  const handleModeChange = (mode: 'sale' | 'rent' | 'commercial' | 'land') => {
+    setListingMode(mode as 'sale' | 'rent');
     onListingModeChange(mode);
     window.dispatchEvent(new CustomEvent('listing-mode-changed'));
   };
@@ -164,6 +164,28 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
                 }`}
               >
                 {t('hero.forRent')}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleModeChange('commercial')}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  (listingMode as string) === 'commercial'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                }`}
+              >
+                Commercial
+              </button>
+              <button
+                type="button"
+                onClick={() => handleModeChange('land')}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  (listingMode as string) === 'land'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                }`}
+              >
+                Land
               </button>
             </div>
           </div>

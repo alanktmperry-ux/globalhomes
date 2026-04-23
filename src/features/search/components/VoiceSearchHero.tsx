@@ -469,8 +469,10 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
           if (data?.success && data.transcript) {
             syncTranscript(data.transcript);
-            setTextQuery(data.transcript);
             processTranscript(data.transcript, data.parsedQuery);
+            // Ensure transcript stays visible in the input after processTranscript
+            // (which may setTextQuery to just the location)
+            setTextQuery(data.transcript);
           } else if (data?.error) {
             toast({ title: '🎙️ Voice Error', description: data.error, variant: 'destructive' });
             syncVoiceState('idle');
@@ -623,26 +625,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                   : 'border-border hover:border-primary/40 focus-within:border-primary focus-within:shadow-lg focus-within:shadow-primary/10'
               }`}>
 
-                {/* Mic button */}
-                <button
-                  onClick={() => startRecording()}
-                  disabled={isProcessing}
-                  className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-                    isRecording
-                      ? 'bg-destructive/10 text-destructive animate-pulse ring-2 ring-destructive/30'
-                      : isProcessing
-                      ? 'bg-secondary text-muted-foreground cursor-wait'
-                      : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-accent'
-                  }`}
-                  title={isRecording ? 'Stop recording' : isProcessing ? 'Transcribing...' : 'Voice search'}
-                >
-                  {isProcessing || isSearching
-                    ? <Loader2 size={18} className="animate-spin" />
-                    : isRecording
-                    ? <MicOff size={18} />
-                    : <Mic size={18} />
-                  }
-                </button>
+                {/* Mic button moved to the right side of the input */}
 
                 {/* Text input */}
                 <div className="flex-1 min-w-0 relative">
@@ -698,6 +681,27 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                     <X size={16} />
                   </button>
                 )}
+
+                {/* Mic button (right side) */}
+                <button
+                  onClick={() => startRecording()}
+                  disabled={isProcessing}
+                  className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                    isRecording
+                      ? 'bg-destructive/10 text-destructive animate-pulse ring-2 ring-destructive/30'
+                      : isProcessing
+                      ? 'bg-secondary text-muted-foreground cursor-wait'
+                      : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-accent'
+                  }`}
+                  title={isRecording ? 'Stop recording' : isProcessing ? 'Transcribing...' : 'Voice search'}
+                >
+                  {isProcessing || isSearching
+                    ? <Loader2 size={18} className="animate-spin" />
+                    : isRecording
+                    ? <MicOff size={18} />
+                    : <Mic size={18} />
+                  }
+                </button>
 
                 {/* Search CTA button */}
                 <button

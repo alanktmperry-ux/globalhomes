@@ -128,37 +128,37 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
       }));
 
       // Phase 0a: Immediately geocode any detected location so radius filter activates
-      if (parsedFilters.location) {
+      if (detectedLocation) {
         // Set suburb filter immediately so DB query narrows results
-        setSearchSuburb(parsedFilters.location);
+        setSearchSuburb(detectedLocation);
 
         // Try static centroid first (instant, works without Google API)
-        const staticCenter = lookupSuburbCentroid(parsedFilters.location);
+        const staticCenter = lookupSuburbCentroid(detectedLocation);
         if (staticCenter) {
-          console.log('[handleSearch] Using static centroid for', parsedFilters.location, staticCenter);
+          console.log('[handleSearch] Using static centroid for', detectedLocation, staticCenter);
           setSearchCenter(staticCenter);
           setSearchRadius(prev => prev ?? DEFAULT_RADIUS_KM);
         }
 
         // Then try Google geocoding for higher precision; falls back silently
-        const locQuery = parsedFilters.location + ', Australia';
+        const locQuery = detectedLocation + ', Australia';
         geocode(locQuery)
           .then((coords) => {
             if (coords) {
-              console.log('[handleSearch] Google geocoded', parsedFilters.location, coords);
+              console.log('[handleSearch] Google geocoded', detectedLocation, coords);
               setSearchCenter(coords);
               setSearchRadius(prev => prev ?? DEFAULT_RADIUS_KM);
             } else if (!staticCenter) {
-              console.warn('[handleSearch] Geocoding returned no result and no static centroid for', parsedFilters.location);
+              console.warn('[handleSearch] Geocoding returned no result and no static centroid for', detectedLocation);
             }
           })
           .catch((err) => {
             console.warn('[handleSearch] Geocoding error:', err);
             if (!staticCenter) {
-              const fallbackCenter = lookupSuburbCentroid(parsedFilters.location);
+              const fallbackCenter = lookupSuburbCentroid(detectedLocation);
               if (fallbackCenter) {
                 console.log('[handleSearch] Geocoding failed, applying static centroid fallback', {
-                  location: parsedFilters.location,
+                  location: detectedLocation,
                   fallbackCenter,
                 });
                 setSearchCenter(fallbackCenter);

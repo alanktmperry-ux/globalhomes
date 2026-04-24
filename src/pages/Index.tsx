@@ -1628,44 +1628,49 @@ const Index = () => {
                 </div>
               </div>
               {showEmptyState ? emptyPlaceholder : (
-                <VirtualizedPropertyList
-                  properties={filteredProperties}
-                  isSearching={isSearching}
-                  isMobile={true}
-                  isSaved={isSaved}
-                  onToggleSave={toggleSaved}
-                  onSelect={(p) => navigate(`/property/${p.id}`)}
-                  cardRefs={cardRefs}
-                  isCollab={isCollab}
-                  getPropertyReactions={isCollab ? getPropertyReactions : undefined}
-                  onToggleReaction={isCollab ? toggleReaction : undefined}
-                  hasPartnerViewed={isCollab ? hasPartnerViewed : undefined}
-                  currentUserId={user?.id}
-                  listingMode={listingMode}
-                />
+                <Suspense fallback={<MapSkeleton />}>
+                  <VirtualizedPropertyList
+                    properties={filteredProperties}
+                    isSearching={isSearching}
+                    isMobile={true}
+                    isSaved={isSaved}
+                    onToggleSave={toggleSaved}
+                    onSelect={(p) => navigate(`/property/${p.id}`)}
+                    cardRefs={cardRefs}
+                    isCollab={isCollab}
+                    getPropertyReactions={isCollab ? getPropertyReactions : undefined}
+                    onToggleReaction={isCollab ? toggleReaction : undefined}
+                    hasPartnerViewed={isCollab ? hasPartnerViewed : undefined}
+                    currentUserId={user?.id}
+                    listingMode={listingMode}
+                  />
+                </Suspense>
               )}
             </div>
           )}
         </div>
       )}
 
-      {/* Property drawer + modals */}
-      <PropertyDrawer
-        property={selectedProperty}
-        onClose={() => setSelectedProperty(null)}
-        isSaved={selectedProperty ? isSaved(selectedProperty.id) : false}
-        onToggleSave={toggleSaved}
-        searchContext={searchContextForLead}
-      />
+      {/* Property drawer + modals — both lazy, so guard with Suspense */}
+      <Suspense fallback={null}>
+        <PropertyDrawer
+          property={selectedProperty}
+          onClose={() => setSelectedProperty(null)}
+          isSaved={selectedProperty ? isSaved(selectedProperty.id) : false}
+          onToggleSave={toggleSaved}
+          searchContext={searchContextForLead}
+        />
+      </Suspense>
 
-      <ConsumerSignUpModal
-        open={showConsumerModal}
-        onOpenChange={setShowConsumerModal}
-        lastQuery={currentQuery || lastSearch?.text || ''}
-      />
-    </div>
-  );
-};
+      {showConsumerModal && (
+        <Suspense fallback={null}>
+          <ConsumerSignUpModal
+            open={showConsumerModal}
+            onOpenChange={setShowConsumerModal}
+            lastQuery={currentQuery || lastSearch?.text || ''}
+          />
+        </Suspense>
+      )}
 
 // ── How It Works section with scroll-triggered staggered fade-in ──
 const HowItWorksSection = ({ t }: { t: (key: string) => string }) => {

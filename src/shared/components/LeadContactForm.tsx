@@ -119,7 +119,7 @@ function ExistingContactPrompt({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <AlertCircle size={18} className="text-amber-500" />
+            <AlertCircle size={18} className="text-warning" />
             Existing contact found
           </DialogTitle>
           <DialogDescription>

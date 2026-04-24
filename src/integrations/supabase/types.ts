@@ -3889,6 +3889,75 @@ export type Database = {
           },
         ]
       }
+      crm_urgency_settings: {
+        Row: {
+          agency_id: string | null
+          agent_id: string | null
+          cool_max_days: number
+          created_at: string
+          going_cold_warn_days: number
+          id: string
+          updated_at: string
+          warm_max_hours: number
+        }
+        Insert: {
+          agency_id?: string | null
+          agent_id?: string | null
+          cool_max_days?: number
+          created_at?: string
+          going_cold_warn_days?: number
+          id?: string
+          updated_at?: string
+          warm_max_hours?: number
+        }
+        Update: {
+          agency_id?: string | null
+          agent_id?: string | null
+          cool_max_days?: number
+          created_at?: string
+          going_cold_warn_days?: number
+          id?: string
+          updated_at?: string
+          warm_max_hours?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_urgency_settings_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_urgency_settings_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_urgency_settings_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_urgency_settings_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_urgency_settings_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+        ]
+      }
       demo_requests: {
         Row: {
           agency_name: string | null
@@ -11866,6 +11935,15 @@ export type Database = {
       }
       contact_custom_value_agency: {
         Args: { _field_id: string }
+        Returns: string
+      }
+      crm_emit_urgency_notifications: { Args: never; Returns: undefined }
+      crm_lead_urgency: {
+        Args: {
+          p_cool_max_days?: number
+          p_last_contacted: string
+          p_warm_max_hours?: number
+        }
         Returns: string
       }
       current_broker_agency: { Args: never; Returns: string }

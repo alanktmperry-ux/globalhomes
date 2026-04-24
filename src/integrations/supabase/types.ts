@@ -3055,6 +3055,7 @@ export type Database = {
         Row: {
           agency_id: string
           created_at: string
+          deleted_at: string | null
           display_order: number
           field_key: string
           field_type: Database["public"]["Enums"]["custom_field_type"]
@@ -3068,6 +3069,7 @@ export type Database = {
         Insert: {
           agency_id: string
           created_at?: string
+          deleted_at?: string | null
           display_order?: number
           field_key: string
           field_type: Database["public"]["Enums"]["custom_field_type"]
@@ -3081,6 +3083,7 @@ export type Database = {
         Update: {
           agency_id?: string
           created_at?: string
+          deleted_at?: string | null
           display_order?: number
           field_key?: string
           field_type?: Database["public"]["Enums"]["custom_field_type"]

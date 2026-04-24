@@ -961,38 +961,40 @@ const Index = () => {
   const mapComponent = isSearching ? (
     <MapSkeleton />
   ) : (
-    <MapErrorBoundary>
-      <Suspense fallback={<MapSkeleton />}>
-        <LazyPropertyMap
-          properties={filteredProperties}
-          onPropertySelect={handleSelectProperty}
-          selectedPropertyId={selectedProperty?.id}
-          onAreaSearch={handleAreaSearch}
-          centerOn={mapCenter}
-          onScrollToProperty={scrollToProperty}
-          formatPrice={formatPrice}
-          onMapMoved={(bounds) => {
-            handleAreaSearch({
-              type: 'polygon',
-              coordinates: [
-                [bounds.north, bounds.west],
-                [bounds.north, bounds.east],
-                [bounds.south, bounds.east],
-                [bounds.south, bounds.west],
-                [bounds.north, bounds.west],
-              ],
-            });
-          }}
-          onGeolocate={(loc) => {
-            setSearchCenter({ lat: loc.lat, lng: loc.lng });
-            if (!searchRadius) setSearchRadius(10);
-            setTimeout(() => {
-              setMapCenter({ lat: loc.lat, lng: loc.lng, key: `geo-${Date.now()}` });
-            }, 100);
-          }}
-        />
-      </Suspense>
-    </MapErrorBoundary>
+    <Suspense fallback={<MapSkeleton />}>
+      <MapErrorBoundary>
+        <Suspense fallback={<MapSkeleton />}>
+          <LazyPropertyMap
+            properties={filteredProperties}
+            onPropertySelect={handleSelectProperty}
+            selectedPropertyId={selectedProperty?.id}
+            onAreaSearch={handleAreaSearch}
+            centerOn={mapCenter}
+            onScrollToProperty={scrollToProperty}
+            formatPrice={formatPrice}
+            onMapMoved={(bounds) => {
+              handleAreaSearch({
+                type: 'polygon',
+                coordinates: [
+                  [bounds.north, bounds.west],
+                  [bounds.north, bounds.east],
+                  [bounds.south, bounds.east],
+                  [bounds.south, bounds.west],
+                  [bounds.north, bounds.west],
+                ],
+              });
+            }}
+            onGeolocate={(loc) => {
+              setSearchCenter({ lat: loc.lat, lng: loc.lng });
+              if (!searchRadius) setSearchRadius(10);
+              setTimeout(() => {
+                setMapCenter({ lat: loc.lat, lng: loc.lng, key: `geo-${Date.now()}` });
+              }, 100);
+            }}
+          />
+        </Suspense>
+      </MapErrorBoundary>
+    </Suspense>
   );
 
   // ── Auto-scroll to top when search results load ──────

@@ -1,6 +1,16 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,6 +23,11 @@ import ContactLanguagePicker from '@/shared/components/ContactLanguagePicker';
 import { DEFAULT_CONTACT_LANGUAGE } from '@/shared/lib/contactLanguages';
 import CommunicationPreferencesEditor from '@/shared/components/CommunicationPreferences/CommunicationPreferencesEditor';
 import { isValidHandle, type CommPreference } from '@/shared/components/CommunicationPreferences/types';
+import { useAuth } from '@/features/auth/AuthProvider';
+import DuplicateMatchPanel from '@/shared/components/DuplicateDetection/DuplicateMatchPanel';
+import { useDuplicateMatches } from '@/shared/components/DuplicateDetection/useDuplicateMatches';
+import { logDuplicateEvent } from '@/shared/components/DuplicateDetection/useDuplicateMatches';
+import type { DuplicateMatch } from '@/shared/components/DuplicateDetection/types';
 import type { Contact } from '@/features/agents/hooks/useContacts';
 
 interface Props {
@@ -167,6 +182,8 @@ function SuburbPicker({ suburbs, onChange }: SuburbPickerProps) {
 const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, leadPanel }: Props) => {
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
+  const { agencyId } = useAuth();
+  const [showDupBlock, setShowDupBlock] = useState(false);
   const [form, setForm] = useState({
     first_name: initialData?.first_name || '',
     last_name: initialData?.last_name || '',
@@ -194,6 +211,21 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
   const [commPrefs, setCommPrefs] = useState<CommPreference[]>(
     (initialData?.communication_preferences as CommPreference[] | undefined) ?? []
   );
+
+  // Live duplicate detection — only when creating, not editing
+  const isEditing = Boolean((initialData as any)?.id);
+  const { matches: duplicateMatches } = useDuplicateMatches({
+    agencyId,
+    enabled: !isEditing,
+    excludeContactId: (initialData as any)?.id ?? null,
+    query: {
+      email: form.email,
+      phone: form.phone,
+      firstName: form.first_name,
+      lastName: form.last_name,
+      address: form.address,
+    },
+  });
 
   const [addressQuery, setAddressQuery] = useState(
     [initialData?.address, initialData?.suburb, initialData?.state, initialData?.postcode, initialData?.country]
@@ -257,9 +289,80 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
   const isBuyer = form.contact_type === 'buyer' || form.contact_type === 'both';
   const isSeller = form.contact_type === 'seller' || form.contact_type === 'both';
 
-  const handleSave = async () => {
-    if (!form.first_name.trim()) return;
+  // "Use this contact" → populate the form with the matched contact's details
+  const handleUseMatch = (match: DuplicateMatch) => {
+    setForm(f => ({
+      ...f,
+      first_name: match.first_name || f.first_name,
+      last_name: match.last_name || f.last_name,
+      email: match.email || f.email,
+      phone: match.mobile || match.phone || f.phone,
+    }));
+    if (match.communication_preferences && match.communication_preferences.length > 0) {
+      setCommPrefs(match.communication_preferences as CommPreference[]);
+    }
+    void logDuplicateEvent({
+      agencyId,
+      action: 'accepted',
+      matchMethod: match.match_method,
+      suggestedIds: [match.id],
+      acceptedContactId: match.id,
+    });
+    toast({
+      title: '✅ Using existing contact',
+      description: `Form populated from ${match.first_name} ${match.last_name ?? ''}`.trim(),
+    });
+    // Close — the parent will re-open to edit if it wants. For now we treat
+    // accept as "found the right contact, no new contact needed".
+    onClose();
+  };
 
+  const handleDismissMatch = (match: DuplicateMatch) => {
+    void logDuplicateEvent({
+      agencyId,
+      action: 'ignored',
+      matchMethod: match.match_method,
+      suggestedIds: [match.id],
+    });
+  };
+
+  // Returns true if the user can proceed; false if guard intercepted.
+  const passesDupGuard = (): boolean => {
+    if (isEditing || duplicateMatches.length === 0) return true;
+    const exact = duplicateMatches.filter(
+      m => m.match_method === 'email' || m.match_method === 'phone',
+    );
+    const fuzzy = duplicateMatches.filter(m => m.match_method === 'name_fuzzy');
+
+    // Hard block on exact matches
+    if (exact.length > 0) {
+      setShowDupBlock(true);
+      void logDuplicateEvent({
+        agencyId,
+        action: 'blocked_at_save',
+        matchMethod: exact[0].match_method,
+        suggestedIds: exact.map(m => m.id),
+      });
+      return false;
+    }
+    // Soft warn on fuzzy
+    if (fuzzy.length > 0) {
+      const f = fuzzy[0];
+      toast({
+        title: '⚠️ Heads up — similar contact exists',
+        description: `${f.first_name} ${f.last_name ?? ''}`.trim() + ' looks similar. Saving anyway.',
+      });
+      void logDuplicateEvent({
+        agencyId,
+        action: 'soft_warned',
+        matchMethod: 'name_fuzzy',
+        suggestedIds: fuzzy.map(m => m.id),
+      });
+    }
+    return true;
+  };
+
+  const performSave = async () => {
     // Build communication_preferences. Auto-populate from email/phone if empty.
     let prefsToSave: CommPreference[] = commPrefs.filter(p => p.handle.trim().length > 0);
     if (prefsToSave.length === 0) {
@@ -268,11 +371,9 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
       if (form.email.trim()) auto.push({ channel: 'email', handle: form.email.trim(), is_primary: auto.length === 0 });
       prefsToSave = auto;
     }
-    // Ensure exactly one primary if any prefs
     if (prefsToSave.length > 0 && !prefsToSave.some(p => p.is_primary)) {
       prefsToSave[0].is_primary = true;
     }
-    // Client-side guard for handle format (the DB trigger is the source of truth)
     const bad = prefsToSave.find(p => !isValidHandle(p.channel as any, p.handle));
     if (bad) {
       toast({
@@ -309,7 +410,25 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
     }
   };
 
+  const handleSave = async () => {
+    if (!form.first_name.trim()) return;
+    if (!passesDupGuard()) return;
+    await performSave();
+  };
+
+  const handleConfirmCreateAnyway = async () => {
+    setShowDupBlock(false);
+    void logDuplicateEvent({
+      agencyId,
+      action: 'created_anyway',
+      matchMethod: duplicateMatches[0]?.match_method,
+      suggestedIds: duplicateMatches.map(m => m.id),
+    });
+    await performSave();
+  };
+
   return (
+    <>
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
@@ -365,6 +484,13 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
               <Input type="tel" value={form.phone} onChange={e => setForm(f => ({...f, phone: e.target.value}))} className="h-9" placeholder="+61 400 000 000" />
             </div>
           </div>
+
+          {/* Inline duplicate match suggestions */}
+          <DuplicateMatchPanel
+            matches={duplicateMatches}
+            onUseContact={handleUseMatch}
+            onDismiss={handleDismissMatch}
+          />
 
           <CommunicationPreferencesEditor value={commPrefs} onChange={setCommPrefs} />
 
@@ -498,6 +624,38 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
         </div>
       </DialogContent>
     </Dialog>
+
+    {/* Save-time guard for exact email/phone duplicates */}
+    <AlertDialog open={showDupBlock} onOpenChange={setShowDupBlock}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>This looks like an existing contact</AlertDialogTitle>
+          <AlertDialogDescription>
+            We found{' '}
+            {duplicateMatches.length === 1 ? 'a contact' : `${duplicateMatches.length} contacts`}{' '}
+            in your agency that match on{' '}
+            {duplicateMatches.some(m => m.match_method === 'email') && duplicateMatches.some(m => m.match_method === 'phone')
+              ? 'email or phone'
+              : duplicateMatches.some(m => m.match_method === 'email')
+                ? 'email'
+                : 'phone'}
+            :{' '}
+            <span className="font-medium text-foreground">
+              {duplicateMatches.slice(0, 2).map(m => `${m.first_name} ${m.last_name ?? ''}`.trim()).join(', ')}
+              {duplicateMatches.length > 2 && ` +${duplicateMatches.length - 2} more`}
+            </span>
+            . Are you sure you want to create a duplicate?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={handleConfirmCreateAnyway}>
+            Create anyway
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 };
 

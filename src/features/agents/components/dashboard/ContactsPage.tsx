@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Plus, Upload, Download, LayoutList, Kanban, ArrowRightLeft } from 'lucide-react';
@@ -10,20 +11,31 @@ import DashboardHeader from './DashboardHeader';
 import { useContacts } from '@/features/agents/hooks/useContacts';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useTeamAgents } from '@/features/agents/hooks/useTeamAgents';
+import { useContactSavedViews } from '@/features/agents/hooks/useContactSavedViews';
 import ContactsList from './contacts/ContactsList';
 import ContactFormModal from './contacts/ContactFormModal';
 import ContactDetailDrawer from './contacts/ContactDetailDrawer';
 import PipelineBoard from './contacts/PipelineBoard';
 import CsvImportModal from './contacts/CsvImportModal';
+import SavedViewsBar from './contacts/savedViews/SavedViewsBar';
+import {
+  ALL_CONTACTS_VIEW_ID, EMPTY_FILTERS, DEFAULT_SORT, DEFAULT_COLUMNS,
+  type ContactSavedView, type ContactFilters, type ContactSort, type ContactColumnKey,
+} from './contacts/savedViews/types';
 import { supabase } from '@/integrations/supabase/client';
 import { logAction } from '@/shared/lib/auditLog';
 import { toast } from 'sonner';
 import type { Contact } from '@/features/agents/hooks/useContacts';
 
+const LAST_VIEW_LS_KEY = 'gh-contacts-last-view';
+
 const ContactsPage = () => {
   const { contacts, loading, createContact, updateContact, deleteContact, addActivity, getActivities, fetchContacts } = useContacts();
   const { user, isPrincipal, isAdmin, agencyId } = useAuth();
   const { agents } = useTeamAgents();
+  const { views } = useContactSavedViews();
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [view, setView] = useState<'list' | 'pipeline'>('list');
   const [showForm, setShowForm] = useState(false);
   const [showImport, setShowImport] = useState(false);
@@ -36,6 +48,56 @@ const ContactsPage = () => {
   const [reassignContact, setReassignContact] = useState<Contact | null>(null);
   const [reassignTo, setReassignTo] = useState('');
   const [reassigning, setReassigning] = useState(false);
+
+  // Saved-view state
+  const [activeViewId, setActiveViewId] = useState<string>(ALL_CONTACTS_VIEW_ID);
+  const [filters, setFilters] = useState<ContactFilters>(EMPTY_FILTERS);
+  const [sort, setSort] = useState<ContactSort>(DEFAULT_SORT);
+  const [columns, setColumns] = useState<ContactColumnKey[]>(DEFAULT_COLUMNS);
+  const initializedRef = useRef(false);
+
+  // On mount + when views load: resolve initial view from ?view= URL param, then localStorage, else All Contacts
+  useEffect(() => {
+    if (initializedRef.current || views.length === 0 && !user) return;
+    const urlViewId = searchParams.get('view');
+    const lsViewId = typeof window !== 'undefined' ? localStorage.getItem(LAST_VIEW_LS_KEY) : null;
+    const candidate = urlViewId || lsViewId;
+    if (candidate && candidate !== ALL_CONTACTS_VIEW_ID) {
+      const found = views.find(v => v.id === candidate);
+      if (found) {
+        applyView(found, /*pushUrl*/ false);
+        initializedRef.current = true;
+        return;
+      }
+    }
+    initializedRef.current = true;
+  }, [views, user, searchParams]);
+
+  const applyView = useCallback((v: ContactSavedView | null, pushUrl = true) => {
+    if (v) {
+      setActiveViewId(v.id);
+      setFilters({ ...EMPTY_FILTERS, ...v.filters });
+      setSort(v.sort || DEFAULT_SORT);
+      setColumns(v.columns?.length ? v.columns : DEFAULT_COLUMNS);
+      if (pushUrl) {
+        const next = new URLSearchParams(searchParams);
+        next.set('view', v.id);
+        setSearchParams(next, { replace: true });
+      }
+      try { localStorage.setItem(LAST_VIEW_LS_KEY, v.id); } catch {}
+    } else {
+      setActiveViewId(ALL_CONTACTS_VIEW_ID);
+      setFilters(EMPTY_FILTERS);
+      setSort(DEFAULT_SORT);
+      setColumns(DEFAULT_COLUMNS);
+      if (pushUrl) {
+        const next = new URLSearchParams(searchParams);
+        next.delete('view');
+        setSearchParams(next, { replace: true });
+      }
+      try { localStorage.setItem(LAST_VIEW_LS_KEY, ALL_CONTACTS_VIEW_ID); } catch {}
+    }
+  }, [searchParams, setSearchParams]);
 
   const showPrincipalControls = (isPrincipal || isAdmin) && agencyId;
 

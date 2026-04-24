@@ -19,6 +19,13 @@ const PublicLayout = () => {
         <Outlet />
       </main>
       {!hasSearch && <MapsDisclosure />}
+      {!hasSearch && (
+        <div className="w-full bg-slate-950 border-t border-white/5">
+          <div className="max-w-6xl mx-auto px-6 py-3 text-center text-[12px] text-slate-400">
+            Licensed agents only · Trust account compliant · Australian property law · ABN 65 608 526 781
+          </div>
+        </div>
+      )}
       {!hasSearch && <SiteFooter />}
       <BottomNav />
     </div>

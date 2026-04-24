@@ -56,36 +56,6 @@ export function SiteHeader() {
           </span>
         </Link>
         
-        {/* Sale / Rent toggle — visible on all sizes */}
-        <div className="flex items-center bg-secondary rounded-full p-0.5 shrink-0">
-          <button
-            onClick={() => {
-              setListingMode('sale');
-              window.dispatchEvent(new CustomEvent('listing-mode-changed'));
-            }}
-            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
-              listingMode === 'sale'
-                ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            {t('nav.forSale')}
-          </button>
-          <button
-            onClick={() => {
-              setListingMode('rent');
-              window.dispatchEvent(new CustomEvent('listing-mode-changed'));
-            }}
-            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
-              listingMode === 'rent'
-                ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            {t('nav.forRent')}
-          </button>
-        </div>
-
         {/* ─── Desktop right side actions (hidden below md) ─── */}
         <div className="hidden md:flex items-center gap-2 shrink-0">
           <Link
@@ -261,6 +231,12 @@ export function SiteHeader() {
             </button>
           ) : (
             <>
+              <Link
+                to="/for-agents"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
+              >
+                For Agents
+              </Link>
               <button
                 onClick={() => navigate('/auth')}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"

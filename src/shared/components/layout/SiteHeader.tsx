@@ -231,6 +231,12 @@ export function SiteHeader() {
             </button>
           ) : (
             <>
+              <Link
+                to="/for-agents"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
+              >
+                For Agents
+              </Link>
               <button
                 onClick={() => navigate('/auth')}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"

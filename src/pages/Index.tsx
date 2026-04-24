@@ -1,11 +1,12 @@
 import { useState, useCallback, useRef, useEffect, useMemo, lazy, Suspense } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-// framer-motion is only needed for the search-results branch (mobile bottom
-// sheet drag). It's lazy-loaded below to keep it out of the cold-paint
-// critical path. The landing hero uses plain CSS animations instead.
+// framer-motion is heavy (~50KB gzipped) and was forcing the whole library
+// into the cold-paint critical path. The landing hero now uses plain CSS
+// animations. The mobile bottom sheet (search-results branch only) lazy-loads
+// motion via a dynamic import wrapper.
 import type { PanInfo } from 'framer-motion';
-import { useMotionValue, useSpring } from 'framer-motion';
+import { MotionDiv, MotionButton, useLazyMotionValues } from '@/shared/components/LazyMotion';
 import { ArrowRight, MapPin, Sparkles, Map, List, Mic, MicOff, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users, Search, Home, Check, ArrowLeftRight, UserCheck, ChevronRight, Globe } from 'lucide-react';
 import { VoiceSearchHero } from '@/features/search/components/VoiceSearchHero';
 import { TranslationDemoCard } from '@/features/marketing/components/TranslationDemoCard';

@@ -41,10 +41,16 @@ const EMPTY_FILTERS: BuyFilters = { suburbs: [], sort: 'newest' };
 function parseFiltersFromParams(sp: URLSearchParams): BuyFilters {
   const sort = sp.get('sort');
   const q = sp.get('q');
-  // Support either `?q=Toorak,Hawthorn` or repeated `?suburb=` params
-  const suburbs = q
-    ? q.split(',').map(s => s.trim()).filter(Boolean)
-    : sp.getAll('suburb').filter(Boolean);
+  const location = sp.get('location'); // e.g. ?location=St+Kilda from search bar
+  // Support `?q=Toorak,Hawthorn`, repeated `?suburb=`, or `?location=Prahran`
+  let suburbs: string[] = [];
+  if (q) {
+    suburbs = q.split(',').map(s => s.trim()).filter(Boolean);
+  } else if (location) {
+    suburbs = location.split(',').map(s => s.trim()).filter(Boolean);
+  } else {
+    suburbs = sp.getAll('suburb').filter(Boolean);
+  }
   return {
     suburbs,
     minBeds: sp.get('beds') ? Number(sp.get('beds')) : undefined,

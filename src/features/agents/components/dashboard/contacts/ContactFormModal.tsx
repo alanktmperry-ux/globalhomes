@@ -1,6 +1,16 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,6 +23,11 @@ import ContactLanguagePicker from '@/shared/components/ContactLanguagePicker';
 import { DEFAULT_CONTACT_LANGUAGE } from '@/shared/lib/contactLanguages';
 import CommunicationPreferencesEditor from '@/shared/components/CommunicationPreferences/CommunicationPreferencesEditor';
 import { isValidHandle, type CommPreference } from '@/shared/components/CommunicationPreferences/types';
+import { useAuth } from '@/features/auth/AuthProvider';
+import DuplicateMatchPanel from '@/shared/components/DuplicateDetection/DuplicateMatchPanel';
+import { useDuplicateMatches } from '@/shared/components/DuplicateDetection/useDuplicateMatches';
+import { logDuplicateEvent } from '@/shared/components/DuplicateDetection/useDuplicateMatches';
+import type { DuplicateMatch } from '@/shared/components/DuplicateDetection/types';
 import type { Contact } from '@/features/agents/hooks/useContacts';
 
 interface Props {

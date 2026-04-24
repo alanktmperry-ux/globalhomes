@@ -7,10 +7,19 @@ import { VoiceSearchHero } from '@/features/search/components/VoiceSearchHero';
 import { TranslationDemoCard } from '@/features/marketing/components/TranslationDemoCard';
 import { useHeroVoiceSearch } from '@/features/search/hooks/useHeroVoiceSearch';
 
-import { VirtualizedPropertyList } from '@/features/properties/components/VirtualizedPropertyList';
 import { MapSkeleton } from '@/features/properties/components/PropertyCardSkeleton';
-import { PropertyDrawer } from '@/features/properties/components/PropertyDrawer';
-import { MapErrorBoundary } from '@/features/properties/components/MapErrorBoundary';
+// Heavy components that only render in the search-results branch (not on the
+// landing hero). Lazy-loading keeps them out of the cold-paint critical path
+// — they download in the background only after the user runs a search.
+const VirtualizedPropertyList = lazy(() =>
+  import('@/features/properties/components/VirtualizedPropertyList').then(m => ({ default: m.VirtualizedPropertyList }))
+);
+const PropertyDrawer = lazy(() =>
+  import('@/features/properties/components/PropertyDrawer').then(m => ({ default: m.PropertyDrawer }))
+);
+const MapErrorBoundary = lazy(() =>
+  import('@/features/properties/components/MapErrorBoundary').then(m => ({ default: m.MapErrorBoundary }))
+);
 import { VoiceSearchErrorBoundary } from '@/features/search/components/VoiceSearchErrorBoundary';
 import { useI18n } from '@/shared/lib/i18n';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
@@ -32,7 +41,8 @@ import { Slider } from '@/components/ui/slider';
 import { useSavedSearches } from '@/features/search/hooks/useSavedSearches';
 import { useCollabSession } from '@/features/search/hooks/useCollabSession';
 import { useAuth } from '@/features/auth/AuthProvider';
-import ConsumerSignUpModal from '@/features/search/components/ConsumerSignUpModal';
+// Lazy — only opens after the 3rd anonymous search.
+const ConsumerSignUpModal = lazy(() => import('@/features/search/components/ConsumerSignUpModal'));
 import { supabase } from '@/integrations/supabase/client';
 import { geocode } from '@/shared/lib/googleMapsService';
 
@@ -926,64 +936,68 @@ const Index = () => {
   const showEmptyState = filteredProperties.length === 0 && !isSearching && !hasSearched;
 
   const propertyList = showEmptyState ? emptyPlaceholder : (
-    <VirtualizedPropertyList
-      properties={filteredProperties}
-      isSearching={isSearching}
-      isMobile={isMobile}
-      isSaved={isSaved}
-      onToggleSave={toggleSaved}
-      onSelect={(p) => {
-        handleSelectProperty(p);
-        if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: `${p.lat}-${p.lng}` });
-      }}
-      cardRefs={cardRefs}
-      isCollab={isCollab}
-      getPropertyReactions={isCollab ? getPropertyReactions : undefined}
-      onToggleReaction={isCollab ? toggleReaction : undefined}
-      hasPartnerViewed={isCollab ? hasPartnerViewed : undefined}
-      currentUserId={user?.id}
-      areaSearch={areaSearch}
-      searchRadius={searchRadius}
-      onClearAreaSearch={() => handleAreaSearch(null)}
-      listingMode={listingMode}
-    />
+    <Suspense fallback={<MapSkeleton />}>
+      <VirtualizedPropertyList
+        properties={filteredProperties}
+        isSearching={isSearching}
+        isMobile={isMobile}
+        isSaved={isSaved}
+        onToggleSave={toggleSaved}
+        onSelect={(p) => {
+          handleSelectProperty(p);
+          if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: `${p.lat}-${p.lng}` });
+        }}
+        cardRefs={cardRefs}
+        isCollab={isCollab}
+        getPropertyReactions={isCollab ? getPropertyReactions : undefined}
+        onToggleReaction={isCollab ? toggleReaction : undefined}
+        hasPartnerViewed={isCollab ? hasPartnerViewed : undefined}
+        currentUserId={user?.id}
+        areaSearch={areaSearch}
+        searchRadius={searchRadius}
+        onClearAreaSearch={() => handleAreaSearch(null)}
+        listingMode={listingMode}
+      />
+    </Suspense>
   );
 
   const mapComponent = isSearching ? (
     <MapSkeleton />
   ) : (
-    <MapErrorBoundary>
-      <Suspense fallback={<MapSkeleton />}>
-        <LazyPropertyMap
-          properties={filteredProperties}
-          onPropertySelect={handleSelectProperty}
-          selectedPropertyId={selectedProperty?.id}
-          onAreaSearch={handleAreaSearch}
-          centerOn={mapCenter}
-          onScrollToProperty={scrollToProperty}
-          formatPrice={formatPrice}
-          onMapMoved={(bounds) => {
-            handleAreaSearch({
-              type: 'polygon',
-              coordinates: [
-                [bounds.north, bounds.west],
-                [bounds.north, bounds.east],
-                [bounds.south, bounds.east],
-                [bounds.south, bounds.west],
-                [bounds.north, bounds.west],
-              ],
-            });
-          }}
-          onGeolocate={(loc) => {
-            setSearchCenter({ lat: loc.lat, lng: loc.lng });
-            if (!searchRadius) setSearchRadius(10);
-            setTimeout(() => {
-              setMapCenter({ lat: loc.lat, lng: loc.lng, key: `geo-${Date.now()}` });
-            }, 100);
-          }}
-        />
-      </Suspense>
-    </MapErrorBoundary>
+    <Suspense fallback={<MapSkeleton />}>
+      <MapErrorBoundary>
+        <Suspense fallback={<MapSkeleton />}>
+          <LazyPropertyMap
+            properties={filteredProperties}
+            onPropertySelect={handleSelectProperty}
+            selectedPropertyId={selectedProperty?.id}
+            onAreaSearch={handleAreaSearch}
+            centerOn={mapCenter}
+            onScrollToProperty={scrollToProperty}
+            formatPrice={formatPrice}
+            onMapMoved={(bounds) => {
+              handleAreaSearch({
+                type: 'polygon',
+                coordinates: [
+                  [bounds.north, bounds.west],
+                  [bounds.north, bounds.east],
+                  [bounds.south, bounds.east],
+                  [bounds.south, bounds.west],
+                  [bounds.north, bounds.west],
+                ],
+              });
+            }}
+            onGeolocate={(loc) => {
+              setSearchCenter({ lat: loc.lat, lng: loc.lng });
+              if (!searchRadius) setSearchRadius(10);
+              setTimeout(() => {
+                setMapCenter({ lat: loc.lat, lng: loc.lng, key: `geo-${Date.now()}` });
+              }, 100);
+            }}
+          />
+        </Suspense>
+      </MapErrorBoundary>
+    </Suspense>
   );
 
   // ── Auto-scroll to top when search results load ──────
@@ -1502,24 +1516,26 @@ const Index = () => {
             {/* Property list */}
             <div className="flex-1 px-4 pb-6">
               {showEmptyState ? emptyPlaceholder : (
-                <VirtualizedPropertyList
-                  properties={filteredProperties}
-                  isSearching={isSearching}
-                  isMobile={false}
-                  isSaved={isSaved}
-                  onToggleSave={toggleSaved}
-                  onSelect={(p) => navigate(`/property/${p.id}`)}
-                  cardRefs={cardRefs}
-                  isCollab={isCollab}
-                  getPropertyReactions={isCollab ? getPropertyReactions : undefined}
-                  onToggleReaction={isCollab ? toggleReaction : undefined}
-                  hasPartnerViewed={isCollab ? hasPartnerViewed : undefined}
-                  currentUserId={user?.id}
-                  areaSearch={areaSearch}
-                  searchRadius={searchRadius}
-                  onClearAreaSearch={() => handleAreaSearch(null)}
-                  listingMode={listingMode}
-                />
+                <Suspense fallback={<MapSkeleton />}>
+                  <VirtualizedPropertyList
+                    properties={filteredProperties}
+                    isSearching={isSearching}
+                    isMobile={false}
+                    isSaved={isSaved}
+                    onToggleSave={toggleSaved}
+                    onSelect={(p) => navigate(`/property/${p.id}`)}
+                    cardRefs={cardRefs}
+                    isCollab={isCollab}
+                    getPropertyReactions={isCollab ? getPropertyReactions : undefined}
+                    onToggleReaction={isCollab ? toggleReaction : undefined}
+                    hasPartnerViewed={isCollab ? hasPartnerViewed : undefined}
+                    currentUserId={user?.id}
+                    areaSearch={areaSearch}
+                    searchRadius={searchRadius}
+                    onClearAreaSearch={() => handleAreaSearch(null)}
+                    listingMode={listingMode}
+                  />
+                </Suspense>
               )}
             </div>
           </div>
@@ -1567,21 +1583,23 @@ const Index = () => {
                 </div>
                 <div className="overflow-y-auto px-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))]" style={{ maxHeight: 'calc(100% - 3.75rem)' }}>
                   {showEmptyState ? emptyPlaceholder : (
-                    <VirtualizedPropertyList
-                      properties={filteredProperties}
-                      isSearching={isSearching}
-                      isMobile={true}
-                      isSaved={isSaved}
-                      onToggleSave={toggleSaved}
-                      onSelect={(p) => navigate(`/property/${p.id}`)}
-                      cardRefs={cardRefs}
-                      isCollab={isCollab}
-                      getPropertyReactions={isCollab ? getPropertyReactions : undefined}
-                      onToggleReaction={isCollab ? toggleReaction : undefined}
-                      hasPartnerViewed={isCollab ? hasPartnerViewed : undefined}
-                      currentUserId={user?.id}
-                      listingMode={listingMode}
-                    />
+                    <Suspense fallback={<MapSkeleton />}>
+                      <VirtualizedPropertyList
+                        properties={filteredProperties}
+                        isSearching={isSearching}
+                        isMobile={true}
+                        isSaved={isSaved}
+                        onToggleSave={toggleSaved}
+                        onSelect={(p) => navigate(`/property/${p.id}`)}
+                        cardRefs={cardRefs}
+                        isCollab={isCollab}
+                        getPropertyReactions={isCollab ? getPropertyReactions : undefined}
+                        onToggleReaction={isCollab ? toggleReaction : undefined}
+                        hasPartnerViewed={isCollab ? hasPartnerViewed : undefined}
+                        currentUserId={user?.id}
+                        listingMode={listingMode}
+                      />
+                    </Suspense>
                   )}
                 </div>
               </motion.div>
@@ -1610,41 +1628,49 @@ const Index = () => {
                 </div>
               </div>
               {showEmptyState ? emptyPlaceholder : (
-                <VirtualizedPropertyList
-                  properties={filteredProperties}
-                  isSearching={isSearching}
-                  isMobile={true}
-                  isSaved={isSaved}
-                  onToggleSave={toggleSaved}
-                  onSelect={(p) => navigate(`/property/${p.id}`)}
-                  cardRefs={cardRefs}
-                  isCollab={isCollab}
-                  getPropertyReactions={isCollab ? getPropertyReactions : undefined}
-                  onToggleReaction={isCollab ? toggleReaction : undefined}
-                  hasPartnerViewed={isCollab ? hasPartnerViewed : undefined}
-                  currentUserId={user?.id}
-                  listingMode={listingMode}
-                />
+                <Suspense fallback={<MapSkeleton />}>
+                  <VirtualizedPropertyList
+                    properties={filteredProperties}
+                    isSearching={isSearching}
+                    isMobile={true}
+                    isSaved={isSaved}
+                    onToggleSave={toggleSaved}
+                    onSelect={(p) => navigate(`/property/${p.id}`)}
+                    cardRefs={cardRefs}
+                    isCollab={isCollab}
+                    getPropertyReactions={isCollab ? getPropertyReactions : undefined}
+                    onToggleReaction={isCollab ? toggleReaction : undefined}
+                    hasPartnerViewed={isCollab ? hasPartnerViewed : undefined}
+                    currentUserId={user?.id}
+                    listingMode={listingMode}
+                  />
+                </Suspense>
               )}
             </div>
           )}
         </div>
       )}
 
-      {/* Property drawer + modals */}
-      <PropertyDrawer
-        property={selectedProperty}
-        onClose={() => setSelectedProperty(null)}
-        isSaved={selectedProperty ? isSaved(selectedProperty.id) : false}
-        onToggleSave={toggleSaved}
-        searchContext={searchContextForLead}
-      />
+      {/* Property drawer + modals — both lazy, so guard with Suspense */}
+      <Suspense fallback={null}>
+        <PropertyDrawer
+          property={selectedProperty}
+          onClose={() => setSelectedProperty(null)}
+          isSaved={selectedProperty ? isSaved(selectedProperty.id) : false}
+          onToggleSave={toggleSaved}
+          searchContext={searchContextForLead}
+        />
+      </Suspense>
 
-      <ConsumerSignUpModal
-        open={showConsumerModal}
-        onOpenChange={setShowConsumerModal}
-        lastQuery={currentQuery || lastSearch?.text || ''}
-      />
+      {showConsumerModal && (
+        <Suspense fallback={null}>
+          <ConsumerSignUpModal
+            open={showConsumerModal}
+            onOpenChange={setShowConsumerModal}
+            lastQuery={currentQuery || lastSearch?.text || ''}
+          />
+        </Suspense>
+      )}
     </div>
   );
 };

@@ -1267,6 +1267,14 @@ const Index = () => {
                 </div>
                </>
              ) : null}
+            <div className="mt-8 text-center">
+              <button
+                onClick={() => navigate('/agents')}
+                className="text-sm text-slate-600 hover:text-blue-600 transition-colors font-medium"
+              >
+                Looking for an agent who speaks your language? Find one →
+              </button>
+            </div>
           </div>
         </motion.section>
 

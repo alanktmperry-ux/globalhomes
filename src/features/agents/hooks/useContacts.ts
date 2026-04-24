@@ -35,6 +35,7 @@ export interface Contact {
   notes: string | null;
   source: string | null;
   tags: string[];
+  communication_preferences: { channel: string; handle: string; is_primary: boolean }[];
   created_at: string;
   updated_at: string;
   // Joined agent data (when isPrincipal)

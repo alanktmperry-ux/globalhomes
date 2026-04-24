@@ -186,6 +186,7 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
     estimated_value: initialData?.estimated_value || '',
     source: initialData?.source || '',
     notes: initialData?.notes || '',
+    preferred_language: (initialData as any)?.preferred_language || DEFAULT_CONTACT_LANGUAGE,
   });
 
   const [addressQuery, setAddressQuery] = useState(

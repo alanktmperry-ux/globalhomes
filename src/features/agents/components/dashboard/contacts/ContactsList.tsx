@@ -127,7 +127,12 @@ const ContactsList = ({ contacts, loading, onSelect, onDelete }: Props) => {
                             <AvatarFallback className="text-xs bg-primary/10 text-primary">{initials}</AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium text-sm">{c.first_name} {c.last_name || ''}</p>
+                            <p className="font-medium text-sm flex items-center gap-1.5">
+                              <span>{c.first_name} {c.last_name || ''}</span>
+                              <CommunicationChannelChips
+                                prefs={(c.communication_preferences as unknown as CommPreference[]) || []}
+                              />
+                            </p>
                             {c.source && <p className="text-[10px] text-muted-foreground capitalize">{c.source}</p>}
                           </div>
                         </div>

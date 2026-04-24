@@ -3146,6 +3146,42 @@ export type Database = {
           },
         ]
       }
+      contact_duplicate_events: {
+        Row: {
+          accepted_contact_id: string | null
+          action: string
+          agency_id: string | null
+          agent_user_id: string
+          created_at: string
+          id: string
+          match_count: number
+          match_method: string | null
+          suggested_contact_ids: string[]
+        }
+        Insert: {
+          accepted_contact_id?: string | null
+          action: string
+          agency_id?: string | null
+          agent_user_id: string
+          created_at?: string
+          id?: string
+          match_count?: number
+          match_method?: string | null
+          suggested_contact_ids?: string[]
+        }
+        Update: {
+          accepted_contact_id?: string | null
+          action?: string
+          agency_id?: string | null
+          agent_user_id?: string
+          created_at?: string
+          id?: string
+          match_count?: number
+          match_method?: string | null
+          suggested_contact_ids?: string[]
+        }
+        Relationships: []
+      }
       contact_tag_assignments: {
         Row: {
           assigned_at: string
@@ -3242,6 +3278,8 @@ export type Database = {
           mobile: string | null
           notes: string | null
           phone: string | null
+          phone_is_landline: boolean | null
+          phone_normalized: string | null
           postcode: string | null
           preferred_baths: number | null
           preferred_beds: number | null
@@ -3279,6 +3317,8 @@ export type Database = {
           mobile?: string | null
           notes?: string | null
           phone?: string | null
+          phone_is_landline?: boolean | null
+          phone_normalized?: string | null
           postcode?: string | null
           preferred_baths?: number | null
           preferred_beds?: number | null
@@ -3316,6 +3356,8 @@ export type Database = {
           mobile?: string | null
           notes?: string | null
           phone?: string | null
+          phone_is_landline?: boolean | null
+          phone_normalized?: string | null
           postcode?: string | null
           preferred_baths?: number | null
           preferred_beds?: number | null
@@ -11835,6 +11877,32 @@ export type Database = {
           suburb: string
         }[]
       }
+      find_duplicate_contacts: {
+        Args: {
+          p_address?: string
+          p_agency_id: string
+          p_email?: string
+          p_exclude_contact_id?: string
+          p_first_name?: string
+          p_last_name?: string
+          p_phone_normalized?: string
+        }
+        Returns: {
+          communication_preferences: Json
+          confidence: number
+          created_by: string
+          email: string
+          first_name: string
+          id: string
+          is_owned_by_other: boolean
+          last_name: string
+          match_method: string
+          mobile: string
+          phone: string
+          tags: string[]
+          updated_at: string
+        }[]
+      }
       find_matching_saved_searches: {
         Args: { p_property_id: string }
         Returns: {
@@ -12225,6 +12293,8 @@ export type Database = {
         Args: { _agent_id: string }
         Returns: undefined
       }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
       sign_document: {
         Args: {
           p_ip_address?: string

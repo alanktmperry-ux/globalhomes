@@ -1192,7 +1192,7 @@ const Index = () => {
             <div className="rounded-2xl border border-slate-200 bg-white p-6 md:p-7 shadow-sm hover:shadow-md transition-shadow">
               <h3 className="text-lg md:text-xl font-bold text-slate-900 mb-2">Are you an agent?</h3>
               <p className="text-sm text-slate-600 mb-5 leading-relaxed">
-                List once, reach every buyer. AI translation, CRM, and off-market network — free for 3 months.
+                List once, translated into 24 languages. Reach multilingual buyers REA and Domain can't. Free for 3 months.
               </p>
               <button
                 onClick={() => navigate('/for-agents')}

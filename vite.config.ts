@@ -22,7 +22,6 @@ export default defineConfig(({ mode }) => ({
         manualChunks(id) {
           if (!id.includes("node_modules")) return;
           // React core + router + small always-needed deps in one chunk.
-          // Everything that *might* run before app code must live with React.
           if (
             id.includes("node_modules/react/") ||
             id.includes("node_modules/react-dom/") ||
@@ -34,10 +33,16 @@ export default defineConfig(({ mode }) => ({
             return "react-vendor";
           }
           if (id.includes("@supabase")) return "supabase";
-          // Heavy libs only used on specific routes — let them split naturally
+          // Heavy libs split into their own chunks so they only load when needed
           if (id.includes("recharts") || id.includes("d3-")) return "charts";
           if (id.includes("framer-motion")) return "motion";
           if (id.includes("@radix-ui")) return "radix";
+          if (id.includes("lucide-react")) return "icons";
+          if (id.includes("react-hook-form") || id.includes("@hookform")) return "forms";
+          if (id.includes("react-markdown") || id.includes("remark") || id.includes("micromark") || id.includes("mdast") || id.includes("hast")) return "markdown";
+          if (id.includes("date-fns") || id.includes("react-day-picker")) return "dates";
+          if (id.includes("embla-carousel")) return "carousel";
+          if (id.includes("cmdk") || id.includes("vaul") || id.includes("sonner") || id.includes("input-otp") || id.includes("react-resizable-panels") || id.includes("react-window") || id.includes("next-themes")) return "ui-extras";
           return "vendor";
         },
       },

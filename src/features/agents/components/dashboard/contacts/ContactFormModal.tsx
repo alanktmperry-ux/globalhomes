@@ -289,9 +289,80 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
   const isBuyer = form.contact_type === 'buyer' || form.contact_type === 'both';
   const isSeller = form.contact_type === 'seller' || form.contact_type === 'both';
 
-  const handleSave = async () => {
-    if (!form.first_name.trim()) return;
+  // "Use this contact" → populate the form with the matched contact's details
+  const handleUseMatch = (match: DuplicateMatch) => {
+    setForm(f => ({
+      ...f,
+      first_name: match.first_name || f.first_name,
+      last_name: match.last_name || f.last_name,
+      email: match.email || f.email,
+      phone: match.mobile || match.phone || f.phone,
+    }));
+    if (match.communication_preferences && match.communication_preferences.length > 0) {
+      setCommPrefs(match.communication_preferences as CommPreference[]);
+    }
+    void logDuplicateEvent({
+      agencyId,
+      action: 'accepted',
+      matchMethod: match.match_method,
+      suggestedIds: [match.id],
+      acceptedContactId: match.id,
+    });
+    toast({
+      title: '✅ Using existing contact',
+      description: `Form populated from ${match.first_name} ${match.last_name ?? ''}`.trim(),
+    });
+    // Close — the parent will re-open to edit if it wants. For now we treat
+    // accept as "found the right contact, no new contact needed".
+    onClose();
+  };
 
+  const handleDismissMatch = (match: DuplicateMatch) => {
+    void logDuplicateEvent({
+      agencyId,
+      action: 'ignored',
+      matchMethod: match.match_method,
+      suggestedIds: [match.id],
+    });
+  };
+
+  // Returns true if the user can proceed; false if guard intercepted.
+  const passesDupGuard = (): boolean => {
+    if (isEditing || duplicateMatches.length === 0) return true;
+    const exact = duplicateMatches.filter(
+      m => m.match_method === 'email' || m.match_method === 'phone',
+    );
+    const fuzzy = duplicateMatches.filter(m => m.match_method === 'name_fuzzy');
+
+    // Hard block on exact matches
+    if (exact.length > 0) {
+      setShowDupBlock(true);
+      void logDuplicateEvent({
+        agencyId,
+        action: 'blocked_at_save',
+        matchMethod: exact[0].match_method,
+        suggestedIds: exact.map(m => m.id),
+      });
+      return false;
+    }
+    // Soft warn on fuzzy
+    if (fuzzy.length > 0) {
+      const f = fuzzy[0];
+      toast({
+        title: '⚠️ Heads up — similar contact exists',
+        description: `${f.first_name} ${f.last_name ?? ''}`.trim() + ' looks similar. Saving anyway.',
+      });
+      void logDuplicateEvent({
+        agencyId,
+        action: 'soft_warned',
+        matchMethod: 'name_fuzzy',
+        suggestedIds: fuzzy.map(m => m.id),
+      });
+    }
+    return true;
+  };
+
+  const performSave = async () => {
     // Build communication_preferences. Auto-populate from email/phone if empty.
     let prefsToSave: CommPreference[] = commPrefs.filter(p => p.handle.trim().length > 0);
     if (prefsToSave.length === 0) {
@@ -300,11 +371,9 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
       if (form.email.trim()) auto.push({ channel: 'email', handle: form.email.trim(), is_primary: auto.length === 0 });
       prefsToSave = auto;
     }
-    // Ensure exactly one primary if any prefs
     if (prefsToSave.length > 0 && !prefsToSave.some(p => p.is_primary)) {
       prefsToSave[0].is_primary = true;
     }
-    // Client-side guard for handle format (the DB trigger is the source of truth)
     const bad = prefsToSave.find(p => !isValidHandle(p.channel as any, p.handle));
     if (bad) {
       toast({
@@ -339,6 +408,23 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleSave = async () => {
+    if (!form.first_name.trim()) return;
+    if (!passesDupGuard()) return;
+    await performSave();
+  };
+
+  const handleConfirmCreateAnyway = async () => {
+    setShowDupBlock(false);
+    void logDuplicateEvent({
+      agencyId,
+      action: 'created_anyway',
+      matchMethod: duplicateMatches[0]?.match_method,
+      suggestedIds: duplicateMatches.map(m => m.id),
+    });
+    await performSave();
   };
 
   return (

@@ -3,7 +3,6 @@ import { geocode } from '@/shared/lib/googleMapsService';
 import { Property } from '@/shared/lib/types';
 
 import { Filters, defaultFilters } from '@/shared/components/FilterSidebar';
-import { firecrawlPropertySearch } from '@/features/properties/api/firecrawlPropertySearch';
 import { searchAgentListings } from '@/features/properties/api/fetchPublicProperties';
 import { mapDbProperty } from '@/features/properties/api/fetchPublicProperties';
 import { toast } from 'sonner';
@@ -201,7 +200,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
           return null;
         });
 
-      // Phase 1 (agent listings) + Phase 2 (Firecrawl) in parallel
+      // Phase 1: agent listings only (no external/web scraping)
       const agentListingsPromise = searchAgentListings(
         query,
         50,
@@ -221,33 +220,15 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
         return [] as Property[];
       });
 
-      const firecrawlPromise = firecrawlPropertySearch(query, 8, listingMode).catch((err) => {
-        console.warn('[handleSearch] Firecrawl search failed:', err);
-        return [] as Property[];
-      });
-
-      // Show agent listings immediately when ready (revenue priority)
-      agentListingsPromise.then((agentResults) => {
-        if (agentResults.length > 0) {
-          setResults((prev) => {
-            const ids = new Set(prev.map((p) => p.id));
-            const unique = agentResults.filter((p) => !ids.has(p.id));
-            if (unique.length === 0) return prev;
-            return [...unique, ...prev];
-          });
-        }
-      });
-
-      // Merge Firecrawl results
-      const firecrawlResults = await firecrawlPromise;
-      if (firecrawlResults.length > 0) {
+      // Show agent listings as soon as they're ready
+      const agentResults = await agentListingsPromise;
+      if (agentResults.length > 0) {
         setResults((prev) => {
           const ids = new Set(prev.map((p) => p.id));
-          const unique = firecrawlResults.filter((p) => !ids.has(p.id));
+          const unique = agentResults.filter((p) => !ids.has(p.id));
           if (unique.length === 0) return prev;
-          return [...prev, ...unique];
+          return [...unique, ...prev];
         });
-        toast.success(`🌐 Web results found — Found ${firecrawlResults.length} listings from the web`);
       }
 
       // Wait for AI search to complete too before marking done

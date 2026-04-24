@@ -65,7 +65,7 @@ const STORAGE_KEY = 'listhq-prelaunch-checklist';
 
 const SEED: Omit<ChecklistItem, 'notes' | 'updatedAt'>[] = [
   // Platform & Core Functionality
-  { id: 'plat-01', category: 'Platform & Core Functionality', task: 'Firecrawl web scraper: fix listing-type filter (rent vs sale)', status: 'pending', dueDate: '2026-04-07' },
+  
   { id: 'plat-02', category: 'Platform & Core Functionality', task: 'Featured listings carousel: ensure it respects listing mode toggle', status: 'pending', dueDate: '2026-04-07' },
   { id: 'plat-03', category: 'Platform & Core Functionality', task: 'Consent banner: useLocation hook error (moved outside Router context)', status: 'pending', dueDate: '2026-04-04' },
   { id: 'plat-04', category: 'Platform & Core Functionality', task: 'Admin Seekers tab: add and style', status: 'pending', dueDate: '2026-04-10' },

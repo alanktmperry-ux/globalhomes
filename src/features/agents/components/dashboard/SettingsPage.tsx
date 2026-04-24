@@ -263,6 +263,9 @@ const SettingsPage = () => {
               ))}
             </div>
 
+            {/* Lead urgency thresholds */}
+            <LeadUrgencySettings />
+
             {/* Territory */}
             <div className="bg-card border border-border rounded-xl p-5 space-y-3">
               <h3 className="font-display text-sm font-bold flex items-center gap-1.5"><Globe size={14} /> Territory</h3>

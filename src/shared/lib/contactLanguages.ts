@@ -6,17 +6,18 @@
  * downstream into translation-aware emails / SMS / portal experiences.
  *
  * Notes:
- *   - Mandarin is intentionally split into Simplified / Traditional because the
- *     listing-content translation pipeline keys translations on those variants.
- *   - Cantonese (yue) speakers most commonly read zh_traditional — we surface
- *     Cantonese as a separate label but persist the underlying zh_traditional
- *     code so listing translations resolve correctly without a mapping layer.
+ *   - Mandarin is split into Simplified / Traditional because the listing-content
+ *     translation pipeline keys translations on those variants.
+ *   - Cantonese (`yue`) is stored as its own distinct value even though, today,
+ *     written content falls back to `zh_traditional`. This is intentional: it
+ *     lets us add Cantonese-specific voice / audio / spoken-language templates
+ *     later without a data migration. See CONTENT_FALLBACK below.
  *   - Pinned (top-of-list) entries are the top AU community languages by
  *     ABS Census language-spoken-at-home counts.
  */
 
 export interface ContactLanguageOption {
-  /** Stored in DB. Must match an i18n.tsx key. */
+  /** Stored in DB. Distinct value per language; may share content via CONTENT_FALLBACK. */
   code: string;
   /** English label shown in the picker. */
   label: string;
@@ -29,16 +30,16 @@ export interface ContactLanguageOption {
 }
 
 export const CONTACT_LANGUAGES: ContactLanguageOption[] = [
-  // ── Pinned: top 6 AU community languages ──
-  { code: 'en',              label: 'English',              native: 'English',  flag: '🇬🇧', pinned: true },
-  { code: 'zh_simplified',   label: 'Mandarin (Simplified)', native: '简体中文',  flag: '🇨🇳', pinned: true },
-  { code: 'zh_traditional',  label: 'Mandarin (Traditional)', native: '繁體中文', flag: '🇹🇼', pinned: true },
-  { code: 'zh_traditional',  label: 'Cantonese',            native: '粵語',      flag: '🇭🇰', pinned: true },
-  { code: 'vi',              label: 'Vietnamese',           native: 'Tiếng Việt', flag: '🇻🇳', pinned: true },
-  { code: 'ar',              label: 'Arabic',               native: 'العربية',   flag: '🇸🇦', pinned: true },
-  { code: 'hi',              label: 'Hindi',                native: 'हिन्दी',     flag: '🇮🇳', pinned: true },
+  // ── Pinned: top AU community languages ──
+  { code: 'en',              label: 'English',                native: 'English',     flag: '🇬🇧', pinned: true },
+  { code: 'zh_simplified',   label: 'Mandarin (Simplified)',  native: '简体中文',      flag: '🇨🇳', pinned: true },
+  { code: 'zh_traditional',  label: 'Mandarin (Traditional)', native: '繁體中文',      flag: '🇹🇼', pinned: true },
+  { code: 'yue',             label: 'Cantonese',              native: '粵語',         flag: '🇭🇰', pinned: true },
+  { code: 'vi',              label: 'Vietnamese',             native: 'Tiếng Việt',  flag: '🇻🇳', pinned: true },
+  { code: 'ar',              label: 'Arabic',                 native: 'العربية',     flag: '🇸🇦', pinned: true },
+  { code: 'hi',              label: 'Hindi',                  native: 'हिन्दी',       flag: '🇮🇳', pinned: true },
 
-  // ── Remaining 24-language i18n set ──
+  // ── Remaining i18n set ──
   { code: 'ko',  label: 'Korean',     native: '한국어',     flag: '🇰🇷' },
   { code: 'ja',  label: 'Japanese',   native: '日本語',     flag: '🇯🇵' },
   { code: 'id',  label: 'Indonesian', native: 'Bahasa Indonesia', flag: '🇮🇩' },
@@ -60,7 +61,28 @@ export const CONTACT_LANGUAGES: ContactLanguageOption[] = [
 
 export const DEFAULT_CONTACT_LANGUAGE = 'en';
 
-/** Look up a label/native pair from a stored DB code (returns first match). */
+/**
+ * Content-resolution fallback map.
+ *
+ * When a downstream system (email/SMS template, listing translation, portal UI)
+ * doesn't have content for a given preferred_language, look here for the next
+ * best key. Used for written content only — voice/audio templates should NOT
+ * use this map (e.g. when Cantonese audio lands, `yue` will play `yue`, not
+ * `zh_traditional`).
+ *
+ * Revisit when voice/audio templates ship.
+ */
+export const CONTENT_FALLBACK: Record<string, string> = {
+  yue: 'zh_traditional', // Cantonese speakers read Traditional Chinese — written only
+};
+
+/** Resolve a preferred_language to the actual content key to fetch (written content). */
+export function resolveContentLanguage(code: string | null | undefined): string {
+  if (!code) return DEFAULT_CONTACT_LANGUAGE;
+  return CONTENT_FALLBACK[code] ?? code;
+}
+
+/** Look up a label/native pair from a stored DB code. */
 export function getContactLanguageOption(code: string | null | undefined): ContactLanguageOption | undefined {
   if (!code) return undefined;
   return CONTACT_LANGUAGES.find(l => l.code === code);

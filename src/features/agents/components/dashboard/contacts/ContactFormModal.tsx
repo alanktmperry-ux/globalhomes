@@ -428,6 +428,7 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
   };
 
   return (
+    <>
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>

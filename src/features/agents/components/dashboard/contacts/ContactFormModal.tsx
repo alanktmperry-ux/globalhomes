@@ -441,6 +441,8 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
             </Select>
           </div>
 
+          {leadPanel}
+
           <div>
             <Label className="text-xs">Notes</Label>
             <Textarea value={form.notes} onChange={e => setForm(f => ({...f, notes: e.target.value}))} rows={3} />
@@ -449,7 +451,7 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="outline" onClick={onClose}>Cancel</Button>
             <Button onClick={handleSave} disabled={!form.first_name.trim() || saving}>
-              {saving ? 'Saving…' : 'Save Contact'}
+              {saving ? 'Saving…' : (saveLabel ?? 'Save Contact')}
             </Button>
           </div>
         </div>

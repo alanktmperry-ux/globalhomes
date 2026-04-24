@@ -1601,7 +1601,9 @@ const Index = () => {
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-medium text-foreground">{filteredProperties.length} properties</span>
                 <div className="flex items-center gap-2">
-                  <FilterSidebar filters={filters} onChange={setFilters} isOpen={filtersOpen} onToggle={() => setFiltersOpen(o => !o)} totalCount={displayProperties.length} filteredCount={filteredProperties.length} />
+                  <Suspense fallback={null}>
+                    <FilterSidebar filters={filters} onChange={setFilters} isOpen={filtersOpen} onToggle={() => setFiltersOpen(o => !o)} totalCount={displayProperties.length} filteredCount={filteredProperties.length} />
+                  </Suspense>
                   <button onClick={() => setMobileView('map')} aria-label="Show map view" className="flex items-center gap-1.5 text-xs text-primary font-medium">
                     <Map size={14} /> Show map
                   </button>

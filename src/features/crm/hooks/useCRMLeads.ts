@@ -96,7 +96,7 @@ export function useCRMLeads(filters: Filters = {}) {
    * NOTE: Direct lead creation is deprecated. Use LeadContactForm instead,
    * which handles find-or-create on the contact side first.
    */
-  const createLead = async (_lead: Partial<CRMLead>) => {
+  const createLead = async (_lead: Partial<CRMLead>): Promise<null> => {
     console.warn('[useCRMLeads.createLead] Deprecated — use LeadContactForm');
     return null;
   };

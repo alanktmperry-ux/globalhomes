@@ -55,9 +55,14 @@ export default defineConfig(({ mode }) => ({
           if (id.includes("jspdf") || id.includes("html2canvas") || id.includes("pdfjs")) return "pdf";
           if (id.includes("@sentry")) return "sentry";
           if (id.includes("mapbox-gl") || id.includes("@googlemaps")) return "maps";
+          // framer-motion is heavy (~50KB gz). Index.tsx statically imports
+          // motion/useMotionValue/useSpring for the mobile bottom-sheet drag in
+          // the search-results branch. Splitting it out keeps it as a parallel
+          // request that doesn't block first paint of the landing hero.
+          if (id.includes("framer-motion")) return "motion";
 
-          // Everything else (lucide icons, radix UI, framer-motion, sonner,
-          // small utilities) shares one vendor chunk loaded with the homepage.
+          // Everything else (lucide icons, radix UI, sonner, small utilities)
+          // shares one vendor chunk loaded with the homepage.
           return "vendor";
         },
       },

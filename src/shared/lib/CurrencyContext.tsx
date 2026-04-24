@@ -61,6 +61,8 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   const [isLiveRates, setIsLiveRates] = useState(false);
 
   useEffect(() => {
+    // Defer the live-rates fetch until the browser is idle so it never blocks
+    // first paint. Falls back to setTimeout if requestIdleCallback isn't supported.
     const fetchRates = async () => {
       try {
         const { data, error } = await supabase.functions.invoke('get-exchange-rates');
@@ -78,7 +80,16 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
         // fallback silently
       }
     };
-    fetchRates();
+
+    const w = window as any;
+    const handle = w.requestIdleCallback
+      ? w.requestIdleCallback(fetchRates, { timeout: 4000 })
+      : window.setTimeout(fetchRates, 1500);
+
+    return () => {
+      if (w.cancelIdleCallback && typeof handle === 'number') w.cancelIdleCallback(handle);
+      else window.clearTimeout(handle);
+    };
   }, []);
 
   const currency = currencies.find(c => c.code === currencyCode) || currencies[0];

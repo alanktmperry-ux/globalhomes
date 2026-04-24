@@ -1,7 +1,11 @@
 import { useState, useCallback, useRef, useEffect, useMemo, lazy, Suspense } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { motion, AnimatePresence, useMotionValue, useSpring, PanInfo } from 'framer-motion';
+// framer-motion is split into its own chunk via vite.config.ts manualChunks.
+// The landing hero uses plain CSS animations to avoid loading this chunk on
+// cold paint. motion is only referenced in the search-results branch (mobile
+// bottom sheet drag), which loads after the user runs a search.
+import { motion, useMotionValue, useSpring, type PanInfo } from 'framer-motion';
 import { ArrowRight, MapPin, Sparkles, Map, List, Mic, MicOff, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users, Search, Home, Check, ArrowLeftRight, UserCheck, ChevronRight, Globe } from 'lucide-react';
 import { VoiceSearchHero } from '@/features/search/components/VoiceSearchHero';
 import { TranslationDemoCard } from '@/features/marketing/components/TranslationDemoCard';
@@ -916,10 +920,8 @@ const Index = () => {
   );
 
   const emptyPlaceholder = (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="flex flex-col items-center justify-center py-16 px-6"
+    <div
+      className="flex flex-col items-center justify-center py-16 px-6 animate-in fade-in slide-in-from-bottom-3 duration-500"
     >
       <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
         <MapPin size={28} className="text-primary" />
@@ -930,7 +932,7 @@ const Index = () => {
       <p className="text-sm text-muted-foreground text-center max-w-xs">
         Agents are setting up their listings. Check back shortly!
       </p>
-    </motion.div>
+    </div>
   );
 
   const showEmptyState = filteredProperties.length === 0 && !isSearching && !hasSearched;
@@ -1041,13 +1043,7 @@ const Index = () => {
     }
   };
 
-  // ── Scroll animation config ──
-  const sectionAnim = {
-    initial: { opacity: 0, y: 24 } as const,
-    whileInView: { opacity: 1, y: 0 } as const,
-    viewport: { once: true, amount: 0.05, margin: '-40px' } as const,
-    transition: { duration: 0.5, ease: 'easeOut' as const },
-  };
+  // (sectionAnim removed — landing sections no longer use framer-motion to keep it off the cold-paint critical path.)
 
   // ── Landing hero: shown until first search, hidden if URL has params ──
   if (!hasSearchParams) {
@@ -1061,22 +1057,16 @@ const Index = () => {
           <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-100/30 blur-[120px] pointer-events-none" />
           <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-violet-100/20 blur-[100px] pointer-events-none" />
 
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="relative z-10 max-w-3xl w-full"
+          <div
+            className="relative z-10 max-w-3xl w-full animate-in fade-in slide-in-from-bottom-6 duration-700"
           >
             {/* Eyebrow */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.1, duration: 0.5 }}
-              className="inline-flex items-center gap-2 mb-8 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-xs font-medium tracking-wide"
+            <div
+              className="inline-flex items-center gap-2 mb-8 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-xs font-medium tracking-wide animate-in fade-in zoom-in-95 duration-500 delay-100 fill-mode-both"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
               {t('hero.eyebrow')}
-            </motion.div>
+            </div>
 
             {/* Headline */}
             <h1 className="text-5xl md:text-7xl font-black leading-tight tracking-tight text-slate-900">
@@ -1193,7 +1183,7 @@ const Index = () => {
                 🔍 {t('hero.browseProperties')}
               </button>
             </div>
-          </motion.div>
+          </div>
 
           {/* ── AUDIENCE SPLIT TILES ── */}
           <div className="relative z-10 mt-12 w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 px-2 text-left">
@@ -1224,24 +1214,21 @@ const Index = () => {
           </div>
 
           {/* Stats strip */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            className="relative z-10 mt-8 max-w-2xl w-full mx-auto"
+          <div
+            className="relative z-10 mt-8 max-w-2xl w-full mx-auto animate-in fade-in duration-700 delay-500 fill-mode-both"
           >
             <p className="text-center text-lg md:text-xl font-semibold text-foreground">
               <span className="underline decoration-blue-500 decoration-2 underline-offset-4">1 in 5</span>{' '}
               Australian buyers doesn't search in English. ListHQ lists them all.
             </p>
-          </motion.div>
+          </div>
         </section>
 
         {/* ── TRANSLATION DEMO ── */}
         <TranslationDemoInline />
 
         {/* ── FEATURED LISTINGS ── */}
-        <motion.section {...sectionAnim} id="featured-listings" className="bg-white py-12 px-6">
+        <section id="featured-listings" className="bg-white py-12 px-6">
           <div className="max-w-5xl mx-auto">
             <div className="flex items-baseline justify-between mb-6">
               <div>
@@ -1296,13 +1283,13 @@ const Index = () => {
               </button>
             </div>
           </div>
-        </motion.section>
+        </section>
 
         {/* ── HOW IT WORKS ── */}
         <HowItWorksSection t={t} />
 
         {/* ── AGENT CTA ── */}
-        <motion.section {...sectionAnim} className="bg-slate-900 py-16 px-6 text-center">
+        <section className="bg-slate-900 py-16 px-6 text-center">
           <div className="max-w-2xl mx-auto">
             <h2 className="text-2xl font-semibold text-white mb-3">{t('home.agentBannerHeadline')}</h2>
             <p className="text-sm text-slate-400 mb-8">{t('home.agentBannerSub')}</p>
@@ -1313,10 +1300,10 @@ const Index = () => {
               {t('home.agentBannerCta')} →
             </button>
           </div>
-        </motion.section>
+        </section>
 
         {/* ── FOR AGENTS — Compact 2-column ── */}
-        <motion.section {...sectionAnim} className="bg-slate-950 py-16 px-6">
+        <section className="bg-slate-950 py-16 px-6">
           <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
             {/* Left: bullets */}
             <div>
@@ -1350,7 +1337,7 @@ const Index = () => {
               </button>
             </div>
           </div>
-        </motion.section>
+        </section>
       </div>
     );
   }

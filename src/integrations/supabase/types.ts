@@ -277,6 +277,53 @@ export type Database = {
           },
         ]
       }
+      agent_dashboard_prefs: {
+        Row: {
+          agent_id: string
+          prefs: Json
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          prefs?: Json
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          prefs?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_dashboard_prefs_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: true
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_dashboard_prefs_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: true
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_dashboard_prefs_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: true
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_dashboard_prefs_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: true
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+        ]
+      }
       agent_lifecycle_notes: {
         Row: {
           agent_id: string
@@ -476,6 +523,62 @@ export type Database = {
             foreignKeyName: "agent_performance_stats_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: true
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+        ]
+      }
+      agent_priority_dismissals: {
+        Row: {
+          agent_id: string
+          created_at: string
+          dismissed_until: string
+          id: string
+          source_id: string
+          source_key: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          dismissed_until: string
+          id?: string
+          source_id: string
+          source_key: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          dismissed_until?: string
+          id?: string
+          source_id?: string
+          source_key?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_priority_dismissals_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_priority_dismissals_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_priority_dismissals_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_priority_dismissals_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
             referencedRelation: "trust_account_balances"
             referencedColumns: ["agent_id"]
           },
@@ -4890,6 +4993,7 @@ export type Database = {
           preferred_contact: string | null
           property_id: string
           read: boolean | null
+          responded_at: string | null
           score: number | null
           search_context: Json | null
           source: string | null
@@ -4916,6 +5020,7 @@ export type Database = {
           preferred_contact?: string | null
           property_id: string
           read?: boolean | null
+          responded_at?: string | null
           score?: number | null
           search_context?: Json | null
           source?: string | null
@@ -4942,6 +5047,7 @@ export type Database = {
           preferred_contact?: string | null
           property_id?: string
           read?: boolean | null
+          responded_at?: string | null
           score?: number | null
           search_context?: Json | null
           source?: string | null

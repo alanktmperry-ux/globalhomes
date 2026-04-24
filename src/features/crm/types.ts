@@ -53,6 +53,22 @@ export interface CRMLead {
   };
   activity_count?: number;
   open_tasks?: number;
+
+  /**
+   * Backward-compatible accessor fields, populated at fetch time by
+   * `useCRMLeads` decorate(). These mirror values from the joined contact
+   * (or lead metadata) so existing UI doesn't have to change all at once.
+   * Prefer the `contact.*` and lead-native fields in new code.
+   */
+  first_name?: string;
+  last_name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  source?: LeadSource;          // alias for enquiry_source
+  budget_min?: number | null;   // from contact
+  budget_max?: number | null;   // from contact
+  pre_approved?: boolean;       // legacy — always false in new schema
+  property_id?: string | null;  // alias for source_property_id
 }
 
 export interface CRMActivity {

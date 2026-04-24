@@ -2,12 +2,14 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { CRMLead, LeadStage } from '../types';
 import { useAgentId } from './useAgentId';
+import { computeUrgency, useUrgencyThresholds, type UrgencyTier } from '../lib/urgency';
 
 interface Filters {
   stage?: LeadStage | 'all';
   search?: string;
   propertyId?: string;
   priority?: string;
+  urgency?: UrgencyTier[];
 }
 
 /**

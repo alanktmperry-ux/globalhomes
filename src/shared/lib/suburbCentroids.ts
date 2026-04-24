@@ -6,7 +6,7 @@ export const SUBURB_CENTROIDS: Record<string, { lat: number; lng: number }> = {
   // Melbourne / VIC
   melbourne: { lat: -37.8136, lng: 144.9631 },
   'melbourne cbd': { lat: -37.8136, lng: 144.9631 },
-  prahran: { lat: -37.8513, lng: 144.9956 },
+  prahran: { lat: -37.8520, lng: 144.9950 },
   toorak: { lat: -37.8417, lng: 145.0153 },
   'south yarra': { lat: -37.8389, lng: 144.9925 },
   windsor: { lat: -37.8567, lng: 144.9928 },

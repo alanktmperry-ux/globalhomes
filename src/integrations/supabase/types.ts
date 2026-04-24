@@ -6346,6 +6346,53 @@ export type Database = {
         }
         Relationships: []
       }
+      pipeline_stages: {
+        Row: {
+          agency_id: string
+          color: string
+          created_at: string
+          deleted_at: string | null
+          display_order: number
+          id: string
+          is_active: boolean
+          label: string
+          probability: number
+          updated_at: string
+        }
+        Insert: {
+          agency_id: string
+          color?: string
+          created_at?: string
+          deleted_at?: string | null
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          label: string
+          probability?: number
+          updated_at?: string
+        }
+        Update: {
+          agency_id?: string
+          color?: string
+          created_at?: string
+          deleted_at?: string | null
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          label?: string
+          probability?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pipeline_stages_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pm_automation_log: {
         Row: {
           agent_id: string | null
@@ -6874,6 +6921,7 @@ export type Database = {
           sold_at: string | null
           sold_price: number | null
           sqm: number
+          stage_id: string | null
           state: string
           status: string
           str_permitted: boolean | null
@@ -7018,6 +7066,7 @@ export type Database = {
           sold_at?: string | null
           sold_price?: number | null
           sqm?: number
+          stage_id?: string | null
           state: string
           status?: string
           str_permitted?: boolean | null
@@ -7162,6 +7211,7 @@ export type Database = {
           sold_at?: string | null
           sold_price?: number | null
           sqm?: number
+          stage_id?: string | null
           state?: string
           status?: string
           str_permitted?: boolean | null
@@ -7218,6 +7268,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "trust_account_balances"
             referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "properties_stage_id_fkey"
+            columns: ["stage_id"]
+            isOneToOne: false
+            referencedRelation: "pipeline_stages"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -12456,6 +12513,7 @@ export type Database = {
           sold_at: string | null
           sold_price: number | null
           sqm: number
+          stage_id: string | null
           state: string
           status: string
           str_permitted: boolean | null
@@ -12528,6 +12586,10 @@ export type Database = {
           id: string
           name: string
         }[]
+      }
+      seed_default_pipeline_stages: {
+        Args: { p_agency_id: string }
+        Returns: undefined
       }
       seed_owner_statement_reminder_rule: {
         Args: { _agent_id: string }

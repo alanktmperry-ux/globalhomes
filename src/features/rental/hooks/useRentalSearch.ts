@@ -29,6 +29,7 @@ export function useRentalSearch(filters: RentalFilters = {}) {
         .select('*', { count: 'exact' })
         .eq('listing_category', 'rent')
         .eq('is_active', true)
+        .eq('status', 'public')
         .order('created_at', { ascending: false });
 
       if (filters.suburb) q = q.ilike('suburb', `%${filters.suburb}%`);

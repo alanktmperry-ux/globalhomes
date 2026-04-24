@@ -212,6 +212,21 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
     (initialData?.communication_preferences as CommPreference[] | undefined) ?? []
   );
 
+  // Live duplicate detection — only when creating, not editing
+  const isEditing = Boolean((initialData as any)?.id);
+  const { matches: duplicateMatches } = useDuplicateMatches({
+    agencyId,
+    enabled: !isEditing,
+    excludeContactId: (initialData as any)?.id ?? null,
+    query: {
+      email: form.email,
+      phone: form.phone,
+      firstName: form.first_name,
+      lastName: form.last_name,
+      address: form.address,
+    },
+  });
+
   const [addressQuery, setAddressQuery] = useState(
     [initialData?.address, initialData?.suburb, initialData?.state, initialData?.postcode, initialData?.country]
       .filter(Boolean).join(', ') || ''

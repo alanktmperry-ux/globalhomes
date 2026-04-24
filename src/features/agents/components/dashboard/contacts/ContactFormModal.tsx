@@ -15,6 +15,12 @@ interface Props {
   onClose: () => void;
   onSave: (data: Partial<Contact>) => Promise<void>;
   initialData?: Partial<Contact>;
+  /** Optional dialog title override (e.g. "Add New Lead" when used in lead context) */
+  title?: string;
+  /** Optional save button label override */
+  saveLabel?: string;
+  /** Optional extra panel rendered between Source and Notes — used by LeadContactForm */
+  leadPanel?: React.ReactNode;
 }
 
 interface SuburbPickerProps {

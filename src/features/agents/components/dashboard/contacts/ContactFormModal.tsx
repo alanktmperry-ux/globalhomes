@@ -160,7 +160,7 @@ function SuburbPicker({ suburbs, onChange }: SuburbPickerProps) {
   );
 }
 
-const ContactFormModal = ({ onClose, onSave, initialData }: Props) => {
+const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, leadPanel }: Props) => {
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
   const [form, setForm] = useState({

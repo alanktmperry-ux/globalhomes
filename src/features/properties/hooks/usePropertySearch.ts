@@ -11,6 +11,7 @@ import { isInsidePolygon, haversineDistance } from '@/shared/lib/geoUtils';
 import { useRealtimeProperties } from './useRealtimeProperties';
 import { useCurrency, ListingMode } from '@/shared/lib/CurrencyContext';
 import { supabase } from '@/integrations/supabase/client';
+import { lookupSuburbCentroid } from '@/shared/lib/suburbCentroids';
 
 
 // ── Types ────────────────────────────────────────────────────

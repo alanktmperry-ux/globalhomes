@@ -22,7 +22,11 @@ import { useSavedProperties } from '@/features/properties/hooks/useSavedProperti
 import { useIsMobile } from '@/shared/hooks/use-mobile';
 import { Property } from '@/shared/lib/types';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
-import { FilterSidebar } from '@/shared/components/FilterSidebar';
+// Lazy-load FilterSidebar — it pulls in calendar/day-picker/date-fns and is
+// only shown after the user opens the filters panel.
+const FilterSidebar = lazy(() =>
+  import('@/shared/components/FilterSidebar').then(m => ({ default: m.FilterSidebar }))
+);
 import { usePropertySearch } from '@/features/properties/hooks/usePropertySearch';
 import { Slider } from '@/components/ui/slider';
 import { useSavedSearches } from '@/features/search/hooks/useSavedSearches';
@@ -833,15 +837,17 @@ const Index = () => {
             Save
           </button>
         )}
-        <FilterSidebar
-          filters={filters}
-          onChange={setFilters}
-          isOpen={filtersOpen}
-          onToggle={() => setFiltersOpen(o => !o)}
-          totalCount={displayProperties.length}
-          filteredCount={filteredProperties.length}
-          listingMode={listingMode}
-        />
+        <Suspense fallback={null}>
+          <FilterSidebar
+            filters={filters}
+            onChange={setFilters}
+            isOpen={filtersOpen}
+            onToggle={() => setFiltersOpen(o => !o)}
+            totalCount={displayProperties.length}
+            filteredCount={filteredProperties.length}
+            listingMode={listingMode}
+          />
+        </Suspense>
         <div className="relative">
           <select
             value={sortBy}
@@ -1544,14 +1550,16 @@ const Index = () => {
                     {filteredProperties.length} {filteredProperties.length === 1 ? 'property' : 'properties'}
                   </span>
                   <div className="flex items-center gap-2">
-                    <FilterSidebar
-                      filters={filters}
-                      onChange={setFilters}
-                      isOpen={filtersOpen}
-                      onToggle={() => setFiltersOpen(o => !o)}
-                      totalCount={displayProperties.length}
-                      filteredCount={filteredProperties.length}
-                    />
+                    <Suspense fallback={null}>
+                      <FilterSidebar
+                        filters={filters}
+                        onChange={setFilters}
+                        isOpen={filtersOpen}
+                        onToggle={() => setFiltersOpen(o => !o)}
+                        totalCount={displayProperties.length}
+                        filteredCount={filteredProperties.length}
+                      />
+                    </Suspense>
                     <button onClick={() => setMobileView('list')} className="text-xs text-primary font-medium">
                       View list
                     </button>
@@ -1593,7 +1601,9 @@ const Index = () => {
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-medium text-foreground">{filteredProperties.length} properties</span>
                 <div className="flex items-center gap-2">
-                  <FilterSidebar filters={filters} onChange={setFilters} isOpen={filtersOpen} onToggle={() => setFiltersOpen(o => !o)} totalCount={displayProperties.length} filteredCount={filteredProperties.length} />
+                  <Suspense fallback={null}>
+                    <FilterSidebar filters={filters} onChange={setFilters} isOpen={filtersOpen} onToggle={() => setFiltersOpen(o => !o)} totalCount={displayProperties.length} filteredCount={filteredProperties.length} />
+                  </Suspense>
                   <button onClick={() => setMobileView('map')} aria-label="Show map view" className="flex items-center gap-1.5 text-xs text-primary font-medium">
                     <Map size={14} /> Show map
                   </button>

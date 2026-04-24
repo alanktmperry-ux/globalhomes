@@ -13,44 +13,11 @@ import { format } from 'date-fns';
 import { useCurrency } from '@/lib/CurrencyContext';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
-export interface Filters {
-  priceRange: [number, number];
-  propertyTypes: string[];
-  minBeds: number;
-  minBaths: number;
-  minParking: number;
-  features: string[];
-  // Rental-specific
-  petFriendly: boolean;
-  furnished: boolean;
-  availableNow: boolean;
-  availableFrom: Date | null;
-  leaseTerm: string;
-  schoolZone: string;
-  // Sale-specific
-  firstHomeBuyer: boolean;
-}
-
-export const defaultFilters: Filters = {
-  priceRange: [0, 5_000_000],
-  propertyTypes: [],
-  minBeds: 0,
-  minBaths: 0,
-  minParking: 0,
-  features: [],
-  petFriendly: false,
-  furnished: false,
-  availableNow: false,
-  availableFrom: null,
-  leaseTerm: '',
-  schoolZone: '',
-  firstHomeBuyer: false,
-};
-
-const defaultRentalFilters: Filters = {
-  ...defaultFilters,
-  priceRange: [0, 3_000],
-};
+// Types + defaults are defined in FilterSidebar.types so they can be imported
+// without dragging in this heavy component (calendar, day-picker, date-fns).
+export type { Filters } from './FilterSidebar.types';
+import { type Filters, defaultFilters, defaultRentalFilters } from './FilterSidebar.types';
+export { defaultFilters, defaultRentalFilters } from './FilterSidebar.types';
 
 // (PROPERTY_TYPES, COMMON_FEATURES, LEASE_TERMS are now defined inside the component for i18n)
 

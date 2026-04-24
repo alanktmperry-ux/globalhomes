@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { geocode } from '@/shared/lib/googleMapsService';
 import { Property } from '@/shared/lib/types';
 
-import { Filters, defaultFilters } from '@/shared/components/FilterSidebar';
+import { Filters, defaultFilters } from '@/shared/components/FilterSidebar.types';
 import { searchAgentListings } from '@/features/properties/api/fetchPublicProperties';
 import { mapDbProperty } from '@/features/properties/api/fetchPublicProperties';
 import { toast } from 'sonner';

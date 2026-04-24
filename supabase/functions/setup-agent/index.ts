@@ -163,6 +163,7 @@ Deno.serve(async (req) => {
 
       if (!agency) throw new Error("Failed to resolve agency");
 
+      const { error: memberError } = await supabaseAdmin
         .from("agency_members")
         .insert({ agency_id: agency.id, user_id: userId, role: "principal" });
       if (memberError && !memberError.message.includes("duplicate")) throw memberError;

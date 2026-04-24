@@ -191,6 +191,10 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
     preferred_language: (initialData as any)?.preferred_language || DEFAULT_CONTACT_LANGUAGE,
   });
 
+  const [commPrefs, setCommPrefs] = useState<CommPreference[]>(
+    (initialData?.communication_preferences as CommPreference[] | undefined) ?? []
+  );
+
   const [addressQuery, setAddressQuery] = useState(
     [initialData?.address, initialData?.suburb, initialData?.state, initialData?.postcode, initialData?.country]
       .filter(Boolean).join(', ') || ''

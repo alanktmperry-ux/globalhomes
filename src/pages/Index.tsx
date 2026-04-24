@@ -41,7 +41,8 @@ import { Slider } from '@/components/ui/slider';
 import { useSavedSearches } from '@/features/search/hooks/useSavedSearches';
 import { useCollabSession } from '@/features/search/hooks/useCollabSession';
 import { useAuth } from '@/features/auth/AuthProvider';
-import ConsumerSignUpModal from '@/features/search/components/ConsumerSignUpModal';
+// Lazy — only opens after the 3rd anonymous search.
+const ConsumerSignUpModal = lazy(() => import('@/features/search/components/ConsumerSignUpModal'));
 import { supabase } from '@/integrations/supabase/client';
 import { geocode } from '@/shared/lib/googleMapsService';
 

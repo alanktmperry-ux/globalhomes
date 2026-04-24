@@ -20,19 +20,38 @@ export default defineConfig(({ mode }) => ({
         chunkFileNames: "assets/[name].js",
         entryFileNames: "assets/[name].js",
         manualChunks(id) {
-          if (id.includes("lucide-react")) return "ui-icons";
-          if (id.includes("@radix-ui")) return "ui-radix";
+          if (!id.includes("node_modules")) return;
+          // Keep React + everything that depends on React in ONE chunk to avoid
+          // "Cannot read properties of undefined (reading 'Component')" caused
+          // by vendor modules evaluating before React is initialised.
           if (
             id.includes("node_modules/react/") ||
             id.includes("node_modules/react-dom/") ||
-            id.includes("react-router")
+            id.includes("node_modules/scheduler/") ||
+            id.includes("react-router") ||
+            id.includes("@radix-ui") ||
+            id.includes("lucide-react") ||
+            id.includes("react-helmet-async") ||
+            id.includes("react-hook-form") ||
+            id.includes("@hookform") ||
+            id.includes("react-day-picker") ||
+            id.includes("react-resizable-panels") ||
+            id.includes("react-markdown") ||
+            id.includes("react-window") ||
+            id.includes("@tanstack") ||
+            id.includes("framer-motion") ||
+            id.includes("recharts") ||
+            id.includes("embla-carousel") ||
+            id.includes("cmdk") ||
+            id.includes("vaul") ||
+            id.includes("sonner") ||
+            id.includes("next-themes") ||
+            id.includes("input-otp")
           ) {
             return "react-vendor";
           }
           if (id.includes("@supabase")) return "supabase";
-          if (id.includes("framer-motion")) return "framer";
-          if (id.includes("@tanstack")) return "tanstack";
-          if (id.includes("node_modules")) return "vendor";
+          return "vendor";
         },
       },
     },

@@ -188,12 +188,17 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
             ].filter(Boolean);
             if (locationParts.length > 0) {
               const locationQuery = locationParts.join(', ');
+              const aiStaticCenter = intent.suburb ? lookupSuburbCentroid(String(intent.suburb)) : null;
+              if (aiStaticCenter) {
+                setSearchCenter(aiStaticCenter);
+                setSearchRadius(prev => prev ?? 10);
+              }
               geocode(locationQuery)
                 .then((coords) => {
                   if (coords) setSearchCenter(coords);
                 })
                 .catch(() => {
-                  // Geocoding failed silently — map stays at current position
+                  // Geocoding failed silently — static centroid (if any) already applied
                 });
             }
           }

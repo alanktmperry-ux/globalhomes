@@ -259,6 +259,30 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
 
   const handleSave = async () => {
     if (!form.first_name.trim()) return;
+
+    // Build communication_preferences. Auto-populate from email/phone if empty.
+    let prefsToSave: CommPreference[] = commPrefs.filter(p => p.handle.trim().length > 0);
+    if (prefsToSave.length === 0) {
+      const auto: CommPreference[] = [];
+      if (form.phone.trim()) auto.push({ channel: 'phone', handle: form.phone.trim(), is_primary: true });
+      if (form.email.trim()) auto.push({ channel: 'email', handle: form.email.trim(), is_primary: auto.length === 0 });
+      prefsToSave = auto;
+    }
+    // Ensure exactly one primary if any prefs
+    if (prefsToSave.length > 0 && !prefsToSave.some(p => p.is_primary)) {
+      prefsToSave[0].is_primary = true;
+    }
+    // Client-side guard for handle format (the DB trigger is the source of truth)
+    const bad = prefsToSave.find(p => !isValidHandle(p.channel as any, p.handle));
+    if (bad) {
+      toast({
+        title: '❌ Invalid contact channel',
+        description: `Check the format for ${bad.channel}: ${bad.handle}`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setSaving(true);
     try {
       await onSave({
@@ -270,6 +294,7 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
         preferred_beds: form.preferred_beds ? Math.max(0, Number(form.preferred_beds)) : null,
         preferred_baths: form.preferred_baths ? Math.max(0, Number(form.preferred_baths)) : null,
         estimated_value: form.estimated_value ? Math.max(0, Number(form.estimated_value)) : null,
+        communication_preferences: prefsToSave,
       } as any);
       toast({ title: '✅ Contact saved', description: `${form.first_name} ${form.last_name}`.trim() });
       onClose();

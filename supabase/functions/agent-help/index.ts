@@ -81,6 +81,7 @@ const SYSTEM_PROMPT = `You are the ListHQ help assistant. Answer agent questions
 ${FAQ_CONTEXT}`;
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get("Origin"));
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

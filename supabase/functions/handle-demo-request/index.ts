@@ -158,9 +158,9 @@ Deno.serve(async (req) => {
       const demoEmail = "demo@listhq.com.au";
       const demoPassword = Deno.env.get("DEMO_ACCOUNT_PASSWORD") || crypto.randomUUID();
 
-      // Use getUserByEmail instead of full-table scan (fix #6)
-      const { data: demoUserData, error: demoGetErr } = await supabase.auth.admin.getUserByEmail(demoEmail);
-      let demoUser = demoGetErr ? null : demoUserData?.user || null;
+      // Look up demo user by email via listUsers (getUserByEmail removed in newer SDK)
+      const { data: listData, error: demoGetErr } = await supabase.auth.admin.listUsers();
+      let demoUser = demoGetErr ? null : (listData?.users?.find((u: { email?: string }) => u.email === demoEmail) || null);
 
       if (!demoUser) {
         const { data: created, error: createErr } = await supabase.auth.admin.createUser({
@@ -205,12 +205,8 @@ Deno.serve(async (req) => {
         email: demoEmail,
       });
 
-      // Sign in as demo user to get session tokens
-      const { data: signInData, error: signInErr } = await supabase.auth.admin.createSession({
-        user_id: demoUser.id,
-      });
-
-      // Fallback: use generateLink token if createSession unavailable
+      // createSession is not available in current SDK — rely on magic-link fallback below
+      const signInData: { session?: { access_token?: string; refresh_token?: string } } | null = null;
       let accessToken = signInData?.session?.access_token;
       let refreshToken = signInData?.session?.refresh_token;
 

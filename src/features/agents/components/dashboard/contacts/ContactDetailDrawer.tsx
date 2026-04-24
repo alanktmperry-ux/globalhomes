@@ -123,6 +123,53 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
         </SheetHeader>
 
         <div className="mt-6 space-y-5">
+          {/* Next Action — inline editor */}
+          {(() => {
+            const dueMs = contact.next_action_due_at ? new Date(contact.next_action_due_at).getTime() : null;
+            const isOverdue = dueMs != null && dueMs < Date.now();
+            const isDueSoon = dueMs != null && !isOverdue && dueMs - Date.now() < 24 * 60 * 60 * 1000;
+            const banner = isOverdue
+              ? 'border-destructive/40 bg-destructive/10'
+              : isDueSoon
+              ? 'border-amber-500/40 bg-amber-500/10'
+              : 'border-border bg-muted/30';
+            return (
+              <section className={`rounded-lg border p-3 space-y-2 ${banner}`}>
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-semibold uppercase">
+                    Next Action {contact.last_contacted_at && (
+                      <span className="ml-2 normal-case text-[10px] font-normal text-muted-foreground">
+                        · last contacted {new Date(contact.last_contacted_at).toLocaleDateString('en-AU')}
+                      </span>
+                    )}
+                  </h4>
+                  {(contact.next_action_due_at || contact.next_action_note) && (
+                    <Button size="sm" variant="ghost" className="h-6 px-2 text-[10px]" onClick={handleClearNextAction} disabled={savingNext}>
+                      Clear
+                    </Button>
+                  )}
+                </div>
+                <div className="grid grid-cols-[auto_1fr_auto] gap-2 items-center">
+                  <Input
+                    type="datetime-local"
+                    value={nextDue}
+                    onChange={(e) => setNextDue(e.target.value)}
+                    className="h-8 text-xs w-auto"
+                  />
+                  <Input
+                    placeholder="What's due? (e.g. Follow up re: 12 Smith St)"
+                    value={nextNote}
+                    onChange={(e) => setNextNote(e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                  <Button size="sm" onClick={handleSaveNextAction} className="h-8 text-xs" disabled={savingNext}>
+                    Save
+                  </Button>
+                </div>
+              </section>
+            );
+          })()}
+
           {/* Contact Info */}
           <section className="space-y-2">
             <h4 className="text-xs font-semibold text-muted-foreground uppercase">Contact Details</h4>

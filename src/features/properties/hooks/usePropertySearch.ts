@@ -62,7 +62,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
     isLoading: dbLoading,
     error: dbError,
   } = useRealtimeProperties({
-    limit: 50,
+    limit: 100,
     nearbyCenter: searchCenter,
     nearbyRadiusKm: searchRadius,
     listingType: listingMode,

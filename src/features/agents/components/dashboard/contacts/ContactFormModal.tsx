@@ -15,6 +15,12 @@ interface Props {
   onClose: () => void;
   onSave: (data: Partial<Contact>) => Promise<void>;
   initialData?: Partial<Contact>;
+  /** Optional dialog title override (e.g. "Add New Lead" when used in lead context) */
+  title?: string;
+  /** Optional save button label override */
+  saveLabel?: string;
+  /** Optional extra panel rendered between Source and Notes — used by LeadContactForm */
+  leadPanel?: React.ReactNode;
 }
 
 interface SuburbPickerProps {
@@ -154,7 +160,7 @@ function SuburbPicker({ suburbs, onChange }: SuburbPickerProps) {
   );
 }
 
-const ContactFormModal = ({ onClose, onSave, initialData }: Props) => {
+const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, leadPanel }: Props) => {
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
   const [form, setForm] = useState({
@@ -273,7 +279,7 @@ const ContactFormModal = ({ onClose, onSave, initialData }: Props) => {
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{initialData ? 'Edit Contact' : 'Add New Contact'}</DialogTitle>
+          <DialogTitle>{title ?? (initialData ? 'Edit Contact' : 'Add New Contact')}</DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4 py-2">
@@ -435,6 +441,8 @@ const ContactFormModal = ({ onClose, onSave, initialData }: Props) => {
             </Select>
           </div>
 
+          {leadPanel}
+
           <div>
             <Label className="text-xs">Notes</Label>
             <Textarea value={form.notes} onChange={e => setForm(f => ({...f, notes: e.target.value}))} rows={3} />
@@ -443,7 +451,7 @@ const ContactFormModal = ({ onClose, onSave, initialData }: Props) => {
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="outline" onClick={onClose}>Cancel</Button>
             <Button onClick={handleSave} disabled={!form.first_name.trim() || saving}>
-              {saving ? 'Saving…' : 'Save Contact'}
+              {saving ? 'Saving…' : (saveLabel ?? 'Save Contact')}
             </Button>
           </div>
         </div>

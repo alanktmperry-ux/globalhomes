@@ -2,7 +2,9 @@ import { useState, useRef, useEffect } from 'react';
 import { MapPin, Bookmark } from 'lucide-react';
 import { Globe, ChevronDown, User, LogIn, Home, Building2, Plus, List, LayoutDashboard, ShieldCheck, Menu, FileText, Handshake, Wrench, Sparkles, Search, MoreHorizontal, HelpCircle, Users, Banknote } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+// framer-motion intentionally NOT imported — it forced the whole library into
+// the cold-paint critical path. Dropdowns now use plain conditional rendering
+// with CSS transitions for the same visual effect at zero JS cost.
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { NotificationBell } from '@/features/agents/components/dashboard/NotificationBell';
@@ -94,32 +96,27 @@ export function SiteHeader() {
             >
               <MoreHorizontal size={18} />
             </button>
-            <AnimatePresence>
-              {showMoreMenu && (
-                <motion.div
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
-                  className="absolute right-0 top-full mt-1 w-52 bg-popover border border-border rounded-xl shadow-elevated overflow-hidden z-50"
-                >
-                  <button onClick={() => { navigate('/brokers'); setShowMoreMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                    <Banknote size={14} className="text-muted-foreground" /> Find a Broker
-                  </button>
-                  <button onClick={() => { navigate('/home-services'); setShowMoreMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                    <Wrench size={14} className="text-muted-foreground" /> Services
-                  </button>
-                  <button onClick={() => { navigate('/conveyancing'); setShowMoreMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                    <FileText size={14} className="text-muted-foreground" /> Conveyancing
-                  </button>
-                  <button onClick={() => { navigate('/refer'); setShowMoreMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                    <Handshake size={14} className="text-muted-foreground" /> Referral Program
-                  </button>
-                  <button onClick={() => { navigate('/help'); setShowMoreMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                    <HelpCircle size={14} className="text-muted-foreground" /> Help Centre
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {showMoreMenu && (
+              <div
+                className="absolute right-0 top-full mt-1 w-52 bg-popover border border-border rounded-xl shadow-elevated overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150"
+              >
+                <button onClick={() => { navigate('/brokers'); setShowMoreMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                  <Banknote size={14} className="text-muted-foreground" /> Find a Broker
+                </button>
+                <button onClick={() => { navigate('/home-services'); setShowMoreMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                  <Wrench size={14} className="text-muted-foreground" /> Services
+                </button>
+                <button onClick={() => { navigate('/conveyancing'); setShowMoreMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                  <FileText size={14} className="text-muted-foreground" /> Conveyancing
+                </button>
+                <button onClick={() => { navigate('/refer'); setShowMoreMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                  <Handshake size={14} className="text-muted-foreground" /> Referral Program
+                </button>
+                <button onClick={() => { navigate('/help'); setShowMoreMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                  <HelpCircle size={14} className="text-muted-foreground" /> Help Centre
+                </button>
+              </div>
+            )}
           </div>
 
 
@@ -178,46 +175,41 @@ export function SiteHeader() {
                 {isAgent && <ChevronDown size={12} />}
               </button>
 
-              <AnimatePresence>
-                {isAgent && showAgentMenu && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -4 }}
-                    className="absolute right-0 top-full mt-1 w-48 bg-popover border border-border rounded-xl shadow-elevated overflow-hidden z-50"
+              {isAgent && showAgentMenu && (
+                <div
+                  className="absolute right-0 top-full mt-1 w-48 bg-popover border border-border rounded-xl shadow-elevated overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150"
+                >
+                  <button
+                    onClick={() => { localStorage.removeItem('pocket-listing-draft'); navigate('/pocket-listing?type=sale&t=' + Date.now()); setShowAgentMenu(false); }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors"
                   >
-                    <button
-                      onClick={() => { localStorage.removeItem('pocket-listing-draft'); navigate('/pocket-listing?type=sale&t=' + Date.now()); setShowAgentMenu(false); }}
-                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors"
-                    >
-                      <Plus size={14} className="text-primary" />
-                      Sale Listing
-                    </button>
-                    <button
-                      onClick={() => { localStorage.removeItem('pocket-listing-draft'); navigate('/pocket-listing?type=rent&t=' + Date.now()); setShowAgentMenu(false); }}
-                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors"
-                    >
-                      <Plus size={14} className="text-primary" />
-                      Rental Listing
-                    </button>
-                    <button
-                      onClick={() => { navigate('/dashboard/listings'); setShowAgentMenu(false); }}
-                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors"
-                    >
-                      <List size={14} className="text-muted-foreground" />
-                      {t('header.myListings')}
-                    </button>
-                    <div className="border-t border-border" />
-                    <button
-                      onClick={() => { navigate('/dashboard'); setShowAgentMenu(false); }}
-                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors"
-                    >
-                      <LayoutDashboard size={14} className="text-muted-foreground" />
-                      Dashboard
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    <Plus size={14} className="text-primary" />
+                    Sale Listing
+                  </button>
+                  <button
+                    onClick={() => { localStorage.removeItem('pocket-listing-draft'); navigate('/pocket-listing?type=rent&t=' + Date.now()); setShowAgentMenu(false); }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors"
+                  >
+                    <Plus size={14} className="text-primary" />
+                    Rental Listing
+                  </button>
+                  <button
+                    onClick={() => { navigate('/dashboard/listings'); setShowAgentMenu(false); }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors"
+                  >
+                    <List size={14} className="text-muted-foreground" />
+                    {t('header.myListings')}
+                  </button>
+                  <div className="border-t border-border" />
+                  <button
+                    onClick={() => { navigate('/dashboard'); setShowAgentMenu(false); }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors"
+                  >
+                    <LayoutDashboard size={14} className="text-muted-foreground" />
+                    Dashboard
+                  </button>
+                </div>
+              )}
             </div>
           )}
 

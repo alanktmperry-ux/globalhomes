@@ -15,6 +15,15 @@ export default defineConfig(({ mode }) => ({
   build: {
     sourcemap: false,
     chunkSizeWarningLimit: 1500,
+    // Only preload entry chunks, not the transitive closure of every dynamic import.
+    // Without this, Vite emits 60+ <link rel="modulepreload"> tags on the homepage
+    // because every React.lazy() route gets its dep graph preloaded eagerly.
+    modulePreload: {
+      resolveDependencies: (_filename, deps) => {
+        // Keep only deps for the entry; route chunks load on navigation.
+        return deps.filter((d) => /react-vendor|^assets\/vendor\.js$|supabase/.test(d));
+      },
+    },
     rollupOptions: {
       output: {
         chunkFileNames: "assets/[name].js",

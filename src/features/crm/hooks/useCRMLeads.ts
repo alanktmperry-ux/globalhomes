@@ -68,7 +68,7 @@ export function useCRMLeads(filters: Filters = {}) {
     // Client-side filter for search since it now spans the joined contact
     if (filters.search) {
       const s = filters.search.toLowerCase();
-      rows = rows.filter(r =>
+      rows = rows.filter((r: any) =>
         (r.first_name ?? '').toLowerCase().includes(s) ||
         (r.last_name ?? '').toLowerCase().includes(s) ||
         (r.email ?? '').toLowerCase().includes(s) ||

@@ -920,10 +920,8 @@ const Index = () => {
   );
 
   const emptyPlaceholder = (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="flex flex-col items-center justify-center py-16 px-6"
+    <div
+      className="flex flex-col items-center justify-center py-16 px-6 animate-in fade-in slide-in-from-bottom-3 duration-500"
     >
       <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
         <MapPin size={28} className="text-primary" />
@@ -934,7 +932,7 @@ const Index = () => {
       <p className="text-sm text-muted-foreground text-center max-w-xs">
         Agents are setting up their listings. Check back shortly!
       </p>
-    </motion.div>
+    </div>
   );
 
   const showEmptyState = filteredProperties.length === 0 && !isSearching && !hasSearched;
@@ -1065,22 +1063,16 @@ const Index = () => {
           <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-100/30 blur-[120px] pointer-events-none" />
           <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-violet-100/20 blur-[100px] pointer-events-none" />
 
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="relative z-10 max-w-3xl w-full"
+          <div
+            className="relative z-10 max-w-3xl w-full animate-in fade-in slide-in-from-bottom-6 duration-700"
           >
             {/* Eyebrow */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.1, duration: 0.5 }}
-              className="inline-flex items-center gap-2 mb-8 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-xs font-medium tracking-wide"
+            <div
+              className="inline-flex items-center gap-2 mb-8 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-xs font-medium tracking-wide animate-in fade-in zoom-in-95 duration-500 delay-100 fill-mode-both"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
               {t('hero.eyebrow')}
-            </motion.div>
+            </div>
 
             {/* Headline */}
             <h1 className="text-5xl md:text-7xl font-black leading-tight tracking-tight text-slate-900">

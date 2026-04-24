@@ -166,14 +166,16 @@ Deno.serve(async (req) => {
       }
 
       // Audit log
-      await supabase.from("audit_log").insert({
-        user_id: caller.id,
-        action_type: ban ? "admin_ban_user" : "admin_unban_user",
-        entity_type: "user",
-        entity_id: user_id,
-        description: ban ? "Admin banned user" : "Admin unbanned user",
-        metadata: { performed_by: caller.email, banned: !!ban },
-      }).catch(e => console.error("audit log:", e));
+      try {
+        await supabase.from("audit_log").insert({
+          user_id: caller.id,
+          action_type: ban ? "admin_ban_user" : "admin_unban_user",
+          entity_type: "user",
+          entity_id: user_id,
+          description: ban ? "Admin banned user" : "Admin unbanned user",
+          metadata: { performed_by: caller.email, banned: !!ban },
+        });
+      } catch (e) { console.error("audit log:", e); }
 
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -216,14 +218,16 @@ Deno.serve(async (req) => {
       if (agentUpdateErr) throw agentUpdateErr;
 
       // Audit log
-      await supabase.from("audit_log").insert({
-        user_id: caller.id,
-        action_type: "admin_set_subscription",
-        entity_type: "user",
-        entity_id: user_id,
-        description: "Admin changed subscription",
-        metadata: { plan_type, performed_by: caller.email },
-      }).catch(e => console.error("audit log:", e));
+      try {
+        await supabase.from("audit_log").insert({
+          user_id: caller.id,
+          action_type: "admin_set_subscription",
+          entity_type: "user",
+          entity_id: user_id,
+          description: "Admin changed subscription",
+          metadata: { plan_type, performed_by: caller.email },
+        });
+      } catch (e) { console.error("audit log:", e); }
 
       return new Response(
         JSON.stringify({ success: true }),
@@ -274,14 +278,16 @@ Deno.serve(async (req) => {
       if (error) throw error;
 
       // Audit log
-      await supabase.from("audit_log").insert({
-        user_id: caller.id,
-        action_type: "admin_delete_user",
-        entity_type: "user",
-        entity_id: request_id,
-        description: "Admin deleted demo request",
-        metadata: { performed_by: caller.email },
-      }).catch(e => console.error("audit log:", e));
+      try {
+        await supabase.from("audit_log").insert({
+          user_id: caller.id,
+          action_type: "admin_delete_user",
+          entity_type: "user",
+          entity_id: request_id,
+          description: "Admin deleted demo request",
+          metadata: { performed_by: caller.email },
+        });
+      } catch (e) { console.error("audit log:", e); }
 
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -390,6 +396,8 @@ Deno.serve(async (req) => {
 
     if (action === "reset_password") {
       const { email } = await req.json();
+      const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || Deno.env.get("SUPABASE_PUBLISHABLE_KEY")!;
+      const anonClient = createClient(supabaseUrl, anonKey);
       const { error } = await anonClient.auth.resetPasswordForEmail(email, {
         redirectTo: (Deno.env.get("SITE_URL") || "https://listhq.lovable.app") + "/reset-password",
       });
@@ -510,14 +518,16 @@ Deno.serve(async (req) => {
       await supabase.from("properties").update({ is_active: true }).eq("agent_id", agent.id);
 
       // Audit log
-      await supabase.from("audit_log").insert({
-        user_id: caller.id,
-        action_type: "admin_unban_user",
-        entity_type: "user",
-        entity_id: user_id,
-        description: "Admin unbanned user",
-        metadata: { performed_by: caller.email },
-      }).catch(e => console.error("audit log:", e));
+      try {
+        await supabase.from("audit_log").insert({
+          user_id: caller.id,
+          action_type: "admin_unban_user",
+          entity_type: "user",
+          entity_id: user_id,
+          description: "Admin unbanned user",
+          metadata: { performed_by: caller.email },
+        });
+      } catch (e) { console.error("audit log:", e); }
 
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

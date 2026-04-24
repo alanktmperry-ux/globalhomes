@@ -347,11 +347,10 @@ const LeadContactForm = ({
         onClose={onClose}
         onSave={handleContactSave}
         initialData={initialContact}
+        title={context === 'lead' ? (initialContact ? 'Edit Lead' : 'Add New Lead') : undefined}
+        saveLabel={context === 'lead' ? 'Save Lead' : undefined}
+        leadPanel={context === 'lead' ? <LeadMetadataPanel meta={leadMeta} onChange={setLeadMeta} /> : undefined}
       />
-
-      {/* Currently unused in the visible UI — kept exported via context so a
-          follow-up can drop it into ContactFormModal as a children slot. */}
-      {false && <LeadMetadataPanel meta={leadMeta} onChange={setLeadMeta} />}
 
       {pendingMatch && (
         <ExistingContactPrompt

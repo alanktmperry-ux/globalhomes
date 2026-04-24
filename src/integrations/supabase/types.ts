@@ -3274,8 +3274,11 @@ export type Database = {
           estimated_value: number | null
           first_name: string
           id: string
+          last_contacted_at: string | null
           last_name: string | null
           mobile: string | null
+          next_action_due_at: string | null
+          next_action_note: string | null
           notes: string | null
           phone: string | null
           phone_is_landline: boolean | null
@@ -3313,8 +3316,11 @@ export type Database = {
           estimated_value?: number | null
           first_name: string
           id?: string
+          last_contacted_at?: string | null
           last_name?: string | null
           mobile?: string | null
+          next_action_due_at?: string | null
+          next_action_note?: string | null
           notes?: string | null
           phone?: string | null
           phone_is_landline?: boolean | null
@@ -3352,8 +3358,11 @@ export type Database = {
           estimated_value?: number | null
           first_name?: string
           id?: string
+          last_contacted_at?: string | null
           last_name?: string | null
           mobile?: string | null
+          next_action_due_at?: string | null
+          next_action_note?: string | null
           notes?: string | null
           phone?: string | null
           phone_is_landline?: boolean | null

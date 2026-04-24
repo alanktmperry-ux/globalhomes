@@ -443,13 +443,23 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
 
   const handleSetSearchRadius = useCallback((radius: number | null) => {
     setSearchRadius(radius);
+    if (radius === null) {
+      // "Any" → drop geographic constraints entirely so all public listings show
+      setSearchSuburb(null);
+      setSearchCenter(null);
+      return;
+    }
     if (radius && !searchCenter) {
       console.warn('[RadiusFilter] Radius set but no search center.');
       toast.success('📍 Select a location first — Pick a location from the suggestions so the radius filter knows where to search from.');
     }
   }, [searchCenter, toast]);
 
-  const clearSearchRadius = useCallback(() => setSearchRadius(null), []);
+  const clearSearchRadius = useCallback(() => {
+    setSearchRadius(null);
+    setSearchSuburb(null);
+    setSearchCenter(null);
+  }, []);
 
   // ── Derived: unique agents from DB listings ───────────────────
   const agents = useMemo(() => {

@@ -9,6 +9,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/shared/hooks/use-toast';
 import { MapPin, X, Plus, Search } from 'lucide-react';
 import { autocomplete, getPlaceDetails } from '@/shared/lib/googleMapsService';
+import ContactLanguagePicker from '@/shared/components/ContactLanguagePicker';
+import { DEFAULT_CONTACT_LANGUAGE } from '@/shared/lib/contactLanguages';
 import type { Contact } from '@/features/agents/hooks/useContacts';
 
 interface Props {
@@ -184,6 +186,7 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
     estimated_value: initialData?.estimated_value || '',
     source: initialData?.source || '',
     notes: initialData?.notes || '',
+    preferred_language: (initialData as any)?.preferred_language || DEFAULT_CONTACT_LANGUAGE,
   });
 
   const [addressQuery, setAddressQuery] = useState(
@@ -331,6 +334,11 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
               <Input type="tel" value={form.phone} onChange={e => setForm(f => ({...f, phone: e.target.value}))} className="h-9" placeholder="+61 400 000 000" />
             </div>
           </div>
+
+          <ContactLanguagePicker
+            value={form.preferred_language}
+            onChange={code => setForm(f => ({ ...f, preferred_language: code }))}
+          />
 
           {/* Google Places address autocomplete */}
           <div ref={wrapperRef} className="relative">

@@ -3075,6 +3075,7 @@ export type Database = {
           postcode: string | null
           preferred_baths: number | null
           preferred_beds: number | null
+          preferred_language: string | null
           preferred_property_types: string[] | null
           preferred_suburbs: string[] | null
           property_address: string | null
@@ -3110,6 +3111,7 @@ export type Database = {
           postcode?: string | null
           preferred_baths?: number | null
           preferred_beds?: number | null
+          preferred_language?: string | null
           preferred_property_types?: string[] | null
           preferred_suburbs?: string[] | null
           property_address?: string | null
@@ -3145,6 +3147,7 @@ export type Database = {
           postcode?: string | null
           preferred_baths?: number | null
           preferred_beds?: number | null
+          preferred_language?: string | null
           preferred_property_types?: string[] | null
           preferred_suburbs?: string[] | null
           property_address?: string | null

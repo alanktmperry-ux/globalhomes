@@ -38,8 +38,11 @@ function decorate(row: any): CRMLead & Record<string, any> {
 
 export function useCRMLeads(filters: Filters = {}) {
   const agentId = useAgentId();
-  const [leads, setLeads] = useState<CRMLead[]>([]);
+  const { thresholds } = useUrgencyThresholds();
+  const [leads, setLeads] = useState<(CRMLead & { urgency: UrgencyTier })[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const urgencyKey = (filters.urgency ?? []).join(',');
 
   const fetchLeads = useCallback(async () => {
     if (!agentId) { setLoading(false); return; }
@@ -65,9 +68,11 @@ export function useCRMLeads(filters: Filters = {}) {
     if (filters.priority) q = q.eq('priority', filters.priority);
 
     const { data } = await q;
-    let rows = (data ?? []).map(decorate);
+    let rows = (data ?? []).map(decorate).map((r: any) => ({
+      ...r,
+      urgency: computeUrgency(r.last_contacted, thresholds),
+    }));
 
-    // Client-side filter for search since it now spans the joined contact
     if (filters.search) {
       const s = filters.search.toLowerCase();
       rows = rows.filter((r: any) =>
@@ -78,9 +83,14 @@ export function useCRMLeads(filters: Filters = {}) {
       );
     }
 
-    setLeads(rows as CRMLead[]);
+    if (filters.urgency && filters.urgency.length > 0) {
+      const set = new Set(filters.urgency);
+      rows = rows.filter((r: any) => set.has(r.urgency));
+    }
+
+    setLeads(rows as any);
     setLoading(false);
-  }, [agentId, filters.stage, filters.search, filters.propertyId, filters.priority]);
+  }, [agentId, filters.stage, filters.search, filters.propertyId, filters.priority, urgencyKey, thresholds]);
 
   useEffect(() => { fetchLeads(); }, [fetchLeads]);
 

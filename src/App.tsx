@@ -17,8 +17,11 @@ import { DefaultSEOHead } from "@/features/seo/components/DefaultSEOHead";
 import { HelpWidget } from "@/features/help/components/HelpWidget";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 
+// Eager-loaded for first paint (homepage path)
+import PublicLayout from "@/shared/components/layout/PublicLayout";
+import Index from "./pages/Index";
+
 // Lazy-loaded pages
-const Index = React.lazy(() => import("./pages/Index"));
 const SavedPage = React.lazy(() => import("./pages/SavedPage"));
 const MessagesPage = React.lazy(() => import("./pages/MessagesPage"));
 const ProfilePage = React.lazy(() => import("./pages/ProfilePage"));
@@ -51,7 +54,7 @@ const AuthConfirmPage = React.lazy(() => import("./features/auth/pages/AuthConfi
 const AuthCallbackPage = React.lazy(() => import("./features/auth/pages/AuthCallbackPage"));
 const OnboardingRolePage = React.lazy(() => import("./features/auth/pages/OnboardingRolePage"));
 const MyApplicationsPage = React.lazy(() => import("./features/rental/pages/MyApplicationsPage"));
-const PublicLayout = React.lazy(() => import("@/shared/components/layout/PublicLayout"));
+
 const BuyPage = React.lazy(() => import("./pages/BuyPage"));
 const SuburbsIndexPage = React.lazy(() => import("./pages/SuburbsIndexPage"));
 const SigningPage = React.lazy(() => import("./pages/SigningPage"));

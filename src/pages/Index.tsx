@@ -936,27 +936,29 @@ const Index = () => {
   const showEmptyState = filteredProperties.length === 0 && !isSearching && !hasSearched;
 
   const propertyList = showEmptyState ? emptyPlaceholder : (
-    <VirtualizedPropertyList
-      properties={filteredProperties}
-      isSearching={isSearching}
-      isMobile={isMobile}
-      isSaved={isSaved}
-      onToggleSave={toggleSaved}
-      onSelect={(p) => {
-        handleSelectProperty(p);
-        if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: `${p.lat}-${p.lng}` });
-      }}
-      cardRefs={cardRefs}
-      isCollab={isCollab}
-      getPropertyReactions={isCollab ? getPropertyReactions : undefined}
-      onToggleReaction={isCollab ? toggleReaction : undefined}
-      hasPartnerViewed={isCollab ? hasPartnerViewed : undefined}
-      currentUserId={user?.id}
-      areaSearch={areaSearch}
-      searchRadius={searchRadius}
-      onClearAreaSearch={() => handleAreaSearch(null)}
-      listingMode={listingMode}
-    />
+    <Suspense fallback={<MapSkeleton />}>
+      <VirtualizedPropertyList
+        properties={filteredProperties}
+        isSearching={isSearching}
+        isMobile={isMobile}
+        isSaved={isSaved}
+        onToggleSave={toggleSaved}
+        onSelect={(p) => {
+          handleSelectProperty(p);
+          if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: `${p.lat}-${p.lng}` });
+        }}
+        cardRefs={cardRefs}
+        isCollab={isCollab}
+        getPropertyReactions={isCollab ? getPropertyReactions : undefined}
+        onToggleReaction={isCollab ? toggleReaction : undefined}
+        hasPartnerViewed={isCollab ? hasPartnerViewed : undefined}
+        currentUserId={user?.id}
+        areaSearch={areaSearch}
+        searchRadius={searchRadius}
+        onClearAreaSearch={() => handleAreaSearch(null)}
+        listingMode={listingMode}
+      />
+    </Suspense>
   );
 
   const mapComponent = isSearching ? (

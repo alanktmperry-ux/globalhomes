@@ -21,36 +21,23 @@ export default defineConfig(({ mode }) => ({
         entryFileNames: "assets/[name].js",
         manualChunks(id) {
           if (!id.includes("node_modules")) return;
-          // Keep React + everything that depends on React in ONE chunk to avoid
-          // "Cannot read properties of undefined (reading 'Component')" caused
-          // by vendor modules evaluating before React is initialised.
+          // React core + router + small always-needed deps in one chunk.
+          // Everything that *might* run before app code must live with React.
           if (
             id.includes("node_modules/react/") ||
             id.includes("node_modules/react-dom/") ||
             id.includes("node_modules/scheduler/") ||
             id.includes("react-router") ||
-            id.includes("@radix-ui") ||
-            id.includes("lucide-react") ||
             id.includes("react-helmet-async") ||
-            id.includes("react-hook-form") ||
-            id.includes("@hookform") ||
-            id.includes("react-day-picker") ||
-            id.includes("react-resizable-panels") ||
-            id.includes("react-markdown") ||
-            id.includes("react-window") ||
-            id.includes("@tanstack") ||
-            id.includes("framer-motion") ||
-            id.includes("recharts") ||
-            id.includes("embla-carousel") ||
-            id.includes("cmdk") ||
-            id.includes("vaul") ||
-            id.includes("sonner") ||
-            id.includes("next-themes") ||
-            id.includes("input-otp")
+            id.includes("@tanstack")
           ) {
             return "react-vendor";
           }
           if (id.includes("@supabase")) return "supabase";
+          // Heavy libs only used on specific routes — let them split naturally
+          if (id.includes("recharts") || id.includes("d3-")) return "charts";
+          if (id.includes("framer-motion")) return "motion";
+          if (id.includes("@radix-ui")) return "radix";
           return "vendor";
         },
       },

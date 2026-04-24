@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { User, Mail, Phone, Shield, Bell, Globe, Camera, Loader2, Package } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { User, Mail, Phone, Shield, Bell, Globe, Camera, Loader2, Package, GitBranch } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -11,6 +12,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import DashboardHeader from './DashboardHeader';
 import SuppliersSettings from './SuppliersSettings';
 import LeadUrgencySettings from './LeadUrgencySettings';
+import PipelineStagesSettings from './PipelineStagesSettings';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface AgentProfile {
@@ -26,6 +28,16 @@ interface AgentProfile {
 const SettingsPage = () => {
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab') || 'profile';
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  const handleTabChange = (v: string) => {
+    setActiveTab(v);
+    const next = new URLSearchParams(searchParams);
+    if (v === 'profile') next.delete('tab'); else next.set('tab', v);
+    setSearchParams(next, { replace: true });
+  };
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -160,9 +172,12 @@ const SettingsPage = () => {
       <DashboardHeader title="Settings" subtitle="Manage your agent profile and preferences" />
 
       <div className="p-4 sm:p-6 max-w-2xl">
-        <Tabs defaultValue="profile">
+        <Tabs value={activeTab} onValueChange={handleTabChange}>
           <TabsList className="bg-secondary mb-6 gap-1 p-1">
             <TabsTrigger value="profile" className="text-xs">Profile</TabsTrigger>
+            <TabsTrigger value="pipeline" className="text-xs gap-1.5">
+              <GitBranch size={12} /> Pipeline
+            </TabsTrigger>
             <TabsTrigger value="suppliers" className="text-xs gap-1.5">
               <Package size={12} /> Suppliers
             </TabsTrigger>
@@ -281,6 +296,10 @@ const SettingsPage = () => {
             <Button onClick={handleSave} disabled={saving} className="w-full">
               {saving ? <><Loader2 size={16} className="animate-spin mr-2" /> Saving...</> : 'Save Changes'}
             </Button>
+          </TabsContent>
+
+          <TabsContent value="pipeline">
+            <PipelineStagesSettings />
           </TabsContent>
 
           <TabsContent value="suppliers">

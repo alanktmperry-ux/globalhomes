@@ -279,7 +279,7 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{initialData ? 'Edit Contact' : 'Add New Contact'}</DialogTitle>
+          <DialogTitle>{title ?? (initialData ? 'Edit Contact' : 'Add New Contact')}</DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4 py-2">

@@ -60,6 +60,13 @@ async function fetchNearbyProperties(
     throw error;
   }
 
+  console.log('[useRealtimeProperties] nearby_properties RPC result', {
+    lat,
+    lng,
+    radiusKm,
+    rpcCount: data?.length ?? 0,
+  });
+
   // RPC returns raw rows without agent join, so we need to fetch agents separately
   if (!data || data.length === 0) return [];
 
@@ -83,6 +90,13 @@ async function fetchNearbyProperties(
     console.error('[useRealtimeProperties] agent join error:', agentError.message);
     return data.map(mapDbProperty);
   }
+
+  console.log('[useRealtimeProperties] nearby_properties hydrated result', {
+    lat,
+    lng,
+    radiusKm,
+    hydratedCount: withAgents?.length ?? 0,
+  });
 
   return (withAgents ?? []).map(mapDbProperty);
 }

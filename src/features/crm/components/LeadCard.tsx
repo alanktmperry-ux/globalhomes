@@ -1,5 +1,6 @@
 import type { CRMLead } from '../types';
-import { Phone, Mail, Home, AlertCircle } from 'lucide-react';
+import { Phone, Mail, Home } from 'lucide-react';
+import { URGENCY_CONFIG, type UrgencyTier } from '../lib/urgency';
 
 const PRIORITY_DOT: Record<string, string> = {
   high: 'bg-destructive',

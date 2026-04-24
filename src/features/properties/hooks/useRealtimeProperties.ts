@@ -9,9 +9,6 @@ import { mapDbProperty } from '@/features/properties/api/fetchPublicProperties';
 // must never be exposed to anonymous visitors via the property join.
 const PROPERTIES_QUERY = '*, agents!inner(id, name, agency, agency_id, phone, email, avatar_url, profile_photo_url, company_logo_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count, approval_status, bio, license_number, slug, headline, languages_spoken, service_areas)';
 
-// Excludes external/scraped listings from buyer-facing queries.
-const EXCLUDE_EXTERNAL_SOURCE = 'source.is.null,source.not.in.(google,web_search,external,scraped)';
-
 async function fetchProperties(limit = 50, listingType?: 'sale' | 'rent', suburb?: string): Promise<Property[]> {
   let query = supabase
     .from('properties')
@@ -24,28 +21,14 @@ async function fetchProperties(limit = 50, listingType?: 'sale' | 'rent', suburb
     .order('created_at', { ascending: false })
     .limit(limit);
 
-  const suburbFilter = suburb
-    ? `suburb.ilike.%${suburb}%,address.ilike.%${suburb}%`
-    : null;
-
-  // Combine all OR clauses into a single .or() call to avoid PostgREST conflicts
-  // (a second .or() silently overwrites the first).
-  const orParts: string[] = [`or(${EXCLUDE_EXTERNAL_SOURCE})`];
-
   if (listingType === 'rent') {
-    if (suburbFilter) orParts.push(`or(${suburbFilter})`);
     query = query.eq('listing_type', 'rent');
   } else if (listingType === 'sale') {
-    if (suburbFilter) orParts.push(`or(${suburbFilter})`);
-    orParts.push('or(listing_type.eq.sale,listing_type.is.null)');
-  } else if (suburbFilter) {
-    orParts.push(`or(${suburbFilter})`);
+    query = query.or('listing_type.eq.sale,listing_type.is.null');
   }
 
-  if (orParts.length === 1) {
-    query = query.or(EXCLUDE_EXTERNAL_SOURCE);
-  } else {
-    query = query.or(`and(${orParts.join(',')})`);
+  if (suburb) {
+    query = query.or(`suburb.ilike.%${suburb}%,address.ilike.%${suburb}%`);
   }
 
   const { data, error } = await query;
@@ -84,16 +67,14 @@ async function fetchNearbyProperties(
   let query = supabase
     .from('properties')
     .select(PROPERTIES_QUERY)
+    .eq('status', 'public')
     .not('agent_id', 'is', null)
     .in('id', ids);
 
   if (listingType === 'rent') {
     query = query.eq('listing_type', 'rent');
-    query = query.or(EXCLUDE_EXTERNAL_SOURCE);
   } else if (listingType === 'sale') {
-    query = query.or(`and(or(${EXCLUDE_EXTERNAL_SOURCE}),or(listing_type.eq.sale,listing_type.is.null))`);
-  } else {
-    query = query.or(EXCLUDE_EXTERNAL_SOURCE);
+    query = query.or('listing_type.eq.sale,listing_type.is.null');
   }
 
   const { data: withAgents, error: agentError } = await query;

@@ -128,14 +128,10 @@ export async function searchAgentListings(
     .order('created_at', { ascending: false })
     .limit(limit);
 
-  // Combine into a single .or() call to avoid PostgREST conflicts.
-  // Mandatory AND-groups (source, moderation) wrap the keyword/suburb OR-group.
-  const andGroups: string[] = [
-    'or(source.is.null,source.not.in.(google,web_search,external,scraped))',
-    'or(moderation_status.eq.approved,moderation_status.is.null)',
-  ];
+  // Moderation filter: approved or null (legacy rows)
+  dbQuery = dbQuery.or('moderation_status.eq.approved,moderation_status.is.null');
 
-  // Keyword/suburb OR clauses combined into a single inner OR-group
+  // Keyword/suburb OR clauses
   const keywordOrParts: string[] = [];
   if (orClauses) keywordOrParts.push(orClauses);
   if (structured?.suburb) {
@@ -143,10 +139,8 @@ export async function searchAgentListings(
     keywordOrParts.push(`address.ilike.%${structured.suburb}%`);
   }
   if (keywordOrParts.length > 0) {
-    andGroups.push(`or(${keywordOrParts.join(',')})`);
+    dbQuery = dbQuery.or(keywordOrParts.join(','));
   }
-
-  dbQuery = dbQuery.or(`and(${andGroups.join(',')})`);
 
   // Apply structured filters
   if (structured?.beds) {
@@ -165,11 +159,10 @@ export async function searchAgentListings(
     dbQuery = dbQuery.ilike('property_type', `%${structured.propertyType}%`);
   }
 
-  // Listing type: use .eq/.is for exact match to avoid a second .or() that conflicts
+  // Listing type
   if (listingType === 'rent') {
     dbQuery = dbQuery.eq('listing_type', 'rent');
   } else if (listingType === 'sale') {
-    // Include sale + null (legacy rows). Use .not() to exclude rent instead of a conflicting .or()
     dbQuery = dbQuery.not('listing_type', 'eq', 'rent');
   }
 

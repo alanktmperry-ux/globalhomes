@@ -3229,6 +3229,7 @@ export type Database = {
           budget_max: number | null
           budget_min: number | null
           buyer_pipeline_stage: string | null
+          communication_preferences: Json
           contact_type: string
           country: string | null
           created_at: string
@@ -3265,6 +3266,7 @@ export type Database = {
           budget_max?: number | null
           budget_min?: number | null
           buyer_pipeline_stage?: string | null
+          communication_preferences?: Json
           contact_type?: string
           country?: string | null
           created_at?: string
@@ -3301,6 +3303,7 @@ export type Database = {
           budget_max?: number | null
           budget_min?: number | null
           buyer_pipeline_stage?: string | null
+          communication_preferences?: Json
           contact_type?: string
           country?: string | null
           created_at?: string

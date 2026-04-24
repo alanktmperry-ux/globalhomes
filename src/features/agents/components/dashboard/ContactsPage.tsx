@@ -151,6 +151,15 @@ const ContactsPage = () => {
       <div className="p-4 sm:p-6 max-w-7xl space-y-4">
         {/* Toolbar */}
         <div className="flex flex-wrap items-center gap-2">
+          {view === 'list' && (
+            <SavedViewsBar
+              activeViewId={activeViewId}
+              filters={filters}
+              sort={sort}
+              columns={columns}
+              onSelectView={(v) => applyView(v)}
+            />
+          )}
           <Button size="sm" onClick={() => setShowForm(true)} className="gap-1.5">
             <Plus size={14} /> Add Contact
           </Button>

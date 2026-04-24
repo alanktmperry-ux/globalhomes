@@ -125,26 +125,28 @@ export async function searchAgentListings(
     .eq('is_active', true)
     .eq('status', 'public')
     .not('agent_id', 'is', null)
-    .or('moderation_status.eq.approved,moderation_status.is.null')
     .order('created_at', { ascending: false })
     .limit(limit);
 
-  // Combine all OR conditions into a single .or() call to avoid
-  // PostgREST conflicts where a second .or() silently overwrites the first.
-  const allOrParts: string[] = [];
+  // Combine into a single .or() call to avoid PostgREST conflicts.
+  // Mandatory AND-groups (source, moderation) wrap the keyword/suburb OR-group.
+  const andGroups: string[] = [
+    'or(source.is.null,source.not.in.(google,web_search,external,scraped))',
+    'or(moderation_status.eq.approved,moderation_status.is.null)',
+  ];
 
-  if (orClauses) {
-    allOrParts.push(orClauses);
-  }
-
+  // Keyword/suburb OR clauses combined into a single inner OR-group
+  const keywordOrParts: string[] = [];
+  if (orClauses) keywordOrParts.push(orClauses);
   if (structured?.suburb) {
-    allOrParts.push(`suburb.ilike.%${structured.suburb}%`);
-    allOrParts.push(`address.ilike.%${structured.suburb}%`);
+    keywordOrParts.push(`suburb.ilike.%${structured.suburb}%`);
+    keywordOrParts.push(`address.ilike.%${structured.suburb}%`);
+  }
+  if (keywordOrParts.length > 0) {
+    andGroups.push(`or(${keywordOrParts.join(',')})`);
   }
 
-  if (allOrParts.length > 0) {
-    dbQuery = dbQuery.or(allOrParts.join(','));
-  }
+  dbQuery = dbQuery.or(`and(${andGroups.join(',')})`);
 
   // Apply structured filters
   if (structured?.beds) {
@@ -198,15 +200,22 @@ export async function fetchPublicProperties(limit = 50, listingType?: 'sale' | '
     )
     .eq('status', 'public')
     .not('agent_id', 'is', null)
-    .or('moderation_status.eq.approved,moderation_status.is.null')
     .order('created_at', { ascending: false })
     .limit(limit);
+
+  // Single combined .or() (mandatory AND of OR-groups: source + moderation [+ listing_type])
+  const andGroups: string[] = [
+    'or(source.is.null,source.not.in.(google,web_search,external,scraped))',
+    'or(moderation_status.eq.approved,moderation_status.is.null)',
+  ];
 
   if (listingType === 'rent') {
     query = query.eq('listing_type', 'rent');
   } else if (listingType === 'sale') {
-    query = query.or('listing_type.eq.sale,listing_type.is.null');
+    andGroups.push('or(listing_type.eq.sale,listing_type.is.null)');
   }
+
+  query = query.or(`and(${andGroups.join(',')})`);
 
   const { data, error } = await query;
 

@@ -22,7 +22,11 @@ import { useSavedProperties } from '@/features/properties/hooks/useSavedProperti
 import { useIsMobile } from '@/shared/hooks/use-mobile';
 import { Property } from '@/shared/lib/types';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
-import { FilterSidebar } from '@/shared/components/FilterSidebar';
+// Lazy-load FilterSidebar — it pulls in calendar/day-picker/date-fns and is
+// only shown after the user opens the filters panel.
+const FilterSidebar = lazy(() =>
+  import('@/shared/components/FilterSidebar').then(m => ({ default: m.FilterSidebar }))
+);
 import { usePropertySearch } from '@/features/properties/hooks/usePropertySearch';
 import { Slider } from '@/components/ui/slider';
 import { useSavedSearches } from '@/features/search/hooks/useSavedSearches';

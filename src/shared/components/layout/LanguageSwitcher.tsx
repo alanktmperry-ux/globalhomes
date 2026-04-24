@@ -107,7 +107,10 @@ export function LanguageSwitcher() {
                     const legacy = (LEGACY_CODE_MAP[code] ?? 'en') as Language;
                     setLanguage(legacy);
                     try {
-                      localStorage.setItem(LANGUAGE_STORAGE_KEY, code);
+                      // Session-only persistence — must NOT survive a fresh browser session.
+                      sessionStorage.setItem(LANGUAGE_STORAGE_KEY, code);
+                      localStorage.removeItem(LANGUAGE_STORAGE_KEY);
+                      localStorage.removeItem('gh-lang');
                     } catch { /* storage unavailable — non-fatal */ }
                     setOpen(false);
                   }}

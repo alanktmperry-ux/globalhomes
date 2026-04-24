@@ -676,7 +676,7 @@ export default function PropertyDetailPage() {
                 'ko': { title: 'title_ko', desc: 'description_ko' },
               } as any;
               const fields = langMap[String((rawProperty as any).__lang ?? '')] || (
-                (typeof window !== 'undefined' ? langMap[localStorage.getItem('gh-lang') || ''] : undefined)
+                (typeof window !== 'undefined' ? langMap[sessionStorage.getItem('i18n-language') || sessionStorage.getItem('listhq_language') || ''] : undefined)
               );
               const storedTitle = fields ? (rawProperty as any)[fields.title] : null;
               const storedDesc = fields ? (rawProperty as any)[fields.desc] : null;

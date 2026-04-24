@@ -57,7 +57,11 @@ export function useTranslation() {
 
   const setLanguage = (code: SupportedLanguageCode) => {
     try {
-      localStorage.setItem(LANGUAGE_STORAGE_KEY, code);
+      // Persist for current session only — language must NOT survive a new browser session.
+      sessionStorage.setItem(LANGUAGE_STORAGE_KEY, code);
+      // Defensively clear any stale localStorage entry from previous versions.
+      localStorage.removeItem(LANGUAGE_STORAGE_KEY);
+      localStorage.removeItem('gh-lang');
     } catch {
       // storage may be unavailable (private mode, etc.) — non-fatal
     }

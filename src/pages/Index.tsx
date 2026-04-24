@@ -132,10 +132,17 @@ const Index = () => {
   const { t, setLanguage } = useTranslation();
   const { addSearch, lastSearch } = useSearchHistory();
 
-  // Browser language auto-detection on first visit
+  // Browser language auto-detection (session-only).
+  // Defaults to English; if the user already chose a language this session,
+  // keep their choice. Never persists across browser sessions.
   useEffect(() => {
     try {
-      if (localStorage.getItem('listhq_language')) return;
+      // Clear any stale localStorage entry from previous versions so language
+      // can no longer "stick" to Chinese (or anything else) across sessions.
+      localStorage.removeItem('listhq_language');
+      localStorage.removeItem('gh-lang');
+
+      if (sessionStorage.getItem('listhq_language') || sessionStorage.getItem('i18n-language')) return;
       const nav = (navigator.language || 'en').toLowerCase();
       let detected: 'en' | 'zh-CN' | 'vi' | 'hi' | 'ar' | 'ko' | 'bn' = 'en';
       if (nav.startsWith('zh')) detected = 'zh-CN';
@@ -144,9 +151,10 @@ const Index = () => {
       else if (nav.startsWith('ar')) detected = 'ar';
       else if (nav.startsWith('ko')) detected = 'ko';
       else if (nav.startsWith('bn')) detected = 'bn';
-      setLanguage(detected);
+      // Only auto-apply non-English on first session; English is the safe default.
+      if (detected !== 'en') setLanguage(detected);
     } catch {
-      // localStorage unavailable — non-fatal
+      // storage unavailable — non-fatal
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

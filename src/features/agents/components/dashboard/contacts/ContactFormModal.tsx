@@ -335,6 +335,11 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
             </div>
           </div>
 
+          <ContactLanguagePicker
+            value={form.preferred_language}
+            onChange={code => setForm(f => ({ ...f, preferred_language: code }))}
+          />
+
           {/* Google Places address autocomplete */}
           <div ref={wrapperRef} className="relative">
             <Label className="text-xs">Current Address</Label>

@@ -1671,6 +1671,9 @@ const Index = () => {
           />
         </Suspense>
       )}
+    </div>
+  );
+};
 
 // ── How It Works section with scroll-triggered staggered fade-in ──
 const HowItWorksSection = ({ t }: { t: (key: string) => string }) => {

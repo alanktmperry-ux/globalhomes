@@ -7,10 +7,19 @@ import { VoiceSearchHero } from '@/features/search/components/VoiceSearchHero';
 import { TranslationDemoCard } from '@/features/marketing/components/TranslationDemoCard';
 import { useHeroVoiceSearch } from '@/features/search/hooks/useHeroVoiceSearch';
 
-import { VirtualizedPropertyList } from '@/features/properties/components/VirtualizedPropertyList';
 import { MapSkeleton } from '@/features/properties/components/PropertyCardSkeleton';
-import { PropertyDrawer } from '@/features/properties/components/PropertyDrawer';
-import { MapErrorBoundary } from '@/features/properties/components/MapErrorBoundary';
+// Heavy components that only render in the search-results branch (not on the
+// landing hero). Lazy-loading keeps them out of the cold-paint critical path
+// — they download in the background only after the user runs a search.
+const VirtualizedPropertyList = lazy(() =>
+  import('@/features/properties/components/VirtualizedPropertyList').then(m => ({ default: m.VirtualizedPropertyList }))
+);
+const PropertyDrawer = lazy(() =>
+  import('@/features/properties/components/PropertyDrawer').then(m => ({ default: m.PropertyDrawer }))
+);
+const MapErrorBoundary = lazy(() =>
+  import('@/features/properties/components/MapErrorBoundary').then(m => ({ default: m.MapErrorBoundary }))
+);
 import { VoiceSearchErrorBoundary } from '@/features/search/components/VoiceSearchErrorBoundary';
 import { useI18n } from '@/shared/lib/i18n';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';

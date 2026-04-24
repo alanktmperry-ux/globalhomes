@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip as UiTooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import DashboardHeader from './DashboardHeader';
+import TodayPrioritiesPanel from './TodayPrioritiesPanel';
 import { getIntentTier, INTENT_TOOLTIP } from '@/features/agents/lib/intentScore';
 import { DEMO_REPUTATION, getScoreColor } from '@/features/agents/utils/reputationScore';
 import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
@@ -496,6 +497,7 @@ const DashboardOverview = () => {
       <DashboardHeader title="Dashboard" subtitle="Welcome back, Agent" />
 
       <div className="p-4 sm:p-6 space-y-6 max-w-7xl">
+        <TodayPrioritiesPanel />
         {!onboardingDismissed && (() => {
           const step1 = !!(onboardingAgent?.name && onboardingAgent?.phone && onboardingAgent?.avatar_url && onboardingAgent?.bio);
           const step2 = onboardingHasListing || listings.length > 0;

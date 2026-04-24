@@ -35,8 +35,8 @@ interface NavItem {
 const SALES_NAV: NavItem[] = [
   { title: 'My Listings', url: '/dashboard/listings', icon: List, badgeKey: 'listings' },
   { title: 'Contacts', url: '/dashboard/contacts', icon: Contact },
-  { title: 'Pipeline', url: '/dashboard/pipeline', icon: Kanban },
-  { title: 'Lead CRM', url: '/dashboard/crm', icon: Flame },
+  { title: 'Listings', url: '/dashboard/pipeline', icon: Kanban },
+  { title: 'Leads', url: '/dashboard/crm', icon: Flame },
   { title: 'Voice Leads', url: '/dashboard/leads', icon: Mic, badgeKey: 'leads' },
   { title: 'AI Concierge', url: '/dashboard/concierge', icon: Sparkles, badgeKey: 'buyerMatches', alertWhenBadge: true },
   { title: 'Lead Marketplace', url: '/dashboard/lead-marketplace', icon: ShoppingBag },

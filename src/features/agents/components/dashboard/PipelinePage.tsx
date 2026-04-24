@@ -196,7 +196,7 @@ const PipelinePage = () => {
   return (
     <div>
       <DashboardHeader
-        title="Pipeline"
+        title="Listings Pipeline"
         subtitle={`${cards.length} listings · ${AUD.format(totalValue)} total value`}
       />
       <div className="px-4 sm:px-6 pt-4 flex justify-end">

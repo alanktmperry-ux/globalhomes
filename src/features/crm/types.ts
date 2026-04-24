@@ -3,6 +3,7 @@ export type LeadStage =
   | 'offer_stage' | 'under_contract' | 'settled' | 'lost';
 
 export type LeadPriority = 'low' | 'medium' | 'high';
+export type LeadTemperature = 'hot' | 'warm' | 'cold';
 
 export type LeadSource =
   | 'manual' | 'enquiry_form' | 'open_home'
@@ -10,29 +11,40 @@ export type LeadSource =
 
 export type ActivityType = 'note' | 'call' | 'email' | 'meeting' | 'task';
 
+/**
+ * A CRMLead now references a Contact (the source of truth for the person)
+ * and only stores lead-specific metadata + pipeline state.
+ */
 export interface CRMLead {
   id: string;
+  contact_id: string;
   agent_id: string;
-  property_id?: string;
-  buyer_id?: string;
-  first_name: string;
-  last_name?: string;
-  email?: string;
-  phone?: string;
+
+  // Lead-specific metadata
+  source_property_id?: string | null;
+  enquiry_source: LeadSource;
+  lead_temperature: LeadTemperature;
+  first_seen_at: string;
+
+  // Pipeline state
   stage: LeadStage;
   priority: LeadPriority;
-  source: LeadSource;
-  budget_min?: number;
-  budget_max?: number;
-  pre_approved: boolean;
-  pre_approval_amount?: number;
-  notes?: string;
+  notes?: string | null;
   tags: string[];
-  lost_reason?: string;
-  expected_close?: string;
-  last_contacted?: string;
+  lost_reason?: string | null;
+  expected_close?: string | null;
+  last_contacted?: string | null;
+
   created_at: string;
   updated_at: string;
+
+  // Joined data (populated by useCRMLeads)
+  contact?: {
+    first_name: string;
+    last_name?: string | null;
+    email?: string | null;
+    phone?: string | null;
+  };
   property?: {
     address: string;
     suburb: string;
@@ -64,8 +76,7 @@ export interface CRMTask {
   completed: boolean;
   created_at: string;
   lead?: {
-    first_name: string;
-    last_name?: string;
+    contact?: { first_name: string; last_name?: string | null };
     property?: { address: string };
   };
 }

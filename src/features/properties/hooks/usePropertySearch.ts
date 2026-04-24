@@ -13,6 +13,8 @@ import { useCurrency, ListingMode } from '@/shared/lib/CurrencyContext';
 import { supabase } from '@/integrations/supabase/client';
 import { lookupSuburbCentroid } from '@/shared/lib/suburbCentroids';
 
+const DEFAULT_RADIUS_KM = 10;
+
 
 // ── Types ────────────────────────────────────────────────────
 
@@ -39,7 +41,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
   const [hasSearched, setHasSearched] = useState(false);
   const [currentQuery, setCurrentQuery] = useState('');
   const [searchCenter, setSearchCenter] = useState<{ lat: number; lng: number } | null>(null);
-  const [searchRadius, setSearchRadius] = useState<number | null>(5);
+  const [searchRadius, setSearchRadius] = useState<number | null>(null);
   const [areaSearch, setAreaSearch] = useState<AreaSearch | null>(null);
   const [searchSummary, setSearchSummary] = useState<string>('');
   const [searchSuburb, setSearchSuburb] = useState<string | null>(null);
@@ -124,7 +126,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
         if (staticCenter) {
           console.log('[handleSearch] Using static centroid for', parsedFilters.location, staticCenter);
           setSearchCenter(staticCenter);
-          setSearchRadius(prev => prev ?? 10);
+          setSearchRadius(prev => prev ?? DEFAULT_RADIUS_KM);
         }
 
         // Then try Google geocoding for higher precision; falls back silently
@@ -134,13 +136,24 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
             if (coords) {
               console.log('[handleSearch] Google geocoded', parsedFilters.location, coords);
               setSearchCenter(coords);
-              setSearchRadius(prev => prev ?? 10);
+              setSearchRadius(prev => prev ?? DEFAULT_RADIUS_KM);
             } else if (!staticCenter) {
               console.warn('[handleSearch] Geocoding returned no result and no static centroid for', parsedFilters.location);
             }
           })
           .catch((err) => {
             console.warn('[handleSearch] Geocoding error:', err);
+            if (!staticCenter) {
+              const fallbackCenter = lookupSuburbCentroid(parsedFilters.location);
+              if (fallbackCenter) {
+                console.log('[handleSearch] Geocoding failed, applying static centroid fallback', {
+                  location: parsedFilters.location,
+                  fallbackCenter,
+                });
+                setSearchCenter(fallbackCenter);
+                setSearchRadius(prev => prev ?? DEFAULT_RADIUS_KM);
+              }
+            }
           });
       }
 
@@ -191,14 +204,28 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
               const aiStaticCenter = intent.suburb ? lookupSuburbCentroid(String(intent.suburb)) : null;
               if (aiStaticCenter) {
                 setSearchCenter(aiStaticCenter);
-                setSearchRadius(prev => prev ?? 10);
+                setSearchRadius(prev => prev ?? DEFAULT_RADIUS_KM);
               }
               geocode(locationQuery)
                 .then((coords) => {
-                  if (coords) setSearchCenter(coords);
+                  if (coords) {
+                    setSearchCenter(coords);
+                    setSearchRadius(prev => prev ?? DEFAULT_RADIUS_KM);
+                  } else if (aiStaticCenter) {
+                    console.log('[handleSearch] AI geocode returned no result, keeping static centroid fallback', {
+                      locationQuery,
+                      aiStaticCenter,
+                    });
+                  }
                 })
-                .catch(() => {
-                  // Geocoding failed silently — static centroid (if any) already applied
+                .catch((error) => {
+                  console.warn('[handleSearch] AI geocoding error:', error);
+                  if (aiStaticCenter) {
+                    console.log('[handleSearch] AI geocoding failed, keeping static centroid fallback', {
+                      locationQuery,
+                      aiStaticCenter,
+                    });
+                  }
                 });
             }
           }
@@ -385,6 +412,18 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
 
     return [...props].sort((a, b) => subscriptionBoost(a) - subscriptionBoost(b));
   }, [displayProperties, areaSearch, sortBy, filters, searchCenter, searchRadius, listingMode]);
+
+  useEffect(() => {
+    if (!hasSearched) return;
+
+    console.log('[usePropertySearch] radius state', {
+      searchCenter,
+      searchRadius,
+      dbResultsCount: dbProperties.length,
+      filteredResultsCount: filteredProperties.length,
+      currentQuery,
+    });
+  }, [hasSearched, searchCenter, searchRadius, dbProperties.length, filteredProperties.length, currentQuery]);
 
   // ── Setters ──────────────────────────────────────────────────
   const handleAreaSearch = useCallback((area: AreaSearch | null) => {

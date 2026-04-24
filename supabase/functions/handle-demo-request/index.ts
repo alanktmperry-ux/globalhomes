@@ -206,9 +206,8 @@ Deno.serve(async (req) => {
       });
 
       // createSession is not available in current SDK — rely on magic-link fallback below
-      const signInData: { session?: { access_token?: string; refresh_token?: string } } | null = null;
-      let accessToken = signInData?.session?.access_token;
-      let refreshToken = signInData?.session?.refresh_token;
+      const accessToken: string | undefined = undefined;
+      const refreshToken: string | undefined = undefined;
 
       if (!accessToken) {
         // Generate a magic link OTP for the client to exchange

@@ -5,9 +5,16 @@ import { CRMListView } from '../components/CRMListView';
 import { PipelineKPIBar } from '../components/PipelineKPIBar';
 import { CRMTasksWidget } from '../components/CRMTasksWidget';
 import { LayoutList, Kanban } from 'lucide-react';
+import type { UrgencyTier } from '../lib/urgency';
 
 export default function CRMPage() {
   const [view, setView] = useState<'board' | 'list'>('board');
+  const [urgencyFilter, setUrgencyFilter] = useState<UrgencyTier[]>([]);
+
+  const handleUrgencyTileClick = (tier: UrgencyTier) => {
+    setUrgencyFilter([tier]);
+    setView('list');
+  };
 
   return (
     <>
@@ -49,11 +56,13 @@ export default function CRMPage() {
           </div>
         </div>
 
-        <PipelineKPIBar />
+        <PipelineKPIBar onUrgencyClick={handleUrgencyTileClick} />
 
         <div className="flex gap-6 flex-col lg:flex-row">
           <div className="flex-1 min-w-0">
-            {view === 'board' ? <PipelineBoard /> : <CRMListView />}
+            {view === 'board'
+              ? <PipelineBoard />
+              : <CRMListView urgencyFilter={urgencyFilter} onUrgencyFilterChange={setUrgencyFilter} />}
           </div>
           <div className="w-full lg:w-72 flex-shrink-0">
             <CRMTasksWidget />

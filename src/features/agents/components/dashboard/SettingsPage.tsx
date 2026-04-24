@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import DashboardHeader from './DashboardHeader';
 import SuppliersSettings from './SuppliersSettings';
+import LeadUrgencySettings from './LeadUrgencySettings';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface AgentProfile {
@@ -261,6 +262,9 @@ const SettingsPage = () => {
                 </div>
               ))}
             </div>
+
+            {/* Lead urgency thresholds */}
+            <LeadUrgencySettings />
 
             {/* Territory */}
             <div className="bg-card border border-border rounded-xl p-5 space-y-3">

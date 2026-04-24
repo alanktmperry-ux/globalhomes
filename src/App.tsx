@@ -54,7 +54,7 @@ const AuthConfirmPage = React.lazy(() => import("./features/auth/pages/AuthConfi
 const AuthCallbackPage = React.lazy(() => import("./features/auth/pages/AuthCallbackPage"));
 const OnboardingRolePage = React.lazy(() => import("./features/auth/pages/OnboardingRolePage"));
 const MyApplicationsPage = React.lazy(() => import("./features/rental/pages/MyApplicationsPage"));
-const PublicLayout = React.lazy(() => import("@/shared/components/layout/PublicLayout"));
+
 const BuyPage = React.lazy(() => import("./pages/BuyPage"));
 const SuburbsIndexPage = React.lazy(() => import("./pages/SuburbsIndexPage"));
 const SigningPage = React.lazy(() => import("./pages/SigningPage"));

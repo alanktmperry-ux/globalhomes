@@ -119,16 +119,29 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
         // Set suburb filter immediately so DB query narrows results
         setSearchSuburb(parsedFilters.location);
 
+        // Try static centroid first (instant, works without Google API)
+        const staticCenter = lookupSuburbCentroid(parsedFilters.location);
+        if (staticCenter) {
+          console.log('[handleSearch] Using static centroid for', parsedFilters.location, staticCenter);
+          setSearchCenter(staticCenter);
+          setSearchRadius(prev => prev ?? 10);
+        }
+
+        // Then try Google geocoding for higher precision; falls back silently
         const locQuery = parsedFilters.location + ', Australia';
         geocode(locQuery)
           .then((coords) => {
             if (coords) {
+              console.log('[handleSearch] Google geocoded', parsedFilters.location, coords);
               setSearchCenter(coords);
-              // Ensure a radius is set so the nearby_properties RPC is used
               setSearchRadius(prev => prev ?? 10);
+            } else if (!staticCenter) {
+              console.warn('[handleSearch] Geocoding returned no result and no static centroid for', parsedFilters.location);
             }
           })
-          .catch(() => {});
+          .catch((err) => {
+            console.warn('[handleSearch] Geocoding error:', err);
+          });
       }
 
       setIsSearching(true);

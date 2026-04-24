@@ -125,7 +125,6 @@ export async function searchAgentListings(
     .eq('is_active', true)
     .eq('status', 'public')
     .not('agent_id', 'is', null)
-    .or('moderation_status.eq.approved,moderation_status.is.null')
     .order('created_at', { ascending: false })
     .limit(limit);
 
@@ -133,8 +132,13 @@ export async function searchAgentListings(
   // PostgREST conflicts where a second .or() silently overwrites the first.
   const allOrParts: string[] = [];
 
+  // Always exclude external/scraped listings on buyer-facing search.
+  allOrParts.push('or(source.is.null,source.not.in.(google,web_search,external,scraped))');
+  // Moderation: approved or null
+  allOrParts.push('or(moderation_status.eq.approved,moderation_status.is.null)');
+
   if (orClauses) {
-    allOrParts.push(orClauses);
+    allOrParts.push(`or(${orClauses})`);
   }
 
   if (structured?.suburb) {

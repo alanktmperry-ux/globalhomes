@@ -182,6 +182,8 @@ function SuburbPicker({ suburbs, onChange }: SuburbPickerProps) {
 const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, leadPanel }: Props) => {
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
+  const { agencyId } = useAuth();
+  const [showDupBlock, setShowDupBlock] = useState(false);
   const [form, setForm] = useState({
     first_name: initialData?.first_name || '',
     last_name: initialData?.last_name || '',

@@ -1,0 +1,1 @@
+UPDATE public.properties SET status = 'public' WHERE 'demo_batch:alan_2026' = ANY(tags) AND status = 'active';

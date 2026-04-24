@@ -13,7 +13,7 @@ import {
   ALL_CONTACTS_VIEW_ID, EMPTY_FILTERS, DEFAULT_SORT, DEFAULT_COLUMNS,
   filtersEqual, sortEqual,
   type ContactSavedView, type ContactFilters, type ContactSort, type ContactColumnKey,
-} from './savedViews/types';
+} from './types';
 
 interface Props {
   activeViewId: string;

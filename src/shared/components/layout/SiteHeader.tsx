@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { lazy, Suspense, useState, useRef, useEffect } from 'react';
 import { MapPin, Bookmark } from 'lucide-react';
 import { Globe, ChevronDown, User, LogIn, Home, Building2, Plus, List, LayoutDashboard, ShieldCheck, Menu, FileText, Handshake, Wrench, Sparkles, Search, MoreHorizontal, HelpCircle, Users, Banknote } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -10,7 +10,9 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { NotificationBell } from '@/features/agents/components/dashboard/NotificationBell';
 import { LanguageSwitcher } from '@/shared/components/layout/LanguageSwitcher';
 import { CurrencySwitcher } from '@/shared/components/layout/CurrencySwitcher';
-import AgentRegistrationModal from '@/features/agents/components/AgentRegistrationModal';
+// Lazy-loaded — pulls in framer-motion, only needed when the user opens the
+// "Become an agent" modal. Keeping it static added ~50KB gz to every cold load.
+const AgentRegistrationModal = lazy(() => import('@/features/agents/components/AgentRegistrationModal'));
 
 import { useI18n } from '@/shared/lib/i18n';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -344,7 +346,11 @@ export function SiteHeader() {
           </Sheet>
         </div>
       </div>
-      <AgentRegistrationModal open={showAgentModal} onOpenChange={setShowAgentModal} />
+      {showAgentModal && (
+        <Suspense fallback={null}>
+          <AgentRegistrationModal open={showAgentModal} onOpenChange={setShowAgentModal} />
+        </Suspense>
+      )}
     </header>
   );
 }

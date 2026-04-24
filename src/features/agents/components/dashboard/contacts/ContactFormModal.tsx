@@ -366,6 +366,8 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
             </div>
           </div>
 
+          <CommunicationPreferencesEditor value={commPrefs} onChange={setCommPrefs} />
+
           <ContactLanguagePicker
             value={form.preferred_language}
             onChange={code => setForm(f => ({ ...f, preferred_language: code }))}

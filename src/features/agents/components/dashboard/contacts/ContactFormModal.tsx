@@ -623,6 +623,38 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
         </div>
       </DialogContent>
     </Dialog>
+
+    {/* Save-time guard for exact email/phone duplicates */}
+    <AlertDialog open={showDupBlock} onOpenChange={setShowDupBlock}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>This looks like an existing contact</AlertDialogTitle>
+          <AlertDialogDescription>
+            We found{' '}
+            {duplicateMatches.length === 1 ? 'a contact' : `${duplicateMatches.length} contacts`}{' '}
+            in your agency that match on{' '}
+            {duplicateMatches.some(m => m.match_method === 'email') && duplicateMatches.some(m => m.match_method === 'phone')
+              ? 'email or phone'
+              : duplicateMatches.some(m => m.match_method === 'email')
+                ? 'email'
+                : 'phone'}
+            :{' '}
+            <span className="font-medium text-foreground">
+              {duplicateMatches.slice(0, 2).map(m => `${m.first_name} ${m.last_name ?? ''}`.trim()).join(', ')}
+              {duplicateMatches.length > 2 && ` +${duplicateMatches.length - 2} more`}
+            </span>
+            . Are you sure you want to create a duplicate?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={handleConfirmCreateAnyway}>
+            Create anyway
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 };
 

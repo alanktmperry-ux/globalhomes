@@ -1550,14 +1550,16 @@ const Index = () => {
                     {filteredProperties.length} {filteredProperties.length === 1 ? 'property' : 'properties'}
                   </span>
                   <div className="flex items-center gap-2">
-                    <FilterSidebar
-                      filters={filters}
-                      onChange={setFilters}
-                      isOpen={filtersOpen}
-                      onToggle={() => setFiltersOpen(o => !o)}
-                      totalCount={displayProperties.length}
-                      filteredCount={filteredProperties.length}
-                    />
+                    <Suspense fallback={null}>
+                      <FilterSidebar
+                        filters={filters}
+                        onChange={setFilters}
+                        isOpen={filtersOpen}
+                        onToggle={() => setFiltersOpen(o => !o)}
+                        totalCount={displayProperties.length}
+                        filteredCount={filteredProperties.length}
+                      />
+                    </Suspense>
                     <button onClick={() => setMobileView('list')} className="text-xs text-primary font-medium">
                       View list
                     </button>

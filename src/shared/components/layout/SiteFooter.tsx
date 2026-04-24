@@ -49,6 +49,7 @@ export function SiteFooter() {
             <ul className="space-y-2.5">
               {[
                 { label: 'Search Properties', to: '/' },
+                { label: 'Find an Agent', to: '/agents' },
                 { label: 'Stamp Duty Calculator', to: '/stamp-duty-calculator' },
                 { label: 'Browse Properties', to: '/buy' },
                 { label: 'Voice Search', to: '/' },

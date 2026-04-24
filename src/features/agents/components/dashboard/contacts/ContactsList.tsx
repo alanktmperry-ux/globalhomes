@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import type { Contact } from '@/features/agents/hooks/useContacts';
+import CommunicationChannelChips from '@/shared/components/CommunicationPreferences/CommunicationChannelChips';
+import type { CommPreference } from '@/shared/components/CommunicationPreferences/types';
 
 const RANKING_CONFIG: Record<string, { icon: React.ReactNode; color: string; label: string }> = {
   hot: { icon: <Flame size={12} />, color: 'bg-destructive/15 text-destructive', label: 'Hot' },

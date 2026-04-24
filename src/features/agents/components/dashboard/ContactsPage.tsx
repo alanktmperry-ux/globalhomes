@@ -209,6 +209,11 @@ const ContactsPage = () => {
           <ContactsList
             contacts={filteredContacts}
             loading={loading}
+            filters={filters}
+            sort={sort}
+            columns={columns}
+            onFiltersChange={setFilters}
+            onSortChange={setSort}
             onSelect={setSelectedContact}
             onDelete={deleteContact}
           />

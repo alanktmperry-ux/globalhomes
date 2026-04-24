@@ -29,8 +29,8 @@ export function LeadCard({ lead, onClick, onDragStart, onDragEnd }: Props) {
   const daysInStage = Math.floor(
     (Date.now() - new Date(lead.updated_at).getTime()) / 86400000
   );
-  const isOverdue = !lead.last_contacted ||
-    (Date.now() - new Date(lead.last_contacted).getTime()) > 7 * 86400000;
+  const urgency = (lead as any).urgency as UrgencyTier | undefined;
+  const cfg = urgency ? URGENCY_CONFIG[urgency] : null;
 
   return (
     <div
@@ -75,7 +75,12 @@ export function LeadCard({ lead, onClick, onDragStart, onDragEnd }: Props) {
           {lead.phone && <Phone size={10} />}
         </div>
         <div className="flex items-center gap-1.5">
-          {isOverdue && <AlertCircle size={10} className="text-destructive" />}
+          {cfg && (
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-full border inline-flex items-center gap-1 ${cfg.chip}`}>
+              <span className={`w-1 h-1 rounded-full ${cfg.dot}`} />
+              {cfg.label}
+            </span>
+          )}
           <span className="text-[10px] text-muted-foreground">{daysInStage}d</span>
         </div>
       </div>

@@ -165,7 +165,7 @@ export function PropertyMap({
           if (pc && h > 10 && w > 10) {
             pendingCenterRef.current = null;
             mapInstanceRef.current?.panTo({ lat: pc.lat, lng: pc.lng });
-            mapInstanceRef.current?.setZoom(14);
+            mapInstanceRef.current?.setZoom(13);
             ro.disconnect();
           }
         });
@@ -196,7 +196,7 @@ export function PropertyMap({
 
     if (hasSize) {
       map.panTo({ lat: centerOn.lat, lng: centerOn.lng });
-      map.setZoom(14);
+      map.setZoom(13);
       pendingCenterRef.current = null;
     } else {
       // Store it — apply when map becomes visible

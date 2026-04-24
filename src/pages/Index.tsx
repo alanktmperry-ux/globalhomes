@@ -1175,6 +1175,34 @@ const Index = () => {
             </div>
           </motion.div>
 
+          {/* ── AUDIENCE SPLIT TILES ── */}
+          <div className="relative z-10 mt-12 w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 px-2 text-left">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 md:p-7 shadow-sm hover:shadow-md transition-shadow">
+              <h3 className="text-lg md:text-xl font-bold text-slate-900 mb-2">Looking for a home?</h3>
+              <p className="text-sm text-slate-600 mb-5 leading-relaxed">
+                Search Australian property in 24 languages. Free, no signup.
+              </p>
+              <button
+                onClick={() => navigate('/buy')}
+                className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-semibold transition-colors"
+              >
+                Browse properties →
+              </button>
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 md:p-7 shadow-sm hover:shadow-md transition-shadow">
+              <h3 className="text-lg md:text-xl font-bold text-slate-900 mb-2">Are you an agent?</h3>
+              <p className="text-sm text-slate-600 mb-5 leading-relaxed">
+                List once, reach every buyer. AI translation, CRM, and off-market network — free for 3 months.
+              </p>
+              <button
+                onClick={() => navigate('/for-agents')}
+                className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-semibold transition-colors"
+              >
+                See agent tools →
+              </button>
+            </div>
+          </div>
+
           {/* Stats strip */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -1205,7 +1233,7 @@ const Index = () => {
             {featuredListings.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {featuredListings.filter(p => p.listing_type !== 'rent' && p.listing_type !== 'rental').slice(0, 6).map((p) => {
+                  {featuredListings.filter(p => p.listing_type !== 'rent' && p.listing_type !== 'rental' && !/^\s*12\s+atherton/i.test(p.address || '')).slice(0, 6).map((p) => {
                     const img = (p.images && p.images[0]) || p.image_url;
                     const hasTranslations = p.translations && Object.keys(p.translations).length > 0;
                     return (

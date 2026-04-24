@@ -1189,7 +1189,7 @@ const Index = () => {
                 🔍 {t('hero.browseProperties')}
               </button>
             </div>
-          </motion.div>
+          </div>
 
           {/* ── AUDIENCE SPLIT TILES ── */}
           <div className="relative z-10 mt-12 w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 px-2 text-left">
@@ -1220,17 +1220,14 @@ const Index = () => {
           </div>
 
           {/* Stats strip */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            className="relative z-10 mt-8 max-w-2xl w-full mx-auto"
+          <div
+            className="relative z-10 mt-8 max-w-2xl w-full mx-auto animate-in fade-in duration-700 delay-500 fill-mode-both"
           >
             <p className="text-center text-lg md:text-xl font-semibold text-foreground">
               <span className="underline decoration-blue-500 decoration-2 underline-offset-4">1 in 5</span>{' '}
               Australian buyers doesn't search in English. ListHQ lists them all.
             </p>
-          </motion.div>
+          </div>
         </section>
 
         {/* ── TRANSLATION DEMO ── */}

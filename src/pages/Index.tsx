@@ -837,15 +837,17 @@ const Index = () => {
             Save
           </button>
         )}
-        <FilterSidebar
-          filters={filters}
-          onChange={setFilters}
-          isOpen={filtersOpen}
-          onToggle={() => setFiltersOpen(o => !o)}
-          totalCount={displayProperties.length}
-          filteredCount={filteredProperties.length}
-          listingMode={listingMode}
-        />
+        <Suspense fallback={null}>
+          <FilterSidebar
+            filters={filters}
+            onChange={setFilters}
+            isOpen={filtersOpen}
+            onToggle={() => setFiltersOpen(o => !o)}
+            totalCount={displayProperties.length}
+            filteredCount={filteredProperties.length}
+            listingMode={listingMode}
+          />
+        </Suspense>
         <div className="relative">
           <select
             value={sortBy}

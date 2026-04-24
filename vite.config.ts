@@ -14,19 +14,25 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     sourcemap: false,
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 1500,
     rollupOptions: {
       output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': [
-            'lucide-react',
-            '@radix-ui/react-dialog',
-            '@radix-ui/react-popover',
-            '@radix-ui/react-select',
-            '@radix-ui/react-dropdown-menu',
-          ],
-          'supabase': ['@supabase/supabase-js'],
+        chunkFileNames: "assets/[name].js",
+        entryFileNames: "assets/[name].js",
+        manualChunks(id) {
+          if (id.includes("lucide-react")) return "ui-icons";
+          if (id.includes("@radix-ui")) return "ui-radix";
+          if (
+            id.includes("node_modules/react/") ||
+            id.includes("node_modules/react-dom/") ||
+            id.includes("react-router")
+          ) {
+            return "react-vendor";
+          }
+          if (id.includes("@supabase")) return "supabase";
+          if (id.includes("framer-motion")) return "framer";
+          if (id.includes("@tanstack")) return "tanstack";
+          if (id.includes("node_modules")) return "vendor";
         },
       },
     },

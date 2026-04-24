@@ -3051,6 +3051,98 @@ export type Database = {
           },
         ]
       }
+      contact_custom_fields: {
+        Row: {
+          agency_id: string
+          created_at: string
+          display_order: number
+          field_key: string
+          field_type: Database["public"]["Enums"]["custom_field_type"]
+          id: string
+          is_active: boolean
+          is_required: boolean
+          label: string
+          options: Json | null
+          updated_at: string
+        }
+        Insert: {
+          agency_id: string
+          created_at?: string
+          display_order?: number
+          field_key: string
+          field_type: Database["public"]["Enums"]["custom_field_type"]
+          id?: string
+          is_active?: boolean
+          is_required?: boolean
+          label: string
+          options?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          agency_id?: string
+          created_at?: string
+          display_order?: number
+          field_key?: string
+          field_type?: Database["public"]["Enums"]["custom_field_type"]
+          id?: string
+          is_active?: boolean
+          is_required?: boolean
+          label?: string
+          options?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_custom_fields_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contact_custom_values: {
+        Row: {
+          contact_id: string
+          created_at: string
+          field_id: string
+          id: string
+          updated_at: string
+          value: Json | null
+        }
+        Insert: {
+          contact_id: string
+          created_at?: string
+          field_id: string
+          id?: string
+          updated_at?: string
+          value?: Json | null
+        }
+        Update: {
+          contact_id?: string
+          created_at?: string
+          field_id?: string
+          id?: string
+          updated_at?: string
+          value?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_custom_values_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contact_custom_values_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "contact_custom_fields"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contacts: {
         Row: {
           address: string | null
@@ -11594,6 +11686,10 @@ export type Database = {
         }
         Returns: Json
       }
+      contact_custom_value_agency: {
+        Args: { _field_id: string }
+        Returns: string
+      }
       current_broker_agency: { Args: never; Returns: string }
       current_broker_id: { Args: never; Returns: string }
       current_broker_is_principal: { Args: never; Returns: boolean }
@@ -12119,6 +12215,13 @@ export type Database = {
         | "withdrawn"
         | "postponed"
       bid_type: "genuine" | "vendor" | "opening"
+      custom_field_type:
+        | "text"
+        | "number"
+        | "date"
+        | "dropdown"
+        | "multi_select"
+        | "boolean"
       id_type:
         | "drivers_licence"
         | "passport"
@@ -12280,6 +12383,14 @@ export const Constants = {
         "postponed",
       ],
       bid_type: ["genuine", "vendor", "opening"],
+      custom_field_type: [
+        "text",
+        "number",
+        "date",
+        "dropdown",
+        "multi_select",
+        "boolean",
+      ],
       id_type: [
         "drivers_licence",
         "passport",

@@ -262,20 +262,33 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
   const displayProperties = useMemo(() => {
     if (!hasSearched) return allProperties;
 
-    const queryWords = currentQuery
-      .toLowerCase()
-      .split(/\s+/)
-      .filter((w) => w.length > 2);
+    // When a geographic radius search is active, the server-side RPC
+    // (nearby_properties) has already filtered dbProperties to the radius.
+    // Do NOT additionally filter by query word — that would strip out
+    // legitimate neighbour-suburb matches (e.g. searching "Prahran" should
+    // still return listings in Toorak/Richmond/South Yarra within 10km).
+    const radiusActive = !!(searchCenter && searchRadius);
 
-    const matchingDbProps = dbProperties.filter((p) => {
-      const searchable = `${p.title} ${p.address} ${p.suburb} ${p.state} ${p.country} ${p.propertyType} ${p.description}`.toLowerCase();
-      return queryWords.some((word) => searchable.includes(word));
-    });
+    let matchingDbProps: Property[];
+    if (radiusActive) {
+      matchingDbProps = dbProperties;
+    } else {
+      const queryWords = currentQuery
+        .toLowerCase()
+        .split(/\s+/)
+        .filter((w) => w.length > 2);
+      matchingDbProps = queryWords.length === 0
+        ? dbProperties
+        : dbProperties.filter((p) => {
+            const searchable = `${p.title} ${p.address} ${p.suburb} ${p.state} ${p.country} ${p.propertyType} ${p.description}`.toLowerCase();
+            return queryWords.some((word) => searchable.includes(word));
+          });
+    }
 
     const seenIds = new Set(matchingDbProps.map((p) => p.id));
     const uniqueMockResults = results.filter((p) => !seenIds.has(p.id));
     return [...matchingDbProps, ...uniqueMockResults];
-  }, [hasSearched, allProperties, results, dbProperties, currentQuery]);
+  }, [hasSearched, allProperties, results, dbProperties, currentQuery, searchCenter, searchRadius]);
 
   // ── Derived: filtered + sorted properties ────────────────────
   const filteredProperties = useMemo(() => {

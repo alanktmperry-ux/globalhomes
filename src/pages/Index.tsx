@@ -1516,24 +1516,26 @@ const Index = () => {
             {/* Property list */}
             <div className="flex-1 px-4 pb-6">
               {showEmptyState ? emptyPlaceholder : (
-                <VirtualizedPropertyList
-                  properties={filteredProperties}
-                  isSearching={isSearching}
-                  isMobile={false}
-                  isSaved={isSaved}
-                  onToggleSave={toggleSaved}
-                  onSelect={(p) => navigate(`/property/${p.id}`)}
-                  cardRefs={cardRefs}
-                  isCollab={isCollab}
-                  getPropertyReactions={isCollab ? getPropertyReactions : undefined}
-                  onToggleReaction={isCollab ? toggleReaction : undefined}
-                  hasPartnerViewed={isCollab ? hasPartnerViewed : undefined}
-                  currentUserId={user?.id}
-                  areaSearch={areaSearch}
-                  searchRadius={searchRadius}
-                  onClearAreaSearch={() => handleAreaSearch(null)}
-                  listingMode={listingMode}
-                />
+                <Suspense fallback={<MapSkeleton />}>
+                  <VirtualizedPropertyList
+                    properties={filteredProperties}
+                    isSearching={isSearching}
+                    isMobile={false}
+                    isSaved={isSaved}
+                    onToggleSave={toggleSaved}
+                    onSelect={(p) => navigate(`/property/${p.id}`)}
+                    cardRefs={cardRefs}
+                    isCollab={isCollab}
+                    getPropertyReactions={isCollab ? getPropertyReactions : undefined}
+                    onToggleReaction={isCollab ? toggleReaction : undefined}
+                    hasPartnerViewed={isCollab ? hasPartnerViewed : undefined}
+                    currentUserId={user?.id}
+                    areaSearch={areaSearch}
+                    searchRadius={searchRadius}
+                    onClearAreaSearch={() => handleAreaSearch(null)}
+                    listingMode={listingMode}
+                  />
+                </Suspense>
               )}
             </div>
           </div>

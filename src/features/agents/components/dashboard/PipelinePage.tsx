@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, DragEvent } from 'react';
 import { motion } from 'framer-motion';
-import { GripVertical, FileText, Plus, Banknote } from 'lucide-react';
+import { GripVertical, FileText, Plus, Banknote, Settings as SettingsIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import DashboardHeader from './DashboardHeader';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -10,6 +10,14 @@ import OfferOutcomeTracker from './pipeline/OfferOutcomeTracker';
 import SettlementModal from './pipeline/SettlementModal';
 import { MortgageBrokerModal } from '@/features/mortgage/components/MortgageBrokerModal';
 import { MortgageReferralModal } from '@/components/MortgageReferralModal';
+import {
+  usePipelineStages,
+  isSettledStage,
+  isUnderOfferStage,
+  stageToPropertyStatus,
+  DEFAULT_STAGES,
+  type PipelineStage,
+} from '@/features/agents/hooks/usePipelineStages';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
 
@@ -18,66 +26,49 @@ interface PipelineCard {
   address: string;
   contactName: string;
   estimatedValue: number;
-  stage: string;
+  /** stage_id from pipeline_stages, or default-* for solo agents */
+  stageId: string;
   movedAt: string;
   propertyId: string;
   listingType: string;
   sentOfferId?: string;
 }
 
-const STAGES = [
-  { key: 'prospecting', label: 'Prospecting', description: 'Initial contact made', color: 'bg-blue-500' },
-  { key: 'appraisal', label: 'Appraisal', description: 'Property valued', color: 'bg-purple-500' },
-  { key: 'listed', label: 'Listed', description: 'Property on market', color: 'bg-amber-500' },
-  { key: 'under_offer', label: 'Under Offer', description: 'Offer accepted', color: 'bg-emerald-500' },
-  { key: 'settled', label: 'Settled', description: 'Deal closed', color: 'bg-slate-500' },
-] as const;
-
 const daysInStage = (movedAt: string) => {
   const diff = Date.now() - new Date(movedAt).getTime();
   return Math.max(0, Math.floor(diff / 86400000));
 };
 
-// Map property status to pipeline stage
-const mapStatusToStage = (status: string | null, isActive: boolean): string => {
-  if (!isActive) return 'prospecting';
-  switch (status) {
-    case 'pending':       return 'prospecting';
-    case 'coming-soon':   return 'appraisal';
-    case 'public':        return 'listed';
-    case 'under_offer':   return 'under_offer';
-    case 'sold':          return 'settled';
-    default:              return 'prospecting';
-  }
-};
-
-// Map pipeline stage back to property status
-const mapStageToStatus = (stage: string): { status: string; is_active: boolean } => {
-  switch (stage) {
-    case 'prospecting':  return { status: 'pending',      is_active: false };
-    case 'appraisal':    return { status: 'coming-soon',  is_active: false };
-    case 'listed':       return { status: 'public',       is_active: true  };
-    case 'under_offer':  return { status: 'under_offer',  is_active: true  };
-    case 'settled':      return { status: 'sold',         is_active: false };
-    default:             return { status: 'pending',      is_active: false };
-  }
+/** For solo agents (no stage_id stored), pick the default stage that matches
+ *  the property's current status. */
+const fallbackStageIdFromStatus = (status: string | null, isActive: boolean): string => {
+  if (!isActive && status === 'pending') return 'default-prospecting';
+  if (!isActive && status === 'coming-soon') return 'default-appraisal';
+  if (status === 'public') return 'default-listed';
+  if (status === 'under_offer') return 'default-under-offer';
+  if (status === 'sold') return 'default-settled';
+  return 'default-prospecting';
 };
 
 const PipelinePage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { stages, loading: stagesLoading, agencyId } = usePipelineStages();
+  const isSoloAgent = !agencyId;
+  const effectiveStages = stages.length > 0 ? stages : DEFAULT_STAGES;
+
   const [cards, setCards] = useState<PipelineCard[]>([]);
-  const [dragOverStage, setDragOverStage] = useState<string | null>(null);
+  const [dragOverStageId, setDragOverStageId] = useState<string | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [agentId, setAgentId] = useState<string | null>(null);
   const [offerCard, setOfferCard] = useState<PipelineCard | null>(null);
-  const [settlementCard, setSettlementCard] = useState<{ card: PipelineCard; previousStage: string } | null>(null);
+  const [settlementCard, setSettlementCard] = useState<{ card: PipelineCard; previousStageId: string } | null>(null);
   const [brokerCard, setBrokerCard] = useState<PipelineCard | null>(null);
   const [mortgageOpen, setMortgageOpen] = useState(false);
   const [mortgagePrice, setMortgagePrice] = useState<number>(0);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || stagesLoading) return;
 
     const fetchPipeline = async () => {
       const { data: agent } = await supabase
@@ -88,16 +79,14 @@ const PipelinePage = () => {
       if (!agent) return;
       setAgentId(agent.id);
 
-      // Query properties directly — vendor_name is the seller contact
       const { data: properties } = await supabase
         .from('properties')
-        .select('id, address, vendor_name, price, status, is_active, listed_date, updated_at, listing_type')
+        .select('id, address, vendor_name, price, status, is_active, listed_date, updated_at, listing_type, stage_id')
         .eq('agent_id', agent.id)
         .neq('status', 'archived');
 
       if (!properties) return;
 
-      // Check for sent offers keyed by property_id
       const propertyIds = properties.map((p: any) => p.id);
       const { data: offers } = await supabase
         .from('offers')
@@ -113,7 +102,7 @@ const PipelinePage = () => {
         address: prop.address || 'Unknown address',
         contactName: prop.vendor_name || 'No owner set',
         estimatedValue: prop.price || 0,
-        stage: mapStatusToStage(prop.status, prop.is_active),
+        stageId: prop.stage_id || fallbackStageIdFromStatus(prop.status, prop.is_active),
         movedAt: prop.updated_at || prop.listed_date || new Date().toISOString(),
         propertyId: prop.id,
         listingType: prop.listing_type || 'sale',
@@ -123,7 +112,7 @@ const PipelinePage = () => {
     };
 
     fetchPipeline();
-  }, [user]);
+  }, [user, stagesLoading]);
 
   const handleDragStart = (e: DragEvent, cardId: string) => {
     e.dataTransfer.setData('text/plain', cardId);
@@ -131,45 +120,53 @@ const PipelinePage = () => {
     setDraggingId(cardId);
   };
 
-  const handleDragOver = (e: DragEvent, stageKey: string) => {
+  const handleDragOver = (e: DragEvent, stageId: string) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
-    setDragOverStage(stageKey);
+    setDragOverStageId(stageId);
   };
 
-  const handleDragLeave = () => setDragOverStage(null);
+  const handleDragLeave = () => setDragOverStageId(null);
 
-  const handleDrop = useCallback(async (e: DragEvent, targetStage: string) => {
+  const persistStageMove = async (cardId: string, targetStage: PipelineStage) => {
+    const { status, is_active } = stageToPropertyStatus(targetStage);
+    const updates: any = { status, is_active };
+    // Only persist stage_id for agency listings (solo agents have NULL stage_id)
+    if (!isSoloAgent && !targetStage.id.startsWith('default-')) {
+      updates.stage_id = targetStage.id;
+    }
+    await supabase.from('properties').update(updates).eq('id', cardId);
+  };
+
+  const handleDrop = useCallback(async (e: DragEvent, targetStageId: string) => {
     e.preventDefault();
-    setDragOverStage(null);
+    setDragOverStageId(null);
     setDraggingId(null);
     const cardId = e.dataTransfer.getData('text/plain');
     if (!cardId) return;
 
     const card = cards.find(c => c.id === cardId);
-    if (!card || card.stage === targetStage) return;
+    const targetStage = effectiveStages.find(s => s.id === targetStageId);
+    if (!card || !targetStage || card.stageId === targetStageId) return;
 
-    // Intercept moves into 'settled' (unless already settled) — show modal
-    if (targetStage === 'settled' && card.stage !== 'settled') {
-      setSettlementCard({ card, previousStage: card.stage });
+    // Intercept moves into a Settled-equivalent stage — show modal first
+    if (isSettledStage(targetStage) && !isSettledStage(effectiveStages.find(s => s.id === card.stageId) || targetStage)) {
+      setSettlementCard({ card, previousStageId: card.stageId });
       return;
     }
 
     setCards(prev => prev.map(c =>
-      c.id === cardId ? { ...c, stage: targetStage, movedAt: new Date().toISOString() } : c
+      c.id === cardId ? { ...c, stageId: targetStageId, movedAt: new Date().toISOString() } : c
     ));
 
-    const { status, is_active } = mapStageToStatus(targetStage);
-    await supabase
-      .from('properties')
-      .update({ status, is_active } as any)
-      .eq('id', cardId);
+    await persistStageMove(cardId, targetStage);
 
-    if (targetStage === 'under_offer' && card.stage !== 'under_offer') {
+    const previousStage = effectiveStages.find(s => s.id === card.stageId);
+    if (isUnderOfferStage(targetStage) && !(previousStage && isUnderOfferStage(previousStage))) {
       setMortgagePrice(card.estimatedValue || 0);
       setMortgageOpen(true);
     }
-  }, [cards]);
+  }, [cards, effectiveStages, isSoloAgent]);
 
   const handleOfferSent = (sentOfferId: string) => {
     if (!offerCard) return;
@@ -180,15 +177,19 @@ const PipelinePage = () => {
   };
 
   const handleOfferOutcome = async (cardId: string, outcome: 'accepted' | 'rejected' | 'countered') => {
-    const targetStage = outcome === 'accepted' ? 'settled' : outcome === 'rejected' ? 'listed' : 'under_offer';
+    // Find current Settled / Listed / Under Offer stages by semantics
+    const settled = effectiveStages.find(isSettledStage);
+    const listed  = effectiveStages.find(s => /listed|on market|marketing|public/i.test(s.label));
+    const offer   = effectiveStages.find(isUnderOfferStage);
+    const target = outcome === 'accepted' ? settled : outcome === 'rejected' ? listed : offer;
+    if (!target) return;
+
     setCards(prev => prev.map(c =>
-      c.id === cardId ? { ...c, stage: targetStage, movedAt: new Date().toISOString(), sentOfferId: undefined } : c
+      c.id === cardId
+        ? { ...c, stageId: target.id, movedAt: new Date().toISOString(), sentOfferId: undefined }
+        : c
     ));
-    const { status, is_active } = mapStageToStatus(targetStage);
-    await supabase
-      .from('properties')
-      .update({ status, is_active } as any)
-      .eq('id', cardId);
+    await persistStageMove(cardId, target);
   };
 
   const totalValue = cards.reduce((sum, c) => sum + c.estimatedValue, 0);
@@ -199,7 +200,16 @@ const PipelinePage = () => {
         title="Listings Pipeline"
         subtitle={`${cards.length} listings · ${AUD.format(totalValue)} total value`}
       />
-      <div className="px-4 sm:px-6 pt-4 flex justify-end">
+      <div className="px-4 sm:px-6 pt-4 flex justify-end gap-2">
+        {!isSoloAgent && (
+          <button
+            onClick={() => navigate('/dashboard/settings?tab=pipeline')}
+            className="flex items-center gap-1.5 text-xs font-medium border border-border bg-card px-3 py-1.5 rounded-lg hover:bg-muted transition"
+            title="Customise pipeline stages"
+          >
+            <SettingsIcon size={13} /> Stages
+          </button>
+        )}
         <button
           onClick={() => navigate('/pocket-listing')}
           className="flex items-center gap-1.5 text-xs font-medium bg-primary text-primary-foreground px-3 py-1.5 rounded-lg hover:bg-primary/90 transition"
@@ -210,30 +220,30 @@ const PipelinePage = () => {
 
       <div className="p-4 sm:p-6 max-w-[1600px]">
         <div className="flex gap-3 overflow-x-auto pb-4">
-          {STAGES.map((stage) => {
-            const stageCards = cards.filter(c => c.stage === stage.key);
+          {effectiveStages.map((stage) => {
+            const stageCards = cards.filter(c => c.stageId === stage.id);
             const stageValue = stageCards.reduce((s, c) => s + c.estimatedValue, 0);
-            const isOver = dragOverStage === stage.key;
+            const isOver = dragOverStageId === stage.id;
 
             return (
               <div
-                key={stage.key}
+                key={stage.id}
                 className={`flex-shrink-0 w-[260px] sm:w-[280px] flex flex-col rounded-xl border transition-all ${
                   isOver ? 'border-primary bg-primary/5 shadow-lg' : 'border-border bg-card'
                 }`}
-                onDragOver={(e) => handleDragOver(e, stage.key)}
+                onDragOver={(e) => handleDragOver(e, stage.id)}
                 onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, stage.key)}
+                onDrop={(e) => handleDrop(e, stage.id)}
               >
                 <div className="p-3 border-b border-border">
                   <div className="flex items-center gap-2 mb-1">
-                    <div className={`w-2.5 h-2.5 rounded-full ${stage.color}`} />
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: stage.color }} />
                     <span className="text-sm font-bold">{stage.label}</span>
                     <span className="ml-auto text-[10px] font-semibold bg-muted text-muted-foreground px-1.5 py-0.5 rounded-full">
                       {stageCards.length}
                     </span>
                   </div>
-                  <p className="text-[10px] text-muted-foreground">{stage.description}</p>
+                  <p className="text-[10px] text-muted-foreground">{stage.probability}% win probability</p>
                   {stageValue > 0 && (
                     <p className="text-[10px] font-semibold text-muted-foreground mt-1">{AUD.format(stageValue)}</p>
                   )}
@@ -243,6 +253,7 @@ const PipelinePage = () => {
                   {stageCards.map((card) => {
                     const days = daysInStage(card.movedAt);
                     const daysColor = days <= 3 ? 'text-emerald-500' : days <= 7 ? 'text-primary' : 'text-destructive';
+                    const isUnderOffer = isUnderOfferStage(stage);
 
                     return (
                       <motion.div
@@ -265,7 +276,7 @@ const PipelinePage = () => {
                               >
                                 {card.address}
                               </p>
-                              {card.stage === 'under_offer' && (
+                              {isUnderOffer && (
                                 <button
                                   onClick={(e) => { e.stopPropagation(); setOfferCard(card); }}
                                   className="p-1 rounded hover:bg-primary/10 transition-colors shrink-0"
@@ -274,7 +285,7 @@ const PipelinePage = () => {
                                   <FileText size={12} className="text-primary" />
                                 </button>
                               )}
-                              {card.stage === 'under_offer' && (
+                              {isUnderOffer && (
                                 <button
                                   onClick={(e) => { e.stopPropagation(); setBrokerCard(card); }}
                                   className="p-1 rounded hover:bg-primary/10 transition-colors shrink-0"
@@ -298,7 +309,7 @@ const PipelinePage = () => {
                               <span className="text-[10px] font-bold">{AUD.format(card.estimatedValue)}</span>
                               <span className={`text-[10px] font-semibold ${daysColor}`}>{days}d</span>
                             </div>
-                            {card.stage === 'under_offer' && card.sentOfferId && user && (
+                            {isUnderOffer && card.sentOfferId && user && (
                               <OfferOutcomeTracker
                                 offerId={card.sentOfferId}
                                 cardId={card.id}
@@ -328,33 +339,37 @@ const PipelinePage = () => {
         <OfferModal
           open={!!offerCard}
           onOpenChange={(open) => { if (!open) setOfferCard(null); }}
-          card={offerCard}
+          card={{ ...offerCard, stage: 'under_offer' } as any}
           propertyId={offerCard.propertyId}
           agentId={agentId}
           onSent={handleOfferSent}
         />
       )}
 
-      {settlementCard && user && (
-        <SettlementModal
-          open={!!settlementCard}
-          onOpenChange={(open) => { if (!open) setSettlementCard(null); }}
-          propertyId={settlementCard.card.propertyId}
-          propertyAddress={settlementCard.card.address}
-          initialPrice={settlementCard.card.estimatedValue}
-          agentId={agentId}
-          userId={user.id}
-          onConfirmed={() => {
-            setCards(prev => prev.map(c =>
-              c.id === settlementCard.card.id
-                ? { ...c, stage: 'settled', movedAt: new Date().toISOString() }
-                : c
-            ));
-            setSettlementCard(null);
-          }}
-          onCancel={() => setSettlementCard(null)}
-        />
-      )}
+      {settlementCard && user && (() => {
+        const settledStage = effectiveStages.find(isSettledStage);
+        return (
+          <SettlementModal
+            open={!!settlementCard}
+            onOpenChange={(open) => { if (!open) setSettlementCard(null); }}
+            propertyId={settlementCard.card.propertyId}
+            propertyAddress={settlementCard.card.address}
+            initialPrice={settlementCard.card.estimatedValue}
+            agentId={agentId}
+            userId={user.id}
+            onConfirmed={() => {
+              if (!settledStage) return;
+              setCards(prev => prev.map(c =>
+                c.id === settlementCard.card.id
+                  ? { ...c, stageId: settledStage.id, movedAt: new Date().toISOString() }
+                  : c
+              ));
+              setSettlementCard(null);
+            }}
+            onCancel={() => setSettlementCard(null)}
+          />
+        );
+      })()}
 
       {brokerCard && (
         <MortgageBrokerModal

@@ -18,6 +18,7 @@ async function fetchProperties(limit = 50, listingType?: 'sale' | 'rent', suburb
     .eq('moderation_status', 'approved')
     .eq('agents.approval_status', 'approved')
     .not('agent_id', 'is', null)
+    .or('source.is.null,source.not.in.(google,web_search,external,scraped)')
     .order('created_at', { ascending: false })
     .limit(limit);
 

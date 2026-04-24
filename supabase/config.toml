@@ -56,3 +56,6 @@ verify_jwt = false
 
 [functions.seed-demo-listings]
 verify_jwt = false
+
+[functions.backfill-property-coordinates]
+verify_jwt = false

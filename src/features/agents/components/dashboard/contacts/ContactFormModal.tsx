@@ -484,6 +484,13 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
             </div>
           </div>
 
+          {/* Inline duplicate match suggestions */}
+          <DuplicateMatchPanel
+            matches={duplicateMatches}
+            onUseContact={handleUseMatch}
+            onDismiss={handleDismissMatch}
+          />
+
           <CommunicationPreferencesEditor value={commPrefs} onChange={setCommPrefs} />
 
           <ContactLanguagePicker

@@ -1234,7 +1234,7 @@ const Index = () => {
         <TranslationDemoInline />
 
         {/* ── FEATURED LISTINGS ── */}
-        <motion.section {...sectionAnim} id="featured-listings" className="bg-white py-12 px-6">
+        <section id="featured-listings" className="bg-white py-12 px-6">
           <div className="max-w-5xl mx-auto">
             <div className="flex items-baseline justify-between mb-6">
               <div>
@@ -1289,13 +1289,13 @@ const Index = () => {
               </button>
             </div>
           </div>
-        </motion.section>
+        </section>
 
         {/* ── HOW IT WORKS ── */}
         <HowItWorksSection t={t} />
 
         {/* ── AGENT CTA ── */}
-        <motion.section {...sectionAnim} className="bg-slate-900 py-16 px-6 text-center">
+        <section className="bg-slate-900 py-16 px-6 text-center">
           <div className="max-w-2xl mx-auto">
             <h2 className="text-2xl font-semibold text-white mb-3">{t('home.agentBannerHeadline')}</h2>
             <p className="text-sm text-slate-400 mb-8">{t('home.agentBannerSub')}</p>
@@ -1306,10 +1306,10 @@ const Index = () => {
               {t('home.agentBannerCta')} →
             </button>
           </div>
-        </motion.section>
+        </section>
 
         {/* ── FOR AGENTS — Compact 2-column ── */}
-        <motion.section {...sectionAnim} className="bg-slate-950 py-16 px-6">
+        <section className="bg-slate-950 py-16 px-6">
           <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
             {/* Left: bullets */}
             <div>
@@ -1343,7 +1343,7 @@ const Index = () => {
               </button>
             </div>
           </div>
-        </motion.section>
+        </section>
       </div>
     );
   }

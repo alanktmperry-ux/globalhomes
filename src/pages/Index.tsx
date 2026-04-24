@@ -1043,13 +1043,7 @@ const Index = () => {
     }
   };
 
-  // ── Scroll animation config ──
-  const sectionAnim = {
-    initial: { opacity: 0, y: 24 } as const,
-    whileInView: { opacity: 1, y: 0 } as const,
-    viewport: { once: true, amount: 0.05, margin: '-40px' } as const,
-    transition: { duration: 0.5, ease: 'easeOut' as const },
-  };
+  // (sectionAnim removed — landing sections no longer use framer-motion to keep it off the cold-paint critical path.)
 
   // ── Landing hero: shown until first search, hidden if URL has params ──
   if (!hasSearchParams) {

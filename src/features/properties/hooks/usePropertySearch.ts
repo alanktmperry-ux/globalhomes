@@ -15,6 +15,16 @@ import { lookupSuburbCentroid } from '@/shared/lib/suburbCentroids';
 
 const DEFAULT_RADIUS_KM = 10;
 
+function inferPlainLocationQuery(query: string): string | null {
+  const cleaned = query.trim().replace(/\s+/g, ' ');
+  if (!cleaned) return null;
+
+  if (lookupSuburbCentroid(cleaned)) return cleaned;
+
+  const looksLikePlainLocation = /^[A-Za-zÀ-ÿ' -]+(?:,\s*[A-Za-z]{2,3})?$/.test(cleaned) && !/\d/.test(cleaned);
+  return looksLikePlainLocation ? cleaned : null;
+}
+
 
 // ── Types ────────────────────────────────────────────────────
 
@@ -101,6 +111,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
 
       // Parse structured filters from the query (local fallback)
       const parsedFilters = parsePropertyQuery(query);
+      const detectedLocation = parsedFilters.location ?? inferPlainLocationQuery(query);
 
       // Update the filter sidebar to reflect what was spoken/typed
       setFilters(prev => ({
@@ -255,7 +266,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
           beds: parsedFilters.beds || undefined,
           priceMin: parsedFilters.priceMin || undefined,
           priceMax: parsedFilters.priceMax || undefined,
-          suburb: parsedFilters.location || undefined,
+          suburb: detectedLocation || undefined,
           propertyType: parsedFilters.propertyType || undefined,
           features: parsedFilters.features.length > 0
             ? parsedFilters.features

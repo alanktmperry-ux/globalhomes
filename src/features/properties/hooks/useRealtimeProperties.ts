@@ -89,8 +89,11 @@ async function fetchNearbyProperties(
 
   if (listingType === 'rent') {
     query = query.eq('listing_type', 'rent');
+    query = query.or(EXCLUDE_EXTERNAL_SOURCE);
   } else if (listingType === 'sale') {
-    query = query.or('listing_type.eq.sale,listing_type.is.null');
+    query = query.or(`and(or(${EXCLUDE_EXTERNAL_SOURCE}),or(listing_type.eq.sale,listing_type.is.null))`);
+  } else {
+    query = query.or(EXCLUDE_EXTERNAL_SOURCE);
   }
 
   const { data: withAgents, error: agentError } = await query;

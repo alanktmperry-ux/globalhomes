@@ -196,19 +196,14 @@ export async function fetchPublicProperties(limit = 50, listingType?: 'sale' | '
     .order('created_at', { ascending: false })
     .limit(limit);
 
-  // Single combined .or() (mandatory AND of OR-groups: source + moderation [+ listing_type])
-  const andGroups: string[] = [
-    'or(source.is.null,source.not.in.(google,web_search,external,scraped))',
-    'or(moderation_status.eq.approved,moderation_status.is.null)',
-  ];
+  // Moderation: approved or null (legacy rows)
+  query = query.or('moderation_status.eq.approved,moderation_status.is.null');
 
   if (listingType === 'rent') {
     query = query.eq('listing_type', 'rent');
   } else if (listingType === 'sale') {
-    andGroups.push('or(listing_type.eq.sale,listing_type.is.null)');
+    query = query.not('listing_type', 'eq', 'rent');
   }
-
-  query = query.or(`and(${andGroups.join(',')})`);
 
   const { data, error } = await query;
 

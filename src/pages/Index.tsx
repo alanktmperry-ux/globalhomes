@@ -1583,21 +1583,23 @@ const Index = () => {
                 </div>
                 <div className="overflow-y-auto px-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))]" style={{ maxHeight: 'calc(100% - 3.75rem)' }}>
                   {showEmptyState ? emptyPlaceholder : (
-                    <VirtualizedPropertyList
-                      properties={filteredProperties}
-                      isSearching={isSearching}
-                      isMobile={true}
-                      isSaved={isSaved}
-                      onToggleSave={toggleSaved}
-                      onSelect={(p) => navigate(`/property/${p.id}`)}
-                      cardRefs={cardRefs}
-                      isCollab={isCollab}
-                      getPropertyReactions={isCollab ? getPropertyReactions : undefined}
-                      onToggleReaction={isCollab ? toggleReaction : undefined}
-                      hasPartnerViewed={isCollab ? hasPartnerViewed : undefined}
-                      currentUserId={user?.id}
-                      listingMode={listingMode}
-                    />
+                    <Suspense fallback={<MapSkeleton />}>
+                      <VirtualizedPropertyList
+                        properties={filteredProperties}
+                        isSearching={isSearching}
+                        isMobile={true}
+                        isSaved={isSaved}
+                        onToggleSave={toggleSaved}
+                        onSelect={(p) => navigate(`/property/${p.id}`)}
+                        cardRefs={cardRefs}
+                        isCollab={isCollab}
+                        getPropertyReactions={isCollab ? getPropertyReactions : undefined}
+                        onToggleReaction={isCollab ? toggleReaction : undefined}
+                        hasPartnerViewed={isCollab ? hasPartnerViewed : undefined}
+                        currentUserId={user?.id}
+                        listingMode={listingMode}
+                      />
+                    </Suspense>
                   )}
                 </div>
               </motion.div>

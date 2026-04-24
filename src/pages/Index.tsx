@@ -256,7 +256,7 @@ const Index = () => {
   useEffect(() => {
     (async () => {
       const { count: propCount } = await supabase
-        .from('properties').select('id', { count: 'exact', head: true }).eq('is_active', true);
+        .from('properties').select('id', { count: 'exact', head: true }).eq('is_active', true).eq('status', 'public');
       setHeroPlatformStats({
         properties: propCount ?? 0,
         buyerCount: null,
@@ -475,6 +475,7 @@ const Index = () => {
         .from('properties')
         .select(cols)
         .eq('is_active', true)
+        .eq('status', 'public')
         .or('is_featured.eq.true,boost_tier.not.is.null')
         .order('created_at', { ascending: false })
         .limit(12);
@@ -497,6 +498,7 @@ const Index = () => {
         .from('properties')
         .select(cols)
         .eq('is_active', true)
+        .eq('status', 'public')
         .or('listing_type.eq.sale,listing_type.is.null')
         .order('created_at', { ascending: false })
         .limit(12);

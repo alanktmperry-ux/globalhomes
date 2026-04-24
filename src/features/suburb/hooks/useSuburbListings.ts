@@ -15,6 +15,7 @@ export function useSuburbListings(suburb: string, state: string) {
         .ilike('suburb', suburb)
         .ilike('state', state)
         .eq('is_active', true)
+        .eq('status', 'public')
         .order('created_at', { ascending: false })
         .limit(6),
       supabase

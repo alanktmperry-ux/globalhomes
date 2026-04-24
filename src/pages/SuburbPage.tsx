@@ -40,6 +40,7 @@ export default function SuburbPage() {
       .ilike('suburb', `%${unslug(suburb)}%`)
       .ilike('state', `%${stateUpper}%`)
       .eq('is_active', true)
+      .eq('status', 'public')
       .order('created_at', { ascending: false })
       .limit(24)
       .then(({ data }) => {

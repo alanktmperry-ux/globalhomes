@@ -3182,6 +3182,53 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_saved_views: {
+        Row: {
+          agency_id: string
+          columns: Json
+          created_at: string
+          filters: Json
+          id: string
+          is_shared: boolean
+          name: string
+          owner_id: string
+          sort: Json
+          updated_at: string
+        }
+        Insert: {
+          agency_id: string
+          columns?: Json
+          created_at?: string
+          filters?: Json
+          id?: string
+          is_shared?: boolean
+          name: string
+          owner_id: string
+          sort?: Json
+          updated_at?: string
+        }
+        Update: {
+          agency_id?: string
+          columns?: Json
+          created_at?: string
+          filters?: Json
+          id?: string
+          is_shared?: boolean
+          name?: string
+          owner_id?: string
+          sort?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_saved_views_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contact_tag_assignments: {
         Row: {
           assigned_at: string
@@ -12037,6 +12084,10 @@ export type Database = {
       }
       is_active_partner_for_agent: {
         Args: { _agent_id: string }
+        Returns: boolean
+      }
+      is_agency_admin_or_principal: {
+        Args: { _agency_id: string }
         Returns: boolean
       }
       is_agency_member: {

@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useCRMLeads } from '../hooks/useCRMLeads';
 import { LeadDetailModal } from './LeadDetailModal';
 import { AddLeadModal } from './AddLeadModal';
 import type { CRMLead, LeadStage } from '../types';
-import { Search, UserPlus } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Search, UserPlus, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import {
+  URGENCY_CONFIG, URGENCY_TIERS, type UrgencyTier,
+} from '../lib/urgency';
 
 const fmtLabel = (s: string) =>
   s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
@@ -21,12 +23,40 @@ const STAGE_BADGE: Record<string, string> = {
   lost: 'bg-destructive/10 text-destructive',
 };
 
-export function CRMListView() {
+interface Props {
+  urgencyFilter?: UrgencyTier[];
+  onUrgencyFilterChange?: (next: UrgencyTier[]) => void;
+}
+
+export function CRMListView({ urgencyFilter, onUrgencyFilterChange }: Props) {
   const [search, setSearch] = useState('');
   const [stageFilter, setStage] = useState<LeadStage | 'all'>('all');
   const [selectedLead, setSelected] = useState<CRMLead | null>(null);
   const [showAddLead, setShowAddLead] = useState(false);
-  const { leads, loading, createLead } = useCRMLeads({ search, stage: stageFilter });
+  const [internalUrgency, setInternalUrgency] = useState<UrgencyTier[]>([]);
+
+  const urgency = urgencyFilter ?? internalUrgency;
+  const setUrgency = onUrgencyFilterChange ?? setInternalUrgency;
+
+  const { leads, loading, createLead } = useCRMLeads({
+    search, stage: stageFilter, urgency: urgency.length ? urgency : undefined,
+  });
+
+  // Sort: urgency DESC (Hot first), then created_at ASC
+  const sorted = useMemo(() => {
+    return [...leads].sort((a: any, b: any) => {
+      const ua = URGENCY_CONFIG[a.urgency as UrgencyTier].order;
+      const ub = URGENCY_CONFIG[b.urgency as UrgencyTier].order;
+      if (ua !== ub) return ua - ub;
+      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    });
+  }, [leads]);
+
+  const toggleUrgency = (tier: UrgencyTier) => {
+    setUrgency(urgency.includes(tier)
+      ? urgency.filter(t => t !== tier)
+      : [...urgency, tier]);
+  };
 
   return (
     <div className="space-y-4">
@@ -50,35 +80,62 @@ export function CRMListView() {
             <option key={s} value={s}>{fmtLabel(s)}</option>
           ))}
         </select>
-        <Button
-          size="sm"
-          onClick={() => setShowAddLead(true)}
-          className="gap-2"
-        >
+        <Button size="sm" onClick={() => setShowAddLead(true)} className="gap-2">
           <UserPlus size={14} /> Add Lead
         </Button>
+      </div>
+
+      {/* Urgency multi-select chips */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-xs text-muted-foreground">Urgency:</span>
+        {URGENCY_TIERS.map(tier => {
+          const cfg = URGENCY_CONFIG[tier];
+          const active = urgency.includes(tier);
+          return (
+            <button
+              key={tier}
+              type="button"
+              onClick={() => toggleUrgency(tier)}
+              className={`text-xs px-2.5 py-1 rounded-full border transition flex items-center gap-1.5
+                ${active ? cfg.chip : 'bg-background text-muted-foreground border-border hover:border-foreground/30'}
+              `}
+            >
+              <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
+              {cfg.label}
+            </button>
+          );
+        })}
+        {urgency.length > 0 && (
+          <button
+            onClick={() => setUrgency([])}
+            className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+          >
+            <X size={12} /> Clear
+          </button>
+        )}
       </div>
 
       <div className="overflow-x-auto rounded-xl border border-border">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-muted/30">
-              {['Contact', 'Property', 'Stage', 'Budget', 'Last Contact', 'Source'].map(h => (
+              {['Contact', 'Urgency', 'Property', 'Stage', 'Budget', 'Last Contact', 'Source'].map(h => (
                 <th key={h} className="text-left py-2.5 px-3 text-xs font-medium text-muted-foreground">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {loading && (
-              <tr><td colSpan={6} className="text-center py-8 text-muted-foreground">Loading…</td></tr>
+              <tr><td colSpan={7} className="text-center py-8 text-muted-foreground">Loading…</td></tr>
             )}
-            {!loading && leads.length === 0 && (
-              <tr><td colSpan={6} className="text-center py-8 text-muted-foreground">No leads found.</td></tr>
+            {!loading && sorted.length === 0 && (
+              <tr><td colSpan={7} className="text-center py-8 text-muted-foreground">No leads found.</td></tr>
             )}
-            {leads.map(lead => {
+            {sorted.map((lead: any) => {
               const daysAgo = lead.last_contacted
                 ? Math.floor((Date.now() - new Date(lead.last_contacted).getTime()) / 86400000)
                 : null;
+              const cfg = URGENCY_CONFIG[lead.urgency as UrgencyTier];
               return (
                 <tr
                   key={lead.id}
@@ -89,6 +146,12 @@ export function CRMListView() {
                     <p className="font-medium text-foreground">{lead.first_name} {lead.last_name ?? ''}</p>
                     <p className="text-xs text-muted-foreground">{lead.email ?? lead.phone ?? '—'}</p>
                   </td>
+                  <td className="py-2.5 px-3">
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium border inline-flex items-center gap-1 ${cfg.chip}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
+                      {cfg.label}
+                    </span>
+                  </td>
                   <td className="py-2.5 px-3 text-muted-foreground">{lead.property?.address ?? '—'}</td>
                   <td className="py-2.5 px-3">
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STAGE_BADGE[lead.stage]}`}>
@@ -98,7 +161,7 @@ export function CRMListView() {
                   <td className="py-2.5 px-3 text-muted-foreground">
                     {lead.budget_max ? `$${(lead.budget_max / 1000).toFixed(0)}k` : '—'}
                   </td>
-                  <td className={`py-2.5 px-3 text-xs ${daysAgo !== null && daysAgo > 7 ? 'text-destructive' : 'text-muted-foreground'}`}>
+                  <td className="py-2.5 px-3 text-xs text-muted-foreground">
                     {daysAgo === null ? 'Never' : `${daysAgo}d ago`}
                   </td>
                   <td className="py-2.5 px-3 text-xs text-muted-foreground">

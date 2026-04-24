@@ -3467,96 +3467,64 @@ export type Database = {
       crm_leads: {
         Row: {
           agent_id: string
-          budget_max: number | null
-          budget_min: number | null
-          buyer_id: string | null
+          contact_id: string
           created_at: string
-          email: string | null
+          enquiry_source: string
           expected_close: string | null
-          first_name: string
+          first_seen_at: string
           id: string
           last_contacted: string | null
-          last_name: string | null
+          lead_temperature: string
           lost_reason: string | null
           notes: string | null
-          phone: string | null
-          pre_approval_amount: number | null
-          pre_approved: boolean | null
           priority: string
-          property_id: string | null
-          source: string
+          source_property_id: string | null
           stage: string
-          tags: string[] | null
+          tags: string[]
           updated_at: string
         }
         Insert: {
           agent_id: string
-          budget_max?: number | null
-          budget_min?: number | null
-          buyer_id?: string | null
+          contact_id: string
           created_at?: string
-          email?: string | null
+          enquiry_source?: string
           expected_close?: string | null
-          first_name: string
+          first_seen_at?: string
           id?: string
           last_contacted?: string | null
-          last_name?: string | null
+          lead_temperature?: string
           lost_reason?: string | null
           notes?: string | null
-          phone?: string | null
-          pre_approval_amount?: number | null
-          pre_approved?: boolean | null
           priority?: string
-          property_id?: string | null
-          source?: string
+          source_property_id?: string | null
           stage?: string
-          tags?: string[] | null
+          tags?: string[]
           updated_at?: string
         }
         Update: {
           agent_id?: string
-          budget_max?: number | null
-          budget_min?: number | null
-          buyer_id?: string | null
+          contact_id?: string
           created_at?: string
-          email?: string | null
+          enquiry_source?: string
           expected_close?: string | null
-          first_name?: string
+          first_seen_at?: string
           id?: string
           last_contacted?: string | null
-          last_name?: string | null
+          lead_temperature?: string
           lost_reason?: string | null
           notes?: string | null
-          phone?: string | null
-          pre_approval_amount?: number | null
-          pre_approved?: boolean | null
           priority?: string
-          property_id?: string | null
-          source?: string
+          source_property_id?: string | null
           stage?: string
-          tags?: string[] | null
+          tags?: string[]
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "crm_leads_property_id_fkey"
-            columns: ["property_id"]
+            foreignKeyName: "crm_leads_contact_id_fkey"
+            columns: ["contact_id"]
             isOneToOne: false
-            referencedRelation: "listings_translation_summary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "crm_leads_property_id_fkey"
-            columns: ["property_id"]
-            isOneToOne: false
-            referencedRelation: "properties"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "crm_leads_property_id_fkey"
-            columns: ["property_id"]
-            isOneToOne: false
-            referencedRelation: "properties_public_safe"
+            referencedRelation: "contacts"
             referencedColumns: ["id"]
           },
         ]

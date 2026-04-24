@@ -11,6 +11,8 @@ import { MapPin, X, Plus, Search } from 'lucide-react';
 import { autocomplete, getPlaceDetails } from '@/shared/lib/googleMapsService';
 import ContactLanguagePicker from '@/shared/components/ContactLanguagePicker';
 import { DEFAULT_CONTACT_LANGUAGE } from '@/shared/lib/contactLanguages';
+import CommunicationPreferencesEditor from '@/shared/components/CommunicationPreferences/CommunicationPreferencesEditor';
+import { isValidHandle, type CommPreference } from '@/shared/components/CommunicationPreferences/types';
 import type { Contact } from '@/features/agents/hooks/useContacts';
 
 interface Props {

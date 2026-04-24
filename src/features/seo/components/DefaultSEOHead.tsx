@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 
-const SITE_URL = 'https://globalhomes.lovable.app';
+const SITE_URL = 'https://listhq.com.au';
 const OG_IMAGE = `${SITE_URL}/og-image.png`;
 
 export function DefaultSEOHead() {

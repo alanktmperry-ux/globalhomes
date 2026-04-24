@@ -298,6 +298,10 @@ const SettingsPage = () => {
             </Button>
           </TabsContent>
 
+          <TabsContent value="pipeline">
+            <PipelineStagesSettings />
+          </TabsContent>
+
           <TabsContent value="suppliers">
             <SuppliersSettings />
           </TabsContent>

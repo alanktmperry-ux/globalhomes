@@ -9,6 +9,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/shared/hooks/use-toast';
 import { MapPin, X, Plus, Search } from 'lucide-react';
 import { autocomplete, getPlaceDetails } from '@/shared/lib/googleMapsService';
+import ContactLanguagePicker from '@/shared/components/ContactLanguagePicker';
+import { DEFAULT_CONTACT_LANGUAGE } from '@/shared/lib/contactLanguages';
 import type { Contact } from '@/features/agents/hooks/useContacts';
 
 interface Props {

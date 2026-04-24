@@ -46,6 +46,22 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
   const [newActivityDesc, setNewActivityDesc] = useState('');
   const [loadingActivities, setLoadingActivities] = useState(true);
 
+  // Next action editor state
+  const toLocalInput = (iso: string | null) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+  const [nextDue, setNextDue] = useState<string>(toLocalInput(contact.next_action_due_at));
+  const [nextNote, setNextNote] = useState<string>(contact.next_action_note || '');
+  const [savingNext, setSavingNext] = useState(false);
+
+  useEffect(() => {
+    setNextDue(toLocalInput(contact.next_action_due_at));
+    setNextNote(contact.next_action_note || '');
+  }, [contact.id, contact.next_action_due_at, contact.next_action_note]);
+
   useEffect(() => {
     setLoadingActivities(true);
     getActivities(contact.id).then(data => {
@@ -60,6 +76,29 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
     setNewActivityDesc('');
     const updated = await getActivities(contact.id);
     setActivities(updated);
+  };
+
+  const handleSaveNextAction = async () => {
+    setSavingNext(true);
+    try {
+      await onUpdate(contact.id, {
+        next_action_due_at: nextDue ? new Date(nextDue).toISOString() : null,
+        next_action_note: nextNote.trim() || null,
+      });
+    } finally {
+      setSavingNext(false);
+    }
+  };
+
+  const handleClearNextAction = async () => {
+    setNextDue('');
+    setNextNote('');
+    setSavingNext(true);
+    try {
+      await onUpdate(contact.id, { next_action_due_at: null, next_action_note: null });
+    } finally {
+      setSavingNext(false);
+    }
   };
 
   const r = RANKING_CONFIG[contact.ranking] || RANKING_CONFIG.cold;

@@ -121,7 +121,7 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
             role="dialog"
             aria-modal="true"
             aria-label={t('share.title')}
-            className="fixed inset-x-0 bottom-0 z-[61] max-h-[92vh] bg-card rounded-t-3xl shadow-drawer overflow-y-auto md:inset-x-auto md:left-1/2 md:top-1/2 md:bottom-auto md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md md:rounded-2xl"
+            className="fixed inset-x-0 bottom-0 z-[61] max-h-[85vh] bg-card rounded-t-3xl shadow-drawer overflow-y-auto md:inset-x-auto md:left-1/2 md:top-1/2 md:bottom-auto md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md md:max-h-[85vh] md:rounded-2xl"
             initial={{ y: '100%', opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: '100%', opacity: 0 }}

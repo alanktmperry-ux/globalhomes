@@ -155,6 +155,49 @@ Return ONLY valid JSON. No markdown, no code fences.`;
   });
 }
 
+async function handleTemplateTranslation(input: {
+  source_text: string;
+  source_subject?: string | null;
+  target_languages: string[];
+}) {
+  // Map our app language codes -> human labels for prompt
+  const LABELS: Record<string, string> = {
+    zh_simplified: "Chinese (Simplified)",
+    zh_traditional: "Chinese (Traditional)",
+    vi: "Vietnamese",
+  };
+  const targets = (input.target_languages || []).filter((l) => LABELS[l]);
+  if (targets.length === 0) {
+    return jsonResponse({ error: "No supported target_languages provided" }, 400);
+  }
+
+  const systemPrompt = `You are a multilingual translator for an Australian real estate CRM. Translate short marketing/communication templates while PRESERVING any merge tags exactly as written, including the double curly braces (e.g. {{contact.first_name}}, {{property.address}}). Do not translate, alter, or wrap merge tags. Keep tone friendly and professional. Return valid JSON only.`;
+
+  const langList = targets.map((l) => `- ${l}: ${LABELS[l]}`).join("\n");
+  const userPrompt = `Translate the following message template${input.source_subject ? " (with subject)" : ""} from English into the languages below. Preserve all {{merge.tags}} verbatim.
+
+LANGUAGES:
+${langList}
+
+ENGLISH BODY:
+"""
+${input.source_text}
+"""
+${input.source_subject ? `\nENGLISH SUBJECT: "${input.source_subject}"\n` : ""}
+
+Return JSON with exactly these top-level keys:
+- "bodies": object keyed by the language codes above, value = translated body
+${input.source_subject ? `- "subjects": object keyed by the language codes above, value = translated subject` : ""}
+
+Return ONLY valid JSON.`;
+
+  const result = await callAI(systemPrompt, userPrompt);
+  return jsonResponse({
+    bodies: result.bodies || {},
+    subjects: result.subjects || {},
+  });
+}
+
 async function handleSearchTranslation(searchQuery: string) {
   const systemPrompt = `You are a multilingual search query translator for an Australian real estate platform. Detect the input language, translate to English, and identify search intent. Return valid JSON only.`;
 
@@ -208,6 +251,18 @@ Deno.serve(async (req) => {
     if (body.type === "translate_search" && body.search_query) {
       // Any authenticated user can translate search queries
       return await handleSearchTranslation(body.search_query);
+    }
+
+    if (body.type === "translate_template" && typeof body.source_text === "string") {
+      // Translate a message-template body (and optional subject) into agent CRM languages.
+      // Auth is sufficient — no per-row ownership check needed; this is a stateless helper.
+      return await handleTemplateTranslation({
+        source_text: body.source_text,
+        source_subject: typeof body.source_subject === "string" ? body.source_subject : null,
+        target_languages: Array.isArray(body.target_languages)
+          ? body.target_languages.map(String)
+          : ["zh_simplified", "zh_traditional", "vi"],
+      });
     }
 
     if (body.type === "translate_text" && body.target_language) {

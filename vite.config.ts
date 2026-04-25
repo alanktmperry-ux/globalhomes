@@ -13,6 +13,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
+    target: 'es2020',
     sourcemap: false,
     chunkSizeWarningLimit: 1500,
     // Only preload entry chunks, not the transitive closure of every dynamic import.
@@ -21,13 +22,14 @@ export default defineConfig(({ mode }) => ({
     modulePreload: {
       resolveDependencies: (_filename, deps) => {
         // Keep only deps for the entry; route chunks load on navigation.
-        return deps.filter((d) => /react-vendor|^assets\/vendor\.js$|supabase/.test(d));
+        // Match hashed filenames like react-vendor-abc123.js, vendor-xyz.js, supabase-foo.js
+        return deps.filter((d) => /react-vendor|vendor|supabase/.test(d));
       },
     },
     rollupOptions: {
       output: {
-        chunkFileNames: "assets/[name].js",
-        entryFileNames: "assets/[name].js",
+        chunkFileNames: "assets/[name]-[hash].js",
+        entryFileNames: "assets/[name]-[hash].js",
         manualChunks(id) {
           if (!id.includes("node_modules")) return;
 

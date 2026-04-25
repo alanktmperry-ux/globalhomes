@@ -332,13 +332,14 @@ const NetworkPage = () => {
         toast.success('Trust entry created for referral deposit');
       }
 
-      await supabase.from('notifications').insert({
+      await dispatchNotification({
         agent_id: contactTarget.sharing_agent_id,
+        event_key: 'co_broke_request',
         type: 'referral',
         title: 'Referral interest received',
         message: contactMessage || `An agent is interested in your off-market listing at ${contactTarget.address}`,
         property_id: contactTarget.property_id,
-      } as any);
+      });
 
       toast.success(`Contact request sent to ${contactTarget.sharing_agent_name}`);
       setShowContact(false);

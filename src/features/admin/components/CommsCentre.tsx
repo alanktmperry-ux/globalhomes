@@ -176,12 +176,13 @@ function ComposePanel({ templates, onSent }: { templates: Template[]; onSent: ()
       const personalBody = body.replace(/{{name}}/g, agent.name.split(' ')[0]);
       try {
         if (method === 'in_app' || method === 'both') {
-          await supabase.from('notifications').insert({
+          await dispatchNotification({
             agent_id: agent.id,
+            event_key: 'mention',
             type: 'broadcast',
             title: subject,
             message: personalBody.slice(0, 300),
-          } as any);
+          });
         }
         if (method === 'email' || method === 'both') {
           await supabase.functions.invoke('send-notification-email', {

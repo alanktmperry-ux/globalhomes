@@ -358,6 +358,7 @@ const App = () => (
                   <Route path="inspection/:inspectionId" element={<InspectionReportPage />} />
                   <Route path="open-homes" element={<OpenHomesPage />} />
                   <Route path="automation" element={<AutomationSettingsPage />} />
+                  <Route path="agency-automations" element={<AgencyAutomationsPage />} />
                   <Route path="suppliers" element={<SuppliersPage />} />
                   <Route path="vacancy-kpi" element={<VacancyKPIPage />} />
                   <Route path="vacancies" element={<VacanciesPage />} />

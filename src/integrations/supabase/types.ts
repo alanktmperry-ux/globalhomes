@@ -4936,6 +4936,160 @@ export type Database = {
         }
         Relationships: []
       }
+      inbox_messages: {
+        Row: {
+          attachments: Json
+          body: string
+          body_html: string | null
+          channel: Database["public"]["Enums"]["inbox_channel"]
+          created_at: string
+          direction: Database["public"]["Enums"]["inbox_direction"]
+          external_id: string | null
+          id: string
+          read_at: string | null
+          sender_id: string | null
+          sender_type: Database["public"]["Enums"]["inbox_sender_type"]
+          sent_at: string
+          thread_id: string
+        }
+        Insert: {
+          attachments?: Json
+          body?: string
+          body_html?: string | null
+          channel: Database["public"]["Enums"]["inbox_channel"]
+          created_at?: string
+          direction: Database["public"]["Enums"]["inbox_direction"]
+          external_id?: string | null
+          id?: string
+          read_at?: string | null
+          sender_id?: string | null
+          sender_type: Database["public"]["Enums"]["inbox_sender_type"]
+          sent_at?: string
+          thread_id: string
+        }
+        Update: {
+          attachments?: Json
+          body?: string
+          body_html?: string | null
+          channel?: Database["public"]["Enums"]["inbox_channel"]
+          created_at?: string
+          direction?: Database["public"]["Enums"]["inbox_direction"]
+          external_id?: string | null
+          id?: string
+          read_at?: string | null
+          sender_id?: string | null
+          sender_type?: Database["public"]["Enums"]["inbox_sender_type"]
+          sent_at?: string
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inbox_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "inbox_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inbox_threads: {
+        Row: {
+          agency_id: string
+          assigned_agent_id: string | null
+          contact_id: string | null
+          created_at: string
+          id: string
+          is_unread: boolean
+          last_message_at: string
+          last_message_preview: string | null
+          lead_id: string | null
+          snoozed_until: string | null
+          status: Database["public"]["Enums"]["inbox_thread_status"]
+          subject: string | null
+          updated_at: string
+        }
+        Insert: {
+          agency_id: string
+          assigned_agent_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          id?: string
+          is_unread?: boolean
+          last_message_at?: string
+          last_message_preview?: string | null
+          lead_id?: string | null
+          snoozed_until?: string | null
+          status?: Database["public"]["Enums"]["inbox_thread_status"]
+          subject?: string | null
+          updated_at?: string
+        }
+        Update: {
+          agency_id?: string
+          assigned_agent_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          id?: string
+          is_unread?: boolean
+          last_message_at?: string
+          last_message_preview?: string | null
+          lead_id?: string | null
+          snoozed_until?: string | null
+          status?: Database["public"]["Enums"]["inbox_thread_status"]
+          subject?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inbox_threads_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inbox_threads_assigned_agent_id_fkey"
+            columns: ["assigned_agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inbox_threads_assigned_agent_id_fkey"
+            columns: ["assigned_agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inbox_threads_assigned_agent_id_fkey"
+            columns: ["assigned_agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inbox_threads_assigned_agent_id_fkey"
+            columns: ["assigned_agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "inbox_threads_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inbox_threads_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "crm_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inspection_maintenance_items: {
         Row: {
           created_at: string | null
@@ -12614,10 +12768,9 @@ export type Database = {
         Args: { _agency_id: string }
         Returns: boolean
       }
-      is_agency_member: {
-        Args: { _agency_id: string; _user_id: string }
-        Returns: boolean
-      }
+      is_agency_member:
+        | { Args: { _agency_id: string }; Returns: boolean }
+        | { Args: { _agency_id: string; _user_id: string }; Returns: boolean }
       is_agency_owner_or_admin: {
         Args: { _agency_id: string; _user_id: string }
         Returns: boolean
@@ -12967,6 +13120,10 @@ export type Database = {
         | "passport"
         | "medicare_card"
         | "proof_of_age_card"
+      inbox_channel: "email" | "in_app"
+      inbox_direction: "inbound" | "outbound"
+      inbox_sender_type: "agent" | "contact" | "system"
+      inbox_thread_status: "open" | "snoozed" | "closed"
       language_proficiency: "native" | "fluent" | "conversational"
       message_template_category:
         | "lead_followup"
@@ -13147,6 +13304,10 @@ export const Constants = {
         "medicare_card",
         "proof_of_age_card",
       ],
+      inbox_channel: ["email", "in_app"],
+      inbox_direction: ["inbound", "outbound"],
+      inbox_sender_type: ["agent", "contact", "system"],
+      inbox_thread_status: ["open", "snoozed", "closed"],
       language_proficiency: ["native", "fluent", "conversational"],
       message_template_category: [
         "lead_followup",

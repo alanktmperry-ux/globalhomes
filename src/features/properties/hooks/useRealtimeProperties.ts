@@ -7,7 +7,10 @@ import { mapDbProperty } from '@/features/properties/api/fetchPublicProperties';
 // Only select public-safe agent columns. Do NOT add user_id, stripe_*, support_pin,
 // payment_failed_at, admin_grace_until, or any internal/admin fields here — these
 // must never be exposed to anonymous visitors via the property join.
-const PROPERTIES_QUERY = '*, agents!inner(id, name, agency, agency_id, phone, email, avatar_url, profile_photo_url, company_logo_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count, approval_status, bio, license_number, slug, headline, languages_spoken, service_areas)';
+// Property columns are explicitly listed (no `*`) to keep the payload small —
+// avoids returning heavy jsonb columns like `translations`, `meta`, `seo_*`.
+const PROPERTY_COLS = 'id, title, address, suburb, state, country, price, price_formatted, beds, baths, parking, sqm, image_url, images, description, estimated_value, property_type, features, agent_id, listed_date, created_at, views, contact_clicks, lat, lng, rental_yield_pct, str_permitted, year_built, council_rates_annual, strata_fees_quarterly, rental_weekly, currency_code, listing_type, is_active, status, moderation_status';
+const PROPERTIES_QUERY = `${PROPERTY_COLS}, agents!inner(id, name, agency, agency_id, phone, email, avatar_url, profile_photo_url, company_logo_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count, approval_status, bio, license_number, slug, headline, languages_spoken, service_areas)`;
 
 async function fetchProperties(limit = 50, listingType?: 'sale' | 'rent', suburb?: string): Promise<Property[]> {
   let query = supabase

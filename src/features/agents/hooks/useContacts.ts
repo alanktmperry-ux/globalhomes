@@ -35,6 +35,7 @@ export interface Contact {
   notes: string | null;
   source: string | null;
   tags: string[];
+  preferred_language: string | null;
   communication_preferences: { channel: string; handle: string; is_primary: boolean }[];
   last_contacted_at: string | null;
   next_action_due_at: string | null;

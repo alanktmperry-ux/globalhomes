@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, ChevronDown, ChevronUp, X, Flame, Snowflake, Clock, Mail, CalendarClock, Loader2, PartyPopper } from 'lucide-react';
+import { Sparkles, ChevronDown, ChevronUp, X, Flame, Snowflake, Clock, Mail, CalendarClock, Loader2, PartyPopper, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useTodayPriorities, type PriorityItem, type PrioritySourceKey } from '@/features/agents/hooks/useTodayPriorities';
+import TemplatePicker, { type TemplatePickerContact, type TemplatePickerProperty } from '@/features/messaging/components/TemplatePicker';
 
 const SOURCE_META: Record<PrioritySourceKey, { icon: React.ReactNode; tone: string }> = {
   hot_lead:       { icon: <Flame size={14} />,        tone: 'text-destructive bg-destructive/10' },
@@ -28,6 +29,44 @@ export default function TodayPrioritiesPanel() {
     if (typeof window === 'undefined') return false;
     return localStorage.getItem(COLLAPSE_KEY) === '1';
   });
+  const [pickerCtx, setPickerCtx] = useState<{ contact: TemplatePickerContact; property: TemplatePickerProperty | null } | null>(null);
+
+  const openPickerFor = async (item: PriorityItem) => {
+    if (item.sourceKey === 'going_cold') {
+      // sourceId = crm_lead.id → join contact
+      const { data } = await supabase
+        .from('crm_leads')
+        .select('contact_id, contacts:contact_id(id, first_name, last_name, email, phone, mobile, preferred_language)')
+        .eq('id', item.sourceId)
+        .maybeSingle();
+      const c = (data as any)?.contacts;
+      if (!c) return;
+      setPickerCtx({ contact: c as TemplatePickerContact, property: null });
+    } else if (item.sourceKey === 'unresponded') {
+      // sourceId = leads.id (public enquiry)
+      const { data } = await supabase
+        .from('leads')
+        .select('user_name, user_email, user_phone, properties:property_id(address, suburb)')
+        .eq('id', item.sourceId)
+        .maybeSingle();
+      if (!data) return;
+      const [first, ...rest] = ((data as any).user_name || '').trim().split(' ');
+      setPickerCtx({
+        contact: {
+          id: null, // no contact record yet; activity log skipped
+          first_name: first || null,
+          last_name: rest.join(' ') || null,
+          email: (data as any).user_email,
+          phone: (data as any).user_phone,
+          mobile: (data as any).user_phone,
+          preferred_language: null,
+        },
+        property: (data as any).properties
+          ? { address: (data as any).properties.address, suburb: (data as any).properties.suburb, price: null }
+          : null,
+      });
+    }
+  };
 
   // Hydrate collapse from server prefs (overrides local on first load if set)
   useEffect(() => {
@@ -103,20 +142,34 @@ export default function TodayPrioritiesPanel() {
                   item={item}
                   onAction={() => navigate(item.actionHref)}
                   onDismiss={() => dismiss(item)}
+                  onTemplate={
+                    item.sourceKey === 'going_cold' || item.sourceKey === 'unresponded'
+                      ? () => openPickerFor(item)
+                      : undefined
+                  }
                 />
               ))}
             </ul>
           )}
         </div>
       )}
+      {pickerCtx && (
+        <TemplatePicker
+          open={!!pickerCtx}
+          onClose={() => setPickerCtx(null)}
+          contact={pickerCtx.contact}
+          property={pickerCtx.property}
+        />
+      )}
     </div>
   );
 }
 
-function PriorityRow({ item, onAction, onDismiss }: {
+function PriorityRow({ item, onAction, onDismiss, onTemplate }: {
   item: PriorityItem;
   onAction: () => void;
   onDismiss: () => void;
+  onTemplate?: () => void;
 }) {
   const meta = SOURCE_META[item.sourceKey];
   return (
@@ -128,6 +181,18 @@ function PriorityRow({ item, onAction, onDismiss }: {
         <p className="text-sm font-medium text-foreground truncate">{item.title}</p>
         <p className="text-xs text-muted-foreground truncate">{item.context}</p>
       </div>
+      {onTemplate && (
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={onTemplate}
+          className="shrink-0 h-9 px-2"
+          title="Send template"
+          aria-label="Send template"
+        >
+          <Send size={14} />
+        </Button>
+      )}
       <Button size="sm" variant="default" onClick={onAction} className="shrink-0">
         {item.actionLabel}
       </Button>

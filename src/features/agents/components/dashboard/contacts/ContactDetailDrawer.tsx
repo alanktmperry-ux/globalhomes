@@ -5,8 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Flame, Thermometer, Snowflake, Phone, Mail, MessageSquare, Calendar, ClipboardList, StickyNote, PhoneCall } from 'lucide-react';
+import { Flame, Thermometer, Snowflake, Phone, Mail, MessageSquare, Calendar, ClipboardList, StickyNote, PhoneCall, Send } from 'lucide-react';
 import type { Contact, ContactActivity } from '@/features/agents/hooks/useContacts';
+import TemplatePicker from '@/features/messaging/components/TemplatePicker';
 
 const RANKING_CONFIG: Record<string, { icon: React.ReactNode; color: string; label: string }> = {
   hot: { icon: <Flame size={12} />, color: 'bg-destructive/15 text-destructive', label: 'Hot' },
@@ -45,6 +46,7 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
   const [newActivityType, setNewActivityType] = useState('note');
   const [newActivityDesc, setNewActivityDesc] = useState('');
   const [loadingActivities, setLoadingActivities] = useState(true);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   // Next action editor state
   const toLocalInput = (iso: string | null) => {
@@ -172,7 +174,12 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
 
           {/* Contact Info */}
           <section className="space-y-2">
-            <h4 className="text-xs font-semibold text-muted-foreground uppercase">Contact Details</h4>
+            <div className="flex items-center justify-between">
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase">Contact Details</h4>
+              <Button size="sm" variant="outline" className="h-7 text-xs gap-1" onClick={() => setPickerOpen(true)}>
+                <Send size={12} /> Send template
+              </Button>
+            </div>
             <div className="grid grid-cols-2 gap-2 text-sm">
               {contact.email && (
                 <a href={`mailto:${contact.email}`} className="flex items-center gap-2 text-primary hover:underline">
@@ -275,6 +282,22 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
           </section>
         </div>
       </SheetContent>
+      {pickerOpen && (
+        <TemplatePicker
+          open={pickerOpen}
+          onClose={() => setPickerOpen(false)}
+          contact={{
+            id: contact.id,
+            first_name: contact.first_name,
+            last_name: contact.last_name,
+            email: contact.email,
+            phone: contact.phone,
+            mobile: contact.mobile,
+            preferred_language: contact.preferred_language ?? null,
+          }}
+          property={contact.property_address ? { address: contact.property_address, suburb: contact.suburb, price: contact.estimated_value } : null}
+        />
+      )}
     </Sheet>
   );
 };

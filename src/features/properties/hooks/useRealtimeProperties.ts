@@ -110,6 +110,11 @@ interface UseRealtimePropertiesOptions {
   nearbyRadiusKm?: number | null;
   listingType?: 'sale' | 'rent';
   suburb?: string | null;
+  /**
+   * When false, skips fetching entirely. Use to defer the heavy 100-row
+   * landing-page search query until the user actually performs a search.
+   */
+  enabled?: boolean;
 }
 
 export function useRealtimeProperties({
@@ -118,6 +123,7 @@ export function useRealtimeProperties({
   nearbyRadiusKm = null,
   listingType,
   suburb = null,
+  enabled = true,
 }: UseRealtimePropertiesOptions = {}) {
   const queryClient = useQueryClient();
 
@@ -133,6 +139,7 @@ export function useRealtimeProperties({
       isNearbySearch
         ? fetchNearbyProperties(nearbyCenter.lat, nearbyCenter.lng, nearbyRadiusKm, limit, listingType)
         : fetchProperties(limit, listingType, suburb || undefined),
+    enabled,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000,   // 10 minutes garbage collection
     refetchOnWindowFocus: false,

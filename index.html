@@ -9,6 +9,10 @@
       document.documentElement.style.colorScheme = 'light';
       localStorage.removeItem('theme');
     </script>
+    <style>
+      #app-loader { opacity: 0; animation: showLoader 0s 0.2s forwards; }
+      @keyframes showLoader { to { opacity: 1; } }
+    </style>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0f172a" />

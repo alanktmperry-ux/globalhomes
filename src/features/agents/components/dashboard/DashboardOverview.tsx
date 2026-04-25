@@ -22,6 +22,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, CartesianGrid } from 'recharts';
 import { toast } from 'sonner';
 import { differenceInDays } from 'date-fns';
+import { useDashboardLayout, CardKey, CardLayoutEntry, isStatTile } from '@/features/agents/hooks/useDashboardLayout';
+import { CustomiseToolbar, CardEditChrome } from './DashboardCustomiseControls';
 
 // Australian currency formatter
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });

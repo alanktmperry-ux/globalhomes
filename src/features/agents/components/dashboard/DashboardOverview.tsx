@@ -741,7 +741,7 @@ const DashboardOverview = () => {
               key: 'reputation_score',
               render: () => (
                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-                  onClick={() => !editMode && navigate(`/agent/me`)}
+                  onClick={() => !editMode && agentId && setRepModalOpen(true)}
                   className="relative bg-card border border-border rounded-xl p-4 cursor-pointer hover:ring-2 hover:ring-primary/20 hover:shadow-md transition-all">
                   <ChevronRight size={14} className="absolute top-2 right-2 text-muted-foreground" />
                   <div className="flex items-start gap-1.5 text-muted-foreground mb-1">
@@ -755,6 +755,9 @@ const DashboardOverview = () => {
                     {repTrend === 'down' && <ArrowDown size={14} className="text-destructive ml-0.5" />}
                     {repTrend === 'neutral' && <Minus size={14} className="text-muted-foreground ml-0.5" />}
                   </div>
+                  <span className={`inline-block mt-1 text-[9px] font-semibold px-1.5 py-0.5 rounded ${repTier.bg} ${repTier.color}`}>
+                    {repTier.tier}
+                  </span>
                 </motion.div>
               ),
             },

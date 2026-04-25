@@ -307,6 +307,7 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
       matchMethod: match.match_method,
       suggestedIds: [match.id],
       acceptedContactId: match.id,
+      similarityScore: match.match_method === 'name_fuzzy' ? (match.confidence ?? null) : null,
     });
     toast({
       title: '✅ Using existing contact',

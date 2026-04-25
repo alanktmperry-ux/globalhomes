@@ -9,6 +9,7 @@ export type CardKey =
   | 'sales_month'
   | 'trust_balance'
   | 'unresponded_leads'
+  | 'avg_response_time'
   | 'reputation_score'
   | 'todays_inspections'
   | 'todays_voice_matches'

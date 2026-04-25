@@ -891,191 +891,169 @@ const DashboardOverview = () => {
           </motion.div>
         )}
 
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
-          className="bg-card border border-border rounded-xl p-5"
-        >
-          <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
-            <CalendarDays size={16} className="text-primary" /> Today's Inspections
-          </h3>
-          {todayInspections.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-4 text-center">No inspections scheduled for today</p>
-          ) : (
-            <div className="space-y-2">
-              {todayInspections.map((insp, i) => (
-                <div
-                  key={i}
-                  onClick={() => navigate('/dashboard/inspection-mode')}
-                  className="flex items-center justify-between border border-border rounded-lg p-3 cursor-pointer hover:ring-2 hover:ring-primary/20 hover:shadow-md transition-all"
-                >
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium truncate">{insp.address}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">🕐 {insp.time}</p>
+        {/* Large cards — driven by layout */}
+        {(() => {
+          const largeCards: Record<string, React.ReactNode> = {
+            todays_inspections: (
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+                className="bg-card border border-border rounded-xl p-5">
+                <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
+                  <CalendarDays size={16} className="text-primary" /> Today's Inspections
+                </h3>
+                {todayInspections.length === 0 ? (
+                  <p className="text-sm text-muted-foreground py-4 text-center">No inspections scheduled for today</p>
+                ) : (
+                  <div className="space-y-2">
+                    {todayInspections.map((insp, i) => (
+                      <div key={i} onClick={() => !editMode && navigate('/dashboard/inspection-mode')}
+                        className="flex items-center justify-between border border-border rounded-lg p-3 cursor-pointer hover:ring-2 hover:ring-primary/20 hover:shadow-md transition-all">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium truncate">{insp.address}</p>
+                          <p className="text-[10px] text-muted-foreground mt-0.5">🕐 {insp.time}</p>
+                        </div>
+                        <Button size="sm" variant="outline" className="text-[10px] h-6 px-2 shrink-0 ml-2"
+                          onClick={(e) => { e.stopPropagation(); if (!editMode) navigate(`/dashboard/listings/${insp.propertyId}`); }}>
+                          View Listing
+                        </Button>
+                      </div>
+                    ))}
                   </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="text-[10px] h-6 px-2 shrink-0 ml-2"
-                    onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/listings/${insp.propertyId}`); }}
-                  >
-                    View Listing
-                  </Button>
+                )}
+              </motion.div>
+            ),
+            todays_voice_matches: (
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                className="bg-card border border-border rounded-xl p-5">
+                <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
+                  <Mic size={16} className="text-success" /> Today's Voice Matches
+                </h3>
+                <p className="text-sm text-muted-foreground py-4 text-center">No voice matches yet</p>
+              </motion.div>
+            ),
+            listing_performance: (
+              <section>
+                <h2 className="font-display text-base font-bold mb-3 flex items-center gap-2">
+                  <Eye size={16} className="text-primary" /> Listing Performance
+                </h2>
+                <div className="bg-card border border-border rounded-xl overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border text-xs text-muted-foreground">
+                        <th className="text-left p-3">Property</th>
+                        <th className="text-left p-3">Status</th>
+                        <th className="text-center p-3">Views</th>
+                        <th className="text-center p-3">Voice</th>
+                        <th className="text-center p-3">Leads</th>
+                        <th className="text-center p-3">Days</th>
+                        <th className="text-right p-3">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td colSpan={7} className="p-6 text-center text-sm text-muted-foreground">
+                          No listings yet — <button onClick={() => !editMode && navigate('/dashboard/listings/new')} className="text-primary underline underline-offset-2">create your first listing</button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
-              ))}
-            </div>
-          )}
-        </motion.div>
-
-        {/* Today's Voice Matches */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-card border border-border rounded-xl p-5"
-        >
-          <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
-            <Mic size={16} className="text-success" /> Today's Voice Matches
-          </h3>
-          <p className="text-sm text-muted-foreground py-4 text-center">No voice matches yet</p>
-        </motion.div>
-
-        {/* Listing Performance */}
-        <section>
-          <h2 className="font-display text-base font-bold mb-3 flex items-center gap-2">
-            <Eye size={16} className="text-primary" /> Listing Performance
-          </h2>
-          <div className="bg-card border border-border rounded-xl overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border text-xs text-muted-foreground">
-                  <th className="text-left p-3">Property</th>
-                  <th className="text-left p-3">Status</th>
-                  <th className="text-center p-3">Views</th>
-                  <th className="text-center p-3">Voice</th>
-                  <th className="text-center p-3">Leads</th>
-                  <th className="text-center p-3">Days</th>
-                  <th className="text-right p-3">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td colSpan={7} className="p-6 text-center text-sm text-muted-foreground">
-                    No listings yet — <button onClick={() => navigate('/dashboard/listings/new')} className="text-primary underline underline-offset-2">create your first listing</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* Recent Activity */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-card border border-border rounded-xl p-5"
-        >
-          <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
-            <Activity size={16} className="text-success" /> Recent Activity
-          </h3>
-          {recentActivities.length > 0 ? (
-            <div className="space-y-3">
-              {recentActivities.map((a) => {
-                const isProperty = a.entity_type === 'property' && a.entity_id;
-                return (
-                  <div
-                    key={a.id}
-                    onClick={isProperty ? () => navigate(`/dashboard/listings/${a.entity_id}`) : undefined}
-                    className={`flex items-start gap-3 text-sm rounded-lg -mx-2 px-2 py-1 ${isProperty ? 'cursor-pointer hover:ring-2 hover:ring-primary/20 hover:shadow-md transition-all' : ''}`}
-                  >
-                    <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs">{a.description || a.action}</p>
-                      <p className="text-[10px] text-muted-foreground">{AU_DATE(a.created_at)}</p>
+              </section>
+            ),
+            recent_activity: (
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+                className="bg-card border border-border rounded-xl p-5">
+                <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
+                  <Activity size={16} className="text-success" /> Recent Activity
+                </h3>
+                {recentActivities.length > 0 ? (
+                  <div className="space-y-3">
+                    {recentActivities.map((a) => {
+                      const isProperty = a.entity_type === 'property' && a.entity_id;
+                      return (
+                        <div key={a.id}
+                          onClick={isProperty && !editMode ? () => navigate(`/dashboard/listings/${a.entity_id}`) : undefined}
+                          className={`flex items-start gap-3 text-sm rounded-lg -mx-2 px-2 py-1 ${isProperty ? 'cursor-pointer hover:ring-2 hover:ring-primary/20 hover:shadow-md transition-all' : ''}`}>
+                          <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs">{a.description || a.action}</p>
+                            <p className="text-[10px] text-muted-foreground">{AU_DATE(a.created_at)}</p>
+                          </div>
+                          {isProperty && <ChevronRight size={14} className="text-muted-foreground shrink-0 mt-1" />}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground py-4 text-center">No recent activity</p>
+                )}
+              </motion.div>
+            ),
+            gci: (
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+                className="bg-card border border-border rounded-xl p-5">
+                <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
+                  <DollarSign size={16} className="text-primary" /> GCI — Gross Commission Income
+                </h3>
+                <div className="space-y-3">
+                  <div>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-muted-foreground">Actual</span>
+                      <span className="font-bold">{AUD.format(gciActual)}</span>
                     </div>
-                    {isProperty && <ChevronRight size={14} className="text-muted-foreground shrink-0 mt-1" />}
+                    <Progress value={gciPercent} className="h-3" />
                   </div>
-                );
-              })}
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground py-4 text-center">No recent activity</p>
-          )}
-        </motion.div>
-
-        {/* GCI Gauge + Pipeline Chart row */}
-        <div className="grid lg:grid-cols-2 gap-4">
-          {/* GCI Gauge */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-            className="bg-card border border-border rounded-xl p-5"
-          >
-            <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
-              <DollarSign size={16} className="text-primary" /> GCI — Gross Commission Income
-            </h3>
-            <div className="space-y-3">
-              <div>
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-muted-foreground">Actual</span>
-                  <span className="font-bold">{AUD.format(gciActual)}</span>
+                  <div>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-muted-foreground">Budgeted</span>
+                      <span className="font-bold">{AUD.format(gciBudgeted)}</span>
+                    </div>
+                    <Progress value={100} className="h-3 opacity-30" />
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-muted-foreground">Potential (Pipeline)</span>
+                      <span className="font-bold text-success">{AUD.format(gciPotential)}</span>
+                    </div>
+                    <Progress value={gciPotential > 0 ? 100 : 0} className="h-3 opacity-50" />
+                  </div>
+                  <p className="text-xs text-muted-foreground pt-2 border-t border-border">
+                    You're at <strong className="text-primary">{gciPercent}%</strong> of your annual budget target
+                  </p>
                 </div>
-                <Progress value={gciPercent} className="h-3" />
-              </div>
-              <div>
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-muted-foreground">Budgeted</span>
-                  <span className="font-bold">{AUD.format(gciBudgeted)}</span>
+              </motion.div>
+            ),
+            pipeline_12mo: (
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                className="bg-card border border-border rounded-xl p-5">
+                <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
+                  <TrendingUp size={16} className="text-primary" /> Pipeline — 12 Month Deal Flow
+                </h3>
+                <div className="h-48 relative">
+                  {pipelineEmpty && (
+                    <div className="absolute inset-0 flex items-center justify-center z-10">
+                      <p className="text-sm text-muted-foreground bg-card/80 backdrop-blur-sm px-3 py-1.5 rounded-lg">No completed sales yet</p>
+                    </div>
+                  )}
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={pipelineData}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                      <XAxis dataKey="month" tick={{ fontSize: 11 }} className="text-muted-foreground" />
+                      <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `$${v / 1000}k`} className="text-muted-foreground" />
+                      <RechartsTooltip
+                        formatter={(value: number) => [AUD.format(value), 'Commission']}
+                        contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', fontSize: '12px' }}
+                      />
+                      <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
-                <Progress value={100} className="h-3 opacity-30" />
-              </div>
-              <div>
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-muted-foreground">Potential (Pipeline)</span>
-                  <span className="font-bold text-success">{AUD.format(gciPotential)}</span>
-                </div>
-                <Progress value={gciPotential > 0 ? 100 : 0} className="h-3 opacity-50" />
-              </div>
-              <p className="text-xs text-muted-foreground pt-2 border-t border-border">
-                You're at <strong className="text-primary">{gciPercent}%</strong> of your annual budget target
-              </p>
-            </div>
-          </motion.div>
-
-          {/* Pipeline Chart */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-card border border-border rounded-xl p-5"
-          >
-            <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
-              <TrendingUp size={16} className="text-primary" /> Pipeline — 12 Month Deal Flow
-            </h3>
-            <div className="h-48 relative">
-              {pipelineEmpty && (
-                <div className="absolute inset-0 flex items-center justify-center z-10">
-                  <p className="text-sm text-muted-foreground bg-card/80 backdrop-blur-sm px-3 py-1.5 rounded-lg">No completed sales yet</p>
-                </div>
-              )}
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={pipelineData}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis dataKey="month" tick={{ fontSize: 11 }} className="text-muted-foreground" />
-                  <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `$${v / 1000}k`} className="text-muted-foreground" />
-                  <RechartsTooltip
-                    formatter={(value: number) => [AUD.format(value), 'Commission']}
-                    contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', fontSize: '12px' }}
-                  />
-                  <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </motion.div>
-        </div>
+              </motion.div>
+            ),
+          };
+          return activeLayout
+            .filter(e => !isStatTile(e.card_key) && largeCards[e.card_key] && (e.is_visible || editMode))
+            .map(e => renderCard(e.card_key, largeCards[e.card_key]));
+        })()}
       </div>
     </div>
   );

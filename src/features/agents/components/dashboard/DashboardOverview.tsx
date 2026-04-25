@@ -1103,6 +1103,9 @@ const DashboardOverview = () => {
       {agentId && (
         <ReputationExplainerModal agentId={agentId} open={repModalOpen} onOpenChange={setRepModalOpen} />
       )}
+      {agentId && (
+        <ResponseTimeModal agentId={agentId} open={respModalOpen} onOpenChange={setRespModalOpen} />
+      )}
     </div>
   );
 };

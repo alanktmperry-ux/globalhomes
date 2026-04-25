@@ -279,7 +279,7 @@ export default function InboxPage() {
                     </Button>
                   )}
                   {composeChannel === 'email' && !activeThread.contact?.email && (
-                    <span className="text-[11px] text-amber-600 ml-auto">No email on file</span>
+                    <span className="text-[11px] text-warning ml-auto">No email on file</span>
                   )}
                 </div>
                 <Textarea

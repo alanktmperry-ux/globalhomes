@@ -131,7 +131,7 @@ export function useDashboardLayout() {
     const merged = { ...(existing?.prefs as object ?? {}), dashboard_layout: next };
     await supabase
       .from('agent_dashboard_prefs')
-      .upsert({ agent_id: agentId, prefs: merged, updated_at: new Date().toISOString() }, { onConflict: 'agent_id' });
+      .upsert([{ agent_id: agentId, prefs: merged, updated_at: new Date().toISOString() }], { onConflict: 'agent_id' });
   }, [agentId]);
 
   const reset = useCallback(() => save(DEFAULT_LAYOUT), [save]);

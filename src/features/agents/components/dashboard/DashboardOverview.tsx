@@ -533,12 +533,9 @@ const DashboardOverview = () => {
   // Stats row - Australian CRM focus
   const unrespondedValue = unrespondedLeads;
 
-  // Reputation score with trend — new users start at 0
-  const repScore = 0;
-  const lastMonthKey = 'gh_rep_last_month';
-  const lastMonth = parseInt(localStorage.getItem(lastMonthKey) || '0', 10);
-  const repTrend = lastMonth === 0 ? 'neutral' : repScore > lastMonth ? 'up' : repScore < lastMonth ? 'down' : 'neutral';
-  useEffect(() => { localStorage.setItem(lastMonthKey, String(repScore)); }, [repScore]);
+  // Reputation score with tier + 30-day trend (real data via hook)
+  const { score: repScore, trend: repTrend, breakdown: repBreakdown } = useAgentReputation(agentId);
+  const repTier = getReputationTier(repScore);
   const repColors = getScoreColor(repScore);
 
   const stats = [

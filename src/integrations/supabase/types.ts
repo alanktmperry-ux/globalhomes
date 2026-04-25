@@ -3857,33 +3857,39 @@ export type Database = {
       }
       crm_activities: {
         Row: {
-          agent_id: string
+          agent_id: string | null
+          auto_generated: boolean
           body: string
           completed: boolean
           created_at: string
           due_at: string | null
+          event_data: Json | null
           id: string
           lead_id: string
           subject: string | null
           type: string
         }
         Insert: {
-          agent_id: string
+          agent_id?: string | null
+          auto_generated?: boolean
           body: string
           completed?: boolean
           created_at?: string
           due_at?: string | null
+          event_data?: Json | null
           id?: string
           lead_id: string
           subject?: string | null
           type: string
         }
         Update: {
-          agent_id?: string
+          agent_id?: string | null
+          auto_generated?: boolean
           body?: string
           completed?: boolean
           created_at?: string
           due_at?: string | null
+          event_data?: Json | null
           id?: string
           lead_id?: string
           subject?: string | null
@@ -3903,9 +3909,13 @@ export type Database = {
         Row: {
           agent_id: string | null
           contact_id: string
+          conversion_notes: string | null
+          conversion_status: string | null
           created_at: string
           enquiry_source: string
           expected_close: string | null
+          first_contacted_at: string | null
+          first_contacted_by_agent_id: string | null
           first_seen_at: string
           id: string
           intent_bathrooms_min: number | null
@@ -3923,6 +3933,7 @@ export type Database = {
           is_thin_search: boolean
           language_routing_status: string | null
           last_contacted: string | null
+          last_status_change_at: string | null
           lead_score: number | null
           lead_score_breakdown: Json | null
           lead_score_updated_at: string | null
@@ -3938,9 +3949,13 @@ export type Database = {
         Insert: {
           agent_id?: string | null
           contact_id: string
+          conversion_notes?: string | null
+          conversion_status?: string | null
           created_at?: string
           enquiry_source?: string
           expected_close?: string | null
+          first_contacted_at?: string | null
+          first_contacted_by_agent_id?: string | null
           first_seen_at?: string
           id?: string
           intent_bathrooms_min?: number | null
@@ -3958,6 +3973,7 @@ export type Database = {
           is_thin_search?: boolean
           language_routing_status?: string | null
           last_contacted?: string | null
+          last_status_change_at?: string | null
           lead_score?: number | null
           lead_score_breakdown?: Json | null
           lead_score_updated_at?: string | null
@@ -3973,9 +3989,13 @@ export type Database = {
         Update: {
           agent_id?: string | null
           contact_id?: string
+          conversion_notes?: string | null
+          conversion_status?: string | null
           created_at?: string
           enquiry_source?: string
           expected_close?: string | null
+          first_contacted_at?: string | null
+          first_contacted_by_agent_id?: string | null
           first_seen_at?: string
           id?: string
           intent_bathrooms_min?: number | null
@@ -3993,6 +4013,7 @@ export type Database = {
           is_thin_search?: boolean
           language_routing_status?: string | null
           last_contacted?: string | null
+          last_status_change_at?: string | null
           lead_score?: number | null
           lead_score_breakdown?: Json | null
           lead_score_updated_at?: string | null
@@ -4040,6 +4061,34 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "contacts"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_leads_first_contacted_by_agent_id_fkey"
+            columns: ["first_contacted_by_agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_leads_first_contacted_by_agent_id_fkey"
+            columns: ["first_contacted_by_agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_leads_first_contacted_by_agent_id_fkey"
+            columns: ["first_contacted_by_agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_leads_first_contacted_by_agent_id_fkey"
+            columns: ["first_contacted_by_agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
           },
           {
             foreignKeyName: "crm_leads_source_property_id_fkey"

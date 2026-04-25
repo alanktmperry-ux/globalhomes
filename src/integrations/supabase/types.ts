@@ -3383,6 +3383,7 @@ export type Database = {
           id: string
           match_count: number
           match_method: string | null
+          similarity_score: number | null
           suggested_contact_ids: string[]
         }
         Insert: {
@@ -3394,6 +3395,7 @@ export type Database = {
           id?: string
           match_count?: number
           match_method?: string | null
+          similarity_score?: number | null
           suggested_contact_ids?: string[]
         }
         Update: {
@@ -3405,6 +3407,7 @@ export type Database = {
           id?: string
           match_count?: number
           match_method?: string | null
+          similarity_score?: number | null
           suggested_contact_ids?: string[]
         }
         Relationships: []
@@ -4282,6 +4285,35 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "trust_account_balances"
             referencedColumns: ["agent_id"]
+          },
+        ]
+      }
+      dedup_config: {
+        Row: {
+          agency_id: string
+          fuzzy_threshold: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          agency_id: string
+          fuzzy_threshold?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          agency_id?: string
+          fuzzy_threshold?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dedup_config_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: true
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
           },
         ]
       }

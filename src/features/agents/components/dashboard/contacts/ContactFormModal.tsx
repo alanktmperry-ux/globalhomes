@@ -307,6 +307,7 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
       matchMethod: match.match_method,
       suggestedIds: [match.id],
       acceptedContactId: match.id,
+      similarityScore: match.match_method === 'name_fuzzy' ? (match.confidence ?? null) : null,
     });
     toast({
       title: '✅ Using existing contact',
@@ -323,6 +324,7 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
       action: 'ignored',
       matchMethod: match.match_method,
       suggestedIds: [match.id],
+      similarityScore: match.match_method === 'name_fuzzy' ? (match.confidence ?? null) : null,
     });
   };
 
@@ -357,6 +359,7 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
         action: 'soft_warned',
         matchMethod: 'name_fuzzy',
         suggestedIds: fuzzy.map(m => m.id),
+        similarityScore: f.confidence ?? null,
       });
     }
     return true;
@@ -418,11 +421,15 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
 
   const handleConfirmCreateAnyway = async () => {
     setShowDupBlock(false);
+    const topFuzzy = duplicateMatches
+      .filter(m => m.match_method === 'name_fuzzy' && typeof m.confidence === 'number')
+      .sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0))[0];
     void logDuplicateEvent({
       agencyId,
       action: 'created_anyway',
       matchMethod: duplicateMatches[0]?.match_method,
       suggestedIds: duplicateMatches.map(m => m.id),
+      similarityScore: topFuzzy?.confidence ?? null,
     });
     await performSave();
   };

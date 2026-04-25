@@ -98,11 +98,16 @@ export function useDuplicateMatches({
               match_methods: rows.map(r => r.match_method),
             });
             // Also persist to DB telemetry table (fire-and-forget)
+            // Capture top fuzzy match's similarity score for tuning
+            const topFuzzy = rows
+              .filter(r => r.match_method === 'name_fuzzy' && typeof r.confidence === 'number')
+              .sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0))[0];
             void logDuplicateEvent({
               agencyId,
               action: 'suggested',
               matchMethod: dominantMethod(rows),
               suggestedIds: rows.map(r => r.id),
+              similarityScore: topFuzzy?.confidence ?? null,
             });
           }
         }
@@ -173,6 +178,7 @@ export async function logDuplicateEvent(opts: {
   matchCount?: number;
   suggestedIds?: string[];
   acceptedContactId?: string | null;
+  similarityScore?: number | null;
 }) {
   try {
     const { data: { user } } = await supabase.auth.getUser();
@@ -185,6 +191,7 @@ export async function logDuplicateEvent(opts: {
       match_count: opts.matchCount ?? opts.suggestedIds?.length ?? 0,
       suggested_contact_ids: opts.suggestedIds ?? [],
       accepted_contact_id: opts.acceptedContactId ?? null,
+      similarity_score: opts.similarityScore ?? null,
     } as any);
   } catch {
     // Telemetry must never break the app

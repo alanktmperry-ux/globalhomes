@@ -31,6 +31,7 @@ const FindAgentPage = React.lazy(() => import("./features/agents/pages/FindAgent
 const FindBrokerPage = React.lazy(() => import("./features/brokers/pages/FindBrokerPage"));
 const PocketListingPage = React.lazy(() => import("./pages/PocketListingPage"));
 const AgentDashboardLayout = React.lazy(() => import("./pages/AgentDashboardLayout"));
+const DedupTelemetryPage = React.lazy(() => import("./features/agents/pages/DedupTelemetryPage"));
 const MyAgenciesPage = React.lazy(() => import("./pages/MyAgenciesPage"));
 const SeekerAuthPage = React.lazy(() => import("./pages/SeekerAuthPage"));
 const AgentAuthPage = React.lazy(() => import("./pages/AgentAuthPage"));
@@ -363,6 +364,7 @@ const App = () => (
                   <Route path="help" element={<HelpPage />} />
                   <Route path="broker-referrals" element={<BrokerReferralsPage />} />
                   <Route path="partner-access" element={<PartnerAccessPage />} />
+                  <Route path="admin/dedup-telemetry" element={<DedupTelemetryPage />} />
                 </Route>
 
                 {/* Partner */}

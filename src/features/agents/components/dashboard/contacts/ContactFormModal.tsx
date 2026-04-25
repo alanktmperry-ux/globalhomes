@@ -421,11 +421,15 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
 
   const handleConfirmCreateAnyway = async () => {
     setShowDupBlock(false);
+    const topFuzzy = duplicateMatches
+      .filter(m => m.match_method === 'name_fuzzy' && typeof m.confidence === 'number')
+      .sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0))[0];
     void logDuplicateEvent({
       agencyId,
       action: 'created_anyway',
       matchMethod: duplicateMatches[0]?.match_method,
       suggestedIds: duplicateMatches.map(m => m.id),
+      similarityScore: topFuzzy?.confidence ?? null,
     });
     await performSave();
   };

@@ -43,28 +43,15 @@ export default function TodayPrioritiesPanel() {
       if (!c) return;
       setPickerCtx({ contact: c as TemplatePickerContact, property: null });
     } else if (item.sourceKey === 'unresponded') {
-      // sourceId = leads.id (public enquiry)
+      // sourceId = inbox_threads.id → join contact
       const { data } = await supabase
-        .from('leads')
-        .select('user_name, user_email, user_phone, properties:property_id(address, suburb)')
+        .from('inbox_threads' as any)
+        .select('contact:contact_id(id, first_name, last_name, email, phone, mobile, preferred_language), subject')
         .eq('id', item.sourceId)
         .maybeSingle();
-      if (!data) return;
-      const [first, ...rest] = ((data as any).user_name || '').trim().split(' ');
-      setPickerCtx({
-        contact: {
-          id: null, // no contact record yet; activity log skipped
-          first_name: first || null,
-          last_name: rest.join(' ') || null,
-          email: (data as any).user_email,
-          phone: (data as any).user_phone,
-          mobile: (data as any).user_phone,
-          preferred_language: null,
-        },
-        property: (data as any).properties
-          ? { address: (data as any).properties.address, suburb: (data as any).properties.suburb, price: null }
-          : null,
-      });
+      const c = (data as any)?.contacts ?? (data as any)?.contact;
+      if (!c) return;
+      setPickerCtx({ contact: c as TemplatePickerContact, property: null });
     }
   };
 

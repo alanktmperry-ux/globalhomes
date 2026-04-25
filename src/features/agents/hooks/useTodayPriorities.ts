@@ -146,32 +146,46 @@ export function useTodayPriorities(limit = 5) {
       });
     }
 
-    // --- 4. Unresponded enquiries >24h ---
-    const { data: unresp } = await supabase
-      .from('leads')
-      .select('id, user_name, user_email, created_at, property_id, properties:property_id(address)')
-      .eq('agent_id', agent.id)
-      .is('responded_at', null)
-      .is('archived_at', null)
-      .lt('created_at', new Date(nowMs - 86_400_000).toISOString())
-      .order('created_at', { ascending: true })
-      .limit(20);
+    // --- 4. Unresponded inbox threads (>24h since last inbound, no outbound reply) ---
+    // Sourced from inbox_threads + inbox_messages (Batch 6 Item 2)
+    const { data: agentRow } = await supabase
+      .from('agents')
+      .select('agency_id')
+      .eq('id', agent.id)
+      .maybeSingle();
+    const agencyId = (agentRow as any)?.agency_id;
 
-    for (const l of unresp || []) {
-      const name = (l as any).user_name || (l as any).user_email || 'Enquirer';
-      const propAddr = (l as any).properties?.address;
-      const ageMs = nowMs - new Date(l.created_at).getTime();
-      candidates.push({
-        id: `unresponded:${l.id}`,
-        sourceKey: 'unresponded',
-        sourceId: l.id,
-        weight: 60,
-        ageMs,
-        title: `Reply to ${name}`,
-        context: propAddr ? `About ${propAddr} · ${formatAgo(ageMs)} ago` : `${formatAgo(ageMs)} ago`,
-        actionHref: `/dashboard/leads?lead=${l.id}`,
-        actionLabel: 'Reply',
-      });
+    if (agencyId) {
+      const cutoffIso = new Date(nowMs - 86_400_000).toISOString();
+      // Threads where last_message is inbound + older than 24h + still open
+      const { data: unrespThreads } = await supabase
+        .from('inbox_threads' as any)
+        .select('id, subject, last_message_at, last_message_preview, contact:contact_id(id, first_name, last_name, email)')
+        .eq('agency_id', agencyId)
+        .eq('is_unread', true)
+        .neq('status', 'closed')
+        .lt('last_message_at', cutoffIso)
+        .order('last_message_at', { ascending: true })
+        .limit(20);
+
+      for (const th of unrespThreads || []) {
+        const c = (th as any).contact;
+        const name = c
+          ? (`${c.first_name ?? ''} ${c.last_name ?? ''}`.trim() || c.email || 'Contact')
+          : ((th as any).subject || 'Lead enquiry');
+        const ageMs = nowMs - new Date((th as any).last_message_at).getTime();
+        candidates.push({
+          id: `unresponded:${(th as any).id}`,
+          sourceKey: 'unresponded',
+          sourceId: (th as any).id,
+          weight: 60,
+          ageMs,
+          title: `Reply to ${name}`,
+          context: `${(th as any).subject || 'Inbox thread'} · ${formatAgo(ageMs)} ago`,
+          actionHref: `/dashboard/inbox?thread=${(th as any).id}`,
+          actionLabel: 'Open',
+        });
+      }
     }
 
     // --- 5. Due within 24h ---

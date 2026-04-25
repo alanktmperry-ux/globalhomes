@@ -1065,6 +1065,9 @@ const DashboardOverview = () => {
             .map(e => renderCard(e.card_key, largeCards[e.card_key]));
         })()}
       </div>
+      {agentId && (
+        <ReputationExplainerModal agentId={agentId} open={repModalOpen} onOpenChange={setRepModalOpen} />
+      )}
     </div>
   );
 };

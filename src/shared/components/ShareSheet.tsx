@@ -1,9 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Copy, Link2, Share2, MessageCircle, Download } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { Property } from '@/shared/lib/types';
 import { useI18n } from '@/shared/lib/i18n';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
+import { useIsMobile } from '@/shared/hooks/use-mobile';
 import { toast } from 'sonner';
 import { capture } from '@/shared/lib/posthog';
 
@@ -16,14 +18,41 @@ interface ShareSheetProps {
 export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
   const { t } = useI18n();
   const { formatPrice } = useCurrency();
+  const isMobile = useIsMobile();
+  const qrWrapperRef = useRef<HTMLDivElement>(null);
 
   const propertyUrl = `${window.location.origin}/property/${property.id}`;
   const encodedUrl = encodeURIComponent(propertyUrl);
-  const qrUrl = `https://chart.googleapis.com/chart?chs=240x240&cht=qr&chl=${encodedUrl}&choe=UTF-8`;
+  const qrSize = isMobile ? 160 : 200;
 
   const shareText = `${property.title} — ${property.address}, ${property.suburb}`;
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${shareText}\n${propertyUrl}`)}`;
   const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodedUrl}`;
+
+  const saveQR = () => {
+    capture('wechat_share_clicked', { listing_id: property.id, action: 'save_qr' });
+    const svg = qrWrapperRef.current?.querySelector('svg');
+    if (!svg) return;
+    const svgXml = new XMLSerializer().serializeToString(svg);
+    const svg64 = btoa(unescape(encodeURIComponent(svgXml)));
+    const img = new Image();
+    img.onload = () => {
+      const scale = 3;
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const link = document.createElement('a');
+      link.download = `listhq-property-${property.id}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    };
+    img.src = `data:image/svg+xml;base64,${svg64}`;
+  };
 
   // Lock body scroll when open
   useEffect(() => {
@@ -92,7 +121,7 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
             role="dialog"
             aria-modal="true"
             aria-label={t('share.title')}
-            className="fixed inset-x-0 bottom-0 z-[61] max-h-[92vh] bg-card rounded-t-3xl shadow-drawer overflow-y-auto md:inset-x-auto md:left-1/2 md:top-1/2 md:bottom-auto md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md md:rounded-2xl"
+            className="fixed inset-x-0 bottom-0 z-[61] max-h-[85vh] bg-card rounded-t-3xl shadow-drawer overflow-y-auto md:inset-x-auto md:left-1/2 md:top-1/2 md:bottom-auto md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md md:max-h-[85vh] md:rounded-2xl"
             initial={{ y: '100%', opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: '100%', opacity: 0 }}
@@ -144,14 +173,8 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
                   <p className="text-xs text-muted-foreground mt-0.5">微信分享</p>
                 </div>
                 <div className="flex justify-center">
-                  <div className="p-3 rounded-xl bg-white border border-border">
-                    <img
-                      src={qrUrl}
-                      alt="WeChat QR Code"
-                      width={200}
-                      height={200}
-                      className="block"
-                    />
+                  <div ref={qrWrapperRef} className="p-3 rounded-xl bg-white border border-border">
+                    <QRCodeSVG value={propertyUrl} size={qrSize} level="M" />
                   </div>
                 </div>
                 <p className="text-center text-xs text-muted-foreground mt-3">
@@ -159,16 +182,13 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
                 </p>
                 <p className="text-center text-xs text-muted-foreground">打开微信 → 点击扫一扫 → 对准二维码</p>
                 <div className="grid grid-cols-2 gap-2 mt-4">
-                  <a
-                    href={qrUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => capture('wechat_share_clicked', { listing_id: property.id, action: 'save_qr' })}
+                  <button
+                    onClick={saveQR}
                     className="flex items-center justify-center gap-1.5 py-2 rounded-lg border border-border text-xs font-medium text-foreground hover:bg-secondary transition-colors"
                   >
                     <Download size={14} />
                     {t('share.saveQR')}
-                  </a>
+                  </button>
                   <button
                     onClick={copyForWeChat}
                     className="flex items-center justify-center gap-1.5 py-2 rounded-lg border border-border text-xs font-medium text-foreground hover:bg-secondary transition-colors"

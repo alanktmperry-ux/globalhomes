@@ -21,9 +21,7 @@ export default defineConfig(({ mode }) => ({
     // because every React.lazy() route gets its dep graph preloaded eagerly.
     modulePreload: {
       resolveDependencies: (_filename, deps) => {
-        // Keep only deps for the entry; route chunks load on navigation.
-        // Match hashed filenames like react-vendor-abc123.js, vendor-xyz.js, supabase-foo.js
-        return deps.filter((d) => /react-vendor|vendor|supabase/.test(d));
+        return deps.filter((d) => /vendor|supabase/.test(d));
       },
     },
     rollupOptions: {
@@ -33,24 +31,7 @@ export default defineConfig(({ mode }) => ({
         manualChunks(id) {
           if (!id.includes("node_modules")) return;
 
-          // React core + everything that calls React.createContext at module init.
-          // Radix, lucide-react, and sonner all consume React context at init,
-          // so they must be in the same chunk as React to avoid load-order TDZ
-          // errors in Safari (e.g. "undefined is not an object (y.createContext)").
-          if (
-            id.includes("node_modules/react/") ||
-            id.includes("node_modules/react-dom/") ||
-            id.includes("node_modules/scheduler/") ||
-            id.includes("react-router") ||
-            id.includes("react-helmet-async") ||
-            id.includes("@tanstack") ||
-            id.includes("@radix-ui") ||
-            id.includes("lucide-react") ||
-            id.includes("sonner")
-          ) {
-            return "react-vendor";
-          }
-
+          // Heavy libs that should stay split off the critical path
           if (id.includes("@supabase")) return "supabase";
           if (id.includes("recharts") || id.includes("d3-")) return "charts";
           if (id.includes("react-day-picker") || id.includes("date-fns")) return "datepicker";
@@ -59,6 +40,8 @@ export default defineConfig(({ mode }) => ({
           if (id.includes("mapbox-gl") || id.includes("@googlemaps")) return "maps";
           if (id.includes("framer-motion")) return "motion";
 
+          // Everything else (including React + all React-consuming libs) into one chunk.
+          // Guarantees React loads before anything that uses createContext.
           return "vendor";
         },
       },

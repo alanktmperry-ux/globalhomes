@@ -44,8 +44,6 @@ import { useLogPropertyView } from '@/features/vendor/hooks/useLogPropertyView';
 import { DocumentVault } from '@/features/documents/components/DocumentVault';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { ShareSheet } from '@/shared/components/ShareSheet';
-import { WeChatShareModal } from '@/shared/components/WeChatShareModal';
-import { capture } from '@/shared/lib/posthog';
 import { MortgageBrokerCTA } from '@/features/mortgage/components/MortgageBrokerCTA';
 import { MortgageReferralModal } from '@/components/MortgageReferralModal';
 import { useListingTranslation } from '@/features/properties/hooks/useListingTranslation';
@@ -75,7 +73,6 @@ export default function PropertyDetailPage() {
   const [isOwnerAgent, setIsOwnerAgent] = useState(false);
   const [translating, setTranslating] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
-  const [wechatOpen, setWechatOpen] = useState(false);
   const [mortgageOpen, setMortgageOpen] = useState(false);
   const { title: translatedTitle, description: translatedDescription, isTranslating, isTranslated } = useListingTranslation(rawProperty);
   useEffect(() => {
@@ -468,25 +465,13 @@ export default function PropertyDetailPage() {
                 </div>
               )}
 
-              <div className="mt-4 flex flex-wrap items-center gap-2">
-                <button
-                  onClick={() => setShareOpen(true)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full border border-teal-600 text-teal-600 font-medium text-sm hover:bg-teal-50 transition-colors"
-                >
-                  <Share2 size={16} />
-                  Share via WeChat, WhatsApp or Line
-                </button>
-                <button
-                  onClick={() => {
-                    capture('wechat_share_clicked', { listing_id: property.id });
-                    setWechatOpen(true);
-                  }}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#07C160] text-[#07C160] font-medium text-sm hover:bg-[#07C160]/10 transition-colors"
-                >
-                  <MessageCircle size={16} />
-                  Share to WeChat
-                </button>
-              </div>
+              <button
+                onClick={() => setShareOpen(true)}
+                className="mt-4 flex items-center gap-2 px-4 py-2 rounded-full border border-teal-600 text-teal-600 font-medium text-sm hover:bg-teal-50 transition-colors"
+              >
+                <Share2 size={16} />
+                Share
+              </button>
             </div>
 
             {/* Key stats */}
@@ -1063,12 +1048,6 @@ export default function PropertyDetailPage() {
         property={property}
         open={shareOpen}
         onClose={() => setShareOpen(false)}
-      />
-
-      <WeChatShareModal
-        property={property}
-        open={wechatOpen}
-        onClose={() => setWechatOpen(false)}
       />
     </div>
   );

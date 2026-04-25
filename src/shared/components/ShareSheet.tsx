@@ -5,6 +5,7 @@ import { Property } from '@/shared/lib/types';
 import { useI18n } from '@/shared/lib/i18n';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { toast } from 'sonner';
+import { capture } from '@/shared/lib/posthog';
 
 interface ShareSheetProps {
   property: Property;
@@ -52,6 +53,7 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
   const copyForWeChat = async () => {
     try {
       await navigator.clipboard.writeText(propertyUrl);
+      capture('wechat_share_clicked', { listing_id: property.id, action: 'copy_link' });
       toast.success(t('share.wechatCopiedToast'));
     } catch {
       toast.error('Could not copy link');
@@ -59,6 +61,7 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
   };
 
   const nativeShare = async () => {
+    capture('native_share_clicked', { listing_id: property.id });
     if (navigator.share) {
       try {
         await navigator.share({
@@ -160,6 +163,7 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
                     href={qrUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => capture('wechat_share_clicked', { listing_id: property.id, action: 'save_qr' })}
                     className="flex items-center justify-center gap-1.5 py-2 rounded-lg border border-border text-xs font-medium text-foreground hover:bg-secondary transition-colors"
                   >
                     <Download size={14} />
@@ -185,6 +189,7 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
                     href={whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => capture('whatsapp_share_clicked', { listing_id: property.id })}
                     className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-border hover:bg-secondary transition-colors"
                   >
                     <span className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white">
@@ -196,6 +201,7 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
                     href={lineUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => capture('line_share_clicked', { listing_id: property.id })}
                     className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-border hover:bg-secondary transition-colors"
                   >
                     <span className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold">

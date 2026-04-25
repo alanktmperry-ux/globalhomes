@@ -1,9 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Copy, Link2, Share2, MessageCircle, Download } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { Property } from '@/shared/lib/types';
 import { useI18n } from '@/shared/lib/i18n';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
+import { useIsMobile } from '@/shared/hooks/use-mobile';
 import { toast } from 'sonner';
 import { capture } from '@/shared/lib/posthog';
 

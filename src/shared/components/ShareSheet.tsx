@@ -111,7 +111,7 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
       {open && (
         <>
           <motion.div
-            className="fixed inset-0 bg-foreground/40 backdrop-blur-sm z-[60] md:flex md:items-center md:justify-center md:p-4"
+            className="fixed inset-0 bg-foreground/40 backdrop-blur-sm z-[60]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

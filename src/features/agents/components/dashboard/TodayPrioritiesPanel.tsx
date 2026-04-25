@@ -165,10 +165,11 @@ export default function TodayPrioritiesPanel() {
   );
 }
 
-function PriorityRow({ item, onAction, onDismiss }: {
+function PriorityRow({ item, onAction, onDismiss, onTemplate }: {
   item: PriorityItem;
   onAction: () => void;
   onDismiss: () => void;
+  onTemplate?: () => void;
 }) {
   const meta = SOURCE_META[item.sourceKey];
   return (
@@ -180,6 +181,18 @@ function PriorityRow({ item, onAction, onDismiss }: {
         <p className="text-sm font-medium text-foreground truncate">{item.title}</p>
         <p className="text-xs text-muted-foreground truncate">{item.context}</p>
       </div>
+      {onTemplate && (
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={onTemplate}
+          className="shrink-0 h-9 px-2"
+          title="Send template"
+          aria-label="Send template"
+        >
+          <Send size={14} />
+        </Button>
+      )}
       <Button size="sm" variant="default" onClick={onAction} className="shrink-0">
         {item.actionLabel}
       </Button>

@@ -61,6 +61,7 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
   };
 
   const nativeShare = async () => {
+    capture('native_share_clicked', { listing_id: property.id });
     if (navigator.share) {
       try {
         await navigator.share({

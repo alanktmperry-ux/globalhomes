@@ -18,14 +18,41 @@ interface ShareSheetProps {
 export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
   const { t } = useI18n();
   const { formatPrice } = useCurrency();
+  const isMobile = useIsMobile();
+  const qrWrapperRef = useRef<HTMLDivElement>(null);
 
   const propertyUrl = `${window.location.origin}/property/${property.id}`;
   const encodedUrl = encodeURIComponent(propertyUrl);
-  const qrUrl = `https://chart.googleapis.com/chart?chs=240x240&cht=qr&chl=${encodedUrl}&choe=UTF-8`;
+  const qrSize = isMobile ? 160 : 200;
 
   const shareText = `${property.title} — ${property.address}, ${property.suburb}`;
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${shareText}\n${propertyUrl}`)}`;
   const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodedUrl}`;
+
+  const saveQR = () => {
+    capture('wechat_share_clicked', { listing_id: property.id, action: 'save_qr' });
+    const svg = qrWrapperRef.current?.querySelector('svg');
+    if (!svg) return;
+    const svgXml = new XMLSerializer().serializeToString(svg);
+    const svg64 = btoa(unescape(encodeURIComponent(svgXml)));
+    const img = new Image();
+    img.onload = () => {
+      const scale = 3;
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const link = document.createElement('a');
+      link.download = `listhq-property-${property.id}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    };
+    img.src = `data:image/svg+xml;base64,${svg64}`;
+  };
 
   // Lock body scroll when open
   useEffect(() => {

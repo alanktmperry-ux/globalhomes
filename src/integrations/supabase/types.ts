@@ -2063,6 +2063,110 @@ export type Database = {
           },
         ]
       }
+      automation_log: {
+        Row: {
+          action_taken: string | null
+          agency_id: string
+          error_msg: string | null
+          fired_at: string
+          fired_date: string
+          id: string
+          rule_id: string
+          target_id: string
+          target_type: string
+        }
+        Insert: {
+          action_taken?: string | null
+          agency_id: string
+          error_msg?: string | null
+          fired_at?: string
+          fired_date?: string
+          id?: string
+          rule_id: string
+          target_id: string
+          target_type: string
+        }
+        Update: {
+          action_taken?: string | null
+          agency_id?: string
+          error_msg?: string | null
+          fired_at?: string
+          fired_date?: string
+          id?: string
+          rule_id?: string
+          target_id?: string
+          target_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_log_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "automation_log_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "automation_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      automation_rules: {
+        Row: {
+          action_config: Json
+          action_type: Database["public"]["Enums"]["automation_action_type"]
+          agency_id: string
+          conditions: Json
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          name: string
+          source_data_available: boolean
+          trigger_type: Database["public"]["Enums"]["automation_trigger_type"]
+          updated_at: string
+        }
+        Insert: {
+          action_config?: Json
+          action_type: Database["public"]["Enums"]["automation_action_type"]
+          agency_id: string
+          conditions?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          source_data_available?: boolean
+          trigger_type: Database["public"]["Enums"]["automation_trigger_type"]
+          updated_at?: string
+        }
+        Update: {
+          action_config?: Json
+          action_type?: Database["public"]["Enums"]["automation_action_type"]
+          agency_id?: string
+          conditions?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          source_data_available?: boolean
+          trigger_type?: Database["public"]["Enums"]["automation_trigger_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_rules_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       broadcast_campaigns: {
         Row: {
           audience: string
@@ -13107,6 +13211,18 @@ export type Database = {
         | "passed_in"
         | "withdrawn"
         | "postponed"
+      automation_action_type:
+        | "notify_agent"
+        | "suggest_template"
+        | "create_task"
+        | "set_next_action"
+      automation_trigger_type:
+        | "lead_going_cold"
+        | "hot_lead_new"
+        | "inspection_followup"
+        | "appraisal_followup"
+        | "under_offer_stale"
+        | "settlement_reminder"
       bid_type: "genuine" | "vendor" | "opening"
       custom_field_type:
         | "text"
@@ -13288,6 +13404,20 @@ export const Constants = {
         "passed_in",
         "withdrawn",
         "postponed",
+      ],
+      automation_action_type: [
+        "notify_agent",
+        "suggest_template",
+        "create_task",
+        "set_next_action",
+      ],
+      automation_trigger_type: [
+        "lead_going_cold",
+        "hot_lead_new",
+        "inspection_followup",
+        "appraisal_followup",
+        "under_offer_stale",
+        "settlement_reminder",
       ],
       bid_type: ["genuine", "vendor", "opening"],
       custom_field_type: [

@@ -90,13 +90,13 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
       return;
     }
 
-    await supabase.from('notifications').insert({
+    await dispatchNotification({
       agent_id: agent.id,
+      event_key: 'agent_rejected',
       type: 'agent_rejected',
       title: 'Agent application not approved',
       message: rejectionReason.trim(),
-      is_read: false,
-    } as any).then(({ error: nErr }) => { if (nErr) console.error('notification insert failed:', nErr); });
+    });
 
     toast({ title: `${agent.name} rejected` });
     setActionLoading(null);

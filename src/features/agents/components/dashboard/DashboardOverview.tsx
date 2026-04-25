@@ -24,6 +24,8 @@ import { toast } from 'sonner';
 import { differenceInDays } from 'date-fns';
 import { useDashboardLayout, CardKey, CardLayoutEntry, isStatTile } from '@/features/agents/hooks/useDashboardLayout';
 import { CustomiseToolbar, CardEditChrome } from './DashboardCustomiseControls';
+import { useAgentReputation, getReputationTier } from '@/features/agents/hooks/useAgentReputation';
+import { ReputationExplainerModal } from './ReputationExplainerModal';
 
 // Australian currency formatter
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });

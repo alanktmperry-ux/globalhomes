@@ -62,6 +62,14 @@ const DashboardOverview = () => {
   const [reportsDue, setReportsDue] = useState<any[]>([]);
   const [sendingReport, setSendingReport] = useState<string | null>(null);
   const [agencyConnected, setAgencyConnected] = useState(false);
+  const [agentId, setAgentId] = useState<string | null>(null);
+  const [repModalOpen, setRepModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle()
+      .then(({ data }) => { if (data?.id) setAgentId(data.id); });
+  }, [user]);
 
   // Dashboard layout customisation
   const { layout, setLayoutLocal, save, reset, loaded: layoutLoaded } = useDashboardLayout();

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { dispatchNotification } from '@/shared/lib/notify';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
 import AdminUsers from '@/features/admin/components/AdminUsers';
@@ -272,13 +273,14 @@ const AdminDashboard = () => {
         .maybeSingle();
 
       if (propData?.agent_id) {
-        await supabase.from('notifications').insert({
+        await dispatchNotification({
           agent_id: propData.agent_id,
+          event_key: 'listing_approved',
           type: 'boost_activated',
           title: `⚡ Your ${tier} boost is live!`,
           message: `${propData.address} is now in the featured grid near ${propData.suburb}. Live for ${days} days.`,
           property_id: id,
-        } as any);
+        });
       }
 
       toast(`${tier} boost activated for ${days} days`);

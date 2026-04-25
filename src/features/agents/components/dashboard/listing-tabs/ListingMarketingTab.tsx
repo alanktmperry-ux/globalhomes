@@ -4,6 +4,7 @@ import type { PropertyRow } from '@/features/agents/types/listing';
 import MarketingSupplierToggle from '../MarketingSupplierToggle';
 import ListingPhotoGallery from './ListingPhotoGallery';
 import { supabase } from '@/integrations/supabase/client';
+import { dispatchNotification } from '@/shared/lib/notify';
 import { useAuth } from '@/features/auth/AuthProvider';
 import {
   differenceInDays, parseISO, subDays,
@@ -220,18 +221,17 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
         .maybeSingle();
 
       if (agent?.id) {
-        await supabase
-          .from('notifications')
-          .insert({
-            agent_id: agent.id,
-            type: 'boost_requested',
-            title: `⚡ ${tierData.label} boost requested`,
-            message:
-              `${listing.address} — pending`
-              + ` activation. You'll get another`
-              + ` notification when it goes live.`,
-            property_id: listing.id,
-          } as any);
+        await dispatchNotification({
+          agent_id: agent.id,
+          event_key: 'listing_approved',
+          type: 'boost_requested',
+          title: `⚡ ${tierData.label} boost requested`,
+          message:
+            `${listing.address} — pending`
+            + ` activation. You'll get another`
+            + ` notification when it goes live.`,
+          property_id: listing.id,
+        });
       }
 
       toast.success(`${tierData.label} boost requested! You'll get a bell notification when it's live.`);

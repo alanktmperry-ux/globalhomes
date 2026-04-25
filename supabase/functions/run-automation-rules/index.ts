@@ -142,12 +142,15 @@ async function fireForEach(
       if (!recipient) continue;
 
       if (rule.action_type === "notify_agent") {
-        await sb.from("notifications").insert({
-          agent_id: recipient,
-          type: `automation_${rule.trigger_type}`,
-          title: rule.name,
-          message: messageBuilder(t),
-          lead_id: targetType === "lead" ? t.id : null,
+        await sb.functions.invoke("dispatch-notification", {
+          body: {
+            agent_id: recipient,
+            event_key: `automation_${rule.trigger_type}`,
+            type: `automation_${rule.trigger_type}`,
+            title: rule.name,
+            message: messageBuilder(t),
+            lead_id: targetType === "lead" ? t.id : null,
+          },
         });
       }
       // suggest_template / create_task / set_next_action: log only in v1 (UI pickup later)

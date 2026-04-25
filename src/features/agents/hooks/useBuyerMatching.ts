@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { dispatchNotification } from '@/shared/lib/notify';
 
 export interface ListingForMatching {
   id: string;
@@ -92,9 +93,9 @@ export function useBuyerMatching() {
 
       const propertyLabel = property.title || `${property.beds}bd/${property.baths}ba in ${property.suburb}`;
 
-      await supabase.from('notifications').insert({
+      await dispatchNotification({
         agent_id: property.agent_id,
-        type: 'buyer_match',
+        event_key: 'buyer_match',
         title: `${matched.length} buyer${matched.length > 1 ? 's' : ''} matched — ${property.suburb}`,
         message: `${propertyLabel} matches ${names}${extra}. Go to Contacts → Pipeline to follow up.`,
       });

@@ -99,12 +99,12 @@ export default function ListingModerationQueue({ onPendingCountChange }: Props) 
       return;
     }
 
-    await supabase.from('notifications').insert({
+    await dispatchNotification({
       agent_id: listing.agent_id,
-      type: 'listing_rejected',
+      event_key: 'listing_rejected',
       title: 'Listing not approved',
       message: rejectReason.trim(),
-    } as any).then(({ error: e }) => { if (e) console.error('notification insert failed:', e); });
+    });
 
     toast.success('Listing rejected');
     setRejectingId(null);

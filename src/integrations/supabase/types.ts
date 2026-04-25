@@ -5683,33 +5683,59 @@ export type Database = {
       }
       message_templates: {
         Row: {
-          audience: string | null
-          body: string
-          category: string | null
+          agency_id: string
+          body_by_language: Json
+          category: Database["public"]["Enums"]["message_template_category"]
+          channel: Database["public"]["Enums"]["message_template_channel"]
           created_at: string
+          created_by: string | null
+          deleted_at: string | null
           id: string
+          is_active: boolean
+          merge_tags: string[]
           name: string
-          subject: string
+          subject_by_language: Json | null
+          updated_at: string
         }
         Insert: {
-          audience?: string | null
-          body: string
-          category?: string | null
+          agency_id: string
+          body_by_language?: Json
+          category?: Database["public"]["Enums"]["message_template_category"]
+          channel: Database["public"]["Enums"]["message_template_channel"]
           created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
           id?: string
+          is_active?: boolean
+          merge_tags?: string[]
           name: string
-          subject: string
+          subject_by_language?: Json | null
+          updated_at?: string
         }
         Update: {
-          audience?: string | null
-          body?: string
-          category?: string | null
+          agency_id?: string
+          body_by_language?: Json
+          category?: Database["public"]["Enums"]["message_template_category"]
+          channel?: Database["public"]["Enums"]["message_template_channel"]
           created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
           id?: string
+          is_active?: boolean
+          merge_tags?: string[]
           name?: string
-          subject?: string
+          subject_by_language?: Json | null
+          updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "message_templates_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       messages: {
         Row: {
@@ -12942,6 +12968,15 @@ export type Database = {
         | "medicare_card"
         | "proof_of_age_card"
       language_proficiency: "native" | "fluent" | "conversational"
+      message_template_category:
+        | "lead_followup"
+        | "open_home"
+        | "under_offer"
+        | "settled"
+        | "appraisal"
+        | "nurture"
+        | "custom"
+      message_template_channel: "email" | "sms" | "whatsapp" | "in_app"
       offer_status:
         | "pending"
         | "accepted"
@@ -13113,6 +13148,16 @@ export const Constants = {
         "proof_of_age_card",
       ],
       language_proficiency: ["native", "fluent", "conversational"],
+      message_template_category: [
+        "lead_followup",
+        "open_home",
+        "under_offer",
+        "settled",
+        "appraisal",
+        "nurture",
+        "custom",
+      ],
+      message_template_channel: ["email", "sms", "whatsapp", "in_app"],
       offer_status: ["pending", "accepted", "rejected", "expired", "withdrawn"],
       partner_member_role: ["owner", "member"],
     },

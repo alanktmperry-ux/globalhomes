@@ -545,6 +545,14 @@ const DashboardOverview = () => {
       <DashboardHeader title="Dashboard" subtitle="Welcome back, Agent" />
 
       <div className="p-4 sm:p-6 space-y-6 max-w-7xl">
+        <div className="flex justify-end">
+          <CustomiseToolbar
+            editMode={editMode}
+            onEnterEdit={enterEdit}
+            onDone={exitEdit}
+            onReset={resetEdit}
+          />
+        </div>
         <TodayPrioritiesPanel />
         {!onboardingDismissed && (() => {
           const step1 = !!(onboardingAgent?.name && onboardingAgent?.phone && onboardingAgent?.avatar_url && onboardingAgent?.bio);

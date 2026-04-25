@@ -57,6 +57,16 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
   const [searchSuburb, setSearchSuburb] = useState<string | null>(null);
 
   // ── Realtime properties with React Query caching ─────────────
+  // Defer the heavy 100-row fetch until the user actually performs a search
+  // (or a radius/suburb filter is active). Pre-search the landing page only
+  // renders the small `featuredListings` query, so this saves a large
+  // payload on first paint.
+  const shouldFetch =
+    hasSearched ||
+    !!searchCenter ||
+    !!searchSuburb ||
+    !!currentQuery;
+
   const {
     properties: dbProperties,
     isLoading: dbLoading,
@@ -67,6 +77,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
     nearbyRadiusKm: searchRadius,
     listingType: listingMode,
     suburb: searchSuburb,
+    enabled: shouldFetch,
   });
 
   // ── Build human-readable summary from parsed intent ─────────

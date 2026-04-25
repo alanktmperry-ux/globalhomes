@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle2, XCircle, Loader2, UserCheck, Inbox } from 'lucide-react';
+import { dispatchNotification } from '@/shared/lib/notify';
 
 interface PendingAgent {
   id: string;

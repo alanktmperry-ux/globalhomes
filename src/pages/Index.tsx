@@ -130,7 +130,19 @@ const Index = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const hasSearch = !!searchParams.get('location');
-  const hasSearchParams = !!(searchParams.get('location') || searchParams.get('beds') || searchParams.get('maxPrice') || searchParams.get('type') || searchParams.get('radius'));
+  // Hide the homepage hero whenever ANY query string is present.
+  // Specific params (location/beds/maxPrice/type/radius) trigger results,
+  // but any other params should also bypass the marketing hero.
+  const hasSearchParams = Array.from(searchParams.keys()).length > 0;
+
+  // When landing with search params, ensure the results section is visible at the top.
+  useEffect(() => {
+    if (hasSearchParams) {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+    // Run only on mount — subsequent param changes shouldn't yank scroll.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Lock body scroll when search is active so inner card column captures scroll events
   useEffect(() => {

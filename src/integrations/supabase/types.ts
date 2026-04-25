@@ -643,6 +643,71 @@ export type Database = {
           },
         ]
       }
+      agent_reputation_history: {
+        Row: {
+          activity_score: number
+          agent_id: string
+          components: Json
+          computed_at: string
+          conversion_score: number
+          id: string
+          response_time_score: number
+          review_score: number
+          total_score: number
+        }
+        Insert: {
+          activity_score?: number
+          agent_id: string
+          components?: Json
+          computed_at?: string
+          conversion_score?: number
+          id?: string
+          response_time_score?: number
+          review_score?: number
+          total_score: number
+        }
+        Update: {
+          activity_score?: number
+          agent_id?: string
+          components?: Json
+          computed_at?: string
+          conversion_score?: number
+          id?: string
+          response_time_score?: number
+          review_score?: number
+          total_score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_reputation_history_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_reputation_history_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_reputation_history_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_reputation_history_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+        ]
+      }
       agent_reviews: {
         Row: {
           agent_id: string
@@ -12240,6 +12305,7 @@ export type Database = {
     }
     Functions: {
       accept_broker_invite: { Args: { _token: string }; Returns: string }
+      compute_agent_reputation: { Args: { p_agent_id: string }; Returns: Json }
       compute_agent_stats: { Args: { p_agent_id: string }; Returns: undefined }
       compute_suburb_stats: {
         Args: { p_state: string; p_suburb: string }

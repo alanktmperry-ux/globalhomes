@@ -637,45 +637,139 @@ const DashboardOverview = () => {
           </div>
         )}
 
-        {/* Stats Row */}
-        <div className="grid grid-cols-4 lg:grid-cols-7 gap-2">
-          {stats.map((s) => (
-            <motion.div
-              key={s.label}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              onClick={() => navigate(s.link)}
-              className="relative bg-card border border-border rounded-xl p-4 cursor-pointer hover:ring-2 hover:ring-primary/20 hover:shadow-md transition-all"
-            >
-              <ChevronRight size={14} className="absolute top-2 right-2 text-muted-foreground" />
-              <div className="flex items-start gap-1.5 text-muted-foreground mb-1">
-                <span className={`${s.color} shrink-0 mt-0.5`}>{s.icon}</span>
-                <span className="text-[11px] leading-tight whitespace-normal break-words">{s.label}</span>
-              </div>
-              <p className="font-display text-2xl font-extrabold">{s.value}</p>
-            </motion.div>
-          ))}
-          {/* Reputation Score stat */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            onClick={() => navigate(`/agent/me`)}
-            className="relative bg-card border border-border rounded-xl p-4 cursor-pointer hover:ring-2 hover:ring-primary/20 hover:shadow-md transition-all"
-          >
-            <ChevronRight size={14} className="absolute top-2 right-2 text-muted-foreground" />
-            <div className="flex items-start gap-1.5 text-muted-foreground mb-1">
-              <span className={`${repColors.text} shrink-0 mt-0.5`}><Shield size={16} /></span>
-              <span className="text-[11px] leading-tight">Reputation</span>
+        {/* Stats Row — driven by layout */}
+        {(() => {
+          const tileMap: Record<string, { key: CardKey; render: () => React.ReactNode }> = {
+            tasks_due: {
+              key: 'tasks_due',
+              render: () => (
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                  onClick={() => !editMode && navigate('/dashboard/contacts?tab=tasks')}
+                  className="relative bg-card border border-border rounded-xl p-4 cursor-pointer hover:ring-2 hover:ring-primary/20 hover:shadow-md transition-all">
+                  <ChevronRight size={14} className="absolute top-2 right-2 text-muted-foreground" />
+                  <div className="flex items-start gap-1.5 text-muted-foreground mb-1">
+                    <span className="text-destructive shrink-0 mt-0.5"><CheckSquare size={16} /></span>
+                    <span className="text-[11px] leading-tight">Tasks Due</span>
+                  </div>
+                  <p className="font-display text-2xl font-extrabold">{tasksDue}</p>
+                </motion.div>
+              ),
+            },
+            active_contacts: {
+              key: 'active_contacts',
+              render: () => (
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                  onClick={() => !editMode && navigate('/dashboard/contacts')}
+                  className="relative bg-card border border-border rounded-xl p-4 cursor-pointer hover:ring-2 hover:ring-primary/20 hover:shadow-md transition-all">
+                  <ChevronRight size={14} className="absolute top-2 right-2 text-muted-foreground" />
+                  <div className="flex items-start gap-1.5 text-muted-foreground mb-1">
+                    <span className="text-primary shrink-0 mt-0.5"><Users size={16} /></span>
+                    <span className="text-[11px] leading-tight">Active Contacts</span>
+                  </div>
+                  <p className="font-display text-2xl font-extrabold">{activeContacts}</p>
+                </motion.div>
+              ),
+            },
+            appraisals_month: {
+              key: 'appraisals_month',
+              render: () => (
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                  onClick={() => !editMode && navigate('/dashboard/pipeline?stage=appraisal')}
+                  className="relative bg-card border border-border rounded-xl p-4 cursor-pointer hover:ring-2 hover:ring-primary/20 hover:shadow-md transition-all">
+                  <ChevronRight size={14} className="absolute top-2 right-2 text-muted-foreground" />
+                  <div className="flex items-start gap-1.5 text-muted-foreground mb-1">
+                    <span className="text-success shrink-0 mt-0.5"><ClipboardList size={16} /></span>
+                    <span className="text-[11px] leading-tight">Appraisals This Month</span>
+                  </div>
+                  <p className="font-display text-2xl font-extrabold">0</p>
+                </motion.div>
+              ),
+            },
+            sales_month: {
+              key: 'sales_month',
+              render: () => (
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                  onClick={() => !editMode && navigate('/dashboard/performance')}
+                  className="relative bg-card border border-border rounded-xl p-4 cursor-pointer hover:ring-2 hover:ring-primary/20 hover:shadow-md transition-all">
+                  <ChevronRight size={14} className="absolute top-2 right-2 text-muted-foreground" />
+                  <div className="flex items-start gap-1.5 text-muted-foreground mb-1">
+                    <span className="text-primary shrink-0 mt-0.5"><DollarSign size={16} /></span>
+                    <span className="text-[11px] leading-tight">Sales This Month</span>
+                  </div>
+                  <p className="font-display text-2xl font-extrabold">{AUD.format(0)}</p>
+                </motion.div>
+              ),
+            },
+            trust_balance: {
+              key: 'trust_balance',
+              render: () => (
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                  onClick={() => !editMode && navigate('/dashboard/trust')}
+                  className="relative bg-card border border-border rounded-xl p-4 cursor-pointer hover:ring-2 hover:ring-primary/20 hover:shadow-md transition-all">
+                  <ChevronRight size={14} className="absolute top-2 right-2 text-muted-foreground" />
+                  <div className="flex items-start gap-1.5 text-muted-foreground mb-1">
+                    <span className="text-success shrink-0 mt-0.5"><Landmark size={16} /></span>
+                    <span className="text-[11px] leading-tight">Trust Balance</span>
+                  </div>
+                  <p className="font-display text-2xl font-extrabold">{AUD.format(trustBalance)}</p>
+                </motion.div>
+              ),
+            },
+            unresponded_leads: {
+              key: 'unresponded_leads',
+              render: () => (
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                  onClick={() => !editMode && navigate('/dashboard/leads')}
+                  className="relative bg-card border border-border rounded-xl p-4 cursor-pointer hover:ring-2 hover:ring-primary/20 hover:shadow-md transition-all">
+                  <ChevronRight size={14} className="absolute top-2 right-2 text-muted-foreground" />
+                  <div className="flex items-start gap-1.5 text-muted-foreground mb-1">
+                    <span className={`${unrespondedValue > 0 ? 'text-destructive' : 'text-success'} shrink-0 mt-0.5`}><Zap size={16} /></span>
+                    <span className="text-[11px] leading-tight">Unresponded Leads</span>
+                  </div>
+                  <p className="font-display text-2xl font-extrabold">{unrespondedValue}</p>
+                </motion.div>
+              ),
+            },
+            reputation_score: {
+              key: 'reputation_score',
+              render: () => (
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                  onClick={() => !editMode && navigate(`/agent/me`)}
+                  className="relative bg-card border border-border rounded-xl p-4 cursor-pointer hover:ring-2 hover:ring-primary/20 hover:shadow-md transition-all">
+                  <ChevronRight size={14} className="absolute top-2 right-2 text-muted-foreground" />
+                  <div className="flex items-start gap-1.5 text-muted-foreground mb-1">
+                    <span className={`${repColors.text} shrink-0 mt-0.5`}><Shield size={16} /></span>
+                    <span className="text-[11px] leading-tight">Reputation</span>
+                  </div>
+                  <div className="flex items-baseline gap-1">
+                    <p className={`font-display text-2xl font-extrabold ${repColors.text}`}>{repScore}</p>
+                    <span className="text-xs text-muted-foreground">/100</span>
+                    {repTrend === 'up' && <ArrowUp size={14} className="text-success ml-0.5" />}
+                    {repTrend === 'down' && <ArrowDown size={14} className="text-destructive ml-0.5" />}
+                    {repTrend === 'neutral' && <Minus size={14} className="text-muted-foreground ml-0.5" />}
+                  </div>
+                </motion.div>
+              ),
+            },
+          };
+          const orderedTiles = activeLayout
+            .filter(e => isStatTile(e.card_key) && (e.is_visible || editMode))
+            .map(e => tileMap[e.card_key])
+            .filter(Boolean);
+          return (
+            <div className="grid grid-cols-4 lg:grid-cols-7 gap-2">
+              {orderedTiles.map(t => (
+                editMode ? (
+                  <CardEditChrome key={t.key} cardKey={t.key} layout={draftLayout ?? layout} onUpdate={setDraftLayout} isMobile={isMobile}>
+                    {t.render()}
+                  </CardEditChrome>
+                ) : (
+                  <div key={t.key}>{t.render()}</div>
+                )
+              ))}
             </div>
-            <div className="flex items-baseline gap-1">
-              <p className={`font-display text-2xl font-extrabold ${repColors.text}`}>{repScore}</p>
-              <span className="text-xs text-muted-foreground">/100</span>
-              {repTrend === 'up' && <ArrowUp size={14} className="text-green-500 ml-0.5" />}
-              {repTrend === 'down' && <ArrowDown size={14} className="text-red-500 ml-0.5" />}
-              {repTrend === 'neutral' && <Minus size={14} className="text-muted-foreground ml-0.5" />}
-            </div>
-          </motion.div>
-        </div>
+          );
+        })()}
 
         {/* Arrears Alert */}
         {arrearsTenancies.length > 0 && (

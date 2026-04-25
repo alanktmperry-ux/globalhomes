@@ -14,6 +14,7 @@ import SuppliersSettings from './SuppliersSettings';
 import LeadUrgencySettings from './LeadUrgencySettings';
 import PipelineStagesSettings from './PipelineStagesSettings';
 import MessageTemplatesSettings from './MessageTemplatesSettings';
+import NotificationPreferencesSettings from './NotificationPreferencesSettings';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface AgentProfile {
@@ -263,24 +264,8 @@ const SettingsPage = () => {
               </div>
             </div>
 
-            {/* Notifications */}
-            <div className="bg-card border border-border rounded-xl p-5 space-y-4">
-              <h3 className="font-display text-sm font-bold flex items-center gap-1.5"><Bell size={14} /> Notifications</h3>
-              {[
-                { label: 'New voice match alerts', desc: 'When a buyer voice search matches your listing', default: true },
-                { label: 'Lead qualification updates', desc: 'When a lead provides pre-approval or contact info', default: true },
-                { label: 'Network co-broke requests', desc: 'When another agent wants to bring a buyer', default: true },
-                { label: 'Weekly analytics digest', desc: 'Performance summary every Monday', default: false },
-              ].map((n) => (
-                <div key={n.label} className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium">{n.label}</p>
-                    <p className="text-xs text-muted-foreground">{n.desc}</p>
-                  </div>
-                  <Switch defaultChecked={n.default} />
-                </div>
-              ))}
-            </div>
+            {/* Notifications — granular per-event preferences */}
+            <NotificationPreferencesSettings />
 
             {/* Lead urgency thresholds */}
             <LeadUrgencySettings />

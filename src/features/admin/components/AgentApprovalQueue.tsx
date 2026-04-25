@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle2, XCircle, Loader2, UserCheck, Inbox } from 'lucide-react';
+import { dispatchNotification } from '@/shared/lib/notify';
 
 interface PendingAgent {
   id: string;
@@ -60,14 +61,13 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
       return;
     }
 
-    // Send notification to agent
-    await supabase.from('notifications').insert({
+    // Send notification to agent (routed through dispatcher)
+    await dispatchNotification({
       agent_id: agent.id,
-      type: 'agent_approved',
+      event_key: 'agent_approved',
       title: 'Your agent account has been approved',
       message: 'Your ListHQ agent account is now active. You can create and publish listings.',
-      is_read: false,
-    } as any).then(({ error: nErr }) => { if (nErr) console.error('notification insert failed:', nErr); });
+    });
 
     toast({ title: `${agent.name} approved` });
     setActionLoading(null);
@@ -90,13 +90,13 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
       return;
     }
 
-    await supabase.from('notifications').insert({
+    await dispatchNotification({
       agent_id: agent.id,
+      event_key: 'agent_rejected',
       type: 'agent_rejected',
       title: 'Agent application not approved',
       message: rejectionReason.trim(),
-      is_read: false,
-    } as any).then(({ error: nErr }) => { if (nErr) console.error('notification insert failed:', nErr); });
+    });
 
     toast({ title: `${agent.name} rejected` });
     setActionLoading(null);

@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle2, XCircle, Loader2, ImageOff } from 'lucide-react';
+import { dispatchNotification } from '@/shared/lib/notify';
 
 interface PendingListing {
   id: string;
@@ -69,12 +70,12 @@ export default function ListingModerationQueue({ onPendingCountChange }: Props) 
       return;
     }
 
-    await supabase.from('notifications').insert({
+    await dispatchNotification({
       agent_id: listing.agent_id,
-      type: 'listing_approved',
+      event_key: 'listing_approved',
       title: 'Your listing has been approved',
       message: `Your listing at ${listing.address} is now live in search results.`,
-    } as any).then(({ error: e }) => { if (e) console.error('notification insert failed:', e); });
+    });
 
     toast.success('Listing approved');
     setActionLoading(null);
@@ -98,12 +99,12 @@ export default function ListingModerationQueue({ onPendingCountChange }: Props) 
       return;
     }
 
-    await supabase.from('notifications').insert({
+    await dispatchNotification({
       agent_id: listing.agent_id,
-      type: 'listing_rejected',
+      event_key: 'listing_rejected',
       title: 'Listing not approved',
       message: rejectReason.trim(),
-    } as any).then(({ error: e }) => { if (e) console.error('notification insert failed:', e); });
+    });
 
     toast.success('Listing rejected');
     setRejectingId(null);

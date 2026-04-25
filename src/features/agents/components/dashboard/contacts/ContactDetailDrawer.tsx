@@ -5,8 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Flame, Thermometer, Snowflake, Phone, Mail, MessageSquare, Calendar, ClipboardList, StickyNote, PhoneCall } from 'lucide-react';
+import { Flame, Thermometer, Snowflake, Phone, Mail, MessageSquare, Calendar, ClipboardList, StickyNote, PhoneCall, Send } from 'lucide-react';
 import type { Contact, ContactActivity } from '@/features/agents/hooks/useContacts';
+import TemplatePicker from '@/features/messaging/components/TemplatePicker';
 
 const RANKING_CONFIG: Record<string, { icon: React.ReactNode; color: string; label: string }> = {
   hot: { icon: <Flame size={12} />, color: 'bg-destructive/15 text-destructive', label: 'Hot' },

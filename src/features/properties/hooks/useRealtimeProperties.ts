@@ -41,7 +41,7 @@ async function fetchProperties(limit = 50, listingType?: 'sale' | 'rent', suburb
     throw error;
   }
 
-  return (data ?? []).map(mapDbProperty);
+  return (data ?? []).map((p) => mapDbProperty(p as any));
 }
 
 async function fetchNearbyProperties(
@@ -91,7 +91,7 @@ async function fetchNearbyProperties(
 
   if (agentError) {
     console.error('[useRealtimeProperties] agent join error:', agentError.message);
-    return data.map(mapDbProperty);
+    return data.map((p: any) => mapDbProperty(p));
   }
 
   console.log('[useRealtimeProperties] nearby_properties hydrated result', {
@@ -101,7 +101,7 @@ async function fetchNearbyProperties(
     hydratedCount: withAgents?.length ?? 0,
   });
 
-  return (withAgents ?? []).map(mapDbProperty);
+  return (withAgents ?? []).map((p) => mapDbProperty(p as any));
 }
 
 interface UseRealtimePropertiesOptions {

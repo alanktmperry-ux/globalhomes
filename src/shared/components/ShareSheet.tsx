@@ -53,6 +53,7 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
   const copyForWeChat = async () => {
     try {
       await navigator.clipboard.writeText(propertyUrl);
+      capture('wechat_share_clicked', { listing_id: property.id, action: 'copy_link' });
       toast.success(t('share.wechatCopiedToast'));
     } catch {
       toast.error('Could not copy link');

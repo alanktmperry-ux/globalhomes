@@ -26,6 +26,8 @@ import { useDashboardLayout, CardKey, CardLayoutEntry, isStatTile } from '@/feat
 import { CustomiseToolbar, CardEditChrome } from './DashboardCustomiseControls';
 import { useAgentReputation, getReputationTier } from '@/features/agents/hooks/useAgentReputation';
 import { ReputationExplainerModal } from './ReputationExplainerModal';
+import { useResponseTimeStats, formatDuration, getResponseTimeColor } from '@/features/agents/hooks/useResponseTimeStats';
+import { ResponseTimeModal } from './ResponseTimeModal';
 
 // Australian currency formatter
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });

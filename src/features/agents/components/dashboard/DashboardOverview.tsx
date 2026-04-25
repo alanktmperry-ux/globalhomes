@@ -24,6 +24,8 @@ import { toast } from 'sonner';
 import { differenceInDays } from 'date-fns';
 import { useDashboardLayout, CardKey, CardLayoutEntry, isStatTile } from '@/features/agents/hooks/useDashboardLayout';
 import { CustomiseToolbar, CardEditChrome } from './DashboardCustomiseControls';
+import { useAgentReputation, getReputationTier } from '@/features/agents/hooks/useAgentReputation';
+import { ReputationExplainerModal } from './ReputationExplainerModal';
 
 // Australian currency formatter
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
@@ -60,6 +62,14 @@ const DashboardOverview = () => {
   const [reportsDue, setReportsDue] = useState<any[]>([]);
   const [sendingReport, setSendingReport] = useState<string | null>(null);
   const [agencyConnected, setAgencyConnected] = useState(false);
+  const [agentId, setAgentId] = useState<string | null>(null);
+  const [repModalOpen, setRepModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle()
+      .then(({ data }) => { if (data?.id) setAgentId(data.id); });
+  }, [user]);
 
   // Dashboard layout customisation
   const { layout, setLayoutLocal, save, reset, loaded: layoutLoaded } = useDashboardLayout();
@@ -523,12 +533,9 @@ const DashboardOverview = () => {
   // Stats row - Australian CRM focus
   const unrespondedValue = unrespondedLeads;
 
-  // Reputation score with trend — new users start at 0
-  const repScore = 0;
-  const lastMonthKey = 'gh_rep_last_month';
-  const lastMonth = parseInt(localStorage.getItem(lastMonthKey) || '0', 10);
-  const repTrend = lastMonth === 0 ? 'neutral' : repScore > lastMonth ? 'up' : repScore < lastMonth ? 'down' : 'neutral';
-  useEffect(() => { localStorage.setItem(lastMonthKey, String(repScore)); }, [repScore]);
+  // Reputation score with tier + 30-day trend (real data via hook)
+  const { score: repScore, trend: repTrend, breakdown: repBreakdown } = useAgentReputation(agentId);
+  const repTier = getReputationTier(repScore);
   const repColors = getScoreColor(repScore);
 
   const stats = [
@@ -734,7 +741,7 @@ const DashboardOverview = () => {
               key: 'reputation_score',
               render: () => (
                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-                  onClick={() => !editMode && navigate(`/agent/me`)}
+                  onClick={() => !editMode && agentId && setRepModalOpen(true)}
                   className="relative bg-card border border-border rounded-xl p-4 cursor-pointer hover:ring-2 hover:ring-primary/20 hover:shadow-md transition-all">
                   <ChevronRight size={14} className="absolute top-2 right-2 text-muted-foreground" />
                   <div className="flex items-start gap-1.5 text-muted-foreground mb-1">
@@ -748,6 +755,9 @@ const DashboardOverview = () => {
                     {repTrend === 'down' && <ArrowDown size={14} className="text-destructive ml-0.5" />}
                     {repTrend === 'neutral' && <Minus size={14} className="text-muted-foreground ml-0.5" />}
                   </div>
+                  <span className={`inline-block mt-1 text-[9px] font-semibold px-1.5 py-0.5 rounded ${repTier.bg} ${repTier.color}`}>
+                    {repTier.tier}
+                  </span>
                 </motion.div>
               ),
             },
@@ -1055,6 +1065,9 @@ const DashboardOverview = () => {
             .map(e => renderCard(e.card_key, largeCards[e.card_key]));
         })()}
       </div>
+      {agentId && (
+        <ReputationExplainerModal agentId={agentId} open={repModalOpen} onOpenChange={setRepModalOpen} />
+      )}
     </div>
   );
 };

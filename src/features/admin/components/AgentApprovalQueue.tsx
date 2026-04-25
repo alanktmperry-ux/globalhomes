@@ -61,14 +61,13 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
       return;
     }
 
-    // Send notification to agent
-    await supabase.from('notifications').insert({
+    // Send notification to agent (routed through dispatcher)
+    await dispatchNotification({
       agent_id: agent.id,
-      type: 'agent_approved',
+      event_key: 'agent_approved',
       title: 'Your agent account has been approved',
       message: 'Your ListHQ agent account is now active. You can create and publish listings.',
-      is_read: false,
-    } as any).then(({ error: nErr }) => { if (nErr) console.error('notification insert failed:', nErr); });
+    });
 
     toast({ title: `${agent.name} approved` });
     setActionLoading(null);

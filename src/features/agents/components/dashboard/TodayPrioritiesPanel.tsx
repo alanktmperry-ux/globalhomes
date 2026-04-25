@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, ChevronDown, ChevronUp, X, Flame, Snowflake, Clock, Mail, CalendarClock, Loader2, PartyPopper } from 'lucide-react';
+import { Sparkles, ChevronDown, ChevronUp, X, Flame, Snowflake, Clock, Mail, CalendarClock, Loader2, PartyPopper, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useTodayPriorities, type PriorityItem, type PrioritySourceKey } from '@/features/agents/hooks/useTodayPriorities';
+import TemplatePicker, { type TemplatePickerContact, type TemplatePickerProperty } from '@/features/messaging/components/TemplatePicker';
 
 const SOURCE_META: Record<PrioritySourceKey, { icon: React.ReactNode; tone: string }> = {
   hot_lead:       { icon: <Flame size={14} />,        tone: 'text-destructive bg-destructive/10' },

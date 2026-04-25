@@ -29,6 +29,44 @@ export default function TodayPrioritiesPanel() {
     if (typeof window === 'undefined') return false;
     return localStorage.getItem(COLLAPSE_KEY) === '1';
   });
+  const [pickerCtx, setPickerCtx] = useState<{ contact: TemplatePickerContact; property: TemplatePickerProperty | null } | null>(null);
+
+  const openPickerFor = async (item: PriorityItem) => {
+    if (item.sourceKey === 'going_cold') {
+      // sourceId = crm_lead.id → join contact
+      const { data } = await supabase
+        .from('crm_leads')
+        .select('contact_id, contacts:contact_id(id, first_name, last_name, email, phone, mobile, preferred_language)')
+        .eq('id', item.sourceId)
+        .maybeSingle();
+      const c = (data as any)?.contacts;
+      if (!c) return;
+      setPickerCtx({ contact: c as TemplatePickerContact, property: null });
+    } else if (item.sourceKey === 'unresponded') {
+      // sourceId = leads.id (public enquiry)
+      const { data } = await supabase
+        .from('leads')
+        .select('user_name, user_email, user_phone, properties:property_id(address, suburb)')
+        .eq('id', item.sourceId)
+        .maybeSingle();
+      if (!data) return;
+      const [first, ...rest] = ((data as any).user_name || '').trim().split(' ');
+      setPickerCtx({
+        contact: {
+          id: null, // no contact record yet; activity log skipped
+          first_name: first || null,
+          last_name: rest.join(' ') || null,
+          email: (data as any).user_email,
+          phone: (data as any).user_phone,
+          mobile: (data as any).user_phone,
+          preferred_language: null,
+        },
+        property: (data as any).properties
+          ? { address: (data as any).properties.address, suburb: (data as any).properties.suburb, price: null }
+          : null,
+      });
+    }
+  };
 
   // Hydrate collapse from server prefs (overrides local on first load if set)
   useEffect(() => {

@@ -31,13 +31,14 @@ export const DEFAULT_LAYOUT: CardLayoutEntry[] = [
   { card_key: 'sales_month',         is_visible: true, display_order: 3 },
   { card_key: 'trust_balance',       is_visible: true, display_order: 4 },
   { card_key: 'unresponded_leads',   is_visible: true, display_order: 5 },
-  { card_key: 'reputation_score',    is_visible: true, display_order: 6 },
-  { card_key: 'todays_inspections',  is_visible: true, display_order: 7 },
-  { card_key: 'todays_voice_matches',is_visible: true, display_order: 8 },
-  { card_key: 'listing_performance', is_visible: true, display_order: 9 },
-  { card_key: 'recent_activity',     is_visible: true, display_order: 10 },
-  { card_key: 'gci',                 is_visible: true, display_order: 11 },
-  { card_key: 'pipeline_12mo',       is_visible: true, display_order: 12 },
+  { card_key: 'avg_response_time',   is_visible: true, display_order: 6 },
+  { card_key: 'reputation_score',    is_visible: true, display_order: 7 },
+  { card_key: 'todays_inspections',  is_visible: true, display_order: 8 },
+  { card_key: 'todays_voice_matches',is_visible: true, display_order: 9 },
+  { card_key: 'listing_performance', is_visible: true, display_order: 10 },
+  { card_key: 'recent_activity',     is_visible: true, display_order: 11 },
+  { card_key: 'gci',                 is_visible: true, display_order: 12 },
+  { card_key: 'pipeline_12mo',       is_visible: true, display_order: 13 },
 ];
 
 export const CARD_LABELS: Record<CardKey, string> = {
@@ -47,6 +48,7 @@ export const CARD_LABELS: Record<CardKey, string> = {
   sales_month: 'Sales This Month',
   trust_balance: 'Trust Balance',
   unresponded_leads: 'Unresponded Leads',
+  avg_response_time: 'Avg Response Time',
   reputation_score: 'Reputation Score',
   todays_inspections: "Today's Inspections",
   todays_voice_matches: "Today's Voice Matches",
@@ -58,7 +60,7 @@ export const CARD_LABELS: Record<CardKey, string> = {
 
 const STAT_TILE_KEYS: CardKey[] = [
   'tasks_due', 'active_contacts', 'appraisals_month', 'sales_month',
-  'trust_balance', 'unresponded_leads', 'reputation_score',
+  'trust_balance', 'unresponded_leads', 'avg_response_time', 'reputation_score',
 ];
 export const isStatTile = (k: CardKey) => STAT_TILE_KEYS.includes(k);
 

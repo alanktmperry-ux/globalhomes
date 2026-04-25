@@ -324,6 +324,7 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
       action: 'ignored',
       matchMethod: match.match_method,
       suggestedIds: [match.id],
+      similarityScore: match.match_method === 'name_fuzzy' ? (match.confidence ?? null) : null,
     });
   };
 

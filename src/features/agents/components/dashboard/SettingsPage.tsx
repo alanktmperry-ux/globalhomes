@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { User, Mail, Phone, Shield, Bell, Globe, Camera, Loader2, Package, GitBranch } from 'lucide-react';
+import { User, Mail, Phone, Shield, Bell, Globe, Camera, Loader2, Package, GitBranch, Languages } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -13,6 +13,7 @@ import DashboardHeader from './DashboardHeader';
 import SuppliersSettings from './SuppliersSettings';
 import LeadUrgencySettings from './LeadUrgencySettings';
 import PipelineStagesSettings from './PipelineStagesSettings';
+import MessageTemplatesSettings from './MessageTemplatesSettings';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface AgentProfile {
@@ -181,6 +182,9 @@ const SettingsPage = () => {
             <TabsTrigger value="suppliers" className="text-xs gap-1.5">
               <Package size={12} /> Suppliers
             </TabsTrigger>
+            <TabsTrigger value="templates" className="text-xs gap-1.5">
+              <Languages size={12} /> Templates
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile" className="space-y-6">
@@ -304,6 +308,10 @@ const SettingsPage = () => {
 
           <TabsContent value="suppliers">
             <SuppliersSettings />
+          </TabsContent>
+
+          <TabsContent value="templates">
+            <MessageTemplatesSettings />
           </TabsContent>
         </Tabs>
       </div>

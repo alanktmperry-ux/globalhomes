@@ -73,7 +73,6 @@ export default function PropertyDetailPage() {
   const [isOwnerAgent, setIsOwnerAgent] = useState(false);
   const [translating, setTranslating] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
-  const [wechatOpen, setWechatOpen] = useState(false);
   const [mortgageOpen, setMortgageOpen] = useState(false);
   const { title: translatedTitle, description: translatedDescription, isTranslating, isTranslated } = useListingTranslation(rawProperty);
   useEffect(() => {

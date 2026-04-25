@@ -61,6 +61,52 @@ const DashboardOverview = () => {
   const [sendingReport, setSendingReport] = useState<string | null>(null);
   const [agencyConnected, setAgencyConnected] = useState(false);
 
+  // Dashboard layout customisation
+  const { layout, setLayoutLocal, save, reset, loaded: layoutLoaded } = useDashboardLayout();
+  const [editMode, setEditMode] = useState(false);
+  const [draftLayout, setDraftLayout] = useState<CardLayoutEntry[] | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+  const activeLayout = editMode && draftLayout ? draftLayout : layout;
+  const isCardVisible = (k: CardKey) => {
+    const e = activeLayout.find(en => en.card_key === k);
+    return e ? e.is_visible : true;
+  };
+  const enterEdit = () => { setDraftLayout([...layout]); setEditMode(true); };
+  const exitEdit = async () => {
+    if (draftLayout) await save(draftLayout);
+    setEditMode(false);
+    setDraftLayout(null);
+  };
+  const resetEdit = () => {
+    reset();
+    setDraftLayout(null);
+    setEditMode(false);
+  };
+  const renderCard = (key: CardKey, content: React.ReactNode) => {
+    if (!isCardVisible(key) && !editMode) return null;
+    if (editMode) {
+      return (
+        <CardEditChrome
+          key={key}
+          cardKey={key}
+          layout={draftLayout ?? layout}
+          onUpdate={setDraftLayout}
+          isMobile={isMobile}
+        >
+          {content}
+        </CardEditChrome>
+      );
+    }
+    return <div key={key}>{content}</div>;
+  };
+
   // Onboarding checklist state
   const [onboardingDismissed, setOnboardingDismissed] = useState(false);
   const [onboardingAgent, setOnboardingAgent] = useState<{

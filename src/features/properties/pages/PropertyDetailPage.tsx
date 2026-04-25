@@ -44,8 +44,6 @@ import { useLogPropertyView } from '@/features/vendor/hooks/useLogPropertyView';
 import { DocumentVault } from '@/features/documents/components/DocumentVault';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { ShareSheet } from '@/shared/components/ShareSheet';
-import { WeChatShareModal } from '@/shared/components/WeChatShareModal';
-import { capture } from '@/shared/lib/posthog';
 import { MortgageBrokerCTA } from '@/features/mortgage/components/MortgageBrokerCTA';
 import { MortgageReferralModal } from '@/components/MortgageReferralModal';
 import { useListingTranslation } from '@/features/properties/hooks/useListingTranslation';

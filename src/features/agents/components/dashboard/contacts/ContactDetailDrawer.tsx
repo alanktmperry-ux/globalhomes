@@ -293,7 +293,7 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
             email: contact.email,
             phone: contact.phone,
             mobile: contact.mobile,
-            preferred_language: (contact as unknown as { preferred_language?: string | null }).preferred_language ?? null,
+            preferred_language: contact.preferred_language ?? null,
           }}
           property={contact.property_address ? { address: contact.property_address, suburb: contact.suburb, price: contact.estimated_value } : null}
         />

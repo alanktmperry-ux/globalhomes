@@ -310,7 +310,6 @@ export default function InboxPage() {
           onClose={() => setPickerOpen(false)}
           contact={pickerContact}
           property={null}
-          defaultChannel={composeChannel}
         />
       )}
     </div>

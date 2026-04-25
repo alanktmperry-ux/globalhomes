@@ -143,6 +143,7 @@ const ConveyancingPage = React.lazy(() => import("./features/conveyancing/pages/
 const ExclusiveLandingPage = React.lazy(() => import("./features/exclusive/pages/ExclusiveLandingPage"));
 const ExclusiveListingsPage = React.lazy(() => import("./features/exclusive/pages/ExclusiveListingsPage"));
 const MortgageCalculatorPage = React.lazy(() => import("./features/mortgage/pages/MortgageCalculatorPage"));
+const BuyerPoolPage = React.lazy(() => import("./pages/BuyerPoolPage"));
 const SchoolPage = React.lazy(() => import("./pages/SchoolPage"));
 const SuburbProfilePage = React.lazy(() => import("./features/suburb/pages/SuburbProfilePage"));
 const SuburbPage = React.lazy(() => import("./pages/SuburbPage"));
@@ -249,6 +250,10 @@ const App = () => (
                   <Route path="/schemes/:id" element={<SchemeProfilePage />} />
                   <Route path="/stamp-duty-calculator" element={<StampDutyPage />} />
                   <Route path="/mortgage-calculator" element={<MortgageCalculatorPage />} />
+                  <Route path="/buyer-pool" element={<BuyerPoolPage />} />
+                  <Route path="/buyer-pool/:slug" element={<BuyerPoolPage />} />
+                  <Route path="/calculator" element={<BuyerPoolPage />} />
+                  <Route path="/calculator/:slug" element={<BuyerPoolPage />} />
                   <Route path="/school/:state/:slug" element={<SchoolPage />} />
                   
                   <Route path="/buy" element={<BuyPage />} />

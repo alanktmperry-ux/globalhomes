@@ -70,12 +70,12 @@ export default function ListingModerationQueue({ onPendingCountChange }: Props) 
       return;
     }
 
-    await supabase.from('notifications').insert({
+    await dispatchNotification({
       agent_id: listing.agent_id,
-      type: 'listing_approved',
+      event_key: 'listing_approved',
       title: 'Your listing has been approved',
       message: `Your listing at ${listing.address} is now live in search results.`,
-    } as any).then(({ error: e }) => { if (e) console.error('notification insert failed:', e); });
+    });
 
     toast.success('Listing approved');
     setActionLoading(null);

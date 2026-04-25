@@ -1064,6 +1064,12 @@ export default function PropertyDetailPage() {
         open={shareOpen}
         onClose={() => setShareOpen(false)}
       />
+
+      <WeChatShareModal
+        property={property}
+        open={wechatOpen}
+        onClose={() => setWechatOpen(false)}
+      />
     </div>
   );
 }

@@ -173,14 +173,8 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
                   <p className="text-xs text-muted-foreground mt-0.5">微信分享</p>
                 </div>
                 <div className="flex justify-center">
-                  <div className="p-3 rounded-xl bg-white border border-border">
-                    <img
-                      src={qrUrl}
-                      alt="WeChat QR Code"
-                      width={200}
-                      height={200}
-                      className="block"
-                    />
+                  <div ref={qrWrapperRef} className="p-3 rounded-xl bg-white border border-border">
+                    <QRCodeSVG value={propertyUrl} size={qrSize} level="M" />
                   </div>
                 </div>
                 <p className="text-center text-xs text-muted-foreground mt-3">
@@ -188,16 +182,13 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
                 </p>
                 <p className="text-center text-xs text-muted-foreground">打开微信 → 点击扫一扫 → 对准二维码</p>
                 <div className="grid grid-cols-2 gap-2 mt-4">
-                  <a
-                    href={qrUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => capture('wechat_share_clicked', { listing_id: property.id, action: 'save_qr' })}
+                  <button
+                    onClick={saveQR}
                     className="flex items-center justify-center gap-1.5 py-2 rounded-lg border border-border text-xs font-medium text-foreground hover:bg-secondary transition-colors"
                   >
                     <Download size={14} />
                     {t('share.saveQR')}
-                  </a>
+                  </button>
                   <button
                     onClick={copyForWeChat}
                     className="flex items-center justify-center gap-1.5 py-2 rounded-lg border border-border text-xs font-medium text-foreground hover:bg-secondary transition-colors"

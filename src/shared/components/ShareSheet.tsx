@@ -163,6 +163,7 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
                     href={qrUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => capture('wechat_share_clicked', { listing_id: property.id, action: 'save_qr' })}
                     className="flex items-center justify-center gap-1.5 py-2 rounded-lg border border-border text-xs font-medium text-foreground hover:bg-secondary transition-colors"
                   >
                     <Download size={14} />

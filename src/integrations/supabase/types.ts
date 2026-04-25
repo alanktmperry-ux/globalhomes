@@ -3908,8 +3908,24 @@ export type Database = {
           expected_close: string | null
           first_seen_at: string
           id: string
+          intent_bathrooms_min: number | null
+          intent_bedrooms_min: number | null
+          intent_budget_max: number | null
+          intent_budget_min: number | null
+          intent_confidence: number | null
+          intent_language_detected: string | null
+          intent_property_type: string | null
+          intent_purpose: string | null
+          intent_raw: Json | null
+          intent_state: string | null
+          intent_suburb: string | null
+          intent_timeline: string | null
+          is_thin_search: boolean
           language_routing_status: string | null
           last_contacted: string | null
+          lead_score: number | null
+          lead_score_breakdown: Json | null
+          lead_score_updated_at: string | null
           lead_temperature: string
           lost_reason: string | null
           notes: string | null
@@ -3927,8 +3943,24 @@ export type Database = {
           expected_close?: string | null
           first_seen_at?: string
           id?: string
+          intent_bathrooms_min?: number | null
+          intent_bedrooms_min?: number | null
+          intent_budget_max?: number | null
+          intent_budget_min?: number | null
+          intent_confidence?: number | null
+          intent_language_detected?: string | null
+          intent_property_type?: string | null
+          intent_purpose?: string | null
+          intent_raw?: Json | null
+          intent_state?: string | null
+          intent_suburb?: string | null
+          intent_timeline?: string | null
+          is_thin_search?: boolean
           language_routing_status?: string | null
           last_contacted?: string | null
+          lead_score?: number | null
+          lead_score_breakdown?: Json | null
+          lead_score_updated_at?: string | null
           lead_temperature?: string
           lost_reason?: string | null
           notes?: string | null
@@ -3946,8 +3978,24 @@ export type Database = {
           expected_close?: string | null
           first_seen_at?: string
           id?: string
+          intent_bathrooms_min?: number | null
+          intent_bedrooms_min?: number | null
+          intent_budget_max?: number | null
+          intent_budget_min?: number | null
+          intent_confidence?: number | null
+          intent_language_detected?: string | null
+          intent_property_type?: string | null
+          intent_purpose?: string | null
+          intent_raw?: Json | null
+          intent_state?: string | null
+          intent_suburb?: string | null
+          intent_timeline?: string | null
+          is_thin_search?: boolean
           language_routing_status?: string | null
           last_contacted?: string | null
+          lead_score?: number | null
+          lead_score_breakdown?: Json | null
+          lead_score_updated_at?: string | null
           lead_temperature?: string
           lost_reason?: string | null
           notes?: string | null

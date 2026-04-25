@@ -173,6 +173,7 @@ export async function logDuplicateEvent(opts: {
   matchCount?: number;
   suggestedIds?: string[];
   acceptedContactId?: string | null;
+  similarityScore?: number | null;
 }) {
   try {
     const { data: { user } } = await supabase.auth.getUser();
@@ -185,6 +186,7 @@ export async function logDuplicateEvent(opts: {
       match_count: opts.matchCount ?? opts.suggestedIds?.length ?? 0,
       suggested_contact_ids: opts.suggestedIds ?? [],
       accepted_contact_id: opts.acceptedContactId ?? null,
+      similarity_score: opts.similarityScore ?? null,
     } as any);
   } catch {
     // Telemetry must never break the app

@@ -14,6 +14,7 @@ import SuppliersSettings from './SuppliersSettings';
 import LeadUrgencySettings from './LeadUrgencySettings';
 import PipelineStagesSettings from './PipelineStagesSettings';
 import MessageTemplatesSettings from './MessageTemplatesSettings';
+import NotificationPreferencesSettings from './NotificationPreferencesSettings';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface AgentProfile {

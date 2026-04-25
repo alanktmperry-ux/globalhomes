@@ -46,6 +46,7 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
   const [newActivityType, setNewActivityType] = useState('note');
   const [newActivityDesc, setNewActivityDesc] = useState('');
   const [loadingActivities, setLoadingActivities] = useState(true);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   // Next action editor state
   const toLocalInput = (iso: string | null) => {

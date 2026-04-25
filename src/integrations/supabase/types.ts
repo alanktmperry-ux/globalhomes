@@ -324,6 +324,65 @@ export type Database = {
           },
         ]
       }
+      agent_language_capabilities: {
+        Row: {
+          agent_id: string
+          created_at: string
+          id: string
+          is_primary: boolean
+          language_code: string
+          proficiency: Database["public"]["Enums"]["language_proficiency"]
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          language_code: string
+          proficiency?: Database["public"]["Enums"]["language_proficiency"]
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          language_code?: string
+          proficiency?: Database["public"]["Enums"]["language_proficiency"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_language_capabilities_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_language_capabilities_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_language_capabilities_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_language_capabilities_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+        ]
+      }
       agent_lifecycle_notes: {
         Row: {
           agent_id: string
@@ -3849,6 +3908,7 @@ export type Database = {
           expected_close: string | null
           first_seen_at: string
           id: string
+          language_routing_status: string | null
           last_contacted: string | null
           lead_temperature: string
           lost_reason: string | null
@@ -3867,6 +3927,7 @@ export type Database = {
           expected_close?: string | null
           first_seen_at?: string
           id?: string
+          language_routing_status?: string | null
           last_contacted?: string | null
           lead_temperature?: string
           lost_reason?: string | null
@@ -3885,6 +3946,7 @@ export type Database = {
           expected_close?: string | null
           first_seen_at?: string
           id?: string
+          language_routing_status?: string | null
           last_contacted?: string | null
           lead_temperature?: string
           lost_reason?: string | null
@@ -12684,6 +12746,7 @@ export type Database = {
         | "passport"
         | "medicare_card"
         | "proof_of_age_card"
+      language_proficiency: "native" | "fluent" | "conversational"
       offer_status:
         | "pending"
         | "accepted"
@@ -12854,6 +12917,7 @@ export const Constants = {
         "medicare_card",
         "proof_of_age_card",
       ],
+      language_proficiency: ["native", "fluent", "conversational"],
       offer_status: ["pending", "accepted", "rejected", "expired", "withdrawn"],
       partner_member_role: ["owner", "member"],
     },

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { dispatchNotification } from '@/shared/lib/notify';
 import {
   Send, Mail, Bell, Users, Clock, CheckCircle2, Plus, Trash2, Edit2,
   RefreshCw, ChevronDown, ChevronUp, FileText, Megaphone, Loader2, X,

@@ -4,6 +4,7 @@ import type { PropertyRow } from '@/features/agents/types/listing';
 import MarketingSupplierToggle from '../MarketingSupplierToggle';
 import ListingPhotoGallery from './ListingPhotoGallery';
 import { supabase } from '@/integrations/supabase/client';
+import { dispatchNotification } from '@/shared/lib/notify';
 import { useAuth } from '@/features/auth/AuthProvider';
 import {
   differenceInDays, parseISO, subDays,

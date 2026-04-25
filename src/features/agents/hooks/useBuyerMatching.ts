@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { dispatchNotification } from '@/shared/lib/notify';
 
 export interface ListingForMatching {
   id: string;

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { dispatchNotification } from '@/shared/lib/notify';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
 import AdminUsers from '@/features/admin/components/AdminUsers';

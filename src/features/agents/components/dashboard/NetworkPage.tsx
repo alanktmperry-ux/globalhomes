@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/select';
 import DashboardHeader from './DashboardHeader';
 import { supabase } from '@/integrations/supabase/client';
+import { dispatchNotification } from '@/shared/lib/notify';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';

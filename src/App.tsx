@@ -105,6 +105,7 @@ const OpenHomesPage = React.lazy(() => import("@/features/open-homes/components/
 const OpenHomeSignInPage = React.lazy(() => import("@/features/open-homes/pages/OpenHomeSignInPage"));
 const RentalApplicationsPage = React.lazy(() => import("@/features/agents/components/dashboard/RentalApplicationsPage"));
 const AutomationSettingsPage = React.lazy(() => import("@/features/agents/components/dashboard/AutomationSettingsPage"));
+const AgencyAutomationsPage = React.lazy(() => import("@/features/agents/components/dashboard/AgencyAutomationsPage"));
 const MaintenancePage = React.lazy(() => import("@/features/agents/components/dashboard/MaintenancePage"));
 const VacanciesPage = React.lazy(() => import("@/features/agents/components/dashboard/VacanciesPage"));
 const InboxPage = React.lazy(() => import("@/features/inbox/pages/InboxPage"));

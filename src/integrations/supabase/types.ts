@@ -6078,6 +6078,132 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_log: {
+        Row: {
+          channel: string
+          created_at: string
+          delivered_at: string | null
+          event_key: string
+          id: string
+          notification_id: string | null
+          suppressed_reason: string | null
+          user_id: string
+        }
+        Insert: {
+          channel: string
+          created_at?: string
+          delivered_at?: string | null
+          event_key: string
+          id?: string
+          notification_id?: string | null
+          suppressed_reason?: string | null
+          user_id: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          delivered_at?: string | null
+          event_key?: string
+          id?: string
+          notification_id?: string | null
+          suppressed_reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notification_preferences: {
+        Row: {
+          channels: Json
+          event_key: string
+          frequency: Database["public"]["Enums"]["notification_frequency"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          channels?: Json
+          event_key: string
+          frequency?: Database["public"]["Enums"]["notification_frequency"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          channels?: Json
+          event_key?: string
+          frequency?: Database["public"]["Enums"]["notification_frequency"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notification_queue: {
+        Row: {
+          channel: string
+          delivered_at: string | null
+          enqueued_at: string
+          event_key: string
+          frequency: Database["public"]["Enums"]["notification_frequency"]
+          id: string
+          message: string | null
+          payload: Json | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          channel: string
+          delivered_at?: string | null
+          enqueued_at?: string
+          event_key: string
+          frequency: Database["public"]["Enums"]["notification_frequency"]
+          id?: string
+          message?: string | null
+          payload?: Json | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          channel?: string
+          delivered_at?: string | null
+          enqueued_at?: string
+          event_key?: string
+          frequency?: Database["public"]["Enums"]["notification_frequency"]
+          id?: string
+          message?: string | null
+          payload?: Json | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notification_settings: {
+        Row: {
+          mute_until: string | null
+          push_enabled: boolean
+          quiet_hours_end: string | null
+          quiet_hours_start: string | null
+          quiet_hours_timezone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          mute_until?: string | null
+          push_enabled?: boolean
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          quiet_hours_timezone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          mute_until?: string | null
+          push_enabled?: boolean
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          quiet_hours_timezone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           agent_id: string
@@ -13131,6 +13257,10 @@ export type Database = {
         Args: { p_agency_id: string }
         Returns: undefined
       }
+      seed_notification_defaults: {
+        Args: { _user_id: string }
+        Returns: undefined
+      }
       seed_owner_statement_reminder_rule: {
         Args: { _agent_id: string }
         Returns: undefined
@@ -13250,6 +13380,11 @@ export type Database = {
         | "nurture"
         | "custom"
       message_template_channel: "email" | "sms" | "whatsapp" | "in_app"
+      notification_frequency:
+        | "realtime"
+        | "hourly_digest"
+        | "daily_digest"
+        | "off"
       offer_status:
         | "pending"
         | "accepted"
@@ -13449,6 +13584,12 @@ export const Constants = {
         "custom",
       ],
       message_template_channel: ["email", "sms", "whatsapp", "in_app"],
+      notification_frequency: [
+        "realtime",
+        "hourly_digest",
+        "daily_digest",
+        "off",
+      ],
       offer_status: ["pending", "accepted", "rejected", "expired", "withdrawn"],
       partner_member_role: ["owner", "member"],
     },

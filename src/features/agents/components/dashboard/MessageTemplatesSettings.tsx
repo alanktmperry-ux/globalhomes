@@ -91,7 +91,7 @@ export default function MessageTemplatesSettings() {
           No templates yet. Create one to start sending consistent messages.
         </div>
       ) : (
-        TEMPLATE_CATEGORIES.map(({ value, label }) => {
+        TEMPLATE_CATEGORIES.map(({ value, label }: { value: TemplateCategory; label: string }) => {
           const list = grouped.get(value) ?? [];
           if (list.length === 0) return null;
           return (
@@ -187,15 +187,15 @@ function TemplateEditorDialog({ template, onClose, onSave }: EditorProps) {
     }
     setTranslating(true);
     try {
-      const targets = TEMPLATE_LANGUAGES.filter((l) => l.code !== 'en' && (!input.body_by_language[l.code] || activeLang === l.code)).map((l) => l.code);
-      const onlyMissing = TEMPLATE_LANGUAGES.filter((l) => l.code !== 'en' && !input.body_by_language[l.code]).map((l) => l.code);
+      const targets = TEMPLATE_LANGUAGES.filter((l: { code: string; label: string }) => l.code !== 'en' && (!input.body_by_language[l.code] || activeLang === l.code)).map((l) => l.code);
+      const onlyMissing = TEMPLATE_LANGUAGES.filter((l: { code: string; label: string }) => l.code !== 'en' && !input.body_by_language[l.code]).map((l) => l.code);
       const useTargets = activeLang !== 'en' ? [activeLang] : (onlyMissing.length > 0 ? onlyMissing : targets);
       const result = await autoTranslateTemplate({
         body_en: input.body_by_language.en,
         subject_en: isEmail ? input.subject_by_language?.en : null,
         target_languages: useTargets,
       });
-      setInput((prev) => ({
+      setInput((prev: TemplateInput) => ({
         ...prev,
         body_by_language: { ...prev.body_by_language, ...result.bodies },
         subject_by_language: isEmail ? { ...(prev.subject_by_language ?? {}), ...(result.subjects ?? {}) } : prev.subject_by_language,
@@ -209,7 +209,7 @@ function TemplateEditorDialog({ template, onClose, onSave }: EditorProps) {
   };
 
   const insertTag = (tag: string) => {
-    setInput((prev) => ({
+    setInput((prev: TemplateInput) => ({
       ...prev,
       body_by_language: {
         ...prev.body_by_language,
@@ -247,7 +247,7 @@ function TemplateEditorDialog({ template, onClose, onSave }: EditorProps) {
               <Select value={input.category} onValueChange={(v) => setInput({ ...input, category: v as TemplateCategory })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {TEMPLATE_CATEGORIES.map((c) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
+                  {TEMPLATE_CATEGORIES.map((c: { value: TemplateCategory; label: string }) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -256,7 +256,7 @@ function TemplateEditorDialog({ template, onClose, onSave }: EditorProps) {
               <Select value={input.channel} onValueChange={(v) => setInput({ ...input, channel: v as TemplateChannel })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {TEMPLATE_CHANNELS.map((c) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
+                  {TEMPLATE_CHANNELS.map((c: { value: TemplateChannel; label: string }) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -265,7 +265,7 @@ function TemplateEditorDialog({ template, onClose, onSave }: EditorProps) {
           <Tabs value={activeLang} onValueChange={setActiveLang}>
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <TabsList className="bg-secondary gap-1 p-1">
-                {TEMPLATE_LANGUAGES.map((l) => {
+                {TEMPLATE_LANGUAGES.map((l: { code: string; label: string }) => {
                   const filled = !!input.body_by_language[l.code]?.trim();
                   return (
                     <TabsTrigger key={l.code} value={l.code} className="text-xs gap-1.5">
@@ -287,7 +287,7 @@ function TemplateEditorDialog({ template, onClose, onSave }: EditorProps) {
               </div>
             </div>
 
-            {TEMPLATE_LANGUAGES.map((l) => (
+            {TEMPLATE_LANGUAGES.map((l: { code: string; label: string }) => (
               <TabsContent key={l.code} value={l.code} className="space-y-3 mt-3">
                 {isEmail && (
                   <div>
@@ -322,7 +322,7 @@ function TemplateEditorDialog({ template, onClose, onSave }: EditorProps) {
           <div className="border-t border-border pt-3">
             <p className="text-xs font-semibold mb-2">Insert merge tag</p>
             <div className="flex flex-wrap gap-1.5">
-              {MERGE_TAGS.map((t) => (
+              {MERGE_TAGS.map((t: { tag: string; label: string; group: string }) => (
                 <button
                   key={t.tag}
                   type="button"
@@ -348,7 +348,7 @@ function TemplateEditorDialog({ template, onClose, onSave }: EditorProps) {
           <Dialog open onOpenChange={(o) => { if (!o) setPreviewing(false); }}>
             <DialogContent className="max-w-lg">
               <DialogHeader>
-                <DialogTitle>Preview · {TEMPLATE_LANGUAGES.find((l) => l.code === activeLang)?.label}</DialogTitle>
+                <DialogTitle>Preview · {TEMPLATE_LANGUAGES.find((l: { code: string; label: string }) => l.code === activeLang)?.label}</DialogTitle>
                 <DialogDescription className="text-xs">Resolved with sample contact + property data.</DialogDescription>
               </DialogHeader>
               {isEmail && (

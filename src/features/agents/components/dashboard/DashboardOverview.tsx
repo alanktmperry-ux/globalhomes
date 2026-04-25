@@ -4,7 +4,7 @@ import {
   CheckSquare, Users, ClipboardList, DollarSign, Landmark,
   Mic, Phone, Send, Calendar, CalendarDays, Flame, Thermometer, Snowflake, Sparkles, Eye,
   TrendingUp, Zap, MessageSquare, Activity, Shield, ArrowUp, ArrowDown, Minus, AlertTriangle, Mail,
-  X, Check, Circle, ChevronRight,
+  X, Check, Circle, ChevronRight, Clock,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';

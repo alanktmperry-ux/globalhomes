@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle2, XCircle, Loader2, ImageOff } from 'lucide-react';
+import { dispatchNotification } from '@/shared/lib/notify';
 
 interface PendingListing {
   id: string;

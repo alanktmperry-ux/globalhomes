@@ -189,6 +189,7 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
                     href={whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => capture('whatsapp_share_clicked', { listing_id: property.id })}
                     className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-border hover:bg-secondary transition-colors"
                   >
                     <span className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white">
@@ -200,6 +201,7 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
                     href={lineUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => capture('line_share_clicked', { listing_id: property.id })}
                     className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-border hover:bg-secondary transition-colors"
                   >
                     <span className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold">

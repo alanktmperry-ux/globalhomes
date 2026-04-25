@@ -468,13 +468,25 @@ export default function PropertyDetailPage() {
                 </div>
               )}
 
-              <button
-                onClick={() => setShareOpen(true)}
-                className="mt-4 flex items-center gap-2 px-4 py-2 rounded-full border border-teal-600 text-teal-600 font-medium text-sm hover:bg-teal-50 transition-colors"
-              >
-                <Share2 size={16} />
-                Share via WeChat, WhatsApp or Line
-              </button>
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <button
+                  onClick={() => setShareOpen(true)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full border border-teal-600 text-teal-600 font-medium text-sm hover:bg-teal-50 transition-colors"
+                >
+                  <Share2 size={16} />
+                  Share via WeChat, WhatsApp or Line
+                </button>
+                <button
+                  onClick={() => {
+                    capture('wechat_share_clicked', { listing_id: property.id });
+                    setWechatOpen(true);
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#07C160] text-[#07C160] font-medium text-sm hover:bg-[#07C160]/10 transition-colors"
+                >
+                  <MessageCircle size={16} />
+                  Share to WeChat
+                </button>
+              </div>
             </div>
 
             {/* Key stats */}

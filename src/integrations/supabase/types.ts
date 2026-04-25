@@ -2673,6 +2673,71 @@ export type Database = {
         }
         Relationships: []
       }
+      buyer_pool_lookups: {
+        Row: {
+          agent_id: string | null
+          created_at: string
+          id: number
+          ip_country: string | null
+          referrer: string | null
+          sa2_code_matched: string | null
+          shared_via: string | null
+          suburb_searched: string
+          user_agent: string | null
+        }
+        Insert: {
+          agent_id?: string | null
+          created_at?: string
+          id?: number
+          ip_country?: string | null
+          referrer?: string | null
+          sa2_code_matched?: string | null
+          shared_via?: string | null
+          suburb_searched: string
+          user_agent?: string | null
+        }
+        Update: {
+          agent_id?: string | null
+          created_at?: string
+          id?: number
+          ip_country?: string | null
+          referrer?: string | null
+          sa2_code_matched?: string | null
+          shared_via?: string | null
+          suburb_searched?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "buyer_pool_lookups_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "buyer_pool_lookups_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "buyer_pool_lookups_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "buyer_pool_lookups_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+        ]
+      }
       buyer_pre_approvals: {
         Row: {
           approved_amount: number | null
@@ -9860,6 +9925,57 @@ export type Database = {
           state?: string
           suburb?: string
           vacancy_rate?: number | null
+        }
+        Relationships: []
+      }
+      suburb_language_stats: {
+        Row: {
+          data_year: number
+          english_only_count: number
+          id: number
+          non_english_count: number
+          non_english_pct: number
+          poor_english_count: number | null
+          poor_english_pct: number | null
+          postcode: string | null
+          sa2_code: string
+          state: string
+          suburb_name: string
+          top_languages: Json
+          total_population: number
+          updated_at: string
+        }
+        Insert: {
+          data_year?: number
+          english_only_count: number
+          id?: number
+          non_english_count: number
+          non_english_pct: number
+          poor_english_count?: number | null
+          poor_english_pct?: number | null
+          postcode?: string | null
+          sa2_code: string
+          state: string
+          suburb_name: string
+          top_languages: Json
+          total_population: number
+          updated_at?: string
+        }
+        Update: {
+          data_year?: number
+          english_only_count?: number
+          id?: number
+          non_english_count?: number
+          non_english_pct?: number
+          poor_english_count?: number | null
+          poor_english_pct?: number | null
+          postcode?: string | null
+          sa2_code?: string
+          state?: string
+          suburb_name?: string
+          top_languages?: Json
+          total_population?: number
+          updated_at?: string
         }
         Relationships: []
       }

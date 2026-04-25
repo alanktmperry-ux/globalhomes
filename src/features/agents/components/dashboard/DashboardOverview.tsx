@@ -745,6 +745,33 @@ const DashboardOverview = () => {
                 </motion.div>
               ),
             },
+            avg_response_time: {
+              key: 'avg_response_time',
+              render: () => (
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                  onClick={() => !editMode && agentId && setRespModalOpen(true)}
+                  className="relative bg-card border border-border rounded-xl p-4 cursor-pointer hover:ring-2 hover:ring-primary/20 hover:shadow-md transition-all">
+                  <ChevronRight size={14} className="absolute top-2 right-2 text-muted-foreground" />
+                  <div className="flex items-start gap-1.5 text-muted-foreground mb-1">
+                    <span className={`${respColors.text} shrink-0 mt-0.5`}><Clock size={16} /></span>
+                    <span className="text-[11px] leading-tight">Avg Response Time</span>
+                  </div>
+                  {respStats.medianMinutes == null ? (
+                    <>
+                      <p className="font-display text-2xl font-extrabold text-muted-foreground">—</p>
+                      <p className="text-[10px] text-muted-foreground leading-tight">Tracks once leads arrive</p>
+                    </>
+                  ) : (
+                    <div className="flex items-baseline gap-1">
+                      <p className={`font-display text-2xl font-extrabold ${respColors.text}`}>{formatDuration(respStats.medianMinutes)}</p>
+                      {respStats.trend === 'up' && <ArrowUp size={14} className="text-success ml-0.5" />}
+                      {respStats.trend === 'down' && <ArrowDown size={14} className="text-destructive ml-0.5" />}
+                      {respStats.trend === 'neutral' && <Minus size={14} className="text-muted-foreground ml-0.5" />}
+                    </div>
+                  )}
+                </motion.div>
+              ),
+            },
             reputation_score: {
               key: 'reputation_score',
               render: () => (

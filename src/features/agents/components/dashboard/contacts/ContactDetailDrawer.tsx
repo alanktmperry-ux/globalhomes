@@ -174,7 +174,12 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
 
           {/* Contact Info */}
           <section className="space-y-2">
-            <h4 className="text-xs font-semibold text-muted-foreground uppercase">Contact Details</h4>
+            <div className="flex items-center justify-between">
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase">Contact Details</h4>
+              <Button size="sm" variant="outline" className="h-7 text-xs gap-1" onClick={() => setPickerOpen(true)}>
+                <Send size={12} /> Send template
+              </Button>
+            </div>
             <div className="grid grid-cols-2 gap-2 text-sm">
               {contact.email && (
                 <a href={`mailto:${contact.email}`} className="flex items-center gap-2 text-primary hover:underline">

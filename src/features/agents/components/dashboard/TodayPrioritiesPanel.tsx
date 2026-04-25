@@ -142,11 +142,24 @@ export default function TodayPrioritiesPanel() {
                   item={item}
                   onAction={() => navigate(item.actionHref)}
                   onDismiss={() => dismiss(item)}
+                  onTemplate={
+                    item.sourceKey === 'going_cold' || item.sourceKey === 'unresponded'
+                      ? () => openPickerFor(item)
+                      : undefined
+                  }
                 />
               ))}
             </ul>
           )}
         </div>
+      )}
+      {pickerCtx && (
+        <TemplatePicker
+          open={!!pickerCtx}
+          onClose={() => setPickerCtx(null)}
+          contact={pickerCtx.contact}
+          property={pickerCtx.property}
+        />
       )}
     </div>
   );

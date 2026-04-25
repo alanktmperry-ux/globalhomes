@@ -12,10 +12,10 @@ import { toast } from 'sonner';
 import {
   TEMPLATE_CATEGORIES, TEMPLATE_CHANNELS, TEMPLATE_LANGUAGES, MERGE_TAGS,
   resolveMergeTags, type TemplateChannel, type TemplateCategory,
-} from '../../../../messaging/lib/mergeTags';
+} from '@/features/messaging/lib/mergeTags';
 import {
   useMessageTemplates, autoTranslateTemplate, type MessageTemplate, type TemplateInput,
-} from '../../../../messaging/hooks/useMessageTemplates';
+} from '@/features/messaging/hooks/useMessageTemplates';
 
 const CHANNEL_ICONS: Record<TemplateChannel, JSX.Element> = {
   email: <Mail size={12} />,

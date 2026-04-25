@@ -541,6 +541,11 @@ const DashboardOverview = () => {
   const repTier = getReputationTier(repScore);
   const repColors = getScoreColor(repScore);
 
+  // Time-to-first-contact (median, 30 days)
+  const respStats = useResponseTimeStats(agentId);
+  const respColors = getResponseTimeColor(respStats.medianMinutes);
+
+
   const stats = [
     { label: 'Tasks Due', value: String(tasksDue), icon: <CheckSquare size={16} />, color: 'text-destructive', link: '/dashboard/contacts?tab=tasks' },
     { label: 'Active Contacts', value: String(activeContacts), icon: <Users size={16} />, color: 'text-primary', link: '/dashboard/contacts' },

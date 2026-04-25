@@ -359,6 +359,7 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
         action: 'soft_warned',
         matchMethod: 'name_fuzzy',
         suggestedIds: fuzzy.map(m => m.id),
+        similarityScore: f.confidence ?? null,
       });
     }
     return true;

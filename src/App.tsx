@@ -107,6 +107,7 @@ const RentalApplicationsPage = React.lazy(() => import("@/features/agents/compon
 const AutomationSettingsPage = React.lazy(() => import("@/features/agents/components/dashboard/AutomationSettingsPage"));
 const MaintenancePage = React.lazy(() => import("@/features/agents/components/dashboard/MaintenancePage"));
 const VacanciesPage = React.lazy(() => import("@/features/agents/components/dashboard/VacanciesPage"));
+const InboxPage = React.lazy(() => import("@/features/inbox/pages/InboxPage"));
 const AgentEOIPage = React.lazy(() => import("@/features/offmarket/pages/AgentEOIPage"));
 const AgencyOnboardingPage = React.lazy(() => import("@/features/agents/pages/AgencyOnboardingPage"));
 const PartnerAuthPage = React.lazy(() => import("./features/partners/pages/PartnerAuthPage"));
@@ -325,6 +326,7 @@ const App = () => (
                   <Route path="listings/:listingId/eoi" element={<AgentEOIPage />} />
                   <Route path="listings/:propertyId/performance" element={<ListingPerformancePage />} />
                   <Route path="contacts" element={<ContactsPage />} />
+                  <Route path="inbox" element={<InboxPage />} />
                   <Route path="leads" element={<VoiceLeadsPage />} />
                   <Route path="concierge" element={<BuyerConciergePage />} />
                   <Route path="pre-market" element={<PreMarketPage />} />

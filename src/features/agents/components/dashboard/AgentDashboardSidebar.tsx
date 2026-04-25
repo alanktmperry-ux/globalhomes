@@ -34,6 +34,7 @@ interface NavItem {
 
 const SALES_NAV: NavItem[] = [
   { title: 'My Listings', url: '/dashboard/listings', icon: List, badgeKey: 'listings' },
+  { title: 'Inbox', url: '/dashboard/inbox', icon: Mail, badgeKey: 'inbox', alertWhenBadge: true },
   { title: 'Contacts', url: '/dashboard/contacts', icon: Contact },
   { title: 'Listings', url: '/dashboard/pipeline', icon: Kanban },
   { title: 'Leads', url: '/dashboard/crm', icon: Flame },

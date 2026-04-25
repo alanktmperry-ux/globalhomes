@@ -33,38 +33,32 @@ export default defineConfig(({ mode }) => ({
         manualChunks(id) {
           if (!id.includes("node_modules")) return;
 
-          // Keep the critical runtime together for stable cold starts.
+          // React core + everything that calls React.createContext at module init.
+          // Radix, lucide-react, and sonner all consume React context at init,
+          // so they must be in the same chunk as React to avoid load-order TDZ
+          // errors in Safari (e.g. "undefined is not an object (y.createContext)").
           if (
             id.includes("node_modules/react/") ||
             id.includes("node_modules/react-dom/") ||
             id.includes("node_modules/scheduler/") ||
             id.includes("react-router") ||
             id.includes("react-helmet-async") ||
-            id.includes("@tanstack")
+            id.includes("@tanstack") ||
+            id.includes("@radix-ui") ||
+            id.includes("lucide-react") ||
+            id.includes("sonner")
           ) {
             return "react-vendor";
           }
 
-          // Backend client stays isolated and cacheable.
           if (id.includes("@supabase")) return "supabase";
-
-          // Heavy libs that are NOT used on the homepage — split out so they
-          // are fetched only when a route that needs them is loaded. With
-          // modulePreload restricted to entry chunks, these stay off the
-          // critical path until React.lazy() pulls them in on navigation.
           if (id.includes("recharts") || id.includes("d3-")) return "charts";
           if (id.includes("react-day-picker") || id.includes("date-fns")) return "datepicker";
           if (id.includes("jspdf") || id.includes("html2canvas") || id.includes("pdfjs")) return "pdf";
           if (id.includes("@sentry")) return "sentry";
           if (id.includes("mapbox-gl") || id.includes("@googlemaps")) return "maps";
-          // framer-motion is heavy (~50KB gz). Index.tsx statically imports
-          // motion/useMotionValue/useSpring for the mobile bottom-sheet drag in
-          // the search-results branch. Splitting it out keeps it as a parallel
-          // request that doesn't block first paint of the landing hero.
           if (id.includes("framer-motion")) return "motion";
 
-          // Everything else (lucide icons, radix UI, sonner, small utilities)
-          // shares one vendor chunk loaded with the homepage.
           return "vendor";
         },
       },

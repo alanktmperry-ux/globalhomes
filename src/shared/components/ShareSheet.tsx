@@ -5,6 +5,7 @@ import { Property } from '@/shared/lib/types';
 import { useI18n } from '@/shared/lib/i18n';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { toast } from 'sonner';
+import { capture } from '@/shared/lib/posthog';
 
 interface ShareSheetProps {
   property: Property;

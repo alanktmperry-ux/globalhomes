@@ -66,6 +66,7 @@ const DashboardOverview = () => {
   const [agencyConnected, setAgencyConnected] = useState(false);
   const [agentId, setAgentId] = useState<string | null>(null);
   const [repModalOpen, setRepModalOpen] = useState(false);
+  const [respModalOpen, setRespModalOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;

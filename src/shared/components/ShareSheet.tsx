@@ -121,30 +121,33 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
             role="dialog"
             aria-modal="true"
             aria-label={t('share.title')}
-            className="fixed inset-x-0 bottom-0 z-[61] max-h-[85vh] bg-card rounded-t-3xl shadow-drawer overflow-y-auto md:inset-x-auto md:left-1/2 md:top-1/2 md:bottom-auto md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md md:max-h-[85vh] md:rounded-2xl"
+            data-testid="share-sheet-scroll-container"
+            className="fixed inset-x-0 bottom-0 z-[61] max-h-[85vh] overflow-y-auto overscroll-contain bg-card rounded-t-3xl shadow-drawer p-0 md:inset-x-auto md:bottom-auto md:left-1/2 md:top-[7.5vh] md:-translate-x-1/2 md:w-full md:max-w-md md:max-h-[85vh] md:rounded-2xl"
             initial={{ y: '100%', opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: '100%', opacity: 0 }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
           >
-            {/* Drag indicator (mobile) */}
-            <div className="sticky top-0 z-10 flex justify-center pt-3 pb-1 bg-card rounded-t-3xl md:hidden">
-              <div className="w-10 h-1 rounded-full bg-border" />
-            </div>
-
-            {/* Header */}
-            <div className="flex items-start justify-between px-5 pt-4 pb-2 gap-3">
-              <div className="min-w-0">
-                <h2 className="font-display text-lg font-semibold text-foreground">{t('share.title')}</h2>
-                <p className="text-sm text-muted-foreground mt-1">Send via WeChat, WhatsApp or Line — or copy the link</p>
+            <div className="p-0">
+              {/* Drag indicator (mobile) */}
+              <div className="sticky top-0 z-10 flex justify-center pt-3 pb-1 bg-card rounded-t-3xl md:hidden">
+                <div className="w-10 h-1 rounded-full bg-border" />
               </div>
-              <button
-                onClick={onClose}
-                className="shrink-0 w-8 h-8 rounded-full hover:bg-secondary flex items-center justify-center text-muted-foreground"
-                aria-label="Close"
-              >
-                <X size={18} />
-              </button>
+
+              {/* Header */}
+              <div className="flex items-start justify-between px-5 pt-4 pb-2 gap-3">
+                <div className="min-w-0">
+                  <h2 className="font-display text-lg font-semibold text-foreground">{t('share.title')}</h2>
+                  <p className="text-sm text-muted-foreground mt-1">Send via WeChat, WhatsApp or Line — or copy the link</p>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="shrink-0 w-8 h-8 rounded-full hover:bg-secondary flex items-center justify-center text-muted-foreground"
+                  aria-label="Close"
+                >
+                  <X size={18} />
+                </button>
+              </div>
             </div>
 
             <div className="px-5 pb-6 space-y-5">

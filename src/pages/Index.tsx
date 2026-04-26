@@ -239,6 +239,33 @@ const Index = () => {
   const [statLanguagesCount, setStatLanguagesCount] = useState(0);
   const [statToolsCount, setStatToolsCount] = useState(0);
   const heroInputRef = useRef<HTMLInputElement>(null);
+  const heroFormRef = useRef<HTMLFormElement>(null);
+  const heroDebounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const [heroSuggestions, setHeroSuggestions] = useState<{ description: string; place_id: string }[]>([]);
+  const [showHeroSuggestions, setShowHeroSuggestions] = useState(false);
+
+  // Debounced Places autocomplete for hero search
+  useEffect(() => {
+    if (heroDebounceRef.current) clearTimeout(heroDebounceRef.current);
+    if (heroQuery.length < 2) { setHeroSuggestions([]); setShowHeroSuggestions(false); return; }
+    heroDebounceRef.current = setTimeout(async () => {
+      const results = await autocomplete(heroQuery);
+      setHeroSuggestions(results);
+      setShowHeroSuggestions(results.length > 0);
+    }, 300);
+    return () => { if (heroDebounceRef.current) clearTimeout(heroDebounceRef.current); };
+  }, [heroQuery]);
+
+  // Close hero suggestions on click outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (heroFormRef.current && !heroFormRef.current.contains(e.target as Node)) {
+        setShowHeroSuggestions(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
 
   // Hero rotating language animation

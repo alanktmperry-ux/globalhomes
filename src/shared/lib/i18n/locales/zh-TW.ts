@@ -560,4 +560,31 @@ export const zhTW: Partial<Record<keyof typeof EnBase, string>> = {
   'property.insights.multiculturalAppeal': '多元文化吸引力',
   'property.insights.suggestedBuyerProfiles': '推薦買家類型',
   'property.insights.keySellingPoints': '主要賣點',
+
+  // Hero — homepage tiles, sub-headline prefix, language banner, category toggle
+  'hero.subheadlinePrefix': '正在展示',
+  'hero.langBannerText': '使用您的語言瀏覽 — 點擊切換',
+  'hero.commercial': '商業',
+  'hero.land': '土地',
+  'hero.buyerTileTitle': '正在找房？',
+  'hero.buyerTileDesc': '用 24 種語言搜尋澳洲房產。免費，無需註冊。',
+  'hero.buyerTileCta': '瀏覽房源 →',
+  'hero.agentTileTitle': '您是仲介嗎？',
+  'hero.agentTileDesc': '一次發佈，自動翻譯為 24 種語言。觸及 REA 和 Domain 無法觸及的多語言買家。免費 3 個月。',
+  'hero.agentTileCta': '查看仲介工具 →',
+
+  // Sort dropdown
+  'sort.default': '預設',
+  'sort.priceAsc': '價格：由低至高',
+  'sort.priceDesc': '價格：由高至低',
+  'sort.newest': '最新',
+  'sort.beds': '臥室數',
+
+  // Search status bar
+  'search.propertiesCount': '{count} 套房源',
+  'search.recommended': '推薦',
+  'search.save': '儲存',
+  'search.searchTogether': '一起搜尋',
+  'search.emptyTitle': '房源即將上線',
+  'search.emptyDesc': '仲介正在準備房源，請稍後再來查看！',
 };

@@ -535,4 +535,31 @@ export const hi: Partial<Record<keyof typeof EnBase, string>> = {
   'property.insights.multiculturalAppeal': 'बहुसांस्कृतिक आकर्षण',
   'property.insights.suggestedBuyerProfiles': 'सुझाए गए ख़रीदार प्रोफ़ाइल',
   'property.insights.keySellingPoints': 'मुख्य बिक्री बिंदु',
+
+  // Hero — homepage tiles, sub-headline prefix, language banner, category toggle
+  'hero.subheadlinePrefix': 'में लिस्टिंग दिखाई जा रही है',
+  'hero.langBannerText': 'अपनी भाषा में ब्राउज़ करें — स्विच करने के लिए टैप करें',
+  'hero.commercial': 'वाणिज्यिक',
+  'hero.land': 'ज़मीन',
+  'hero.buyerTileTitle': 'घर ढूंढ रहे हैं?',
+  'hero.buyerTileDesc': '24 भाषाओं में ऑस्ट्रेलियाई संपत्ति खोजें। मुफ़्त, कोई साइनअप नहीं।',
+  'hero.buyerTileCta': 'संपत्तियाँ ब्राउज़ करें →',
+  'hero.agentTileTitle': 'क्या आप एजेंट हैं?',
+  'hero.agentTileDesc': 'एक बार सूचीबद्ध करें, 24 भाषाओं में अनुवादित। बहुभाषी ख़रीदारों तक पहुँचें जिन तक REA और Domain नहीं पहुँच सकते। 3 महीने के लिए मुफ़्त।',
+  'hero.agentTileCta': 'एजेंट टूल देखें →',
+
+  // Sort dropdown
+  'sort.default': 'डिफ़ॉल्ट',
+  'sort.priceAsc': 'क़ीमत: कम–अधिक',
+  'sort.priceDesc': 'क़ीमत: अधिक–कम',
+  'sort.newest': 'नवीनतम',
+  'sort.beds': 'बेडरूम',
+
+  // Search status bar
+  'search.propertiesCount': '{count} संपत्तियाँ',
+  'search.recommended': 'अनुशंसित',
+  'search.save': 'सहेजें',
+  'search.searchTogether': 'साथ में खोजें',
+  'search.emptyTitle': 'जल्द ही संपत्तियाँ आ रही हैं',
+  'search.emptyDesc': 'एजेंट अपनी लिस्टिंग सेट कर रहे हैं। थोड़ी देर में फिर देखें!',
 };

@@ -87,7 +87,7 @@ const AuthLandingPage = () => {
 
           <div className="flex flex-col gap-3">
             <button
-              onClick={() => navigate('/login')}
+              onClick={() => { dismissError(); navigate('/login'); }}
               className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-slate-900 text-white text-sm font-medium hover:bg-slate-700 transition-colors"
             >
               Sign in or create account

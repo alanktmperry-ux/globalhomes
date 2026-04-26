@@ -361,10 +361,10 @@ export function FilterSidebar({ filters, onChange, isOpen, onToggle, totalCount,
                 {/* Price Range / Weekly Rent */}
                 <Section title={isRental ? 'Weekly Rent' : 'Price Range'}>
                   <div className="flex items-center justify-between text-sm font-medium text-foreground">
-                    <span>{isRental ? formatRentPrice(filters.priceRange[0]) : formatPrice(filters.priceRange[0])}</span>
+                    <span>{isRental ? formatRentPrice(draftPrice[0]) : formatPrice(draftPrice[0])}</span>
                     <span>
-                      {isRental ? formatRentPrice(filters.priceRange[1]) : formatPrice(filters.priceRange[1])}
-                      {isRental && filters.priceRange[1] >= priceMax && '+'}
+                      {isRental ? formatRentPrice(draftPrice[1]) : formatPrice(draftPrice[1])}
+                      {isRental && draftPrice[1] >= priceMax && '+'}
                     </span>
                   </div>
                   <Slider
@@ -372,10 +372,11 @@ export function FilterSidebar({ filters, onChange, isOpen, onToggle, totalCount,
                     max={priceMax}
                     step={priceStep}
                     value={[
-                      Math.min(filters.priceRange[0], priceMax),
-                      Math.min(filters.priceRange[1], priceMax),
+                      Math.min(draftPrice[0], priceMax),
+                      Math.min(draftPrice[1], priceMax),
                     ]}
-                    onValueChange={(v) => update('priceRange', v as [number, number])}
+                    onValueChange={(v) => setDraftPrice(v as [number, number])}
+                    onValueCommit={(v) => update('priceRange', v as [number, number])}
                     className="mt-2"
                   />
                   {/* Bond Budget helper for rentals */}

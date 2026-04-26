@@ -1,4 +1,4 @@
-import { getCorsHeaders } from "../_shared/cors.ts";
+import { getCorsHeaders, getAllowedOrigin } from "../_shared/cors.ts";
 
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req.headers.get("Origin"));
@@ -19,6 +19,16 @@ Deno.serve(async (req) => {
     const { action, input, input_types } = await req.json();
 
     if (action === 'get_key') {
+      // Strict origin allowlist — the SDK key may only be returned to known frontends.
+      // The browser cannot forge Origin, so this prevents arbitrary callers from harvesting the key.
+      const origin = req.headers.get('Origin');
+      const allowed = getAllowedOrigin(origin);
+      if (!allowed) {
+        return new Response(JSON.stringify({ error: 'Forbidden' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
       return new Response(JSON.stringify({ key: apiKey }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });

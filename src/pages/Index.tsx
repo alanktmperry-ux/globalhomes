@@ -48,7 +48,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 // Lazy — only opens after the 3rd anonymous search.
 const ConsumerSignUpModal = lazy(() => import('@/features/search/components/ConsumerSignUpModal'));
 import { supabase } from '@/integrations/supabase/client';
-import { geocode } from '@/shared/lib/googleMapsService';
+import { geocode, autocomplete } from '@/shared/lib/googleMapsService';
 
 const HERO_ROTATING_LANGUAGES = [
   'in Mandarin.',

@@ -1,8 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/features/auth/AuthProvider';
+import { toast } from 'sonner';
 import {
   TrendingUp,
   TrendingDown,
+  Minus,
   Users,
   Building2,
   DollarSign,
@@ -16,6 +20,14 @@ import {
   Activity,
   Target,
   ArrowUpRight,
+  ArrowRight,
+  CheckCircle2,
+  Mail,
+  Eye,
+  ClipboardCheck,
+  Gamepad2,
+  MessageSquare,
+  Megaphone,
 } from 'lucide-react';
 import {
   AreaChart,
@@ -27,6 +39,8 @@ import {
   CartesianGrid,
 } from 'recharts';
 
+type Trend = 'up' | 'down' | 'flat' | null;
+
 interface CCData {
   mrr: number;
   arr: number;
@@ -34,9 +48,13 @@ interface CCData {
   totalAgents: number;
   activeTrials: number;
   paidAgents: number;
+  paidAgentsPrevWeek: number;
+  conversionRate: number;
+  conversionRatePrevWeek: number;
   trialsExpiringThisWeek: number;
   newAgentsToday: number;
   newAgentsThisWeek: number;
+  newAgentsPrevWeek: number;
   newAgentsThisMonth: number;
   churnedThisMonth: number;
   liveListings: number;
@@ -48,6 +66,10 @@ interface CCData {
   leadsThisWeek: number;
   leads30d: number;
   voiceSearches30d: number;
+  pendingAgentApprovals: number;
+  pendingListingReviews: number;
+  pendingDemoRequests: number;
+  openSupportTickets: number;
   atRiskAgents: {
     id: string;
     name: string;
@@ -57,21 +79,9 @@ interface CCData {
     daysSince: number;
   }[];
   agentsNoListings: number;
-  stateBreakdown: {
-    state: string;
-    count: number;
-  }[];
-  growthChart: {
-    label: string;
-    agents: number;
-    listings: number;
-    leads: number;
-  }[];
-  planMix: {
-    plan: string;
-    count: number;
-    mrr: number;
-  }[];
+  stateBreakdown: { state: string; count: number }[];
+  growthChart: { label: string; agents: number; listings: number; leads: number }[];
+  planMix: { plan: string; count: number; mrr: number }[];
   fetchedAt: string;
 }
 
@@ -88,6 +98,13 @@ const PLAN_LABEL: Record<string, string> = {
   demo: 'Trial',
 };
 
+function trendFromDelta(curr: number, prev: number): Trend {
+  if (prev === 0 && curr === 0) return 'flat';
+  if (curr > prev) return 'up';
+  if (curr < prev) return 'down';
+  return 'flat';
+}
+
 function KPI({
   label,
   value,
@@ -101,29 +118,22 @@ function KPI({
   sub?: string;
   icon: any;
   color?: string;
-  trend?: 'up' | 'down' | 'flat' | null;
+  trend?: Trend;
 }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-4 space-y-1">
       <div className="flex items-center justify-between">
-        <p className="text-xs text-muted-foreground font-medium">
-          {label}
-        </p>
-        <div className={`${color}`}>
+        <p className="text-xs text-muted-foreground font-medium">{label}</p>
+        <div className={color}>
           <Icon size={16} />
         </div>
       </div>
-      <p className="text-2xl font-bold text-foreground">
-        {value}
-      </p>
+      <p className="text-2xl font-bold text-foreground">{value}</p>
       {sub && (
         <p className="text-[11px] text-muted-foreground flex items-center gap-1">
-          {trend === 'up' && (
-            <TrendingUp size={12} className="text-emerald-500" />
-          )}
-          {trend === 'down' && (
-            <TrendingDown size={12} className="text-destructive" />
-          )}
+          {trend === 'up' && <TrendingUp size={12} className="text-emerald-500" />}
+          {trend === 'down' && <TrendingDown size={12} className="text-destructive" />}
+          {trend === 'flat' && <Minus size={12} className="text-muted-foreground" />}
           {sub}
         </p>
       )}
@@ -131,55 +141,82 @@ function KPI({
   );
 }
 
-function SectionHead({
-  title,
-  sub,
-}: {
-  title: string;
-  sub?: string;
-}) {
+function SectionHead({ title, sub }: { title: string; sub?: string }) {
   return (
     <div className="flex items-center gap-3 mb-4 mt-8 first:mt-0">
       <div>
-        <h3 className="text-sm font-semibold text-foreground">
-          {title}
-        </h3>
-        {sub && (
-          <p className="text-[11px] text-muted-foreground">
-            {sub}
-          </p>
-        )}
+        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+        {sub && <p className="text-[11px] text-muted-foreground">{sub}</p>}
       </div>
     </div>
   );
 }
 
-function CCAlert({
-  severity,
-  children,
+function AttentionCard({
+  icon: Icon,
+  label,
+  count,
+  description,
+  to,
+  navigate,
+  tone = 'amber',
 }: {
-  severity: 'red' | 'amber';
-  children: React.ReactNode;
+  icon: any;
+  label: string;
+  count: number;
+  description: string;
+  to: string;
+  navigate: (to: string) => void;
+  tone?: 'amber' | 'red' | 'blue';
 }) {
+  const toneClasses = {
+    amber: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+    red: 'bg-destructive/10 text-destructive',
+    blue: 'bg-primary/10 text-primary',
+  }[tone];
+
   return (
-    <div className={`flex items-start gap-2 text-xs rounded-xl px-3 py-2 ${severity === 'red' ? 'bg-destructive/10 text-destructive' : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'}`}>
-      <AlertTriangle size={14} className="mt-0.5 shrink-0" />
-      {children}
+    <div className="rounded-2xl border border-border bg-card p-4 flex flex-col gap-3">
+      <div className="flex items-start gap-3">
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${toneClasses}`}>
+          <Icon size={20} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-foreground">
+            {label}: <span className="font-bold">{count} pending</span>
+          </p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">{description}</p>
+        </div>
+      </div>
+      <button
+        onClick={() => navigate(to)}
+        className="self-start inline-flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+      >
+        Review <ArrowRight size={12} />
+      </button>
     </div>
   );
 }
 
 export default function CommandCentre() {
+  const navigate = useNavigate();
+  const auth = useAuth();
+  const startImpersonation = (auth as any)?.startImpersonation as
+    | ((userId: string, userEmail: string) => Promise<void>)
+    | undefined;
+
   const [data, setData] = useState<CCData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const fetchAllRef = useRef<() => Promise<void>>(() => Promise.resolve());
 
-  const fetchAll = async () => {
+  const fetchAll = useCallback(async () => {
     setRefreshing(true);
     try {
       const now = new Date();
       const d7 = new Date(now.getTime() - 7 * 86400000).toISOString();
       const d14 = new Date(now.getTime() - 14 * 86400000).toISOString();
+      const d14Date = new Date(now.getTime() - 14 * 86400000);
       const d30 = new Date(now.getTime() - 30 * 86400000).toISOString();
       const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
@@ -195,8 +232,13 @@ export default function CommandCentre() {
         leadsTodayRes,
         leadsWeekRes,
         leads30dRes,
+        pendingAgentsRes,
+        pendingListingsRes,
+        pendingDemosRes,
+        openTicketsRes,
+        churnRes,
       ] = await Promise.all([
-        supabase.from('agents').select('id, name, email, agency, is_subscribed, created_at, onboarding_complete, agent_subscriptions(plan_type)'),
+        supabase.from('agents').select('id, name, email, agency, is_subscribed, created_at, updated_at, onboarding_complete, agent_subscriptions(plan_type)'),
         supabase.from('properties').select('id, agent_id, state, is_active, views, images, created_at'),
         supabase.from('leads').select('id, created_at'),
         supabase.from('voice_searches').select('id', { count: 'exact', head: true }).gte('created_at', d30),
@@ -206,6 +248,11 @@ export default function CommandCentre() {
         supabase.from('leads').select('id', { count: 'exact', head: true }).gte('created_at', todayStart),
         supabase.from('leads').select('id', { count: 'exact', head: true }).gte('created_at', d7),
         supabase.from('leads').select('id', { count: 'exact', head: true }).gte('created_at', d30),
+        supabase.from('agents').select('id', { count: 'exact', head: true }).eq('approval_status', 'pending'),
+        supabase.from('properties').select('id', { count: 'exact', head: true }).eq('is_active', false),
+        (supabase.from('demo_requests' as any).select('id', { count: 'exact', head: true }).eq('status', 'pending')) as any,
+        (supabase.from('support_tickets' as any).select('id', { count: 'exact', head: true }).eq('status', 'open')) as any,
+        supabase.from('agents').select('id', { count: 'exact', head: true }).eq('is_subscribed', false).gte('updated_at', monthStart),
       ]);
 
       const agents = agentsRes.data || [];
@@ -220,14 +267,30 @@ export default function CommandCentre() {
       } catch {}
 
       const paidAgents = agents.filter(a => a.is_subscribed);
-      const mrr = paidAgents.reduce((s, a: any) => s + (PLAN_MRR[(a.agent_subscriptions?.plan_type || '').toLowerCase()] || 0), 0);
+      const mrr = paidAgents.reduce(
+        (s, a: any) => s + (PLAN_MRR[(a.agent_subscriptions?.plan_type || '').toLowerCase()] || 0),
+        0,
+      );
       const prevMonthPaid = agents.filter(a => a.is_subscribed && a.created_at < monthStart).length;
-      const mrrGrowthPct = prevMonthPaid > 0 ? Math.round(((paidAgents.length - prevMonthPaid) / prevMonthPaid) * 100) : null;
+      const mrrGrowthPct =
+        prevMonthPaid > 0 ? Math.round(((paidAgents.length - prevMonthPaid) / prevMonthPaid) * 100) : null;
+
+      // Week-over-week paid agents (subscribed before each cutoff)
+      const paidAgentsPrevWeek = agents.filter(a => a.is_subscribed && a.created_at < d7).length;
+
+      const conversionRate =
+        agents.length > 0 ? Math.round((paidAgents.length / agents.length) * 1000) / 10 : 0;
+      const totalAgentsPrevWeek = agents.filter(a => a.created_at < d7).length;
+      const conversionRatePrevWeek =
+        totalAgentsPrevWeek > 0 ? Math.round((paidAgentsPrevWeek / totalAgentsPrevWeek) * 1000) / 10 : 0;
 
       const trials = agents.filter(a => !a.is_subscribed);
       const newToday = agents.filter(a => a.created_at >= todayStart).length;
       const newWeek = agents.filter(a => a.created_at >= d7).length;
       const newMonth = agents.filter(a => a.created_at >= monthStart).length;
+      const newPrevWeek = agents.filter(
+        a => a.created_at >= new Date(now.getTime() - 14 * 86400000).toISOString() && a.created_at < d7,
+      ).length;
 
       const trialsExpiringThisWeek = agents.filter(a => {
         if (a.is_subscribed) return false;
@@ -239,7 +302,7 @@ export default function CommandCentre() {
         .filter(a => {
           const lastSeen = signInMap.get(a.id);
           if (!lastSeen) return true;
-          return new Date(lastSeen) < new Date(d14);
+          return new Date(lastSeen) < d14Date;
         })
         .slice(0, 8)
         .map(a => {
@@ -263,8 +326,11 @@ export default function CommandCentre() {
 
       const activeProps = allProps.filter(p => p.is_active);
       const totalViews = activeProps.reduce((s, p) => s + (p.views || 0), 0);
-      const avgViewsPerListing = activeProps.length > 0 ? Math.round(totalViews / activeProps.length) : 0;
-      const listingsNoPhotos = allProps.filter(p => !p.images || (p.images as any[]).length === 0).length;
+      const avgViewsPerListing =
+        activeProps.length > 0 ? Math.round(totalViews / activeProps.length) : 0;
+      const listingsNoPhotos = allProps.filter(
+        p => !p.images || (p.images as any[]).length === 0,
+      ).length;
 
       const stateCount = new Map<string, number>();
       activeProps.forEach(p => {
@@ -316,11 +382,15 @@ export default function CommandCentre() {
         totalAgents: agents.length,
         activeTrials: trials.length,
         paidAgents: paidAgents.length,
+        paidAgentsPrevWeek,
+        conversionRate,
+        conversionRatePrevWeek,
         trialsExpiringThisWeek,
         newAgentsToday: newToday,
         newAgentsThisWeek: newWeek,
+        newAgentsPrevWeek: newPrevWeek,
         newAgentsThisMonth: newMonth,
-        churnedThisMonth: 0,
+        churnedThisMonth: churnRes.count || 0,
         liveListings: liveListingsRes.count || 0,
         listingsToday: listingsTodayRes.count || 0,
         listingsThisWeek: listingsWeekRes.count || 0,
@@ -330,6 +400,10 @@ export default function CommandCentre() {
         leadsThisWeek: leadsWeekRes.count || 0,
         leads30d: leads30dRes.count || 0,
         voiceSearches30d: voice30dRes.count || 0,
+        pendingAgentApprovals: pendingAgentsRes.count || 0,
+        pendingListingReviews: pendingListingsRes.count || 0,
+        pendingDemoRequests: pendingDemosRes.count || 0,
+        openSupportTickets: openTicketsRes.count || 0,
         atRiskAgents,
         agentsNoListings,
         stateBreakdown,
@@ -341,11 +415,66 @@ export default function CommandCentre() {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, []);
 
+  // Keep latest fetch in a ref so the visibility/interval effect stays stable
+  useEffect(() => {
+    fetchAllRef.current = fetchAll;
+  }, [fetchAll]);
+
+  // Initial load
   useEffect(() => {
     fetchAll();
+  }, [fetchAll]);
+
+  // Auto-refresh every 5 min, paused when tab is hidden
+  useEffect(() => {
+    let intervalId: number | null = null;
+
+    const start = () => {
+      if (intervalId != null) return;
+      intervalId = window.setInterval(() => {
+        if (document.visibilityState === 'visible') {
+          fetchAllRef.current();
+        }
+      }, 5 * 60 * 1000);
+    };
+
+    const stop = () => {
+      if (intervalId != null) {
+        window.clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        // Resume immediately on tab return
+        fetchAllRef.current();
+        start();
+      } else {
+        stop();
+      }
+    };
+
+    if (document.visibilityState === 'visible') start();
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      stop();
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, []);
+
+  const handleImpersonate = async (id: string, email: string, name: string) => {
+    if (!startImpersonation) return;
+    try {
+      await startImpersonation(id, email || name);
+      navigate('/dashboard');
+    } catch (err: any) {
+      toast.error(err?.message ?? 'Could not start impersonation');
+    }
+  };
 
   if (loading) {
     return (
@@ -360,26 +489,54 @@ export default function CommandCentre() {
 
   if (!data) return null;
 
-  const alerts = [
-    data.trialsExpiringThisWeek > 0 && (
-      <CCAlert key="trials" severity="red">
-        {data.trialsExpiringThisWeek} trial{data.trialsExpiringThisWeek > 1 ? 's' : ''} expiring this week — follow up before they churn
-      </CCAlert>
+  const attentionCards = [
+    data.pendingAgentApprovals > 0 && (
+      <AttentionCard
+        key="agents"
+        icon={UserCheck}
+        label="Agent Approvals"
+        count={data.pendingAgentApprovals}
+        description="New agents waiting on verification"
+        to="/admin/approvals"
+        navigate={navigate}
+        tone="blue"
+      />
     ),
-    data.agentsNoListings > 0 && (
-      <CCAlert key="no-listings" severity="amber">
-        {data.agentsNoListings} agent{data.agentsNoListings > 1 ? 's' : ''} signed up but haven't listed yet
-      </CCAlert>
+    data.pendingListingReviews > 0 && (
+      <AttentionCard
+        key="listings"
+        icon={ClipboardCheck}
+        label="Listing Reviews"
+        count={data.pendingListingReviews}
+        description="Listings awaiting moderation"
+        to="/admin/approvals"
+        navigate={navigate}
+        tone="amber"
+      />
     ),
-    data.atRiskAgents.length > 0 && (
-      <CCAlert key="at-risk" severity="amber">
-        {data.atRiskAgents.length} agent{data.atRiskAgents.length > 1 ? 's' : ''} haven't logged in for 14+ days
-      </CCAlert>
+    data.pendingDemoRequests > 0 && (
+      <AttentionCard
+        key="demos"
+        icon={Gamepad2}
+        label="Demo Requests"
+        count={data.pendingDemoRequests}
+        description="Pending demo access requests"
+        to="/admin/approvals"
+        navigate={navigate}
+        tone="amber"
+      />
     ),
-    data.listingsNoPhotos > 0 && (
-      <CCAlert key="no-photos" severity="amber">
-        {data.listingsNoPhotos} listing{data.listingsNoPhotos > 1 ? 's' : ''} have no photos
-      </CCAlert>
+    data.openSupportTickets > 0 && (
+      <AttentionCard
+        key="support"
+        icon={MessageSquare}
+        label="Support Tickets"
+        count={data.openSupportTickets}
+        description="Open conversations needing a reply"
+        to="/admin/approvals"
+        navigate={navigate}
+        tone="red"
+      />
     ),
   ].filter(Boolean);
 
@@ -387,13 +544,12 @@ export default function CommandCentre() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-bold text-foreground">
-            Command Centre
-          </h2>
+          <h2 className="text-lg font-bold text-foreground">Command Centre</h2>
           <p className="text-[11px] text-muted-foreground flex items-center gap-1">
             <Clock size={12} />
             Last updated{' '}
             {new Date(data.fetchedAt).toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' })}
+            <span className="ml-1 opacity-70">· auto-refreshes every 5 min</span>
           </p>
         </div>
         <button
@@ -406,20 +562,32 @@ export default function CommandCentre() {
         </button>
       </div>
 
-      {alerts.length > 0 && (
-        <div className="space-y-2">
-          {alerts}
+      {/* SECTION 1 — Needs Attention */}
+      <SectionHead title="Needs Attention" sub="Pending items across the platform" />
+      {attentionCards.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">{attentionCards}</div>
+      ) : (
+        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 flex items-center gap-3">
+          <CheckCircle2 size={20} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+          <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+            All clear — nothing needs your attention right now.
+          </p>
         </div>
       )}
 
-      <SectionHead title="Revenue" sub="Monthly recurring revenue from paid plans" />
+      {/* SECTION 2 — Revenue pulse */}
+      <SectionHead title="Revenue pulse" sub="Monthly recurring revenue and conversion" />
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KPI
           label="MRR"
           value={`$${data.mrr.toLocaleString()}`}
           icon={DollarSign}
           color={data.mrr > 0 ? 'text-emerald-500' : 'text-muted-foreground'}
-          sub={data.mrrGrowthPct != null ? `${data.mrrGrowthPct >= 0 ? '+' : ''}${data.mrrGrowthPct}% vs last month` : 'No prev data'}
+          sub={
+            data.mrrGrowthPct != null
+              ? `${data.mrrGrowthPct >= 0 ? '+' : ''}${data.mrrGrowthPct}% vs last month`
+              : 'No prev data'
+          }
           trend={data.mrrGrowthPct != null ? (data.mrrGrowthPct >= 0 ? 'up' : 'down') : null}
         />
         <KPI
@@ -433,67 +601,43 @@ export default function CommandCentre() {
           label="Paid Agents"
           value={data.paidAgents}
           icon={UserCheck}
-          sub={`${data.activeTrials} on trial`}
-          trend={data.paidAgents > 0 ? 'up' : null}
+          sub={`${data.paidAgents - data.paidAgentsPrevWeek >= 0 ? '+' : ''}${data.paidAgents - data.paidAgentsPrevWeek} vs last week`}
+          trend={trendFromDelta(data.paidAgents, data.paidAgentsPrevWeek)}
         />
         <KPI
-          label="Churn (month)"
-          value={data.churnedThisMonth}
-          icon={UserX}
-          color={data.churnedThisMonth > 0 ? 'text-destructive' : 'text-muted-foreground'}
-          sub="Lost this month"
-          trend={data.churnedThisMonth > 0 ? 'down' : null}
+          label="Conversion Rate"
+          value={`${data.conversionRate}%`}
+          icon={Target}
+          color="text-primary"
+          sub={`${(data.conversionRate - data.conversionRatePrevWeek).toFixed(1)}pp vs last week`}
+          trend={trendFromDelta(data.conversionRate, data.conversionRatePrevWeek)}
         />
       </div>
 
-      {data.planMix.length > 0 && (
-        <div className="rounded-2xl border border-border bg-card p-4">
-          <p className="text-xs font-semibold text-foreground mb-3">
-            Plan Mix
-          </p>
-          <div className="flex flex-wrap gap-3">
-            {data.planMix.map(p => (
-              <div key={p.plan} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary text-xs">
-                <span className="font-bold text-foreground">
-                  {p.count}
-                </span>
-                <span className="text-muted-foreground">
-                  {PLAN_LABEL[p.plan] || p.plan}
-                </span>
-                {p.mrr > 0 && (
-                  <span className="text-emerald-500 font-medium">
-                    ${p.mrr}/mo
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
+      {/* Churn surfaced separately so we can keep 4-up grid above */}
+      {data.churnedThisMonth > 0 && (
+        <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive flex items-center gap-2">
+          <AlertTriangle size={14} />
+          <span>
+            <strong>{data.churnedThisMonth}</strong> agent{data.churnedThisMonth > 1 ? 's' : ''} churned this month
+            (subscription cancelled or lapsed).
+          </span>
         </div>
       )}
 
-      <SectionHead title="Agent Growth" sub="Sign-ups and retention" />
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <KPI
-          label="Total Agents"
-          value={data.totalAgents}
-          icon={Users}
-          sub={`+${data.newAgentsToday} today`}
-          color={data.newAgentsToday > 0 ? 'text-primary' : 'text-muted-foreground'}
-          trend={data.newAgentsToday > 0 ? 'up' : null}
-        />
-        <KPI label="New (7d)" value={data.newAgentsThisWeek} icon={ArrowUpRight} />
-        <KPI label="New (month)" value={data.newAgentsThisMonth} icon={ArrowUpRight} />
-        <KPI label="Trials Expiring" value={data.trialsExpiringThisWeek} icon={Clock} color={data.trialsExpiringThisWeek > 0 ? 'text-amber-500' : 'text-muted-foreground'} />
-      </div>
-
-      <SectionHead title="12-Week Growth" />
+      {/* SECTION 3 — 12-week growth chart */}
+      <SectionHead title="12-Week Growth" sub="Agents, listings & leads per week" />
       <div className="rounded-2xl border border-border bg-card p-4">
-        <ResponsiveContainer width="100%" height={220}>
+        <ResponsiveContainer width="100%" height={240}>
           <AreaChart data={data.growthChart}>
             <defs>
               <linearGradient id="ccAgents" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
                 <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="ccListings" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#10b981" stopOpacity={0.3} />
+                <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="ccLeads" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#a855f7" stopOpacity={0.3} />
@@ -503,20 +647,170 @@ export default function CommandCentre() {
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
             <XAxis dataKey="label" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
             <YAxis tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
-            <Tooltip contentStyle={{ fontSize: 12, borderRadius: 12, border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }} />
-            <Area type="monotone" dataKey="agents" stroke="hsl(var(--primary))" fill="url(#ccAgents)" strokeWidth={2} name="Agents" />
-            <Area type="monotone" dataKey="leads" stroke="#a855f7" fill="url(#ccLeads)" strokeWidth={2} name="Leads" />
+            <Tooltip
+              contentStyle={{
+                fontSize: 12,
+                borderRadius: 12,
+                border: '1px solid hsl(var(--border))',
+                background: 'hsl(var(--card))',
+              }}
+            />
+            <Area
+              type="monotone"
+              dataKey="agents"
+              stroke="hsl(var(--primary))"
+              fill="url(#ccAgents)"
+              strokeWidth={2}
+              name="Agents"
+            />
+            <Area
+              type="monotone"
+              dataKey="listings"
+              stroke="#10b981"
+              fill="url(#ccListings)"
+              strokeWidth={2}
+              name="Listings"
+            />
+            <Area
+              type="monotone"
+              dataKey="leads"
+              stroke="#a855f7"
+              fill="url(#ccLeads)"
+              strokeWidth={2}
+              name="Leads"
+            />
           </AreaChart>
         </ResponsiveContainer>
+        <div className="flex items-center gap-4 mt-3 text-[11px] text-muted-foreground flex-wrap">
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-primary" /> Agents
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full" style={{ background: '#10b981' }} /> Listings
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full" style={{ background: '#a855f7' }} /> Leads
+          </span>
+        </div>
       </div>
 
-      <SectionHead title="Platform Activity" sub="Listings, leads & engagement" />
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <KPI label="Live Listings" value={data.liveListings} icon={Building2} sub={`+${data.listingsThisWeek} this week`} color={data.listingsThisWeek > 0 ? 'text-primary' : 'text-muted-foreground'} trend={data.listingsThisWeek > 0 ? 'up' : null} />
-        <KPI label="Avg Views" value={data.avgViewsPerListing} icon={Activity} />
-        <KPI label="Leads Today" value={data.leadsToday} icon={Target} sub={`${data.leads30d} in 30d`} color={data.leadsToday > 0 ? 'text-purple-500' : 'text-muted-foreground'} trend={data.leadsToday > 0 ? 'up' : null} />
-        <KPI label="Voice (30d)" value={data.voiceSearches30d} icon={Zap} color={data.voiceSearches30d > 0 ? 'text-amber-500' : 'text-muted-foreground'} />
+      {/* SECTION 4 — At-Risk Agents */}
+      {data.atRiskAgents.length > 0 && (
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-sm font-semibold text-foreground">At-Risk Agents</h3>
+              <p className="text-[11px] text-muted-foreground">
+                No login in 14+ days — prioritise for outreach
+              </p>
+            </div>
+            <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">
+              {data.atRiskAgents.length} agents
+            </span>
+          </div>
+          <div className="space-y-3">
+            {data.atRiskAgents.map(a => (
+              <div key={a.id} className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="w-8 h-8 rounded-full bg-destructive/10 text-destructive flex items-center justify-center text-xs font-bold shrink-0">
+                    {a.name?.[0]?.toUpperCase() ?? '?'}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{a.name}</p>
+                    <p className="text-[11px] text-muted-foreground truncate">
+                      {a.email}
+                      {a.agency ? ` · ${a.agency}` : ''}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right shrink-0">
+                  <p
+                    className={`text-xs font-medium ${
+                      a.daysSince > 30 ? 'text-destructive' : 'text-amber-500'
+                    }`}
+                  >
+                    {a.daysSince === 999 ? 'Never logged in' : `${a.daysSince}d ago`}
+                  </p>
+                  {a.lastSeen && (
+                    <p className="text-[10px] text-muted-foreground">
+                      {new Date(a.lastSeen).toLocaleDateString('en-AU')}
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {a.email && (
+                    <a
+                      href={`mailto:${a.email}?subject=${encodeURIComponent('We miss you on ListHQ')}`}
+                      className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-1 rounded-lg border border-border hover:bg-accent transition-colors"
+                    >
+                      <Mail size={12} /> Email
+                    </a>
+                  )}
+                  {startImpersonation && (
+                    <button
+                      onClick={() => handleImpersonate(a.id, a.email, a.name)}
+                      className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-1 rounded-lg border border-border hover:bg-accent transition-colors"
+                    >
+                      <Eye size={12} /> Impersonate
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* SECTION 5 — Platform health */}
+      <SectionHead title="Platform health" sub="Listings, engagement & activation" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <KPI
+          label="Live Listings"
+          value={data.liveListings}
+          icon={Building2}
+          sub={`+${data.listingsThisWeek} this week`}
+          color={data.listingsThisWeek > 0 ? 'text-primary' : 'text-muted-foreground'}
+          trend={data.listingsThisWeek > 0 ? 'up' : 'flat'}
+        />
+        <KPI
+          label="Avg views / listing"
+          value={data.avgViewsPerListing}
+          icon={Activity}
+        />
+        <KPI
+          label="Voice searches (30d)"
+          value={data.voiceSearches30d}
+          icon={Zap}
+          color={data.voiceSearches30d > 0 ? 'text-amber-500' : 'text-muted-foreground'}
+        />
       </div>
+
+      {data.agentsNoListings > 0 && (
+        <div className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3 flex-wrap">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
+            <UserX size={20} className="text-amber-500" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-foreground">
+              {data.agentsNoListings} agents with no listings
+            </p>
+            <p className="text-[11px] text-muted-foreground">
+              They signed up but haven't listed yet — reach out to activate them
+            </p>
+          </div>
+          <button
+            onClick={() =>
+              navigate(
+                '/admin/outreach?audience=no_listings&template=' +
+                  encodeURIComponent('Get your first listing live on ListHQ'),
+              )
+            }
+            className="inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shrink-0"
+          >
+            <Megaphone size={14} /> Nudge all
+          </button>
+        </div>
+      )}
 
       {data.stateBreakdown.length > 0 && (
         <div className="rounded-2xl border border-border bg-card p-4">
@@ -536,7 +830,10 @@ export default function CommandCentre() {
                     </span>
                   </div>
                   <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
-                    <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${pct}%` }} />
+                    <div
+                      className="h-full rounded-full bg-primary transition-all"
+                      style={{ width: `${pct}%` }}
+                    />
                   </div>
                 </div>
               );
@@ -545,70 +842,51 @@ export default function CommandCentre() {
         </div>
       )}
 
-      {data.atRiskAgents.length > 0 && (
+      {/* SECTION 6 — Plan mix */}
+      {data.planMix.length > 0 && (
         <div className="rounded-2xl border border-border bg-card p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-sm font-semibold text-foreground">
-                At-Risk Agents
-              </h3>
-              <p className="text-[11px] text-muted-foreground">
-                No login in 14+ days — prioritise for outreach
-              </p>
-            </div>
-            <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">
-              {data.atRiskAgents.length} agents
-            </span>
-          </div>
-          <div className="space-y-3">
-            {data.atRiskAgents.map(a => (
-              <div key={a.id} className="flex items-center justify-between">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-8 h-8 rounded-full bg-destructive/10 text-destructive flex items-center justify-center text-xs font-bold shrink-0">
-                    {a.name[0]?.toUpperCase()}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">
-                      {a.name}
-                    </p>
-                    <p className="text-[11px] text-muted-foreground truncate">
-                      {a.email}{a.agency ? ` · ${a.agency}` : ''}
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right shrink-0 ml-3">
-                  <p className={`text-xs font-medium ${a.daysSince > 30 ? 'text-destructive' : 'text-amber-500'}`}>
-                    {a.daysSince === 999 ? 'Never logged in' : `${a.daysSince}d ago`}
-                  </p>
-                  {a.lastSeen && (
-                    <p className="text-[10px] text-muted-foreground">
-                      {new Date(a.lastSeen).toLocaleDateString('en-AU')}
-                    </p>
-                  )}
-                </div>
+          <p className="text-xs font-semibold text-foreground mb-3">Plan Mix</p>
+          <div className="flex flex-wrap gap-3">
+            {data.planMix.map(p => (
+              <div
+                key={p.plan}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary text-xs"
+              >
+                <span className="font-bold text-foreground">{p.count}</span>
+                <span className="text-muted-foreground">{PLAN_LABEL[p.plan] || p.plan}</span>
+                {p.mrr > 0 && <span className="text-emerald-500 font-medium">${p.mrr}/mo</span>}
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {data.agentsNoListings > 0 && (
-        <div className="rounded-2xl border border-border bg-card p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
-              <UserX size={20} className="text-amber-500" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-foreground">
-                {data.agentsNoListings} agents with no listings
-              </p>
-              <p className="text-[11px] text-muted-foreground">
-                They signed up but haven't listed yet — reach out to activate them
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Trial growth context (kept from prior version) */}
+      <SectionHead title="Agent Growth" sub="Sign-ups and retention" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <KPI
+          label="Total Agents"
+          value={data.totalAgents}
+          icon={Users}
+          sub={`+${data.newAgentsToday} today`}
+          color={data.newAgentsToday > 0 ? 'text-primary' : 'text-muted-foreground'}
+          trend={data.newAgentsToday > 0 ? 'up' : 'flat'}
+        />
+        <KPI
+          label="New (7d)"
+          value={data.newAgentsThisWeek}
+          icon={ArrowUpRight}
+          sub={`${data.newAgentsThisWeek - data.newAgentsPrevWeek >= 0 ? '+' : ''}${data.newAgentsThisWeek - data.newAgentsPrevWeek} vs prev week`}
+          trend={trendFromDelta(data.newAgentsThisWeek, data.newAgentsPrevWeek)}
+        />
+        <KPI label="New (month)" value={data.newAgentsThisMonth} icon={ArrowUpRight} />
+        <KPI
+          label="Trials Expiring"
+          value={data.trialsExpiringThisWeek}
+          icon={Clock}
+          color={data.trialsExpiringThisWeek > 0 ? 'text-amber-500' : 'text-muted-foreground'}
+        />
+      </div>
     </div>
   );
 }

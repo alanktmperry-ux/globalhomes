@@ -18,8 +18,8 @@ const SavedPage = () => {
   const [dbLoading, setDbLoading] = useState(true);
 
   useEffect(() => {
-    fetchPublicProperties().then((props) => {
-      setDbProperties(props);
+    fetchPublicProperties(0, 50).then(({ data }) => {
+      setDbProperties(data);
       setDbLoading(false);
     });
   }, []);

@@ -160,7 +160,7 @@ export default function PropertyDetailPage() {
           isSubscribed: agentRow.is_subscribed || false,
         } : { id: '', name: 'Private Seller', agency: '', phone: '', email: '', avatarUrl: '', isSubscribed: false },
         listedDate: p.listed_date || p.created_at,
-        views: (p.views ?? 0) + 1,
+        views: p.views ?? 0,
         contactClicks: p.contact_clicks,
         status: 'listed',
         rentalYieldPct: p.rental_yield_pct,
@@ -175,20 +175,7 @@ export default function PropertyDetailPage() {
       });
       setInspectionTimes(Array.isArray(p.inspection_times) ? p.inspection_times : []);
 
-      // Render now — fire-and-forget the view increment
       setLoading(false);
-
-      supabase.rpc('increment_property_views', { property_id: p.id }).then(({ error: rpcErr }) => {
-        if (rpcErr) {
-          supabase
-            .from('properties')
-            .update({ views: (p.views ?? 0) + 1 })
-            .eq('id', p.id)
-            .then(({ error: updateErr }) => {
-              if (updateErr) console.warn('[PropertyDetail] View count update failed:', updateErr.message);
-            });
-        }
-      });
     };
     fetchProperty();
   }, [id]);

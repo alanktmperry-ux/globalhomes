@@ -55,6 +55,8 @@ export interface PropertyOption {
   address: string;
 }
 
+const TX_PAGE_SIZE = 100;
+
 export function useTrustAccounting() {
   const { user } = useAuth();
   const [accounts, setAccounts] = useState<TrustAccount[]>([]);
@@ -62,6 +64,8 @@ export function useTrustAccounting() {
   const [contacts, setContacts] = useState<ContactOption[]>([]);
   const [properties, setProperties] = useState<PropertyOption[]>([]);
   const [loading, setLoading] = useState(true);
+  const [txPage, setTxPage] = useState(0);
+  const [hasMoreTx, setHasMoreTx] = useState(false);
 
   const fetchAccounts = useCallback(async () => {
     if (!user) return;
@@ -78,19 +82,27 @@ export function useTrustAccounting() {
     }
   }, [user]);
 
-  const fetchTransactions = useCallback(async () => {
+  const fetchTransactionsPage = useCallback(async (page: number, append: boolean) => {
     if (!user) return;
     try {
+      // Fetch a page of receipts and a page of payments, then merge.
+      // Each table is ranged independently; combined "hasMore" is true if
+      // either side returned a full page.
+      const from = page * TX_PAGE_SIZE;
+      const to = from + TX_PAGE_SIZE - 1;
+
       const { data: receipts, error: rErr } = await supabase
         .from('trust_receipts')
         .select('*')
-        .order('date_received', { ascending: false });
+        .order('date_received', { ascending: false })
+        .range(from, to);
       if (rErr) throw rErr;
 
       const { data: payments, error: pErr } = await supabase
         .from('trust_payments')
         .select('*')
-        .order('date_paid', { ascending: false });
+        .order('date_paid', { ascending: false })
+        .range(from, to);
       if (pErr) throw pErr;
 
       const mapped: TrustTransaction[] = [];
@@ -144,12 +156,28 @@ export function useTrustAccounting() {
       }
 
       mapped.sort((a, b) => b.transaction_date.localeCompare(a.transaction_date));
-      setTransactions(mapped);
+      setTransactions(prev => append ? [...prev, ...mapped] : mapped);
+      setHasMoreTx(
+        (receipts?.length ?? 0) === TX_PAGE_SIZE ||
+        (payments?.length ?? 0) === TX_PAGE_SIZE
+      );
     } catch (err: any) {
       console.error('Failed to fetch trust transactions:', err);
       toast.error('Failed to load trust transactions');
     }
   }, [user]);
+
+  const fetchTransactions = useCallback(async () => {
+    setTxPage(0);
+    await fetchTransactionsPage(0, false);
+  }, [fetchTransactionsPage]);
+
+  const loadMoreTransactions = useCallback(async () => {
+    if (!hasMoreTx) return;
+    const next = txPage + 1;
+    setTxPage(next);
+    await fetchTransactionsPage(next, true);
+  }, [hasMoreTx, txPage, fetchTransactionsPage]);
 
   const fetchContacts = useCallback(async () => {
     if (!user) return;
@@ -334,6 +362,7 @@ export function useTrustAccounting() {
 
   return {
     accounts, transactions, contacts, properties, loading,
+    hasMoreTx, loadMoreTransactions,
     fetchAccounts, fetchTransactions,
     createAccount, createTransaction,
     voidTransaction,

@@ -184,8 +184,34 @@ export async function searchAgentListings(
 
 /**
  * Fetches public (status = 'public') properties with agent data joined.
+ * Supports range-based pagination via `page` and `pageSize`.
  */
-export async function fetchPublicProperties(limit = 50, listingType?: 'sale' | 'rent'): Promise<Property[]> {
+export async function fetchPublicProperties(
+  pageOrListingType: number | 'sale' | 'rent' = 0,
+  pageSizeOrListingType: number | 'sale' | 'rent' = 20,
+  listingTypeArg?: 'sale' | 'rent',
+): Promise<{ data: Property[]; hasMore: boolean }> {
+  // Backward-compat: previous signature was (limit?, listingType?)
+  let page = 0;
+  let pageSize = 20;
+  let listingType: 'sale' | 'rent' | undefined;
+
+  if (typeof pageOrListingType === 'string') {
+    listingType = pageOrListingType;
+    pageSize = typeof pageSizeOrListingType === 'number' ? pageSizeOrListingType : 20;
+  } else {
+    page = pageOrListingType;
+    if (typeof pageSizeOrListingType === 'number') {
+      pageSize = pageSizeOrListingType;
+      listingType = listingTypeArg;
+    } else {
+      // Treated old "limit" call: (50, 'sale')
+      pageSize = pageOrListingType;
+      page = 0;
+      listingType = pageSizeOrListingType;
+    }
+  }
+
   let query = supabase
     .from('properties')
     .select(
@@ -194,7 +220,7 @@ export async function fetchPublicProperties(limit = 50, listingType?: 'sale' | '
     .eq('status', 'public')
     .not('agent_id', 'is', null)
     .order('created_at', { ascending: false })
-    .limit(limit);
+    .range(page * pageSize, (page + 1) * pageSize - 1);
 
   // Moderation: approved or null (legacy rows)
   query = query.or('moderation_status.eq.approved,moderation_status.is.null');
@@ -209,8 +235,9 @@ export async function fetchPublicProperties(limit = 50, listingType?: 'sale' | '
 
   if (error) {
     console.error('[fetchPublicProperties]', error.message);
-    return [];
+    return { data: [], hasMore: false };
   }
 
-  return (data ?? []).map(mapDbProperty);
+  const mapped = (data ?? []).map(mapDbProperty);
+  return { data: mapped, hasMore: mapped.length === pageSize };
 }

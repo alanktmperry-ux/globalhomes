@@ -26,7 +26,7 @@ export interface ManusSearchResult {
   status?: 'pending' | 'running' | 'completed' | 'failed' | 'mock';
 }
 
-type StatusCallback = (update: { status: string; properties?: Property[] }) => void;
+type StatusCallback = (update: { status: string; properties?: Property[]; error?: string }) => void;
 
 const POLL_INTERVAL = 4000;
 const MAX_POLL_TIME = 60000; // 1 minute — Manus tasks can take a while
@@ -46,9 +46,9 @@ class ManusSearchService {
     const mockResult = await this.mockSearch(params);
 
     // Fire off Manus task in background
-    this.startManusSearch(params, onUpdate).catch((err) =>
-      {} // silently ignore background search failure
-    );
+    this.startManusSearch(params, onUpdate).catch((err) => {
+      console.error('[ManusSearch] background search failed:', err);
+    });
 
     return {
       ...mockResult,
@@ -78,7 +78,8 @@ class ManusSearchService {
       // Start polling
       await this.pollTaskStatus(taskId, onUpdate);
     } catch (err) {
-      
+      console.error('[ManusSearch] error:', err);
+      onUpdate?.({ status: 'failed', error: String(err) });
     }
   }
 
@@ -122,7 +123,8 @@ class ManusSearchService {
         // Still pending/running
         onUpdate?.({ status: data?.status || 'running' });
       } catch (err) {
-        
+        console.error('[ManusSearch] error:', err);
+        onUpdate?.({ status: 'failed', error: String(err) });
       }
     }
 
@@ -220,7 +222,7 @@ class ManusSearchService {
         contactClicks: 0,
       }));
     } catch (err) {
-      
+      console.error('[ManusSearch] error:', err);
       return [];
     }
   }

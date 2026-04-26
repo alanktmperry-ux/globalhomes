@@ -129,7 +129,10 @@ export function useContacts() {
         fetchContacts();
       })
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      channel.unsubscribe();
+      supabase.removeChannel(channel);
+    };
   }, [fetchContacts]);
 
   const getAgentContext = async () => {

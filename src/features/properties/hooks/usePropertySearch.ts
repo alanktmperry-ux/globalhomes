@@ -146,7 +146,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
         // Try static centroid first (instant, works without Google API)
         const staticCenter = lookupSuburbCentroid(detectedLocation);
         if (staticCenter) {
-          console.log('[handleSearch] Using static centroid for', detectedLocation, staticCenter);
+          if (import.meta.env.DEV) console.log('[handleSearch] Using static centroid for', detectedLocation, staticCenter);
           setSearchCenter(staticCenter);
           setSearchRadius(prev => prev ?? DEFAULT_RADIUS_KM);
         }
@@ -156,19 +156,19 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
         geocode(locQuery)
           .then((coords) => {
             if (coords) {
-              console.log('[handleSearch] Google geocoded', detectedLocation, coords);
+              if (import.meta.env.DEV) console.log('[handleSearch] Google geocoded', detectedLocation, coords);
               setSearchCenter(coords);
               setSearchRadius(prev => prev ?? DEFAULT_RADIUS_KM);
             } else if (!staticCenter) {
-              console.warn('[handleSearch] Geocoding returned no result and no static centroid for', detectedLocation);
+              if (import.meta.env.DEV) console.warn('[handleSearch] Geocoding returned no result and no static centroid for', detectedLocation);
             }
           })
           .catch((err) => {
-            console.warn('[handleSearch] Geocoding error:', err);
+            if (import.meta.env.DEV) console.warn('[handleSearch] Geocoding error:', err);
             if (!staticCenter) {
               const fallbackCenter = lookupSuburbCentroid(detectedLocation);
               if (fallbackCenter) {
-                console.log('[handleSearch] Geocoding failed, applying static centroid fallback', {
+                if (import.meta.env.DEV) console.log('[handleSearch] Geocoding failed, applying static centroid fallback', {
                   location: detectedLocation,
                   fallbackCenter,
                 });
@@ -188,7 +188,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
         })
         .then(({ data, error }) => {
           if (error || !data) {
-            console.warn('[handleSearch] AI parse failed:', error);
+            if (import.meta.env.DEV) console.warn('[handleSearch] AI parse failed:', error);
             return null;
           }
           // Update search summary from parsed intent
@@ -234,16 +234,16 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
                     setSearchCenter(coords);
                     setSearchRadius(prev => prev ?? DEFAULT_RADIUS_KM);
                   } else if (aiStaticCenter) {
-                    console.log('[handleSearch] AI geocode returned no result, keeping static centroid fallback', {
+                    if (import.meta.env.DEV) console.log('[handleSearch] AI geocode returned no result, keeping static centroid fallback', {
                       locationQuery,
                       aiStaticCenter,
                     });
                   }
                 })
                 .catch((error) => {
-                  console.warn('[handleSearch] AI geocoding error:', error);
+                  if (import.meta.env.DEV) console.warn('[handleSearch] AI geocoding error:', error);
                   if (aiStaticCenter) {
-                    console.log('[handleSearch] AI geocoding failed, keeping static centroid fallback', {
+                    if (import.meta.env.DEV) console.log('[handleSearch] AI geocoding failed, keeping static centroid fallback', {
                       locationQuery,
                       aiStaticCenter,
                     });
@@ -264,7 +264,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
           return data;
         })
         .catch((err: unknown): null => {
-          console.warn('[handleSearch] AI parse error:', err);
+          if (import.meta.env.DEV) console.warn('[handleSearch] AI parse error:', err);
           return null;
         });
 
@@ -284,7 +284,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
             : undefined,
         }
       ).catch((err) => {
-        console.warn('[handleSearch] Agent listings search failed:', err);
+        if (import.meta.env.DEV) console.warn('[handleSearch] Agent listings search failed:', err);
         return [] as Property[];
       });
 
@@ -373,7 +373,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
         return false;
       });
     } else if (searchRadius && !searchCenter) {
-      console.warn('[RadiusFilter] Radius is set but no searchCenter — skipping radius filter');
+      if (import.meta.env.DEV) console.warn('[RadiusFilter] Radius is set but no searchCenter — skipping radius filter');
     }
 
     // Area filter (map drawing)
@@ -438,7 +438,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
   useEffect(() => {
     if (!hasSearched) return;
 
-    console.log('[usePropertySearch] radius state', {
+    if (import.meta.env.DEV) console.log('[usePropertySearch] radius state', {
       searchCenter,
       searchRadius,
       dbResultsCount: dbProperties.length,
@@ -461,7 +461,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
       return;
     }
     if (radius && !searchCenter) {
-      console.warn('[RadiusFilter] Radius set but no search center.');
+      if (import.meta.env.DEV) console.warn('[RadiusFilter] Radius set but no search center.');
       toast.success('📍 Select a location first — Pick a location from the suggestions so the radius filter knows where to search from.');
     }
   }, [searchCenter, toast]);

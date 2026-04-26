@@ -114,7 +114,7 @@ function loanTypeLabel(t: string | null | undefined): string {
 }
 
 export default function BrokerPortal() {
-  console.log("BrokerPortal v2");
+  if (import.meta.env.DEV) console.log("BrokerPortal v2");
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [broker, setBroker] = useState<BrokerRecord | null>(null);

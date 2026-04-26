@@ -64,7 +64,7 @@ const StepPhotos = ({ draft, update }: Props) => {
   };
 
   const addPhotos = async (files: FileList | null) => {
-    console.log('[StepPhotos] addPhotos called', { count: files?.length, userId: user?.id });
+    if (import.meta.env.DEV) console.log('[StepPhotos] addPhotos called', { count: files?.length, userId: user?.id });
     if (!files || files.length === 0) {
       toast.error('No files received. Try clicking the box and selecting from your computer.');
       return;
@@ -91,7 +91,7 @@ const StepPhotos = ({ draft, update }: Props) => {
 
       if (!resolvedType) {
         skippedUnsupported++;
-        console.warn('[StepPhotos] unsupported file', { name: file.name, type: file.type });
+        if (import.meta.env.DEV) console.warn('[StepPhotos] unsupported file', { name: file.name, type: file.type });
         continue;
       }
       if (file.size > 10 * 1024 * 1024) {

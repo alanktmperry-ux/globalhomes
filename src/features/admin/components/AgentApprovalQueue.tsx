@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { CheckCircle2, XCircle, Loader2, UserCheck, Inbox } from 'lucide-react';
 import { dispatchNotification } from '@/shared/lib/notify';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { buildAuditMeta } from '@/shared/lib/auditLog';
 
 interface PendingAgent {
   id: string;

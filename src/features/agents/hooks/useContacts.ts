@@ -56,40 +56,66 @@ export interface ContactActivity {
   created_at: string;
 }
 
+const PAGE_SIZE = 50;
+
 export function useContacts() {
   const { user, isPrincipal, isAdmin, agencyId } = useAuth();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
 
-  const fetchContacts = useCallback(async () => {
+  const fetchPage = useCallback(async (targetPage: number, append: boolean) => {
     if (!user) return;
     setLoading(true);
 
-    // Principals/admins see all agency contacts with assigned agent name
+    const from = targetPage * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+
     if ((isPrincipal || isAdmin) && agencyId) {
       const { data, error } = await supabase
         .from('contacts')
         .select('*, agents:assigned_agent_id(name, avatar_url)')
         .eq('agency_id', agencyId)
-        .order('updated_at', { ascending: false });
+        .order('updated_at', { ascending: false })
+        .range(from, to);
 
       if (!error && data) {
-        setContacts(data.map((d: any) => ({
+        const mapped = data.map((d: any) => ({
           ...d,
           assigned_agent: d.agents || null,
           agents: undefined,
-        })) as unknown as Contact[]);
+        })) as unknown as Contact[];
+        setContacts(prev => append ? [...prev, ...mapped] : mapped);
+        setHasMore(mapped.length === PAGE_SIZE);
       }
     } else {
       const { data, error } = await supabase
         .from('contacts')
         .select('*')
-        .order('updated_at', { ascending: false });
+        .order('updated_at', { ascending: false })
+        .range(from, to);
 
-      if (!error && data) setContacts(data as unknown as Contact[]);
+      if (!error && data) {
+        const mapped = data as unknown as Contact[];
+        setContacts(prev => append ? [...prev, ...mapped] : mapped);
+        setHasMore(mapped.length === PAGE_SIZE);
+      }
     }
     setLoading(false);
   }, [user, isPrincipal, isAdmin, agencyId]);
+
+  const fetchContacts = useCallback(async () => {
+    setPage(0);
+    await fetchPage(0, false);
+  }, [fetchPage]);
+
+  const loadMore = useCallback(async () => {
+    if (!hasMore || loading) return;
+    const next = page + 1;
+    setPage(next);
+    await fetchPage(next, true);
+  }, [hasMore, loading, page, fetchPage]);
 
   useEffect(() => {
     fetchContacts();
@@ -199,5 +225,5 @@ export function useContacts() {
     return data || [];
   };
 
-  return { contacts, loading, fetchContacts, createContact, updateContact, deleteContact, addActivity, getActivities };
+  return { contacts, loading, hasMore, loadMore, fetchContacts, createContact, updateContact, deleteContact, addActivity, getActivities };
 }

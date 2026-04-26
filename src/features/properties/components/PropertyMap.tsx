@@ -330,7 +330,7 @@ export function PropertyMap({
         });
       }
 
-      marker.addListener('click', () => {
+      const clickListener = marker.addListener('click', () => {
         onPropertySelect(property);
         onScrollToProperty?.(property.id);
         // Bounce animation
@@ -343,6 +343,7 @@ export function PropertyMap({
           setTimeout(() => { el.style.transform = 'translateY(-100%) scale(1)'; }, 450);
         }
       });
+      mapListenersRef.current.push(clickListener);
 
       markersRef.current.push(marker);
       bounds.extend({ lat: property.lat!, lng: property.lng! });
@@ -392,7 +393,17 @@ export function PropertyMap({
           google.maps.event.removeListener(listener);
         }
       });
+      mapListenersRef.current.push(listener);
     }
+
+    return () => {
+      mapListenersRef.current.forEach((l) => google.maps.event.removeListener(l));
+      mapListenersRef.current = [];
+      if (clustererRef.current) {
+        clustererRef.current.clearMarkers();
+        clustererRef.current = null;
+      }
+    };
   }, [properties, selectedPropertyId, onPropertySelect, centerOn, onScrollToProperty, formatPrice]);
 
   // School markers

@@ -49,9 +49,9 @@ const BuyerSettingsPage = () => {
     const load = async () => {
       // Load profile + preferences in parallel
       const [profileRes, prefsRes, buyerRes] = await Promise.all([
-        supabase.from('profiles').select('avatar_url, display_name, phone, preferred_language').eq('user_id', user.id).single(),
-        supabase.from('user_preferences').select('budget_min, budget_max, preferred_beds, preferred_baths, preferred_locations, notification_preferences').eq('user_id', user.id).single(),
-        supabase.from('buyer_profiles').select('preferred_property_types').eq('user_id', user.id).single(),
+        supabase.from('profiles').select('avatar_url, display_name, phone, preferred_language').eq('user_id', user.id).maybeSingle(),
+        supabase.from('user_preferences').select('budget_min, budget_max, preferred_beds, preferred_baths, preferred_locations, notification_preferences').eq('user_id', user.id).maybeSingle(),
+        supabase.from('buyer_profiles').select('preferred_property_types').eq('user_id', user.id).maybeSingle(),
       ]);
 
       if (profileRes.data) {
@@ -146,7 +146,7 @@ const BuyerSettingsPage = () => {
         .from('user_preferences')
         .select('id')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       const prefsPayload: Record<string, any> = {
         user_id: user.id,
@@ -174,7 +174,7 @@ const BuyerSettingsPage = () => {
         .from('buyer_profiles')
         .select('id')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       const buyerPayload = {
         user_id: user.id,

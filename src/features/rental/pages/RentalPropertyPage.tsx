@@ -18,7 +18,7 @@ export default function RentalPropertyPage() {
       .from('properties')
       .select('*')
       .eq('id', id)
-      .single()
+      .maybeSingle()
       .then(({ data }: any) => {
         setProperty(data);
         setLoading(false);

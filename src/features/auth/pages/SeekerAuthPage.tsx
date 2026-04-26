@@ -459,16 +459,14 @@ const SeekerAuthPage = () => {
                           placeholder={t('auth.displayNamePlaceholder')} className={input} />
                       </div>
                       <div>
-                        <label className={label}>{t('auth.mobile')} <span className="text-red-400">*</span></label>
+                        <label className={label}>{t('auth.mobile')}</label>
                         <PhoneInput value={phone} onChange={setPhone} />
                       </div>
-                      <div>
-                        <label className={label}>{t('auth.passwordLabel')} <span className="text-red-400">*</span></label>
-                        <input type="password" required minLength={8} value={password}
-                          onChange={e => setPassword(e.target.value)} className={input} />
-                      </div>
-                      <button type="submit" disabled={loading} className={btnPrimary}>
-                        {loading ? t('auth.creatingAccount') : t('auth.createAccountBtn')}
+                      <p className="text-[12px] text-stone-400 leading-relaxed -mt-1">
+                        We'll email you a 6-digit code to verify it's you. No password needed.
+                      </p>
+                      <button type="submit" disabled={loading || !email.trim()} className={btnPrimary}>
+                        {loading ? 'Sending code…' : 'Send verification code'}
                       </button>
                     </form>
                     <button onClick={goBack}

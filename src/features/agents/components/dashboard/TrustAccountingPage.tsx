@@ -250,9 +250,12 @@ const TrustAccountingPage = () => {
 
   // Running balance calculation
   const txWithBalance = useMemo(() => {
-    const accountId = filteredTx[0]?.trust_account_id ?? null;
-    const account = accounts.find(a => a.id === accountId);
-    let balance = account?.opening_balance ?? 0;
+    // Transactions are not linked to a specific account; use the sole account's
+    // opening balance when there is exactly one, otherwise sum opening balances.
+    const startingBalance = accounts.length === 1
+      ? (accounts[0].opening_balance ?? 0)
+      : accounts.reduce((sum, a) => sum + (a.opening_balance ?? 0), 0);
+    let balance = startingBalance;
     const reversed = [...filteredTx].reverse();
     const result = reversed.map(tx => {
       const impact = tx.transaction_type === 'deposit' ? tx.amount : -tx.amount;

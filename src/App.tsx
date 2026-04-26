@@ -142,6 +142,7 @@ const HomeServicesPage = React.lazy(() => import("./features/services/pages/Home
 const ConveyancingPage = React.lazy(() => import("./features/conveyancing/pages/ConveyancingPage"));
 const ExclusiveLandingPage = React.lazy(() => import("./features/exclusive/pages/ExclusiveLandingPage"));
 const ExclusiveListingsPage = React.lazy(() => import("./features/exclusive/pages/ExclusiveListingsPage"));
+const ValuationPage = React.lazy(() => import("./pages/ValuationPage"));
 const MortgageCalculatorPage = React.lazy(() => import("./features/mortgage/pages/MortgageCalculatorPage"));
 const BuyerPoolPage = React.lazy(() => import("./pages/BuyerPoolPage"));
 const SchoolPage = React.lazy(() => import("./pages/SchoolPage"));

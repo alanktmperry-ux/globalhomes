@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Plus, Zap, Eye, MessageSquare, TrendingUp, Copy, Sparkles, Key, Link } from 'lucide-react';
+import { ArrowLeft, Plus, Zap, Eye, MessageSquare, TrendingUp, Copy, Sparkles, Key, Link, Loader2 } from 'lucide-react';
 import { ImportListingDialog } from '@/features/agents/components/pocket-listing/ImportListingDialog';
-import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation, Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
@@ -52,10 +52,21 @@ const PocketListingPage = () => {
   }, [isExplicitNewListing, routeState?._ts, requestedListingType]);
 
   const [showLimitDialog, setShowLimitDialog] = useState(false);
-  const { listings, agentId } = useAgentListings();
+  const { user, loading: authLoading } = useAuth();
+  const { listings, agentId, loading: listingsLoading } = useAgentListings();
   const { toast } = useToast();
   const sub = useSubscription();
   const [showImportDialog, setShowImportDialog] = useState(false);
+
+  if (authLoading || (user && listingsLoading && agentId === null)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="animate-spin text-primary" size={32} />
+      </div>
+    );
+  }
+  if (!user) return <Navigate to="/login?return_to=/pocket-listing" replace />;
+  if (!listingsLoading && !agentId) return <Navigate to="/onboarding/agency" replace />;
 
   const activeCount = listings.filter(l => l.status !== 'sold').length;
   const totalLeads = listings.reduce((sum, l) => sum + l.contact_clicks, 0);

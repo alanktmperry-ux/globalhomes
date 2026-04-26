@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { dispatchNotification } from '@/shared/lib/notify';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
+import { buildAuditMeta } from '@/shared/lib/auditLog';
 import AdminUsers from '@/features/admin/components/AdminUsers';
 import AdminListings from '@/features/admin/components/AdminListings';
 import AdminRoles from '@/features/admin/components/AdminRoles';

@@ -24,6 +24,7 @@ const AuthCallbackPage = () => {
         });
         setTimeout(() => {
           subscription.unsubscribe();
+          toast.error('Sign-in is taking too long. Please try again.');
           navigate('/auth?error=oauth_failed', { replace: true });
         }, 8000);
         return;

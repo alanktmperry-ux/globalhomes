@@ -43,10 +43,47 @@ const SeekerAuthPage = () => {
     }
   }, [pendingSignIn, captchaToken]);
 
-  const handleEmailContinue = (e: React.FormEvent) => {
+  const handleEmailContinue = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) return;
-    setStep('password');
+    const cleaned = email.trim().toLowerCase();
+    if (!cleaned) return;
+    setLoading(true);
+    try {
+      // Probe whether the email belongs to an existing account by attempting an OTP send
+      // with shouldCreateUser:false. Supabase returns an error if the user doesn't exist.
+      const { error: probeErr } = await supabase.auth.signInWithOtp({
+        email: cleaned,
+        options: { shouldCreateUser: false },
+      });
+
+      if (!probeErr) {
+        // Existing account — they can sign in with password OR use the code we just sent
+        setStep('password');
+        return;
+      }
+
+      const msg = (probeErr.message || '').toLowerCase();
+      const isMissing = msg.includes('not found') || msg.includes('signups not allowed') ||
+        msg.includes("doesn't exist") || msg.includes('user not found') || msg.includes('invalid');
+
+      if (isMissing) {
+        // New user — send a real OTP and go to verification
+        const { error: createErr } = await supabase.auth.signInWithOtp({
+          email: cleaned,
+          options: { shouldCreateUser: true },
+        });
+        if (createErr) throw createErr;
+        toast.success('Code sent', { description: `Check ${cleaned} for your 6-digit code.` });
+        setStep('otp');
+      } else {
+        // Unknown error from probe — fall through to password step (existing user could still sign in)
+        setStep('password');
+      }
+    } catch (err) {
+      toast.error('Could not continue', { description: getErrorMessage(err) });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -190,7 +227,7 @@ const SeekerAuthPage = () => {
       <OTPVerificationScreen
         email={email}
         onVerified={handleOtpVerified}
-        onBack={() => { setStep('create'); }}
+        onBack={() => { setStep('email'); }}
       />
     );
   }

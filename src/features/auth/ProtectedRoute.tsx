@@ -1,7 +1,5 @@
-import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 
 interface Props {
@@ -12,44 +10,9 @@ interface Props {
 }
 
 export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePartner }: Props) => {
-  const { user, loading, isAgent, isAdmin, isPartner, refreshRoles } = useAuth();
-  const [provisioning, setProvisioning] = useState(false);
-  const [provisionFailed, setProvisionFailed] = useState(false);
+  const { user, loading, isAgent, isAdmin, isPartner } = useAuth();
 
-  useEffect(() => {
-    if (!user || !requireAgent || isAgent || loading || provisioning || provisionFailed) return;
-    let cancelled = false;
-    (async () => {
-      setProvisioning(true);
-      try {
-        const { data: existing } = await supabase
-          .from('agents')
-          .select('id')
-          .eq('user_id', user.id)
-          .maybeSingle();
-        if (!existing) {
-          const { error } = await supabase.from('agents').insert({
-            user_id: user.id,
-            email: user.email ?? null,
-            name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'Agent',
-            is_subscribed: true,
-            subscription_status: 'active',
-          } as any);
-          if (error) {
-            console.error('[ProtectedRoute] agent auto-create failed:', error);
-            if (!cancelled) setProvisionFailed(true);
-            return;
-          }
-        }
-        await refreshRoles();
-      } finally {
-        if (!cancelled) setProvisioning(false);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [user, requireAgent, isAgent, loading, provisioning, provisionFailed, refreshRoles]);
-
-  if (loading || provisioning) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="animate-spin text-primary" size={32} />
@@ -64,15 +27,7 @@ export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePa
   }
 
   if (requireAdmin && !isAdmin) return <Navigate to="/" replace />;
-  if (requireAgent && !isAgent && !isAdmin) {
-    if (provisionFailed) return <Navigate to="/" replace />;
-    // still waiting for refreshRoles to flip isAgent — show spinner
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="animate-spin text-primary" size={32} />
-      </div>
-    );
-  }
+  if (requireAgent && !isAgent && !isAdmin) return <Navigate to="/onboarding/agency" replace />;
   if (requirePartner && !isPartner) return <Navigate to="/" replace />;
 
   return <>{children}</>;

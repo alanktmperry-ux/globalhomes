@@ -772,7 +772,7 @@ export default function PropertyDetailPage() {
 
             {((property as any).price_guide_low || (property as any).price_guide_high) && (
               <div className="p-4 rounded-2xl bg-card border border-border">
-                <p className="text-sm font-medium text-foreground">Price guide</p>
+                <p className="text-sm font-medium text-foreground">{tp('property.priceGuide')}</p>
                 <p className="text-xl font-bold text-foreground mt-1">
                   {(property as any).price_guide_low && `$${Number((property as any).price_guide_low).toLocaleString()}`}
                   {(property as any).price_guide_low && (property as any).price_guide_high && (property as any).price_guide_low !== (property as any).price_guide_high
@@ -847,7 +847,7 @@ export default function PropertyDetailPage() {
             {/* Features */}
             {property.features.length > 0 && (
               <div>
-                <h2 className="text-[15px] font-bold text-slate-900 mb-3 flex items-center gap-2.5 before:content-[''] before:w-[3px] before:h-4 before:rounded-full before:bg-blue-600 before:shrink-0">Features</h2>
+                <h2 className="text-[15px] font-bold text-slate-900 mb-3 flex items-center gap-2.5 before:content-[''] before:w-[3px] before:h-4 before:rounded-full before:bg-blue-600 before:shrink-0">{tp('property.section.features')}</h2>
                 <div className="flex flex-wrap gap-2">
                   {property.features.map(f => (
                     <span key={f} className="px-3 py-1.5 rounded-full border border-slate-200 bg-slate-50 text-sm font-medium text-slate-600">
@@ -929,7 +929,7 @@ export default function PropertyDetailPage() {
                     className="w-full py-2.5 rounded-xl text-[13px] font-semibold transition-colors"
                     style={{ border: '1.5px solid rgba(255,255,255,0.12)', color: '#fff', background: 'transparent' }}
                   >
-                    Apply Now
+                    {tp('property.applyNow')}
                   </button>
                 </div>
               )}
@@ -946,16 +946,16 @@ export default function PropertyDetailPage() {
 
             {!isRental && (
               <div className="mt-4 p-4 rounded-xl border border-primary/20 bg-primary/5">
-                <p className="text-sm font-medium">Need finance?</p>
-                <p className="text-xs text-muted-foreground mb-2">Get pre-approved before you make an offer.</p>
-                <Button size="sm" variant="outline" onClick={() => setMortgageOpen(true)}>Get pre-approved</Button>
+                <p className="text-sm font-medium">{tp('property.finance.shortTitle')}</p>
+                <p className="text-xs text-muted-foreground mb-2">{tp('property.finance.shortBody')}</p>
+                <Button size="sm" variant="outline" onClick={() => setMortgageOpen(true)}>{tp('property.finance.shortCta')}</Button>
               </div>
             )}
             {!isRental && (
               <div className="mt-3 p-4 rounded-xl border border-primary/20 bg-primary/5">
-                <p className="text-sm font-medium">Need a conveyancer?</p>
-                <p className="text-xs text-muted-foreground mb-2">Fixed-fee settlement from $990.</p>
-                <Button size="sm" variant="outline" onClick={() => navigate('/conveyancing')}>Get a fixed quote</Button>
+                <p className="text-sm font-medium">{tp('property.conveyancer.title')}</p>
+                <p className="text-xs text-muted-foreground mb-2">{tp('property.conveyancer.body')}</p>
+                <Button size="sm" variant="outline" onClick={() => navigate('/conveyancing')}>{tp('property.conveyancer.cta')}</Button>
               </div>
             )}
             <MortgageReferralModal

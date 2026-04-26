@@ -485,4 +485,78 @@ export const zhCN: Record<keyof typeof EnBase, string> = {
   'mortgage.result.totalRepayable': '还款总额',
   'mortgage.result.totalInterest': '利息总额',
   'mortgage.cta.broker': '咨询贷款顾问',
+
+  // ──────────────────────────────────────────────────────────────────
+  // Property detail page
+  // ──────────────────────────────────────────────────────────────────
+  'property.saved': '已收藏',
+  'property.save': '收藏',
+  'property.share': '分享',
+  'property.call': '致电',
+  'property.contactAgent': '联系经纪人',
+  'property.requestInspection': '预约看房',
+  'property.viewSuburb': '查看 {suburb} 区域简介',
+  'property.titleFallback': '{suburb} {state} 的{type}',
+  'property.applications': '{count} 份申请',
+  'property.applicationsPlural': '{count} 份申请',
+  'property.applyNow': '立即申请',
+  'property.priceGuide': '价格指引',
+  'property.perWeek': '每周',
+  'property.aiTranslated': '由 AI 翻译',
+
+  'property.facts.listed': '上架时间',
+  'property.facts.views': '浏览量',
+  'property.facts.type': '类型',
+  'property.facts.beds': '卧室',
+  'property.facts.baths': '浴室',
+  'property.facts.parking': '停车位',
+  'property.facts.size': '面积',
+
+  'property.section.culturalHighlights': '文化亮点',
+  'property.section.buyerInsights': '本地市场买家洞察',
+  'property.section.inspectionTimes': '看房时间',
+  'property.section.openHomes': '开放看房',
+  'property.section.openHomesUpcoming': '即将开放 {count} 场',
+  'property.section.financeProperty': '为本房产融资',
+  'property.section.aboutThisProperty': '关于此房产',
+  'property.section.location': '位置',
+  'property.section.features': '房产特色',
+  'property.section.rentalInformation': '租赁信息',
+
+  'property.rental.availableFrom': '入住时间',
+  'property.rental.availableNow': '即可入住',
+  'property.rental.leaseTerm': '租期',
+  'property.rental.leaseTermValue': '6 – 12 个月',
+  'property.rental.bond': '押金',
+  'property.rental.bondWeeks': '（4 周租金）',
+  'property.rental.petPolicy': '宠物政策',
+  'property.rental.petsAllowed': '允许携带宠物',
+  'property.rental.petsOnApplication': '需另行申请',
+  'property.rental.furnished': '本房产带家具',
+
+  'property.inspection.empty': '暂未安排看房。请联系经纪人安排时间。',
+  'property.inspection.book': '预约',
+  'property.openHomes.empty': '暂无开放看房安排',
+  'property.openHomes.emptySub': '请联系经纪人安排私人看房',
+
+  'property.finance.title': '需要贷款？与贷款顾问聊聊',
+  'property.finance.body': '通过持牌房贷顾问获得预批 — 免费、无任何义务。',
+  'property.finance.cta': '获取预批',
+  'property.finance.browseAll': '浏览所有顾问',
+  'property.finance.shortTitle': '需要贷款？',
+  'property.finance.shortBody': '出价前先获得预批。',
+  'property.finance.shortCta': '获取预批',
+
+  'property.conveyancer.title': '需要产权转让师？',
+  'property.conveyancer.body': '固定费用结算，仅 $990 起。',
+  'property.conveyancer.cta': '获取报价',
+
+  'property.foreignBuyer.toggle': '我是海外买家（非澳大利亚公民或永久居民）',
+
+  'property.notFound': '未找到该房产',
+  'property.notFound.back': '返回搜索',
+
+  'property.insights.multiculturalAppeal': '多元文化吸引力',
+  'property.insights.suggestedBuyerProfiles': '推荐买家类型',
+  'property.insights.keySellingPoints': '主要卖点',
 };

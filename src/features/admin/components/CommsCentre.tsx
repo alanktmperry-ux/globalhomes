@@ -155,7 +155,13 @@ function ComposePanel({ templates, onSent }: { templates: Template[]; onSent: ()
   const handleSend = async () => {
     if (!subject.trim() || !body.trim()) { toast.error('Subject and message are required'); return; }
     if (preview.length === 0) { toast.error('No recipients in this audience'); return; }
-    if (!confirm(`Send to ${preview.length} agent${preview.length > 1 ? 's' : ''}? This cannot be undone.`)) return;
+    const recipientCount = preview.length;
+    if (recipientCount > 50) {
+      const input = window.prompt(`You are about to send to ${recipientCount} agents. Type CONFIRM to proceed.`);
+      if (input !== 'CONFIRM') return;
+    } else {
+      if (!confirm(`Send to ${recipientCount} agent${recipientCount > 1 ? 's' : ''}? This cannot be undone.`)) return;
+    }
 
     setSending(true);
 

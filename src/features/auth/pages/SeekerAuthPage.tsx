@@ -185,6 +185,16 @@ const SeekerAuthPage = () => {
   const btnOAuth = "w-full h-[50px] flex items-center gap-3 px-5 rounded-2xl border border-stone-200 bg-white hover:bg-stone-50 hover:border-stone-300 text-[14px] text-stone-700 font-normal transition-all";
   const label = "block text-[11px] font-medium tracking-[0.07em] uppercase text-stone-400 mb-2";
 
+  if (step === 'otp') {
+    return (
+      <OTPVerificationScreen
+        email={email}
+        onVerified={handleOtpVerified}
+        onBack={() => { setStep('create'); }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen flex">
 

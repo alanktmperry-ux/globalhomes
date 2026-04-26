@@ -46,9 +46,9 @@ class ManusSearchService {
     const mockResult = await this.mockSearch(params);
 
     // Fire off Manus task in background
-    this.startManusSearch(params, onUpdate).catch((err) =>
-      {} // silently ignore background search failure
-    );
+    this.startManusSearch(params, onUpdate).catch((err) => {
+      console.error('[ManusSearch] background search failed:', err);
+    });
 
     return {
       ...mockResult,

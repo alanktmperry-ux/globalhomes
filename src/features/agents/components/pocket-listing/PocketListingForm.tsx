@@ -332,7 +332,13 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
   useEffect(() => {
     if (editPropertyId) return;
     autoSaveRef.current = setInterval(() => {
-      localStorage.setItem('pocket-listing-draft', JSON.stringify(draft));
+      try {
+        localStorage.setItem('pocket-listing-draft', JSON.stringify(draft));
+      } catch (e) {
+        if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+          toast.warning('Could not save draft — browser storage is full. Your progress is not saved.');
+        }
+      }
     }, 10000);
     return () => clearInterval(autoSaveRef.current);
   }, [draft, editPropertyId]);
@@ -343,10 +349,15 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
   useEffect(() => {
     if (editPropertyId) return;
     if (initialListingType) {
-      localStorage.removeItem('pocket-listing-draft');
+      try { localStorage.removeItem('pocket-listing-draft'); } catch { /* ignore */ }
       return;
     }
-    const saved = localStorage.getItem('pocket-listing-draft');
+    let saved: string | null = null;
+    try {
+      saved = localStorage.getItem('pocket-listing-draft');
+    } catch {
+      saved = null;
+    }
     if (saved) {
       try {
         const parsed = JSON.parse(saved) as Partial<ListingDraft>;
@@ -354,10 +365,10 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         if (parsed.address && parsed.address.length > 0) {
           setPendingDraft(parsed);
         } else {
-          localStorage.removeItem('pocket-listing-draft');
+          try { localStorage.removeItem('pocket-listing-draft'); } catch { /* ignore */ }
         }
       } catch {
-        localStorage.removeItem('pocket-listing-draft');
+        try { localStorage.removeItem('pocket-listing-draft'); } catch { /* ignore */ }
       }
     }
   }, [editPropertyId, initialListingType]);

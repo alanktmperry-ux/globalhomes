@@ -211,6 +211,17 @@ function ComposePanel({ templates, onSent }: { templates: Template[]; onSent: ()
       sent_at: new Date().toISOString(),
     } as any).eq('id', (campaign as any).id);
 
+    if (user?.id) {
+      await supabase.from('audit_log').insert({
+        user_id: user.id,
+        action_type: 'bulk_email_sent',
+        entity_type: 'broadcast_campaign',
+        entity_id: (campaign as any).id,
+        description: subject,
+        metadata: { recipient_count: preview.length, admin_id: user.id },
+      } as any);
+    }
+
     toast.success(`Sent to ${sentCount} of ${preview.length} agents`);
     setSending(false);
     setSubject('');

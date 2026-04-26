@@ -78,7 +78,8 @@ class ManusSearchService {
       // Start polling
       await this.pollTaskStatus(taskId, onUpdate);
     } catch (err) {
-      
+      console.error('[ManusSearch] error:', err);
+      onUpdate?.({ status: 'failed', error: String(err) });
     }
   }
 

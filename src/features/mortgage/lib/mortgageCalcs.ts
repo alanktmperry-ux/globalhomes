@@ -64,6 +64,7 @@ export interface RepaymentResult {
   interestSaving: number;
   yearsEarlier: number;
   schedule: AmortisationRow[];
+  warning?: string;
 }
 
 export interface AmortisationRow {
@@ -215,6 +216,20 @@ export function calculateRepayments(inputs: RepaymentInputs): RepaymentResult {
     loanAmount, interestRate, loanTermYears,
     loanType, frequency, offsetBalance = 0, extraRepayment = 0,
   } = inputs;
+
+  // Guard: offset balance fully covers the loan — no interest payable.
+  if (offsetBalance > loanAmount) {
+    return {
+      periodicRepayment: 0,
+      totalRepayments: 0,
+      totalInterest: 0,
+      monthlyRepayment: 0,
+      interestSaving: 0,
+      yearsEarlier: 0,
+      schedule: [],
+      warning: 'Offset balance exceeds loan amount — no interest is payable.',
+    };
+  }
 
   const effectivePrincipal = Math.max(0, loanAmount - offsetBalance);
   const r   = interestRate / 100 / 12;

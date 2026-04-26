@@ -8,6 +8,7 @@ const CURRENT_AGENT_SELECT = `
   name,
   agency,
   agency_id,
+  agencies ( name ),
   agency_role,
   approval_status,
   onboarding_complete,
@@ -23,6 +24,7 @@ export interface CurrentAgent {
   name: string;
   agency: string | null;
   agency_id: string | null;
+  agency_name: string | null;
   agency_role: string | null;
   approval_status: string;
   onboarding_complete: boolean | null;
@@ -50,7 +52,17 @@ export function useCurrentAgent() {
 
       if (error) throw error;
 
-      return (data as CurrentAgent | null) ?? null;
+      if (!data) return null;
+
+      const relation = (data as any).agencies;
+      const agencyName = Array.isArray(relation)
+        ? relation[0]?.name ?? null
+        : relation?.name ?? null;
+
+      return {
+        ...(data as Omit<CurrentAgent, 'agency_name'>),
+        agency_name: agencyName ?? (data as any).agency ?? null,
+      } as CurrentAgent;
     },
   });
 

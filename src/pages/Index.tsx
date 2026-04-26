@@ -78,6 +78,7 @@ const HERO_PLACEHOLDER_KEYS = [
 const LANG_BANNER_DISMISSED_KEY = 'lang-banner-dismissed';
 
 function LanguageHintBanner() {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(() => {
     if (typeof window === 'undefined') return false;
     try {

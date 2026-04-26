@@ -257,7 +257,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const onAuthPage = path === '/login' || path === '/auth' || path === '/agent-auth' || path === '/';
         if (isAgentUser && onAuthPage && sessionStorage.getItem('post_login_redirected') !== '1') {
           sessionStorage.setItem('post_login_redirected', '1');
-          window.location.href = '/dashboard/rent-roll';
+          const returnTo = new URLSearchParams(window.location.search).get('return_to');
+          const destination = returnTo && returnTo.startsWith('/') ? returnTo : '/dashboard/overview';
+          window.location.replace(destination);
           return;
         }
       } catch (err) {

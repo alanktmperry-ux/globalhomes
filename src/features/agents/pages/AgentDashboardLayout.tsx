@@ -7,6 +7,7 @@ import { useIsMobile } from '@/shared/hooks/use-mobile';
 import { NotificationBell } from '@/features/agents/components/dashboard/NotificationBell';
 import AgentDashboardSidebar from '@/features/agents/components/dashboard/AgentDashboardSidebar';
 import { PaymentStatusBanner } from '@/features/agents/components/PaymentStatusBanner';
+import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
 
 
 const AgentDashboardLayout = () => {
@@ -14,41 +15,35 @@ const AgentDashboardLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
+  const { agent, loading: agentLoading } = useCurrentAgent();
   const [checked, setChecked] = useState(false);
   const [onboardingComplete, setOnboardingComplete] = useState(true);
   const [trustPending, setTrustPending] = useState(false);
 
   useEffect(() => {
     const effectiveUserId = impersonatedUserId || user?.id;
-    if (!effectiveUserId || checked) return;
-    const checkOnboarding = async () => {
-      const { data: agent } = await supabase.from('agents').select('onboarding_complete').eq('user_id', effectiveUserId).maybeSingle();
-      if (!agent) {
-        if (!impersonatedUserId && !location.pathname.includes('/dashboard/onboarding')) {
-          navigate('/dashboard/onboarding', { replace: true });
-        }
-        setOnboardingComplete(false);
-        setChecked(true);
-        return;
-      }
-      const complete = !!(agent as any).onboarding_complete;
-      setOnboardingComplete(complete);
-      if (!complete && !impersonatedUserId && !location.pathname.includes('/dashboard/onboarding')) {
+    if (!effectiveUserId || checked || agentLoading) return;
+
+    if (!agent) {
+      if (!impersonatedUserId && !location.pathname.includes('/dashboard/onboarding')) {
         navigate('/dashboard/onboarding', { replace: true });
       }
+      setOnboardingComplete(false);
       setChecked(true);
-    };
-    checkOnboarding();
-  }, [user, impersonatedUserId, checked, location.pathname, navigate]);
+      return;
+    }
+
+    const complete = !!agent.onboarding_complete;
+    setOnboardingComplete(complete);
+    if (!complete && !impersonatedUserId && !location.pathname.includes('/dashboard/onboarding')) {
+      navigate('/dashboard/onboarding', { replace: true });
+    }
+    setChecked(true);
+  }, [user, impersonatedUserId, checked, location.pathname, navigate, agent, agentLoading]);
 
   useEffect(() => {
-    const effectiveUserId = impersonatedUserId || user?.id;
-    if (!effectiveUserId) return;
-    supabase.from('agents').select('trust_setup_pending').eq('user_id', effectiveUserId).maybeSingle()
-      .then(({ data }) => {
-        if ((data as any)?.trust_setup_pending) setTrustPending(true);
-      });
-  }, [user?.id, impersonatedUserId]);
+    setTrustPending(!!agent?.trust_setup_pending);
+  }, [agent?.trust_setup_pending]);
 
 
   return (

@@ -1229,7 +1229,7 @@ const Index = () => {
             </div>
 
             {/* Search bar */}
-            <form onSubmit={handleHeroSubmit} className="relative max-w-2xl mx-auto">
+            <form ref={heroFormRef} onSubmit={handleHeroSubmit} className="relative max-w-2xl mx-auto">
               <div className="flex items-center bg-white border border-slate-200 rounded-2xl shadow-lg shadow-slate-100/80 px-4 py-2 gap-3 hover:border-slate-300 hover:shadow-xl transition-all duration-200 focus-within:border-blue-300 focus-within:shadow-blue-50/80 focus-within:shadow-xl">
                 <input
                   id="search-bar"
@@ -1237,8 +1237,10 @@ const Index = () => {
                   type="text"
                   value={heroQuery}
                   onChange={e => setHeroQuery(e.target.value)}
+                  onFocus={() => heroSuggestions.length > 0 && setShowHeroSuggestions(true)}
                   placeholder={t(HERO_PLACEHOLDER_KEYS[heroPlaceholderIndex])}
                   aria-label={t('search.placeholder')}
+                  autoComplete="off"
                   className="flex-1 bg-transparent outline-none text-slate-800 text-[15px] placeholder:text-slate-400 min-w-0"
                 />
                 <button

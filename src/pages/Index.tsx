@@ -1266,6 +1266,22 @@ const Index = () => {
                   {t('hero.search')}
                 </button>
               </div>
+              {showHeroSuggestions && heroSuggestions.length > 0 && (
+                <ul className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl overflow-y-auto max-h-60">
+                  {heroSuggestions.map((s) => (
+                    <li key={s.place_id}>
+                      <button
+                        type="button"
+                        onClick={() => handleSelectHeroSuggestion(s)}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-left text-sm text-slate-800 hover:bg-slate-50 transition-colors"
+                      >
+                        <MapPin size={16} className="text-slate-400 shrink-0" />
+                        <span className="truncate">{s.description}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
               {heroMicLabel && (
                 <div className="flex items-center justify-center gap-2 mt-2">
                   <span className={`inline-block w-2 h-2 rounded-full ${heroMicListening ? 'bg-red-500 animate-pulse' : 'bg-blue-500 animate-pulse'}`} />

@@ -595,7 +595,9 @@ const Index = () => {
       if (sort) setSortBy(sort as typeof sortBy);
       else setSortBy('default');
       if (radius) setSearchRadius(Number(radius));
-      else setSearchRadius(5);
+      // No default radius: leave null when URL has none (matches initial state
+      // in usePropertySearch). Setting a default here causes the push-to-URL
+      // effect to re-stamp ?radius=5 on cold loads when popstate fires.
       if (location) handleSearch(location);
 
       initializedFromUrl.current = true;

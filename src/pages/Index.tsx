@@ -6,7 +6,7 @@ import { Helmet } from 'react-helmet-async';
 // cold paint. motion is only referenced in the search-results branch (mobile
 // bottom sheet drag), which loads after the user runs a search.
 import { motion, useMotionValue, useSpring, type PanInfo } from 'framer-motion';
-import { ArrowRight, MapPin, Sparkles, Map, List, Mic, MicOff, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users, Search, Home, Check, ArrowLeftRight, UserCheck, ChevronRight, Globe } from 'lucide-react';
+import { ArrowRight, ArrowLeft, MapPin, Sparkles, Map, List, Mic, MicOff, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users, Search, Home, Check, ArrowLeftRight, UserCheck, ChevronRight, Globe } from 'lucide-react';
 import { VoiceSearchHero } from '@/features/search/components/VoiceSearchHero';
 import { TranslationDemoCard } from '@/features/marketing/components/TranslationDemoCard';
 import { useHeroVoiceSearch } from '@/features/search/hooks/useHeroVoiceSearch';
@@ -161,7 +161,7 @@ const Index = () => {
     };
   }, [hasSearch]);
   const { t: legacyT } = useI18n();
-  const { t, setLanguage } = useTranslation();
+  const { t, setLanguage, language } = useTranslation();
   const { addSearch, lastSearch } = useSearchHistory();
 
   // Browser language auto-detection (session-only).
@@ -169,12 +169,13 @@ const Index = () => {
   // keep their choice. Never persists across browser sessions.
   useEffect(() => {
     try {
-      // Clear any stale localStorage entry from previous versions so language
-      // can no longer "stick" to Chinese (or anything else) across sessions.
-      localStorage.removeItem('listhq_language');
-      localStorage.removeItem('gh-lang');
-
-      if (sessionStorage.getItem('listhq_language') || sessionStorage.getItem('i18n-language')) return;
+      // If the user already chose a language (persisted in localStorage or this session), keep it.
+      if (
+        localStorage.getItem('listhq_language') ||
+        localStorage.getItem('gh-lang') ||
+        sessionStorage.getItem('listhq_language') ||
+        sessionStorage.getItem('i18n-language')
+      ) return;
       const nav = (navigator.language || 'en').toLowerCase();
       let detected: 'en' | 'zh-CN' | 'vi' | 'hi' | 'ar' | 'ko' | 'bn' = 'en';
       if (nav.startsWith('zh')) detected = 'zh-CN';
@@ -183,7 +184,7 @@ const Index = () => {
       else if (nav.startsWith('ar')) detected = 'ar';
       else if (nav.startsWith('ko')) detected = 'ko';
       else if (nav.startsWith('bn')) detected = 'bn';
-      // Only auto-apply non-English on first session; English is the safe default.
+      // Only auto-apply non-English on first visit; English is the safe default.
       if (detected !== 'en') setLanguage(detected);
     } catch {
       // storage unavailable — non-fatal
@@ -1501,16 +1502,52 @@ const Index = () => {
 
   return (
     <div className={`flex flex-col bg-background ${!isMobile ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
-    {/* Results header when coming from search params */}
-    {hasSearch && searchParams.get('location') && (
-      <div className="px-6 pt-6 pb-2">
-        <p className="text-sm text-slate-500">
-          Showing results for <span className="font-medium text-slate-800">"{new URLSearchParams(window.location.search).get('location')}"</span>
-        </p>
+    {/* Compact results header — replaces the full hero once a search is active */}
+    {hasSearch ? (
+      <div className="shrink-0 px-4 md:px-6 pt-4 pb-3 border-b border-slate-200 bg-white">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const v = (e.currentTarget.elements.namedItem('q') as HTMLInputElement)?.value?.trim();
+            if (v) wrappedHandleSearch(v);
+          }}
+          className="flex items-center gap-2 max-w-3xl mx-auto"
+        >
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            aria-label="Clear search and return to home"
+            className="shrink-0 p-2 rounded-full text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+          >
+            <ArrowLeft size={18} />
+          </button>
+          <div className="flex-1 flex items-center bg-slate-50 border border-slate-200 rounded-full px-4 py-2 gap-2 focus-within:border-blue-300 focus-within:bg-white transition-colors">
+            <Search size={14} className="text-slate-400 shrink-0" />
+            <input
+              name="q"
+              type="text"
+              defaultValue={currentQuery || searchParams.get('location') || ''}
+              key={currentQuery || searchParams.get('location') || ''}
+              placeholder={t('search.placeholder')}
+              className="flex-1 bg-transparent outline-none text-sm text-slate-800 placeholder:text-slate-400 min-w-0"
+            />
+          </div>
+          {language && language !== 'en' && (
+            <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-[11px] font-semibold shrink-0">
+              <Globe size={11} />
+              {language.toUpperCase()}
+            </span>
+          )}
+          <button
+            type="submit"
+            className="shrink-0 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm font-semibold transition-colors"
+          >
+            {t('hero.search')}
+          </button>
+        </form>
       </div>
-    )}
-    {/* ── Top: Voice Search Bar ─────────────────────────────── */}
-    <div className="shrink-0" style={{ display: searchParams.get('location') ? 'none' : undefined }}>
+    ) : (
+      <div className="shrink-0">
         <VoiceSearchErrorBoundary>
           <VoiceSearchHero
             onSearch={wrappedHandleSearch}
@@ -1528,6 +1565,7 @@ const Index = () => {
           />
         </VoiceSearchErrorBoundary>
       </div>
+    )}
 
     {/* ── Desktop: Zillow-style split ────────────────────────── */}
     {!isMobile ? (

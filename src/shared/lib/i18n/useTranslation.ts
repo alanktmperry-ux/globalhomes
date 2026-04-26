@@ -57,10 +57,11 @@ export function useTranslation() {
 
   const setLanguage = (code: SupportedLanguageCode) => {
     try {
-      // Persist for current session only — language must NOT survive a new browser session.
+      // Persist across browser sessions — user's language choice should stick.
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, code);
+      // Mirror to sessionStorage so legacy fallback checks still work.
       sessionStorage.setItem(LANGUAGE_STORAGE_KEY, code);
-      // Defensively clear any stale localStorage entry from previous versions.
-      localStorage.removeItem(LANGUAGE_STORAGE_KEY);
+      // Clear stale legacy key (the I18nProvider also writes its own `gh-lang`).
       localStorage.removeItem('gh-lang');
     } catch {
       // storage may be unavailable (private mode, etc.) — non-fatal

@@ -524,16 +524,46 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
     }
   }, []);
 
-  const handleTextSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const [textDetectedLang, setTextDetectedLang] = useState<string | null>(null);
+  const [isTranslatingText, setIsTranslatingText] = useState(false);
+
+  const submitTypedQuery = useCallback(async (raw: string) => {
+    const trimmed = raw.trim();
+    if (!trimmed) return;
     suppressAutocompleteRef.current = true;
     setSuggestions([]);
     setShowSuggestions(false);
-    if (textQuery.trim()) {
-      setTranscript(textQuery.trim());
-      processTranscript(textQuery.trim());
+    setTranscript(trimmed);
+    setIsTranslatingText(true);
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 3000);
+      const { data: translationResult, error: fnError } = await supabase.functions.invoke('generate-translations', {
+        body: { type: 'translate_search', search_query: trimmed },
+      });
+      clearTimeout(timeout);
+      if (!fnError && translationResult) {
+        const lang = translationResult.detected_language as string | undefined;
+        const englishQuery = (translationResult.english_query as string | undefined) || trimmed;
+        if (lang && lang !== 'en' && lang !== 'English') {
+          setTextDetectedLang(lang);
+          setTimeout(() => setTextDetectedLang(null), 3000);
+        }
+        processTranscript(englishQuery);
+      } else {
+        processTranscript(trimmed);
+      }
+    } catch {
+      processTranscript(trimmed);
+    } finally {
+      setIsTranslatingText(false);
+      setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
     }
-    setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
+  }, [processTranscript]);
+
+  const handleTextSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    submitTypedQuery(textQuery);
   };
 
   const handleSelectSuggestion = async (suggestion: { description: string; place_id: string }) => {
@@ -651,9 +681,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                         onChange={e => setTextQuery(e.target.value)}
                         onKeyDown={e => {
                           if (e.key === 'Enter' && textQuery.trim()) {
-                            suppressAutocompleteRef.current = true;
-                            processTranscript(textQuery.trim());
-                            setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
+                            submitTypedQuery(textQuery);
                           }
                         }}
                         autoFocus
@@ -705,31 +733,29 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
                 {/* Search CTA button */}
                 <button
-                  onClick={() => {
-                    if (textQuery.trim()) {
-                      suppressAutocompleteRef.current = true;
-                      processTranscript(textQuery.trim());
-                      setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
-                    }
-                  }}
-                  className="shrink-0 flex items-center gap-2 h-10 px-5 rounded-xl bg-primary text-primary-foreground text-[14px] font-semibold hover:opacity-90 active:scale-95 transition-all whitespace-nowrap hidden sm:flex"
+                  onClick={() => submitTypedQuery(textQuery)}
+                  disabled={isTranslatingText}
+                  className="shrink-0 flex items-center gap-2 h-10 px-5 rounded-xl bg-primary text-primary-foreground text-[14px] font-semibold hover:opacity-90 active:scale-95 transition-all whitespace-nowrap hidden sm:flex disabled:opacity-60"
                 >
-                  <Search size={15} /> Search
+                  {isTranslatingText ? <Loader2 size={15} className="animate-spin" /> : <Search size={15} />} Search
                 </button>
               </div>
 
+              {textDetectedLang && (
+                <div className="mt-2 flex justify-center">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
+                    🌐 Detected {textDetectedLang.toUpperCase()} — searching in English
+                  </span>
+                </div>
+              )}
+
               {/* Mobile full-width search button */}
               <button
-                onClick={() => {
-                  if (textQuery.trim()) {
-                    suppressAutocompleteRef.current = true;
-                    processTranscript(textQuery.trim());
-                    setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
-                  }
-                }}
-                className="sm:hidden w-full flex items-center justify-center gap-2 h-11 mt-2 rounded-xl bg-primary text-primary-foreground text-[14px] font-semibold active:scale-[0.98] transition-all"
+                onClick={() => submitTypedQuery(textQuery)}
+                disabled={isTranslatingText}
+                className="sm:hidden w-full flex items-center justify-center gap-2 h-11 mt-2 rounded-xl bg-primary text-primary-foreground text-[14px] font-semibold active:scale-[0.98] transition-all disabled:opacity-60"
               >
-                <Search size={15} /> Search
+                {isTranslatingText ? <Loader2 size={15} className="animate-spin" /> : <Search size={15} />} Search
               </button>
 
               {/* Autocomplete dropdown */}

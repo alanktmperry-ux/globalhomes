@@ -317,13 +317,14 @@ const Index = () => {
   } = usePropertySearch({ addSearch });
 
   // Consumer sign-up modal trigger after 3rd anonymous search
-  const wrappedHandleSearch = useCallback((query: string) => {
+  const wrappedHandleSearch = useCallback((query: string, detectedLanguage?: string) => {
+    const lang = detectedLanguage || 'en';
     handleSearch(query);
 
     // Track search
     try {
       if (typeof window !== 'undefined' && (window as any).posthog?.capture) {
-        (window as any).posthog.capture('search_performed', { query, detected_language: 'en', result_count: filteredProperties?.length ?? 0 });
+        (window as any).posthog.capture('search_performed', { query, detected_language: lang, result_count: filteredProperties?.length ?? 0 });
       }
     } catch {}
 
@@ -333,7 +334,7 @@ const Index = () => {
       .insert({
         transcript: query.slice(0, 200),
         user_id: user?.id ?? null,
-        detected_language: 'en',
+        detected_language: lang,
         status: 'completed',
       })
       .then(() => {});
@@ -1036,6 +1037,39 @@ const Index = () => {
   );
 
   // ── Hero submit handler ──
+  const [heroDetectedLang, setHeroDetectedLang] = useState<string | null>(null);
+  const [heroIsTranslating, setHeroIsTranslating] = useState(false);
+
+  const translateAndSearch = useCallback(async (rawQuery: string) => {
+    const trimmed = rawQuery.trim();
+    if (!trimmed) return;
+    setHeroIsTranslating(true);
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 3000);
+      const { data: translationResult, error: fnError } = await supabase.functions.invoke('generate-translations', {
+        body: { type: 'translate_search', search_query: trimmed },
+      });
+      clearTimeout(timeout);
+
+      if (!fnError && translationResult) {
+        const lang = translationResult.detected_language as string | undefined;
+        const englishQuery = (translationResult.english_query as string | undefined) || trimmed;
+        if (lang && lang !== 'en' && lang !== 'English') {
+          setHeroDetectedLang(lang);
+          setTimeout(() => setHeroDetectedLang(null), 3000);
+        }
+        wrappedHandleSearch(englishQuery, lang || 'en');
+      } else {
+        wrappedHandleSearch(trimmed);
+      }
+    } catch {
+      wrappedHandleSearch(trimmed);
+    } finally {
+      setHeroIsTranslating(false);
+    }
+  }, [wrappedHandleSearch]);
+
   const handleHeroSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!heroQuery.trim()) return;
@@ -1046,7 +1080,7 @@ const Index = () => {
       navigate(`/?${params.toString()}`);
       return;
     }
-    wrappedHandleSearch(heroQuery.trim());
+    translateAndSearch(heroQuery.trim());
   };
 
   const handleHeroModeChange = (mode: 'sale' | 'rent' | 'commercial' | 'land') => {
@@ -1181,6 +1215,16 @@ const Index = () => {
                 <div className="flex items-center justify-center gap-2 mt-2">
                   <span className={`inline-block w-2 h-2 rounded-full ${heroMicListening ? 'bg-red-500 animate-pulse' : 'bg-blue-500 animate-pulse'}`} />
                   <span className="text-sm text-slate-500 font-medium">{heroMicLabel}</span>
+                </div>
+              )}
+              {heroIsTranslating && (
+                <p className="text-xs text-blue-500 mt-2 text-center">Translating…</p>
+              )}
+              {heroDetectedLang && (
+                <div className="mt-2 flex justify-center">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
+                    🌐 Detected {heroDetectedLang.toUpperCase()} — searching in English
+                  </span>
                 </div>
               )}
               <p className="text-sm text-slate-400 mt-3 text-center">

@@ -118,6 +118,8 @@ export function FilterSidebar({ filters, onChange, isOpen, onToggle, totalCount,
   const { formatPrice } = useCurrency();
   const { t } = useTranslation();
   const isRental = listingMode === 'rent';
+  const [draftPrice, setDraftPrice] = useState<[number, number]>(filters.priceRange);
+  useEffect(() => { setDraftPrice(filters.priceRange); }, [filters.priceRange]);
 
   const PROPERTY_TYPES = [
     { value: 'House', label: t('filter.type.house') },

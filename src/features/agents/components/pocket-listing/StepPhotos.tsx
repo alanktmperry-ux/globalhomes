@@ -185,6 +185,14 @@ const StepPhotos = ({ draft, update }: Props) => {
     update({ photos: newPhotos, primaryPhoto: 0 });
   };
 
+  const handleUploadDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOver(false);
+    const files = extractDroppedFiles(e.dataTransfer);
+    void addPhotos(files);
+  };
+
   return (
     <div className="space-y-4">
       <Label className="text-sm font-semibold block">Property Photos (up to 20)</Label>
@@ -194,9 +202,10 @@ const StepPhotos = ({ draft, update }: Props) => {
 
       {/* Drop zone */}
       <div
-        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={(e) => { e.preventDefault(); setDragOver(false); addPhotos(e.dataTransfer.files); }}
+        onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setDragOver(true); }}
+        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); e.dataTransfer.dropEffect = 'copy'; setDragOver(true); }}
+        onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setDragOver(false); }}
+        onDrop={handleUploadDrop}
         onClick={() => fileRef.current?.click()}
         className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-colors ${
           dragOver ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40'

@@ -1110,6 +1110,32 @@ const Index = () => {
     translateAndSearch(heroQuery.trim());
   };
 
+  const handleSelectHeroSuggestion = useCallback(async (suggestion: { description: string; place_id: string }) => {
+    setHeroQuery(suggestion.description);
+    setShowHeroSuggestions(false);
+    setHeroSuggestions([]);
+
+    // Geocode and centre the map (same pattern as the results-page autocomplete)
+    try {
+      const loc = await geocode(suggestion.description);
+      if (loc) {
+        setSearchCenter({ lat: loc.lat, lng: loc.lng });
+        setMapCenter({ lat: loc.lat, lng: loc.lng, key: `hero-${Date.now()}` });
+      }
+    } catch {
+      /* non-fatal */
+    }
+
+    if (heroCategory === 'commercial' || heroCategory === 'land') {
+      const params = new URLSearchParams();
+      params.set('location', suggestion.description);
+      params.set('category', heroCategory);
+      navigate(`/?${params.toString()}`);
+      return;
+    }
+    wrappedHandleSearch(suggestion.description);
+  }, [heroCategory, navigate, wrappedHandleSearch, setSearchCenter]);
+
   const handleHeroModeChange = (mode: 'sale' | 'rent' | 'commercial' | 'land') => {
     setHeroCategory(mode);
     if (mode === 'sale' || mode === 'rent') {

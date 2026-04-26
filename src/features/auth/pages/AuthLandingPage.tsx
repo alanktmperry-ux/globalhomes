@@ -1,13 +1,42 @@
 import { motion } from 'framer-motion';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
 
 const AuthLandingPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const errorParam = searchParams.get('error');
+  const [showError, setShowError] = useState(false);
+
+  useEffect(() => {
+    setShowError(!!errorParam);
+  }, [errorParam]);
+
+  const errorMessage =
+    errorParam === 'oauth_failed'
+      ? 'There was a problem signing in. Please try again or use email/password.'
+      : errorParam === 'email_not_confirmed'
+      ? 'Please check your email and click the confirmation link before signing in.'
+      : null;
+
+  const dismissError = () => setShowError(false);
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row" style={{ background: '#020817' }}>
       <Helmet><title>Sign In</title></Helmet>
+
+      {showError && errorMessage && (
+        <div className="fixed top-16 left-1/2 -translate-x-1/2 z-30 max-w-md w-[92%]">
+          <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-destructive/10 border border-destructive/30 text-destructive text-sm shadow-lg backdrop-blur-sm">
+            <span className="flex-1">{errorMessage}</span>
+            <button onClick={dismissError} className="shrink-0 opacity-70 hover:opacity-100" aria-label="Dismiss">
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ListHQ wordmark — centred top */}
       <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">

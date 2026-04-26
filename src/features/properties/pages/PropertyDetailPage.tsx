@@ -8,6 +8,7 @@ import MultilingualListingDetail from '@/features/properties/components/Multilin
 import { Button } from '@/components/ui/button';
 import { Property } from '@/shared/lib/types';
 import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { AgentContactModal } from '@/features/agents/components/AgentContactModal';
 import { InvestmentInsightsCard } from '@/features/properties/components/InvestmentInsightsCard';

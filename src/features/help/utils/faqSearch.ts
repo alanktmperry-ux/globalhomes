@@ -185,6 +185,16 @@ export function getFaqMatches(query: string, limit = SEARCH_RESULT_LIMIT) {
         score += 8;
       }
 
+      if (hasRentalIntent && entry.item.category === 'renters') {
+        score *= 1.75;
+      } else if (
+        hasRentalIntent &&
+        entry.item.category === 'agents' &&
+        (entry.tagTokens.has('rent') || entry.tagTokens.has('rental') || entry.answerTokens.has('application'))
+      ) {
+        score *= 1.4;
+      }
+
       return score > 0
         ? {
             item: entry.item,

@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle2, XCircle, Loader2, UserCheck, Inbox } from 'lucide-react';
 import { dispatchNotification } from '@/shared/lib/notify';
+import { useAuth } from '@/features/auth/AuthProvider';
 
 interface PendingAgent {
   id: string;
@@ -23,6 +24,7 @@ interface AgentApprovalQueueProps {
 
 export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprovalQueueProps) {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [agents, setAgents] = useState<PendingAgent[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -49,7 +51,28 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
 
   useEffect(() => { fetchPending(); }, []);
 
+  const writeAuditLog = async (
+    action: 'approve' | 'reject',
+    agent: PendingAgent,
+    reason: string | null,
+  ) => {
+    const { error: auditError } = await supabase.from('audit_log').insert({
+      user_id: user?.id ?? null,
+      action_type: action === 'approve' ? 'agent_approved' : 'agent_rejected',
+      entity_type: 'agent',
+      entity_id: agent.id,
+      description: `Admin ${action}d agent ${agent.name}`,
+      metadata: { reason, admin_email: user?.email },
+    });
+    if (auditError) console.error('[AgentApprovalQueue] audit log failed:', auditError);
+  };
+
   const handleApprove = async (agent: PendingAgent) => {
+    const confirmed = window.confirm(
+      `Approve agent ${agent.name}? This will grant them full platform access.`,
+    );
+    if (!confirmed) return;
+
     setActionLoading(agent.id);
     const { error } = await (supabase.from('agents') as any)
       .update({ approval_status: 'approved' })
@@ -60,6 +83,8 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
       setActionLoading(null);
       return;
     }
+
+    await writeAuditLog('approve', agent, null);
 
     // Send notification to agent (routed through dispatcher)
     await dispatchNotification({
@@ -89,6 +114,8 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
       setActionLoading(null);
       return;
     }
+
+    await writeAuditLog('reject', agent, rejectionReason.trim());
 
     await dispatchNotification({
       agent_id: agent.id,

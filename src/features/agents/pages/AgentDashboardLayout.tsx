@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useIsMobile } from '@/shared/hooks/use-mobile';
 import { NotificationBell } from '@/features/agents/components/dashboard/NotificationBell';

@@ -7579,7 +7579,7 @@ export type Database = {
           flood_zone: boolean | null
           floor_area_sqm: number | null
           floor_plan_url: string | null
-          furnished: boolean | null
+          furnished: string | null
           garage_type: string | null
           has_air_con: boolean | null
           has_alfresco: boolean | null
@@ -7724,7 +7724,7 @@ export type Database = {
           flood_zone?: boolean | null
           floor_area_sqm?: number | null
           floor_plan_url?: string | null
-          furnished?: boolean | null
+          furnished?: string | null
           garage_type?: string | null
           has_air_con?: boolean | null
           has_alfresco?: boolean | null
@@ -7869,7 +7869,7 @@ export type Database = {
           flood_zone?: boolean | null
           floor_area_sqm?: number | null
           floor_plan_url?: string | null
-          furnished?: boolean | null
+          furnished?: string | null
           garage_type?: string | null
           has_air_con?: boolean | null
           has_alfresco?: boolean | null
@@ -13222,7 +13222,7 @@ export type Database = {
           flood_zone: boolean | null
           floor_area_sqm: number | null
           floor_plan_url: string | null
-          furnished: boolean | null
+          furnished: string | null
           garage_type: string | null
           has_air_con: boolean | null
           has_alfresco: boolean | null

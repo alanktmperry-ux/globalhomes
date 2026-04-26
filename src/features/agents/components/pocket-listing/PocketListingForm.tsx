@@ -594,7 +594,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
     } catch (err: any) {
       console.error('Publish error:', err);
       const msg = err?.message || err?.error_description || err?.details || err?.hint || (typeof err === 'string' ? err : JSON.stringify(err));
-      toast.error(`${editPropertyId ? 'Failed to update' : 'Failed to publish'}: ${msg}`);
+      toast.error(`${editPropertyId ? 'Failed to update' : 'Failed to publish'}: ${msg}`, { duration: 15000 });
     } finally {
       setPublishing(false);
     }
@@ -675,7 +675,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
       </div>
 
       {/* Step content */}
-      <div className="p-5 overflow-y-auto max-h-[70vh]">
+      <div className="p-5 overflow-y-auto flex-1 min-h-0">
         {stepContent()}
       </div>
 

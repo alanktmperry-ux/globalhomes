@@ -83,7 +83,7 @@ function VendorContactPicker({ draft, update, isRental }: Props & { isRental: bo
         .from('contacts')
         .select('id, first_name, last_name, email, phone, mobile')
         .eq('created_by', user.id)
-        .or(`contact_type.eq.seller,contact_type.eq.landlord,contact_type.eq.both`)
+        .in('contact_type', ['seller', 'landlord', 'both'])
         .or(`first_name.ilike.%${query}%,last_name.ilike.%${query}%,email.ilike.%${query}%,phone.ilike.%${query}%`)
         .limit(6);
       setSuggestions((data as ContactSuggestion[]) ?? []);

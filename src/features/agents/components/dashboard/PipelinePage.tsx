@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import DashboardHeader from './DashboardHeader';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import OfferModal from './pipeline/OfferModal';
 import OfferOutcomeTracker from './pipeline/OfferOutcomeTracker';
 import SettlementModal from './pipeline/SettlementModal';
@@ -135,7 +136,8 @@ const PipelinePage = () => {
     if (!isSoloAgent && !targetStage.id.startsWith('default-')) {
       updates.stage_id = targetStage.id;
     }
-    await supabase.from('properties').update(updates).eq('id', cardId);
+    const { error } = await supabase.from('properties').update(updates).eq('id', cardId);
+    if (error) throw error;
   };
 
   const handleDrop = useCallback(async (e: DragEvent, targetStageId: string) => {
@@ -155,11 +157,19 @@ const PipelinePage = () => {
       return;
     }
 
-    setCards(prev => prev.map(c =>
-      c.id === cardId ? { ...c, stageId: targetStageId, movedAt: new Date().toISOString() } : c
-    ));
+    const previousCards = [...cards];
 
-    await persistStageMove(cardId, targetStage);
+    try {
+      await persistStageMove(cardId, targetStage);
+      setCards(prev => prev.map(c =>
+        c.id === cardId ? { ...c, stageId: targetStageId, movedAt: new Date().toISOString() } : c
+      ));
+    } catch (err) {
+      console.error('[Pipeline] persistStageMove failed:', err);
+      setCards(previousCards);
+      toast.error('Failed to move card — please try again');
+      return;
+    }
 
     const previousStage = effectiveStages.find(s => s.id === card.stageId);
     if (isUnderOfferStage(targetStage) && !(previousStage && isUnderOfferStage(previousStage))) {

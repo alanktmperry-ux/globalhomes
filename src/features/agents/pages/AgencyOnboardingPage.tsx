@@ -305,6 +305,25 @@ export default function AgencyOnboardingPage() {
       toast.error(getErrorMessage(error) || 'Failed to skip trust account setup');
       return;
     }
+
+    try {
+      await supabase.functions.invoke('send-email', {
+        body: {
+          to: user.email,
+          template: 'trust_setup_reminder',
+          data: {
+            name:
+              (user.user_metadata as { display_name?: string } | undefined)?.display_name ||
+              user.email?.split('@')[0] ||
+              'Agent',
+            setup_url: `${window.location.origin}/dashboard/trust-accounting`,
+          },
+        },
+      });
+    } catch (emailErr) {
+      console.warn('Trust setup reminder email failed to enqueue:', emailErr);
+    }
+
     setStep(3);
   };
 

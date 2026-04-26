@@ -980,7 +980,44 @@ const Index = () => {
     </div>
   );
 
+  const noResultsPlaceholder = (
+    <div className="flex flex-col items-center justify-center py-16 px-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
+      <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+        <Search size={28} className="text-primary" />
+      </div>
+      <h2 className="text-lg font-display font-bold text-foreground mb-1.5 text-center">
+        No properties found{currentQuery ? ` for "${currentQuery}"` : ''}
+      </h2>
+      <p className="text-sm text-muted-foreground text-center max-w-xs mb-5">
+        Try widening your search area, clearing filters, or browsing all properties.
+      </p>
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        <button
+          onClick={() => setSearchRadius(25)}
+          className="px-3.5 py-2 rounded-full bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors"
+        >
+          Widen to 25km
+        </button>
+        <button
+          onClick={() => setFilters(defaultFilters)}
+          className="px-3.5 py-2 rounded-full bg-secondary border border-border text-xs font-semibold text-foreground hover:bg-accent transition-colors"
+        >
+          Clear all filters
+        </button>
+        <button
+          onClick={() => navigate('/buy')}
+          className="px-3.5 py-2 rounded-full bg-secondary border border-border text-xs font-semibold text-foreground hover:bg-accent transition-colors"
+        >
+          Browse all properties
+        </button>
+      </div>
+    </div>
+  );
+
   const showEmptyState = filteredProperties.length === 0 && !isSearching && !hasSearched;
+  const showNoResultsState = filteredProperties.length === 0 && !isSearching && hasSearched;
+  const emptyOrNoResults = showNoResultsState ? noResultsPlaceholder : emptyPlaceholder;
+  const shouldShowPlaceholder = showEmptyState || showNoResultsState;
 
   const propertyList = showEmptyState ? emptyPlaceholder : (
     <Suspense fallback={<MapSkeleton />}>

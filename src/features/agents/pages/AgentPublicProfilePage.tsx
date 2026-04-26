@@ -16,6 +16,20 @@ import { StarRating } from '@/features/agents/components/StarRating';
 import { ReviewsList } from '@/features/agents/components/ReviewsList';
 import { WriteReviewModal } from '@/features/agents/components/WriteReviewModal';
 import type { AgentReviewData } from '@/features/agents/types';
+import AppErrorBoundary from '@/components/AppErrorBoundary';
+
+// Validate agent-supplied URLs before rendering as href to prevent phishing.
+// Only allow https:// URLs.
+function isSafeExternalUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'https:') return null;
+    return url;
+  } catch {
+    return null;
+  }
+}
 
 interface AgentProfile {
   id: string;
@@ -360,10 +374,30 @@ export default function AgentPublicProfilePage() {
                 <span className="text-sm font-medium text-foreground truncate">{agent.email}</span>
               </a>
             )}
-            {agent.websiteUrl && (
-              <a href={agent.websiteUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl bg-secondary hover:bg-accent transition-colors">
+            {agent.websiteUrl && (() => {
+              const safeWebsite = isSafeExternalUrl(agent.websiteUrl);
+              return safeWebsite ? (
+                <a href={safeWebsite} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl bg-secondary hover:bg-accent transition-colors">
+                  <Globe size={16} className="text-primary shrink-0" />
+                  <span className="text-sm font-medium text-foreground truncate">Website</span>
+                </a>
+              ) : (
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary opacity-60 cursor-not-allowed" title="Website link unavailable">
+                  <Globe size={16} className="text-muted-foreground shrink-0" />
+                  <span className="text-sm font-medium text-muted-foreground truncate">Website unavailable</span>
+                </div>
+              );
+            })()}
+            {isSafeExternalUrl(agent.linkedinUrl) && (
+              <a href={isSafeExternalUrl(agent.linkedinUrl)!} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl bg-secondary hover:bg-accent transition-colors">
                 <Globe size={16} className="text-primary shrink-0" />
-                <span className="text-sm font-medium text-foreground truncate">Website</span>
+                <span className="text-sm font-medium text-foreground truncate">LinkedIn</span>
+              </a>
+            )}
+            {isSafeExternalUrl(agent.instagramUrl) && (
+              <a href={isSafeExternalUrl(agent.instagramUrl)!} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl bg-secondary hover:bg-accent transition-colors">
+                <Globe size={16} className="text-primary shrink-0" />
+                <span className="text-sm font-medium text-foreground truncate">Instagram</span>
               </a>
             )}
             {agent.officeAddress && (

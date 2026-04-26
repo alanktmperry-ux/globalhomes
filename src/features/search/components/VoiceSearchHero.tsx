@@ -524,16 +524,46 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
     }
   }, []);
 
-  const handleTextSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const [textDetectedLang, setTextDetectedLang] = useState<string | null>(null);
+  const [isTranslatingText, setIsTranslatingText] = useState(false);
+
+  const submitTypedQuery = useCallback(async (raw: string) => {
+    const trimmed = raw.trim();
+    if (!trimmed) return;
     suppressAutocompleteRef.current = true;
     setSuggestions([]);
     setShowSuggestions(false);
-    if (textQuery.trim()) {
-      setTranscript(textQuery.trim());
-      processTranscript(textQuery.trim());
+    setTranscript(trimmed);
+    setIsTranslatingText(true);
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 3000);
+      const { data: translationResult, error: fnError } = await supabase.functions.invoke('generate-translations', {
+        body: { type: 'translate_search', search_query: trimmed },
+      });
+      clearTimeout(timeout);
+      if (!fnError && translationResult) {
+        const lang = translationResult.detected_language as string | undefined;
+        const englishQuery = (translationResult.english_query as string | undefined) || trimmed;
+        if (lang && lang !== 'en' && lang !== 'English') {
+          setTextDetectedLang(lang);
+          setTimeout(() => setTextDetectedLang(null), 3000);
+        }
+        processTranscript(englishQuery);
+      } else {
+        processTranscript(trimmed);
+      }
+    } catch {
+      processTranscript(trimmed);
+    } finally {
+      setIsTranslatingText(false);
+      setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
     }
-    setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
+  }, [processTranscript]);
+
+  const handleTextSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    submitTypedQuery(textQuery);
   };
 
   const handleSelectSuggestion = async (suggestion: { description: string; place_id: string }) => {

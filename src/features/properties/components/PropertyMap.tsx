@@ -68,6 +68,8 @@ export function PropertyMap({
   const drawnOverlayRef = useRef<google.maps.Circle | google.maps.Polygon | null>(null);
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
   const pendingCenterRef = useRef<{ lat: number; lng: number } | null>(null);
+  const mapListenersRef = useRef<google.maps.MapsEventListener[]>([]);
+  const schoolListenersRef = useRef<google.maps.MapsEventListener[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showSearchArea, setShowSearchArea] = useState(false);

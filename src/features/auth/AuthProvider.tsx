@@ -113,14 +113,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const stopImpersonation = async () => {
-    supabase.from('audit_log').insert({
+    const { error: auditError } = await supabase.from('audit_log').insert({
       user_id: user?.id ?? null,
       action_type: 'admin_stop_impersonation',
       entity_type: 'user',
       entity_id: impersonatedUserId ?? null,
       description: 'Admin ended impersonation session',
       metadata: {},
-    } as any).then(({ error }: any) => { if (error) console.error('impersonation audit log:', error); });
+    } as any);
+    if (auditError) {
+      console.error('impersonation audit log:', auditError);
+      toast.error('Warning: could not log impersonation exit');
+    }
     sessionStorage.removeItem('admin_email');
     sessionStorage.removeItem('admin_impersonated_id');
     setImpersonating(false);

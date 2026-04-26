@@ -40,6 +40,7 @@ import { useCurrency } from '@/shared/lib/CurrencyContext';
 const FilterSidebar = lazy(() =>
   import('@/shared/components/FilterSidebar').then(m => ({ default: m.FilterSidebar }))
 );
+import { defaultFilters } from '@/shared/components/FilterSidebar.types';
 import { usePropertySearch } from '@/features/properties/hooks/usePropertySearch';
 import { Slider } from '@/components/ui/slider';
 import { useSavedSearches } from '@/features/search/hooks/useSavedSearches';
@@ -823,31 +824,33 @@ const Index = () => {
             <Sparkles size={12} className="text-primary" /> {t('search.recommended')}
           </span>
         )}
-        {/* Always-visible radius pills */}
-        <div className="flex items-center gap-1 shrink-0">
-          {[
-            { label: 'Any', value: null },
-            { label: '5 km', value: 5 },
-            { label: '10 km', value: 10 },
-            { label: '25 km', value: 25 },
-            { label: '50 km', value: 50 },
-          ].map(({ label, value }) => {
-            const isActive = value === null ? !searchRadius : searchRadius === value;
-            return (
-              <button
-                key={label}
-                onClick={() => value === null ? clearSearchRadius() : setSearchRadius(value)}
-                className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-secondary text-muted-foreground hover:bg-accent hover:text-foreground'
-                }`}
-              >
-                {label}
-              </button>
-            );
-          })}
-        </div>
+    {/* Radius pills — only when a search center is set */}
+        {searchCenter && (
+          <div className="flex items-center gap-1 shrink-0">
+            {[
+              { label: 'Any', value: null },
+              { label: '5 km', value: 5 },
+              { label: '10 km', value: 10 },
+              { label: '25 km', value: 25 },
+              { label: '50 km', value: 50 },
+            ].map(({ label, value }) => {
+              const isActive = value === null ? !searchRadius : searchRadius === value;
+              return (
+                <button
+                  key={label}
+                  onClick={() => value === null ? clearSearchRadius() : setSearchRadius(value)}
+                  className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-secondary text-muted-foreground hover:bg-accent hover:text-foreground'
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        )}
         {areaSearch && (
           <button
             onClick={() => handleAreaSearch(null)}
@@ -978,9 +981,46 @@ const Index = () => {
     </div>
   );
 
-  const showEmptyState = filteredProperties.length === 0 && !isSearching && !hasSearched;
+  const noResultsPlaceholder = (
+    <div className="flex flex-col items-center justify-center py-16 px-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
+      <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+        <Search size={28} className="text-primary" />
+      </div>
+      <h2 className="text-lg font-display font-bold text-foreground mb-1.5 text-center">
+        No properties found{currentQuery ? ` for "${currentQuery}"` : ''}
+      </h2>
+      <p className="text-sm text-muted-foreground text-center max-w-xs mb-5">
+        Try widening your search area, clearing filters, or browsing all properties.
+      </p>
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        <button
+          onClick={() => setSearchRadius(25)}
+          className="px-3.5 py-2 rounded-full bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors"
+        >
+          Widen to 25km
+        </button>
+        <button
+          onClick={() => setFilters(defaultFilters)}
+          className="px-3.5 py-2 rounded-full bg-secondary border border-border text-xs font-semibold text-foreground hover:bg-accent transition-colors"
+        >
+          Clear all filters
+        </button>
+        <button
+          onClick={() => navigate('/buy')}
+          className="px-3.5 py-2 rounded-full bg-secondary border border-border text-xs font-semibold text-foreground hover:bg-accent transition-colors"
+        >
+          Browse all properties
+        </button>
+      </div>
+    </div>
+  );
 
-  const propertyList = showEmptyState ? emptyPlaceholder : (
+  const showEmptyState = filteredProperties.length === 0 && !isSearching && !hasSearched;
+  const showNoResultsState = filteredProperties.length === 0 && !isSearching && hasSearched;
+  const emptyOrNoResults = showNoResultsState ? noResultsPlaceholder : emptyPlaceholder;
+  const shouldShowPlaceholder = showEmptyState || showNoResultsState;
+
+  const propertyList = shouldShowPlaceholder ? emptyOrNoResults : (
     <Suspense fallback={<MapSkeleton />}>
       <VirtualizedPropertyList
         properties={filteredProperties}
@@ -1192,8 +1232,8 @@ const Index = () => {
             </p>
 
             {/* Sale / Rent toggle */}
-            <div className="flex justify-center mb-6">
-              <div className="inline-flex items-center bg-slate-100 rounded-full p-1 gap-1 flex-wrap">
+            <div className="flex flex-col items-center mb-6">
+              <div className="inline-flex items-center bg-slate-100 rounded-full p-1 gap-1">
                 <button
                   onClick={() => handleHeroModeChange('sale')}
                   className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
@@ -1210,23 +1250,10 @@ const Index = () => {
                 >
                   {t('hero.forRent')}
                 </button>
-                <button
-                  onClick={() => handleHeroModeChange('commercial')}
-                  className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
-                    heroCategory === 'commercial' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-700'
-                  }`}
-                >
-                  {t('hero.commercial')}
-                </button>
-                <button
-                  onClick={() => handleHeroModeChange('land')}
-                  className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
-                    heroCategory === 'land' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-700'
-                  }`}
-                >
-                  {t('hero.land')}
-                </button>
               </div>
+              <p className="text-xs text-slate-400 mt-2">
+                Commercial &amp; land search — coming soon
+              </p>
             </div>
 
             {/* Search bar */}
@@ -1632,7 +1659,7 @@ const Index = () => {
 
             {/* Property list */}
             <div className="flex-1 px-4 pb-6">
-              {showEmptyState ? emptyPlaceholder : (
+              {shouldShowPlaceholder ? emptyOrNoResults : (
                 <Suspense fallback={<MapSkeleton />}>
                   <VirtualizedPropertyList
                     properties={filteredProperties}
@@ -1699,7 +1726,7 @@ const Index = () => {
                   </div>
                 </div>
                 <div className="overflow-y-auto px-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))]" style={{ maxHeight: 'calc(100% - 3.75rem)' }}>
-                  {showEmptyState ? emptyPlaceholder : (
+                  {shouldShowPlaceholder ? emptyOrNoResults : (
                     <Suspense fallback={<MapSkeleton />}>
                       <VirtualizedPropertyList
                         properties={filteredProperties}
@@ -1744,7 +1771,7 @@ const Index = () => {
                   </button>
                 </div>
               </div>
-              {showEmptyState ? emptyPlaceholder : (
+              {shouldShowPlaceholder ? emptyOrNoResults : (
                 <Suspense fallback={<MapSkeleton />}>
                   <VirtualizedPropertyList
                     properties={filteredProperties}

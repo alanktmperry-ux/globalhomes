@@ -171,8 +171,8 @@ const SeekerAuthPage = () => {
   };
 
   const goBack = () => {
-    if (step === 'password' || step === 'create') {
-      setStep('email');
+    if (step === 'password' || step === 'create' || step === 'otp') {
+      setStep(step === 'otp' ? 'create' : 'email');
       setPassword('');
     } else {
       navigate('/');

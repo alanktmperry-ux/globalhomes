@@ -14,7 +14,7 @@
  */
 import type { en as EnBase } from './en';
 
-export const zhCN: Record<keyof typeof EnBase, string> = {
+export const zhCN: Partial<Record<keyof typeof EnBase, string>> = {
   // ──────────────────────────────────────────────────────────────────
   // Homepage hero
   // ──────────────────────────────────────────────────────────────────

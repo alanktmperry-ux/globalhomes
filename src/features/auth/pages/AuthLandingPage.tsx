@@ -149,7 +149,7 @@ const AuthLandingPage = () => {
           </div>
 
           <button
-            onClick={() => navigate('/agents/login')}
+            onClick={() => { dismissError(); navigate('/agents/login'); }}
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white text-slate-900 text-sm font-medium hover:bg-slate-100 transition-colors"
           >
             Agent sign in

@@ -391,7 +391,7 @@ const App = () => (
                 </Route>
 
                 {/* Strata */}
-                <Route path="/strata-dashboard" element={<ProtectedRoute><StrataDashboardLayout /></ProtectedRoute>} />
+                <Route path="/strata-dashboard" element={<ProtectedRoute requireStrata><StrataDashboardLayout /></ProtectedRoute>} />
 
                 {/* Admin */}
                 <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />

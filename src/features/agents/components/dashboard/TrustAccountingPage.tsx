@@ -250,7 +250,9 @@ const TrustAccountingPage = () => {
 
   // Running balance calculation
   const txWithBalance = useMemo(() => {
-    let balance = 0;
+    const accountId = filteredTx[0]?.trust_account_id ?? null;
+    const account = accounts.find(a => a.id === accountId);
+    let balance = account?.opening_balance ?? 0;
     const reversed = [...filteredTx].reverse();
     const result = reversed.map(tx => {
       const impact = tx.transaction_type === 'deposit' ? tx.amount : -tx.amount;
@@ -258,7 +260,7 @@ const TrustAccountingPage = () => {
       return { ...tx, runningBalance: balance };
     });
     return result.reverse();
-  }, [filteredTx]);
+  }, [filteredTx, accounts]);
 
   // ── Handlers ──
   const resetTxForm = () => {
@@ -313,7 +315,14 @@ const TrustAccountingPage = () => {
   const handleCreateAccount = async () => {
     if (!newAccName || !newAccBank || !newAccBsb || !newAccNumber || !user) return;
     if (!/^\d{6}$/.test(newAccBsb)) { toast.error('BSB must be exactly 6 digits'); return; }
-    const openingBalance = parseFloat(newAccOpeningBalance) || 0;
+    if (!/^\d{6,10}$/.test(newAccNumber.replace(/\s/g, ''))) {
+      toast.error('Account number must be 6–10 digits'); return;
+    }
+    const openingBalance = parseFloat(newAccOpeningBalance);
+    if (newAccOpeningBalance && isNaN(openingBalance)) {
+      toast.error('Opening balance must be a valid number'); return;
+    }
+    const safeOpeningBalance = isNaN(openingBalance) ? 0 : openingBalance;
     try {
       const { data: agentData } = await supabase
         .from('agents').select('id').eq('user_id', user.id).maybeSingle();
@@ -325,8 +334,8 @@ const TrustAccountingPage = () => {
         bsb: newAccBsb,
         account_number: newAccNumber,
         bank_name: newAccBank,
-        opening_balance: openingBalance,
-        current_balance: openingBalance,
+        opening_balance: safeOpeningBalance,
+        current_balance: safeOpeningBalance,
       } as any);
       // Also update opening_balance and current_balance via direct update
       toast.success('Trust account created successfully.');

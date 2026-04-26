@@ -534,6 +534,75 @@ Deno.serve(async (req) => {
       });
     }
 
+    if (action === "grant_role" || action === "revoke_role") {
+      const userId = bodyParams.userId || bodyParams.user_id;
+      const role = bodyParams.role;
+      const allowedRoles = ["user", "agent", "admin"];
+      if (!userId || !role || !allowedRoles.includes(role)) {
+        return new Response(JSON.stringify({ error: "Invalid userId or role" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      if (action === "grant_role") {
+        // Idempotent: ignore conflict on (user_id, role) unique
+        const { error: insErr } = await supabase
+          .from("user_roles")
+          .insert({ user_id: userId, role });
+        if (insErr && !String(insErr.message || "").toLowerCase().includes("duplicate")) {
+          throw insErr;
+        }
+
+        // If granting agent role, ensure an agents row exists
+        if (role === "agent") {
+          const { data: existing } = await supabase
+            .from("agents")
+            .select("id")
+            .eq("user_id", userId)
+            .maybeSingle();
+          if (!existing) {
+            const { data: authUser } = await supabase.auth.admin.getUserById(userId);
+            const u = authUser?.user;
+            await supabase.from("agents").insert({
+              user_id: userId,
+              name: u?.user_metadata?.display_name || u?.user_metadata?.full_name || u?.email || "Agent",
+              email: u?.email,
+            });
+          }
+        }
+      } else {
+        const { error: delErr } = await supabase
+          .from("user_roles")
+          .delete()
+          .eq("user_id", userId)
+          .eq("role", role);
+        if (delErr) throw delErr;
+      }
+
+      // Server-side audit log
+      try {
+        await supabase.from("audit_log").insert({
+          user_id: caller.id,
+          action_type: action === "grant_role" ? "role_granted" : "role_revoked",
+          entity_type: "user",
+          entity_id: userId,
+          description: `Admin ${action === "grant_role" ? "granted" : "revoked"} role "${role}"`,
+          metadata: {
+            role,
+            changed_by: caller.id,
+            admin_email: caller.email,
+            timestamp_utc: new Date().toISOString(),
+            source: "edge_function",
+          },
+        });
+      } catch (e) { console.error("audit log:", e); }
+
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     return new Response(JSON.stringify({ error: "Unknown action" }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -230,20 +230,36 @@ const AdminDashboard = () => {
   };
 
   const handleRoleChange = async (userId: string, role: 'user' | 'agent' | 'admin', action: 'add' | 'remove') => {
-    if (action === 'add') {
-      await supabase.from('user_roles').insert({ user_id: userId, role: role as any });
-      if (role === 'agent') {
-        const userProfile = users.find((u) => u.id === userId);
-        const { data: existing } = await supabase.from('agents').select('id').eq('user_id', userId).maybeSingle();
-        if (!existing) {
-          await supabase.from('agents').insert({ user_id: userId, name: userProfile?.display_name || 'Agent', email: userProfile?.email });
-        }
-      }
-      toast(`Role "${role}" added`);
-    } else {
-      await supabase.from('user_roles').delete().eq('user_id', userId).eq('role', role as any);
-      toast(`Role "${role}" removed`);
+    const confirmed = window.confirm(`Are you sure you want to ${action} the "${role}" role for this user?`);
+    if (!confirmed) return;
+
+    const currentAdminUserId = user?.id;
+
+    // Audit log entry (forensic record before action)
+    try {
+      await supabase.from('audit_log').insert({
+        user_id: currentAdminUserId ?? null,
+        action_type: action === 'add' ? 'role_granted' : 'role_revoked',
+        entity_type: 'user',
+        entity_id: userId,
+        description: `Admin ${action === 'add' ? 'granted' : 'revoked'} role "${role}"`,
+        metadata: buildAuditMeta({ role, changed_by: currentAdminUserId, admin_email: user?.email }),
+      } as any);
+    } catch (auditErr) {
+      console.error('[AdminDashboard] role-change audit log failed:', auditErr);
     }
+
+    // Route role change through edge function (server-side admin enforcement)
+    const { data, error } = await supabase.functions.invoke('admin-users', {
+      body: { action: action === 'add' ? 'grant_role' : 'revoke_role', userId, role },
+    });
+
+    if (error || (data as any)?.error) {
+      toast.error(`Failed to ${action} role: ${error?.message || (data as any)?.error || 'Unknown error'}`);
+      return;
+    }
+
+    toast(`Role "${role}" ${action === 'add' ? 'added' : 'removed'}`);
     fetchData();
   };
 

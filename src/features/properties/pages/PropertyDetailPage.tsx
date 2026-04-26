@@ -525,35 +525,35 @@ export default function PropertyDetailPage() {
               <div className="p-5 rounded-2xl bg-card border border-border shadow-card">
                 <h2 className="font-display text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                   <FileText size={18} className="text-primary" />
-                  Rental Information
+                  {tp('property.section.rentalInformation')}
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-3 rounded-xl bg-secondary">
-                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Available From</p>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">{tp('property.rental.availableFrom')}</p>
                     <p className="text-sm font-semibold text-foreground mt-1 flex items-center gap-1.5">
                       <Calendar size={14} className="text-primary" />
-                      Available Now
+                      {tp('property.rental.availableNow')}
                     </p>
                   </div>
                   <div className="p-3 rounded-xl bg-secondary">
-                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Lease Term</p>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">{tp('property.rental.leaseTerm')}</p>
                     <p className="text-sm font-semibold text-foreground mt-1 flex items-center gap-1.5">
                       <Clock size={14} className="text-primary" />
-                      6 – 12 months
+                      {tp('property.rental.leaseTermValue')}
                     </p>
                   </div>
                   <div className="p-3 rounded-xl bg-secondary">
-                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Bond</p>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">{tp('property.rental.bond')}</p>
                     <p className="text-sm font-semibold text-foreground mt-1">
-                      {formatPrice(bondAmount, 'sale')} <span className="text-xs text-muted-foreground font-normal">(4 weeks)</span>
+                      {formatPrice(bondAmount, 'sale')} <span className="text-xs text-muted-foreground font-normal">{tp('property.rental.bondWeeks')}</span>
                     </p>
                   </div>
                   <div className="p-3 rounded-xl bg-secondary">
-                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Pet Policy</p>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">{tp('property.rental.petPolicy')}</p>
                     <p className="text-sm font-semibold mt-1 flex items-center gap-1.5">
                       <PawPrint size={14} className={isPetFriendly ? 'text-emerald-500' : 'text-muted-foreground'} />
                       <span className={isPetFriendly ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}>
-                        {isPetFriendly ? 'Pets Allowed' : 'On Application'}
+                        {isPetFriendly ? tp('property.rental.petsAllowed') : tp('property.rental.petsOnApplication')}
                       </span>
                     </p>
                   </div>
@@ -561,7 +561,7 @@ export default function PropertyDetailPage() {
                     <div className="sm:col-span-2 p-3 rounded-xl bg-primary/5 border border-primary/10">
                       <p className="text-sm font-semibold text-primary flex items-center gap-1.5">
                         <Sofa size={14} />
-                        This property is furnished
+                        {tp('property.rental.furnished')}
                       </p>
                     </div>
                   )}
@@ -573,7 +573,7 @@ export default function PropertyDetailPage() {
             <div className="p-5 rounded-2xl bg-card border border-border shadow-card">
               <h2 className="font-display text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
                 <Eye size={18} className="text-primary" />
-                Inspection Times
+                {tp('property.section.inspectionTimes')}
               </h2>
               {(() => {
                 const upcoming = inspectionTimes.filter(s => new Date(`${s.date}T${s.start}`) > new Date());
@@ -581,13 +581,13 @@ export default function PropertyDetailPage() {
                   return (
                     <>
                       <p className="text-sm text-muted-foreground">
-                        No scheduled inspections. Contact agent for inspection times.
+                        {tp('property.inspection.empty')}
                       </p>
                       <button
                         onClick={handleCtaClick}
                         className="mt-3 px-5 py-2.5 rounded-xl bg-secondary text-foreground font-medium text-sm hover:bg-accent transition-colors"
                       >
-                        Request Inspection
+                        {tp('property.requestInspection')}
                       </button>
                     </>
                   );
@@ -612,7 +612,7 @@ export default function PropertyDetailPage() {
                             </p>
                           </div>
                           <span className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                            Book
+                            {tp('property.inspection.book')}
                           </span>
                         </button>
                       );
@@ -634,7 +634,7 @@ export default function PropertyDetailPage() {
                 <div className="p-3 rounded-xl bg-secondary flex items-center gap-3">
                   <Calendar size={16} className="text-muted-foreground shrink-0" />
                   <div>
-                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Listed</p>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">{tp('property.facts.listed')}</p>
                     <p className="text-sm font-semibold text-foreground">{new Date(property.listedDate).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                   </div>
                 </div>
@@ -643,7 +643,7 @@ export default function PropertyDetailPage() {
                 <div className="p-3 rounded-xl bg-secondary flex items-center gap-3">
                   <Eye size={16} className="text-muted-foreground shrink-0" />
                   <div>
-                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Views</p>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">{tp('property.facts.views')}</p>
                     <p className="text-sm font-semibold text-foreground">{property.views.toLocaleString()}</p>
                   </div>
                 </div>
@@ -651,7 +651,7 @@ export default function PropertyDetailPage() {
               <div className="p-3 rounded-xl bg-secondary flex items-center gap-3">
                 <Home size={16} className="text-muted-foreground shrink-0" />
                 <div>
-                  <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Type</p>
+                  <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">{tp('property.facts.type')}</p>
                   <p className="text-sm font-semibold text-foreground">{property.propertyType}</p>
                 </div>
               </div>

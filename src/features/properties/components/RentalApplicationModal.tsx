@@ -123,7 +123,7 @@ export function RentalApplicationModal({ property, open, onClose }: Props) {
 
       const { error } = await supabase.from('rental_applications' as any).insert({
         property_id: property.id,
-        agent_id: property.agent.id || null,
+        agent_id: property.agent?.id || null,
         user_id: userId,
         reference_number: ref,
         full_name: form.fullName,
@@ -151,10 +151,10 @@ export function RentalApplicationModal({ property, open, onClose }: Props) {
       setSubmitted(true);
 
       // Notify agent
-      if (property.agent.id) {
+      if (property.agent?.id) {
         supabase.functions.invoke('send-notification-email', {
           body: {
-            agent_id: property.agent.id,
+            agent_id: property.agent?.id,
             type: 'lead',
             title: `New rental application from ${form.fullName}`,
             message: `${form.fullName} submitted a rental application for ${property.title}`,

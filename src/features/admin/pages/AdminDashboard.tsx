@@ -246,8 +246,23 @@ const AdminDashboard = () => {
     fetchData();
   };
 
+  const logAdminAction = async (propertyId: string, actionName: string) => {
+    const { error: auditError } = await supabase.from('audit_log').insert({
+      user_id: user?.id ?? null,
+      action_type: 'admin_property_action',
+      entity_type: 'property',
+      entity_id: propertyId,
+      description: `Admin ${actionName} property`,
+      metadata: { action: actionName, admin_email: user?.email },
+    });
+    if (auditError) console.error('[AdminDashboard] audit log failed:', auditError);
+  };
+
   const togglePropertyActive = async (propId: string, isActive: boolean) => {
-    await supabase.from('properties').update({ is_active: !isActive }).eq('id', propId);
+    const { error } = await supabase.from('properties').update({ is_active: !isActive }).eq('id', propId);
+    if (!error) {
+      await logAdminAction(propId, isActive ? 'deactivated' : 'activated');
+    }
     toast(isActive ? 'Listing deactivated' : 'Listing activated');
     fetchData();
   };
@@ -266,6 +281,8 @@ const AdminDashboard = () => {
       } as any)
       .eq('id', id);
     if (!error) {
+      await logAdminAction(id, `boost_approved_${tier}`);
+
       const { data: propData } = await supabase
         .from('properties')
         .select('agent_id, address, suburb')

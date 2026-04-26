@@ -60,13 +60,13 @@ export default function AdminLayout() {
         {/* Header strip */}
         <header className="flex-shrink-0 border-b border-border bg-card/40 backdrop-blur-sm">
           {impersonating && (
-            <div className="bg-amber-500/15 text-amber-900 dark:text-amber-200 px-4 py-2 text-xs flex items-center justify-between gap-3">
+            <div className="bg-warning/15 text-warning-foreground px-4 py-2 text-xs flex items-center justify-between gap-3">
               <span>
                 Viewing as <strong>{impersonatedUser}</strong> — admin impersonation active
               </span>
               <button
                 onClick={async () => { await stopImpersonation(); navigate('/admin'); }}
-                className="rounded-md bg-amber-600/20 hover:bg-amber-600/30 px-2 py-1 font-medium"
+                className="rounded-md bg-warning/20 hover:bg-warning/30 px-2 py-1 font-medium"
               >
                 Exit impersonation
               </button>

@@ -27,30 +27,50 @@ const StepPhotos = ({ draft, update }: Props) => {
 
   const addPhotos = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
+    if (!user?.id) {
+      toast.error('You must be signed in to upload photos.');
+      return;
+    }
     setUploading(true);
     const uploadedUrls: string[] = [];
+    let skippedTooLarge = 0;
+    let failedCount = 0;
+    let lastErrorMsg = '';
 
     const remaining = 20 - draft.photos.length;
     const filesToUpload = Array.from(files).slice(0, remaining);
 
     for (const file of filesToUpload) {
       if (file.size > 10 * 1024 * 1024) {
-        continue; // Skip files > 10 MB
+        skippedTooLarge++;
+        continue;
       }
       const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-      const folder = user?.id || 'anonymous';
-      const filePath = `${folder}/${crypto.randomUUID()}.${ext}`;
+      const filePath = `${user.id}/${crypto.randomUUID()}.${ext}`;
       const { error } = await supabase.storage
         .from('property-images')
         .upload(filePath, file, { upsert: false, contentType: file.type });
-      if (error) continue;
+      if (error) {
+        failedCount++;
+        lastErrorMsg = error.message;
+        console.error('[StepPhotos] upload failed', { filePath, error });
+        continue;
+      }
       const { data: { publicUrl } } = supabase.storage
         .from('property-images')
         .getPublicUrl(filePath);
       uploadedUrls.push(publicUrl);
     }
 
-    update({ photos: [...draft.photos, ...uploadedUrls].slice(0, 20) });
+    if (uploadedUrls.length > 0) {
+      update({ photos: [...draft.photos, ...uploadedUrls].slice(0, 20) });
+    }
+    if (skippedTooLarge > 0) {
+      toast.error(`${skippedTooLarge} photo${skippedTooLarge > 1 ? 's' : ''} skipped — over 10 MB limit.`);
+    }
+    if (failedCount > 0) {
+      toast.error(`${failedCount} photo${failedCount > 1 ? 's' : ''} failed: ${lastErrorMsg || 'unknown error'}`, { duration: 12000 });
+    }
     setUploading(false);
   };
 

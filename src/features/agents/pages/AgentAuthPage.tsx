@@ -174,6 +174,16 @@ const AgentAuthPage = () => {
 
   const AGENT_PILLS = ['Pocket listings', 'Pre-market period', 'AI buyer matching', 'Pipeline kanban', 'Rent roll', 'Trust accounting', '24 languages'];
 
+  if (step === 'otp') {
+    return (
+      <OTPVerificationScreen
+        email={regEmail}
+        onVerified={handleAgentOtpVerified}
+        onBack={() => setStep('register')}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen flex" style={{ background: '#020817' }}>
 
@@ -226,21 +236,19 @@ const AgentAuthPage = () => {
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-stone-200 bg-stone-50 mb-5">
             <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
             <span className="text-[10px] font-medium tracking-widest uppercase text-stone-400">
-              {(step === 'register' || step === 'check-email') ? 'Agent registration' : 'Agent sign in'}
+              {step === 'register' ? 'Agent registration' : 'Agent sign in'}
             </span>
           </div>
 
           <h1 className="text-[38px] font-light text-stone-900 leading-[1.08] mb-8" style={{ letterSpacing: '-1.5px' }}>
             {(step === 'email' || step === 'password') && <>Welcome<br /><strong className="font-semibold">back.</strong></>}
             {step === 'register' && <>Join<br /><strong className="font-semibold">ListHQ.</strong></>}
-            {step === 'check-email' && <>Check your<br /><strong className="font-semibold">inbox.</strong></>}
           </h1>
 
           <p className="text-sm text-stone-400 mb-6 -mt-4">
             {step === 'email' && 'Access your dashboard, listings, and leads.'}
             {step === 'password' && email}
             {step === 'register' && 'Start your free 3-month trial. No credit card required.'}
-            {step === 'check-email' && `We've sent a confirmation link to ${regEmail}`}
           </p>
 
           {/* ── Step: Email (sign in) ── */}
@@ -373,36 +381,8 @@ const AgentAuthPage = () => {
             </>
           )}
 
-          {/* ── Step: Check email ── */}
-          {step === 'check-email' && (
-            <div className="text-center space-y-5">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                <Mail size={32} className="text-primary" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-foreground">Check your inbox</h2>
-                <p className="text-sm text-muted-foreground mt-1">We've sent a confirmation link to:</p>
-                <p className="font-semibold text-foreground text-sm mt-1">{regEmail}</p>
-              </div>
-              <div className="bg-stone-50 border border-stone-200 rounded-xl p-4 text-xs text-stone-500 text-left space-y-1.5">
-                <p>· Click the link in the email to verify your address and continue setup</p>
-                <p>· Check your spam folder if it doesn't arrive within 2 minutes</p>
-                <p>· Your Agent Quick-Start Guide is included in the email — download it while you wait</p>
-                <p>· The confirmation link expires after 24 hours</p>
-              </div>
-              <button
-                type="button"
-                onClick={handleResendEmail}
-                disabled={emailSubmitting}
-                className="w-full py-3.5 rounded-full border border-border text-foreground font-semibold text-sm transition-colors hover:bg-accent disabled:opacity-50"
-              >
-                {emailSubmitting ? 'Sending...' : 'Resend confirmation email'}
-              </button>
-              <button onClick={() => { setStep('register'); setRegEmail(''); }} className="text-xs text-muted-foreground hover:text-foreground">
-                Wrong email? Go back and change it
-              </button>
-            </div>
-          )}
+
+
 
         </motion.div>
         </div>

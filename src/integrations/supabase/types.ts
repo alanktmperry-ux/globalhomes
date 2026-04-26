@@ -9335,6 +9335,96 @@ export type Database = {
         }
         Relationships: []
       }
+      seller_leads: {
+        Row: {
+          address: string
+          baths: number | null
+          beds: number | null
+          cars: number | null
+          created_at: string
+          estimate_method: string | null
+          estimated_value_max: number | null
+          estimated_value_min: number | null
+          id: string
+          land_size_sqm: number | null
+          lat: number | null
+          lng: number | null
+          matched_agent_ids: string[] | null
+          postcode: string | null
+          preferred_contact: string | null
+          preferred_language: string | null
+          property_type: string
+          renovations: string | null
+          source: string | null
+          state: string
+          status: string
+          suburb: string
+          updated_at: string
+          user_email: string
+          user_id: string | null
+          user_name: string
+          user_phone: string | null
+        }
+        Insert: {
+          address: string
+          baths?: number | null
+          beds?: number | null
+          cars?: number | null
+          created_at?: string
+          estimate_method?: string | null
+          estimated_value_max?: number | null
+          estimated_value_min?: number | null
+          id?: string
+          land_size_sqm?: number | null
+          lat?: number | null
+          lng?: number | null
+          matched_agent_ids?: string[] | null
+          postcode?: string | null
+          preferred_contact?: string | null
+          preferred_language?: string | null
+          property_type: string
+          renovations?: string | null
+          source?: string | null
+          state: string
+          status?: string
+          suburb: string
+          updated_at?: string
+          user_email: string
+          user_id?: string | null
+          user_name: string
+          user_phone?: string | null
+        }
+        Update: {
+          address?: string
+          baths?: number | null
+          beds?: number | null
+          cars?: number | null
+          created_at?: string
+          estimate_method?: string | null
+          estimated_value_max?: number | null
+          estimated_value_min?: number | null
+          id?: string
+          land_size_sqm?: number | null
+          lat?: number | null
+          lng?: number | null
+          matched_agent_ids?: string[] | null
+          postcode?: string | null
+          preferred_contact?: string | null
+          preferred_language?: string | null
+          property_type?: string
+          renovations?: string | null
+          source?: string | null
+          state?: string
+          status?: string
+          suburb?: string
+          updated_at?: string
+          user_email?: string
+          user_id?: string | null
+          user_name?: string
+          user_phone?: string | null
+        }
+        Relationships: []
+      }
       seller_likelihood_scores: {
         Row: {
           created_at: string
@@ -11756,6 +11846,66 @@ export type Database = {
           },
         ]
       }
+      valuation_estimates: {
+        Row: {
+          address: string | null
+          base_value: number | null
+          baths: number | null
+          beds: number | null
+          calculation_metadata: Json | null
+          cars: number | null
+          created_at: string
+          estimated_value_max: number
+          estimated_value_min: number
+          id: string
+          land_size_sqm: number | null
+          method: string | null
+          postcode: string | null
+          property_type: string
+          renovations: string | null
+          state: string
+          suburb: string
+        }
+        Insert: {
+          address?: string | null
+          base_value?: number | null
+          baths?: number | null
+          beds?: number | null
+          calculation_metadata?: Json | null
+          cars?: number | null
+          created_at?: string
+          estimated_value_max: number
+          estimated_value_min: number
+          id?: string
+          land_size_sqm?: number | null
+          method?: string | null
+          postcode?: string | null
+          property_type: string
+          renovations?: string | null
+          state: string
+          suburb: string
+        }
+        Update: {
+          address?: string | null
+          base_value?: number | null
+          baths?: number | null
+          beds?: number | null
+          calculation_metadata?: Json | null
+          cars?: number | null
+          created_at?: string
+          estimated_value_max?: number
+          estimated_value_min?: number
+          id?: string
+          land_size_sqm?: number | null
+          method?: string | null
+          postcode?: string | null
+          property_type?: string
+          renovations?: string | null
+          state?: string
+          suburb?: string
+        }
+        Relationships: []
+      }
       vendor_report_tokens: {
         Row: {
           agent_id: string
@@ -12894,6 +13044,18 @@ export type Database = {
       current_broker_is_principal: { Args: never; Returns: boolean }
       current_user_in_agency: { Args: { _agency_id: string }; Returns: boolean }
       delete_user_cascade: { Args: { p_user_id: string }; Returns: undefined }
+      estimate_property_value: {
+        Args: {
+          p_baths?: number
+          p_beds?: number
+          p_land_size_sqm?: number
+          p_property_type?: string
+          p_renovations?: string
+          p_state: string
+          p_suburb: string
+        }
+        Returns: Json
+      }
       expire_featured_listings: { Args: never; Returns: undefined }
       expire_stale_pre_approvals: { Args: never; Returns: undefined }
       find_agents: {

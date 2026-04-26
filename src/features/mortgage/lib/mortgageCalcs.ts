@@ -236,7 +236,7 @@ export function calculateRepayments(inputs: RepaymentInputs): RepaymentResult {
   let totalInterestPaid = 0;
   const schedule: AmortisationRow[] = [];
 
-  for (let m = 1; m <= n && balance > 0; m++) {
+  for (let m = 1; m <= Math.min(n, 720) && balance > 0; m++) {
     const interestPayment = balance * r;
     const principalPayment = loanType === 'interest_only'
       ? 0

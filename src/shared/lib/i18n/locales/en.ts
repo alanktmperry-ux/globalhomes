@@ -488,6 +488,81 @@ export const en = {
   'mortgage.result.totalRepayable': 'Total repayable',
   'mortgage.result.totalInterest': 'Total interest',
   'mortgage.cta.broker': 'Speak to a broker',
+
+  // ──────────────────────────────────────────────────────────────────
+  // Property detail page
+  // ──────────────────────────────────────────────────────────────────
+  'property.saved': 'Saved',
+  'property.save': 'Save',
+  'property.share': 'Share',
+  'property.call': 'Call',
+  'property.contactAgent': 'Contact Agent',
+  'property.requestInspection': 'Request Inspection',
+  'property.viewSuburb': 'View {suburb} suburb profile',
+  'property.titleFallback': '{type} in {suburb} {state}',
+  'property.applications': '{count} application',
+  'property.applicationsPlural': '{count} applications',
+  'property.applyNow': 'Apply Now',
+  'property.priceGuide': 'Price guide',
+  'property.perWeek': 'per week',
+  'property.aiTranslated': 'Translated by AI',
+
+  'property.facts.listed': 'Listed',
+  'property.facts.views': 'Views',
+  'property.facts.type': 'Type',
+  'property.facts.beds': 'Bedrooms',
+  'property.facts.baths': 'Bathrooms',
+  'property.facts.parking': 'Parking',
+  'property.facts.size': 'Size',
+
+  'property.section.culturalHighlights': 'Cultural Highlights',
+  'property.section.buyerInsights': 'Buyer Insights for This Market',
+  'property.section.inspectionTimes': 'Inspection Times',
+  'property.section.openHomes': 'Open Homes',
+  'property.section.openHomesUpcoming': '{count} upcoming',
+  'property.section.financeProperty': 'Finance this property',
+  'property.section.aboutThisProperty': 'About this property',
+  'property.section.location': 'Location',
+  'property.section.features': 'Features',
+  'property.section.rentalInformation': 'Rental Information',
+
+  'property.rental.availableFrom': 'Available From',
+  'property.rental.availableNow': 'Available Now',
+  'property.rental.leaseTerm': 'Lease Term',
+  'property.rental.leaseTermValue': '6 – 12 months',
+  'property.rental.bond': 'Bond',
+  'property.rental.bondWeeks': '(4 weeks)',
+  'property.rental.petPolicy': 'Pet Policy',
+  'property.rental.petsAllowed': 'Pets Allowed',
+  'property.rental.petsOnApplication': 'On Application',
+  'property.rental.furnished': 'This property is furnished',
+
+  'property.inspection.empty': 'No scheduled inspections. Contact agent for inspection times.',
+  'property.inspection.book': 'Book',
+  'property.openHomes.empty': 'No open homes scheduled',
+  'property.openHomes.emptySub': 'Contact the agent to arrange a private inspection',
+
+  'property.finance.title': 'Need finance? Speak to a broker',
+  'property.finance.body': 'Get pre-approved with a licensed mortgage broker — free, no obligation.',
+  'property.finance.cta': 'Get pre-approved',
+  'property.finance.browseAll': 'Browse all brokers',
+  'property.finance.shortTitle': 'Need finance?',
+  'property.finance.shortBody': 'Get pre-approved before you make an offer.',
+  'property.finance.shortCta': 'Get pre-approved',
+
+  'property.conveyancer.title': 'Need a conveyancer?',
+  'property.conveyancer.body': 'Fixed-fee settlement from $990.',
+  'property.conveyancer.cta': 'Get a fixed quote',
+
+  'property.foreignBuyer.toggle': 'I am a foreign buyer (non-Australian citizen or permanent resident)',
+
+  'property.notFound': 'Property not found',
+  'property.notFound.back': 'Back to search',
+
+  // Insights subheadings (MultilingualListingDetail)
+  'property.insights.multiculturalAppeal': 'Multicultural Appeal',
+  'property.insights.suggestedBuyerProfiles': 'Suggested Buyer Profiles',
+  'property.insights.keySellingPoints': 'Key Selling Points',
 } as const;
 
 export type TranslationKey = keyof typeof en;

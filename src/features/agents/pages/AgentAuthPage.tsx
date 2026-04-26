@@ -1,14 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { motion } from 'framer-motion';
-import { Building2, Zap, Mail, ListChecks, FileText, ShieldCheck, Landmark } from 'lucide-react';
+import { Building2, Zap, ListChecks, FileText, ShieldCheck, Landmark } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import OTPVerificationScreen from '@/features/auth/components/OTPVerificationScreen';
 
-type Step = 'email' | 'password' | 'register' | 'check-email';
+type Step = 'email' | 'password' | 'register' | 'otp';
 
 const AgentAuthPage = () => {
   const navigate = useNavigate();
@@ -102,46 +103,53 @@ const AgentAuthPage = () => {
     if (!regEmail.trim()) return;
     setEmailSubmitting(true);
     try {
-      const email = regEmail.trim().toLowerCase();
-      // Try to sign up first
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password: crypto.randomUUID(),
+      const cleaned = regEmail.trim().toLowerCase();
+      const { error } = await supabase.auth.signInWithOtp({
+        email: cleaned,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard/onboarding`,
+          shouldCreateUser: true,
           data: { registration_started: true, registered_as: 'agent' },
         },
       });
-      // If user already exists (signUp returns user with identities=[]), send magic link instead
-      if (!error && data.user && data.user.identities?.length === 0) {
-        await supabase.auth.signInWithOtp({
-          email,
-          options: { emailRedirectTo: `${window.location.origin}/dashboard/onboarding` },
-        });
-        sessionStorage.setItem('listhq_pending_email', email);
-        setStep('check-email');
-        toast.info('An account with this email already exists — we sent you a sign-in link');
-        return;
-      }
-      if (error && !error.message.toLowerCase().includes('already registered')) throw error;
-      sessionStorage.setItem('listhq_pending_email', email);
-      setStep('check-email');
+      if (error) throw error;
+      sessionStorage.setItem('listhq_pending_email', cleaned);
+      setRegEmail(cleaned);
+      toast.success('Code sent', { description: `Check ${cleaned} for your 6-digit code.` });
+      setStep('otp');
     } catch (err: unknown) {
-      toast.error(`Could not send confirmation — ${getErrorMessage(err)}`);
+      toast.error(`Could not send code — ${getErrorMessage(err)}`);
     } finally {
       setEmailSubmitting(false);
     }
   };
 
-  const handleResendEmail = async () => {
-    setEmailSubmitting(true);
+  const handleAgentOtpVerified = async () => {
     try {
-      await supabase.auth.resend({ type: 'signup', email: regEmail.trim().toLowerCase() });
-      toast.success('Confirmation email resent — check your inbox');
-    } catch {
-      toast.error('Could not resend — please try again');
-    } finally {
-      setEmailSubmitting(false);
+      const { data: { user: u } } = await supabase.auth.getUser();
+      if (!u) {
+        navigate('/onboarding/agency');
+        return;
+      }
+      // Stamp role hint in profiles
+      try {
+        await supabase.from('profiles').upsert(
+          { user_id: u.id, user_role: 'agent' as any, onboarded: false } as any,
+          { onConflict: 'user_id' },
+        );
+      } catch { /* non-fatal */ }
+      const { data: agentRow } = await supabase
+        .from('agents')
+        .select('id, onboarding_complete')
+        .eq('user_id', u.id)
+        .maybeSingle();
+      if (agentRow && (agentRow as any).onboarding_complete) {
+        navigate('/dashboard/overview');
+      } else {
+        navigate('/onboarding/agency');
+      }
+    } catch (err) {
+      toast.error('Sign-in succeeded but routing failed', { description: getErrorMessage(err) });
+      navigate('/onboarding/agency');
     }
   };
 
@@ -157,7 +165,7 @@ const AgentAuthPage = () => {
     setCaptchaToken(null);
     captchaRef.current?.resetCaptcha();
     if (step === 'password') { setStep('email'); setPassword(''); }
-    else if (step === 'check-email') { setStep('register'); }
+    else if (step === 'otp') { setStep('register'); }
     else if (step === 'register') { setStep('email'); setRegEmail(''); }
     else navigate('/for-agents');
   };

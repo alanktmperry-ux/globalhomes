@@ -97,8 +97,6 @@ function ToggleRow({ icon: Icon, label, checked, onChange, description }: {
 
 function Section({ title, children, defaultOpen = true }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
-  const [draftPrice, setDraftPrice] = useState<[number, number]>(filters.priceRange);
-  useEffect(() => { setDraftPrice(filters.priceRange); }, [filters.priceRange]);
   return (
     <div className="border-b border-border pb-4">
       <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between py-2">

@@ -32,11 +32,11 @@ const MapsKeyDiagnostic = () => {
   };
 
   return (
-    <div className="mb-4 rounded-lg border border-dashed border-amber-400 bg-amber-50 p-3 text-sm">
+    <div className="mb-4 rounded-lg border border-dashed border-muted-foreground/40 bg-muted p-3 text-sm">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <p className="font-medium text-amber-900">Temporary diagnostic — remove after use</p>
-          <p className="text-xs text-amber-800">Maps Key Check — identifies which Google Maps API key the app is loading.</p>
+          <p className="font-medium text-foreground">Temporary diagnostic — remove after use</p>
+          <p className="text-xs text-muted-foreground">Maps Key Check — identifies which Google Maps API key the app is loading.</p>
         </div>
         <Button size="sm" variant="outline" onClick={checkMapsKey} disabled={loading}>
           {loading ? 'Checking…' : 'Identify Maps Key'}

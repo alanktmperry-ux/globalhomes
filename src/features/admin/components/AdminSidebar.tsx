@@ -14,8 +14,17 @@ interface NavItem {
   badge?: number;
 }
 
+/** @deprecated Legacy tab key kept for back-compat with old AdminDashboard.tsx (now /admin/legacy). */
+export type AdminTab = string;
+
 interface AdminSidebarProps {
   pendingApprovalsTotal?: number;
+  /** @deprecated legacy props — ignored */
+  tab?: unknown;
+  setTab?: unknown;
+  pendingDemoCount?: number;
+  pendingApprovalCount?: number;
+  pendingModerationCount?: number;
 }
 
 const SectionLabel = ({ children }: { children: React.ReactNode }) => (

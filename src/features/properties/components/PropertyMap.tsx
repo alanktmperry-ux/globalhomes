@@ -324,7 +324,7 @@ export function PropertyMap({
               <div style="font-size: 12px; color: #64748b; margin-top: 2px;">${property.title}</div>
               <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">🛏 ${property.beds} · 🛁 ${property.baths} · 🚗 ${property.parking}</div>
             </div>
-          `));
+          `, { ALLOWED_TAGS: ['div','span','p','br','strong','em','img','a'], ALLOWED_ATTR: ['class','style','src','alt','href','target'] }));
           infoWindow.open(map, marker);
         });
         markerEl.addEventListener('mouseleave', () => {

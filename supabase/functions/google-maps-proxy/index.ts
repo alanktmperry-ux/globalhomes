@@ -19,10 +19,15 @@ Deno.serve(async (req) => {
     const { action, input, input_types } = await req.json();
 
     if (action === 'get_key') {
-      // Strict origin allowlist — the SDK key may only be returned to known frontends.
-      // The browser cannot forge Origin, so this prevents arbitrary callers from harvesting the key.
-      const origin = req.headers.get('Origin');
-      const allowed = getAllowedOrigin(origin);
+      const origin = req.headers.get('Origin') ?? '';
+      const referer = req.headers.get('Referer') ?? '';
+      const ALLOWED_ORIGINS = [
+        'https://globalhomes.lovable.app',
+        'https://listhq.com.au',
+        'http://localhost:8080',
+        'http://localhost:5173',
+      ];
+      const allowed = ALLOWED_ORIGINS.some(o => origin.startsWith(o) || referer.startsWith(o));
       if (!allowed) {
         return new Response(JSON.stringify({ error: 'Forbidden' }), {
           status: 403,

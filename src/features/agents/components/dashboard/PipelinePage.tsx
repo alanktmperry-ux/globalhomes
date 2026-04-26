@@ -157,11 +157,19 @@ const PipelinePage = () => {
       return;
     }
 
-    setCards(prev => prev.map(c =>
-      c.id === cardId ? { ...c, stageId: targetStageId, movedAt: new Date().toISOString() } : c
-    ));
+    const previousCards = [...cards];
 
-    await persistStageMove(cardId, targetStage);
+    try {
+      await persistStageMove(cardId, targetStage);
+      setCards(prev => prev.map(c =>
+        c.id === cardId ? { ...c, stageId: targetStageId, movedAt: new Date().toISOString() } : c
+      ));
+    } catch (err) {
+      console.error('[Pipeline] persistStageMove failed:', err);
+      setCards(previousCards);
+      toast.error('Failed to move card — please try again');
+      return;
+    }
 
     const previousStage = effectiveStages.find(s => s.id === card.stageId);
     if (isUnderOfferStage(targetStage) && !(previousStage && isUnderOfferStage(previousStage))) {

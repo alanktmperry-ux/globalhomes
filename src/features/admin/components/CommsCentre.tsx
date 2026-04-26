@@ -219,7 +219,7 @@ function ComposePanel({ templates, onSent }: { templates: Template[]; onSent: ()
         entity_type: 'broadcast_campaign',
         entity_id: (campaign as any).id,
         description: subject,
-        metadata: { recipient_count: preview.length, admin_id: user.id },
+        metadata: buildAuditMeta({ recipient_count: preview.length, admin_id: user.id }),
       } as any);
     }
 

@@ -19,6 +19,8 @@ export const SUPPORTED_LANGUAGES = [
   { code: 'ar',    name: 'العربية' },
   { code: 'hi',    name: 'हिन्दी' },
   { code: 'bn',    name: 'বাংলা' },
+  { code: 'pa',    name: 'ਪੰਜਾਬੀ' },
+  { code: 'ta',    name: 'தமிழ்' },
 ] as const;
 
 export type SupportedLanguageCode = typeof SUPPORTED_LANGUAGES[number]['code'];

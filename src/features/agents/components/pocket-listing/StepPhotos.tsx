@@ -177,7 +177,7 @@ const StepPhotos = ({ draft, update }: Props) => {
         <input
           ref={fileRef}
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif"
           multiple
           className="hidden"
           onChange={(e) => addPhotos(e.target.files)}

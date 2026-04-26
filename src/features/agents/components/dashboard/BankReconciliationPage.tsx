@@ -149,29 +149,56 @@ const BankReconciliationPage = () => {
     if (!user) return;
     setAutoMatchRunning(true);
     let matchCount = 0;
+    let failCount = 0;
 
     const unmatchedItems = reconItems.filter(i => i.status === 'unmatched');
     const usedReceiptIds = new Set(reconItems.filter(i => i.matched_receipt_id).map(i => i.matched_receipt_id!));
     const usedPaymentIds = new Set(reconItems.filter(i => i.matched_payment_id).map(i => i.matched_payment_id!));
 
+    const writeAudit = async (entityId: string, amount: number, bankRef: string | null) => {
+      try {
+        await supabase.from('audit_log').insert({
+          user_id: user.id,
+          action_type: 'bank_reconciliation_match',
+          entity_type: 'trust_reconciliation',
+          entity_id: entityId,
+          metadata: {
+            matched_amount: amount,
+            bank_reference: bankRef,
+            timestamp_utc: new Date().toISOString(),
+          },
+        } as any);
+      } catch (e) {
+        console.error('[BankReconciliation] audit log failed:', e);
+      }
+    };
+
     for (const item of unmatchedItems) {
       const isCredit = item.amount > 0;
       const targetAmt = Math.abs(item.amount);
       const desc = (item.description || '').toLowerCase();
+      const bankRef = (item as any).bank_reference ?? null;
 
       if (isCredit) {
-        // Try match to receipt by amount, then by client name similarity
         const candidate = receipts.find(r =>
           !usedReceiptIds.has(r.id) &&
           Math.abs(r.amount - targetAmt) < 0.01 &&
-          (desc.includes(r.client.toLowerCase().slice(0, 5)) || true) // amount match is primary
+          (desc.includes(r.client.toLowerCase().slice(0, 5)) || true)
         );
         if (candidate) {
-          const { error } = await supabase
+          const { error: matchError } = await supabase
             .from('trust_reconciliations')
             .update({ status: 'matched', matched_receipt_id: candidate.id } as any)
             .eq('id', item.id);
-          if (!error) { usedReceiptIds.add(candidate.id); matchCount++; }
+          if (matchError) {
+            console.error('[BankReconciliation] match failed:', matchError);
+            toast.error('Failed to match transaction: ' + matchError.message);
+            failCount++;
+            continue;
+          }
+          usedReceiptIds.add(candidate.id);
+          matchCount++;
+          await writeAudit(item.id, item.amount, bankRef);
         }
       } else {
         const candidate = payments.find(p =>
@@ -179,19 +206,26 @@ const BankReconciliationPage = () => {
           Math.abs(p.amount - targetAmt) < 0.01
         );
         if (candidate) {
-          const { error } = await supabase
+          const { error: matchError } = await supabase
             .from('trust_reconciliations')
             .update({ status: 'matched', matched_payment_id: candidate.id } as any)
             .eq('id', item.id);
-          if (!error) { usedPaymentIds.add(candidate.id); matchCount++; }
+          if (matchError) {
+            console.error('[BankReconciliation] match failed:', matchError);
+            toast.error('Failed to match transaction: ' + matchError.message);
+            failCount++;
+            continue;
+          }
+          usedPaymentIds.add(candidate.id);
+          matchCount++;
+          await writeAudit(item.id, item.amount, bankRef);
         }
       }
     }
 
     setAutoMatchRunning(false);
     await fetchData();
-    const pct = unmatchedItems.length > 0 ? Math.round((matchCount / unmatchedItems.length) * 100) : 0;
-    toast.success(`Auto-matched ${matchCount} of ${unmatchedItems.length} entries (${pct}%)`);
+    toast.success(`Matched ${matchCount} transaction${matchCount !== 1 ? 's' : ''}.${failCount > 0 ? ' ' + failCount + ' failed.' : ''}`);
   };
 
   // ── Reconcile All ──

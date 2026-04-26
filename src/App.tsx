@@ -276,6 +276,7 @@ const App = () => (
                   <Route path="/conveyancing" element={<ConveyancingPage />} />
                   <Route path="/exclusive" element={<ExclusiveLandingPage />} />
                   <Route path="/exclusive/listings" element={<ExclusiveListingsPage />} />
+                  <Route path="/valuation" element={<ValuationPage />} />
                 </Route>
 
                 {/* Public standalone pages (no shared layout) */}

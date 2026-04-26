@@ -128,7 +128,7 @@ export function useInboxThreads(filter: InboxFilter, search: string) {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'inbox_threads', filter: `agency_id=eq.${agencyId}` }, () => load())
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'inbox_messages' }, () => load())
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => { channel.unsubscribe(); supabase.removeChannel(channel); };
   }, [agencyId, load]);
 
   const counts = useMemo(() => {
@@ -139,21 +139,51 @@ export function useInboxThreads(filter: InboxFilter, search: string) {
   return { threads, loading, reload: load, counts, agentId, agencyId };
 }
 
+const INBOX_PAGE_SIZE = 50;
+
 export function useInboxMessages(threadId: string | null) {
   const [messages, setMessages] = useState<InboxMessageRow[]>([]);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
 
-  const load = useCallback(async () => {
+  // Reset pagination when thread changes
+  useEffect(() => {
+    setMessages([]);
+    setPage(0);
+    setHasMore(false);
+  }, [threadId]);
+
+  const fetchPage = useCallback(async (targetPage: number, append: boolean) => {
     if (!threadId) { setMessages([]); return; }
     setLoading(true);
+    // Fetch newest-first so page 0 = most recent 50
+    const from = targetPage * INBOX_PAGE_SIZE;
+    const to = from + INBOX_PAGE_SIZE - 1;
     const { data } = await supabase
       .from('inbox_messages' as any)
       .select('*')
       .eq('thread_id', threadId)
-      .order('sent_at', { ascending: true });
-    setMessages(((data as any[]) || []) as InboxMessageRow[]);
+      .order('sent_at', { ascending: false })
+      .range(from, to);
+    const rows = ((data as any[]) || []) as InboxMessageRow[];
+    setHasMore(rows.length === INBOX_PAGE_SIZE);
+    // Re-sort ascending for display
+    const ascending = [...rows].sort((a, b) => new Date(a.sent_at).getTime() - new Date(b.sent_at).getTime());
+    setMessages(prev => append ? [...ascending, ...prev] : ascending);
     setLoading(false);
   }, [threadId]);
+
+  const load = useCallback(async () => {
+    setPage(0);
+    await fetchPage(0, false);
+  }, [fetchPage]);
+
+  const loadMore = useCallback(async () => {
+    const next = page + 1;
+    setPage(next);
+    await fetchPage(next, true);
+  }, [page, fetchPage]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -163,10 +193,27 @@ export function useInboxMessages(threadId: string | null) {
       .channel(`inbox_messages_${threadId}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'inbox_messages', filter: `thread_id=eq.${threadId}` }, () => load())
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => { channel.unsubscribe(); supabase.removeChannel(channel); };
   }, [threadId, load]);
 
-  return { messages, loading, reload: load };
+  return { messages, loading, reload: load, hasMore, loadMore };
+}
+
+// Attachment validation helper — call before uploading file attachments to inbox_messages
+const ALLOWED_ATTACHMENT_MIME = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+const MAX_ATTACHMENT_SIZE_MB = 25;
+
+export function validateInboxAttachment(file: File): { valid: boolean; error?: string } {
+  if (!ALLOWED_ATTACHMENT_MIME.includes(file.type)) {
+    return { valid: false, error: 'Only JPEG, PNG, WebP, and PDF attachments are accepted.' };
+  }
+  if (file.size > MAX_ATTACHMENT_SIZE_MB * 1024 * 1024) {
+    return {
+      valid: false,
+      error: `Attachment too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum is ${MAX_ATTACHMENT_SIZE_MB} MB.`,
+    };
+  }
+  return { valid: true };
 }
 
 export async function markThreadRead(threadId: string) {

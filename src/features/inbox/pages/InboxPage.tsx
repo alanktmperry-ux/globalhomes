@@ -41,7 +41,7 @@ export default function InboxPage() {
   const [search, setSearch] = useState('');
   const [activeId, setActiveId] = useState<string | null>(null);
   const { threads, loading, agentId, counts } = useInboxThreads(filter, search);
-  const { messages, loading: messagesLoading } = useInboxMessages(activeId);
+  const { messages, loading: messagesLoading, hasMore, loadMore } = useInboxMessages(activeId);
   const activeThread = useMemo(() => threads.find(t => t.id === activeId) || null, [threads, activeId]);
 
   const [draft, setDraft] = useState('');
@@ -239,7 +239,14 @@ export default function InboxPage() {
 
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                {messagesLoading ? (
+                {hasMore && (
+                  <div className="flex justify-center">
+                    <Button variant="ghost" size="sm" onClick={loadMore} disabled={messagesLoading}>
+                      {messagesLoading ? 'Loading…' : 'Load older messages'}
+                    </Button>
+                  </div>
+                )}
+                {messagesLoading && messages.length === 0 ? (
                   <div className="flex items-center justify-center p-8"><Loader2 className="animate-spin text-muted-foreground" size={20} /></div>
                 ) : messages.length === 0 ? (
                   <div className="text-center text-sm text-muted-foreground py-8">No messages yet — start the conversation below.</div>

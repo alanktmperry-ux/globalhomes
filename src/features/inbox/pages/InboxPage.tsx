@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import DOMPurify from 'dompurify';
 import { Helmet } from 'react-helmet-async';
 import { Loader2, Mail, MessageSquare, Search, Send, Clock, X, CheckCircle2, Inbox as InboxIcon, MailOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -253,7 +254,7 @@ export default function InboxPage() {
                           <span>{formatDistanceToNow(new Date(m.sent_at), { addSuffix: true })}</span>
                         </div>
                         {m.body_html ? (
-                          <div className="text-sm prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: m.body_html }} />
+                          <div className="text-sm prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(m.body_html, { ALLOWED_TAGS: ['p','br','strong','em','ul','ol','li','a'], ALLOWED_ATTR: ['href','target','rel'] }) }} />
                         ) : (
                           <div className="text-sm whitespace-pre-wrap break-words">{m.body}</div>
                         )}

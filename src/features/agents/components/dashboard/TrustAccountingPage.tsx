@@ -53,6 +53,7 @@ const TrustAccountingPage = () => {
   const { canAccessTrust, loading: subLoading } = useSubscription();
   const {
     accounts, transactions, contacts, properties, loading,
+    hasMoreTx, loadMoreTransactions,
     fetchAccounts, fetchTransactions,
     createAccount, createTransaction, voidTransaction,
   } = useTrustAccounting();

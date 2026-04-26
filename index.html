@@ -61,7 +61,7 @@
             api_host: 'https://app.posthog.com',
             capture_pageview: true,
             capture_pageleave: true,
-            session_recording: { maskAllInputs: false }
+            session_recording: { maskAllInputs: true, sampleRate: 0.1 }
           });
         }
         if ('requestIdleCallback' in window) {

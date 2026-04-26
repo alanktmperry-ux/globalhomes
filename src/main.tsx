@@ -9,11 +9,9 @@ setTimeout(() => {
   Sentry.init({
     dsn: import.meta.env.VITE_SENTRY_DSN,
     environment: import.meta.env.MODE,
-    tracesSampleRate: 0.2,
-    replaysOnErrorSampleRate: 1.0,
+    tracesSampleRate: 0.05,
     integrations: [
       Sentry.browserTracingIntegration(),
-      Sentry.replayIntegration({ maskAllInputs: false }),
     ],
   });
 }, 0);
@@ -34,13 +32,3 @@ createRoot(document.getElementById("root")!).render(
   </ThemeProvider>
 );
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(regs => {
-    regs.forEach(reg => {
-      reg.unregister();
-    });
-  });
-  if ('caches' in window) {
-    caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
-  }
-}

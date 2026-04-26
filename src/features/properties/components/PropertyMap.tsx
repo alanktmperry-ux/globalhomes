@@ -68,6 +68,8 @@ export function PropertyMap({
   const drawnOverlayRef = useRef<google.maps.Circle | google.maps.Polygon | null>(null);
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
   const pendingCenterRef = useRef<{ lat: number; lng: number } | null>(null);
+  const mapListenersRef = useRef<google.maps.MapsEventListener[]>([]);
+  const schoolListenersRef = useRef<google.maps.MapsEventListener[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showSearchArea, setShowSearchArea] = useState(false);
@@ -87,6 +89,8 @@ export function PropertyMap({
   // Initialize map
   useEffect(() => {
     let cancelled = false;
+    let ro: ResizeObserver | undefined;
+    const mapListeners: google.maps.MapsEventListener[] = [];
 
     async function init() {
       if (!mapRef.current) return;
@@ -147,18 +151,18 @@ export function PropertyMap({
         mapInstanceRef.current = map;
 
         // Track user interaction for "Search this area"
-        map.addListener('dragend', () => {
+        mapListeners.push(map.addListener('dragend', () => {
           userMovedRef.current = true;
           setShowSearchArea(true);
-        });
-        map.addListener('zoom_changed', () => {
+        }));
+        mapListeners.push(map.addListener('zoom_changed', () => {
           if (userMovedRef.current) setShowSearchArea(true);
-        });
+        }));
 
         setIsLoading(false);
 
         // Watch for pending center when map container becomes visible
-        const ro = new ResizeObserver(() => {
+        ro = new ResizeObserver(() => {
           const pc = pendingCenterRef.current;
           const h = mapRef.current?.offsetHeight ?? 0;
           const w = mapRef.current?.offsetWidth ?? 0;
@@ -166,7 +170,7 @@ export function PropertyMap({
             pendingCenterRef.current = null;
             mapInstanceRef.current?.panTo({ lat: pc.lat, lng: pc.lng });
             mapInstanceRef.current?.setZoom(13);
-            ro.disconnect();
+            ro?.disconnect();
           }
         });
         if (mapRef.current) ro.observe(mapRef.current);
@@ -179,9 +183,12 @@ export function PropertyMap({
       }
     }
 
-    let ro: ResizeObserver | undefined;
-    init().then(() => { /* ro is set inside init */ });
-    return () => { cancelled = true; };
+    init();
+    return () => {
+      cancelled = true;
+      ro?.disconnect();
+      mapListeners.forEach((l) => google.maps.event.removeListener(l));
+    };
   }, []);
 
   // Center map when location is selected
@@ -325,7 +332,7 @@ export function PropertyMap({
         });
       }
 
-      marker.addListener('click', () => {
+      const clickListener = marker.addListener('click', () => {
         onPropertySelect(property);
         onScrollToProperty?.(property.id);
         // Bounce animation
@@ -338,6 +345,7 @@ export function PropertyMap({
           setTimeout(() => { el.style.transform = 'translateY(-100%) scale(1)'; }, 450);
         }
       });
+      mapListenersRef.current.push(clickListener);
 
       markersRef.current.push(marker);
       bounds.extend({ lat: property.lat!, lng: property.lng! });
@@ -387,7 +395,17 @@ export function PropertyMap({
           google.maps.event.removeListener(listener);
         }
       });
+      mapListenersRef.current.push(listener);
     }
+
+    return () => {
+      mapListenersRef.current.forEach((l) => google.maps.event.removeListener(l));
+      mapListenersRef.current = [];
+      if (clustererRef.current) {
+        clustererRef.current.clearMarkers();
+        clustererRef.current = null;
+      }
+    };
   }, [properties, selectedPropertyId, onPropertySelect, centerOn, onScrollToProperty, formatPrice]);
 
   // School markers
@@ -445,6 +463,12 @@ export function PropertyMap({
 
       schoolMarkersRef.current.push(marker);
     });
+
+    return () => {
+      infoWindow.close();
+      schoolMarkersRef.current.forEach((m) => (m.map = null));
+      schoolMarkersRef.current = [];
+    };
   }, [schoolMarkers]);
 
   const handleGeolocate = () => {

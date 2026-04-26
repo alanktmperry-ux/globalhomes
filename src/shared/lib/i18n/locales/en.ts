@@ -618,6 +618,33 @@ export const en = {
   'valuation.trust.free': 'Free estimate',
   'valuation.trust.language': 'Agents speak your language',
   'valuation.trust.fast': '24-hour response',
+
+  // Hero — homepage tiles, sub-headline prefix, language banner, category toggle
+  'hero.subheadlinePrefix': 'Showing listings in',
+  'hero.langBannerText': 'Browse in your language — tap to switch',
+  'hero.commercial': 'Commercial',
+  'hero.land': 'Land',
+  'hero.buyerTileTitle': 'Looking for a home?',
+  'hero.buyerTileDesc': 'Search Australian property in 24 languages. Free, no signup.',
+  'hero.buyerTileCta': 'Browse properties →',
+  'hero.agentTileTitle': 'Are you an agent?',
+  'hero.agentTileDesc': "List once, translated into 24 languages. Reach multilingual buyers REA and Domain can't. Free for 3 months.",
+  'hero.agentTileCta': 'See agent tools →',
+
+  // Sort dropdown
+  'sort.default': 'Default',
+  'sort.priceAsc': 'Price: Low–High',
+  'sort.priceDesc': 'Price: High–Low',
+  'sort.newest': 'Newest',
+  'sort.beds': 'Bedrooms',
+
+  // Search status bar
+  'search.propertiesCount': '{count} properties',
+  'search.recommended': 'Recommended',
+  'search.save': 'Save',
+  'search.searchTogether': 'Search together',
+  'search.emptyTitle': 'Properties coming soon',
+  'search.emptyDesc': 'Agents are setting up their listings. Check back shortly!',
 } as const;
 
 export type TranslationKey = keyof typeof en;

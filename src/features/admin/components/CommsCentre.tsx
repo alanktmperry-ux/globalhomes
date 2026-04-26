@@ -71,8 +71,13 @@ const CATEGORY_LABELS: Record<TemplateCategory, string> = {
 };
 
 function buildEmailHtml(subject: string, body: string, agentName: string): string {
-  const escaped = body.replace(/{{name}}/g, agentName).replace(/\n/g, '<br>');
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${subject}</title></head><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#1a1a1a;line-height:1.6"><p style="font-size:15px">${escaped}</p><hr style="border:none;border-top:1px solid #e5e7eb;margin:32px 0 16px"><p style="font-size:11px;color:#9ca3af">© ListHQ Pty Ltd · Melbourne, Victoria, Australia</p></body></html>`;
+  const personalised = body.replace(/{{name}}/g, agentName);
+  const escapedBody = personalised
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\n/g, '<br>');
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${subject}</title></head><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#1a1a1a;line-height:1.6"><p style="font-size:15px">${escapedBody}</p><hr style="border:none;border-top:1px solid #e5e7eb;margin:32px 0 16px"><p style="font-size:11px;color:#9ca3af">© ListHQ Pty Ltd · Melbourne, Victoria, Australia</p></body></html>`;
 }
 
 function ComposePanel({ templates, onSent }: { templates: Template[]; onSent: () => void }) {
@@ -150,7 +155,13 @@ function ComposePanel({ templates, onSent }: { templates: Template[]; onSent: ()
   const handleSend = async () => {
     if (!subject.trim() || !body.trim()) { toast.error('Subject and message are required'); return; }
     if (preview.length === 0) { toast.error('No recipients in this audience'); return; }
-    if (!confirm(`Send to ${preview.length} agent${preview.length > 1 ? 's' : ''}? This cannot be undone.`)) return;
+    const recipientCount = preview.length;
+    if (recipientCount > 50) {
+      const input = window.prompt(`You are about to send to ${recipientCount} agents. Type CONFIRM to proceed.`);
+      if (input !== 'CONFIRM') return;
+    } else {
+      if (!confirm(`Send to ${recipientCount} agent${recipientCount > 1 ? 's' : ''}? This cannot be undone.`)) return;
+    }
 
     setSending(true);
 
@@ -199,6 +210,17 @@ function ComposePanel({ templates, onSent }: { templates: Template[]; onSent: ()
       sent_count: sentCount,
       sent_at: new Date().toISOString(),
     } as any).eq('id', (campaign as any).id);
+
+    if (user?.id) {
+      await supabase.from('audit_log').insert({
+        user_id: user.id,
+        action_type: 'bulk_email_sent',
+        entity_type: 'broadcast_campaign',
+        entity_id: (campaign as any).id,
+        description: subject,
+        metadata: { recipient_count: preview.length, admin_id: user.id },
+      } as any);
+    }
 
     toast.success(`Sent to ${sentCount} of ${preview.length} agents`);
     setSending(false);

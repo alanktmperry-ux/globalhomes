@@ -681,9 +681,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                         onChange={e => setTextQuery(e.target.value)}
                         onKeyDown={e => {
                           if (e.key === 'Enter' && textQuery.trim()) {
-                            suppressAutocompleteRef.current = true;
-                            processTranscript(textQuery.trim());
-                            setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
+                            submitTypedQuery(textQuery);
                           }
                         }}
                         autoFocus

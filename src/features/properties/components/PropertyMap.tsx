@@ -453,7 +453,7 @@ export function PropertyMap({
                 ${typeLabel}${sectorLabel ? ' · ' + sectorLabel : ''}${school.icsea ? ' · ICSEA ' + school.icsea : ''}
               </div>
             </div>
-          `));
+          `, { ALLOWED_TAGS: ['div','span','p','br','strong','em','img','a'], ALLOWED_ATTR: ['class','style','src','alt','href','target'] }));
           infoWindow.open(map, marker);
         });
         markerEl.addEventListener('mouseleave', () => {

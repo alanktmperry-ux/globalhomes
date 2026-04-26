@@ -168,7 +168,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
             if (!staticCenter) {
               const fallbackCenter = lookupSuburbCentroid(detectedLocation);
               if (fallbackCenter) {
-                console.log('[handleSearch] Geocoding failed, applying static centroid fallback', {
+                if (import.meta.env.DEV) console.log('[handleSearch] Geocoding failed, applying static centroid fallback', {
                   location: detectedLocation,
                   fallbackCenter,
                 });
@@ -234,7 +234,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
                     setSearchCenter(coords);
                     setSearchRadius(prev => prev ?? DEFAULT_RADIUS_KM);
                   } else if (aiStaticCenter) {
-                    console.log('[handleSearch] AI geocode returned no result, keeping static centroid fallback', {
+                    if (import.meta.env.DEV) console.log('[handleSearch] AI geocode returned no result, keeping static centroid fallback', {
                       locationQuery,
                       aiStaticCenter,
                     });
@@ -243,7 +243,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
                 .catch((error) => {
                   if (import.meta.env.DEV) console.warn('[handleSearch] AI geocoding error:', error);
                   if (aiStaticCenter) {
-                    console.log('[handleSearch] AI geocoding failed, keeping static centroid fallback', {
+                    if (import.meta.env.DEV) console.log('[handleSearch] AI geocoding failed, keeping static centroid fallback', {
                       locationQuery,
                       aiStaticCenter,
                     });
@@ -438,7 +438,7 @@ export function usePropertySearch({ addSearch }: UsePropertySearchOptions) {
   useEffect(() => {
     if (!hasSearched) return;
 
-    console.log('[usePropertySearch] radius state', {
+    if (import.meta.env.DEV) console.log('[usePropertySearch] radius state', {
       searchCenter,
       searchRadius,
       dbResultsCount: dbProperties.length,

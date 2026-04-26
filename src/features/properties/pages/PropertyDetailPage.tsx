@@ -903,7 +903,7 @@ export default function PropertyDetailPage() {
                     className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[13px] font-semibold text-white transition-colors"
                     style={{ border: '1.5px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)' }}
                   >
-                    <Phone size={13} strokeWidth={2} /> Call
+                    <Phone size={13} strokeWidth={2} /> {tp('property.call')}
                   </a>
                 ) : (
                   <button
@@ -911,7 +911,7 @@ export default function PropertyDetailPage() {
                     className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[13px] font-semibold text-white transition-colors"
                     style={{ border: '1.5px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)' }}
                   >
-                    <Phone size={13} strokeWidth={2} /> Call
+                    <Phone size={13} strokeWidth={2} /> {tp('property.call')}
                   </button>
                 )}
                 <button

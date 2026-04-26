@@ -3,6 +3,7 @@ import { Banknote } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { MortgageBrokerModal } from './MortgageBrokerModal';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 interface MortgageBrokerCTAProps {
   title?: string;
@@ -16,16 +17,20 @@ interface MortgageBrokerCTAProps {
 }
 
 export function MortgageBrokerCTA({
-  title = 'Need finance? Speak to a broker',
-  description = 'Get pre-approved with a licensed mortgage broker — free, no obligation.',
-  buttonLabel = 'Get pre-approved',
+  title,
+  description,
+  buttonLabel,
   sourcePage,
   defaultPrice,
   propertyId,
   agentId,
   className = '',
 }: MortgageBrokerCTAProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const resolvedTitle = title ?? t('property.finance.title');
+  const resolvedDescription = description ?? t('property.finance.body');
+  const resolvedButtonLabel = buttonLabel ?? t('property.finance.cta');
   return (
     <>
       <div className={`p-4 rounded-2xl bg-card border border-border ${className}`}>
@@ -34,14 +39,14 @@ export function MortgageBrokerCTA({
             <Banknote className="w-5 h-5 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-foreground">{title}</h3>
-            <p className="text-sm text-muted-foreground mt-0.5">{description}</p>
+            <h3 className="font-semibold text-foreground">{resolvedTitle}</h3>
+            <p className="text-sm text-muted-foreground mt-0.5">{resolvedDescription}</p>
             <div className="flex flex-wrap gap-2 mt-3">
               <Button onClick={() => setOpen(true)} size="sm">
-                {buttonLabel}
+                {resolvedButtonLabel}
               </Button>
               <Button asChild size="sm" variant="outline">
-                <Link to="/brokers">Browse all brokers</Link>
+                <Link to="/brokers">{t('property.finance.browseAll')}</Link>
               </Button>
             </div>
           </div>

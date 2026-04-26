@@ -260,9 +260,9 @@ export default function PropertyDetailPage() {
     return (
       <div className="flex-1 flex flex-col items-center justify-center gap-4">
         <Home size={48} className="text-muted-foreground" />
-        <h1 className="font-display text-xl font-bold text-foreground">Property not found</h1>
+        <h1 className="font-display text-xl font-bold text-foreground">{tp('property.notFound')}</h1>
         <button onClick={() => navigate('/')} className="px-6 py-2 rounded-xl bg-primary text-primary-foreground font-medium text-sm">
-          Back to search
+          {tp('property.notFound.back')}
         </button>
       </div>
     );
@@ -294,7 +294,7 @@ export default function PropertyDetailPage() {
     }
   };
 
-  const ctaLabel = isRental ? 'Enquire / Apply' : t('property.contact');
+  const ctaLabel = isRental ? 'Enquire / Apply' : tp('property.contactAgent');
 
   return (
     <div className="bg-background overflow-y-auto overflow-x-hidden">
@@ -370,7 +370,7 @@ export default function PropertyDetailPage() {
             {isRental && property.contactClicks > 0 && (
               <span className="px-3 py-1.5 rounded-full bg-primary/90 text-primary-foreground text-xs font-bold tracking-wide uppercase shadow-sm flex items-center gap-1">
                 <Users size={12} />
-                {property.contactClicks} application{property.contactClicks !== 1 ? 's' : ''}
+                {tp(property.contactClicks === 1 ? 'property.applications' : 'property.applicationsPlural', { count: property.contactClicks })}
               </span>
             )}
           </div>
@@ -384,7 +384,7 @@ export default function PropertyDetailPage() {
             className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 h-10 rounded-full border border-border bg-card text-sm font-medium text-foreground hover:bg-secondary transition-colors"
           >
             <Heart size={16} className={saved ? 'fill-destructive text-destructive' : ''} />
-            {saved ? t('property.saved') || 'Saved' : t('property.save') || 'Save'}
+            {saved ? tp('property.saved') : tp('property.save')}
           </button>
         </div>
 
@@ -417,7 +417,7 @@ export default function PropertyDetailPage() {
                     <p className="font-display text-3xl md:text-4xl font-bold text-foreground">
                       {formatPrice(weeklyRent, 'rent')}
                     </p>
-                    <span className="text-lg text-muted-foreground font-medium">per week</span>
+                    <span className="text-lg text-muted-foreground font-medium">{tp('property.perWeek')}</span>
                   </div>
                   {currency.code !== 'AUD' && (
                     <p className="text-sm text-muted-foreground mt-0.5">${weeklyRent.toLocaleString()}/wk AUD</p>
@@ -452,7 +452,7 @@ export default function PropertyDetailPage() {
                   to={`/suburb/${property.state.toLowerCase()}/${property.suburb.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`}
                   className="inline-block text-xs text-muted-foreground hover:text-primary transition-colors mt-1"
                 >
-                  View {property.suburb} suburb profile →
+                  {tp('property.viewSuburb', { suburb: property.suburb })} →
                 </Link>
               )}
               {((property as any).listing_mode === 'eoi' || (property as any).listing_mode === 'off_market') && (
@@ -472,17 +472,17 @@ export default function PropertyDetailPage() {
                 className="mt-4 flex items-center gap-2 px-4 py-2 rounded-full border border-teal-600 text-teal-600 font-medium text-sm hover:bg-teal-50 transition-colors"
               >
                 <Share2 size={16} />
-                Share
+                {tp('property.share')}
               </button>
             </div>
 
             {/* Key stats */}
             <div className="flex border border-slate-200 rounded-2xl overflow-hidden">
               {[
-                { icon: Bed, value: property.beds, label: t('property.beds') },
-                { icon: Bath, value: property.baths, label: t('property.baths') },
-                { icon: Car, value: property.parking, label: t('property.parking') },
-                { icon: Ruler, value: property.sqm ? `${property.sqm}m²` : '—', label: 'Size' },
+                { icon: Bed, value: property.beds, label: tp('property.facts.beds') },
+                { icon: Bath, value: property.baths, label: tp('property.facts.baths') },
+                { icon: Car, value: property.parking, label: tp('property.facts.parking') },
+                { icon: Ruler, value: property.sqm ? `${property.sqm}m²` : '—', label: tp('property.facts.size') },
               ].map((stat, i) => (
                 <div key={stat.label} className={`flex-1 flex flex-col items-center py-3.5 gap-0.5 bg-white ${i < 3 ? 'border-r border-slate-200' : ''}`}>
                   <stat.icon size={15} className="text-slate-400 mb-1" strokeWidth={1.8} />
@@ -512,7 +512,7 @@ export default function PropertyDetailPage() {
                     </p>
                     {isTranslated && (
                       <p className="mt-2 text-[11px] text-muted-foreground italic">
-                        Translated by AI
+                        {tp('property.aiTranslated')}
                       </p>
                     )}
                   </>

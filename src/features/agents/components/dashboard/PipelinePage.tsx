@@ -136,7 +136,8 @@ const PipelinePage = () => {
     if (!isSoloAgent && !targetStage.id.startsWith('default-')) {
       updates.stage_id = targetStage.id;
     }
-    await supabase.from('properties').update(updates).eq('id', cardId);
+    const { error } = await supabase.from('properties').update(updates).eq('id', cardId);
+    if (error) throw error;
   };
 
   const handleDrop = useCallback(async (e: DragEvent, targetStageId: string) => {

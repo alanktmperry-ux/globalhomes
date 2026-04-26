@@ -145,11 +145,14 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <UserCheck size={22} className="text-primary" />
-        <h2 className="text-xl font-bold">Agent Approval Queue</h2>
+        <h2 className="text-xl font-bold">Agent Monitor</h2>
         {agents.length > 0 && (
-          <Badge variant="destructive" className="text-xs">{agents.length} pending</Badge>
+          <Badge variant="secondary" className="text-xs">{agents.length} flagged</Badge>
         )}
       </div>
+      <p className="text-sm text-muted-foreground -mt-3">
+        Agents are auto-approved on email verification. Use this view to monitor signups and suspend suspicious accounts.
+      </p>
 
       {agents.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-3">

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
 
 export type PlanType = 'demo' | 'starter' | 'pro' | 'agency' | 'enterprise' | null;
 
@@ -59,6 +60,7 @@ export function getPlanFeatures(plan: string | null): PlanFeatures {
 
 export function useSubscription(): SubscriptionState {
   const { user } = useAuth();
+  const { agent } = useCurrentAgent();
   const [state, setState] = useState<SubscriptionState>({
     plan: null,
     isDemo: true,
@@ -92,21 +94,15 @@ export function useSubscription(): SubscriptionState {
       return;
     }
 
+    if (!agent?.id) {
+      setState(prev => ({ ...prev, loading: false }));
+      return;
+    }
+
     let cancelled = false;
 
     const fetch = async () => {
       try {
-        const { data: agent } = await supabase
-          .from('agents')
-          .select('id')
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        if (!agent || cancelled) {
-          if (!cancelled) setState(prev => ({ ...prev, loading: false }));
-          return;
-        }
-
         const { data: sub } = await supabase
           .from('agent_subscriptions')
           .select('*')
@@ -143,7 +139,7 @@ export function useSubscription(): SubscriptionState {
 
     fetch();
     return () => { cancelled = true; };
-  }, [user]);
+  }, [user, agent?.id]);
 
   // If the timeout fired but we're still loading, return loading: false to unblock pages
   if (subLoadingTimeout && state.loading) {

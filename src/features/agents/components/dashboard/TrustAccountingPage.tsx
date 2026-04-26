@@ -652,7 +652,7 @@ const TrustAccountingPage = () => {
               {overdrawnLedgers.map(l => (
                 <div key={l.name} className="flex items-center justify-between text-xs bg-destructive/10 rounded px-2 py-1">
                   <span className="font-medium text-foreground">{l.name}</span>
-                  <span className="font-mono text-destructive font-bold">−${Math.abs(l.balance).toFixed(2)}</span>
+                  <span className="font-mono text-destructive font-bold">−${safeAmount(l.balance)}</span>
                 </div>
               ))}
             </div>

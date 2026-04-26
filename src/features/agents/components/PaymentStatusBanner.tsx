@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { X } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/features/auth/AuthProvider';
+import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
 
 interface AgentPaymentState {
   subscriptionStatus: string | null;
@@ -21,43 +20,20 @@ function getDaysSince(dateStr: string | null): number {
  * for agents with payment issues. Only renders for authenticated agents.
  */
 export function PaymentStatusBanner() {
-  const { user } = useAuth();
-  const [state, setState] = useState<AgentPaymentState | null>(null);
-  const [isAgent, setIsAgent] = useState(false);
+  const { agent } = useCurrentAgent();
   const [dismissed, setDismissed] = useState(() =>
     sessionStorage.getItem('payment-banner-dismissed') === 'true'
   );
 
-  useEffect(() => {
-    if (!user) return;
-    let cancelled = false;
-
-    const fetchStatus = async () => {
-      const { data: agent } = await supabase
-        .from('agents')
-        .select('subscription_status, payment_failed_at, admin_grace_until')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (cancelled) return;
-      if (!agent) {
-        setIsAgent(false);
-        return;
+  const state: AgentPaymentState | null = agent
+    ? {
+        subscriptionStatus: agent.subscription_status ?? 'active',
+        paymentFailedAt: agent.payment_failed_at ?? null,
+        adminGraceUntil: agent.admin_grace_until ?? null,
       }
+    : null;
 
-      setIsAgent(true);
-      setState({
-        subscriptionStatus: (agent as any).subscription_status ?? 'active',
-        paymentFailedAt: (agent as any).payment_failed_at ?? null,
-        adminGraceUntil: (agent as any).admin_grace_until ?? null,
-      });
-    };
-
-    fetchStatus();
-    return () => { cancelled = true; };
-  }, [user]);
-
-  if (!isAgent || !state) return null;
+  if (!agent || !state) return null;
 
   // Check admin grace period
   if (state.adminGraceUntil && new Date(state.adminGraceUntil) > new Date()) {

@@ -97,8 +97,11 @@ export function useTranslation() {
       value = en[key as TranslationKey];
     }
 
-    // 4. Last-resort: the key itself
-    if (typeof value !== 'string') return String(key);
+    // 4. Last-resort: empty string (never expose raw key names to users)
+    if (typeof value !== 'string') {
+      if (import.meta.env.DEV) console.warn('[i18n] Missing translation key:', key);
+      return '';
+    }
 
     if (vars) {
       return value.replace(/\{(\w+)\}/g, (_, name) =>

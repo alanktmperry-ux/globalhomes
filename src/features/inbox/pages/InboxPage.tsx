@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import DOMPurify from 'dompurify';
 import { Helmet } from 'react-helmet-async';
 import { Loader2, Mail, MessageSquare, Search, Send, Clock, X, CheckCircle2, Inbox as InboxIcon, MailOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';

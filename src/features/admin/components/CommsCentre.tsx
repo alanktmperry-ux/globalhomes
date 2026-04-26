@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { buildAuditMeta } from '@/shared/lib/auditLog';
 
 type Audience = 'all' | 'trial' | 'expiring' | 'paid' | 'never_listed' | 'at_risk';
 type SendMethod = 'in_app' | 'email' | 'both';

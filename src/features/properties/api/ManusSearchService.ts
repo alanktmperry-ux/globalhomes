@@ -26,7 +26,7 @@ export interface ManusSearchResult {
   status?: 'pending' | 'running' | 'completed' | 'failed' | 'mock';
 }
 
-type StatusCallback = (update: { status: string; properties?: Property[] }) => void;
+type StatusCallback = (update: { status: string; properties?: Property[]; error?: string }) => void;
 
 const POLL_INTERVAL = 4000;
 const MAX_POLL_TIME = 60000; // 1 minute — Manus tasks can take a while

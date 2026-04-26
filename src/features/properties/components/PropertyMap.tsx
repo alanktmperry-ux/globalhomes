@@ -87,6 +87,8 @@ export function PropertyMap({
   // Initialize map
   useEffect(() => {
     let cancelled = false;
+    let ro: ResizeObserver | undefined;
+    const mapListeners: google.maps.MapsEventListener[] = [];
 
     async function init() {
       if (!mapRef.current) return;
@@ -147,18 +149,18 @@ export function PropertyMap({
         mapInstanceRef.current = map;
 
         // Track user interaction for "Search this area"
-        map.addListener('dragend', () => {
+        mapListeners.push(map.addListener('dragend', () => {
           userMovedRef.current = true;
           setShowSearchArea(true);
-        });
-        map.addListener('zoom_changed', () => {
+        }));
+        mapListeners.push(map.addListener('zoom_changed', () => {
           if (userMovedRef.current) setShowSearchArea(true);
-        });
+        }));
 
         setIsLoading(false);
 
         // Watch for pending center when map container becomes visible
-        const ro = new ResizeObserver(() => {
+        ro = new ResizeObserver(() => {
           const pc = pendingCenterRef.current;
           const h = mapRef.current?.offsetHeight ?? 0;
           const w = mapRef.current?.offsetWidth ?? 0;
@@ -166,7 +168,7 @@ export function PropertyMap({
             pendingCenterRef.current = null;
             mapInstanceRef.current?.panTo({ lat: pc.lat, lng: pc.lng });
             mapInstanceRef.current?.setZoom(13);
-            ro.disconnect();
+            ro?.disconnect();
           }
         });
         if (mapRef.current) ro.observe(mapRef.current);
@@ -179,9 +181,12 @@ export function PropertyMap({
       }
     }
 
-    let ro: ResizeObserver | undefined;
-    init().then(() => { /* ro is set inside init */ });
-    return () => { cancelled = true; };
+    init();
+    return () => {
+      cancelled = true;
+      ro?.disconnect();
+      mapListeners.forEach((l) => google.maps.event.removeListener(l));
+    };
   }, []);
 
   // Center map when location is selected

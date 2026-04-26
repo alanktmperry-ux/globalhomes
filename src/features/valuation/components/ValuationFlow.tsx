@@ -72,11 +72,27 @@ export function ValuationFlow({ initialAddress = '', compact = false }: Props) {
         p_renovations: renovations,
       });
       if (rpcErr) throw rpcErr;
-      const parsed = typeof data === 'string' ? JSON.parse(data) : data;
+
+      // Validate RPC payload shape before use
+      let parsed: any = {};
+      try {
+        parsed = typeof data === 'string' ? JSON.parse(data) : (data ?? {});
+        if (typeof parsed !== 'object' || parsed === null) parsed = {};
+      } catch {
+        setError(t('valuation.error.submit'));
+        return;
+      }
+
+      const midNum = Number(parsed.mid);
+      if (!isFinite(midNum)) {
+        setError('Could not calculate an estimate. Please try again.');
+        return;
+      }
+
       const est: Estimate = {
         min: Number(parsed.min),
         max: Number(parsed.max),
-        mid: Number(parsed.mid),
+        mid: midNum,
         base: Number(parsed.base),
         method: parsed.method,
         sample_size: Number(parsed.sample_size ?? 0),

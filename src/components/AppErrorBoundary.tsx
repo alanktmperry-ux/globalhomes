@@ -2,6 +2,7 @@ import React, { Component, ErrorInfo, ReactNode } from "react";
 
 interface Props {
   children: ReactNode;
+  fallback?: ReactNode;
 }
 
 interface State {
@@ -33,6 +34,7 @@ class AppErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
+      if (this.props.fallback) return this.props.fallback;
       return (
         <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-background px-6 text-center">
           <div className="rounded-2xl border border-border bg-card p-10 shadow-lg max-w-md w-full">

@@ -463,6 +463,12 @@ export function PropertyMap({
 
       schoolMarkersRef.current.push(marker);
     });
+
+    return () => {
+      infoWindow.close();
+      schoolMarkersRef.current.forEach((m) => (m.map = null));
+      schoolMarkersRef.current = [];
+    };
   }, [schoolMarkers]);
 
   const handleGeolocate = () => {

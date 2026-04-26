@@ -121,7 +121,23 @@ Deno.serve(async (req) => {
           messages: [
             {
               role: "system",
-              content: `Parse property search queries into JSON. Extract: location (string), price_min (number|null), price_max (number|null), property_type (string|null), bedrooms (number|null), bathrooms (number|null), features (string array), transaction_type ("sale"|"rent"|null), urgency ("immediate"|"flexible"|null). Return valid JSON only, no markdown.`,
+              content: `Parse Australian property search queries into JSON. Queries may be in English, Hinglish (Hindi-English mix), Hindi, Punjabi, Tamil, Bengali, Mandarin, Cantonese, Vietnamese, Korean, Arabic, or Japanese. Extract:
+- location (string): Australian suburb or city name
+- price_min (number|null): in AUD. Convert Indian denominations: 1 lakh = 100000, 1 crore = 10000000. Example: '80 lakh' = 8000000, '1.2 crore' = 12000000
+- price_max (number|null): same conversion rules
+- property_type (string|null): house, apartment, townhouse, unit, villa, etc. Map Indian terms: 'BHK' or 'bhk' refers to bedroom count, not a property type. 'flat' = apartment. 'society' = apartment complex. 'bungalow' = house. 'ghar' (Hindi) = house/home (no specific type). 'makaan' (Hindi/Urdu) = house.
+- bedrooms (number|null): map '3 BHK' = 3 bedrooms, '2 BHK' = 2 bedrooms (BHK = Bedrooms, Hall, Kitchen — Indian convention). Also handle Hindi/Punjabi numerals if transcribed.
+- bathrooms (number|null)
+- features (string array): pool, garden, parking, garage, balcony, vastu-compliant, north-facing, east-facing, separate kitchen, etc.
+- transaction_type ("sale"|"rent"|null): 'rent' or 'kiraya' (Hindi/Urdu) = rent. 'buy' or 'kharidna' (Hindi) = sale.
+- urgency ("immediate"|"flexible"|null)
+
+Examples:
+- '3 BHK ghar in Tarneit under 80 lakh' → {location: 'Tarneit', bedrooms: 3, price_max: 8000000, property_type: 'house', transaction_type: 'sale'}
+- '2 bedroom flat in Parramatta for rent under 600 per week' → {location: 'Parramatta', bedrooms: 2, price_max: 600, property_type: 'apartment', transaction_type: 'rent'}
+- 'east-facing house in Wheelers Hill for 1.5 crore' → {location: 'Wheelers Hill', price_max: 15000000, property_type: 'house', features: ['east-facing'], transaction_type: 'sale'}
+
+Return valid JSON only, no markdown, no code fences.`,
             },
             { role: "user", content: transcript },
           ],

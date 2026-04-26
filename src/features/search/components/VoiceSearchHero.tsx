@@ -733,31 +733,29 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
                 {/* Search CTA button */}
                 <button
-                  onClick={() => {
-                    if (textQuery.trim()) {
-                      suppressAutocompleteRef.current = true;
-                      processTranscript(textQuery.trim());
-                      setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
-                    }
-                  }}
-                  className="shrink-0 flex items-center gap-2 h-10 px-5 rounded-xl bg-primary text-primary-foreground text-[14px] font-semibold hover:opacity-90 active:scale-95 transition-all whitespace-nowrap hidden sm:flex"
+                  onClick={() => submitTypedQuery(textQuery)}
+                  disabled={isTranslatingText}
+                  className="shrink-0 flex items-center gap-2 h-10 px-5 rounded-xl bg-primary text-primary-foreground text-[14px] font-semibold hover:opacity-90 active:scale-95 transition-all whitespace-nowrap hidden sm:flex disabled:opacity-60"
                 >
-                  <Search size={15} /> Search
+                  {isTranslatingText ? <Loader2 size={15} className="animate-spin" /> : <Search size={15} />} Search
                 </button>
               </div>
 
+              {textDetectedLang && (
+                <div className="mt-2 flex justify-center">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
+                    🌐 Detected {textDetectedLang.toUpperCase()} — searching in English
+                  </span>
+                </div>
+              )}
+
               {/* Mobile full-width search button */}
               <button
-                onClick={() => {
-                  if (textQuery.trim()) {
-                    suppressAutocompleteRef.current = true;
-                    processTranscript(textQuery.trim());
-                    setTimeout(() => { suppressAutocompleteRef.current = false; }, 500);
-                  }
-                }}
-                className="sm:hidden w-full flex items-center justify-center gap-2 h-11 mt-2 rounded-xl bg-primary text-primary-foreground text-[14px] font-semibold active:scale-[0.98] transition-all"
+                onClick={() => submitTypedQuery(textQuery)}
+                disabled={isTranslatingText}
+                className="sm:hidden w-full flex items-center justify-center gap-2 h-11 mt-2 rounded-xl bg-primary text-primary-foreground text-[14px] font-semibold active:scale-[0.98] transition-all disabled:opacity-60"
               >
-                <Search size={15} /> Search
+                {isTranslatingText ? <Loader2 size={15} className="animate-spin" /> : <Search size={15} />} Search
               </button>
 
               {/* Autocomplete dropdown */}

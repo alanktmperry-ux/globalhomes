@@ -151,10 +151,10 @@ export function RentalApplicationModal({ property, open, onClose }: Props) {
       setSubmitted(true);
 
       // Notify agent
-      if (property.agent.id) {
+      if (property.agent?.id) {
         supabase.functions.invoke('send-notification-email', {
           body: {
-            agent_id: property.agent.id,
+            agent_id: property.agent?.id,
             type: 'lead',
             title: `New rental application from ${form.fullName}`,
             message: `${form.fullName} submitted a rental application for ${property.title}`,

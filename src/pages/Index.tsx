@@ -823,31 +823,33 @@ const Index = () => {
             <Sparkles size={12} className="text-primary" /> {t('search.recommended')}
           </span>
         )}
-        {/* Always-visible radius pills */}
-        <div className="flex items-center gap-1 shrink-0">
-          {[
-            { label: 'Any', value: null },
-            { label: '5 km', value: 5 },
-            { label: '10 km', value: 10 },
-            { label: '25 km', value: 25 },
-            { label: '50 km', value: 50 },
-          ].map(({ label, value }) => {
-            const isActive = value === null ? !searchRadius : searchRadius === value;
-            return (
-              <button
-                key={label}
-                onClick={() => value === null ? clearSearchRadius() : setSearchRadius(value)}
-                className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-secondary text-muted-foreground hover:bg-accent hover:text-foreground'
-                }`}
-              >
-                {label}
-              </button>
-            );
-          })}
-        </div>
+    {/* Radius pills — only when a search center is set */}
+        {searchCenter && (
+          <div className="flex items-center gap-1 shrink-0">
+            {[
+              { label: 'Any', value: null },
+              { label: '5 km', value: 5 },
+              { label: '10 km', value: 10 },
+              { label: '25 km', value: 25 },
+              { label: '50 km', value: 50 },
+            ].map(({ label, value }) => {
+              const isActive = value === null ? !searchRadius : searchRadius === value;
+              return (
+                <button
+                  key={label}
+                  onClick={() => value === null ? clearSearchRadius() : setSearchRadius(value)}
+                  className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-secondary text-muted-foreground hover:bg-accent hover:text-foreground'
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        )}
         {areaSearch && (
           <button
             onClick={() => handleAreaSearch(null)}

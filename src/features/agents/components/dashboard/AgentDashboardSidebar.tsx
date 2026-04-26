@@ -20,7 +20,6 @@ import {
 } from '@/components/ui/sidebar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
 
@@ -89,10 +88,10 @@ const AgentDashboardSidebar = () => {
   const isMobile = useIsMobile();
   const location = useLocation();
   const navigate = useNavigate();
-  const { signOut, isAdmin, isPrincipal, user } = useAuth();
+  const { signOut, isAdmin, isPrincipal } = useAuth();
   const { agent } = useCurrentAgent();
-  const { listings } = useAgentListings({ enabled: false });
   const { plan, foundingMember } = useSubscription();
+  const [activeCount, setActiveCount] = useState(0);
   const [arrearsCount, setArrearsCount] = useState(0);
   const [renewalsCount, setRenewalsCount] = useState(0);
   const [buyerMatchesCount, setBuyerMatchesCount] = useState(0);
@@ -100,6 +99,21 @@ const AgentDashboardSidebar = () => {
   const [agentLogo, setAgentLogo] = useState<string | null>(null);
   const [agentName, setAgentName] = useState<string | null>(null);
   const [agencyName, setAgencyName] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!agent?.id) return;
+    const fetchActiveCount = async () => {
+      const { count } = await supabase
+        .from('properties')
+        .select('id', { count: 'exact', head: true })
+        .eq('agent_id', agent.id)
+        .eq('is_active', true);
+
+      setActiveCount(count ?? 0);
+    };
+
+    fetchActiveCount();
+  }, [agent?.id]);
 
   useEffect(() => {
     if (!agent?.id) return;
@@ -176,8 +190,6 @@ const AgentDashboardSidebar = () => {
   useEffect(() => {
     setOnboardingComplete(!!agent?.onboarding_complete);
   }, [agent?.onboarding_complete]);
-
-  const activeCount = listings.filter(l => ('_mock_status' in l ? l._mock_status !== 'sold' : (l as any).status !== 'sold')).length;
 
   const badgeValues: Record<string, string> = {
     listings: activeCount > 0 ? String(activeCount) : '',

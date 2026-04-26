@@ -206,8 +206,33 @@ export default function AgencyOnboardingPage() {
     return token;
   };
 
+  const isValidABN = (value: string): boolean => {
+    const weights = [10, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19];
+    const digits = value.replace(/\s/g, '').split('').map(Number);
+    if (digits.length !== 11 || digits.some(d => Number.isNaN(d))) return false;
+    digits[0] -= 1;
+    const sum = digits.reduce((acc, d, i) => acc + d * weights[i], 0);
+    return sum % 89 === 0;
+  };
+
   const handleStep2Next = async () => {
     if (!user) return;
+    if (isAustralia && abn.trim() && !isValidABN(abn)) {
+      toast.error('Invalid ABN — please check your number');
+      return;
+    }
+    if (agencyEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(agencyEmail)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+    if (
+      isAustralia &&
+      agencyPhone &&
+      !/^(\+?61|0)[2-9]\d{8}$/.test(agencyPhone.replace(/[\s\-()]/g, ''))
+    ) {
+      toast.error('Please enter a valid Australian phone number (e.g. 03 9123 4567)');
+      return;
+    }
     setLoading(true);
     try {
       const token = await getAuthToken();

@@ -30,12 +30,14 @@ const CsvImportModal = ({ onClose, onImport }: Props) => {
     const rawHeaders = lines[0].split(',').map(h => h.replace(/["']/g, '').trim().toLowerCase().replace(/\s+/g, '_'));
     setHeaders(rawHeaders);
 
+    const sanitizeText = (val: string) => val.replace(/<[^>]*>/g, '').trim();
+
     const rows: Partial<Contact>[] = [];
     for (let i = 1; i < lines.length; i++) {
       const values = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g)?.map(v => v.replace(/^"|"$/g, '').trim()) || lines[i].split(',').map(v => v.trim());
       const row: any = {};
       rawHeaders.forEach((h, idx) => {
-        const val = values[idx] || '';
+        const val = sanitizeText(values[idx] || '');
         if (h === 'first_name' && val) row.first_name = val;
         else if (h === 'last_name') row.last_name = val || null;
         else if (h === 'email') row.email = val || null;

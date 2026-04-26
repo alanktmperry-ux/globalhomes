@@ -169,12 +169,13 @@ const Index = () => {
   // keep their choice. Never persists across browser sessions.
   useEffect(() => {
     try {
-      // Clear any stale localStorage entry from previous versions so language
-      // can no longer "stick" to Chinese (or anything else) across sessions.
-      localStorage.removeItem('listhq_language');
-      localStorage.removeItem('gh-lang');
-
-      if (sessionStorage.getItem('listhq_language') || sessionStorage.getItem('i18n-language')) return;
+      // If the user already chose a language (persisted in localStorage or this session), keep it.
+      if (
+        localStorage.getItem('listhq_language') ||
+        localStorage.getItem('gh-lang') ||
+        sessionStorage.getItem('listhq_language') ||
+        sessionStorage.getItem('i18n-language')
+      ) return;
       const nav = (navigator.language || 'en').toLowerCase();
       let detected: 'en' | 'zh-CN' | 'vi' | 'hi' | 'ar' | 'ko' | 'bn' = 'en';
       if (nav.startsWith('zh')) detected = 'zh-CN';
@@ -183,7 +184,7 @@ const Index = () => {
       else if (nav.startsWith('ar')) detected = 'ar';
       else if (nav.startsWith('ko')) detected = 'ko';
       else if (nav.startsWith('bn')) detected = 'bn';
-      // Only auto-apply non-English on first session; English is the safe default.
+      // Only auto-apply non-English on first visit; English is the safe default.
       if (detected !== 'en') setLanguage(detected);
     } catch {
       // storage unavailable — non-fatal

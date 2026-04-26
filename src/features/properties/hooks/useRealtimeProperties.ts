@@ -63,7 +63,7 @@ async function fetchNearbyProperties(
     throw error;
   }
 
-  console.log('[useRealtimeProperties] nearby_properties RPC result', {
+  if (import.meta.env.DEV) console.log('[useRealtimeProperties] nearby_properties RPC result', {
     lat,
     lng,
     radiusKm,
@@ -94,7 +94,7 @@ async function fetchNearbyProperties(
     return data.map((p: any) => mapDbProperty(p));
   }
 
-  console.log('[useRealtimeProperties] nearby_properties hydrated result', {
+  if (import.meta.env.DEV) console.log('[useRealtimeProperties] nearby_properties hydrated result', {
     lat,
     lng,
     radiusKm,

@@ -12,6 +12,23 @@ const BOT_PATTERNS = [
   'outbrain', 'pinterest', 'developers.google.com/+/web/snippet',
 ];
 
+// --- Ad-hoc per-IP rate limit for bot traffic (resets on worker recycle) ---
+const ipRequestCounts = new Map();
+const RATE_LIMIT = 50;
+const RATE_WINDOW_MS = 60_000;
+
+function checkRateLimit(ip) {
+  const now = Date.now();
+  const entry = ipRequestCounts.get(ip);
+  if (!entry || now - entry.windowStart > RATE_WINDOW_MS) {
+    ipRequestCounts.set(ip, { count: 1, windowStart: now });
+    return false;
+  }
+  if (entry.count >= RATE_LIMIT) return true;
+  entry.count++;
+  return false;
+}
+
 function isBot(userAgent) {
   const ua = (userAgent ?? '').toLowerCase();
   return BOT_PATTERNS.some((p) => ua.includes(p));
@@ -111,6 +128,11 @@ export default {
       } catch {
         // Fall through to serve static sitemap from origin
       }
+    }
+
+    const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown';
+    if (isBot(userAgent) && checkRateLimit(ip)) {
+      return new Response('Too Many Requests', { status: 429 });
     }
 
     if (!isBot(userAgent)) {

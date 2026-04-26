@@ -34,7 +34,7 @@ const AuthCallbackPage = () => {
     };
 
     const checkOnboarding = async (userId: string) => {
-      // Check for agent role first — agents go to their dashboard
+      // Agents go straight to dashboard
       const { data: agentData } = await supabase
         .from('agents')
         .select('id')
@@ -46,15 +46,19 @@ const AuthCallbackPage = () => {
         return;
       }
 
-      // Non-agent users — check if onboarding is complete
+      // OAuth users skip OTP (email already verified). Check for role.
       const { data: profile } = await supabase
         .from('profiles')
-        .select('onboarded')
+        .select('user_role, onboarded')
         .eq('user_id', userId)
         .maybeSingle();
 
-      if (profile && !profile.onboarded) {
+      const role = (profile as { user_role?: string | null } | null)?.user_role;
+
+      if (!role) {
         navigate('/onboarding/role', { replace: true });
+      } else if (role === 'agent' || role === 'property_manager') {
+        navigate('/onboarding/agency', { replace: true });
       } else {
         navigate('/', { replace: true });
       }

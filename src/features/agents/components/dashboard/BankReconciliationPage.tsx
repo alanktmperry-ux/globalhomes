@@ -163,11 +163,10 @@ const BankReconciliationPage = () => {
           action_type: 'bank_reconciliation_match',
           entity_type: 'trust_reconciliation',
           entity_id: entityId,
-          metadata: {
+          metadata: buildAuditMeta({
             matched_amount: amount,
             bank_reference: bankRef,
-            timestamp_utc: new Date().toISOString(),
-          },
+          }),
         } as any);
       } catch (e) {
         console.error('[BankReconciliation] audit log failed:', e);

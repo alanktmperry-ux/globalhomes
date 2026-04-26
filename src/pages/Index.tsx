@@ -6,7 +6,7 @@ import { Helmet } from 'react-helmet-async';
 // cold paint. motion is only referenced in the search-results branch (mobile
 // bottom sheet drag), which loads after the user runs a search.
 import { motion, useMotionValue, useSpring, type PanInfo } from 'framer-motion';
-import { ArrowRight, MapPin, Sparkles, Map, List, Mic, MicOff, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users, Search, Home, Check, ArrowLeftRight, UserCheck, ChevronRight, Globe } from 'lucide-react';
+import { ArrowRight, ArrowLeft, MapPin, Sparkles, Map, List, Mic, MicOff, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users, Search, Home, Check, ArrowLeftRight, UserCheck, ChevronRight, Globe } from 'lucide-react';
 import { VoiceSearchHero } from '@/features/search/components/VoiceSearchHero';
 import { TranslationDemoCard } from '@/features/marketing/components/TranslationDemoCard';
 import { useHeroVoiceSearch } from '@/features/search/hooks/useHeroVoiceSearch';

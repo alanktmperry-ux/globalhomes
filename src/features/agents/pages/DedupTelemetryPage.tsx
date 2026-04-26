@@ -188,8 +188,8 @@ export default function DedupTelemetryPage() {
       entity_type: 'dedup_config',
       entity_id: agencyId,
       description: `Fuzzy match threshold changed from ${previous.toFixed(2)} to ${next.toFixed(2)}`,
-      metadata: { previous, next },
-    });
+      metadata: buildAuditMeta({ previous, next }),
+    } as any);
 
     setThreshold(next);
     setConfirmOpen(false);

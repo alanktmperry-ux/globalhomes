@@ -222,7 +222,7 @@ class ManusSearchService {
         contactClicks: 0,
       }));
     } catch (err) {
-      
+      console.error('[ManusSearch] error:', err);
       return [];
     }
   }

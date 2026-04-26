@@ -48,7 +48,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 // Lazy — only opens after the 3rd anonymous search.
 const ConsumerSignUpModal = lazy(() => import('@/features/search/components/ConsumerSignUpModal'));
 import { supabase } from '@/integrations/supabase/client';
-import { geocode } from '@/shared/lib/googleMapsService';
+import { geocode, autocomplete } from '@/shared/lib/googleMapsService';
 
 const HERO_ROTATING_LANGUAGES = [
   'in Mandarin.',
@@ -239,6 +239,33 @@ const Index = () => {
   const [statLanguagesCount, setStatLanguagesCount] = useState(0);
   const [statToolsCount, setStatToolsCount] = useState(0);
   const heroInputRef = useRef<HTMLInputElement>(null);
+  const heroFormRef = useRef<HTMLFormElement>(null);
+  const heroDebounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const [heroSuggestions, setHeroSuggestions] = useState<{ description: string; place_id: string }[]>([]);
+  const [showHeroSuggestions, setShowHeroSuggestions] = useState(false);
+
+  // Debounced Places autocomplete for hero search
+  useEffect(() => {
+    if (heroDebounceRef.current) clearTimeout(heroDebounceRef.current);
+    if (heroQuery.length < 2) { setHeroSuggestions([]); setShowHeroSuggestions(false); return; }
+    heroDebounceRef.current = setTimeout(async () => {
+      const results = await autocomplete(heroQuery);
+      setHeroSuggestions(results);
+      setShowHeroSuggestions(results.length > 0);
+    }, 300);
+    return () => { if (heroDebounceRef.current) clearTimeout(heroDebounceRef.current); };
+  }, [heroQuery]);
+
+  // Close hero suggestions on click outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (heroFormRef.current && !heroFormRef.current.contains(e.target as Node)) {
+        setShowHeroSuggestions(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
 
   // Hero rotating language animation
@@ -1083,6 +1110,32 @@ const Index = () => {
     translateAndSearch(heroQuery.trim());
   };
 
+  const handleSelectHeroSuggestion = useCallback(async (suggestion: { description: string; place_id: string }) => {
+    setHeroQuery(suggestion.description);
+    setShowHeroSuggestions(false);
+    setHeroSuggestions([]);
+
+    // Geocode and centre the map (same pattern as the results-page autocomplete)
+    try {
+      const loc = await geocode(suggestion.description);
+      if (loc) {
+        setSearchCenter({ lat: loc.lat, lng: loc.lng });
+        setMapCenter({ lat: loc.lat, lng: loc.lng, key: `hero-${Date.now()}` });
+      }
+    } catch {
+      /* non-fatal */
+    }
+
+    if (heroCategory === 'commercial' || heroCategory === 'land') {
+      const params = new URLSearchParams();
+      params.set('location', suggestion.description);
+      params.set('category', heroCategory);
+      navigate(`/?${params.toString()}`);
+      return;
+    }
+    wrappedHandleSearch(suggestion.description);
+  }, [heroCategory, navigate, wrappedHandleSearch, setSearchCenter]);
+
   const handleHeroModeChange = (mode: 'sale' | 'rent' | 'commercial' | 'land') => {
     setHeroCategory(mode);
     if (mode === 'sale' || mode === 'rent') {
@@ -1176,7 +1229,7 @@ const Index = () => {
             </div>
 
             {/* Search bar */}
-            <form onSubmit={handleHeroSubmit} className="relative max-w-2xl mx-auto">
+            <form ref={heroFormRef} onSubmit={handleHeroSubmit} className="relative max-w-2xl mx-auto">
               <div className="flex items-center bg-white border border-slate-200 rounded-2xl shadow-lg shadow-slate-100/80 px-4 py-2 gap-3 hover:border-slate-300 hover:shadow-xl transition-all duration-200 focus-within:border-blue-300 focus-within:shadow-blue-50/80 focus-within:shadow-xl">
                 <input
                   id="search-bar"
@@ -1184,8 +1237,10 @@ const Index = () => {
                   type="text"
                   value={heroQuery}
                   onChange={e => setHeroQuery(e.target.value)}
+                  onFocus={() => heroSuggestions.length > 0 && setShowHeroSuggestions(true)}
                   placeholder={t(HERO_PLACEHOLDER_KEYS[heroPlaceholderIndex])}
                   aria-label={t('search.placeholder')}
+                  autoComplete="off"
                   className="flex-1 bg-transparent outline-none text-slate-800 text-[15px] placeholder:text-slate-400 min-w-0"
                 />
                 <button
@@ -1211,6 +1266,22 @@ const Index = () => {
                   {t('hero.search')}
                 </button>
               </div>
+              {showHeroSuggestions && heroSuggestions.length > 0 && (
+                <ul className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl overflow-y-auto max-h-60">
+                  {heroSuggestions.map((s) => (
+                    <li key={s.place_id}>
+                      <button
+                        type="button"
+                        onClick={() => handleSelectHeroSuggestion(s)}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-left text-sm text-slate-800 hover:bg-slate-50 transition-colors"
+                      >
+                        <MapPin size={16} className="text-slate-400 shrink-0" />
+                        <span className="truncate">{s.description}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
               {heroMicLabel && (
                 <div className="flex items-center justify-center gap-2 mt-2">
                   <span className={`inline-block w-2 h-2 rounded-full ${heroMicListening ? 'bg-red-500 animate-pulse' : 'bg-blue-500 animate-pulse'}`} />

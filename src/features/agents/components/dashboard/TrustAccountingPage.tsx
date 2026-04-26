@@ -1013,6 +1013,13 @@ const TrustAccountingPage = () => {
                   )}
                 </TableBody>
               </Table>
+              {hasMoreTx && (
+                <div className="flex justify-center py-3 border-t border-border">
+                  <Button variant="outline" size="sm" onClick={loadMoreTransactions} disabled={loading}>
+                    {loading ? 'Loading…' : 'Load more transactions'}
+                  </Button>
+                </div>
+              )}
             </Card>
           </div>
 

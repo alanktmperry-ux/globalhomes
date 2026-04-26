@@ -161,7 +161,7 @@ const Index = () => {
     };
   }, [hasSearch]);
   const { t: legacyT } = useI18n();
-  const { t, setLanguage } = useTranslation();
+  const { t, setLanguage, language } = useTranslation();
   const { addSearch, lastSearch } = useSearchHistory();
 
   // Browser language auto-detection (session-only).

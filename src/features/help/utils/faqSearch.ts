@@ -185,6 +185,10 @@ export function getFaqMatches(query: string, limit = SEARCH_RESULT_LIMIT) {
         score += 8;
       }
 
+      if (hasRentalIntent && entry.item.category === 'renters') {
+        score *= 1.75;
+      }
+
       return score > 0
         ? {
             item: entry.item,

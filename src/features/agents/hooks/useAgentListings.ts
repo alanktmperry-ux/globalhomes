@@ -11,8 +11,13 @@ interface ListingWithMeta extends Property {
 
 export type AgentListing = ListingWithMeta;
 
-export function useAgentListings() {
+interface UseAgentListingsOptions {
+  enabled?: boolean;
+}
+
+export function useAgentListings(options: UseAgentListingsOptions = {}) {
   const { user, impersonatedUserId } = useAuth();
+  const enabled = options.enabled ?? true;
   const [listings, setListings] = useState<AgentListing[]>([]);
   const [loading, setLoading] = useState(true);
   const [agentId, setAgentId] = useState<string | null>(null);
@@ -22,6 +27,7 @@ export function useAgentListings() {
 
   useEffect(() => {
     const effectiveUserId = impersonatedUserId || user?.id;
+    if (!enabled) { setListings([]); setAgentId(null); setLoading(false); return; }
     if (!effectiveUserId) { setListings([]); setLoading(false); return; }
 
     const fetch = async () => {
@@ -53,7 +59,7 @@ export function useAgentListings() {
     };
 
     fetch();
-  }, [user, impersonatedUserId, fetchKey]);
+  }, [user, impersonatedUserId, fetchKey, enabled]);
 
   const realCount = listings.length;
   const isMockData = false;

@@ -144,34 +144,29 @@ const AgentDashboardSidebar = () => {
 
   useEffect(() => {
     if (!user) return;
-    const fetchAgentInfo = () => {
-      supabase
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
         .from('agents')
         .select('company_logo_url, name, agency, agency_id')
         .eq('user_id', user.id)
-        .maybeSingle()
-        .then(async ({ data }) => {
-          if (data) {
-            setAgentLogo(data.company_logo_url || null);
-            setAgentName(data.name || null);
-            // Prefer agency name from agencies table if linked
-            if (data.agency_id) {
-              const { data: agencyData } = await supabase
-                .from('agencies')
-                .select('name')
-                .eq('id', data.agency_id)
-                .single();
-              setAgencyName(agencyData?.name || data.agency || null);
-            } else {
-              setAgencyName(data.agency || null);
-            }
-          }
-        });
-    };
-    fetchAgentInfo();
-    // Refetch when navigating back to catch profile edits
-    const interval = setInterval(fetchAgentInfo, 30000);
-    return () => clearInterval(interval);
+        .maybeSingle();
+      if (cancelled || !data) return;
+      setAgentLogo(data.company_logo_url || null);
+      setAgentName(data.name || null);
+      if (data.agency_id) {
+        const { data: agencyData } = await supabase
+          .from('agencies')
+          .select('name')
+          .eq('id', data.agency_id)
+          .maybeSingle();
+        if (cancelled) return;
+        setAgencyName(agencyData?.name || data.agency || null);
+      } else {
+        setAgencyName(data.agency || null);
+      }
+    })();
+    return () => { cancelled = true; };
   }, [user, location.pathname]);
 
   // Buyer-match badge count + realtime

@@ -1,6 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import PublicLayout from '@/shared/components/layout/PublicLayout';
 import { ValuationFlow } from '@/features/valuation/components/ValuationFlow';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
@@ -10,7 +9,7 @@ export default function ValuationPage() {
   const initialAddress = params.get('address') ?? '';
 
   return (
-    <PublicLayout>
+    <>
       <Helmet>
         <title>{`${t('valuation.title')} | ListHQ`}</title>
         <meta name="description" content={t('valuation.subtitle')} />
@@ -24,6 +23,6 @@ export default function ValuationPage() {
         </div>
         <ValuationFlow initialAddress={initialAddress} />
       </section>
-    </PublicLayout>
+    </>
   );
 }

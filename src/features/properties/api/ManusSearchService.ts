@@ -123,7 +123,8 @@ class ManusSearchService {
         // Still pending/running
         onUpdate?.({ status: data?.status || 'running' });
       } catch (err) {
-        
+        console.error('[ManusSearch] error:', err);
+        onUpdate?.({ status: 'failed', error: String(err) });
       }
     }
 

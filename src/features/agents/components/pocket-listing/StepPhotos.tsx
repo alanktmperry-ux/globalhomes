@@ -31,6 +31,38 @@ const StepPhotos = ({ draft, update }: Props) => {
     webp: 'image/webp', gif: 'image/gif',
   };
 
+  useEffect(() => {
+    const preventWindowDrop = (event: DragEvent) => {
+      event.preventDefault();
+    };
+
+    window.addEventListener('dragover', preventWindowDrop);
+    window.addEventListener('drop', preventWindowDrop);
+    return () => {
+      window.removeEventListener('dragover', preventWindowDrop);
+      window.removeEventListener('drop', preventWindowDrop);
+    };
+  }, []);
+
+  const fileListFromArray = (files: File[]): FileList => {
+    const dataTransfer = new DataTransfer();
+    files.forEach((file) => dataTransfer.items.add(file));
+    return dataTransfer.files;
+  };
+
+  const extractDroppedFiles = (dataTransfer: DataTransfer): FileList | null => {
+    if (dataTransfer.files && dataTransfer.files.length > 0) {
+      return dataTransfer.files;
+    }
+
+    const files = Array.from(dataTransfer.items ?? [])
+      .filter((item) => item.kind === 'file')
+      .map((item) => item.getAsFile())
+      .filter((file): file is File => !!file);
+
+    return files.length > 0 ? fileListFromArray(files) : null;
+  };
+
   const addPhotos = async (files: FileList | null) => {
     console.log('[StepPhotos] addPhotos called', { count: files?.length, userId: user?.id });
     if (!files || files.length === 0) {
@@ -81,6 +113,10 @@ const StepPhotos = ({ draft, update }: Props) => {
         .from('property-images')
         .getPublicUrl(filePath);
       uploadedUrls.push(publicUrl);
+    }
+
+    if (fileRef.current) {
+      fileRef.current.value = '';
     }
 
     if (uploadedUrls.length > 0) {

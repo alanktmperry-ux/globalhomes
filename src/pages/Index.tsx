@@ -1217,6 +1217,16 @@ const Index = () => {
                   <span className="text-sm text-slate-500 font-medium">{heroMicLabel}</span>
                 </div>
               )}
+              {heroIsTranslating && (
+                <p className="text-xs text-blue-500 mt-2 text-center">Translating…</p>
+              )}
+              {heroDetectedLang && (
+                <div className="mt-2 flex justify-center">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
+                    🌐 Detected {heroDetectedLang.toUpperCase()} — searching in English
+                  </span>
+                </div>
+              )}
               <p className="text-sm text-slate-400 mt-3 text-center">
                 {t('hero.searchHint')}
               </p>

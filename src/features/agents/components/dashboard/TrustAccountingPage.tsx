@@ -391,7 +391,7 @@ const TrustAccountingPage = () => {
         const d = new Date(tx.transaction_date);
         const dateStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
         const isInflow = tx.transaction_type === 'deposit' || tx.category === 'rent';
-        const signedAmount = isInflow ? tx.amount.toFixed(2) : (-tx.amount).toFixed(2);
+        const signedAmount = (isInflow ? '' : '-') + safeAmount(tx.amount);
         const payee = tx.client_name || tx.payee_name || '';
         const description = [tx.property_address, tx.description].filter(Boolean).join(' — ') || tx.category;
         const reference = tx.reference || '';

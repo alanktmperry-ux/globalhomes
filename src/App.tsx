@@ -38,6 +38,14 @@ const AgentAuthPage = React.lazy(() => import("./pages/AgentAuthPage"));
 const CheckEmailPage = React.lazy(() => import("./pages/CheckEmailPage"));
 const AuthLandingPage = React.lazy(() => import("./pages/AuthLandingPage"));
 const AdminDashboard = React.lazy(() => import("./pages/AdminDashboard"));
+const AdminLayout = React.lazy(() => import("./features/admin/components/AdminLayout"));
+const CommandCentre = React.lazy(() => import("./features/admin/components/CommandCentre"));
+const AdminApprovalsPage = React.lazy(() => import("./features/admin/pages/AdminApprovalsPage"));
+const AdminAgentsPage = React.lazy(() => import("./features/admin/pages/AdminAgentsPage"));
+const AdminListingsPage = React.lazy(() => import("./features/admin/pages/AdminListingsPage"));
+const AdminRevenuePage = React.lazy(() => import("./features/admin/pages/AdminRevenuePage"));
+const AdminOutreachPage = React.lazy(() => import("./features/admin/pages/AdminOutreachPage"));
+const AdminSystemPage = React.lazy(() => import("./features/admin/pages/AdminSystemPage"));
 const ForgotPasswordPage = React.lazy(() => import("./pages/ForgotPasswordPage"));
 const ResetPasswordPage = React.lazy(() => import("./pages/ResetPasswordPage"));
 const AgencyProfilePage = React.lazy(() => import("./pages/AgencyProfilePage"));
@@ -394,7 +402,16 @@ const App = () => (
                 <Route path="/strata-dashboard" element={<ProtectedRoute requireStrata><StrataDashboardLayout /></ProtectedRoute>} />
 
                 {/* Admin */}
-                <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
+                <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminLayout /></ProtectedRoute>}>
+                  <Route index element={<CommandCentre />} />
+                  <Route path="approvals" element={<AdminApprovalsPage />} />
+                  <Route path="agents" element={<AdminAgentsPage />} />
+                  <Route path="listings" element={<AdminListingsPage />} />
+                  <Route path="revenue" element={<AdminRevenuePage />} />
+                  <Route path="outreach" element={<AdminOutreachPage />} />
+                  <Route path="system" element={<AdminSystemPage />} />
+                </Route>
+                <Route path="/admin/legacy" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
 
                 <Route path="*" element={<NotFound />} />
               </Routes>

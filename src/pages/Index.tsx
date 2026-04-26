@@ -1020,7 +1020,7 @@ const Index = () => {
   const emptyOrNoResults = showNoResultsState ? noResultsPlaceholder : emptyPlaceholder;
   const shouldShowPlaceholder = showEmptyState || showNoResultsState;
 
-  const propertyList = showEmptyState ? emptyPlaceholder : (
+  const propertyList = shouldShowPlaceholder ? emptyOrNoResults : (
     <Suspense fallback={<MapSkeleton />}>
       <VirtualizedPropertyList
         properties={filteredProperties}
@@ -1672,7 +1672,7 @@ const Index = () => {
 
             {/* Property list */}
             <div className="flex-1 px-4 pb-6">
-              {showEmptyState ? emptyPlaceholder : (
+              {shouldShowPlaceholder ? emptyOrNoResults : (
                 <Suspense fallback={<MapSkeleton />}>
                   <VirtualizedPropertyList
                     properties={filteredProperties}
@@ -1739,7 +1739,7 @@ const Index = () => {
                   </div>
                 </div>
                 <div className="overflow-y-auto px-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))]" style={{ maxHeight: 'calc(100% - 3.75rem)' }}>
-                  {showEmptyState ? emptyPlaceholder : (
+                  {shouldShowPlaceholder ? emptyOrNoResults : (
                     <Suspense fallback={<MapSkeleton />}>
                       <VirtualizedPropertyList
                         properties={filteredProperties}
@@ -1784,7 +1784,7 @@ const Index = () => {
                   </button>
                 </div>
               </div>
-              {showEmptyState ? emptyPlaceholder : (
+              {shouldShowPlaceholder ? emptyOrNoResults : (
                 <Suspense fallback={<MapSkeleton />}>
                   <VirtualizedPropertyList
                     properties={filteredProperties}

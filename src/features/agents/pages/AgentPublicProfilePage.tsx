@@ -246,6 +246,16 @@ export default function AgentPublicProfilePage() {
 
   const currentListings = listingTab === 'active' ? listings : soldListings;
 
+  const isSafeImageUrl = (url: string | null | undefined): boolean => {
+    if (!url) return false;
+    try {
+      const parsed = new URL(url);
+      return parsed.protocol === 'https:';
+    } catch {
+      return false;
+    }
+  };
+
   return (
     <div className="flex flex-col">
       <AgentSEOHead agent={agent} listingCount={listings.length} />
@@ -253,7 +263,7 @@ export default function AgentPublicProfilePage() {
       {/* Banner */}
       <div
         className="relative h-48 sm:h-64 bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900"
-        style={agent.profileBannerUrl ? { backgroundImage: `url(${agent.profileBannerUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+        style={isSafeImageUrl(agent.profileBannerUrl) ? { backgroundImage: `url(${agent.profileBannerUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
       >
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="absolute bottom-4 right-4 flex gap-2">

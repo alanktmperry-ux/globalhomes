@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { CheckCircle2, XCircle, Loader2, UserCheck, Inbox } from 'lucide-react';
 import { dispatchNotification } from '@/shared/lib/notify';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { buildAuditMeta } from '@/shared/lib/auditLog';
 
 interface PendingAgent {
   id: string;
@@ -62,8 +63,8 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
       entity_type: 'agent',
       entity_id: agent.id,
       description: `Admin ${action}d agent ${agent.name}`,
-      metadata: { reason, admin_email: user?.email },
-    });
+      metadata: buildAuditMeta({ reason, admin_email: user?.email }),
+    } as any);
     if (auditError) console.error('[AgentApprovalQueue] audit log failed:', auditError);
   };
 

@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { buildAuditMeta } from '@/shared/lib/auditLog';
 
 type Audience = 'all' | 'trial' | 'expiring' | 'paid' | 'never_listed' | 'at_risk';
 type SendMethod = 'in_app' | 'email' | 'both';
@@ -218,7 +219,7 @@ function ComposePanel({ templates, onSent }: { templates: Template[]; onSent: ()
         entity_type: 'broadcast_campaign',
         entity_id: (campaign as any).id,
         description: subject,
-        metadata: { recipient_count: preview.length, admin_id: user.id },
+        metadata: buildAuditMeta({ recipient_count: preview.length, admin_id: user.id }),
       } as any);
     }
 

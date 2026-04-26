@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { dispatchNotification } from '@/shared/lib/notify';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
+import { buildAuditMeta } from '@/shared/lib/auditLog';
 import AdminUsers from '@/features/admin/components/AdminUsers';
 import AdminListings from '@/features/admin/components/AdminListings';
 import AdminRoles from '@/features/admin/components/AdminRoles';
@@ -253,8 +254,8 @@ const AdminDashboard = () => {
       entity_type: 'property',
       entity_id: propertyId,
       description: `Admin ${actionName} property`,
-      metadata: { action: actionName, admin_email: user?.email },
-    });
+      metadata: buildAuditMeta({ action: actionName, admin_email: user?.email }),
+    } as any);
     if (auditError) console.error('[AdminDashboard] audit log failed:', auditError);
   };
 

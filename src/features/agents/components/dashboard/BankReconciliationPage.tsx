@@ -19,6 +19,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/AuthProvider';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import { buildAuditMeta } from '@/shared/lib/auditLog';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 2 });
 const DATE_FMT = new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -162,11 +163,10 @@ const BankReconciliationPage = () => {
           action_type: 'bank_reconciliation_match',
           entity_type: 'trust_reconciliation',
           entity_id: entityId,
-          metadata: {
+          metadata: buildAuditMeta({
             matched_amount: amount,
             bank_reference: bankRef,
-            timestamp_utc: new Date().toISOString(),
-          },
+          }),
         } as any);
       } catch (e) {
         console.error('[BankReconciliation] audit log failed:', e);

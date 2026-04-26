@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, useRef, useCallback, Re
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { buildAuditMeta } from '@/shared/lib/auditLog';
 
 interface AuthContextType {
   user: User | null;
@@ -96,7 +97,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         entity_type: 'user',
         entity_id: userId,
         description: 'Admin started impersonation session',
-        metadata: { impersonated_email: userEmail },
+        metadata: buildAuditMeta({ impersonated_email: userEmail }),
       } as any);
       if (auditError) throw auditError;
     } catch (err) {
@@ -119,7 +120,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       entity_type: 'user',
       entity_id: impersonatedUserId ?? null,
       description: 'Admin ended impersonation session',
-      metadata: {},
+      metadata: buildAuditMeta({}),
     } as any);
     if (auditError) {
       console.error('impersonation audit log:', auditError);

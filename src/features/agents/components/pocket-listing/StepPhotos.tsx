@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Upload, Star, X, ImagePlus, Sparkles, GripVertical, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Label } from '@/components/ui/label';

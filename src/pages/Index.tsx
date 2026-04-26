@@ -1037,6 +1037,39 @@ const Index = () => {
   );
 
   // ── Hero submit handler ──
+  const [heroDetectedLang, setHeroDetectedLang] = useState<string | null>(null);
+  const [heroIsTranslating, setHeroIsTranslating] = useState(false);
+
+  const translateAndSearch = useCallback(async (rawQuery: string) => {
+    const trimmed = rawQuery.trim();
+    if (!trimmed) return;
+    setHeroIsTranslating(true);
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 3000);
+      const { data: translationResult, error: fnError } = await supabase.functions.invoke('generate-translations', {
+        body: { type: 'translate_search', search_query: trimmed },
+      });
+      clearTimeout(timeout);
+
+      if (!fnError && translationResult) {
+        const lang = translationResult.detected_language as string | undefined;
+        const englishQuery = (translationResult.english_query as string | undefined) || trimmed;
+        if (lang && lang !== 'en' && lang !== 'English') {
+          setHeroDetectedLang(lang);
+          setTimeout(() => setHeroDetectedLang(null), 3000);
+        }
+        wrappedHandleSearch(englishQuery, lang || 'en');
+      } else {
+        wrappedHandleSearch(trimmed);
+      }
+    } catch {
+      wrappedHandleSearch(trimmed);
+    } finally {
+      setHeroIsTranslating(false);
+    }
+  }, [wrappedHandleSearch]);
+
   const handleHeroSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!heroQuery.trim()) return;
@@ -1047,7 +1080,7 @@ const Index = () => {
       navigate(`/?${params.toString()}`);
       return;
     }
-    wrappedHandleSearch(heroQuery.trim());
+    translateAndSearch(heroQuery.trim());
   };
 
   const handleHeroModeChange = (mode: 'sale' | 'rent' | 'commercial' | 'land') => {

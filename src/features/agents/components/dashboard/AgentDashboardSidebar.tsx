@@ -20,8 +20,8 @@ import {
 } from '@/components/ui/sidebar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
 import { supabase } from '@/integrations/supabase/client';
+import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
 
 interface NavItem {
   title: string;
@@ -88,9 +88,10 @@ const AgentDashboardSidebar = () => {
   const isMobile = useIsMobile();
   const location = useLocation();
   const navigate = useNavigate();
-  const { signOut, isAdmin, isPrincipal, user } = useAuth();
-  const { listings } = useAgentListings();
+  const { signOut, isAdmin, isPrincipal } = useAuth();
+  const { agent } = useCurrentAgent();
   const { plan, foundingMember } = useSubscription();
+  const [activeCount, setActiveCount] = useState(0);
   const [arrearsCount, setArrearsCount] = useState(0);
   const [renewalsCount, setRenewalsCount] = useState(0);
   const [buyerMatchesCount, setBuyerMatchesCount] = useState(0);
@@ -100,10 +101,23 @@ const AgentDashboardSidebar = () => {
   const [agencyName, setAgencyName] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) return;
+    if (!agent?.id) return;
+    const fetchActiveCount = async () => {
+      const { count } = await supabase
+        .from('properties')
+        .select('id', { count: 'exact', head: true })
+        .eq('agent_id', agent.id)
+        .eq('is_active', true);
+
+      setActiveCount(count ?? 0);
+    };
+
+    fetchActiveCount();
+  }, [agent?.id]);
+
+  useEffect(() => {
+    if (!agent?.id) return;
     const fetchArrears = async () => {
-      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
-      if (!agent) return;
       const { data: tenancies } = await supabase
         .from('tenancies').select('id, rent_amount, lease_start, lease_end, renewal_status').eq('agent_id', agent.id).eq('status', 'active');
       if (!tenancies || tenancies.length === 0) {
@@ -140,44 +154,19 @@ const AgentDashboardSidebar = () => {
       setArrearsCount(count);
     };
     fetchArrears();
-  }, [user]);
+  }, [agent?.id]);
 
   useEffect(() => {
-    if (!user) return;
-    let cancelled = false;
-    (async () => {
-      const { data } = await supabase
-        .from('agents')
-        .select('company_logo_url, name, agency, agency_id')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      if (cancelled || !data) return;
-      setAgentLogo(data.company_logo_url || null);
-      setAgentName(data.name || null);
-      if (data.agency_id) {
-        const { data: agencyData } = await supabase
-          .from('agencies')
-          .select('name')
-          .eq('id', data.agency_id)
-          .maybeSingle();
-        if (cancelled) return;
-        setAgencyName(agencyData?.name || data.agency || null);
-      } else {
-        setAgencyName(data.agency || null);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [user, location.pathname]);
+    setAgentLogo(agent?.company_logo_url || null);
+    setAgentName(agent?.name || null);
+    setAgencyName(agent?.agency_name || agent?.agency || null);
+  }, [agent]);
 
   // Buyer-match badge count + realtime
   useEffect(() => {
-    if (!user) return;
+    if (!agent?.id) return;
     let channel: ReturnType<typeof supabase.channel> | null = null;
-    let agentIdLocal: string | null = null;
     (async () => {
-      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
-      if (!agent) return;
-      agentIdLocal = agent.id;
       const refresh = async () => {
         const { count } = await supabase
           .from('listing_buyer_matches')
@@ -195,19 +184,12 @@ const AgentDashboardSidebar = () => {
         .subscribe();
     })();
     return () => { if (channel) supabase.removeChannel(channel); };
-  }, [user]);
+  }, [agent?.id]);
 
   // Check onboarding status
   useEffect(() => {
-    if (!user) return;
-    const checkOnboarding = async () => {
-      const { data: agent } = await supabase.from('agents').select('onboarding_complete').eq('user_id', user.id).maybeSingle();
-      if (agent) setOnboardingComplete(!!(agent as any).onboarding_complete);
-    };
-    checkOnboarding();
-  }, [user]);
-
-  const activeCount = listings.filter(l => ('_mock_status' in l ? l._mock_status !== 'sold' : (l as any).status !== 'sold')).length;
+    setOnboardingComplete(!!agent?.onboarding_complete);
+  }, [agent?.onboarding_complete]);
 
   const badgeValues: Record<string, string> = {
     listings: activeCount > 0 ? String(activeCount) : '',

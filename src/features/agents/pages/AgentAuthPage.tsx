@@ -1,14 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { motion } from 'framer-motion';
-import { Building2, Zap, Mail, ListChecks, FileText, ShieldCheck, Landmark } from 'lucide-react';
+import { Building2, Zap, ListChecks, FileText, ShieldCheck, Landmark } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import OTPVerificationScreen from '@/features/auth/components/OTPVerificationScreen';
 
-type Step = 'email' | 'password' | 'register' | 'check-email';
+type Step = 'email' | 'password' | 'register' | 'otp';
 
 const AgentAuthPage = () => {
   const navigate = useNavigate();
@@ -102,46 +103,53 @@ const AgentAuthPage = () => {
     if (!regEmail.trim()) return;
     setEmailSubmitting(true);
     try {
-      const email = regEmail.trim().toLowerCase();
-      // Try to sign up first
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password: crypto.randomUUID(),
+      const cleaned = regEmail.trim().toLowerCase();
+      const { error } = await supabase.auth.signInWithOtp({
+        email: cleaned,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard/onboarding`,
+          shouldCreateUser: true,
           data: { registration_started: true, registered_as: 'agent' },
         },
       });
-      // If user already exists (signUp returns user with identities=[]), send magic link instead
-      if (!error && data.user && data.user.identities?.length === 0) {
-        await supabase.auth.signInWithOtp({
-          email,
-          options: { emailRedirectTo: `${window.location.origin}/dashboard/onboarding` },
-        });
-        sessionStorage.setItem('listhq_pending_email', email);
-        setStep('check-email');
-        toast.info('An account with this email already exists — we sent you a sign-in link');
-        return;
-      }
-      if (error && !error.message.toLowerCase().includes('already registered')) throw error;
-      sessionStorage.setItem('listhq_pending_email', email);
-      setStep('check-email');
+      if (error) throw error;
+      sessionStorage.setItem('listhq_pending_email', cleaned);
+      setRegEmail(cleaned);
+      toast.success('Code sent', { description: `Check ${cleaned} for your 6-digit code.` });
+      setStep('otp');
     } catch (err: unknown) {
-      toast.error(`Could not send confirmation — ${getErrorMessage(err)}`);
+      toast.error(`Could not send code — ${getErrorMessage(err)}`);
     } finally {
       setEmailSubmitting(false);
     }
   };
 
-  const handleResendEmail = async () => {
-    setEmailSubmitting(true);
+  const handleAgentOtpVerified = async () => {
     try {
-      await supabase.auth.resend({ type: 'signup', email: regEmail.trim().toLowerCase() });
-      toast.success('Confirmation email resent — check your inbox');
-    } catch {
-      toast.error('Could not resend — please try again');
-    } finally {
-      setEmailSubmitting(false);
+      const { data: { user: u } } = await supabase.auth.getUser();
+      if (!u) {
+        navigate('/onboarding/agency');
+        return;
+      }
+      // Stamp role hint in profiles
+      try {
+        await supabase.from('profiles').upsert(
+          { user_id: u.id, user_role: 'agent' as any, onboarded: false } as any,
+          { onConflict: 'user_id' },
+        );
+      } catch { /* non-fatal */ }
+      const { data: agentRow } = await supabase
+        .from('agents')
+        .select('id, onboarding_complete')
+        .eq('user_id', u.id)
+        .maybeSingle();
+      if (agentRow && (agentRow as any).onboarding_complete) {
+        navigate('/dashboard/overview');
+      } else {
+        navigate('/onboarding/agency');
+      }
+    } catch (err) {
+      toast.error('Sign-in succeeded but routing failed', { description: getErrorMessage(err) });
+      navigate('/onboarding/agency');
     }
   };
 
@@ -157,7 +165,7 @@ const AgentAuthPage = () => {
     setCaptchaToken(null);
     captchaRef.current?.resetCaptcha();
     if (step === 'password') { setStep('email'); setPassword(''); }
-    else if (step === 'check-email') { setStep('register'); }
+    else if (step === 'otp') { setStep('register'); }
     else if (step === 'register') { setStep('email'); setRegEmail(''); }
     else navigate('/for-agents');
   };
@@ -165,6 +173,16 @@ const AgentAuthPage = () => {
   const inputClass = "w-full px-4 py-3.5 rounded-[14px] border border-stone-200 bg-stone-50 text-stone-900 text-sm placeholder:text-stone-300 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:bg-white transition-all";
 
   const AGENT_PILLS = ['Pocket listings', 'Pre-market period', 'AI buyer matching', 'Pipeline kanban', 'Rent roll', 'Trust accounting', '24 languages'];
+
+  if (step === 'otp') {
+    return (
+      <OTPVerificationScreen
+        email={regEmail}
+        onVerified={handleAgentOtpVerified}
+        onBack={() => setStep('register')}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen flex" style={{ background: '#020817' }}>
@@ -218,21 +236,19 @@ const AgentAuthPage = () => {
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-stone-200 bg-stone-50 mb-5">
             <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
             <span className="text-[10px] font-medium tracking-widest uppercase text-stone-400">
-              {(step === 'register' || step === 'check-email') ? 'Agent registration' : 'Agent sign in'}
+              {step === 'register' ? 'Agent registration' : 'Agent sign in'}
             </span>
           </div>
 
           <h1 className="text-[38px] font-light text-stone-900 leading-[1.08] mb-8" style={{ letterSpacing: '-1.5px' }}>
             {(step === 'email' || step === 'password') && <>Welcome<br /><strong className="font-semibold">back.</strong></>}
             {step === 'register' && <>Join<br /><strong className="font-semibold">ListHQ.</strong></>}
-            {step === 'check-email' && <>Check your<br /><strong className="font-semibold">inbox.</strong></>}
           </h1>
 
           <p className="text-sm text-stone-400 mb-6 -mt-4">
             {step === 'email' && 'Access your dashboard, listings, and leads.'}
             {step === 'password' && email}
             {step === 'register' && 'Start your free 3-month trial. No credit card required.'}
-            {step === 'check-email' && `We've sent a confirmation link to ${regEmail}`}
           </p>
 
           {/* ── Step: Email (sign in) ── */}
@@ -365,36 +381,8 @@ const AgentAuthPage = () => {
             </>
           )}
 
-          {/* ── Step: Check email ── */}
-          {step === 'check-email' && (
-            <div className="text-center space-y-5">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                <Mail size={32} className="text-primary" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-foreground">Check your inbox</h2>
-                <p className="text-sm text-muted-foreground mt-1">We've sent a confirmation link to:</p>
-                <p className="font-semibold text-foreground text-sm mt-1">{regEmail}</p>
-              </div>
-              <div className="bg-stone-50 border border-stone-200 rounded-xl p-4 text-xs text-stone-500 text-left space-y-1.5">
-                <p>· Click the link in the email to verify your address and continue setup</p>
-                <p>· Check your spam folder if it doesn't arrive within 2 minutes</p>
-                <p>· Your Agent Quick-Start Guide is included in the email — download it while you wait</p>
-                <p>· The confirmation link expires after 24 hours</p>
-              </div>
-              <button
-                type="button"
-                onClick={handleResendEmail}
-                disabled={emailSubmitting}
-                className="w-full py-3.5 rounded-full border border-border text-foreground font-semibold text-sm transition-colors hover:bg-accent disabled:opacity-50"
-              >
-                {emailSubmitting ? 'Sending...' : 'Resend confirmation email'}
-              </button>
-              <button onClick={() => { setStep('register'); setRegEmail(''); }} className="text-xs text-muted-foreground hover:text-foreground">
-                Wrong email? Go back and change it
-              </button>
-            </div>
-          )}
+
+
 
         </motion.div>
         </div>

@@ -4,7 +4,7 @@
  */
 import type { en as EnBase } from './en';
 
-export const hi: Record<keyof typeof EnBase, string> = {
+export const hi: Partial<Record<keyof typeof EnBase, string>> = {
   // Homepage hero
   'hero.eyebrow': 'ऑस्ट्रेलिया का AI-संचालित संपत्ति प्लेटफ़ॉर्म',
   'hero.headline': 'अपना घर खोजें।',

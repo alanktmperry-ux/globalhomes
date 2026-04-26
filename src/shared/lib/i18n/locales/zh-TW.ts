@@ -15,7 +15,7 @@
  */
 import type { en as EnBase } from './en';
 
-export const zhTW: Record<keyof typeof EnBase, string> = {
+export const zhTW: Partial<Record<keyof typeof EnBase, string>> = {
   // ──────────────────────────────────────────────────────────────────
   // Homepage hero
   // ──────────────────────────────────────────────────────────────────

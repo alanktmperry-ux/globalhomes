@@ -10,8 +10,9 @@ import { lovable } from '@/integrations/lovable/index';
 import { toast } from 'sonner';
 import seekerHero from '@/assets/seeker-auth-hero.jpg';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
+import OTPVerificationScreen from '@/features/auth/components/OTPVerificationScreen';
 
-type Step = 'email' | 'password' | 'create' | 'prefs';
+type Step = 'email' | 'password' | 'create' | 'otp' | 'prefs';
 
 const SeekerAuthPage = () => {
   const { t } = useTranslation();

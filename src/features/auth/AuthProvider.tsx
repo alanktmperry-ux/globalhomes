@@ -97,7 +97,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         entity_type: 'user',
         entity_id: userId,
         description: 'Admin started impersonation session',
-        metadata: { impersonated_email: userEmail },
+        metadata: buildAuditMeta({ impersonated_email: userEmail }),
       } as any);
       if (auditError) throw auditError;
     } catch (err) {

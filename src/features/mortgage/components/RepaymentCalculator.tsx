@@ -196,6 +196,9 @@ export function RepaymentCalculator({ initialAmount }: { initialAmount?: number 
               )}
             </div>
           )}
+          {rawResult?.warning && (
+            <p className="text-sm text-primary bg-primary/10 px-3 py-2 rounded-lg mt-3">{rawResult.warning}</p>
+          )}
         </div>
 
         {/* Chart */}

@@ -166,4 +166,31 @@ export const vi: Partial<Record<TranslationKey, string>> = {
   'property.insights.multiculturalAppeal': 'Sức hút đa văn hoá',
   'property.insights.suggestedBuyerProfiles': 'Đối tượng người mua phù hợp',
   'property.insights.keySellingPoints': 'Điểm bán chính',
+
+  // Hero — homepage tiles, sub-headline prefix, language banner, category toggle
+  'hero.subheadlinePrefix': 'Đang hiển thị danh sách bằng',
+  'hero.langBannerText': 'Duyệt bằng ngôn ngữ của bạn — nhấn để chuyển',
+  'hero.commercial': 'Thương mại',
+  'hero.land': 'Đất',
+  'hero.buyerTileTitle': 'Đang tìm nhà?',
+  'hero.buyerTileDesc': 'Tìm bất động sản Úc bằng 24 ngôn ngữ. Miễn phí, không cần đăng ký.',
+  'hero.buyerTileCta': 'Xem bất động sản →',
+  'hero.agentTileTitle': 'Bạn là môi giới?',
+  'hero.agentTileDesc': 'Đăng một lần, dịch sang 24 ngôn ngữ. Tiếp cận người mua đa ngôn ngữ mà REA và Domain không thể. Miễn phí 3 tháng.',
+  'hero.agentTileCta': 'Xem công cụ môi giới →',
+
+  // Sort dropdown
+  'sort.default': 'Mặc định',
+  'sort.priceAsc': 'Giá: Thấp–Cao',
+  'sort.priceDesc': 'Giá: Cao–Thấp',
+  'sort.newest': 'Mới nhất',
+  'sort.beds': 'Phòng ngủ',
+
+  // Search status bar
+  'search.propertiesCount': '{count} bất động sản',
+  'search.recommended': 'Đề xuất',
+  'search.save': 'Lưu',
+  'search.searchTogether': 'Tìm kiếm cùng nhau',
+  'search.emptyTitle': 'Bất động sản sắp có',
+  'search.emptyDesc': 'Các môi giới đang thiết lập danh sách. Vui lòng kiểm tra lại sau!',
 };

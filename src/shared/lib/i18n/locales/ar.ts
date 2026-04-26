@@ -94,4 +94,31 @@ export const ar: Partial<Record<TranslationKey, string>> = {
   'hero.placeholder2': 'مثال: شقة في بوندي بأقل من 800 ألف',
   'hero.placeholder3': 'مثال: إيجار قرب وسط ملبورن بأقل من 500 أسبوعياً',
   'hero.placeholder4': 'مثال: منزل عائلي مع مسبح في بريسبان',
+
+  // Hero — homepage tiles, sub-headline prefix, language banner, category toggle
+  'hero.subheadlinePrefix': 'عرض القوائم بـ',
+  'hero.langBannerText': 'تصفح بلغتك — اضغط للتبديل',
+  'hero.commercial': 'تجاري',
+  'hero.land': 'أرض',
+  'hero.buyerTileTitle': 'تبحث عن منزل؟',
+  'hero.buyerTileDesc': 'ابحث عن العقارات الأسترالية بـ 24 لغة. مجاناً، بدون تسجيل.',
+  'hero.buyerTileCta': 'تصفح العقارات ←',
+  'hero.agentTileTitle': 'هل أنت وكيل عقاري؟',
+  'hero.agentTileDesc': 'أدرج العقار مرة واحدة، وسيُترجم إلى 24 لغة. الوصول إلى مشترين متعددي اللغات لا يصلهم REA و Domain. مجاناً لمدة 3 أشهر.',
+  'hero.agentTileCta': 'استكشف أدوات الوكلاء ←',
+
+  // Sort dropdown
+  'sort.default': 'افتراضي',
+  'sort.priceAsc': 'السعر: من الأقل إلى الأعلى',
+  'sort.priceDesc': 'السعر: من الأعلى إلى الأقل',
+  'sort.newest': 'الأحدث',
+  'sort.beds': 'غرف النوم',
+
+  // Search status bar
+  'search.propertiesCount': '{count} عقار',
+  'search.recommended': 'موصى به',
+  'search.save': 'حفظ',
+  'search.searchTogether': 'ابحث معاً',
+  'search.emptyTitle': 'العقارات قادمة قريباً',
+  'search.emptyDesc': 'الوكلاء يقومون بإعداد قوائمهم. تحقق مرة أخرى قريباً!',
 };

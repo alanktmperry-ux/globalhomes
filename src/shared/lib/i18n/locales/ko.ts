@@ -94,4 +94,31 @@ export const ko: Partial<Record<TranslationKey, string>> = {
   'hero.placeholder2': '예: 본다이 80만 달러 이하 아파트',
   'hero.placeholder3': '예: 멜버른 CBD 근처 주당 500달러 이하 임대',
   'hero.placeholder4': '예: 브리즈번 수영장이 있는 가족 주택',
+
+  // Hero — homepage tiles, sub-headline prefix, language banner, category toggle
+  'hero.subheadlinePrefix': '목록 표시 중',
+  'hero.langBannerText': '내 언어로 둘러보기 — 탭하여 변경',
+  'hero.commercial': '상업용',
+  'hero.land': '토지',
+  'hero.buyerTileTitle': '집을 찾고 계신가요?',
+  'hero.buyerTileDesc': '24개 언어로 호주 부동산을 검색하세요. 무료, 가입 불필요.',
+  'hero.buyerTileCta': '부동산 둘러보기 →',
+  'hero.agentTileTitle': '에이전트이신가요?',
+  'hero.agentTileDesc': '한 번 등록하면 24개 언어로 번역됩니다. REA와 Domain이 닿지 못하는 다국어 구매자에게 도달하세요. 3개월 무료.',
+  'hero.agentTileCta': '에이전트 도구 보기 →',
+
+  // Sort dropdown
+  'sort.default': '기본',
+  'sort.priceAsc': '가격: 낮은 순',
+  'sort.priceDesc': '가격: 높은 순',
+  'sort.newest': '최신순',
+  'sort.beds': '침실 수',
+
+  // Search status bar
+  'search.propertiesCount': '{count}개 매물',
+  'search.recommended': '추천',
+  'search.save': '저장',
+  'search.searchTogether': '함께 검색하기',
+  'search.emptyTitle': '곧 매물이 등록됩니다',
+  'search.emptyDesc': '에이전트들이 매물을 등록 중입니다. 잠시 후 다시 확인해 주세요!',
 };

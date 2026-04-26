@@ -535,4 +535,31 @@ export const bn: Partial<Record<keyof typeof EnBase, string>> = {
   'property.insights.multiculturalAppeal': 'বহুসাংস্কৃতিক আকর্ষণ',
   'property.insights.suggestedBuyerProfiles': 'প্রস্তাবিত ক্রেতার প্রোফাইল',
   'property.insights.keySellingPoints': 'মূল বিক্রয় পয়েন্ট',
+
+  // Hero — homepage tiles, sub-headline prefix, language banner, category toggle
+  'hero.subheadlinePrefix': 'তালিকা দেখানো হচ্ছে',
+  'hero.langBannerText': 'আপনার ভাষায় ব্রাউজ করুন — পরিবর্তন করতে ট্যাপ করুন',
+  'hero.commercial': 'বাণিজ্যিক',
+  'hero.land': 'জমি',
+  'hero.buyerTileTitle': 'বাড়ি খুঁজছেন?',
+  'hero.buyerTileDesc': '২৪টি ভাষায় অস্ট্রেলিয়ান সম্পত্তি খুঁজুন। বিনামূল্যে, সাইনআপ লাগে না।',
+  'hero.buyerTileCta': 'সম্পত্তি দেখুন →',
+  'hero.agentTileTitle': 'আপনি কি এজেন্ট?',
+  'hero.agentTileDesc': 'একবার তালিকাভুক্ত করুন, ২৪টি ভাষায় অনুবাদিত। REA এবং Domain যাদের কাছে পৌঁছাতে পারে না সেই বহুভাষী ক্রেতাদের কাছে পৌঁছান। ৩ মাস বিনামূল্যে।',
+  'hero.agentTileCta': 'এজেন্ট টুলস দেখুন →',
+
+  // Sort dropdown
+  'sort.default': 'ডিফল্ট',
+  'sort.priceAsc': 'দাম: কম–বেশি',
+  'sort.priceDesc': 'দাম: বেশি–কম',
+  'sort.newest': 'নতুন',
+  'sort.beds': 'বেডরুম',
+
+  // Search status bar
+  'search.propertiesCount': '{count}টি সম্পত্তি',
+  'search.recommended': 'প্রস্তাবিত',
+  'search.save': 'সংরক্ষণ',
+  'search.searchTogether': 'একসাথে খুঁজুন',
+  'search.emptyTitle': 'শীঘ্রই সম্পত্তি আসছে',
+  'search.emptyDesc': 'এজেন্টরা তাদের তালিকা প্রস্তুত করছেন। শীঘ্রই আবার দেখুন!',
 };

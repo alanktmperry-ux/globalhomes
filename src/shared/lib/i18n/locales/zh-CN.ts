@@ -559,4 +559,31 @@ export const zhCN: Partial<Record<keyof typeof EnBase, string>> = {
   'property.insights.multiculturalAppeal': '多元文化吸引力',
   'property.insights.suggestedBuyerProfiles': '推荐买家类型',
   'property.insights.keySellingPoints': '主要卖点',
+
+  // Hero — homepage tiles, sub-headline prefix, language banner, category toggle
+  'hero.subheadlinePrefix': '正在展示',
+  'hero.langBannerText': '使用您的语言浏览 — 点击切换',
+  'hero.commercial': '商业',
+  'hero.land': '土地',
+  'hero.buyerTileTitle': '正在找房？',
+  'hero.buyerTileDesc': '用 24 种语言搜索澳大利亚房产。免费，无需注册。',
+  'hero.buyerTileCta': '浏览房源 →',
+  'hero.agentTileTitle': '您是中介吗？',
+  'hero.agentTileDesc': '一次发布，自动翻译为 24 种语言。触达 REA 和 Domain 无法触及的多语言买家。免费 3 个月。',
+  'hero.agentTileCta': '查看中介工具 →',
+
+  // Sort dropdown
+  'sort.default': '默认',
+  'sort.priceAsc': '价格：从低到高',
+  'sort.priceDesc': '价格：从高到低',
+  'sort.newest': '最新',
+  'sort.beds': '卧室数',
+
+  // Search status bar
+  'search.propertiesCount': '{count} 套房源',
+  'search.recommended': '推荐',
+  'search.save': '保存',
+  'search.searchTogether': '一起搜索',
+  'search.emptyTitle': '房源即将上线',
+  'search.emptyDesc': '中介正在准备房源，请稍后再来查看！',
 };

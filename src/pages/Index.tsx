@@ -78,6 +78,7 @@ const HERO_PLACEHOLDER_KEYS = [
 const LANG_BANNER_DISMISSED_KEY = 'lang-banner-dismissed';
 
 function LanguageHintBanner() {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(() => {
     if (typeof window === 'undefined') return false;
     try {
@@ -110,7 +111,7 @@ function LanguageHintBanner() {
           className="flex items-center gap-2 flex-1 text-left hover:text-blue-700 transition-colors"
         >
           <Globe size={16} className="shrink-0" />
-          <span>Browse in your language — tap to switch</span>
+          <span>{t('hero.langBannerText')}</span>
           <ChevronRight size={16} className="shrink-0" />
         </button>
         <button
@@ -751,11 +752,11 @@ const Index = () => {
 
   // ── Rendering helpers ────────────────────────────────────────
   const sortOptions = [
-    { value: 'default', label: 'Default' },
-    { value: 'price-asc', label: 'Price: Low–High' },
-    { value: 'price-desc', label: 'Price: High–Low' },
-    { value: 'newest', label: 'Newest' },
-    { value: 'beds', label: 'Bedrooms' },
+    { value: 'default', label: t('sort.default') },
+    { value: 'price-asc', label: t('sort.priceAsc') },
+    { value: 'price-desc', label: t('sort.priceDesc') },
+    { value: 'newest', label: t('sort.newest') },
+    { value: 'beds', label: t('sort.beds') },
   ] as const;
 
   const pageTitle = `${currentQuery || 'Melbourne'} Property Search | ListHQ`;
@@ -807,7 +808,7 @@ const Index = () => {
     <div className="flex items-center justify-between mb-3 gap-2">
       <div className="flex items-center gap-2 min-w-0">
         <span className="text-sm font-medium text-foreground shrink-0">
-          {filteredProperties.length} properties
+          {t('search.propertiesCount', { count: filteredProperties.length })}
         </span>
         {hasSearched && searchSummary && (
           <span className="text-xs text-primary font-medium truncate max-w-[300px]" title={searchSummary}>
@@ -819,7 +820,7 @@ const Index = () => {
         )}
         {!hasSearched && (
           <span className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Sparkles size={12} className="text-primary" /> Recommended
+            <Sparkles size={12} className="text-primary" /> {t('search.recommended')}
           </span>
         )}
         {/* Always-visible radius pills */}
@@ -869,7 +870,7 @@ const Index = () => {
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors shrink-0"
           >
             <Users size={12} />
-            Search together
+            {t('search.searchTogether')}
           </button>
         )}
         {isCollab && (
@@ -890,7 +891,7 @@ const Index = () => {
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-secondary border border-border text-xs font-medium text-foreground hover:bg-accent transition-colors"
           >
             <Bookmark size={12} />
-            Save
+            {t('search.save')}
           </button>
         )}
         <Suspense fallback={null}>
@@ -969,10 +970,10 @@ const Index = () => {
         <MapPin size={28} className="text-primary" />
       </div>
       <h2 className="text-lg font-display font-bold text-foreground mb-1.5 text-center">
-        Properties coming soon
+        {t('search.emptyTitle')}
       </h2>
       <p className="text-sm text-muted-foreground text-center max-w-xs">
-        Agents are setting up their listings. Check back shortly!
+        {t('search.emptyDesc')}
       </p>
     </div>
   );
@@ -1179,7 +1180,7 @@ const Index = () => {
             <p className="text-xl md:text-2xl text-slate-500 font-medium mt-4 mb-0">
               <noscript>{t('hero.subheadline')}</noscript>
               <span>
-                Showing listings in{' '}
+                {t('hero.subheadlinePrefix')}{' '}
                 <span
                   className={`text-blue-500 inline-block transition-opacity duration-300 ${
                     heroSubLangVisible ? 'opacity-100' : 'opacity-0'
@@ -1215,7 +1216,7 @@ const Index = () => {
                     heroCategory === 'commercial' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-700'
                   }`}
                 >
-                  Commercial
+                  {t('hero.commercial')}
                 </button>
                 <button
                   onClick={() => handleHeroModeChange('land')}
@@ -1223,7 +1224,7 @@ const Index = () => {
                     heroCategory === 'land' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-700'
                   }`}
                 >
-                  Land
+                  {t('hero.land')}
                 </button>
               </div>
             </div>
@@ -1317,27 +1318,27 @@ const Index = () => {
           {/* ── AUDIENCE SPLIT TILES ── */}
           <div className="relative z-10 mt-12 w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 px-2 text-left">
             <div className="rounded-2xl border border-slate-200 bg-white p-6 md:p-7 shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="text-lg md:text-xl font-bold text-slate-900 mb-2">Looking for a home?</h3>
+              <h3 className="text-lg md:text-xl font-bold text-slate-900 mb-2">{t('hero.buyerTileTitle')}</h3>
               <p className="text-sm text-slate-600 mb-5 leading-relaxed">
-                Search Australian property in 24 languages. Free, no signup.
+                {t('hero.buyerTileDesc')}
               </p>
               <button
                 onClick={() => navigate('/buy')}
                 className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-semibold transition-colors"
               >
-                Browse properties →
+                {t('hero.buyerTileCta')}
               </button>
             </div>
             <div className="rounded-2xl border border-slate-200 bg-white p-6 md:p-7 shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="text-lg md:text-xl font-bold text-slate-900 mb-2">Are you an agent?</h3>
+              <h3 className="text-lg md:text-xl font-bold text-slate-900 mb-2">{t('hero.agentTileTitle')}</h3>
               <p className="text-sm text-slate-600 mb-5 leading-relaxed">
-                List once, translated into 24 languages. Reach multilingual buyers REA and Domain can't. Free for 3 months.
+                {t('hero.agentTileDesc')}
               </p>
               <button
                 onClick={() => navigate('/for-agents')}
                 className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-semibold transition-colors"
               >
-                See agent tools →
+                {t('hero.agentTileCta')}
               </button>
             </div>
           </div>

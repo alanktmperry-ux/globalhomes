@@ -33,6 +33,8 @@ export function RepaymentCalculator({ initialAmount }: { initialAmount?: number 
     weekly:      t('mortgage.result.weekly'),
   };
 
+  const safeNum = (n: number) => (Number.isFinite(n) ? n : 0);
+
   const sanitizedInputs = useMemo<RepaymentInputs>(() => {
     const clamp = (n: number, min: number, max: number, fallback: number) =>
       Number.isFinite(n) && n >= min && n <= max ? n : fallback;
@@ -47,7 +49,6 @@ export function RepaymentCalculator({ initialAmount }: { initialAmount?: number 
   }, [inputs]);
 
   const rawResult = useMemo(() => calculateRepayments(sanitizedInputs), [sanitizedInputs]);
-  const safeNum = (n: number) => (Number.isFinite(n) ? n : 0);
   const result = useMemo(() => ({
     ...rawResult,
     periodicRepayment: safeNum(rawResult.periodicRepayment),

@@ -28,7 +28,8 @@ export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePa
   }
 
   if (requireAdmin && !isAdmin) return <Navigate to="/" replace />;
-  if (requireAgent && !isAgent && !isAdmin) return <Navigate to="/onboarding/agency" replace />;
+  // Agents are auto-approved on email verification — gate is now role-only.
+  if (requireAgent && !isAgent && !isAdmin) return <Navigate to="/onboarding/role" replace />;
   if (requirePartner && !isPartner) return <Navigate to="/" replace />;
   if (requireStrata && !isStrataManager && !isAdmin) return <Navigate to="/" replace />;
 

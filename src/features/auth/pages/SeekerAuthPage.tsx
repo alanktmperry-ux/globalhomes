@@ -10,8 +10,9 @@ import { lovable } from '@/integrations/lovable/index';
 import { toast } from 'sonner';
 import seekerHero from '@/assets/seeker-auth-hero.jpg';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
+import OTPVerificationScreen from '@/features/auth/components/OTPVerificationScreen';
 
-type Step = 'email' | 'password' | 'create' | 'prefs';
+type Step = 'email' | 'password' | 'create' | 'otp' | 'prefs';
 
 const SeekerAuthPage = () => {
   const { t } = useTranslation();
@@ -89,48 +90,55 @@ const SeekerAuthPage = () => {
 
   const handleCreateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!phone.trim()) {
-      toast.error('Phone required', { description: 'Please enter your mobile number.' });
+    if (!email.trim()) {
+      toast.error('Email required');
       return;
     }
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signInWithOtp({
         email,
-        password,
         options: {
-          emailRedirectTo: window.location.origin + '/auth/confirm',
-          data: { display_name: displayName || email, phone },
+          shouldCreateUser: true,
+          data: {
+            display_name: displayName || email,
+            phone: phone || undefined,
+          },
         },
       });
       if (error) throw error;
-
-      if (data.user && !data.session) {
-        await supabase.from('profiles').update({
-          terms_accepted_at: new Date().toISOString(),
-          terms_version: '1.0',
-        } as any).eq('user_id', data.user.id);
-
-        toast('✉️ Check your email', {
-          description: `We sent a confirmation link to ${email}. Click it to verify your account. Check your spam folder if you don't see it.`,
-          duration: 10000,
-        });
-        setStep('email');
-      } else {
-        if (data.user) {
-          await supabase.from('profiles').update({
-            terms_accepted_at: new Date().toISOString(),
-            terms_version: '1.0',
-          } as any).eq('user_id', data.user.id);
-        }
-        toast.success('🎉 Account created!');
-        setStep('prefs');
-      }
+      toast.success('Code sent', {
+        description: `Check ${email} for your 6-digit code.`,
+      });
+      setStep('otp');
     } catch (err: unknown) {
-      toast.error('Something went wrong', { description: getErrorMessage(err) });
+      toast.error('Could not send code', { description: getErrorMessage(err) });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleOtpVerified = async () => {
+    // After OTP verify the user is signed in. Stamp terms acceptance and route to role selection.
+    try {
+      const { data: { user: u } } = await supabase.auth.getUser();
+      if (u) {
+        await supabase.from('profiles').upsert(
+          {
+            user_id: u.id,
+            terms_accepted_at: new Date().toISOString(),
+            terms_version: '1.0',
+            display_name: displayName || undefined,
+            phone: phone || undefined,
+          } as any,
+          { onConflict: 'user_id' },
+        );
+      }
+    } catch {
+      // non-fatal
+    }
+    toast.success('Email verified');
+    navigate('/onboarding/role', { replace: true });
   };
 
   const handleSavePrefs = async () => {
@@ -163,8 +171,8 @@ const SeekerAuthPage = () => {
   };
 
   const goBack = () => {
-    if (step === 'password' || step === 'create') {
-      setStep('email');
+    if (step === 'password' || step === 'create' || step === 'otp') {
+      setStep(step === 'otp' ? 'create' : 'email');
       setPassword('');
     } else {
       navigate('/');
@@ -176,6 +184,16 @@ const SeekerAuthPage = () => {
   const btnPrimary = "w-full h-[52px] rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-[15px] font-medium transition-colors disabled:opacity-40";
   const btnOAuth = "w-full h-[50px] flex items-center gap-3 px-5 rounded-2xl border border-stone-200 bg-white hover:bg-stone-50 hover:border-stone-300 text-[14px] text-stone-700 font-normal transition-all";
   const label = "block text-[11px] font-medium tracking-[0.07em] uppercase text-stone-400 mb-2";
+
+  if (step === 'otp') {
+    return (
+      <OTPVerificationScreen
+        email={email}
+        onVerified={handleOtpVerified}
+        onBack={() => { setStep('create'); }}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen flex">
@@ -441,16 +459,14 @@ const SeekerAuthPage = () => {
                           placeholder={t('auth.displayNamePlaceholder')} className={input} />
                       </div>
                       <div>
-                        <label className={label}>{t('auth.mobile')} <span className="text-red-400">*</span></label>
+                        <label className={label}>{t('auth.mobile')}</label>
                         <PhoneInput value={phone} onChange={setPhone} />
                       </div>
-                      <div>
-                        <label className={label}>{t('auth.passwordLabel')} <span className="text-red-400">*</span></label>
-                        <input type="password" required minLength={8} value={password}
-                          onChange={e => setPassword(e.target.value)} className={input} />
-                      </div>
-                      <button type="submit" disabled={loading} className={btnPrimary}>
-                        {loading ? t('auth.creatingAccount') : t('auth.createAccountBtn')}
+                      <p className="text-[12px] text-stone-400 leading-relaxed -mt-1">
+                        We'll email you a 6-digit code to verify it's you. No password needed.
+                      </p>
+                      <button type="submit" disabled={loading || !email.trim()} className={btnPrimary}>
+                        {loading ? 'Sending code…' : 'Send verification code'}
                       </button>
                     </form>
                     <button onClick={goBack}

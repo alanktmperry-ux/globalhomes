@@ -7481,6 +7481,7 @@ export type Database = {
           terms_version: string | null
           updated_at: string
           user_id: string
+          user_role: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -7505,6 +7506,7 @@ export type Database = {
           terms_version?: string | null
           updated_at?: string
           user_id: string
+          user_role?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -7529,6 +7531,7 @@ export type Database = {
           terms_version?: string | null
           updated_at?: string
           user_id?: string
+          user_role?: string | null
         }
         Relationships: []
       }

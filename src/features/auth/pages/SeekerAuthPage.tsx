@@ -90,48 +90,55 @@ const SeekerAuthPage = () => {
 
   const handleCreateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!phone.trim()) {
-      toast.error('Phone required', { description: 'Please enter your mobile number.' });
+    if (!email.trim()) {
+      toast.error('Email required');
       return;
     }
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signInWithOtp({
         email,
-        password,
         options: {
-          emailRedirectTo: window.location.origin + '/auth/confirm',
-          data: { display_name: displayName || email, phone },
+          shouldCreateUser: true,
+          data: {
+            display_name: displayName || email,
+            phone: phone || undefined,
+          },
         },
       });
       if (error) throw error;
-
-      if (data.user && !data.session) {
-        await supabase.from('profiles').update({
-          terms_accepted_at: new Date().toISOString(),
-          terms_version: '1.0',
-        } as any).eq('user_id', data.user.id);
-
-        toast('✉️ Check your email', {
-          description: `We sent a confirmation link to ${email}. Click it to verify your account. Check your spam folder if you don't see it.`,
-          duration: 10000,
-        });
-        setStep('email');
-      } else {
-        if (data.user) {
-          await supabase.from('profiles').update({
-            terms_accepted_at: new Date().toISOString(),
-            terms_version: '1.0',
-          } as any).eq('user_id', data.user.id);
-        }
-        toast.success('🎉 Account created!');
-        setStep('prefs');
-      }
+      toast.success('Code sent', {
+        description: `Check ${email} for your 6-digit code.`,
+      });
+      setStep('otp');
     } catch (err: unknown) {
-      toast.error('Something went wrong', { description: getErrorMessage(err) });
+      toast.error('Could not send code', { description: getErrorMessage(err) });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleOtpVerified = async () => {
+    // After OTP verify the user is signed in. Stamp terms acceptance and route to role selection.
+    try {
+      const { data: { user: u } } = await supabase.auth.getUser();
+      if (u) {
+        await supabase.from('profiles').upsert(
+          {
+            user_id: u.id,
+            terms_accepted_at: new Date().toISOString(),
+            terms_version: '1.0',
+            display_name: displayName || undefined,
+            phone: phone || undefined,
+          } as any,
+          { onConflict: 'user_id' },
+        );
+      }
+    } catch {
+      // non-fatal
+    }
+    toast.success('Email verified');
+    navigate('/onboarding/role', { replace: true });
   };
 
   const handleSavePrefs = async () => {

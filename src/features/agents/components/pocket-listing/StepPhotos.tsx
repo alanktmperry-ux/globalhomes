@@ -25,8 +25,18 @@ const StepPhotos = ({ draft, update }: Props) => {
   const [uploading, setUploading] = useState(false);
   const { user } = useAuth();
 
+  const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+  const EXT_TO_MIME: Record<string, string> = {
+    jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png',
+    webp: 'image/webp', gif: 'image/gif',
+  };
+
   const addPhotos = async (files: FileList | null) => {
-    if (!files || files.length === 0) return;
+    console.log('[StepPhotos] addPhotos called', { count: files?.length, userId: user?.id });
+    if (!files || files.length === 0) {
+      toast.error('No files received. Try clicking the box and selecting from your computer.');
+      return;
+    }
     if (!user?.id) {
       toast.error('You must be signed in to upload photos.');
       return;
@@ -34,6 +44,7 @@ const StepPhotos = ({ draft, update }: Props) => {
     setUploading(true);
     const uploadedUrls: string[] = [];
     let skippedTooLarge = 0;
+    let skippedUnsupported = 0;
     let failedCount = 0;
     let lastErrorMsg = '';
 
@@ -41,15 +52,25 @@ const StepPhotos = ({ draft, update }: Props) => {
     const filesToUpload = Array.from(files).slice(0, remaining);
 
     for (const file of filesToUpload) {
+      const ext = (file.name.split('.').pop() || '').toLowerCase();
+      const resolvedType = ALLOWED_MIME.includes(file.type)
+        ? file.type
+        : EXT_TO_MIME[ext];
+
+      if (!resolvedType) {
+        skippedUnsupported++;
+        console.warn('[StepPhotos] unsupported file', { name: file.name, type: file.type });
+        continue;
+      }
       if (file.size > 10 * 1024 * 1024) {
         skippedTooLarge++;
         continue;
       }
-      const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-      const filePath = `${user.id}/${crypto.randomUUID()}.${ext}`;
+      const safeExt = ext || resolvedType.split('/')[1] || 'jpg';
+      const filePath = `${user.id}/${crypto.randomUUID()}.${safeExt}`;
       const { error } = await supabase.storage
         .from('property-images')
-        .upload(filePath, file, { upsert: false, contentType: file.type });
+        .upload(filePath, file, { upsert: false, contentType: resolvedType });
       if (error) {
         failedCount++;
         lastErrorMsg = error.message;
@@ -64,6 +85,10 @@ const StepPhotos = ({ draft, update }: Props) => {
 
     if (uploadedUrls.length > 0) {
       update({ photos: [...draft.photos, ...uploadedUrls].slice(0, 20) });
+      toast.success(`${uploadedUrls.length} photo${uploadedUrls.length > 1 ? 's' : ''} added.`);
+    }
+    if (skippedUnsupported > 0) {
+      toast.error(`${skippedUnsupported} file${skippedUnsupported > 1 ? 's' : ''} skipped — only JPG, PNG, WebP, GIF allowed (HEIC not supported).`, { duration: 12000 });
     }
     if (skippedTooLarge > 0) {
       toast.error(`${skippedTooLarge} photo${skippedTooLarge > 1 ? 's' : ''} skipped — over 10 MB limit.`);

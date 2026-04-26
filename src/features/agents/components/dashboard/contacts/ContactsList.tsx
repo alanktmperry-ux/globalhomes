@@ -61,11 +61,14 @@ interface Props {
   onSortChange: (s: ContactSort) => void;
   onSelect: (c: Contact) => void;
   onDelete: (id: string) => void;
+  hasMore?: boolean;
+  onLoadMore?: () => void;
 }
 
 const ContactsList = ({
   contacts, loading, filters, sort, columns,
   onFiltersChange, onSortChange, onSelect, onDelete,
+  hasMore, onLoadMore,
 }: Props) => {
   const showCol = (k: ContactColumnKey) => columns.includes(k);
 
@@ -445,6 +448,13 @@ const ContactsList = ({
               </tbody>
             </table>
           </div>
+          {hasMore && onLoadMore && (
+            <div className="flex justify-center py-3 border-t border-border">
+              <Button variant="outline" size="sm" onClick={onLoadMore} disabled={loading}>
+                {loading ? 'Loading…' : 'Load more'}
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>

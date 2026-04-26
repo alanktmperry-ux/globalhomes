@@ -40,8 +40,11 @@ export default defineConfig(({ mode }) => ({
           if (id.includes("mapbox-gl") || id.includes("@googlemaps")) return "maps";
           if (id.includes("framer-motion")) return "motion";
 
-          // Everything else (including React + all React-consuming libs) into one chunk.
-          // Guarantees React loads before anything that uses createContext.
+          if (id.includes("react/") || id.includes("react-dom") || id.includes("react-router")) return "react-core";
+          if (id.includes("@radix-ui")) return "radix-ui";
+          if (id.includes("@tanstack") || id.includes("react-hook-form") || id.includes("zod")) return "react-utils";
+          if (id.includes("lucide-react")) return "icons";
+
           return "vendor";
         },
       },

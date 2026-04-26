@@ -79,18 +79,26 @@ LISTING DATA:
 - Features: ${listing.features ? JSON.stringify(listing.features) : "None listed"}
 - Year Built: ${listing.year_built || "N/A"}
 
-TRANSLATIONS — provide for each of these language keys: "zh_simplified" (Simplified Chinese), "zh_traditional" (Traditional Chinese), "vi" (Vietnamese), "ko" (Korean), "ar" (Arabic), "ja" (Japanese)
+TRANSLATIONS — provide for each of these language keys: "zh_simplified" (Simplified Chinese), "zh_traditional" (Traditional Chinese), "vi" (Vietnamese), "ko" (Korean), "ar" (Arabic), "ja" (Japanese), "hi" (Hindi), "pa" (Punjabi - Gurmukhi script), "ta" (Tamil), "bn" (Bengali)
 Each language must contain:
 - title: translated property title
 - description: full translated description (natural, not word-for-word)
 - summary: 1-2 sentence highlight summary
 - cultural_highlights: array of strings noting culturally relevant features ONLY if genuinely applicable (e.g. feng shui orientation, school proximity, multigenerational layout, garden space). Never fabricate cultural relevance.
+For Indian-buyer-relevant features specifically, consider noting (only when genuinely applicable):
+- Vastu-compliant orientation (north or east-facing entrance)
+- Multigenerational layout potential (separate living wings, granny flat, ground-floor bedroom)
+- Proximity to Hindu temples, Sikh gurdwaras, Indian grocers, sweet shops, or Indian restaurants
+- Proximity to high-performing schools and tutoring/coaching centres (a major Indian-Australian buyer priority)
+- Vegetarian-friendly kitchen layout (separate stove space, large pantry)
+- Distance to Indian community centres or cultural associations
+For Tamil buyers specifically, also consider proximity to South Indian temples and Carnatic music/dance schools where genuinely nearby.
 
-CRITICAL: All 6 language keys MUST be present in the "translations" object. For Arabic, ensure right-to-left natural phrasing.
+CRITICAL: All 10 language keys MUST be present in the "translations" object. For Arabic, ensure right-to-left natural phrasing. For Hindi, Punjabi, Tamil, and Bengali, use natural Indian-Australian property terminology where appropriate. Use 'lakh' and 'crore' phrasing for Indian buyers when prices fit those denominations, alongside the AUD figure.
 
 AGENT INSIGHTS — in English, under key "agent_insights":
 - multicultural_appeal: string describing the property's appeal to multicultural buyers
-- suggested_buyer_profiles: array of strings (e.g. "Young Mandarin-speaking professionals", "Vietnamese families seeking school catchments")
+- suggested_buyer_profiles: array of strings (e.g. "Young Mandarin-speaking professionals", "Vietnamese families seeking school catchments", "Punjabi-Sikh families seeking western Sydney/Melbourne growth corridors", "Hindi-speaking IT professionals in Sydney North Shore or Melbourne south-east", "Tamil families prioritising school catchments", "Bengali-speaking professional couples")
 - key_selling_points_for_diverse_buyers: array of strings
 
 Return ONLY valid JSON. No markdown, no code fences.`;

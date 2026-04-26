@@ -1,6 +1,23 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
 
+// --- Ad-hoc in-memory rate limiting (resets on cold start) ---
+const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
+const RATE_LIMIT_MAX = 10;
+const rateLimitMap = new Map<string, { count: number; windowStart: number }>();
+
+function isRateLimited(userId: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(userId);
+  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
+    rateLimitMap.set(userId, { count: 1, windowStart: now });
+    return false;
+  }
+  if (entry.count >= RATE_LIMIT_MAX) return true;
+  entry.count++;
+  return false;
+}
+
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req.headers.get("Origin"));
 
@@ -52,6 +69,14 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Per-admin rate limit (post-auth so unauthenticated calls don't pollute the map)
+    if (isRateLimited(caller.id)) {
+      return new Response(JSON.stringify({ error: "Rate limit exceeded. Max 10 operations per minute." }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const url = new URL(req.url);
     // Support params from URL query string OR JSON body (for supabase.functions.invoke)
     let bodyParams: Record<string, any> = {};
@@ -62,6 +87,9 @@ Deno.serve(async (req) => {
       url.searchParams.get(key) ?? bodyParams[key]?.toString() ?? fallback ?? null;
 
     const action = getParam("action");
+
+    // Forensic log for every admin operation
+    console.log(`[admin-users] action=${action} caller=${caller.id} target=${bodyParams.userId ?? bodyParams.user_id ?? 'n/a'} ts=${new Date().toISOString()}`);
 
     if (action === "list_users") {
       const page = parseInt(getParam("page", "1")!);

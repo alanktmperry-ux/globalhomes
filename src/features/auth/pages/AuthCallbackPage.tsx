@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const AuthCallbackPage = () => {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ const AuthCallbackPage = () => {
         });
         setTimeout(() => {
           subscription.unsubscribe();
+          toast.error('Sign-in is taking too long. Please try again.');
           navigate('/auth?error=oauth_failed', { replace: true });
         }, 8000);
         return;

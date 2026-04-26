@@ -40,6 +40,7 @@ import { useCurrency } from '@/shared/lib/CurrencyContext';
 const FilterSidebar = lazy(() =>
   import('@/shared/components/FilterSidebar').then(m => ({ default: m.FilterSidebar }))
 );
+import { defaultFilters } from '@/shared/components/FilterSidebar.types';
 import { usePropertySearch } from '@/features/properties/hooks/usePropertySearch';
 import { Slider } from '@/components/ui/slider';
 import { useSavedSearches } from '@/features/search/hooks/useSavedSearches';

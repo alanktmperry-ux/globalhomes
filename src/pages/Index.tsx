@@ -317,13 +317,14 @@ const Index = () => {
   } = usePropertySearch({ addSearch });
 
   // Consumer sign-up modal trigger after 3rd anonymous search
-  const wrappedHandleSearch = useCallback((query: string) => {
+  const wrappedHandleSearch = useCallback((query: string, detectedLanguage?: string) => {
+    const lang = detectedLanguage || 'en';
     handleSearch(query);
 
     // Track search
     try {
       if (typeof window !== 'undefined' && (window as any).posthog?.capture) {
-        (window as any).posthog.capture('search_performed', { query, detected_language: 'en', result_count: filteredProperties?.length ?? 0 });
+        (window as any).posthog.capture('search_performed', { query, detected_language: lang, result_count: filteredProperties?.length ?? 0 });
       }
     } catch {}
 
@@ -333,7 +334,7 @@ const Index = () => {
       .insert({
         transcript: query.slice(0, 200),
         user_id: user?.id ?? null,
-        detected_language: 'en',
+        detected_language: lang,
         status: 'completed',
       })
       .then(() => {});

@@ -28,7 +28,7 @@ import PreApprovalReview from '@/features/admin/components/PreApprovalReview';
 import AgentApprovalQueue from '@/features/admin/components/AgentApprovalQueue';
 import ListingModerationQueue from '@/features/admin/components/ListingModerationQueue';
 import AdminSidebar, { type AdminTab } from '@/features/admin/components/AdminSidebar';
-import MapsKeyDiagnostic from '@/features/admin/components/MapsKeyDiagnostic';
+
 
 type Tab = AdminTab;
 
@@ -339,7 +339,7 @@ const AdminDashboard = () => {
       {/* ── CONTENT AREA ── */}
       <main className="flex-1 min-w-0 overflow-y-auto">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
-          <MapsKeyDiagnostic />
+          
           {loading && tab !== 'users' && tab !== 'database' && tab !== 'ai-insights' ? (
             <div className="flex justify-center py-20">
               <Loader2 className="animate-spin text-primary" size={32} />

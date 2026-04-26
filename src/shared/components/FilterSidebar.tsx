@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SlidersHorizontal, X, ChevronDown, ChevronUp, RotateCcw, PawPrint, Home, GraduationCap, Sofa, BadgeCheck, CalendarDays, Clock, DollarSign } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
@@ -118,6 +118,8 @@ export function FilterSidebar({ filters, onChange, isOpen, onToggle, totalCount,
   const { formatPrice } = useCurrency();
   const { t } = useTranslation();
   const isRental = listingMode === 'rent';
+  const [draftPrice, setDraftPrice] = useState<[number, number]>(filters.priceRange);
+  useEffect(() => { setDraftPrice(filters.priceRange); }, [filters.priceRange]);
 
   const PROPERTY_TYPES = [
     { value: 'House', label: t('filter.type.house') },
@@ -359,10 +361,10 @@ export function FilterSidebar({ filters, onChange, isOpen, onToggle, totalCount,
                 {/* Price Range / Weekly Rent */}
                 <Section title={isRental ? 'Weekly Rent' : 'Price Range'}>
                   <div className="flex items-center justify-between text-sm font-medium text-foreground">
-                    <span>{isRental ? formatRentPrice(filters.priceRange[0]) : formatPrice(filters.priceRange[0])}</span>
+                    <span>{isRental ? formatRentPrice(draftPrice[0]) : formatPrice(draftPrice[0])}</span>
                     <span>
-                      {isRental ? formatRentPrice(filters.priceRange[1]) : formatPrice(filters.priceRange[1])}
-                      {isRental && filters.priceRange[1] >= priceMax && '+'}
+                      {isRental ? formatRentPrice(draftPrice[1]) : formatPrice(draftPrice[1])}
+                      {isRental && draftPrice[1] >= priceMax && '+'}
                     </span>
                   </div>
                   <Slider
@@ -370,10 +372,11 @@ export function FilterSidebar({ filters, onChange, isOpen, onToggle, totalCount,
                     max={priceMax}
                     step={priceStep}
                     value={[
-                      Math.min(filters.priceRange[0], priceMax),
-                      Math.min(filters.priceRange[1], priceMax),
+                      Math.min(draftPrice[0], priceMax),
+                      Math.min(draftPrice[1], priceMax),
                     ]}
-                    onValueChange={(v) => update('priceRange', v as [number, number])}
+                    onValueChange={(v) => setDraftPrice(v as [number, number])}
+                    onValueCommit={(v) => update('priceRange', v as [number, number])}
                     className="mt-2"
                   />
                   {/* Bond Budget helper for rentals */}

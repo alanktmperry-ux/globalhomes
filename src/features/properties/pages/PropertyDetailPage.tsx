@@ -8,6 +8,7 @@ import MultilingualListingDetail from '@/features/properties/components/Multilin
 import { Button } from '@/components/ui/button';
 import { Property } from '@/shared/lib/types';
 import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { AgentContactModal } from '@/features/agents/components/AgentContactModal';
 import { InvestmentInsightsCard } from '@/features/properties/components/InvestmentInsightsCard';
@@ -53,6 +54,7 @@ export default function PropertyDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useI18n();
+  const { t: tp } = useTranslation();
   const { formatPrice, currency, listingMode } = useCurrency();
   const { isSaved, toggleSaved } = useSavedProperties();
   const isMobile = useIsMobile();
@@ -258,9 +260,9 @@ export default function PropertyDetailPage() {
     return (
       <div className="flex-1 flex flex-col items-center justify-center gap-4">
         <Home size={48} className="text-muted-foreground" />
-        <h1 className="font-display text-xl font-bold text-foreground">Property not found</h1>
+        <h1 className="font-display text-xl font-bold text-foreground">{tp('property.notFound')}</h1>
         <button onClick={() => navigate('/')} className="px-6 py-2 rounded-xl bg-primary text-primary-foreground font-medium text-sm">
-          Back to search
+          {tp('property.notFound.back')}
         </button>
       </div>
     );
@@ -292,7 +294,7 @@ export default function PropertyDetailPage() {
     }
   };
 
-  const ctaLabel = isRental ? 'Enquire / Apply' : t('property.contact');
+  const ctaLabel = isRental ? 'Enquire / Apply' : tp('property.contactAgent');
 
   return (
     <div className="bg-background overflow-y-auto overflow-x-hidden">
@@ -368,7 +370,7 @@ export default function PropertyDetailPage() {
             {isRental && property.contactClicks > 0 && (
               <span className="px-3 py-1.5 rounded-full bg-primary/90 text-primary-foreground text-xs font-bold tracking-wide uppercase shadow-sm flex items-center gap-1">
                 <Users size={12} />
-                {property.contactClicks} application{property.contactClicks !== 1 ? 's' : ''}
+                {tp(property.contactClicks === 1 ? 'property.applications' : 'property.applicationsPlural', { count: property.contactClicks })}
               </span>
             )}
           </div>
@@ -382,7 +384,7 @@ export default function PropertyDetailPage() {
             className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 h-10 rounded-full border border-border bg-card text-sm font-medium text-foreground hover:bg-secondary transition-colors"
           >
             <Heart size={16} className={saved ? 'fill-destructive text-destructive' : ''} />
-            {saved ? t('property.saved') || 'Saved' : t('property.save') || 'Save'}
+            {saved ? tp('property.saved') : tp('property.save')}
           </button>
         </div>
 
@@ -415,7 +417,7 @@ export default function PropertyDetailPage() {
                     <p className="font-display text-3xl md:text-4xl font-bold text-foreground">
                       {formatPrice(weeklyRent, 'rent')}
                     </p>
-                    <span className="text-lg text-muted-foreground font-medium">per week</span>
+                    <span className="text-lg text-muted-foreground font-medium">{tp('property.perWeek')}</span>
                   </div>
                   {currency.code !== 'AUD' && (
                     <p className="text-sm text-muted-foreground mt-0.5">${weeklyRent.toLocaleString()}/wk AUD</p>
@@ -450,7 +452,7 @@ export default function PropertyDetailPage() {
                   to={`/suburb/${property.state.toLowerCase()}/${property.suburb.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`}
                   className="inline-block text-xs text-muted-foreground hover:text-primary transition-colors mt-1"
                 >
-                  View {property.suburb} suburb profile →
+                  {tp('property.viewSuburb', { suburb: property.suburb })} →
                 </Link>
               )}
               {((property as any).listing_mode === 'eoi' || (property as any).listing_mode === 'off_market') && (
@@ -470,17 +472,17 @@ export default function PropertyDetailPage() {
                 className="mt-4 flex items-center gap-2 px-4 py-2 rounded-full border border-teal-600 text-teal-600 font-medium text-sm hover:bg-teal-50 transition-colors"
               >
                 <Share2 size={16} />
-                Share
+                {tp('property.share')}
               </button>
             </div>
 
             {/* Key stats */}
             <div className="flex border border-slate-200 rounded-2xl overflow-hidden">
               {[
-                { icon: Bed, value: property.beds, label: t('property.beds') },
-                { icon: Bath, value: property.baths, label: t('property.baths') },
-                { icon: Car, value: property.parking, label: t('property.parking') },
-                { icon: Ruler, value: property.sqm ? `${property.sqm}m²` : '—', label: 'Size' },
+                { icon: Bed, value: property.beds, label: tp('property.facts.beds') },
+                { icon: Bath, value: property.baths, label: tp('property.facts.baths') },
+                { icon: Car, value: property.parking, label: tp('property.facts.parking') },
+                { icon: Ruler, value: property.sqm ? `${property.sqm}m²` : '—', label: tp('property.facts.size') },
               ].map((stat, i) => (
                 <div key={stat.label} className={`flex-1 flex flex-col items-center py-3.5 gap-0.5 bg-white ${i < 3 ? 'border-r border-slate-200' : ''}`}>
                   <stat.icon size={15} className="text-slate-400 mb-1" strokeWidth={1.8} />
@@ -510,7 +512,7 @@ export default function PropertyDetailPage() {
                     </p>
                     {isTranslated && (
                       <p className="mt-2 text-[11px] text-muted-foreground italic">
-                        Translated by AI
+                        {tp('property.aiTranslated')}
                       </p>
                     )}
                   </>
@@ -523,35 +525,35 @@ export default function PropertyDetailPage() {
               <div className="p-5 rounded-2xl bg-card border border-border shadow-card">
                 <h2 className="font-display text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                   <FileText size={18} className="text-primary" />
-                  Rental Information
+                  {tp('property.section.rentalInformation')}
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-3 rounded-xl bg-secondary">
-                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Available From</p>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">{tp('property.rental.availableFrom')}</p>
                     <p className="text-sm font-semibold text-foreground mt-1 flex items-center gap-1.5">
                       <Calendar size={14} className="text-primary" />
-                      Available Now
+                      {tp('property.rental.availableNow')}
                     </p>
                   </div>
                   <div className="p-3 rounded-xl bg-secondary">
-                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Lease Term</p>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">{tp('property.rental.leaseTerm')}</p>
                     <p className="text-sm font-semibold text-foreground mt-1 flex items-center gap-1.5">
                       <Clock size={14} className="text-primary" />
-                      6 – 12 months
+                      {tp('property.rental.leaseTermValue')}
                     </p>
                   </div>
                   <div className="p-3 rounded-xl bg-secondary">
-                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Bond</p>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">{tp('property.rental.bond')}</p>
                     <p className="text-sm font-semibold text-foreground mt-1">
-                      {formatPrice(bondAmount, 'sale')} <span className="text-xs text-muted-foreground font-normal">(4 weeks)</span>
+                      {formatPrice(bondAmount, 'sale')} <span className="text-xs text-muted-foreground font-normal">{tp('property.rental.bondWeeks')}</span>
                     </p>
                   </div>
                   <div className="p-3 rounded-xl bg-secondary">
-                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Pet Policy</p>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">{tp('property.rental.petPolicy')}</p>
                     <p className="text-sm font-semibold mt-1 flex items-center gap-1.5">
                       <PawPrint size={14} className={isPetFriendly ? 'text-emerald-500' : 'text-muted-foreground'} />
                       <span className={isPetFriendly ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}>
-                        {isPetFriendly ? 'Pets Allowed' : 'On Application'}
+                        {isPetFriendly ? tp('property.rental.petsAllowed') : tp('property.rental.petsOnApplication')}
                       </span>
                     </p>
                   </div>
@@ -559,7 +561,7 @@ export default function PropertyDetailPage() {
                     <div className="sm:col-span-2 p-3 rounded-xl bg-primary/5 border border-primary/10">
                       <p className="text-sm font-semibold text-primary flex items-center gap-1.5">
                         <Sofa size={14} />
-                        This property is furnished
+                        {tp('property.rental.furnished')}
                       </p>
                     </div>
                   )}
@@ -571,7 +573,7 @@ export default function PropertyDetailPage() {
             <div className="p-5 rounded-2xl bg-card border border-border shadow-card">
               <h2 className="font-display text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
                 <Eye size={18} className="text-primary" />
-                Inspection Times
+                {tp('property.section.inspectionTimes')}
               </h2>
               {(() => {
                 const upcoming = inspectionTimes.filter(s => new Date(`${s.date}T${s.start}`) > new Date());
@@ -579,13 +581,13 @@ export default function PropertyDetailPage() {
                   return (
                     <>
                       <p className="text-sm text-muted-foreground">
-                        No scheduled inspections. Contact agent for inspection times.
+                        {tp('property.inspection.empty')}
                       </p>
                       <button
                         onClick={handleCtaClick}
                         className="mt-3 px-5 py-2.5 rounded-xl bg-secondary text-foreground font-medium text-sm hover:bg-accent transition-colors"
                       >
-                        Request Inspection
+                        {tp('property.requestInspection')}
                       </button>
                     </>
                   );
@@ -610,7 +612,7 @@ export default function PropertyDetailPage() {
                             </p>
                           </div>
                           <span className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                            Book
+                            {tp('property.inspection.book')}
                           </span>
                         </button>
                       );
@@ -632,7 +634,7 @@ export default function PropertyDetailPage() {
                 <div className="p-3 rounded-xl bg-secondary flex items-center gap-3">
                   <Calendar size={16} className="text-muted-foreground shrink-0" />
                   <div>
-                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Listed</p>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">{tp('property.facts.listed')}</p>
                     <p className="text-sm font-semibold text-foreground">{new Date(property.listedDate).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                   </div>
                 </div>
@@ -641,7 +643,7 @@ export default function PropertyDetailPage() {
                 <div className="p-3 rounded-xl bg-secondary flex items-center gap-3">
                   <Eye size={16} className="text-muted-foreground shrink-0" />
                   <div>
-                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Views</p>
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">{tp('property.facts.views')}</p>
                     <p className="text-sm font-semibold text-foreground">{property.views.toLocaleString()}</p>
                   </div>
                 </div>
@@ -649,7 +651,7 @@ export default function PropertyDetailPage() {
               <div className="p-3 rounded-xl bg-secondary flex items-center gap-3">
                 <Home size={16} className="text-muted-foreground shrink-0" />
                 <div>
-                  <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Type</p>
+                  <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">{tp('property.facts.type')}</p>
                   <p className="text-sm font-semibold text-foreground">{property.propertyType}</p>
                 </div>
               </div>
@@ -770,7 +772,7 @@ export default function PropertyDetailPage() {
 
             {((property as any).price_guide_low || (property as any).price_guide_high) && (
               <div className="p-4 rounded-2xl bg-card border border-border">
-                <p className="text-sm font-medium text-foreground">Price guide</p>
+                <p className="text-sm font-medium text-foreground">{tp('property.priceGuide')}</p>
                 <p className="text-xl font-bold text-foreground mt-1">
                   {(property as any).price_guide_low && `$${Number((property as any).price_guide_low).toLocaleString()}`}
                   {(property as any).price_guide_low && (property as any).price_guide_high && (property as any).price_guide_low !== (property as any).price_guide_high
@@ -845,7 +847,7 @@ export default function PropertyDetailPage() {
             {/* Features */}
             {property.features.length > 0 && (
               <div>
-                <h2 className="text-[15px] font-bold text-slate-900 mb-3 flex items-center gap-2.5 before:content-[''] before:w-[3px] before:h-4 before:rounded-full before:bg-blue-600 before:shrink-0">Features</h2>
+                <h2 className="text-[15px] font-bold text-slate-900 mb-3 flex items-center gap-2.5 before:content-[''] before:w-[3px] before:h-4 before:rounded-full before:bg-blue-600 before:shrink-0">{tp('property.section.features')}</h2>
                 <div className="flex flex-wrap gap-2">
                   {property.features.map(f => (
                     <span key={f} className="px-3 py-1.5 rounded-full border border-slate-200 bg-slate-50 text-sm font-medium text-slate-600">
@@ -901,7 +903,7 @@ export default function PropertyDetailPage() {
                     className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[13px] font-semibold text-white transition-colors"
                     style={{ border: '1.5px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)' }}
                   >
-                    <Phone size={13} strokeWidth={2} /> Call
+                    <Phone size={13} strokeWidth={2} /> {tp('property.call')}
                   </a>
                 ) : (
                   <button
@@ -909,7 +911,7 @@ export default function PropertyDetailPage() {
                     className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[13px] font-semibold text-white transition-colors"
                     style={{ border: '1.5px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)' }}
                   >
-                    <Phone size={13} strokeWidth={2} /> Call
+                    <Phone size={13} strokeWidth={2} /> {tp('property.call')}
                   </button>
                 )}
                 <button
@@ -927,7 +929,7 @@ export default function PropertyDetailPage() {
                     className="w-full py-2.5 rounded-xl text-[13px] font-semibold transition-colors"
                     style={{ border: '1.5px solid rgba(255,255,255,0.12)', color: '#fff', background: 'transparent' }}
                   >
-                    Apply Now
+                    {tp('property.applyNow')}
                   </button>
                 </div>
               )}
@@ -944,16 +946,16 @@ export default function PropertyDetailPage() {
 
             {!isRental && (
               <div className="mt-4 p-4 rounded-xl border border-primary/20 bg-primary/5">
-                <p className="text-sm font-medium">Need finance?</p>
-                <p className="text-xs text-muted-foreground mb-2">Get pre-approved before you make an offer.</p>
-                <Button size="sm" variant="outline" onClick={() => setMortgageOpen(true)}>Get pre-approved</Button>
+                <p className="text-sm font-medium">{tp('property.finance.shortTitle')}</p>
+                <p className="text-xs text-muted-foreground mb-2">{tp('property.finance.shortBody')}</p>
+                <Button size="sm" variant="outline" onClick={() => setMortgageOpen(true)}>{tp('property.finance.shortCta')}</Button>
               </div>
             )}
             {!isRental && (
               <div className="mt-3 p-4 rounded-xl border border-primary/20 bg-primary/5">
-                <p className="text-sm font-medium">Need a conveyancer?</p>
-                <p className="text-xs text-muted-foreground mb-2">Fixed-fee settlement from $990.</p>
-                <Button size="sm" variant="outline" onClick={() => navigate('/conveyancing')}>Get a fixed quote</Button>
+                <p className="text-sm font-medium">{tp('property.conveyancer.title')}</p>
+                <p className="text-xs text-muted-foreground mb-2">{tp('property.conveyancer.body')}</p>
+                <Button size="sm" variant="outline" onClick={() => navigate('/conveyancing')}>{tp('property.conveyancer.cta')}</Button>
               </div>
             )}
             <MortgageReferralModal

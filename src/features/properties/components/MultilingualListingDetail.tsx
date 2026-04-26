@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { MortgageBrokerCard } from './MortgageBrokerCard';
 import { capture } from '@/shared/lib/posthog';
 import { useI18n, type Language } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 type LanguageKey = 'en' | 'zh_simplified' | 'zh_traditional' | 'vi';
 
@@ -69,6 +70,7 @@ function i18nLangToListingLang(lang: Language): LanguageKey {
 
 const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
   const { language: i18nLang } = useI18n();
+  const { t: tp } = useTranslation();
 
   const [liveTranslations, setLiveTranslations] = useState<Record<string, Translation>>(
     () => (listing.translations ?? {}) as Record<string, Translation>
@@ -278,7 +280,7 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
         <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-900/20">
           <h3 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-amber-800 dark:text-amber-300">
             <Sparkles size={14} />
-            Cultural Highlights
+            {tp('property.section.culturalHighlights')}
           </h3>
           <ul className="list-inside list-disc space-y-1 text-sm text-amber-700 dark:text-amber-400">
             {culturalHighlights.map((h, i) => (
@@ -295,7 +297,7 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
             onClick={() => setInsightsOpen(!insightsOpen)}
             className="flex w-full items-center justify-between px-4 py-3 text-sm font-semibold text-blue-800 dark:text-blue-300"
           >
-            <span>Buyer Insights for This Market</span>
+            <span>{tp('property.section.buyerInsights')}</span>
             {insightsOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
 
@@ -303,13 +305,13 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
             <div className="space-y-3 border-t border-blue-200 px-4 py-3 text-sm text-blue-700 dark:border-blue-700 dark:text-blue-400">
               {agentInsights.multicultural_appeal && (
                 <div>
-                  <h4 className="font-medium text-blue-800 dark:text-blue-300">Multicultural Appeal</h4>
+                  <h4 className="font-medium text-blue-800 dark:text-blue-300">{tp('property.insights.multiculturalAppeal')}</h4>
                   <p>{agentInsights.multicultural_appeal}</p>
                 </div>
               )}
               {agentInsights.suggested_buyer_profiles && agentInsights.suggested_buyer_profiles.length > 0 && (
                 <div>
-                  <h4 className="font-medium text-blue-800 dark:text-blue-300">Suggested Buyer Profiles</h4>
+                  <h4 className="font-medium text-blue-800 dark:text-blue-300">{tp('property.insights.suggestedBuyerProfiles')}</h4>
                   <ul className="list-inside list-disc space-y-0.5">
                     {agentInsights.suggested_buyer_profiles.map((p, i) => (
                       <li key={i}>{p}</li>
@@ -320,7 +322,7 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
               {agentInsights.key_selling_points_for_diverse_buyers &&
                 agentInsights.key_selling_points_for_diverse_buyers.length > 0 && (
                   <div>
-                    <h4 className="font-medium text-blue-800 dark:text-blue-300">Key Selling Points</h4>
+                    <h4 className="font-medium text-blue-800 dark:text-blue-300">{tp('property.insights.keySellingPoints')}</h4>
                     <ul className="list-inside list-disc space-y-0.5">
                       {agentInsights.key_selling_points_for_diverse_buyers.map((p, i) => (
                         <li key={i}>{p}</li>

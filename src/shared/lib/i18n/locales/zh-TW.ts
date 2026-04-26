@@ -486,4 +486,78 @@ export const zhTW: Record<keyof typeof EnBase, string> = {
   'mortgage.result.totalRepayable': '還款總額',
   'mortgage.result.totalInterest': '利息總額',
   'mortgage.cta.broker': '諮詢貸款顧問',
+
+  // ──────────────────────────────────────────────────────────────────
+  // Property detail page
+  // ──────────────────────────────────────────────────────────────────
+  'property.saved': '已收藏',
+  'property.save': '收藏',
+  'property.share': '分享',
+  'property.call': '致電',
+  'property.contactAgent': '聯絡經紀',
+  'property.requestInspection': '預約睇樓',
+  'property.viewSuburb': '查看 {suburb} 地區簡介',
+  'property.titleFallback': '位於 {suburb} {state} 的{type}',
+  'property.applications': '{count} 份申請',
+  'property.applicationsPlural': '{count} 份申請',
+  'property.applyNow': '立即申請',
+  'property.priceGuide': '價格指引',
+  'property.perWeek': '每週',
+  'property.aiTranslated': '由 AI 翻譯',
+
+  'property.facts.listed': '上架日期',
+  'property.facts.views': '瀏覽次數',
+  'property.facts.type': '類型',
+  'property.facts.beds': '睡房',
+  'property.facts.baths': '浴室',
+  'property.facts.parking': '車位',
+  'property.facts.size': '面積',
+
+  'property.section.culturalHighlights': '文化亮點',
+  'property.section.buyerInsights': '本地市場買家洞察',
+  'property.section.inspectionTimes': '睇樓時間',
+  'property.section.openHomes': '開放睇樓',
+  'property.section.openHomesUpcoming': '即將開放 {count} 場',
+  'property.section.financeProperty': '為本物業融資',
+  'property.section.aboutThisProperty': '關於本物業',
+  'property.section.location': '位置',
+  'property.section.features': '物業特色',
+  'property.section.rentalInformation': '租賃資訊',
+
+  'property.rental.availableFrom': '可入住日期',
+  'property.rental.availableNow': '即可入住',
+  'property.rental.leaseTerm': '租期',
+  'property.rental.leaseTermValue': '6 – 12 個月',
+  'property.rental.bond': '按金',
+  'property.rental.bondWeeks': '（4 週租金）',
+  'property.rental.petPolicy': '寵物政策',
+  'property.rental.petsAllowed': '可攜帶寵物',
+  'property.rental.petsOnApplication': '須另行申請',
+  'property.rental.furnished': '本物業附傢俬',
+
+  'property.inspection.empty': '暫未安排睇樓。請聯絡經紀預約時間。',
+  'property.inspection.book': '預約',
+  'property.openHomes.empty': '暫無開放睇樓安排',
+  'property.openHomes.emptySub': '請聯絡經紀安排私人睇樓',
+
+  'property.finance.title': '需要貸款？與貸款顧問商談',
+  'property.finance.body': '透過持牌房貸顧問獲取預批 — 免費、無任何義務。',
+  'property.finance.cta': '獲取預批',
+  'property.finance.browseAll': '瀏覽所有顧問',
+  'property.finance.shortTitle': '需要貸款？',
+  'property.finance.shortBody': '出價前先獲取預批。',
+  'property.finance.shortCta': '獲取預批',
+
+  'property.conveyancer.title': '需要產權轉讓師？',
+  'property.conveyancer.body': '固定費用結算，僅 $990 起。',
+  'property.conveyancer.cta': '獲取報價',
+
+  'property.foreignBuyer.toggle': '我是海外買家（非澳洲公民或永久居民）',
+
+  'property.notFound': '找不到該物業',
+  'property.notFound.back': '返回搜尋',
+
+  'property.insights.multiculturalAppeal': '多元文化吸引力',
+  'property.insights.suggestedBuyerProfiles': '推薦買家類型',
+  'property.insights.keySellingPoints': '主要賣點',
 };

@@ -9,6 +9,7 @@ import {
 import { calculateFirbCosts, FOREIGN_SURCHARGE_RATES } from '@/lib/firb';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 interface Props {
   propertyPrice: number | null;
@@ -24,6 +25,7 @@ function formatAUD(n: number): string {
 
 export function FIRBCalculator({ propertyPrice, propertyAddress, propertyState }: Props) {
   const { t } = useI18n();
+  const { t: tp } = useTranslation();
   const { formatPrice, currency } = useCurrency();
   const [enabled, setEnabled] = useState(false);
   const [state, setState] = useState<AustralianState>(() => {
@@ -45,7 +47,7 @@ export function FIRBCalculator({ propertyPrice, propertyAddress, propertyState }
           </div>
           <div>
             <p className="font-display text-sm font-semibold text-foreground">
-              I am a foreign buyer (non-Australian citizen or permanent resident)
+              {tp('property.foreignBuyer.toggle')}
             </p>
             <p className="text-xs text-muted-foreground">
               {enabled && breakdown

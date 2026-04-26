@@ -30,7 +30,7 @@ import type { Contact } from '@/features/agents/hooks/useContacts';
 const LAST_VIEW_LS_KEY = 'gh-contacts-last-view';
 
 const ContactsPage = () => {
-  const { contacts, loading, createContact, updateContact, deleteContact, addActivity, getActivities, fetchContacts } = useContacts();
+  const { contacts, loading, hasMore, loadMore, createContact, updateContact, deleteContact, addActivity, getActivities, fetchContacts } = useContacts();
   const { user, isPrincipal, isAdmin, agencyId } = useAuth();
   const { agents } = useTeamAgents();
   const { views } = useContactSavedViews();
@@ -216,6 +216,8 @@ const ContactsPage = () => {
             onSortChange={setSort}
             onSelect={setSelectedContact}
             onDelete={deleteContact}
+            hasMore={hasMore}
+            onLoadMore={loadMore}
           />
         ) : (
           <PipelineBoard

@@ -70,6 +70,7 @@ function i18nLangToListingLang(lang: Language): LanguageKey {
 
 const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
   const { language: i18nLang } = useI18n();
+  const { t: tp } = useTranslation();
 
   const [liveTranslations, setLiveTranslations] = useState<Record<string, Translation>>(
     () => (listing.translations ?? {}) as Record<string, Translation>

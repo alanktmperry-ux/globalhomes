@@ -150,6 +150,8 @@ export function calculateBorrowingPower(inputs: BorrowingInputs): BorrowingResul
   const surplus = totalNetMonthly - totalCommitments;
   if (surplus <= 0) return zeroResult(deposit, totalNetMonthly, totalCommitments, hemUsed);
 
+  if (!assessmentRate || assessmentRate <= 0) return zeroResult(deposit, totalNetMonthly, totalCommitments, hemUsed);
+
   const r = assessmentRate / 100 / 12;
   const n = loanTermYears * 12;
   let maxLoanFromIncome: number;

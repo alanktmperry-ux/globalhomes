@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { Shield, AlertTriangle, TrendingUp } from 'lucide-react';
+import { buildAuditMeta } from '@/shared/lib/auditLog';
 
 interface DedupEvent {
   id: string;

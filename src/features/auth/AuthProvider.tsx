@@ -67,16 +67,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [impersonatedUserId, setImpersonatedUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    const savedEmail = sessionStorage.getItem('admin_email');
-    const savedId = sessionStorage.getItem('admin_impersonated_id');
-    if (savedEmail) {
-      setImpersonating(true);
-      setImpersonatedUser(savedEmail);
+    if (!isAdmin) {
+      sessionStorage.removeItem('admin_email');
+      sessionStorage.removeItem('admin_impersonated_id');
+    } else {
+      const savedEmail = sessionStorage.getItem('admin_email');
+      const savedId = sessionStorage.getItem('admin_impersonated_id');
+      if (savedEmail) {
+        setImpersonating(true);
+        setImpersonatedUser(savedEmail);
+      }
+      if (savedId) {
+        setImpersonatedUserId(savedId);
+      }
     }
-    if (savedId) {
-      setImpersonatedUserId(savedId);
-    }
-  }, []);
+  }, [isAdmin]);
 
   const startImpersonation = async (userId: string, userEmail: string) => {
     if (!isAdmin) return;

@@ -351,6 +351,12 @@ const TrustAccountingPage = () => {
     }
   };
 
+  // Safe amount formatter — guards against NaN/non-finite values from corrupted imports
+  const safeAmount = (n: unknown): string => {
+    const num = Number(n);
+    return isFinite(num) ? Math.abs(num).toFixed(2) : '0.00';
+  };
+
   // CSV export
   const exportCsv = () => {
     const headers = ['Date', 'Client Name', 'Property Address', 'Type', 'Amount', 'Status', 'Balance Impact', 'Description', 'Reference'];
@@ -359,9 +365,9 @@ const TrustAccountingPage = () => {
       tx.client_name || tx.payee_name || '',
       tx.property_address || '',
       tx.category,
-      tx.amount.toFixed(2),
+      safeAmount(tx.amount),
       STATUS_MAP[tx.status]?.label || tx.status,
-      (tx.transaction_type === 'deposit' ? '+' : '-') + tx.amount.toFixed(2),
+      (tx.transaction_type === 'deposit' ? '+' : '-') + safeAmount(tx.amount),
       tx.description || '',
       tx.reference || '',
     ]);

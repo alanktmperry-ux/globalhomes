@@ -362,7 +362,23 @@ export function RentalApplicationModal({ property, open, onClose }: Props) {
                         </div>
                         <div>
                           <label className={labelCls}>Upload Document</label>
-                          <input ref={fileRef} type="file" accept="image/*,.pdf" className="hidden" onChange={e => set('identityFile', e.target.files?.[0] || null)} />
+                          <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,.pdf" className="hidden" onChange={e => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            const MAX_MB = 10;
+                            const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+                            if (!ALLOWED_TYPES.includes(file.type)) {
+                              toast.error('Only JPEG, PNG, WebP, and PDF files are accepted.');
+                              e.target.value = '';
+                              return;
+                            }
+                            if (file.size > MAX_MB * 1024 * 1024) {
+                              toast.error(`File is too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum size is ${MAX_MB} MB.`);
+                              e.target.value = '';
+                              return;
+                            }
+                            set('identityFile', file);
+                          }} />
                           <button
                             type="button"
                             onClick={() => fileRef.current?.click()}

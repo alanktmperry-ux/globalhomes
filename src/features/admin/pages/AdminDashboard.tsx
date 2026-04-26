@@ -255,7 +255,7 @@ const AdminDashboard = () => {
       entity_id: propertyId,
       description: `Admin ${actionName} property`,
       metadata: buildAuditMeta({ action: actionName, admin_email: user?.email }),
-    });
+    } as any);
     if (auditError) console.error('[AdminDashboard] audit log failed:', auditError);
   };
 

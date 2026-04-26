@@ -71,8 +71,13 @@ const CATEGORY_LABELS: Record<TemplateCategory, string> = {
 };
 
 function buildEmailHtml(subject: string, body: string, agentName: string): string {
-  const escaped = body.replace(/{{name}}/g, agentName).replace(/\n/g, '<br>');
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${subject}</title></head><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#1a1a1a;line-height:1.6"><p style="font-size:15px">${escaped}</p><hr style="border:none;border-top:1px solid #e5e7eb;margin:32px 0 16px"><p style="font-size:11px;color:#9ca3af">© ListHQ Pty Ltd · Melbourne, Victoria, Australia</p></body></html>`;
+  const personalised = body.replace(/{{name}}/g, agentName);
+  const escapedBody = personalised
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\n/g, '<br>');
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${subject}</title></head><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#1a1a1a;line-height:1.6"><p style="font-size:15px">${escapedBody}</p><hr style="border:none;border-top:1px solid #e5e7eb;margin:32px 0 16px"><p style="font-size:11px;color:#9ca3af">© ListHQ Pty Ltd · Melbourne, Victoria, Australia</p></body></html>`;
 }
 
 function ComposePanel({ templates, onSent }: { templates: Template[]; onSent: () => void }) {

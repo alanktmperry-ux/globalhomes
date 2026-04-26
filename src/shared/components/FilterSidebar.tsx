@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SlidersHorizontal, X, ChevronDown, ChevronUp, RotateCcw, PawPrint, Home, GraduationCap, Sofa, BadgeCheck, CalendarDays, Clock, DollarSign } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';

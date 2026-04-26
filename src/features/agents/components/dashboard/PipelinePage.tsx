@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import DashboardHeader from './DashboardHeader';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import OfferModal from './pipeline/OfferModal';
 import OfferOutcomeTracker from './pipeline/OfferOutcomeTracker';
 import SettlementModal from './pipeline/SettlementModal';

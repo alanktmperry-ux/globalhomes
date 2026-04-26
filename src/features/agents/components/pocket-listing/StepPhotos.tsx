@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { Upload, Star, X, ImagePlus, Sparkles, GripVertical, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';

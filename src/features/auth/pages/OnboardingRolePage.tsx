@@ -46,8 +46,17 @@ const OnboardingRolePage = () => {
 
     await supabase
       .from('profiles')
-      .update({ onboarded: true } as any)
+      .update({ onboarded: true, user_role: selected } as any)
       .eq('user_id', user.id);
+
+    const roleToAssign =
+      selected === 'agent' || selected === 'property_manager' ? 'agent' : 'buyer';
+    await supabase
+      .from('user_roles')
+      .upsert(
+        { user_id: user.id, role: roleToAssign as any },
+        { onConflict: 'user_id,role' }
+      );
 
     if (selected === 'agent' || selected === 'property_manager') {
       setSaving(false);

@@ -54,6 +54,7 @@ export default function PropertyDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useI18n();
+  const { t: tp } = useTranslation();
   const { formatPrice, currency, listingMode } = useCurrency();
   const { isSaved, toggleSaved } = useSavedProperties();
   const isMobile = useIsMobile();

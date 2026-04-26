@@ -351,6 +351,12 @@ const TrustAccountingPage = () => {
     }
   };
 
+  // Safe amount formatter — guards against NaN/non-finite values from corrupted imports
+  const safeAmount = (n: unknown): string => {
+    const num = Number(n);
+    return isFinite(num) ? Math.abs(num).toFixed(2) : '0.00';
+  };
+
   // CSV export
   const exportCsv = () => {
     const headers = ['Date', 'Client Name', 'Property Address', 'Type', 'Amount', 'Status', 'Balance Impact', 'Description', 'Reference'];
@@ -359,9 +365,9 @@ const TrustAccountingPage = () => {
       tx.client_name || tx.payee_name || '',
       tx.property_address || '',
       tx.category,
-      tx.amount.toFixed(2),
+      safeAmount(tx.amount),
       STATUS_MAP[tx.status]?.label || tx.status,
-      (tx.transaction_type === 'deposit' ? '+' : '-') + tx.amount.toFixed(2),
+      (tx.transaction_type === 'deposit' ? '+' : '-') + safeAmount(tx.amount),
       tx.description || '',
       tx.reference || '',
     ]);
@@ -385,7 +391,7 @@ const TrustAccountingPage = () => {
         const d = new Date(tx.transaction_date);
         const dateStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
         const isInflow = tx.transaction_type === 'deposit' || tx.category === 'rent';
-        const signedAmount = isInflow ? tx.amount.toFixed(2) : (-tx.amount).toFixed(2);
+        const signedAmount = (isInflow ? '' : '-') + safeAmount(tx.amount);
         const payee = tx.client_name || tx.payee_name || '';
         const description = [tx.property_address, tx.description].filter(Boolean).join(' — ') || tx.category;
         const reference = tx.reference || '';
@@ -646,7 +652,7 @@ const TrustAccountingPage = () => {
               {overdrawnLedgers.map(l => (
                 <div key={l.name} className="flex items-center justify-between text-xs bg-destructive/10 rounded px-2 py-1">
                   <span className="font-medium text-foreground">{l.name}</span>
-                  <span className="font-mono text-destructive font-bold">−${Math.abs(l.balance).toFixed(2)}</span>
+                  <span className="font-mono text-destructive font-bold">−${safeAmount(l.balance)}</span>
                 </div>
               ))}
             </div>

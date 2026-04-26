@@ -123,7 +123,7 @@ export function RentalApplicationModal({ property, open, onClose }: Props) {
 
       const { error } = await supabase.from('rental_applications' as any).insert({
         property_id: property.id,
-        agent_id: property.agent.id || null,
+        agent_id: property.agent?.id || null,
         user_id: userId,
         reference_number: ref,
         full_name: form.fullName,

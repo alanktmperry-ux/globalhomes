@@ -117,7 +117,7 @@ function ReputationScoreCard({ score }: { score: ReputationResult }) {
   );
 }
 
-export default function AgentPublicProfilePage() {
+function AgentPublicProfilePageInner() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useI18n();
@@ -515,5 +515,20 @@ export default function AgentPublicProfilePage() {
         onClose={() => setReviewModalOpen(false)}
       />
     </div>
+  );
+}
+
+export default function AgentPublicProfilePage() {
+  return (
+    <AppErrorBoundary
+      fallback={
+        <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+          <h1 className="text-xl font-semibold text-foreground">This profile is temporarily unavailable.</h1>
+          <a href="/agents" className="text-primary hover:underline">Browse all agents →</a>
+        </div>
+      }
+    >
+      <AgentPublicProfilePageInner />
+    </AppErrorBoundary>
   );
 }

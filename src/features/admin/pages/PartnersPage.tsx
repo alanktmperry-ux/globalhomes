@@ -239,7 +239,7 @@ function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
     setSubmitting(true);
     try {
       try {
-        await (supabase.from('partner_invitations') as any).insert({
+        await ((supabase as any).from('partner_invitations')).insert({
           business_name: businessName,
           contact_name: contactName,
           email,

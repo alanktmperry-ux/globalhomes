@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
 
-export type PlanType = 'demo' | 'starter' | 'pro' | 'agency' | 'enterprise' | null;
+export type PlanType = 'demo' | 'solo' | 'agency' | 'agency_pro' | 'enterprise' | null;
 
 export interface PlanFeatures {
   canAccessTrust: boolean;
@@ -18,45 +18,77 @@ export interface PlanFeatures {
   canAccessOwnerPortal: boolean;
   canAccessLeadRouting: boolean;
   canUnlimitedListings: boolean;
+  canAccessTrustAccountantPartner: boolean;
+  canAccessMortgageBrokerWidget: boolean;
+  canAccessApi: boolean;
+  canAccessMultiBranch: boolean;
 }
 
-export interface SubscriptionState extends PlanFeatures {
+export interface PlanLimits {
+  listingLimit: number;
+  featuredListingsPerMonth: number;
+  premiumListingsPerMonth: number;
+  pocketListingsPerMonth: number;
+  seatLimit: number;
+  featuredCreditsAud: number;
+}
+
+export interface SubscriptionState extends PlanFeatures, PlanLimits {
   plan: PlanType;
   isDemo: boolean;
-  isStarter: boolean;
-  isPro: boolean;
+  isSolo: boolean;
   isAgency: boolean;
+  isAgencyPro: boolean;
   isEnterprise: boolean;
   isPaid: boolean;
-  listingLimit: number;
-  seatLimit: number;
-  foundingMember: boolean;
   subscriptionEnd: string | null;
   autoRenew: boolean;
   loading: boolean;
   subLoadingTimeout: boolean;
 }
 
-const PRO_PLUS = ['pro', 'agency', 'enterprise'];
-const AGENCY_PLUS = ['agency', 'enterprise'];
+const SOLO_PLUS = ['solo', 'agency', 'agency_pro', 'enterprise'];
+const AGENCY_PLUS = ['agency', 'agency_pro', 'enterprise'];
+const PRO_PLUS = ['agency_pro', 'enterprise'];
 
 export function getPlanFeatures(plan: string | null): PlanFeatures {
   const p = plan || 'demo';
   return {
-    canAccessTrust: PRO_PLUS.includes(p),
-    canAccessNetwork: PRO_PLUS.includes(p),
-    canAccessInspections: PRO_PLUS.includes(p),
-    canAccessSettlement: PRO_PLUS.includes(p),
-    canAccessCommission: PRO_PLUS.includes(p),
-    canAccessRentRoll: PRO_PLUS.includes(p),
+    canAccessTrust: SOLO_PLUS.includes(p),
+    canAccessNetwork: SOLO_PLUS.includes(p),
+    canAccessInspections: SOLO_PLUS.includes(p),
+    canAccessSettlement: SOLO_PLUS.includes(p),
+    canAccessCommission: SOLO_PLUS.includes(p),
+    canAccessRentRoll: SOLO_PLUS.includes(p),
     canAccessTeam: AGENCY_PLUS.includes(p),
     canAccessAgencyDashboard: AGENCY_PLUS.includes(p),
-    canAccessWhiteLabel: AGENCY_PLUS.includes(p),
+    canAccessWhiteLabel: PRO_PLUS.includes(p),
     canAccessOwnerPortal: AGENCY_PLUS.includes(p),
     canAccessLeadRouting: AGENCY_PLUS.includes(p),
     canUnlimitedListings: PRO_PLUS.includes(p),
+    canAccessTrustAccountantPartner: PRO_PLUS.includes(p),
+    canAccessMortgageBrokerWidget: AGENCY_PLUS.includes(p),
+    canAccessApi: PRO_PLUS.includes(p),
+    canAccessMultiBranch: PRO_PLUS.includes(p),
   };
 }
+
+export function getPlanLimits(plan: string | null): PlanLimits {
+  switch (plan) {
+    case 'solo':
+      return { listingLimit: 15, featuredListingsPerMonth: 2, premiumListingsPerMonth: 0, pocketListingsPerMonth: 20, seatLimit: 1, featuredCreditsAud: 0 };
+    case 'agency':
+      return { listingLimit: 75, featuredListingsPerMonth: 15, premiumListingsPerMonth: 3, pocketListingsPerMonth: Infinity, seatLimit: 12, featuredCreditsAud: 0 };
+    case 'agency_pro':
+      return { listingLimit: Infinity, featuredListingsPerMonth: 50, premiumListingsPerMonth: 10, pocketListingsPerMonth: Infinity, seatLimit: Infinity, featuredCreditsAud: 750 };
+    case 'enterprise':
+      return { listingLimit: Infinity, featuredListingsPerMonth: Infinity, premiumListingsPerMonth: 25, pocketListingsPerMonth: Infinity, seatLimit: Infinity, featuredCreditsAud: 2000 };
+    default:
+      return { listingLimit: 3, featuredListingsPerMonth: 0, premiumListingsPerMonth: 0, pocketListingsPerMonth: 5, seatLimit: 1, featuredCreditsAud: 0 };
+  }
+}
+
+const initialLimits = getPlanLimits(null);
 
 export function useSubscription(): SubscriptionState {
   const { user } = useAuth();
@@ -64,22 +96,19 @@ export function useSubscription(): SubscriptionState {
   const [state, setState] = useState<SubscriptionState>({
     plan: null,
     isDemo: true,
-    isStarter: false,
-    isPro: false,
+    isSolo: false,
     isAgency: false,
+    isAgencyPro: false,
     isEnterprise: false,
     isPaid: false,
-    listingLimit: 3,
-    seatLimit: 1,
-    foundingMember: false,
     subscriptionEnd: null,
     autoRenew: false,
     loading: true,
     subLoadingTimeout: false,
     ...getPlanFeatures(null),
+    ...initialLimits,
   });
 
-  // Safety net: if loading takes longer than 3s, treat as loaded to unblock the UI
   const [subLoadingTimeout, setSubLoadingTimeout] = useState(false);
 
   useEffect(() => {
@@ -93,14 +122,12 @@ export function useSubscription(): SubscriptionState {
       setState(prev => ({ ...prev, loading: false }));
       return;
     }
-
     if (!agent?.id) {
       setState(prev => ({ ...prev, loading: false }));
       return;
     }
 
     let cancelled = false;
-
     const fetch = async () => {
       try {
         const { data: sub } = await supabase
@@ -111,26 +138,25 @@ export function useSubscription(): SubscriptionState {
 
         if (cancelled) return;
 
-        const plan = (sub as any)?.plan_type as string || 'demo';
-        const normalPlan = (['starter', 'pro', 'agency', 'enterprise'].includes(plan) ? plan : 'demo') as PlanType;
+        const rawPlan = (sub as any)?.plan_type as string || 'demo';
+        const normalPlan = (['solo', 'agency', 'agency_pro', 'enterprise'].includes(rawPlan) ? rawPlan : 'demo') as PlanType;
         const features = getPlanFeatures(normalPlan);
+        const limits = getPlanLimits(normalPlan);
 
         setState({
           plan: normalPlan,
           isDemo: normalPlan === 'demo',
-          isStarter: normalPlan === 'starter',
-          isPro: normalPlan === 'pro',
+          isSolo: normalPlan === 'solo',
           isAgency: normalPlan === 'agency',
+          isAgencyPro: normalPlan === 'agency_pro',
           isEnterprise: normalPlan === 'enterprise',
           isPaid: normalPlan !== 'demo',
-          listingLimit: (sub as any)?.listing_limit ?? 3,
-          seatLimit: (sub as any)?.seat_limit ?? 1,
-          foundingMember: (sub as any)?.founding_member ?? false,
           subscriptionEnd: (sub as any)?.subscription_end ?? null,
           autoRenew: (sub as any)?.auto_renew ?? false,
           loading: false,
           subLoadingTimeout: false,
           ...features,
+          ...limits,
         });
       } catch {
         if (!cancelled) setState(prev => ({ ...prev, loading: false }));
@@ -141,7 +167,6 @@ export function useSubscription(): SubscriptionState {
     return () => { cancelled = true; };
   }, [user, agent?.id]);
 
-  // If the timeout fired but we're still loading, return loading: false to unblock pages
   if (subLoadingTimeout && state.loading) {
     return { ...state, loading: false, subLoadingTimeout: true };
   }

@@ -513,7 +513,7 @@ const BuyerConciergePage = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredTable.map((m) => (
+                    {(matchLimit !== null ? filteredTable.slice(0, matchLimit) : filteredTable).map((m) => (
                       <TableRow key={m.id} className="cursor-pointer" onClick={() => openContact(m)}>
                         <TableCell>
                           <p className="font-medium text-sm">{buyerName(m)}</p>
@@ -541,6 +541,21 @@ const BuyerConciergePage = () => {
                         </TableCell>
                       </TableRow>
                     ))}
+                    {matchLimit !== null && filteredTable.length > matchLimit && (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center text-sm text-muted-foreground py-4 bg-muted/30">
+                          <div className="flex items-center justify-center gap-2">
+                            <Lock size={12} />
+                            <span>
+                              {filteredTable.length - matchLimit} more matches hidden —{' '}
+                              <button onClick={() => navigate('/dashboard/billing')} className="underline font-medium text-primary">
+                                upgrade to see all
+                              </button>
+                            </span>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
                     {filteredTable.length === 0 && (
                       <TableRow><TableCell colSpan={8} className="text-center text-sm text-muted-foreground py-8">No matches</TableCell></TableRow>
                     )}

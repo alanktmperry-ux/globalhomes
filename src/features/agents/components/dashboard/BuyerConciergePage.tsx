@@ -12,10 +12,15 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
   Loader2, Sparkles, Archive, Mail, Home, ChevronDown, ChevronRight,
-  Flame, Search as SearchIcon, MapPin, ArrowUpDown,
+  Flame, Search as SearchIcon, MapPin, ArrowUpDown, Lock,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
+import { Progress } from '@/components/ui/progress';
+import { useSubscription } from '@/features/agents/hooks/useSubscription';
+import { useConciergeUsage, recordConciergeAction } from '@/features/agents/hooks/useConciergeUsage';
+import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
+import { useNavigate } from 'react-router-dom';
 
 interface MatchRow {
   id: string;
@@ -138,6 +143,16 @@ const BuyerConciergePage = () => {
   const [contactMatch, setContactMatch] = useState<EnrichedMatch | null>(null);
   const [search, setSearch] = useState('');
   const [sortKey, setSortKey] = useState<'match' | 'readiness' | 'recent'>('match');
+
+  const navigate = useNavigate();
+  const { canAccessBuyerConcierge, conciergeMatchesPerMonth, conciergeIntrosPerMonth } = useSubscription();
+  const { agent } = useCurrentAgent();
+  const { matchesUsed, introsUsed, refresh: refreshUsage } = useConciergeUsage(agent?.id || null);
+
+  const matchLimit = conciergeMatchesPerMonth === Infinity ? null : conciergeMatchesPerMonth;
+  const introLimit = conciergeIntrosPerMonth === Infinity ? null : conciergeIntrosPerMonth;
+  const matchPct = matchLimit ? Math.min((matchesUsed / matchLimit) * 100, 100) : 0;
+  const introPct = introLimit ? Math.min((introsUsed / introLimit) * 100, 100) : 0;
 
   // Initial load
   const fetchAll = useCallback(async () => {
@@ -269,6 +284,22 @@ const BuyerConciergePage = () => {
     ? `Hi ${contactMatch.profile?.display_name?.split(' ')[0] || contactMatch.profile?.full_name?.split(' ')[0] || 'there'}, I noticed you've been searching in ${buyerSuburb(contactMatch)} — I have a listing that might suit you perfectly: ${contactMatch.listing?.address || ''}. Would you like me to send through more details or arrange an inspection?\n\nBest regards`
     : '';
 
+  if (!canAccessBuyerConcierge) {
+    return (
+      <div className="max-w-2xl mx-auto p-6 text-center space-y-4">
+        <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+          <Sparkles className="text-primary" size={22} />
+        </div>
+        <h1 className="text-2xl font-bold tracking-tight">Buyer Concierge</h1>
+        <p className="text-sm text-muted-foreground">
+          AI-powered buyer matching is available on all paid plans.
+          Start your 60-day free trial to unlock it.
+        </p>
+        <Button onClick={() => navigate('/dashboard/billing')}>View plans</Button>
+      </div>
+    );
+  }
+
   if (loading) {
     return <div className="flex items-center justify-center py-24"><Loader2 className="animate-spin text-primary" size={32} /></div>;
   }
@@ -276,6 +307,9 @@ const BuyerConciergePage = () => {
   if (error) {
     return <div className="p-6"><Card><CardContent className="p-6 text-sm text-destructive">{error}</CardContent></Card></div>;
   }
+
+  const visibleMatches = matchLimit !== null ? matches.slice(0, matchLimit) : matches;
+  const hiddenMatches = matches.length - visibleMatches.length;
 
   return (
     <div className="space-y-8 max-w-7xl">
@@ -294,6 +328,44 @@ const BuyerConciergePage = () => {
           </Button>
         )}
       </div>
+
+      {(matchLimit !== null || introLimit !== null) && (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {matchLimit !== null && (
+            <Card>
+              <CardContent className="p-4 space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">Matches viewed</span>
+                  <span className="font-semibold tabular-nums">{matchesUsed} / {matchLimit}</span>
+                </div>
+                <Progress value={matchPct} className="h-1.5" />
+              </CardContent>
+            </Card>
+          )}
+          {introLimit !== null && (
+            <Card>
+              <CardContent className="p-4 space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">Introductions sent</span>
+                  <span className="font-semibold tabular-nums">{introsUsed} / {introLimit}</span>
+                </div>
+                <Progress value={introPct} className="h-1.5" />
+              </CardContent>
+            </Card>
+          )}
+          {(matchPct >= 80 || introPct >= 80) && (
+            <div className="sm:col-span-2 flex items-center gap-2 text-xs text-amber-600 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2">
+              <span>⚠</span>
+              <span>
+                Approaching your monthly limit —{' '}
+                <button onClick={() => navigate('/dashboard/billing')} className="underline font-medium">
+                  upgrade for more
+                </button>
+              </span>
+            </div>
+          )}
+        </div>
+      )}
 
       {matches.length === 0 ? (
         <Card>
@@ -441,7 +513,7 @@ const BuyerConciergePage = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredTable.map((m) => (
+                    {(matchLimit !== null ? filteredTable.slice(0, matchLimit) : filteredTable).map((m) => (
                       <TableRow key={m.id} className="cursor-pointer" onClick={() => openContact(m)}>
                         <TableCell>
                           <p className="font-medium text-sm">{buyerName(m)}</p>
@@ -469,6 +541,21 @@ const BuyerConciergePage = () => {
                         </TableCell>
                       </TableRow>
                     ))}
+                    {matchLimit !== null && filteredTable.length > matchLimit && (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center text-sm text-muted-foreground py-4 bg-muted/30">
+                          <div className="flex items-center justify-center gap-2">
+                            <Lock size={12} />
+                            <span>
+                              {filteredTable.length - matchLimit} more matches hidden —{' '}
+                              <button onClick={() => navigate('/dashboard/billing')} className="underline font-medium text-primary">
+                                upgrade to see all
+                              </button>
+                            </span>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
                     {filteredTable.length === 0 && (
                       <TableRow><TableCell colSpan={8} className="text-center text-sm text-muted-foreground py-8">No matches</TableCell></TableRow>
                     )}
@@ -503,7 +590,18 @@ const BuyerConciergePage = () => {
               <DialogFooter>
                 <Button variant="outline" onClick={() => setContactMatch(null)}>Cancel</Button>
                 <Button onClick={async () => {
+                  if (introLimit !== null && introsUsed >= introLimit) {
+                    toast.error('Monthly intro limit reached', {
+                      description: 'Upgrade your plan to send more introductions this month.',
+                      action: { label: 'Upgrade', onClick: () => navigate('/dashboard/billing') },
+                    });
+                    return;
+                  }
                   await setStatus(contactMatch.id, 'contacted');
+                  if (agent?.id) {
+                    await recordConciergeAction(agent.id, 'intro_sent', contactMatch.id);
+                    refreshUsage();
+                  }
                   toast.success('Marked as contacted', { description: 'Outbound messaging launches soon.' });
                   setContactMatch(null);
                 }}>

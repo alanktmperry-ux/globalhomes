@@ -105,18 +105,20 @@ const SeekerAuthPage = () => {
         throw error;
       }
       toast('Welcome back!');
-      const ADMIN_EMAILS = ['alan@everythingco.com.au', 'alanktmperry@gmail.com', 'alan@everythingeco.com.au'];
-      const isAdminEmail = ADMIN_EMAILS.includes(email.trim().toLowerCase());
-      if (isAdminEmail) {
-        navigate('/dashboard/rent-roll');
-      } else {
-        const { data: { user: signedInUser } } = await supabase.auth.getUser();
-        if (signedInUser) {
-          const { data: agentRow } = await supabase.from('agents').select('id').eq('user_id', signedInUser.id).maybeSingle();
-          navigate(agentRow ? '/dashboard/rent-roll' : '/');
+      const { data: { user: signedInUser } } = await supabase.auth.getUser();
+      if (signedInUser) {
+        const { data: roles } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', signedInUser.id);
+        const roleList = roles?.map(r => r.role) || [];
+        if (roleList.includes('admin') || roleList.includes('agent')) {
+          navigate('/dashboard/overview', { replace: true });
         } else {
-          navigate('/');
+          navigate('/', { replace: true });
         }
+      } else {
+        navigate('/', { replace: true });
       }
     } catch (err: unknown) {
       toast.error('Something went wrong', { description: getErrorMessage(err) });

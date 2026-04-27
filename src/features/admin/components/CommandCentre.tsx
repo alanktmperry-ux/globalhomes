@@ -69,6 +69,11 @@ interface CCData {
   revenueAtRisk: number;
   ltvEstimate: number | null;
   netNewMRR: number;
+  trialConversionPct: number;
+  onboardingIncomplete: number;
+  netNewMrrThisMonth: number;
+  partnerCount: number;
+  brokerCount: number;
   liveListings: number;
   listingsToday: number;
   listingsThisWeek: number;

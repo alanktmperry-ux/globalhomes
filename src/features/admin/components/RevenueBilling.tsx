@@ -11,9 +11,29 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-const PLAN_MRR: Record<string, number> = { solo: 299, agency: 899, agency_pro: 1999, enterprise: 4999 };
-const PLAN_LABEL: Record<string, string> = { solo: 'Solo', agency: 'Agency', agency_pro: 'Agency Pro', enterprise: 'Enterprise', demo: 'Trial', basic: 'Trial' };
-const PLAN_COLOR: Record<string, string> = { solo: '#6366f1', agency: '#8b5cf6', agency_pro: '#a855f7', enterprise: '#ec4899', demo: '#94a3b8' };
+const PLAN_LABELS: Record<string, string> = {
+  solo: 'Solo',
+  agency: 'Agency',
+  agency_pro: 'Agency Pro',
+  enterprise: 'Enterprise',
+  demo: 'Trial',
+};
+
+const PLAN_MRR: Record<string, number> = {
+  solo: 299,
+  agency: 899,
+  agency_pro: 1999,
+  enterprise: 4999,
+  demo: 0,
+};
+
+const PLAN_COLOR: Record<string, string> = {
+  solo: '#6366f1',
+  agency: '#0ea5e9',
+  agency_pro: '#8b5cf6',
+  enterprise: '#f59e0b',
+  demo: '#94a3b8',
+};
 
 interface AgentBillingRow {
   id: string;
@@ -57,7 +77,7 @@ function exportCSV(rows: AgentBillingRow[]) {
   const totalMrr = rows.filter(r => r.isSubscribed).reduce((s, r) => s + r.mrr, 0);
   const headers = ['Agent', 'Agency', 'Email', 'Plan', 'MRR ($)', 'Status', 'Subscription Start', 'Renewal Date', 'Days Until Renewal'];
   const data = rows.map(r => [
-    r.name, r.agency || '', r.email, PLAN_LABEL[r.plan] || r.plan, r.mrr,
+    r.name, r.agency || '', r.email, PLAN_LABELS[r.plan] || r.plan, r.mrr,
     r.isSubscribed ? 'Active' : 'Trial',
     r.subscriptionStart ? fmtDate(r.subscriptionStart) : '',
     r.renewalDate ? fmtDate(r.renewalDate) : '', r.daysUntilRenewal ?? '',
@@ -138,7 +158,7 @@ function RenewalRow({ agent }: { agent: AgentBillingRow }) {
         <div>
           <p className="text-sm font-semibold text-foreground">{fmt(agent.mrr)}/mo</p>
           <p className="text-xs text-muted-foreground">
-            {PLAN_LABEL[agent.plan] || agent.plan}
+            {PLAN_LABELS[agent.plan] || agent.plan}
           </p>
         </div>
         <div>
@@ -158,6 +178,7 @@ export default function RevenueBilling() {
   const [agents, setAgents] = useState<AgentBillingRow[]>([]);
   const [mrrTrend, setMrrTrend] = useState<MRRPoint[]>([]);
   const [planMix, setPlanMix] = useState<PlanMixPoint[]>([]);
+  const [addonTotals, setAddonTotals] = useState<Record<string, { units: number; revenue: number }>>({});
   const [loading, setLoading] = useState(true);
   const [planFilter, setPlanFilter] = useState('all');
   const [renewalWindow, setRenewalWindow] = useState<7 | 14 | 30>(30);
@@ -250,6 +271,26 @@ export default function RevenueBilling() {
         trend.push({ label, mrr, arr: mrr * 12, newMrr, churnMrr, netNew: newMrr - churnMrr });
       }
       setMrrTrend(trend);
+
+      // Add-on revenue (last 30 days)
+      try {
+        const since = new Date(now.getTime() - 30 * 86400000).toISOString();
+        const { data: addonData } = await ((supabase as any).from('addon_purchases'))
+          .select('id, addon_type, amount_aud, created_at, agent_id')
+          .gte('created_at', since)
+          .order('created_at', { ascending: false })
+          .limit(200);
+        const totals: Record<string, { units: number; revenue: number }> = {};
+        (addonData || []).forEach((p: any) => {
+          const key = p.addon_type || 'other';
+          if (!totals[key]) totals[key] = { units: 0, revenue: 0 };
+          totals[key].units += 1;
+          totals[key].revenue += Number(p.amount_aud || 0);
+        });
+        setAddonTotals(totals);
+      } catch {
+        setAddonTotals({});
+      }
     } finally {
       setLoading(false);
     }
@@ -379,7 +420,7 @@ export default function RevenueBilling() {
                 <div key={p.plan}>
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm font-medium text-foreground">
-                      {PLAN_LABEL[p.plan] || p.plan}
+                      {PLAN_LABELS[p.plan] || p.plan}
                       <span className="text-muted-foreground ml-1">({p.count})</span>
                     </span>
                     <span className="text-xs font-semibold text-muted-foreground">
@@ -484,7 +525,7 @@ export default function RevenueBilling() {
                     <p className="font-medium text-foreground">{a.name}</p>
                     <p className="text-xs text-muted-foreground">{a.agency || a.email}</p>
                   </td>
-                  <td className="py-2 px-3 text-foreground">{PLAN_LABEL[a.plan] || a.plan}</td>
+                  <td className="py-2 px-3 text-foreground">{PLAN_LABELS[a.plan] || a.plan}</td>
                   <td className="py-2 px-3 text-foreground">{a.mrr > 0 ? fmt(a.mrr) : '—'}</td>
                   <td className="py-2 px-3">
                     <Badge variant={a.isSubscribed ? 'default' : 'secondary'}>{a.isSubscribed ? 'Active' : 'Trial'}</Badge>
@@ -514,6 +555,58 @@ export default function RevenueBilling() {
             )}
           </table>
         </div>
+      </div>
+
+      {/* Add-on Revenue (last 30 days) */}
+      <div className="bg-card border border-border rounded-2xl p-5">
+        <h3 className="text-sm font-semibold text-foreground mb-4">Add-on Revenue (last 30 days)</h3>
+        {(() => {
+          const ADDON_LABELS: Record<string, string> = {
+            featured: 'Featured listing',
+            premium: 'Premium listing',
+            pocket_pack: 'Pocket pack',
+            extra_seat: 'Extra seat',
+            multilingual: 'Multilingual',
+          };
+          const ORDER = ['featured', 'premium', 'pocket_pack', 'extra_seat', 'multilingual', 'other'];
+          // bucket unknown types into 'other'
+          const bucketed: Record<string, { units: number; revenue: number }> = {};
+          ORDER.forEach((k) => { bucketed[k] = { units: 0, revenue: 0 }; });
+          Object.entries(addonTotals).forEach(([k, v]) => {
+            const key = ORDER.includes(k) ? k : 'other';
+            bucketed[key].units += v.units;
+            bucketed[key].revenue += v.revenue;
+          });
+          const totalUnits = Object.values(bucketed).reduce((s, v) => s + v.units, 0);
+          const totalRevenue = Object.values(bucketed).reduce((s, v) => s + v.revenue, 0);
+          return (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Add-on</th>
+                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Units (30d)</th>
+                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Revenue (30d)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ORDER.map((key) => (
+                    <tr key={key} className="border-b border-border/50">
+                      <td className="py-2 px-3 text-foreground">{ADDON_LABELS[key] || 'Other'}</td>
+                      <td className="py-2 px-3 text-right text-foreground">{bucketed[key].units}</td>
+                      <td className="py-2 px-3 text-right text-foreground">{fmt(bucketed[key].revenue)}</td>
+                    </tr>
+                  ))}
+                  <tr className="border-t-2 border-border">
+                    <td className="py-2 px-3 font-bold text-foreground">TOTAL</td>
+                    <td className="py-2 px-3 text-right font-bold text-foreground">{totalUnits}</td>
+                    <td className="py-2 px-3 text-right font-bold text-foreground">{fmt(totalRevenue)}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );

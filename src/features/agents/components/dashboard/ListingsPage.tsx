@@ -211,12 +211,64 @@ const StatusTabs = ({
 
 const ListingsPage = () => {
   const navigate = useNavigate();
+  const { agent } = useCurrentAgent();
   const [listingMode, setListingMode] = useState<'sale' | 'rent'>('sale');
   const [saleStatusTab, setSaleStatusTab] = useState('all');
   const [rentStatusTab, setRentStatusTab] = useState('all');
   const { listings, loading, isMockData, refetch } = useAgentListings();
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [reportModal, setReportModal] = useState<{ url: string; address: string } | null>(null);
+
+  const handleSendReport = async (l: AgentListing) => {
+    if (l._source !== 'db') {
+      toast.success('Demo listing — Create a real listing first.');
+      return;
+    }
+    if (!agent?.id) {
+      toast.error('Agent profile not loaded');
+      return;
+    }
+    setActionLoading(l.id);
+    try {
+      let token: string | null = null;
+
+      // Try the RPC first
+      const { data: rpcData, error: rpcError } = await supabase.rpc(
+        'generate_vendor_report_token' as any,
+        { p_property_id: l.id, p_agent_id: agent.id } as any,
+      );
+      if (!rpcError && rpcData) {
+        token = typeof rpcData === 'string' ? rpcData : (rpcData as any)?.token ?? null;
+      }
+
+      // Fallback: insert directly
+      if (!token) {
+        const newToken = crypto.randomUUID();
+        const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+        const { data: insertData, error: insertError } = await supabase
+          .from('vendor_report_tokens' as any)
+          .insert({
+            property_id: l.id,
+            agent_id: agent.id,
+            token: newToken,
+            expires_at: expiresAt,
+          } as any)
+          .select('token')
+          .maybeSingle();
+        if (insertError) throw insertError;
+        token = (insertData as any)?.token ?? newToken;
+      }
+
+      const url = `${window.location.origin}/vendor-report/${token}`;
+      setReportModal({ url, address: l.address });
+    } catch (e) {
+      console.error(e);
+      toast.error('Failed to generate report link');
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   const handlePublish = async (l: AgentListing) => {
     if (l._source !== 'db') { toast.success('Demo listing — Create a real listing first.'); return; }

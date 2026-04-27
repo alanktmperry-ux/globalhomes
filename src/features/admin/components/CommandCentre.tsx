@@ -675,6 +675,38 @@ export default function CommandCentre() {
         </div>
       )}
 
+      {/* SECTION 2b — Buyers pulse */}
+      <SectionHead title="Buyers pulse" sub="Real-time demand from property seekers" />
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+        <KPI
+          label="Searches today"
+          value={data.searchesToday}
+          sub="text + voice combined"
+        />
+        <KPI
+          label="Enquiries today"
+          value={data.leadsToday}
+          sub="messages sent to agents"
+          trend={trendFromDelta(data.leadsToday, Math.round(data.leadsThisWeek / 7))}
+        />
+        <KPI
+          label="Saves today"
+          value={data.savesToday}
+          sub="properties bookmarked"
+        />
+        <KPI
+          label="Total buyers"
+          value={data.totalBuyers}
+          sub={`+${data.newBuyersThisWeek} this week`}
+          trend={data.newBuyersThisWeek > 0 ? 'up' : 'flat'}
+        />
+        <KPI
+          label="Top suburb"
+          value={data.topSuburb ?? '—'}
+          sub="most searched (7 days)"
+        />
+      </div>
+
       {/* SECTION 3 — 12-week growth chart */}
       <SectionHead title="12-Week Growth" sub="Agents, listings & leads per week" />
       <div className="rounded-2xl border border-border bg-card p-4">

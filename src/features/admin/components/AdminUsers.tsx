@@ -20,6 +20,11 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import {
+  PieChart, Pie, Cell, Tooltip as RTooltip, ResponsiveContainer,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  AreaChart, Area, Legend,
+} from 'recharts';
 
 interface AuthUser {
   id: string;

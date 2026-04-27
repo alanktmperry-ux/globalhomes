@@ -87,8 +87,8 @@ const AgentPortalPage = () => {
       subEnd.setMonth(subEnd.getMonth() + 1);
       await supabase.from('agent_subscriptions').upsert({
         agent_id: agent!.id,
-        plan_type: 'pro',
-        listing_limit: 50,
+        plan_type: 'agency',
+        listing_limit: 75,
         subscription_end: subEnd.toISOString(),
         auto_renew: true,
       }, { onConflict: 'agent_id' });

@@ -556,6 +556,58 @@ export default function RevenueBilling() {
           </table>
         </div>
       </div>
+
+      {/* Add-on Revenue (last 30 days) */}
+      <div className="bg-card border border-border rounded-2xl p-5">
+        <h3 className="text-sm font-semibold text-foreground mb-4">Add-on Revenue (last 30 days)</h3>
+        {(() => {
+          const ADDON_LABELS: Record<string, string> = {
+            featured: 'Featured listing',
+            premium: 'Premium listing',
+            pocket_pack: 'Pocket pack',
+            extra_seat: 'Extra seat',
+            multilingual: 'Multilingual',
+          };
+          const ORDER = ['featured', 'premium', 'pocket_pack', 'extra_seat', 'multilingual', 'other'];
+          // bucket unknown types into 'other'
+          const bucketed: Record<string, { units: number; revenue: number }> = {};
+          ORDER.forEach((k) => { bucketed[k] = { units: 0, revenue: 0 }; });
+          Object.entries(addonTotals).forEach(([k, v]) => {
+            const key = ORDER.includes(k) ? k : 'other';
+            bucketed[key].units += v.units;
+            bucketed[key].revenue += v.revenue;
+          });
+          const totalUnits = Object.values(bucketed).reduce((s, v) => s + v.units, 0);
+          const totalRevenue = Object.values(bucketed).reduce((s, v) => s + v.revenue, 0);
+          return (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Add-on</th>
+                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Units (30d)</th>
+                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Revenue (30d)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ORDER.map((key) => (
+                    <tr key={key} className="border-b border-border/50">
+                      <td className="py-2 px-3 text-foreground">{ADDON_LABELS[key] || 'Other'}</td>
+                      <td className="py-2 px-3 text-right text-foreground">{bucketed[key].units}</td>
+                      <td className="py-2 px-3 text-right text-foreground">{fmt(bucketed[key].revenue)}</td>
+                    </tr>
+                  ))}
+                  <tr className="border-t-2 border-border">
+                    <td className="py-2 px-3 font-bold text-foreground">TOTAL</td>
+                    <td className="py-2 px-3 text-right font-bold text-foreground">{totalUnits}</td>
+                    <td className="py-2 px-3 text-right font-bold text-foreground">{fmt(totalRevenue)}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          );
+        })()}
+      </div>
     </div>
   );
 }

@@ -695,7 +695,7 @@ const BuyPage = () => {
                   <button
                     onClick={() => setPage(p => p + 1)}
                     disabled={loadingMore}
-                    className="h-11 px-10 rounded-2xl border border-stone-200 bg-white hover:bg-stone-50 text-[14px] text-stone-700 font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+                    className="h-11 px-10 rounded-2xl border border-border bg-background hover:bg-muted text-sm text-foreground font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
                   >
                     {loadingMore ? (
                       <><Loader2 size={15} className="animate-spin" /> {t('Loading…')}</>

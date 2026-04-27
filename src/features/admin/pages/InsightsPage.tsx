@@ -145,7 +145,7 @@ export default function InsightsPage() {
         supabase.from('properties').select('id, agent_id, state, is_active, created_at'),
         supabase.from('leads').select('id, agent_id, created_at').gte('created_at', d30),
         (supabase.from('demo_requests' as any).select('id, status, created_at')) as any,
-        callAdminFunction('list_users').catch(() => ({ users: [] })),
+        callAdminFunction('list_users').catch(() => ({ users: [] as any[] })),
       ]);
 
       const agents: any[] = agentsRes.data || [];

@@ -22,6 +22,10 @@ export interface PlanFeatures {
   canAccessMortgageBrokerWidget: boolean;
   canAccessApi: boolean;
   canAccessMultiBranch: boolean;
+  canAccessBuyerConcierge: boolean;
+  canAccessSettlementConcierge: boolean;
+  conciergeMatchesPerMonth: number;
+  conciergeIntrosPerMonth: number;
 }
 
 export interface PlanLimits {
@@ -70,6 +74,16 @@ export function getPlanFeatures(plan: string | null): PlanFeatures {
     canAccessMortgageBrokerWidget: AGENCY_PLUS.includes(p),
     canAccessApi: PRO_PLUS.includes(p),
     canAccessMultiBranch: PRO_PLUS.includes(p),
+    canAccessBuyerConcierge: SOLO_PLUS.includes(p),
+    canAccessSettlementConcierge: AGENCY_PLUS.includes(p),
+    conciergeMatchesPerMonth:
+      p === 'solo' ? 20 :
+      p === 'agency' ? 100 :
+      (PRO_PLUS.includes(p)) ? Infinity : 0,
+    conciergeIntrosPerMonth:
+      p === 'solo' ? 5 :
+      p === 'agency' ? 30 :
+      (PRO_PLUS.includes(p)) ? Infinity : 0,
   };
 }
 

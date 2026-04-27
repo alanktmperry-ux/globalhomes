@@ -121,6 +121,20 @@ export default function ListingModerationQueue({ onPendingCountChange }: Props) 
     fetchPending();
   };
 
+  const handleDelete = async (listing: PendingListing) => {
+    if (!window.confirm('Delete this listing permanently? This cannot be undone.')) return;
+    setActionLoading(listing.id);
+    const { error } = await supabase.from('properties').delete().eq('id', listing.id);
+    if (error) {
+      toast.error('Failed to delete listing');
+      setActionLoading(null);
+      return;
+    }
+    toast.success('Listing deleted');
+    setActionLoading(null);
+    fetchPending();
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center py-20">

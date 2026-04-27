@@ -8,12 +8,16 @@ import { Label } from "@/components/ui/label";
 import { Loader2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
-const AUTHORISED_ADMINS = [
-  "alanktmperry@gmail.com",
-  "alan@everythingco.com.au",
-  "alan@everythingeco.com.au",
-  "alan@squaredevelopment.com.au",
-].map((e) => e.trim().toLowerCase());
+async function hasAdminRole(userId: string) {
+  const { data, error } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId);
+
+  if (error) throw error;
+
+  return (data ?? []).some((row) => row.role === "admin");
+}
 
 export default function AdminLoginPage() {
   const navigate = useNavigate();
@@ -33,8 +37,11 @@ export default function AdminLoginPage() {
         password,
       });
       if (error) throw error;
+      if (!data.user) throw new Error("Login failed");
 
-      if (!AUTHORISED_ADMINS.includes(normalised)) {
+      const isAdminUser = await hasAdminRole(data.user.id);
+
+      if (!isAdminUser) {
         await supabase.auth.signOut();
         toast.error("You are not authorised to access this area");
         return;

@@ -6,7 +6,7 @@ import { geocode } from '@/shared/lib/googleMapsService';
 import { PropertyCard } from '@/components/PropertyCard';
 import { mapDbProperty } from '@/features/properties/api/fetchPublicProperties';
 import { Property } from '@/shared/lib/types';
-import { Loader2, X, BellPlus, Sparkles, SlidersHorizontal, Filter, Map as MapIcon, List as ListIcon } from 'lucide-react';
+import { Loader2, X, Bell, BellPlus, Sparkles, SlidersHorizontal, Filter, Home, Map as MapIcon, List as ListIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from '@/components/ui/sheet';
 import { useCurrency } from '@/shared/lib/CurrencyContext';

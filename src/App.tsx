@@ -69,6 +69,7 @@ const DemoAccessPage = React.lazy(() => import("./features/agents/pages/DemoAcce
 const AuthConfirmPage = React.lazy(() => import("./features/auth/pages/AuthConfirmPage"));
 const AuthCallbackPage = React.lazy(() => import("./features/auth/pages/AuthCallbackPage"));
 const OnboardingRolePage = React.lazy(() => import("./features/auth/pages/OnboardingRolePage"));
+const OnboardingBuyerPrefsPage = React.lazy(() => import("./features/auth/pages/OnboardingBuyerPrefsPage"));
 const MyApplicationsPage = React.lazy(() => import("./features/rental/pages/MyApplicationsPage"));
 
 const BuyPage = React.lazy(() => import("./pages/BuyPage"));

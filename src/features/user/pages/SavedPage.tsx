@@ -148,7 +148,7 @@ function SavedTab() {
           return (
             <div key={p.id} className="relative">
               {priceDropped && (
-                <div className="absolute top-2 left-2 z-10 flex items-center gap-1 bg-green-600 text-white text-[10px] font-semibold px-2 py-1 rounded-full shadow">
+                <div className="absolute top-2 left-2 z-10 flex items-center gap-1 bg-primary text-primary-foreground text-[10px] font-semibold px-2 py-1 rounded-full shadow">
                   <TrendingDown className="w-3 h-3" />
                   Price drop
                 </div>

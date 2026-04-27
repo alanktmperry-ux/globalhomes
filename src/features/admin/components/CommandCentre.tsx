@@ -1009,6 +1009,8 @@ export default function CommandCentre() {
         />
       </div>
 
+      </>)}
+
       <SectionHead title="Buyers pulse" sub="Real-time demand from property seekers" />
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
         <KPI

@@ -6,6 +6,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
 import AdminSidebar from './AdminSidebar';
 import AdminCommandPalette from './AdminCommandPalette';
+import SetPasswordBanner from './SetPasswordBanner';
 
 const SECTION_LABELS: Record<string, string> = {
   '': 'Command Centre',
@@ -59,6 +60,7 @@ export default function AdminLayout() {
 
       <main className="flex-1 min-w-0 flex flex-col h-screen overflow-hidden">
         {/* Header strip */}
+        {(location.pathname === '/admin' || location.pathname === '/admin/') && <SetPasswordBanner />}
         <header className="flex-shrink-0 border-b border-border bg-card/40 backdrop-blur-sm">
           {impersonating && (
             <div className="bg-warning/15 text-warning-foreground px-4 py-2 text-xs flex items-center justify-between gap-3">

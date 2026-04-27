@@ -406,6 +406,11 @@ export default function CommandCentre() {
       const ltvEstimate = churnRatePct > 0 ? arpu / (churnRatePct / 100) : null;
       const newPaidAgentsThisMonth = agents.filter((a: any) => a.is_subscribed && a.created_at >= monthStart).length;
       const netNewMRR = (newPaidAgentsThisMonth * arpu) - (churnedThisMonthCount * arpu);
+      const trialConversionPct = agents.length > 0 ? Math.round((paidAgents.length / agents.length) * 100) : 0;
+      const onboardingIncomplete = agents.filter((a: any) => !a.onboarding_complete && !a.is_subscribed).length;
+      const netNewMrrThisMonth = agents
+        .filter((a: any) => a.is_subscribed && a.created_at >= monthStart)
+        .reduce((s: number, a: any) => s + (PLAN_MRR[(a.agent_subscriptions?.plan_type || '').toLowerCase()] || 0), 0);
 
       // Week-over-week paid agents (subscribed before each cutoff)
       const paidAgentsPrevWeek = agents.filter(a => a.is_subscribed && a.created_at < d7).length;

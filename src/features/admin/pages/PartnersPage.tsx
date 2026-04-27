@@ -109,7 +109,7 @@ function PartnerTable({ rows, variant, onUpdate }: PartnerTableProps) {
 
   const handleStatus = async (p: Partner, next: PartnerStatus) => {
     try {
-      const { error } = await (supabase.from('partners') as any)
+      const { error } = await ((supabase as any).from('partners'))
         .update({ status: next })
         .eq('id', p.id);
       if (error) throw error;

@@ -211,6 +211,7 @@ const BuyPage = () => {
   const { user } = useAuth();
   const { saveSearch } = useSavedSearchesDB();
   const [savingSearch, setSavingSearch] = useState(false);
+  const [savedSearch, setSavedSearch] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'map' | 'split'>(() => {
     const stored = localStorage.getItem('buy-view-mode');

@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Zap, CheckCircle, Users, Building2, DollarSign, Megaphone, Settings,
-  Shield, ArrowLeft, UserCog, LineChart, BookOpen, Wallet,
+  Shield, ArrowLeft, UserCog, LineChart, BookOpen, Wallet, HelpCircle,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -83,6 +83,7 @@ export default function AdminSidebar({ pendingApprovalsTotal = 0, isSupport = fa
   ];
   const system: NavItem[] = [
     { to: '/admin/system', label: 'System', icon: Settings },
+    { to: '/admin/help-faqs', label: 'Help & FAQs', icon: HelpCircle },
   ];
   const help: NavItem[] = [
     { to: '/admin/help', label: 'Help', icon: BookOpen },

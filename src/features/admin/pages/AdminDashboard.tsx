@@ -27,6 +27,7 @@ import PressOutreachPage from '@/features/admin/components/PressOutreachPage';
 import PreApprovalReview from '@/features/admin/components/PreApprovalReview';
 import AgentApprovalQueue from '@/features/admin/components/AgentApprovalQueue';
 import ListingModerationQueue from '@/features/admin/components/ListingModerationQueue';
+import AdminHelpFAQs from '@/features/admin/components/AdminHelpFAQs';
 import AdminSidebar, { type AdminTab } from '@/features/admin/components/AdminSidebar';
 
 
@@ -367,6 +368,7 @@ const AdminDashboard = () => {
               {tab === 'legal-compliance' && <LegalComplianceChecklist />}
               {tab === 'press-outreach' && <PressOutreachPage />}
               {tab === 'pre-approval-review' && <PreApprovalReview />}
+              {tab === 'help-faqs' && <AdminHelpFAQs />}
             </>
           )}
         </div>

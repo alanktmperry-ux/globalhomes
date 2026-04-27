@@ -168,15 +168,8 @@ const AdminUsers = () => {
 
   const handleOpenSubModal = (u: AuthUser) => {
     const plan = u.plan_type || 'demo';
-    const limits: Record<string, { listings: number; seats: number }> = {
-      demo: { listings: 3, seats: 1 },
-      starter: { listings: 10, seats: 1 },
-      pro: { listings: 9999, seats: 1 },
-      agency: { listings: 9999, seats: 8 },
-      enterprise: { listings: 9999, seats: 50 },
-    };
-    const def = limits[plan] || limits.demo;
-    setSubForm({ plan_type: plan, listing_limit: def.listings, seat_limit: def.seats, founding_member: false });
+    const def = PLAN_LIMITS[plan] || PLAN_LIMITS.demo;
+    setSubForm({ plan_type: plan, listing_limit: def.listings, seat_limit: def.seats });
     setSubModal({ open: true, userId: u.id, email: u.email, currentPlan: plan });
   };
 

@@ -575,7 +575,18 @@ const BuyerConciergePage = () => {
               <DialogFooter>
                 <Button variant="outline" onClick={() => setContactMatch(null)}>Cancel</Button>
                 <Button onClick={async () => {
+                  if (introLimit !== null && introsUsed >= introLimit) {
+                    toast.error('Monthly intro limit reached', {
+                      description: 'Upgrade your plan to send more introductions this month.',
+                      action: { label: 'Upgrade', onClick: () => navigate('/dashboard/billing') },
+                    });
+                    return;
+                  }
                   await setStatus(contactMatch.id, 'contacted');
+                  if (agent?.id) {
+                    await recordConciergeAction(agent.id, 'intro_sent', contactMatch.id);
+                    refreshUsage();
+                  }
                   toast.success('Marked as contacted', { description: 'Outbound messaging launches soon.' });
                   setContactMatch(null);
                 }}>

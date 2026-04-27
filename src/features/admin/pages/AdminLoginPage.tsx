@@ -13,7 +13,7 @@ const AUTHORISED_ADMINS = [
   "alan@everythingco.com.au",
   "alan@everythingeco.com.au",
   "alan@squaredevelopment.com.au",
-];
+].map((e) => e.trim().toLowerCase());
 
 export default function AdminLoginPage() {
   const navigate = useNavigate();

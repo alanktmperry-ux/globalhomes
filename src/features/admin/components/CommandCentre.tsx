@@ -66,6 +66,11 @@ interface CCData {
   leadsThisWeek: number;
   leads30d: number;
   voiceSearches30d: number;
+  searchesToday: number;
+  savesToday: number;
+  totalBuyers: number;
+  newBuyersThisWeek: number;
+  topSuburb: string | null;
   pendingAgentApprovals: number;
   pendingListingReviews: number;
   pendingDemoRequests: number;
@@ -118,7 +123,7 @@ function KPI({
   label: string;
   value: string | number;
   sub?: string;
-  icon: any;
+  icon?: any;
   color?: string;
   trend?: Trend;
 }) {
@@ -126,11 +131,13 @@ function KPI({
     <div className="rounded-2xl border border-border bg-card p-4 space-y-1">
       <div className="flex items-center justify-between">
         <p className="text-xs text-muted-foreground font-medium">{label}</p>
-        <div className={color}>
-          <Icon size={16} />
-        </div>
+        {Icon && (
+          <div className={color}>
+            <Icon size={16} />
+          </div>
+        )}
       </div>
-      <p className="text-2xl font-bold text-foreground">{value}</p>
+      <p className="text-2xl font-bold text-foreground">{String(value)}</p>
       {sub && (
         <p className="text-[11px] text-muted-foreground flex items-center gap-1">
           {trend === 'up' && <TrendingUp size={12} className="text-emerald-500" />}
@@ -227,6 +234,7 @@ export default function CommandCentre() {
         agentsRes,
         propsRes,
         leadsRes,
+        voiceSearchesTodayRes,
         voice30dRes,
         liveListingsRes,
         listingsTodayRes,
@@ -239,10 +247,15 @@ export default function CommandCentre() {
         pendingDemosRes,
         openTicketsRes,
         churnRes,
+        buyerSearchesTodayRes,
+        savesTodayRes,
+        totalBuyersRes,
+        newBuyersWeekRes,
       ] = await Promise.all([
         supabase.from('agents').select('id, name, email, agency, is_subscribed, created_at, updated_at, onboarding_complete, agent_subscriptions(plan_type)'),
         supabase.from('properties').select('id, agent_id, state, is_active, views, images, created_at'),
         supabase.from('leads').select('id, created_at'),
+        supabase.from('voice_searches').select('id', { count: 'exact', head: true }).gte('created_at', todayStart),
         supabase.from('voice_searches').select('id', { count: 'exact', head: true }).gte('created_at', d30),
         supabase.from('properties').select('id', { count: 'exact', head: true }).eq('is_active', true),
         supabase.from('properties').select('id', { count: 'exact', head: true }).gte('created_at', todayStart),
@@ -255,7 +268,37 @@ export default function CommandCentre() {
         (supabase.from('demo_requests' as any).select('id', { count: 'exact', head: true }).eq('status', 'pending')) as any,
         (supabase.from('support_tickets' as any).select('id', { count: 'exact', head: true }).eq('status', 'open')) as any,
         supabase.from('agents').select('id', { count: 'exact', head: true }).eq('is_subscribed', false).gte('updated_at', monthStart),
+        (supabase.from('buyer_activity_events' as any).select('id', { count: 'exact', head: true }).eq('event_type', 'search').gte('created_at', todayStart)) as any,
+        (supabase.from('saved_properties' as any).select('id', { count: 'exact', head: true }).gte('saved_at', todayStart)) as any,
+        (supabase.from('buyer_profiles' as any).select('id', { count: 'exact', head: true })) as any,
+        (supabase.from('buyer_profiles' as any).select('id', { count: 'exact', head: true }).gte('created_at', d7)) as any,
       ]);
+
+      // Top suburb from voice searches in the last 7 days
+      let topSuburb: string | null = null;
+      try {
+        const { data: vsData } = await supabase
+          .from('voice_searches')
+          .select('parsed_query')
+          .gte('created_at', d7)
+          .limit(200);
+        if (vsData) {
+          const suburbCount = new Map<string, number>();
+          vsData.forEach((vs: any) => {
+            const suburb = vs.parsed_query?.suburb || vs.parsed_query?.location;
+            if (typeof suburb === 'string' && suburb.trim()) {
+              const key = suburb.trim();
+              suburbCount.set(key, (suburbCount.get(key) || 0) + 1);
+            }
+          });
+          if (suburbCount.size > 0) {
+            topSuburb = Array.from(suburbCount.entries())
+              .sort((a, b) => b[1] - a[1])[0][0];
+          }
+        }
+      } catch {}
+
+      const searchesToday = (buyerSearchesTodayRes.count || 0) + (voiceSearchesTodayRes.count || 0);
 
       const agents = agentsRes.data || [];
       const allProps = propsRes.data || [];
@@ -402,6 +445,11 @@ export default function CommandCentre() {
         leadsThisWeek: leadsWeekRes.count || 0,
         leads30d: leads30dRes.count || 0,
         voiceSearches30d: voice30dRes.count || 0,
+        searchesToday,
+        savesToday: savesTodayRes.count || 0,
+        totalBuyers: totalBuyersRes.count || 0,
+        newBuyersThisWeek: newBuyersWeekRes.count || 0,
+        topSuburb,
         pendingAgentApprovals: pendingAgentsRes.count || 0,
         pendingListingReviews: pendingListingsRes.count || 0,
         pendingDemoRequests: pendingDemosRes.count || 0,
@@ -626,6 +674,38 @@ export default function CommandCentre() {
           </span>
         </div>
       )}
+
+      {/* SECTION 2b — Buyers pulse */}
+      <SectionHead title="Buyers pulse" sub="Real-time demand from property seekers" />
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+        <KPI
+          label="Searches today"
+          value={data.searchesToday}
+          sub="text + voice combined"
+        />
+        <KPI
+          label="Enquiries today"
+          value={data.leadsToday}
+          sub="messages sent to agents"
+          trend={trendFromDelta(data.leadsToday, Math.round(data.leadsThisWeek / 7))}
+        />
+        <KPI
+          label="Saves today"
+          value={data.savesToday}
+          sub="properties bookmarked"
+        />
+        <KPI
+          label="Total buyers"
+          value={data.totalBuyers}
+          sub={`+${data.newBuyersThisWeek} this week`}
+          trend={data.newBuyersThisWeek > 0 ? 'up' : 'flat'}
+        />
+        <KPI
+          label="Top suburb"
+          value={data.topSuburb ?? '—'}
+          sub="most searched (7 days)"
+        />
+      </div>
 
       {/* SECTION 3 — 12-week growth chart */}
       <SectionHead title="12-Week Growth" sub="Agents, listings & leads per week" />

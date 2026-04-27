@@ -922,6 +922,8 @@ export default function PropertyDetailPage() {
               )}
             </div>
 
+            <OpenHomesCard propertyId={property.id} />
+
             {!isRental && (
               <MortgageBrokerCTA
                 sourcePage="property_detail"

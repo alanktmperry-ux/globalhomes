@@ -509,6 +509,27 @@ const Index = () => {
     })();
   }, [user, hasSearchParams]);
 
+  // ── Show "set preferences" prompt for signed-in users with no prefs ──
+  useEffect(() => {
+    if (!user) { setNoPrefsBannerVisible(false); return; }
+    if (sessionStorage.getItem('listhq_no_prefs_banner_dismissed')) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from('user_preferences')
+        .select('seeking_type, preferred_locations, budget_max')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (cancelled) return;
+      const hasPrefs =
+        !!data?.seeking_type &&
+        Array.isArray(data?.preferred_locations) &&
+        (data!.preferred_locations as string[]).length > 0;
+      setNoPrefsBannerVisible(!hasPrefs);
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
+
 
   useEffect(() => {
     const handler = () => setMapCenter(null);

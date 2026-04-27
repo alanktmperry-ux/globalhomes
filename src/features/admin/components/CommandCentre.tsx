@@ -234,6 +234,7 @@ function AttentionCard({
 export default function CommandCentre() {
   const navigate = useNavigate();
   const auth = useAuth();
+  const isSupport = !!auth?.isSupport && !auth?.isAdmin;
   const startImpersonation = (auth as any)?.startImpersonation as
     | ((userId: string, userEmail: string) => Promise<void>)
     | undefined;

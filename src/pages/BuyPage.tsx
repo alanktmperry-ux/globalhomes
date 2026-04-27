@@ -331,6 +331,7 @@ const BuyPage = () => {
     setPage(0);
     setAllProperties([]);
     setHasMore(true);
+    setSavedSearch(false);
   }, [filters]);
 
   useEffect(() => {

@@ -1013,6 +1013,19 @@ export default function CommandCentre() {
           color={data.paidAgents > 0 ? 'text-emerald-500' : 'text-muted-foreground'}
           sub="MRR ÷ paid agents"
         />
+        <KPI
+          label="Trial → Paid"
+          value={`${data.trialConversionPct}%`}
+          icon={Target}
+          sub="of all sign-ups converted"
+        />
+        <KPI
+          label="New MRR (month)"
+          value={`$${data.netNewMrrThisMonth.toLocaleString()}`}
+          icon={TrendingUp}
+          color={data.netNewMrrThisMonth > 0 ? 'text-emerald-500' : 'text-muted-foreground'}
+          sub="from new paid agents this month"
+        />
       </div>
 
       {/* Churn surfaced separately so we can keep 4-up grid above */}

@@ -282,7 +282,7 @@ export default function CommandCentre() {
         totalBuyersRes,
         newBuyersWeekRes,
       ] = await Promise.all([
-        supabase.from('agents').select('id, name, email, agency, is_subscribed, created_at, updated_at, onboarding_complete, agent_subscriptions(plan_type)'),
+        supabase.from('agents').select('id, user_id, name, email, agency, is_subscribed, subscription_status, created_at, updated_at, onboarding_complete, agent_subscriptions(plan_type)'),
         supabase.from('properties').select('id, agent_id, state, is_active, views, images, created_at'),
         supabase.from('leads').select('id, created_at'),
         supabase.from('voice_searches').select('id', { count: 'exact', head: true }).gte('created_at', todayStart),

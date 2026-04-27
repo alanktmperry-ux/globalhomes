@@ -95,19 +95,33 @@ const PlanBadge = ({ user }: { user: AuthUser }) => {
   if (user.user_type === 'demo' || user.user_type === 'demo_request') return null;
   if (!user.is_subscribed) return null;
 
-  const plan = (user.plan_type || 'basic').toLowerCase();
-  if (plan === 'pro' || plan === 'agency') {
+  const plan = (user.plan_type || 'demo').toLowerCase();
+  const labels: Record<string, string> = {
+    solo: 'Solo',
+    agency: 'Agency',
+    agency_pro: 'Agency Pro',
+    enterprise: 'Enterprise',
+  };
+  if (labels[plan]) {
     return (
       <Badge className="bg-gradient-to-r from-primary to-cyan-500 text-white border-0 text-[10px] font-semibold">
-        {plan === 'agency' ? 'Agency Plan' : 'Pro Plan'}
+        {labels[plan]}
       </Badge>
     );
   }
   return (
     <Badge variant="outline" className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 text-[10px] font-medium">
-      Standard
+      Trial
     </Badge>
   );
+};
+
+const PLAN_LIMITS: Record<string, { listings: number; seats: number }> = {
+  demo: { listings: 3, seats: 1 },
+  solo: { listings: 15, seats: 1 },
+  agency: { listings: 75, seats: 12 },
+  agency_pro: { listings: 9999, seats: 9999 },
+  enterprise: { listings: 9999, seats: 9999 },
 };
 
 const SubscriptionStatusBadge = ({ status }: { status?: string | null }) => {

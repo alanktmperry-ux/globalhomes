@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
+
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
@@ -95,19 +95,33 @@ const PlanBadge = ({ user }: { user: AuthUser }) => {
   if (user.user_type === 'demo' || user.user_type === 'demo_request') return null;
   if (!user.is_subscribed) return null;
 
-  const plan = (user.plan_type || 'basic').toLowerCase();
-  if (plan === 'pro' || plan === 'agency') {
+  const plan = (user.plan_type || 'demo').toLowerCase();
+  const labels: Record<string, string> = {
+    solo: 'Solo',
+    agency: 'Agency',
+    agency_pro: 'Agency Pro',
+    enterprise: 'Enterprise',
+  };
+  if (labels[plan]) {
     return (
       <Badge className="bg-gradient-to-r from-primary to-cyan-500 text-white border-0 text-[10px] font-semibold">
-        {plan === 'agency' ? 'Agency Plan' : 'Pro Plan'}
+        {labels[plan]}
       </Badge>
     );
   }
   return (
     <Badge variant="outline" className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 text-[10px] font-medium">
-      Standard
+      Trial
     </Badge>
   );
+};
+
+const PLAN_LIMITS: Record<string, { listings: number; seats: number }> = {
+  demo: { listings: 3, seats: 1 },
+  solo: { listings: 15, seats: 1 },
+  agency: { listings: 75, seats: 12 },
+  agency_pro: { listings: 9999, seats: 9999 },
+  enterprise: { listings: 9999, seats: 9999 },
 };
 
 const SubscriptionStatusBadge = ({ status }: { status?: string | null }) => {
@@ -138,7 +152,7 @@ const AdminUsers = () => {
   const [filterType, setFilterType] = useState<string>('all');
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [subModal, setSubModal] = useState<{ open: boolean; userId: string; email: string; currentPlan: string }>({ open: false, userId: '', email: '', currentPlan: 'demo' });
-  const [subForm, setSubForm] = useState({ plan_type: 'demo', listing_limit: 3, seat_limit: 1, founding_member: false });
+  const [subForm, setSubForm] = useState({ plan_type: 'demo', listing_limit: 3, seat_limit: 1 });
   const [savingSub, setSavingSub] = useState(false);
   const [graceModal, setGraceModal] = useState<{ open: boolean; userId: string; email: string; currentGrace: string | null }>({ open: false, userId: '', email: '', currentGrace: null });
   const [graceDate, setGraceDate] = useState<Date | undefined>(undefined);
@@ -154,15 +168,8 @@ const AdminUsers = () => {
 
   const handleOpenSubModal = (u: AuthUser) => {
     const plan = u.plan_type || 'demo';
-    const limits: Record<string, { listings: number; seats: number }> = {
-      demo: { listings: 3, seats: 1 },
-      starter: { listings: 10, seats: 1 },
-      pro: { listings: 9999, seats: 1 },
-      agency: { listings: 9999, seats: 8 },
-      enterprise: { listings: 9999, seats: 50 },
-    };
-    const def = limits[plan] || limits.demo;
-    setSubForm({ plan_type: plan, listing_limit: def.listings, seat_limit: def.seats, founding_member: false });
+    const def = PLAN_LIMITS[plan] || PLAN_LIMITS.demo;
+    setSubForm({ plan_type: plan, listing_limit: def.listings, seat_limit: def.seats });
     setSubModal({ open: true, userId: u.id, email: u.email, currentPlan: plan });
   };
 
@@ -207,14 +214,7 @@ const AdminUsers = () => {
   };
 
   const handlePlanChange = (plan: string) => {
-    const limits: Record<string, { listings: number; seats: number }> = {
-      demo: { listings: 3, seats: 1 },
-      starter: { listings: 10, seats: 1 },
-      pro: { listings: 9999, seats: 1 },
-      agency: { listings: 9999, seats: 8 },
-      enterprise: { listings: 9999, seats: 50 },
-    };
-    const def = limits[plan] || limits.demo;
+    const def = PLAN_LIMITS[plan] || PLAN_LIMITS.demo;
     setSubForm(f => ({ ...f, plan_type: plan, listing_limit: def.listings, seat_limit: def.seats }));
   };
 
@@ -794,11 +794,11 @@ const AdminUsers = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="demo">Demo — 3 listings</SelectItem>
-                  <SelectItem value="starter">Starter — $99/mo, 10 listings</SelectItem>
-                  <SelectItem value="pro">Pro — $199/mo, unlimited</SelectItem>
-                  <SelectItem value="agency">Agency — $399/mo, 8 seats</SelectItem>
-                  <SelectItem value="enterprise">Enterprise — custom</SelectItem>
+                  <SelectItem value="demo">Trial</SelectItem>
+                  <SelectItem value="solo">Solo — $299/mo</SelectItem>
+                  <SelectItem value="agency">Agency — $899/mo</SelectItem>
+                  <SelectItem value="agency_pro">Agency Pro — $1,999/mo</SelectItem>
+                  <SelectItem value="enterprise">Enterprise — Custom</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -822,17 +822,6 @@ const AdminUsers = () => {
                   className="w-full h-9 px-3 text-sm border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
-            </div>
-
-            <div className="flex items-center justify-between rounded-lg border border-border p-3">
-              <div>
-                <p className="text-sm font-medium text-foreground">Founding member</p>
-                <p className="text-xs text-muted-foreground">Rate locked for life</p>
-              </div>
-              <Switch
-                checked={subForm.founding_member}
-                onCheckedChange={(v) => setSubForm(f => ({ ...f, founding_member: v }))}
-              />
             </div>
 
             <div className="flex gap-2 pt-2">

@@ -1,4 +1,5 @@
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { logApiUsage, costFor } from "../_shared/usageLog.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {

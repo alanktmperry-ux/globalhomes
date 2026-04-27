@@ -28,6 +28,9 @@ import {
   Gamepad2,
   MessageSquare,
   Megaphone,
+  Ban,
+  Trash2,
+  UserPlus,
 } from 'lucide-react';
 import {
   AreaChart,
@@ -91,6 +94,23 @@ interface CCData {
   stateBreakdown: { state: string; count: number }[];
   growthChart: { label: string; agents: number; listings: number; leads: number }[];
   planMix: { plan: string; count: number; mrr: number }[];
+  totalSeekers: number;
+  newSeekersThisWeek: number;
+  totalMortgageBrokers: number;
+  totalTrustAccountants: number;
+  totalDemoUsers: number;
+  pendingPartners: number;
+  recentUsers: {
+    id: string;
+    email: string;
+    displayName: string;
+    userType: 'agent' | 'seeker' | 'partner' | 'demo' | 'demo_request';
+    partnerType?: string | null;
+    isBanned: boolean;
+    isAgent: boolean;
+    created_at: string;
+    lastSignIn: string | null;
+  }[];
   fetchedAt: string;
 }
 

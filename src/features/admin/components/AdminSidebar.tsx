@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Zap, CheckCircle, Users, Building2, DollarSign, Megaphone, Settings,
-  Shield, ArrowLeft, UserCog, LineChart, BookOpen,
+  Shield, ArrowLeft, UserCog, LineChart, BookOpen, Wallet,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -68,6 +68,7 @@ export default function AdminSidebar({ pendingApprovalsTotal = 0 }: AdminSidebar
   ];
   const strategy: NavItem[] = [
     { to: '/admin/insights', label: 'Insights', icon: LineChart },
+    { to: '/admin/costs', label: 'Costs', icon: Wallet },
   ];
   const operations: NavItem[] = [
     { to: '/admin/approvals', label: 'Approvals', icon: CheckCircle, badge: pendingApprovalsTotal },

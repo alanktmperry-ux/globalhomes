@@ -1,4 +1,5 @@
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { logApiUsage, costFor } from "../_shared/usageLog.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -97,6 +98,17 @@ Deno.serve(async (req) => {
     const result = await whisperRes.json();
     const transcript =
       result.text?.trim() || "";
+
+    // Estimate audio duration in seconds — fallback to a rough estimate based on
+    // 32kbps WebM (~4 KB/s) when API doesn't return it.
+    const approxSeconds = Math.max(1, Math.round(audioBuffer.byteLength / 4000));
+    await logApiUsage({
+      service: "deepgram",
+      action: "voice_transcript",
+      units: approxSeconds,
+      cost_estimate: costFor.deepgram(approxSeconds),
+      metadata: { lang, bytes: audioBuffer.byteLength, transcript_chars: transcript.length },
+    });
 
     return new Response(
       JSON.stringify({ transcript }),

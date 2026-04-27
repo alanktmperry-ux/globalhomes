@@ -562,10 +562,15 @@ Deno.serve(async (req) => {
       });
     }
 
-    if (action === "grant_role" || action === "revoke_role") {
+    if (action === "grant_role" || action === "revoke_role" || action === "set_role") {
       const userId = bodyParams.userId || bodyParams.user_id;
       const role = bodyParams.role;
-      const allowedRoles = ["user", "agent", "admin"];
+      const allowedRoles = ["user", "agent", "admin", "support"];
+      // set_role: { user_id, role, enabled? } — defaults to enabled=true (grant)
+      const isSet = action === "set_role";
+      const enabled = isSet ? (bodyParams.enabled !== false) : null;
+      const opName = isSet ? (enabled ? "grant_role" : "revoke_role") : action;
+
       if (!userId || !role || !allowedRoles.includes(role)) {
         return new Response(JSON.stringify({ error: "Invalid userId or role" }), {
           status: 400,

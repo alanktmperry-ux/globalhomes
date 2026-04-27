@@ -57,7 +57,7 @@ function NavLinkItem({ item, active }: { item: NavItem; active: boolean }) {
   );
 }
 
-export default function AdminSidebar({ pendingApprovalsTotal = 0 }: AdminSidebarProps) {
+export default function AdminSidebar({ pendingApprovalsTotal = 0, isSupport = false }: AdminSidebarProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 

@@ -271,6 +271,26 @@ export default function RevenueBilling() {
         trend.push({ label, mrr, arr: mrr * 12, newMrr, churnMrr, netNew: newMrr - churnMrr });
       }
       setMrrTrend(trend);
+
+      // Add-on revenue (last 30 days)
+      try {
+        const since = new Date(now.getTime() - 30 * 86400000).toISOString();
+        const { data: addonData } = await ((supabase as any).from('addon_purchases'))
+          .select('id, addon_type, amount_aud, created_at, agent_id')
+          .gte('created_at', since)
+          .order('created_at', { ascending: false })
+          .limit(200);
+        const totals: Record<string, { units: number; revenue: number }> = {};
+        (addonData || []).forEach((p: any) => {
+          const key = p.addon_type || 'other';
+          if (!totals[key]) totals[key] = { units: 0, revenue: 0 };
+          totals[key].units += 1;
+          totals[key].revenue += Number(p.amount_aud || 0);
+        });
+        setAddonTotals(totals);
+      } catch {
+        setAddonTotals({});
+      }
     } finally {
       setLoading(false);
     }

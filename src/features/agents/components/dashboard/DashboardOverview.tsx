@@ -142,280 +142,157 @@ const DashboardOverview = () => {
       .eq('user_id', user.id);
   };
 
-  // Fetch onboarding agent data + persisted steps
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return;
-
-      supabase
-        .from('agents')
-        .select('onboarding_complete')
-        .eq('user_id', user.id)
-        .maybeSingle()
-        .then(({ data }) => {
-          setAgencyConnected(data?.onboarding_complete === true);
-        });
-    });
-  }, []);
-
+  // Consolidated dashboard data fetch — all queries in 2 parallel waves
   useEffect(() => {
     if (!user) return;
-    const fetchOnboarding = async () => {
-      // Fetch profile + agent in parallel
-      const [profileResult, agentResult] = await Promise.all([
-        supabase
-          .from('profiles')
-          .select('onboarding_steps_completed')
-          .eq('user_id', user.id)
-          .maybeSingle(),
-        supabase
-          .from('agents')
+    let cancelled = false;
+
+    const loadDashboard = async () => {
+      const todayStr = new Date().toISOString().split('T')[0];
+      const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+      const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString();
+      const now = new Date();
+      const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1).toISOString();
+
+      // Wave 1: profile + agent (need agent.id for everything else)
+      const [profileRes, agentRes] = await Promise.all([
+        supabase.from('profiles').select('onboarding_steps_completed').eq('user_id', user.id).maybeSingle(),
+        supabase.from('agents')
           .select('id, name, phone, avatar_url, bio, agency_id, stripe_customer_id, onboarding_complete')
-          .eq('user_id', user.id)
-          .maybeSingle(),
+          .eq('user_id', user.id).maybeSingle(),
       ]);
+      if (cancelled) return;
 
-      const steps = (profileResult.data as any)?.onboarding_steps_completed || {};
+      const steps = ((profileRes.data as any)?.onboarding_steps_completed || {}) as Record<string, boolean>;
       setOnboardingSteps(steps);
-      if (steps.dismissed) { setOnboardingDismissed(true); return; }
+      if (steps.dismissed) setOnboardingDismissed(true);
+      setOnboardingAgent(agentRes.data);
+      setAgencyConnected(agentRes.data?.onboarding_complete === true);
 
-      const agent = agentResult.data;
-      setOnboardingAgent(agent);
-      if (agent?.id) {
-        const { count } = await supabase
-          .from('properties')
-          .select('id', { count: 'exact', head: true })
-          .eq('agent_id', agent.id);
-        setOnboardingHasListing((count || 0) > 0);
-      } else {
+      const aId = agentRes.data?.id;
+      if (!aId) {
         setOnboardingHasListing(false);
+        return;
       }
-    };
-    fetchOnboarding();
-  }, [user]);
+      setAgentId(aId);
 
-  // Fetch tasks due today
-  useEffect(() => {
-    if (!user) return;
-    const today = new Date().toISOString().split('T')[0];
-    supabase
-      .from('tasks')
-      .select('id', { count: 'exact', head: true })
-      .or(`user_id.eq.${user.id},assigned_to.eq.${user.id}`)
-      .eq('status', 'pending')
-      .lte('due_date', today)
-      .then(({ count }) => setTasksDue(count || 0));
-  }, [user]);
-
-  // Fetch active contacts count
-  useEffect(() => {
-    if (!user) return;
-    supabase
-      .from('contacts')
-      .select('id', { count: 'exact', head: true })
-      .eq('created_by', user.id)
-      .then(({ count }) => setActiveContacts(count || 0));
-  }, [user]);
-
-  // Fetch trust balance
-  useEffect(() => {
-    if (!user) return;
-    const fetchTrust = async () => {
-      const { data: agent } = await supabase
-        .from('agents').select('id').eq('user_id', user.id).maybeSingle();
-      if (!agent) return;
-      // Use trust_account_balances view for accurate balance
-      const { data } = await supabase
-        .from('trust_account_balances')
-        .select('current_balance')
-        .eq('agent_id', agent.id)
-        .maybeSingle();
-      if (data) setTrustBalance(Math.max(0, Number(data.current_balance) || 0));
-    };
-    fetchTrust();
-  }, [user]);
-
-  // Fetch unresponded leads (status='new', older than 5 min)
-  useEffect(() => {
-    if (!user) return;
-    const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
-    supabase
-      .from('agents')
-      .select('id')
-      .eq('user_id', user.id)
-      .maybeSingle()
-      .then(({ data: agent }) => {
-        if (!agent) return;
-        supabase
-          .from('leads')
-          .select('id', { count: 'exact', head: true })
-          .eq('agent_id', agent.id)
-          .eq('status', 'new')
-          .lt('created_at', fiveMinAgo)
-          .then(({ count }) => setUnrespondedLeads(count || 0));
-      });
-  }, [user]);
-
-  // Fetch pipeline data from activities (entity_type='property', action='sold')
-  useEffect(() => {
-    if (!user) return;
-    const now = new Date();
-    const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1).toISOString();
-    supabase
-      .from('activities')
-      .select('created_at, metadata')
-      .eq('user_id', user.id)
-      .eq('entity_type', 'property')
-      .eq('action', 'sold')
-      .gte('created_at', twelveMonthsAgo)
-      .then(({ data }) => {
-        const months = buildEmptyMonths();
-        if (data && data.length > 0) {
-          const monthMap = new Map(months.map((m, i) => [i, m]));
-          const baseDate = new Date(now.getFullYear(), now.getMonth() - 11, 1);
-          data.forEach((row) => {
-            const d = new Date(row.created_at);
-            const idx = (d.getFullYear() - baseDate.getFullYear()) * 12 + (d.getMonth() - baseDate.getMonth());
-            if (idx >= 0 && idx < 12) {
-              const entry = monthMap.get(idx)!;
-              entry.deals += 1;
-              const val = (row.metadata as any)?.commission ?? (row.metadata as any)?.value ?? 0;
-              entry.value += Number(val) || 0;
-            }
-          });
-          setPipelineData(months);
-          setPipelineEmpty(false);
-        } else {
-          setPipelineData(months);
-          setPipelineEmpty(true);
-        }
-      });
-  }, [user]);
-
-  // Fetch recent activities
-  useEffect(() => {
-    if (!user) return;
-    supabase
-      .from('activities')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(5)
-      .then(({ data }) => setRecentActivities(data || []));
-  }, [user]);
-
-  // Fetch today's inspections from properties with inspection_times JSONB
-  useEffect(() => {
-    if (!user) return;
-    const todayStr = new Date().toISOString().split('T')[0];
-    supabase
-      .from('properties')
-      .select('id, address, inspection_times')
-      .eq('is_active', true)
-      .not('inspection_times', 'eq', '[]')
-      .then(({ data }) => {
-        if (!data) return;
-        const inspections: { address: string; time: string; propertyId: string }[] = [];
-        data.forEach((prop) => {
-          const times = prop.inspection_times as any[];
-          if (!Array.isArray(times)) return;
-          times.forEach((slot: any) => {
-            const slotDate = typeof slot === 'string' ? slot : slot?.date || slot?.start;
-            if (typeof slotDate === 'string' && slotDate.startsWith(todayStr)) {
-              const d = new Date(slotDate);
-              const timeStr = d.toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit', hour12: true });
-              inspections.push({ address: prop.address, time: timeStr, propertyId: prop.id });
-            }
-          });
-        });
-        inspections.sort((a, b) => a.time.localeCompare(b.time));
-        setTodayInspections(inspections);
-      });
-  }, [user]);
-
-  // Fetch arrears tenancies
-  useEffect(() => {
-    if (!user) return;
-    const fetchArrears = async () => {
-      const { data: agent } = await supabase
-        .from('agents').select('id').eq('user_id', user.id).maybeSingle();
-      if (!agent) return;
-
-      const { data: tenancies } = await supabase
-        .from('tenancies')
-        .select('*, properties(address, suburb)')
-        .eq('agent_id', agent.id)
-        .eq('status', 'active');
-      if (!tenancies || tenancies.length === 0) return;
-
-      const tenancyIds = tenancies.map(t => t.id);
-      const { data: payments } = await supabase
-        .from('rent_payments')
-        .select('*')
-        .in('tenancy_id', tenancyIds)
-        .order('payment_date', { ascending: false });
-
-      const today = new Date();
-      const overdue: any[] = [];
-
-      for (const t of tenancies) {
-        const tenancyPayments = (payments || []).filter(p => p.tenancy_id === t.id);
-        const latest = tenancyPayments[0];
-        if (!latest) {
-          // No payments at all — check if lease started more than 3 days ago
-          const leaseStart = new Date(t.lease_start);
-          const daysSinceStart = differenceInDays(today, leaseStart);
-          if (daysSinceStart > 3) {
-            overdue.push({ ...t, daysOverdue: daysSinceStart, amountOwed: Number(t.rent_amount) });
-          }
-          continue;
-        }
-        const periodEnd = new Date(latest.period_to);
-        const daysOverdue = differenceInDays(today, periodEnd);
-        if (daysOverdue > 3 && latest.status !== 'paid') {
-          overdue.push({ ...t, daysOverdue, amountOwed: Number(t.rent_amount) });
-        }
-      }
-      setArrearsTenancies(overdue);
-    };
-    fetchArrears();
-  }, [user]);
-
-  // Fetch listings with no vendor report in the last 7 days
-  useEffect(() => {
-    if (!user) return;
-    const fetchReportsDue = async () => {
-      const { data: agent } = await supabase
-        .from('agents')
-        .select('id')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      if (!agent) return;
-
-      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-      // Fetch properties + recent reports in parallel
-      const [propsResult, reportsResult] = await Promise.all([
-        supabase
-          .from('properties')
+      // Wave 2: everything else in parallel
+      const [
+        listingCountRes, tasksRes, contactsRes, trustRes, leadsRes,
+        activitiesRes, recentActivitiesRes, agentInspectionsRes,
+        tenanciesRes, propertiesRes, vendorReportsRes,
+      ] = await Promise.all([
+        supabase.from('properties').select('id', { count: 'exact', head: true }).eq('agent_id', aId),
+        supabase.from('tasks').select('id', { count: 'exact', head: true })
+          .or(`user_id.eq.${user.id},assigned_to.eq.${user.id}`)
+          .eq('status', 'pending').lte('due_date', todayStr),
+        supabase.from('contacts').select('id', { count: 'exact', head: true }).eq('created_by', user.id),
+        supabase.from('trust_account_balances').select('current_balance').eq('agent_id', aId).maybeSingle(),
+        supabase.from('leads').select('id', { count: 'exact', head: true })
+          .eq('agent_id', aId).eq('status', 'new').lt('created_at', fiveMinAgo),
+        supabase.from('activities').select('created_at, metadata')
+          .eq('user_id', user.id).eq('entity_type', 'property').eq('action', 'sold')
+          .gte('created_at', twelveMonthsAgo),
+        supabase.from('activities').select('*').eq('user_id', user.id)
+          .order('created_at', { ascending: false }).limit(5),
+        // FIX: scope inspections to this agent only — was scanning every active property
+        supabase.from('properties').select('id, address, inspection_times')
+          .eq('agent_id', aId).eq('is_active', true).not('inspection_times', 'eq', '[]'),
+        supabase.from('tenancies').select('*, properties(address, suburb)')
+          .eq('agent_id', aId).eq('status', 'active'),
+        supabase.from('properties')
           .select('id, address, suburb, views, contact_clicks, listed_date, vendor_name, vendor_email')
-          .eq('agent_id', agent.id)
-          .eq('status', 'public')
-          .eq('is_active', true),
-        supabase
-          .from('vendor_reports')
-          .select('property_id, sent_at')
-          .eq('agent_id', agent.id)
-          .gte('sent_at', sevenDaysAgo),
+          .eq('agent_id', aId).eq('status', 'public').eq('is_active', true),
+        supabase.from('vendor_reports').select('property_id, sent_at')
+          .eq('agent_id', aId).gte('sent_at', sevenDaysAgo),
       ]);
+      if (cancelled) return;
 
-      const props = propsResult.data;
-      if (!props || props.length === 0) return;
+      setOnboardingHasListing((listingCountRes.count || 0) > 0);
+      setTasksDue(tasksRes.count || 0);
+      setActiveContacts(contactsRes.count || 0);
+      if (trustRes.data) setTrustBalance(Math.max(0, Number(trustRes.data.current_balance) || 0));
+      setUnrespondedLeads(leadsRes.count || 0);
+      setRecentActivities(recentActivitiesRes.data || []);
 
-      const recentPropertyIds = new Set((reportsResult.data || []).map(r => r.property_id));
-      const due = props.filter(p => !recentPropertyIds.has(p.id) && p.vendor_email);
-      setReportsDue(due);
+      // Pipeline data
+      const months = buildEmptyMonths();
+      if (activitiesRes.data && activitiesRes.data.length > 0) {
+        const monthMap = new Map(months.map((m, i) => [i, m]));
+        const baseDate = new Date(now.getFullYear(), now.getMonth() - 11, 1);
+        activitiesRes.data.forEach((row) => {
+          const d = new Date(row.created_at);
+          const idx = (d.getFullYear() - baseDate.getFullYear()) * 12 + (d.getMonth() - baseDate.getMonth());
+          if (idx >= 0 && idx < 12) {
+            const entry = monthMap.get(idx)!;
+            entry.deals += 1;
+            const val = (row.metadata as any)?.commission ?? (row.metadata as any)?.value ?? 0;
+            entry.value += Number(val) || 0;
+          }
+        });
+        setPipelineData(months);
+        setPipelineEmpty(false);
+      } else {
+        setPipelineData(months);
+        setPipelineEmpty(true);
+      }
+
+      // Today's inspections
+      const inspections: { address: string; time: string; propertyId: string }[] = [];
+      (agentInspectionsRes.data || []).forEach((prop) => {
+        const times = prop.inspection_times as any[];
+        if (!Array.isArray(times)) return;
+        times.forEach((slot: any) => {
+          const slotDate = typeof slot === 'string' ? slot : slot?.date || slot?.start;
+          if (typeof slotDate === 'string' && slotDate.startsWith(todayStr)) {
+            const d = new Date(slotDate);
+            const timeStr = d.toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit', hour12: true });
+            inspections.push({ address: prop.address, time: timeStr, propertyId: prop.id });
+          }
+        });
+      });
+      inspections.sort((a, b) => a.time.localeCompare(b.time));
+      setTodayInspections(inspections);
+
+      // Arrears (needs follow-up rent_payments query keyed off tenancy ids)
+      const tenancies = tenanciesRes.data;
+      if (tenancies && tenancies.length > 0) {
+        const tenancyIds = tenancies.map((t: any) => t.id);
+        const { data: payments } = await supabase
+          .from('rent_payments').select('*').in('tenancy_id', tenancyIds)
+          .order('payment_date', { ascending: false });
+        if (cancelled) return;
+
+        const overdue: any[] = [];
+        for (const t of tenancies as any[]) {
+          const tenancyPayments = (payments || []).filter((p: any) => p.tenancy_id === t.id);
+          const latest = tenancyPayments[0];
+          if (!latest) {
+            const leaseStart = new Date(t.lease_start);
+            const daysSinceStart = differenceInDays(now, leaseStart);
+            if (daysSinceStart > 3) overdue.push({ ...t, daysOverdue: daysSinceStart, amountOwed: Number(t.rent_amount) });
+            continue;
+          }
+          const periodEnd = new Date(latest.period_to);
+          const daysOverdue = differenceInDays(now, periodEnd);
+          if (daysOverdue > 3 && latest.status !== 'paid') {
+            overdue.push({ ...t, daysOverdue, amountOwed: Number(t.rent_amount) });
+          }
+        }
+        setArrearsTenancies(overdue);
+      }
+
+      // Reports due
+      const props = propertiesRes.data;
+      if (props && props.length > 0) {
+        const recentPropertyIds = new Set((vendorReportsRes.data || []).map((r: any) => r.property_id));
+        const due = props.filter((p: any) => !recentPropertyIds.has(p.id) && p.vendor_email);
+        setReportsDue(due);
+      }
     };
-    fetchReportsDue();
+
+    loadDashboard();
+    return () => { cancelled = true; };
   }, [user]);
 
   const handleSendReminder = async (tenancy: any) => {

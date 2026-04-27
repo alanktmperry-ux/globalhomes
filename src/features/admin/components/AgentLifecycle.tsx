@@ -50,11 +50,11 @@ interface AgentLifecycleRow {
 }
 
 const PLAN_LABEL: Record<string, string> = {
-  starter: 'Starter $99',
-  pro: 'Pro $199',
-  agency: 'Agency $399',
+  solo: 'Solo $299',
+  agency: 'Agency $899',
+  agency_pro: 'Agency Pro $1,999',
+  enterprise: 'Enterprise',
   demo: 'Trial',
-  basic: 'Trial',
 };
 
 const STAGE_CONFIG: Record<string, { label: string; color: string; bg: string }> = {

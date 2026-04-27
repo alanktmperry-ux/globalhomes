@@ -163,13 +163,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!user) return;
     lastFetchedUserId.current = null;
     setRolesFetched(false);
-    const { data } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
-    const roles = data?.map((r) => r.role) || [];
-    const { data: agentData } = await supabase
-      .from('agents')
-      .select('id, agency_role, agency_id, approval_status')
-      .eq('user_id', user.id)
-      .maybeSingle();
+    const [rolesResult, agentResult] = await Promise.all([
+      supabase.from('user_roles').select('role').eq('user_id', user.id),
+      supabase.from('agents').select('id, agency_role, agency_id, approval_status').eq('user_id', user.id).maybeSingle(),
+    ]);
+    const roles = rolesResult.data?.map((r) => r.role) || [];
+    const agentData = agentResult.data;
     const isAdminUser = roles.includes('admin');
     const isApprovedAgent = !!agentData && ((agentData as any).approval_status === 'approved' || isAdminUser);
     // Only grant agent role if the agents row is approved (admins always pass)

@@ -807,7 +807,6 @@ export type Database = {
           auto_renew: boolean | null
           created_at: string
           featured_remaining: number
-          founding_member: boolean
           id: string
           listing_limit: number
           monthly_price_aud: number
@@ -824,7 +823,6 @@ export type Database = {
           auto_renew?: boolean | null
           created_at?: string
           featured_remaining?: number
-          founding_member?: boolean
           id?: string
           listing_limit?: number
           monthly_price_aud?: number
@@ -841,7 +839,6 @@ export type Database = {
           auto_renew?: boolean | null
           created_at?: string
           featured_remaining?: number
-          founding_member?: boolean
           id?: string
           listing_limit?: number
           monthly_price_aud?: number
@@ -961,7 +958,6 @@ export type Database = {
           cpd_hours_required: number | null
           created_at: string
           email: string | null
-          founding_member: boolean | null
           handles_trust_accounting: boolean | null
           headline: string | null
           id: string
@@ -1021,7 +1017,6 @@ export type Database = {
           cpd_hours_required?: number | null
           created_at?: string
           email?: string | null
-          founding_member?: boolean | null
           handles_trust_accounting?: boolean | null
           headline?: string | null
           id?: string
@@ -1081,7 +1076,6 @@ export type Database = {
           cpd_hours_required?: number | null
           created_at?: string
           email?: string | null
-          founding_member?: boolean | null
           handles_trust_accounting?: boolean | null
           headline?: string | null
           id?: string
@@ -12203,7 +12197,6 @@ export type Database = {
           company_logo_url: string | null
           created_at: string | null
           email: string | null
-          founding_member: boolean | null
           handles_trust_accounting: boolean | null
           headline: string | null
           id: string | null
@@ -12250,7 +12243,6 @@ export type Database = {
           company_logo_url?: string | null
           created_at?: string | null
           email?: string | null
-          founding_member?: boolean | null
           handles_trust_accounting?: boolean | null
           headline?: string | null
           id?: string | null
@@ -12297,7 +12289,6 @@ export type Database = {
           company_logo_url?: string | null
           created_at?: string | null
           email?: string | null
-          founding_member?: boolean | null
           handles_trust_accounting?: boolean | null
           headline?: string | null
           id?: string | null
@@ -12353,7 +12344,6 @@ export type Database = {
           company_logo_url: string | null
           created_at: string | null
           email: string | null
-          founding_member: boolean | null
           headline: string | null
           id: string | null
           instagram_url: string | null
@@ -12393,7 +12383,6 @@ export type Database = {
           company_logo_url?: string | null
           created_at?: string | null
           email?: string | null
-          founding_member?: boolean | null
           headline?: string | null
           id?: string | null
           instagram_url?: string | null
@@ -12433,7 +12422,6 @@ export type Database = {
           company_logo_url?: string | null
           created_at?: string | null
           email?: string | null
-          founding_member?: boolean | null
           headline?: string | null
           id?: string | null
           instagram_url?: string | null

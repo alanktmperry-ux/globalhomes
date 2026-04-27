@@ -329,11 +329,36 @@ export default function CommandCentre() {
       const allLeads = leadsRes.data || [];
 
       const signInMap = new Map<string, string | null>();
+      let allUsers: any[] = [];
       try {
         const { callAdminFunction } = await import('@/features/admin/lib/adminApi');
         const j = await callAdminFunction('list_users');
-        (j?.users || []).forEach((u: any) => signInMap.set(u.id, u.last_sign_in_at || null));
+        allUsers = j?.users || [];
+        allUsers.forEach((u: any) => signInMap.set(u.id, u.last_sign_in_at || null));
       } catch {}
+
+      const seekersList = allUsers.filter(u => u.user_type === 'seeker');
+      const partnersList = allUsers.filter(u => u.user_type === 'partner');
+      const demoUsersList = allUsers.filter(u => u.user_type === 'demo' || u.user_type === 'demo_request');
+      const mortgageBrokersList = partnersList.filter(u => u.partner_type === 'mortgage_broker');
+      const trustAccountantsList = partnersList.filter(u => u.partner_type === 'trust_accountant');
+      const pendingPartnersCount = partnersList.filter(u => !u.is_partner_verified).length;
+      const sevenDaysAgo = new Date(Date.now() - 7 * 86400000);
+      const newSeekersThisWeekCount = seekersList.filter(u => new Date(u.created_at) >= sevenDaysAgo).length;
+      const recentUsersList = [...allUsers]
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .slice(0, 12)
+        .map(u => ({
+          id: u.id,
+          email: u.email,
+          displayName: u.display_name || u.email,
+          userType: u.user_type,
+          partnerType: u.partner_type ?? null,
+          isBanned: !!u.banned_until,
+          isAgent: u.user_type === 'agent',
+          created_at: u.created_at,
+          lastSignIn: u.last_sign_in_at ?? null,
+        }));
 
       const paidAgents = agents.filter(a => a.is_subscribed);
       const mrr = paidAgents.reduce(
@@ -499,6 +524,13 @@ export default function CommandCentre() {
         stateBreakdown,
         growthChart,
         planMix,
+        totalSeekers: seekersList.length,
+        newSeekersThisWeek: newSeekersThisWeekCount,
+        totalMortgageBrokers: mortgageBrokersList.length,
+        totalTrustAccountants: trustAccountantsList.length,
+        totalDemoUsers: demoUsersList.length,
+        pendingPartners: pendingPartnersCount,
+        recentUsers: recentUsersList,
         fetchedAt: new Date().toISOString(),
       });
     } finally {

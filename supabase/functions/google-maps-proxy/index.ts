@@ -41,11 +41,17 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'autocomplete') {
-      // Default to '(regions)' for suburb/locality search; use 'address' for street-level
       const types = input_types || '(regions)';
       const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&types=${encodeURIComponent(types)}&key=${apiKey}`;
       const res = await fetch(url);
       const data = await res.json();
+      await logApiUsage({
+        service: 'google_maps',
+        action: 'autocomplete',
+        units: 1,
+        cost_estimate: costFor.googleMaps(),
+        metadata: { types },
+      });
       return new Response(JSON.stringify(data), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -55,6 +61,12 @@ Deno.serve(async (req) => {
       const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(input)}&key=${apiKey}`;
       const res = await fetch(url);
       const data = await res.json();
+      await logApiUsage({
+        service: 'google_maps',
+        action: 'geocode',
+        units: 1,
+        cost_estimate: costFor.googleMaps(),
+      });
       return new Response(JSON.stringify(data), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -64,6 +76,12 @@ Deno.serve(async (req) => {
       const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(input)}&fields=geometry,formatted_address,address_components&key=${apiKey}`;
       const res = await fetch(url);
       const data = await res.json();
+      await logApiUsage({
+        service: 'google_maps',
+        action: 'place_details',
+        units: 1,
+        cost_estimate: costFor.googleMaps(),
+      });
       return new Response(JSON.stringify(data), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -74,6 +92,12 @@ Deno.serve(async (req) => {
       const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
       const res = await fetch(url);
       const data = await res.json();
+      await logApiUsage({
+        service: 'google_maps',
+        action: 'reverse_geocode',
+        units: 1,
+        cost_estimate: costFor.googleMaps(),
+      });
       return new Response(JSON.stringify(data), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });

@@ -507,11 +507,11 @@ const BuyPage = () => {
                 variant="outline"
                 size="sm"
                 onClick={handleSaveSearch}
-                disabled={savingSearch}
+                disabled={savingSearch || savedSearch}
                 className="gap-1.5"
               >
-                <BellPlus className="h-4 w-4" />
-                {savingSearch ? t('Saving…') : t('Save search & alert me')}
+                <Bell className="h-4 w-4" />
+                {savedSearch ? t('Saved ✓') : savingSearch ? t('Saving…') : t('Save search')}
               </Button>
             </div>
           </div>

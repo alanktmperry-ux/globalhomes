@@ -4,15 +4,15 @@ import { Helmet } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import { geocode } from '@/shared/lib/googleMapsService';
 import { PropertyCard } from '@/components/PropertyCard';
-import { mapDbProperty } from '@/features/allProperties/api/fetchPublicProperties';
+import { mapDbProperty } from '@/features/properties/api/fetchPublicProperties';
 import { Property } from '@/shared/lib/types';
 import { Loader2, X, BellPlus, Sparkles, SlidersHorizontal, Filter, Map as MapIcon, List as ListIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from '@/components/ui/sheet';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { useI18n } from '@/shared/lib/i18n';
-import { AIPropertySearch } from '@/features/allProperties/components/AIPropertySearch';
-import { PropertyMap } from '@/features/allProperties/components/PropertyMap';
+import { AIPropertySearch } from '@/features/properties/components/AIPropertySearch';
+import { PropertyMap } from '@/features/properties/components/PropertyMap';
 import { Switch } from '@/components/ui/switch';
 import { SearchModeTabs } from '@/features/search/components/SearchModeTabs';
 import { SuburbChipInput } from '@/features/search/components/SuburbChipInput';
@@ -339,7 +339,7 @@ const BuyPage = () => {
       else setLoadingMore(true);
       try {
         let q = supabase
-          .from('allProperties')
+          .from('properties')
           .select(PROPERTIES_WITH_AGENTS)
           .eq('is_active', true)
           .not('agent_id', 'is', null)
@@ -456,7 +456,7 @@ const BuyPage = () => {
     <>
       <Helmet>
         <title>{headerSuburbLabel ? `Properties for Sale in ${headerSuburbLabel}` : 'Properties for Sale in Australia'}</title>
-        <meta name="description" content="Browse allProperties for sale across Australia on ListHQ." />
+        <meta name="description" content="Browse properties for sale across Australia on ListHQ." />
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -473,7 +473,7 @@ const BuyPage = () => {
                 {headerSuburbLabel ? t(`Properties for Sale in ${headerSuburbLabel}`) : t('Properties for Sale')}
               </h1>
               <p className="text-muted-foreground mt-1">
-                {isLoading ? t('Searching…') : `${allProperties?.length ?? 0} ${t('allProperties found')}`}
+                {isLoading ? t('Searching…') : `${allProperties?.length ?? 0} ${t('properties found')}`}
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -562,7 +562,7 @@ const BuyPage = () => {
                   </SheetTrigger>
                   <SheetContent side="bottom" className="h-[85vh] overflow-y-auto">
                     <SheetHeader className="text-left">
-                      <SheetTitle>{t('Filter allProperties')}</SheetTitle>
+                      <SheetTitle>{t('Filter properties')}</SheetTitle>
                     </SheetHeader>
                     <div className="py-4">
                       <FilterControls filters={filters} onChange={updateFilters} layout="stacked" />
@@ -628,7 +628,7 @@ const BuyPage = () => {
                 viewMode === 'map' ? (
                   <div className="rounded-xl overflow-hidden border border-border">
                     <PropertyMap
-                      allProperties={allProperties}
+                      properties={allProperties}
                       onPropertySelect={(p) => setSelectedPropertyId(p.id)}
                       selectedPropertyId={selectedPropertyId}
                       centerOn={mapCenter ? { ...mapCenter, key: `${primarySuburb || 'fallback'}-${mapZoom}` } : null}
@@ -652,7 +652,7 @@ const BuyPage = () => {
                     </div>
                     <div className="hidden lg:block sticky top-20 h-[calc(100vh-220px)] rounded-xl overflow-hidden border border-border">
                       <PropertyMap
-                        allProperties={allProperties}
+                        properties={allProperties}
                         onPropertySelect={(p) => { setSelectedPropertyId(p.id); }}
                         selectedPropertyId={selectedPropertyId}
                         centerOn={mapCenter ? { ...mapCenter, key: `${primarySuburb || 'fallback'}-${mapZoom}` } : null}
@@ -677,7 +677,7 @@ const BuyPage = () => {
                 )
               ) : (
                 <div className="text-center py-20 space-y-3">
-                  <p className="text-muted-foreground">{t('No allProperties match your search.')}</p>
+                  <p className="text-muted-foreground">{t('No properties match your search.')}</p>
                   <p className="text-sm text-muted-foreground">
                     {t('Try removing some filters or broadening your price range.')}
                   </p>

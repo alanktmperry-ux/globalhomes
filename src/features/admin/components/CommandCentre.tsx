@@ -64,6 +64,11 @@ interface CCData {
   projectedARR: number;
   projectedARR12m: number;
   monthlyGrowthRate: number;
+  arpu: number;
+  churnRatePct: number;
+  revenueAtRisk: number;
+  ltvEstimate: number | null;
+  netNewMRR: number;
   liveListings: number;
   listingsToday: number;
   listingsThisWeek: number;

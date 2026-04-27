@@ -866,14 +866,16 @@ const UsersDashboard = ({ users, loading }: UsersDashboardProps) => {
                           <Loader2 className="animate-spin text-muted-foreground" size={16} />
                         ) : (
                           <>
-                            <button
-                              onClick={() => handleOpenSubModal(u)}
-                              className="p-1.5 rounded-lg bg-violet-500/10 text-violet-500 hover:bg-violet-500/20 transition-colors"
-                              title="Manage subscription"
-                            >
-                              <Settings size={14} />
-                            </button>
-                            {(u.subscription_status === 'payment_failed' || u.subscription_status === 'locked') && (
+                            {!isSupport && (
+                              <button
+                                onClick={() => handleOpenSubModal(u)}
+                                className="p-1.5 rounded-lg bg-violet-500/10 text-violet-500 hover:bg-violet-500/20 transition-colors"
+                                title="Manage subscription"
+                              >
+                                <Settings size={14} />
+                              </button>
+                            )}
+                            {!isSupport && (u.subscription_status === 'payment_failed' || u.subscription_status === 'locked') && (
                               <button
                                 onClick={() => {
                                   setGraceDate(u.admin_grace_until ? new Date(u.admin_grace_until) : undefined);
@@ -885,7 +887,7 @@ const UsersDashboard = ({ users, loading }: UsersDashboardProps) => {
                                 <CalendarClock size={14} />
                               </button>
                             )}
-                            {u.subscription_status !== 'active' && u.subscription_status && (
+                            {!isSupport && u.subscription_status !== 'active' && u.subscription_status && (
                               <button
                                 onClick={() => handleMarkActive(u.id, u.email)}
                                 className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 transition-colors"
@@ -901,6 +903,19 @@ const UsersDashboard = ({ users, loading }: UsersDashboardProps) => {
                             >
                               <UserCog size={14} />
                             </button>
+                            {authIsAdmin && (
+                              <button
+                                onClick={() => handleToggleSupport(u)}
+                                className={`p-1.5 rounded-lg transition-colors ${
+                                  (u.roles || []).includes('support')
+                                    ? 'bg-sky-500/20 text-sky-600 hover:bg-sky-500/30'
+                                    : 'bg-sky-500/10 text-sky-500 hover:bg-sky-500/20'
+                                }`}
+                                title={(u.roles || []).includes('support') ? 'Remove support role' : 'Make support worker'}
+                              >
+                                <Headphones size={14} />
+                              </button>
+                            )}
                             <button
                               onClick={() => handleBan(u.id, !u.banned_until)}
                               className={`p-1.5 rounded-lg transition-colors ${
@@ -910,6 +925,17 @@ const UsersDashboard = ({ users, loading }: UsersDashboardProps) => {
                             >
                               {u.banned_until ? <UserCheck size={14} /> : <Ban size={14} />}
                             </button>
+                            {!isSupport && (
+                              <button
+                                onClick={() => handleDeleteClick(u)}
+                                className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
+                                title="Delete user"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            )}
+                          </>
+                        )}
                             <button
                               onClick={() => handleDeleteClick(u)}
                               className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"

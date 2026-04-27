@@ -2,11 +2,15 @@ import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Eye, EyeOff, Zap, CheckCircle2, Clock, Sparkles, TrendingUp, Info, Loader2, Pencil, Globe, Home, Building } from 'lucide-react';
+import { Plus, Eye, EyeOff, Zap, CheckCircle2, Clock, Sparkles, TrendingUp, Info, Loader2, Pencil, Globe, Home, Building, MoreHorizontal, FileBarChart2, Copy, Mail } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { useNavigate } from 'react-router-dom';
 import DashboardHeader from './DashboardHeader';
 import { useAgentListings, type AgentListing } from '@/features/agents/hooks/useAgentListings';
+import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
 import { PropertyDrawer } from '@/features/properties/components/PropertyDrawer';
 import { Property } from '@/shared/lib/types';
 import { supabase } from '@/integrations/supabase/client';
@@ -72,11 +76,12 @@ interface ListingCardProps {
   onSelect: (p: Property) => void;
   onPublish: (l: AgentListing) => void;
   onMarkSold: (l: AgentListing) => void;
+  onSendReport: (l: AgentListing) => void;
   navigate: ReturnType<typeof useNavigate>;
   isRental?: boolean;
 }
 
-const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, navigate, isRental }: ListingCardProps) => {
+const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSendReport, navigate, isRental }: ListingCardProps) => {
   const s = STATUS_CONFIG[l._status] || STATUS_CONFIG.public;
   const days = getListingDays(l);
   const leads = getListingLeads(l);
@@ -148,6 +153,19 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, naviga
               {actionLoading === l.id ? <Loader2 size={10} className="animate-spin" /> : null} Mark Sold
             </Button>
           )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="sm" variant="ghost" className="h-6 w-6 p-0" aria-label="More actions">
+                <MoreHorizontal size={14} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuItem onClick={() => onSendReport(l)} className="gap-2 text-xs cursor-pointer">
+                <FileBarChart2 size={14} className="text-primary" />
+                Send vendor report 📊
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </div>
@@ -193,12 +211,64 @@ const StatusTabs = ({
 
 const ListingsPage = () => {
   const navigate = useNavigate();
+  const { agent } = useCurrentAgent();
   const [listingMode, setListingMode] = useState<'sale' | 'rent'>('sale');
   const [saleStatusTab, setSaleStatusTab] = useState('all');
   const [rentStatusTab, setRentStatusTab] = useState('all');
   const { listings, loading, isMockData, refetch } = useAgentListings();
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [reportModal, setReportModal] = useState<{ url: string; address: string } | null>(null);
+
+  const handleSendReport = async (l: AgentListing) => {
+    if (l._source !== 'db') {
+      toast.success('Demo listing — Create a real listing first.');
+      return;
+    }
+    if (!agent?.id) {
+      toast.error('Agent profile not loaded');
+      return;
+    }
+    setActionLoading(l.id);
+    try {
+      let token: string | null = null;
+
+      // Try the RPC first
+      const { data: rpcData, error: rpcError } = await supabase.rpc(
+        'generate_vendor_report_token' as any,
+        { p_property_id: l.id, p_agent_id: agent.id } as any,
+      );
+      if (!rpcError && rpcData) {
+        token = typeof rpcData === 'string' ? rpcData : (rpcData as any)?.token ?? null;
+      }
+
+      // Fallback: insert directly
+      if (!token) {
+        const newToken = crypto.randomUUID();
+        const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+        const { data: insertData, error: insertError } = await supabase
+          .from('vendor_report_tokens' as any)
+          .insert({
+            property_id: l.id,
+            agent_id: agent.id,
+            token: newToken,
+            expires_at: expiresAt,
+          } as any)
+          .select('token')
+          .maybeSingle();
+        if (insertError) throw insertError;
+        token = (insertData as any)?.token ?? newToken;
+      }
+
+      const url = `${window.location.origin}/vendor-report/${token}`;
+      setReportModal({ url, address: l.address });
+    } catch (e) {
+      console.error(e);
+      toast.error('Failed to generate report link');
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   const handlePublish = async (l: AgentListing) => {
     if (l._source !== 'db') { toast.success('Demo listing — Create a real listing first.'); return; }
@@ -341,6 +411,7 @@ const ListingsPage = () => {
                   onSelect={setSelectedProperty}
                   onPublish={handlePublish}
                   onMarkSold={handleMarkSold}
+                  onSendReport={handleSendReport}
                   navigate={navigate}
                   isRental={listingMode === 'rent'}
                 />
@@ -356,7 +427,62 @@ const ListingsPage = () => {
         isSaved={false}
         onToggleSave={() => {}}
       />
+
+      <VendorReportDialog
+        open={!!reportModal}
+        onClose={() => setReportModal(null)}
+        url={reportModal?.url ?? ''}
+        address={reportModal?.address ?? ''}
+      />
     </>
+  );
+};
+
+const VendorReportDialog = ({
+  open, onClose, url, address,
+}: { open: boolean; onClose: () => void; url: string; address: string }) => {
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success('Report link copied');
+    } catch {
+      toast.error('Could not copy link');
+    }
+  };
+
+  const handleEmail = () => {
+    const subject = encodeURIComponent(`Your property report for ${address}`);
+    const body = encodeURIComponent(
+      `Hi,\n\nHere's your weekly performance report for ${address}:\n${url}\n\nThis link is valid for 30 days.`
+    );
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-base">
+            <FileBarChart2 size={18} className="text-primary" />
+            Send vendor report
+          </DialogTitle>
+          <DialogDescription className="text-xs">
+            Share this private link with your vendor for {address}. Valid for 30 days.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3">
+          <Input readOnly value={url} className="text-xs font-mono" onFocus={(e) => e.currentTarget.select()} />
+          <div className="flex gap-2">
+            <Button onClick={handleCopy} className="flex-1 gap-1.5 text-xs">
+              <Copy size={14} /> Copy link
+            </Button>
+            <Button onClick={handleEmail} variant="outline" className="flex-1 gap-1.5 text-xs">
+              <Mail size={14} /> Send by email
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

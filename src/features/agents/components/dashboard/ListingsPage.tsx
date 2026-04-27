@@ -76,11 +76,12 @@ interface ListingCardProps {
   onSelect: (p: Property) => void;
   onPublish: (l: AgentListing) => void;
   onMarkSold: (l: AgentListing) => void;
+  onSendReport: (l: AgentListing) => void;
   navigate: ReturnType<typeof useNavigate>;
   isRental?: boolean;
 }
 
-const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, navigate, isRental }: ListingCardProps) => {
+const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSendReport, navigate, isRental }: ListingCardProps) => {
   const s = STATUS_CONFIG[l._status] || STATUS_CONFIG.public;
   const days = getListingDays(l);
   const leads = getListingLeads(l);

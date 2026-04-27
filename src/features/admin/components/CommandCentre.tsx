@@ -605,6 +605,52 @@ export default function CommandCentre() {
     }
   };
 
+  const [ccDeleteTarget, setCCDeleteTarget] = useState<CCData['recentUsers'][0] | null>(null);
+  const [ccDeleting, setCCDeleting] = useState(false);
+  const [ccActionLoading, setCCActionLoading] = useState<string | null>(null);
+
+  const handleCCDelete = async (u: CCData['recentUsers'][0]) => {
+    setCCDeleting(true);
+    setCCActionLoading(u.id);
+    try {
+      if (u.isAgent) {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const token = sessionData.session?.access_token;
+        if (!token) throw new Error('No active session');
+        const { data: delData, error: delError } = await supabase.functions.invoke('admin-delete-agent', {
+          body: { userId: u.id },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (delError || (delData as any)?.error) throw new Error(delError?.message || (delData as any)?.error || 'Delete failed');
+        toast.success('Agent and all data permanently deleted');
+      } else {
+        const { callAdminFunction } = await import('@/features/admin/lib/adminApi');
+        await callAdminFunction('delete_user', { user_id: u.id });
+        toast.success('User permanently deleted');
+      }
+      setCCDeleteTarget(null);
+      fetchAll();
+    } catch (err: any) {
+      toast.error(err?.message ?? 'Delete failed');
+    }
+    setCCDeleting(false);
+    setCCActionLoading(null);
+  };
+
+  const handleCCSuspend = async (u: CCData['recentUsers'][0]) => {
+    setCCActionLoading(u.id);
+    try {
+      const { callAdminFunction } = await import('@/features/admin/lib/adminApi');
+      const action = u.isBanned ? 'unban_user' : 'ban_user';
+      await callAdminFunction(action, { user_id: u.id });
+      toast.success(u.isBanned ? 'User unsuspended' : 'User suspended');
+      fetchAll();
+    } catch (err: any) {
+      toast.error(err?.message ?? 'Action failed');
+    }
+    setCCActionLoading(null);
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center py-20">

@@ -411,6 +411,7 @@ const ListingsPage = () => {
                   onSelect={setSelectedProperty}
                   onPublish={handlePublish}
                   onMarkSold={handleMarkSold}
+                  onSendReport={handleSendReport}
                   navigate={navigate}
                   isRental={listingMode === 'rent'}
                 />
@@ -425,6 +426,13 @@ const ListingsPage = () => {
         onClose={() => setSelectedProperty(null)}
         isSaved={false}
         onToggleSave={() => {}}
+      />
+
+      <VendorReportDialog
+        open={!!reportModal}
+        onClose={() => setReportModal(null)}
+        url={reportModal?.url ?? ''}
+        address={reportModal?.address ?? ''}
       />
     </>
   );

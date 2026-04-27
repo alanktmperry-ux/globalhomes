@@ -63,6 +63,7 @@ const TermsPage = React.lazy(() => import("./pages/TermsPage"));
 const PrivacyPage = React.lazy(() => import("./pages/PrivacyPage"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 const MarketingLandingPage = React.lazy(() => import("./features/marketing/pages/MarketingLandingPage"));
+const PricingPage = React.lazy(() => import("./pages/PricingPage"));
 const WaitlistPage = React.lazy(() => import("./features/marketing/pages/WaitlistPage"));
 const AgentPerformanceDashboard = React.lazy(() => import("./features/agents/pages/AgentPerformanceDashboard"));
 const DemoAccessPage = React.lazy(() => import("./features/agents/pages/DemoAccessPage"));
@@ -253,6 +254,7 @@ const App = () => (
                   <Route path="/agents" element={<FindAgentPage />} />
                   <Route path="/brokers" element={<FindBrokerPage />} />
                   <Route path="/for-agents" element={<AgentLandingPage />} />
+                  <Route path="/pricing" element={<PricingPage />} />
                   <Route path="/suburbs" element={<SuburbsIndexPage />} />
                   <Route path="/launch" element={<MarketingLandingPage />} />
                   <Route path="/waitlist" element={<WaitlistPage />} />

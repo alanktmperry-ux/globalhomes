@@ -25,7 +25,7 @@ function getSectionLabel(pathname: string): string {
 export default function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { impersonating, impersonatedUser, stopImpersonation } = useAuth();
+  const { impersonating, impersonatedUser, stopImpersonation, isSupport, isAdmin } = useAuth();
   const [pendingTotal, setPendingTotal] = useState(0);
 
   useEffect(() => {

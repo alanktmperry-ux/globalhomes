@@ -294,7 +294,7 @@ export default function CommandCentre() {
         supabase.from('leads').select('id', { count: 'exact', head: true }).gte('created_at', d7),
         supabase.from('leads').select('id', { count: 'exact', head: true }).gte('created_at', d30),
         supabase.from('agents').select('id', { count: 'exact', head: true }).eq('approval_status', 'pending'),
-        supabase.from('properties').select('id', { count: 'exact', head: true }).eq('is_active', false),
+        ((supabase.from('properties') as any).select('id', { count: 'exact', head: true }).eq('moderation_status', 'pending')) as any,
         (supabase.from('demo_requests' as any).select('id', { count: 'exact', head: true }).eq('status', 'pending')) as any,
         (supabase.from('support_tickets' as any).select('id', { count: 'exact', head: true }).eq('status', 'open')) as any,
         supabase.from('agents').select('id', { count: 'exact', head: true }).eq('is_subscribed', false).gte('updated_at', monthStart),
@@ -952,7 +952,7 @@ export default function CommandCentre() {
       {/* SECTION 2 — Revenue pulse */}
       {!isSupport && (<>
       <SectionHead title="Revenue pulse" sub="Monthly recurring revenue and conversion" />
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
         <KPI
           label="MRR"
           value={`$${data.mrr.toLocaleString()}`}
@@ -986,6 +986,13 @@ export default function CommandCentre() {
           color="text-primary"
           sub={`${(data.conversionRate - data.conversionRatePrevWeek).toFixed(1)}pp vs last week`}
           trend={trendFromDelta(data.conversionRate, data.conversionRatePrevWeek)}
+        />
+        <KPI
+          label="Rev / Agent"
+          value={data.paidAgents > 0 ? `$${Math.round(data.mrr / data.paidAgents).toLocaleString()}/agent` : '—'}
+          icon={DollarSign}
+          color={data.paidAgents > 0 ? 'text-emerald-500' : 'text-muted-foreground'}
+          sub="MRR ÷ paid agents"
         />
       </div>
 

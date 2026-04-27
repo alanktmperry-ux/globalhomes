@@ -202,7 +202,7 @@ const AgentPortalPage = () => {
               <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                 <Crown size={24} className="text-primary" />
               </div>
-              <h3 className="font-display text-lg font-bold text-foreground">Pro Agent</h3>
+              <h3 className="font-display text-lg font-bold text-foreground">Agency</h3>
               <p className="text-sm text-muted-foreground mt-2 mb-4">
                 Unlock direct leads, show your contact details to property seekers, and get analytics on your listings.
               </p>

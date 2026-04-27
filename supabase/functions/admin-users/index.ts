@@ -167,6 +167,7 @@ Deno.serve(async (req) => {
           subscription_status: agent?.subscription_status || null,
           payment_failed_at: agent?.payment_failed_at || null,
           admin_grace_until: agent?.admin_grace_until || null,
+          roles: rolesMap.get(u.id) || [],
         };
       });
 

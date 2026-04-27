@@ -77,7 +77,7 @@ function exportCSV(rows: AgentBillingRow[]) {
   const totalMrr = rows.filter(r => r.isSubscribed).reduce((s, r) => s + r.mrr, 0);
   const headers = ['Agent', 'Agency', 'Email', 'Plan', 'MRR ($)', 'Status', 'Subscription Start', 'Renewal Date', 'Days Until Renewal'];
   const data = rows.map(r => [
-    r.name, r.agency || '', r.email, PLAN_LABEL[r.plan] || r.plan, r.mrr,
+    r.name, r.agency || '', r.email, PLAN_LABELS[r.plan] || r.plan, r.mrr,
     r.isSubscribed ? 'Active' : 'Trial',
     r.subscriptionStart ? fmtDate(r.subscriptionStart) : '',
     r.renewalDate ? fmtDate(r.renewalDate) : '', r.daysUntilRenewal ?? '',
@@ -158,7 +158,7 @@ function RenewalRow({ agent }: { agent: AgentBillingRow }) {
         <div>
           <p className="text-sm font-semibold text-foreground">{fmt(agent.mrr)}/mo</p>
           <p className="text-xs text-muted-foreground">
-            {PLAN_LABEL[agent.plan] || agent.plan}
+            {PLAN_LABELS[agent.plan] || agent.plan}
           </p>
         </div>
         <div>
@@ -399,7 +399,7 @@ export default function RevenueBilling() {
                 <div key={p.plan}>
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm font-medium text-foreground">
-                      {PLAN_LABEL[p.plan] || p.plan}
+                      {PLAN_LABELS[p.plan] || p.plan}
                       <span className="text-muted-foreground ml-1">({p.count})</span>
                     </span>
                     <span className="text-xs font-semibold text-muted-foreground">
@@ -504,7 +504,7 @@ export default function RevenueBilling() {
                     <p className="font-medium text-foreground">{a.name}</p>
                     <p className="text-xs text-muted-foreground">{a.agency || a.email}</p>
                   </td>
-                  <td className="py-2 px-3 text-foreground">{PLAN_LABEL[a.plan] || a.plan}</td>
+                  <td className="py-2 px-3 text-foreground">{PLAN_LABELS[a.plan] || a.plan}</td>
                   <td className="py-2 px-3 text-foreground">{a.mrr > 0 ? fmt(a.mrr) : '—'}</td>
                   <td className="py-2 px-3">
                     <Badge variant={a.isSubscribed ? 'default' : 'secondary'}>{a.isSubscribed ? 'Active' : 'Trial'}</Badge>

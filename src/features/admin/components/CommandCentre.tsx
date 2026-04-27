@@ -1260,7 +1260,7 @@ export default function CommandCentre() {
       )}
 
       {/* SECTION 6 — Plan mix */}
-      {data.planMix.length > 0 && (
+      {!isSupport && data.planMix.length > 0 && (
         <div className="rounded-2xl border border-border bg-card p-4">
           <p className="text-xs font-semibold text-foreground mb-3">Plan Mix</p>
           <div className="flex flex-wrap gap-3">

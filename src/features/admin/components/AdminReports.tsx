@@ -42,15 +42,18 @@ interface ChartPoint {
 
 const PLAN_LABELS: Record<string, string> = {
   demo: 'Trial',
-  starter: 'Starter',
-  pro: 'Pro',
+  solo: 'Solo',
   agency: 'Agency',
+  agency_pro: 'Agency Pro',
+  enterprise: 'Enterprise',
 };
 
 const PLAN_MRR: Record<string, number> = {
-  starter: 99,
-  pro: 199,
-  agency: 399,
+  solo: 299,
+  agency: 899,
+  agency_pro: 1999,
+  enterprise: 4999,
+  demo: 0,
 };
 
 const planLabel = (p: string | null) => PLAN_LABELS[p?.toLowerCase() || 'demo'] || 'Trial';

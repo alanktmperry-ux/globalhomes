@@ -97,7 +97,7 @@ const AgentPortalPage = () => {
       await supabase.from('agents').update({ is_subscribed: true, subscription_expires_at: subEnd.toISOString() }).eq('id', agent!.id);
 
       setIsSubscribed(true);
-      toast({ title: 'Subscribed!', description: 'You now have Pro Agent access.' });
+      toast({ title: 'Subscribed!', description: 'You now have Agency plan access.' });
     } catch (err: unknown) {
       toast({ title: 'Error', description: getErrorMessage(err), variant: 'destructive' });
     } finally {

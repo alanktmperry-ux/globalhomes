@@ -688,6 +688,23 @@ const BuyPage = () => {
                   )}
                 </div>
               )}
+
+              {/* Load more */}
+              {!isLoading && hasMore && allProperties.length > 0 && (
+                <div className="flex justify-center mt-8 mb-12">
+                  <button
+                    onClick={() => setPage(p => p + 1)}
+                    disabled={loadingMore}
+                    className="h-11 px-10 rounded-2xl border border-stone-200 bg-white hover:bg-stone-50 text-[14px] text-stone-700 font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+                  >
+                    {loadingMore ? (
+                      <><Loader2 size={15} className="animate-spin" /> {t('Loading…')}</>
+                    ) : (
+                      t('Load more properties')
+                    )}
+                  </button>
+                </div>
+              )}
             </>
           )}
         </div>

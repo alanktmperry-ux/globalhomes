@@ -83,6 +83,7 @@ export default function AdminSidebar({ pendingApprovalsTotal = 0, isSupport = fa
   ];
   const system: NavItem[] = [
     { to: '/admin/system', label: 'System', icon: Settings },
+    { to: '/admin/help-faqs', label: 'Help & FAQs', icon: HelpCircle },
   ];
   const help: NavItem[] = [
     { to: '/admin/help', label: 'Help', icon: BookOpen },

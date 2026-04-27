@@ -45,6 +45,8 @@ const AdminAgentsPage = React.lazy(() => import("./features/admin/pages/AgentsPa
 const AdminPartnersPage = React.lazy(() => import("./features/admin/pages/PartnersPage"));
 const AdminSupportPage = React.lazy(() => import("./features/admin/pages/SupportPage"));
 const AdminListingsPage = React.lazy(() => import("./features/admin/pages/AdminListingsPage"));
+const AdminInsightsPage = React.lazy(() => import("./features/admin/pages/InsightsPage"));
+const AdminHelpPage = React.lazy(() => import("./features/admin/pages/AdminHelpPage"));
 const AdminRevenuePage = React.lazy(() => import("./features/admin/pages/RevenuePage"));
 const AdminOutreachPage = React.lazy(() => import("./features/admin/pages/OutreachPage"));
 const AdminBuyersPage = React.lazy(() => import("./features/admin/pages/BuyersPage"));

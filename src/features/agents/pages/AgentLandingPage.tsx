@@ -286,6 +286,175 @@ const AgentLandingPage = () => {
         </div>
       </section>
 
+      {/* ─── PRICING ─── */}
+      <section className="py-24 bg-background">
+        <div className="container mx-auto px-6 max-w-6xl">
+          <div className="text-center mb-12">
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-foreground mb-3">
+              Simple, transparent pricing
+            </h2>
+            <p className="text-muted-foreground">
+              60-day free trial · No credit card required · Cancel any time
+            </p>
+          </div>
+
+          {/* Plan cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-16">
+            {[
+              {
+                name: 'Solo',
+                price: '$299',
+                cadence: '/mo',
+                features: [
+                  '1 agent, up to 3 listings',
+                  'Buyer concierge (20 matches/mo)',
+                  'Trust accounting',
+                  'CRM & contacts',
+                  'AI listing descriptions',
+                  'Email & chat support',
+                ],
+                highlight: false,
+              },
+              {
+                name: 'Agency',
+                price: '$899',
+                cadence: '/mo',
+                features: [
+                  'Up to 5 agents, unlimited listings',
+                  'Buyer concierge (100 matches/mo)',
+                  'Full trust accounting + bank reconciliation',
+                  'Pipeline & rent roll',
+                  'Pocket (off-market) listings',
+                  'Priority support',
+                ],
+                highlight: true,
+              },
+              {
+                name: 'Agency Pro',
+                price: '$1,999',
+                cadence: '/mo',
+                features: [
+                  'Up to 15 agents',
+                  'Unlimited everything',
+                  'Buyer concierge (unlimited)',
+                  'Exclusive listing access',
+                  'Commission calculator',
+                  'Dedicated account manager',
+                ],
+                highlight: false,
+              },
+              {
+                name: 'Enterprise',
+                price: 'Custom',
+                cadence: '',
+                features: [
+                  'Unlimited agents',
+                  'White-label option',
+                  'API access',
+                  'Custom integrations',
+                  'SLA support',
+                ],
+                highlight: false,
+              },
+            ].map((plan) => (
+              <div
+                key={plan.name}
+                className={`relative flex flex-col rounded-2xl bg-card p-6 transition ${
+                  plan.highlight
+                    ? 'border-2 border-primary shadow-lg lg:scale-105'
+                    : 'border border-border'
+                }`}
+              >
+                {plan.highlight && (
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-primary text-primary-foreground text-[11px] font-bold uppercase tracking-wide">
+                    Most Popular
+                  </span>
+                )}
+                <h3 className="font-display text-lg font-bold text-foreground">
+                  {plan.name}
+                </h3>
+                <div className="mt-3 mb-2 flex items-baseline gap-1">
+                  <span className="font-display text-3xl font-extrabold text-foreground">
+                    {plan.price}
+                  </span>
+                  {plan.cadence && (
+                    <span className="text-sm text-muted-foreground">{plan.cadence}</span>
+                  )}
+                </div>
+                <span className="inline-flex self-start items-center px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-semibold uppercase tracking-wide mb-5">
+                  60-day free trial
+                </span>
+                <ul className="space-y-2.5 text-sm text-muted-foreground mb-6 flex-1">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2">
+                      <CheckCircle2 size={14} className="text-primary mt-0.5 shrink-0" />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Button
+                  onClick={() => setShowModal(true)}
+                  variant={plan.highlight ? 'default' : 'outline'}
+                  className="w-full font-semibold"
+                >
+                  Start Free Trial
+                </Button>
+              </div>
+            ))}
+          </div>
+
+          {/* Feature comparison */}
+          <div className="rounded-2xl border border-border bg-card overflow-hidden">
+            <div className="px-6 py-4 border-b border-border">
+              <h3 className="font-display text-lg font-bold text-foreground">
+                Compare features
+              </h3>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-secondary/40">
+                  <tr>
+                    <th className="text-left font-semibold text-foreground px-6 py-3">Feature</th>
+                    <th className="text-center font-semibold text-foreground px-3 py-3">Solo</th>
+                    <th className="text-center font-semibold text-primary px-3 py-3">Agency</th>
+                    <th className="text-center font-semibold text-foreground px-3 py-3">Agency Pro</th>
+                    <th className="text-center font-semibold text-foreground px-3 py-3">Enterprise</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {([
+                    ['Pocket listings',     false, true,  true, true],
+                    ['Trust accounting',    true,  true,  true, true],
+                    ['Buyer concierge',     true,  true,  true, true],
+                    ['AI descriptions',     true,  true,  true, true],
+                    ['Bank reconciliation', false, true,  true, true],
+                    ['Dedicated manager',   false, false, true, true],
+                  ] as Array<[string, boolean, boolean, boolean, boolean]>).map(
+                    ([label, ...cells], idx) => (
+                      <tr
+                        key={label as string}
+                        className={idx % 2 === 0 ? 'bg-background' : 'bg-secondary/20'}
+                      >
+                        <td className="px-6 py-3 text-foreground">{label}</td>
+                        {cells.map((included, i) => (
+                          <td key={i} className="text-center px-3 py-3">
+                            {included ? (
+                              <CheckCircle2 size={16} className="inline text-primary" />
+                            ) : (
+                              <span className="text-muted-foreground/50">—</span>
+                            )}
+                          </td>
+                        ))}
+                      </tr>
+                    )
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ─── FINAL CTA ─── */}
       <section className="py-24 bg-primary relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjEpIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCBmaWxsPSJ1cmwoI2cpIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIi8+PC9zdmc+')] opacity-40" />

@@ -67,6 +67,13 @@ async function sendViaResend(to: string, subject: string, html: string) {
     return { ok: false, reason: errText };
   }
   console.log(`Email sent to ${to}: ${subject}`);
+  await logApiUsage({
+    service: "resend",
+    action: "email_sent",
+    units: 1,
+    cost_estimate: costFor.resend(),
+    metadata: { subject },
+  });
   return { ok: true };
 }
 

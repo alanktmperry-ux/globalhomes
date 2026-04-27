@@ -372,6 +372,17 @@ const BillingPage = () => {
                 </span>
               </div>
             ))}
+            {(sub.plan === 'solo' || sub.plan === 'agency') && (
+              <div className="flex items-center justify-between rounded-lg border border-border/60 px-3 py-2.5 bg-muted/30">
+                <div className="flex flex-col">
+                  <span className="text-xs text-foreground flex items-center gap-1.5">
+                    <Sparkles size={12} className="text-primary" /> Concierge intro pack
+                  </span>
+                  <span className="text-[10px] text-muted-foreground mt-0.5">15 additional buyer introductions</span>
+                </div>
+                <span className="text-xs font-semibold text-foreground">$99</span>
+              </div>
+            )}
           </div>
         </div>
 

@@ -68,12 +68,6 @@ const DashboardOverview = () => {
   const [repModalOpen, setRepModalOpen] = useState(false);
   const [respModalOpen, setRespModalOpen] = useState(false);
 
-  useEffect(() => {
-    if (!user) return;
-    supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle()
-      .then(({ data }) => { if (data?.id) setAgentId(data.id); });
-  }, [user]);
-
   // Dashboard layout customisation
   const { layout, setLayoutLocal, save, reset, loaded: layoutLoaded } = useDashboardLayout();
   const [editMode, setEditMode] = useState(false);

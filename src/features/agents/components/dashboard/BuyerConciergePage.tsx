@@ -284,6 +284,22 @@ const BuyerConciergePage = () => {
     ? `Hi ${contactMatch.profile?.display_name?.split(' ')[0] || contactMatch.profile?.full_name?.split(' ')[0] || 'there'}, I noticed you've been searching in ${buyerSuburb(contactMatch)} — I have a listing that might suit you perfectly: ${contactMatch.listing?.address || ''}. Would you like me to send through more details or arrange an inspection?\n\nBest regards`
     : '';
 
+  if (!canAccessBuyerConcierge) {
+    return (
+      <div className="max-w-2xl mx-auto p-6 text-center space-y-4">
+        <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+          <Sparkles className="text-primary" size={22} />
+        </div>
+        <h1 className="text-2xl font-bold tracking-tight">Buyer Concierge</h1>
+        <p className="text-sm text-muted-foreground">
+          AI-powered buyer matching is available on all paid plans.
+          Start your 60-day free trial to unlock it.
+        </p>
+        <Button onClick={() => navigate('/dashboard/billing')}>View plans</Button>
+      </div>
+    );
+  }
+
   if (loading) {
     return <div className="flex items-center justify-center py-24"><Loader2 className="animate-spin text-primary" size={32} /></div>;
   }
@@ -291,6 +307,9 @@ const BuyerConciergePage = () => {
   if (error) {
     return <div className="p-6"><Card><CardContent className="p-6 text-sm text-destructive">{error}</CardContent></Card></div>;
   }
+
+  const visibleMatches = matchLimit !== null ? matches.slice(0, matchLimit) : matches;
+  const hiddenMatches = matches.length - visibleMatches.length;
 
   return (
     <div className="space-y-8 max-w-7xl">

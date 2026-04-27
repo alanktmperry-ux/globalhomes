@@ -47,6 +47,21 @@ export function PaymentStatusBanner() {
     return <LockedOverlay />;
   }
 
+  // TRIAL COUNTDOWN — only when not subscribed and no payment issues
+  if (
+    subscriptionStatus !== 'payment_failed' &&
+    subscriptionStatus !== 'expired' &&
+    !agent.is_subscribed &&
+    agent.created_at
+  ) {
+    const trialEndsAt = new Date(new Date(agent.created_at).getTime() + 60 * 86400 * 1000);
+    const daysLeft = Math.ceil((trialEndsAt.getTime() - Date.now()) / 86400000);
+
+    if (daysLeft >= 0 && daysLeft <= 30) {
+      return <TrialBanner daysLeft={daysLeft} />;
+    }
+  }
+
   if (subscriptionStatus !== 'payment_failed' || !paymentFailedAt) return null;
 
   const daysSinceFailure = getDaysSince(paymentFailedAt);

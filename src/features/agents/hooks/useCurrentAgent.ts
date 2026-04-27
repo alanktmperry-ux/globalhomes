@@ -15,7 +15,9 @@ const CURRENT_AGENT_SELECT = `
   trust_setup_pending,
   subscription_status,
   payment_failed_at,
-  admin_grace_until
+  admin_grace_until,
+  created_at,
+  is_subscribed
 `;
 
 export interface CurrentAgent {
@@ -32,6 +34,8 @@ export interface CurrentAgent {
   subscription_status: string | null;
   payment_failed_at: string | null;
   admin_grace_until: string | null;
+  created_at: string;
+  is_subscribed: boolean;
 }
 
 export function useCurrentAgent() {

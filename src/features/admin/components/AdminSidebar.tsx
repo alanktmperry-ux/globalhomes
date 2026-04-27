@@ -19,6 +19,7 @@ export type AdminTab = string;
 
 interface AdminSidebarProps {
   pendingApprovalsTotal?: number;
+  isSupport?: boolean;
   /** @deprecated legacy props — ignored */
   tab?: unknown;
   setTab?: unknown;

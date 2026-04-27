@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Zap, CheckCircle, Users, Building2, DollarSign, Megaphone, Settings,
-  Shield, ArrowLeft, UserCog,
+  Shield, ArrowLeft, UserCog, LineChart, BookOpen,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -66,9 +66,12 @@ export default function AdminSidebar({ pendingApprovalsTotal = 0 }: AdminSidebar
   const home: NavItem[] = [
     { to: '/admin', label: 'Command Centre', icon: Zap, exact: true },
   ];
+  const strategy: NavItem[] = [
+    { to: '/admin/insights', label: 'Insights', icon: LineChart },
+  ];
   const operations: NavItem[] = [
     { to: '/admin/approvals', label: 'Approvals', icon: CheckCircle, badge: pendingApprovalsTotal },
-    { to: '/admin/users', label: 'Users', icon: UserCog },
+    { to: '/admin/users', label: 'Accounts', icon: UserCog },
     { to: '/admin/agents', label: 'Agents', icon: Users },
     { to: '/admin/listings', label: 'Listings', icon: Building2 },
   ];
@@ -78,6 +81,9 @@ export default function AdminSidebar({ pendingApprovalsTotal = 0 }: AdminSidebar
   ];
   const system: NavItem[] = [
     { to: '/admin/system', label: 'System', icon: Settings },
+  ];
+  const help: NavItem[] = [
+    { to: '/admin/help', label: 'Help', icon: BookOpen },
   ];
 
   return (
@@ -98,6 +104,11 @@ export default function AdminSidebar({ pendingApprovalsTotal = 0 }: AdminSidebar
             <NavLinkItem key={item.to} item={item} active={isActive(item.to, item.exact)} />
           ))}
 
+          <SectionLabel>Strategy</SectionLabel>
+          {strategy.map((item) => (
+            <NavLinkItem key={item.to} item={item} active={isActive(item.to, item.exact)} />
+          ))}
+
           <SectionLabel>Operations</SectionLabel>
           {operations.map((item) => (
             <NavLinkItem key={item.to} item={item} active={isActive(item.to, item.exact)} />
@@ -110,6 +121,10 @@ export default function AdminSidebar({ pendingApprovalsTotal = 0 }: AdminSidebar
 
           <SectionLabel>System</SectionLabel>
           {system.map((item) => (
+            <NavLinkItem key={item.to} item={item} active={isActive(item.to, item.exact)} />
+          ))}
+
+          {help.map((item) => (
             <NavLinkItem key={item.to} item={item} active={isActive(item.to, item.exact)} />
           ))}
         </nav>

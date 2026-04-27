@@ -45,6 +45,8 @@ const AdminAgentsPage = React.lazy(() => import("./features/admin/pages/AgentsPa
 const AdminPartnersPage = React.lazy(() => import("./features/admin/pages/PartnersPage"));
 const AdminSupportPage = React.lazy(() => import("./features/admin/pages/SupportPage"));
 const AdminListingsPage = React.lazy(() => import("./features/admin/pages/AdminListingsPage"));
+const AdminInsightsPage = React.lazy(() => import("./features/admin/pages/InsightsPage"));
+const AdminHelpPage = React.lazy(() => import("./features/admin/pages/AdminHelpPage"));
 const AdminRevenuePage = React.lazy(() => import("./features/admin/pages/RevenuePage"));
 const AdminOutreachPage = React.lazy(() => import("./features/admin/pages/OutreachPage"));
 const AdminBuyersPage = React.lazy(() => import("./features/admin/pages/BuyersPage"));
@@ -414,6 +416,8 @@ const App = () => (
                   <Route path="users" element={<AdminUsersPage />} />
                   <Route path="agents" element={<AdminAgentsPage />} />
                   <Route path="listings" element={<AdminListingsPage />} />
+                  <Route path="insights" element={<AdminInsightsPage />} />
+                  <Route path="help" element={<AdminHelpPage />} />
                   <Route path="revenue" element={<AdminRevenuePage />} />
                   <Route path="outreach" element={<AdminOutreachPage />} />
                   <Route path="system" element={<AdminSystemPage />} />

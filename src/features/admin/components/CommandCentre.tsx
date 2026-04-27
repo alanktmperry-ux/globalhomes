@@ -324,6 +324,18 @@ export default function CommandCentre() {
       const mrrGrowthPct =
         prevMonthPaid > 0 ? Math.round(((paidAgents.length - prevMonthPaid) / prevMonthPaid) * 100) : null;
 
+      // Revenue projections
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const dayOfMonth = now.getDate();
+      const daysRemaining = daysInMonth - dayOfMonth;
+      const dailyConversionRate = dayOfMonth > 0 ? (paidAgents.length / dayOfMonth) : 0;
+      const projectedNewPaid = Math.round(dailyConversionRate * daysRemaining);
+      const avgMrrPerAgent = paidAgents.length > 0 ? mrr / paidAgents.length : 0;
+      const projectedMRR = mrr + projectedNewPaid * avgMrrPerAgent;
+      const projectedARR = projectedMRR * 12;
+      const monthlyGrowthRate = prevMonthPaid > 0 ? (paidAgents.length - prevMonthPaid) / prevMonthPaid : 0;
+      const projectedARR12m = mrr * 12 * Math.pow(1 + Math.max(monthlyGrowthRate, 0), 12);
+
       // Week-over-week paid agents (subscribed before each cutoff)
       const paidAgentsPrevWeek = agents.filter(a => a.is_subscribed && a.created_at < d7).length;
 
@@ -440,6 +452,10 @@ export default function CommandCentre() {
         newAgentsPrevWeek: newPrevWeek,
         newAgentsThisMonth: newMonth,
         churnedThisMonth: churnRes.count || 0,
+        projectedMRR,
+        projectedARR,
+        projectedARR12m,
+        monthlyGrowthRate,
         liveListings: liveListingsRes.count || 0,
         listingsToday: listingsTodayRes.count || 0,
         listingsThisWeek: listingsWeekRes.count || 0,

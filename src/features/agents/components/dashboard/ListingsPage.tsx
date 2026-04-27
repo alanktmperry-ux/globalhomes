@@ -153,6 +153,19 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSend
               {actionLoading === l.id ? <Loader2 size={10} className="animate-spin" /> : null} Mark Sold
             </Button>
           )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="sm" variant="ghost" className="h-6 w-6 p-0" aria-label="More actions">
+                <MoreHorizontal size={14} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuItem onClick={() => onSendReport(l)} className="gap-2 text-xs cursor-pointer">
+                <FileBarChart2 size={14} className="text-primary" />
+                Send vendor report 📊
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </div>

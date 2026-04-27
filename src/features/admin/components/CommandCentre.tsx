@@ -86,15 +86,17 @@ interface CCData {
 }
 
 const PLAN_MRR: Record<string, number> = {
-  starter: 99,
-  pro: 199,
-  agency: 399,
+  solo: 299,
+  agency: 899,
+  agency_pro: 1999,
+  enterprise: 4999,
 };
 
 const PLAN_LABEL: Record<string, string> = {
-  starter: 'Starter',
-  pro: 'Pro',
+  solo: 'Solo',
   agency: 'Agency',
+  agency_pro: 'Agency Pro',
+  enterprise: 'Enterprise',
   demo: 'Trial',
 };
 
@@ -490,16 +492,16 @@ export default function CommandCentre() {
   if (!data) return null;
 
   const attentionCards = [
-    data.pendingAgentApprovals > 0 && (
+    data.trialsExpiringThisWeek > 0 && (
       <AttentionCard
-        key="agents"
-        icon={UserCheck}
-        label="Agent Approvals"
-        count={data.pendingAgentApprovals}
-        description="New agents waiting on verification"
-        to="/admin/approvals"
+        key="trials_expiring"
+        icon={Clock}
+        label="Trials Expiring"
+        count={data.trialsExpiringThisWeek}
+        description="Trials ending within 7 days — schedule a sales call"
+        to="/admin/agents?filter=trials_expiring"
         navigate={navigate}
-        tone="blue"
+        tone="amber"
       />
     ),
     data.pendingListingReviews > 0 && (

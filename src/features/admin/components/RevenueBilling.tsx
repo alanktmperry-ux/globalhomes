@@ -11,9 +11,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-const PLAN_MRR: Record<string, number> = { starter: 99, pro: 199, agency: 399 };
-const PLAN_LABEL: Record<string, string> = { starter: 'Starter', pro: 'Pro', agency: 'Agency', demo: 'Trial', basic: 'Trial' };
-const PLAN_COLOR: Record<string, string> = { starter: '#6366f1', pro: '#8b5cf6', agency: '#a855f7', demo: '#94a3b8' };
+const PLAN_MRR: Record<string, number> = { solo: 299, agency: 899, agency_pro: 1999, enterprise: 4999 };
+const PLAN_LABEL: Record<string, string> = { solo: 'Solo', agency: 'Agency', agency_pro: 'Agency Pro', enterprise: 'Enterprise', demo: 'Trial', basic: 'Trial' };
+const PLAN_COLOR: Record<string, string> = { solo: '#6366f1', agency: '#8b5cf6', agency_pro: '#a855f7', enterprise: '#ec4899', demo: '#94a3b8' };
 
 interface AgentBillingRow {
   id: string;
@@ -23,7 +23,6 @@ interface AgentBillingRow {
   plan: string;
   mrr: number;
   isSubscribed: boolean;
-  foundingMember: boolean;
   subscriptionStart: string | null;
   subscriptionEnd: string | null;
   renewalDate: string | null;

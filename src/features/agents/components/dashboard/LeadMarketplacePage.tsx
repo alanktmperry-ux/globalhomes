@@ -65,7 +65,7 @@ const LeadMarketplacePage = () => {
   const [purchasing, setPurchasing] = useState<string | null>(null);
   const [successModal, setSuccessModal] = useState<PurchasedBuyer | null>(null);
 
-  const isPremium = plan === 'pro' || plan === 'agency' || plan === 'enterprise' || plan === 'demo';
+  const isPremium = plan === 'agency' || plan === 'agency_pro' || plan === 'enterprise' || plan === 'demo';
 
   useEffect(() => {
     if (!user) return;

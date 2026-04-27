@@ -124,6 +124,7 @@ const AgentEOIPage = React.lazy(() => import("@/features/offmarket/pages/AgentEO
 const AgencyOnboardingPage = React.lazy(() => import("@/features/agents/pages/AgencyOnboardingPage"));
 const PartnerAuthPage = React.lazy(() => import("./features/partners/pages/PartnerAuthPage"));
 const PartnerDashboardLayout = React.lazy(() => import("./features/partners/pages/PartnerDashboardLayout"));
+const MortgageBrokerPortal = React.lazy(() => import("./features/partners/pages/MortgageBrokerPortal"));
 const PartnerOverviewPage = React.lazy(() => import("./features/partners/pages/PartnerOverviewPage"));
 const PartnerAcceptPage = React.lazy(() => import("./features/partners/pages/PartnerAcceptPage"));
 const PartnerTrustPage = React.lazy(() => import("./features/partners/pages/PartnerTrustPage"));
@@ -385,6 +386,7 @@ const App = () => (
 
                 {/* Partner */}
                 <Route path="/partner/login" element={<PartnerAuthPage />} />
+                <Route path="/partner/broker" element={<MortgageBrokerPortal />} />
                 <Route path="/partner/accept" element={<PartnerAcceptPage />} />
                 <Route path="/partner/join" element={<PartnerJoinPage />} />
                 <Route path="/partner" element={<ProtectedRoute requirePartner><PartnerDashboardLayout /></ProtectedRoute>}>

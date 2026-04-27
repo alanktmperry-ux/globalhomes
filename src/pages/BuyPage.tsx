@@ -679,16 +679,22 @@ const BuyPage = () => {
                   </div>
                 )
               ) : (
-                <div className="text-center py-20 space-y-3">
-                  <p className="text-muted-foreground">{t('No properties match your search.')}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {t('Try removing some filters or broadening your price range.')}
+                <div className="flex flex-col items-center text-center py-20">
+                  <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center mb-4">
+                    <Home className="h-6 w-6 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-1">
+                    {t('No properties found')}
+                  </h3>
+                  <p className="text-sm text-muted-foreground max-w-sm mb-6">
+                    {t('Try adjusting your filters — remove a bedroom requirement or widen the price range.')}
                   </p>
-                  {hasActiveFilters && (
-                    <button onClick={clearFilters} className="mt-2 text-primary underline text-sm">
-                      {t('Clear all filters')}
-                    </button>
-                  )}
+                  <button
+                    onClick={clearFilters}
+                    className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+                  >
+                    {t('Clear all filters')}
+                  </button>
                 </div>
               )}
 

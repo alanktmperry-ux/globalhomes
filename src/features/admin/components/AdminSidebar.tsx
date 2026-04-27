@@ -68,6 +68,7 @@ export default function AdminSidebar({ pendingApprovalsTotal = 0 }: AdminSidebar
   ];
   const strategy: NavItem[] = [
     { to: '/admin/insights', label: 'Insights', icon: LineChart },
+    { to: '/admin/costs', label: 'Costs', icon: Wallet },
   ];
   const operations: NavItem[] = [
     { to: '/admin/approvals', label: 'Approvals', icon: CheckCircle, badge: pendingApprovalsTotal },

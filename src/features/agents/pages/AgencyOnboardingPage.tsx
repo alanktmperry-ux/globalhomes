@@ -192,6 +192,22 @@ export default function AgencyOnboardingPage() {
     const { error } = await supabase.from('agents').update({ onboarding_complete: true } as any).eq('user_id', user.id);
     if (error) throw error;
     await refreshRoles();
+
+    // Best-effort welcome email — non-fatal
+    try {
+      const { data: { user: u } } = await supabase.auth.getUser();
+      if (u?.email) {
+        await supabase.functions.invoke('send-welcome-email', {
+          body: {
+            type: 'agent',
+            user_id: u.id,
+            name: principalName || u.email,
+            email: u.email,
+            agency: agencyName || '',
+          },
+        });
+      }
+    } catch { /* non-fatal */ }
   };
 
   const getAuthToken = async () => {

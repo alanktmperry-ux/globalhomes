@@ -477,6 +477,13 @@ export default function CommandCentre() {
     fetchAll();
   }, [fetchAll]);
 
+  // Listen for global refresh from command palette
+  useEffect(() => {
+    const handler = () => fetchAllRef.current();
+    window.addEventListener('admin:refresh-cc', handler);
+    return () => window.removeEventListener('admin:refresh-cc', handler);
+  }, []);
+
   // Auto-refresh every 5 min, paused when tab is hidden
   useEffect(() => {
     let intervalId: number | null = null;

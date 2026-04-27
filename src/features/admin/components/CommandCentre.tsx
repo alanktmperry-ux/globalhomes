@@ -57,6 +57,10 @@ interface CCData {
   newAgentsPrevWeek: number;
   newAgentsThisMonth: number;
   churnedThisMonth: number;
+  projectedMRR: number;
+  projectedARR: number;
+  projectedARR12m: number;
+  monthlyGrowthRate: number;
   liveListings: number;
   listingsToday: number;
   listingsThisWeek: number;

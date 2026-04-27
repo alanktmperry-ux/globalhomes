@@ -101,8 +101,27 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, naviga
         <p className="text-sm font-display font-bold text-primary mt-1">{l.price_formatted}</p>
       </div>
       <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-1 shrink-0">
-        <span className="text-xs text-muted-foreground flex items-center gap-1"><Eye size={10} /> {l.views}</span>
-        <span className="text-xs text-muted-foreground flex items-center gap-1"><Sparkles size={10} /> {leads} leads</span>
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/performance?listing=${l.id}`); }}
+          className="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-border bg-background hover:bg-accent hover:border-primary/40 cursor-pointer transition"
+          aria-label="View performance"
+          title="View performance"
+        >
+          {l.views === 0 && leads === 0 ? (
+            <span className="text-xs text-muted-foreground">—</span>
+          ) : (
+            <>
+              <span className="text-xs font-semibold text-foreground flex items-center gap-1">
+                <Eye size={10} /> {l.views} views
+              </span>
+              <span className="text-xs text-muted-foreground">·</span>
+              <span className="text-xs font-semibold text-primary flex items-center gap-1">
+                <Sparkles size={10} /> {leads} {leads === 1 ? 'enquiry' : 'enquiries'}
+              </span>
+            </>
+          )}
+        </button>
         <div className="flex gap-1 mt-1">
           {l._source === 'db' && (
             <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5" onClick={() => navigate(`/dashboard/listings/${l.id}`)}>

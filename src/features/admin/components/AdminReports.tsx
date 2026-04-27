@@ -633,9 +633,10 @@ const AdminReports = ({ isAdmin, currentAgentId }: Props) => {
             >
               <option value="all">All plans</option>
               <option value="demo">Trial</option>
-              <option value="starter">Starter</option>
-              <option value="pro">Pro</option>
+              <option value="solo">Solo</option>
               <option value="agency">Agency</option>
+              <option value="agency_pro">Agency Pro</option>
+              <option value="enterprise">Enterprise</option>
             </select>
           </div>
 

@@ -439,6 +439,7 @@ const AdminUsers = () => {
   return (
     <>
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <UsersDashboard users={users} loading={loading} />
       <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
         <div className="relative flex-1 max-w-sm">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />

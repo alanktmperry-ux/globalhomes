@@ -4721,6 +4721,33 @@ export type Database = {
           },
         ]
       }
+      email_log: {
+        Row: {
+          id: string
+          recipient_email: string
+          recipient_id: string | null
+          sent_at: string
+          subject: string | null
+          template: string
+        }
+        Insert: {
+          id?: string
+          recipient_email: string
+          recipient_id?: string | null
+          sent_at?: string
+          subject?: string | null
+          template: string
+        }
+        Update: {
+          id?: string
+          recipient_email?: string
+          recipient_id?: string | null
+          sent_at?: string
+          subject?: string | null
+          template?: string
+        }
+        Relationships: []
+      }
       error_log: {
         Row: {
           context: Json | null

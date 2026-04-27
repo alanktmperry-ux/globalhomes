@@ -1260,6 +1260,39 @@ export type Database = {
           },
         ]
       }
+      api_usage_events: {
+        Row: {
+          action: string
+          cost_estimate: number
+          created_at: string
+          id: string
+          metadata: Json | null
+          service: string
+          units: number
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          cost_estimate?: number
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          service: string
+          units?: number
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          cost_estimate?: number
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          service?: string
+          units?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       auction_bidder_registrations: {
         Row: {
           address: string | null
@@ -13155,6 +13188,7 @@ export type Database = {
         Args: { _agency_id: string; _user_id: string }
         Returns: boolean
       }
+      is_platform_admin: { Args: { _user_id: string }; Returns: boolean }
       link_broker_auth_user: {
         Args: { p_email: string; p_user_id: string }
         Returns: undefined

@@ -473,7 +473,7 @@ const BuyPage = () => {
                 {headerSuburbLabel ? t(`Properties for Sale in ${headerSuburbLabel}`) : t('Properties for Sale')}
               </h1>
               <p className="text-muted-foreground mt-1">
-                {isLoading ? t('Searching…') : `${allProperties?.length ?? 0} ${t('properties found')}`}
+                {isLoading ? t('Searching…') : `${allProperties.length} ${t('properties found')}${hasMore && allProperties.length > 0 ? ` — ${t('scroll down for more')}` : ''}`}
               </p>
             </div>
             <div className="flex items-center gap-2">

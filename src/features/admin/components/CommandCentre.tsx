@@ -750,6 +750,183 @@ export default function CommandCentre() {
         </div>
       )}
 
+      {/* PLATFORM USERS */}
+      <SectionHead title="Platform Users" sub="Live counts across every account type" />
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        <button
+          onClick={() => navigate('/admin/users?filter=agents')}
+          className="rounded-2xl border border-border bg-card p-4 text-left hover:bg-accent transition-colors"
+        >
+          <p className="text-xs text-muted-foreground font-medium">Agents</p>
+          <p className="text-2xl font-bold text-foreground mt-1">{data.totalAgents}</p>
+          <p className="text-[11px] text-muted-foreground mt-1">
+            {data.paidAgents} paid · {data.activeTrials} trial
+          </p>
+        </button>
+        <button
+          onClick={() => navigate('/admin/users?filter=seekers')}
+          className="rounded-2xl border border-border bg-card p-4 text-left hover:bg-accent transition-colors"
+        >
+          <p className="text-xs text-muted-foreground font-medium">Seekers</p>
+          <p className="text-2xl font-bold text-foreground mt-1">{data.totalSeekers}</p>
+          <p className="text-[11px] text-muted-foreground mt-1">+{data.newSeekersThisWeek} this week</p>
+        </button>
+        <button
+          onClick={() => navigate('/admin/users?filter=partners')}
+          className="rounded-2xl border border-border bg-card p-4 text-left hover:bg-accent transition-colors"
+        >
+          <p className="text-xs text-muted-foreground font-medium">Mortgage Brokers</p>
+          <p className="text-2xl font-bold text-foreground mt-1">{data.totalMortgageBrokers}</p>
+          <p className="text-[11px] text-muted-foreground mt-1">partners</p>
+        </button>
+        <button
+          onClick={() => navigate('/admin/users?filter=partners')}
+          className="rounded-2xl border border-border bg-card p-4 text-left hover:bg-accent transition-colors"
+        >
+          <p className="text-xs text-muted-foreground font-medium">Trust Accountants</p>
+          <p className="text-2xl font-bold text-foreground mt-1">{data.totalTrustAccountants}</p>
+          {data.pendingPartners > 0 && (
+            <p className="text-[11px] text-amber-500 mt-1">{data.pendingPartners} pending verification</p>
+          )}
+        </button>
+        <button
+          onClick={() => navigate('/admin/users?filter=demo')}
+          className="rounded-2xl border border-border bg-card p-4 text-left hover:bg-accent transition-colors"
+        >
+          <p className="text-xs text-muted-foreground font-medium">Demo / Pending</p>
+          <p className="text-2xl font-bold text-foreground mt-1">{data.totalDemoUsers}</p>
+          <p className="text-[11px] text-muted-foreground mt-1">access requests</p>
+        </button>
+      </div>
+
+      {data.recentUsers.length > 0 && (
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-foreground">Recently Joined</h3>
+            <button
+              onClick={() => navigate('/admin/users')}
+              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
+            >
+              View all <ArrowRight size={12} />
+            </button>
+          </div>
+          <div className="space-y-2">
+            {data.recentUsers.map(u => {
+              const typeColors: Record<string, string> = {
+                agent: 'bg-blue-500/15 text-blue-600',
+                seeker: 'bg-emerald-500/15 text-emerald-600',
+                partner: 'bg-violet-500/15 text-violet-600',
+                demo: 'bg-amber-500/15 text-amber-600',
+                demo_request: 'bg-amber-500/15 text-amber-600',
+              };
+              const typeLabel: Record<string, string> = {
+                agent: 'Agent',
+                seeker: 'Seeker',
+                partner:
+                  u.partnerType === 'mortgage_broker'
+                    ? 'Broker'
+                    : u.partnerType === 'trust_accountant'
+                    ? 'Accountant'
+                    : 'Partner',
+                demo: 'Demo',
+                demo_request: 'Demo Req',
+              };
+              const isLoading = ccActionLoading === u.id;
+              return (
+                <div
+                  key={u.id}
+                  className="flex items-center gap-3 py-2 border-b border-border last:border-0"
+                >
+                  <div className="w-8 h-8 rounded-full bg-secondary text-foreground flex items-center justify-center text-xs font-bold shrink-0">
+                    {u.displayName?.[0]?.toUpperCase() ?? '?'}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-foreground truncate">{u.email}</p>
+                    <p className="text-[11px] text-muted-foreground truncate">
+                      Joined {new Date(u.created_at).toLocaleDateString('en-AU')}
+                      {u.lastSignIn
+                        ? ` · last seen ${new Date(u.lastSignIn).toLocaleDateString('en-AU')}`
+                        : ' · never logged in'}
+                    </p>
+                  </div>
+                  <span
+                    className={`text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 ${
+                      typeColors[u.userType] || 'bg-secondary text-muted-foreground'
+                    }`}
+                  >
+                    {typeLabel[u.userType] || u.userType}
+                  </span>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {startImpersonation && (
+                      <button
+                        disabled={isLoading}
+                        onClick={() => handleImpersonate(u.id, u.email, u.displayName)}
+                        title="Impersonate"
+                        className="p-1.5 rounded-lg hover:bg-accent transition-colors text-muted-foreground hover:text-foreground"
+                      >
+                        <UserPlus size={14} />
+                      </button>
+                    )}
+                    <button
+                      disabled={isLoading}
+                      onClick={() => handleCCSuspend(u)}
+                      title={u.isBanned ? 'Unsuspend' : 'Suspend'}
+                      className={`p-1.5 rounded-lg hover:bg-accent transition-colors ${
+                        u.isBanned ? 'text-amber-500' : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      <Ban size={14} />
+                    </button>
+                    <button
+                      disabled={isLoading}
+                      onClick={() => setCCDeleteTarget(u)}
+                      title="Delete user"
+                      className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {ccDeleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-card border border-border rounded-2xl p-6 max-w-md w-full space-y-4">
+            <h3 className="text-base font-semibold text-foreground">Delete user permanently?</h3>
+            <p className="text-sm text-muted-foreground">
+              This will permanently remove <strong className="text-foreground">{ccDeleteTarget.email}</strong>{' '}
+              and all their data, listings, messages, and history. This cannot be undone.
+            </p>
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                onClick={() => setCCDeleteTarget(null)}
+                disabled={ccDeleting}
+                className="px-4 py-2 rounded-xl border border-border text-sm font-medium hover:bg-accent transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleCCDelete(ccDeleteTarget)}
+                disabled={ccDeleting}
+                className="px-4 py-2 rounded-xl bg-destructive text-destructive-foreground text-sm font-medium hover:bg-destructive/90 transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                {ccDeleting ? (
+                  <>
+                    <RefreshCw size={14} className="animate-spin" /> Deleting…
+                  </>
+                ) : (
+                  'Delete forever'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* SECTION 2 — Revenue pulse */}
       <SectionHead title="Revenue pulse" sub="Monthly recurring revenue and conversion" />
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

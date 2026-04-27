@@ -178,6 +178,7 @@ export default function RevenueBilling() {
   const [agents, setAgents] = useState<AgentBillingRow[]>([]);
   const [mrrTrend, setMrrTrend] = useState<MRRPoint[]>([]);
   const [planMix, setPlanMix] = useState<PlanMixPoint[]>([]);
+  const [addonTotals, setAddonTotals] = useState<Record<string, { units: number; revenue: number }>>({});
   const [loading, setLoading] = useState(true);
   const [planFilter, setPlanFilter] = useState('all');
   const [renewalWindow, setRenewalWindow] = useState<7 | 14 | 30>(30);

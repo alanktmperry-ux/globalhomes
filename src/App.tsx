@@ -412,6 +412,7 @@ const App = () => (
 
 
                 {/* Admin */}
+                <Route path="/admin/login" element={<AdminLoginPage />} />
                 <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminLayout /></ProtectedRoute>}>
                   <Route index element={<CommandCentre />} />
                   <Route path="approvals" element={<AdminApprovalsPage />} />

@@ -1,4 +1,5 @@
 import { getCorsHeaders, getAllowedOrigin } from "../_shared/cors.ts";
+import { logApiUsage, costFor } from "../_shared/usageLog.ts";
 
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req.headers.get("Origin"));

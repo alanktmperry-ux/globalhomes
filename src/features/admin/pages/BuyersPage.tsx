@@ -1,7 +1,16 @@
-import { useEffect, useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Loader2, Mail, Trash2, Search } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { callAdminFunction } from '@/features/admin/lib/adminApi';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 type Kpi = { label: string; value: number | string };
 

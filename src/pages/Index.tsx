@@ -212,6 +212,7 @@ const Index = () => {
   const [viewedIds, setViewedIds] = useState<Set<string>>(new Set());
   const sessionStartRef = useRef(Date.now());
   const [prefsBannerVisible, setPrefsBannerVisible] = useState(false);
+  const [noPrefsBannerVisible, setNoPrefsBannerVisible] = useState(false);
   const prefsAppliedRef = useRef(false);
   const [mobileView, setMobileView] = useState<'map' | 'list'>('map');
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key?: number | string } | null>(null);
@@ -507,6 +508,27 @@ const Index = () => {
       setPrefsBannerVisible(true);
     })();
   }, [user, hasSearchParams]);
+
+  // ── Show "set preferences" prompt for signed-in users with no prefs ──
+  useEffect(() => {
+    if (!user) { setNoPrefsBannerVisible(false); return; }
+    if (sessionStorage.getItem('listhq_no_prefs_banner_dismissed')) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from('user_preferences')
+        .select('seeking_type, preferred_locations, budget_max')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (cancelled) return;
+      const hasPrefs =
+        !!data?.seeking_type &&
+        Array.isArray(data?.preferred_locations) &&
+        (data!.preferred_locations as string[]).length > 0;
+      setNoPrefsBannerVisible(!hasPrefs);
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
 
 
   useEffect(() => {
@@ -1691,6 +1713,31 @@ const Index = () => {
                   >
                     Dismiss
                   </button>
+                </div>
+              )}
+              {noPrefsBannerVisible && !prefsBannerVisible && (
+                <div className="mt-2 flex items-center justify-between gap-2 rounded-lg bg-primary/10 border border-primary/20 px-3 py-2 text-xs text-primary">
+                  <span className="truncate">
+                    Set your preferences to get personalised property alerts.
+                  </span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => navigate('/preferences')}
+                      className="font-semibold hover:underline"
+                    >
+                      Set preferences
+                    </button>
+                    <button
+                      aria-label="Dismiss"
+                      onClick={() => {
+                        setNoPrefsBannerVisible(false);
+                        sessionStorage.setItem('listhq_no_prefs_banner_dismissed', '1');
+                      }}
+                      className="text-primary/70 hover:text-primary"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </div>
               )}
             </div>

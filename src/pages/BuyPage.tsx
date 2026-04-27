@@ -6,7 +6,7 @@ import { geocode } from '@/shared/lib/googleMapsService';
 import { PropertyCard } from '@/components/PropertyCard';
 import { mapDbProperty } from '@/features/properties/api/fetchPublicProperties';
 import { Property } from '@/shared/lib/types';
-import { Loader2, X, BellPlus, Sparkles, SlidersHorizontal, Filter, Map as MapIcon, List as ListIcon } from 'lucide-react';
+import { Loader2, X, Bell, BellPlus, Sparkles, SlidersHorizontal, Filter, Home, Map as MapIcon, List as ListIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from '@/components/ui/sheet';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
@@ -211,6 +211,7 @@ const BuyPage = () => {
   const { user } = useAuth();
   const { saveSearch } = useSavedSearchesDB();
   const [savingSearch, setSavingSearch] = useState(false);
+  const [savedSearch, setSavedSearch] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'map' | 'split'>(() => {
     const stored = localStorage.getItem('buy-view-mode');
@@ -330,6 +331,7 @@ const BuyPage = () => {
     setPage(0);
     setAllProperties([]);
     setHasMore(true);
+    setSavedSearch(false);
   }, [filters]);
 
   useEffect(() => {
@@ -442,7 +444,8 @@ const BuyPage = () => {
         property_types: filters.propertyType ? [filters.propertyType] : [],
         listing_mode: 'sale',
       } as any, 'instant');
-      toast.success(t("Search saved — we'll email you when new matches appear."), {
+      setSavedSearch(true);
+      toast.success(t("Search saved — we'll alert you to new matches"), {
         action: { label: t('Manage'), onClick: () => navigate('/saved') },
       });
     } catch {
@@ -504,11 +507,11 @@ const BuyPage = () => {
                 variant="outline"
                 size="sm"
                 onClick={handleSaveSearch}
-                disabled={savingSearch}
+                disabled={savingSearch || savedSearch}
                 className="gap-1.5"
               >
-                <BellPlus className="h-4 w-4" />
-                {savingSearch ? t('Saving…') : t('Save search & alert me')}
+                <Bell className="h-4 w-4" />
+                {savedSearch ? t('Saved ✓') : savingSearch ? t('Saving…') : t('Save search')}
               </Button>
             </div>
           </div>
@@ -676,16 +679,22 @@ const BuyPage = () => {
                   </div>
                 )
               ) : (
-                <div className="text-center py-20 space-y-3">
-                  <p className="text-muted-foreground">{t('No properties match your search.')}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {t('Try removing some filters or broadening your price range.')}
+                <div className="flex flex-col items-center text-center py-20">
+                  <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center mb-4">
+                    <Home className="h-6 w-6 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-1">
+                    {t('No properties found')}
+                  </h3>
+                  <p className="text-sm text-muted-foreground max-w-sm mb-6">
+                    {t('Try adjusting your filters — remove a bedroom requirement or widen the price range.')}
                   </p>
-                  {hasActiveFilters && (
-                    <button onClick={clearFilters} className="mt-2 text-primary underline text-sm">
-                      {t('Clear all filters')}
-                    </button>
-                  )}
+                  <button
+                    onClick={clearFilters}
+                    className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+                  >
+                    {t('Clear all filters')}
+                  </button>
                 </div>
               )}
 

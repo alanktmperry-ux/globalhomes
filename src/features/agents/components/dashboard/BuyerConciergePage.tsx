@@ -144,6 +144,16 @@ const BuyerConciergePage = () => {
   const [search, setSearch] = useState('');
   const [sortKey, setSortKey] = useState<'match' | 'readiness' | 'recent'>('match');
 
+  const navigate = useNavigate();
+  const { canAccessBuyerConcierge, conciergeMatchesPerMonth, conciergeIntrosPerMonth } = useSubscription();
+  const { agent } = useCurrentAgent();
+  const { matchesUsed, introsUsed, refresh: refreshUsage } = useConciergeUsage(agent?.id || null);
+
+  const matchLimit = conciergeMatchesPerMonth === Infinity ? null : conciergeMatchesPerMonth;
+  const introLimit = conciergeIntrosPerMonth === Infinity ? null : conciergeIntrosPerMonth;
+  const matchPct = matchLimit ? Math.min((matchesUsed / matchLimit) * 100, 100) : 0;
+  const introPct = introLimit ? Math.min((introsUsed / introLimit) * 100, 100) : 0;
+
   // Initial load
   const fetchAll = useCallback(async () => {
     if (!user) return;

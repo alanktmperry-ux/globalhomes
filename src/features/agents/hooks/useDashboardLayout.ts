@@ -92,20 +92,22 @@ function normalise(stored: CardLayoutEntry[] | undefined | null): CardLayoutEntr
 export function useDashboardLayout() {
   const { user } = useAuth();
   const [layout, setLayout] = useState<CardLayoutEntry[]>(DEFAULT_LAYOUT);
-  const [loaded, setLoaded] = useState(false);
+  // Render with defaults immediately — never block the dashboard on this fetch.
+  // Saved prefs are merged in once the background fetch resolves.
+  const [loaded, setLoaded] = useState(true);
   const [agentId, setAgentId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
-      if (!user) { setLoaded(true); return; }
+    if (!user) return;
+    // Defer to idle so it never competes with the dashboard's critical queries.
+    const run = async () => {
       const { data: agent } = await supabase
         .from('agents')
         .select('id')
         .eq('user_id', user.id)
         .maybeSingle();
-      if (cancelled) return;
-      if (!agent?.id) { setLoaded(true); return; }
+      if (cancelled || !agent?.id) return;
       setAgentId(agent.id);
 
       const { data } = await supabase
@@ -116,10 +118,17 @@ export function useDashboardLayout() {
       if (cancelled) return;
 
       const stored = (data?.prefs as { dashboard_layout?: CardLayoutEntry[] } | null)?.dashboard_layout;
-      setLayout(normalise(stored));
+      if (stored && Array.isArray(stored) && stored.length > 0) {
+        setLayout(normalise(stored));
+      }
       setLoaded(true);
-    })();
-    return () => { cancelled = true; };
+    };
+    const idle = (window as any).requestIdleCallback?.(run) ?? setTimeout(run, 0);
+    return () => {
+      cancelled = true;
+      if (typeof idle === 'number') clearTimeout(idle);
+      else (window as any).cancelIdleCallback?.(idle);
+    };
   }, [user]);
 
   const save = useCallback(async (next: CardLayoutEntry[]) => {

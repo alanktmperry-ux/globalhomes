@@ -66,6 +66,11 @@ interface CCData {
   leadsThisWeek: number;
   leads30d: number;
   voiceSearches30d: number;
+  searchesToday: number;
+  savesToday: number;
+  totalBuyers: number;
+  newBuyersThisWeek: number;
+  topSuburb: string | null;
   pendingAgentApprovals: number;
   pendingListingReviews: number;
   pendingDemoRequests: number;

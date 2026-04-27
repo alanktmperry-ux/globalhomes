@@ -38,7 +38,7 @@ const OnboardingRolePage = () => {
 
   const routeForRole = (role: Role | string) => {
     if (role === 'buyer' || role === 'renter') {
-      navigate('/', { replace: true });
+      navigate('/onboarding/buyer-prefs', { replace: true });
     } else if (role === 'agent' || role === 'property_manager') {
       navigate('/onboarding/agency', { replace: true });
     } else {

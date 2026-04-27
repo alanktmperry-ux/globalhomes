@@ -104,6 +104,11 @@ export default function AdminSidebar({ pendingApprovalsTotal = 0 }: AdminSidebar
             <NavLinkItem key={item.to} item={item} active={isActive(item.to, item.exact)} />
           ))}
 
+          <SectionLabel>Strategy</SectionLabel>
+          {strategy.map((item) => (
+            <NavLinkItem key={item.to} item={item} active={isActive(item.to, item.exact)} />
+          ))}
+
           <SectionLabel>Operations</SectionLabel>
           {operations.map((item) => (
             <NavLinkItem key={item.to} item={item} active={isActive(item.to, item.exact)} />
@@ -116,6 +121,10 @@ export default function AdminSidebar({ pendingApprovalsTotal = 0 }: AdminSidebar
 
           <SectionLabel>System</SectionLabel>
           {system.map((item) => (
+            <NavLinkItem key={item.to} item={item} active={isActive(item.to, item.exact)} />
+          ))}
+
+          {help.map((item) => (
             <NavLinkItem key={item.to} item={item} active={isActive(item.to, item.exact)} />
           ))}
         </nav>

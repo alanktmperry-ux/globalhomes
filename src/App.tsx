@@ -41,7 +41,7 @@ const AdminDashboard = React.lazy(() => import("./pages/AdminDashboard"));
 const AdminLayout = React.lazy(() => import("./features/admin/components/AdminLayout"));
 const CommandCentre = React.lazy(() => import("./features/admin/components/CommandCentre"));
 const AdminApprovalsPage = React.lazy(() => import("./features/admin/pages/ApprovalsPage"));
-const AdminAgentsPage = React.lazy(() => import("./features/admin/pages/AdminAgentsPage"));
+const AdminAgentsPage = React.lazy(() => import("./features/admin/pages/AgentsPage"));
 const AdminListingsPage = React.lazy(() => import("./features/admin/pages/AdminListingsPage"));
 const AdminRevenuePage = React.lazy(() => import("./features/admin/pages/AdminRevenuePage"));
 const AdminOutreachPage = React.lazy(() => import("./features/admin/pages/AdminOutreachPage"));

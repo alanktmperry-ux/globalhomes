@@ -50,9 +50,9 @@ interface AgentLifecycleRow {
 }
 
 const PLAN_LABEL: Record<string, string> = {
-  solo: 'Solo $299',
-  agency: 'Agency $899',
-  agency_pro: 'Agency Pro $1,999',
+  solo: 'Solo',
+  agency: 'Agency',
+  agency_pro: 'Agency Pro',
   enterprise: 'Enterprise',
   demo: 'Trial',
 };
@@ -268,11 +268,11 @@ function AgentRow({ agent, onNoteAdded }: { agent: AgentLifecycleRow; onNoteAdde
   );
 }
 
-export default function AgentLifecycle() {
+export default function AgentLifecycle({ filter }: { filter?: string | null } = {}) {
   const [agents, setAgents] = useState<AgentLifecycleRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [stage, setStage] = useState<LifecycleStage>('all');
+  const [stage, setStage] = useState<LifecycleStage>(filter === 'trials_expiring' ? 'expiring' : 'all');
   const [sortBy, setSortBy] = useState<'joined' | 'login' | 'adoption' | 'trial'>('trial');
 
   const fetchAll = useCallback(async () => {

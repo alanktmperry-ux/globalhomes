@@ -329,7 +329,7 @@ export default function PartnersPage() {
   const fetchPartners = useCallback(async () => {
     setLoading(true);
     try {
-      const { data, error } = await (supabase.from('partners') as any)
+      const { data, error } = await ((supabase as any).from('partners'))
         .select('id, business_name, contact_name, email, phone, partner_type, abn, website, status, plan_type, created_at, notes')
         .order('created_at', { ascending: false });
       if (error) throw error;

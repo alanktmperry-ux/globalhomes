@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
-import UpgradeGate from '@/features/agents/components/shared/UpgradeGate';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

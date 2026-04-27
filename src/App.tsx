@@ -411,6 +411,7 @@ const App = () => (
                   <Route path="revenue" element={<AdminRevenuePage />} />
                   <Route path="outreach" element={<AdminOutreachPage />} />
                   <Route path="system" element={<AdminSystemPage />} />
+                  <Route path="partners" element={<AdminPartnersPage />} />
                 </Route>
                 <Route path="/admin/legacy" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
 

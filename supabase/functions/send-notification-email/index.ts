@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { logApiUsage, costFor } from "../_shared/usageLog.ts";
 
 interface DirectPayload {
   to: string;

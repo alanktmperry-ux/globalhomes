@@ -309,6 +309,8 @@ export default function CommandCentre() {
         (supabase.from('saved_properties' as any).select('id', { count: 'exact', head: true }).gte('saved_at', todayStart)) as any,
         (supabase.from('buyer_profiles' as any).select('id', { count: 'exact', head: true })) as any,
         (supabase.from('buyer_profiles' as any).select('id', { count: 'exact', head: true }).gte('created_at', d7)) as any,
+        (supabase.from('partners' as any).select('id', { count: 'exact', head: true })) as any,
+        (supabase.from('brokers' as any).select('id', { count: 'exact', head: true })) as any,
       ]);
 
       // Top suburb from voice searches in the last 7 days

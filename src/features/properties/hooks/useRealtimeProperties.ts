@@ -157,8 +157,13 @@ export function useRealtimeProperties({
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'properties' },
-          () => {
-            queryClient.invalidateQueries({ queryKey: ['properties'] });
+          (payload) => {
+            // Only invalidate when the changed row is (or was) public-visible.
+            // Skips noisy mutations on drafts, archived, or moderation churn.
+            const row: any = payload.new || payload.old;
+            if (row?.is_active && row?.status === 'public') {
+              queryClient.invalidateQueries({ queryKey: ['properties'] });
+            }
           }
         )
         .subscribe();

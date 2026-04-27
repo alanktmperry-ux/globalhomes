@@ -64,6 +64,11 @@ interface CCData {
   projectedARR: number;
   projectedARR12m: number;
   monthlyGrowthRate: number;
+  arpu: number;
+  churnRatePct: number;
+  revenueAtRisk: number;
+  ltvEstimate: number | null;
+  netNewMRR: number;
   liveListings: number;
   listingsToday: number;
   listingsThisWeek: number;
@@ -277,7 +282,7 @@ export default function CommandCentre() {
         totalBuyersRes,
         newBuyersWeekRes,
       ] = await Promise.all([
-        supabase.from('agents').select('id, name, email, agency, is_subscribed, created_at, updated_at, onboarding_complete, agent_subscriptions(plan_type)'),
+        supabase.from('agents').select('id, user_id, name, email, agency, is_subscribed, subscription_status, created_at, updated_at, onboarding_complete, agent_subscriptions(plan_type)'),
         supabase.from('properties').select('id, agent_id, state, is_active, views, images, created_at'),
         supabase.from('leads').select('id, created_at'),
         supabase.from('voice_searches').select('id', { count: 'exact', head: true }).gte('created_at', todayStart),
@@ -382,6 +387,17 @@ export default function CommandCentre() {
       const monthlyGrowthRate = prevMonthPaid > 0 ? (paidAgents.length - prevMonthPaid) / prevMonthPaid : 0;
       const projectedARR12m = mrr * 12 * Math.pow(1 + Math.max(monthlyGrowthRate, 0), 12);
 
+      // Executive financial health metrics
+      const churnedThisMonthCount = churnRes.count || 0;
+      const arpu = paidAgents.length > 0 ? mrr / paidAgents.length : 0;
+      const churnDenominator = Math.max(paidAgents.length + churnedThisMonthCount, 1);
+      const churnRatePct = (churnedThisMonthCount / churnDenominator) * 100;
+      const paymentFailedCount = agents.filter((a: any) => a.subscription_status === 'payment_failed').length;
+      const revenueAtRisk = paymentFailedCount * arpu;
+      const ltvEstimate = churnRatePct > 0 ? arpu / (churnRatePct / 100) : null;
+      const newPaidAgentsThisMonth = agents.filter((a: any) => a.is_subscribed && a.created_at >= monthStart).length;
+      const netNewMRR = (newPaidAgentsThisMonth * arpu) - (churnedThisMonthCount * arpu);
+
       // Week-over-week paid agents (subscribed before each cutoff)
       const paidAgentsPrevWeek = agents.filter(a => a.is_subscribed && a.created_at < d7).length;
 
@@ -407,13 +423,12 @@ export default function CommandCentre() {
 
       const atRiskAgents = agents
         .filter(a => {
-          const lastSeen = signInMap.get(a.id);
+          const lastSeen = signInMap.get(a.user_id);
           if (!lastSeen) return true;
           return new Date(lastSeen) < d14Date;
         })
-        .slice(0, 8)
         .map(a => {
-          const lastSeen = signInMap.get(a.id) || null;
+          const lastSeen = signInMap.get(a.user_id) || null;
           const daysSince = lastSeen
             ? Math.floor((now.getTime() - new Date(lastSeen).getTime()) / 86400000)
             : 999;
@@ -426,7 +441,8 @@ export default function CommandCentre() {
             daysSince,
           };
         })
-        .sort((a, b) => b.daysSince - a.daysSince);
+        .sort((a, b) => b.daysSince - a.daysSince)
+        .slice(0, 8);
 
       const agentsWithListings = new Set(allProps.map(p => p.agent_id).filter(Boolean));
       const agentsNoListings = agents.filter(a => !agentsWithListings.has(a.id)).length;
@@ -502,6 +518,11 @@ export default function CommandCentre() {
         projectedARR,
         projectedARR12m,
         monthlyGrowthRate,
+        arpu,
+        churnRatePct,
+        revenueAtRisk,
+        ltvEstimate,
+        netNewMRR,
         liveListings: liveListingsRes.count || 0,
         listingsToday: listingsTodayRes.count || 0,
         listingsThisWeek: listingsWeekRes.count || 0,
@@ -979,6 +1000,36 @@ export default function CommandCentre() {
         </div>
       )}
 
+      {/* Partners & Brokers */}
+      <SectionHead title="Partners & Brokers" sub="Platform partner network" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <KPI
+          label="Trust Accountants"
+          value={data.totalTrustAccountants}
+          sub="signed up on platform"
+          icon={UserCheck}
+        />
+        <KPI
+          label="Mortgage Brokers"
+          value={data.totalMortgageBrokers}
+          sub="signed up on platform"
+          icon={UserCheck}
+        />
+        <KPI
+          label="Pending Verification"
+          value={data.pendingPartners}
+          sub="partners awaiting approval"
+          icon={Clock}
+          color={data.pendingPartners > 0 ? 'text-amber-500' : 'text-muted-foreground'}
+        />
+        <KPI
+          label="Seekers"
+          value={data.totalSeekers}
+          sub={`+${data.newSeekersThisWeek} this week`}
+          icon={Users}
+        />
+      </div>
+
       {/* Revenue Forecast */}
       <SectionHead title="Revenue Forecast" sub="Projected based on current pace" />
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -1006,6 +1057,52 @@ export default function CommandCentre() {
           sub={data.monthlyGrowthRate > 0 ? 'paid agents vs last month' : data.monthlyGrowthRate < 0 ? 'paid agents vs last month' : 'no change vs last month'}
           color={data.monthlyGrowthRate > 0 ? 'text-emerald-500' : data.monthlyGrowthRate < 0 ? 'text-destructive' : 'text-muted-foreground'}
           trend={data.monthlyGrowthRate > 0 ? 'up' : data.monthlyGrowthRate < 0 ? 'down' : 'flat'}
+        />
+      </div>
+
+      {/* Business Health */}
+      <SectionHead title="Business Health" sub="Key metrics for executive decision-making" />
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
+        <KPI
+          label="ARPU"
+          value={data.paidAgents > 0 ? `$${Math.round(data.arpu).toLocaleString()}/mo` : '$0/mo'}
+          sub="avg revenue per user"
+          icon={DollarSign}
+        />
+        <KPI
+          label="Churn Rate"
+          value={`${data.churnRatePct.toFixed(1)}%`}
+          sub="this month"
+          icon={TrendingDown}
+          color={data.churnRatePct > 5 ? 'text-destructive' : 'text-muted-foreground'}
+        />
+        <KPI
+          label="Revenue at Risk"
+          value={`$${Math.round(data.revenueAtRisk).toLocaleString()}`}
+          sub="payment failed accounts"
+          icon={AlertTriangle}
+          color={data.revenueAtRisk > 0 ? 'text-destructive' : 'text-muted-foreground'}
+        />
+        <KPI
+          label="LTV Estimate"
+          value={data.ltvEstimate != null ? `$${Math.round(data.ltvEstimate).toLocaleString()}` : 'Calculating…'}
+          sub="lifetime value per user"
+          icon={Target}
+        />
+        <KPI
+          label="Net New MRR"
+          value={`${data.netNewMRR >= 0 ? '+' : ''}$${Math.round(data.netNewMRR).toLocaleString()}`}
+          sub="this month"
+          icon={data.netNewMRR >= 0 ? TrendingUp : TrendingDown}
+          color={data.netNewMRR > 0 ? 'text-emerald-500' : data.netNewMRR < 0 ? 'text-destructive' : 'text-muted-foreground'}
+          trend={data.netNewMRR > 0 ? 'up' : data.netNewMRR < 0 ? 'down' : 'flat'}
+        />
+        <KPI
+          label="12-Month Projection"
+          value={`$${Math.round(data.projectedARR12m).toLocaleString()}`}
+          sub="projected annual revenue"
+          icon={TrendingUp}
+          color="text-emerald-500"
         />
       </div>
 

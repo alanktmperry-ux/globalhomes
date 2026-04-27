@@ -46,6 +46,21 @@ async function callAI(systemPrompt: string, userPrompt: string) {
   const data = await resp.json();
   const content = data.choices?.[0]?.message?.content;
   if (!content) throw new Error("No content in AI response");
+
+  const promptTokens = Number(data?.usage?.prompt_tokens ?? 0);
+  const completionTokens = Number(data?.usage?.completion_tokens ?? 0);
+  const totalTokens =
+    Number(data?.usage?.total_tokens ?? promptTokens + completionTokens) ||
+    Math.ceil((systemPrompt.length + userPrompt.length + content.length) / 4);
+
+  await logApiUsage({
+    service: "gemini",
+    action: "listing_translate",
+    units: totalTokens,
+    cost_estimate: costFor.gemini(totalTokens),
+    metadata: { model: MODEL, prompt_tokens: promptTokens, completion_tokens: completionTokens },
+  });
+
   return JSON.parse(content);
 }
 

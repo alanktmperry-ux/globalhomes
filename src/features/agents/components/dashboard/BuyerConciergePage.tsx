@@ -12,10 +12,15 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
   Loader2, Sparkles, Archive, Mail, Home, ChevronDown, ChevronRight,
-  Flame, Search as SearchIcon, MapPin, ArrowUpDown,
+  Flame, Search as SearchIcon, MapPin, ArrowUpDown, Lock,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
+import { Progress } from '@/components/ui/progress';
+import { useSubscription } from '@/features/agents/hooks/useSubscription';
+import { useConciergeUsage, recordConciergeAction } from '@/features/agents/hooks/useConciergeUsage';
+import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
+import { useNavigate } from 'react-router-dom';
 
 interface MatchRow {
   id: string;

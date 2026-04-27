@@ -234,6 +234,7 @@ export default function CommandCentre() {
         agentsRes,
         propsRes,
         leadsRes,
+        voiceSearchesTodayRes,
         voice30dRes,
         liveListingsRes,
         listingsTodayRes,
@@ -246,10 +247,15 @@ export default function CommandCentre() {
         pendingDemosRes,
         openTicketsRes,
         churnRes,
+        buyerSearchesTodayRes,
+        savesTodayRes,
+        totalBuyersRes,
+        newBuyersWeekRes,
       ] = await Promise.all([
         supabase.from('agents').select('id, name, email, agency, is_subscribed, created_at, updated_at, onboarding_complete, agent_subscriptions(plan_type)'),
         supabase.from('properties').select('id, agent_id, state, is_active, views, images, created_at'),
         supabase.from('leads').select('id, created_at'),
+        supabase.from('voice_searches').select('id', { count: 'exact', head: true }).gte('created_at', todayStart),
         supabase.from('voice_searches').select('id', { count: 'exact', head: true }).gte('created_at', d30),
         supabase.from('properties').select('id', { count: 'exact', head: true }).eq('is_active', true),
         supabase.from('properties').select('id', { count: 'exact', head: true }).gte('created_at', todayStart),
@@ -262,7 +268,37 @@ export default function CommandCentre() {
         (supabase.from('demo_requests' as any).select('id', { count: 'exact', head: true }).eq('status', 'pending')) as any,
         (supabase.from('support_tickets' as any).select('id', { count: 'exact', head: true }).eq('status', 'open')) as any,
         supabase.from('agents').select('id', { count: 'exact', head: true }).eq('is_subscribed', false).gte('updated_at', monthStart),
+        (supabase.from('buyer_activity_events' as any).select('id', { count: 'exact', head: true }).eq('event_type', 'search').gte('created_at', todayStart)) as any,
+        (supabase.from('saved_properties' as any).select('id', { count: 'exact', head: true }).gte('saved_at', todayStart)) as any,
+        (supabase.from('buyer_profiles' as any).select('id', { count: 'exact', head: true })) as any,
+        (supabase.from('buyer_profiles' as any).select('id', { count: 'exact', head: true }).gte('created_at', d7)) as any,
       ]);
+
+      // Top suburb from voice searches in the last 7 days
+      let topSuburb: string | null = null;
+      try {
+        const { data: vsData } = await supabase
+          .from('voice_searches')
+          .select('parsed_query')
+          .gte('created_at', d7)
+          .limit(200);
+        if (vsData) {
+          const suburbCount = new Map<string, number>();
+          vsData.forEach((vs: any) => {
+            const suburb = vs.parsed_query?.suburb || vs.parsed_query?.location;
+            if (typeof suburb === 'string' && suburb.trim()) {
+              const key = suburb.trim();
+              suburbCount.set(key, (suburbCount.get(key) || 0) + 1);
+            }
+          });
+          if (suburbCount.size > 0) {
+            topSuburb = Array.from(suburbCount.entries())
+              .sort((a, b) => b[1] - a[1])[0][0];
+          }
+        }
+      } catch {}
+
+      const searchesToday = (buyerSearchesTodayRes.count || 0) + (voiceSearchesTodayRes.count || 0);
 
       const agents = agentsRes.data || [];
       const allProps = propsRes.data || [];

@@ -254,6 +254,7 @@ const App = () => (
                   <Route path="/agents" element={<FindAgentPage />} />
                   <Route path="/brokers" element={<FindBrokerPage />} />
                   <Route path="/for-agents" element={<AgentLandingPage />} />
+                  <Route path="/pricing" element={<PricingPage />} />
                   <Route path="/suburbs" element={<SuburbsIndexPage />} />
                   <Route path="/launch" element={<MarketingLandingPage />} />
                   <Route path="/waitlist" element={<WaitlistPage />} />

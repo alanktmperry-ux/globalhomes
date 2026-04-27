@@ -106,10 +106,14 @@ export default function AdminSidebar({ pendingApprovalsTotal = 0, isSupport = fa
             <NavLinkItem key={item.to} item={item} active={isActive(item.to, item.exact)} />
           ))}
 
-          <SectionLabel>Strategy</SectionLabel>
-          {strategy.map((item) => (
-            <NavLinkItem key={item.to} item={item} active={isActive(item.to, item.exact)} />
-          ))}
+          {!isSupport && (
+            <>
+              <SectionLabel>Strategy</SectionLabel>
+              {strategy.map((item) => (
+                <NavLinkItem key={item.to} item={item} active={isActive(item.to, item.exact)} />
+              ))}
+            </>
+          )}
 
           <SectionLabel>Operations</SectionLabel>
           {operations.map((item) => (
@@ -117,14 +121,20 @@ export default function AdminSidebar({ pendingApprovalsTotal = 0, isSupport = fa
           ))}
 
           <SectionLabel>Business</SectionLabel>
-          {business.map((item) => (
-            <NavLinkItem key={item.to} item={item} active={isActive(item.to, item.exact)} />
-          ))}
+          {business
+            .filter((item) => !isSupport || item.to === '/admin/outreach')
+            .map((item) => (
+              <NavLinkItem key={item.to} item={item} active={isActive(item.to, item.exact)} />
+            ))}
 
-          <SectionLabel>System</SectionLabel>
-          {system.map((item) => (
-            <NavLinkItem key={item.to} item={item} active={isActive(item.to, item.exact)} />
-          ))}
+          {!isSupport && (
+            <>
+              <SectionLabel>System</SectionLabel>
+              {system.map((item) => (
+                <NavLinkItem key={item.to} item={item} active={isActive(item.to, item.exact)} />
+              ))}
+            </>
+          )}
 
           {help.map((item) => (
             <NavLinkItem key={item.to} item={item} active={isActive(item.to, item.exact)} />

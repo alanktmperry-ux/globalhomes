@@ -1428,7 +1428,7 @@ export default function CommandCentre() {
 
       {/* Trial growth context (kept from prior version) */}
       <SectionHead title="Agent Growth" sub="Sign-ups and retention" />
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
         <KPI
           label="Total Agents"
           value={data.totalAgents}
@@ -1451,7 +1451,22 @@ export default function CommandCentre() {
           icon={Clock}
           color={data.trialsExpiringThisWeek > 0 ? 'text-amber-500' : 'text-muted-foreground'}
         />
+        <KPI
+          label="Stuck in Setup"
+          value={data.onboardingIncomplete}
+          icon={AlertTriangle}
+          color={data.onboardingIncomplete > 0 ? 'text-amber-500' : 'text-muted-foreground'}
+          sub="onboarding incomplete"
+        />
       </div>
+      {data.onboardingIncomplete > 0 && (
+        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-amber-700 dark:text-amber-400 flex items-center gap-2 mt-3">
+          <AlertTriangle size={14} />
+          <span>
+            <strong>{data.onboardingIncomplete}</strong> agent{data.onboardingIncomplete > 1 ? 's haven\'t' : ' hasn\'t'} completed onboarding yet.
+          </span>
+        </div>
+      )}
     </div>
   );
 }

@@ -152,7 +152,7 @@ const AdminUsers = () => {
   const [filterType, setFilterType] = useState<string>('all');
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [subModal, setSubModal] = useState<{ open: boolean; userId: string; email: string; currentPlan: string }>({ open: false, userId: '', email: '', currentPlan: 'demo' });
-  const [subForm, setSubForm] = useState({ plan_type: 'demo', listing_limit: 3, seat_limit: 1, founding_member: false });
+  const [subForm, setSubForm] = useState({ plan_type: 'demo', listing_limit: 3, seat_limit: 1 });
   const [savingSub, setSavingSub] = useState(false);
   const [graceModal, setGraceModal] = useState<{ open: boolean; userId: string; email: string; currentGrace: string | null }>({ open: false, userId: '', email: '', currentGrace: null });
   const [graceDate, setGraceDate] = useState<Date | undefined>(undefined);

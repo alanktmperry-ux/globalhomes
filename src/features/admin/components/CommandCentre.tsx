@@ -412,13 +412,12 @@ export default function CommandCentre() {
 
       const atRiskAgents = agents
         .filter(a => {
-          const lastSeen = signInMap.get(a.id);
+          const lastSeen = signInMap.get(a.user_id);
           if (!lastSeen) return true;
           return new Date(lastSeen) < d14Date;
         })
-        .slice(0, 8)
         .map(a => {
-          const lastSeen = signInMap.get(a.id) || null;
+          const lastSeen = signInMap.get(a.user_id) || null;
           const daysSince = lastSeen
             ? Math.floor((now.getTime() - new Date(lastSeen).getTime()) / 86400000)
             : 999;
@@ -431,7 +430,8 @@ export default function CommandCentre() {
             daysSince,
           };
         })
-        .sort((a, b) => b.daysSince - a.daysSince);
+        .sort((a, b) => b.daysSince - a.daysSince)
+        .slice(0, 8);
 
       const agentsWithListings = new Set(allProps.map(p => p.agent_id).filter(Boolean));
       const agentsNoListings = agents.filter(a => !agentsWithListings.has(a.id)).length;

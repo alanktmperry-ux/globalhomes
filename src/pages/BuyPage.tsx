@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { geocode } from '@/shared/lib/googleMapsService';
 import { PropertyCard } from '@/components/PropertyCard';
@@ -319,41 +318,71 @@ const BuyPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [primarySuburb]);
 
-  const { data: properties, isLoading } = useQuery({
-    queryKey: ['buy-properties', filters],
-    queryFn: async (): Promise<Property[]> => {
-      let q = supabase
-        .from('properties')
-        .select(PROPERTIES_WITH_AGENTS)
-        .eq('is_active', true)
-        .not('agent_id', 'is', null)
-        .not('listing_type', 'eq', 'rent')
-        .limit(60);
+  const PAGE_SIZE = 24;
+  const [page, setPage] = useState(0);
+  const [allProperties, setAllProperties] = useState<Property[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
 
-      if (filters.sort === 'price_asc') q = q.order('price', { ascending: true, nullsFirst: false });
-      else if (filters.sort === 'price_desc') q = q.order('price', { ascending: false, nullsFirst: false });
-      else q = q.order('created_at', { ascending: false });
+  // Reset pagination whenever filters change
+  useEffect(() => {
+    setPage(0);
+    setAllProperties([]);
+    setHasMore(true);
+  }, [filters]);
 
-      if (filters.suburbs.length === 1) {
-        q = q.ilike('suburb', `%${filters.suburbs[0]}%`);
-      } else if (filters.suburbs.length > 1) {
-        // Postgres OR filter — match any of the selected suburbs
-        const orExpr = filters.suburbs.map(s => `suburb.ilike.%${s.replace(/[%,()]/g, '')}%`).join(',');
-        q = q.or(orExpr);
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      if (page === 0) setIsLoading(true);
+      else setLoadingMore(true);
+      try {
+        let q = supabase
+          .from('properties')
+          .select(PROPERTIES_WITH_AGENTS)
+          .eq('is_active', true)
+          .not('agent_id', 'is', null)
+          .not('listing_type', 'eq', 'rent')
+          .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+
+        if (filters.sort === 'price_asc') q = q.order('price', { ascending: true, nullsFirst: false });
+        else if (filters.sort === 'price_desc') q = q.order('price', { ascending: false, nullsFirst: false });
+        else q = q.order('created_at', { ascending: false });
+
+        if (filters.suburbs.length === 1) {
+          q = q.ilike('suburb', `%${filters.suburbs[0]}%`);
+        } else if (filters.suburbs.length > 1) {
+          const orExpr = filters.suburbs.map(s => `suburb.ilike.%${s.replace(/[%,()]/g, '')}%`).join(',');
+          q = q.or(orExpr);
+        }
+        if (filters.state) q = q.eq('state', filters.state.toUpperCase());
+        if (filters.minBeds) q = q.gte('beds', filters.minBeds);
+        if (filters.minBaths) q = q.gte('baths', filters.minBaths);
+        if (filters.minParking) q = q.gte('cars', filters.minParking);
+        if (filters.minPrice) q = q.gte('price', filters.minPrice);
+        if (filters.maxPrice) q = q.lte('price', filters.maxPrice);
+        if (filters.propertyType) q = q.ilike('property_type', `%${filters.propertyType}%`);
+
+        const { data, error } = await q;
+        if (cancelled) return;
+        if (error) throw error;
+        const mapped = (data ?? []).map((p: any) => mapDbProperty(p));
+        setAllProperties(prev => (page === 0 ? mapped : [...prev, ...mapped]));
+        setHasMore((data ?? []).length === PAGE_SIZE);
+      } catch (err) {
+        console.error('[BuyPage] load error:', err);
+        if (!cancelled && page === 0) setAllProperties([]);
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+          setLoadingMore(false);
+        }
       }
-      if (filters.state) q = q.eq('state', filters.state.toUpperCase());
-      if (filters.minBeds) q = q.gte('beds', filters.minBeds);
-      if (filters.minBaths) q = q.gte('baths', filters.minBaths);
-      if (filters.minParking) q = q.gte('cars', filters.minParking);
-      if (filters.minPrice) q = q.gte('price', filters.minPrice);
-      if (filters.maxPrice) q = q.lte('price', filters.maxPrice);
-      if (filters.propertyType) q = q.ilike('property_type', `%${filters.propertyType}%`);
-
-      const { data, error } = await q;
-      if (error) throw error;
-      return (data ?? []).map((p: any) => mapDbProperty(p));
-    },
-  });
+    };
+    load();
+    return () => { cancelled = true; };
+  }, [filters, page]);
 
   const handleSelect = useCallback((property: Property) => {
     navigate(`/property/${property.id}`);
@@ -444,7 +473,7 @@ const BuyPage = () => {
                 {headerSuburbLabel ? t(`Properties for Sale in ${headerSuburbLabel}`) : t('Properties for Sale')}
               </h1>
               <p className="text-muted-foreground mt-1">
-                {isLoading ? t('Searching…') : `${properties?.length ?? 0} ${t('properties found')}`}
+                {isLoading ? t('Searching…') : `${allProperties.length} ${t('properties found')}${hasMore && allProperties.length > 0 ? ` — ${t('scroll down for more')}` : ''}`}
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -545,7 +574,7 @@ const BuyPage = () => {
                         </Button>
                       )}
                       <Button className="flex-1" onClick={() => setMobileFiltersOpen(false)}>
-                        {t('Show')} {properties?.length ?? 0} {t('results')}
+                        {t('Show')} {allProperties?.length ?? 0} {t('results')}
                       </Button>
                     </SheetFooter>
                   </SheetContent>
@@ -595,11 +624,11 @@ const BuyPage = () => {
                 <div className="flex items-center justify-center py-20">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
-              ) : properties && properties.length > 0 ? (
+              ) : allProperties && allProperties.length > 0 ? (
                 viewMode === 'map' ? (
                   <div className="rounded-xl overflow-hidden border border-border">
                     <PropertyMap
-                      properties={properties}
+                      properties={allProperties}
                       onPropertySelect={(p) => setSelectedPropertyId(p.id)}
                       selectedPropertyId={selectedPropertyId}
                       centerOn={mapCenter ? { ...mapCenter, key: `${primarySuburb || 'fallback'}-${mapZoom}` } : null}
@@ -610,7 +639,7 @@ const BuyPage = () => {
                 ) : viewMode === 'split' ? (
                   <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[calc(100vh-220px)] overflow-y-auto pr-1">
-                      {properties.map((property, index) => (
+                      {allProperties.map((property, index) => (
                         <PropertyCard
                           key={property.id}
                           property={property}
@@ -623,7 +652,7 @@ const BuyPage = () => {
                     </div>
                     <div className="hidden lg:block sticky top-20 h-[calc(100vh-220px)] rounded-xl overflow-hidden border border-border">
                       <PropertyMap
-                        properties={properties}
+                        properties={allProperties}
                         onPropertySelect={(p) => { setSelectedPropertyId(p.id); }}
                         selectedPropertyId={selectedPropertyId}
                         centerOn={mapCenter ? { ...mapCenter, key: `${primarySuburb || 'fallback'}-${mapZoom}` } : null}
@@ -634,7 +663,7 @@ const BuyPage = () => {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {properties.map((property, index) => (
+                    {allProperties.map((property, index) => (
                       <PropertyCard
                         key={property.id}
                         property={property}
@@ -657,6 +686,23 @@ const BuyPage = () => {
                       {t('Clear all filters')}
                     </button>
                   )}
+                </div>
+              )}
+
+              {/* Load more */}
+              {!isLoading && hasMore && allProperties.length > 0 && (
+                <div className="flex justify-center mt-8 mb-12">
+                  <button
+                    onClick={() => setPage(p => p + 1)}
+                    disabled={loadingMore}
+                    className="h-11 px-10 rounded-2xl border border-border bg-background hover:bg-muted text-sm text-foreground font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+                  >
+                    {loadingMore ? (
+                      <><Loader2 size={15} className="animate-spin" /> {t('Loading…')}</>
+                    ) : (
+                      t('Load more properties')
+                    )}
+                  </button>
                 </div>
               )}
             </>

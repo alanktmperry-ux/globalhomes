@@ -310,7 +310,7 @@ const App = () => (
                 <Route path="/supplier/portal" element={<SupplierPortalPage />} />
                 <Route path="/owner/portal" element={<OwnerPortalPage />} />
                 <Route path="/review/:token" element={<ReviewSubmitPage />} />
-                <Route path="/strata/login" element={<StrataAuthPage />} />
+                
                 <Route path="/broker/login" element={<BrokerLogin />} />
                 <Route path="/broker/portal" element={<BrokerPortal />} />
                 <Route path="/broker/lead/:id" element={<BrokerLeadDetailPage />} />

@@ -16,7 +16,7 @@ const sections = [
   { title: 'Auctions', ids: ['agent-auction-setup', 'agent-auction-registration'] },
   { title: 'CRM & Leads', ids: ['agent-crm', 'agent-saved-searches', 'agent-lead-marketplace'] },
   { title: 'Rentals & Property Management', ids: ['agent-rental-pm'] },
-  { title: 'Market Tools', ids: ['agent-suburb-intelligence', 'agent-cma', 'agent-strata-health'] },
+  { title: 'Market Tools', ids: ['agent-suburb-intelligence', 'agent-cma'] },
   { title: 'Client Reporting', ids: ['agent-vendor-dashboard', 'agent-documents', 'agent-vendor-report-link'] },
   { title: 'Team & Agency', ids: ['agent-team-invite', 'agent-team-roles', 'agent-team-access-levels'] },
   { title: 'Reviews & Profile', ids: ['agent-reviews'] },

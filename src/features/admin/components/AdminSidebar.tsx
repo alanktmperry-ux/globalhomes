@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Zap, CheckCircle, Users, Building2, DollarSign, Megaphone, Settings,
-  Shield, ArrowLeft, UserCog, LineChart, BookOpen, Wallet,
+  Shield, ArrowLeft, UserCog, LineChart, BookOpen, Wallet, HelpCircle,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';

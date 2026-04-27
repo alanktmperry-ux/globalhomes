@@ -12,6 +12,7 @@ const AUTHORISED_ADMINS = [
   "alanktmperry@gmail.com",
   "alan@everythingco.com.au",
   "alan@everythingeco.com.au",
+  "alan@squaredevelopment.com.au",
 ];
 
 export default function AdminLoginPage() {

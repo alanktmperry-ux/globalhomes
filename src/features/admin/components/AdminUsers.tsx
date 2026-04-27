@@ -794,11 +794,11 @@ const AdminUsers = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="demo">Demo — 3 listings</SelectItem>
-                  <SelectItem value="starter">Starter — $99/mo, 10 listings</SelectItem>
-                  <SelectItem value="pro">Pro — $199/mo, unlimited</SelectItem>
-                  <SelectItem value="agency">Agency — $399/mo, 8 seats</SelectItem>
-                  <SelectItem value="enterprise">Enterprise — custom</SelectItem>
+                  <SelectItem value="demo">Trial</SelectItem>
+                  <SelectItem value="solo">Solo — $299/mo</SelectItem>
+                  <SelectItem value="agency">Agency — $899/mo</SelectItem>
+                  <SelectItem value="agency_pro">Agency Pro — $1,999/mo</SelectItem>
+                  <SelectItem value="enterprise">Enterprise — Custom</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -822,17 +822,6 @@ const AdminUsers = () => {
                   className="w-full h-9 px-3 text-sm border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
-            </div>
-
-            <div className="flex items-center justify-between rounded-lg border border-border p-3">
-              <div>
-                <p className="text-sm font-medium text-foreground">Founding member</p>
-                <p className="text-xs text-muted-foreground">Rate locked for life</p>
-              </div>
-              <Switch
-                checked={subForm.founding_member}
-                onCheckedChange={(v) => setSubForm(f => ({ ...f, founding_member: v }))}
-              />
             </div>
 
             <div className="flex gap-2 pt-2">

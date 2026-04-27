@@ -221,8 +221,163 @@ const AdminUsers = () => {
   const handlePlanChange = (plan: string) => {
     const def = PLAN_LIMITS[plan] || PLAN_LIMITS.demo;
     setSubForm(f => ({ ...f, plan_type: plan, listing_limit: def.listings, seat_limit: def.seats }));
-  };
+};
 
+/* ─────────── Users Dashboard (charts + KPIs) ─────────── */
+interface UsersDashboardProps {
+  users: AuthUser[];
+  loading: boolean;
+}
+
+const UsersDashboard = ({ users, loading }: UsersDashboardProps) => {
+  if (loading || users.length === 0) return null;
+
+  const now = Date.now();
+  const agentCount = users.filter(u => u.user_type === 'agent').length;
+  const seekerCount = users.filter(u => u.user_type === 'seeker').length;
+  const paidAgentCount = users.filter(u => u.user_type === 'agent' && u.is_subscribed).length;
+  const bannedCount = users.filter(u => u.banned_until).length;
+
+  const typeBreakdown = [
+    { name: 'Agents',   value: agentCount,                                                                                fill: 'hsl(var(--primary))' },
+    { name: 'Seekers',  value: seekerCount,                                                                                fill: '#10b981' },
+    { name: 'Partners', value: users.filter(u => u.user_type === 'partner').length,                                       fill: '#8b5cf6' },
+    { name: 'Demo',     value: users.filter(u => u.user_type === 'demo' || u.user_type === 'demo_request').length,         fill: '#f59e0b' },
+  ].filter(d => d.value > 0);
+
+  const planBreakdown = [
+    { name: 'Trial',      value: users.filter(u => u.user_type === 'agent' && !u.is_subscribed).length, fill: '#94a3b8' },
+    { name: 'Solo',       value: users.filter(u => (u as any).plan_type === 'solo').length,             fill: '#6366f1' },
+    { name: 'Agency',     value: users.filter(u => (u as any).plan_type === 'agency').length,           fill: '#0ea5e9' },
+    { name: 'Agency Pro', value: users.filter(u => (u as any).plan_type === 'agency_pro').length,       fill: '#8b5cf6' },
+    { name: 'Enterprise', value: users.filter(u => (u as any).plan_type === 'enterprise').length,       fill: '#f59e0b' },
+  ].filter(d => d.value > 0);
+
+  const showPlanMix = paidAgentCount > 0;
+
+  const loginActivity = [
+    { name: 'Today',      value: users.filter(u => u.last_sign_in_at && (now - new Date(u.last_sign_in_at).getTime()) < 86400000).length },
+    { name: 'This week',  value: users.filter(u => u.last_sign_in_at && (now - new Date(u.last_sign_in_at).getTime()) < 7 * 86400000).length },
+    { name: 'This month', value: users.filter(u => u.last_sign_in_at && (now - new Date(u.last_sign_in_at).getTime()) < 30 * 86400000).length },
+    { name: '30–90d',     value: users.filter(u => u.last_sign_in_at && (now - new Date(u.last_sign_in_at).getTime()) >= 30 * 86400000 && (now - new Date(u.last_sign_in_at).getTime()) < 90 * 86400000).length },
+    { name: '90d+',       value: users.filter(u => u.last_sign_in_at && (now - new Date(u.last_sign_in_at).getTime()) >= 90 * 86400000).length },
+    { name: 'Never',      value: users.filter(u => !u.last_sign_in_at).length },
+  ];
+
+  const weeklySignups = Array.from({ length: 8 }, (_, i) => {
+    const weekStart = new Date(now - (8 - i) * 7 * 86400000);
+    const weekEnd = new Date(now - (7 - i) * 7 * 86400000);
+    const label = weekStart.toLocaleDateString('en-AU', { day: '2-digit', month: 'short' });
+    return {
+      label,
+      agents: users.filter(u => u.user_type === 'agent' && new Date(u.created_at) >= weekStart && new Date(u.created_at) < weekEnd).length,
+      seekers: users.filter(u => u.user_type === 'seeker' && new Date(u.created_at) >= weekStart && new Date(u.created_at) < weekEnd).length,
+    };
+  });
+
+  const Kpi = ({ label, value, sub, danger }: { label: string; value: number | string; sub?: string; danger?: boolean }) => (
+    <div className="rounded-2xl border border-border bg-card p-4">
+      <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</p>
+      <p className={`mt-1 text-2xl font-bold ${danger ? 'text-destructive' : 'text-foreground'}`}>{value}</p>
+      {sub && <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>}
+    </div>
+  );
+
+  const Donut = ({ title, data }: { title: string; data: { name: string; value: number; fill: string }[] }) => (
+    <div className="rounded-2xl border border-border bg-card p-4">
+      <h3 className="text-sm font-semibold text-foreground mb-2">{title}</h3>
+      <div className="h-[180px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie data={data} dataKey="value" nameKey="name" innerRadius={55} outerRadius={80} paddingAngle={2} stroke="none">
+              {data.map((d, i) => <Cell key={i} fill={d.fill} />)}
+            </Pie>
+            <RTooltip
+              contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+      <ul className="mt-3 space-y-1">
+        {data.map(d => (
+          <li key={d.name} className="flex items-center justify-between text-xs">
+            <span className="flex items-center gap-2 text-foreground">
+              <span className="w-2.5 h-2.5 rounded-sm" style={{ background: d.fill }} />
+              {d.name}
+            </span>
+            <span className="font-semibold text-foreground">{d.value}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+
+  return (
+    <div className="mb-6 space-y-4">
+      {/* Row 1: KPIs */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <Kpi label="Total Users" value={users.length} />
+        <Kpi label="Agents" value={agentCount} sub={`${paidAgentCount} paid`} />
+        <Kpi label="Seekers" value={seekerCount} />
+        <Kpi label="Banned" value={bannedCount} danger={bannedCount > 0} />
+      </div>
+
+      {/* Row 2: 3 charts */}
+      <div className={`grid grid-cols-1 ${showPlanMix ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} gap-4`}>
+        <Donut title="User Types" data={typeBreakdown} />
+        {showPlanMix && <Donut title="Plan Mix" data={planBreakdown} />}
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <h3 className="text-sm font-semibold text-foreground mb-2">Login Activity</h3>
+          <div className="h-[200px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={loginActivity} margin={{ top: 8, right: 8, bottom: 8, left: -16 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
+                <RTooltip
+                  contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
+                />
+                <Bar dataKey="value" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Row 3: Signup trend */}
+      <div className="rounded-2xl border border-border bg-card p-4">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-semibold text-foreground">Signup Trend · Last 8 weeks</h3>
+        </div>
+        <div className="h-[160px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={weeklySignups} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
+              <defs>
+                <linearGradient id="agentGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
+                  <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="seekerGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis dataKey="label" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
+              <RTooltip
+                contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
+              />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Area type="monotone" dataKey="agents" stroke="hsl(var(--primary))" fill="url(#agentGrad)" strokeWidth={2} />
+              <Area type="monotone" dataKey="seekers" stroke="#10b981" fill="url(#seekerGrad)" strokeWidth={2} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
+  );
+};
 
   const callAdminApi = useCallback(async (action: string, body?: any) => {
     const { callAdminFunction } = await import('@/features/admin/lib/adminApi');

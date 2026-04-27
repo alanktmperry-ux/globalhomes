@@ -318,41 +318,71 @@ const BuyPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [primarySuburb]);
 
-  const { data: properties, isLoading } = useQuery({
-    queryKey: ['buy-properties', filters],
-    queryFn: async (): Promise<Property[]> => {
-      let q = supabase
-        .from('properties')
-        .select(PROPERTIES_WITH_AGENTS)
-        .eq('is_active', true)
-        .not('agent_id', 'is', null)
-        .not('listing_type', 'eq', 'rent')
-        .limit(60);
+  const PAGE_SIZE = 24;
+  const [page, setPage] = useState(0);
+  const [allProperties, setAllProperties] = useState<Property[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
 
-      if (filters.sort === 'price_asc') q = q.order('price', { ascending: true, nullsFirst: false });
-      else if (filters.sort === 'price_desc') q = q.order('price', { ascending: false, nullsFirst: false });
-      else q = q.order('created_at', { ascending: false });
+  // Reset pagination whenever filters change
+  useEffect(() => {
+    setPage(0);
+    setAllProperties([]);
+    setHasMore(true);
+  }, [filters]);
 
-      if (filters.suburbs.length === 1) {
-        q = q.ilike('suburb', `%${filters.suburbs[0]}%`);
-      } else if (filters.suburbs.length > 1) {
-        // Postgres OR filter — match any of the selected suburbs
-        const orExpr = filters.suburbs.map(s => `suburb.ilike.%${s.replace(/[%,()]/g, '')}%`).join(',');
-        q = q.or(orExpr);
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      if (page === 0) setIsLoading(true);
+      else setLoadingMore(true);
+      try {
+        let q = supabase
+          .from('properties')
+          .select(PROPERTIES_WITH_AGENTS)
+          .eq('is_active', true)
+          .not('agent_id', 'is', null)
+          .not('listing_type', 'eq', 'rent')
+          .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+
+        if (filters.sort === 'price_asc') q = q.order('price', { ascending: true, nullsFirst: false });
+        else if (filters.sort === 'price_desc') q = q.order('price', { ascending: false, nullsFirst: false });
+        else q = q.order('created_at', { ascending: false });
+
+        if (filters.suburbs.length === 1) {
+          q = q.ilike('suburb', `%${filters.suburbs[0]}%`);
+        } else if (filters.suburbs.length > 1) {
+          const orExpr = filters.suburbs.map(s => `suburb.ilike.%${s.replace(/[%,()]/g, '')}%`).join(',');
+          q = q.or(orExpr);
+        }
+        if (filters.state) q = q.eq('state', filters.state.toUpperCase());
+        if (filters.minBeds) q = q.gte('beds', filters.minBeds);
+        if (filters.minBaths) q = q.gte('baths', filters.minBaths);
+        if (filters.minParking) q = q.gte('cars', filters.minParking);
+        if (filters.minPrice) q = q.gte('price', filters.minPrice);
+        if (filters.maxPrice) q = q.lte('price', filters.maxPrice);
+        if (filters.propertyType) q = q.ilike('property_type', `%${filters.propertyType}%`);
+
+        const { data, error } = await q;
+        if (cancelled) return;
+        if (error) throw error;
+        const mapped = (data ?? []).map((p: any) => mapDbProperty(p));
+        setAllProperties(prev => (page === 0 ? mapped : [...prev, ...mapped]));
+        setHasMore((data ?? []).length === PAGE_SIZE);
+      } catch (err) {
+        console.error('[BuyPage] load error:', err);
+        if (!cancelled && page === 0) setAllProperties([]);
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+          setLoadingMore(false);
+        }
       }
-      if (filters.state) q = q.eq('state', filters.state.toUpperCase());
-      if (filters.minBeds) q = q.gte('beds', filters.minBeds);
-      if (filters.minBaths) q = q.gte('baths', filters.minBaths);
-      if (filters.minParking) q = q.gte('cars', filters.minParking);
-      if (filters.minPrice) q = q.gte('price', filters.minPrice);
-      if (filters.maxPrice) q = q.lte('price', filters.maxPrice);
-      if (filters.propertyType) q = q.ilike('property_type', `%${filters.propertyType}%`);
-
-      const { data, error } = await q;
-      if (error) throw error;
-      return (data ?? []).map((p: any) => mapDbProperty(p));
-    },
-  });
+    };
+    load();
+    return () => { cancelled = true; };
+  }, [filters, page]);
 
   const handleSelect = useCallback((property: Property) => {
     navigate(`/property/${property.id}`);

@@ -105,6 +105,7 @@ function ListingsTab({ onCount }: { onCount: (n: number) => void }) {
         .from('properties')
         .select('id, address, suburb, state, property_type, price, agent_id, images, created_at, agents!inner(name, email, agency)')
         .eq('is_active', false)
+        .not('status', 'eq', 'archived')
         .order('created_at', { ascending: false })
         .limit(50);
       if (error) throw error;
@@ -123,7 +124,7 @@ function ListingsTab({ onCount }: { onCount: (n: number) => void }) {
   const approve = async (row: ListingRow) => {
     setBusyId(row.id);
     try {
-      const { error } = await supabase.from('properties').update({ is_active: true }).eq('id', row.id);
+      const { error } = await (supabase.from('properties') as any).update({ is_active: true, status: 'public' }).eq('id', row.id);
       if (error) throw error;
       await logAudit('listing_approved', 'property', row.id, { address: row.address });
       toast.success('Listing approved');
@@ -147,7 +148,7 @@ function ListingsTab({ onCount }: { onCount: (n: number) => void }) {
     setBusyId(row.id);
     try {
       const { error } = await (supabase.from('properties') as any)
-        .update({ is_active: false, rejection_reason: rejectReason.trim() })
+        .update({ is_active: false, status: 'rejected', rejection_reason: rejectReason.trim() })
         .eq('id', row.id);
       if (error) throw error;
       await logAudit('listing_rejected', 'property', row.id, { reason: rejectReason.trim(), address: row.address });

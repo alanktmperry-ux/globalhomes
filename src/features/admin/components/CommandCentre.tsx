@@ -57,6 +57,10 @@ interface CCData {
   newAgentsPrevWeek: number;
   newAgentsThisMonth: number;
   churnedThisMonth: number;
+  projectedMRR: number;
+  projectedARR: number;
+  projectedARR12m: number;
+  monthlyGrowthRate: number;
   liveListings: number;
   listingsToday: number;
   listingsThisWeek: number;
@@ -320,6 +324,18 @@ export default function CommandCentre() {
       const mrrGrowthPct =
         prevMonthPaid > 0 ? Math.round(((paidAgents.length - prevMonthPaid) / prevMonthPaid) * 100) : null;
 
+      // Revenue projections
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const dayOfMonth = now.getDate();
+      const daysRemaining = daysInMonth - dayOfMonth;
+      const dailyConversionRate = dayOfMonth > 0 ? (paidAgents.length / dayOfMonth) : 0;
+      const projectedNewPaid = Math.round(dailyConversionRate * daysRemaining);
+      const avgMrrPerAgent = paidAgents.length > 0 ? mrr / paidAgents.length : 0;
+      const projectedMRR = mrr + projectedNewPaid * avgMrrPerAgent;
+      const projectedARR = projectedMRR * 12;
+      const monthlyGrowthRate = prevMonthPaid > 0 ? (paidAgents.length - prevMonthPaid) / prevMonthPaid : 0;
+      const projectedARR12m = mrr * 12 * Math.pow(1 + Math.max(monthlyGrowthRate, 0), 12);
+
       // Week-over-week paid agents (subscribed before each cutoff)
       const paidAgentsPrevWeek = agents.filter(a => a.is_subscribed && a.created_at < d7).length;
 
@@ -436,6 +452,10 @@ export default function CommandCentre() {
         newAgentsPrevWeek: newPrevWeek,
         newAgentsThisMonth: newMonth,
         churnedThisMonth: churnRes.count || 0,
+        projectedMRR,
+        projectedARR,
+        projectedARR12m,
+        monthlyGrowthRate,
         liveListings: liveListingsRes.count || 0,
         listingsToday: listingsTodayRes.count || 0,
         listingsThisWeek: listingsWeekRes.count || 0,
@@ -682,7 +702,36 @@ export default function CommandCentre() {
         </div>
       )}
 
-      {/* SECTION 2b — Buyers pulse */}
+      {/* Revenue Forecast */}
+      <SectionHead title="Revenue Forecast" sub="Projected based on current pace" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <KPI
+          label="Month-end MRR"
+          value={`$${Math.round(data.projectedMRR).toLocaleString()}`}
+          sub="projected if growth holds"
+          icon={DollarSign}
+        />
+        <KPI
+          label="Month-end ARR"
+          value={`$${Math.round(data.projectedARR).toLocaleString()}`}
+          sub="annualised at month-end"
+          icon={TrendingUp}
+        />
+        <KPI
+          label="12-month ARR"
+          value={`$${Math.round(data.projectedARR12m).toLocaleString()}`}
+          sub="at current growth rate"
+          icon={Target}
+        />
+        <KPI
+          label="MoM growth"
+          value={`${(data.monthlyGrowthRate * 100).toFixed(1)}%`}
+          sub={data.monthlyGrowthRate > 0 ? 'paid agents vs last month' : data.monthlyGrowthRate < 0 ? 'paid agents vs last month' : 'no change vs last month'}
+          color={data.monthlyGrowthRate > 0 ? 'text-emerald-500' : data.monthlyGrowthRate < 0 ? 'text-destructive' : 'text-muted-foreground'}
+          trend={data.monthlyGrowthRate > 0 ? 'up' : data.monthlyGrowthRate < 0 ? 'down' : 'flat'}
+        />
+      </div>
+
       <SectionHead title="Buyers pulse" sub="Real-time demand from property seekers" />
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
         <KPI

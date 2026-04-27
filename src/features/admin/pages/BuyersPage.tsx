@@ -1,7 +1,16 @@
-import { useEffect, useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Loader2, Mail, Trash2, Search } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { callAdminFunction } from '@/features/admin/lib/adminApi';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 type Kpi = { label: string; value: number | string };
 
@@ -318,6 +327,211 @@ export default function BuyersPage() {
           )}
         </Card>
       </div>
+
+      <SeekerRoster />
     </div>
   );
 }
+
+// ─────────────────────────────────────────────────────
+// Seeker Accounts Roster
+// ─────────────────────────────────────────────────────
+
+interface SeekerRow {
+  id: string;
+  email: string;
+  created_at: string;
+  last_sign_in_at: string | null;
+  banned_until: string | null;
+}
+
+function fmtJoined(iso: string) {
+  return new Date(iso).toLocaleDateString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function fmtLastLogin(iso: string | null) {
+  if (!iso) return 'Never';
+  const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  if (days > 7) return `${days}d ago`;
+  return new Date(iso).toLocaleDateString('en-AU', { day: '2-digit', month: 'short' });
+}
+
+function SeekerRoster() {
+  const [seekers, setSeekers] = useState<SeekerRow[]>([]);
+  const [saveCounts, setSaveCounts] = useState<Record<string, number>>({});
+  const [appCounts, setAppCounts] = useState<Record<string, number>>({});
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      try {
+        const data = await callAdminFunction('list_users');
+        const allSeekers: SeekerRow[] = (data?.users || [])
+          .filter((u: any) => u.user_type === 'seeker')
+          .map((u: any) => ({
+            id: u.id,
+            email: u.email || '',
+            created_at: u.created_at,
+            last_sign_in_at: u.last_sign_in_at || null,
+            banned_until: u.banned_until || null,
+          }));
+        if (cancelled) return;
+        setSeekers(allSeekers);
+
+        const ids = allSeekers.map(s => s.id);
+        if (ids.length > 0) {
+          const [{ data: saves }, { data: apps }] = await Promise.all([
+            (supabase as any).from('saved_properties').select('user_id').in('user_id', ids),
+            (supabase as any).from('rental_applications').select('applicant_id').in('applicant_id', ids),
+          ]);
+          if (cancelled) return;
+          const sc: Record<string, number> = {};
+          (saves || []).forEach((r: any) => { sc[r.user_id] = (sc[r.user_id] || 0) + 1; });
+          const ac: Record<string, number> = {};
+          (apps || []).forEach((r: any) => { ac[r.applicant_id] = (ac[r.applicant_id] || 0) + 1; });
+          setSaveCounts(sc);
+          setAppCounts(ac);
+        }
+      } catch (err: any) {
+        toast.error(err?.message || 'Failed to load seekers');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return seekers;
+    return seekers.filter(s => s.email.toLowerCase().includes(q));
+  }, [seekers, search]);
+
+  const handleDelete = async (id: string) => {
+    setDeletingId(id);
+    try {
+      await callAdminFunction('delete_user', { user_id: id });
+      setSeekers(prev => prev.filter(s => s.id !== id));
+      toast.success('Seeker deleted');
+    } catch (err: any) {
+      toast.error(err?.message || 'Delete failed');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  return (
+    <div className="rounded-2xl border border-stone-200 bg-white p-5">
+      <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
+        <div>
+          <div className="text-[15px] font-semibold text-stone-900">Seeker Accounts</div>
+          <div className="text-[12px] text-stone-500 mt-0.5">
+            {loading ? 'Loading…' : `${filtered.length} seeker${filtered.length === 1 ? '' : 's'} registered`}
+          </div>
+        </div>
+        <div className="relative w-full sm:w-72">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
+          <Input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Filter by email…"
+            className="pl-9"
+          />
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center py-12">
+          <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="text-sm text-stone-400 py-12 text-center">
+          {seekers.length === 0 ? 'No seeker accounts yet.' : 'No matches.'}
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="text-xs text-stone-500">
+              <tr>
+                <th className="text-left px-3 py-2 font-medium">Email</th>
+                <th className="text-left px-3 py-2 font-medium">Joined</th>
+                <th className="text-left px-3 py-2 font-medium">Last login</th>
+                <th className="text-right px-3 py-2 font-medium">Saves</th>
+                <th className="text-right px-3 py-2 font-medium">Applications</th>
+                <th className="text-left px-3 py-2 font-medium">Status</th>
+                <th className="text-right px-3 py-2 font-medium">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(s => {
+                const banned = !!s.banned_until && new Date(s.banned_until) > new Date();
+                return (
+                  <tr key={s.id} className="border-t border-stone-100">
+                    <td className="px-3 py-2 text-stone-900">{s.email || '—'}</td>
+                    <td className="px-3 py-2 text-stone-600">{fmtJoined(s.created_at)}</td>
+                    <td className="px-3 py-2 text-stone-600">{fmtLastLogin(s.last_sign_in_at)}</td>
+                    <td className="px-3 py-2 text-right tabular-nums text-stone-700">{saveCounts[s.id] || 0}</td>
+                    <td className="px-3 py-2 text-right tabular-nums text-stone-700">{appCounts[s.id] || 0}</td>
+                    <td className="px-3 py-2">
+                      {banned ? (
+                        <Badge variant="destructive" className="text-[10px]">Banned</Badge>
+                      ) : (
+                        <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 text-[10px]">Active</Badge>
+                      )}
+                    </td>
+                    <td className="px-3 py-2">
+                      <div className="flex items-center justify-end gap-1">
+                        <a
+                          href={`mailto:${s.email}`}
+                          className="p-2 text-stone-500 hover:text-stone-900 rounded-md"
+                          title="Email"
+                        >
+                          <Mail size={14} />
+                        </a>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              disabled={deletingId === s.id}
+                              className="text-destructive hover:text-destructive"
+                              title="Delete"
+                            >
+                              <Trash2 size={14} />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete seeker?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This permanently deletes the user and all their data. This cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDelete(s.id)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+

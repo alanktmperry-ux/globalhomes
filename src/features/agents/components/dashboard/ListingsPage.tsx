@@ -438,4 +438,52 @@ const ListingsPage = () => {
   );
 };
 
+const VendorReportDialog = ({
+  open, onClose, url, address,
+}: { open: boolean; onClose: () => void; url: string; address: string }) => {
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success('Report link copied');
+    } catch {
+      toast.error('Could not copy link');
+    }
+  };
+
+  const handleEmail = () => {
+    const subject = encodeURIComponent(`Your property report for ${address}`);
+    const body = encodeURIComponent(
+      `Hi,\n\nHere's your weekly performance report for ${address}:\n${url}\n\nThis link is valid for 30 days.`
+    );
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-base">
+            <FileBarChart2 size={18} className="text-primary" />
+            Send vendor report
+          </DialogTitle>
+          <DialogDescription className="text-xs">
+            Share this private link with your vendor for {address}. Valid for 30 days.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3">
+          <Input readOnly value={url} className="text-xs font-mono" onFocus={(e) => e.currentTarget.select()} />
+          <div className="flex gap-2">
+            <Button onClick={handleCopy} className="flex-1 gap-1.5 text-xs">
+              <Copy size={14} /> Copy link
+            </Button>
+            <Button onClick={handleEmail} variant="outline" className="flex-1 gap-1.5 text-xs">
+              <Mail size={14} /> Send by email
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 export default ListingsPage;

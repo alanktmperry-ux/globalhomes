@@ -69,6 +69,11 @@ interface CCData {
   revenueAtRisk: number;
   ltvEstimate: number | null;
   netNewMRR: number;
+  trialConversionPct: number;
+  onboardingIncomplete: number;
+  netNewMrrThisMonth: number;
+  partnerCount: number;
+  brokerCount: number;
   liveListings: number;
   listingsToday: number;
   listingsThisWeek: number;
@@ -281,6 +286,8 @@ export default function CommandCentre() {
         savesTodayRes,
         totalBuyersRes,
         newBuyersWeekRes,
+        partnersRes,
+        brokersRes,
       ] = await Promise.all([
         supabase.from('agents').select('id, user_id, name, email, agency, is_subscribed, subscription_status, created_at, updated_at, onboarding_complete, agent_subscriptions(plan_type)'),
         supabase.from('properties').select('id, agent_id, state, is_active, views, images, created_at'),
@@ -302,6 +309,8 @@ export default function CommandCentre() {
         (supabase.from('saved_properties' as any).select('id', { count: 'exact', head: true }).gte('saved_at', todayStart)) as any,
         (supabase.from('buyer_profiles' as any).select('id', { count: 'exact', head: true })) as any,
         (supabase.from('buyer_profiles' as any).select('id', { count: 'exact', head: true }).gte('created_at', d7)) as any,
+        (supabase.from('partners' as any).select('id', { count: 'exact', head: true })) as any,
+        (supabase.from('brokers' as any).select('id', { count: 'exact', head: true })) as any,
       ]);
 
       // Top suburb from voice searches in the last 7 days
@@ -397,6 +406,11 @@ export default function CommandCentre() {
       const ltvEstimate = churnRatePct > 0 ? arpu / (churnRatePct / 100) : null;
       const newPaidAgentsThisMonth = agents.filter((a: any) => a.is_subscribed && a.created_at >= monthStart).length;
       const netNewMRR = (newPaidAgentsThisMonth * arpu) - (churnedThisMonthCount * arpu);
+      const trialConversionPct = agents.length > 0 ? Math.round((paidAgents.length / agents.length) * 100) : 0;
+      const onboardingIncomplete = agents.filter((a: any) => !a.onboarding_complete && !a.is_subscribed).length;
+      const netNewMrrThisMonth = agents
+        .filter((a: any) => a.is_subscribed && a.created_at >= monthStart)
+        .reduce((s: number, a: any) => s + (PLAN_MRR[(a.agent_subscriptions?.plan_type || '').toLowerCase()] || 0), 0);
 
       // Week-over-week paid agents (subscribed before each cutoff)
       const paidAgentsPrevWeek = agents.filter(a => a.is_subscribed && a.created_at < d7).length;
@@ -523,6 +537,11 @@ export default function CommandCentre() {
         revenueAtRisk,
         ltvEstimate,
         netNewMRR,
+        trialConversionPct,
+        onboardingIncomplete,
+        netNewMrrThisMonth,
+        partnerCount: partnersRes?.count || 0,
+        brokerCount: brokersRes?.count || 0,
         liveListings: liveListingsRes.count || 0,
         listingsToday: listingsTodayRes.count || 0,
         listingsThisWeek: listingsWeekRes.count || 0,
@@ -952,7 +971,7 @@ export default function CommandCentre() {
       {/* SECTION 2 — Revenue pulse */}
       {!isSupport && (<>
       <SectionHead title="Revenue pulse" sub="Monthly recurring revenue and conversion" />
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
         <KPI
           label="MRR"
           value={`$${data.mrr.toLocaleString()}`}
@@ -994,6 +1013,19 @@ export default function CommandCentre() {
           color={data.paidAgents > 0 ? 'text-emerald-500' : 'text-muted-foreground'}
           sub="MRR ÷ paid agents"
         />
+        <KPI
+          label="Trial → Paid"
+          value={`${data.trialConversionPct}%`}
+          icon={Target}
+          sub="of all sign-ups converted"
+        />
+        <KPI
+          label="New MRR (month)"
+          value={`$${data.netNewMrrThisMonth.toLocaleString()}`}
+          icon={TrendingUp}
+          color={data.netNewMrrThisMonth > 0 ? 'text-emerald-500' : 'text-muted-foreground'}
+          sub="from new paid agents this month"
+        />
       </div>
 
       {/* Churn surfaced separately so we can keep 4-up grid above */}
@@ -1009,7 +1041,19 @@ export default function CommandCentre() {
 
       {/* Partners & Brokers */}
       <SectionHead title="Partners & Brokers" sub="Platform partner network" />
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <KPI
+          label="Trust Partners"
+          value={data.partnerCount}
+          sub="from partners table"
+          icon={Users}
+        />
+        <KPI
+          label="Brokers"
+          value={data.brokerCount}
+          sub="from brokers table"
+          icon={Users}
+        />
         <KPI
           label="Trust Accountants"
           value={data.totalTrustAccountants}
@@ -1384,7 +1428,7 @@ export default function CommandCentre() {
 
       {/* Trial growth context (kept from prior version) */}
       <SectionHead title="Agent Growth" sub="Sign-ups and retention" />
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
         <KPI
           label="Total Agents"
           value={data.totalAgents}
@@ -1407,7 +1451,22 @@ export default function CommandCentre() {
           icon={Clock}
           color={data.trialsExpiringThisWeek > 0 ? 'text-amber-500' : 'text-muted-foreground'}
         />
+        <KPI
+          label="Stuck in Setup"
+          value={data.onboardingIncomplete}
+          icon={AlertTriangle}
+          color={data.onboardingIncomplete > 0 ? 'text-amber-500' : 'text-muted-foreground'}
+          sub="onboarding incomplete"
+        />
       </div>
+      {data.onboardingIncomplete > 0 && (
+        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-amber-700 dark:text-amber-400 flex items-center gap-2 mt-3">
+          <AlertTriangle size={14} />
+          <span>
+            <strong>{data.onboardingIncomplete}</strong> agent{data.onboardingIncomplete > 1 ? 's haven\'t' : ' hasn\'t'} completed onboarding yet.
+          </span>
+        </div>
+      )}
     </div>
   );
 }

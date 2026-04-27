@@ -987,6 +987,13 @@ export default function CommandCentre() {
           sub={`${(data.conversionRate - data.conversionRatePrevWeek).toFixed(1)}pp vs last week`}
           trend={trendFromDelta(data.conversionRate, data.conversionRatePrevWeek)}
         />
+        <KPI
+          label="Rev / Agent"
+          value={data.paidAgents > 0 ? `$${Math.round(data.mrr / data.paidAgents).toLocaleString()}/agent` : '—'}
+          icon={DollarSign}
+          color={data.paidAgents > 0 ? 'text-emerald-500' : 'text-muted-foreground'}
+          sub="MRR ÷ paid agents"
+        />
       </div>
 
       {/* Churn surfaced separately so we can keep 4-up grid above */}

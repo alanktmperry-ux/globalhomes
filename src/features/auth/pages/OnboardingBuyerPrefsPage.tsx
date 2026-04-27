@@ -27,6 +27,22 @@ export default function OnboardingBuyerPrefsPage() {
     if (!loading && !user) navigate('/login', { replace: true });
   }, [user, loading, navigate]);
 
+  const sendWelcomeEmail = async () => {
+    try {
+      const { data: { user: u } } = await supabase.auth.getUser();
+      if (u?.email) {
+        await supabase.functions.invoke('send-welcome-email', {
+          body: {
+            type: 'buyer',
+            user_id: u.id,
+            name: (u.user_metadata as any)?.display_name || '',
+            email: u.email,
+          },
+        });
+      }
+    } catch { /* non-fatal */ }
+  };
+
   const handleContinue = async () => {
     if (!seekingType) return;
     setSaving(true);
@@ -57,13 +73,17 @@ export default function OnboardingBuyerPrefsPage() {
       if (seekingType === 'rent') searchParams.set('type', 'rent');
       const qs = searchParams.toString();
       navigate(qs ? `/?${qs}` : '/', { replace: true });
+      sendWelcomeEmail();
     } catch (err) {
       toast.error("Couldn't save your preferences", { description: getErrorMessage(err) });
       setSaving(false);
     }
   };
 
-  const handleSkip = () => navigate('/', { replace: true });
+  const handleSkip = () => {
+    navigate('/', { replace: true });
+    sendWelcomeEmail();
+  };
 
   return (
     <div className="bg-stone-50 min-h-screen flex items-center justify-center px-4 py-12">

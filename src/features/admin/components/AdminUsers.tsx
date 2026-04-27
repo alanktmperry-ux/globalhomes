@@ -934,16 +934,7 @@ const UsersDashboard = ({ users, loading }: UsersDashboardProps) => {
                                 <Trash2 size={14} />
                               </button>
                             )}
-                          </>
-                        )}
-                            <button
-                              onClick={() => handleDeleteClick(u)}
-                              className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
-                              title="Delete user"
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </>
+                           </>
                         )}
                       </div>
                     ) : (

@@ -214,14 +214,7 @@ const AdminUsers = () => {
   };
 
   const handlePlanChange = (plan: string) => {
-    const limits: Record<string, { listings: number; seats: number }> = {
-      demo: { listings: 3, seats: 1 },
-      starter: { listings: 10, seats: 1 },
-      pro: { listings: 9999, seats: 1 },
-      agency: { listings: 9999, seats: 8 },
-      enterprise: { listings: 9999, seats: 50 },
-    };
-    const def = limits[plan] || limits.demo;
+    const def = PLAN_LIMITS[plan] || PLAN_LIMITS.demo;
     setSubForm(f => ({ ...f, plan_type: plan, listing_limit: def.listings, seat_limit: def.seats }));
   };
 

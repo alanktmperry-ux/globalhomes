@@ -123,7 +123,7 @@ function KPI({
   label: string;
   value: string | number;
   sub?: string;
-  icon: any;
+  icon?: any;
   color?: string;
   trend?: Trend;
 }) {
@@ -131,11 +131,13 @@ function KPI({
     <div className="rounded-2xl border border-border bg-card p-4 space-y-1">
       <div className="flex items-center justify-between">
         <p className="text-xs text-muted-foreground font-medium">{label}</p>
-        <div className={color}>
-          <Icon size={16} />
-        </div>
+        {Icon && (
+          <div className={color}>
+            <Icon size={16} />
+          </div>
+        )}
       </div>
-      <p className="text-2xl font-bold text-foreground">{value}</p>
+      <p className="text-2xl font-bold text-foreground">{String(value)}</p>
       {sub && (
         <p className="text-[11px] text-muted-foreground flex items-center gap-1">
           {trend === 'up' && <TrendingUp size={12} className="text-emerald-500" />}

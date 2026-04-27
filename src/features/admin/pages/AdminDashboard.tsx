@@ -368,6 +368,7 @@ const AdminDashboard = () => {
               {tab === 'legal-compliance' && <LegalComplianceChecklist />}
               {tab === 'press-outreach' && <PressOutreachPage />}
               {tab === 'pre-approval-review' && <PreApprovalReview />}
+              {tab === 'help-faqs' && <AdminHelpFAQs />}
             </>
           )}
         </div>

@@ -578,7 +578,7 @@ Deno.serve(async (req) => {
         });
       }
 
-      if (action === "grant_role") {
+      if (opName === "grant_role") {
         // Idempotent: ignore conflict on (user_id, role) unique
         const { error: insErr } = await supabase
           .from("user_roles")
@@ -617,10 +617,10 @@ Deno.serve(async (req) => {
       try {
         await supabase.from("audit_log").insert({
           user_id: caller.id,
-          action_type: action === "grant_role" ? "role_granted" : "role_revoked",
+          action_type: opName === "grant_role" ? "role_granted" : "role_revoked",
           entity_type: "user",
           entity_id: userId,
-          description: `Admin ${action === "grant_role" ? "granted" : "revoked"} role "${role}"`,
+          description: `Admin ${opName === "grant_role" ? "granted" : "revoked"} role "${role}"`,
           metadata: {
             role,
             changed_by: caller.id,

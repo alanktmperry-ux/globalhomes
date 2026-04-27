@@ -1041,7 +1041,19 @@ export default function CommandCentre() {
 
       {/* Partners & Brokers */}
       <SectionHead title="Partners & Brokers" sub="Platform partner network" />
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <KPI
+          label="Trust Partners"
+          value={data.partnerCount}
+          sub="from partners table"
+          icon={Users}
+        />
+        <KPI
+          label="Brokers"
+          value={data.brokerCount}
+          sub="from brokers table"
+          icon={Users}
+        />
         <KPI
           label="Trust Accountants"
           value={data.totalTrustAccountants}

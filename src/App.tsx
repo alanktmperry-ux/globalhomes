@@ -47,6 +47,7 @@ const AdminSupportPage = React.lazy(() => import("./features/admin/pages/Support
 const AdminListingsPage = React.lazy(() => import("./features/admin/pages/AdminListingsPage"));
 const AdminRevenuePage = React.lazy(() => import("./features/admin/pages/RevenuePage"));
 const AdminOutreachPage = React.lazy(() => import("./features/admin/pages/OutreachPage"));
+const AdminBuyersPage = React.lazy(() => import("./features/admin/pages/BuyersPage"));
 const AdminSystemPage = React.lazy(() => import("./features/admin/pages/AdminSystemPage"));
 const ForgotPasswordPage = React.lazy(() => import("./pages/ForgotPasswordPage"));
 const ResetPasswordPage = React.lazy(() => import("./pages/ResetPasswordPage"));
@@ -414,6 +415,7 @@ const App = () => (
                   <Route path="system" element={<AdminSystemPage />} />
                   <Route path="partners" element={<AdminPartnersPage />} />
                   <Route path="support" element={<AdminSupportPage />} />
+                  <Route path="buyers" element={<AdminBuyersPage />} />
                 </Route>
                 <Route path="/admin/legacy" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
 

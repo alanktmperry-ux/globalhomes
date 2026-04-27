@@ -7,8 +7,9 @@ import { Helmet } from 'react-helmet-async';
 // bottom sheet drag), which loads after the user runs a search.
 import { motion, useMotionValue, useSpring, type PanInfo } from 'framer-motion';
 import { ArrowRight, ArrowLeft, MapPin, Sparkles, Map, List, Mic, MicOff, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users, Search, Home, Check, ArrowLeftRight, UserCheck, ChevronRight, Globe } from 'lucide-react';
-import { VoiceSearchHero } from '@/features/search/components/VoiceSearchHero';
-import { TranslationDemoCard } from '@/features/marketing/components/TranslationDemoCard';
+const VoiceSearchHero = lazy(() =>
+  import('@/features/search/components/VoiceSearchHero').then(m => ({ default: m.VoiceSearchHero }))
+);
 import { useHeroVoiceSearch } from '@/features/search/hooks/useHeroVoiceSearch';
 
 import { MapSkeleton } from '@/features/properties/components/PropertyCardSkeleton';
@@ -1571,20 +1572,22 @@ const Index = () => {
     ) : (
       <div className="shrink-0">
         <VoiceSearchErrorBoundary>
-          <VoiceSearchHero
-            onSearch={wrappedHandleSearch}
-            onLocationSelect={(loc) => {
-              setSearchCenter({ lat: loc.lat, lng: loc.lng });
-              if (!searchRadius) setSearchRadius(10);
-              setTimeout(() => {
-                setMapCenter({ lat: loc.lat, lng: loc.lng, key: `${loc.lat}-${loc.lng}-${Date.now()}` });
-              }, 300);
-            }}
-            onRadiusChange={setSearchRadius}
-            selectedRadius={searchRadius}
-            resultCount={hasSearched ? filteredProperties.length : undefined}
-            isSearching={isSearching}
-          />
+          <Suspense fallback={null}>
+            <VoiceSearchHero
+              onSearch={wrappedHandleSearch}
+              onLocationSelect={(loc) => {
+                setSearchCenter({ lat: loc.lat, lng: loc.lng });
+                if (!searchRadius) setSearchRadius(10);
+                setTimeout(() => {
+                  setMapCenter({ lat: loc.lat, lng: loc.lng, key: `${loc.lat}-${loc.lng}-${Date.now()}` });
+                }, 300);
+              }}
+              onRadiusChange={setSearchRadius}
+              selectedRadius={searchRadius}
+              resultCount={hasSearched ? filteredProperties.length : undefined}
+              isSearching={isSearching}
+            />
+          </Suspense>
         </VoiceSearchErrorBoundary>
       </div>
     )}

@@ -48,6 +48,7 @@ const AdminListingsPage = React.lazy(() => import("./features/admin/pages/AdminL
 const AdminInsightsPage = React.lazy(() => import("./features/admin/pages/InsightsPage"));
 const AdminCostsPage = React.lazy(() => import("./features/admin/pages/CostsPage"));
 const AdminHelpPage = React.lazy(() => import("./features/admin/pages/AdminHelpPage"));
+const AdminLoginPage = React.lazy(() => import("./features/admin/pages/AdminLoginPage"));
 const AdminRevenuePage = React.lazy(() => import("./features/admin/pages/RevenuePage"));
 const AdminOutreachPage = React.lazy(() => import("./features/admin/pages/OutreachPage"));
 const AdminBuyersPage = React.lazy(() => import("./features/admin/pages/BuyersPage"));
@@ -411,6 +412,7 @@ const App = () => (
 
 
                 {/* Admin */}
+                <Route path="/admin/login" element={<AdminLoginPage />} />
                 <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminLayout /></ProtectedRoute>}>
                   <Route index element={<CommandCentre />} />
                   <Route path="approvals" element={<AdminApprovalsPage />} />

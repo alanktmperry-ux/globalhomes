@@ -3305,6 +3305,59 @@ export type Database = {
           },
         ]
       }
+      concierge_usage: {
+        Row: {
+          action: string
+          agent_id: string
+          created_at: string
+          entity_id: string | null
+          id: string
+        }
+        Insert: {
+          action: string
+          agent_id: string
+          created_at?: string
+          entity_id?: string | null
+          id?: string
+        }
+        Update: {
+          action?: string
+          agent_id?: string
+          created_at?: string
+          entity_id?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concierge_usage_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concierge_usage_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concierge_usage_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concierge_usage_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+        ]
+      }
       consumer_profiles: {
         Row: {
           budget_max: number | null

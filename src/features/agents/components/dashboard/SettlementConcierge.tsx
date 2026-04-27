@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { PartyPopper, MapPin, Clock, ChevronDown, ChevronUp, Star, ExternalLink, Gift, Loader2 } from 'lucide-react';
+import { PartyPopper, MapPin, Clock, ChevronDown, ChevronUp, Star, ExternalLink, Gift, Loader2, Home } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -162,10 +163,23 @@ const SettlementConcierge = () => {
     toast.success('📋 Copied — Review request copied to clipboard');
   };
 
-  const { canAccessSettlement, loading: subLoading } = useSubscription();
+  const { canAccessSettlementConcierge, loading: subLoading } = useSubscription();
 
-  if (!subLoading && !canAccessSettlement) {
-    return <UpgradeGate requiredPlan="Pro or above" message="Settlement Concierge is available on the Pro plan and above. Track every milestone from exchange to settlement so nothing slips." />;
+  if (!subLoading && !canAccessSettlementConcierge) {
+    return (
+      <div className="max-w-2xl mx-auto p-6 text-center space-y-4">
+        <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+          <Home className="text-primary" size={22} />
+        </div>
+        <h1 className="text-2xl font-bold tracking-tight">Settlement Concierge</h1>
+        <p className="text-sm text-muted-foreground">
+          Settlement coordination tools are available on Agency plans and above.
+        </p>
+        <Button asChild>
+          <Link to="/dashboard/billing">Upgrade to Agency</Link>
+        </Button>
+      </div>
+    );
   }
 
   if (loading) {

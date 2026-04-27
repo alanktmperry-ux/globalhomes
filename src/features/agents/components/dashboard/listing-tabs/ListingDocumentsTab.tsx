@@ -20,7 +20,6 @@ const CATEGORIES = [
   { value: 'vendor_statement', label: 'Vendor Statement (S32)' },
   { value: 'building_report', label: 'Building Report' },
   { value: 'pest_report', label: 'Pest Report' },
-  { value: 'strata', label: 'Strata Report' },
   { value: 'general', label: 'General' },
 ];
 

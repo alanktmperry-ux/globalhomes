@@ -9,11 +9,10 @@ interface Props {
   requireAgent?: boolean;
   requireAdmin?: boolean;
   requirePartner?: boolean;
-  requireStrata?: boolean;
 }
 
-export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePartner, requireStrata }: Props) => {
-  const { user, loading, isAgent, isAdmin, isPartner, isStrataManager, refreshRoles } = useAuth();
+export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePartner }: Props) => {
+  const { user, loading, isAgent, isAdmin, isPartner, refreshRoles } = useAuth();
 
   // Auto-approve verified-email agents (no manual admin gate)
   useEffect(() => {
@@ -67,7 +66,6 @@ export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePa
   // Agent guard: if no agents row exists, send to onboarding to create one.
   if (requireAgent && !isAgent && !isAdmin) return <Navigate to="/onboarding/agency" replace />;
   if (requirePartner && !isPartner) return <Navigate to="/" replace />;
-  if (requireStrata && !isStrataManager && !isAdmin) return <Navigate to="/" replace />;
 
   return <>{children}</>;
 };

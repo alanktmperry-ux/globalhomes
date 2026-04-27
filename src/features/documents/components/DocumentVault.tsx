@@ -14,7 +14,7 @@ import type { DocumentRequest } from '../types';
 const FILTER_TABS = [
   { key: 'all', label: 'All' },
   { key: 'contract_of_sale,section32', label: 'Contracts' },
-  { key: 'building_inspection,strata_report', label: 'Reports' },
+  { key: 'building_inspection', label: 'Reports' },
   { key: 'title_search,council_rates,land_tax', label: 'Title' },
   { key: 'lease_agreement,condition_report', label: 'Lease' },
   { key: 'floor_plan', label: 'Floor Plans' },

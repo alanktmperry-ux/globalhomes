@@ -214,13 +214,6 @@ export const FAQ_ITEMS: FaqItem[] = [
     tags: ['access', 'read only', 'full access', 'team', 'permissions'],
   },
   {
-    id: 'agent-strata-health',
-    question: 'What is the Strata Health Score?',
-    answer: 'The Strata Health Score is a 0–100 score that assesses the financial and compliance health of a strata scheme — relevant for apartments, townhouses, and units in managed complexes.\n\nThe score is calculated across five weighted factors:\n• Sinking fund adequacy (30 points) — how well-funded the capital works reserve is relative to its target\n• Special levy history (25 points) — whether any unexpected levies have been issued in the past 5 years, and their size per lot\n• Levy-to-value ratio (20 points) — annual levies as a proportion of estimated lot value\n• Capital works plan currency (15 points) — how recently the 10-year capital works plan was updated\n• Defect disclosure (10 points) — presence of known building defects or active defect bonds\n\nA score of 80+ is considered healthy. Below 50 indicates potential financial risk for buyers.\n\nAs a listing agent, you can attach the Strata Health Score to any applicable listing. Buyers see the score on the property detail page as a trust signal. The score is computed automatically from the strata data you enter and can be regenerated if data changes.',
-    category: 'agents',
-    tags: ['strata', 'health score', 'sinking fund', 'levy', 'apartment', 'defect', 'capital works'],
-  },
-  {
     id: 'agent-cma',
     question: 'How do I run a Comparative Market Analysis (CMA)?',
     answer: 'The CMA tool is available in your agent dashboard under Market → CMA. It allows you to produce a professional market analysis report to support a listing presentation or vendor appraisal.\n\nTo run a CMA:\n1. Enter the subject property address\n2. ListHQ pulls comparable sold and listed properties from the same suburb, filtered by property type, bedroom count, and sale method\n3. Review and select which comparables to include or exclude\n4. The CMA report calculates a suggested price range based on median and average comparable sale prices, adjusted for days on market\n5. Export the report as a PDF to share with your vendor\n\nThe CMA report includes a cover page, comparable property table, price per square metre analysis, and a recommended listing price range. It is designed to be presented directly to vendors at the appraisal meeting.',

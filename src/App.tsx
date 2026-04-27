@@ -134,10 +134,6 @@ const PartnerTeamPage = React.lazy(() => import("./features/partners/pages/Partn
 const PartnerAccessPage = React.lazy(() => import("./features/agents/components/dashboard/PartnerAccessPage"));
 const ReviewSubmitPage = React.lazy(() => import("./features/agents/pages/ReviewSubmitPage"));
 const VerifyReviewPage = React.lazy(() => import("./features/agents/pages/VerifyReviewPage"));
-const StrataDirectoryPage = React.lazy(() => import("./features/strata/pages/StrataDirectoryPage"));
-const SchemeProfilePage = React.lazy(() => import("./features/strata/pages/SchemeProfilePage"));
-const StrataDashboardLayout = React.lazy(() => import("./features/strata/pages/StrataDashboardLayout"));
-const StrataAuthPage = React.lazy(() => import("./features/strata/pages/StrataAuthPage"));
 const HelpCentrePage = React.lazy(() => import("./pages/HelpCentrePage"));
 const FaqPage = React.lazy(() => import("./pages/FaqPage"));
 const HelpAgentsPage = React.lazy(() => import("./pages/HelpAgentsPage"));
@@ -258,8 +254,6 @@ const App = () => (
                   <Route path="/terms" element={<TermsPage />} />
                   <Route path="/sign/:token" element={<SigningPage />} />
                   <Route path="/privacy" element={<PrivacyPage />} />
-                  <Route path="/strata" element={<StrataDirectoryPage />} />
-                  <Route path="/schemes/:id" element={<SchemeProfilePage />} />
                   <Route path="/stamp-duty-calculator" element={<StampDutyPage />} />
                   <Route path="/mortgage-calculator" element={<MortgageCalculatorPage />} />
                   <Route path="/buyer-pool" element={<BuyerPoolPage />} />
@@ -310,7 +304,7 @@ const App = () => (
                 <Route path="/supplier/portal" element={<SupplierPortalPage />} />
                 <Route path="/owner/portal" element={<OwnerPortalPage />} />
                 <Route path="/review/:token" element={<ReviewSubmitPage />} />
-                <Route path="/strata/login" element={<StrataAuthPage />} />
+                
                 <Route path="/broker/login" element={<BrokerLogin />} />
                 <Route path="/broker/portal" element={<BrokerPortal />} />
                 <Route path="/broker/lead/:id" element={<BrokerLeadDetailPage />} />
@@ -401,8 +395,6 @@ const App = () => (
                   <Route path="arrears" element={<PartnerArrearsPage />} />
                 </Route>
 
-                {/* Strata */}
-                <Route path="/strata-dashboard" element={<ProtectedRoute requireStrata><StrataDashboardLayout /></ProtectedRoute>} />
 
                 {/* Admin */}
                 <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminLayout /></ProtectedRoute>}>

@@ -16,7 +16,6 @@ const QUICK_QUESTIONS = [
   'How do I record a trust receipt?',
   'How does multilingual translation work?',
   'How do I invite a team member?',
-  'What is the Strata Health Score?',
   'How do I use voice listing creation?',
   'How does the co-broke toggle work?',
 ];

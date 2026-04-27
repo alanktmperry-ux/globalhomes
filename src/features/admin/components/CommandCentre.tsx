@@ -387,6 +387,17 @@ export default function CommandCentre() {
       const monthlyGrowthRate = prevMonthPaid > 0 ? (paidAgents.length - prevMonthPaid) / prevMonthPaid : 0;
       const projectedARR12m = mrr * 12 * Math.pow(1 + Math.max(monthlyGrowthRate, 0), 12);
 
+      // Executive financial health metrics
+      const churnedThisMonthCount = churnRes.count || 0;
+      const arpu = paidAgents.length > 0 ? mrr / paidAgents.length : 0;
+      const churnDenominator = Math.max(paidAgents.length + churnedThisMonthCount, 1);
+      const churnRatePct = (churnedThisMonthCount / churnDenominator) * 100;
+      const paymentFailedCount = agents.filter((a: any) => a.subscription_status === 'payment_failed').length;
+      const revenueAtRisk = paymentFailedCount * arpu;
+      const ltvEstimate = churnRatePct > 0 ? arpu / (churnRatePct / 100) : null;
+      const newPaidAgentsThisMonth = agents.filter((a: any) => a.is_subscribed && a.created_at >= monthStart).length;
+      const netNewMRR = (newPaidAgentsThisMonth * arpu) - (churnedThisMonthCount * arpu);
+
       // Week-over-week paid agents (subscribed before each cutoff)
       const paidAgentsPrevWeek = agents.filter(a => a.is_subscribed && a.created_at < d7).length;
 

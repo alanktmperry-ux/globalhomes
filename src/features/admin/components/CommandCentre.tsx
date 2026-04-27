@@ -1000,6 +1000,36 @@ export default function CommandCentre() {
         </div>
       )}
 
+      {/* Partners & Brokers */}
+      <SectionHead title="Partners & Brokers" sub="Platform partner network" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <KPI
+          label="Trust Accountants"
+          value={data.totalTrustAccountants}
+          sub="signed up on platform"
+          icon={UserCheck}
+        />
+        <KPI
+          label="Mortgage Brokers"
+          value={data.totalMortgageBrokers}
+          sub="signed up on platform"
+          icon={UserCheck}
+        />
+        <KPI
+          label="Pending Verification"
+          value={data.pendingPartners}
+          sub="partners awaiting approval"
+          icon={Clock}
+          color={data.pendingPartners > 0 ? 'text-amber-500' : 'text-muted-foreground'}
+        />
+        <KPI
+          label="Seekers"
+          value={data.totalSeekers}
+          sub={`+${data.newSeekersThisWeek} this week`}
+          icon={Users}
+        />
+      </div>
+
       {/* Revenue Forecast */}
       <SectionHead title="Revenue Forecast" sub="Projected based on current pace" />
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -1027,6 +1057,52 @@ export default function CommandCentre() {
           sub={data.monthlyGrowthRate > 0 ? 'paid agents vs last month' : data.monthlyGrowthRate < 0 ? 'paid agents vs last month' : 'no change vs last month'}
           color={data.monthlyGrowthRate > 0 ? 'text-emerald-500' : data.monthlyGrowthRate < 0 ? 'text-destructive' : 'text-muted-foreground'}
           trend={data.monthlyGrowthRate > 0 ? 'up' : data.monthlyGrowthRate < 0 ? 'down' : 'flat'}
+        />
+      </div>
+
+      {/* Business Health */}
+      <SectionHead title="Business Health" sub="Key metrics for executive decision-making" />
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
+        <KPI
+          label="ARPU"
+          value={data.paidAgents > 0 ? `$${Math.round(data.arpu).toLocaleString()}/mo` : '$0/mo'}
+          sub="avg revenue per user"
+          icon={DollarSign}
+        />
+        <KPI
+          label="Churn Rate"
+          value={`${data.churnRatePct.toFixed(1)}%`}
+          sub="this month"
+          icon={TrendingDown}
+          color={data.churnRatePct > 5 ? 'text-destructive' : 'text-muted-foreground'}
+        />
+        <KPI
+          label="Revenue at Risk"
+          value={`$${Math.round(data.revenueAtRisk).toLocaleString()}`}
+          sub="payment failed accounts"
+          icon={AlertTriangle}
+          color={data.revenueAtRisk > 0 ? 'text-destructive' : 'text-muted-foreground'}
+        />
+        <KPI
+          label="LTV Estimate"
+          value={data.ltvEstimate != null ? `$${Math.round(data.ltvEstimate).toLocaleString()}` : 'Calculating…'}
+          sub="lifetime value per user"
+          icon={Target}
+        />
+        <KPI
+          label="Net New MRR"
+          value={`${data.netNewMRR >= 0 ? '+' : ''}$${Math.round(data.netNewMRR).toLocaleString()}`}
+          sub="this month"
+          icon={data.netNewMRR >= 0 ? TrendingUp : TrendingDown}
+          color={data.netNewMRR > 0 ? 'text-emerald-500' : data.netNewMRR < 0 ? 'text-destructive' : 'text-muted-foreground'}
+          trend={data.netNewMRR > 0 ? 'up' : data.netNewMRR < 0 ? 'down' : 'flat'}
+        />
+        <KPI
+          label="12-Month Projection"
+          value={`$${Math.round(data.projectedARR12m).toLocaleString()}`}
+          sub="projected annual revenue"
+          icon={TrendingUp}
+          color="text-emerald-500"
         />
       </div>
 

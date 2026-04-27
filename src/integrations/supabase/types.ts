@@ -7082,6 +7082,7 @@ export type Database = {
           is_verified: boolean
           logo_url: string | null
           notes: string | null
+          partner_type: string
           updated_at: string
           user_id: string
           verified_at: string | null
@@ -7098,6 +7099,7 @@ export type Database = {
           is_verified?: boolean
           logo_url?: string | null
           notes?: string | null
+          partner_type?: string
           updated_at?: string
           user_id: string
           verified_at?: string | null
@@ -7114,6 +7116,7 @@ export type Database = {
           is_verified?: boolean
           logo_url?: string | null
           notes?: string | null
+          partner_type?: string
           updated_at?: string
           user_id?: string
           verified_at?: string | null

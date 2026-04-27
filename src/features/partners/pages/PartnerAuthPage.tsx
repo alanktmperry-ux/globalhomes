@@ -20,6 +20,7 @@ const PartnerAuthPage = () => {
   const [phone, setPhone] = useState('');
   const [abn, setAbn] = useState('');
   const [website, setWebsite] = useState('');
+  const [partnerType, setPartnerType] = useState<'trust_accountant' | 'mortgage_broker'>('trust_accountant');
   const [loading, setLoading] = useState(false);
   const [registered, setRegistered] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
@@ -29,11 +30,17 @@ const PartnerAuthPage = () => {
 
   const inputClass = "w-full px-4 py-3.5 rounded-full border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40";
 
-  const features = [
+  const trustFeatures = [
     { icon: Landmark, text: 'Manage trust accounting for multiple agencies' },
     { icon: Users, text: 'Single login across all your client accounts' },
     { icon: FileText, text: 'Full audit trail for every transaction' },
   ];
+  const brokerFeatures = [
+    { icon: Landmark, text: 'Embed a mortgage calculator widget on any page' },
+    { icon: Users, text: 'Receive qualified leads from ListHQ property searches' },
+    { icon: FileText, text: 'Track referral stats and conversions' },
+  ];
+  const features = partnerType === 'mortgage_broker' ? brokerFeatures : trustFeatures;
 
   // Auto-submit sign-in after captcha verification
   useEffect(() => {
@@ -82,7 +89,13 @@ const PartnerAuthPage = () => {
         throw new Error('No partner account found for this email. Please register below.');
       }
 
-      navigate('/partner/dashboard');
+      const { data: partnerData } = await (supabase as any)
+        .from('partners')
+        .select('partner_type')
+        .eq('user_id', signedInUser?.id || '')
+        .maybeSingle();
+      const pType = (partnerData as any)?.partner_type || 'trust_accountant';
+      navigate(pType === 'mortgage_broker' ? '/partner/broker' : '/partner/dashboard');
     } catch (err: unknown) {
       toast.error(getErrorMessage(err));
     }
@@ -116,9 +129,20 @@ const PartnerAuthPage = () => {
           contactPhone: phone || null,
           abn: abn || null,
           website: website || null,
+          partner_type: partnerType,
         },
       });
       if (setupError) throw setupError;
+
+      // Best-effort: ensure partner_type is persisted even if the edge function ignores it
+      try {
+        await (supabase as any)
+          .from('partners')
+          .update({ partner_type: partnerType })
+          .eq('user_id', data.user.id);
+      } catch {
+        // non-fatal
+      }
 
       setRegistered(true);
     } catch (err: unknown) {
@@ -164,9 +188,9 @@ const PartnerAuthPage = () => {
           </div>
 
           <div>
-            <h2 className="font-display text-4xl font-bold leading-tight mb-4">One login.<br />Every client.</h2>
+            <h2 className="font-display text-4xl font-bold leading-tight mb-4">Partner with ListHQ</h2>
             <p className="text-white/70 text-base mb-6 max-w-sm">
-              Manage trust accounting across all your client agencies from a single secure portal.
+              Join Australia's fastest-growing property platform as a trusted partner.
             </p>
             <div className="space-y-3">
               {features.map((f, i) => (
@@ -260,6 +284,31 @@ const PartnerAuthPage = () => {
           {step === 'register' && (
             <>
               <form onSubmit={handleRegister} className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">I am a…</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {([
+                      { v: 'trust_accountant', label: 'Trust Accountant' },
+                      { v: 'mortgage_broker', label: 'Mortgage Broker' },
+                    ] as const).map(opt => {
+                      const selected = partnerType === opt.v;
+                      return (
+                        <button
+                          key={opt.v}
+                          type="button"
+                          onClick={() => setPartnerType(opt.v)}
+                          className={`py-2.5 rounded-full border text-sm font-medium transition-colors ${
+                            selected
+                              ? 'bg-blue-600 text-white border-blue-600'
+                              : 'bg-white text-stone-700 border-stone-200 hover:border-stone-300'
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">
                     Company name<span className="text-destructive">*</span>

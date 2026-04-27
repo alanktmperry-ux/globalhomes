@@ -54,6 +54,24 @@ const PartnerDashboardLayout = () => {
     }
   }, [user, isPartner, loading, navigate]);
 
+  // Route mortgage brokers to their lightweight portal
+  useEffect(() => {
+    if (!user || loading) return;
+    let cancelled = false;
+    (async () => {
+      const { data: partnerRow } = await (supabase as any)
+        .from('partners')
+        .select('partner_type')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (cancelled) return;
+      if ((partnerRow as any)?.partner_type === 'mortgage_broker') {
+        navigate('/partner/broker', { replace: true });
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user, loading, navigate]);
+
   const fetchAgencies = useCallback(async () => {
     if (!user) return;
     setAgenciesLoading(true);

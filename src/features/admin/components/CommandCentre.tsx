@@ -286,6 +286,8 @@ export default function CommandCentre() {
         savesTodayRes,
         totalBuyersRes,
         newBuyersWeekRes,
+        partnersRes,
+        brokersRes,
       ] = await Promise.all([
         supabase.from('agents').select('id, user_id, name, email, agency, is_subscribed, subscription_status, created_at, updated_at, onboarding_complete, agent_subscriptions(plan_type)'),
         supabase.from('properties').select('id, agent_id, state, is_active, views, images, created_at'),

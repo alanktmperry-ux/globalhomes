@@ -147,7 +147,8 @@ const SubscriptionStatusBadge = ({ status }: { status?: string | null }) => {
 
 const AdminUsers = () => {
   const { toast } = useToast();
-  const { startImpersonation } = useAuth();
+  const { startImpersonation, isSupport: authIsSupport, isAdmin: authIsAdmin } = useAuth();
+  const isSupport = !!authIsSupport && !authIsAdmin;
   const navigate = useNavigate();
   const [users, setUsers] = useState<AuthUser[]>([]);
   const [loading, setLoading] = useState(true);

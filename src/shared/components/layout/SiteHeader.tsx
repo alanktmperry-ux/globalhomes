@@ -85,6 +85,13 @@ export function SiteHeader() {
             <Users size={13} className="text-primary" /> Find an Agent
           </Link>
 
+          <Link
+            to="/pricing"
+            className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-foreground hover:text-primary hover:bg-primary/5 transition-colors"
+          >
+            <Sparkles size={13} className="text-primary" /> Pricing
+          </Link>
+
           <CurrencySwitcher />
           <LanguageSwitcher />
 

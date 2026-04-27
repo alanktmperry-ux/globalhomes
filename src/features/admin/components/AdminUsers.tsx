@@ -45,6 +45,7 @@ interface AuthUser {
   subscription_status?: string | null;
   payment_failed_at?: string | null;
   admin_grace_until?: string | null;
+  roles?: string[];
 }
 
 const UserTypeBadge = ({ user }: { user: AuthUser }) => {

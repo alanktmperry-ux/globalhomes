@@ -20,7 +20,7 @@ export default function SupportLoginPage() {
         return;
       }
       const { data: { user: u } } = await supabase.auth.getUser();
-      const { data: roleRow } = await supabase
+      const { data: roleRow } = await (supabase as any)
         .from('user_roles')
         .select('role')
         .eq('user_id', u?.id || '')

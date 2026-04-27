@@ -7,7 +7,7 @@ import { Loader2 } from 'lucide-react';
 
 interface SupportNavItemProps {
   to: string;
-  icon: React.ComponentType<{ size?: number }>;
+  icon: React.ComponentType<any>;
   label: string;
 }
 

@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
 import AdminSidebar from './AdminSidebar';
+import AdminCommandPalette from './AdminCommandPalette';
 
 const SECTION_LABELS: Record<string, string> = {
   '': 'Command Centre',
@@ -100,6 +101,7 @@ export default function AdminLayout() {
           </div>
         </div>
       </main>
+      <AdminCommandPalette />
     </div>
   );
 }

@@ -90,7 +90,7 @@ const AgentDashboardSidebar = () => {
   const navigate = useNavigate();
   const { signOut, isAdmin, isPrincipal } = useAuth();
   const { agent } = useCurrentAgent();
-  const { plan, foundingMember } = useSubscription();
+  const { plan } = useSubscription();
   const [activeCount, setActiveCount] = useState(0);
   const [arrearsCount, setArrearsCount] = useState(0);
   const [renewalsCount, setRenewalsCount] = useState(0);
@@ -324,14 +324,14 @@ const AgentDashboardSidebar = () => {
               {plan && (
                 <div className="flex items-center gap-1 mt-1">
                   <Badge variant="outline" className={`text-[10px] px-1 py-0 h-4 ${
-                    plan === 'pro' ? 'bg-primary/10 text-primary border-primary/20' :
+                    plan === 'solo' ? 'bg-primary/10 text-primary border-primary/20' :
                     plan === 'agency' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' :
-                    plan === 'enterprise' ? 'bg-violet-500/10 text-violet-600 border-violet-500/20' :
+                    plan === 'agency_pro' ? 'bg-violet-500/10 text-violet-600 border-violet-500/20' :
+                    plan === 'enterprise' ? 'bg-fuchsia-500/10 text-fuchsia-600 border-fuchsia-500/20' :
                     'bg-muted text-muted-foreground'
                   }`}>
-                    {plan === 'demo' ? 'Demo' : plan.charAt(0).toUpperCase() + plan.slice(1)}
+                    {plan === 'demo' ? 'Demo' : plan === 'agency_pro' ? 'Agency Pro' : plan.charAt(0).toUpperCase() + plan.slice(1)}
                   </Badge>
-                  {foundingMember && <Flame size={10} className="text-amber-500" />}
                 </div>
               )}
             </div>

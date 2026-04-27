@@ -84,7 +84,7 @@ const PocketListingPage = () => {
   };
 
   const checkLimitAndCreate = (type: 'sale' | 'rent') => {
-    if (sub.isStarter && activeCount >= sub.listingLimit) {
+    if (sub.isSolo && activeCount >= sub.listingLimit) {
       setShowLimitDialog(true);
       return;
     }

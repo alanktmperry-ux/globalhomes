@@ -11,9 +11,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-const PLAN_MRR: Record<string, number> = { starter: 99, pro: 199, agency: 399 };
-const PLAN_LABEL: Record<string, string> = { starter: 'Starter', pro: 'Pro', agency: 'Agency', demo: 'Trial', basic: 'Trial' };
-const PLAN_COLOR: Record<string, string> = { starter: '#6366f1', pro: '#8b5cf6', agency: '#a855f7', demo: '#94a3b8' };
+const PLAN_MRR: Record<string, number> = { solo: 299, agency: 899, agency_pro: 1999, enterprise: 4999 };
+const PLAN_LABEL: Record<string, string> = { solo: 'Solo', agency: 'Agency', agency_pro: 'Agency Pro', enterprise: 'Enterprise', demo: 'Trial', basic: 'Trial' };
+const PLAN_COLOR: Record<string, string> = { solo: '#6366f1', agency: '#8b5cf6', agency_pro: '#a855f7', enterprise: '#ec4899', demo: '#94a3b8' };
 
 interface AgentBillingRow {
   id: string;
@@ -23,7 +23,6 @@ interface AgentBillingRow {
   plan: string;
   mrr: number;
   isSubscribed: boolean;
-  foundingMember: boolean;
   subscriptionStart: string | null;
   subscriptionEnd: string | null;
   renewalDate: string | null;
@@ -56,10 +55,10 @@ const fmtDate = (d: string) =>
 
 function exportCSV(rows: AgentBillingRow[]) {
   const totalMrr = rows.filter(r => r.isSubscribed).reduce((s, r) => s + r.mrr, 0);
-  const headers = ['Agent', 'Agency', 'Email', 'Plan', 'MRR ($)', 'Status', 'Founding Member', 'Subscription Start', 'Renewal Date', 'Days Until Renewal'];
+  const headers = ['Agent', 'Agency', 'Email', 'Plan', 'MRR ($)', 'Status', 'Subscription Start', 'Renewal Date', 'Days Until Renewal'];
   const data = rows.map(r => [
     r.name, r.agency || '', r.email, PLAN_LABEL[r.plan] || r.plan, r.mrr,
-    r.isSubscribed ? 'Active' : 'Trial', r.foundingMember ? 'Yes' : 'No',
+    r.isSubscribed ? 'Active' : 'Trial',
     r.subscriptionStart ? fmtDate(r.subscriptionStart) : '',
     r.renewalDate ? fmtDate(r.renewalDate) : '', r.daysUntilRenewal ?? '',
   ]);
@@ -140,7 +139,6 @@ function RenewalRow({ agent }: { agent: AgentBillingRow }) {
           <p className="text-sm font-semibold text-foreground">{fmt(agent.mrr)}/mo</p>
           <p className="text-xs text-muted-foreground">
             {PLAN_LABEL[agent.plan] || agent.plan}
-            {agent.foundingMember && ' · Founding'}
           </p>
         </div>
         <div>
@@ -170,7 +168,7 @@ export default function RevenueBilling() {
       const now = new Date();
 
       const [agentsRes, subsRes, eventsRes] = await Promise.all([
-        supabase.from('agents').select('id, name, email, agency, is_subscribed, created_at, founding_member, stripe_customer_id'),
+        supabase.from('agents').select('id, name, email, agency, is_subscribed, created_at, stripe_customer_id'),
         supabase.from('agent_subscriptions').select('agent_id, plan_type, subscription_start, subscription_end, auto_renew'),
         supabase.from('subscription_events').select('agent_id, event_type, from_plan, to_plan, mrr_change, created_at').order('created_at', { ascending: true }),
       ]);
@@ -203,7 +201,6 @@ export default function RevenueBilling() {
         return {
           id: a.id, name: a.name, email: a.email, agency: a.agency,
           plan, mrr, isSubscribed: a.is_subscribed,
-          foundingMember: a.founding_member || false,
           subscriptionStart, subscriptionEnd, renewalDate, daysUntilRenewal,
           lastLogin: signInMap.get(a.id) || null,
           stripeConnected: !!a.stripe_customer_id,
@@ -264,7 +261,7 @@ export default function RevenueBilling() {
   const trialAgents = agents.filter(a => !a.isSubscribed);
   const totalMrr = paidAgents.reduce((s, a) => s + a.mrr, 0);
   const totalArr = totalMrr * 12;
-  const foundingCount = paidAgents.filter(a => a.foundingMember).length;
+  
 
   const prevMonth = mrrTrend[mrrTrend.length - 2];
   const mrrGrowthPct = prevMonth?.mrr > 0
@@ -327,7 +324,7 @@ export default function RevenueBilling() {
         />
         <KPI label="Annual Run Rate" value={fmt(totalArr)} icon={TrendingUp} color={totalArr > 0 ? 'text-emerald-500' : 'text-muted-foreground'} sub="Annualised run rate" />
         <KPI label="Paying Agents" value={paidAgents.length} icon={Users} color="text-primary" sub={`${trialAgents.length} on trial`} />
-        <KPI label="Founding Members" value={foundingCount} icon={Zap} color="text-amber-500" sub="Locked-in rate for life" />
+        <KPI label="Trial Agents" value={trialAgents.length} icon={Users} color="text-amber-500" sub="Currently on free trial" />
       </div>
 
       {/* MRR Trend Chart */}
@@ -464,9 +461,10 @@ export default function RevenueBilling() {
           >
             <option value="all">All plans</option>
             <option value="paid">Paid only</option>
-            <option value="starter">Starter</option>
-            <option value="pro">Pro</option>
+            <option value="solo">Solo</option>
             <option value="agency">Agency</option>
+            <option value="agency_pro">Agency Pro</option>
+            <option value="enterprise">Enterprise</option>
             <option value="demo">Trial</option>
           </select>
         </div>
@@ -474,7 +472,7 @@ export default function RevenueBilling() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border">
-                {['Agent', 'Plan', 'MRR', 'Status', 'Founding', 'Sub Start', 'Renewal', 'Days'].map(h => (
+                {['Agent', 'Plan', 'MRR', 'Status', 'Sub Start', 'Renewal', 'Days'].map(h => (
                   <th key={h} className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">{h}</th>
                 ))}
               </tr>
@@ -491,7 +489,7 @@ export default function RevenueBilling() {
                   <td className="py-2 px-3">
                     <Badge variant={a.isSubscribed ? 'default' : 'secondary'}>{a.isSubscribed ? 'Active' : 'Trial'}</Badge>
                   </td>
-                  <td className="py-2 px-3 text-foreground">{a.foundingMember ? '⭐' : '—'}</td>
+                  
                   <td className="py-2 px-3 text-foreground">{a.subscriptionStart ? fmtDate(a.subscriptionStart) : '—'}</td>
                   <td className="py-2 px-3 text-foreground">{a.renewalDate ? fmtDate(a.renewalDate) : '—'}</td>
                   <td className="py-2 px-3">

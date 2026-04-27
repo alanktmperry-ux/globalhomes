@@ -125,6 +125,21 @@ Deno.serve(async (req) => {
         agentMap.set(a.user_id, a);
       }
 
+      // Fetch all roles for currently listed users
+      const userIdsForRoles = data.users.map((u: any) => u.id);
+      const rolesMap = new Map<string, string[]>();
+      if (userIdsForRoles.length > 0) {
+        const { data: roleRows } = await supabase
+          .from("user_roles")
+          .select("user_id, role")
+          .in("user_id", userIdsForRoles);
+        for (const r of (roleRows || [])) {
+          const arr = rolesMap.get(r.user_id) || [];
+          arr.push(r.role);
+          rolesMap.set(r.user_id, arr);
+        }
+      }
+
       // Map auth users
       const authUsers = data.users.map((u: any) => {
         const agent = agentMap.get(u.id);

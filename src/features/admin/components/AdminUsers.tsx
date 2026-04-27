@@ -401,6 +401,21 @@ const UsersDashboard = ({ users, loading }: UsersDashboardProps) => {
 
   useEffect(() => { fetchUsers(); }, []);
 
+  const handleToggleSupport = async (user: AuthUser) => {
+    if (user.id.startsWith('demo-')) return;
+    const hasSupport = (user.roles || []).includes('support');
+    if (!confirm(`${hasSupport ? 'Remove' : 'Grant'} support-worker role for ${user.email}?`)) return;
+    setActionLoading(user.id);
+    try {
+      await callAdminApi('set_role', { user_id: user.id, role: 'support', enabled: !hasSupport });
+      toast({ title: hasSupport ? 'Support role removed' : 'Support role granted' });
+    } catch (err: unknown) {
+      toast({ title: 'Failed', description: getErrorMessage(err), variant: 'destructive' });
+    }
+    setActionLoading(null);
+    fetchUsers();
+  };
+
   const handleBan = async (userId: string, ban: boolean) => {
     if (userId.startsWith('demo-')) return;
     setActionLoading(userId);

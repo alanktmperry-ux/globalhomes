@@ -46,7 +46,7 @@ const AdminPartnersPage = React.lazy(() => import("./features/admin/pages/Partne
 const AdminSupportPage = React.lazy(() => import("./features/admin/pages/SupportPage"));
 const AdminListingsPage = React.lazy(() => import("./features/admin/pages/AdminListingsPage"));
 const AdminRevenuePage = React.lazy(() => import("./features/admin/pages/RevenuePage"));
-const AdminOutreachPage = React.lazy(() => import("./features/admin/pages/AdminOutreachPage"));
+const AdminOutreachPage = React.lazy(() => import("./features/admin/pages/OutreachPage"));
 const AdminSystemPage = React.lazy(() => import("./features/admin/pages/AdminSystemPage"));
 const ForgotPasswordPage = React.lazy(() => import("./pages/ForgotPasswordPage"));
 const ResetPasswordPage = React.lazy(() => import("./pages/ResetPasswordPage"));

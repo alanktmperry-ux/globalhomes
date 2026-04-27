@@ -1715,6 +1715,31 @@ const Index = () => {
                   </button>
                 </div>
               )}
+              {noPrefsBannerVisible && !prefsBannerVisible && (
+                <div className="mt-2 flex items-center justify-between gap-2 rounded-lg bg-primary/10 border border-primary/20 px-3 py-2 text-xs text-primary">
+                  <span className="truncate">
+                    Set your preferences to get personalised property alerts.
+                  </span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => navigate('/preferences')}
+                      className="font-semibold hover:underline"
+                    >
+                      Set preferences
+                    </button>
+                    <button
+                      aria-label="Dismiss"
+                      onClick={() => {
+                        setNoPrefsBannerVisible(false);
+                        sessionStorage.setItem('listhq_no_prefs_banner_dismissed', '1');
+                      }}
+                      className="text-primary/70 hover:text-primary"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Property list */}

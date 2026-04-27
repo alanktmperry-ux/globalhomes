@@ -416,6 +416,8 @@ const App = () => (
                   <Route path="users" element={<AdminUsersPage />} />
                   <Route path="agents" element={<AdminAgentsPage />} />
                   <Route path="listings" element={<AdminListingsPage />} />
+                  <Route path="insights" element={<AdminInsightsPage />} />
+                  <Route path="help" element={<AdminHelpPage />} />
                   <Route path="revenue" element={<AdminRevenuePage />} />
                   <Route path="outreach" element={<AdminOutreachPage />} />
                   <Route path="system" element={<AdminSystemPage />} />

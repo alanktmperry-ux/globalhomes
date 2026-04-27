@@ -41,7 +41,7 @@ export default function ListingModerationQueue({ onPendingCountChange }: Props) 
   const fetchPending = useCallback(async () => {
     const { data, error } = await (supabase
       .from('properties')
-      .select('id, address, suburb, state, price_formatted, listing_type, beds, baths, images, created_at, agent_id, agents!inner(name, email, user_id)') as any)
+      .select('id, address, suburb, state, price_formatted, listing_type, beds, baths, images, created_at, agent_id, agents(name, email, user_id)') as any)
       .eq('moderation_status', 'pending')
       .order('created_at', { ascending: true });
 
@@ -70,12 +70,16 @@ export default function ListingModerationQueue({ onPendingCountChange }: Props) 
       return;
     }
 
-    await dispatchNotification({
-      agent_id: listing.agent_id,
-      event_key: 'listing_approved',
-      title: 'Your listing has been approved',
-      message: `Your listing at ${listing.address} is now live in search results.`,
-    });
+    try {
+      await dispatchNotification({
+        agent_id: listing.agent_id,
+        event_key: 'listing_approved',
+        title: 'Your listing has been approved',
+        message: `Your listing at ${listing.address} is now live in search results.`,
+      });
+    } catch {
+      // notification failed silently — moderation action still succeeded
+    }
 
     toast.success('Listing approved');
     setActionLoading(null);
@@ -99,12 +103,16 @@ export default function ListingModerationQueue({ onPendingCountChange }: Props) 
       return;
     }
 
-    await dispatchNotification({
-      agent_id: listing.agent_id,
-      event_key: 'listing_rejected',
-      title: 'Listing not approved',
-      message: rejectReason.trim(),
-    });
+    try {
+      await dispatchNotification({
+        agent_id: listing.agent_id,
+        event_key: 'listing_rejected',
+        title: 'Listing not approved',
+        message: rejectReason.trim(),
+      });
+    } catch {
+      // notification failed silently — moderation action still succeeded
+    }
 
     toast.success('Listing rejected');
     setRejectingId(null);
@@ -202,14 +210,24 @@ export default function ListingModerationQueue({ onPendingCountChange }: Props) 
                       </div>
                     </div>
                   ) : (
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => setRejectingId(listing.id)}
-                      disabled={actionLoading === listing.id}
-                    >
-                      <XCircle size={14} className="mr-1" /> Reject
-                    </Button>
+                    <>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => setRejectingId(listing.id)}
+                        disabled={actionLoading === listing.id}
+                      >
+                        <XCircle size={14} className="mr-1" /> Reject
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDelete(listing)}
+                        disabled={actionLoading === listing.id}
+                      >
+                        <XCircle size={14} className="mr-1" /> Delete listing
+                      </Button>
+                    </>
                   )}
                 </div>
               </CardContent>

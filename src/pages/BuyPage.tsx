@@ -444,7 +444,8 @@ const BuyPage = () => {
         property_types: filters.propertyType ? [filters.propertyType] : [],
         listing_mode: 'sale',
       } as any, 'instant');
-      toast.success(t("Search saved — we'll email you when new matches appear."), {
+      setSavedSearch(true);
+      toast.success(t("Search saved — we'll alert you to new matches"), {
         action: { label: t('Manage'), onClick: () => navigate('/saved') },
       });
     } catch {

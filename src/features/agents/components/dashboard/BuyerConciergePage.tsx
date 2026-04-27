@@ -329,6 +329,44 @@ const BuyerConciergePage = () => {
         )}
       </div>
 
+      {(matchLimit !== null || introLimit !== null) && (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {matchLimit !== null && (
+            <Card>
+              <CardContent className="p-4 space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">Matches viewed</span>
+                  <span className="font-semibold tabular-nums">{matchesUsed} / {matchLimit}</span>
+                </div>
+                <Progress value={matchPct} className="h-1.5" />
+              </CardContent>
+            </Card>
+          )}
+          {introLimit !== null && (
+            <Card>
+              <CardContent className="p-4 space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">Introductions sent</span>
+                  <span className="font-semibold tabular-nums">{introsUsed} / {introLimit}</span>
+                </div>
+                <Progress value={introPct} className="h-1.5" />
+              </CardContent>
+            </Card>
+          )}
+          {(matchPct >= 80 || introPct >= 80) && (
+            <div className="sm:col-span-2 flex items-center gap-2 text-xs text-amber-600 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2">
+              <span>⚠</span>
+              <span>
+                Approaching your monthly limit —{' '}
+                <button onClick={() => navigate('/dashboard/billing')} className="underline font-medium">
+                  upgrade for more
+                </button>
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+
       {matches.length === 0 ? (
         <Card>
           <CardContent className="p-10 text-center">

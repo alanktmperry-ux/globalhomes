@@ -125,6 +125,21 @@ Deno.serve(async (req) => {
         agentMap.set(a.user_id, a);
       }
 
+      // Fetch all roles for currently listed users
+      const userIdsForRoles = data.users.map((u: any) => u.id);
+      const rolesMap = new Map<string, string[]>();
+      if (userIdsForRoles.length > 0) {
+        const { data: roleRows } = await supabase
+          .from("user_roles")
+          .select("user_id, role")
+          .in("user_id", userIdsForRoles);
+        for (const r of (roleRows || [])) {
+          const arr = rolesMap.get(r.user_id) || [];
+          arr.push(r.role);
+          rolesMap.set(r.user_id, arr);
+        }
+      }
+
       // Map auth users
       const authUsers = data.users.map((u: any) => {
         const agent = agentMap.get(u.id);
@@ -152,6 +167,7 @@ Deno.serve(async (req) => {
           subscription_status: agent?.subscription_status || null,
           payment_failed_at: agent?.payment_failed_at || null,
           admin_grace_until: agent?.admin_grace_until || null,
+          roles: rolesMap.get(u.id) || [],
         };
       });
 
@@ -562,10 +578,15 @@ Deno.serve(async (req) => {
       });
     }
 
-    if (action === "grant_role" || action === "revoke_role") {
+    if (action === "grant_role" || action === "revoke_role" || action === "set_role") {
       const userId = bodyParams.userId || bodyParams.user_id;
       const role = bodyParams.role;
-      const allowedRoles = ["user", "agent", "admin"];
+      const allowedRoles = ["user", "agent", "admin", "support"];
+      // set_role: { user_id, role, enabled? } — defaults to enabled=true (grant)
+      const isSet = action === "set_role";
+      const enabled = isSet ? (bodyParams.enabled !== false) : null;
+      const opName = isSet ? (enabled ? "grant_role" : "revoke_role") : action;
+
       if (!userId || !role || !allowedRoles.includes(role)) {
         return new Response(JSON.stringify({ error: "Invalid userId or role" }), {
           status: 400,
@@ -573,7 +594,7 @@ Deno.serve(async (req) => {
         });
       }
 
-      if (action === "grant_role") {
+      if (opName === "grant_role") {
         // Idempotent: ignore conflict on (user_id, role) unique
         const { error: insErr } = await supabase
           .from("user_roles")
@@ -612,10 +633,10 @@ Deno.serve(async (req) => {
       try {
         await supabase.from("audit_log").insert({
           user_id: caller.id,
-          action_type: action === "grant_role" ? "role_granted" : "role_revoked",
+          action_type: opName === "grant_role" ? "role_granted" : "role_revoked",
           entity_type: "user",
           entity_id: userId,
-          description: `Admin ${action === "grant_role" ? "granted" : "revoked"} role "${role}"`,
+          description: `Admin ${opName === "grant_role" ? "granted" : "revoked"} role "${role}"`,
           metadata: {
             role,
             changed_by: caller.id,

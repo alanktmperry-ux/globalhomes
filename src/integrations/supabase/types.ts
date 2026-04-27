@@ -13506,6 +13506,7 @@ export type Database = {
         | "property_manager"
         | "partner"
         | "strata_manager"
+        | "support"
       auction_status:
         | "scheduled"
         | "open"
@@ -13703,6 +13704,7 @@ export const Constants = {
         "property_manager",
         "partner",
         "strata_manager",
+        "support",
       ],
       auction_status: [
         "scheduled",

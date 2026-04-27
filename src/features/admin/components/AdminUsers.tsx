@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Ban, Trash2, UserCheck, Loader2, Mail, Clock, Shield, Rocket, Eye, CheckSquare, Square, MinusSquare, UserCog, Settings, X, Check, Landmark, ShieldCheck, CalendarClock, CircleDollarSign } from 'lucide-react';
+import { Search, Ban, Trash2, UserCheck, Loader2, Mail, Clock, Shield, Rocket, Eye, CheckSquare, Square, MinusSquare, UserCog, Settings, X, Check, Landmark, ShieldCheck, CalendarClock, CircleDollarSign, Headphones } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/shared/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
@@ -45,6 +45,7 @@ interface AuthUser {
   subscription_status?: string | null;
   payment_failed_at?: string | null;
   admin_grace_until?: string | null;
+  roles?: string[];
 }
 
 const UserTypeBadge = ({ user }: { user: AuthUser }) => {
@@ -147,7 +148,8 @@ const SubscriptionStatusBadge = ({ status }: { status?: string | null }) => {
 
 const AdminUsers = () => {
   const { toast } = useToast();
-  const { startImpersonation } = useAuth();
+  const { startImpersonation, isSupport: authIsSupport, isAdmin: authIsAdmin } = useAuth();
+  const isSupport = !!authIsSupport && !authIsAdmin;
   const navigate = useNavigate();
   const [users, setUsers] = useState<AuthUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -398,6 +400,21 @@ const UsersDashboard = ({ users, loading }: UsersDashboardProps) => {
   };
 
   useEffect(() => { fetchUsers(); }, []);
+
+  const handleToggleSupport = async (user: AuthUser) => {
+    if (user.id.startsWith('demo-')) return;
+    const hasSupport = (user.roles || []).includes('support');
+    if (!confirm(`${hasSupport ? 'Remove' : 'Grant'} support-worker role for ${user.email}?`)) return;
+    setActionLoading(user.id);
+    try {
+      await callAdminApi('set_role', { user_id: user.id, role: 'support', enabled: !hasSupport });
+      toast({ title: hasSupport ? 'Support role removed' : 'Support role granted' });
+    } catch (err: unknown) {
+      toast({ title: 'Failed', description: getErrorMessage(err), variant: 'destructive' });
+    }
+    setActionLoading(null);
+    fetchUsers();
+  };
 
   const handleBan = async (userId: string, ban: boolean) => {
     if (userId.startsWith('demo-')) return;
@@ -849,14 +866,16 @@ const UsersDashboard = ({ users, loading }: UsersDashboardProps) => {
                           <Loader2 className="animate-spin text-muted-foreground" size={16} />
                         ) : (
                           <>
-                            <button
-                              onClick={() => handleOpenSubModal(u)}
-                              className="p-1.5 rounded-lg bg-violet-500/10 text-violet-500 hover:bg-violet-500/20 transition-colors"
-                              title="Manage subscription"
-                            >
-                              <Settings size={14} />
-                            </button>
-                            {(u.subscription_status === 'payment_failed' || u.subscription_status === 'locked') && (
+                            {!isSupport && (
+                              <button
+                                onClick={() => handleOpenSubModal(u)}
+                                className="p-1.5 rounded-lg bg-violet-500/10 text-violet-500 hover:bg-violet-500/20 transition-colors"
+                                title="Manage subscription"
+                              >
+                                <Settings size={14} />
+                              </button>
+                            )}
+                            {!isSupport && (u.subscription_status === 'payment_failed' || u.subscription_status === 'locked') && (
                               <button
                                 onClick={() => {
                                   setGraceDate(u.admin_grace_until ? new Date(u.admin_grace_until) : undefined);
@@ -868,7 +887,7 @@ const UsersDashboard = ({ users, loading }: UsersDashboardProps) => {
                                 <CalendarClock size={14} />
                               </button>
                             )}
-                            {u.subscription_status !== 'active' && u.subscription_status && (
+                            {!isSupport && u.subscription_status !== 'active' && u.subscription_status && (
                               <button
                                 onClick={() => handleMarkActive(u.id, u.email)}
                                 className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 transition-colors"
@@ -884,6 +903,19 @@ const UsersDashboard = ({ users, loading }: UsersDashboardProps) => {
                             >
                               <UserCog size={14} />
                             </button>
+                            {authIsAdmin && (
+                              <button
+                                onClick={() => handleToggleSupport(u)}
+                                className={`p-1.5 rounded-lg transition-colors ${
+                                  (u.roles || []).includes('support')
+                                    ? 'bg-sky-500/20 text-sky-600 hover:bg-sky-500/30'
+                                    : 'bg-sky-500/10 text-sky-500 hover:bg-sky-500/20'
+                                }`}
+                                title={(u.roles || []).includes('support') ? 'Remove support role' : 'Make support worker'}
+                              >
+                                <Headphones size={14} />
+                              </button>
+                            )}
                             <button
                               onClick={() => handleBan(u.id, !u.banned_until)}
                               className={`p-1.5 rounded-lg transition-colors ${
@@ -893,6 +925,17 @@ const UsersDashboard = ({ users, loading }: UsersDashboardProps) => {
                             >
                               {u.banned_until ? <UserCheck size={14} /> : <Ban size={14} />}
                             </button>
+                            {!isSupport && (
+                              <button
+                                onClick={() => handleDeleteClick(u)}
+                                className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
+                                title="Delete user"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            )}
+                          </>
+                        )}
                             <button
                               onClick={() => handleDeleteClick(u)}
                               className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"

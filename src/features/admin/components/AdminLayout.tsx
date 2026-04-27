@@ -25,7 +25,7 @@ function getSectionLabel(pathname: string): string {
 export default function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { impersonating, impersonatedUser, stopImpersonation } = useAuth();
+  const { impersonating, impersonatedUser, stopImpersonation, isSupport, isAdmin } = useAuth();
   const [pendingTotal, setPendingTotal] = useState(0);
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-background flex">
-      <AdminSidebar pendingApprovalsTotal={pendingTotal} />
+      <AdminSidebar pendingApprovalsTotal={pendingTotal} isSupport={isSupport && !isAdmin} />
 
       <main className="flex-1 min-w-0 flex flex-col h-screen overflow-hidden">
         {/* Header strip */}

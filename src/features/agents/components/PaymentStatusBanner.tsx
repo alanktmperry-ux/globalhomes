@@ -114,6 +114,69 @@ export function PaymentStatusBanner() {
   return null;
 }
 
+function TrialBanner({ daysLeft }: { daysLeft: number }) {
+  const [dismissed, setDismissed] = useState(() =>
+    sessionStorage.getItem('trial-banner-dismissed') === 'true'
+  );
+
+  // Urgent (0-6): red, not dismissible
+  if (daysLeft <= 6) {
+    return (
+      <div className="sticky top-0 z-40 w-full bg-red-600 text-white px-4 py-3 text-sm">
+        <div className="max-w-5xl mx-auto flex items-center justify-center gap-2 text-center">
+          <span>
+            🚨 Your trial ends in <strong>{daysLeft} day{daysLeft !== 1 ? 's' : ''}</strong>. Upgrade immediately to keep listings live.{' '}
+            <Link to="/dashboard/billing" className="underline font-semibold hover:text-white/90">
+              Upgrade now →
+            </Link>
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // Warning (7-14): amber, not dismissible
+  if (daysLeft <= 14) {
+    return (
+      <div className="sticky top-0 z-40 w-full bg-amber-500 text-white px-4 py-3 text-sm">
+        <div className="max-w-5xl mx-auto flex items-center justify-center gap-2 text-center">
+          <span>
+            ⏰ <strong>{daysLeft} days</strong> left on your trial. Upgrade now to avoid interruption.{' '}
+            <Link to="/dashboard/billing" className="underline font-semibold hover:text-white/90">
+              Upgrade now →
+            </Link>
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // Info (15-30): blue, dismissible
+  if (dismissed) return null;
+  return (
+    <div className="sticky top-0 z-40 w-full bg-blue-600 text-white px-4 py-3 text-sm">
+      <div className="max-w-5xl mx-auto flex items-center justify-between gap-2">
+        <span className="flex-1 text-center">
+          🎉 You're on a free trial — <strong>{daysLeft} days remaining</strong>. Upgrade to keep your listings live.{' '}
+          <Link to="/dashboard/billing" className="underline font-semibold hover:text-white/90">
+            Upgrade now →
+          </Link>
+        </span>
+        <button
+          onClick={() => {
+            setDismissed(true);
+            sessionStorage.setItem('trial-banner-dismissed', 'true');
+          }}
+          className="shrink-0 p-1 rounded hover:bg-white/20 transition-colors"
+          aria-label="Dismiss"
+        >
+          <X size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function LockedOverlay() {
   return (
     <div className="fixed inset-0 z-50 bg-white flex items-center justify-center p-6">

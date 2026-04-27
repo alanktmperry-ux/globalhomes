@@ -294,7 +294,7 @@ export default function CommandCentre() {
         supabase.from('leads').select('id', { count: 'exact', head: true }).gte('created_at', d7),
         supabase.from('leads').select('id', { count: 'exact', head: true }).gte('created_at', d30),
         supabase.from('agents').select('id', { count: 'exact', head: true }).eq('approval_status', 'pending'),
-        (supabase.from('properties').select('id', { count: 'exact', head: true }).eq('moderation_status' as any, 'pending')) as any,
+        ((supabase.from('properties') as any).select('id', { count: 'exact', head: true }).eq('moderation_status', 'pending')) as any,
         (supabase.from('demo_requests' as any).select('id', { count: 'exact', head: true }).eq('status', 'pending')) as any,
         (supabase.from('support_tickets' as any).select('id', { count: 'exact', head: true }).eq('status', 'open')) as any,
         supabase.from('agents').select('id', { count: 'exact', head: true }).eq('is_subscribed', false).gte('updated_at', monthStart),

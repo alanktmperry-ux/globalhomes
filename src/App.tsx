@@ -49,6 +49,10 @@ const AdminRevenuePage = React.lazy(() => import("./features/admin/pages/Revenue
 const AdminOutreachPage = React.lazy(() => import("./features/admin/pages/OutreachPage"));
 const AdminBuyersPage = React.lazy(() => import("./features/admin/pages/BuyersPage"));
 const AdminSystemPage = React.lazy(() => import("./features/admin/pages/SystemPage"));
+const SupportLoginPage = React.lazy(() => import("./features/admin/pages/SupportLoginPage"));
+const SupportDashboardLayout = React.lazy(() => import("./features/admin/pages/SupportDashboardLayout"));
+const SupportTicketsWrapper = React.lazy(() => import("./features/admin/pages/SupportTicketsWrapper"));
+const SupportAgentsView = React.lazy(() => import("./features/admin/pages/SupportAgentsView"));
 const ForgotPasswordPage = React.lazy(() => import("./pages/ForgotPasswordPage"));
 const ResetPasswordPage = React.lazy(() => import("./pages/ResetPasswordPage"));
 const AgencyProfilePage = React.lazy(() => import("./pages/AgencyProfilePage"));
@@ -412,6 +416,14 @@ const App = () => (
                   <Route path="buyers" element={<AdminBuyersPage />} />
                 </Route>
                 <Route path="/admin/legacy" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
+
+                {/* Support */}
+                <Route path="/support/login" element={<SupportLoginPage />} />
+                <Route path="/support" element={<SupportDashboardLayout />}>
+                  <Route index element={<Navigate to="/support/dashboard" replace />} />
+                  <Route path="dashboard" element={<SupportTicketsWrapper />} />
+                  <Route path="agents" element={<SupportAgentsView />} />
+                </Route>
 
                 <Route path="*" element={<NotFound />} />
               </Routes>

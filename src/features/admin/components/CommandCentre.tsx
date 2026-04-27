@@ -929,6 +929,7 @@ export default function CommandCentre() {
       )}
 
       {/* SECTION 2 — Revenue pulse */}
+      {!isSupport && (<>
       <SectionHead title="Revenue pulse" sub="Monthly recurring revenue and conversion" />
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KPI

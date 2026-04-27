@@ -4,15 +4,15 @@ import { Helmet } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import { geocode } from '@/shared/lib/googleMapsService';
 import { PropertyCard } from '@/components/PropertyCard';
-import { mapDbProperty } from '@/features/properties/api/fetchPublicProperties';
+import { mapDbProperty } from '@/features/allProperties/api/fetchPublicProperties';
 import { Property } from '@/shared/lib/types';
 import { Loader2, X, BellPlus, Sparkles, SlidersHorizontal, Filter, Map as MapIcon, List as ListIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from '@/components/ui/sheet';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { useI18n } from '@/shared/lib/i18n';
-import { AIPropertySearch } from '@/features/properties/components/AIPropertySearch';
-import { PropertyMap } from '@/features/properties/components/PropertyMap';
+import { AIPropertySearch } from '@/features/allProperties/components/AIPropertySearch';
+import { PropertyMap } from '@/features/allProperties/components/PropertyMap';
 import { Switch } from '@/components/ui/switch';
 import { SearchModeTabs } from '@/features/search/components/SearchModeTabs';
 import { SuburbChipInput } from '@/features/search/components/SuburbChipInput';
@@ -339,7 +339,7 @@ const BuyPage = () => {
       else setLoadingMore(true);
       try {
         let q = supabase
-          .from('properties')
+          .from('allProperties')
           .select(PROPERTIES_WITH_AGENTS)
           .eq('is_active', true)
           .not('agent_id', 'is', null)
@@ -456,7 +456,7 @@ const BuyPage = () => {
     <>
       <Helmet>
         <title>{headerSuburbLabel ? `Properties for Sale in ${headerSuburbLabel}` : 'Properties for Sale in Australia'}</title>
-        <meta name="description" content="Browse properties for sale across Australia on ListHQ." />
+        <meta name="description" content="Browse allProperties for sale across Australia on ListHQ." />
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -473,7 +473,7 @@ const BuyPage = () => {
                 {headerSuburbLabel ? t(`Properties for Sale in ${headerSuburbLabel}`) : t('Properties for Sale')}
               </h1>
               <p className="text-muted-foreground mt-1">
-                {isLoading ? t('Searching…') : `${properties?.length ?? 0} ${t('properties found')}`}
+                {isLoading ? t('Searching…') : `${allProperties?.length ?? 0} ${t('allProperties found')}`}
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -562,7 +562,7 @@ const BuyPage = () => {
                   </SheetTrigger>
                   <SheetContent side="bottom" className="h-[85vh] overflow-y-auto">
                     <SheetHeader className="text-left">
-                      <SheetTitle>{t('Filter properties')}</SheetTitle>
+                      <SheetTitle>{t('Filter allProperties')}</SheetTitle>
                     </SheetHeader>
                     <div className="py-4">
                       <FilterControls filters={filters} onChange={updateFilters} layout="stacked" />
@@ -574,7 +574,7 @@ const BuyPage = () => {
                         </Button>
                       )}
                       <Button className="flex-1" onClick={() => setMobileFiltersOpen(false)}>
-                        {t('Show')} {properties?.length ?? 0} {t('results')}
+                        {t('Show')} {allProperties?.length ?? 0} {t('results')}
                       </Button>
                     </SheetFooter>
                   </SheetContent>
@@ -624,11 +624,11 @@ const BuyPage = () => {
                 <div className="flex items-center justify-center py-20">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
-              ) : properties && properties.length > 0 ? (
+              ) : allProperties && allProperties.length > 0 ? (
                 viewMode === 'map' ? (
                   <div className="rounded-xl overflow-hidden border border-border">
                     <PropertyMap
-                      properties={properties}
+                      allProperties={allProperties}
                       onPropertySelect={(p) => setSelectedPropertyId(p.id)}
                       selectedPropertyId={selectedPropertyId}
                       centerOn={mapCenter ? { ...mapCenter, key: `${primarySuburb || 'fallback'}-${mapZoom}` } : null}
@@ -639,7 +639,7 @@ const BuyPage = () => {
                 ) : viewMode === 'split' ? (
                   <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[calc(100vh-220px)] overflow-y-auto pr-1">
-                      {properties.map((property, index) => (
+                      {allProperties.map((property, index) => (
                         <PropertyCard
                           key={property.id}
                           property={property}
@@ -652,7 +652,7 @@ const BuyPage = () => {
                     </div>
                     <div className="hidden lg:block sticky top-20 h-[calc(100vh-220px)] rounded-xl overflow-hidden border border-border">
                       <PropertyMap
-                        properties={properties}
+                        allProperties={allProperties}
                         onPropertySelect={(p) => { setSelectedPropertyId(p.id); }}
                         selectedPropertyId={selectedPropertyId}
                         centerOn={mapCenter ? { ...mapCenter, key: `${primarySuburb || 'fallback'}-${mapZoom}` } : null}
@@ -663,7 +663,7 @@ const BuyPage = () => {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {properties.map((property, index) => (
+                    {allProperties.map((property, index) => (
                       <PropertyCard
                         key={property.id}
                         property={property}
@@ -677,7 +677,7 @@ const BuyPage = () => {
                 )
               ) : (
                 <div className="text-center py-20 space-y-3">
-                  <p className="text-muted-foreground">{t('No properties match your search.')}</p>
+                  <p className="text-muted-foreground">{t('No allProperties match your search.')}</p>
                   <p className="text-sm text-muted-foreground">
                     {t('Try removing some filters or broadening your price range.')}
                   </p>

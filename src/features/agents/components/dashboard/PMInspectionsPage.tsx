@@ -48,6 +48,9 @@ interface InspectionRow {
   status: InspectionStatus;
   notice_sent_at: string | null;
   overall_notes: string | null;
+  tenant_disputed_at?: string | null;
+  tenant_dispute_notes?: string | null;
+  dispute_resolved_at?: string | null;
   tenancies?: {
     tenant_name: string | null;
     lease_start: string | null;
@@ -148,7 +151,7 @@ const CONDITION_LABELS: Record<CompleteForm['condition'], string> = {
   urgent: 'Urgent Issues',
 };
 
-type FilterTab = 'upcoming' | 'overdue' | 'completed' | 'due';
+type FilterTab = 'upcoming' | 'overdue' | 'completed' | 'due' | 'disputes';
 
 export default function PMInspectionsPage() {
   const { user } = useAuth();
@@ -194,6 +197,7 @@ export default function PMInspectionsPage() {
         .from('property_inspections')
         .select(`
           id, tenancy_id, inspection_type, scheduled_date, conducted_date, status, notice_sent_at, overall_notes,
+          tenant_disputed_at, tenant_dispute_notes, dispute_resolved_at,
           tenancies!inner(
             tenant_name, lease_start, lease_end, agent_id,
             properties(address, suburb, state)

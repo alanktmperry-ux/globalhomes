@@ -104,7 +104,9 @@ function ListingsTab({ onCount }: { onCount: (n: number) => void }) {
       const { data, error } = await supabase
         .from('properties')
         .select('id, address, suburb, state, property_type, price, agent_id, images, created_at, agents!inner(name, email, agency)')
-        .eq('moderation_status', 'pending')
+        .eq('is_active', false)
+        .neq('moderation_status', 'rejected')
+        .not('status', 'eq', 'archived')
         .order('created_at', { ascending: false })
         .limit(50);
       if (error) throw error;
@@ -147,7 +149,7 @@ function ListingsTab({ onCount }: { onCount: (n: number) => void }) {
     setBusyId(row.id);
     try {
       const { error } = await (supabase.from('properties') as any)
-        .update({ moderation_status: 'rejected' })
+        .update({ is_active: false, moderation_status: 'rejected' })
         .eq('id', row.id);
       if (error) throw error;
       await logAudit('listing_rejected', 'property', row.id, { reason: rejectReason.trim(), address: row.address });

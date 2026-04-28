@@ -288,7 +288,7 @@ export default function FindBrokerPage() {
       {/* Enquiry modal */}
       {selectedBroker && (
         <EnquiryModal
-          broker={selectedBroker}
+          broker={{ ...selectedBroker, is_founding_partner: false }}
           onClose={() => setSelectedBroker(null)}
         />
       )}

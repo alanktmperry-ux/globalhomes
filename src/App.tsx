@@ -125,6 +125,7 @@ const RentRollPage = React.lazy(() => import("@/features/agents/components/dashb
 const ArrearsPage = React.lazy(() => import("@/features/agents/components/dashboard/ArrearsPage"));
 const RentIncreasePage = React.lazy(() => import("@/features/agents/components/dashboard/RentIncreasePage"));
 const KeyRegisterPage = React.lazy(() => import("@/features/agents/components/dashboard/KeyRegisterPage"));
+const PMInspectionsPage = React.lazy(() => import("@/features/agents/components/dashboard/PMInspectionsPage"));
 const PropertyDocumentsPage = React.lazy(() => import("@/features/agents/components/dashboard/PropertyDocumentsPage"));
 const TenancyDetailPage = React.lazy(() => import("@/features/agents/components/dashboard/TenancyDetailPage"));
 const InspectionReportPage = React.lazy(() => import("./pages/InspectionReportPage"));
@@ -390,6 +391,7 @@ const App = () => (
                   <Route path="arrears" element={<ArrearsPage />} />
                   <Route path="rent-increases" element={<RentIncreasePage />} />
                   <Route path="keys" element={<KeyRegisterPage />} />
+                  <Route path="pm-inspections" element={<PMInspectionsPage />} />
                   <Route path="property-documents" element={<PropertyDocumentsPage />} />
                   <Route path="tenancies/:tenancyId" element={<TenancyDetailPage />} />
                   <Route path="inspection/:inspectionId" element={<InspectionReportPage />} />

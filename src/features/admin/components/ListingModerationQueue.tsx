@@ -59,10 +59,10 @@ export default function ListingModerationQueue({ onPendingCountChange }: Props) 
 
   const handleApprove = async (listing: PendingListing) => {
     setActionLoading(listing.id);
-    const { error } = await supabase
-      .from('properties')
-      .update({ moderation_status: 'approved' } as any)
-      .eq('id', listing.id);
+    const { error } = await supabase.rpc('admin_moderate_listing' as any, {
+      listing_id: listing.id,
+      new_status: 'approved',
+    });
 
     if (error) {
       toast.error('Failed to approve listing');
@@ -92,10 +92,10 @@ export default function ListingModerationQueue({ onPendingCountChange }: Props) 
       return;
     }
     setActionLoading(listing.id);
-    const { error } = await supabase
-      .from('properties')
-      .update({ moderation_status: 'rejected' } as any)
-      .eq('id', listing.id);
+    const { error } = await supabase.rpc('admin_moderate_listing' as any, {
+      listing_id: listing.id,
+      new_status: 'rejected',
+    });
 
     if (error) {
       toast.error('Failed to reject listing');

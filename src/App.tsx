@@ -43,6 +43,7 @@ const CommandCentre = React.lazy(() => import("./features/admin/components/Comma
 const AdminApprovalsPage = React.lazy(() => import("./features/admin/pages/ApprovalsPage"));
 const AdminAgentsPage = React.lazy(() => import("./features/admin/pages/AgentsPage"));
 const AdminPartnersPage = React.lazy(() => import("./features/admin/pages/PartnersPage"));
+const AdminBrokers = React.lazy(() => import("./features/admin/components/AdminBrokers"));
 const AdminSupportPage = React.lazy(() => import("./features/admin/pages/SupportPage"));
 const AdminListingsPage = React.lazy(() => import("./features/admin/pages/AdminListingsPage"));
 const AdminInsightsPage = React.lazy(() => import("./features/admin/pages/InsightsPage"));
@@ -428,6 +429,7 @@ const App = () => (
                   <Route path="outreach" element={<AdminOutreachPage />} />
                   <Route path="system" element={<AdminSystemPage />} />
                   <Route path="partners" element={<AdminPartnersPage />} />
+                  <Route path="brokers" element={<AdminBrokers />} />
                   <Route path="support" element={<AdminSupportPage />} />
                   <Route path="buyers" element={<AdminBuyersPage />} />
                 </Route>

@@ -478,52 +478,69 @@ export default function InspectionReportPublic() {
             </div>
           )}
 
-          {data.finalised_at && !tenantAccepted && !tenantDisputed && (
-            <Card className="border-2 border-dashed">
-              <CardHeader>
-                <CardTitle className="text-base">Tenant Acknowledgement</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  Please review this report. You have until{" "}
-                  <span className="font-medium text-foreground">
-                    {data.tenant_dispute_deadline
-                      ? format(new Date(data.tenant_dispute_deadline), "d MMMM yyyy")
-                      : "the specified deadline"}
-                  </span>{" "}
-                  to respond.
-                </p>
+          {data.finalised_at && !tenantAccepted && !tenantDisputed && (() => {
+            const deadlineStr = data.tenant_dispute_deadline;
+            const deadlineDate = deadlineStr ? new Date(deadlineStr + 'T23:59:59') : null;
+            const isClosed = !!deadlineDate && new Date() > deadlineDate;
+            const formattedDeadline = deadlineDate ? format(deadlineDate, "EEEE, d MMM yyyy") : null;
 
-                {!showConcernForm ? (
-                  <div className="flex flex-col gap-2 sm:flex-row">
-                    <Button onClick={handleAccept} disabled={submitting} className="flex-1">
-                      <CheckCircle2 className="mr-2 h-4 w-4" /> I Accept This Report
-                    </Button>
-                    <Button variant="outline" onClick={() => setShowConcernForm(true)} disabled={submitting} className="flex-1">
-                      <AlertTriangle className="mr-2 h-4 w-4" /> I Have Concerns
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    <Textarea
-                      placeholder="Describe your concerns about this report…"
-                      value={concernsText}
-                      onChange={e => setConcernsText(e.target.value)}
-                      rows={4}
-                    />
-                    <div className="flex gap-2">
-                      <Button onClick={handleSubmitConcerns} disabled={submitting || !concernsText.trim()}>
-                        Submit Concerns
+            if (isClosed) {
+              return (
+                <Card className="border-amber-500/40 bg-amber-500/5">
+                  <CardContent className="p-4 flex items-start gap-2">
+                    <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
+                    <p className="text-sm text-amber-800">
+                      The dispute period for this report closed on {formattedDeadline}.
+                      Please contact your property manager if you have concerns.
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            }
+
+            return (
+              <Card className="border-2 border-dashed">
+                <CardHeader>
+                  <CardTitle className="text-base">Tenant Acknowledgement</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {!showConcernForm ? (
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                      <Button onClick={handleAccept} disabled={submitting} className="flex-1">
+                        <CheckCircle2 className="mr-2 h-4 w-4" /> I Accept This Report
                       </Button>
-                      <Button variant="ghost" onClick={() => setShowConcernForm(false)} disabled={submitting}>
-                        Cancel
+                      <Button variant="outline" onClick={() => setShowConcernForm(true)} disabled={submitting} className="flex-1">
+                        <AlertTriangle className="mr-2 h-4 w-4" /> I Have Concerns
                       </Button>
                     </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
+                  ) : (
+                    <div className="space-y-3">
+                      <Textarea
+                        placeholder="Describe your concerns about this report…"
+                        value={concernsText}
+                        onChange={e => setConcernsText(e.target.value)}
+                        rows={4}
+                      />
+                      <div className="flex gap-2">
+                        <Button onClick={handleSubmitConcerns} disabled={submitting || !concernsText.trim()}>
+                          Submit Concerns
+                        </Button>
+                        <Button variant="ghost" onClick={() => setShowConcernForm(false)} disabled={submitting}>
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {formattedDeadline && (
+                    <p className="text-xs text-muted-foreground">
+                      You have until <span className="font-medium text-foreground">{formattedDeadline}</span> to accept or dispute this report.
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })()}
         </div>
 
         {/* Footer */}

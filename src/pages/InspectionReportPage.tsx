@@ -87,6 +87,7 @@ const InspectionReportPage = () => {
   const [inspection, setInspection] = useState<InspectionData | null>(null);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [propertyAddress, setPropertyAddress] = useState('');
+  const [propertyState, setPropertyState] = useState<string | null>(null);
   const [tenantEmail, setTenantEmail] = useState('');
   const [agentName, setAgentName] = useState('');
   const [agentPhone, setAgentPhone] = useState('');
@@ -130,7 +131,10 @@ const InspectionReportPage = () => {
       supabase.from('agents').select('name, phone').eq('id', inspData.agent_id).maybeSingle(),
       supabase.from('tenancies').select('tenant_email').eq('id', inspData.tenancy_id).maybeSingle(),
     ]);
-    if (propRes.data) setPropertyAddress(`${propRes.data.address}, ${propRes.data.suburb} ${propRes.data.state || ''}`);
+    if (propRes.data) {
+      setPropertyAddress(`${propRes.data.address}, ${propRes.data.suburb} ${propRes.data.state || ''}`);
+      setPropertyState(propRes.data.state || null);
+    }
     if (agentRes.data) { setAgentName(agentRes.data.name); setAgentPhone(agentRes.data.phone || ''); }
     if (tenancyRes.data) { setTenantEmail(tenancyRes.data.tenant_email || ''); setFinaliseTenantEmail(tenancyRes.data.tenant_email || ''); }
 
@@ -279,6 +283,16 @@ const InspectionReportPage = () => {
     if (!inspection) return;
     setFinalising(true);
     const today = format(new Date(), 'yyyy-MM-dd');
+
+    // Calculate tenant dispute deadline for entry reports
+    const disputeDays: Record<string, number> = {
+      VIC: 3, NSW: 7, QLD: 3, WA: 5, SA: 5, ACT: 7, TAS: 5, NT: 5,
+    };
+    const days = propertyState ? (disputeDays[propertyState.toUpperCase()] ?? 5) : 5;
+    const deadline = new Date();
+    deadline.setDate(deadline.getDate() + days);
+    const disputeDeadline = format(deadline, 'yyyy-MM-dd');
+
     await supabase.from('property_inspections').update({
       conducted_date: today,
       finalised_at: new Date().toISOString(),
@@ -287,6 +301,7 @@ const InspectionReportPage = () => {
       remotes_count: remotesCount,
       water_meter_reading: waterMeter || null,
       overall_notes: overallNotes || null,
+      ...(inspection.inspection_type === 'entry' ? { tenant_dispute_deadline: disputeDeadline } : {}),
     } as any).eq('id', inspection.id);
 
     const reportLink = `https://listhq.com.au/inspection-report/${inspection.report_token}`;

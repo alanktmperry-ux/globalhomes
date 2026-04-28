@@ -10576,12 +10576,14 @@ export type Database = {
         Row: {
           actual_vacate_date: string | null
           agent_id: string
+          arrears_action_status: string
           bond_amount: number
           bond_authority: string | null
           bond_lodgement_number: string | null
           created_at: string
           days_to_re_let: number | null
           id: string
+          last_arrears_notice_date: string | null
           lease_end: string
           lease_start: string
           management_fee_percent: number
@@ -10612,12 +10614,14 @@ export type Database = {
         Insert: {
           actual_vacate_date?: string | null
           agent_id: string
+          arrears_action_status?: string
           bond_amount: number
           bond_authority?: string | null
           bond_lodgement_number?: string | null
           created_at?: string
           days_to_re_let?: number | null
           id?: string
+          last_arrears_notice_date?: string | null
           lease_end: string
           lease_start: string
           management_fee_percent?: number
@@ -10648,12 +10652,14 @@ export type Database = {
         Update: {
           actual_vacate_date?: string | null
           agent_id?: string
+          arrears_action_status?: string
           bond_amount?: number
           bond_authority?: string | null
           bond_lodgement_number?: string | null
           created_at?: string
           days_to_re_let?: number | null
           id?: string
+          last_arrears_notice_date?: string | null
           lease_end?: string
           lease_start?: string
           management_fee_percent?: number

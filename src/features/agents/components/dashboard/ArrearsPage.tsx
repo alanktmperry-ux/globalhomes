@@ -154,17 +154,31 @@ const ArrearsPage = () => {
     return { count: items.length, totalOwing, critical };
   }, [items]);
 
-  const openBreachNotice = (row: ArrearsItem) => {
+  const openBreachNotice = async (row: ArrearsItem) => {
     const stateCode = (row.properties?.state || '').toUpperCase();
     const cfg = STATE_NOTICE[stateCode] || { title: 'Breach Notice', days: 14 };
     const dateStr = new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
     const propLine = [row.properties?.address, row.properties?.suburb, row.properties?.state].filter(Boolean).join(', ');
+
+    // Fetch primary + co-tenant contacts so the notice addresses everyone on the lease
+    const { data: contacts } = await supabase
+      .from('tenancy_contacts' as any)
+      .select('name, contact_type')
+      .eq('tenancy_id', row.id)
+      .in('contact_type', ['primary_tenant', 'co_tenant']);
+    const names: string[] = [];
+    const primary = (contacts as any[] | null)?.find(c => c.contact_type === 'primary_tenant')?.name;
+    if (primary) names.push(primary);
+    else if (row.tenant_name) names.push(row.tenant_name);
+    (contacts as any[] | null)?.filter(c => c.contact_type === 'co_tenant').forEach(c => names.push(c.name));
+    const toLine = names.length > 0 ? names.join(' & ') : 'Tenant';
+
     const text =
 `${cfg.title}
 
 Date: ${dateStr}
 
-To: ${row.tenant_name || 'Tenant'}
+To: ${toLine}
 Property: ${propLine || '—'}
 
 This notice is to advise that you are in breach of your tenancy agreement for the following reason:

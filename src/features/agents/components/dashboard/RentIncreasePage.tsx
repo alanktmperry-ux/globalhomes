@@ -230,7 +230,22 @@ const RentIncreasePage = () => {
     loadData();
   };
 
-  const buildNoticeText = (row: RowItem, inc: RentIncrease) => {
+  const openNotice = async (row: RowItem, increase: RentIncrease) => {
+    const { data: contacts } = await supabase
+      .from('tenancy_contacts' as any)
+      .select('name, contact_type')
+      .eq('tenancy_id', row.id)
+      .in('contact_type', ['primary_tenant', 'co_tenant']);
+    const names: string[] = [];
+    const primary = (contacts as any[] | null)?.find(c => c.contact_type === 'primary_tenant')?.name;
+    if (primary) names.push(primary);
+    else if (row.tenant_name) names.push(row.tenant_name);
+    (contacts as any[] | null)?.filter(c => c.contact_type === 'co_tenant').forEach(c => names.push(c.name));
+    const toLine = names.length > 0 ? names.join(' & ') : 'Tenant';
+    setNoticeFor({ row, increase, toLine });
+  };
+
+  const buildNoticeText = (row: RowItem, inc: RentIncrease, toLine?: string) => {
     const propLine = [row.properties?.address, row.properties?.suburb, row.properties?.state].filter(Boolean).join(', ');
     return `Notice of Rent Increase
 
@@ -238,7 +253,7 @@ ${row.actName}
 
 Date: ${fmtDate(new Date())}
 
-To: ${row.tenant_name || 'Tenant'}
+To: ${toLine || row.tenant_name || 'Tenant'}
 Property: ${propLine || '—'}
 
 This is to advise that your rent will increase as follows:

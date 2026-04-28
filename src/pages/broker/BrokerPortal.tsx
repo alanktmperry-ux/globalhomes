@@ -52,7 +52,7 @@ interface Lead {
   loan_type: string | null;
   estimated_loan_amount: number | null;
   message: string | null;
-  status: LeadStatusExt;
+  status: LeadStatus;
   assigned_broker_id: string | null;
   property_id: string | null;
   property_url: string | null;
@@ -69,7 +69,7 @@ interface PropertyMini {
   price: number | string | null;
 }
 
-const STATUS_OPTIONS: { value: LeadStatusExt; label: string }[] = [
+const STATUS_OPTIONS: { value: LeadStatus; label: string }[] = [
   { value: "new", label: "New" },
   { value: "contacted", label: "Contacted" },
   { value: "meeting_booked", label: "Meeting Booked" },
@@ -78,18 +78,18 @@ const STATUS_OPTIONS: { value: LeadStatusExt; label: string }[] = [
   { value: "lost", label: "Lost" },
 ];
 
-function statusLabel(s: LeadStatusExt): string {
+function statusLabel(s: LeadStatus): string {
   return STATUS_OPTIONS.find((o) => o.value === s)?.label ?? s;
 }
 
-function statusDot(s: LeadStatusExt): string {
+function statusDot(s: LeadStatus): string {
   if (s === "new") return "bg-green-500";
   if (s === "settled") return "bg-slate-400";
   if (s === "lost") return "bg-red-400";
   return "bg-orange-500"; // active stages
 }
 
-function statusBucket(s: LeadStatusExt): "new" | "active" | "settled" {
+function statusBucket(s: LeadStatus): "new" | "active" | "settled" {
   if (s === "new") return "new";
   if (s === "settled" || s === "lost") return "settled";
   return "active";
@@ -435,7 +435,7 @@ function LeadDetail({
   const isNonEnglish = !!langMeta && langMeta.label !== "English";
   const referralFee = lead.referral_fee_amount ? Number(lead.referral_fee_amount) : lead.estimated_loan_amount ? Math.round(Number(lead.estimated_loan_amount) * 0.0065 * 0.20) : 0;
 
-  const updateStatus = async (next: LeadStatusExt) => {
+  const updateStatus = async (next: LeadStatus) => {
     setBusy("status");
     const patch: Record<string, unknown> = { status: next };
     if (next === "settled") {
@@ -514,7 +514,7 @@ function LeadDetail({
           </label>
           <Select
             value={lead.status}
-            onValueChange={(v) => updateStatus(v as LeadStatusExt)}
+            onValueChange={(v) => updateStatus(v as LeadStatus)}
             disabled={busy === "status"}
           >
             <SelectTrigger className="h-9">

@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/sheet';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { buildInvoiceHtml } from '@/pages/broker/invoiceTemplate';
 
 interface ReferralLead {
   id: string;
@@ -34,6 +35,26 @@ const statusVariant = (s: string): 'default' | 'secondary' | 'outline' => {
   if (s === 'settled') return 'default';
   if (s === 'lost') return 'outline';
   return 'secondary';
+};
+
+const downloadInvoice = (lead: ReferralLead) => {
+  const fee = Number(lead.referral_fee_amount) || 0;
+  const loan = Number(lead.estimated_loan_amount) || 0;
+  const html = buildInvoiceHtml({
+    invoiceNumber: `INV-${lead.id.slice(0, 8).toUpperCase()}`,
+    fromName: 'Referring Agent',
+    fromEmail: '',
+    toName: 'Assigned Broker',
+    toRef: lead.id,
+    buyerName: lead.buyer_name || 'Buyer',
+    loanAmount: fmtAUD(loan),
+    amount: fmtAUD(fee),
+  });
+  const w = window.open('', '_blank');
+  if (!w) { toast.error('Popup blocked — please allow popups'); return; }
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
 };
 
 export default function BrokerReferralsPage() {
@@ -272,6 +293,14 @@ export default function BrokerReferralsPage() {
                       </td>
                       <td className="p-3 text-right font-medium text-primary">
                         {loan ? fmtAUD(estCommission) : '—'}
+                        {l.status === 'settled' && (
+                          <button
+                            onClick={() => downloadInvoice(l)}
+                            className="block ml-auto mt-1 text-xs text-primary underline font-normal"
+                          >
+                            Download invoice
+                          </button>
+                        )}
                       </td>
                     </tr>
                   );

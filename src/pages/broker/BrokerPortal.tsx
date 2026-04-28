@@ -39,6 +39,7 @@ import {
   formatAud,
   getLanguageMeta,
 } from "./brokerPortalUtils";
+import { buildInvoiceHtml } from "./invoiceTemplate";
 
 const CALENDLY_URL = (import.meta.env.VITE_CALENDLY_URL as string) || "";
 
@@ -61,6 +62,7 @@ interface Lead {
   settled_at: string | null;
   referral_fee_amount: number | null;
   notes: string | null;
+  referral_agent_id: string | null;
 }
 
 interface PropertyMini {
@@ -646,8 +648,38 @@ function LeadDetail({
       fee_agreed_at: lead.fee_agreed_at || new Date().toISOString(),
     }).eq("id", lead.id);
     setBusy(null);
-    if (error) toast.error("Could not mark settled: " + error.message);
-    else { toast.success("Lead marked as settled"); onChanged(); }
+    if (error) { toast.error("Could not mark settled: " + error.message); return; }
+
+    // Notify the referring agent
+    if (lead.referral_agent_id) {
+      await (supabase.from("notifications") as any).insert({
+        agent_id: lead.referral_agent_id,
+        type: "referral_settled",
+        title: "💰 Referral fee earned",
+        message: `Your referral ${lead.buyer_name || "buyer"} has settled. Your referral fee of ${formatAud(referralFee)} is now due. Download your invoice from the Broker Referrals page.`,
+      } as any);
+    }
+
+    toast.success("Lead marked as settled");
+    onChanged();
+  };
+
+  const handleDownloadInvoice = () => {
+    const html = buildInvoiceHtml({
+      invoiceNumber: `INV-${lead.id.slice(0, 8).toUpperCase()}`,
+      fromName: broker.company || broker.full_name || broker.name || "Broker",
+      fromEmail: broker.email || "",
+      toName: "Referring Agent",
+      toRef: lead.referral_agent_id || "—",
+      buyerName: lead.buyer_name || "Buyer",
+      loanAmount: formatAud(lead.estimated_loan_amount),
+      amount: formatAud(referralFee),
+    });
+    const w = window.open("", "_blank");
+    if (!w) { toast.error("Popup blocked — please allow popups"); return; }
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
   };
 
   const handleSaveNote = async () => {
@@ -850,6 +882,13 @@ function LeadDetail({
                 {busy === "settle"
                   ? <Loader2 className="animate-spin" size={14} />
                   : "Confirm Settlement"}
+              </Button>
+            </div>
+          )}
+          {lead.status === "settled" && (
+            <div className="mt-3">
+              <Button variant="outline" size="sm" onClick={handleDownloadInvoice}>
+                Download Invoice
               </Button>
             </div>
           )}

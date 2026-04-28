@@ -58,6 +58,33 @@ export type Database = {
           },
         ]
       }
+      admin_impersonation_sessions: {
+        Row: {
+          admin_id: string
+          created_at: string
+          expires_at: string
+          id: string
+          impersonated_email: string | null
+          impersonated_user_id: string
+        }
+        Insert: {
+          admin_id: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          impersonated_email?: string | null
+          impersonated_user_id: string
+        }
+        Update: {
+          admin_id?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          impersonated_email?: string | null
+          impersonated_user_id?: string
+        }
+        Relationships: []
+      }
       agencies: {
         Row: {
           abn: string | null
@@ -13888,6 +13915,7 @@ export type Database = {
         Args: { _agent_id: string }
         Returns: boolean
       }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_agency_admin_or_principal: {
         Args: { _agency_id: string }
         Returns: boolean

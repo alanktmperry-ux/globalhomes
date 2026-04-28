@@ -66,33 +66,59 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [impersonating, setImpersonating] = useState(false);
   const [impersonatedUser, setImpersonatedUser] = useState<string | null>(null);
   const [impersonatedUserId, setImpersonatedUserId] = useState<string | null>(null);
+  const [impersonationSessionId, setImpersonationSessionId] = useState<string | null>(null);
 
+  // Load active impersonation session from Supabase (server-side, can't be tampered with via DevTools)
   useEffect(() => {
-    if (!isAdmin) {
-      sessionStorage.removeItem('admin_email');
-      sessionStorage.removeItem('admin_impersonated_id');
-    } else {
-      const savedEmail = sessionStorage.getItem('admin_email');
-      const savedId = sessionStorage.getItem('admin_impersonated_id');
-      if (savedEmail) {
-        setImpersonating(true);
-        setImpersonatedUser(savedEmail);
-      }
-      if (savedId) {
-        setImpersonatedUserId(savedId);
-      }
+    if (!user || !isAdmin) {
+      setImpersonating(false);
+      setImpersonatedUser(null);
+      setImpersonatedUserId(null);
+      setImpersonationSessionId(null);
+      return;
     }
-  }, [isAdmin]);
+    let cancelled = false;
+    (async () => {
+      const nowIso = new Date().toISOString();
+      const { data, error } = await (supabase as any)
+        .from('admin_impersonation_sessions')
+        .select('id, impersonated_user_id, impersonated_email, expires_at')
+        .eq('admin_id', user.id)
+        .gt('expires_at', nowIso)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (cancelled) return;
+      if (error) {
+        console.error('[Auth] failed to load impersonation session:', error);
+        return;
+      }
+      if (data) {
+        setImpersonating(true);
+        setImpersonatedUser(data.impersonated_email ?? null);
+        setImpersonatedUserId(data.impersonated_user_id);
+        setImpersonationSessionId(data.id);
+      }
+
+      // Cleanup any expired rows for this admin
+      await (supabase as any)
+        .from('admin_impersonation_sessions')
+        .delete()
+        .eq('admin_id', user.id)
+        .lt('expires_at', nowIso);
+    })();
+    return () => { cancelled = true; };
+  }, [user, isAdmin]);
 
   const startImpersonation = async (userId: string, userEmail: string) => {
-    if (!isAdmin) return;
+    if (!isAdmin || !user) return;
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
 
     // Audit log MUST succeed before impersonation proceeds
     try {
       const { error: auditError } = await supabase.from('audit_log').insert({
-        user_id: user?.id ?? null,
+        user_id: user.id,
         action_type: 'admin_start_impersonation',
         entity_type: 'user',
         entity_id: userId,
@@ -106,8 +132,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    sessionStorage.setItem('admin_email', userEmail);
-    sessionStorage.setItem('admin_impersonated_id', userId);
+    // Persist impersonation session server-side (1 hour TTL set by table default)
+    const { data: sessionRow, error: insertError } = await (supabase as any)
+      .from('admin_impersonation_sessions')
+      .insert({
+        admin_id: user.id,
+        impersonated_user_id: userId,
+        impersonated_email: userEmail,
+        expires_at: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+      })
+      .select('id')
+      .maybeSingle();
+
+    if (insertError || !sessionRow) {
+      console.error('impersonation session insert failed:', insertError);
+      toast.error('Impersonation blocked — session could not be created.');
+      return;
+    }
+
+    setImpersonationSessionId(sessionRow.id);
     setImpersonating(true);
     setImpersonatedUser(userEmail);
     setImpersonatedUserId(userId);
@@ -126,8 +169,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.error('impersonation audit log:', auditError);
       toast.error('Warning: could not log impersonation exit');
     }
-    sessionStorage.removeItem('admin_email');
-    sessionStorage.removeItem('admin_impersonated_id');
+
+    // Remove the server-side session row
+    if (user) {
+      await (supabase as any)
+        .from('admin_impersonation_sessions')
+        .delete()
+        .eq('admin_id', user.id);
+    }
+
+    setImpersonationSessionId(null);
     setImpersonating(false);
     setImpersonatedUser(null);
     setImpersonatedUserId(null);
@@ -355,6 +406,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     sessionStorage.removeItem('post_login_redirected');
+    // Clear any active impersonation rows for this admin
+    if (user) {
+      try {
+        await (supabase as any)
+          .from('admin_impersonation_sessions')
+          .delete()
+          .eq('admin_id', user.id);
+      } catch (e) { /* non-fatal */ }
+    }
     clearRoles();
     setUser(null);
     setSession(null);

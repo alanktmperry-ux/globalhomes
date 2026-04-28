@@ -208,6 +208,14 @@ const BillingPage = () => {
       }
       await supabase.from('agents').update({ is_subscribed: true }).eq('id', agent.id);
 
+      try {
+        capture('subscription_started', {
+          agent_id: agent.id,
+          plan: planId,
+          mrr: payload.monthly_price_aud,
+        });
+      } catch {}
+
       toast.success("Plan updated! Stripe billing is coming — we'll email you when payment is ready.");
       window.location.reload();
     } catch (err: unknown) {

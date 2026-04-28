@@ -80,10 +80,9 @@ const SeekerAuthPage = () => {
       setCaptchaToken(null);
       captchaRef.current?.resetCaptcha();
       if (error) {
-        if (error.message.includes('Email not confirmed')) {
-          throw new Error('Please check your email and click the confirmation link before signing in.');
-        }
-        throw error;
+        toast.error("If an account exists with this email, you'll receive a login link.");
+        setLoading(false);
+        return;
       }
       toast('Welcome back!');
       const { data: { user: signedInUser } } = await supabase.auth.getUser();
@@ -101,8 +100,8 @@ const SeekerAuthPage = () => {
       } else {
         navigate('/', { replace: true });
       }
-    } catch (err: unknown) {
-      toast.error('Something went wrong', { description: getErrorMessage(err) });
+    } catch {
+      toast.error("If an account exists with this email, you'll receive a login link.");
     } finally {
       setLoading(false);
     }

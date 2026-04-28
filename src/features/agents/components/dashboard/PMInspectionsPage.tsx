@@ -520,6 +520,14 @@ ${agencyName || ''}`.trim();
               <TabsTrigger value="overdue">Overdue</TabsTrigger>
               <TabsTrigger value="completed">Completed</TabsTrigger>
               <TabsTrigger value="due">Due for Inspection</TabsTrigger>
+              <TabsTrigger value="disputes" className="relative">
+                Disputes
+                {stats.disputes > 0 && (
+                  <span className="ml-2 inline-flex items-center justify-center min-w-[18px] h-[18px] rounded-full bg-red-600 text-white text-[10px] px-1.5">
+                    {stats.disputes}
+                  </span>
+                )}
+              </TabsTrigger>
             </TabsList>
           </Tabs>
           <Button onClick={() => openSchedule()}>

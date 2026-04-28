@@ -7970,6 +7970,7 @@ export type Database = {
           owner_name: string | null
           owner_phone: string | null
           owner_portal_token: string | null
+          owner_portal_token_expires_at: string | null
           parking: number
           parking_notes: string | null
           pets_allowed: boolean | null
@@ -8115,6 +8116,7 @@ export type Database = {
           owner_name?: string | null
           owner_phone?: string | null
           owner_portal_token?: string | null
+          owner_portal_token_expires_at?: string | null
           parking?: number
           parking_notes?: string | null
           pets_allowed?: boolean | null
@@ -8260,6 +8262,7 @@ export type Database = {
           owner_name?: string | null
           owner_phone?: string | null
           owner_portal_token?: string | null
+          owner_portal_token_expires_at?: string | null
           parking?: number
           parking_notes?: string | null
           pets_allowed?: boolean | null
@@ -13673,6 +13676,7 @@ export type Database = {
           owner_name: string | null
           owner_phone: string | null
           owner_portal_token: string | null
+          owner_portal_token_expires_at: string | null
           parking: number
           parking_notes: string | null
           pets_allowed: boolean | null

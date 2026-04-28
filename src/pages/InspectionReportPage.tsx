@@ -283,6 +283,16 @@ const InspectionReportPage = () => {
     if (!inspection) return;
     setFinalising(true);
     const today = format(new Date(), 'yyyy-MM-dd');
+
+    // Calculate tenant dispute deadline for entry reports
+    const disputeDays: Record<string, number> = {
+      VIC: 3, NSW: 7, QLD: 3, WA: 5, SA: 5, ACT: 7, TAS: 5, NT: 5,
+    };
+    const days = propertyState ? (disputeDays[propertyState.toUpperCase()] ?? 5) : 5;
+    const deadline = new Date();
+    deadline.setDate(deadline.getDate() + days);
+    const disputeDeadline = format(deadline, 'yyyy-MM-dd');
+
     await supabase.from('property_inspections').update({
       conducted_date: today,
       finalised_at: new Date().toISOString(),
@@ -291,6 +301,7 @@ const InspectionReportPage = () => {
       remotes_count: remotesCount,
       water_meter_reading: waterMeter || null,
       overall_notes: overallNotes || null,
+      ...(inspection.inspection_type === 'entry' ? { tenant_dispute_deadline: disputeDeadline } : {}),
     } as any).eq('id', inspection.id);
 
     const reportLink = `https://listhq.com.au/inspection-report/${inspection.report_token}`;

@@ -25,6 +25,7 @@ import TenantPortalCard from './TenantPortalCard';
 import OwnerPortalCard from './OwnerPortalCard';
 import TenancyContactsPanel from './TenancyContactsPanel';
 import WaterBillingPanel from './WaterBillingPanel';
+import SmokeAlarmPanel from './SmokeAlarmPanel';
 import { format, parseISO, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { cn } from '@/shared/lib/utils';
 

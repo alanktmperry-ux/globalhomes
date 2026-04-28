@@ -56,6 +56,7 @@ const PROPERTY_NAV_URGENT: NavItem[] = [
 
 const PROPERTY_NAV_TENANCY: NavItem[] = [
   { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home },
+  { title: 'Rent Increases', url: '/dashboard/rent-increases', icon: TrendingUp },
   { title: 'Rental Applications', url: '/dashboard/rental-applications', icon: ClipboardList },
   { title: 'Vacancies', url: '/dashboard/vacancies', icon: Building2 },
   { title: 'Vacancy KPIs', url: '/dashboard/vacancy-kpi', icon: Activity },

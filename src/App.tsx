@@ -123,6 +123,7 @@ const HelpPage = React.lazy(() => import("@/features/agents/components/dashboard
 const BrokerReferralsPage = React.lazy(() => import("@/features/agents/components/dashboard/BrokerReferralsPage"));
 const RentRollPage = React.lazy(() => import("@/features/agents/components/dashboard/RentRollPage"));
 const ArrearsPage = React.lazy(() => import("@/features/agents/components/dashboard/ArrearsPage"));
+const RentIncreasePage = React.lazy(() => import("@/features/agents/components/dashboard/RentIncreasePage"));
 const TenancyDetailPage = React.lazy(() => import("@/features/agents/components/dashboard/TenancyDetailPage"));
 const InspectionReportPage = React.lazy(() => import("./pages/InspectionReportPage"));
 const OpenHomesPage = React.lazy(() => import("@/features/open-homes/components/AgentOpenHomeManager"));
@@ -385,6 +386,7 @@ const App = () => (
                   <Route path="performance" element={<PerformancePage />} />
                   <Route path="rent-roll" element={<RentRollPage />} />
                   <Route path="arrears" element={<ArrearsPage />} />
+                  <Route path="rent-increases" element={<RentIncreasePage />} />
                   <Route path="tenancies/:tenancyId" element={<TenancyDetailPage />} />
                   <Route path="inspection/:inspectionId" element={<InspectionReportPage />} />
                   <Route path="open-homes" element={<OpenHomesPage />} />

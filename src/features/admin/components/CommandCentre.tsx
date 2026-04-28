@@ -304,7 +304,7 @@ export default function CommandCentre() {
         ((supabase.from('properties') as any).select('id', { count: 'exact', head: true }).eq('moderation_status', 'pending')) as any,
         (supabase.from('demo_requests' as any).select('id', { count: 'exact', head: true }).eq('status', 'pending')) as any,
         (supabase.from('support_tickets' as any).select('id', { count: 'exact', head: true }).eq('status', 'open')) as any,
-        supabase.from('agents').select('id', { count: 'exact', head: true }).eq('is_subscribed', false).gte('updated_at', monthStart),
+        supabase.from('agents').select('id', { count: 'exact', head: true }).eq('is_subscribed', false).lt('created_at', monthStart),
         (supabase.from('buyer_activity_events' as any).select('id', { count: 'exact', head: true }).eq('event_type', 'search').gte('created_at', todayStart)) as any,
         (supabase.from('saved_properties' as any).select('id', { count: 'exact', head: true }).gte('saved_at', todayStart)) as any,
         (supabase.from('buyer_profiles' as any).select('id', { count: 'exact', head: true })) as any,

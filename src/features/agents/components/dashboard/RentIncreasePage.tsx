@@ -275,7 +275,7 @@ ${agencyName || ''}`.trim();
   const copyNotice = async () => {
     if (!noticeFor) return;
     try {
-      await navigator.clipboard.writeText(buildNoticeText(noticeFor.row, noticeFor.increase));
+      await navigator.clipboard.writeText(buildNoticeText(noticeFor.row, noticeFor.increase, noticeFor.toLine));
       toast.success('Copied');
     } catch {
       toast.error('Could not copy');

@@ -717,6 +717,16 @@ const TenancyDetailPage = () => {
               />
             </div>
 
+            {agentId && (
+              <div className="mt-4">
+                <SmokeAlarmPanel
+                  propertyId={tenancy.property_id}
+                  propertyState={(tenancy.properties as any)?.state ?? null}
+                  agentId={agentId}
+                />
+              </div>
+            )}
+
             <div className="mt-4">
               <TenancyContactsPanel tenancyId={tenancy.id} />
             </div>

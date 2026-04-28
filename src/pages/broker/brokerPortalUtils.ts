@@ -2,7 +2,7 @@
  * Shared utilities for the broker portal.
  */
 
-export type LeadStatus = "new" | "claimed" | "in_progress" | "settled" | "lost";
+export type LeadStatus = "new" | "contacted" | "meeting_booked" | "pre_approval" | "settled" | "lost";
 
 export interface BrokerRecord {
   id: string;
@@ -117,8 +117,9 @@ export function formatAud(n: number | null | undefined): string {
 export function statusBadge(status: LeadStatus): { label: string; className: string } {
   switch (status) {
     case "new": return { label: "New", className: "bg-blue-100 text-blue-800 border-blue-200" };
-    case "claimed": return { label: "Claimed", className: "bg-violet-100 text-violet-800 border-violet-200" };
-    case "in_progress": return { label: "In Progress", className: "bg-amber-100 text-amber-800 border-amber-200" };
+    case "contacted": return { label: "Contacted", className: "bg-violet-100 text-violet-800 border-violet-200" };
+    case "meeting_booked": return { label: "Meeting Booked", className: "bg-amber-100 text-amber-800 border-amber-200" };
+    case "pre_approval": return { label: "Pre-approval", className: "bg-orange-100 text-orange-800 border-orange-200" };
     case "settled": return { label: "Settled", className: "bg-green-100 text-green-800 border-green-200" };
     case "lost": return { label: "Lost", className: "bg-slate-100 text-slate-600 border-slate-200" };
   }

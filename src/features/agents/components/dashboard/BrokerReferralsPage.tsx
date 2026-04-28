@@ -32,8 +32,8 @@ const fmtAUD = (n: number) =>
 
 const statusVariant = (s: string): 'default' | 'secondary' | 'outline' => {
   if (s === 'settled') return 'default';
-  if (s === 'new' || s === 'assigned' || s === 'contacted') return 'secondary';
-  return 'outline';
+  if (s === 'lost') return 'outline';
+  return 'secondary';
 };
 
 export default function BrokerReferralsPage() {

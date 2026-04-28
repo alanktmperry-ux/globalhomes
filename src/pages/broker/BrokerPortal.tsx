@@ -32,6 +32,7 @@ import {
 import { toast } from "sonner";
 import {
   type BrokerRecord,
+  type LeadStatus,
   initialsFromName,
   avatarColorForLanguage,
   timeAgo,
@@ -40,18 +41,6 @@ import {
 } from "./brokerPortalUtils";
 
 const CALENDLY_URL = (import.meta.env.VITE_CALENDLY_URL as string) || "";
-
-// Extended status flow per spec (stored in referral_leads.status which is `text`)
-type LeadStatusExt =
-  | "new"
-  | "contacted"
-  | "meeting_booked"
-  | "pre_approval"
-  | "settled"
-  | "lost"
-  // legacy values still in DB
-  | "claimed"
-  | "in_progress";
 
 interface Lead {
   id: string;

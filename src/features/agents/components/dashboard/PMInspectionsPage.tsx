@@ -30,7 +30,7 @@ import {
 import { toast } from 'sonner';
 import {
   CalendarDays, Plus, CheckCircle2, XCircle, Loader2, Mail,
-  AlertTriangle, ExternalLink, CalendarIcon, Copy, ClipboardCheck,
+  AlertTriangle, ExternalLink, CalendarIcon, Copy, ClipboardCheck, FileText, PlayCircle,
 } from 'lucide-react';
 import { format, parseISO, addDays, differenceInDays } from 'date-fns';
 import DashboardHeader from './DashboardHeader';
@@ -307,13 +307,13 @@ export default function PMInspectionsPage() {
   const selectedRule = useMemo(() => ruleFor(selectedTenancy?.properties?.state), [selectedTenancy]);
   const selectedMinDate = useMemo(() => ruleMinDate(selectedRule), [selectedRule]);
 
-  const submitSchedule = async () => {
+  const submitSchedule = async (opts: { startReport?: boolean } = {}) => {
     if (!scheduleForm || !agentId) return;
     if (!scheduleForm.tenancy_id) { toast.error('Select a tenancy'); return; }
     if (!scheduleForm.scheduled_date) { toast.error('Select a date'); return; }
     const t = activeTenancies.find(x => x.id === scheduleForm.tenancy_id);
     setSavingSchedule(true);
-    const { error } = await supabase.from('property_inspections').insert({
+    const { data: inserted, error } = await supabase.from('property_inspections').insert({
       tenancy_id: scheduleForm.tenancy_id,
       property_id: t?.property_id,
       agent_id: agentId,
@@ -321,12 +321,33 @@ export default function PMInspectionsPage() {
       scheduled_date: format(scheduleForm.scheduled_date, 'yyyy-MM-dd'),
       status: 'scheduled',
       overall_notes: scheduleForm.notes.trim() || null,
-    } as any);
+    } as any).select('id').maybeSingle();
     setSavingSchedule(false);
-    if (error) { toast.error('Could not schedule inspection'); return; }
+    if (error || !inserted) { toast.error('Could not schedule inspection'); return; }
     toast.success('Inspection scheduled');
     setScheduleForm(null);
+    if (opts.startReport) {
+      navigate(`/dashboard/inspection/${(inserted as any).id}`);
+      return;
+    }
     loadData();
+  };
+
+  const scheduleAndStartFromSuggestion = async (s: SuggestedInspection) => {
+    if (!agentId) return;
+    const t = activeTenancies.find(x => x.id === s.tenancyId);
+    if (!t) return;
+    const r = ruleFor(t.properties?.state);
+    const { data: inserted, error } = await supabase.from('property_inspections').insert({
+      tenancy_id: t.id,
+      property_id: t.property_id,
+      agent_id: agentId,
+      inspection_type: 'routine',
+      scheduled_date: format(ruleMinDate(r), 'yyyy-MM-dd'),
+      status: 'scheduled',
+    } as any).select('id').maybeSingle();
+    if (error || !inserted) { toast.error('Could not schedule inspection'); return; }
+    navigate(`/dashboard/inspection/${(inserted as any).id}`);
   };
 
   // Notice
@@ -514,8 +535,8 @@ ${agencyName || ''}`.trim();
                         <TableCell className="text-xs">{s.state || '—'}</TableCell>
                         <TableCell className="text-xs text-muted-foreground">{s.reason}</TableCell>
                         <TableCell className="text-right">
-                          <Button size="sm" onClick={() => openSchedule(s.tenancyId)}>
-                            Schedule Now
+                          <Button size="sm" onClick={() => scheduleAndStartFromSuggestion(s)}>
+                            Schedule & Start Report
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -592,14 +613,19 @@ ${agencyName || ''}`.trim();
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end flex-wrap gap-1">
-                              {i.status === 'scheduled' && !i.notice_sent_at && (
-                                <Button size="sm" variant="ghost" onClick={() => setNoticeFor(i)}>
-                                  <Mail size={12} className="mr-1" /> Notice
+                              {i.status === 'scheduled' && (
+                                <Button size="sm" onClick={() => navigate(`/dashboard/inspection/${i.id}`)}>
+                                  <PlayCircle size={12} className="mr-1" /> Start Report
                                 </Button>
                               )}
-                              {i.status === 'scheduled' && (
-                                <Button size="sm" variant="outline" onClick={() => openComplete(i)}>
-                                  <CheckCircle2 size={12} className="mr-1" /> Complete
+                              {i.status === 'completed' && (
+                                <Button size="sm" variant="outline" onClick={() => navigate(`/dashboard/inspection/${i.id}`)}>
+                                  <FileText size={12} className="mr-1" /> View Report
+                                </Button>
+                              )}
+                              {i.status === 'scheduled' && !i.notice_sent_at && (
+                                <Button size="sm" variant="ghost" onClick={() => setNoticeFor(i)}>
+                                  <Mail size={12} className="mr-1" /> Send Notice
                                 </Button>
                               )}
                               {i.status === 'scheduled' && (
@@ -709,11 +735,15 @@ ${agencyName || ''}`.trim();
               </div>
             </div>
           )}
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button variant="outline" onClick={() => setScheduleForm(null)} disabled={savingSchedule}>Cancel</Button>
-            <Button onClick={submitSchedule} disabled={savingSchedule}>
+            <Button variant="secondary" onClick={() => submitSchedule()} disabled={savingSchedule}>
               {savingSchedule && <Loader2 size={14} className="mr-1 animate-spin" />}
-              Schedule
+              Schedule Only
+            </Button>
+            <Button onClick={() => submitSchedule({ startReport: true })} disabled={savingSchedule}>
+              {savingSchedule && <Loader2 size={14} className="mr-1 animate-spin" />}
+              <PlayCircle size={14} className="mr-1" /> Schedule & Start Report
             </Button>
           </DialogFooter>
         </DialogContent>

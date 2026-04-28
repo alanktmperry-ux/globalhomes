@@ -262,7 +262,7 @@ const InspectionReportPage = () => {
 
     setFinalising(false);
     toast.success('Report finalised');
-    navigate('/dashboard/rent-roll');
+    navigate('/dashboard/pm-inspections');
   };
 
   const allMaintenance = rooms.flatMap(r => r.maintenance.map(m => ({ ...m, roomName: r.room_name })));

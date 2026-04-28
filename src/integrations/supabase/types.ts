@@ -12364,6 +12364,71 @@ export type Database = {
         }
         Relationships: []
       }
+      water_bills: {
+        Row: {
+          created_at: string | null
+          end_reading: number
+          id: string
+          invoice_date: string | null
+          notes: string | null
+          paid_date: string | null
+          period_end: string
+          period_start: string
+          rate_per_kl: number
+          start_reading: number
+          status: string | null
+          supply_charge: number | null
+          tenancy_id: string
+          total_amount: number | null
+          usage_charge: number | null
+          usage_kl: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          end_reading: number
+          id?: string
+          invoice_date?: string | null
+          notes?: string | null
+          paid_date?: string | null
+          period_end: string
+          period_start: string
+          rate_per_kl?: number
+          start_reading: number
+          status?: string | null
+          supply_charge?: number | null
+          tenancy_id: string
+          total_amount?: number | null
+          usage_charge?: number | null
+          usage_kl?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          end_reading?: number
+          id?: string
+          invoice_date?: string | null
+          notes?: string | null
+          paid_date?: string | null
+          period_end?: string
+          period_start?: string
+          rate_per_kl?: number
+          start_reading?: number
+          status?: string | null
+          supply_charge?: number | null
+          tenancy_id?: string
+          total_amount?: number | null
+          usage_charge?: number | null
+          usage_kl?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "water_bills_tenancy_id_fkey"
+            columns: ["tenancy_id"]
+            isOneToOne: false
+            referencedRelation: "tenancies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       agent_locations_public_safe: {

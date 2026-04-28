@@ -24,6 +24,7 @@ import DashboardHeader from './DashboardHeader';
 import TenantPortalCard from './TenantPortalCard';
 import OwnerPortalCard from './OwnerPortalCard';
 import TenancyContactsPanel from './TenancyContactsPanel';
+import WaterBillingPanel from './WaterBillingPanel';
 import { format, parseISO, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { cn } from '@/shared/lib/utils';
 
@@ -172,7 +173,7 @@ const TenancyDetailPage = () => {
     const [tRes, pRes, jRes] = await Promise.all([
       supabase
         .from('tenancies')
-        .select('*, properties(address, suburb, owner_portal_token, owner_name, owner_email)')
+        .select('*, properties(address, suburb, state, owner_portal_token, owner_name, owner_email)')
         .eq('id', tenancyId)
         .eq('agent_id', agentData.id)
         .single(),
@@ -707,6 +708,13 @@ const TenancyDetailPage = () => {
                 </div>
               </CardContent>
             </Card>
+
+            <div className="mt-4">
+              <WaterBillingPanel
+                tenancyId={tenancy.id}
+                propertyState={(tenancy.properties as any)?.state ?? null}
+              />
+            </div>
 
             <div className="mt-4">
               <TenancyContactsPanel tenancyId={tenancy.id} />

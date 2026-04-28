@@ -116,7 +116,7 @@ const RentIncreasePage = () => {
   const [saving, setSaving] = useState(false);
 
   // Notice modal
-  const [noticeFor, setNoticeFor] = useState<{ row: RowItem; increase: RentIncrease } | null>(null);
+  const [noticeFor, setNoticeFor] = useState<{ row: RowItem; increase: RentIncrease; toLine: string } | null>(null);
 
   const loadData = async () => {
     if (!agent?.id) return;

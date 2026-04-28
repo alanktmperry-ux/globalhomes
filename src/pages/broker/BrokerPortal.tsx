@@ -444,7 +444,7 @@ function LeadDetail({
 
   const langMeta = getLanguageMeta(lead.buyer_language);
   const isNonEnglish = !!langMeta && langMeta.label !== "English";
-  const referralFee = Number(lead.referral_fee_amount || 75);
+  const referralFee = lead.referral_fee_amount ? Number(lead.referral_fee_amount) : lead.estimated_loan_amount ? Math.round(Number(lead.estimated_loan_amount) * 0.0065 * 0.20) : 0;
 
   const updateStatus = async (next: LeadStatusExt) => {
     setBusy("status");
@@ -662,8 +662,7 @@ function LeadDetail({
           <div className="flex items-start gap-2 mb-3">
             <AlertCircle size={16} className="text-amber-700 mt-0.5 shrink-0" />
             <p className="text-sm text-amber-900">
-              Referral fee: <strong>{formatAud(referralFee)}</strong>. This arrangement
-              will be disclosed to the client as required under NCCP.
+              Referral fee: <strong>{formatAud(referralFee)}</strong> (20% of broker upfront commission on estimated loan of {formatAud(lead.estimated_loan_amount)}). This arrangement will be disclosed to the client as required under NCCP.
             </p>
           </div>
           <label className="flex items-start gap-2 cursor-pointer text-sm text-amber-900">

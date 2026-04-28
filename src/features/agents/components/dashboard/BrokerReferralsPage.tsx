@@ -126,6 +126,7 @@ export default function BrokerReferralsPage() {
       referral_agent_id: agentId,
       referred_by_code: referredByCode,
       assigned_broker_id: broker?.id ?? null,
+      referral_fee_amount: loanAmount ? Math.round(Number(loanAmount) * 0.0065 * 0.20) : null,
     });
 
     setSubmitting(false);
@@ -210,8 +211,8 @@ export default function BrokerReferralsPage() {
       <div className="flex items-start gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4">
         <Info className="h-4 w-4 text-primary mt-0.5 shrink-0" />
         <p className="text-sm text-foreground">
-          Every settled referral earns you a share of the broker commission.
-          Average return: <strong>$1,200–$2,400</strong> per settled loan.
+          Every settled referral earns you a 20% referral fee on the broker's commission.
+          On a $600,000 loan that's typically <strong>$780</strong> — on a $1M loan, around <strong>$1,300</strong>.
         </p>
       </div>
 
@@ -263,7 +264,7 @@ export default function BrokerReferralsPage() {
               <tbody>
                 {leads.map((l) => {
                   const loan = Number(l.estimated_loan_amount) || 0;
-                  const estCommission = loan * 0.003 * 0.25;
+                  const estCommission = loan * 0.0065 * 0.20;
                   return (
                     <tr key={l.id} className="border-t">
                       <td className="p-3">

@@ -8512,6 +8512,8 @@ export type Database = {
           bond_lodgment_number: string | null
           conducted_date: string | null
           created_at: string | null
+          dispute_resolution_notes: string | null
+          dispute_resolved_at: string | null
           finalised_at: string | null
           id: string
           inspection_type: string
@@ -8538,6 +8540,8 @@ export type Database = {
           bond_lodgment_number?: string | null
           conducted_date?: string | null
           created_at?: string | null
+          dispute_resolution_notes?: string | null
+          dispute_resolved_at?: string | null
           finalised_at?: string | null
           id?: string
           inspection_type: string
@@ -8564,6 +8568,8 @@ export type Database = {
           bond_lodgment_number?: string | null
           conducted_date?: string | null
           created_at?: string | null
+          dispute_resolution_notes?: string | null
+          dispute_resolved_at?: string | null
           finalised_at?: string | null
           id?: string
           inspection_type?: string

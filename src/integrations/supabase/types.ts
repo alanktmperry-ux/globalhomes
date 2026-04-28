@@ -2194,6 +2194,144 @@ export type Database = {
           },
         ]
       }
+      bond_claim_items: {
+        Row: {
+          amount: number
+          category: string
+          claim_id: string
+          created_at: string
+          description: string
+          id: string
+          room_name: string | null
+        }
+        Insert: {
+          amount?: number
+          category: string
+          claim_id: string
+          created_at?: string
+          description: string
+          id?: string
+          room_name?: string | null
+        }
+        Update: {
+          amount?: number
+          category?: string
+          claim_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+          room_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bond_claim_items_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "bond_claims"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bond_claims: {
+        Row: {
+          agent_id: string
+          authority_name: string | null
+          authority_reference: string | null
+          bond_amount_held: number
+          claimed_amount: number | null
+          created_at: string
+          exit_inspection_id: string | null
+          id: string
+          lodged_date: string | null
+          notes: string | null
+          outcome_amount: number | null
+          outcome_date: string | null
+          status: string
+          tenancy_id: string | null
+          total_deductions: number
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          authority_name?: string | null
+          authority_reference?: string | null
+          bond_amount_held?: number
+          claimed_amount?: number | null
+          created_at?: string
+          exit_inspection_id?: string | null
+          id?: string
+          lodged_date?: string | null
+          notes?: string | null
+          outcome_amount?: number | null
+          outcome_date?: string | null
+          status?: string
+          tenancy_id?: string | null
+          total_deductions?: number
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          authority_name?: string | null
+          authority_reference?: string | null
+          bond_amount_held?: number
+          claimed_amount?: number | null
+          created_at?: string
+          exit_inspection_id?: string | null
+          id?: string
+          lodged_date?: string | null
+          notes?: string | null
+          outcome_amount?: number | null
+          outcome_date?: string | null
+          status?: string
+          tenancy_id?: string | null
+          total_deductions?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bond_claims_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bond_claims_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bond_claims_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bond_claims_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "bond_claims_exit_inspection_id_fkey"
+            columns: ["exit_inspection_id"]
+            isOneToOne: false
+            referencedRelation: "property_inspections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bond_claims_tenancy_id_fkey"
+            columns: ["tenancy_id"]
+            isOneToOne: false
+            referencedRelation: "tenancies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       broadcast_campaigns: {
         Row: {
           audience: string

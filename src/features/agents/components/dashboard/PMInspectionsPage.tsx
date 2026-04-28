@@ -282,7 +282,7 @@ export default function PMInspectionsPage() {
         const hasExit = inspections.some(i =>
           i.tenancy_id === t.id &&
           i.inspection_type === 'exit' &&
-          (i.status === 'scheduled' || i.status === 'in_progress' || i.status === 'completed')
+          i.status !== 'cancelled'
         );
         return !hasExit;
       })

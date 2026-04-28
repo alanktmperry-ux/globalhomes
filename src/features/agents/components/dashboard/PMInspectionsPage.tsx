@@ -408,6 +408,27 @@ export default function PMInspectionsPage() {
     navigate(`/dashboard/inspection/${(inserted as any).id}`);
   };
 
+  const scheduleExitInspection = async (tenancyId: string, leaseEnd: string) => {
+    if (!agentId) return;
+    const t = activeTenancies.find(x => x.id === tenancyId);
+    if (!t) return;
+    const today = new Date();
+    let scheduled = parseISO(leaseEnd);
+    const threeBefore = addDays(scheduled, -3);
+    if (threeBefore > today) scheduled = threeBefore;
+    if (scheduled < today) scheduled = today;
+    const { data: inserted, error } = await supabase.from('property_inspections').insert({
+      tenancy_id: tenancyId,
+      property_id: t.property_id,
+      agent_id: agentId,
+      inspection_type: 'exit',
+      scheduled_date: format(scheduled, 'yyyy-MM-dd'),
+      status: 'scheduled',
+    } as any).select('id').maybeSingle();
+    if (error || !inserted) { toast.error('Could not schedule exit inspection'); return; }
+    navigate(`/dashboard/inspection/${(inserted as any).id}`);
+  };
+
   // Notice
   const buildNoticeText = (i: InspectionRow): string => {
     const state = (i.tenancies?.properties?.state || '').toUpperCase();

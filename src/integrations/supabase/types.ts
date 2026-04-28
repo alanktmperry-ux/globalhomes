@@ -8658,6 +8658,7 @@ export type Database = {
           buyer_name: string | null
           buyer_phone: string | null
           calendly_booking_url: string | null
+          claim_expires_at: string | null
           claimed_at: string | null
           commission_aud: number
           created_at: string
@@ -8690,6 +8691,7 @@ export type Database = {
           buyer_name?: string | null
           buyer_phone?: string | null
           calendly_booking_url?: string | null
+          claim_expires_at?: string | null
           claimed_at?: string | null
           commission_aud?: number
           created_at?: string
@@ -8722,6 +8724,7 @@ export type Database = {
           buyer_name?: string | null
           buyer_phone?: string | null
           calendly_booking_url?: string | null
+          claim_expires_at?: string | null
           claimed_at?: string | null
           commission_aud?: number
           created_at?: string

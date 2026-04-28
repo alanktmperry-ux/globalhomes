@@ -405,25 +405,40 @@ function StatChip({ label, value, tone }: { label: string; value: number; tone: 
   );
 }
 
-function LeadRow({ lead, selected, onSelect }: { lead: Lead; selected: boolean; onSelect: () => void }) {
+function LeadRow({
+  lead, selected, onSelect, showClaim, claiming, onClaim,
+}: {
+  lead: Lead;
+  selected: boolean;
+  onSelect: () => void;
+  showClaim?: boolean;
+  claiming?: boolean;
+  onClaim?: () => void;
+}) {
   const langMeta = getLanguageMeta(lead.buyer_language);
   const isNonEnglish = !!langMeta && langMeta.label !== "English";
+  // For unclaimed leads we hide PII — only show first name.
+  const displayName = showClaim
+    ? (lead.buyer_name?.split(" ")[0] || "New buyer")
+    : (lead.buyer_name || "Unnamed buyer");
+
   return (
     <li>
-      <button
-        onClick={onSelect}
-        className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-slate-50 transition-colors ${
+      <div
+        className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-slate-50 transition-colors cursor-pointer ${
           selected ? "bg-blue-50/60 border-l-2 border-l-blue-500" : "border-l-2 border-l-transparent"
         }`}
+        onClick={onSelect}
+        role="button"
       >
         <div className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold ${avatarColorForLanguage(lead.buyer_language)}`}>
-          {initialsFromName(lead.buyer_name)}
+          {initialsFromName(displayName)}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className={`shrink-0 w-2 h-2 rounded-full ${statusDot(lead.status)}`} aria-hidden />
             <p className="font-semibold text-sm text-slate-900 truncate flex-1">
-              {lead.buyer_name || "Unnamed buyer"}
+              {displayName}
             </p>
             <span className="text-[11px] text-slate-400 shrink-0">{timeAgo(lead.created_at)}</span>
           </div>
@@ -443,8 +458,75 @@ function LeadRow({ lead, selected, onSelect }: { lead: Lead; selected: boolean; 
             )}
           </div>
         </div>
-      </button>
+        {showClaim && onClaim && (
+          <Button
+            size="sm"
+            onClick={(e) => { e.stopPropagation(); onClaim(); }}
+            disabled={claiming}
+            className="h-7 px-2.5 text-xs bg-blue-600 hover:bg-blue-700 text-white shrink-0"
+          >
+            {claiming ? <Loader2 size={12} className="animate-spin" /> : "Claim"}
+          </Button>
+        )}
+      </div>
     </li>
+  );
+}
+
+/* ---------- Right panel: available lead preview (no contact details) ---------- */
+
+function AvailableLeadPreview({
+  lead, claiming, onClaim,
+}: { lead: Lead; claiming: boolean; onClaim: () => void }) {
+  const langMeta = getLanguageMeta(lead.buyer_language);
+  const firstName = lead.buyer_name?.split(" ")[0] || "New buyer";
+  return (
+    <div className="h-full flex items-center justify-center p-6">
+      <div className="max-w-md w-full bg-white border border-slate-200 rounded-xl p-8 shadow-sm">
+        <div className="text-center mb-6">
+          <div className="mx-auto w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
+            <AlertCircle size={22} />
+          </div>
+          <h2 className="text-xl font-bold text-slate-900">Available lead</h2>
+          <p className="text-sm text-slate-500 mt-1">
+            Contact details unlock once you claim this lead.
+          </p>
+        </div>
+
+        <dl className="space-y-3 text-sm">
+          <PreviewRow label="Buyer">{firstName}</PreviewRow>
+          <PreviewRow label="Loan amount">
+            {lead.estimated_loan_amount != null
+              ? formatAud(lead.estimated_loan_amount)
+              : "Not specified"}
+          </PreviewRow>
+          <PreviewRow label="Loan type">{loanTypeLabel(lead.loan_type)}</PreviewRow>
+          <PreviewRow label="Language">
+            {langMeta ? `${langMeta.flag} ${langMeta.label}` : "English"}
+          </PreviewRow>
+          <PreviewRow label="Submitted">{timeAgo(lead.created_at)}</PreviewRow>
+        </dl>
+
+        <Button
+          onClick={onClaim}
+          disabled={claiming}
+          className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          {claiming
+            ? <><Loader2 size={14} className="mr-2 animate-spin" /> Claiming…</>
+            : "Claim this lead"}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function PreviewRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex justify-between gap-3 border-b border-slate-100 pb-2 last:border-b-0">
+      <dt className="text-slate-500">{label}</dt>
+      <dd className="font-medium text-slate-900 text-right">{children}</dd>
+    </div>
   );
 }
 

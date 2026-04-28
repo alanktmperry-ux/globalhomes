@@ -724,10 +724,22 @@ export default function CommandCentre() {
         icon={ClipboardCheck}
         label="Listing Reviews"
         count={data.pendingListingReviews}
-        description="Listings awaiting moderation"
+        description={`${data.pendingListingReviews} listing${data.pendingListingReviews > 1 ? 's' : ''} waiting for moderation review`}
         to="/admin/approvals"
         navigate={navigate}
-        tone="amber"
+        tone="red"
+      />
+    ),
+    data.pendingAgentApprovals > 0 && (
+      <AttentionCard
+        key="pending_agents"
+        icon={UserCheck}
+        label="Agent Applications"
+        count={data.pendingAgentApprovals}
+        description={`${data.pendingAgentApprovals} agent application${data.pendingAgentApprovals > 1 ? 's' : ''} awaiting approval`}
+        to="/admin/approvals"
+        navigate={navigate}
+        tone="red"
       />
     ),
     data.pendingDemoRequests > 0 && (
@@ -736,8 +748,20 @@ export default function CommandCentre() {
         icon={Gamepad2}
         label="Demo Requests"
         count={data.pendingDemoRequests}
-        description="Pending demo access requests"
+        description={`${data.pendingDemoRequests} demo request${data.pendingDemoRequests > 1 ? 's' : ''} need a response`}
         to="/admin/approvals"
+        navigate={navigate}
+        tone="red"
+      />
+    ),
+    data.onboardingIncomplete > 0 && (
+      <AttentionCard
+        key="onboarding"
+        icon={UserX}
+        label="Onboarding Incomplete"
+        count={data.onboardingIncomplete}
+        description={`${data.onboardingIncomplete} agent${data.onboardingIncomplete > 1 ? 's' : ''} haven't completed onboarding yet`}
+        to="/admin/agents?filter=onboarding_incomplete"
         navigate={navigate}
         tone="amber"
       />

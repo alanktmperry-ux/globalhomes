@@ -72,6 +72,7 @@ const PROPERTY_NAV_OPERATIONS: NavItem[] = [
 const PROPERTY_NAV_FINANCE: NavItem[] = [
   { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
   { title: 'Statements', url: '/dashboard/statements', icon: Receipt },
+  { title: 'Documents', url: '/dashboard/property-documents', icon: FileText },
   { title: 'Automation', url: '/dashboard/automation', icon: Mail },
   { title: 'Partner Access', url: '/dashboard/partner-access', icon: Handshake },
 ];

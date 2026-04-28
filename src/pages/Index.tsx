@@ -356,7 +356,6 @@ const Index = () => {
 
     // Track search
     try {
-      const { capture } = await import('@/shared/lib/posthog');
       capture('search_performed', { query, detected_language: lang, result_count: filteredProperties?.length ?? 0 });
     } catch {}
 

@@ -30,7 +30,7 @@ import {
 import { toast } from 'sonner';
 import {
   CalendarDays, Plus, CheckCircle2, XCircle, Loader2, Mail,
-  AlertTriangle, ExternalLink, CalendarIcon, Copy, ClipboardCheck,
+  AlertTriangle, ExternalLink, CalendarIcon, Copy, ClipboardCheck, FileText, PlayCircle,
 } from 'lucide-react';
 import { format, parseISO, addDays, differenceInDays } from 'date-fns';
 import DashboardHeader from './DashboardHeader';
@@ -307,13 +307,13 @@ export default function PMInspectionsPage() {
   const selectedRule = useMemo(() => ruleFor(selectedTenancy?.properties?.state), [selectedTenancy]);
   const selectedMinDate = useMemo(() => ruleMinDate(selectedRule), [selectedRule]);
 
-  const submitSchedule = async () => {
+  const submitSchedule = async (opts: { startReport?: boolean } = {}) => {
     if (!scheduleForm || !agentId) return;
     if (!scheduleForm.tenancy_id) { toast.error('Select a tenancy'); return; }
     if (!scheduleForm.scheduled_date) { toast.error('Select a date'); return; }
     const t = activeTenancies.find(x => x.id === scheduleForm.tenancy_id);
     setSavingSchedule(true);
-    const { error } = await supabase.from('property_inspections').insert({
+    const { data: inserted, error } = await supabase.from('property_inspections').insert({
       tenancy_id: scheduleForm.tenancy_id,
       property_id: t?.property_id,
       agent_id: agentId,
@@ -321,12 +321,33 @@ export default function PMInspectionsPage() {
       scheduled_date: format(scheduleForm.scheduled_date, 'yyyy-MM-dd'),
       status: 'scheduled',
       overall_notes: scheduleForm.notes.trim() || null,
-    } as any);
+    } as any).select('id').maybeSingle();
     setSavingSchedule(false);
-    if (error) { toast.error('Could not schedule inspection'); return; }
+    if (error || !inserted) { toast.error('Could not schedule inspection'); return; }
     toast.success('Inspection scheduled');
     setScheduleForm(null);
+    if (opts.startReport) {
+      navigate(`/dashboard/inspection/${(inserted as any).id}`);
+      return;
+    }
     loadData();
+  };
+
+  const scheduleAndStartFromSuggestion = async (s: SuggestedInspection) => {
+    if (!agentId) return;
+    const t = activeTenancies.find(x => x.id === s.tenancyId);
+    if (!t) return;
+    const r = ruleFor(t.properties?.state);
+    const { data: inserted, error } = await supabase.from('property_inspections').insert({
+      tenancy_id: t.id,
+      property_id: t.property_id,
+      agent_id: agentId,
+      inspection_type: 'routine',
+      scheduled_date: format(ruleMinDate(r), 'yyyy-MM-dd'),
+      status: 'scheduled',
+    } as any).select('id').maybeSingle();
+    if (error || !inserted) { toast.error('Could not schedule inspection'); return; }
+    navigate(`/dashboard/inspection/${(inserted as any).id}`);
   };
 
   // Notice

@@ -87,6 +87,7 @@ const InspectionReportPage = () => {
   const [inspection, setInspection] = useState<InspectionData | null>(null);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [propertyAddress, setPropertyAddress] = useState('');
+  const [propertyState, setPropertyState] = useState<string | null>(null);
   const [tenantEmail, setTenantEmail] = useState('');
   const [agentName, setAgentName] = useState('');
   const [agentPhone, setAgentPhone] = useState('');

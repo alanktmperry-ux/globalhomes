@@ -275,7 +275,7 @@ export default function AdminBrokers() {
             )}
           </TabsContent>
 
-          <TabsContent value="active" className="mt-4">
+          <TabsContent value="active" className="mt-4 space-y-6">
             {active.length === 0 ? (
               <EmptyState text="No active brokers yet." />
             ) : (
@@ -285,6 +285,22 @@ export default function AdminBrokers() {
                 onDeactivate={handleDeactivate}
               />
             )}
+
+            <div>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-3">
+                Revenue
+              </h2>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <KpiCard label="Total Settlements" value={String(revenue.totalSettled)} />
+                <KpiCard label="Agent Fees Paid" value={AUD(revenue.totalReferralFees)} />
+                <KpiCard
+                  label="ListHQ Platform Fees"
+                  value={AUD(revenue.totalPlatformFees)}
+                  helper="(platform fee tracking coming soon)"
+                />
+                <KpiCard label="Settled This Month" value={String(revenue.thisMonthSettled)} />
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       )}

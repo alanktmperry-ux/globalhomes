@@ -403,6 +403,31 @@ const TenancyDetailPage = () => {
     fetchAll();
   };
 
+  const scheduleExitInspectionFromTenancy = async () => {
+    if (!tenancy || !agentId) return;
+    const today = new Date();
+    const leaseEnd = parseISO(tenancy.lease_end);
+    let scheduled = leaseEnd;
+    const threeBefore = new Date(leaseEnd.getTime() - 3 * 86400000);
+    if (threeBefore > today) scheduled = threeBefore;
+    if (scheduled < today) scheduled = today;
+    const { data: inserted, error } = await supabase.from('property_inspections').insert({
+      tenancy_id: tenancy.id,
+      property_id: tenancy.property_id,
+      agent_id: agentId,
+      inspection_type: 'exit',
+      scheduled_date: format(scheduled, 'yyyy-MM-dd'),
+      status: 'scheduled',
+    } as any).select('id').maybeSingle();
+    if (error || !inserted) { toast.error('Could not schedule exit inspection'); return; }
+    navigate(`/dashboard/inspection/${(inserted as any).id}`);
+  };
+
+  const copyInspectionLink = (token: string) => {
+    navigator.clipboard.writeText(`${window.location.origin}/inspection-report/${token}`);
+    toast.success('Report link copied');
+  };
+
   /* ─── Owner portal email ─── */
   const copyOwnerLink = () => {
     const token = tenancy?.properties?.owner_portal_token;

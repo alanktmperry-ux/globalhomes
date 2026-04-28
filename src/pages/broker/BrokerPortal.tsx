@@ -107,28 +107,40 @@ export default function BrokerPortal() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [broker, setBroker] = useState<BrokerRecord | null>(null);
-  const [leads, setLeads] = useState<Lead[]>([]);
+  const [availableLeads, setAvailableLeads] = useState<Lead[]>([]);
+  const [myLeads, setMyLeads] = useState<Lead[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"available" | "mine">("available");
+  const [claimingId, setClaimingId] = useState<string | null>(null);
 
   const loadLeads = useCallback(async (b: BrokerRecord) => {
-    // Principals see all leads assigned to anyone in their agency.
-    // Associates see only their own leads. RLS enforces this too — this just
-    // skips an unnecessary filter on the principal side.
-    let q = supabase
-      .from("referral_leads")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const isPrincipal = b.agency_role === 'principal';
 
-    if (b.agency_role !== 'principal') {
-      q = q.eq("assigned_broker_id", b.id);
-    }
+    const [availRes, mineRes] = await Promise.all([
+      supabase
+        .from("referral_leads")
+        .select("*")
+        .is("assigned_broker_id", null)
+        .eq("status", "new")
+        .order("created_at", { ascending: false }),
+      isPrincipal
+        ? supabase
+            .from("referral_leads")
+            .select("*")
+            .not("assigned_broker_id", "is", null)
+            .order("created_at", { ascending: false })
+        : supabase
+            .from("referral_leads")
+            .select("*")
+            .eq("assigned_broker_id", b.id)
+            .order("created_at", { ascending: false }),
+    ]);
 
-    const { data, error } = await q;
-    if (error) {
-      console.error("[BrokerPortal] loadLeads error:", error);
-      return;
-    }
-    setLeads((data ?? []) as unknown as Lead[]);
+    if (availRes.error) console.error("[BrokerPortal] available error:", availRes.error);
+    if (mineRes.error) console.error("[BrokerPortal] mine error:", mineRes.error);
+
+    setAvailableLeads((availRes.data ?? []) as unknown as Lead[]);
+    setMyLeads((mineRes.data ?? []) as unknown as Lead[]);
   }, []);
 
   useEffect(() => {
@@ -175,7 +187,8 @@ export default function BrokerPortal() {
     return () => { cancelled = true; };
   }, [navigate, loadLeads]);
 
-  // Realtime subscription — principals listen agency-wide, associates only their own
+  // Realtime — listen to all referral_leads changes and refetch both lists.
+  // Filtering is cheap on the client and saves us managing two channels.
   useEffect(() => {
     if (!broker) return;
     const channel = supabase
@@ -186,9 +199,6 @@ export default function BrokerPortal() {
           event: "*",
           schema: "public",
           table: "referral_leads",
-          ...(broker.agency_role !== 'principal'
-            ? { filter: `assigned_broker_id=eq.${broker.id}` }
-            : {}),
         },
         () => { loadLeads(broker); }
       )
@@ -198,14 +208,47 @@ export default function BrokerPortal() {
 
   const stats = useMemo(() => {
     const counts = { new: 0, active: 0, settled: 0 };
-    leads.forEach((l) => { counts[statusBucket(l.status)]++; });
+    myLeads.forEach((l) => { counts[statusBucket(l.status)]++; });
     return counts;
-  }, [leads]);
+  }, [myLeads]);
 
+  // Selected lead must come from myLeads — available leads only show a preview.
   const selectedLead = useMemo(
-    () => leads.find((l) => l.id === selectedId) ?? null,
-    [leads, selectedId]
+    () => myLeads.find((l) => l.id === selectedId) ?? null,
+    [myLeads, selectedId]
   );
+
+  const selectedAvailable = useMemo(
+    () => availableLeads.find((l) => l.id === selectedId) ?? null,
+    [availableLeads, selectedId]
+  );
+
+  const handleClaim = useCallback(async (lead: Lead) => {
+    if (!broker) return;
+    setClaimingId(lead.id);
+    const { data, error } = await (supabase
+      .from("referral_leads") as any)
+      .update({ assigned_broker_id: broker.id, status: "contacted" } as any)
+      .eq("id", lead.id)
+      .is("assigned_broker_id", null)
+      .select("id");
+    setClaimingId(null);
+
+    if (error) {
+      toast.error("This lead was just claimed by another broker");
+      loadLeads(broker);
+      return;
+    }
+    if (!data || (Array.isArray(data) && data.length === 0)) {
+      toast.error("This lead was just claimed by another broker");
+      loadLeads(broker);
+      return;
+    }
+    toast.success("Lead claimed");
+    await loadLeads(broker);
+    setActiveTab("mine");
+    setSelectedId(lead.id);
+  }, [broker, loadLeads]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -219,6 +262,8 @@ export default function BrokerPortal() {
       </div>
     );
   }
+
+  const visibleLeads = activeTab === "available" ? availableLeads : myLeads;
 
   return (
     <div className="h-screen flex flex-col bg-slate-50">
@@ -245,7 +290,7 @@ export default function BrokerPortal() {
       {/* Two-panel body */}
       <div className="flex-1 min-h-0 flex flex-col lg:flex-row">
         {/* Left panel */}
-        <aside className="w-full lg:w-[320px] lg:shrink-0 lg:h-full flex flex-col bg-white border-b lg:border-b-0 lg:border-r border-slate-200 max-h-[50vh] lg:max-h-none">
+        <aside className="w-full lg:w-[340px] lg:shrink-0 lg:h-full flex flex-col bg-white border-b lg:border-b-0 lg:border-r border-slate-200 max-h-[50vh] lg:max-h-none">
           <div className="px-5 py-4 border-b border-slate-200">
             <p className="text-sm font-semibold text-slate-900 truncate">
               {broker.full_name || broker.name}
@@ -258,19 +303,41 @@ export default function BrokerPortal() {
             </div>
           </div>
 
+          {/* Tabs */}
+          <div className="flex border-b border-slate-200 bg-slate-50">
+            <TabButton
+              active={activeTab === "available"}
+              onClick={() => { setActiveTab("available"); setSelectedId(null); }}
+              showDot={availableLeads.length > 0}
+            >
+              Available ({availableLeads.length})
+            </TabButton>
+            <TabButton
+              active={activeTab === "mine"}
+              onClick={() => { setActiveTab("mine"); setSelectedId(null); }}
+            >
+              My Leads ({myLeads.length})
+            </TabButton>
+          </div>
+
           <div className="flex-1 min-h-0 overflow-y-auto">
-            {leads.length === 0 ? (
+            {visibleLeads.length === 0 ? (
               <div className="h-full flex items-center justify-center text-sm text-slate-400 p-8 text-center">
-                No leads assigned yet
+                {activeTab === "available"
+                  ? "No leads available right now"
+                  : "No leads assigned yet"}
               </div>
             ) : (
               <ul className="divide-y divide-slate-100">
-                {leads.map((lead) => (
+                {visibleLeads.map((lead) => (
                   <LeadRow
                     key={lead.id}
                     lead={lead}
                     selected={selectedId === lead.id}
                     onSelect={() => setSelectedId(lead.id)}
+                    showClaim={activeTab === "available"}
+                    claiming={claimingId === lead.id}
+                    onClaim={() => handleClaim(lead)}
                   />
                 ))}
               </ul>
@@ -287,6 +354,12 @@ export default function BrokerPortal() {
               broker={broker}
               onChanged={() => loadLeads(broker)}
             />
+          ) : selectedAvailable ? (
+            <AvailableLeadPreview
+              lead={selectedAvailable}
+              claiming={claimingId === selectedAvailable.id}
+              onClaim={() => handleClaim(selectedAvailable)}
+            />
           ) : (
             <WelcomeCard broker={broker} />
           )}
@@ -295,6 +368,27 @@ export default function BrokerPortal() {
     </div>
   );
 }
+
+function TabButton({
+  active, onClick, children, showDot,
+}: { active: boolean; onClick: () => void; children: React.ReactNode; showDot?: boolean }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex-1 text-sm font-medium py-2.5 transition-colors relative flex items-center justify-center gap-2 ${
+        active
+          ? "bg-white text-slate-900 border-b-2 border-blue-500"
+          : "text-slate-500 hover:text-slate-700"
+      }`}
+    >
+      {showDot && (
+        <span className="w-2 h-2 rounded-full bg-green-500" aria-hidden />
+      )}
+      {children}
+    </button>
+  );
+}
+
 
 /* ---------- Sidebar pieces ---------- */
 
@@ -311,25 +405,40 @@ function StatChip({ label, value, tone }: { label: string; value: number; tone: 
   );
 }
 
-function LeadRow({ lead, selected, onSelect }: { lead: Lead; selected: boolean; onSelect: () => void }) {
+function LeadRow({
+  lead, selected, onSelect, showClaim, claiming, onClaim,
+}: {
+  lead: Lead;
+  selected: boolean;
+  onSelect: () => void;
+  showClaim?: boolean;
+  claiming?: boolean;
+  onClaim?: () => void;
+}) {
   const langMeta = getLanguageMeta(lead.buyer_language);
   const isNonEnglish = !!langMeta && langMeta.label !== "English";
+  // For unclaimed leads we hide PII — only show first name.
+  const displayName = showClaim
+    ? (lead.buyer_name?.split(" ")[0] || "New buyer")
+    : (lead.buyer_name || "Unnamed buyer");
+
   return (
     <li>
-      <button
-        onClick={onSelect}
-        className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-slate-50 transition-colors ${
+      <div
+        className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-slate-50 transition-colors cursor-pointer ${
           selected ? "bg-blue-50/60 border-l-2 border-l-blue-500" : "border-l-2 border-l-transparent"
         }`}
+        onClick={onSelect}
+        role="button"
       >
         <div className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold ${avatarColorForLanguage(lead.buyer_language)}`}>
-          {initialsFromName(lead.buyer_name)}
+          {initialsFromName(displayName)}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className={`shrink-0 w-2 h-2 rounded-full ${statusDot(lead.status)}`} aria-hidden />
             <p className="font-semibold text-sm text-slate-900 truncate flex-1">
-              {lead.buyer_name || "Unnamed buyer"}
+              {displayName}
             </p>
             <span className="text-[11px] text-slate-400 shrink-0">{timeAgo(lead.created_at)}</span>
           </div>
@@ -349,8 +458,75 @@ function LeadRow({ lead, selected, onSelect }: { lead: Lead; selected: boolean; 
             )}
           </div>
         </div>
-      </button>
+        {showClaim && onClaim && (
+          <Button
+            size="sm"
+            onClick={(e) => { e.stopPropagation(); onClaim(); }}
+            disabled={claiming}
+            className="h-7 px-2.5 text-xs bg-blue-600 hover:bg-blue-700 text-white shrink-0"
+          >
+            {claiming ? <Loader2 size={12} className="animate-spin" /> : "Claim"}
+          </Button>
+        )}
+      </div>
     </li>
+  );
+}
+
+/* ---------- Right panel: available lead preview (no contact details) ---------- */
+
+function AvailableLeadPreview({
+  lead, claiming, onClaim,
+}: { lead: Lead; claiming: boolean; onClaim: () => void }) {
+  const langMeta = getLanguageMeta(lead.buyer_language);
+  const firstName = lead.buyer_name?.split(" ")[0] || "New buyer";
+  return (
+    <div className="h-full flex items-center justify-center p-6">
+      <div className="max-w-md w-full bg-white border border-slate-200 rounded-xl p-8 shadow-sm">
+        <div className="text-center mb-6">
+          <div className="mx-auto w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
+            <AlertCircle size={22} />
+          </div>
+          <h2 className="text-xl font-bold text-slate-900">Available lead</h2>
+          <p className="text-sm text-slate-500 mt-1">
+            Contact details unlock once you claim this lead.
+          </p>
+        </div>
+
+        <dl className="space-y-3 text-sm">
+          <PreviewRow label="Buyer">{firstName}</PreviewRow>
+          <PreviewRow label="Loan amount">
+            {lead.estimated_loan_amount != null
+              ? formatAud(lead.estimated_loan_amount)
+              : "Not specified"}
+          </PreviewRow>
+          <PreviewRow label="Loan type">{loanTypeLabel(lead.loan_type)}</PreviewRow>
+          <PreviewRow label="Language">
+            {langMeta ? `${langMeta.flag} ${langMeta.label}` : "English"}
+          </PreviewRow>
+          <PreviewRow label="Submitted">{timeAgo(lead.created_at)}</PreviewRow>
+        </dl>
+
+        <Button
+          onClick={onClaim}
+          disabled={claiming}
+          className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          {claiming
+            ? <><Loader2 size={14} className="mr-2 animate-spin" /> Claiming…</>
+            : "Claim this lead"}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function PreviewRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex justify-between gap-3 border-b border-slate-100 pb-2 last:border-b-0">
+      <dt className="text-slate-500">{label}</dt>
+      <dd className="font-medium text-slate-900 text-right">{children}</dd>
+    </div>
   );
 }
 

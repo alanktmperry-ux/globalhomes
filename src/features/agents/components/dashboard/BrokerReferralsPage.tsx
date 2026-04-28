@@ -104,15 +104,6 @@ export default function BrokerReferralsPage() {
     }
     setSubmitting(true);
 
-    // Auto-assign first active broker
-    const { data: broker } = await supabase
-      .from('brokers')
-      .select('id')
-      .eq('is_active', true)
-      .order('created_at', { ascending: true })
-      .limit(1)
-      .maybeSingle();
-
     const referredByCode = `agent_${agentId.slice(0, 8)}`;
 
     const { error } = await supabase.from('referral_leads').insert({
@@ -125,9 +116,10 @@ export default function BrokerReferralsPage() {
       status: 'new',
       referral_agent_id: agentId,
       referred_by_code: referredByCode,
-      assigned_broker_id: broker?.id ?? null,
+      assigned_broker_id: null as any,
+      claim_expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString() as any,
       referral_fee_amount: loanAmount ? Math.round(Number(loanAmount) * 0.0065 * 0.20) : null,
-    });
+    } as any);
 
     setSubmitting(false);
     if (error) {

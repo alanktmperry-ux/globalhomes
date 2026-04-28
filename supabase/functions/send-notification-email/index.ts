@@ -39,6 +39,7 @@ interface NotificationPayload {
   days_remaining?: string;
   notice_days?: number;
   tenant_name?: string;
+  dispute_notes?: string;
 }
 
 async function sendViaResend(to: string, subject: string, html: string) {
@@ -177,6 +178,24 @@ Deno.serve(async (req) => {
       recipientEmail = payload.recipient_email || null;
       const subject = payload.title || `Lease Expiry Notice — ${payload.property_address || 'Your Rental'}`;
       if (recipientEmail) await sendViaResend(recipientEmail, subject, buildLeaseExpiryHtml({ tenantName: payload.recipient_name || 'Tenant', propertyAddress: payload.property_address, leaseEndDate: payload.lease_end_date, daysRemaining: payload.days_remaining, agentName: payload.agent_name, agentPhone: payload.agent_phone }));
+      return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+
+    } else if (type === 'tenant_dispute') {
+      recipientEmail = payload.recipient_email || null;
+      const propAddr = payload.property_address || 'your managed property';
+      const inspLabel = payload.inspection_type || 'entry';
+      const subject = payload.title || `Tenant disputed ${inspLabel} condition report — ${propAddr}`;
+      const safeNotes = (payload.dispute_notes || '').replace(/[<>]/g, (c) => c === '<' ? '&lt;' : '&gt;');
+      const html = `<!doctype html><html><body style="font-family:Arial,sans-serif;background:#f6f7f9;padding:24px;">
+<div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:8px;padding:28px;border:1px solid #e5e7eb;">
+  <h1 style="font-size:18px;color:#b91c1c;margin:0 0 12px;">Tenant has disputed an inspection report</h1>
+  <p style="font-size:14px;color:#374151;margin:0 0 8px;">Hi ${payload.recipient_name || 'Property Manager'},</p>
+  <p style="font-size:14px;color:#374151;margin:0 0 16px;">A tenant has raised concerns about the <strong>${inspLabel}</strong> condition report for <strong>${propAddr}</strong>.</p>
+  <div style="background:#fef2f2;border-left:3px solid #b91c1c;padding:12px 14px;margin:0 0 18px;font-size:13px;color:#7f1d1d;white-space:pre-wrap;">${safeNotes || '(No notes provided)'}</div>
+  ${payload.report_link ? `<p style="margin:0 0 8px;"><a href="${payload.report_link}" style="display:inline-block;background:#0f172a;color:#ffffff;padding:10px 16px;border-radius:6px;text-decoration:none;font-size:14px;">View report</a></p>` : ''}
+  <p style="font-size:12px;color:#6b7280;margin:24px 0 0;">You can mark the dispute as resolved from the Routine Inspections → Disputes tab in your dashboard.</p>
+</div></body></html>`;
+      if (recipientEmail) await sendViaResend(recipientEmail, subject, html);
       return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     } else {

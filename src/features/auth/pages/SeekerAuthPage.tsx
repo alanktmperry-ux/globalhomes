@@ -184,7 +184,7 @@ const SeekerAuthPage = () => {
       redirect_uri: window.location.origin + '/auth/callback',
     });
     if (error) {
-      toast.error('Something went wrong', { description: error?.message || 'Please try again.' });
+      toast.error('Something went wrong. Please try again.');
     }
   };
 

@@ -23,6 +23,7 @@ import { toast } from 'sonner';
 import DashboardHeader from './DashboardHeader';
 import TenantPortalCard from './TenantPortalCard';
 import OwnerPortalCard from './OwnerPortalCard';
+import TenancyContactsPanel from './TenancyContactsPanel';
 import { format, parseISO, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { cn } from '@/shared/lib/utils';
 
@@ -706,6 +707,10 @@ const TenancyDetailPage = () => {
                 </div>
               </CardContent>
             </Card>
+
+            <div className="mt-4">
+              <TenancyContactsPanel tenancyId={tenancy.id} />
+            </div>
 
             {agentId && (
               <div className="mt-4 grid gap-4 md:grid-cols-2">

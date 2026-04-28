@@ -953,6 +953,45 @@ ${agencyName || ''}`.trim();
         </DialogContent>
       </Dialog>
 
+      {/* Resolve dispute modal */}
+      <Dialog open={!!resolveFor} onOpenChange={(o) => !o && setResolveFor(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Resolve Dispute</DialogTitle>
+          </DialogHeader>
+          {resolveFor && (
+            <div className="space-y-3">
+              <div className="text-xs text-muted-foreground rounded-md bg-secondary/50 p-2">
+                {TYPE_LABEL[resolveFor.inspection_type]} inspection at{' '}
+                {resolveFor.tenancies?.properties?.address || 'property'}
+              </div>
+              {resolveFor.tenant_dispute_notes && (
+                <div className="rounded-md border border-red-200 bg-red-50 p-2 text-xs text-red-900 whitespace-pre-wrap">
+                  <p className="font-medium mb-1">Tenant's concerns:</p>
+                  {resolveFor.tenant_dispute_notes}
+                </div>
+              )}
+              <div>
+                <Label>Resolution Notes</Label>
+                <Textarea
+                  rows={4}
+                  placeholder="What was agreed or actioned…"
+                  value={resolveNotes}
+                  onChange={e => setResolveNotes(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setResolveFor(null)} disabled={savingResolve}>Cancel</Button>
+            <Button onClick={submitResolve} disabled={savingResolve}>
+              {savingResolve && <Loader2 size={14} className="mr-1 animate-spin" />}
+              Mark Resolved
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Cancel confirm */}
       <AlertDialog open={!!cancelTarget} onOpenChange={(o) => !o && setCancelTarget(null)}>
         <AlertDialogContent>

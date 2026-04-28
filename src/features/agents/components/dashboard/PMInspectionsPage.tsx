@@ -735,11 +735,15 @@ ${agencyName || ''}`.trim();
               </div>
             </div>
           )}
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button variant="outline" onClick={() => setScheduleForm(null)} disabled={savingSchedule}>Cancel</Button>
-            <Button onClick={submitSchedule} disabled={savingSchedule}>
+            <Button variant="secondary" onClick={() => submitSchedule()} disabled={savingSchedule}>
               {savingSchedule && <Loader2 size={14} className="mr-1 animate-spin" />}
-              Schedule
+              Schedule Only
+            </Button>
+            <Button onClick={() => submitSchedule({ startReport: true })} disabled={savingSchedule}>
+              {savingSchedule && <Loader2 size={14} className="mr-1 animate-spin" />}
+              <PlayCircle size={14} className="mr-1" /> Schedule & Start Report
             </Button>
           </DialogFooter>
         </DialogContent>

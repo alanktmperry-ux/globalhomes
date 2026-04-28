@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import { capture, identify } from '@/shared/lib/posthog';
 import OTPVerificationScreen from '@/features/auth/components/OTPVerificationScreen';
 
 type Step = 'email' | 'password' | 'register' | 'otp';

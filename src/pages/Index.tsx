@@ -355,9 +355,8 @@ const Index = () => {
 
     // Track search
     try {
-      if (typeof window !== 'undefined' && (window as any).posthog?.capture) {
-        (window as any).posthog.capture('search_performed', { query, detected_language: lang, result_count: filteredProperties?.length ?? 0 });
-      }
+      const { capture } = await import('@/shared/lib/posthog');
+      capture('search_performed', { query, detected_language: lang, result_count: filteredProperties?.length ?? 0 });
     } catch {}
 
     // Fire-and-forget: log every search to voice_searches for AI Buyer Concierge pipeline

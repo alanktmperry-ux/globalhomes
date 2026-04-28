@@ -121,6 +121,16 @@ interface CCData {
     created_at: string;
     lastSignIn: string | null;
   }[];
+  ltv: number;
+  nrr: number;
+  forecast3m: number;
+  forecast6m: number;
+  forecast12m: number;
+  cohorts: { month: string; signedUp: number; stillActive: number; retentionPct: number }[];
+  brokerLeadsThisMonth: number;
+  brokerSettlementsThisMonth: number;
+  brokerSettlementRate: number;
+  brokerPlatformFeesThisMonth: number;
   fetchedAt: string;
 }
 

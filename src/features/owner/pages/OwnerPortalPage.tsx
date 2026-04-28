@@ -43,7 +43,12 @@ export default function OwnerPortalPage() {
     setLoading(true);
     const { data: result, error: err } = await supabase.rpc('get_property_by_owner_token', { p_token: token } as any);
     if (err || !result || (result as any).error) {
-      setError('Invalid or expired link — please contact your property manager');
+      const code = (result as any)?.error;
+      if (code === 'expired') {
+        setError('expired');
+      } else {
+        setError('Invalid or expired link — please contact your property manager');
+      }
       setLoading(false);
       return;
     }

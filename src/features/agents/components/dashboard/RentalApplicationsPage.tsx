@@ -248,6 +248,10 @@ const RentalApplicationsPage = () => {
                               )}
                             </div>
 
+                            <div className="py-3 border-t border-border">
+                              <TICACheckPanel applicationId={app.id} applicantName={app.full_name} />
+                            </div>
+
                             {(app.status === 'new' || app.status === 'reviewing' || app.status === 'pending') && (
                               <div className="flex gap-2 pt-3 border-t border-border">
                                 <Button

@@ -40,7 +40,7 @@ interface BrokerData {
   languages: string[];
   tagline: string | null;
   calendar_url: string | null;
-  is_founding_partner: boolean;
+  
   specialties?: string[];
   suburb?: string | null;
   state?: string | null;
@@ -58,8 +58,7 @@ export default function FindBrokerPage() {
     const fetchBrokers = async () => {
       const { data } = await supabase
         .from('brokers_public_safe' as any)
-        .select('id, name, company, acl_number, photo_url, languages, tagline, calendar_url, is_founding_partner, specialties, suburb, state')
-        .order('is_founding_partner', { ascending: false })
+        .select('id, name, company, acl_number, photo_url, languages, tagline, calendar_url, specialties, suburb, state')
         .order('name', { ascending: true });
       if (data) setBrokers(data as unknown as BrokerData[]);
       setLoading(false);
@@ -201,11 +200,6 @@ export default function FindBrokerPage() {
                         <h3 className="font-semibold text-foreground leading-tight">
                           {broker.name}
                         </h3>
-                        {broker.is_founding_partner && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide bg-primary/10 text-primary border border-primary/20 rounded-full px-1.5 py-0.5">
-                            <BadgeCheck size={10} /> Founding
-                          </span>
-                        )}
                       </div>
                       {broker.company && (
                         <p className="text-xs text-muted-foreground truncate">{broker.company}</p>
@@ -294,7 +288,7 @@ export default function FindBrokerPage() {
       {/* Enquiry modal */}
       {selectedBroker && (
         <EnquiryModal
-          broker={selectedBroker}
+          broker={{ ...selectedBroker, is_founding_partner: false }}
           onClose={() => setSelectedBroker(null)}
         />
       )}

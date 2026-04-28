@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import TICACheckPanel, { TICAStatusIcon } from './TICACheckPanel';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
 const AU_DATE = (d: string) => new Date(d).toLocaleDateString('en-AU');
@@ -45,6 +46,7 @@ interface Application {
   status: string;
   created_at: string;
   properties: { address: string; suburb: string; rent_amount?: number; beds?: number } | null;
+  tica_checks?: { result: string }[] | null;
 }
 
 const RentalApplicationsPage = () => {
@@ -62,7 +64,7 @@ const RentalApplicationsPage = () => {
 
     const { data } = await (supabase as any)
       .from('rental_applications')
-      .select('*, properties(address, suburb, beds, rental_weekly)')
+      .select('*, properties(address, suburb, beds, rental_weekly), tica_checks(result, created_at)')
       .eq('agent_id', agent.id)
       .order('created_at', { ascending: false });
 
@@ -178,21 +180,23 @@ const RentalApplicationsPage = () => {
                 <TableHead>Applicant</TableHead>
                 <TableHead>Employment</TableHead>
                 <TableHead>Date</TableHead>
+                <TableHead className="w-16 text-center">TICA</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
-                <TableRow><TableCell colSpan={7} className="text-center py-12 text-muted-foreground">Loading…</TableCell></TableRow>
+                <TableRow><TableCell colSpan={8} className="text-center py-12 text-muted-foreground">Loading…</TableCell></TableRow>
               ) : applications.length === 0 ? (
-                <TableRow><TableCell colSpan={7} className="text-center py-12 text-muted-foreground">No rental applications yet</TableCell></TableRow>
+                <TableRow><TableCell colSpan={8} className="text-center py-12 text-muted-foreground">No rental applications yet</TableCell></TableRow>
               ) : (
                 applications.map(app => {
                   const expanded = expandedId === app.id;
                   const s = STATUS_STYLES[app.status] || STATUS_STYLES.new;
+                  const ticaResult = app.tica_checks && app.tica_checks.length > 0 ? app.tica_checks[0].result : null;
                   return (
                     <TableRow key={app.id} className="group">
-                      <TableCell colSpan={7} className="p-0">
+                      <TableCell colSpan={8} className="p-0">
                         <button
                           onClick={() => toggle(app.id)}
                           className="w-full text-left px-4 py-3 flex items-center gap-4 hover:bg-accent/50 transition-colors"
@@ -207,6 +211,7 @@ const RentalApplicationsPage = () => {
                           <span className="text-sm font-medium w-36 shrink-0 truncate">{app.full_name}</span>
                           <span className="text-xs text-muted-foreground w-24 shrink-0">{app.employment_status || '—'}</span>
                           <span className="text-xs text-muted-foreground w-20 shrink-0">{AU_DATE(app.created_at)}</span>
+                          <span className="w-12 shrink-0 flex justify-center"><TICAStatusIcon result={ticaResult} /></span>
                           <Badge variant={s.variant} className="text-[10px] shrink-0">{s.label}</Badge>
                         </button>
 
@@ -241,6 +246,10 @@ const RentalApplicationsPage = () => {
                                   <p className="text-sm mt-0.5">{app.message_to_landlord}</p>
                                 </div>
                               )}
+                            </div>
+
+                            <div className="py-3 border-t border-border">
+                              <TICACheckPanel applicationId={app.id} applicantName={app.full_name} />
                             </div>
 
                             {(app.status === 'new' || app.status === 'reviewing' || app.status === 'pending') && (

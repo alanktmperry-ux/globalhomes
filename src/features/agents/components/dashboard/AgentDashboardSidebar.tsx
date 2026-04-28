@@ -67,6 +67,7 @@ const PROPERTY_NAV_OPERATIONS: NavItem[] = [
   { title: 'Routine Inspections', url: '/dashboard/pm-inspections', icon: CalendarDays, badgeKey: 'disputes', alertWhenBadge: true },
   { title: 'Suppliers', url: '/dashboard/suppliers', icon: Wrench },
   { title: 'Key Register', url: '/dashboard/keys', icon: Scale },
+  { title: 'Smoke Alarms', url: '/dashboard/smoke-alarms', icon: AlertCircle, badgeKey: 'smokeAlarms', alertWhenBadge: true },
 ];
 
 const PROPERTY_NAV_FINANCE: NavItem[] = [

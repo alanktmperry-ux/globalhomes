@@ -18,6 +18,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
 import TrustImportWizard from '@/features/agents/components/dashboard/TrustImportWizard';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import { capture } from '@/shared/lib/posthog';
 
 type OnboardingPath = 'fresh' | 'migration';
 

@@ -107,28 +107,40 @@ export default function BrokerPortal() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [broker, setBroker] = useState<BrokerRecord | null>(null);
-  const [leads, setLeads] = useState<Lead[]>([]);
+  const [availableLeads, setAvailableLeads] = useState<Lead[]>([]);
+  const [myLeads, setMyLeads] = useState<Lead[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"available" | "mine">("available");
+  const [claimingId, setClaimingId] = useState<string | null>(null);
 
   const loadLeads = useCallback(async (b: BrokerRecord) => {
-    // Principals see all leads assigned to anyone in their agency.
-    // Associates see only their own leads. RLS enforces this too — this just
-    // skips an unnecessary filter on the principal side.
-    let q = supabase
-      .from("referral_leads")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const isPrincipal = b.agency_role === 'principal';
 
-    if (b.agency_role !== 'principal') {
-      q = q.eq("assigned_broker_id", b.id);
-    }
+    const [availRes, mineRes] = await Promise.all([
+      supabase
+        .from("referral_leads")
+        .select("*")
+        .is("assigned_broker_id", null)
+        .eq("status", "new")
+        .order("created_at", { ascending: false }),
+      isPrincipal
+        ? supabase
+            .from("referral_leads")
+            .select("*")
+            .not("assigned_broker_id", "is", null)
+            .order("created_at", { ascending: false })
+        : supabase
+            .from("referral_leads")
+            .select("*")
+            .eq("assigned_broker_id", b.id)
+            .order("created_at", { ascending: false }),
+    ]);
 
-    const { data, error } = await q;
-    if (error) {
-      console.error("[BrokerPortal] loadLeads error:", error);
-      return;
-    }
-    setLeads((data ?? []) as unknown as Lead[]);
+    if (availRes.error) console.error("[BrokerPortal] available error:", availRes.error);
+    if (mineRes.error) console.error("[BrokerPortal] mine error:", mineRes.error);
+
+    setAvailableLeads((availRes.data ?? []) as unknown as Lead[]);
+    setMyLeads((mineRes.data ?? []) as unknown as Lead[]);
   }, []);
 
   useEffect(() => {

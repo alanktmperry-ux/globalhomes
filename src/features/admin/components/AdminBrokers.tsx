@@ -330,6 +330,20 @@ function SummaryCard({
   );
 }
 
+function KpiCard({
+  label, value, helper,
+}: { label: string; value: string; helper?: string }) {
+  return (
+    <div className="rounded-lg border border-border bg-card p-3">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="text-2xl font-bold text-foreground mt-1">{value}</p>
+      {helper && (
+        <p className="text-[10px] text-muted-foreground mt-1">{helper}</p>
+      )}
+    </div>
+  );
+}
+
 function EmptyState({ text }: { text: string }) {
   return (
     <div className="text-center py-12 text-sm text-muted-foreground border border-dashed border-border rounded-lg">

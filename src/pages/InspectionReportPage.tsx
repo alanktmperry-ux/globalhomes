@@ -17,7 +17,18 @@ import DashboardHeader from '@/features/agents/components/dashboard/DashboardHea
 import { format, parseISO } from 'date-fns';
 import {
   Loader2, Camera, Plus, ChevronDown, AlertTriangle, Wrench, CheckCircle2, X, ArrowLeft,
+  ArrowDown, ArrowUp, Minus, Scale, FileWarning,
 } from 'lucide-react';
+
+const CONDITION_RANK: Record<string, number> = {
+  excellent: 5, good: 4, fair: 3, poor: 2, damaged: 1, na: 0,
+};
+
+interface EntryReportData {
+  inspection: { id: string; conducted_date: string | null; finalised_at: string | null };
+  rooms: { id: string; room_name: string; condition: string | null; notes: string | null }[];
+  photos: { id: string; room_id: string; photo_url: string; caption: string | null }[];
+}
 
 const DEFAULT_ROOMS = [
   'Entry/Front Door', 'Living Room', 'Dining Room', 'Kitchen',

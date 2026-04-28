@@ -422,6 +422,192 @@ const InspectionReportPage = () => {
         </CardContent>
       </Card>
 
+      {/* Entry vs Exit Comparison — only for exit inspections */}
+      {inspection.inspection_type === 'exit' && (() => {
+        if (!entryReport) {
+          return (
+            <div className="mx-4 sm:mx-6 flex items-start gap-2 px-3 py-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <AlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
+              <div className="text-xs text-amber-700">
+                <p className="font-medium">No completed entry condition report found for this tenancy.</p>
+                <p>A side-by-side comparison is not available.</p>
+              </div>
+            </div>
+          );
+        }
+
+        const entryByName = new Map<string, EntryReportData['rooms'][number]>();
+        entryReport.rooms.forEach(r => entryByName.set(r.room_name.trim().toLowerCase(), r));
+
+        type Cmp = {
+          room: Room;
+          entry: EntryReportData['rooms'][number] | null;
+          status: 'deteriorated' | 'unchanged' | 'improved' | 'new';
+        };
+        const comparisons: Cmp[] = rooms.map(room => {
+          const entry = entryByName.get(room.room_name.trim().toLowerCase()) || null;
+          if (!entry) return { room, entry: null, status: 'new' as const };
+          const eRank = CONDITION_RANK[entry.condition || 'na'] ?? 0;
+          const xRank = CONDITION_RANK[room.condition || 'na'] ?? 0;
+          if (entry.condition === 'na' || room.condition === 'na' || !entry.condition || !room.condition) {
+            return { room, entry, status: 'unchanged' as const };
+          }
+          if (eRank > xRank) return { room, entry, status: 'deteriorated' as const };
+          if (xRank > eRank) return { room, entry, status: 'improved' as const };
+          return { room, entry, status: 'unchanged' as const };
+        });
+
+        const deteriorated = comparisons.filter(c => c.status === 'deteriorated');
+        const unchangedCount = comparisons.filter(c => c.status === 'unchanged' || c.status === 'improved').length;
+        const newCount = comparisons.filter(c => c.status === 'new').length;
+
+        const entryPhotosByRoom = new Map<string, EntryReportData['photos']>();
+        entryReport.photos.forEach(p => {
+          const list = entryPhotosByRoom.get(p.room_id) || [];
+          list.push(p);
+          entryPhotosByRoom.set(p.room_id, list);
+        });
+
+        const PhotoThumbs = ({ photos }: { photos: { id: string; photo_url: string; caption: string | null }[] }) => {
+          if (!photos.length) return <span className="text-xs text-muted-foreground">—</span>;
+          const shown = photos.slice(0, 3);
+          const extra = photos.length - shown.length;
+          return (
+            <div className="flex items-center gap-1">
+              {shown.map(p => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => setLightboxUrl(p.photo_url)}
+                  className="w-10 h-10 rounded overflow-hidden border border-border hover:ring-2 hover:ring-primary/40"
+                >
+                  <img src={p.photo_url} alt={p.caption || ''} className="w-full h-full object-cover" />
+                </button>
+              ))}
+              {extra > 0 && (
+                <span className="text-xs text-muted-foreground">+{extra}</span>
+              )}
+            </div>
+          );
+        };
+
+        return (
+          <Card className="mx-4 sm:mx-6 border-blue-500/20">
+            <CardContent className="p-4 space-y-4">
+              <div className="flex items-start justify-between gap-3 flex-wrap">
+                <div className="flex items-start gap-2">
+                  <Scale size={18} className="text-blue-600 mt-0.5" />
+                  <div>
+                    <h2 className="text-sm font-semibold text-foreground">Condition Comparison — Entry vs Exit</h2>
+                    <p className="text-xs text-muted-foreground">
+                      Entry report conducted: {entryReport.inspection.conducted_date
+                        ? format(parseISO(entryReport.inspection.conducted_date), 'dd MMM yyyy')
+                        : 'date not recorded'}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Badge variant="outline" className="text-xs">Unchanged / Improved: {unchangedCount}</Badge>
+                  <Badge className={cn('text-xs border-0', deteriorated.length > 0 ? 'bg-red-500/15 text-red-700' : 'bg-muted text-muted-foreground')}>
+                    Deteriorated: {deteriorated.length}
+                  </Badge>
+                  {newCount > 0 && (
+                    <Badge className="text-xs border-0 bg-amber-500/15 text-amber-700">
+                      Not in entry: {newCount}
+                    </Badge>
+                  )}
+                </div>
+              </div>
+
+              <div className="overflow-x-auto -mx-4 sm:mx-0">
+                <table className="w-full text-xs min-w-[640px]">
+                  <thead>
+                    <tr className="border-b border-border text-muted-foreground">
+                      <th className="text-left font-medium py-2 px-2">Room</th>
+                      <th className="text-left font-medium py-2 px-2">Entry</th>
+                      <th className="text-left font-medium py-2 px-2">Exit</th>
+                      <th className="text-left font-medium py-2 px-2">Change</th>
+                      <th className="text-left font-medium py-2 px-2">Entry Photos</th>
+                      <th className="text-left font-medium py-2 px-2">Exit Photos</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {comparisons.map(c => (
+                      <tr key={c.room.id} className="border-b border-border/50">
+                        <td className="py-2 px-2 font-medium text-foreground">{c.room.room_name}</td>
+                        <td className="py-2 px-2">
+                          {c.entry?.condition ? (
+                            <Badge className={cn('border capitalize text-[10px]', CONDITION_COLORS[c.entry.condition] || '')}>{c.entry.condition}</Badge>
+                          ) : <span className="text-muted-foreground">—</span>}
+                        </td>
+                        <td className="py-2 px-2">
+                          {c.room.condition ? (
+                            <Badge className={cn('border capitalize text-[10px]', CONDITION_COLORS[c.room.condition] || '')}>{c.room.condition}</Badge>
+                          ) : <span className="text-muted-foreground">—</span>}
+                        </td>
+                        <td className="py-2 px-2">
+                          {c.status === 'deteriorated' && (
+                            <Badge className="border-0 bg-red-500/15 text-red-700 text-[10px]"><ArrowDown size={10} className="mr-0.5" />Worsened</Badge>
+                          )}
+                          {c.status === 'unchanged' && (
+                            <Badge variant="outline" className="text-[10px]"><Minus size={10} className="mr-0.5" />Unchanged</Badge>
+                          )}
+                          {c.status === 'improved' && (
+                            <Badge className="border-0 bg-emerald-500/15 text-emerald-700 text-[10px]"><ArrowUp size={10} className="mr-0.5" />Improved</Badge>
+                          )}
+                          {c.status === 'new' && (
+                            <Badge className="border-0 bg-amber-500/15 text-amber-700 text-[10px]">New / not recorded at entry</Badge>
+                          )}
+                        </td>
+                        <td className="py-2 px-2">
+                          <PhotoThumbs photos={c.entry ? (entryPhotosByRoom.get(c.entry.id) || []) : []} />
+                        </td>
+                        <td className="py-2 px-2">
+                          <PhotoThumbs photos={c.room.photos} />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {deteriorated.length > 0 && (
+                <div className="rounded-lg border border-red-500/30 bg-red-500/5 p-3 space-y-3">
+                  <div className="flex items-center gap-2 text-red-700">
+                    <FileWarning size={16} />
+                    <p className="text-sm font-semibold">
+                      {deteriorated.length} room{deteriorated.length === 1 ? '' : 's'} show deterioration — review before lodging bond claim
+                    </p>
+                  </div>
+                  <ul className="space-y-2 text-xs text-foreground">
+                    {deteriorated.map(c => (
+                      <li key={c.room.id} className="border-l-2 border-red-500/40 pl-2">
+                        <p className="font-medium">
+                          {c.room.room_name}: <span className="capitalize">{c.entry?.condition}</span> → <span className="capitalize">{c.room.condition}</span>
+                        </p>
+                        {c.entry?.notes && <p className="text-muted-foreground">Entry notes: {c.entry.notes}</p>}
+                        {c.room.notes && <p className="text-muted-foreground">Exit notes: {c.room.notes}</p>}
+                      </li>
+                    ))}
+                  </ul>
+                  <Button size="sm" onClick={() => navigate('/dashboard/bond-claims')}>
+                    Prepare Bond Claim
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        );
+      })()}
+
+      {/* Lightbox for comparison photos */}
+      <Dialog open={!!lightboxUrl} onOpenChange={(o) => !o && setLightboxUrl(null)}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader><DialogTitle>Photo</DialogTitle></DialogHeader>
+          {lightboxUrl && <img src={lightboxUrl} alt="" className="w-full h-auto rounded" />}
+        </DialogContent>
+      </Dialog>
+
       {/* Section 2 — Rooms */}
       <div className="px-4 sm:px-6 space-y-3">
         <h2 className="text-sm font-semibold text-foreground">Rooms</h2>

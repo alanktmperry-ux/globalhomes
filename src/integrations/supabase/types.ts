@@ -12927,6 +12927,10 @@ export type Database = {
     }
     Functions: {
       accept_broker_invite: { Args: { _token: string }; Returns: string }
+      admin_moderate_listing: {
+        Args: { listing_id: string; new_status: string }
+        Returns: undefined
+      }
       compute_agent_reputation: { Args: { p_agent_id: string }; Returns: Json }
       compute_agent_stats: { Args: { p_agent_id: string }; Returns: undefined }
       compute_suburb_stats: {

@@ -152,6 +152,13 @@ const AgentAuthPage = () => {
       if (agentRow && (agentRow as any).onboarding_complete) {
         navigate('/dashboard/overview');
       } else {
+        // First-time arrival here = genuine agent signup (no agent row yet, or onboarding not complete)
+        if (!agentRow) {
+          try {
+            identify(u.id, { email: u.email, plan: 'trial' });
+            capture('agent_signed_up', { source: 'agent_auth_otp' });
+          } catch { /* analytics never breaks the flow */ }
+        }
         navigate('/onboarding/agency');
       }
     } catch (err) {

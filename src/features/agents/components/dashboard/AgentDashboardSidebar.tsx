@@ -179,6 +179,15 @@ const AgentDashboardSidebar = () => {
         .is('dispute_resolved_at', null)
         .in('tenancy_id', tenancies.map(t => t.id));
       setDisputeCount(dCount || 0);
+
+      // Smoke alarm records overdue
+      const todayStr = new Date().toISOString().split('T')[0];
+      const { count: smokeCount } = await supabase
+        .from('smoke_alarm_records')
+        .select('id', { count: 'exact', head: true })
+        .eq('agent_id', agent.id)
+        .lt('next_service_due', todayStr);
+      setSmokeAlarmOverdue(smokeCount || 0);
     };
     fetchArrears();
   }, [agent?.id]);

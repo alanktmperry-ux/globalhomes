@@ -397,7 +397,7 @@ ${agencyName || ''}`.trim();
                       </TableCell>
                       <TableCell className="text-right">
                         {row.lastIncrease?.status === 'scheduled' ? (
-                          <Button size="sm" variant="outline" onClick={() => setNoticeFor({ row, increase: row.lastIncrease! })} className="gap-1">
+                          <Button size="sm" variant="outline" onClick={() => openNotice(row, row.lastIncrease!)} className="gap-1">
                             <FileText size={14} /> View Notice
                           </Button>
                         ) : row.isEligible ? (

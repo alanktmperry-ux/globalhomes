@@ -15,6 +15,7 @@ import { logAction } from '@/shared/lib/auditLog';
 import { useNavigate } from 'react-router-dom';
 import DashboardHeader from './DashboardHeader';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import { capture } from '@/shared/lib/posthog';
 
 interface PlanDef {
   id: string;

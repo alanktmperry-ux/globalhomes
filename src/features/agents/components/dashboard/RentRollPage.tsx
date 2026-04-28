@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, Home, Loader2, AlertTriangle, CheckCircle2, Clock, ClipboardCheck, ChevronDown, ChevronUp, Calendar, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { capture } from '@/shared/lib/posthog';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';

@@ -122,6 +122,7 @@ const PerformancePage = React.lazy(() => import("@/features/agents/components/da
 const HelpPage = React.lazy(() => import("@/features/agents/components/dashboard/HelpPage"));
 const BrokerReferralsPage = React.lazy(() => import("@/features/agents/components/dashboard/BrokerReferralsPage"));
 const RentRollPage = React.lazy(() => import("@/features/agents/components/dashboard/RentRollPage"));
+const ArrearsPage = React.lazy(() => import("@/features/agents/components/dashboard/ArrearsPage"));
 const TenancyDetailPage = React.lazy(() => import("@/features/agents/components/dashboard/TenancyDetailPage"));
 const InspectionReportPage = React.lazy(() => import("./pages/InspectionReportPage"));
 const OpenHomesPage = React.lazy(() => import("@/features/open-homes/components/AgentOpenHomeManager"));

@@ -67,6 +67,7 @@ const PROPERTY_NAV_OPERATIONS: NavItem[] = [
   { title: 'Routine Inspections', url: '/dashboard/pm-inspections', icon: CalendarDays, badgeKey: 'disputes', alertWhenBadge: true },
   { title: 'Suppliers', url: '/dashboard/suppliers', icon: Wrench },
   { title: 'Key Register', url: '/dashboard/keys', icon: Scale },
+  { title: 'Smoke Alarms', url: '/dashboard/smoke-alarms', icon: AlertCircle, badgeKey: 'smokeAlarms', alertWhenBadge: true },
 ];
 
 const PROPERTY_NAV_FINANCE: NavItem[] = [
@@ -109,6 +110,7 @@ const AgentDashboardSidebar = () => {
   const [arrearsCount, setArrearsCount] = useState(0);
   const [renewalsCount, setRenewalsCount] = useState(0);
   const [disputeCount, setDisputeCount] = useState(0);
+  const [smokeAlarmOverdue, setSmokeAlarmOverdue] = useState(0);
   const [buyerMatchesCount, setBuyerMatchesCount] = useState(0);
   const [onboardingComplete, setOnboardingComplete] = useState(true);
   const [agentLogo, setAgentLogo] = useState<string | null>(null);
@@ -177,6 +179,15 @@ const AgentDashboardSidebar = () => {
         .is('dispute_resolved_at', null)
         .in('tenancy_id', tenancies.map(t => t.id));
       setDisputeCount(dCount || 0);
+
+      // Smoke alarm records overdue
+      const todayStr = new Date().toISOString().split('T')[0];
+      const { count: smokeCount } = await supabase
+        .from('smoke_alarm_records')
+        .select('id', { count: 'exact', head: true })
+        .eq('agent_id', agent.id)
+        .lt('next_service_due', todayStr);
+      setSmokeAlarmOverdue(smokeCount || 0);
     };
     fetchArrears();
   }, [agent?.id]);
@@ -223,6 +234,7 @@ const AgentDashboardSidebar = () => {
     renewals: renewalsCount > 0 ? String(renewalsCount) : '',
     buyerMatches: buyerMatchesCount > 0 ? String(buyerMatchesCount) : '',
     disputes: disputeCount > 0 ? String(disputeCount) : '',
+    smokeAlarms: smokeAlarmOverdue > 0 ? String(smokeAlarmOverdue) : '',
   };
 
   const ACCOUNT_NAV: NavItem[] = [

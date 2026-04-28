@@ -25,6 +25,7 @@ import TenantPortalCard from './TenantPortalCard';
 import OwnerPortalCard from './OwnerPortalCard';
 import TenancyContactsPanel from './TenancyContactsPanel';
 import WaterBillingPanel from './WaterBillingPanel';
+import SmokeAlarmPanel from './SmokeAlarmPanel';
 import { format, parseISO, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { cn } from '@/shared/lib/utils';
 
@@ -715,6 +716,16 @@ const TenancyDetailPage = () => {
                 propertyState={(tenancy.properties as any)?.state ?? null}
               />
             </div>
+
+            {agentId && (
+              <div className="mt-4">
+                <SmokeAlarmPanel
+                  propertyId={tenancy.property_id}
+                  propertyState={(tenancy.properties as any)?.state ?? null}
+                  agentId={agentId}
+                />
+              </div>
+            )}
 
             <div className="mt-4">
               <TenancyContactsPanel tenancyId={tenancy.id} />

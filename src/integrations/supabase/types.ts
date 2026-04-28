@@ -10127,6 +10127,104 @@ export type Database = {
           },
         ]
       }
+      smoke_alarm_records: {
+        Row: {
+          agent_id: string
+          alarm_count: number
+          alarm_type: string | null
+          certificate_number: string | null
+          compliance_status: string
+          created_at: string
+          id: string
+          next_service_due: string
+          notes: string | null
+          property_id: string
+          service_date: string
+          technician_company: string | null
+          technician_name: string | null
+        }
+        Insert: {
+          agent_id: string
+          alarm_count?: number
+          alarm_type?: string | null
+          certificate_number?: string | null
+          compliance_status?: string
+          created_at?: string
+          id?: string
+          next_service_due: string
+          notes?: string | null
+          property_id: string
+          service_date: string
+          technician_company?: string | null
+          technician_name?: string | null
+        }
+        Update: {
+          agent_id?: string
+          alarm_count?: number
+          alarm_type?: string | null
+          certificate_number?: string | null
+          compliance_status?: string
+          created_at?: string
+          id?: string
+          next_service_due?: string
+          notes?: string | null
+          property_id?: string
+          service_date?: string
+          technician_company?: string | null
+          technician_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "smoke_alarm_records_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "smoke_alarm_records_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "smoke_alarm_records_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "smoke_alarm_records_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "smoke_alarm_records_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "smoke_alarm_records_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "smoke_alarm_records_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscription_events: {
         Row: {
           agent_id: string

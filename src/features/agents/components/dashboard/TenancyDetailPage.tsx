@@ -708,6 +708,10 @@ const TenancyDetailPage = () => {
               </CardContent>
             </Card>
 
+            <div className="mt-4">
+              <TenancyContactsPanel tenancyId={tenancy.id} />
+            </div>
+
             {agentId && (
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 <TenantPortalCard

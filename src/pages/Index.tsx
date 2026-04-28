@@ -27,6 +27,7 @@ const MapErrorBoundary = lazy(() =>
 );
 import { VoiceSearchErrorBoundary } from '@/features/search/components/VoiceSearchErrorBoundary';
 import { useI18n } from '@/shared/lib/i18n';
+import { capture } from '@/shared/lib/posthog';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 // Lazy-load map — only initialize when needed

@@ -31,6 +31,7 @@ const SeekerAuthPage = () => {
   const [petsRequired, setPetsRequired] = useState(false);
   const [furnishedRequired, setFurnishedRequired] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [dataLocationConsent, setDataLocationConsent] = useState(false);
   const [pendingSignIn, setPendingSignIn] = useState(false);
   const captchaRef = useRef<HCaptchaType>(null);
   const hcaptchaSiteKey = import.meta.env.VITE_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001';

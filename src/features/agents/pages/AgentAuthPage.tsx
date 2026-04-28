@@ -86,15 +86,14 @@ const AgentAuthPage = () => {
       setCaptchaToken(null);
       captchaRef.current?.resetCaptcha();
       if (error) {
-        if (error.message.includes('Email not confirmed')) {
-          throw new Error('Please check your email and click the confirmation link before signing in.');
-        }
-        throw error;
+        toast.error("If an account exists with this email, you'll receive a login link.");
+        setLoading(false);
+        return;
       }
       toast('Welcome back!');
       setPendingRedirect('dashboard');
-    } catch (err: unknown) {
-      toast.error('Sign in failed', { description: getErrorMessage(err) });
+    } catch {
+      toast.error("If an account exists with this email, you'll receive a login link.");
       setLoading(false);
     }
   };
@@ -114,10 +113,12 @@ const AgentAuthPage = () => {
       if (error) throw error;
       sessionStorage.setItem('listhq_pending_email', cleaned);
       setRegEmail(cleaned);
-      toast.success('Code sent', { description: `Check ${cleaned} for your 6-digit code.` });
+      toast.success("If an account exists with this email, you'll receive a login link.");
       setStep('otp');
-    } catch (err: unknown) {
-      toast.error(`Could not send code — ${getErrorMessage(err)}`);
+    } catch {
+      sessionStorage.setItem('listhq_pending_email', regEmail.trim().toLowerCase());
+      toast.success("If an account exists with this email, you'll receive a login link.");
+      setStep('otp');
     } finally {
       setEmailSubmitting(false);
     }

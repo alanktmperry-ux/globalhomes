@@ -49,38 +49,19 @@ const SeekerAuthPage = () => {
     if (!cleaned) return;
     setLoading(true);
     try {
-      // Probe whether the email belongs to an existing account by attempting an OTP send
-      // with shouldCreateUser:false. Supabase returns an error if the user doesn't exist.
-      const { error: probeErr } = await supabase.auth.signInWithOtp({
+      // Always send an OTP without revealing whether the account exists.
+      // Supabase will silently no-op for unknown emails when shouldCreateUser is false,
+      // so we allow account creation to keep the response identical for new vs existing users.
+      await supabase.auth.signInWithOtp({
         email: cleaned,
-        options: { shouldCreateUser: false },
+        options: { shouldCreateUser: true },
       });
-
-      if (!probeErr) {
-        // Existing account — they can sign in with password OR use the code we just sent
-        setStep('password');
-        return;
-      }
-
-      const msg = (probeErr.message || '').toLowerCase();
-      const isMissing = msg.includes('not found') || msg.includes('signups not allowed') ||
-        msg.includes("doesn't exist") || msg.includes('user not found') || msg.includes('invalid');
-
-      if (isMissing) {
-        // New user — send a real OTP and go to verification
-        const { error: createErr } = await supabase.auth.signInWithOtp({
-          email: cleaned,
-          options: { shouldCreateUser: true },
-        });
-        if (createErr) throw createErr;
-        toast.success('Code sent', { description: `Check ${cleaned} for your 6-digit code.` });
-        setStep('otp');
-      } else {
-        // Unknown error from probe — fall through to password step (existing user could still sign in)
-        setStep('password');
-      }
-    } catch (err) {
-      toast.error('Could not continue', { description: getErrorMessage(err) });
+      toast.success("If an account exists with this email, you'll receive a login link.");
+      setStep('otp');
+    } catch {
+      // Never surface provider errors — keep response identical regardless of email status.
+      toast.success("If an account exists with this email, you'll receive a login link.");
+      setStep('otp');
     } finally {
       setLoading(false);
     }
@@ -99,10 +80,9 @@ const SeekerAuthPage = () => {
       setCaptchaToken(null);
       captchaRef.current?.resetCaptcha();
       if (error) {
-        if (error.message.includes('Email not confirmed')) {
-          throw new Error('Please check your email and click the confirmation link before signing in.');
-        }
-        throw error;
+        toast.error("If an account exists with this email, you'll receive a login link.");
+        setLoading(false);
+        return;
       }
       toast('Welcome back!');
       const { data: { user: signedInUser } } = await supabase.auth.getUser();
@@ -120,8 +100,8 @@ const SeekerAuthPage = () => {
       } else {
         navigate('/', { replace: true });
       }
-    } catch (err: unknown) {
-      toast.error('Something went wrong', { description: getErrorMessage(err) });
+    } catch {
+      toast.error("If an account exists with this email, you'll receive a login link.");
     } finally {
       setLoading(false);
     }
@@ -146,12 +126,11 @@ const SeekerAuthPage = () => {
         },
       });
       if (error) throw error;
-      toast.success('Code sent', {
-        description: `Check ${email} for your 6-digit code.`,
-      });
+      toast.success("If an account exists with this email, you'll receive a login link.");
       setStep('otp');
-    } catch (err: unknown) {
-      toast.error('Could not send code', { description: getErrorMessage(err) });
+    } catch {
+      toast.success("If an account exists with this email, you'll receive a login link.");
+      setStep('otp');
     } finally {
       setLoading(false);
     }

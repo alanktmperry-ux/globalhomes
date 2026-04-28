@@ -446,7 +446,7 @@ const InspectionReportPage = () => {
         };
         const comparisons: Cmp[] = rooms.map(room => {
           const entry: EntryReportData['rooms'][number] | null = entryByName.get(room.room_name.trim().toLowerCase()) || null;
-          if (!entry) return { room, entry: null, status: 'new' as const };
+          if (!entry) return { room, entry: null as EntryReportData['rooms'][number] | null, status: 'new' as const };
           const eRank = CONDITION_RANK[entry.condition || 'na'] ?? 0;
           const xRank = CONDITION_RANK[room.condition || 'na'] ?? 0;
           if (entry.condition === 'na' || room.condition === 'na' || !entry.condition || !room.condition) {

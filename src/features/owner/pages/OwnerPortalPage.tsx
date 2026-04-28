@@ -91,13 +91,20 @@ export default function OwnerPortalPage() {
     return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin h-8 w-8 text-muted-foreground" /></div>;
   }
   if (error || !data) {
+    const isExpired = error === 'expired';
     return (
       <div className="min-h-screen flex items-center justify-center p-6 bg-muted/30">
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center">
             <AlertCircle className="h-10 w-10 text-destructive mx-auto mb-3" />
-            <h1 className="text-lg font-semibold mb-1">Portal unavailable</h1>
-            <p className="text-sm text-muted-foreground">{error}</p>
+            <h1 className="text-lg font-semibold mb-1">
+              {isExpired ? 'This link has expired' : 'Portal unavailable'}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              {isExpired
+                ? 'Your access link has expired. Please contact your property manager to receive a new link.'
+                : error}
+            </p>
           </CardContent>
         </Card>
       </div>

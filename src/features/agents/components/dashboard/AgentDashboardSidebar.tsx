@@ -64,7 +64,7 @@ const PROPERTY_NAV_TENANCY: NavItem[] = [
 
 const PROPERTY_NAV_OPERATIONS: NavItem[] = [
   { title: 'Maintenance', url: '/dashboard/maintenance', icon: Wrench },
-  { title: 'Routine Inspections', url: '/dashboard/pm-inspections', icon: CalendarDays },
+  { title: 'Routine Inspections', url: '/dashboard/pm-inspections', icon: CalendarDays, badgeKey: 'disputes', alertWhenBadge: true },
   { title: 'Suppliers', url: '/dashboard/suppliers', icon: Wrench },
   { title: 'Key Register', url: '/dashboard/keys', icon: Scale },
 ];
@@ -107,6 +107,7 @@ const AgentDashboardSidebar = () => {
   const [activeCount, setActiveCount] = useState(0);
   const [arrearsCount, setArrearsCount] = useState(0);
   const [renewalsCount, setRenewalsCount] = useState(0);
+  const [disputeCount, setDisputeCount] = useState(0);
   const [buyerMatchesCount, setBuyerMatchesCount] = useState(0);
   const [onboardingComplete, setOnboardingComplete] = useState(true);
   const [agentLogo, setAgentLogo] = useState<string | null>(null);
@@ -136,6 +137,7 @@ const AgentDashboardSidebar = () => {
       if (!tenancies || tenancies.length === 0) {
         setArrearsCount(0);
         setRenewalsCount(0);
+        setDisputeCount(0);
         return;
       }
       const today = new Date();
@@ -165,6 +167,15 @@ const AgentDashboardSidebar = () => {
         if (daysOver > 3 && latest.status !== 'paid') count++;
       }
       setArrearsCount(count);
+
+      // Unresolved tenant disputes on inspections
+      const { count: dCount } = await supabase
+        .from('property_inspections')
+        .select('id', { count: 'exact', head: true })
+        .not('tenant_disputed_at', 'is', null)
+        .is('dispute_resolved_at', null)
+        .in('tenancy_id', tenancies.map(t => t.id));
+      setDisputeCount(dCount || 0);
     };
     fetchArrears();
   }, [agent?.id]);
@@ -210,6 +221,7 @@ const AgentDashboardSidebar = () => {
     arrears: arrearsCount > 0 ? String(arrearsCount) : '',
     renewals: renewalsCount > 0 ? String(renewalsCount) : '',
     buyerMatches: buyerMatchesCount > 0 ? String(buyerMatchesCount) : '',
+    disputes: disputeCount > 0 ? String(disputeCount) : '',
   };
 
   const ACCOUNT_NAV: NavItem[] = [

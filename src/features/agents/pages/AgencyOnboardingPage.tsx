@@ -306,6 +306,8 @@ export default function AgencyOnboardingPage() {
       } as any);
       if (error) throw error;
 
+      try { capture('trust_account_created', { agent_id: agent.id }); } catch {}
+
       toast.success('Trust account created');
       setStep(3);
     } catch (e: unknown) {

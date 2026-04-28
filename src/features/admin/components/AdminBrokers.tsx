@@ -58,10 +58,30 @@ async function sendBrokerLoginLink(email: string) {
   return error;
 }
 
+interface RevenueStats {
+  totalSettled: number;
+  totalReferralFees: number;
+  totalPlatformFees: number;
+  thisMonthSettled: number;
+}
+
+const AUD = (n: number) =>
+  new Intl.NumberFormat('en-AU', {
+    style: 'currency',
+    currency: 'AUD',
+    maximumFractionDigits: 0,
+  }).format(n || 0);
+
 export default function AdminBrokers() {
   const [pending, setPending] = useState<Broker[]>([]);
   const [active, setActive] = useState<Broker[]>([]);
   const [settledLeads, setSettledLeads] = useState(0);
+  const [revenue, setRevenue] = useState<RevenueStats>({
+    totalSettled: 0,
+    totalReferralFees: 0,
+    totalPlatformFees: 0,
+    thisMonthSettled: 0,
+  });
   const [loading, setLoading] = useState(true);
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
@@ -70,7 +90,7 @@ export default function AdminBrokers() {
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
-    const [pendingRes, activeRes, settledRes] = await Promise.all([
+    const [pendingRes, activeRes, settledRes, settledRowsRes] = await Promise.all([
       (supabase.from('brokers') as any)
         .select('*')
         .eq('is_active', false)
@@ -83,10 +103,35 @@ export default function AdminBrokers() {
         .from('referral_leads')
         .select('id', { count: 'exact', head: true })
         .eq('status', 'settled'),
+      (supabase.from('referral_leads') as any)
+        .select('id, status, referral_fee_amount, platform_fee_amount, settled_at')
+        .eq('status', 'settled'),
     ]);
     setPending(((pendingRes.data ?? []) as any[]) || []);
     setActive(((activeRes.data ?? []) as any[]) || []);
     setSettledLeads(settledRes.count || 0);
+
+    const rows = (settledRowsRes.data ?? []) as any[];
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const totalReferralFees = rows.reduce(
+      (s, r) => s + (Number(r.referral_fee_amount) || 0),
+      0,
+    );
+    const totalPlatformFees = rows.reduce(
+      (s, r) => s + (Number(r.platform_fee_amount) || 0),
+      0,
+    );
+    const thisMonthSettled = rows.filter(
+      (r) => r.settled_at && new Date(r.settled_at) >= monthStart,
+    ).length;
+    setRevenue({
+      totalSettled: rows.length,
+      totalReferralFees,
+      totalPlatformFees,
+      thisMonthSettled,
+    });
+
     setLoading(false);
   }, []);
 

@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, Home, Loader2, AlertTriangle, CheckCircle2, Clock, ClipboardCheck, ChevronDown, ChevronUp, Calendar, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { capture } from '@/shared/lib/posthog';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -651,12 +652,22 @@ const RentRollPage = () => {
       owner_bsb: form.owner_bsb || null,
       owner_account_number: form.owner_account_number || null,
     };
+    // Detect "first property imported into rent roll" before insert
+    const { count: existingCount } = await supabase
+      .from('tenancies')
+      .select('id', { count: 'exact', head: true })
+      .eq('agent_id', agentId);
+    const isFirst = (existingCount ?? 0) === 0;
+
     const { error } = await supabase.from('tenancies').insert(insertPayload as any);
     setSaving(false);
 
     if (error) {
       toast.error(`Error creating tenancy — ${error.message}`);
     } else {
+      if (isFirst) {
+        try { capture('first_property_imported', { agent_id: agentId }); } catch {}
+      }
       toast.success('Tenancy created');
       setShowAddModal(false);
       setStep(1);

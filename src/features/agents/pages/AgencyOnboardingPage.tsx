@@ -18,6 +18,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
 import TrustImportWizard from '@/features/agents/components/dashboard/TrustImportWizard';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import { capture } from '@/shared/lib/posthog';
 
 type OnboardingPath = 'fresh' | 'migration';
 
@@ -304,6 +305,8 @@ export default function AgencyOnboardingPage() {
         current_balance: 0,
       } as any);
       if (error) throw error;
+
+      try { capture('trust_account_created', { agent_id: agent.id }); } catch {}
 
       toast.success('Trust account created');
       setStep(3);

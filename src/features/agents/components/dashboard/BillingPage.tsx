@@ -15,6 +15,7 @@ import { logAction } from '@/shared/lib/auditLog';
 import { useNavigate } from 'react-router-dom';
 import DashboardHeader from './DashboardHeader';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import { capture } from '@/shared/lib/posthog';
 
 interface PlanDef {
   id: string;
@@ -206,6 +207,14 @@ const BillingPage = () => {
         await supabase.from('agent_subscriptions').insert(payload);
       }
       await supabase.from('agents').update({ is_subscribed: true }).eq('id', agent.id);
+
+      try {
+        capture('subscription_started', {
+          agent_id: agent.id,
+          plan: planId,
+          mrr: payload.monthly_price_aud,
+        });
+      } catch {}
 
       toast.success("Plan updated! Stripe billing is coming — we'll email you when payment is ready.");
       window.location.reload();

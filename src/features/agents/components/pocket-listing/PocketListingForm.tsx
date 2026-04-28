@@ -551,6 +551,13 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         toast.success('Listing updated! — Your changes have been saved.');
         fireAIMatch(editPropertyId);
       } else {
+        // Detect first published listing for this agent (before insert)
+        const { count: priorListings } = await supabase
+          .from('properties')
+          .select('id', { count: 'exact', head: true })
+          .eq('agent_id', agentId);
+        const isFirstListing = (priorListings ?? 0) === 0;
+
         const { data: inserted, error } = await supabase
           .from('properties')
           .insert({
@@ -570,6 +577,12 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
             property_type: draft.propertyType,
             has_images: (draft.photos?.length ?? 0) > 0,
           });
+          if (isFirstListing) {
+            capture('first_listing_published', {
+              agent_id: agentId,
+              suburb: draft.suburb || '',
+            });
+          }
         } catch {}
 
         const matched = await matchBuyersToListing({

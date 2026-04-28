@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import { capture, identify } from '@/shared/lib/posthog';
 import OTPVerificationScreen from '@/features/auth/components/OTPVerificationScreen';
 
 type Step = 'email' | 'password' | 'register' | 'otp';
@@ -151,6 +152,13 @@ const AgentAuthPage = () => {
       if (agentRow && (agentRow as any).onboarding_complete) {
         navigate('/dashboard/overview');
       } else {
+        // First-time arrival here = genuine agent signup (no agent row yet, or onboarding not complete)
+        if (!agentRow) {
+          try {
+            identify(u.id, { email: u.email, plan: 'trial' });
+            capture('agent_signed_up', { source: 'agent_auth_otp' });
+          } catch { /* analytics never breaks the flow */ }
+        }
         navigate('/onboarding/agency');
       }
     } catch (err) {

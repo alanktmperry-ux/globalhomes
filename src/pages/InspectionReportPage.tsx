@@ -173,6 +173,41 @@ const InspectionReportPage = () => {
     }));
 
     setRooms(enrichedRooms);
+
+    // If this is an exit inspection, fetch the most recent completed entry report for comparison
+    if (inspData.inspection_type === 'exit') {
+      const { data: entryInsp } = await supabase
+        .from('property_inspections')
+        .select('id, conducted_date, finalised_at')
+        .eq('tenancy_id', inspData.tenancy_id)
+        .eq('inspection_type', 'entry')
+        .eq('status', 'completed')
+        .order('conducted_date', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (entryInsp) {
+        const { data: entryRooms } = await supabase
+          .from('inspection_rooms')
+          .select('id, room_name, condition, notes')
+          .eq('inspection_id', entryInsp.id)
+          .order('display_order');
+        const entryRoomIds = (entryRooms || []).map(r => r.id);
+        const entryPhotosRes = entryRoomIds.length > 0
+          ? await supabase.from('inspection_room_photos')
+              .select('id, room_id, photo_url, caption')
+              .eq('inspection_id', entryInsp.id)
+          : { data: [] as EntryReportData['photos'] };
+        setEntryReport({
+          inspection: entryInsp as EntryReportData['inspection'],
+          rooms: (entryRooms || []) as EntryReportData['rooms'],
+          photos: (entryPhotosRes.data || []) as EntryReportData['photos'],
+        });
+      } else {
+        setEntryReport(null);
+      }
+    }
+
     setLoading(false);
   }, [inspectionId]);
 

@@ -526,6 +526,55 @@ export default function CommandCentre() {
         });
       }
 
+      // === BUSINESS HEALTH METRICS ===
+      const subMonthsArr = paidAgents.map((a: any) => Math.max(0.5, (now.getTime() - new Date(a.created_at).getTime()) / (30 * 86400000)));
+      const avgSubscriptionMonths = subMonthsArr.length > 0
+        ? subMonthsArr.reduce((s, n) => s + n, 0) / subMonthsArr.length
+        : 0;
+      const ltv = Math.round(arpu * avgSubscriptionMonths);
+
+      const existingPaid = agents.filter((a: any) => a.is_subscribed && a.created_at < monthStart);
+      const existingPaidMRR = existingPaid.reduce(
+        (s: number, a: any) => s + (PLAN_MRR[(a.agent_subscriptions?.plan_type || '').toLowerCase()] || 0),
+        0,
+      );
+      const prevMonthMRR = existingPaidMRR;
+      const nrrRaw = prevMonthMRR > 0 ? Math.round((existingPaidMRR / prevMonthMRR) * 100) : 100;
+      const nrr = Math.min(150, nrrRaw);
+
+      const growthDecimal = mrrGrowthPct != null ? mrrGrowthPct / 100 : 0.05;
+      const forecast3m = Math.round(mrr * Math.pow(1 + growthDecimal, 3));
+      const forecast6m = Math.round(mrr * Math.pow(1 + growthDecimal, 6));
+      const forecast12m = Math.round(mrr * Math.pow(1 + growthDecimal, 12));
+
+      const cohorts: { month: string; signedUp: number; stillActive: number; retentionPct: number }[] = [];
+      for (let i = 5; i >= 0; i--) {
+        const cohortStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const cohortEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
+        const inCohort = agents.filter((a: any) => {
+          const d = new Date(a.created_at);
+          return d >= cohortStart && d < cohortEnd;
+        });
+        const stillActive = inCohort.filter((a: any) => a.is_subscribed).length;
+        cohorts.push({
+          month: cohortStart.toLocaleDateString('en-AU', { month: 'short', year: '2-digit' }),
+          signedUp: inCohort.length,
+          stillActive,
+          retentionPct: inCohort.length > 0 ? Math.round((stillActive / inCohort.length) * 100) : 0,
+        });
+      }
+
+      const brokerLeadsThisMonth = brokerLeadsRes?.count || 0;
+      const brokerSettledData: any[] = brokerSettledRes?.data || [];
+      const brokerSettlementsThisMonth = brokerSettledData.length;
+      const brokerSettlementRate = brokerLeadsThisMonth > 0
+        ? Math.round((brokerSettlementsThisMonth / brokerLeadsThisMonth) * 100)
+        : 0;
+      const brokerPlatformFeesThisMonth = brokerSettledData.reduce(
+        (s, r: any) => s + (Number(r.platform_fee_amount) || 0),
+        0,
+      );
+
       setData({
         mrr,
         arr: mrr * 12,

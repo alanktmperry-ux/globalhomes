@@ -131,7 +131,10 @@ const InspectionReportPage = () => {
       supabase.from('agents').select('name, phone').eq('id', inspData.agent_id).maybeSingle(),
       supabase.from('tenancies').select('tenant_email').eq('id', inspData.tenancy_id).maybeSingle(),
     ]);
-    if (propRes.data) setPropertyAddress(`${propRes.data.address}, ${propRes.data.suburb} ${propRes.data.state || ''}`);
+    if (propRes.data) {
+      setPropertyAddress(`${propRes.data.address}, ${propRes.data.suburb} ${propRes.data.state || ''}`);
+      setPropertyState(propRes.data.state || null);
+    }
     if (agentRes.data) { setAgentName(agentRes.data.name); setAgentPhone(agentRes.data.phone || ''); }
     if (tenancyRes.data) { setTenantEmail(tenancyRes.data.tenant_email || ''); setFinaliseTenantEmail(tenancyRes.data.tenant_email || ''); }
 

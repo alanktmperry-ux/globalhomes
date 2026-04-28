@@ -65,6 +65,7 @@ interface ActiveTenancy {
   id: string;
   tenant_name: string | null;
   lease_start: string;
+  property_id: string;
   properties?: {
     address: string | null;
     suburb: string | null;

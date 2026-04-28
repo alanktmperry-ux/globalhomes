@@ -406,6 +406,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     sessionStorage.removeItem('post_login_redirected');
+    // Clear any active impersonation rows for this admin
+    if (user) {
+      try {
+        await (supabase as any)
+          .from('admin_impersonation_sessions')
+          .delete()
+          .eq('admin_id', user.id);
+      } catch (e) { /* non-fatal */ }
+    }
     clearRoles();
     setUser(null);
     setSession(null);

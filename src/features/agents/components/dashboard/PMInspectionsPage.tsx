@@ -68,6 +68,7 @@ interface ActiveTenancy {
   id: string;
   tenant_name: string | null;
   lease_start: string;
+  lease_end: string | null;
   property_id: string;
   properties?: {
     address: string | null;
@@ -211,7 +212,7 @@ export default function PMInspectionsPage() {
         .order('scheduled_date', { ascending: true }),
       supabase
         .from('tenancies')
-        .select('id, tenant_name, lease_start, property_id, properties(address, suburb, state)')
+        .select('id, tenant_name, lease_start, lease_end, property_id, properties(address, suburb, state)')
         .eq('agent_id', aid)
         .eq('status', 'active'),
     ]);
@@ -267,6 +268,32 @@ export default function PMInspectionsPage() {
       });
     }
     return out;
+  }, [activeTenancies, inspections]);
+
+  // Vacating soon — tenancies ending within 60 days with no exit inspection yet
+  const vacatingSoon = useMemo(() => {
+    const today = new Date();
+    const todayStr = today.toISOString().slice(0, 10);
+    const sixty = addDays(today, 60).toISOString().slice(0, 10);
+    return activeTenancies
+      .filter(t => {
+        if (!t.lease_end) return false;
+        if (t.lease_end < todayStr || t.lease_end > sixty) return false;
+        const hasExit = inspections.some(i =>
+          i.tenancy_id === t.id &&
+          i.inspection_type === 'exit' &&
+          i.status !== 'cancelled'
+        );
+        return !hasExit;
+      })
+      .map(t => ({
+        tenancyId: t.id,
+        tenantName: t.tenant_name || 'Tenant',
+        address: [t.properties?.address, t.properties?.suburb].filter(Boolean).join(', ') || '—',
+        leaseEnd: t.lease_end as string,
+        daysToEnd: differenceInDays(parseISO(t.lease_end as string), today),
+      }))
+      .sort((a, b) => a.daysToEnd - b.daysToEnd);
   }, [activeTenancies, inspections]);
 
   // Disputed (unresolved) inspections
@@ -378,6 +405,27 @@ export default function PMInspectionsPage() {
       status: 'scheduled',
     } as any).select('id').maybeSingle();
     if (error || !inserted) { toast.error('Could not schedule inspection'); return; }
+    navigate(`/dashboard/inspection/${(inserted as any).id}`);
+  };
+
+  const scheduleExitInspection = async (tenancyId: string, leaseEnd: string) => {
+    if (!agentId) return;
+    const t = activeTenancies.find(x => x.id === tenancyId);
+    if (!t) return;
+    const today = new Date();
+    let scheduled = parseISO(leaseEnd);
+    const threeBefore = addDays(scheduled, -3);
+    if (threeBefore > today) scheduled = threeBefore;
+    if (scheduled < today) scheduled = today;
+    const { data: inserted, error } = await supabase.from('property_inspections').insert({
+      tenancy_id: tenancyId,
+      property_id: t.property_id,
+      agent_id: agentId,
+      inspection_type: 'exit',
+      scheduled_date: format(scheduled, 'yyyy-MM-dd'),
+      status: 'scheduled',
+    } as any).select('id').maybeSingle();
+    if (error || !inserted) { toast.error('Could not schedule exit inspection'); return; }
     navigate(`/dashboard/inspection/${(inserted as any).id}`);
   };
 
@@ -548,43 +596,88 @@ ${agencyName || ''}`.trim();
             <Loader2 size={18} className="animate-spin mr-2" /> Loading inspections…
           </div>
         ) : tab === 'due' ? (
-          <Card>
-            <CardContent className="p-0">
-              {suggested.length === 0 ? (
-                <div className="py-12 text-center text-muted-foreground text-sm">
-                  <ClipboardCheck className="mx-auto mb-2" size={28} />
-                  No properties currently flagged as due for inspection.
-                </div>
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-sm font-semibold mb-2">Suggested Routine Inspections</h3>
+              <Card>
+                <CardContent className="p-0">
+                  {suggested.length === 0 ? (
+                    <div className="py-12 text-center text-muted-foreground text-sm">
+                      <ClipboardCheck className="mx-auto mb-2" size={28} />
+                      No properties currently flagged as due for inspection.
+                    </div>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Property</TableHead>
+                          <TableHead>Tenant</TableHead>
+                          <TableHead>State</TableHead>
+                          <TableHead>Reason</TableHead>
+                          <TableHead className="text-right">Action</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {suggested.map(s => (
+                          <TableRow key={s.tenancyId}>
+                            <TableCell className="font-medium text-sm">{s.address}</TableCell>
+                            <TableCell className="text-sm">{s.tenantName}</TableCell>
+                            <TableCell className="text-xs">{s.state || '—'}</TableCell>
+                            <TableCell className="text-xs text-muted-foreground">{s.reason}</TableCell>
+                            <TableCell className="text-right">
+                              <Button size="sm" onClick={() => scheduleAndStartFromSuggestion(s)}>
+                                Schedule & Start Report
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold mb-2">Vacating Soon — Exit Inspection Required</h3>
+              {vacatingSoon.length === 0 ? (
+                <Card><CardContent className="py-8 text-center text-sm text-muted-foreground">
+                  No tenancies ending in the next 60 days.
+                </CardContent></Card>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Property</TableHead>
-                      <TableHead>Tenant</TableHead>
-                      <TableHead>State</TableHead>
-                      <TableHead>Reason</TableHead>
-                      <TableHead className="text-right">Action</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {suggested.map(s => (
-                      <TableRow key={s.tenancyId}>
-                        <TableCell className="font-medium text-sm">{s.address}</TableCell>
-                        <TableCell className="text-sm">{s.tenantName}</TableCell>
-                        <TableCell className="text-xs">{s.state || '—'}</TableCell>
-                        <TableCell className="text-xs text-muted-foreground">{s.reason}</TableCell>
-                        <TableCell className="text-right">
-                          <Button size="sm" onClick={() => scheduleAndStartFromSuggestion(s)}>
-                            Schedule & Start Report
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {vacatingSoon.map(v => {
+                    const tone = v.daysToEnd <= 14
+                      ? 'bg-red-500/15 text-red-700 border-red-500/30'
+                      : v.daysToEnd <= 30
+                        ? 'bg-amber-500/15 text-amber-700 border-amber-500/30'
+                        : 'bg-muted text-muted-foreground border-border';
+                    return (
+                      <Card key={v.tenancyId}>
+                        <CardContent className="p-4 space-y-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium truncate">{v.address}</p>
+                              <p className="text-xs text-muted-foreground truncate">{v.tenantName}</p>
+                            </div>
+                            <Badge className={cn('border capitalize text-[10px] whitespace-nowrap', tone)}>
+                              Ends in {v.daysToEnd} day{v.daysToEnd === 1 ? '' : 's'}
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            Lease ends: <span className="text-foreground font-medium">{format(parseISO(v.leaseEnd), 'dd MMM yyyy')}</span>
+                          </p>
+                          <Button size="sm" className="w-full" onClick={() => scheduleExitInspection(v.tenancyId, v.leaseEnd)}>
+                            Schedule Exit Inspection
                           </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         ) : tab === 'disputes' ? (
           <Card>
             <CardContent className="p-0">

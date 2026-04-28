@@ -174,6 +174,7 @@ const RentalPropertyPage = React.lazy(() => import("./features/rental/pages/Rent
 const LiveAuctionPage = React.lazy(() => import("./features/auctions/pages/LiveAuctionPage"));
 const InspectionReportPublic = React.lazy(() => import("./pages/InspectionReportPage_Public"));
 const BrokerLogin = React.lazy(() => import("./pages/broker/BrokerLogin"));
+const BrokerRegisterPage = React.lazy(() => import("./pages/broker/BrokerRegisterPage"));
 const BrokerPortal = React.lazy(() => import("./pages/broker/BrokerPortal"));
 const BrokerLeadDetailPage = React.lazy(() => import("./pages/broker/BrokerLeadDetailPage"));
 const BrokerTeamPage = React.lazy(() => import("./pages/broker/BrokerTeamPage"));
@@ -320,6 +321,7 @@ const App = () => (
                 <Route path="/review/:token" element={<ReviewSubmitPage />} />
                 
                 <Route path="/broker/login" element={<BrokerLogin />} />
+                <Route path="/broker/register" element={<BrokerRegisterPage />} />
                 <Route path="/broker/portal" element={<BrokerPortal />} />
                 <Route path="/broker/lead/:id" element={<BrokerLeadDetailPage />} />
                 <Route path="/broker/portal/team" element={<BrokerTeamPage />} />

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import TICACheckPanel, { TICAStatusIcon } from './TICACheckPanel';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
 const AU_DATE = (d: string) => new Date(d).toLocaleDateString('en-AU');
@@ -45,6 +46,7 @@ interface Application {
   status: string;
   created_at: string;
   properties: { address: string; suburb: string; rent_amount?: number; beds?: number } | null;
+  tica_checks?: { result: string }[] | null;
 }
 
 const RentalApplicationsPage = () => {
@@ -62,7 +64,7 @@ const RentalApplicationsPage = () => {
 
     const { data } = await (supabase as any)
       .from('rental_applications')
-      .select('*, properties(address, suburb, beds, rental_weekly)')
+      .select('*, properties(address, suburb, beds, rental_weekly), tica_checks(result, created_at)')
       .eq('agent_id', agent.id)
       .order('created_at', { ascending: false });
 

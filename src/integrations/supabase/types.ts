@@ -8793,6 +8793,53 @@ export type Database = {
           },
         ]
       }
+      rent_increases: {
+        Row: {
+          created_at: string
+          effective_date: string
+          id: string
+          new_amount: number
+          notes: string | null
+          notice_sent_date: string | null
+          old_amount: number
+          rent_frequency: string
+          status: string
+          tenancy_id: string
+        }
+        Insert: {
+          created_at?: string
+          effective_date: string
+          id?: string
+          new_amount: number
+          notes?: string | null
+          notice_sent_date?: string | null
+          old_amount: number
+          rent_frequency: string
+          status?: string
+          tenancy_id: string
+        }
+        Update: {
+          created_at?: string
+          effective_date?: string
+          id?: string
+          new_amount?: number
+          notes?: string | null
+          notice_sent_date?: string | null
+          old_amount?: number
+          rent_frequency?: string
+          status?: string
+          tenancy_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rent_increases_tenancy_id_fkey"
+            columns: ["tenancy_id"]
+            isOneToOne: false
+            referencedRelation: "tenancies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rent_payments: {
         Row: {
           agent_id: string
@@ -13217,6 +13264,10 @@ export type Database = {
         Returns: boolean
       }
       is_platform_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_tenancy_agent: {
+        Args: { _tenancy_id: string; _user_id: string }
+        Returns: boolean
+      }
       link_broker_auth_user: {
         Args: { p_email: string; p_user_id: string }
         Returns: undefined

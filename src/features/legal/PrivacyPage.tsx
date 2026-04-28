@@ -80,14 +80,20 @@ const PrivacyPage = () => {
 
             <section id="transfers">
               <h2>4. International Data Transfers</h2>
-              <p>ListHQ serves users globally. Your data may be processed by:</p>
+              <p>ListHQ serves users globally. Your personal information is hosted and processed by the following providers:</p>
               <ul>
-                <li>Supabase (database and authentication) — servers in Australia and USA.</li>
+                <li><strong>Primary database, authentication and file storage (Supabase):</strong> Singapore — AWS region <code>ap-southeast-1</code>.</li>
                 <li>Resend (transactional email) — USA.</li>
                 <li>Stripe (payments) — USA.</li>
-                <li>Google (QR code generation, maps) — USA.</li>
+                <li>Google (maps, QR code generation, OAuth sign-in) — USA.</li>
+                <li>PostHog (product analytics) — European Union.</li>
               </ul>
-              <p>Data transfers comply with applicable international transfer mechanisms.</p>
+
+              <h3>4.1 Disclosure of personal information overseas (APP 8)</h3>
+              <p>Because our primary database is hosted in Singapore, your personal information is disclosed to an overseas recipient for the purposes of Australian Privacy Principle 8 (<em>cross-border disclosure of personal information</em>).</p>
+              <p>Singapore is bound by the <strong>Personal Data Protection Act 2012 (PDPA)</strong>, which the Office of the Australian Information Commissioner and Australian privacy practitioners generally regard as providing protections substantially similar to the Australian Privacy Principles. The PDPA imposes obligations on organisations in relation to consent, purpose limitation, notification, access and correction, accuracy, protection (security), retention limitation, and transfer of personal data, and is enforced by the Personal Data Protection Commission of Singapore.</p>
+              <p>By creating a ListHQ account you acknowledge that your personal information will be stored and processed on servers located in Singapore. You may withdraw your account at any time as described in section 6 (<em>Your Rights</em>); subject to the legal retention periods in section 5, we will delete or de-identify your personal information on request.</p>
+              <p>Where information is also disclosed to providers in the USA or EU (as listed above), those transfers are made in reliance on the recipient's contractual undertakings, applicable Standard Contractual Clauses, and/or the relevant provider's published data protection terms.</p>
             </section>
 
             <section id="retention">

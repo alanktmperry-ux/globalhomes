@@ -393,6 +393,7 @@ const App = () => (
                   <Route path="rent-increases" element={<RentIncreasePage />} />
                   <Route path="keys" element={<KeyRegisterPage />} />
                   <Route path="pm-inspections" element={<PMInspectionsPage />} />
+                  <Route path="bond-claims" element={<BondClaimsPage />} />
                   <Route path="property-documents" element={<PropertyDocumentsPage />} />
                   <Route path="tenancies/:tenancyId" element={<TenancyDetailPage />} />
                   <Route path="inspection/:inspectionId" element={<InspectionReportPage />} />

@@ -181,7 +181,7 @@ const TenancyDetailPage = () => {
     setAgentId(agentData.id);
     setAgentInfo(agentData);
 
-    const [tRes, pRes, jRes] = await Promise.all([
+    const [tRes, pRes, jRes, iRes] = await Promise.all([
       supabase
         .from('tenancies')
         .select('*, properties(address, suburb, state, owner_portal_token, owner_name, owner_email)')
@@ -198,6 +198,11 @@ const TenancyDetailPage = () => {
         .select('*')
         .eq('tenancy_id', tenancyId)
         .order('created_at', { ascending: false }),
+      supabase
+        .from('property_inspections')
+        .select('id, inspection_type, scheduled_date, conducted_date, status, finalised_at, report_token, overall_notes')
+        .eq('tenancy_id', tenancyId)
+        .order('scheduled_date', { ascending: false }),
     ]);
 
     if (tRes.data) {
@@ -208,6 +213,7 @@ const TenancyDetailPage = () => {
     }
     if (pRes.data) setPayments(pRes.data as RentPayment[]);
     if (jRes.data) setJobs(jRes.data as MaintenanceJob[]);
+    if (iRes.data) setInspections(iRes.data as any);
     setLoading(false);
   }, [user, tenancyId]);
 

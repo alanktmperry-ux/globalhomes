@@ -25,6 +25,7 @@ const AgentAuthPage = () => {
   const [loading, setLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [pendingSignIn, setPendingSignIn] = useState(false);
+  const [dataLocationConsent, setDataLocationConsent] = useState(false);
 
   // ── All useRef hooks ──
   const captchaRef = useRef<HCaptcha>(null);
@@ -100,6 +101,10 @@ const AgentAuthPage = () => {
 
   const handleEmailSubmit = async () => {
     if (!regEmail.trim()) return;
+    if (!dataLocationConsent) {
+      toast.error('Please acknowledge where your data is stored to continue.');
+      return;
+    }
     setEmailSubmitting(true);
     try {
       const cleaned = regEmail.trim().toLowerCase();

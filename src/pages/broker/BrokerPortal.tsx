@@ -187,7 +187,8 @@ export default function BrokerPortal() {
     return () => { cancelled = true; };
   }, [navigate, loadLeads]);
 
-  // Realtime subscription — principals listen agency-wide, associates only their own
+  // Realtime — listen to all referral_leads changes and refetch both lists.
+  // Filtering is cheap on the client and saves us managing two channels.
   useEffect(() => {
     if (!broker) return;
     const channel = supabase
@@ -198,9 +199,6 @@ export default function BrokerPortal() {
           event: "*",
           schema: "public",
           table: "referral_leads",
-          ...(broker.agency_role !== 'principal'
-            ? { filter: `assigned_broker_id=eq.${broker.id}` }
-            : {}),
         },
         () => { loadLeads(broker); }
       )
@@ -210,14 +208,47 @@ export default function BrokerPortal() {
 
   const stats = useMemo(() => {
     const counts = { new: 0, active: 0, settled: 0 };
-    leads.forEach((l) => { counts[statusBucket(l.status)]++; });
+    myLeads.forEach((l) => { counts[statusBucket(l.status)]++; });
     return counts;
-  }, [leads]);
+  }, [myLeads]);
 
+  // Selected lead must come from myLeads — available leads only show a preview.
   const selectedLead = useMemo(
-    () => leads.find((l) => l.id === selectedId) ?? null,
-    [leads, selectedId]
+    () => myLeads.find((l) => l.id === selectedId) ?? null,
+    [myLeads, selectedId]
   );
+
+  const selectedAvailable = useMemo(
+    () => availableLeads.find((l) => l.id === selectedId) ?? null,
+    [availableLeads, selectedId]
+  );
+
+  const handleClaim = useCallback(async (lead: Lead) => {
+    if (!broker) return;
+    setClaimingId(lead.id);
+    const { data, error } = await (supabase
+      .from("referral_leads") as any)
+      .update({ assigned_broker_id: broker.id, status: "contacted" } as any)
+      .eq("id", lead.id)
+      .is("assigned_broker_id", null)
+      .select("id");
+    setClaimingId(null);
+
+    if (error) {
+      toast.error("This lead was just claimed by another broker");
+      loadLeads(broker);
+      return;
+    }
+    if (!data || (Array.isArray(data) && data.length === 0)) {
+      toast.error("This lead was just claimed by another broker");
+      loadLeads(broker);
+      return;
+    }
+    toast.success("Lead claimed");
+    await loadLeads(broker);
+    setActiveTab("mine");
+    setSelectedId(lead.id);
+  }, [broker, loadLeads]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -231,6 +262,8 @@ export default function BrokerPortal() {
       </div>
     );
   }
+
+  const visibleLeads = activeTab === "available" ? availableLeads : myLeads;
 
   return (
     <div className="h-screen flex flex-col bg-slate-50">
@@ -257,7 +290,7 @@ export default function BrokerPortal() {
       {/* Two-panel body */}
       <div className="flex-1 min-h-0 flex flex-col lg:flex-row">
         {/* Left panel */}
-        <aside className="w-full lg:w-[320px] lg:shrink-0 lg:h-full flex flex-col bg-white border-b lg:border-b-0 lg:border-r border-slate-200 max-h-[50vh] lg:max-h-none">
+        <aside className="w-full lg:w-[340px] lg:shrink-0 lg:h-full flex flex-col bg-white border-b lg:border-b-0 lg:border-r border-slate-200 max-h-[50vh] lg:max-h-none">
           <div className="px-5 py-4 border-b border-slate-200">
             <p className="text-sm font-semibold text-slate-900 truncate">
               {broker.full_name || broker.name}
@@ -270,19 +303,41 @@ export default function BrokerPortal() {
             </div>
           </div>
 
+          {/* Tabs */}
+          <div className="flex border-b border-slate-200 bg-slate-50">
+            <TabButton
+              active={activeTab === "available"}
+              onClick={() => { setActiveTab("available"); setSelectedId(null); }}
+              showDot={availableLeads.length > 0}
+            >
+              Available ({availableLeads.length})
+            </TabButton>
+            <TabButton
+              active={activeTab === "mine"}
+              onClick={() => { setActiveTab("mine"); setSelectedId(null); }}
+            >
+              My Leads ({myLeads.length})
+            </TabButton>
+          </div>
+
           <div className="flex-1 min-h-0 overflow-y-auto">
-            {leads.length === 0 ? (
+            {visibleLeads.length === 0 ? (
               <div className="h-full flex items-center justify-center text-sm text-slate-400 p-8 text-center">
-                No leads assigned yet
+                {activeTab === "available"
+                  ? "No leads available right now"
+                  : "No leads assigned yet"}
               </div>
             ) : (
               <ul className="divide-y divide-slate-100">
-                {leads.map((lead) => (
+                {visibleLeads.map((lead) => (
                   <LeadRow
                     key={lead.id}
                     lead={lead}
                     selected={selectedId === lead.id}
                     onSelect={() => setSelectedId(lead.id)}
+                    showClaim={activeTab === "available"}
+                    claiming={claimingId === lead.id}
+                    onClaim={() => handleClaim(lead)}
                   />
                 ))}
               </ul>
@@ -299,6 +354,12 @@ export default function BrokerPortal() {
               broker={broker}
               onChanged={() => loadLeads(broker)}
             />
+          ) : selectedAvailable ? (
+            <AvailableLeadPreview
+              lead={selectedAvailable}
+              claiming={claimingId === selectedAvailable.id}
+              onClaim={() => handleClaim(selectedAvailable)}
+            />
           ) : (
             <WelcomeCard broker={broker} />
           )}
@@ -307,6 +368,27 @@ export default function BrokerPortal() {
     </div>
   );
 }
+
+function TabButton({
+  active, onClick, children, showDot,
+}: { active: boolean; onClick: () => void; children: React.ReactNode; showDot?: boolean }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex-1 text-sm font-medium py-2.5 transition-colors relative flex items-center justify-center gap-2 ${
+        active
+          ? "bg-white text-slate-900 border-b-2 border-blue-500"
+          : "text-slate-500 hover:text-slate-700"
+      }`}
+    >
+      {showDot && (
+        <span className="w-2 h-2 rounded-full bg-green-500" aria-hidden />
+      )}
+      {children}
+    </button>
+  );
+}
+
 
 /* ---------- Sidebar pieces ---------- */
 

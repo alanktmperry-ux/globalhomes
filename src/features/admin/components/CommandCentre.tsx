@@ -121,6 +121,16 @@ interface CCData {
     created_at: string;
     lastSignIn: string | null;
   }[];
+  ltv: number;
+  nrr: number;
+  forecast3m: number;
+  forecast6m: number;
+  forecast12m: number;
+  cohorts: { month: string; signedUp: number; stillActive: number; retentionPct: number }[];
+  brokerLeadsThisMonth: number;
+  brokerSettlementsThisMonth: number;
+  brokerSettlementRate: number;
+  brokerPlatformFeesThisMonth: number;
   fetchedAt: string;
 }
 
@@ -252,6 +262,11 @@ export default function CommandCentre() {
   const [data, setData] = useState<CCData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [monthlyMarketingSpend, setMonthlyMarketingSpend] = useState<number>(() => {
+    if (typeof window === 'undefined') return 0;
+    const v = window.localStorage.getItem('cc_marketing_spend');
+    return v ? Number(v) || 0 : 0;
+  });
   const fetchAllRef = useRef<() => Promise<void>>(() => Promise.resolve());
 
   const fetchAll = useCallback(async () => {
@@ -288,6 +303,8 @@ export default function CommandCentre() {
         newBuyersWeekRes,
         partnersRes,
         brokersRes,
+        brokerLeadsRes,
+        brokerSettledRes,
       ] = await Promise.all([
         supabase.from('agents').select('id, user_id, name, email, agency, is_subscribed, subscription_status, created_at, updated_at, onboarding_complete, agent_subscriptions(plan_type)'),
         supabase.from('properties').select('id, agent_id, state, is_active, views, images, created_at'),
@@ -311,6 +328,8 @@ export default function CommandCentre() {
         (supabase.from('buyer_profiles' as any).select('id', { count: 'exact', head: true }).gte('created_at', d7)) as any,
         (supabase.from('partners' as any).select('id', { count: 'exact', head: true })) as any,
         (supabase.from('brokers' as any).select('id', { count: 'exact', head: true })) as any,
+        (supabase.from('referral_leads' as any).select('id', { count: 'exact', head: true }).gte('created_at', monthStart)) as any,
+        (supabase.from('referral_leads' as any).select('platform_fee_amount').eq('status', 'settled').gte('settled_at', monthStart)) as any,
       ]);
 
       // Top suburb from voice searches in the last 7 days
@@ -512,6 +531,55 @@ export default function CommandCentre() {
         });
       }
 
+      // === BUSINESS HEALTH METRICS ===
+      const subMonthsArr = paidAgents.map((a: any) => Math.max(0.5, (now.getTime() - new Date(a.created_at).getTime()) / (30 * 86400000)));
+      const avgSubscriptionMonths = subMonthsArr.length > 0
+        ? subMonthsArr.reduce((s, n) => s + n, 0) / subMonthsArr.length
+        : 0;
+      const ltv = Math.round(arpu * avgSubscriptionMonths);
+
+      const existingPaid = agents.filter((a: any) => a.is_subscribed && a.created_at < monthStart);
+      const existingPaidMRR = existingPaid.reduce(
+        (s: number, a: any) => s + (PLAN_MRR[(a.agent_subscriptions?.plan_type || '').toLowerCase()] || 0),
+        0,
+      );
+      const prevMonthMRR = existingPaidMRR;
+      const nrrRaw = prevMonthMRR > 0 ? Math.round((existingPaidMRR / prevMonthMRR) * 100) : 100;
+      const nrr = Math.min(150, nrrRaw);
+
+      const growthDecimal = mrrGrowthPct != null ? mrrGrowthPct / 100 : 0.05;
+      const forecast3m = Math.round(mrr * Math.pow(1 + growthDecimal, 3));
+      const forecast6m = Math.round(mrr * Math.pow(1 + growthDecimal, 6));
+      const forecast12m = Math.round(mrr * Math.pow(1 + growthDecimal, 12));
+
+      const cohorts: { month: string; signedUp: number; stillActive: number; retentionPct: number }[] = [];
+      for (let i = 5; i >= 0; i--) {
+        const cohortStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const cohortEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
+        const inCohort = agents.filter((a: any) => {
+          const d = new Date(a.created_at);
+          return d >= cohortStart && d < cohortEnd;
+        });
+        const stillActive = inCohort.filter((a: any) => a.is_subscribed).length;
+        cohorts.push({
+          month: cohortStart.toLocaleDateString('en-AU', { month: 'short', year: '2-digit' }),
+          signedUp: inCohort.length,
+          stillActive,
+          retentionPct: inCohort.length > 0 ? Math.round((stillActive / inCohort.length) * 100) : 0,
+        });
+      }
+
+      const brokerLeadsThisMonth = brokerLeadsRes?.count || 0;
+      const brokerSettledData: any[] = brokerSettledRes?.data || [];
+      const brokerSettlementsThisMonth = brokerSettledData.length;
+      const brokerSettlementRate = brokerLeadsThisMonth > 0
+        ? Math.round((brokerSettlementsThisMonth / brokerLeadsThisMonth) * 100)
+        : 0;
+      const brokerPlatformFeesThisMonth = brokerSettledData.reduce(
+        (s, r: any) => s + (Number(r.platform_fee_amount) || 0),
+        0,
+      );
+
       setData({
         mrr,
         arr: mrr * 12,
@@ -572,6 +640,16 @@ export default function CommandCentre() {
         totalDemoUsers: demoUsersList.length,
         pendingPartners: pendingPartnersCount,
         recentUsers: recentUsersList,
+        ltv,
+        nrr,
+        forecast3m,
+        forecast6m,
+        forecast12m,
+        cohorts,
+        brokerLeadsThisMonth,
+        brokerSettlementsThisMonth,
+        brokerSettlementRate,
+        brokerPlatformFeesThisMonth,
         fetchedAt: new Date().toISOString(),
       });
     } finally {
@@ -1177,6 +1255,191 @@ export default function CommandCentre() {
           value={`$${Math.round(data.projectedARR12m).toLocaleString()}`}
           sub="projected annual revenue"
           icon={TrendingUp}
+          color="text-emerald-500"
+        />
+      </div>
+
+      {/* Extended Business Health: Churn / LTV / NRR / CAC */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-4">
+        <KPI
+          label="Churn Rate"
+          value={`${data.churnRatePct.toFixed(1)}%`}
+          sub="this month"
+          icon={TrendingDown}
+          color={
+            data.churnRatePct > 5
+              ? 'text-destructive'
+              : data.churnRatePct >= 2
+              ? 'text-amber-500'
+              : 'text-emerald-500'
+          }
+        />
+        <KPI
+          label="Est. LTV"
+          value={`$${data.ltv.toLocaleString()}`}
+          sub="ARPU × avg sub months"
+          icon={DollarSign}
+        />
+        <KPI
+          label="NRR"
+          value={`${data.nrr}%`}
+          sub="net revenue retention"
+          icon={TrendingUp}
+          color={
+            data.nrr >= 100
+              ? 'text-emerald-500'
+              : data.nrr >= 90
+              ? 'text-amber-500'
+              : 'text-destructive'
+          }
+        />
+        {(() => {
+          const cac = monthlyMarketingSpend > 0 && data.newAgentsThisMonth > 0
+            ? Math.round(monthlyMarketingSpend / data.newAgentsThisMonth)
+            : null;
+          const ratio = cac && cac > 0 && data.ltv > 0 ? data.ltv / cac : null;
+          const ratioColor = ratio == null
+            ? 'text-muted-foreground'
+            : ratio >= 3
+            ? 'text-emerald-500'
+            : ratio >= 1
+            ? 'text-amber-500'
+            : 'text-destructive';
+          return (
+            <div className="rounded-2xl border border-border bg-card p-4 space-y-1">
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-muted-foreground font-medium">CAC (month)</p>
+                <DollarSign size={16} className="text-primary" />
+              </div>
+              {cac == null ? (
+                <p className="text-sm text-muted-foreground mt-1">Enter spend ↑</p>
+              ) : (
+                <>
+                  <p className="text-2xl font-bold text-foreground">${cac.toLocaleString()}</p>
+                  <p className={`text-[11px] font-medium ${ratioColor}`}>
+                    LTV:CAC {ratio != null ? `${ratio.toFixed(1)}x` : '—'}
+                  </p>
+                </>
+              )}
+            </div>
+          );
+        })()}
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card p-4 mb-6 flex items-end gap-3 flex-wrap">
+        <div className="flex-1 min-w-[200px]">
+          <label className="text-xs font-medium text-muted-foreground block mb-1">
+            Monthly marketing spend ($)
+          </label>
+          <input
+            type="number"
+            min={0}
+            value={monthlyMarketingSpend || ''}
+            onChange={(e) => {
+              const v = Number(e.target.value) || 0;
+              setMonthlyMarketingSpend(v);
+              try { window.localStorage.setItem('cc_marketing_spend', String(v)); } catch {}
+            }}
+            placeholder="e.g. 5000"
+            className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm"
+          />
+          <p className="text-[11px] text-muted-foreground mt-1">
+            Used to calculate CAC and LTV:CAC ratio. Saved locally.
+          </p>
+        </div>
+      </div>
+
+      {/* Revenue Forecast card */}
+      <div className="rounded-2xl border border-border bg-card p-4 mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-foreground">Revenue Forecast</h3>
+          <span className="text-[11px] text-muted-foreground">
+            Based on current {data.mrrGrowthPct ?? 5}% monthly growth rate
+          </span>
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          <div>
+            <p className="text-[11px] text-muted-foreground font-medium">3 months</p>
+            <p className="text-xl font-bold text-foreground">${data.forecast3m.toLocaleString()}</p>
+          </div>
+          <div>
+            <p className="text-[11px] text-muted-foreground font-medium">6 months</p>
+            <p className="text-xl font-bold text-foreground">${data.forecast6m.toLocaleString()}</p>
+          </div>
+          <div>
+            <p className="text-[11px] text-muted-foreground font-medium">12 months</p>
+            <p className="text-xl font-bold text-emerald-600">${data.forecast12m.toLocaleString()}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Cohort Retention */}
+      <SectionHead title="Cohort Retention" sub="Which months are retaining best" />
+      <div className="rounded-2xl border border-border bg-card overflow-hidden mb-6">
+        <table className="w-full text-xs">
+          <thead className="bg-secondary/50">
+            <tr className="text-left text-muted-foreground">
+              <th className="px-3 py-2 font-medium">Month</th>
+              <th className="px-3 py-2 font-medium">Signed Up</th>
+              <th className="px-3 py-2 font-medium">Still Active</th>
+              <th className="px-3 py-2 font-medium">Retention %</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.cohorts.map((c) => (
+              <tr key={c.month} className="border-t border-border">
+                <td className="px-3 py-2 font-medium text-foreground">{c.month}</td>
+                <td className="px-3 py-2 text-foreground">{c.signedUp}</td>
+                <td className="px-3 py-2 text-foreground">{c.stillActive}</td>
+                <td
+                  className={`px-3 py-2 font-medium ${
+                    c.retentionPct >= 70
+                      ? 'text-emerald-600'
+                      : c.retentionPct >= 40
+                      ? 'text-amber-500'
+                      : 'text-destructive'
+                  }`}
+                >
+                  {c.signedUp > 0 ? `${c.retentionPct}%` : '—'}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Broker Network */}
+      <SectionHead title="Broker Network" sub="Mortgage broker referral activity this month" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <KPI
+          label="Leads This Month"
+          value={data.brokerLeadsThisMonth}
+          icon={Users}
+          sub="referrals submitted"
+        />
+        <KPI
+          label="Settled This Month"
+          value={data.brokerSettlementsThisMonth}
+          icon={CheckCircle2}
+          color={data.brokerSettlementsThisMonth > 0 ? 'text-emerald-500' : 'text-muted-foreground'}
+        />
+        <KPI
+          label="Settlement Rate"
+          value={`${data.brokerSettlementRate}%`}
+          icon={Target}
+          color={
+            data.brokerSettlementRate >= 30
+              ? 'text-emerald-500'
+              : data.brokerSettlementRate >= 10
+              ? 'text-amber-500'
+              : 'text-muted-foreground'
+          }
+        />
+        <KPI
+          label="Platform Fees"
+          value={`$${Math.round(data.brokerPlatformFeesThisMonth).toLocaleString()}`}
+          icon={DollarSign}
+          sub="ListHQ revenue (settled)"
           color="text-emerald-500"
         />
       </div>

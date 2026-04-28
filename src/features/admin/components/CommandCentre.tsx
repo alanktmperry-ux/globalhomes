@@ -1259,6 +1259,191 @@ export default function CommandCentre() {
         />
       </div>
 
+      {/* Extended Business Health: Churn / LTV / NRR / CAC */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-4">
+        <KPI
+          label="Churn Rate"
+          value={`${data.churnRatePct.toFixed(1)}%`}
+          sub="this month"
+          icon={TrendingDown}
+          color={
+            data.churnRatePct > 5
+              ? 'text-destructive'
+              : data.churnRatePct >= 2
+              ? 'text-amber-500'
+              : 'text-emerald-500'
+          }
+        />
+        <KPI
+          label="Est. LTV"
+          value={`$${data.ltv.toLocaleString()}`}
+          sub="ARPU × avg sub months"
+          icon={DollarSign}
+        />
+        <KPI
+          label="NRR"
+          value={`${data.nrr}%`}
+          sub="net revenue retention"
+          icon={TrendingUp}
+          color={
+            data.nrr >= 100
+              ? 'text-emerald-500'
+              : data.nrr >= 90
+              ? 'text-amber-500'
+              : 'text-destructive'
+          }
+        />
+        {(() => {
+          const cac = monthlyMarketingSpend > 0 && data.newAgentsThisMonth > 0
+            ? Math.round(monthlyMarketingSpend / data.newAgentsThisMonth)
+            : null;
+          const ratio = cac && cac > 0 && data.ltv > 0 ? data.ltv / cac : null;
+          const ratioColor = ratio == null
+            ? 'text-muted-foreground'
+            : ratio >= 3
+            ? 'text-emerald-500'
+            : ratio >= 1
+            ? 'text-amber-500'
+            : 'text-destructive';
+          return (
+            <div className="rounded-2xl border border-border bg-card p-4 space-y-1">
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-muted-foreground font-medium">CAC (month)</p>
+                <DollarSign size={16} className="text-primary" />
+              </div>
+              {cac == null ? (
+                <p className="text-sm text-muted-foreground mt-1">Enter spend ↑</p>
+              ) : (
+                <>
+                  <p className="text-2xl font-bold text-foreground">${cac.toLocaleString()}</p>
+                  <p className={`text-[11px] font-medium ${ratioColor}`}>
+                    LTV:CAC {ratio != null ? `${ratio.toFixed(1)}x` : '—'}
+                  </p>
+                </>
+              )}
+            </div>
+          );
+        })()}
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card p-4 mb-6 flex items-end gap-3 flex-wrap">
+        <div className="flex-1 min-w-[200px]">
+          <label className="text-xs font-medium text-muted-foreground block mb-1">
+            Monthly marketing spend ($)
+          </label>
+          <input
+            type="number"
+            min={0}
+            value={monthlyMarketingSpend || ''}
+            onChange={(e) => {
+              const v = Number(e.target.value) || 0;
+              setMonthlyMarketingSpend(v);
+              try { window.localStorage.setItem('cc_marketing_spend', String(v)); } catch {}
+            }}
+            placeholder="e.g. 5000"
+            className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm"
+          />
+          <p className="text-[11px] text-muted-foreground mt-1">
+            Used to calculate CAC and LTV:CAC ratio. Saved locally.
+          </p>
+        </div>
+      </div>
+
+      {/* Revenue Forecast card */}
+      <div className="rounded-2xl border border-border bg-card p-4 mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-foreground">Revenue Forecast</h3>
+          <span className="text-[11px] text-muted-foreground">
+            Based on current {data.mrrGrowthPct ?? 5}% monthly growth rate
+          </span>
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          <div>
+            <p className="text-[11px] text-muted-foreground font-medium">3 months</p>
+            <p className="text-xl font-bold text-foreground">${data.forecast3m.toLocaleString()}</p>
+          </div>
+          <div>
+            <p className="text-[11px] text-muted-foreground font-medium">6 months</p>
+            <p className="text-xl font-bold text-foreground">${data.forecast6m.toLocaleString()}</p>
+          </div>
+          <div>
+            <p className="text-[11px] text-muted-foreground font-medium">12 months</p>
+            <p className="text-xl font-bold text-emerald-600">${data.forecast12m.toLocaleString()}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Cohort Retention */}
+      <SectionHead title="Cohort Retention" sub="Which months are retaining best" />
+      <div className="rounded-2xl border border-border bg-card overflow-hidden mb-6">
+        <table className="w-full text-xs">
+          <thead className="bg-secondary/50">
+            <tr className="text-left text-muted-foreground">
+              <th className="px-3 py-2 font-medium">Month</th>
+              <th className="px-3 py-2 font-medium">Signed Up</th>
+              <th className="px-3 py-2 font-medium">Still Active</th>
+              <th className="px-3 py-2 font-medium">Retention %</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.cohorts.map((c) => (
+              <tr key={c.month} className="border-t border-border">
+                <td className="px-3 py-2 font-medium text-foreground">{c.month}</td>
+                <td className="px-3 py-2 text-foreground">{c.signedUp}</td>
+                <td className="px-3 py-2 text-foreground">{c.stillActive}</td>
+                <td
+                  className={`px-3 py-2 font-medium ${
+                    c.retentionPct >= 70
+                      ? 'text-emerald-600'
+                      : c.retentionPct >= 40
+                      ? 'text-amber-500'
+                      : 'text-destructive'
+                  }`}
+                >
+                  {c.signedUp > 0 ? `${c.retentionPct}%` : '—'}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Broker Network */}
+      <SectionHead title="Broker Network" sub="Mortgage broker referral activity this month" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <KPI
+          label="Leads This Month"
+          value={data.brokerLeadsThisMonth}
+          icon={Users}
+          sub="referrals submitted"
+        />
+        <KPI
+          label="Settled This Month"
+          value={data.brokerSettlementsThisMonth}
+          icon={CheckCircle2}
+          color={data.brokerSettlementsThisMonth > 0 ? 'text-emerald-500' : 'text-muted-foreground'}
+        />
+        <KPI
+          label="Settlement Rate"
+          value={`${data.brokerSettlementRate}%`}
+          icon={Target}
+          color={
+            data.brokerSettlementRate >= 30
+              ? 'text-emerald-500'
+              : data.brokerSettlementRate >= 10
+              ? 'text-amber-500'
+              : 'text-muted-foreground'
+          }
+        />
+        <KPI
+          label="Platform Fees"
+          value={`$${Math.round(data.brokerPlatformFeesThisMonth).toLocaleString()}`}
+          icon={DollarSign}
+          sub="ListHQ revenue (settled)"
+          color="text-emerald-500"
+        />
+      </div>
+
       </>)}
 
       <SectionHead title="Buyers pulse" sub="Real-time demand from property seekers" />

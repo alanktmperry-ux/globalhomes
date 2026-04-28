@@ -45,23 +45,34 @@ const SALES_NAV: NavItem[] = [
   { title: 'Off-Market Network', url: '/dashboard/network', icon: Users },
   { title: 'Opportunities', url: '/dashboard/opportunities', icon: Target },
   { title: 'Exclusive Program', url: '/exclusive/listings', icon: Star },
-];
-
-const PROPERTY_NAV: NavItem[] = [
-  { title: 'Arrears', url: '/dashboard/rent-roll?filter=arrears', icon: AlertCircle, badgeKey: 'arrears', alertWhenBadge: true },
-  { title: 'Renewals Due', url: '/dashboard/rent-roll?filter=renewals', icon: RefreshCw, badgeKey: 'renewals', alertWhenBadge: true },
-  { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home },
-  { title: 'Maintenance', url: '/dashboard/maintenance', icon: Wrench },
-  { title: 'Vacancies', url: '/dashboard/vacancies', icon: Building2 },
-  { title: 'Inspections', url: '/dashboard/inspection-mode', icon: CalendarDays },
-  { title: 'Rental Applications', url: '/dashboard/rental-applications', icon: ClipboardList },
-  { title: 'Suppliers', url: '/dashboard/suppliers', icon: Wrench },
-  { title: 'Statements', url: '/dashboard/statements', icon: Receipt },
-  { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
-  { title: 'Automation', url: '/dashboard/automation', icon: Mail },
-  { title: 'Vacancy KPIs', url: '/dashboard/vacancy-kpi', icon: Activity },
   { title: 'Open Homes', url: '/dashboard/open-homes', icon: CalendarDays },
   { title: 'Settlement', url: '/dashboard/settlements', icon: PartyPopper },
+];
+
+const PROPERTY_NAV_URGENT: NavItem[] = [
+  { title: 'Arrears', url: '/dashboard/rent-roll?filter=arrears', icon: AlertCircle, badgeKey: 'arrears', alertWhenBadge: true },
+  { title: 'Renewals Due', url: '/dashboard/rent-roll?filter=renewals', icon: RefreshCw, badgeKey: 'renewals', alertWhenBadge: true },
+];
+
+const PROPERTY_NAV_TENANCY: NavItem[] = [
+  { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home },
+  { title: 'Rental Applications', url: '/dashboard/rental-applications', icon: ClipboardList },
+  { title: 'Vacancies', url: '/dashboard/vacancies', icon: Building2 },
+  { title: 'Vacancy KPIs', url: '/dashboard/vacancy-kpi', icon: Activity },
+];
+
+const PROPERTY_NAV_OPERATIONS: NavItem[] = [
+  { title: 'Maintenance', url: '/dashboard/maintenance', icon: Wrench },
+  { title: 'Routine Inspections', url: '/dashboard/pm-inspections', icon: CalendarDays },
+  { title: 'Suppliers', url: '/dashboard/suppliers', icon: Wrench },
+  { title: 'Key Register', url: '/dashboard/keys', icon: Scale },
+];
+
+const PROPERTY_NAV_FINANCE: NavItem[] = [
+  { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
+  { title: 'Statements', url: '/dashboard/statements', icon: Receipt },
+  { title: 'Automation', url: '/dashboard/automation', icon: Mail },
+  { title: 'Partner Access', url: '/dashboard/partner-access', icon: Handshake },
 ];
 
 const INSIGHTS_NAV: NavItem[] = [

@@ -205,9 +205,24 @@ const InspectionReportPage = () => {
     if (error) { toast.error('Failed to add'); return; }
     if (data) {
       setRooms(prev => prev.map(r => r.id === maintenanceForm.roomId ? { ...r, maintenance: [...r.maintenance, data as any] } : r));
+      // Auto-create a maintenance job
+      const room = rooms.find(r => r.id === maintenanceForm.roomId);
+      const roomLabel = room ? ` (${room.room_name})` : '';
+      const inspType = inspection.inspection_type.charAt(0).toUpperCase() + inspection.inspection_type.slice(1);
+      await supabase.from('maintenance_jobs').insert({
+        agent_id: inspection.agent_id,
+        property_id: inspection.property_id,
+        tenancy_id: inspection.tenancy_id,
+        title: `${maintenanceForm.description}${roomLabel}`,
+        description: `Flagged during ${inspType} condition report on ${format(new Date(), 'dd MMM yyyy')}`,
+        category: 'general',
+        priority: maintenanceForm.priority === 'urgent' ? 'urgent' :
+                  maintenanceForm.priority === 'normal' ? 'routine' : 'low',
+        status: 'new',
+      } as any);
     }
     setMaintenanceForm(null);
-    toast.success('Maintenance item flagged');
+    toast.success('Maintenance item flagged and job created');
   };
 
   const allRoomsRated = rooms.length > 0 && rooms.every(r => r.condition !== null);

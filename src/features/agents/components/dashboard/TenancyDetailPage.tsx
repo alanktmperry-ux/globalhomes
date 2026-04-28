@@ -768,6 +768,113 @@ const TenancyDetailPage = () => {
               </div>
             )}
 
+            {/* Lease-end exit inspection banner */}
+            {(() => {
+              if (!tenancy.lease_end) return null;
+              const days = Math.floor((parseISO(tenancy.lease_end).getTime() - Date.now()) / 86400000);
+              if (days < 0 || days > 60) return null;
+              const hasExit = inspections.some(i => i.inspection_type === 'exit' && i.status !== 'cancelled');
+              if (hasExit) return null;
+              return (
+                <div className="mt-4 flex items-start gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                  <span className="text-amber-600 mt-0.5">⚠️</span>
+                  <div className="flex-1 flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-xs text-amber-800">
+                      Lease ends {format(parseISO(tenancy.lease_end), 'dd MMM yyyy')} — exit condition report not yet scheduled.
+                    </p>
+                    <Button size="sm" onClick={scheduleExitInspectionFromTenancy}>Schedule Exit Inspection</Button>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Inspection History */}
+            <div className="mt-4">
+              <Card>
+                <CardContent className="p-5 space-y-3">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <h3 className="text-sm font-semibold">Inspection History</h3>
+                    {inspections.length > 0 && (() => {
+                      const e = inspections.filter(i => i.inspection_type === 'entry').length;
+                      const r = inspections.filter(i => i.inspection_type === 'routine').length;
+                      const x = inspections.filter(i => i.inspection_type === 'exit').length;
+                      return (
+                        <p className="text-xs text-muted-foreground">
+                          {inspections.length} recorded — {e} entry · {r} routine · {x} exit
+                        </p>
+                      );
+                    })()}
+                  </div>
+
+                  {inspections.length === 0 ? (
+                    <div className="py-6 text-center space-y-2">
+                      <p className="text-sm text-muted-foreground">No inspections recorded yet</p>
+                      <Button size="sm" variant="outline" onClick={() => navigate('/dashboard/pm-inspections')}>
+                        Schedule Inspection
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto -mx-5 sm:mx-0">
+                      <table className="w-full text-xs min-w-[640px]">
+                        <thead>
+                          <tr className="border-b border-border text-muted-foreground">
+                            <th className="text-left font-medium py-2 px-2">Type</th>
+                            <th className="text-left font-medium py-2 px-2">Status</th>
+                            <th className="text-left font-medium py-2 px-2">Date</th>
+                            <th className="text-left font-medium py-2 px-2">Notes</th>
+                            <th className="text-right font-medium py-2 px-2">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {inspections.map(i => {
+                            const typeColor: Record<string, string> = {
+                              entry: 'bg-blue-500/15 text-blue-700',
+                              routine: 'bg-violet-500/15 text-violet-700',
+                              exit: 'bg-orange-500/15 text-orange-700',
+                            };
+                            const statusColor: Record<string, string> = {
+                              scheduled: 'bg-blue-500/15 text-blue-700',
+                              in_progress: 'bg-amber-500/15 text-amber-700',
+                              completed: 'bg-emerald-500/15 text-emerald-700',
+                              cancelled: 'bg-muted text-muted-foreground',
+                            };
+                            const isCompleted = i.status === 'completed';
+                            const dateStr = isCompleted && i.conducted_date
+                              ? `Conducted ${format(parseISO(i.conducted_date), 'dd MMM yyyy')}`
+                              : `Scheduled ${format(parseISO(i.scheduled_date), 'dd MMM yyyy')}`;
+                            return (
+                              <tr key={i.id} className="border-b border-border/50">
+                                <td className="py-2 px-2">
+                                  <Badge className={cn('border-0 capitalize text-[10px]', typeColor[i.inspection_type] || 'bg-muted')}>{i.inspection_type}</Badge>
+                                </td>
+                                <td className="py-2 px-2">
+                                  <Badge className={cn('border-0 capitalize text-[10px]', statusColor[i.status] || 'bg-muted')}>{i.status.replace('_', ' ')}</Badge>
+                                </td>
+                                <td className="py-2 px-2">{dateStr}</td>
+                                <td className="py-2 px-2 text-muted-foreground truncate max-w-[200px]">
+                                  {i.overall_notes ? (i.overall_notes.length > 60 ? i.overall_notes.slice(0, 60) + '…' : i.overall_notes) : '—'}
+                                </td>
+                                <td className="py-2 px-2 text-right whitespace-nowrap">
+                                  <Button size="sm" variant="outline" className="h-7 text-xs mr-1" onClick={() => navigate(`/dashboard/inspection/${i.id}`)}>
+                                    Open Report
+                                  </Button>
+                                  {i.report_token && isCompleted && (
+                                    <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => copyInspectionLink(i.report_token!)}>
+                                      Share Link
+                                    </Button>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
             <div className="mt-4">
               <TenancyContactsPanel tenancyId={tenancy.id} />
             </div>

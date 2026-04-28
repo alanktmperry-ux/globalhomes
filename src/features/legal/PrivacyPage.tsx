@@ -82,18 +82,22 @@ const PrivacyPage = () => {
               <h2>4. International Data Transfers</h2>
               <p>ListHQ serves users globally. Your personal information is hosted and processed by the following providers:</p>
               <ul>
-                <li><strong>Primary database, authentication and file storage (Supabase):</strong> Singapore — AWS region <code>ap-southeast-1</code>.</li>
-                <li>Resend (transactional email) — USA.</li>
-                <li>Stripe (payments) — USA.</li>
-                <li>Google (maps, QR code generation, OAuth sign-in) — USA.</li>
+                <li><strong>Primary database, authentication and file storage (Supabase):</strong> Singapore — AWS region <code>ap-southeast-1</code>. We plan to migrate this primary store to Sydney, Australia (AWS <code>ap-southeast-2</code>) within the next 6 months.</li>
+                <li>Resend (transactional email delivery) — USA.</li>
+                <li>Stripe (payment processing) — USA.</li>
+                <li>Google (Maps Platform, OAuth sign-in, QR code rendering) — USA.</li>
                 <li>PostHog (product analytics) — European Union.</li>
+                <li>Sentry (application error monitoring) — USA.</li>
+                <li>hCaptcha (anti-abuse / bot detection on sign-in and signup) — USA.</li>
+                <li>Lovable AI Gateway (AI features such as listing translation, voice-to-listing, AI buyer concierge, search query parsing) — routes to model providers including Google (USA / EU) and OpenAI (USA).</li>
               </ul>
 
               <h3>4.1 Disclosure of personal information overseas (APP 8)</h3>
-              <p>Because our primary database is hosted in Singapore, your personal information is disclosed to an overseas recipient for the purposes of Australian Privacy Principle 8 (<em>cross-border disclosure of personal information</em>).</p>
-              <p>Singapore is bound by the <strong>Personal Data Protection Act 2012 (PDPA)</strong>, which the Office of the Australian Information Commissioner and Australian privacy practitioners generally regard as providing protections substantially similar to the Australian Privacy Principles. The PDPA imposes obligations on organisations in relation to consent, purpose limitation, notification, access and correction, accuracy, protection (security), retention limitation, and transfer of personal data, and is enforced by the Personal Data Protection Commission of Singapore.</p>
-              <p>By creating a ListHQ account you acknowledge that your personal information will be stored and processed on servers located in Singapore. You may withdraw your account at any time as described in section 6 (<em>Your Rights</em>); subject to the legal retention periods in section 5, we will delete or de-identify your personal information on request.</p>
-              <p>Where information is also disclosed to providers in the USA or EU (as listed above), those transfers are made in reliance on the recipient's contractual undertakings, applicable Standard Contractual Clauses, and/or the relevant provider's published data protection terms.</p>
+              <p>Because some of the providers listed above (in particular our primary database, hosted in Singapore) are located outside Australia, your personal information is disclosed to overseas recipients for the purposes of Australian Privacy Principle 8 (<em>cross-border disclosure of personal information</em>).</p>
+              <p><strong>Primary basis — your consent (APP 8.2(b)).</strong> When you create a ListHQ account you are asked to acknowledge that your personal information will be stored on servers located in Singapore. By providing that acknowledgement, you consent to the disclosure of your personal information to ListHQ's overseas service providers on the basis that APP 8.1 will not apply to that disclosure. This consent is informed and may be withdrawn at any time by closing your account or contacting our Privacy Officer (see section 11). If you withdraw consent, we will, subject to the legal retention periods in section 5, delete or de-identify your personal information.</p>
+              <p><strong>Supporting basis — comparable overseas protection.</strong> We also note that Singapore is bound by the <em>Personal Data Protection Act 2012 (PDPA)</em>, which imposes obligations broadly comparable to the Australian Privacy Principles in relation to consent, purpose limitation, notification, access and correction, accuracy, security, retention limitation and cross-border transfer, and is enforced by the Personal Data Protection Commission of Singapore. ListHQ does not rely on the PDPA alone as the basis for offshore disclosure under APP 8 — the primary basis remains your consent above.</p>
+              <p><strong>Other overseas providers (USA / EU).</strong> Where information is disclosed to providers in the United States or European Union, those transfers are made in reliance on each provider's contractual undertakings (including Standard Contractual Clauses where applicable) and their published data protection terms, and remain covered by the consent described above.</p>
+              <p><strong>Accountability.</strong> Notwithstanding the above, ListHQ remains accountable to you under the <em>Privacy Act 1988</em> (Cth) for how your personal information is handled and will respond to access, correction and complaint requests in accordance with sections 6 and 11 of this policy.</p>
             </section>
 
             <section id="retention">

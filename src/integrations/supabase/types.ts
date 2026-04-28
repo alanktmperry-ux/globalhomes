@@ -7392,6 +7392,105 @@ export type Database = {
           },
         ]
       }
+      pm_documents: {
+        Row: {
+          agent_id: string
+          category: string
+          file_name: string
+          file_path: string
+          file_size_bytes: number | null
+          id: string
+          notes: string | null
+          property_id: string | null
+          tenancy_id: string | null
+          title: string
+          uploaded_at: string
+        }
+        Insert: {
+          agent_id: string
+          category: string
+          file_name: string
+          file_path: string
+          file_size_bytes?: number | null
+          id?: string
+          notes?: string | null
+          property_id?: string | null
+          tenancy_id?: string | null
+          title: string
+          uploaded_at?: string
+        }
+        Update: {
+          agent_id?: string
+          category?: string
+          file_name?: string
+          file_path?: string
+          file_size_bytes?: number | null
+          id?: string
+          notes?: string | null
+          property_id?: string | null
+          tenancy_id?: string | null
+          title?: string
+          uploaded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pm_documents_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pm_documents_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pm_documents_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pm_documents_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "pm_documents_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pm_documents_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pm_documents_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pm_documents_tenancy_id_fkey"
+            columns: ["tenancy_id"]
+            isOneToOne: false
+            referencedRelation: "tenancies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pre_auction_offers: {
         Row: {
           accepted_at: string | null

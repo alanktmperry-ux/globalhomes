@@ -2422,6 +2422,7 @@ export type Database = {
           acl_number: string
           agency_id: string | null
           agency_role: string
+          approval_status: string | null
           auth_user_id: string | null
           calendar_url: string | null
           cap_expires_at: string | null
@@ -2441,12 +2442,17 @@ export type Database = {
           name: string
           phone: string | null
           photo_url: string | null
+          rejection_reason: string | null
+          specialties: string[] | null
+          state: string | null
+          suburb: string | null
           tagline: string | null
         }
         Insert: {
           acl_number: string
           agency_id?: string | null
           agency_role?: string
+          approval_status?: string | null
           auth_user_id?: string | null
           calendar_url?: string | null
           cap_expires_at?: string | null
@@ -2466,12 +2472,17 @@ export type Database = {
           name: string
           phone?: string | null
           photo_url?: string | null
+          rejection_reason?: string | null
+          specialties?: string[] | null
+          state?: string | null
+          suburb?: string | null
           tagline?: string | null
         }
         Update: {
           acl_number?: string
           agency_id?: string | null
           agency_role?: string
+          approval_status?: string | null
           auth_user_id?: string | null
           calendar_url?: string | null
           cap_expires_at?: string | null
@@ -2491,6 +2502,10 @@ export type Database = {
           name?: string
           phone?: string | null
           photo_url?: string | null
+          rejection_reason?: string | null
+          specialties?: string[] | null
+          state?: string | null
+          suburb?: string | null
           tagline?: string | null
         }
         Relationships: [

@@ -10892,6 +10892,53 @@ export type Database = {
           },
         ]
       }
+      tenancy_contacts: {
+        Row: {
+          contact_type: string
+          created_at: string
+          date_of_birth: string | null
+          email: string | null
+          id: string
+          id_verified: boolean
+          name: string
+          notes: string | null
+          phone: string | null
+          tenancy_id: string
+        }
+        Insert: {
+          contact_type: string
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string | null
+          id?: string
+          id_verified?: boolean
+          name: string
+          notes?: string | null
+          phone?: string | null
+          tenancy_id: string
+        }
+        Update: {
+          contact_type?: string
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string | null
+          id?: string
+          id_verified?: boolean
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          tenancy_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenancy_contacts_tenancy_id_fkey"
+            columns: ["tenancy_id"]
+            isOneToOne: false
+            referencedRelation: "tenancies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenant_documents: {
         Row: {
           document_type: string

@@ -126,14 +126,18 @@ const BondClaimsPage = () => {
 
     const { data: agentRow } = await supabase
       .from('agents')
-      .select('id, name, agency_name')
+      .select('id, name, agency_id')
       .eq('user_id', user.id)
       .maybeSingle();
 
     if (!agentRow) { setLoading(false); return; }
     setAgentId(agentRow.id);
     setAgentName(agentRow.name || '');
-    setAgencyName((agentRow as any).agency_name || '');
+
+    if ((agentRow as any).agency_id) {
+      const { data: ag } = await supabase.from('agencies').select('name').eq('id', (agentRow as any).agency_id).maybeSingle();
+      if (ag?.name) setAgencyName(ag.name);
+    }
 
     const [claimsRes, tenanciesRes] = await Promise.all([
       supabase

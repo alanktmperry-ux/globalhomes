@@ -234,6 +234,7 @@ const AgentDashboardSidebar = () => {
     renewals: renewalsCount > 0 ? String(renewalsCount) : '',
     buyerMatches: buyerMatchesCount > 0 ? String(buyerMatchesCount) : '',
     disputes: disputeCount > 0 ? String(disputeCount) : '',
+    smokeAlarms: smokeAlarmOverdue > 0 ? String(smokeAlarmOverdue) : '',
   };
 
   const ACCOUNT_NAV: NavItem[] = [

@@ -6,7 +6,7 @@ const sections = [
   { id: 'introduction', title: '1. Introduction' },
   { id: 'collect', title: '2. What Information We Collect' },
   { id: 'use', title: '3. How We Use Your Information' },
-  { id: 'transfers', title: '4. International Data Transfers' },
+  { id: 'transfers', title: '4. International Data Transfers (incl. APP 8)' },
   { id: 'retention', title: '5. Data Retention' },
   { id: 'rights', title: '6. Your Rights' },
   { id: 'cookies', title: '7. Cookies' },
@@ -33,7 +33,7 @@ const PrivacyPage = () => {
       <main className="bg-background">
         <article className="max-w-3xl mx-auto px-4 py-12 md:py-16">
           <h1 className="font-display text-3xl font-extrabold text-foreground mb-2">Privacy Policy</h1>
-          <p className="text-sm text-muted-foreground mb-6">Last updated: April 2026</p>
+          <p className="text-sm text-muted-foreground mb-6">Last updated: 28 April 2026</p>
 
           <nav className="bg-muted/40 border border-border rounded-lg p-4 mb-10">
             <p className="text-sm font-semibold text-foreground mb-3">Contents</p>

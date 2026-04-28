@@ -23,6 +23,7 @@ import { toast } from 'sonner';
 import DashboardHeader from './DashboardHeader';
 import TenantPortalCard from './TenantPortalCard';
 import OwnerPortalCard from './OwnerPortalCard';
+import TenancyContactsPanel from './TenancyContactsPanel';
 import { format, parseISO, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { cn } from '@/shared/lib/utils';
 

@@ -71,6 +71,7 @@ const PROPERTY_NAV_OPERATIONS: NavItem[] = [
 
 const PROPERTY_NAV_FINANCE: NavItem[] = [
   { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
+  { title: 'Bond Claims', url: '/dashboard/bond-claims', icon: Scale },
   { title: 'Statements', url: '/dashboard/statements', icon: Receipt },
   { title: 'Documents', url: '/dashboard/property-documents', icon: FileText },
   { title: 'Automation', url: '/dashboard/automation', icon: Mail },

@@ -99,6 +99,8 @@ const InspectionReportPage = () => {
   const [finaliseTenantEmail, setFinaliseTenantEmail] = useState('');
   const [finalising, setFinalising] = useState(false);
   const [maintenanceForm, setMaintenanceForm] = useState<{ roomId: string; description: string; priority: string } | null>(null);
+  const [entryReport, setEntryReport] = useState<EntryReportData | null>(null);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const isReadOnly = inspection?.status === 'completed';

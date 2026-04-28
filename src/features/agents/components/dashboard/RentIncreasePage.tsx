@@ -517,7 +517,7 @@ ${agencyName || ''}`.trim();
           {noticeFor && (
             <Textarea
               readOnly
-              value={buildNoticeText(noticeFor.row, noticeFor.increase)}
+              value={buildNoticeText(noticeFor.row, noticeFor.increase, noticeFor.toLine)}
               rows={20}
               className="font-mono text-xs"
             />

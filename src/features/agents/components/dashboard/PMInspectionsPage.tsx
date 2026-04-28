@@ -270,6 +270,32 @@ export default function PMInspectionsPage() {
     return out;
   }, [activeTenancies, inspections]);
 
+  // Vacating soon — tenancies ending within 60 days with no exit inspection yet
+  const vacatingSoon = useMemo(() => {
+    const today = new Date();
+    const todayStr = today.toISOString().slice(0, 10);
+    const sixty = addDays(today, 60).toISOString().slice(0, 10);
+    return activeTenancies
+      .filter(t => {
+        if (!t.lease_end) return false;
+        if (t.lease_end < todayStr || t.lease_end > sixty) return false;
+        const hasExit = inspections.some(i =>
+          i.tenancy_id === t.id &&
+          i.inspection_type === 'exit' &&
+          (i.status === 'scheduled' || i.status === 'in_progress' || i.status === 'completed')
+        );
+        return !hasExit;
+      })
+      .map(t => ({
+        tenancyId: t.id,
+        tenantName: t.tenant_name || 'Tenant',
+        address: [t.properties?.address, t.properties?.suburb].filter(Boolean).join(', ') || '—',
+        leaseEnd: t.lease_end as string,
+        daysToEnd: differenceInDays(parseISO(t.lease_end as string), today),
+      }))
+      .sort((a, b) => a.daysToEnd - b.daysToEnd);
+  }, [activeTenancies, inspections]);
+
   // Disputed (unresolved) inspections
   const disputed = useMemo(() => {
     return inspections.filter(i => !!i.tenant_disputed_at && !i.dispute_resolved_at);

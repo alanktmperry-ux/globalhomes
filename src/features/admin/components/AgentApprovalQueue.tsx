@@ -76,7 +76,7 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
 
     setActionLoading(agent.id);
     const { error } = await (supabase.from('agents') as any)
-      .update({ approval_status: 'approved' })
+      .update({ approval_status: 'approved', is_approved: true })
       .eq('id', agent.id);
 
     if (error) {
@@ -107,7 +107,7 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
     }
     setActionLoading(agent.id);
     const { error } = await (supabase.from('agents') as any)
-      .update({ approval_status: 'rejected' })
+      .update({ approval_status: 'rejected', is_approved: false })
       .eq('id', agent.id);
 
     if (error) {
@@ -151,7 +151,7 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
         )}
       </div>
       <p className="text-sm text-muted-foreground -mt-3">
-        Agents are auto-approved on email verification. Use this view to monitor signups and suspend suspicious accounts.
+        Approve or reject agent applications. Approved agents gain access to their dashboard.
       </p>
 
       {agents.length === 0 ? (

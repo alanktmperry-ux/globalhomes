@@ -25,6 +25,7 @@ const AgentAuthPage = () => {
   const [loading, setLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [pendingSignIn, setPendingSignIn] = useState(false);
+  const [dataLocationConsent, setDataLocationConsent] = useState(false);
 
   // ── All useRef hooks ──
   const captchaRef = useRef<HCaptcha>(null);
@@ -100,6 +101,10 @@ const AgentAuthPage = () => {
 
   const handleEmailSubmit = async () => {
     if (!regEmail.trim()) return;
+    if (!dataLocationConsent) {
+      toast.error('Please acknowledge where your data is stored to continue.');
+      return;
+    }
     setEmailSubmitting(true);
     try {
       const cleaned = regEmail.trim().toLowerCase();
@@ -368,7 +373,19 @@ const AgentAuthPage = () => {
                     We'll send a confirmation link to this address before you continue.
                   </p>
                 </div>
-                <button type="submit" disabled={emailSubmitting} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
+                <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={dataLocationConsent}
+                    onChange={(e) => setDataLocationConsent(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-stone-300 text-primary focus:ring-primary cursor-pointer shrink-0"
+                    aria-describedby="agent-data-location-help"
+                  />
+                  <span id="agent-data-location-help" className="text-xs text-muted-foreground leading-relaxed">
+                    I understand my data is stored on secure servers in Singapore. ListHQ complies with the Australian Privacy Act 1988.
+                  </span>
+                </label>
+                <button type="submit" disabled={emailSubmitting || !dataLocationConsent} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
                   {emailSubmitting ? 'Sending confirmation...' : 'Continue — confirm my email'}
                 </button>
               </form>

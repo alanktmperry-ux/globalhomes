@@ -31,6 +31,7 @@ const SeekerAuthPage = () => {
   const [petsRequired, setPetsRequired] = useState(false);
   const [furnishedRequired, setFurnishedRequired] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [dataLocationConsent, setDataLocationConsent] = useState(false);
   const [pendingSignIn, setPendingSignIn] = useState(false);
   const captchaRef = useRef<HCaptchaType>(null);
   const hcaptchaSiteKey = import.meta.env.VITE_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001';
@@ -111,6 +112,10 @@ const SeekerAuthPage = () => {
     e.preventDefault();
     if (!email.trim()) {
       toast.error('Email required');
+      return;
+    }
+    if (!dataLocationConsent) {
+      toast.error('Please acknowledge where your data is stored to continue.');
       return;
     }
     setLoading(true);
@@ -483,7 +488,19 @@ const SeekerAuthPage = () => {
                       <p className="text-[12px] text-stone-400 leading-relaxed -mt-1">
                         We'll email you a 6-digit code to verify it's you. No password needed.
                       </p>
-                      <button type="submit" disabled={loading || !email.trim()} className={btnPrimary}>
+                      <label className="flex items-start gap-2.5 pt-1 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={dataLocationConsent}
+                          onChange={(e) => setDataLocationConsent(e.target.checked)}
+                          className="mt-0.5 h-4 w-4 rounded border-stone-300 text-primary focus:ring-primary cursor-pointer shrink-0"
+                          aria-describedby="seeker-data-location-help"
+                        />
+                        <span id="seeker-data-location-help" className="text-[12px] text-stone-500 leading-relaxed">
+                          I understand my data is stored on secure servers in Singapore. ListHQ complies with the Australian Privacy Act 1988.
+                        </span>
+                      </label>
+                      <button type="submit" disabled={loading || !email.trim() || !dataLocationConsent} className={btnPrimary}>
                         {loading ? 'Sending code…' : 'Send verification code'}
                       </button>
                     </form>

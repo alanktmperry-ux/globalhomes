@@ -39,6 +39,7 @@ import {
   formatAud,
   getLanguageMeta,
 } from "./brokerPortalUtils";
+import { buildInvoiceHtml } from "./invoiceTemplate";
 
 const CALENDLY_URL = (import.meta.env.VITE_CALENDLY_URL as string) || "";
 

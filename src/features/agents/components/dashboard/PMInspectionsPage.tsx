@@ -315,7 +315,7 @@ export default function PMInspectionsPage() {
     setSavingSchedule(true);
     const { error } = await supabase.from('property_inspections').insert({
       tenancy_id: scheduleForm.tenancy_id,
-      property_id: (t as any)?.properties?.id || null, // may be null if not selected; falls back below
+      property_id: t?.property_id,
       agent_id: agentId,
       inspection_type: scheduleForm.inspection_type,
       scheduled_date: format(scheduleForm.scheduled_date, 'yyyy-MM-dd'),

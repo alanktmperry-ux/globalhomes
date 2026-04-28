@@ -27,6 +27,7 @@ const MapErrorBoundary = lazy(() =>
 );
 import { VoiceSearchErrorBoundary } from '@/features/search/components/VoiceSearchErrorBoundary';
 import { useI18n } from '@/shared/lib/i18n';
+import { capture } from '@/shared/lib/posthog';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 // Lazy-load map — only initialize when needed
@@ -355,9 +356,7 @@ const Index = () => {
 
     // Track search
     try {
-      if (typeof window !== 'undefined' && (window as any).posthog?.capture) {
-        (window as any).posthog.capture('search_performed', { query, detected_language: lang, result_count: filteredProperties?.length ?? 0 });
-      }
+      capture('search_performed', { query, detected_language: lang, result_count: filteredProperties?.length ?? 0 });
     } catch {}
 
     // Fire-and-forget: log every search to voice_searches for AI Buyer Concierge pipeline

@@ -1,9 +1,16 @@
 import * as Sentry from "@sentry/react";
+import posthog from "posthog-js";
 import { createRoot } from "react-dom/client";
 import { ThemeProvider } from "next-themes";
 import { InvestorModeProvider } from "./context/InvestorModeContext";
 import App from "./App.tsx";
 import "./index.css";
+
+posthog.init('phc_t5GbsNYF3Qb7xPpxK8hMVKMv4GYvvrJwS5KNLKWBbvTk', {
+  api_host: 'https://eu.i.posthog.com',
+  capture_pageview: true,
+  capture_pageleave: true,
+});
 
 setTimeout(() => {
   Sentry.init({

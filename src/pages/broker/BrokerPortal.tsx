@@ -884,6 +884,13 @@ function LeadDetail({
               </Button>
             </div>
           )}
+          {lead.status === "settled" && (
+            <div className="mt-3">
+              <Button variant="outline" size="sm" onClick={handleDownloadInvoice}>
+                Download Invoice
+              </Button>
+            </div>
+          )}
         </section>
       )}
 

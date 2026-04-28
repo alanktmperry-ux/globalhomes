@@ -11097,6 +11097,81 @@ export type Database = {
           },
         ]
       }
+      tica_checks: {
+        Row: {
+          applicant_name: string
+          application_id: string
+          check_date: string
+          checked_by_agent_id: string | null
+          created_at: string | null
+          id: string
+          listing_types: string[] | null
+          notes: string | null
+          result: string
+          tica_reference: string | null
+        }
+        Insert: {
+          applicant_name: string
+          application_id: string
+          check_date?: string
+          checked_by_agent_id?: string | null
+          created_at?: string | null
+          id?: string
+          listing_types?: string[] | null
+          notes?: string | null
+          result?: string
+          tica_reference?: string | null
+        }
+        Update: {
+          applicant_name?: string
+          application_id?: string
+          check_date?: string
+          checked_by_agent_id?: string | null
+          created_at?: string | null
+          id?: string
+          listing_types?: string[] | null
+          notes?: string | null
+          result?: string
+          tica_reference?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tica_checks_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "rental_applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tica_checks_checked_by_agent_id_fkey"
+            columns: ["checked_by_agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tica_checks_checked_by_agent_id_fkey"
+            columns: ["checked_by_agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tica_checks_checked_by_agent_id_fkey"
+            columns: ["checked_by_agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tica_checks_checked_by_agent_id_fkey"
+            columns: ["checked_by_agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+        ]
+      }
       transactions: {
         Row: {
           agent_id: string | null

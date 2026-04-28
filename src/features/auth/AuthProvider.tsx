@@ -305,7 +305,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Post-login redirect: only approved agents land on dashboard
         const isAgentUser = filteredRoles.includes('agent') || filteredRoles.includes('admin');
         const path = window.location.pathname;
-        const onAuthPage = path === '/login' || path === '/auth' || path === '/agent-auth' || path === '/';
+        const onAuthPage = [
+          '/',
+          '/login',
+          '/auth',
+          '/agent-auth',
+          '/agents/login',
+          '/auth/confirm',
+          '/auth/callback',
+        ].includes(path);
         if (isAgentUser && onAuthPage && sessionStorage.getItem('post_login_redirected') !== '1') {
           sessionStorage.setItem('post_login_redirected', '1');
           const returnTo = new URLSearchParams(window.location.search).get('return_to');

@@ -108,6 +108,10 @@ export default function BrokerLogin() {
           Not a registered broker?{" "}
           <a href="mailto:alanperry@gmail.com" className="underline">Contact ListHQ</a>.
         </p>
+        <p className="text-xs text-muted-foreground text-center mt-2">
+          Want to join our broker network?{" "}
+          <a href="/broker/register" className="underline text-primary">Apply here</a>.
+        </p>
       </div>
     </div>
   );

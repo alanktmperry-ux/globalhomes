@@ -107,6 +107,16 @@ const TenancyDetailPage = () => {
   const [tenancy, setTenancy] = useState<Tenancy | null>(null);
   const [payments, setPayments] = useState<RentPayment[]>([]);
   const [jobs, setJobs] = useState<MaintenanceJob[]>([]);
+  const [inspections, setInspections] = useState<Array<{
+    id: string;
+    inspection_type: string;
+    scheduled_date: string;
+    conducted_date: string | null;
+    status: string;
+    finalised_at: string | null;
+    report_token: string | null;
+    overall_notes: string | null;
+  }>>([]);
   const [loading, setLoading] = useState(true);
   const [agentId, setAgentId] = useState<string | null>(null);
   const [agentInfo, setAgentInfo] = useState<{ name: string; agency: string | null; license_number: string | null } | null>(null);

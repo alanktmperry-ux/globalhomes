@@ -212,7 +212,7 @@ export default function PMInspectionsPage() {
         .order('scheduled_date', { ascending: true }),
       supabase
         .from('tenancies')
-        .select('id, tenant_name, lease_start, property_id, properties(address, suburb, state)')
+        .select('id, tenant_name, lease_start, lease_end, property_id, properties(address, suburb, state)')
         .eq('agent_id', aid)
         .eq('status', 'active'),
     ]);

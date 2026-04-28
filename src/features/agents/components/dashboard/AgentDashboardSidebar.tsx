@@ -456,7 +456,10 @@ const AgentDashboardSidebar = () => {
         </div>
 
         {renderGroup('Sales', SALES_NAV)}
-        {renderGroup('Property Management', PROPERTY_NAV)}
+        {renderGroup('Urgent', PROPERTY_NAV_URGENT)}
+        {renderGroup('Tenancy', PROPERTY_NAV_TENANCY)}
+        {renderGroup('Operations', PROPERTY_NAV_OPERATIONS)}
+        {renderGroup('PM Finance', PROPERTY_NAV_FINANCE)}
         {renderGroup('Insights', INSIGHTS_NAV)}
         {(isPrincipal || isAdmin) && renderGroup('Principal', PRINCIPAL_NAV)}
         {renderGroup('Account', ACCOUNT_NAV)}

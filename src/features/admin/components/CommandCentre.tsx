@@ -635,6 +635,16 @@ export default function CommandCentre() {
         totalDemoUsers: demoUsersList.length,
         pendingPartners: pendingPartnersCount,
         recentUsers: recentUsersList,
+        ltv,
+        nrr,
+        forecast3m,
+        forecast6m,
+        forecast12m,
+        cohorts,
+        brokerLeadsThisMonth,
+        brokerSettlementsThisMonth,
+        brokerSettlementRate,
+        brokerPlatformFeesThisMonth,
         fetchedAt: new Date().toISOString(),
       });
     } finally {

@@ -585,6 +585,66 @@ ${agencyName || ''}`.trim();
               )}
             </CardContent>
           </Card>
+        ) : tab === 'disputes' ? (
+          <Card>
+            <CardContent className="p-0">
+              {disputed.length === 0 ? (
+                <div className="py-12 text-center text-muted-foreground text-sm">
+                  <CheckCircle2 className="mx-auto mb-2 text-emerald-600" size={28} />
+                  No unresolved tenant disputes.
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Property</TableHead>
+                      <TableHead>Tenant</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Inspection Date</TableHead>
+                      <TableHead>Disputed On</TableHead>
+                      <TableHead>Dispute Notes</TableHead>
+                      <TableHead className="text-right">Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {disputed.map(i => {
+                      const propAddr = [i.tenancies?.properties?.address, i.tenancies?.properties?.suburb].filter(Boolean).join(', ');
+                      const fullNotes = i.tenant_dispute_notes || '';
+                      const truncated = fullNotes.length > 80 ? `${fullNotes.slice(0, 80)}…` : fullNotes;
+                      return (
+                        <TableRow key={i.id}>
+                          <TableCell className="font-medium text-sm">{propAddr || '—'}</TableCell>
+                          <TableCell className="text-sm">{i.tenancies?.tenant_name || '—'}</TableCell>
+                          <TableCell>
+                            <Badge className={cn(TYPE_BADGE[i.inspection_type], 'text-[10px]')}>
+                              {TYPE_LABEL[i.inspection_type]}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-sm">
+                            {format(parseISO(i.conducted_date || i.scheduled_date), 'd MMM yyyy')}
+                          </TableCell>
+                          <TableCell className="text-xs">
+                            {i.tenant_disputed_at ? format(parseISO(i.tenant_disputed_at), 'd MMM yyyy') : '—'}
+                          </TableCell>
+                          <TableCell className="text-xs text-muted-foreground max-w-[280px]" title={fullNotes || undefined}>
+                            {truncated || '—'}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              size="sm"
+                              onClick={() => { setResolveFor(i); setResolveNotes(''); }}
+                            >
+                              <CheckCircle2 size={12} className="mr-1" /> Mark Resolved
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
         ) : (
           <Card>
             <CardContent className="p-0">

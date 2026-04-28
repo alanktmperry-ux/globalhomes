@@ -535,8 +535,8 @@ ${agencyName || ''}`.trim();
                         <TableCell className="text-xs">{s.state || '—'}</TableCell>
                         <TableCell className="text-xs text-muted-foreground">{s.reason}</TableCell>
                         <TableCell className="text-right">
-                          <Button size="sm" onClick={() => openSchedule(s.tenancyId)}>
-                            Schedule Now
+                          <Button size="sm" onClick={() => scheduleAndStartFromSuggestion(s)}>
+                            Schedule & Start Report
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -613,14 +613,19 @@ ${agencyName || ''}`.trim();
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end flex-wrap gap-1">
-                              {i.status === 'scheduled' && !i.notice_sent_at && (
-                                <Button size="sm" variant="ghost" onClick={() => setNoticeFor(i)}>
-                                  <Mail size={12} className="mr-1" /> Notice
+                              {i.status === 'scheduled' && (
+                                <Button size="sm" onClick={() => navigate(`/dashboard/inspection/${i.id}`)}>
+                                  <PlayCircle size={12} className="mr-1" /> Start Report
                                 </Button>
                               )}
-                              {i.status === 'scheduled' && (
-                                <Button size="sm" variant="outline" onClick={() => openComplete(i)}>
-                                  <CheckCircle2 size={12} className="mr-1" /> Complete
+                              {i.status === 'completed' && (
+                                <Button size="sm" variant="outline" onClick={() => navigate(`/dashboard/inspection/${i.id}`)}>
+                                  <FileText size={12} className="mr-1" /> View Report
+                                </Button>
+                              )}
+                              {i.status === 'scheduled' && !i.notice_sent_at && (
+                                <Button size="sm" variant="ghost" onClick={() => setNoticeFor(i)}>
+                                  <Mail size={12} className="mr-1" /> Send Notice
                                 </Button>
                               )}
                               {i.status === 'scheduled' && (

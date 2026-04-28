@@ -114,6 +114,10 @@ const SeekerAuthPage = () => {
       toast.error('Email required');
       return;
     }
+    if (!dataLocationConsent) {
+      toast.error('Please acknowledge where your data is stored to continue.');
+      return;
+    }
     setLoading(true);
     try {
       const { error } = await supabase.auth.signInWithOtp({

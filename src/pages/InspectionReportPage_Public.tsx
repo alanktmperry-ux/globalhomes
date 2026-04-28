@@ -184,6 +184,33 @@ export default function InspectionReportPublic() {
       setTenantDisputedAt(new Date().toISOString());
       setTenantDisputeNotes(concernsText.trim());
       toast.success("Your concerns have been submitted. The agent will be in touch.");
+
+      // Notify the PM by email
+      const { data: inspRow } = await supabase
+        .from('property_inspections')
+        .select('agent_id, inspection_type')
+        .eq('report_token', token!)
+        .maybeSingle();
+      if (inspRow?.agent_id) {
+        const { data: agentRow } = await supabase
+          .from('agents')
+          .select('email')
+          .eq('id', inspRow.agent_id)
+          .maybeSingle();
+        if (agentRow?.email) {
+          await supabase.functions.invoke('send-notification-email', {
+            body: {
+              type: 'tenant_dispute',
+              recipient_email: agentRow.email,
+              recipient_name: 'Property Manager',
+              property_address: property ? `${property.address}, ${property.suburb}` : 'your managed property',
+              inspection_type: inspRow.inspection_type || 'entry',
+              dispute_notes: concernsText.trim(),
+              report_link: `${window.location.origin}/inspection-report/${token}`,
+            },
+          }).catch(() => {});
+        }
+      }
     }
     setSubmitting(false);
   };

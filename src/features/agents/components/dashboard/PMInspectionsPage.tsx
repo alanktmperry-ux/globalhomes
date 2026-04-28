@@ -48,6 +48,9 @@ interface InspectionRow {
   status: InspectionStatus;
   notice_sent_at: string | null;
   overall_notes: string | null;
+  tenant_disputed_at?: string | null;
+  tenant_dispute_notes?: string | null;
+  dispute_resolved_at?: string | null;
   tenancies?: {
     tenant_name: string | null;
     lease_start: string | null;
@@ -148,7 +151,7 @@ const CONDITION_LABELS: Record<CompleteForm['condition'], string> = {
   urgent: 'Urgent Issues',
 };
 
-type FilterTab = 'upcoming' | 'overdue' | 'completed' | 'due';
+type FilterTab = 'upcoming' | 'overdue' | 'completed' | 'due' | 'disputes';
 
 export default function PMInspectionsPage() {
   const { user } = useAuth();
@@ -175,6 +178,10 @@ export default function PMInspectionsPage() {
 
   const [cancelTarget, setCancelTarget] = useState<InspectionRow | null>(null);
 
+  const [resolveFor, setResolveFor] = useState<InspectionRow | null>(null);
+  const [resolveNotes, setResolveNotes] = useState('');
+  const [savingResolve, setSavingResolve] = useState(false);
+
   const loadData = useCallback(async () => {
     if (!user) return;
     setLoading(true);
@@ -194,6 +201,7 @@ export default function PMInspectionsPage() {
         .from('property_inspections')
         .select(`
           id, tenancy_id, inspection_type, scheduled_date, conducted_date, status, notice_sent_at, overall_notes,
+          tenant_disputed_at, tenant_dispute_notes, dispute_resolved_at,
           tenancies!inner(
             tenant_name, lease_start, lease_end, agent_id,
             properties(address, suburb, state)
@@ -261,6 +269,11 @@ export default function PMInspectionsPage() {
     return out;
   }, [activeTenancies, inspections]);
 
+  // Disputed (unresolved) inspections
+  const disputed = useMemo(() => {
+    return inspections.filter(i => !!i.tenant_disputed_at && !i.dispute_resolved_at);
+  }, [inspections]);
+
   // Stats
   const stats = useMemo(() => {
     const today = new Date().toISOString().slice(0, 10);
@@ -276,13 +289,13 @@ export default function PMInspectionsPage() {
         if (d && d >= last90) completedQuarter++;
       }
     }
-    return { upcoming, overdue, completedQuarter, due: suggested.length };
-  }, [inspections, suggested]);
+    return { upcoming, overdue, completedQuarter, due: suggested.length, disputes: disputed.length };
+  }, [inspections, suggested, disputed]);
 
   // Filtered list
   const filtered = useMemo(() => {
     const today = new Date().toISOString().slice(0, 10);
-    if (tab === 'due') return [];
+    if (tab === 'due' || tab === 'disputes') return [];
     return inspections.filter(i => {
       if (tab === 'upcoming') return i.status === 'scheduled' && i.scheduled_date >= today;
       if (tab === 'overdue') return i.status === 'scheduled' && i.scheduled_date < today;
@@ -290,6 +303,24 @@ export default function PMInspectionsPage() {
       return true;
     });
   }, [inspections, tab]);
+
+  const submitResolve = async () => {
+    if (!resolveFor) return;
+    setSavingResolve(true);
+    const { error } = await supabase
+      .from('property_inspections')
+      .update({
+        dispute_resolved_at: new Date().toISOString(),
+        dispute_resolution_notes: resolveNotes.trim() || null,
+      } as any)
+      .eq('id', resolveFor.id);
+    setSavingResolve(false);
+    if (error) { toast.error('Could not mark resolved'); return; }
+    toast.success('Dispute marked as resolved');
+    setResolveFor(null);
+    setResolveNotes('');
+    loadData();
+  };
 
   // Handlers
   const openSchedule = (tenancyId?: string) => {
@@ -489,6 +520,14 @@ ${agencyName || ''}`.trim();
               <TabsTrigger value="overdue">Overdue</TabsTrigger>
               <TabsTrigger value="completed">Completed</TabsTrigger>
               <TabsTrigger value="due">Due for Inspection</TabsTrigger>
+              <TabsTrigger value="disputes" className="relative">
+                Disputes
+                {stats.disputes > 0 && (
+                  <span className="ml-2 inline-flex items-center justify-center min-w-[18px] h-[18px] rounded-full bg-red-600 text-white text-[10px] px-1.5">
+                    {stats.disputes}
+                  </span>
+                )}
+              </TabsTrigger>
             </TabsList>
           </Tabs>
           <Button onClick={() => openSchedule()}>
@@ -541,6 +580,66 @@ ${agencyName || ''}`.trim();
                         </TableCell>
                       </TableRow>
                     ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        ) : tab === 'disputes' ? (
+          <Card>
+            <CardContent className="p-0">
+              {disputed.length === 0 ? (
+                <div className="py-12 text-center text-muted-foreground text-sm">
+                  <CheckCircle2 className="mx-auto mb-2 text-emerald-600" size={28} />
+                  No unresolved tenant disputes.
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Property</TableHead>
+                      <TableHead>Tenant</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Inspection Date</TableHead>
+                      <TableHead>Disputed On</TableHead>
+                      <TableHead>Dispute Notes</TableHead>
+                      <TableHead className="text-right">Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {disputed.map(i => {
+                      const propAddr = [i.tenancies?.properties?.address, i.tenancies?.properties?.suburb].filter(Boolean).join(', ');
+                      const fullNotes = i.tenant_dispute_notes || '';
+                      const truncated = fullNotes.length > 80 ? `${fullNotes.slice(0, 80)}…` : fullNotes;
+                      return (
+                        <TableRow key={i.id}>
+                          <TableCell className="font-medium text-sm">{propAddr || '—'}</TableCell>
+                          <TableCell className="text-sm">{i.tenancies?.tenant_name || '—'}</TableCell>
+                          <TableCell>
+                            <Badge className={cn(TYPE_BADGE[i.inspection_type], 'text-[10px]')}>
+                              {TYPE_LABEL[i.inspection_type]}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-sm">
+                            {format(parseISO(i.conducted_date || i.scheduled_date), 'd MMM yyyy')}
+                          </TableCell>
+                          <TableCell className="text-xs">
+                            {i.tenant_disputed_at ? format(parseISO(i.tenant_disputed_at), 'd MMM yyyy') : '—'}
+                          </TableCell>
+                          <TableCell className="text-xs text-muted-foreground max-w-[280px]" title={fullNotes || undefined}>
+                            {truncated || '—'}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              size="sm"
+                              onClick={() => { setResolveFor(i); setResolveNotes(''); }}
+                            >
+                              <CheckCircle2 size={12} className="mr-1" /> Mark Resolved
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               )}
@@ -849,6 +948,45 @@ ${agencyName || ''}`.trim();
             <Button onClick={submitComplete} disabled={savingComplete}>
               {savingComplete && <Loader2 size={14} className="mr-1 animate-spin" />}
               Record
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Resolve dispute modal */}
+      <Dialog open={!!resolveFor} onOpenChange={(o) => !o && setResolveFor(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Resolve Dispute</DialogTitle>
+          </DialogHeader>
+          {resolveFor && (
+            <div className="space-y-3">
+              <div className="text-xs text-muted-foreground rounded-md bg-secondary/50 p-2">
+                {TYPE_LABEL[resolveFor.inspection_type]} inspection at{' '}
+                {resolveFor.tenancies?.properties?.address || 'property'}
+              </div>
+              {resolveFor.tenant_dispute_notes && (
+                <div className="rounded-md border border-red-200 bg-red-50 p-2 text-xs text-red-900 whitespace-pre-wrap">
+                  <p className="font-medium mb-1">Tenant's concerns:</p>
+                  {resolveFor.tenant_dispute_notes}
+                </div>
+              )}
+              <div>
+                <Label>Resolution Notes</Label>
+                <Textarea
+                  rows={4}
+                  placeholder="What was agreed or actioned…"
+                  value={resolveNotes}
+                  onChange={e => setResolveNotes(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setResolveFor(null)} disabled={savingResolve}>Cancel</Button>
+            <Button onClick={submitResolve} disabled={savingResolve}>
+              {savingResolve && <Loader2 size={14} className="mr-1 animate-spin" />}
+              Mark Resolved
             </Button>
           </DialogFooter>
         </DialogContent>

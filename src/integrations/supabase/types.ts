@@ -5503,6 +5503,120 @@ export type Database = {
           },
         ]
       }
+      key_register: {
+        Row: {
+          agent_id: string
+          created_at: string
+          description: string | null
+          expected_return_date: string | null
+          id: string
+          issued_date: string | null
+          issued_to_name: string | null
+          issued_to_type: string | null
+          key_type: string
+          notes: string | null
+          property_id: string
+          returned_date: string | null
+          status: string
+          tag_number: string | null
+          tenancy_id: string | null
+          total_sets: number
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          description?: string | null
+          expected_return_date?: string | null
+          id?: string
+          issued_date?: string | null
+          issued_to_name?: string | null
+          issued_to_type?: string | null
+          key_type: string
+          notes?: string | null
+          property_id: string
+          returned_date?: string | null
+          status?: string
+          tag_number?: string | null
+          tenancy_id?: string | null
+          total_sets?: number
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          description?: string | null
+          expected_return_date?: string | null
+          id?: string
+          issued_date?: string | null
+          issued_to_name?: string | null
+          issued_to_type?: string | null
+          key_type?: string
+          notes?: string | null
+          property_id?: string
+          returned_date?: string | null
+          status?: string
+          tag_number?: string | null
+          tenancy_id?: string | null
+          total_sets?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "key_register_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "key_register_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "key_register_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "key_register_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances"
+            referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "key_register_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "key_register_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "key_register_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "key_register_tenancy_id_fkey"
+            columns: ["tenancy_id"]
+            isOneToOne: false
+            referencedRelation: "tenancies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lead_events: {
         Row: {
           agent_id: string

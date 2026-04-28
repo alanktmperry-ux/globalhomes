@@ -178,6 +178,10 @@ export default function PMInspectionsPage() {
 
   const [cancelTarget, setCancelTarget] = useState<InspectionRow | null>(null);
 
+  const [resolveFor, setResolveFor] = useState<InspectionRow | null>(null);
+  const [resolveNotes, setResolveNotes] = useState('');
+  const [savingResolve, setSavingResolve] = useState(false);
+
   const loadData = useCallback(async () => {
     if (!user) return;
     setLoading(true);
@@ -265,6 +269,11 @@ export default function PMInspectionsPage() {
     return out;
   }, [activeTenancies, inspections]);
 
+  // Disputed (unresolved) inspections
+  const disputed = useMemo(() => {
+    return inspections.filter(i => !!i.tenant_disputed_at && !i.dispute_resolved_at);
+  }, [inspections]);
+
   // Stats
   const stats = useMemo(() => {
     const today = new Date().toISOString().slice(0, 10);
@@ -280,13 +289,13 @@ export default function PMInspectionsPage() {
         if (d && d >= last90) completedQuarter++;
       }
     }
-    return { upcoming, overdue, completedQuarter, due: suggested.length };
-  }, [inspections, suggested]);
+    return { upcoming, overdue, completedQuarter, due: suggested.length, disputes: disputed.length };
+  }, [inspections, suggested, disputed]);
 
   // Filtered list
   const filtered = useMemo(() => {
     const today = new Date().toISOString().slice(0, 10);
-    if (tab === 'due') return [];
+    if (tab === 'due' || tab === 'disputes') return [];
     return inspections.filter(i => {
       if (tab === 'upcoming') return i.status === 'scheduled' && i.scheduled_date >= today;
       if (tab === 'overdue') return i.status === 'scheduled' && i.scheduled_date < today;
@@ -294,6 +303,24 @@ export default function PMInspectionsPage() {
       return true;
     });
   }, [inspections, tab]);
+
+  const submitResolve = async () => {
+    if (!resolveFor) return;
+    setSavingResolve(true);
+    const { error } = await supabase
+      .from('property_inspections')
+      .update({
+        dispute_resolved_at: new Date().toISOString(),
+        dispute_resolution_notes: resolveNotes.trim() || null,
+      } as any)
+      .eq('id', resolveFor.id);
+    setSavingResolve(false);
+    if (error) { toast.error('Could not mark resolved'); return; }
+    toast.success('Dispute marked as resolved');
+    setResolveFor(null);
+    setResolveNotes('');
+    loadData();
+  };
 
   // Handlers
   const openSchedule = (tenancyId?: string) => {

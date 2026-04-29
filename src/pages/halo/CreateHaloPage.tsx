@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -35,6 +35,8 @@ const initialData: HaloFormData = {
 };
 
 const STEP_LABELS = ['What are you looking for?', 'Where and how much?', 'Tell agents more'];
+
+const VALID_SOURCE_TYPES = new Set(['direct','listing_qr','crm_invite','rent_roll','voice_lead','settlement']);
 
 export default function CreateHaloPage() {
   const navigate = useNavigate();

@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, Languages } from 'lucide-react';
+import { CheckCircle2, Languages, Star } from 'lucide-react';
 import HaloQualityBadge from '@/components/halo/HaloQualityBadge';
 import type { Halo } from '@/types/halo';
 import { TIMEFRAME_LABELS, FINANCE_LABELS } from '@/types/halo';
@@ -11,6 +11,7 @@ interface Props {
   halo: Halo;
   unlocked: boolean;
   onRespond: (halo: Halo) => void;
+  pocketMatch?: boolean;
 }
 
 const fmt = (n: number | null | undefined) =>
@@ -26,7 +27,7 @@ const timeAgo = (iso: string) => {
   return months === 1 ? '1 month ago' : `${months} months ago`;
 };
 
-export function HaloPreviewCard({ halo, unlocked, onRespond }: Props) {
+export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Props) {
   const navigate = useNavigate();
   const intentLabel = halo.intent === 'buy' ? 'Buy' : 'Rent';
   const intentClass =
@@ -64,6 +65,14 @@ export function HaloPreviewCard({ halo, unlocked, onRespond }: Props) {
               </Badge>
             )}
             <HaloQualityBadge score={halo.quality_score} variant="agent" />
+            {pocketMatch && (
+              <Badge
+                variant="secondary"
+                className="bg-amber-100 text-amber-800 hover:bg-amber-100 gap-1 border border-amber-300"
+              >
+                <Star size={12} className="fill-amber-500 text-amber-500" /> Pocket Match
+              </Badge>
+            )}
           </div>
           <span className="text-xs text-muted-foreground">
             Posted {timeAgo(halo.created_at)} · Expires in {daysLeft}d

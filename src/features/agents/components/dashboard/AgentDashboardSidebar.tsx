@@ -113,6 +113,7 @@ const AgentDashboardSidebar = () => {
   const [disputeCount, setDisputeCount] = useState(0);
   const [smokeAlarmOverdue, setSmokeAlarmOverdue] = useState(0);
   const [buyerMatchesCount, setBuyerMatchesCount] = useState(0);
+  const [haloCredits, setHaloCredits] = useState(0);
   const [onboardingComplete, setOnboardingComplete] = useState(true);
   const [agentLogo, setAgentLogo] = useState<string | null>(null);
   const [agentName, setAgentName] = useState<string | null>(null);

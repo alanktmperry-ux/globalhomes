@@ -226,29 +226,30 @@ const AgentDashboardSidebar = () => {
 
   // Halo credits badge + realtime
   useEffect(() => {
-    if (!agent?.user_id) return;
+    const uid = user?.id;
+    if (!uid) return;
     let channel: ReturnType<typeof supabase.channel> | null = null;
     (async () => {
       const refresh = async () => {
         const { data } = await supabase
           .from('halo_credits')
           .select('balance')
-          .eq('agent_id', agent.user_id)
+          .eq('agent_id', uid)
           .maybeSingle();
         setHaloCredits(data?.balance ?? 0);
       };
       await refresh();
       channel = supabase
-        .channel('sidebar-halo-credits-' + agent.user_id)
+        .channel('sidebar-halo-credits-' + uid)
         .on(
           'postgres_changes',
-          { event: '*', schema: 'public', table: 'halo_credits', filter: `agent_id=eq.${agent.user_id}` },
+          { event: '*', schema: 'public', table: 'halo_credits', filter: `agent_id=eq.${uid}` },
           () => refresh(),
         )
         .subscribe();
     })();
     return () => { if (channel) supabase.removeChannel(channel); };
-  }, [agent?.user_id]);
+  }, [user?.id]);
 
   // Check onboarding status
   useEffect(() => {

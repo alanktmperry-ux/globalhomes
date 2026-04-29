@@ -455,6 +455,7 @@ const App = () => (
                   <Route path="system" element={<AdminSystemPage />} />
                   <Route path="partners" element={<AdminPartnersPage />} />
                   <Route path="brokers" element={<AdminBrokers />} />
+                  <Route path="halo-credits" element={<AdminHaloCreditsPage />} />
                   <Route path="support" element={<AdminSupportPage />} />
                   <Route path="buyers" element={<AdminBuyersPage />} />
                 </Route>

@@ -421,6 +421,8 @@ const App = () => (
                   <Route path="broker-referrals" element={<BrokerReferralsPage />} />
                   <Route path="partner-access" element={<PartnerAccessPage />} />
                   <Route path="admin/dedup-telemetry" element={<DedupTelemetryPage />} />
+                  <Route path="halo-board" element={<HaloBoardPage />} />
+                  <Route path="halo-board/:id" element={<HaloDetailPage />} />
                 </Route>
 
                 {/* Partner */}

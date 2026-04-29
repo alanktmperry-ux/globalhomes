@@ -5469,6 +5469,54 @@ export type Database = {
         }
         Relationships: []
       }
+      halo_messages: {
+        Row: {
+          body: string
+          created_at: string
+          halo_id: string
+          halo_response_id: string
+          id: string
+          read_by_recipient: boolean
+          sender_id: string
+          sender_type: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          halo_id: string
+          halo_response_id: string
+          id?: string
+          read_by_recipient?: boolean
+          sender_id: string
+          sender_type: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          halo_id?: string
+          halo_response_id?: string
+          id?: string
+          read_by_recipient?: boolean
+          sender_id?: string
+          sender_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "halo_messages_halo_id_fkey"
+            columns: ["halo_id"]
+            isOneToOne: false
+            referencedRelation: "halos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "halo_messages_halo_response_id_fkey"
+            columns: ["halo_response_id"]
+            isOneToOne: false
+            referencedRelation: "halo_responses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       halo_pocket_matches: {
         Row: {
           agent_id: string
@@ -5538,26 +5586,44 @@ export type Database = {
       }
       halo_responses: {
         Row: {
+          accepted: boolean | null
+          accepted_at: string | null
           agent_id: string
+          body: string | null
           created_at: string
+          dismissed_at: string | null
+          dismissed_by_seeker: boolean | null
           halo_id: string
           id: string
+          suggested_property_ids: string[] | null
           unlocked_at: string
           viewed_by_seeker: boolean
         }
         Insert: {
+          accepted?: boolean | null
+          accepted_at?: string | null
           agent_id: string
+          body?: string | null
           created_at?: string
+          dismissed_at?: string | null
+          dismissed_by_seeker?: boolean | null
           halo_id: string
           id?: string
+          suggested_property_ids?: string[] | null
           unlocked_at?: string
           viewed_by_seeker?: boolean
         }
         Update: {
+          accepted?: boolean | null
+          accepted_at?: string | null
           agent_id?: string
+          body?: string | null
           created_at?: string
+          dismissed_at?: string | null
+          dismissed_by_seeker?: boolean | null
           halo_id?: string
           id?: string
+          suggested_property_ids?: string[] | null
           unlocked_at?: string
           viewed_by_seeker?: boolean
         }

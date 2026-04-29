@@ -1,9 +1,10 @@
-import { useState, KeyboardEvent } from 'react';
+import { useState, KeyboardEvent, useCallback } from 'react';
 import { X } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { SuburbAutocomplete } from '@/components/ui/SuburbAutocomplete';
 import { cn } from '@/lib/utils';
 import type { HaloFormData, HaloTimeframe, HaloFinanceStatus } from '@/types/halo';
 import { TIMEFRAME_LABELS, FINANCE_LABELS } from '@/types/halo';
@@ -25,20 +26,20 @@ const parseAUD = (s: string): number | null => {
 export function HaloStep2({ data, update }: Props) {
   const [suburbInput, setSuburbInput] = useState('');
 
-  const addSuburb = (raw: string) => {
+  const addSuburb = useCallback((raw: string) => {
     const v = raw.trim();
     if (!v) return;
     if (data.suburbs.length >= 5) return;
-    if (data.suburbs.includes(v)) return;
+    if (data.suburbs.some((s) => s.toLowerCase() === v.toLowerCase())) {
+      setSuburbInput('');
+      return;
+    }
     update({ suburbs: [...data.suburbs, v] });
     setSuburbInput('');
-  };
+  }, [data.suburbs, update]);
 
   const handleSuburbKey = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      addSuburb(suburbInput.replace(/,/g, ''));
-    } else if (e.key === 'Backspace' && !suburbInput && data.suburbs.length) {
+    if (e.key === 'Backspace' && !suburbInput && data.suburbs.length) {
       update({ suburbs: data.suburbs.slice(0, -1) });
     }
   };
@@ -65,13 +66,13 @@ export function HaloStep2({ data, update }: Props) {
             </span>
           ))}
         </div>
-        <Input
+        <SuburbAutocomplete
           value={suburbInput}
-          onChange={(e) => setSuburbInput(e.target.value)}
+          onChange={setSuburbInput}
+          onSelect={addSuburb}
           onKeyDown={handleSuburbKey}
-          onBlur={() => addSuburb(suburbInput)}
           disabled={data.suburbs.length >= 5}
-          placeholder={data.suburbs.length >= 5 ? 'Maximum reached' : 'Type a suburb and press Enter'}
+          placeholder={data.suburbs.length >= 5 ? 'Maximum reached' : 'Start typing a suburb…'}
         />
         <p className="text-xs text-muted-foreground mt-1">
           {data.suburbs.length >= 5 ? 'Maximum 5 suburbs' : `${data.suburbs.length}/5 suburbs`}

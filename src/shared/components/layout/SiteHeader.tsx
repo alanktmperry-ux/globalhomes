@@ -345,6 +345,18 @@ export function SiteHeader() {
                 )}
 
                 {/* Buyer links */}
+                {user && !isAgent && !isAdmin && (
+                  <>
+                    <button onClick={() => navTo('/halo/new')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
+                      <Sparkles size={16} className="text-primary" /> Create your Halo
+                    </button>
+                    <button onClick={() => navTo('/dashboard/my-halos')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
+                      <Sparkles size={16} className="text-muted-foreground" /> My Halos
+                    </button>
+                  </>
+                )}
+
+                {/* Buyer links */}
                 {user && !isAgent && (
                   <>
                     <button onClick={() => navTo('/saved')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">

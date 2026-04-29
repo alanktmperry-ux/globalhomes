@@ -360,7 +360,7 @@ const App = () => (
                 <Route path="/halo/new" element={<ProtectedRoute><CreateHaloPage /></ProtectedRoute>} />
                 <Route path="/dashboard/my-halos" element={<ProtectedRoute><MyHalosPage /></ProtectedRoute>} />
                 <Route path="/seeker/dashboard" element={<SeekerDashboard />} />
-                <Route path="/seeker/inbox" element={<Navigate to="/seeker/dashboard" replace />} />
+                <Route path="/seeker/inbox" element={<ProtectedRoute><SeekerInbox /></ProtectedRoute>} />
 
                 {/* Agent */}
                 <Route path="/agent-dashboard" element={<ProtectedRoute requireAgent><AgentPerformanceDashboard /></ProtectedRoute>} />

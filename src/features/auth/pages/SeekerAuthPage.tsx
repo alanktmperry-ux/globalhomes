@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
@@ -20,6 +20,16 @@ const SeekerAuthPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dataLocationConsent, setDataLocationConsent] = useState(false);
+
+  // Bug Fix 1: password reset emails redirect to /login. If we land here with a
+  // recovery token in the URL hash, forward to /reset-password preserving the hash
+  // so the user can set a new password without being kicked out.
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash && (hash.includes('type=recovery') || hash.includes('PASSWORD_RECOVERY'))) {
+      navigate('/reset-password' + hash, { replace: true });
+    }
+  }, [navigate]);
 
   const routeAfterSignIn = async () => {
     const { data: { user: signedInUser } } = await supabase.auth.getUser();

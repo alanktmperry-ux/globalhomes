@@ -67,6 +67,7 @@ const URGENCY_CONFIG = {
 /* ── Component ───────────────────────────────────────────────── */
 
 const VoiceLeadsPage = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { saveContact, isSaved, isSaving } = useSaveContact();
   const [leads, setLeads] = useState<VoiceLead[]>([]);
@@ -332,6 +333,35 @@ const VoiceLeadsPage = () => {
                   </div>
                 )}
               </div>
+
+              {/* Create Halo from high-score lead */}
+              {selected.score >= 70 && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-1.5 w-full"
+                  onClick={() => {
+                    const params = new URLSearchParams();
+                    const lower = selected.transcript.toLowerCase();
+                    const intent = lower.includes('rent') || lower.includes('lease') ? 'rent' : 'buy';
+                    params.set('intent', intent);
+                    if (selected.buyerLocation && selected.buyerLocation !== 'Unknown') {
+                      params.set('suburb', selected.buyerLocation);
+                    }
+                    const budgetMatch = selected.transcript.match(/\$\s?([\d,]+)\s?(k|m)?/i);
+                    if (budgetMatch) {
+                      let n = Number(budgetMatch[1].replace(/,/g, ''));
+                      if (budgetMatch[2]?.toLowerCase() === 'k') n *= 1_000;
+                      if (budgetMatch[2]?.toLowerCase() === 'm') n *= 1_000_000;
+                      if (n > 0) params.set('budget_max', String(n));
+                    }
+                    params.set('source_type', 'voice_lead');
+                    navigate(`/halo/new?${params.toString()}`);
+                  }}
+                >
+                  <Sparkles size={14} /> Create Halo from this lead
+                </Button>
+              )}
 
               {/* Contact buttons */}
               {selected.userName !== 'Voice Searcher' && (

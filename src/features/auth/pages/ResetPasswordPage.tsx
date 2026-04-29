@@ -129,8 +129,27 @@ const ResetPasswordPage = () => {
     try {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
-      toast({ title: 'Password updated', description: 'Please sign in with your new password.' });
-      navigate('/agents/login');
+
+      // After updateUser succeeds during PASSWORD_RECOVERY, the session is already active.
+      // Verify we have a session, then route based on whether the user is an agent.
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        // No session somehow — fall back to standard login
+        toast({ title: 'Password updated', description: 'Please sign in with your new password.' });
+        navigate('/login');
+        return;
+      }
+
+      // Check whether this user is an agent → dashboard, otherwise home
+      const { data: agentRow } = await supabase
+        .from('agents')
+        .select('id')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+
+      toast({ title: 'Password updated', description: 'You are now signed in.' });
+      navigate(agentRow ? '/dashboard' : '/');
     } catch (err: unknown) {
       toast({ title: 'Error', description: getErrorMessage(err), variant: 'destructive' });
     } finally {

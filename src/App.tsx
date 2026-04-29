@@ -169,6 +169,7 @@ const MyHalosPage = React.lazy(() => import("./pages/halo/MyHalosPage"));
 const HaloBoardPage = React.lazy(() => import("./pages/halo/HaloBoardPage"));
 const HaloDetailPage = React.lazy(() => import("./pages/halo/HaloDetailPage"));
 const SeekerDashboard = React.lazy(() => import("./pages/seeker/SeekerDashboard"));
+const SeekerInbox = React.lazy(() => import("./pages/seeker/SeekerInbox"));
 const AdminHaloCreditsPage = React.lazy(() => import("./features/admin/pages/HaloCreditsPage"));
 const AdminHaloHealthPage = React.lazy(() => import("./features/admin/pages/HaloHealthPage"));
 const AdminHaloAnalyticsPage = React.lazy(() => import("./features/admin/pages/HaloAnalyticsPage"));

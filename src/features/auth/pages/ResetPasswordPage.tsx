@@ -143,6 +143,11 @@ const ResetPasswordPage = () => {
         return;
       }
 
+      // Bug Fix 1: Refresh roles in AuthProvider BEFORE navigating to /dashboard.
+      // Without this, ProtectedRoute may see isAgent=false and bounce the user
+      // back to /login — the "kicked out" symptom.
+      await refreshRoles();
+
       // Check whether this user is an agent → dashboard, otherwise home
       const { data: agentRow } = await supabase
         .from('agents')
@@ -151,7 +156,7 @@ const ResetPasswordPage = () => {
         .maybeSingle();
 
       toast({ title: 'Password updated', description: 'You are now signed in.' });
-      navigate(agentRow ? '/dashboard' : '/');
+      navigate(agentRow ? '/dashboard' : '/', { replace: true });
     } catch (err: unknown) {
       toast({ title: 'Error', description: getErrorMessage(err), variant: 'destructive' });
     } finally {

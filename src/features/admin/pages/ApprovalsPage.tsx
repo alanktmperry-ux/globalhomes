@@ -472,28 +472,34 @@ function PartnersTab({ onCount }: { onCount: (n: number) => void }) {
 // ─────────────────────────────────────────────────────
 
 export default function ApprovalsPage() {
-  const [tab, setTab] = useState<TabKey>('listings');
-  const [counts, setCounts] = useState<{ listings: number; demos: number; partners: number }>({
-    listings: 0, demos: 0, partners: 0,
+  const [tab, setTab] = useState<TabKey>('agents');
+  const [counts, setCounts] = useState<{ agents: number; listings: number; demos: number; partners: number }>({
+    agents: 0, listings: 0, demos: 0, partners: 0,
   });
 
+  const setAgentsCount = useCallback((n: number) => setCounts(c => ({ ...c, agents: n })), []);
   const setListingsCount = useCallback((n: number) => setCounts(c => ({ ...c, listings: n })), []);
   const setDemosCount = useCallback((n: number) => setCounts(c => ({ ...c, demos: n })), []);
   const setPartnersCount = useCallback((n: number) => setCounts(c => ({ ...c, partners: n })), []);
+
+  const total = counts.agents + counts.listings + counts.demos + counts.partners;
 
   return (
     <div className="max-w-screen-xl mx-auto px-6 py-8">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-foreground">Approvals</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Review and action pending items across the platform
+          Review and action pending items across the platform — {total} total pending
         </p>
       </div>
 
       <Tabs value={tab} onValueChange={(v) => setTab(v as TabKey)}>
         <TabsList>
+          <TabsTrigger value="agents">
+            Agent Approvals<CountBadge count={counts.agents} />
+          </TabsTrigger>
           <TabsTrigger value="listings">
-            Listings<CountBadge count={counts.listings} />
+            Listing Approvals<CountBadge count={counts.listings} />
           </TabsTrigger>
           <TabsTrigger value="demos">
             Demo Requests<CountBadge count={counts.demos} />
@@ -503,6 +509,9 @@ export default function ApprovalsPage() {
           </TabsTrigger>
         </TabsList>
 
+        <TabsContent value="agents" className="mt-6">
+          {tab === 'agents' && <AgentApprovalQueue onPendingCountChange={setAgentsCount} />}
+        </TabsContent>
         <TabsContent value="listings" className="mt-6">
           {tab === 'listings' && <ListingsTab onCount={setListingsCount} />}
         </TabsContent>

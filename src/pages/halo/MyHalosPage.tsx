@@ -57,6 +57,24 @@ export default function MyHalosPage() {
     }
   };
 
+  const handleFulfil = async (id: string) => {
+    const { error } = await supabase
+      .from('halos' as any)
+      .update({ status: 'fulfilled' })
+      .eq('id', id);
+    if (error) {
+      toast.error('Could not mark as fulfilled');
+      return;
+    }
+    setHalos((prev) => prev.map((h) => (h.id === id ? { ...h, status: 'fulfilled' } : h)));
+    try {
+      await supabase.functions.invoke('send-halo-fulfilled-notice', { body: { halo_id: id } });
+    } catch {
+      /* non-fatal */
+    }
+    toast.success('Halo marked as fulfilled. Agents have been notified.');
+  };
+
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-3xl mx-auto">

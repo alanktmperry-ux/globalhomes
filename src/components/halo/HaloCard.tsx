@@ -139,6 +139,17 @@ export function HaloCard({ halo, onStatusChange, onFulfil }: Props) {
               )}
             </Button>
           ) : null}
+          {onFulfil && (halo.status === 'active' || halo.status === 'paused') && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-green-700 hover:text-green-800"
+              onClick={() => setFulfilOpen(true)}
+              disabled={busy}
+            >
+              <CheckCircle2 size={14} /> Mark as fulfilled
+            </Button>
+          )}
           <Button
             size="sm"
             variant="outline"
@@ -167,6 +178,13 @@ export function HaloCard({ halo, onStatusChange, onFulfil }: Props) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <HaloFulfilmentDialog
+        open={fulfilOpen}
+        busy={busy}
+        onOpenChange={setFulfilOpen}
+        onConfirm={handleFulfil}
+      />
     </Card>
   );
 }

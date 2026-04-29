@@ -34,9 +34,15 @@ export default function AdminLayout() {
 
     async function loadCounts() {
       try {
+        // IMPORTANT: these filters MUST mirror what ApprovalsPage actually displays,
+        // otherwise the sidebar badge and the page list go out of sync.
         const [agentsRes, propsRes, demosRes] = await Promise.all([
           supabase.from('agents').select('id', { count: 'exact', head: true }).eq('approval_status', 'pending'),
-          supabase.from('properties').select('id', { count: 'exact', head: true }).eq('is_active', false),
+          // Match ListingsTab: inactive AND not rejected AND not archived
+          (supabase.from('properties').select('id', { count: 'exact', head: true })
+            .eq('is_active', false)
+            .neq('moderation_status', 'rejected')
+            .not('status', 'eq', 'archived')) as any,
           (supabase.from('demo_requests' as any).select('id', { count: 'exact', head: true }).eq('status', 'pending')) as any,
         ]);
         if (cancelled) return;

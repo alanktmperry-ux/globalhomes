@@ -70,6 +70,37 @@ export default function CreateHaloPage() {
     }
   }, []);
 
+  // Apply query-param prefill (Listing CTA, CRM invite, voice lead, rent roll)
+  useEffect(() => {
+    const intent = searchParams.get('intent');
+    const suburb = searchParams.get('suburb');
+    const budgetMax = searchParams.get('budget_max');
+    const propertyType = searchParams.get('property_type');
+    const sLid = searchParams.get('source_listing_id') ?? undefined;
+    const sAid = searchParams.get('source_agent_id') ?? undefined;
+    const sType = searchParams.get('source_type') ?? undefined;
+
+    let touched = false;
+    const patch: Partial<HaloFormData> = {};
+    if (intent === 'buy' || intent === 'rent') { patch.intent = intent; touched = true; }
+    if (suburb) { patch.suburbs = [suburb]; touched = true; }
+    if (budgetMax && !Number.isNaN(Number(budgetMax))) { patch.budget_max = Number(budgetMax); touched = true; }
+    if (propertyType) { patch.property_types = [propertyType]; touched = true; }
+
+    if (touched) {
+      setData((d) => ({ ...d, ...patch }));
+      setPrefilled(true);
+    }
+    if (sLid || sAid || sType) {
+      setSource({
+        source_listing_id: sLid,
+        source_agent_id: sAid,
+        source_type: sType && VALID_SOURCE_TYPES.has(sType) ? sType : undefined,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Auto-save
   useEffect(() => {
     try {

@@ -248,6 +248,7 @@ const AgentDashboardSidebar = () => {
         .subscribe();
     })();
     return () => { if (channel) supabase.removeChannel(channel); };
+  }, [agent?.user_id]);
 
   // Check onboarding status
   useEffect(() => {

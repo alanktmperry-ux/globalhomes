@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Loader2, CheckCircle2, XCircle, ExternalLink } from 'lucide-react';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { buildAuditMeta } from '@/shared/lib/auditLog';
+import AgentApprovalQueue from '@/features/admin/components/AgentApprovalQueue';
 
-type TabKey = 'listings' | 'demos' | 'partners';
+type TabKey = 'agents' | 'listings' | 'demos' | 'partners';
 
 interface ListingRow {
   id: string;

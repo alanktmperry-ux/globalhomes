@@ -166,6 +166,9 @@ const CRMPage = React.lazy(() => import("./features/crm/pages/CRMPage"));
 const SavedSearchesPage = React.lazy(() => import("./features/alerts/pages/SavedSearchesPage"));
 const CreateHaloPage = React.lazy(() => import("./pages/halo/CreateHaloPage"));
 const MyHalosPage = React.lazy(() => import("./pages/halo/MyHalosPage"));
+const HaloBoardPage = React.lazy(() => import("./pages/halo/HaloBoardPage"));
+const HaloDetailPage = React.lazy(() => import("./pages/halo/HaloDetailPage"));
+const AdminHaloCreditsPage = React.lazy(() => import("./features/admin/pages/HaloCreditsPage"));
 const StampDutyPage = React.lazy(() => import("./pages/StampDutyPage"));
 const HomeServicesPage = React.lazy(() => import("./features/services/pages/HomeServicesPage"));
 const ConveyancingPage = React.lazy(() => import("./features/conveyancing/pages/ConveyancingPage"));
@@ -418,6 +421,8 @@ const App = () => (
                   <Route path="broker-referrals" element={<BrokerReferralsPage />} />
                   <Route path="partner-access" element={<PartnerAccessPage />} />
                   <Route path="admin/dedup-telemetry" element={<DedupTelemetryPage />} />
+                  <Route path="halo-board" element={<HaloBoardPage />} />
+                  <Route path="halo-board/:id" element={<HaloDetailPage />} />
                 </Route>
 
                 {/* Partner */}
@@ -450,6 +455,7 @@ const App = () => (
                   <Route path="system" element={<AdminSystemPage />} />
                   <Route path="partners" element={<AdminPartnersPage />} />
                   <Route path="brokers" element={<AdminBrokers />} />
+                  <Route path="halo-credits" element={<AdminHaloCreditsPage />} />
                   <Route path="support" element={<AdminSupportPage />} />
                   <Route path="buyers" element={<AdminBuyersPage />} />
                 </Route>

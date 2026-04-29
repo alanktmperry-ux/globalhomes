@@ -77,6 +77,7 @@ export default function AdminSidebar({ pendingApprovalsTotal = 0, isSupport = fa
     { to: '/admin/agents', label: 'Agents', icon: Users },
     { to: '/admin/listings', label: 'Listings', icon: Building2 },
     { to: '/admin/brokers', label: 'Brokers', icon: Landmark },
+    { to: '/admin/halo-credits', label: 'Halo Credits', icon: Landmark },
   ];
   const business: NavItem[] = [
     { to: '/admin/revenue', label: 'Revenue', icon: DollarSign },

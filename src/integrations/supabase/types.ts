@@ -5339,6 +5339,94 @@ export type Database = {
           },
         ]
       }
+      halo_credit_transactions: {
+        Row: {
+          agent_id: string
+          amount: number
+          created_at: string
+          halo_id: string | null
+          id: string
+          note: string | null
+          type: string
+        }
+        Insert: {
+          agent_id: string
+          amount: number
+          created_at?: string
+          halo_id?: string | null
+          id?: string
+          note?: string | null
+          type: string
+        }
+        Update: {
+          agent_id?: string
+          amount?: number
+          created_at?: string
+          halo_id?: string | null
+          id?: string
+          note?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "halo_credit_transactions_halo_id_fkey"
+            columns: ["halo_id"]
+            isOneToOne: false
+            referencedRelation: "halos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      halo_credits: {
+        Row: {
+          agent_id: string
+          balance: number
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          balance?: number
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          balance?: number
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      halo_responses: {
+        Row: {
+          agent_id: string
+          halo_id: string
+          id: string
+          unlocked_at: string
+        }
+        Insert: {
+          agent_id: string
+          halo_id: string
+          id?: string
+          unlocked_at?: string
+        }
+        Update: {
+          agent_id?: string
+          halo_id?: string
+          id?: string
+          unlocked_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "halo_responses_halo_id_fkey"
+            columns: ["halo_id"]
+            isOneToOne: false
+            referencedRelation: "halos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       halos: {
         Row: {
           bathrooms_min: number | null

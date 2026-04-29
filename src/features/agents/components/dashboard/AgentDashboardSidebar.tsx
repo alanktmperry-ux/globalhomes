@@ -40,6 +40,7 @@ const SALES_NAV: NavItem[] = [
   { title: 'Leads', url: '/dashboard/crm', icon: Flame },
   { title: 'Voice Leads', url: '/dashboard/leads', icon: Mic, badgeKey: 'leads' },
   { title: 'AI Concierge', url: '/dashboard/concierge', icon: Sparkles, badgeKey: 'buyerMatches', alertWhenBadge: true },
+  { title: 'Halo Board', url: '/dashboard/halo-board', icon: Sparkles, badgeKey: 'haloCredits' },
   { title: 'Lead Marketplace', url: '/dashboard/lead-marketplace', icon: ShoppingBag },
   { title: 'Pre-Market', url: '/dashboard/pre-market', icon: Target },
   { title: 'Off-Market Network', url: '/dashboard/network', icon: Users },
@@ -103,7 +104,7 @@ const AgentDashboardSidebar = () => {
   const isMobile = useIsMobile();
   const location = useLocation();
   const navigate = useNavigate();
-  const { signOut, isAdmin, isPrincipal } = useAuth();
+  const { signOut, isAdmin, isPrincipal, user } = useAuth();
   const { agent } = useCurrentAgent();
   const { plan } = useSubscription();
   const [activeCount, setActiveCount] = useState(0);
@@ -112,6 +113,7 @@ const AgentDashboardSidebar = () => {
   const [disputeCount, setDisputeCount] = useState(0);
   const [smokeAlarmOverdue, setSmokeAlarmOverdue] = useState(0);
   const [buyerMatchesCount, setBuyerMatchesCount] = useState(0);
+  const [haloCredits, setHaloCredits] = useState(0);
   const [onboardingComplete, setOnboardingComplete] = useState(true);
   const [agentLogo, setAgentLogo] = useState<string | null>(null);
   const [agentName, setAgentName] = useState<string | null>(null);
@@ -222,6 +224,33 @@ const AgentDashboardSidebar = () => {
     return () => { if (channel) supabase.removeChannel(channel); };
   }, [agent?.id]);
 
+  // Halo credits badge + realtime
+  useEffect(() => {
+    const uid = user?.id;
+    if (!uid) return;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    (async () => {
+      const refresh = async () => {
+        const { data } = await supabase
+          .from('halo_credits')
+          .select('balance')
+          .eq('agent_id', uid)
+          .maybeSingle();
+        setHaloCredits(data?.balance ?? 0);
+      };
+      await refresh();
+      channel = supabase
+        .channel('sidebar-halo-credits-' + uid)
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'halo_credits', filter: `agent_id=eq.${uid}` },
+          () => refresh(),
+        )
+        .subscribe();
+    })();
+    return () => { if (channel) supabase.removeChannel(channel); };
+  }, [user?.id]);
+
   // Check onboarding status
   useEffect(() => {
     setOnboardingComplete(!!agent?.onboarding_complete);
@@ -235,6 +264,7 @@ const AgentDashboardSidebar = () => {
     buyerMatches: buyerMatchesCount > 0 ? String(buyerMatchesCount) : '',
     disputes: disputeCount > 0 ? String(disputeCount) : '',
     smokeAlarms: smokeAlarmOverdue > 0 ? String(smokeAlarmOverdue) : '',
+    haloCredits: haloCredits > 0 ? `${haloCredits}` : '0',
   };
 
   const ACCOUNT_NAV: NavItem[] = [

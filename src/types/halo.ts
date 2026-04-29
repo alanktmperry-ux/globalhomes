@@ -52,6 +52,30 @@ export const FINANCE_LABELS: Record<HaloFinanceStatus, string> = {
   not_started: 'Not started',
 };
 
+export interface HaloCredit {
+  id: string;
+  agent_id: string;
+  balance: number;
+  updated_at: string;
+}
+
+export interface HaloCreditTransaction {
+  id: string;
+  agent_id: string;
+  amount: number;
+  type: 'grant' | 'spend' | 'refund';
+  halo_id: string | null;
+  note: string | null;
+  created_at: string;
+}
+
+export interface HaloResponse {
+  id: string;
+  halo_id: string;
+  agent_id: string;
+  unlocked_at: string;
+}
+
 export const PROPERTY_TYPE_OPTIONS = ['House', 'Apartment', 'Townhouse', 'Villa', 'Land', 'Commercial', 'Any'] as const;
 export const MUST_HAVE_OPTIONS = [
   'Pool',

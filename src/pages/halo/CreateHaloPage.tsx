@@ -41,9 +41,16 @@ const VALID_SOURCE_TYPES = new Set(['direct','listing_qr','crm_invite','rent_rol
 export default function CreateHaloPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const [step, setStep] = useState(1);
   const [data, setData] = useState<HaloFormData>(initialData);
   const [restored, setRestored] = useState(false);
+  const [prefilled, setPrefilled] = useState(false);
+  const [source, setSource] = useState<{
+    source_listing_id?: string;
+    source_agent_id?: string;
+    source_type?: string;
+  }>({});
   const [submitting, setSubmitting] = useState(false);
   const [stepError, setStepError] = useState<string | null>(null);
 

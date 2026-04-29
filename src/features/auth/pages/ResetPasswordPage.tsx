@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/shared/hooks/use-toast';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import { useAuth } from '@/features/auth/AuthProvider';
 
 const AGENT_PILLS = ['Pocket listings', 'Pre-market period', 'AI buyer matching', 'Pipeline kanban', 'Rent roll', 'Trust accounting', '24 languages'];
 
@@ -62,6 +63,7 @@ const inputClass = "w-full pl-10 pr-11 py-3.5 rounded-[14px] border border-stone
 const ResetPasswordPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { refreshRoles } = useAuth();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -141,6 +143,11 @@ const ResetPasswordPage = () => {
         return;
       }
 
+      // Bug Fix 1: Refresh roles in AuthProvider BEFORE navigating to /dashboard.
+      // Without this, ProtectedRoute may see isAgent=false and bounce the user
+      // back to /login — the "kicked out" symptom.
+      await refreshRoles();
+
       // Check whether this user is an agent → dashboard, otherwise home
       const { data: agentRow } = await supabase
         .from('agents')
@@ -149,7 +156,7 @@ const ResetPasswordPage = () => {
         .maybeSingle();
 
       toast({ title: 'Password updated', description: 'You are now signed in.' });
-      navigate(agentRow ? '/dashboard' : '/');
+      navigate(agentRow ? '/dashboard' : '/', { replace: true });
     } catch (err: unknown) {
       toast({ title: 'Error', description: getErrorMessage(err), variant: 'destructive' });
     } finally {

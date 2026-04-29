@@ -81,7 +81,7 @@ export default function SeekerInbox() {
         ? supabase.from('agents').select('user_id, full_name, agency_name, avatar_url').in('user_id', agentIds)
         : Promise.resolve({ data: [] as any[] }),
       allPropertyIds.length
-        ? supabase.from('listings').select('id, title, address_line1, suburb, price_min, price_max').in('id', allPropertyIds)
+        ? supabase.from('properties').select('id, title, address, suburb, price').in('id', allPropertyIds)
         : Promise.resolve({ data: [] as any[] }),
       supabase
         .from('halo_messages')

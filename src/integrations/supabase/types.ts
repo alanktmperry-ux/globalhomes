@@ -5539,21 +5539,27 @@ export type Database = {
       halo_responses: {
         Row: {
           agent_id: string
+          created_at: string
           halo_id: string
           id: string
           unlocked_at: string
+          viewed_by_seeker: boolean
         }
         Insert: {
           agent_id: string
+          created_at?: string
           halo_id: string
           id?: string
           unlocked_at?: string
+          viewed_by_seeker?: boolean
         }
         Update: {
           agent_id?: string
+          created_at?: string
           halo_id?: string
           id?: string
           unlocked_at?: string
+          viewed_by_seeker?: boolean
         }
         Relationships: [
           {

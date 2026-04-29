@@ -29,6 +29,8 @@ export interface Halo {
   status: HaloStatus;
   expires_at: string;
   expiry_reminder_sent: boolean;
+  no_response_alert_sent?: boolean;
+  quality_score?: number | null;
   created_at: string;
   updated_at: string;
 }

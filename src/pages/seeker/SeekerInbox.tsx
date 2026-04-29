@@ -357,12 +357,12 @@ export default function SeekerInbox() {
                               <Home className="h-4 w-4 text-[#2563EB] mt-0.5 flex-shrink-0" />
                               <div className="min-w-0">
                                 <p className="text-sm font-medium text-[#1E293B] truncate">
-                                  {p.title || p.address_line1 || 'Property'}
+                                  {p.title || p.address || 'Property'}
                                 </p>
                                 <p className="text-xs text-[#64748B] truncate">{p.suburb}</p>
-                                {formatPrice(p.price_min, p.price_max) && (
+                                {formatPrice(p.price) && (
                                   <p className="text-xs text-[#1E3A5F] font-medium mt-1">
-                                    {formatPrice(p.price_min, p.price_max)}
+                                    {formatPrice(p.price)}
                                   </p>
                                 )}
                               </div>

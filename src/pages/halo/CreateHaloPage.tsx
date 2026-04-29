@@ -144,30 +144,35 @@ export default function CreateHaloPage() {
     }
     setSubmitting(true);
     try {
+      const insertPayload: Record<string, unknown> = { ...data, seeker_id: user.id };
+      if (source.source_listing_id) insertPayload.source_listing_id = source.source_listing_id;
+      if (source.source_agent_id) insertPayload.source_agent_id = source.source_agent_id;
+      if (source.source_type) insertPayload.source_type = source.source_type;
+
       const { data: inserted, error } = await supabase
         .from('halos' as any)
-        .insert({ ...data, seeker_id: user.id })
+        .insert(insertPayload)
         .select('id')
         .single();
       if (error) throw error;
 
-      // Fire confirmation email (best-effort)
       try {
         await supabase.functions.invoke('send-halo-confirmation', {
           body: { id: (inserted as any).id, seeker_id: user.id },
         });
-      } catch {
-        /* non-fatal */
-      }
+      } catch { /* non-fatal */ }
 
-      // Score the Halo (best-effort)
       try {
         await supabase.functions.invoke('score-halo', {
           body: { halo_id: (inserted as any).id },
         });
-      } catch {
-        /* non-fatal */
-      }
+      } catch { /* non-fatal */ }
+
+      try {
+        await supabase.functions.invoke('match-halo-to-pocket-listings', {
+          body: { halo_id: (inserted as any).id },
+        });
+      } catch { /* non-fatal */ }
 
       localStorage.removeItem(DRAFT_KEY);
       toast.success('Your Halo is live');
@@ -191,6 +196,14 @@ export default function CreateHaloPage() {
         <div className="mb-6">
           <HaloStepIndicator current={step} total={3} labels={STEP_LABELS} />
         </div>
+
+        {prefilled && (
+          <Alert className="mb-4">
+            <AlertDescription>
+              We've pre-filled some details from the listing you viewed. Check and adjust anything before posting.
+            </AlertDescription>
+          </Alert>
+        )}
 
         {restored && (
           <Alert className="mb-6">

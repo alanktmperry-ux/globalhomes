@@ -223,7 +223,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const isAdminUser = roles.includes('admin');
     const isApprovedAgent = !!agentData && ((agentData as any).approval_status === 'approved' || isAdminUser);
     // Only grant agent role if the agents row is approved (admins always pass)
-    const filteredRoles = roles.filter((r) => !(r === 'agent' && agentData && !isApprovedAgent));
+    const filteredRoles = roles.filter((r) => {
+      if (r !== 'agent') return true;
+      return isApprovedAgent;
+    });
     if (isApprovedAgent && !filteredRoles.includes('agent')) filteredRoles.push('agent');
     applyRoles(filteredRoles, user.email);
     if (agentData) {

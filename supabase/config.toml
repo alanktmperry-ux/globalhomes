@@ -62,3 +62,9 @@ verify_jwt = false
 
 [functions.send-auth-email]
 verify_jwt = false
+
+[functions.halo-expiry-reminders]
+verify_jwt = false
+
+[functions.stripe-credit-webhook]
+verify_jwt = false

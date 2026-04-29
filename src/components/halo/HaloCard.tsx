@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pause, Play, Trash2, Pencil } from 'lucide-react';
+import { Pause, Play, Trash2, Pencil, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,11 +14,14 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
+import HaloQualityBadge from '@/components/halo/HaloQualityBadge';
+import HaloFulfilmentDialog from '@/components/halo/HaloFulfilmentDialog';
 import type { Halo, HaloStatus } from '@/types/halo';
 
 interface Props {
   halo: Halo;
   onStatusChange: (id: string, status: HaloStatus) => Promise<void> | void;
+  onFulfil?: (id: string) => Promise<void> | void;
 }
 
 const STATUS_STYLES: Record<HaloStatus, string> = {
@@ -32,8 +35,9 @@ const STATUS_STYLES: Record<HaloStatus, string> = {
 const fmt = (n: number | null | undefined) =>
   n == null ? '—' : n.toLocaleString('en-AU');
 
-export function HaloCard({ halo, onStatusChange }: Props) {
+export function HaloCard({ halo, onStatusChange, onFulfil }: Props) {
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [fulfilOpen, setFulfilOpen] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const daysLeft = Math.max(
@@ -64,18 +68,32 @@ export function HaloCard({ halo, onStatusChange }: Props) {
     }
   };
 
+  const handleFulfil = async () => {
+    if (!onFulfil) return;
+    setBusy(true);
+    try {
+      await onFulfil(halo.id);
+      setFulfilOpen(false);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const lowScore = halo.quality_score != null && halo.quality_score < 50;
+
   return (
     <Card>
       <CardContent className="p-5 space-y-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-start justify-between gap-3 flex-wrap">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
               <Badge className={STATUS_STYLES[halo.status]} variant="secondary">
                 {halo.status}
               </Badge>
               <span className="text-xs text-muted-foreground">
                 {halo.status === 'expired' ? 'Expired' : `Expires in ${daysLeft} days`}
               </span>
+              <HaloQualityBadge score={halo.quality_score} variant="seeker" />
             </div>
             <p className="font-semibold text-base break-words">
               {intentLabel} · {suburbsLabel} · {budgetLabel}
@@ -83,6 +101,18 @@ export function HaloCard({ halo, onStatusChange }: Props) {
             {halo.property_types.length > 0 && (
               <p className="text-sm text-muted-foreground mt-1">
                 {halo.property_types.join(', ')}
+              </p>
+            )}
+            {lowScore && (halo.status === 'active' || halo.status === 'paused') && (
+              <p className="mt-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-2 py-1.5">
+                Tip: Add more detail to attract more agents.{' '}
+                <button
+                  type="button"
+                  onClick={() => toast('Edit coming soon')}
+                  className="underline font-medium"
+                >
+                  Edit Halo
+                </button>
               </p>
             )}
           </div>
@@ -109,6 +139,17 @@ export function HaloCard({ halo, onStatusChange }: Props) {
               )}
             </Button>
           ) : null}
+          {onFulfil && (halo.status === 'active' || halo.status === 'paused') && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-green-700 hover:text-green-800"
+              onClick={() => setFulfilOpen(true)}
+              disabled={busy}
+            >
+              <CheckCircle2 size={14} /> Mark as fulfilled
+            </Button>
+          )}
           <Button
             size="sm"
             variant="outline"
@@ -137,6 +178,13 @@ export function HaloCard({ halo, onStatusChange }: Props) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <HaloFulfilmentDialog
+        open={fulfilOpen}
+        busy={busy}
+        onOpenChange={setFulfilOpen}
+        onConfirm={handleFulfil}
+      />
     </Card>
   );
 }

@@ -5339,6 +5339,77 @@ export type Database = {
           },
         ]
       }
+      halo_credit_packages: {
+        Row: {
+          active: boolean
+          created_at: string
+          credits: number
+          id: string
+          name: string
+          price_aud: number
+          stripe_price_id: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          credits: number
+          id?: string
+          name: string
+          price_aud: number
+          stripe_price_id: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          credits?: number
+          id?: string
+          name?: string
+          price_aud?: number
+          stripe_price_id?: string
+        }
+        Relationships: []
+      }
+      halo_credit_purchases: {
+        Row: {
+          agent_id: string
+          amount_paid_aud: number
+          created_at: string
+          credits_granted: number
+          id: string
+          package_id: string
+          status: string
+          stripe_session_id: string
+        }
+        Insert: {
+          agent_id: string
+          amount_paid_aud: number
+          created_at?: string
+          credits_granted: number
+          id?: string
+          package_id: string
+          status?: string
+          stripe_session_id: string
+        }
+        Update: {
+          agent_id?: string
+          amount_paid_aud?: number
+          created_at?: string
+          credits_granted?: number
+          id?: string
+          package_id?: string
+          status?: string
+          stripe_session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "halo_credit_purchases_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "halo_credit_packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       halo_credit_transactions: {
         Row: {
           agent_id: string
@@ -5444,8 +5515,10 @@ export type Database = {
           id: string
           intent: string
           must_haves: string[]
+          no_response_alert_sent: boolean
           preferred_language: string
           property_types: string[]
+          quality_score: number | null
           referral_source: string | null
           seeker_id: string
           status: string
@@ -5470,8 +5543,10 @@ export type Database = {
           id?: string
           intent: string
           must_haves?: string[]
+          no_response_alert_sent?: boolean
           preferred_language?: string
           property_types?: string[]
+          quality_score?: number | null
           referral_source?: string | null
           seeker_id: string
           status?: string
@@ -5496,8 +5571,10 @@ export type Database = {
           id?: string
           intent?: string
           must_haves?: string[]
+          no_response_alert_sent?: boolean
           preferred_language?: string
           property_types?: string[]
+          quality_score?: number | null
           referral_source?: string | null
           seeker_id?: string
           status?: string

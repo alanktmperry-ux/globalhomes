@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, Languages } from 'lucide-react';
+import HaloQualityBadge from '@/components/halo/HaloQualityBadge';
 import type { Halo } from '@/types/halo';
 import { TIMEFRAME_LABELS, FINANCE_LABELS } from '@/types/halo';
 
@@ -62,6 +63,7 @@ export function HaloPreviewCard({ halo, unlocked, onRespond }: Props) {
                 <Languages size={12} /> {halo.preferred_language}
               </Badge>
             )}
+            <HaloQualityBadge score={halo.quality_score} variant="agent" />
           </div>
           <span className="text-xs text-muted-foreground">
             Posted {timeAgo(halo.created_at)} · Expires in {daysLeft}d

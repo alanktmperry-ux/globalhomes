@@ -113,7 +113,7 @@ export default function MyHalosPage() {
         ) : (
           <div className="space-y-4">
             {halos.map((h) => (
-              <HaloCard key={h.id} halo={h} onStatusChange={updateStatus} />
+              <HaloCard key={h.id} halo={h} onStatusChange={updateStatus} onFulfil={handleFulfil} />
             ))}
           </div>
         )}

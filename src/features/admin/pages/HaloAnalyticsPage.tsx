@@ -294,11 +294,18 @@ export default function HaloAnalyticsPage() {
             <h2 className="font-semibold">Halos posted per week</h2>
             <span className="text-xs text-muted-foreground">Last 12 weeks</span>
           </div>
-          <div className="h-64">
+          <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
+              <LineChart data={chartData} margin={{ top: 10, right: 16, left: 0, bottom: 24 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="week" tick={{ fontSize: 11 }} />
+                <XAxis
+                  dataKey="week"
+                  tick={{ fontSize: 11 }}
+                  interval={0}
+                  angle={-35}
+                  textAnchor="end"
+                  height={48}
+                />
                 <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
                 <Tooltip
                   contentStyle={{
@@ -307,13 +314,31 @@ export default function HaloAnalyticsPage() {
                     borderRadius: 8,
                     fontSize: 12,
                   }}
+                  labelFormatter={(label, payload) => {
+                    const p = payload?.[0]?.payload as { isCurrent?: boolean } | undefined;
+                    return `Week of ${label}${p?.isCurrent ? ' (this week)' : ''}`;
+                  }}
                 />
                 <Line
                   type="monotone"
                   dataKey="count"
                   stroke="hsl(var(--primary))"
                   strokeWidth={2}
-                  dot={{ r: 3 }}
+                  dot={(props: any) => {
+                    const { cx, cy, payload, index } = props;
+                    const isCurrent = payload?.isCurrent;
+                    return (
+                      <circle
+                        key={`dot-${index}`}
+                        cx={cx}
+                        cy={cy}
+                        r={isCurrent ? 5 : 3}
+                        fill={isCurrent ? 'hsl(var(--primary))' : 'hsl(var(--background))'}
+                        stroke="hsl(var(--primary))"
+                        strokeWidth={2}
+                      />
+                    );
+                  }}
                 />
               </LineChart>
             </ResponsiveContainer>

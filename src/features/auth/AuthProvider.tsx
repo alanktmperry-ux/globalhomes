@@ -317,7 +317,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (isAgentUser && onAuthPage && sessionStorage.getItem('post_login_redirected') !== '1') {
           sessionStorage.setItem('post_login_redirected', '1');
           const returnTo = new URLSearchParams(window.location.search).get('return_to');
-          const destination = returnTo && returnTo.startsWith('/') ? returnTo : '/dashboard/overview';
+          const destination = returnTo && returnTo.startsWith('/') ? returnTo : '/dashboard';
           window.location.replace(destination);
           return;
         }

@@ -370,21 +370,29 @@ function PartnersTab({ onCount }: { onCount: (n: number) => void }) {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const { data, error } = await (supabase.from('partner_applications' as any) as any)
-        .select('id, business_name, contact_name, email, phone, partner_type, abn, message, created_at')
-        .eq('status', 'pending')
+      // Bug Fix 2: query the real `partners` table (no `partner_applications` table exists).
+      // A partner is "pending" when it hasn't been verified yet.
+      const { data, error } = await (supabase.from('partners') as any)
+        .select('id, company_name, contact_name, contact_email, contact_phone, partner_type, abn, notes, created_at')
+        .eq('is_verified', false)
         .order('created_at', { ascending: false })
         .limit(50);
-      if (error) {
-        // Table may not exist yet — silently suppress
-        setRows([]);
-        onCount(0);
-        return;
-      }
-      const list = (data ?? []) as PartnerRow[];
+      if (error) throw error;
+      const list = (data ?? []).map((r: any) => ({
+        id: r.id,
+        business_name: r.company_name,
+        contact_name: r.contact_name,
+        email: r.contact_email,
+        phone: r.contact_phone,
+        partner_type: r.partner_type,
+        abn: r.abn,
+        message: r.notes,
+        created_at: r.created_at,
+      })) as PartnerRow[];
       setRows(list);
       onCount(list.length);
-    } catch {
+    } catch (err) {
+      console.error('[PartnersTab] load failed', err);
       setRows([]);
       onCount(0);
     } finally {
@@ -397,12 +405,14 @@ function PartnersTab({ onCount }: { onCount: (n: number) => void }) {
   const action = async (row: PartnerRow, approve: boolean) => {
     setBusyId(row.id);
     try {
-      const newStatus = approve ? 'approved' : 'rejected';
-      const { error } = await (supabase.from('partner_applications' as any) as any)
-        .update({ status: newStatus })
+      const patch = approve
+        ? { is_verified: true, verified_at: new Date().toISOString() }
+        : { is_verified: false, notes: (row.message ? row.message + '\n' : '') + '[Rejected by admin]' };
+      const { error } = await (supabase.from('partners') as any)
+        .update(patch)
         .eq('id', row.id);
       if (error) throw error;
-      await logAudit(approve ? 'partner_approved' : 'partner_rejected', 'partner_application', row.id, { business: row.business_name });
+      await logAudit(approve ? 'partner_approved' : 'partner_rejected', 'partner', row.id, { business: row.business_name });
       toast.success(approve ? 'Partner approved' : 'Partner rejected');
       setRows(prev => {
         const next = prev.filter(r => r.id !== row.id);

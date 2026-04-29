@@ -154,6 +154,25 @@ export function SiteHeader() {
             </button>
           )}
 
+          {user && !isAgent && !isAdmin && (
+            <>
+              <button
+                onClick={() => navigate('/halo/new')}
+                className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                title="Create your Halo"
+              >
+                <Sparkles size={13} /> Create your Halo
+              </button>
+              <button
+                onClick={() => navigate('/dashboard/my-halos')}
+                className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-foreground hover:text-primary hover:bg-primary/5 transition-colors"
+                title="My Halos"
+              >
+                My Halos
+              </button>
+            </>
+          )}
+
           {user && !isAgent && (
             <button
               onClick={() => navigate('/saved')}

@@ -17,11 +17,11 @@ const ForgotPasswordPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const origin = window.location.origin;
-      // Fix #5: Removed ensure_auth_user call — was creating unauth'd users
-
+      // Bug Fix 1: All password reset emails must link back to /login.
+      // SeekerAuthPage detects the recovery hash and forwards to /reset-password
+      // so the user lands on the new-password form with the recovery session intact.
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${origin}/reset-password`,
+        redirectTo: 'https://globalhomes.lovable.app/login',
       });
       if (error) throw error;
       setSent(true);

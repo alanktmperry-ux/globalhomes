@@ -492,6 +492,36 @@ export default function ApprovalsPage() {
   const setDemosCount = useCallback((n: number) => setCounts(c => ({ ...c, demos: n })), []);
   const setPartnersCount = useCallback((n: number) => setCounts(c => ({ ...c, partners: n })), []);
 
+  // Bug Fix 2: Prefetch counts for ALL tabs on mount so the badges and "X total
+  // pending" subtitle are accurate regardless of which tab is currently rendered.
+  // Each tab still re-fetches when activated, so these counts stay in sync.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [agentsRes, listingsRes, demosRes, partnersRes] = await Promise.all([
+          supabase.from('agents').select('id', { count: 'exact', head: true }).eq('approval_status', 'pending'),
+          (supabase.from('properties').select('id', { count: 'exact', head: true })
+            .eq('is_active', false)
+            .neq('moderation_status', 'rejected')
+            .not('status', 'eq', 'archived')) as any,
+          (supabase.from('demo_requests' as any).select('id', { count: 'exact', head: true }).eq('status', 'pending')) as any,
+          (supabase.from('partners').select('id', { count: 'exact', head: true }).eq('is_verified', false)) as any,
+        ]);
+        if (cancelled) return;
+        setCounts({
+          agents: agentsRes.count ?? 0,
+          listings: listingsRes.count ?? 0,
+          demos: demosRes.count ?? 0,
+          partners: partnersRes.count ?? 0,
+        });
+      } catch (err) {
+        console.error('[ApprovalsPage] preload counts failed', err);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
   const total = counts.agents + counts.listings + counts.demos + counts.partners;
 
   return (

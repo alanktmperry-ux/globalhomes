@@ -35,11 +35,9 @@ interface HaloMessage {
   created_at: string;
 }
 
-const formatPrice = (min: number | null, max: number | null) => {
-  if (!min && !max) return null;
-  const fmt = (n: number) => `$${(n / 1000).toFixed(0)}k`;
-  if (min && max) return `${fmt(min)}–${fmt(max)}`;
-  return fmt(min || max!);
+const formatPrice = (price: number | null) => {
+  if (!price) return null;
+  return `$${(price / 1000).toFixed(0)}k`;
 };
 
 export default function SeekerInbox() {

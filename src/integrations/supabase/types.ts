@@ -5469,6 +5469,73 @@ export type Database = {
         }
         Relationships: []
       }
+      halo_pocket_matches: {
+        Row: {
+          agent_id: string
+          halo_id: string
+          id: string
+          notified_at: string
+          pocket_listing_id: string
+        }
+        Insert: {
+          agent_id: string
+          halo_id: string
+          id?: string
+          notified_at?: string
+          pocket_listing_id: string
+        }
+        Update: {
+          agent_id?: string
+          halo_id?: string
+          id?: string
+          notified_at?: string
+          pocket_listing_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "halo_pocket_matches_halo_id_fkey"
+            columns: ["halo_id"]
+            isOneToOne: false
+            referencedRelation: "halos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      halo_referral_credits: {
+        Row: {
+          created_at: string
+          credit_granted: boolean
+          halo_id: string
+          id: string
+          referring_agent_id: string
+          triggered_by: string
+        }
+        Insert: {
+          created_at?: string
+          credit_granted?: boolean
+          halo_id: string
+          id?: string
+          referring_agent_id: string
+          triggered_by: string
+        }
+        Update: {
+          created_at?: string
+          credit_granted?: boolean
+          halo_id?: string
+          id?: string
+          referring_agent_id?: string
+          triggered_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "halo_referral_credits_halo_id_fkey"
+            columns: ["halo_id"]
+            isOneToOne: false
+            referencedRelation: "halos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       halo_responses: {
         Row: {
           agent_id: string
@@ -5498,6 +5565,27 @@ export type Database = {
           },
         ]
       }
+      halo_suburb_digests: {
+        Row: {
+          agent_id: string
+          halo_count: number
+          id: string
+          sent_at: string
+        }
+        Insert: {
+          agent_id: string
+          halo_count: number
+          id?: string
+          sent_at?: string
+        }
+        Update: {
+          agent_id?: string
+          halo_count?: number
+          id?: string
+          sent_at?: string
+        }
+        Relationships: []
+      }
       halos: {
         Row: {
           bathrooms_min: number | null
@@ -5521,6 +5609,9 @@ export type Database = {
           quality_score: number | null
           referral_source: string | null
           seeker_id: string
+          source_agent_id: string | null
+          source_listing_id: string | null
+          source_type: string | null
           status: string
           suburb_flexibility: boolean
           suburbs: string[]
@@ -5549,6 +5640,9 @@ export type Database = {
           quality_score?: number | null
           referral_source?: string | null
           seeker_id: string
+          source_agent_id?: string | null
+          source_listing_id?: string | null
+          source_type?: string | null
           status?: string
           suburb_flexibility?: boolean
           suburbs?: string[]
@@ -5577,13 +5671,38 @@ export type Database = {
           quality_score?: number | null
           referral_source?: string | null
           seeker_id?: string
+          source_agent_id?: string | null
+          source_listing_id?: string | null
+          source_type?: string | null
           status?: string
           suburb_flexibility?: boolean
           suburbs?: string[]
           timeframe?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "halos_source_listing_id_fkey"
+            columns: ["source_listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "halos_source_listing_id_fkey"
+            columns: ["source_listing_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "halos_source_listing_id_fkey"
+            columns: ["source_listing_id"]
+            isOneToOne: false
+            referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       home_service_bookings: {
         Row: {
@@ -11471,6 +11590,7 @@ export type Database = {
           bond_lodgement_number: string | null
           created_at: string
           days_to_re_let: number | null
+          halo_invite_sent: boolean
           id: string
           last_arrears_notice_date: string | null
           lease_end: string
@@ -11509,6 +11629,7 @@ export type Database = {
           bond_lodgement_number?: string | null
           created_at?: string
           days_to_re_let?: number | null
+          halo_invite_sent?: boolean
           id?: string
           last_arrears_notice_date?: string | null
           lease_end: string
@@ -11547,6 +11668,7 @@ export type Database = {
           bond_lodgement_number?: string | null
           created_at?: string
           days_to_re_let?: number | null
+          halo_invite_sent?: boolean
           id?: string
           last_arrears_notice_date?: string | null
           lease_end?: string

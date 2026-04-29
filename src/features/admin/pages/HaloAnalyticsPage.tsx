@@ -185,19 +185,26 @@ export default function HaloAnalyticsPage() {
   }, [halos, responses]);
 
   // ── 12-week chart ──────────────────────────────────────────────────────
+  // Bug Fix 3: Build the last 12 weekly buckets dynamically from "now" — no
+  // hardcoded dates. Each bucket starts on Monday 00:00 local time. The final
+  // bucket is always the current week, so halos posted today land in it.
   const chartData = useMemo(() => {
-    const buckets: { week: string; count: number; ts: number }[] = [];
+    const buckets: { week: string; count: number; ts: number; isCurrent: boolean }[] = [];
     const now = new Date();
+    // Snap "now" back to this week's Monday (local time)
+    const thisMonday = new Date(now);
+    const dow = thisMonday.getDay(); // 0 = Sun … 6 = Sat
+    thisMonday.setDate(thisMonday.getDate() - ((dow + 6) % 7));
+    thisMonday.setHours(0, 0, 0, 0);
+
     for (let i = 11; i >= 0; i--) {
-      const start = new Date(now);
+      const start = new Date(thisMonday);
       start.setDate(start.getDate() - i * 7);
-      const day = start.getDay();
-      start.setDate(start.getDate() - ((day + 6) % 7));
-      start.setHours(0, 0, 0, 0);
       buckets.push({
         week: start.toLocaleDateString('en-AU', { month: 'short', day: 'numeric' }),
         count: 0,
         ts: start.getTime(),
+        isCurrent: i === 0,
       });
     }
     allHalos.forEach((h) => {
@@ -287,11 +294,18 @@ export default function HaloAnalyticsPage() {
             <h2 className="font-semibold">Halos posted per week</h2>
             <span className="text-xs text-muted-foreground">Last 12 weeks</span>
           </div>
-          <div className="h-64">
+          <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
+              <LineChart data={chartData} margin={{ top: 10, right: 16, left: 0, bottom: 24 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="week" tick={{ fontSize: 11 }} />
+                <XAxis
+                  dataKey="week"
+                  tick={{ fontSize: 11 }}
+                  interval={0}
+                  angle={-35}
+                  textAnchor="end"
+                  height={48}
+                />
                 <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
                 <Tooltip
                   contentStyle={{
@@ -300,13 +314,31 @@ export default function HaloAnalyticsPage() {
                     borderRadius: 8,
                     fontSize: 12,
                   }}
+                  labelFormatter={(label, payload) => {
+                    const p = payload?.[0]?.payload as { isCurrent?: boolean } | undefined;
+                    return `Week of ${label}${p?.isCurrent ? ' (this week)' : ''}`;
+                  }}
                 />
                 <Line
                   type="monotone"
                   dataKey="count"
                   stroke="hsl(var(--primary))"
                   strokeWidth={2}
-                  dot={{ r: 3 }}
+                  dot={(props: any) => {
+                    const { cx, cy, payload, index } = props;
+                    const isCurrent = payload?.isCurrent;
+                    return (
+                      <circle
+                        key={`dot-${index}`}
+                        cx={cx}
+                        cy={cy}
+                        r={isCurrent ? 5 : 3}
+                        fill={isCurrent ? 'hsl(var(--primary))' : 'hsl(var(--background))'}
+                        stroke="hsl(var(--primary))"
+                        strokeWidth={2}
+                      />
+                    );
+                  }}
                 />
               </LineChart>
             </ResponsiveContainer>

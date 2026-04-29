@@ -36,7 +36,7 @@ export default function AdminLayout() {
       try {
         // IMPORTANT: these filters MUST mirror what ApprovalsPage actually displays,
         // otherwise the sidebar badge and the page list go out of sync.
-        const [agentsRes, propsRes, demosRes] = await Promise.all([
+        const [agentsRes, propsRes, demosRes, partnersRes] = await Promise.all([
           supabase.from('agents').select('id', { count: 'exact', head: true }).eq('approval_status', 'pending'),
           // Match ListingsTab: inactive AND not rejected AND not archived
           (supabase.from('properties').select('id', { count: 'exact', head: true })
@@ -44,9 +44,11 @@ export default function AdminLayout() {
             .neq('moderation_status', 'rejected')
             .not('status', 'eq', 'archived')) as any,
           (supabase.from('demo_requests' as any).select('id', { count: 'exact', head: true }).eq('status', 'pending')) as any,
+          // Match PartnersTab: unverified partners
+          (supabase.from('partners').select('id', { count: 'exact', head: true }).eq('is_verified', false)) as any,
         ]);
         if (cancelled) return;
-        const total = (agentsRes.count ?? 0) + (propsRes.count ?? 0) + (demosRes.count ?? 0);
+        const total = (agentsRes.count ?? 0) + (propsRes.count ?? 0) + (demosRes.count ?? 0) + (partnersRes.count ?? 0);
         setPendingTotal(total);
       } catch {
         if (!cancelled) setPendingTotal(0);

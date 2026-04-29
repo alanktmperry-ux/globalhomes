@@ -224,6 +224,31 @@ const AgentDashboardSidebar = () => {
     return () => { if (channel) supabase.removeChannel(channel); };
   }, [agent?.id]);
 
+  // Halo credits badge + realtime
+  useEffect(() => {
+    if (!agent?.user_id) return;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    (async () => {
+      const refresh = async () => {
+        const { data } = await supabase
+          .from('halo_credits')
+          .select('balance')
+          .eq('agent_id', agent.user_id)
+          .maybeSingle();
+        setHaloCredits(data?.balance ?? 0);
+      };
+      await refresh();
+      channel = supabase
+        .channel('sidebar-halo-credits-' + agent.user_id)
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'halo_credits', filter: `agent_id=eq.${agent.user_id}` },
+          () => refresh(),
+        )
+        .subscribe();
+    })();
+    return () => { if (channel) supabase.removeChannel(channel); };
+
   // Check onboarding status
   useEffect(() => {
     setOnboardingComplete(!!agent?.onboarding_complete);

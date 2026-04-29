@@ -104,7 +104,7 @@ const AgentDashboardSidebar = () => {
   const isMobile = useIsMobile();
   const location = useLocation();
   const navigate = useNavigate();
-  const { signOut, isAdmin, isPrincipal } = useAuth();
+  const { signOut, isAdmin, isPrincipal, user } = useAuth();
   const { agent } = useCurrentAgent();
   const { plan } = useSubscription();
   const [activeCount, setActiveCount] = useState(0);

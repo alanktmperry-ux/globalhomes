@@ -41,6 +41,109 @@ Deno.serve(async (req) => {
       });
     }
 
+    // ── Referral credit: if this Halo originated via a referring agent
+    // (listing CTA, CRM invite, rent roll, settlement) AND this is the very
+    // first agent response, grant the referring agent 1 free credit.
+    try {
+      if (halo.source_agent_id) {
+        const { count } = await admin
+          .from('halo_responses')
+          .select('id', { count: 'exact', head: true })
+          .eq('halo_id', halo.id);
+
+        // The unlocking agent's row was inserted before this function runs.
+        if ((count ?? 0) === 1) {
+          const triggerMap: Record<string, string> = {
+            listing_qr: 'listing_qr',
+            crm_invite: 'crm_invite',
+            rent_roll: 'rent_roll',
+            settlement: 'settlement',
+          };
+          const trigger = triggerMap[halo.source_type] ?? 'listing_qr';
+
+          // Insert referral row if not already present
+          const { data: existingRef } = await admin
+            .from('halo_referral_credits')
+            .select('id, credit_granted')
+            .eq('referring_agent_id', halo.source_agent_id)
+            .eq('halo_id', halo.id)
+            .maybeSingle();
+
+          let referralRowId: string | null = existingRef?.id ?? null;
+          let alreadyGranted = !!existingRef?.credit_granted;
+
+          if (!existingRef) {
+            const { data: newRef } = await admin
+              .from('halo_referral_credits')
+              .insert({
+                referring_agent_id: halo.source_agent_id,
+                halo_id: halo.id,
+                triggered_by: trigger,
+                credit_granted: false,
+              })
+              .select('id')
+              .single();
+            referralRowId = newRef?.id ?? null;
+          }
+
+          if (referralRowId && !alreadyGranted) {
+            // Upsert credit balance
+            const { data: bal } = await admin
+              .from('halo_credits')
+              .select('balance')
+              .eq('agent_id', halo.source_agent_id)
+              .maybeSingle();
+
+            if (bal) {
+              await admin
+                .from('halo_credits')
+                .update({ balance: (bal.balance ?? 0) + 1, updated_at: new Date().toISOString() })
+                .eq('agent_id', halo.source_agent_id);
+            } else {
+              await admin
+                .from('halo_credits')
+                .insert({ agent_id: halo.source_agent_id, balance: 1 });
+            }
+
+            await admin.from('halo_credit_transactions').insert({
+              agent_id: halo.source_agent_id,
+              amount: 1,
+              type: 'grant',
+              halo_id: halo.id,
+              note: `Referral credit (${trigger})`,
+            });
+
+            await admin
+              .from('halo_referral_credits')
+              .update({ credit_granted: true })
+              .eq('id', referralRowId);
+
+            // Notify referring agent
+            if (resendKey) {
+              const { data: refUser } = await admin.auth.admin.getUserById(halo.source_agent_id);
+              const refEmail = refUser?.user?.email;
+              if (refEmail) {
+                const suburb = (halo.suburbs ?? [])[0] ?? 'your area';
+                await fetch('https://api.resend.com/emails', {
+                  method: 'POST',
+                  headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    from: 'ListHQ <onboarding@resend.dev>',
+                    to: [refEmail],
+                    subject: 'You earned a referral credit on ListHQ',
+                    html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#0f172a;"><h1 style="font-size:22px;margin:0 0 12px;">You earned a referral credit</h1><p style="font-size:15px;line-height:1.5;">A buyer you introduced via your listing in <strong>${suburb}</strong> just had their Halo unlocked by an agent. We've added <strong>1 free credit</strong> to your account.</p><p style="margin:24px 0;"><a href="https://globalhomes.lovable.app/dashboard/halo-board" style="display:inline-block;background:#3b82f6;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600;">View Halo Board →</a></p><p style="font-size:12px;color:#64748b;margin-top:32px;">— The ListHQ team</p></div>`,
+                  }),
+                });
+              }
+            }
+          }
+        }
+      }
+    } catch (refErr) {
+      console.error('referral credit error', refErr);
+      // non-fatal — continue with seeker email
+    }
+
     const { data: userData } = await admin.auth.admin.getUserById(halo.seeker_id);
     const recipientEmail = userData?.user?.email;
     if (!recipientEmail) {

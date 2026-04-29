@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -36,12 +36,21 @@ const initialData: HaloFormData = {
 
 const STEP_LABELS = ['What are you looking for?', 'Where and how much?', 'Tell agents more'];
 
+const VALID_SOURCE_TYPES = new Set(['direct','listing_qr','crm_invite','rent_roll','voice_lead','settlement']);
+
 export default function CreateHaloPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const [step, setStep] = useState(1);
   const [data, setData] = useState<HaloFormData>(initialData);
   const [restored, setRestored] = useState(false);
+  const [prefilled, setPrefilled] = useState(false);
+  const [source, setSource] = useState<{
+    source_listing_id?: string;
+    source_agent_id?: string;
+    source_type?: string;
+  }>({});
   const [submitting, setSubmitting] = useState(false);
   const [stepError, setStepError] = useState<string | null>(null);
 
@@ -59,6 +68,37 @@ export default function CreateHaloPage() {
     } catch {
       /* ignore */
     }
+  }, []);
+
+  // Apply query-param prefill (Listing CTA, CRM invite, voice lead, rent roll)
+  useEffect(() => {
+    const intent = searchParams.get('intent');
+    const suburb = searchParams.get('suburb');
+    const budgetMax = searchParams.get('budget_max');
+    const propertyType = searchParams.get('property_type');
+    const sLid = searchParams.get('source_listing_id') ?? undefined;
+    const sAid = searchParams.get('source_agent_id') ?? undefined;
+    const sType = searchParams.get('source_type') ?? undefined;
+
+    let touched = false;
+    const patch: Partial<HaloFormData> = {};
+    if (intent === 'buy' || intent === 'rent') { patch.intent = intent; touched = true; }
+    if (suburb) { patch.suburbs = [suburb]; touched = true; }
+    if (budgetMax && !Number.isNaN(Number(budgetMax))) { patch.budget_max = Number(budgetMax); touched = true; }
+    if (propertyType) { patch.property_types = [propertyType]; touched = true; }
+
+    if (touched) {
+      setData((d) => ({ ...d, ...patch }));
+      setPrefilled(true);
+    }
+    if (sLid || sAid || sType) {
+      setSource({
+        source_listing_id: sLid,
+        source_agent_id: sAid,
+        source_type: sType && VALID_SOURCE_TYPES.has(sType) ? sType : undefined,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Auto-save
@@ -104,30 +144,35 @@ export default function CreateHaloPage() {
     }
     setSubmitting(true);
     try {
+      const insertPayload: Record<string, unknown> = { ...data, seeker_id: user.id };
+      if (source.source_listing_id) insertPayload.source_listing_id = source.source_listing_id;
+      if (source.source_agent_id) insertPayload.source_agent_id = source.source_agent_id;
+      if (source.source_type) insertPayload.source_type = source.source_type;
+
       const { data: inserted, error } = await supabase
         .from('halos' as any)
-        .insert({ ...data, seeker_id: user.id })
+        .insert(insertPayload)
         .select('id')
         .single();
       if (error) throw error;
 
-      // Fire confirmation email (best-effort)
       try {
         await supabase.functions.invoke('send-halo-confirmation', {
           body: { id: (inserted as any).id, seeker_id: user.id },
         });
-      } catch {
-        /* non-fatal */
-      }
+      } catch { /* non-fatal */ }
 
-      // Score the Halo (best-effort)
       try {
         await supabase.functions.invoke('score-halo', {
           body: { halo_id: (inserted as any).id },
         });
-      } catch {
-        /* non-fatal */
-      }
+      } catch { /* non-fatal */ }
+
+      try {
+        await supabase.functions.invoke('match-halo-to-pocket-listings', {
+          body: { halo_id: (inserted as any).id },
+        });
+      } catch { /* non-fatal */ }
 
       localStorage.removeItem(DRAFT_KEY);
       toast.success('Your Halo is live');
@@ -151,6 +196,14 @@ export default function CreateHaloPage() {
         <div className="mb-6">
           <HaloStepIndicator current={step} total={3} labels={STEP_LABELS} />
         </div>
+
+        {prefilled && (
+          <Alert className="mb-4">
+            <AlertDescription>
+              We've pre-filled some details from the listing you viewed. Check and adjust anything before posting.
+            </AlertDescription>
+          </Alert>
+        )}
 
         {restored && (
           <Alert className="mb-6">

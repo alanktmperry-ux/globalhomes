@@ -49,6 +49,7 @@ import { ShareSheet } from '@/shared/components/ShareSheet';
 import { MortgageBrokerCTA } from '@/features/mortgage/components/MortgageBrokerCTA';
 import { MortgageReferralModal } from '@/components/MortgageReferralModal';
 import { useListingTranslation } from '@/features/properties/hooks/useListingTranslation';
+import { HaloFromListingCTA } from '@/components/halo/HaloFromListingCTA';
 
 export default function PropertyDetailPage() {
   // Support both /property/:slug and /property/:uuid for backward compat
@@ -933,6 +934,16 @@ export default function PropertyDetailPage() {
                 agentId={property.agent?.id ?? null}
               />
             )}
+
+            <HaloFromListingCTA
+              listingId={property.id}
+              agentId={property.agent?.id ?? null}
+              listingType={isRental ? 'lease' : 'sale'}
+              suburb={property.suburb}
+              price={property.price}
+              weeklyRent={(rawProperty as any)?.rent_per_week ?? (rawProperty as any)?.weekly_rent ?? null}
+              propertyType={(rawProperty as any)?.property_type ?? null}
+            />
 
             {!isRental && (
               <div className="mt-4 p-4 rounded-xl border border-primary/20 bg-primary/5">

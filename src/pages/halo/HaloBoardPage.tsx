@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HaloPreviewCard } from '@/components/halo/HaloPreviewCard';
 import { HaloUnlockDialog } from '@/components/halo/HaloUnlockDialog';
 import { AgentCreditBadge } from '@/components/halo/AgentCreditBadge';
@@ -17,15 +18,19 @@ import {
 } from '@/components/halo/HaloBoardFilters';
 import type { Halo } from '@/types/halo';
 
+type BoardTab = 'all' | 'pocket';
+
 export default function HaloBoardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [halos, setHalos] = useState<Halo[]>([]);
   const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set());
+  const [pocketMatchIds, setPocketMatchIds] = useState<Set<string>>(new Set());
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [filters, setFilters] = useState<HaloBoardFiltersState>(DEFAULT_FILTERS);
+  const [tab, setTab] = useState<BoardTab>('all');
   const [target, setTarget] = useState<Halo | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -35,7 +40,7 @@ export default function HaloBoardPage() {
     (async () => {
       setLoading(true);
       try {
-        const [halosRes, respRes, credRes] = await Promise.all([
+        const [halosRes, respRes, credRes, pmRes] = await Promise.all([
           supabase
             .from('halos')
             .select('*')
@@ -43,11 +48,13 @@ export default function HaloBoardPage() {
             .order('created_at', { ascending: false }),
           supabase.from('halo_responses').select('halo_id').eq('agent_id', user.id),
           supabase.from('halo_credits').select('balance').eq('agent_id', user.id).maybeSingle(),
+          supabase.from('halo_pocket_matches').select('halo_id').eq('agent_id', user.id),
         ]);
         if (!active) return;
         if (halosRes.error) throw halosRes.error;
         setHalos((halosRes.data ?? []) as Halo[]);
         setUnlockedIds(new Set((respRes.data ?? []).map((r: any) => r.halo_id)));
+        setPocketMatchIds(new Set((pmRes.data ?? []).map((r: any) => r.halo_id)));
         setBalance(credRes.data?.balance ?? 0);
       } catch (e) {
         console.error('[HaloBoard] load error', e);
@@ -61,7 +68,8 @@ export default function HaloBoardPage() {
     };
   }, [user]);
 
-  const filtered = applyFilters(halos, filters);
+  const tabFiltered = tab === 'pocket' ? halos.filter((h) => pocketMatchIds.has(h.id)) : halos;
+  const filtered = applyFilters(tabFiltered, filters);
 
   const handleConfirm = async () => {
     if (!user || !target) return;
@@ -147,10 +155,25 @@ export default function HaloBoardPage() {
         </div>
       ) : (
         <>
+          <Tabs value={tab} onValueChange={(v) => setTab(v as BoardTab)} className="mb-4">
+            <TabsList>
+              <TabsTrigger value="all">All Halos</TabsTrigger>
+              <TabsTrigger value="pocket">
+                Private Matches
+                {pocketMatchIds.size > 0 && (
+                  <span className="ml-1.5 inline-flex items-center justify-center min-w-[18px] h-[18px] text-[10px] rounded-full bg-amber-500 text-white px-1">
+                    {pocketMatchIds.size}
+                  </span>
+                )}
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
           <HaloBoardFilters value={filters} onChange={setFilters} resultCount={filtered.length} />
           {filtered.length === 0 ? (
             <p className="text-center text-muted-foreground py-12">
-              No active Halos match your filters.
+              {tab === 'pocket'
+                ? 'No Halos match any of your pocket listings yet.'
+                : 'No active Halos match your filters.'}
             </p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -160,6 +183,7 @@ export default function HaloBoardPage() {
                   halo={h}
                   unlocked={unlockedIds.has(h.id)}
                   onRespond={setTarget}
+                  pocketMatch={pocketMatchIds.has(h.id)}
                 />
               ))}
             </div>

@@ -282,8 +282,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (cancelled) return;
         const isAdminUser = roles.includes('admin');
         const isApprovedAgent = !!agentData && ((agentData as any).approval_status === 'approved' || isAdminUser);
-        // Strip any stale agent role if the agents row exists but isn't approved
-        const filteredRoles = roles.filter((r) => !(r === 'agent' && agentData && !isApprovedAgent));
+        // Stricter: an 'agent' role is only honoured when an approved agents row exists
+        const filteredRoles = roles.filter((r) => {
+          if (r !== 'agent') return true;
+          return isApprovedAgent;
+        });
         if (isApprovedAgent && !filteredRoles.includes('agent')) {
           filteredRoles.push('agent');
           // Best-effort backfill of user_roles row

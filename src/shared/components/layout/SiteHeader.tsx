@@ -8,6 +8,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { NotificationBell } from '@/features/agents/components/dashboard/NotificationBell';
+import { SeekerNotificationBell } from '@/components/halo/SeekerNotificationBell';
 import { LanguageSwitcher } from '@/shared/components/layout/LanguageSwitcher';
 import { CurrencySwitcher } from '@/shared/components/layout/CurrencySwitcher';
 // Lazy-loaded — pulls in framer-motion, only needed when the user opens the
@@ -159,17 +160,18 @@ export function SiteHeader() {
               <button
                 onClick={() => navigate('/halo/new')}
                 className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-                title="Create your Halo"
+                title="Post a Halo"
               >
-                <Sparkles size={13} /> Create your Halo
+                <Sparkles size={13} /> + Post a Halo
               </button>
               <button
-                onClick={() => navigate('/dashboard/my-halos')}
+                onClick={() => navigate('/seeker/dashboard')}
                 className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-foreground hover:text-primary hover:bg-primary/5 transition-colors"
                 title="My Halos"
               >
                 My Halos
               </button>
+              <SeekerNotificationBell />
             </>
           )}
 

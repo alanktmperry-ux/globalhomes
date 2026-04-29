@@ -168,6 +168,7 @@ const CreateHaloPage = React.lazy(() => import("./pages/halo/CreateHaloPage"));
 const MyHalosPage = React.lazy(() => import("./pages/halo/MyHalosPage"));
 const HaloBoardPage = React.lazy(() => import("./pages/halo/HaloBoardPage"));
 const HaloDetailPage = React.lazy(() => import("./pages/halo/HaloDetailPage"));
+const SeekerDashboard = React.lazy(() => import("./pages/seeker/SeekerDashboard"));
 const AdminHaloCreditsPage = React.lazy(() => import("./features/admin/pages/HaloCreditsPage"));
 const AdminHaloHealthPage = React.lazy(() => import("./features/admin/pages/HaloHealthPage"));
 const AdminHaloAnalyticsPage = React.lazy(() => import("./features/admin/pages/HaloAnalyticsPage"));
@@ -357,6 +358,8 @@ const App = () => (
                 {/* Halo — seeker reverse marketplace */}
                 <Route path="/halo/new" element={<ProtectedRoute><CreateHaloPage /></ProtectedRoute>} />
                 <Route path="/dashboard/my-halos" element={<ProtectedRoute><MyHalosPage /></ProtectedRoute>} />
+                <Route path="/seeker/dashboard" element={<SeekerDashboard />} />
+                <Route path="/seeker/inbox" element={<Navigate to="/seeker/dashboard" replace />} />
 
                 {/* Agent */}
                 <Route path="/agent-dashboard" element={<ProtectedRoute requireAgent><AgentPerformanceDashboard /></ProtectedRoute>} />

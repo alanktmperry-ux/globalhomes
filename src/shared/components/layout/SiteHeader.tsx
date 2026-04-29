@@ -154,6 +154,25 @@ export function SiteHeader() {
             </button>
           )}
 
+          {user && !isAgent && !isAdmin && (
+            <>
+              <button
+                onClick={() => navigate('/halo/new')}
+                className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                title="Create your Halo"
+              >
+                <Sparkles size={13} /> Create your Halo
+              </button>
+              <button
+                onClick={() => navigate('/dashboard/my-halos')}
+                className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-foreground hover:text-primary hover:bg-primary/5 transition-colors"
+                title="My Halos"
+              >
+                My Halos
+              </button>
+            </>
+          )}
+
           {user && !isAgent && (
             <button
               onClick={() => navigate('/saved')}
@@ -323,6 +342,18 @@ export function SiteHeader() {
                   <button onClick={() => navTo('/admin')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
                     <ShieldCheck size={16} className="text-primary" /> Admin
                   </button>
+                )}
+
+                {/* Buyer links */}
+                {user && !isAgent && !isAdmin && (
+                  <>
+                    <button onClick={() => navTo('/halo/new')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
+                      <Sparkles size={16} className="text-primary" /> Create your Halo
+                    </button>
+                    <button onClick={() => navTo('/dashboard/my-halos')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
+                      <Sparkles size={16} className="text-muted-foreground" /> My Halos
+                    </button>
+                  </>
                 )}
 
                 {/* Buyer links */}

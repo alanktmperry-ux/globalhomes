@@ -5252,6 +5252,87 @@ export type Database = {
           },
         ]
       }
+      halos: {
+        Row: {
+          bathrooms_min: number | null
+          bedrooms_max: number | null
+          bedrooms_min: number | null
+          budget_max: number
+          budget_min: number | null
+          car_spaces_min: number | null
+          created_at: string
+          deal_breakers: string | null
+          description: string | null
+          expires_at: string
+          expiry_reminder_sent: boolean
+          finance_status: string
+          id: string
+          intent: string
+          must_haves: string[]
+          preferred_language: string
+          property_types: string[]
+          referral_source: string | null
+          seeker_id: string
+          status: string
+          suburb_flexibility: boolean
+          suburbs: string[]
+          timeframe: string
+          updated_at: string
+        }
+        Insert: {
+          bathrooms_min?: number | null
+          bedrooms_max?: number | null
+          bedrooms_min?: number | null
+          budget_max: number
+          budget_min?: number | null
+          car_spaces_min?: number | null
+          created_at?: string
+          deal_breakers?: string | null
+          description?: string | null
+          expires_at?: string
+          expiry_reminder_sent?: boolean
+          finance_status: string
+          id?: string
+          intent: string
+          must_haves?: string[]
+          preferred_language?: string
+          property_types?: string[]
+          referral_source?: string | null
+          seeker_id: string
+          status?: string
+          suburb_flexibility?: boolean
+          suburbs?: string[]
+          timeframe: string
+          updated_at?: string
+        }
+        Update: {
+          bathrooms_min?: number | null
+          bedrooms_max?: number | null
+          bedrooms_min?: number | null
+          budget_max?: number
+          budget_min?: number | null
+          car_spaces_min?: number | null
+          created_at?: string
+          deal_breakers?: string | null
+          description?: string | null
+          expires_at?: string
+          expiry_reminder_sent?: boolean
+          finance_status?: string
+          id?: string
+          intent?: string
+          must_haves?: string[]
+          preferred_language?: string
+          property_types?: string[]
+          referral_source?: string | null
+          seeker_id?: string
+          status?: string
+          suburb_flexibility?: boolean
+          suburbs?: string[]
+          timeframe?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       home_service_bookings: {
         Row: {
           agent_id: string | null

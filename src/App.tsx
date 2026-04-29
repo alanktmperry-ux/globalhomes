@@ -164,6 +164,8 @@ const HelpPropertyManagersPage = React.lazy(() => import("./pages/HelpPropertyMa
 const HelpContactPage = React.lazy(() => import("./pages/HelpContactPage"));
 const CRMPage = React.lazy(() => import("./features/crm/pages/CRMPage"));
 const SavedSearchesPage = React.lazy(() => import("./features/alerts/pages/SavedSearchesPage"));
+const CreateHaloPage = React.lazy(() => import("./pages/halo/CreateHaloPage"));
+const MyHalosPage = React.lazy(() => import("./pages/halo/MyHalosPage"));
 const StampDutyPage = React.lazy(() => import("./pages/StampDutyPage"));
 const HomeServicesPage = React.lazy(() => import("./features/services/pages/HomeServicesPage"));
 const ConveyancingPage = React.lazy(() => import("./features/conveyancing/pages/ConveyancingPage"));
@@ -345,6 +347,10 @@ const App = () => (
                 <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute><BuyerSettingsPage /></ProtectedRoute>} />
                 <Route path="/my-applications" element={<ProtectedRoute><MyApplicationsPage /></ProtectedRoute>} />
+
+                {/* Halo (seeker reverse marketplace) */}
+                <Route path="/halo/new" element={<ProtectedRoute><CreateHaloPage /></ProtectedRoute>} />
+                <Route path="/dashboard/my-halos" element={<ProtectedRoute><MyHalosPage /></ProtectedRoute>} />
 
                 {/* Agent */}
                 <Route path="/agent-dashboard" element={<ProtectedRoute requireAgent><AgentPerformanceDashboard /></ProtectedRoute>} />

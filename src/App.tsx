@@ -314,6 +314,8 @@ const App = () => (
                   <Route path="/exclusive" element={<ExclusiveLandingPage />} />
                   <Route path="/exclusive/listings" element={<ExclusiveListingsPage />} />
                   <Route path="/valuation" element={<ValuationPage />} />
+                  <Route path="/seeker/dashboard" element={<SeekerDashboard />} />
+                  <Route path="/seeker/inbox" element={<ProtectedRoute><SeekerInbox /></ProtectedRoute>} />
                 </Route>
 
                 {/* Public standalone pages (no shared layout) */}
@@ -359,8 +361,6 @@ const App = () => (
                 {/* Halo — seeker reverse marketplace */}
                 <Route path="/halo/new" element={<ProtectedRoute><CreateHaloPage /></ProtectedRoute>} />
                 <Route path="/dashboard/my-halos" element={<ProtectedRoute><MyHalosPage /></ProtectedRoute>} />
-                <Route path="/seeker/dashboard" element={<SeekerDashboard />} />
-                <Route path="/seeker/inbox" element={<ProtectedRoute><SeekerInbox /></ProtectedRoute>} />
 
                 {/* Agent */}
                 <Route path="/agent-dashboard" element={<ProtectedRoute requireAgent><AgentPerformanceDashboard /></ProtectedRoute>} />

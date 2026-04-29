@@ -22,6 +22,21 @@ export default function SeekerDashboard() {
   const [halos, setHalos] = useState<HaloRow[] | null>(null);
   const [unreadTotal, setUnreadTotal] = useState(0);
   const [filter, setFilter] = useState<'all' | 'buy' | 'rent'>('all');
+  const [profile, setProfile] = useState<{ first_name: string | null; full_name: string | null } | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('first_name, full_name')
+        .eq('id', user.id)
+        .maybeSingle();
+      if (!cancelled) setProfile(data as any);
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -77,6 +92,8 @@ export default function SeekerDashboard() {
 
   const firstName = (user.user_metadata?.first_name as string)
     ?? (user.user_metadata?.full_name as string)?.split(' ')[0]
+    ?? profile?.first_name
+    ?? profile?.full_name?.split(' ')[0]
     ?? user.email?.split('@')[0]
     ?? 'there';
 
@@ -89,7 +106,9 @@ export default function SeekerDashboard() {
     return {
       active: activeHalos.length,
       unread: unreadTotal,
-      languages: Array.from(langs).join(', ') || 'English',
+      languages: Array.from(langs)
+        .map((l) => l.charAt(0).toUpperCase() + l.slice(1))
+        .join(', ') || 'English',
     };
   }, [halos, activeHalos.length, unreadTotal]);
 
@@ -246,7 +265,9 @@ function HaloCard({ halo }: { halo: HaloRow }) {
       </div>
 
       <p className="text-sm text-[#64748B] mb-3">
-        Budget {fmtMoney(halo.budget_min)} – {fmtMoney(halo.budget_max)}
+        {halo.budget_min == null
+          ? `Up to ${fmtMoney(halo.budget_max)}`
+          : `${fmtMoney(halo.budget_min)} – ${fmtMoney(halo.budget_max)}`}
         {' · Posted '}{ageDays === 0 ? 'today' : `${ageDays} day${ageDays === 1 ? '' : 's'} ago`}
       </p>
 

@@ -302,24 +302,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
         }
 
-        // Post-login redirect: only approved agents land on dashboard
+        // Post-login redirect:
+        //   approved agents/admins → /dashboard or /admin
+        //   seekers (everyone else) → /seeker/dashboard, BUT only when they
+        //   logged in via /login or /auth (never auto-bounce them off public pages)
         const isAgentUser = filteredRoles.includes('agent') || filteredRoles.includes('admin');
         const path = window.location.pathname;
-        const onAuthPage = [
-          '/',
-          '/login',
-          '/auth',
-          '/agent-auth',
-          '/agents/login',
-          '/auth/confirm',
-          '/auth/callback',
-        ].includes(path);
-        if (isAgentUser && onAuthPage && sessionStorage.getItem('post_login_redirected') !== '1') {
-          sessionStorage.setItem('post_login_redirected', '1');
+        const agentAuthPages = [
+          '/', '/login', '/auth', '/agent-auth', '/agents/login',
+          '/auth/confirm', '/auth/callback',
+        ];
+        const seekerAuthPages = ['/login', '/auth', '/auth/confirm', '/auth/callback'];
+        if (sessionStorage.getItem('post_login_redirected') !== '1') {
           const returnTo = new URLSearchParams(window.location.search).get('return_to');
-          const destination = returnTo && returnTo.startsWith('/') ? returnTo : '/dashboard';
-          window.location.replace(destination);
-          return;
+          const safeReturnTo = returnTo && returnTo.startsWith('/') ? returnTo : null;
+          if (isAgentUser && agentAuthPages.includes(path)) {
+            sessionStorage.setItem('post_login_redirected', '1');
+            window.location.replace(safeReturnTo ?? (filteredRoles.includes('admin') ? '/admin' : '/dashboard'));
+            return;
+          }
+          if (!isAgentUser && !filteredRoles.includes('partner') && !filteredRoles.includes('support') && seekerAuthPages.includes(path)) {
+            sessionStorage.setItem('post_login_redirected', '1');
+            window.location.replace(safeReturnTo ?? '/seeker/dashboard');
+            return;
+          }
         }
       } catch (err) {
         console.error('[Auth] fetchRoles error:', err);

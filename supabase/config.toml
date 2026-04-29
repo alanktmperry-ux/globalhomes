@@ -59,3 +59,6 @@ verify_jwt = false
 
 [functions.backfill-property-coordinates]
 verify_jwt = false
+
+[functions.send-auth-email]
+verify_jwt = false

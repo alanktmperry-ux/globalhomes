@@ -40,7 +40,7 @@ export default function HaloBoardPage() {
     (async () => {
       setLoading(true);
       try {
-        const [halosRes, respRes, credRes] = await Promise.all([
+        const [halosRes, respRes, credRes, pmRes] = await Promise.all([
           supabase
             .from('halos')
             .select('*')
@@ -48,11 +48,13 @@ export default function HaloBoardPage() {
             .order('created_at', { ascending: false }),
           supabase.from('halo_responses').select('halo_id').eq('agent_id', user.id),
           supabase.from('halo_credits').select('balance').eq('agent_id', user.id).maybeSingle(),
+          supabase.from('halo_pocket_matches').select('halo_id').eq('agent_id', user.id),
         ]);
         if (!active) return;
         if (halosRes.error) throw halosRes.error;
         setHalos((halosRes.data ?? []) as Halo[]);
         setUnlockedIds(new Set((respRes.data ?? []).map((r: any) => r.halo_id)));
+        setPocketMatchIds(new Set((pmRes.data ?? []).map((r: any) => r.halo_id)));
         setBalance(credRes.data?.balance ?? 0);
       } catch (e) {
         console.error('[HaloBoard] load error', e);
@@ -66,7 +68,8 @@ export default function HaloBoardPage() {
     };
   }, [user]);
 
-  const filtered = applyFilters(halos, filters);
+  const tabFiltered = tab === 'pocket' ? halos.filter((h) => pocketMatchIds.has(h.id)) : halos;
+  const filtered = applyFilters(tabFiltered, filters);
 
   const handleConfirm = async () => {
     if (!user || !target) return;

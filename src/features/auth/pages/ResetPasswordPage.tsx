@@ -63,6 +63,7 @@ const inputClass = "w-full pl-10 pr-11 py-3.5 rounded-[14px] border border-stone
 const ResetPasswordPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { refreshRoles } = useAuth();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);

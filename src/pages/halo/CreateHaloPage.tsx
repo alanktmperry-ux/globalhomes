@@ -120,6 +120,15 @@ export default function CreateHaloPage() {
         /* non-fatal */
       }
 
+      // Score the Halo (best-effort)
+      try {
+        await supabase.functions.invoke('score-halo', {
+          body: { halo_id: (inserted as any).id },
+        });
+      } catch {
+        /* non-fatal */
+      }
+
       localStorage.removeItem(DRAFT_KEY);
       toast.success('Your Halo is live');
       navigate('/dashboard/my-halos');

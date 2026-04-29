@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { Mic, Flame, Thermometer, Snowflake, Phone, MessageSquare, Mail, X, MapPin, Shield, Sparkles, Loader2, UserPlus, Check } from 'lucide-react';

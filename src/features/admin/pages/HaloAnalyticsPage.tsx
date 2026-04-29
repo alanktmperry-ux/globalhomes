@@ -185,19 +185,26 @@ export default function HaloAnalyticsPage() {
   }, [halos, responses]);
 
   // ── 12-week chart ──────────────────────────────────────────────────────
+  // Bug Fix 3: Build the last 12 weekly buckets dynamically from "now" — no
+  // hardcoded dates. Each bucket starts on Monday 00:00 local time. The final
+  // bucket is always the current week, so halos posted today land in it.
   const chartData = useMemo(() => {
-    const buckets: { week: string; count: number; ts: number }[] = [];
+    const buckets: { week: string; count: number; ts: number; isCurrent: boolean }[] = [];
     const now = new Date();
+    // Snap "now" back to this week's Monday (local time)
+    const thisMonday = new Date(now);
+    const dow = thisMonday.getDay(); // 0 = Sun … 6 = Sat
+    thisMonday.setDate(thisMonday.getDate() - ((dow + 6) % 7));
+    thisMonday.setHours(0, 0, 0, 0);
+
     for (let i = 11; i >= 0; i--) {
-      const start = new Date(now);
+      const start = new Date(thisMonday);
       start.setDate(start.getDate() - i * 7);
-      const day = start.getDay();
-      start.setDate(start.getDate() - ((day + 6) % 7));
-      start.setHours(0, 0, 0, 0);
       buckets.push({
         week: start.toLocaleDateString('en-AU', { month: 'short', day: 'numeric' }),
         count: 0,
         ts: start.getTime(),
+        isCurrent: i === 0,
       });
     }
     allHalos.forEach((h) => {

@@ -155,10 +155,25 @@ export default function HaloBoardPage() {
         </div>
       ) : (
         <>
+          <Tabs value={tab} onValueChange={(v) => setTab(v as BoardTab)} className="mb-4">
+            <TabsList>
+              <TabsTrigger value="all">All Halos</TabsTrigger>
+              <TabsTrigger value="pocket">
+                Private Matches
+                {pocketMatchIds.size > 0 && (
+                  <span className="ml-1.5 inline-flex items-center justify-center min-w-[18px] h-[18px] text-[10px] rounded-full bg-amber-500 text-white px-1">
+                    {pocketMatchIds.size}
+                  </span>
+                )}
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
           <HaloBoardFilters value={filters} onChange={setFilters} resultCount={filtered.length} />
           {filtered.length === 0 ? (
             <p className="text-center text-muted-foreground py-12">
-              No active Halos match your filters.
+              {tab === 'pocket'
+                ? 'No Halos match any of your pocket listings yet.'
+                : 'No active Halos match your filters.'}
             </p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -168,6 +183,7 @@ export default function HaloBoardPage() {
                   halo={h}
                   unlocked={unlockedIds.has(h.id)}
                   onRespond={setTarget}
+                  pocketMatch={pocketMatchIds.has(h.id)}
                 />
               ))}
             </div>

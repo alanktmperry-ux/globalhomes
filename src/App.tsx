@@ -348,7 +348,7 @@ const App = () => (
                 <Route path="/settings" element={<ProtectedRoute><BuyerSettingsPage /></ProtectedRoute>} />
                 <Route path="/my-applications" element={<ProtectedRoute><MyApplicationsPage /></ProtectedRoute>} />
 
-                {/* Halo (seeker reverse marketplace) */}
+                {/* Halo — seeker reverse marketplace */}
                 <Route path="/halo/new" element={<ProtectedRoute><CreateHaloPage /></ProtectedRoute>} />
                 <Route path="/dashboard/my-halos" element={<ProtectedRoute><MyHalosPage /></ProtectedRoute>} />
 

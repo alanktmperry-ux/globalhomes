@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HaloPreviewCard } from '@/components/halo/HaloPreviewCard';
 import { HaloUnlockDialog } from '@/components/halo/HaloUnlockDialog';
 import { AgentCreditBadge } from '@/components/halo/AgentCreditBadge';
@@ -17,15 +18,19 @@ import {
 } from '@/components/halo/HaloBoardFilters';
 import type { Halo } from '@/types/halo';
 
+type BoardTab = 'all' | 'pocket';
+
 export default function HaloBoardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [halos, setHalos] = useState<Halo[]>([]);
   const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set());
+  const [pocketMatchIds, setPocketMatchIds] = useState<Set<string>>(new Set());
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [filters, setFilters] = useState<HaloBoardFiltersState>(DEFAULT_FILTERS);
+  const [tab, setTab] = useState<BoardTab>('all');
   const [target, setTarget] = useState<Halo | null>(null);
   const [busy, setBusy] = useState(false);
 

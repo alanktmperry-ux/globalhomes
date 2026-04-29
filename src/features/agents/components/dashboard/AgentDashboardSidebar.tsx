@@ -40,6 +40,7 @@ const SALES_NAV: NavItem[] = [
   { title: 'Leads', url: '/dashboard/crm', icon: Flame },
   { title: 'Voice Leads', url: '/dashboard/leads', icon: Mic, badgeKey: 'leads' },
   { title: 'AI Concierge', url: '/dashboard/concierge', icon: Sparkles, badgeKey: 'buyerMatches', alertWhenBadge: true },
+  { title: 'Halo Board', url: '/dashboard/halo-board', icon: Sparkles, badgeKey: 'haloCredits' },
   { title: 'Lead Marketplace', url: '/dashboard/lead-marketplace', icon: ShoppingBag },
   { title: 'Pre-Market', url: '/dashboard/pre-market', icon: Target },
   { title: 'Off-Market Network', url: '/dashboard/network', icon: Users },

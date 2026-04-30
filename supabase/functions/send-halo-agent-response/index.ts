@@ -10,6 +10,15 @@ const corsHeaders = {
 const fmtAUD = (n: number | null | undefined) =>
   n == null ? '—' : n.toLocaleString('en-AU');
 
+const formatBudget = (min: number | null | undefined, max: number | null | undefined) => {
+  const hasMin = min != null && Number(min) > 0;
+  const hasMax = max != null && Number(max) > 0;
+  if (hasMin && hasMax) return `AUD $${Number(min).toLocaleString('en-AU')} – $${Number(max).toLocaleString('en-AU')}`;
+  if (hasMax) return `Up to AUD $${Number(max).toLocaleString('en-AU')}`;
+  if (hasMin) return `From AUD $${Number(min).toLocaleString('en-AU')}`;
+  return 'Budget not specified';
+};
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -163,7 +172,7 @@ Deno.serve(async (req) => {
 
     const intentLabel = halo.intent === 'buy' ? 'Buy' : 'Rent';
     const suburbsLabel = (halo.suburbs ?? []).join(', ') || '—';
-    const budgetLabel = `AUD $${fmtAUD(halo.budget_min)} – $${fmtAUD(halo.budget_max)}`;
+    const budgetLabel = formatBudget(halo.budget_min, halo.budget_max);
 
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; color: #0f172a;">

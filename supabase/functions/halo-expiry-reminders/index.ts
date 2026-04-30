@@ -195,7 +195,14 @@ Deno.serve(async (req) => {
 
         const items = matching.map((h: any) => {
           const sub = (h.suburbs ?? []).join(', ');
-          const budget = `AUD $${Number(h.budget_min ?? 0).toLocaleString('en-AU')} – $${Number(h.budget_max ?? 0).toLocaleString('en-AU')}`;
+          const hasMin = h.budget_min != null && Number(h.budget_min) > 0;
+          const hasMax = h.budget_max != null && Number(h.budget_max) > 0;
+          const minStr = `$${Number(h.budget_min).toLocaleString('en-AU')}`;
+          const maxStr = `$${Number(h.budget_max).toLocaleString('en-AU')}`;
+          const budget = hasMin && hasMax ? `AUD ${minStr} – ${maxStr}`
+            : hasMax ? `Up to AUD ${maxStr}`
+            : hasMin ? `From AUD ${minStr}`
+            : 'Budget not specified';
           const tf = TIMEFRAME_LABELS[h.timeframe] ?? h.timeframe;
           const q = h.quality_score != null ? ` · Quality: ${h.quality_score}/100` : '';
           return `<li style="margin:8px 0;"><strong>${h.intent === 'buy' ? 'Buy' : 'Rent'}</strong> · ${sub} · ${budget} · ${tf}${q}</li>`;

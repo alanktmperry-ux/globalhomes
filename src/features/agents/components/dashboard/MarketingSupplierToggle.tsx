@@ -40,7 +40,7 @@ function generateBrief(listing: PropertyRow, supplier: Supplier, agent: { name?:
     ? `$${Number(listing.price).toLocaleString()}`
     : 'Contact Agent';
   const listingCategory = listing.listing_category === 'rent' ? 'For Lease' : 'For Sale';
-  const listingUrl = `https://globalhomes.lovable.app/property/${listing.slug || listing.id}`;
+  const listingUrl = `https://listhq.com.au/property/${listing.slug || listing.id}`;
 
   return `Hi ${supplier.supplier_name},
 

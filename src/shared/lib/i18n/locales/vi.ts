@@ -74,7 +74,7 @@ export const vi: Partial<Record<TranslationKey, string>> = {
   'help.pageTitle': 'Trung tâm Hỗ trợ',
 
   'home.agents.eyebrow': 'Dành cho môi giới',
-  'home.agents.cta': 'Truy cập sớm',
+  'home.agents.cta': 'Bắt đầu dùng thử miễn phí',
   'home.agents.founding': 'Miễn phí 3 tháng',
   'home.agents.freeTagSub': 'Không cần thẻ tín dụng. Truy cập đầy đủ.',
   'home.agents.feature1': 'Tin đăng đa ngôn ngữ bằng AI',

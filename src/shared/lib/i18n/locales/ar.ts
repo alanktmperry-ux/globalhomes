@@ -74,7 +74,7 @@ export const ar: Partial<Record<TranslationKey, string>> = {
   'help.pageTitle': 'مركز المساعدة',
 
   'home.agents.eyebrow': 'للوكلاء',
-  'home.agents.cta': 'احصل على وصول مبكر',
+  'home.agents.cta': 'مجاني تجربة بدء',
   'home.agents.founding': 'مجاني لمدة 3 أشهر',
   'home.agents.freeTagSub': 'لا حاجة لبطاقة ائتمان. وصول كامل.',
   'home.agents.feature1': 'إعلانات متعددة اللغات مدعومة بالذكاء الاصطناعي',

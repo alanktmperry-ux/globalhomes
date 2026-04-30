@@ -548,9 +548,10 @@ const Index = () => {
     }
   }, [searchCenter]);
 
-  // Fetch featured/boosted listings, deduplicated, with fallback
+  // Fetch featured residential listings (house/apartment/townhouse), with fallback
   useEffect(() => {
     const cols = 'id, title, address, suburb, state, price, price_formatted, images, image_url, property_type, beds, baths, parking, lat, lng, boost_tier, is_featured, listing_type, translations';
+    const RESIDENTIAL_TYPES = ['house', 'apartment', 'townhouse', 'unit', 'villa', 'duplex', 'studio'];
     const MIN_FEATURED = 4;
 
     (async () => {
@@ -559,11 +560,11 @@ const Index = () => {
         .select(cols)
         .eq('is_active', true)
         .eq('status', 'public')
+        .in('property_type', RESIDENTIAL_TYPES)
         .or('is_featured.eq.true,boost_tier.not.is.null')
         .order('created_at', { ascending: false })
         .limit(12);
 
-      // Deduplicate by id
       const seen = new Set<string>();
       const unique = (featured ?? []).filter(p => {
         if (seen.has(p.id)) return false;
@@ -576,12 +577,13 @@ const Index = () => {
         return;
       }
 
-      // Fallback: fill with recent active sale listings (exclude rentals)
+      // Fallback: fill with recent active residential sale listings
       const { data: fallback } = await supabase
         .from('properties')
         .select(cols)
         .eq('is_active', true)
         .eq('status', 'public')
+        .in('property_type', RESIDENTIAL_TYPES)
         .or('listing_type.eq.sale,listing_type.is.null')
         .order('created_at', { ascending: false })
         .limit(12);
@@ -594,7 +596,16 @@ const Index = () => {
         if (unique.length >= 6) break;
       }
 
-      if (unique.length > 0) setFeaturedListings(unique);
+      if (unique.length > 0) {
+        setFeaturedListings(unique);
+      } else {
+        // Hardcoded residential placeholders (shown only if DB has 0 residential listings)
+        setFeaturedListings([
+          { id: 'placeholder-1', title: '4 bed house', address: '14 Maple Street, Auburn NSW', suburb: 'Auburn', state: 'NSW', price: 1200000, images: [], image_url: null, property_type: 'house', beds: 4, baths: 2, parking: 2, listing_type: 'sale', translations: { zh_simplified: {} }, _placeholder: true },
+          { id: 'placeholder-2', title: '2 bed apartment', address: '8/22 Box Hill Road, Box Hill VIC', suburb: 'Box Hill', state: 'VIC', price: 680000, images: [], image_url: null, property_type: 'apartment', beds: 2, baths: 1, parking: 1, listing_type: 'sale', translations: { zh_simplified: {} }, _placeholder: true },
+          { id: 'placeholder-3', title: '3 bed townhouse', address: '3 Oak Lane, Doncaster VIC', suburb: 'Doncaster', state: 'VIC', price: 895000, images: [], image_url: null, property_type: 'townhouse', beds: 3, baths: 2, parking: 1, listing_type: 'sale', translations: { zh_simplified: {} }, _placeholder: true },
+        ]);
+      }
     })();
   }, []);
 
@@ -1239,19 +1250,13 @@ const Index = () => {
               <span className="text-blue-500">{t('hero.headline2')}</span>
             </h1>
 
-            {/* Subheadline */}
-            <p className="text-xl md:text-2xl text-slate-500 font-medium mt-4 mb-0">
-              <noscript>{t('hero.subheadline')}</noscript>
-              <span>
-                {t('hero.subheadlinePrefix')}{' '}
-                <span
-                  className={`text-blue-500 inline-block transition-opacity duration-300 ${
-                    heroSubLangVisible ? 'opacity-100' : 'opacity-0'
-                  }`}
-                >
-                  {HERO_SUBHEADLINE_LANGUAGES[heroSubLangIndex]}
-                </span>
-              </span>
+            {/* Subheadline — static English, brand blue */}
+            <p
+              className="text-xl md:text-2xl mt-4 mb-0"
+              style={{ color: '#2563EB', fontWeight: 600 }}
+              lang="en"
+            >
+              Browse properties in 24 languages
             </p>
 
             {/* Sale / Rent toggle */}
@@ -1274,9 +1279,6 @@ const Index = () => {
                   {t('hero.forRent')}
                 </button>
               </div>
-              <p className="text-xs text-slate-400 mt-2">
-                Commercial &amp; land search — coming soon
-              </p>
             </div>
 
             {/* Search bar */}
@@ -1426,8 +1428,8 @@ const Index = () => {
                     return (
                       <div
                         key={p.id}
-                        onClick={() => navigate(`/property/${p.id}`)}
-                        className="rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                        onClick={() => { if (!p._placeholder) navigate(`/property/${p.id}`); }}
+                        className={`rounded-xl border border-slate-200 overflow-hidden transition-shadow ${p._placeholder ? "" : "hover:shadow-md cursor-pointer"}`}
                       >
                         <div className="h-40 bg-slate-100 flex items-center justify-center relative">
                           {img ? (

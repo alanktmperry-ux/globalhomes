@@ -74,7 +74,7 @@ export const ko: Partial<Record<TranslationKey, string>> = {
   'help.pageTitle': '도움말 센터',
 
   'home.agents.eyebrow': '에이전트용',
-  'home.agents.cta': '얼리 액세스 받기',
+  'home.agents.cta': '무료 체험 시작',
   'home.agents.founding': '3개월 무료',
   'home.agents.freeTagSub': '신용카드 필요 없음. 전체 액세스.',
   'home.agents.feature1': 'AI 기반 다국어 매물',

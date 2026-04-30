@@ -18,11 +18,36 @@ const AgentRegistrationModal = lazy(() => import('@/features/agents/components/A
 import { useI18n } from '@/shared/lib/i18n';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
+type NavItem = { label: string; to: string; icon: React.ComponentType<{ size?: number; className?: string }> };
+
+const PUBLIC_NAV: NavItem[] = [
+  { label: 'Search', to: '/search', icon: Search },
+  { label: 'Find an Agent', to: '/agents', icon: Users },
+  { label: 'Pricing', to: '/pricing', icon: Sparkles },
+];
+
+const SEEKER_NAV: NavItem[] = [
+  { label: 'Browse Properties', to: '/search', icon: Search },
+  { label: 'Find an Agent', to: '/agents', icon: Users },
+];
+
+const AGENT_NAV: NavItem[] = [
+  { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
+  { label: 'Halo Board', to: '/dashboard/halo-board', icon: Sparkles },
+  { label: 'Listings', to: '/dashboard/listings', icon: List },
+  { label: 'Trust Accounting', to: '/dashboard/trust-accounting', icon: Wallet },
+];
+
+function isActiveRoute(current: string, target: string) {
+  if (target === '/') return current === '/';
+  return current === target || current.startsWith(target + '/');
+}
+
 export function SiteHeader() {
-  const { listingMode, setListingMode } = useCurrency();
-  const { user, userRole, isAgent, isAdmin } = useAuth();
+  const { user, isAgent, isAdmin, signOut } = useAuth();
   const { t } = useI18n();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showAgentModal, setShowAgentModal] = useState(false);
 
@@ -44,6 +69,13 @@ export function SiteHeader() {
   }, []);
 
   const isSeeker = !!user && !isAgent && !isAdmin;
+  const leftNav: NavItem[] = isAgent ? AGENT_NAV : isSeeker ? SEEKER_NAV : PUBLIC_NAV;
+
+  const handleSignOut = async () => {
+    setShowUserMenu(false);
+    try { await signOut(); } catch { /* non-fatal */ }
+    navigate('/');
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-md border-b border-border/50">
@@ -59,26 +91,26 @@ export function SiteHeader() {
             </span>
           </Link>
 
-          {/* Left-side primary nav (desktop only) */}
+          {/* Left-side primary nav (desktop only) — role-aware with active pill */}
           <div className="hidden md:flex items-center gap-1 pl-3 ml-1 border-l border-border/60">
-            <Link
-              to="/search"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-foreground hover:text-primary hover:bg-primary/5 transition-colors"
-            >
-              <Search size={13} className="text-primary" /> Search
-            </Link>
-            <Link
-              to="/agents"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-foreground hover:text-primary hover:bg-primary/5 transition-colors"
-            >
-              <Users size={13} className="text-primary" /> Find an Agent
-            </Link>
-            <Link
-              to="/pricing"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-foreground hover:text-primary hover:bg-primary/5 transition-colors"
-            >
-              <Sparkles size={13} className="text-primary" /> Pricing
-            </Link>
+            {leftNav.map(item => {
+              const Icon = item.icon;
+              const active = isActiveRoute(location.pathname, item.to);
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                    active
+                      ? 'bg-[#EFF6FF] text-[#2563EB]'
+                      : 'text-foreground hover:text-primary hover:bg-primary/5'
+                  }`}
+                >
+                  <Icon size={13} className={active ? 'text-[#2563EB]' : 'text-primary'} />
+                  {item.label}
+                </Link>
+              );
+            })}
           </div>
         </div>
 
@@ -96,22 +128,21 @@ export function SiteHeader() {
               Start free trial
             </button>
           )}
-          {user && isAgent && (
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
-            >
-              <LayoutDashboard size={13} /> Dashboard
-            </button>
-          )}
           {isSeeker && (
             <button
               onClick={() => navigate('/halo/new')}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold text-white shadow-sm transition-colors"
+              style={{ backgroundColor: '#7C3AED' }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6D28D9')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#7C3AED')}
             >
               <Sparkles size={13} /> Post a Halo
             </button>
           )}
+
+          {/* Notification bell — agent or seeker variant */}
+          {user && isAgent && <NotificationBell />}
+          {isSeeker && <SeekerNotificationBell />}
 
           {/* Admin shortcut stays distinct */}
           {user && isAdmin && (
@@ -137,29 +168,41 @@ export function SiteHeader() {
               </button>
               {showUserMenu && (
                 <div className="absolute right-0 top-full mt-1 w-56 bg-popover border border-border rounded-xl shadow-elevated overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150">
-                  <button onClick={() => { navigate('/profile'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                    <User size={14} className="text-muted-foreground" /> {t('nav.profile')}
-                  </button>
                   {isSeeker && (
-                    <button onClick={() => { navigate('/seeker/dashboard'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                      <Sparkles size={14} className="text-muted-foreground" /> My Halos
-                    </button>
-                  )}
-                  {!isAgent && (
                     <>
-                      <button onClick={() => { navigate('/notifications'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                        <Sparkles size={14} className="text-muted-foreground" /> Notifications
+                      <button onClick={() => { navigate('/seeker/dashboard'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                        <Sparkles size={14} className="text-muted-foreground" /> My Halos
                       </button>
                       <button onClick={() => { navigate('/saved'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                        <Bookmark size={14} className="text-muted-foreground" /> Saved properties
+                        <Bookmark size={14} className="text-muted-foreground" /> Saved Properties
+                      </button>
+                      <button onClick={() => { navigate('/settings'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                        <Settings size={14} className="text-muted-foreground" /> Account Settings
                       </button>
                     </>
                   )}
                   {isAgent && (
-                    <button onClick={() => { navigate('/dashboard'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                      <LayoutDashboard size={14} className="text-muted-foreground" /> Dashboard
+                    <>
+                      <button onClick={() => { navigate('/rent-roll'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                        <Home size={14} className="text-muted-foreground" /> Rent Roll
+                      </button>
+                      <button onClick={() => { navigate('/pipeline'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                        <KanbanSquare size={14} className="text-muted-foreground" /> Pipeline
+                      </button>
+                      <button onClick={() => { navigate('/settings'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                        <Settings size={14} className="text-muted-foreground" /> Account Settings
+                      </button>
+                    </>
+                  )}
+                  {isAdmin && !isAgent && (
+                    <button onClick={() => { navigate('/profile'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                      <User size={14} className="text-muted-foreground" /> {t('nav.profile')}
                     </button>
                   )}
+                  <div className="border-t border-border" />
+                  <button onClick={handleSignOut} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                    <LogOut size={14} className="text-muted-foreground" /> Sign Out
+                  </button>
                 </div>
               )}
             </div>
@@ -174,6 +217,7 @@ export function SiteHeader() {
             </button>
           )}
         </div>
+
 
 
         {/* ─── Mobile hamburger (visible below md) ─── */}

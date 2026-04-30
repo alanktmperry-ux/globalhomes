@@ -1,3 +1,4 @@
+import "../_shared/email-footer.ts";
 // IMPORTANT: Register this as a Supabase Auth Hook in the dashboard:
 // Supabase Dashboard → Authentication → Hooks → Send Email Hook
 // Set the URL to: https://[project-ref].supabase.co/functions/v1/send-auth-email

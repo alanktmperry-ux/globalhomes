@@ -102,6 +102,13 @@ const AgencyProfilePage = () => {
 
   return (
     <div>
+      <SEO
+        title={`${agency.name} — Real Estate Agency | ListHQ`}
+        description={agency.description?.slice(0, 160) || `Browse listings, agents and contact details for ${agency.name} on ListHQ.`}
+        path={`/agency/${agency.slug}`}
+        image={agency.logo_url || undefined}
+        type="profile"
+      />
 
       {/* Hero / Branding */}
       <section className="relative bg-gradient-to-br from-primary/10 via-background to-accent/10 border-b border-border">

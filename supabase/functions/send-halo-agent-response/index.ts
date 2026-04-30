@@ -172,7 +172,7 @@ Deno.serve(async (req) => {
 
     const intentLabel = halo.intent === 'buy' ? 'Buy' : 'Rent';
     const suburbsLabel = (halo.suburbs ?? []).join(', ') || '—';
-    const budgetLabel = `AUD $${fmtAUD(halo.budget_min)} – $${fmtAUD(halo.budget_max)}`;
+    const budgetLabel = formatBudget(halo.budget_min, halo.budget_max);
 
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; color: #0f172a;">

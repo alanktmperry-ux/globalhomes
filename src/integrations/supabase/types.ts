@@ -5048,6 +5048,33 @@ export type Database = {
         }
         Relationships: []
       }
+      email_unsubscribes: {
+        Row: {
+          email: string
+          id: string
+          ip: string | null
+          source: string | null
+          unsubscribed_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          email: string
+          id?: string
+          ip?: string | null
+          source?: string | null
+          unsubscribed_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          email?: string
+          id?: string
+          ip?: string | null
+          source?: string | null
+          unsubscribed_at?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       error_log: {
         Row: {
           context: Json | null
@@ -14490,6 +14517,7 @@ export type Database = {
         Args: { _agency_id: string; _user_id: string }
         Returns: boolean
       }
+      is_email_unsubscribed: { Args: { _email: string }; Returns: boolean }
       is_exclusive_member: { Args: never; Returns: boolean }
       is_partner_for_agency: {
         Args: { _agency_id: string; _user_id: string }

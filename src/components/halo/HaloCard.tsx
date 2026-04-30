@@ -55,7 +55,7 @@ export function HaloCard({ halo, onStatusChange, onFulfil }: Props) {
 
   const intentLabel = halo.intent === 'buy' ? 'Buy' : 'Rent';
   const suburbsLabel = halo.suburbs.join(', ') || '—';
-  const budgetLabel = `AUD ${fmt(halo.budget_min)}–${fmt(halo.budget_max)}`;
+  const budgetLabel = `AUD ${formatBudget(halo.budget_min, halo.budget_max)}`;
 
   const handleToggle = async () => {
     setBusy(true);

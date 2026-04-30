@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
 
     const intentLabel = halo.intent === 'buy' ? 'Buy' : 'Rent';
     const suburbsLabel = (halo.suburbs ?? []).join(', ') || '—';
-    const budgetLabel = `AUD ${fmtAUD(halo.budget_min)} – ${fmtAUD(halo.budget_max)}`;
+    const budgetLabel = formatBudget(halo.budget_min, halo.budget_max);
     const propertyLabel = (halo.property_types ?? []).join(', ') || '—';
     const timeframeLabel = TIMEFRAME_LABELS[halo.timeframe] ?? halo.timeframe;
 

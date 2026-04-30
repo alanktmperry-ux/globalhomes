@@ -321,6 +321,8 @@ const App = () => (
                 <Route path="/auth" element={<AuthLandingPage />} />
                 <Route path="/login" element={<SeekerAuthPage />} />
                 <Route path="/agents/login" element={<AgentAuthPage />} />
+                {/* Legacy URL — older notification emails link to /agent-auth */}
+                <Route path="/agent-auth" element={<Navigate to="/agents/login" replace />} />
                 <Route path="/agents/demo" element={<DemoAccessPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />

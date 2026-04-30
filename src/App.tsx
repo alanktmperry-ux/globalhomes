@@ -198,11 +198,7 @@ const BrokerLeadDetailPage = React.lazy(() => import("./pages/broker/BrokerLeadD
 const BrokerTeamPage = React.lazy(() => import("./pages/broker/BrokerTeamPage"));
 const ReferralLandingPage = React.lazy(() => import("./features/referral/pages/ReferralLandingPage"));
 const ReferralDashboardPage = React.lazy(() => import("./features/referral/pages/ReferralDashboardPage"));
-const PageLoader = () => (
-  <div className="flex h-screen w-full items-center justify-center bg-background">
-    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-  </div>
-);
+const PageLoader = () => <PageSkeleton />;
 
 const ImpersonationBanner = () => {
   const { impersonating, impersonatedUser, stopImpersonation } = useAuth();

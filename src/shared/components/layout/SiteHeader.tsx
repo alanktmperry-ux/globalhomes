@@ -68,8 +68,16 @@ export function SiteHeader() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const isSeeker = !!user && !isAgent && !isAdmin;
-  const leftNav: NavItem[] = isAgent ? AGENT_NAV : isSeeker ? SEEKER_NAV : PUBLIC_NAV;
+  // Treat admins as agents for nav purposes (agent privileges are a superset)
+  const isAgentLike = !!user && (isAgent || isAdmin);
+  // Only show seeker nav once roles have actually resolved — otherwise an
+  // agent visiting a public page briefly sees seeker chrome before isAgent flips true.
+  const isSeeker = !!user && !isAgentLike && !loading;
+  const leftNav: NavItem[] = isAgentLike
+    ? AGENT_NAV
+    : isSeeker
+      ? SEEKER_NAV
+      : PUBLIC_NAV;
 
   const handleSignOut = async () => {
     setShowUserMenu(false);

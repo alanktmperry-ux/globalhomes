@@ -44,7 +44,7 @@ function isActiveRoute(current: string, target: string) {
 }
 
 export function SiteHeader() {
-  const { user, isAgent, isAdmin, loading, signOut } = useAuth();
+  const { user, isAgent, isAdmin, loading, userRole, signOut } = useAuth();
   const { t } = useI18n();
   const navigate = useNavigate();
   const location = useLocation();
@@ -68,11 +68,16 @@ export function SiteHeader() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  // Treat admins as agents for nav purposes (agent privileges are a superset)
+  // Agent detection mirrors the /dashboard route guard: AuthProvider's `isAgent`
+  // is derived from the `agents` table (approval_status === 'approved'), NOT
+  // from profiles.role. Admins are treated as agents (superset of privileges).
   const isAgentLike = !!user && (isAgent || isAdmin);
-  // Only show seeker nav once roles have actually resolved — otherwise an
-  // agent visiting a public page briefly sees seeker chrome before isAgent flips true.
-  const isSeeker = !!user && !isAgentLike && !loading;
+  // Roles are only "resolved" once userRole has been populated by AuthProvider.
+  // Until then, render the public nav so an agent never briefly sees seeker chrome
+  // (the 3s loading-timeout safety net would otherwise flip `loading` to false
+  // before the agents-table query returns).
+  const rolesResolved = !!user && userRole !== null;
+  const isSeeker = rolesResolved && !isAgentLike;
   const leftNav: NavItem[] = isAgentLike
     ? AGENT_NAV
     : isSeeker

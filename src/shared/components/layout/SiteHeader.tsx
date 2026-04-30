@@ -136,7 +136,7 @@ export function SiteHeader() {
           {!user && (
             <button
               onClick={() => navigate('/auth?mode=agent')}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm"
             >
               Start free trial
             </button>

@@ -109,7 +109,7 @@ export default function HaloDetailPage() {
         </Badge>
         {halo.preferred_language && halo.preferred_language !== 'en' && (
           <Badge variant="outline" className="gap-1">
-            <Languages size={12} /> {halo.preferred_language}
+            <Languages size={12} /> {halo.preferred_language.charAt(0).toUpperCase() + halo.preferred_language.slice(1)}
           </Badge>
         )}
       </div>
@@ -154,7 +154,14 @@ export default function HaloDetailPage() {
           />
           <Field
             label="Budget"
-            value={`AUD $${fmt(halo.budget_min)} – $${fmt(halo.budget_max)}`}
+            value={(() => {
+              const hasMin = halo.budget_min != null && halo.budget_min > 0;
+              const hasMax = halo.budget_max != null && halo.budget_max > 0;
+              if (hasMin && hasMax) return `AUD $${fmt(halo.budget_min)} – $${fmt(halo.budget_max)}`;
+              if (hasMax) return `AUD Up to $${fmt(halo.budget_max)}`;
+              if (hasMin) return `AUD From $${fmt(halo.budget_min)}`;
+              return 'Any budget';
+            })()}
           />
           <Field
             label="Bedrooms"

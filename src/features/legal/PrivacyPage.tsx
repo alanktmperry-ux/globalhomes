@@ -1,4 +1,4 @@
-import { Helmet } from 'react-helmet-async';
+import { SEO } from '@/shared/components/SEO';
 import { useEffect, useState } from 'react';
 import { ArrowUp } from 'lucide-react';
 

@@ -139,7 +139,7 @@ export function SiteHeader() {
               onClick={() => navigate('/agent-auth')}
               className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg text-sm"
             >
-              {t('home.agents.cta')}
+              Start free trial
             </Button>
           )}
           {isSeeker && (

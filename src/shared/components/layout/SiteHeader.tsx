@@ -17,6 +17,7 @@ const AgentRegistrationModal = lazy(() => import('@/features/agents/components/A
 
 import { useI18n } from '@/shared/lib/i18n';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
 
 type NavItem = { label: string; to: string; icon: any };
 
@@ -134,12 +135,12 @@ export function SiteHeader() {
 
           {/* Unauthenticated navbar actions — keep CTA in-header between settings and account */}
           {!user && (
-            <button
-              onClick={() => navigate('/agents/login')}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm"
+            <Button
+              onClick={() => navigate('/agent-auth')}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg text-sm"
             >
               {t('home.agents.cta')}
-            </button>
+            </Button>
           )}
           {isSeeker && (
             <button

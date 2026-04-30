@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState, useRef, useEffect } from 'react';
-import { MapPin, Bookmark } from 'lucide-react';
+import { MapPin, Bookmark, LogOut, Settings, KanbanSquare, Wallet } from 'lucide-react';
 import { Globe, ChevronDown, User, LogIn, Home, Building2, Plus, List, LayoutDashboard, ShieldCheck, Menu, FileText, Handshake, Wrench, Sparkles, Search, MoreHorizontal, HelpCircle, Users, Banknote } from 'lucide-react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 // framer-motion intentionally NOT imported — it forced the whole library into
 // the cold-paint critical path. Dropdowns now use plain conditional rendering
 // with CSS transitions for the same visual effect at zero JS cost.

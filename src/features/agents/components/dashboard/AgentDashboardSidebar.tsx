@@ -21,7 +21,9 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
+import { useHaloCreditsBalance } from '@/features/halo/hooks/useHaloCreditsBalance';
 
 interface NavItem {
   title: string;

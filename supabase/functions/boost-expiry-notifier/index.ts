@@ -1,3 +1,4 @@
+import "../_shared/email-footer.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
 

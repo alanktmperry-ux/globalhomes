@@ -67,6 +67,7 @@ const AgentPublicProfilePage = React.lazy(() => import("./pages/AgentPublicProfi
 const BuyerSettingsPage = React.lazy(() => import("./pages/BuyerSettingsPage"));
 const TermsPage = React.lazy(() => import("./pages/TermsPage"));
 const PrivacyPage = React.lazy(() => import("./pages/PrivacyPage"));
+const UnsubscribePage = React.lazy(() => import("./pages/UnsubscribePage"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 const MarketingLandingPage = React.lazy(() => import("./features/marketing/pages/MarketingLandingPage"));
 const PricingPage = React.lazy(() => import("./pages/PricingPage"));
@@ -282,6 +283,7 @@ const App = () => (
                   <Route path="/terms" element={<TermsPage />} />
                   <Route path="/sign/:token" element={<SigningPage />} />
                   <Route path="/privacy" element={<PrivacyPage />} />
+                  <Route path="/unsubscribe" element={<UnsubscribePage />} />
                   <Route path="/stamp-duty-calculator" element={<StampDutyPage />} />
                   <Route path="/mortgage-calculator" element={<MortgageCalculatorPage />} />
                   <Route path="/buyer-pool" element={<BuyerPoolPage />} />

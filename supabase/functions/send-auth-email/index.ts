@@ -1,3 +1,4 @@
+import "../_shared/email-footer.ts";
 // IMPORTANT: Register this as a Supabase Auth Hook in the dashboard:
 // Supabase Dashboard → Authentication → Hooks → Send Email Hook
 // Set the URL to: https://[project-ref].supabase.co/functions/v1/send-auth-email
@@ -82,6 +83,10 @@ Deno.serve(async (req) => {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${RESEND_API_KEY}`,
+        // Spam Act exemption: login codes / password resets / email-change
+        // confirmations are pure transactional auth — bypass suppression
+        // and use essential footer.
+        'x-email-essential': 'true',
       },
       body: JSON.stringify({
         from: FROM_ADDRESS,

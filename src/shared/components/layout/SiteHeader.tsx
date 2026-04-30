@@ -149,7 +149,7 @@ export function SiteHeader() {
           )}
 
           {/* Notification bell — agent or seeker variant */}
-          {user && isAgent && <NotificationBell />}
+          {isAgentLike && <NotificationBell />}
           {isSeeker && <SeekerNotificationBell />}
 
           {/* Admin shortcut stays distinct */}

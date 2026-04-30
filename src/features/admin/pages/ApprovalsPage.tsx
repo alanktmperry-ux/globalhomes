@@ -56,10 +56,6 @@ function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-AU', { day: '2-digit', month: 'short', year: '2-digit' });
 }
 
-function fmtPrice(n: number | null) {
-  if (!n) return '—';
-  return `$${n.toLocaleString()}`;
-}
 
 function CountBadge({ count }: { count: number }) {
   if (!count) return null;

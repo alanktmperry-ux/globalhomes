@@ -606,7 +606,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
             { duration: 6000 }
           );
         } else {
-          toast.success('Listing saved! — Your property is in draft. Publish it from your dashboard to make it visible to buyers.');
+          toast.success('Listing published! — It’s now live and visible to buyers.');
         }
 
         fireAIMatch(inserted.id);

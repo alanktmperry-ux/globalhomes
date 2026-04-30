@@ -14,8 +14,18 @@ interface Props {
   pocketMatch?: boolean;
 }
 
-const fmt = (n: number | null | undefined) =>
-  n == null ? '—' : n.toLocaleString('en-AU');
+const fmtMoney = (n: number) => `$${n.toLocaleString('en-AU')}`;
+
+const formatBudget = (min: number | null | undefined, max: number | null | undefined) => {
+  const hasMin = min != null && min > 0;
+  const hasMax = max != null && max > 0;
+  if (hasMin && hasMax) return `${fmtMoney(min!)} – ${fmtMoney(max!)}`;
+  if (hasMax) return `Up to ${fmtMoney(max!)}`;
+  if (hasMin) return `From ${fmtMoney(min!)}`;
+  return 'Any budget';
+};
+
+const capitalise = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 const timeAgo = (iso: string) => {
   const diff = Date.now() - new Date(iso).getTime();

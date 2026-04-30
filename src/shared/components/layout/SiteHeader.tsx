@@ -18,7 +18,7 @@ const AgentRegistrationModal = lazy(() => import('@/features/agents/components/A
 import { useI18n } from '@/shared/lib/i18n';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
-type NavItem = { label: string; to: string; icon: React.ComponentType<{ size?: number; className?: string }> };
+type NavItem = { label: string; to: string; icon: any };
 
 const PUBLIC_NAV: NavItem[] = [
   { label: 'Search', to: '/search', icon: Search },

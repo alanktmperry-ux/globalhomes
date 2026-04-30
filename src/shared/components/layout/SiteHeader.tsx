@@ -33,9 +33,9 @@ const SEEKER_NAV: NavItem[] = [
 
 const AGENT_NAV: NavItem[] = [
   { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
-  { label: 'Halo Board', to: '/dashboard/halo-board', icon: Sparkles },
+  { label: 'Halo Board', to: '/halo/board', icon: Sparkles },
   { label: 'Listings', to: '/dashboard/listings', icon: List },
-  { label: 'Trust Accounting', to: '/dashboard/trust-accounting', icon: Wallet },
+  { label: 'Trust Accounting', to: '/trust-accounting', icon: Wallet },
 ];
 
 function isActiveRoute(current: string, target: string) {

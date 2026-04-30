@@ -44,7 +44,7 @@ function isActiveRoute(current: string, target: string) {
 }
 
 export function SiteHeader() {
-  const { user, isAgent, isAdmin, signOut } = useAuth();
+  const { user, isAgent, isAdmin, loading, signOut } = useAuth();
   const { t } = useI18n();
   const navigate = useNavigate();
   const location = useLocation();

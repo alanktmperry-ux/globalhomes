@@ -23,25 +23,8 @@ export function SiteHeader() {
   const { user, userRole, isAgent, isAdmin } = useAuth();
   const { t } = useI18n();
   const navigate = useNavigate();
-  const [showAgentMenu, setShowAgentMenu] = useState(false);
-  const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [showAgentModal, setShowAgentModal] = useState(false);
-  const agentMenuRef = useRef<HTMLDivElement>(null);
-  const moreMenuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (agentMenuRef.current && !agentMenuRef.current.contains(e.target as Node)) {
-        setShowAgentMenu(false);
-      }
-      if (moreMenuRef.current && !moreMenuRef.current.contains(e.target as Node)) {
-        setShowMoreMenu(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, []);
+  const [showAgentModal] = useState(false);
 
   const navTo = (path: string) => {
     setMobileOpen(false);

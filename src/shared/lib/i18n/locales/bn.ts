@@ -417,7 +417,7 @@ export const bn: Partial<Record<keyof typeof EnBase, string>> = {
   'home.agents.eyebrow': 'এজেন্টদের জন্য',
   'home.agents.headline': 'বহুসাংস্কৃতিক অস্ট্রেলিয়ার জন্য তৈরি প্ল্যাটফর্ম।',
   'home.agents.sub': 'CRM, লিস্টিং, সম্পত্তি ব্যবস্থাপনা, AI সরঞ্জাম — সব এক জায়গায়। ২৪টি ভাষায়।',
-  'home.agents.cta': 'প্রাথমিক অ্যাক্সেস পান',
+  'home.agents.cta': 'ফ্রি ট্রায়াল শুরু করুন',
   'home.agents.founding': '৩ মাস বিনামূল্যে',
   'home.agents.freeTagSub': 'ক্রেডিট কার্ড প্রয়োজন নেই। সম্পূর্ণ অ্যাক্সেস।',
   'home.agents.feature1': 'AI-চালিত বহুভাষিক লিস্টিং',

@@ -441,7 +441,7 @@ export const en = {
   'home.agents.eyebrow': 'For agents',
   'home.agents.headline': 'The platform built for multicultural Australia.',
   'home.agents.sub': 'CRM, listings, property management, AI tools — all in one place. In 24 languages.',
-  'home.agents.cta': 'Get early access',
+  'home.agents.cta': 'Start free trial',
   'home.agents.founding': 'Free for 3 months',
   'home.agents.freeTagSub': 'No credit card required. Full access.',
   'home.agents.feature1': 'AI-powered multilingual listings',

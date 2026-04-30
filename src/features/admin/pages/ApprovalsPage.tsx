@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Loader2, CheckCircle2, XCircle, ExternalLink } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { buildAuditMeta } from '@/shared/lib/auditLog';
 import AgentApprovalQueue from '@/features/admin/components/AgentApprovalQueue';

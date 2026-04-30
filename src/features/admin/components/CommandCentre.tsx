@@ -677,40 +677,17 @@ export default function CommandCentre() {
 
   // Auto-refresh every 5 min, paused when tab is hidden
   useEffect(() => {
-    let intervalId: number | null = null;
-
-    const start = () => {
-      if (intervalId != null) return;
-      intervalId = window.setInterval(() => {
-        if (document.visibilityState === 'visible') {
-          fetchAllRef.current();
-        }
-      }, 5 * 60 * 1000);
-    };
-
-    const stop = () => {
-      if (intervalId != null) {
-        window.clearInterval(intervalId);
-        intervalId = null;
-      }
-    };
-
-    const handleVisibility = () => {
-      if (document.visibilityState === 'visible') {
-        // Resume immediately on tab return
-        fetchAllRef.current();
-        start();
-      } else {
-        stop();
-      }
-    };
-
-    if (document.visibilityState === 'visible') start();
-    document.addEventListener('visibilitychange', handleVisibility);
+    // NOTE: We intentionally do NOT re-fetch on tab focus / visibilitychange.
+    // Supabase sessions are long-lived and auto-refresh; firing queries on every
+    // tab return previously caused unintended re-renders and routing glitches
+    // (admin appearing as a 404 after idle). Use the manual Refresh button
+    // in the header if up-to-the-minute counts are needed.
+    const intervalId = window.setInterval(() => {
+      fetchAllRef.current();
+    }, 5 * 60 * 1000);
 
     return () => {
-      stop();
-      document.removeEventListener('visibilitychange', handleVisibility);
+      window.clearInterval(intervalId);
     };
   }, []);
 

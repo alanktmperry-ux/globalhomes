@@ -52,13 +52,16 @@ export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePa
     );
   }
 
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) {
+    // Admin routes have their own login screen — never bounce admins to the seeker login (or worse, a 404).
+    return <Navigate to={requireAdmin ? '/agents/login' : '/login'} replace />;
+  }
 
   if (user && !user.email_confirmed_at && !isAdmin) {
     return <Navigate to="/check-email" replace />;
   }
 
-  if (requireAdmin && !isAdmin && !isSupport) return <Navigate to="/" replace />;
+  if (requireAdmin && !isAdmin && !isSupport) return <Navigate to="/agents/login" replace />;
 
   // Agent guard: if no agents row exists, send to onboarding to create one.
   if (requireAgent && !isAdmin && approvalState === 'none') {

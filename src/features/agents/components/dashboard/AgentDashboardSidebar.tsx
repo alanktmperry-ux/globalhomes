@@ -284,6 +284,37 @@ const AgentDashboardSidebar = () => {
     return location.pathname.startsWith(path);
   };
 
+  // Prefetch route data when the user hovers a nav item, so by the time they
+  // click, the most expensive query for that page is already in cache.
+  // Currently wired for the Halo Board (4 parallel queries) — extend as needed.
+  const prefetchRoute = (url: string) => {
+    if (!user?.id) return;
+    if (url === '/dashboard/halo-board') {
+      queryClient.prefetchQuery({
+        queryKey: ['halo-board-halos'],
+        staleTime: 60 * 1000,
+        queryFn: async () => {
+          const { data } = await supabase
+            .from('halos')
+            .select('*')
+            .eq('status', 'active')
+            .order('created_at', { ascending: false });
+          return data ?? [];
+        },
+      });
+      // Warm the shared credits cache too (already cached for 5min, but safe).
+      queryClient.prefetchQuery({
+        queryKey: ['halo-credits-balance', user.id],
+        staleTime: 5 * 60 * 1000,
+        queryFn: async () => {
+          const { data } = await supabase
+            .from('halo_credits').select('balance').eq('agent_id', user.id).maybeSingle();
+          return data?.balance ?? 0;
+        },
+      });
+    }
+  };
+
   const renderGroup = (label: string, items: NavItem[]) => (
     <SidebarGroup key={label}>
       <SidebarGroupLabel>{!collapsed && label}</SidebarGroupLabel>

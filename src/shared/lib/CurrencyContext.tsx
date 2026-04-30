@@ -60,13 +60,19 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   const [currencies, setCurrencies] = useState<CurrencyInfo[]>(FALLBACK_CURRENCIES);
   const [isLiveRates, setIsLiveRates] = useState(false);
 
+  // Live FX rates are only needed when the user is actually viewing prices in
+  // a non-AUD currency. We skip the network call entirely on the default AUD
+  // experience (homepage, agent dashboard, etc.) so it doesn't add to the
+  // dashboard request waterfall.
   useEffect(() => {
-    // Defer the live-rates fetch until the browser is idle so it never blocks
-    // first paint. Falls back to setTimeout if requestIdleCallback isn't supported.
+    if (currencyCode === 'AUD') return;
+    if (isLiveRates) return; // already fetched in this session
+
+    let cancelled = false;
     const fetchRates = async () => {
       try {
         const { data, error } = await supabase.functions.invoke('get-exchange-rates');
-        if (error || !data?.rates) return;
+        if (cancelled || error || !data?.rates) return;
 
         const rates = data.rates as Record<string, number>;
         const updated = FALLBACK_CURRENCIES.map(c => ({
@@ -84,13 +90,14 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     const w = window as any;
     const handle = w.requestIdleCallback
       ? w.requestIdleCallback(fetchRates, { timeout: 4000 })
-      : window.setTimeout(fetchRates, 1500);
+      : window.setTimeout(fetchRates, 800);
 
     return () => {
+      cancelled = true;
       if (w.cancelIdleCallback && typeof handle === 'number') w.cancelIdleCallback(handle);
       else window.clearTimeout(handle);
     };
-  }, []);
+  }, [currencyCode, isLiveRates]);
 
   const currency = currencies.find(c => c.code === currencyCode) || currencies[0];
 

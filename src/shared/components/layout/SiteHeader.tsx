@@ -44,7 +44,7 @@ function isActiveRoute(current: string, target: string) {
 }
 
 export function SiteHeader() {
-  const { user, isAgent, isAdmin, signOut } = useAuth();
+  const { user, isAgent, isAdmin, loading, signOut } = useAuth();
   const { t } = useI18n();
   const navigate = useNavigate();
   const location = useLocation();
@@ -68,8 +68,16 @@ export function SiteHeader() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const isSeeker = !!user && !isAgent && !isAdmin;
-  const leftNav: NavItem[] = isAgent ? AGENT_NAV : isSeeker ? SEEKER_NAV : PUBLIC_NAV;
+  // Treat admins as agents for nav purposes (agent privileges are a superset)
+  const isAgentLike = !!user && (isAgent || isAdmin);
+  // Only show seeker nav once roles have actually resolved — otherwise an
+  // agent visiting a public page briefly sees seeker chrome before isAgent flips true.
+  const isSeeker = !!user && !isAgentLike && !loading;
+  const leftNav: NavItem[] = isAgentLike
+    ? AGENT_NAV
+    : isSeeker
+      ? SEEKER_NAV
+      : PUBLIC_NAV;
 
   const handleSignOut = async () => {
     setShowUserMenu(false);
@@ -141,7 +149,7 @@ export function SiteHeader() {
           )}
 
           {/* Notification bell — agent or seeker variant */}
-          {user && isAgent && <NotificationBell />}
+          {isAgentLike && <NotificationBell />}
           {isSeeker && <SeekerNotificationBell />}
 
           {/* Admin shortcut stays distinct */}
@@ -181,23 +189,18 @@ export function SiteHeader() {
                       </button>
                     </>
                   )}
-                  {isAgent && (
+                  {isAgentLike && (
                     <>
-                      <button onClick={() => { navigate('/rent-roll'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                        <Home size={14} className="text-muted-foreground" /> Rent Roll
+                      <button onClick={() => { navigate(isAdmin ? '/admin' : '/dashboard'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                        <LayoutDashboard size={14} className="text-muted-foreground" /> My Dashboard
                       </button>
-                      <button onClick={() => { navigate('/pipeline'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                        <KanbanSquare size={14} className="text-muted-foreground" /> Pipeline
+                      <button onClick={() => { navigate('/dashboard/listings'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                        <List size={14} className="text-muted-foreground" /> My Listings
                       </button>
                       <button onClick={() => { navigate('/settings'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
                         <Settings size={14} className="text-muted-foreground" /> Account Settings
                       </button>
                     </>
-                  )}
-                  {isAdmin && !isAgent && (
-                    <button onClick={() => { navigate('/profile'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                      <User size={14} className="text-muted-foreground" /> {t('nav.profile')}
-                    </button>
                   )}
                   <div className="border-t border-border" />
                   <button onClick={handleSignOut} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">

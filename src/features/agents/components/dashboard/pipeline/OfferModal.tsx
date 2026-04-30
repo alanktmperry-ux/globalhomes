@@ -57,7 +57,8 @@ const OfferModal = ({ open, onOpenChange, card, propertyId, agentId, onSent }: O
     toast({ title: 'Copied to clipboard' });
   };
 
-  const handleDownloadPdf = () => {
+  const handleDownloadPdf = async () => {
+    const { generateOfferPdf } = await import('@/features/agents/lib/generateOfferPdf');
     generateOfferPdf({
       propertyAddress: card.address,
       buyerName: card.contactName,

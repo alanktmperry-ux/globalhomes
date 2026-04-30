@@ -71,7 +71,7 @@ export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Prop
             )}
             {showLanguageBadge && (
               <Badge variant="outline" className="gap-1">
-                <Languages size={12} /> {halo.preferred_language}
+                <Languages size={12} /> {capitalise(halo.preferred_language)}
               </Badge>
             )}
             <HaloQualityBadge score={halo.quality_score} variant="agent" />

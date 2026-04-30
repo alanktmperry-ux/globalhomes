@@ -290,7 +290,7 @@ function buildWelcomeEmailHtml(agentName: string) {
   </ul>
   <p style="font-size:15px;color:#333;margin:0 0 24px;">We'll email you as soon as your account is approved. In the meantime, feel free to explore the platform.</p>
   <div style="text-align:center;margin:28px 0;">
-    <a href="https://listhq.lovable.app/agent-auth" style="display:inline-block;background:#16a34a;color:#fff;font-size:14px;font-weight:600;padding:12px 32px;border-radius:10px;text-decoration:none;">Sign In to Your Dashboard</a>
+    <a href="https://listhq.lovable.app/agents/login" style="display:inline-block;background:#16a34a;color:#fff;font-size:14px;font-weight:600;padding:12px 32px;border-radius:10px;text-decoration:none;">Sign In to Your Dashboard</a>
   </div>
   <div style="border-top:1px solid #eee;padding-top:20px;margin-top:32px;text-align:center;">
     <p style="font-size:11px;color:#aaa;margin:0;">Questions? Reply to this email or contact our support team.</p>

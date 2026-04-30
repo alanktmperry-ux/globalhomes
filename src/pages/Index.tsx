@@ -1428,8 +1428,8 @@ const Index = () => {
                     return (
                       <div
                         key={p.id}
-                        onClick={() => navigate(`/property/${p.id}`)}
-                        className="rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                        onClick={() => { if (!p._placeholder) navigate(`/property/${p.id}`); }}
+                        className={`rounded-xl border border-slate-200 overflow-hidden transition-shadow ${p._placeholder ? "" : "hover:shadow-md cursor-pointer"}`}
                       >
                         <div className="h-40 bg-slate-100 flex items-center justify-center relative">
                           {img ? (

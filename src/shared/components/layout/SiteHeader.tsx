@@ -189,23 +189,18 @@ export function SiteHeader() {
                       </button>
                     </>
                   )}
-                  {isAgent && (
+                  {isAgentLike && (
                     <>
-                      <button onClick={() => { navigate('/rent-roll'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                        <Home size={14} className="text-muted-foreground" /> Rent Roll
+                      <button onClick={() => { navigate(isAdmin ? '/admin' : '/dashboard'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                        <LayoutDashboard size={14} className="text-muted-foreground" /> My Dashboard
                       </button>
-                      <button onClick={() => { navigate('/pipeline'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                        <KanbanSquare size={14} className="text-muted-foreground" /> Pipeline
+                      <button onClick={() => { navigate('/dashboard/listings'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                        <List size={14} className="text-muted-foreground" /> My Listings
                       </button>
                       <button onClick={() => { navigate('/settings'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
                         <Settings size={14} className="text-muted-foreground" /> Account Settings
                       </button>
                     </>
-                  )}
-                  {isAdmin && !isAgent && (
-                    <button onClick={() => { navigate('/profile'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                      <User size={14} className="text-muted-foreground" /> {t('nav.profile')}
-                    </button>
                   )}
                   <div className="border-t border-border" />
                   <button onClick={handleSignOut} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">

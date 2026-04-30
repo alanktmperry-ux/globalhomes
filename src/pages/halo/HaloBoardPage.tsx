@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { useHaloCreditsBalance } from '@/features/halo/hooks/useHaloCreditsBalance';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -23,10 +25,11 @@ type BoardTab = 'all' | 'pocket';
 export default function HaloBoardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const { balance } = useHaloCreditsBalance();
   const [halos, setHalos] = useState<Halo[]>([]);
   const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set());
   const [pocketMatchIds, setPocketMatchIds] = useState<Set<string>>(new Set());
-  const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [filters, setFilters] = useState<HaloBoardFiltersState>(DEFAULT_FILTERS);
@@ -40,22 +43,28 @@ export default function HaloBoardPage() {
     (async () => {
       setLoading(true);
       try {
-        const [halosRes, respRes, credRes, pmRes] = await Promise.all([
-          supabase
-            .from('halos')
-            .select('*')
-            .eq('status', 'active')
-            .order('created_at', { ascending: false }),
+        // Halos list may already be in cache from sidebar hover prefetch.
+        const cachedHalos = queryClient.getQueryData<Halo[]>(['halo-board-halos']);
+        const halosPromise = cachedHalos
+          ? Promise.resolve({ data: cachedHalos, error: null as any })
+          : supabase
+              .from('halos')
+              .select('*')
+              .eq('status', 'active')
+              .order('created_at', { ascending: false });
+
+        const [halosRes, respRes, pmRes] = await Promise.all([
+          halosPromise,
           supabase.from('halo_responses').select('halo_id').eq('agent_id', user.id),
-          supabase.from('halo_credits').select('balance').eq('agent_id', user.id).maybeSingle(),
           supabase.from('halo_pocket_matches').select('halo_id').eq('agent_id', user.id),
         ]);
         if (!active) return;
-        if (halosRes.error) throw halosRes.error;
-        setHalos((halosRes.data ?? []) as Halo[]);
+        if ((halosRes as any).error) throw (halosRes as any).error;
+        const halosData = (halosRes as any).data ?? [];
+        setHalos(halosData as Halo[]);
+        queryClient.setQueryData(['halo-board-halos'], halosData);
         setUnlockedIds(new Set((respRes.data ?? []).map((r: any) => r.halo_id)));
         setPocketMatchIds(new Set((pmRes.data ?? []).map((r: any) => r.halo_id)));
-        setBalance(credRes.data?.balance ?? 0);
       } catch (e) {
         console.error('[HaloBoard] load error', e);
         if (active) setError(true);
@@ -66,7 +75,7 @@ export default function HaloBoardPage() {
     return () => {
       active = false;
     };
-  }, [user]);
+  }, [user, queryClient]);
 
   const tabFiltered = tab === 'pocket' ? halos.filter((h) => pocketMatchIds.has(h.id)) : halos;
   const filtered = applyFilters(tabFiltered, filters);
@@ -119,7 +128,7 @@ export default function HaloBoardPage() {
 
       const id = target.id;
       setTarget(null);
-      setBalance(current - 1);
+      queryClient.invalidateQueries({ queryKey: ['halo-credits-balance', user.id] });
       setUnlockedIds((prev) => new Set(prev).add(id));
       toast.success('Halo unlocked. Contact details are now visible.');
       navigate(`/dashboard/halo-board/${id}`);

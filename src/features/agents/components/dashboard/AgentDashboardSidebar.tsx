@@ -21,7 +21,9 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
+import { useHaloCreditsBalance } from '@/features/halo/hooks/useHaloCreditsBalance';
 
 interface NavItem {
   title: string;
@@ -108,13 +110,14 @@ const AgentDashboardSidebar = () => {
   const { signOut, isAdmin, isPrincipal, user } = useAuth();
   const { agent } = useCurrentAgent();
   const { plan } = useSubscription();
+  const queryClient = useQueryClient();
+  const { balance: haloCredits } = useHaloCreditsBalance();
   const [activeCount, setActiveCount] = useState(0);
   const [arrearsCount, setArrearsCount] = useState(0);
   const [renewalsCount, setRenewalsCount] = useState(0);
   const [disputeCount, setDisputeCount] = useState(0);
   const [smokeAlarmOverdue, setSmokeAlarmOverdue] = useState(0);
   const [buyerMatchesCount, setBuyerMatchesCount] = useState(0);
-  const [haloCredits, setHaloCredits] = useState(0);
   const [onboardingComplete, setOnboardingComplete] = useState(true);
   const [agentLogo, setAgentLogo] = useState<string | null>(null);
   const [agentName, setAgentName] = useState<string | null>(null);
@@ -225,32 +228,9 @@ const AgentDashboardSidebar = () => {
     return () => { if (channel) supabase.removeChannel(channel); };
   }, [agent?.id]);
 
-  // Halo credits badge + realtime
-  useEffect(() => {
-    const uid = user?.id;
-    if (!uid) return;
-    let channel: ReturnType<typeof supabase.channel> | null = null;
-    (async () => {
-      const refresh = async () => {
-        const { data } = await supabase
-          .from('halo_credits')
-          .select('balance')
-          .eq('agent_id', uid)
-          .maybeSingle();
-        setHaloCredits(data?.balance ?? 0);
-      };
-      await refresh();
-      channel = supabase
-        .channel('sidebar-halo-credits-' + uid)
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'halo_credits', filter: `agent_id=eq.${uid}` },
-          () => refresh(),
-        )
-        .subscribe();
-    })();
-    return () => { if (channel) supabase.removeChannel(channel); };
-  }, [user?.id]);
+  // Halo credits badge is provided by the shared `useHaloCreditsBalance` hook
+  // (cached + realtime). The previous duplicate fetch + channel was removed
+  // so the sidebar and Halo Board page share a single network call.
 
   // Check onboarding status
   useEffect(() => {
@@ -304,6 +284,37 @@ const AgentDashboardSidebar = () => {
     return location.pathname.startsWith(path);
   };
 
+  // Prefetch route data when the user hovers a nav item, so by the time they
+  // click, the most expensive query for that page is already in cache.
+  // Currently wired for the Halo Board (4 parallel queries) — extend as needed.
+  const prefetchRoute = (url: string) => {
+    if (!user?.id) return;
+    if (url === '/dashboard/halo-board') {
+      queryClient.prefetchQuery({
+        queryKey: ['halo-board-halos'],
+        staleTime: 60 * 1000,
+        queryFn: async () => {
+          const { data } = await supabase
+            .from('halos')
+            .select('*')
+            .eq('status', 'active')
+            .order('created_at', { ascending: false });
+          return data ?? [];
+        },
+      });
+      // Warm the shared credits cache too (already cached for 5min, but safe).
+      queryClient.prefetchQuery({
+        queryKey: ['halo-credits-balance', user.id],
+        staleTime: 5 * 60 * 1000,
+        queryFn: async () => {
+          const { data } = await supabase
+            .from('halo_credits').select('balance').eq('agent_id', user.id).maybeSingle();
+          return data?.balance ?? 0;
+        },
+      });
+    }
+  };
+
   const renderGroup = (label: string, items: NavItem[]) => (
     <SidebarGroup key={label}>
       <SidebarGroupLabel>{!collapsed && label}</SidebarGroupLabel>
@@ -321,6 +332,8 @@ const AgentDashboardSidebar = () => {
                     navigate(item.url);
                     if (isMobile) setOpenMobile(false);
                   }}
+                  onMouseEnter={() => !item.comingSoon && prefetchRoute(item.url)}
+                  onFocus={() => !item.comingSoon && prefetchRoute(item.url)}
                   className={`flex items-center gap-2 w-full px-3 py-2.5 rounded-lg text-sm transition-colors ${
                     item.comingSoon
                       ? 'text-muted-foreground/50 cursor-default'

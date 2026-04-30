@@ -46,7 +46,7 @@ export default function RentSearchPage() {
       <Helmet>
         <title>Rental Properties Australia — Find Your Next Home</title>
         <meta name="description" content="Browse rental properties across Australia. Search by suburb, price, bedrooms, and pet-friendly options. Apply online with ListHQ." />
-        <link rel="canonical" href="https://globalhomes.lovable.app/rent" />
+        <link rel="canonical" href="https://listhq.com.au/rent" />
       </Helmet>
 
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">

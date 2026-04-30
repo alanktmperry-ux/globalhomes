@@ -548,9 +548,10 @@ const Index = () => {
     }
   }, [searchCenter]);
 
-  // Fetch featured/boosted listings, deduplicated, with fallback
+  // Fetch featured residential listings (house/apartment/townhouse), with fallback
   useEffect(() => {
     const cols = 'id, title, address, suburb, state, price, price_formatted, images, image_url, property_type, beds, baths, parking, lat, lng, boost_tier, is_featured, listing_type, translations';
+    const RESIDENTIAL_TYPES = ['house', 'apartment', 'townhouse', 'unit', 'villa', 'duplex', 'studio'];
     const MIN_FEATURED = 4;
 
     (async () => {
@@ -559,11 +560,11 @@ const Index = () => {
         .select(cols)
         .eq('is_active', true)
         .eq('status', 'public')
+        .in('property_type', RESIDENTIAL_TYPES)
         .or('is_featured.eq.true,boost_tier.not.is.null')
         .order('created_at', { ascending: false })
         .limit(12);
 
-      // Deduplicate by id
       const seen = new Set<string>();
       const unique = (featured ?? []).filter(p => {
         if (seen.has(p.id)) return false;
@@ -576,12 +577,13 @@ const Index = () => {
         return;
       }
 
-      // Fallback: fill with recent active sale listings (exclude rentals)
+      // Fallback: fill with recent active residential sale listings
       const { data: fallback } = await supabase
         .from('properties')
         .select(cols)
         .eq('is_active', true)
         .eq('status', 'public')
+        .in('property_type', RESIDENTIAL_TYPES)
         .or('listing_type.eq.sale,listing_type.is.null')
         .order('created_at', { ascending: false })
         .limit(12);
@@ -594,7 +596,16 @@ const Index = () => {
         if (unique.length >= 6) break;
       }
 
-      if (unique.length > 0) setFeaturedListings(unique);
+      if (unique.length > 0) {
+        setFeaturedListings(unique);
+      } else {
+        // Hardcoded residential placeholders (shown only if DB has 0 residential listings)
+        setFeaturedListings([
+          { id: 'placeholder-1', title: '4 bed house', address: '14 Maple Street, Auburn NSW', suburb: 'Auburn', state: 'NSW', price: 1200000, images: [], image_url: null, property_type: 'house', beds: 4, baths: 2, parking: 2, listing_type: 'sale', translations: { zh_simplified: {} }, _placeholder: true },
+          { id: 'placeholder-2', title: '2 bed apartment', address: '8/22 Box Hill Road, Box Hill VIC', suburb: 'Box Hill', state: 'VIC', price: 680000, images: [], image_url: null, property_type: 'apartment', beds: 2, baths: 1, parking: 1, listing_type: 'sale', translations: { zh_simplified: {} }, _placeholder: true },
+          { id: 'placeholder-3', title: '3 bed townhouse', address: '3 Oak Lane, Doncaster VIC', suburb: 'Doncaster', state: 'VIC', price: 895000, images: [], image_url: null, property_type: 'townhouse', beds: 3, baths: 2, parking: 1, listing_type: 'sale', translations: { zh_simplified: {} }, _placeholder: true },
+        ]);
+      }
     })();
   }, []);
 

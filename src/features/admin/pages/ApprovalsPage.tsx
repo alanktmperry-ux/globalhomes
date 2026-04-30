@@ -9,7 +9,7 @@ import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { buildAuditMeta } from '@/shared/lib/auditLog';
 import AgentApprovalQueue from '@/features/admin/components/AgentApprovalQueue';
 
-type TabKey = 'agents' | 'listings' | 'demos' | 'partners';
+type TabKey = 'agents' | 'demos' | 'partners';
 
 interface ListingRow {
   id: string;

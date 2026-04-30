@@ -1239,19 +1239,13 @@ const Index = () => {
               <span className="text-blue-500">{t('hero.headline2')}</span>
             </h1>
 
-            {/* Subheadline */}
-            <p className="text-xl md:text-2xl text-slate-500 font-medium mt-4 mb-0">
-              <noscript>{t('hero.subheadline')}</noscript>
-              <span>
-                {t('hero.subheadlinePrefix')}{' '}
-                <span
-                  className={`text-blue-500 inline-block transition-opacity duration-300 ${
-                    heroSubLangVisible ? 'opacity-100' : 'opacity-0'
-                  }`}
-                >
-                  {HERO_SUBHEADLINE_LANGUAGES[heroSubLangIndex]}
-                </span>
-              </span>
+            {/* Subheadline — static English, brand blue */}
+            <p
+              className="text-xl md:text-2xl mt-4 mb-0"
+              style={{ color: '#2563EB', fontWeight: 600 }}
+              lang="en"
+            >
+              Browse properties in 24 languages
             </p>
 
             {/* Sale / Rent toggle */}

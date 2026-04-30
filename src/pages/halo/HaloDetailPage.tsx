@@ -158,11 +158,14 @@ export default function HaloDetailPage() {
           />
           <Field
             label="Bedrooms"
-            value={
-              halo.bedrooms_min || halo.bedrooms_max
-                ? `${halo.bedrooms_min ?? '—'} to ${halo.bedrooms_max ?? '—'}`
-                : 'Any'
-            }
+            value={(() => {
+              const min = halo.bedrooms_min;
+              const max = halo.bedrooms_max;
+              if (!min && !max) return 'Any';
+              if (min && max) return min === max ? `${min} bedrooms` : `${min} to ${max}`;
+              if (max) return `Up to ${max}`;
+              return `${min}+`;
+            })()}
           />
           <Field label="Bathrooms (min)" value={halo.bathrooms_min ?? 'Any'} />
           <Field label="Car spaces (min)" value={halo.car_spaces_min ?? 'Any'} />

@@ -55,7 +55,7 @@ export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Prop
 
   return (
     <Card>
-      <CardContent className="p-5 space-y-4">
+      <CardContent className="p-5 pr-14 sm:pr-5 space-y-4">
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div className="flex flex-wrap items-center gap-2">
             <Badge className={intentClass} variant="secondary">
@@ -84,7 +84,7 @@ export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Prop
               </Badge>
             )}
           </div>
-          <span className="text-xs text-muted-foreground">
+          <span className="text-xs text-muted-foreground whitespace-nowrap shrink-0">
             Posted {timeAgo(halo.created_at)} · Expires in {daysLeft}d
           </span>
         </div>

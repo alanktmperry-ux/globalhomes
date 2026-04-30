@@ -77,6 +77,64 @@ export default function HaloBoardPage() {
     };
   }, [user, queryClient]);
 
+  // Realtime: new/updated/deleted Halos appear without a refresh.
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel('halo-board-halos')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'halos' },
+        (payload) => {
+          const row = payload.new as Halo;
+          if (row.status !== 'active') return;
+          setHalos((prev) => {
+            if (prev.some((h) => h.id === row.id)) return prev;
+            const next = [row, ...prev];
+            queryClient.setQueryData(['halo-board-halos'], next);
+            return next;
+          });
+        },
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'halos' },
+        (payload) => {
+          const row = payload.new as Halo;
+          setHalos((prev) => {
+            const exists = prev.some((h) => h.id === row.id);
+            let next: Halo[];
+            if (row.status !== 'active') {
+              next = prev.filter((h) => h.id !== row.id);
+            } else if (exists) {
+              next = prev.map((h) => (h.id === row.id ? row : h));
+            } else {
+              next = [row, ...prev];
+            }
+            queryClient.setQueryData(['halo-board-halos'], next);
+            return next;
+          });
+        },
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'halos' },
+        (payload) => {
+          const oldId = (payload.old as { id?: string })?.id;
+          if (!oldId) return;
+          setHalos((prev) => {
+            const next = prev.filter((h) => h.id !== oldId);
+            queryClient.setQueryData(['halo-board-halos'], next);
+            return next;
+          });
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, queryClient]);
+
   const tabFiltered = tab === 'pocket' ? halos.filter((h) => pocketMatchIds.has(h.id)) : halos;
   const filtered = applyFilters(tabFiltered, filters);
 

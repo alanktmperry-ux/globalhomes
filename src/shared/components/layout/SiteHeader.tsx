@@ -132,13 +132,13 @@ export function SiteHeader() {
           {/* Combined globe/settings — currency + language */}
           <SettingsMenu />
 
-          {/* Primary CTA — varies by role */}
+          {/* Unauthenticated navbar actions — keep CTA in-header between settings and account */}
           {!user && (
             <button
-              onClick={() => navigate('/auth?mode=agent')}
+              onClick={() => navigate('/agents/login')}
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm"
             >
-              Start free trial
+              {t('home.agents.cta')}
             </button>
           )}
           {isSeeker && (

@@ -428,7 +428,10 @@ const DashboardOverview = () => {
 
   return (
     <div>
-      <DashboardHeader title="Dashboard" subtitle="Welcome back, Agent" />
+      <DashboardHeader
+        title="Dashboard"
+        subtitle={`Welcome back, ${onboardingAgent?.name?.trim().split(/\s+/)[0] || 'Agent'}`}
+      />
 
       <div className="p-4 sm:p-6 space-y-6 max-w-7xl">
         <div className="flex justify-end">

@@ -50,7 +50,7 @@ export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Prop
     Math.ceil((new Date(halo.expires_at).getTime() - Date.now()) / 86400000),
   );
 
-  const budgetLabel = `AUD $${fmt(halo.budget_min)} – $${fmt(halo.budget_max)}`;
+  const budgetLabel = `AUD ${formatBudget(halo.budget_min, halo.budget_max)}`;
   const showLanguageBadge = halo.preferred_language && halo.preferred_language !== 'en';
 
   return (

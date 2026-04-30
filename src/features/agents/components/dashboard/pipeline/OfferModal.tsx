@@ -7,7 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { Sparkles, Loader2, Copy, Send, FileDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { generateOfferPdf } from '@/features/agents/lib/generateOfferPdf';
+// generateOfferPdf is dynamically imported in handleDownloadPdf so jsPDF
+// (~150KB) is excluded from the initial bundle and only loaded when an
+// agent actually clicks "Download PDF".
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
@@ -55,7 +57,8 @@ const OfferModal = ({ open, onOpenChange, card, propertyId, agentId, onSent }: O
     toast({ title: 'Copied to clipboard' });
   };
 
-  const handleDownloadPdf = () => {
+  const handleDownloadPdf = async () => {
+    const { generateOfferPdf } = await import('@/features/agents/lib/generateOfferPdf');
     generateOfferPdf({
       propertyAddress: card.address,
       buyerName: card.contactName,

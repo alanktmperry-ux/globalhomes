@@ -11,8 +11,8 @@ import { I18nProvider } from "@/shared/lib/i18n";
 import { CurrencyProvider } from "@/shared/lib/CurrencyContext";
 import { AuthProvider, useAuth } from "@/features/auth/AuthProvider";
 import { ProtectedRoute } from "@/features/auth/ProtectedRoute";
-import { Loader2 } from "lucide-react";
 import AppErrorBoundary from "@/components/AppErrorBoundary";
+import { PageSkeleton } from "@/shared/components/PageSkeleton";
 import { DefaultSEOHead } from "@/features/seo/components/DefaultSEOHead";
 import { HelpWidget } from "@/features/help/components/HelpWidget";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
@@ -198,11 +198,7 @@ const BrokerLeadDetailPage = React.lazy(() => import("./pages/broker/BrokerLeadD
 const BrokerTeamPage = React.lazy(() => import("./pages/broker/BrokerTeamPage"));
 const ReferralLandingPage = React.lazy(() => import("./features/referral/pages/ReferralLandingPage"));
 const ReferralDashboardPage = React.lazy(() => import("./features/referral/pages/ReferralDashboardPage"));
-const PageLoader = () => (
-  <div className="flex h-screen w-full items-center justify-center bg-background">
-    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-  </div>
-);
+const PageLoader = () => <PageSkeleton />;
 
 const ImpersonationBanner = () => {
   const { impersonating, impersonatedUser, stopImpersonation } = useAuth();

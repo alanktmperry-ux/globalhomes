@@ -430,7 +430,11 @@ const DashboardOverview = () => {
     <div>
       <DashboardHeader
         title="Dashboard"
-        subtitle={`Welcome back, ${onboardingAgent?.name?.trim().split(/\s+/)[0] || 'Agent'}`}
+       subtitle={`Welcome back, ${(() => {
+          const first = onboardingAgent?.name?.trim().split(/\s+/)[0];
+          if (!first) return 'Agent';
+          return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
+        })()}`}
       />
 
       <div className="p-4 sm:p-6 space-y-6 max-w-7xl">

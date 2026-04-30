@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
 
     const intentLabel = halo.intent === 'buy' ? 'Buy' : 'Rent';
     const suburbsLabel = (halo.suburbs ?? []).join(', ') || '—';
-    const budgetLabel = `AUD $${fmt(halo.budget_min)} – $${fmt(halo.budget_max)}`;
+    const budgetLabel = formatBudget(halo.budget_min, halo.budget_max);
     const summary = `${intentLabel} · ${suburbsLabel} · ${budgetLabel}`;
 
     // Notify seeker

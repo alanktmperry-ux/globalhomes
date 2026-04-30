@@ -24,7 +24,7 @@ export function SiteHeader() {
   const { t } = useI18n();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [showAgentModal] = useState(false);
+  const [showAgentModal, setShowAgentModal] = useState(false);
 
   const navTo = (path: string) => {
     setMobileOpen(false);

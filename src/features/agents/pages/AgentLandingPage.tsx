@@ -32,10 +32,11 @@ const AgentLandingPage = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
-      <Helmet>
-        <title>Real Estate Agent Software Australia | ListHQ</title>
-        <meta name="description" content="CRM, property management, trust accounting and lead tools built for Australian agents." />
-      </Helmet>
+      <SEO
+        title="Real Estate Agent Software Australia | ListHQ"
+        description="CRM, property management, trust accounting and lead tools built for Australian agents."
+        path="/for-agents"
+      />
       {/* ─── HERO ─── */}
       <section className="relative min-h-[92vh] flex items-center">
         {/* Split background */}

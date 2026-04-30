@@ -1268,9 +1268,6 @@ const Index = () => {
                   {t('hero.forRent')}
                 </button>
               </div>
-              <p className="text-xs text-slate-400 mt-2">
-                Commercial &amp; land search — coming soon
-              </p>
             </div>
 
             {/* Search bar */}

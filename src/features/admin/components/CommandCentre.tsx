@@ -773,18 +773,8 @@ export default function CommandCentre() {
         tone="amber"
       />
     ),
-    data.pendingListingReviews > 0 && (
-      <AttentionCard
-        key="listings"
-        icon={ClipboardCheck}
-        label="Listing Reviews"
-        count={data.pendingListingReviews}
-        description={`${data.pendingListingReviews} listing${data.pendingListingReviews > 1 ? 's' : ''} waiting for moderation review`}
-        to="/admin/approvals"
-        navigate={navigate}
-        tone="red"
-      />
-    ),
+    // Listings auto-publish — no moderation queue card.
+
     data.pendingAgentApprovals > 0 && (
       <AttentionCard
         key="pending_agents"

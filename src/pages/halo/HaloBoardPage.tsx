@@ -128,7 +128,7 @@ export default function HaloBoardPage() {
 
       const id = target.id;
       setTarget(null);
-      setBalance(current - 1);
+      queryClient.invalidateQueries({ queryKey: ['halo-credits-balance', user.id] });
       setUnlockedIds((prev) => new Set(prev).add(id));
       toast.success('Halo unlocked. Contact details are now visible.');
       navigate(`/dashboard/halo-board/${id}`);

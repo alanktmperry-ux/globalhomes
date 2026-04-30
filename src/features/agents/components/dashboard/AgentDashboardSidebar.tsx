@@ -332,6 +332,8 @@ const AgentDashboardSidebar = () => {
                     navigate(item.url);
                     if (isMobile) setOpenMobile(false);
                   }}
+                  onMouseEnter={() => !item.comingSoon && prefetchRoute(item.url)}
+                  onFocus={() => !item.comingSoon && prefetchRoute(item.url)}
                   className={`flex items-center gap-2 w-full px-3 py-2.5 rounded-lg text-sm transition-colors ${
                     item.comingSoon
                       ? 'text-muted-foreground/50 cursor-default'

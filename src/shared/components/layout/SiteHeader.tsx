@@ -48,21 +48,153 @@ export function SiteHeader() {
     navigate(path);
   };
 
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setShowUserMenu(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const isSeeker = !!user && !isAgent && !isAdmin;
+
   return (
     <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-md border-b border-border/50">
       <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 shrink-0" aria-label="ListHQ home">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-cyan-accent flex items-center justify-center">
-            <Globe size={18} className="text-primary-foreground" />
+        {/* Logo — always show globe + ListHQ wordmark on every breakpoint */}
+        <div className="flex items-center gap-3 shrink-0 min-w-0">
+          <Link to="/" className="flex items-center gap-2 shrink-0" aria-label="ListHQ home">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-cyan-accent flex items-center justify-center shrink-0">
+              <Globe size={18} className="text-primary-foreground" />
+            </div>
+            <span className="font-display text-base font-bold text-foreground tracking-tight">
+              ListHQ
+            </span>
+          </Link>
+
+          {/* Left-side primary nav (desktop only) */}
+          <div className="hidden md:flex items-center gap-1 pl-3 ml-1 border-l border-border/60">
+            <Link
+              to="/search"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-foreground hover:text-primary hover:bg-primary/5 transition-colors"
+            >
+              <Search size={13} className="text-primary" /> Search
+            </Link>
+            <Link
+              to="/agents"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-foreground hover:text-primary hover:bg-primary/5 transition-colors"
+            >
+              <Users size={13} className="text-primary" /> Find an Agent
+            </Link>
+            <Link
+              to="/pricing"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-foreground hover:text-primary hover:bg-primary/5 transition-colors"
+            >
+              <Sparkles size={13} className="text-primary" /> Pricing
+            </Link>
           </div>
-          <span className="font-display text-base font-bold text-foreground tracking-tight hidden sm:inline">
-            ListHQ
-          </span>
-        </Link>
-        
+        </div>
+
         {/* ─── Desktop right side actions (hidden below md) ─── */}
         <div className="hidden md:flex items-center gap-2 shrink-0">
+          {/* Combined globe/settings — currency + language */}
+          <SettingsMenu />
+
+          {/* Primary CTA — varies by role */}
+          {!user && (
+            <button
+              onClick={() => navigate('/auth?mode=agent')}
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
+            >
+              Start free trial
+            </button>
+          )}
+          {user && isAgent && (
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
+            >
+              <LayoutDashboard size={13} /> Dashboard
+            </button>
+          )}
+          {isSeeker && (
+            <button
+              onClick={() => navigate('/halo/new')}
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
+            >
+              <Sparkles size={13} /> Post a Halo
+            </button>
+          )}
+
+          {/* Admin shortcut stays distinct */}
+          {user && isAdmin && (
+            <button
+              onClick={() => navigate('/admin')}
+              className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary/20 transition-colors"
+              aria-label="Admin"
+              title="Admin"
+            >
+              <ShieldCheck size={17} />
+            </button>
+          )}
+
+          {/* User avatar — opens dropdown when signed in, otherwise goes to auth */}
+          {user ? (
+            <div ref={userMenuRef} className="relative">
+              <button
+                onClick={() => setShowUserMenu(o => !o)}
+                className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                aria-label="Account menu"
+              >
+                <User size={18} />
+              </button>
+              {showUserMenu && (
+                <div className="absolute right-0 top-full mt-1 w-56 bg-popover border border-border rounded-xl shadow-elevated overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                  <button onClick={() => { navigate('/profile'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                    <User size={14} className="text-muted-foreground" /> {t('nav.profile')}
+                  </button>
+                  {isSeeker && (
+                    <button onClick={() => { navigate('/seeker/dashboard'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                      <Sparkles size={14} className="text-muted-foreground" /> My Halos
+                    </button>
+                  )}
+                  {!isAgent && (
+                    <>
+                      <button onClick={() => { navigate('/notifications'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                        <Sparkles size={14} className="text-muted-foreground" /> Notifications
+                      </button>
+                      <button onClick={() => { navigate('/saved'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                        <Bookmark size={14} className="text-muted-foreground" /> Saved properties
+                      </button>
+                    </>
+                  )}
+                  {isAgent && (
+                    <button onClick={() => { navigate('/dashboard'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                      <LayoutDashboard size={14} className="text-muted-foreground" /> Dashboard
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() => navigate('/auth')}
+              className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              aria-label="Sign in"
+              title="Sign in"
+            >
+              <User size={18} />
+            </button>
+          )}
+        </div>
+
+        {/* ─── Hidden legacy desktop block (kept for ref-removal only) ─── */}
+        <div className="hidden">
+          {/* legacy markers preserved for compilation; no longer rendered */}
           <Link
             to="/exclusive"
             className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-foreground hover:text-primary hover:bg-primary/5 transition-colors"

@@ -449,10 +449,12 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         image_url: mainPhoto,
         images: draft.photos.length > 0 ? draft.photos : [],
         cover_index: draft.primaryPhoto,
-        is_active: editPropertyId ? draft.visibility === 'public' : false,
+        // Listings auto-publish on submission — no admin moderation step.
+        is_active: editPropertyId ? draft.visibility === 'public' : true,
         status: editPropertyId
           ? (draft.visibility === 'public' ? 'public' : draft.visibility)
-          : 'pending',
+          : 'public',
+        moderation_status: 'approved',
         lat: draft.lat || null,
         lng: draft.lng || null,
         rental_weekly: draft.listingType === 'rent' ? (draft.rentalWeekly || null) : (draft.estimatedRentalWeekly || null),

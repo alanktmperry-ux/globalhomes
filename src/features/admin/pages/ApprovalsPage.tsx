@@ -11,18 +11,6 @@ import AgentApprovalQueue from '@/features/admin/components/AgentApprovalQueue';
 
 type TabKey = 'agents' | 'demos' | 'partners';
 
-interface ListingRow {
-  id: string;
-  address: string | null;
-  suburb: string | null;
-  state: string | null;
-  property_type: string | null;
-  price: number | null;
-  agent_id: string | null;
-  images: string[] | null;
-  created_at: string;
-  agents: { name: string | null; email: string | null; agency: string | null } | null;
-}
 
 interface DemoRow {
   id: string;

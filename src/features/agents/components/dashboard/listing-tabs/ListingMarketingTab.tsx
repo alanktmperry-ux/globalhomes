@@ -1009,7 +1009,7 @@ function buildVendorReportHtml(params: {
   </div>` : ''}
 
   <div style="text-align:center;padding:16px 0;">
-    <div style="font-size:11px;color:#aaa;">Sent via ListHQ · globalhomes.lovable.app</div>
+    <div style="font-size:11px;color:#aaa;">Sent via ListHQ · listhq.com.au</div>
   </div>
 </div>
 </body></html>`;

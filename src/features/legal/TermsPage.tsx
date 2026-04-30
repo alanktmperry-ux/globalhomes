@@ -1,4 +1,4 @@
-import { Helmet } from 'react-helmet-async';
+import { SEO } from '@/shared/components/SEO';
 import { useEffect, useState } from 'react';
 import { ArrowUp } from 'lucide-react';
 
@@ -28,10 +28,11 @@ const TermsPage = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Terms of Service</title>
-        <meta name="description" content="Terms of Service for ListHQ — Australian real estate platform connecting agents, buyers, renters, vendors and property managers." />
-      </Helmet>
+      <SEO
+        title="Terms of Service | ListHQ"
+        description="Terms of Service for ListHQ — Australian real estate platform connecting agents, buyers, renters, vendors and property managers."
+        path="/terms"
+      />
       <main className="bg-background">
         <article className="max-w-3xl mx-auto px-4 py-12 md:py-16">
           <h1 className="font-display text-3xl font-extrabold text-foreground mb-2">Terms of Service</h1>

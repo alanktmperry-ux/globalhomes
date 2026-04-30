@@ -794,15 +794,15 @@ const Index = () => {
       <meta property="og:title" content={pageTitle} />
       <meta property="og:description" content={pageDescription} />
       <meta property="og:type" content="website" />
-      <meta property="og:url" content="https://globalhomes.lovable.app" />
-      <meta property="og:image" content="https://globalhomes.lovable.app/listhq-og.png" />
+      <meta property="og:url" content="https://listhq.com.au" />
+      <meta property="og:image" content="https://listhq.com.au/listhq-og.png" />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={pageTitle} />
       <meta name="twitter:description" content={pageDescription} />
-      <meta name="twitter:image" content="https://globalhomes.lovable.app/listhq-og.png" />
-      <link rel="canonical" href="https://globalhomes.lovable.app" />
+      <meta name="twitter:image" content="https://listhq.com.au/listhq-og.png" />
+      <link rel="canonical" href="https://listhq.com.au" />
       <script type="application/ld+json">{JSON.stringify({
         "@context": "https://schema.org",
         "@type": "Organization",

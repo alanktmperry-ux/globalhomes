@@ -1,4 +1,4 @@
-import { Helmet } from 'react-helmet-async';
+import { SEO } from '@/shared/components/SEO';
 import { useEffect, useState } from 'react';
 import { ArrowUp } from 'lucide-react';
 
@@ -26,10 +26,11 @@ const PrivacyPage = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Privacy Policy</title>
-        <meta name="description" content="Privacy Policy for ListHQ — how we collect, use and protect your personal information under the Australian Privacy Act and GDPR." />
-      </Helmet>
+      <SEO
+        title="Privacy Policy | ListHQ"
+        description="Privacy Policy for ListHQ — how we collect, use and protect your personal information under the Australian Privacy Act and GDPR."
+        path="/privacy"
+      />
       <main className="bg-background">
         <article className="max-w-3xl mx-auto px-4 py-12 md:py-16">
           <h1 className="font-display text-3xl font-extrabold text-foreground mb-2">Privacy Policy</h1>

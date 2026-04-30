@@ -228,32 +228,9 @@ const AgentDashboardSidebar = () => {
     return () => { if (channel) supabase.removeChannel(channel); };
   }, [agent?.id]);
 
-  // Halo credits badge + realtime
-  useEffect(() => {
-    const uid = user?.id;
-    if (!uid) return;
-    let channel: ReturnType<typeof supabase.channel> | null = null;
-    (async () => {
-      const refresh = async () => {
-        const { data } = await supabase
-          .from('halo_credits')
-          .select('balance')
-          .eq('agent_id', uid)
-          .maybeSingle();
-        setHaloCredits(data?.balance ?? 0);
-      };
-      await refresh();
-      channel = supabase
-        .channel('sidebar-halo-credits-' + uid)
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'halo_credits', filter: `agent_id=eq.${uid}` },
-          () => refresh(),
-        )
-        .subscribe();
-    })();
-    return () => { if (channel) supabase.removeChannel(channel); };
-  }, [user?.id]);
+  // Halo credits badge is provided by the shared `useHaloCreditsBalance` hook
+  // (cached + realtime). The previous duplicate fetch + channel was removed
+  // so the sidebar and Halo Board page share a single network call.
 
   // Check onboarding status
   useEffect(() => {

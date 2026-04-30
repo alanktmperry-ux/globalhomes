@@ -4,25 +4,13 @@ import { toast } from 'sonner';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Loader2, CheckCircle2, XCircle, ExternalLink } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { buildAuditMeta } from '@/shared/lib/auditLog';
 import AgentApprovalQueue from '@/features/admin/components/AgentApprovalQueue';
 
-type TabKey = 'agents' | 'listings' | 'demos' | 'partners';
+type TabKey = 'agents' | 'demos' | 'partners';
 
-interface ListingRow {
-  id: string;
-  address: string | null;
-  suburb: string | null;
-  state: string | null;
-  property_type: string | null;
-  price: number | null;
-  agent_id: string | null;
-  images: string[] | null;
-  created_at: string;
-  agents: { name: string | null; email: string | null; agency: string | null } | null;
-}
 
 interface DemoRow {
   id: string;
@@ -68,10 +56,6 @@ function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-AU', { day: '2-digit', month: 'short', year: '2-digit' });
 }
 
-function fmtPrice(n: number | null) {
-  if (!n) return '—';
-  return `$${n.toLocaleString()}`;
-}
 
 function CountBadge({ count }: { count: number }) {
   if (!count) return null;
@@ -88,175 +72,8 @@ function EmptyState({ message }: { message: string }) {
   );
 }
 
-// ─────────────────────────────────────────────────────
-// Tab 1 — Listings
-// ─────────────────────────────────────────────────────
+// Listing approvals removed — listings auto-publish on submission.
 
-function ListingsTab({ onCount }: { onCount: (n: number) => void }) {
-  const [rows, setRows] = useState<ListingRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [busyId, setBusyId] = useState<string | null>(null);
-  const [rejectingId, setRejectingId] = useState<string | null>(null);
-  const [rejectReason, setRejectReason] = useState('');
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('properties')
-        .select('id, address, suburb, state, property_type, price, agent_id, images, created_at, agents!inner(name, email, agency)')
-        .eq('is_active', false)
-        .neq('moderation_status', 'rejected')
-        .not('status', 'eq', 'archived')
-        .order('created_at', { ascending: false })
-        .limit(50);
-      if (error) throw error;
-      const list = (data ?? []) as unknown as ListingRow[];
-      setRows(list);
-      onCount(list.length);
-    } catch (err) {
-      toast.error(getErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
-  }, [onCount]);
-
-  useEffect(() => { load(); }, [load]);
-
-  const approve = async (row: ListingRow) => {
-    setBusyId(row.id);
-    try {
-      const { error } = await (supabase.from('properties') as any).update({ is_active: true, moderation_status: 'approved' }).eq('id', row.id);
-      if (error) throw error;
-      await logAudit('listing_approved', 'property', row.id, { address: row.address });
-      toast.success('Listing approved');
-      setRows(prev => {
-        const next = prev.filter(r => r.id !== row.id);
-        onCount(next.length);
-        return next;
-      });
-    } catch (err) {
-      toast.error(getErrorMessage(err));
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  const reject = async (row: ListingRow) => {
-    if (!rejectReason.trim()) {
-      toast.error('Please enter a rejection reason');
-      return;
-    }
-    setBusyId(row.id);
-    try {
-      const { error } = await (supabase.from('properties') as any)
-        .update({ is_active: false, moderation_status: 'rejected' })
-        .eq('id', row.id);
-      if (error) throw error;
-      await logAudit('listing_rejected', 'property', row.id, { reason: rejectReason.trim(), address: row.address });
-      toast.success('Listing rejected');
-      setRows(prev => {
-        const next = prev.filter(r => r.id !== row.id);
-        onCount(next.length);
-        return next;
-      });
-      setRejectingId(null);
-      setRejectReason('');
-    } catch (err) {
-      toast.error(getErrorMessage(err));
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  if (loading) return <div className="flex justify-center py-16"><Loader2 className="animate-spin text-muted-foreground" /></div>;
-  if (rows.length === 0) return <EmptyState message="No listings pending review" />;
-
-  return (
-    <div className="overflow-x-auto rounded-2xl border border-border bg-card">
-      <table className="w-full text-sm">
-        <thead className="bg-muted/40 text-xs text-muted-foreground">
-          <tr>
-            <th className="text-left px-4 py-3 font-medium">Address</th>
-            <th className="text-left px-4 py-3 font-medium">Agent</th>
-            <th className="text-left px-4 py-3 font-medium">Agency</th>
-            <th className="text-left px-4 py-3 font-medium">Type</th>
-            <th className="text-left px-4 py-3 font-medium">Price</th>
-            <th className="text-left px-4 py-3 font-medium">Submitted</th>
-            <th className="text-right px-4 py-3 font-medium">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map(row => {
-            const thumb = Array.isArray(row.images) && row.images.length > 0 ? row.images[0] : null;
-            const isRejecting = rejectingId === row.id;
-            return (
-              <>
-                <tr key={row.id} className="border-t border-border">
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      {thumb ? (
-                        <img src={thumb} alt="" className="w-10 h-10 rounded-lg object-cover" />
-                      ) : (
-                        <div className="w-10 h-10 rounded-lg bg-muted" />
-                      )}
-                      <div>
-                        <p className="font-medium text-foreground">{row.address || '—'}</p>
-                        <p className="text-xs text-muted-foreground">{[row.suburb, row.state].filter(Boolean).join(', ')}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-foreground">{row.agents?.name || '—'}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{row.agents?.agency || '—'}</td>
-                  <td className="px-4 py-3 text-muted-foreground capitalize">{row.property_type || '—'}</td>
-                  <td className="px-4 py-3 text-foreground">{fmtPrice(row.price)}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{fmtDate(row.created_at)}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-1">
-                      <Button size="sm" variant="ghost" disabled={busyId === row.id} onClick={() => approve(row)} title="Approve">
-                        <CheckCircle2 size={16} className="text-emerald-500" />
-                      </Button>
-                      <Button size="sm" variant="ghost" disabled={busyId === row.id} onClick={() => { setRejectingId(isRejecting ? null : row.id); setRejectReason(''); }} title="Reject">
-                        <XCircle size={16} className="text-destructive" />
-                      </Button>
-                      <a href={`/listing/${row.id}`} target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-foreground p-2">
-                        <ExternalLink size={14} />
-                      </a>
-                    </div>
-                  </td>
-                </tr>
-                {isRejecting && (
-                  <tr key={`${row.id}-reject`} className="border-t border-border bg-muted/30">
-                    <td colSpan={7} className="px-4 py-3">
-                      <div className="flex items-start gap-2">
-                        <textarea
-                          autoFocus
-                          maxLength={200}
-                          value={rejectReason}
-                          onChange={e => setRejectReason(e.target.value)}
-                          placeholder="Reason for rejection (max 200 chars)"
-                          className="flex-1 text-sm border border-border rounded-lg px-3 py-2 bg-background min-h-[60px] resize-none"
-                        />
-                        <div className="flex flex-col gap-2">
-                          <Button size="sm" variant="destructive" disabled={busyId === row.id} onClick={() => reject(row)}>
-                            Confirm reject
-                          </Button>
-                          <Button size="sm" variant="ghost" onClick={() => { setRejectingId(null); setRejectReason(''); }}>
-                            Cancel
-                          </Button>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
-}
 
 // ─────────────────────────────────────────────────────
 // Tab 2 — Demo Requests
@@ -488,30 +305,25 @@ export default function ApprovalsPage() {
   });
 
   const setAgentsCount = useCallback((n: number) => setCounts(c => ({ ...c, agents: n })), []);
-  const setListingsCount = useCallback((n: number) => setCounts(c => ({ ...c, listings: n })), []);
   const setDemosCount = useCallback((n: number) => setCounts(c => ({ ...c, demos: n })), []);
   const setPartnersCount = useCallback((n: number) => setCounts(c => ({ ...c, partners: n })), []);
 
-  // Bug Fix 2: Prefetch counts for ALL tabs on mount so the badges and "X total
-  // pending" subtitle are accurate regardless of which tab is currently rendered.
-  // Each tab still re-fetches when activated, so these counts stay in sync.
+  // Prefetch counts for ALL tabs on mount so the badges and "X total pending"
+  // subtitle are accurate regardless of which tab is currently rendered.
+  // Listings no longer require approval, so they're excluded from this count.
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const [agentsRes, listingsRes, demosRes, partnersRes] = await Promise.all([
+        const [agentsRes, demosRes, partnersRes] = await Promise.all([
           supabase.from('agents').select('id', { count: 'exact', head: true }).eq('approval_status', 'pending'),
-          (supabase.from('properties').select('id', { count: 'exact', head: true })
-            .eq('is_active', false)
-            .neq('moderation_status', 'rejected')
-            .not('status', 'eq', 'archived')) as any,
           (supabase.from('demo_requests' as any).select('id', { count: 'exact', head: true }).eq('status', 'pending')) as any,
           (supabase.from('partners').select('id', { count: 'exact', head: true }).eq('is_verified', false)) as any,
         ]);
         if (cancelled) return;
         setCounts({
           agents: agentsRes.count ?? 0,
-          listings: listingsRes.count ?? 0,
+          listings: 0,
           demos: demosRes.count ?? 0,
           partners: partnersRes.count ?? 0,
         });
@@ -522,7 +334,7 @@ export default function ApprovalsPage() {
     return () => { cancelled = true; };
   }, []);
 
-  const total = counts.agents + counts.listings + counts.demos + counts.partners;
+  const total = counts.agents + counts.demos + counts.partners;
 
   return (
     <div className="max-w-screen-xl mx-auto px-6 py-8">
@@ -538,9 +350,6 @@ export default function ApprovalsPage() {
           <TabsTrigger value="agents">
             Agent Approvals<CountBadge count={counts.agents} />
           </TabsTrigger>
-          <TabsTrigger value="listings">
-            Listing Approvals<CountBadge count={counts.listings} />
-          </TabsTrigger>
           <TabsTrigger value="demos">
             Demo Requests<CountBadge count={counts.demos} />
           </TabsTrigger>
@@ -551,9 +360,6 @@ export default function ApprovalsPage() {
 
         <TabsContent value="agents" className="mt-6">
           {tab === 'agents' && <AgentApprovalQueue onPendingCountChange={setAgentsCount} />}
-        </TabsContent>
-        <TabsContent value="listings" className="mt-6">
-          {tab === 'listings' && <ListingsTab onCount={setListingsCount} />}
         </TabsContent>
         <TabsContent value="demos" className="mt-6">
           {tab === 'demos' && <DemosTab onCount={setDemosCount} />}

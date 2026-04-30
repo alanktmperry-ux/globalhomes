@@ -3,6 +3,15 @@ import { Helmet } from "react-helmet-async";
 const SITE_URL = "https://listhq.com.au";
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 
+// hreflang codes for the 24 languages ListHQ supports + x-default.
+// All currently point to the canonical site root — update once per-locale
+// URLs exist (e.g. /zh, /vi).
+const HREFLANGS = [
+  "en-au", "zh-hans", "zh-hant", "vi", "ko", "ar", "hi", "ja", "th",
+  "id", "ms", "tl", "ta", "te", "mr", "pa", "bn", "ur", "fa", "el",
+  "it", "es", "pt", "x-default",
+] as const;
+
 interface SEOProps {
   /** Full page title — will be rendered as-is. Should be unique per page. */
   title: string;
@@ -47,6 +56,9 @@ export function SEO({
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={image} />
+      {HREFLANGS.map((code) => (
+        <link key={code} rel="alternate" hrefLang={code} href={`${SITE_URL}/`} />
+      ))}
     </Helmet>
   );
 }

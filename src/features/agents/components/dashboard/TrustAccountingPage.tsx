@@ -417,6 +417,13 @@ const TrustAccountingPage = () => {
     );
   }
 
+  // Plan gate must run BEFORE the import-wizard and empty-state early returns,
+  // otherwise non-eligible agents can open the "Create Trust Account" modal
+  // from the empty state and only hit the paywall on submit.
+  if (!subLoading && !canAccessTrust) {
+    return <UpgradeGate requiredPlan="Pro or above" message="Trust accounting is available on the Pro plan and above. Record deposits, manage client ledgers, generate compliance-ready statements, and import your opening balance from PropertyMe." />;
+  }
+
   if (showImportWizard) {
     return (
       <div>
@@ -588,9 +595,6 @@ const TrustAccountingPage = () => {
     );
   }
 
-  if (!subLoading && !canAccessTrust) {
-    return <UpgradeGate requiredPlan="Pro or above" message="Trust accounting is available on the Pro plan and above. Record deposits, manage client ledgers, generate compliance-ready statements, and import your opening balance from PropertyMe." />;
-  }
 
   return (
     <div>

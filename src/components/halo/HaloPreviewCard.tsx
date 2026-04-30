@@ -14,8 +14,18 @@ interface Props {
   pocketMatch?: boolean;
 }
 
-const fmt = (n: number | null | undefined) =>
-  n == null ? '—' : n.toLocaleString('en-AU');
+const fmtMoney = (n: number) => `$${n.toLocaleString('en-AU')}`;
+
+const formatBudget = (min: number | null | undefined, max: number | null | undefined) => {
+  const hasMin = min != null && min > 0;
+  const hasMax = max != null && max > 0;
+  if (hasMin && hasMax) return `${fmtMoney(min!)} – ${fmtMoney(max!)}`;
+  if (hasMax) return `Up to ${fmtMoney(max!)}`;
+  if (hasMin) return `From ${fmtMoney(min!)}`;
+  return 'Any budget';
+};
+
+const capitalise = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 const timeAgo = (iso: string) => {
   const diff = Date.now() - new Date(iso).getTime();
@@ -40,7 +50,7 @@ export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Prop
     Math.ceil((new Date(halo.expires_at).getTime() - Date.now()) / 86400000),
   );
 
-  const budgetLabel = `AUD $${fmt(halo.budget_min)} – $${fmt(halo.budget_max)}`;
+  const budgetLabel = `AUD ${formatBudget(halo.budget_min, halo.budget_max)}`;
   const showLanguageBadge = halo.preferred_language && halo.preferred_language !== 'en';
 
   return (
@@ -61,7 +71,7 @@ export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Prop
             )}
             {showLanguageBadge && (
               <Badge variant="outline" className="gap-1">
-                <Languages size={12} /> {halo.preferred_language}
+                <Languages size={12} /> {capitalise(halo.preferred_language)}
               </Badge>
             )}
             <HaloQualityBadge score={halo.quality_score} variant="agent" />

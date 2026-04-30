@@ -321,3 +321,59 @@ export function SiteHeader() {
     </header>
   );
 }
+
+/**
+ * Combined currency + language picker shown as a single globe icon in the
+ * desktop nav. Reuses the existing CurrencySwitcher and LanguageSwitcher
+ * (each owns its own portal/dropdown state) inside a small popover.
+ */
+function SettingsMenu() {
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        const target = e.target as HTMLElement;
+        if (target.closest('[data-settings-portal-ignore]')) return;
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  return (
+    <div ref={containerRef} className="relative">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+        aria-label="Language and currency"
+        title="Language & currency"
+      >
+        <Globe size={17} />
+      </button>
+      {open && (
+        <div
+          data-settings-portal-ignore
+          className="absolute right-0 top-full mt-1 w-56 bg-popover border border-border rounded-xl shadow-elevated overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150 p-2 space-y-1"
+        >
+          <div className="px-2 pt-1 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
+            Currency
+          </div>
+          <div className="px-1">
+            <CurrencySwitcher />
+          </div>
+          <div className="border-t border-border my-1" />
+          <div className="px-2 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
+            Language
+          </div>
+          <div className="px-1 pb-1">
+            <LanguageSwitcher />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

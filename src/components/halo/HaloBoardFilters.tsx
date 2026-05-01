@@ -84,6 +84,22 @@ export function HaloBoardFilters({ value, onChange, resultCount }: Props) {
         })}
       </div>
 
+      <div className="flex flex-wrap gap-2">
+        {LANGUAGE_OPTIONS.map((opt) => {
+          const active = value.language === opt.value;
+          return (
+            <Badge
+              key={opt.value}
+              onClick={() => onChange({ ...value, language: opt.value })}
+              variant={active ? 'default' : 'outline'}
+              className="cursor-pointer select-none"
+            >
+              {opt.label}
+            </Badge>
+          );
+        })}
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Select
           value={value.budget}

@@ -1367,6 +1367,10 @@ const BROWSER_LANG_MAP: Record<string, Language> = {
   'zh-hant': 'zh-TW',
   'vi': 'vi',
   'vi-vn': 'vi',
+  'pa': 'pa',
+  'pa-in': 'pa',
+  'ta': 'ta',
+  'ta-in': 'ta',
 };
 
 function detectBrowserLanguage(): Language {

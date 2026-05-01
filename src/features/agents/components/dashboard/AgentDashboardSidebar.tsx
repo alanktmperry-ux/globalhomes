@@ -91,7 +91,6 @@ const NAV_SECTIONS: NavSection[] = [
       { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
       { title: 'Arrears', url: '/dashboard/arrears', icon: AlertCircle, badgeKey: 'arrears', alertWhenBadge: true },
       { title: 'Renewals Due', url: '/dashboard/rent-roll?filter=renewals', icon: RefreshCw, badgeKey: 'renewals', alertWhenBadge: true },
-      { title: 'Buy Credits', url: '/dashboard/buy-credits', icon: HandCoins },
     ],
   },
   {

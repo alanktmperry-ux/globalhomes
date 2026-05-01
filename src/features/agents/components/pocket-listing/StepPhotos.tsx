@@ -251,35 +251,36 @@ const StepPhotos = ({ draft, update }: Props) => {
               onDragOver={(e) => handleDragOver(e, i)}
               onDragEnd={() => { setDragIdx(null); setOverIdx(null); }}
               onDrop={(e) => handleDrop(e, i)}
-              className={`relative group rounded-xl overflow-hidden aspect-[4/3] cursor-grab active:cursor-grabbing transition-all ${
+              className={`relative rounded-xl overflow-hidden aspect-[4/3] cursor-grab active:cursor-grabbing transition-all ${
                 dragIdx === i ? 'opacity-40 scale-95' : ''
               } ${overIdx === i && dragIdx !== i ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}`}
             >
               <img src={url} alt={`Photo ${i + 1}`} className="w-full h-full object-cover" />
 
               {/* Drag handle */}
-              <div className="absolute top-1.5 right-1.5 w-6 h-6 rounded-md bg-background/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute top-1.5 right-1.5 w-6 h-6 rounded-md bg-background/70 flex items-center justify-center">
                 <GripVertical size={12} className="text-foreground" />
               </div>
 
-              {/* Hover actions */}
-              <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/40 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+              {/* Always-visible action bar */}
+              <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-1.5 py-1.5 bg-gradient-to-t from-black/60 to-transparent">
                 {i !== 0 && (
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); moveToFirst(i); }}
                     title="Make feature photo"
-                    className="w-7 h-7 rounded-full bg-card/80 text-foreground flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
+                    className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-amber-500 transition-colors"
                   >
-                    <Star size={14} />
+                    <Star size={13} />
                   </button>
                 )}
+                {i === 0 && <div className="w-7" />}
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); removePhoto(i); }}
-                  className="w-7 h-7 rounded-full bg-destructive/80 text-destructive-foreground flex items-center justify-center"
+                  className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-red-500 transition-colors"
                 >
-                  <X size={14} />
+                  <X size={13} />
                 </button>
               </div>
 

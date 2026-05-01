@@ -1461,9 +1461,10 @@ const Index = () => {
             {featuredListings.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {featuredListings.filter(p => p.listing_type !== 'rent' && p.listing_type !== 'rental' && !/^\s*12\s+atherton/i.test(p.address || '')).slice(0, 6).map((p) => {
+                  {featuredListings.filter(p => p.listing_type !== 'rent' && p.listing_type !== 'rental' && !/^\s*12\s+atherton/i.test(p.address || '')).slice(0, 6).map((p, idx) => {
                     const img = (p.images && p.images[0]) || p.image_url;
                     const hasTranslations = p.translations && Object.keys(p.translations).length > 0;
+                    const isPriority = idx === 0;
                     return (
                       <div
                         key={p.id}
@@ -1472,7 +1473,13 @@ const Index = () => {
                       >
                         <div className="h-40 bg-slate-100 flex items-center justify-center relative">
                           {img ? (
-                            <img src={img} alt={p.title || p.address} className="w-full h-full object-cover" />
+                            <img
+                              src={img}
+                              alt={p.title || p.address}
+                              className="w-full h-full object-cover"
+                              loading={isPriority ? 'eager' : 'lazy'}
+                              fetchPriority={isPriority ? 'high' : 'auto'}
+                            />
                           ) : (
                             <Home size={32} className="text-slate-300" />
                           )}

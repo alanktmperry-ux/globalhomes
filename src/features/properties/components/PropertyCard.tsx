@@ -48,6 +48,7 @@ interface PropertyCardProps {
   onToggleReaction?: (propertyId: string, emoji: string) => void;
   partnerViewed?: boolean;
   currentUserId?: string;
+  priority?: boolean;
 }
 
 const COLLAB_EMOJIS = ['👍', '👎', '🔥'] as const;

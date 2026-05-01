@@ -109,6 +109,24 @@ export default function PropertyDetailPage() {
           'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=80&auto=format&fit=crop',
           'https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?w=1200&q=80&auto=format&fit=crop',
         ];
+        const p4Images = [
+          'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600573472556-e636c2acda88?w=1200&q=80&auto=format&fit=crop',
+        ];
+        const p5Images = [
+          'https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1565182999561-18d7dc61c393?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=1200&q=80&auto=format&fit=crop',
+        ];
+        const p6Images = [
+          'https://images.unsplash.com/photo-1597047084897-51e81819a499?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600210491369-e753d80a41f3?w=1200&q=80&auto=format&fit=crop',
+        ];
         const DEMO_PROPERTIES: Record<string, any> = {
           'placeholder-1': {
             id: 'placeholder-1',
@@ -154,6 +172,51 @@ export default function PropertyDetailPage() {
             year_built: 2022,
             listed_date: new Date().toISOString(),
             views: 189,
+          },
+          'placeholder-4': {
+            id: 'placeholder-4',
+            title: 'Luxury 5-bedroom harbour-view residence',
+            address: '12 Harbour Crescent, Mosman NSW 2088',
+            suburb: 'Mosman', state: 'NSW', country: 'Australia',
+            price: 4250000, beds: 5, baths: 4, parking: 3, sqm: 720,
+            images: p4Images, image_url: p4Images[0],
+            description: 'Architecturally renowned five-bedroom residence with panoramic Sydney Harbour views. Soaring ceilings, four bathrooms, three-car garage, infinity pool, and landscaped gardens. Walking distance to Balmoral Beach and Mosman Junction. Once-in-a-generation address.',
+            property_type: 'House',
+            features: ['Harbour views', 'Infinity pool', '3-car garage', 'Wine cellar', 'Smart home automation', 'Landscaped gardens'],
+            listing_type: 'sale',
+            year_built: 2019,
+            listed_date: new Date().toISOString(),
+            views: 412,
+          },
+          'placeholder-5': {
+            id: 'placeholder-5',
+            title: 'Spacious 4-bedroom family home in elite school zone',
+            address: '27 Springfield Avenue, Glen Waverley VIC 3150',
+            suburb: 'Glen Waverley', state: 'VIC', country: 'Australia',
+            price: 1650000, beds: 4, baths: 3, parking: 2, sqm: 560,
+            images: p5Images, image_url: p5Images[0],
+            description: "Generously proportioned family home in the heart of Glen Waverley's coveted Glen Waverley Secondary College catchment. Four bedrooms plus study, three bathrooms, formal and informal living, large backyard. Walking distance to Glen Waverley Station, The Glen Shopping Centre, and Brentwood Reserve.",
+            property_type: 'House',
+            features: ['GWSC school zone', 'Study', 'Two living areas', 'Ducted heating & cooling', 'Solar panels', 'Established gardens'],
+            listing_type: 'sale',
+            year_built: 2015,
+            listed_date: new Date().toISOString(),
+            views: 268,
+          },
+          'placeholder-6': {
+            id: 'placeholder-6',
+            title: 'Architecturally designed 3-bedroom townhouse',
+            address: '14 Albert Road, Strathfield NSW 2135',
+            suburb: 'Strathfield', state: 'NSW', country: 'Australia',
+            price: 1395000, beds: 3, baths: 2, parking: 2, sqm: 240,
+            images: p6Images, image_url: p6Images[0],
+            description: 'Striking modern townhouse moments from Strathfield Station. Three bedrooms, two bathrooms, double garage, private rooftop terrace with city views. Premium European appliances, oak floors, secure intercom entry. Catchment for Strathfield Public and Homebush Boys.',
+            property_type: 'Townhouse',
+            features: ['Rooftop terrace', 'City views', 'Double garage', 'European appliances', 'Oak floors', 'Intercom security'],
+            listing_type: 'sale',
+            year_built: 2023,
+            listed_date: new Date().toISOString(),
+            views: 203,
           },
         };
         const demo = DEMO_PROPERTIES[id];

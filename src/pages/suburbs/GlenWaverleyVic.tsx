@@ -3,24 +3,24 @@ import { Link } from 'react-router-dom';
 
 const FAQS = [
   {
-    q: 'Is Glen Waverley a good suburb to buy in?',
-    a: "Yes. Glen Waverley is one of Melbourne's most sought-after south-eastern suburbs, anchored by the prestigious Glen Waverley Secondary College zone, The Glen shopping centre, and direct train access to the CBD. It has a long-established Chinese-Australian community and consistently ranks as one of the most searched suburbs by Chinese buyers in Melbourne.",
+    q: 'Is Glen Waverley worth the premium over Box Hill?',
+    a: "For families prioritising school zones, yes. Glen Waverley Secondary College consistently ranks among Victoria's top government schools by ATAR results, and the school zone directly drives a price premium. Buyers who purchase within the GWSC zone are paying for access that holds its value in resale. If school zoning is not a priority, Box Hill offers similar amenities at a lower median price point.",
   },
   {
-    q: 'What is the average house price in Glen Waverley?',
-    a: 'Median house prices in Glen Waverley are approximately $1.6 million to $1.85 million. Units and apartments have a median in the range of $700,000 to $850,000. Prices vary substantially depending on whether the property sits inside the Glen Waverley Secondary College zone, which commands a clear premium.',
+    q: 'What is the median house price in Glen Waverley?',
+    a: 'As of 2025–2026, the median house price in Glen Waverley sits at approximately $1.5M–$1.8M depending on block size, school zone position, and renovation status. Median unit prices are approximately $700,000–$850,000. Properties within the GWSC zone on larger blocks regularly exceed $2M at auction.',
   },
   {
     q: 'Can foreign buyers purchase property in Glen Waverley?',
-    a: 'Foreign buyers (non-residents and most temporary visa holders) can purchase property in Glen Waverley but must obtain prior approval from the Foreign Investment Review Board (FIRB) at firb.gov.au before signing a contract. Victoria also applies a foreign purchaser additional duty of 8% on top of standard stamp duty. Independent legal advice is strongly recommended.',
+    a: 'Yes, subject to FIRB approval. Foreign nationals and temporary residents must apply to the Foreign Investment Review Board before signing a contract. Foreign purchasers also pay an additional 8% Foreign Purchaser Additional Duty on top of standard Victorian stamp duty. An annual Land Tax Absentee Owner Surcharge of 4% of land value may also apply. Always obtain independent legal advice before proceeding.',
   },
   {
-    q: 'How do I find a Mandarin-speaking real estate agent in Glen Waverley?',
-    a: "ListHQ (listhq.com.au) is a multilingual real estate platform where agents publish listings in Simplified Chinese, Traditional Chinese, and other languages. Buyers can use the platform's Halo system to post property requirements and receive responses from multilingual agents active in Glen Waverley. Many local agencies also have dedicated Mandarin-speaking sales staff.",
+    q: 'How do I find a Mandarin-speaking agent in Glen Waverley?',
+    a: "ListHQ (listhq.com.au) is Australia's first multilingual real estate platform. You can search for Glen Waverley listings in Simplified or Traditional Chinese, and use the Halo system to post your buyer requirements — budget, school zone priority, property type — so that Mandarin-speaking agents contact you directly.",
   },
   {
-    q: 'What type of properties are available in Glen Waverley?',
-    a: 'Glen Waverley has a mix of large post-war family homes on 600–800 square metre blocks, modern rebuilds, townhouse developments, and a growing apartment market around The Glen and Kingsway. The detached-house market is dominated by family buyers focused on the school zone.',
+    q: 'What makes Glen Waverley Secondary College special?',
+    a: "GWSC is one of Victoria's highest-performing government secondary schools by ATAR results. Unlike selective-entry schools, GWSC admits students purely on residential zone — any family that purchases within the catchment has guaranteed access. The school is co-educational, well-resourced, and has a large Chinese-Australian student community. Zone boundaries are verified at findmyschool.vic.gov.au.",
   },
 ];
 
@@ -28,24 +28,24 @@ const SCHEMA = [
   {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    '@id': 'https://listhq.com.au/suburbs/glen-waverley-vic',
-    url: 'https://listhq.com.au/suburbs/glen-waverley-vic',
     name: 'Buying Property in Glen Waverley — A Guide for Chinese Buyers',
+    url: 'https://listhq.com.au/suburbs/glen-waverley-vic',
     description:
-      'A complete guide for Chinese buyers purchasing property in Glen Waverley, Victoria (3150). Median prices, FIRB rules, stamp duty, school zones, transport, and Mandarin-speaking agents.',
+      'A complete guide to buying property in Glen Waverley, VIC for Mandarin-speaking and Chinese-Australian buyers. Covers schools, median prices, FIRB rules, the buying process, and how to find a multilingual agent.',
     inLanguage: 'en-AU',
+    datePublished: '2026-05-02',
+    dateModified: '2026-05-02',
     publisher: { '@type': 'Organization', name: 'ListHQ', url: 'https://listhq.com.au' },
     about: {
       '@type': 'Place',
       name: 'Glen Waverley',
       address: {
         '@type': 'PostalAddress',
+        postalCode: '3150',
         addressLocality: 'Glen Waverley',
         addressRegion: 'VIC',
-        postalCode: '3150',
         addressCountry: 'AU',
       },
-      geo: { '@type': 'GeoCoordinates', latitude: -37.8784, longitude: 145.1651 },
     },
     breadcrumb: {
       '@type': 'BreadcrumbList',
@@ -67,6 +67,12 @@ const SCHEMA = [
   },
 ];
 
+const PRICE_ROWS: Array<[string, string, string]> = [
+  ['House', '$1.5M–$1.8M', '3–4 bedroom on 500–700 sqm'],
+  ['Townhouse', '$1.0M–$1.3M', '3 bedroom, double garage, low-maintenance'],
+  ['Unit / Apartment', '$700K–$850K', '2 bedroom, close to The Glen or the station'],
+];
+
 export default function GlenWaverleyVic() {
   return (
     <>
@@ -74,7 +80,7 @@ export default function GlenWaverleyVic() {
         <title>Buying Property in Glen Waverley, VIC — A Guide for Chinese Buyers | ListHQ</title>
         <meta
           name="description"
-          content="Complete guide for Chinese buyers purchasing property in Glen Waverley, Victoria. Median prices, FIRB rules, stamp duty, school zones, transport, and Mandarin-speaking agents."
+          content="Complete guide to buying property in Glen Waverley, VIC for Mandarin-speaking and Chinese-Australian buyers. Schools, median prices, FIRB rules, and multilingual agents."
         />
         <link rel="canonical" href="https://listhq.com.au/suburbs/glen-waverley-vic" />
         <script type="application/ld+json">{JSON.stringify(SCHEMA)}</script>
@@ -94,72 +100,99 @@ export default function GlenWaverleyVic() {
         </h1>
 
         <p className="text-base leading-relaxed text-muted-foreground mb-8">
-          Glen Waverley (postcode 3150) is a suburb of Melbourne, Victoria, located approximately 19 kilometres south-east of the CBD in the City of Monash. It is one of the most established and sought-after suburbs for Chinese-Australian families, anchored by Glen Waverley Secondary College, The Glen shopping centre, and the terminus of the Glen Waverley train line. Median house prices sit in the range of $1.6 million to $1.85 million, with apartments available from approximately $700,000.
+          Glen Waverley is Melbourne's most sought-after suburb for Chinese-Australian families, combining one of Victoria's top-performing government school zones with direct train access to the CBD and a well-established Mandarin-speaking community. Located approximately 22 kilometres south-east of Melbourne's CBD in the City of Monash (postcode 3150), the suburb commands median house prices of $1.5M–$1.8M — a premium that reflects consistent demand and limited supply within its school zones.
         </p>
 
         <h2 className="font-display text-2xl font-semibold mt-10 mb-3">Why Chinese Buyers Choose Glen Waverley</h2>
-        <p className="mb-4"><strong>Schools.</strong> Glen Waverley Secondary College is consistently one of Victoria's highest-performing government secondary schools. The school zone is the single largest driver of demand and a clear premium attaches to properties inside the catchment.</p>
-        <p className="mb-4"><strong>Established Chinese-Australian community.</strong> The Glen, Kingsway, and Springvale Road have a high concentration of Asian supermarkets, restaurants, bubble tea shops, and professional services operating in Mandarin and Cantonese.</p>
-        <p className="mb-4"><strong>Transport.</strong> Glen Waverley Station is the terminus of the Glen Waverley line, providing direct trains to Melbourne CBD in approximately 35 minutes. Multiple bus routes serve Monash University Clayton.</p>
-        <p className="mb-4"><strong>Lifestyle and amenity.</strong> The Glen shopping centre underwent a major redevelopment and is now one of Melbourne's premier suburban retail hubs, with a strong mix of Asian dining and grocery options.</p>
-        <p className="mb-4"><strong>Capital growth track record.</strong> Glen Waverley has demonstrated long-term capital growth driven by school demand, Monash University proximity, and constrained detached-house supply.</p>
+        <p className="mb-4">Glen Waverley has earned the informal title of "the Chinese Beverly Hills of Melbourne" for five specific, well-documented reasons.</p>
+        <p className="mb-4"><strong>1. Glen Waverley Secondary College school zone.</strong> GWSC is a non-selective government secondary school that consistently produces ATAR results ranking it among Victoria's top 10 government schools. Unlike select-entry schools, admission is purely zone-based — the property address is the entry ticket. Families regard GWSC zone properties as a long-term education investment.</p>
+        <p className="mb-4"><strong>2. Established Chinese-Australian community.</strong> Mandarin is spoken widely in local supermarkets, medical clinics, restaurants, and community groups. The suburb has a high proportion of Chinese-Australian residents, making it one of the easiest suburbs for new arrivals from China, Hong Kong, and Taiwan to settle into quickly.</p>
+        <p className="mb-4"><strong>3. The Glen shopping centre.</strong> The Glen on Springvale Road is a major regional shopping centre with strong representation of Asian grocery stores and food courts serving the local community.</p>
+        <p className="mb-4"><strong>4. Direct train to Melbourne CBD.</strong> Glen Waverley Station is the terminus of the Glen Waverley train line, with direct services to Flinders Street Station in approximately 35 minutes during off-peak travel.</p>
+        <p className="mb-4"><strong>5. Monash University proximity and rental demand.</strong> Monash University's Clayton campus is approximately 5 kilometres away, sustaining consistent rental demand for units and townhouses.</p>
 
         <h2 className="font-display text-2xl font-semibold mt-10 mb-3">Glen Waverley Property Market Overview</h2>
-        <p className="mb-2"><strong>Median prices (approximate, recent Melbourne market data):</strong></p>
-        <ul className="list-disc pl-6 mb-4 space-y-1">
-          <li>Houses: $1.6 million — $1.85 million</li>
-          <li>Units and apartments: $700,000 — $850,000</li>
-          <li>Townhouses: $1.05 million — $1.35 million</li>
-        </ul>
-        <p className="mb-4">At $850,000, buyers are looking at one- or two-bedroom apartments around The Glen and Kingsway, or older two-bedroom units in smaller blocks.</p>
-        <p className="mb-4">At $1.35 million, buyers can access modern three-bedroom townhouses or older three-bedroom houses on smaller blocks (typically 350–500 square metres), often outside the prime school zone.</p>
-        <p className="mb-4">At $2 million+, buyers enter the market for four-bedroom detached houses on established 600–800 square metre blocks inside the Glen Waverley Secondary College zone.</p>
 
-        <h2 className="font-display text-2xl font-semibold mt-10 mb-3">Buying Process in Australia — Key Steps</h2>
+        <div className="overflow-x-auto mb-6">
+          <table className="w-full text-sm border border-border">
+            <thead className="bg-muted/50">
+              <tr>
+                <th className="text-left p-2 border-b border-border">Property Type</th>
+                <th className="text-left p-2 border-b border-border">Approximate Median</th>
+                <th className="text-left p-2 border-b border-border">What It Buys</th>
+              </tr>
+            </thead>
+            <tbody>
+              {PRICE_ROWS.map(([type, price, desc]) => (
+                <tr key={type} className="border-b border-border last:border-0">
+                  <td className="p-2 font-medium">{type}</td>
+                  <td className="p-2">{price}</td>
+                  <td className="p-2 text-muted-foreground">{desc}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <p className="mb-4">At $900,000 you are looking at a 2-bedroom unit or older townhouse requiring renovation. School zone access at this price is unlikely unless on the outer edge of the GWSC catchment.</p>
+        <p className="mb-4">At $1.5M you are competitive for a standard 3–4 bedroom house on a 500+ sqm block. Most auctions at this range attract 3–5 registered bidders.</p>
+        <p className="mb-4">At $2M+ you are looking at renovated 4–5 bedroom homes on 600–800 sqm blocks or development sites. Zone proximity to GWSC is a key price driver.</p>
+        <p className="mb-4">Properties within the GWSC zone consistently command a 10–20% premium over comparable properties just outside the catchment boundary. Verify zone status at findmyschool.vic.gov.au before making any offer.</p>
+
+        <h2 className="font-display text-2xl font-semibold mt-10 mb-3">Buying Process in Victoria — Key Steps</h2>
         <ol className="list-decimal pl-6 mb-4 space-y-2">
-          <li><strong>Determine your budget and finance.</strong> Obtain formal pre-approval before attending inspections.</li>
-          <li><strong>Check your FIRB status.</strong> Non-residents must obtain FIRB approval before purchasing. Apply at firb.gov.au.</li>
-          <li><strong>Engage a buyer's agent (optional).</strong> A buyer's agent acts exclusively for you and can bid at auction on your behalf.</li>
-          <li><strong>Attend inspections and review the Section 32 Vendor Statement.</strong> Have it reviewed by your conveyancer before signing.</li>
-          <li><strong>Make an offer or bid at auction.</strong> Auctions have no cooling-off period — finance and inspections must be complete before bidding.</li>
-          <li><strong>Pay the deposit.</strong> Typically 10% on exchange of contracts.</li>
-          <li><strong>Cooling-off period (private treaty only).</strong> Three business days in Victoria.</li>
-          <li><strong>Engage a conveyancer or solicitor.</strong> They handle the legal transfer and settlement.</li>
-          <li><strong>Pay stamp duty.</strong> See sro.vic.gov.au for current Victorian rates.</li>
-          <li><strong>Settlement.</strong> Typically 30–90 days after contract signing.</li>
+          <li><strong>Engage a conveyancer or solicitor first.</strong> Contracts of sale are available at open inspections. Engage a Mandarin-speaking conveyancer before you begin inspecting.</li>
+          <li><strong>Obtain finance pre-approval.</strong> Australian lenders assess foreign income differently. Consider Australian branches of Chinese banks (Bank of China Australia) if financing foreign income.</li>
+          <li><strong>Apply for FIRB approval if required.</strong> Apply at firb.gov.au before signing any contract. Allow 30 days for processing.</li>
+          <li><strong>Review the Section 32 Vendor's Statement.</strong> Discloses title, planning overlays, encumbrances, and owners corporation fees. Your conveyancer must review this before you sign.</li>
+          <li><strong>Verify the school zone.</strong> Use findmyschool.vic.gov.au with the exact property address. Do not rely on agent representations alone.</li>
+          <li><strong>Make an offer or bid at auction.</strong> Auction purchases are unconditional — no cooling-off period. Bring a 10% deposit cheque to auction.</li>
+          <li><strong>Sign contracts and pay the deposit.</strong> Private sales include a 3-business-day cooling-off period in Victoria. The 10% deposit is held in trust until settlement.</li>
+          <li><strong>Pay stamp duty.</strong> Foreign purchasers pay an additional 8% Foreign Purchaser Additional Duty. Your conveyancer will calculate the full amount.</li>
+          <li><strong>Arrange building and pest inspection.</strong> For private sales, complete inspections before signing or within the cooling-off period.</li>
+          <li><strong>Settle.</strong> Typically 30–90 days from contract signing. Keys are released at settlement.</li>
         </ol>
 
-        <h2 className="font-display text-2xl font-semibold mt-10 mb-3">Important Considerations for Chinese Buyers</h2>
-        <p className="mb-4"><strong>FIRB — Foreign Investment Review Board.</strong> Non-residents and most temporary visa holders must obtain FIRB approval before purchasing residential real estate. Apply at firb.gov.au.</p>
-        <p className="mb-4"><strong>Stamp duty for foreign purchasers.</strong> Victoria applies a foreign purchaser additional duty of 8% on top of standard stamp duty.</p>
-        <p className="mb-4"><strong>Land tax.</strong> Investment properties attract annual land tax. An absentee owner surcharge also applies to foreign persons not ordinarily resident in Australia.</p>
-        <p className="mb-4"><strong>Using a Chinese-speaking agent and conveyancer.</strong> Request that the Section 32 Vendor Statement and Contract of Sale be explained in Mandarin before you sign.</p>
         <p className="text-xs italic text-muted-foreground border-l-2 border-border pl-3 my-6">
-          Disclaimer: This guide provides general information only. FIRB rules, stamp duty rates, and land tax obligations change. Obtain independent legal and financial advice before purchasing.
+          Legal disclaimer: The buying process above is a general guide only and does not constitute legal advice. Laws, duties, and FIRB requirements change. Always obtain independent legal and financial advice before signing any contract.
+        </p>
+
+        <h2 className="font-display text-2xl font-semibold mt-10 mb-3">Important Considerations for Chinese Buyers</h2>
+        <p className="mb-4"><strong>FIRB.</strong> Foreign nationals and temporary visa holders must apply for FIRB approval before purchasing. Apply at firb.gov.au. Purchasing without approval where required is a criminal offence.</p>
+        <p className="mb-4"><strong>Foreign Purchaser Additional Duty — 8%.</strong> On a $1.5M purchase this is $120,000 in additional duty. Applies to foreign nationals and some temporary visa holders. Australian permanent residents and citizens are exempt.</p>
+        <p className="mb-4"><strong>Absentee Owner Surcharge.</strong> If the property is not your principal place of residence and you qualify as an absentee owner, a 4% annual surcharge on land value applies on top of standard land tax. Current rates at sro.vic.gov.au.</p>
+        <p className="mb-4"><strong>Chinese-speaking professionals.</strong> Engage a conveyancer and solicitor fluent in Mandarin. Several Melbourne south-east firms specialise in acting for Chinese-Australian buyers.</p>
+
+        <p className="text-xs italic text-muted-foreground border-l-2 border-border pl-3 my-6">
+          Disclaimer: Duty rates, FIRB thresholds, and surcharge rates are subject to change. Always verify current rates with sro.vic.gov.au and seek independent legal advice.
         </p>
 
         <h2 className="font-display text-2xl font-semibold mt-10 mb-3">Finding a Multilingual Agent in Glen Waverley</h2>
-        <p className="mb-4">Glen Waverley has many real estate agencies with Chinese-speaking staff. ListHQ is Australia's first multilingual real estate platform, where listings are published in English, Simplified Chinese, Traditional Chinese, Vietnamese, Korean, and Japanese. Buyers can search Glen Waverley listings in Mandarin and find agents who operate multilingually. The Halo system also lets buyers post requirements (suburb, type, budget, school zone) and receive direct responses from matching agents.</p>
+        <p className="mb-4">Glen Waverley has many agencies with Mandarin-speaking staff, but finding the right agent for your specific requirements — school zone, block size, development potential — requires more than a Google search. Working with an agent who can explain auction strategy and contract conditions in Mandarin reduces the risk of costly misunderstandings on a $1.5M+ purchase.</p>
+        <p className="mb-4">ListHQ is Australia's first multilingual real estate platform, and Glen Waverley is one of its most active markets. Agents publish listings in English, Simplified Chinese, and Traditional Chinese. ListHQ's Halo system lets you post your buying requirements — school zone priority, budget, property type — and receive direct responses from Mandarin-speaking agents who are actively selling in Glen Waverley.</p>
 
         <h2 className="font-display text-2xl font-semibold mt-10 mb-3">Schools Near Glen Waverley</h2>
-        <p className="mb-2"><strong>Secondary schools:</strong></p>
+
+        <h3 className="font-semibold text-lg mt-4 mb-2">Glen Waverley Secondary College (GWSC)</h3>
+        <p className="mb-4">GWSC is a non-selective co-educational government school for Years 7–12, consistently ranking among Victoria's top 10 government schools by median ATAR. Admission is zone-based only — your address determines eligibility. Zone boundaries are published and searchable at findmyschool.vic.gov.au. Always verify with the specific property address before purchasing.</p>
+
+        <h3 className="font-semibold text-lg mt-4 mb-2">Highvale Secondary College</h3>
+        <p className="mb-4">A select-entry government secondary school in Glen Waverley, open to students across Victoria via an application process — not zone-based. Highvale consistently ranks among Melbourne's top government schools for VCE performance.</p>
+
+        <h3 className="font-semibold text-lg mt-4 mb-2">Mount Waverley Secondary College</h3>
+        <p className="mb-4">Located in neighbouring Mount Waverley, another high-performing government school with a large Chinese-Australian student cohort. Buyers who cannot secure a GWSC-zone property sometimes consider the Mount Waverley zone as a comparable alternative at a slightly lower median price.</p>
+
+        <h3 className="font-semibold text-lg mt-4 mb-2">Primary Schools</h3>
         <ul className="list-disc pl-6 mb-4 space-y-1">
-          <li><strong>Glen Waverley Secondary College</strong> — The dominant catchment school, consistently among Victoria's top government secondaries.</li>
-          <li><strong>Brentwood Secondary College</strong> — Government secondary serving parts of the area.</li>
+          <li><strong>Glen Waverley Primary School</strong> — central to the suburb</li>
+          <li><strong>Highvale Primary School</strong> — feeds into GWSC and Highvale Secondary</li>
         </ul>
-        <p className="mb-2"><strong>Primary schools:</strong></p>
-        <ul className="list-disc pl-6 mb-4 space-y-1">
-          <li><strong>Glen Waverley Primary School</strong></li>
-          <li><strong>Glendal Primary School</strong></li>
-          <li><strong>Camelot Rise Primary School</strong></li>
-        </ul>
-        <p className="mb-4">Confirm current zones at findmyschool.vic.gov.au before purchasing on the basis of school access.</p>
 
         <h2 className="font-display text-2xl font-semibold mt-10 mb-3">Transport</h2>
         <ul className="list-disc pl-6 mb-4 space-y-2">
-          <li><strong>Train.</strong> Glen Waverley Station — terminus of the Glen Waverley line. To Flinders Street: approximately 35 minutes.</li>
-          <li><strong>Bus.</strong> Multiple SmartBus routes including the 902 (Chelsea–Airport West) and connections to Monash University Clayton.</li>
-          <li><strong>Car.</strong> Approximately 19 km from Melbourne CBD via the Monash Freeway. Drive time: 30–45 minutes depending on traffic.</li>
+          <li><strong>Train.</strong> Glen Waverley Station — direct to Flinders Street Station in ~35 minutes. Frequent services during peak hours.</li>
+          <li><strong>Bus.</strong> SmartBus 900 orbital route. Local buses to Clayton, Oakleigh, and Monash University Clayton campus.</li>
+          <li><strong>Road.</strong> Monash Freeway (M1) nearby, providing direct access to Melbourne CBD and Melbourne Airport via CityLink.</li>
         </ul>
 
         <h2 className="font-display text-2xl font-semibold mt-10 mb-3">Frequently Asked Questions</h2>
@@ -173,7 +206,7 @@ export default function GlenWaverleyVic() {
         </div>
 
         <p className="text-xs text-muted-foreground border-t border-border pt-4 mt-8">
-          Disclosure: This page is published by ListHQ, a multilingual real estate platform. Median price data is approximate and based on publicly available Melbourne market information. Last reviewed May 2026.
+          Disclosure: This page is published by ListHQ, a multilingual real estate platform mentioned in the "Finding a Multilingual Agent" section. Median price data is approximate and based on publicly available Melbourne market information. Last reviewed May 2026.
         </p>
       </article>
     </>

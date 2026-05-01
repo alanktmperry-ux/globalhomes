@@ -9,6 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { SoundWaveVisualizer } from '@/features/search/components/SoundWaveVisualizer';
 import { useVoiceSearch } from '@/features/search/hooks/useVoiceSearch';
+import { VoiceMicButton } from '@/shared/components/VoiceMicButton';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import { toast } from 'sonner';
 import type { ListingDraft } from './PocketListingForm';
 

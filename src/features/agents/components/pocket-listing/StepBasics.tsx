@@ -366,17 +366,33 @@ const StepBasics = ({ draft, update }: Props) => {
 
         <div className="space-y-1.5">
           <Label className="text-sm font-semibold block">Description</Label>
-          <Textarea
-            value={draft.voiceTranscript}
-            onChange={(e) => update({ voiceTranscript: e.target.value })}
-            placeholder="Describe the property — key selling points, lifestyle, neighbourhood highlights…"
-            className="min-h-[140px] resize-y"
-            rows={6}
-          />
+          <div className="relative">
+            <Textarea
+              value={draft.voiceTranscript}
+              onChange={(e) => update({ voiceTranscript: e.target.value })}
+              placeholder="Describe the property — key selling points, lifestyle, neighbourhood highlights…"
+              className="min-h-[140px] resize-y pr-12"
+              rows={6}
+            />
+            <button
+              type="button"
+              onClick={toggleVoice}
+              aria-label={isListening ? 'Stop dictation' : 'Start voice dictation'}
+              className={`absolute top-2 right-2 w-10 h-10 rounded-full flex items-center justify-center transition-colors border ${
+                isListening
+                  ? 'bg-destructive text-destructive-foreground border-destructive animate-pulse'
+                  : 'bg-card text-primary border-border hover:bg-primary/10'
+              }`}
+            >
+              {isListening ? <MicOff size={16} /> : <Mic size={16} />}
+            </button>
+          </div>
           <p className="text-xs text-muted-foreground">
-            {draft.voiceTranscript.length > 0
-              ? `${draft.voiceTranscript.length} characters`
-              : 'You can also dictate this in the Voice step'}
+            {isListening
+              ? 'Listening… tap the mic again to stop.'
+              : draft.voiceTranscript.length > 0
+                ? `${draft.voiceTranscript.length} characters`
+                : 'Tap the mic to dictate, or type directly.'}
           </p>
         </div>
       </div>

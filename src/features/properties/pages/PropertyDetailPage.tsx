@@ -322,6 +322,7 @@ export default function PropertyDetailPage() {
   const viewTracked = useRef(false);
   useEffect(() => {
     if (!property || viewTracked.current) return;
+    if (property.id.startsWith('placeholder-')) return;
     viewTracked.current = true;
 
     supabase.rpc('increment_property_views', { property_id: property.id }).then(({ error }) => {

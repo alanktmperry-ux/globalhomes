@@ -665,30 +665,8 @@ const AgentDashboardSidebar = () => {
           )}
         </div>
 
-        {/* Team Overview — principals/admins only */}
-        {(isPrincipal || isAdmin) && (
-          <div
-            onClick={() => {
-              navigate('/dashboard/team-overview');
-              if (isMobile) setOpenMobile(false);
-            }}
-            className={`flex items-center gap-2.5 px-3 py-2 mx-2 rounded-lg text-sm cursor-pointer transition-colors mb-1 ${
-              location.pathname === '/dashboard/team-overview'
-                ? 'bg-secondary text-foreground font-medium'
-                : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground'
-            }`}
-          >
-            <Users size={16} />
-            {!collapsed && 'Team Overview'}
-          </div>
-        )}
-
         {/* 6 top-level sections — each is clickable and expands to show sub-items */}
         {NAV_SECTIONS.map((section) => renderSection(section))}
-
-        {(isPrincipal || isAdmin) && renderGroup('Principal', PRINCIPAL_NAV)}
-        {renderGroup('Account', ACCOUNT_NAV)}
-        {ADMIN_NAV.length > 0 && renderGroup('Admin', ADMIN_NAV)}
       </SidebarContent>
 
       <SidebarFooter className="border-t border-border p-3">

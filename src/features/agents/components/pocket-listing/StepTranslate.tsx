@@ -38,6 +38,15 @@ const StepTranslate = ({ draft, update }: Props) => {
   const titleValue = (draft[active.titleField] as string) || '';
   const descValue = (draft[active.descField] as string) || '';
 
+  const titleVoice = useVoiceSearch(
+    (text) => update({ [active.titleField]: text.slice(0, TITLE_LIMIT) } as Partial<ListingDraft>),
+    (msg) => toast.error(msg),
+  );
+  const descVoice = useVoiceSearch(
+    (text) => update({ [active.descField]: text } as Partial<ListingDraft>),
+    (msg) => toast.error(msg),
+  );
+
   const sourceTitle = draft.generatedTitle || `${draft.propertyType} in ${draft.suburb || 'Location'}`;
   const sourceDescription = [
     draft.voiceTranscript,

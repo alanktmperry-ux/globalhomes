@@ -14398,6 +14398,7 @@ export type Database = {
       }
       generate_referral_code: { Args: never; Returns: string }
       get_agent_id_for_user: { Args: { p_user_id: string }; Returns: string }
+      get_agent_sidebar_counts: { Args: { p_agent_id: string }; Returns: Json }
       get_auction_public: { Args: { p_property_id: string }; Returns: Json }
       get_auction_sensitive: {
         Args: { p_auction_id: string }

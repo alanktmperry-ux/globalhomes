@@ -83,8 +83,6 @@ export function useMessages(conversationId: string | null) {
   useEffect(() => {
     if (!conversationId) return;
 
-    channelRef.current?.unsubscribe();
-
     const channel = supabase
       .channel(`messages:${conversationId}`)
       .on('postgres_changes', {

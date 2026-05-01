@@ -185,11 +185,6 @@ export function useConversations(userId: string | undefined) {
         table: 'conversation_participants',
         filter: `user_id=eq.${userId}`,
       }, () => load())
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'conversations',
-      }, () => load())
       .subscribe();
 
     channelRef.current = channel;

@@ -687,8 +687,12 @@ const AgentDashboardSidebar = () => {
           )}
         </div>
 
-        {/* 6 top-level sections — each is clickable and expands to show sub-items */}
+        {/* Top-level sections — each is clickable and expands to show sub-items */}
         {NAV_SECTIONS.map((section) => renderSection(section))}
+
+        {renderGroup('Account', ACCOUNT_NAV)}
+        {isPrincipal && renderGroup('Principal', PRINCIPAL_NAV)}
+        {isAdmin && renderGroup('Admin', ADMIN_NAV)}
         </nav>
       </SidebarContent>
 

@@ -9,6 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { SoundWaveVisualizer } from '@/features/search/components/SoundWaveVisualizer';
 import { useVoiceSearch } from '@/features/search/hooks/useVoiceSearch';
+import { VoiceMicButton } from '@/shared/components/VoiceMicButton';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import { toast } from 'sonner';
 import type { ListingDraft } from './PocketListingForm';
 
@@ -37,6 +39,7 @@ const StepVoice = ({ draft, update }: Props) => {
   const [streamingBullets, setStreamingBullets] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
   const wasListeningRef = useRef(false);
+  const { language } = useTranslation();
 
   const onVoiceResult = useCallback((text: string) => {
     update({ voiceTranscript: text });
@@ -276,20 +279,36 @@ const StepVoice = ({ draft, update }: Props) => {
             </button>
           )}
         </div>
-        <Textarea
-          value={aiGenerated ? aiDescription : draft.voiceTranscript}
-          onChange={(e) => {
-            if (aiGenerated) {
-              setAiDescription(e.target.value);
-              update({ voiceTranscript: e.target.value });
-            } else {
-              update({ voiceTranscript: e.target.value });
-            }
-          }}
-          placeholder="Your recorded notes will appear here, or type directly…"
-          className="min-h-[100px] resize-y text-sm"
-          rows={4}
-        />
+        <div className="relative">
+          <Textarea
+            value={aiGenerated ? aiDescription : draft.voiceTranscript}
+            onChange={(e) => {
+              if (aiGenerated) {
+                setAiDescription(e.target.value);
+                update({ voiceTranscript: e.target.value });
+              } else {
+                update({ voiceTranscript: e.target.value });
+              }
+            }}
+            placeholder="Your recorded notes will appear here, or type directly…"
+            className="min-h-[100px] resize-y text-sm pr-10"
+            rows={4}
+          />
+          <VoiceMicButton
+            onTranscript={(t) => {
+              if (aiGenerated) {
+                setAiDescription(t);
+                update({ voiceTranscript: t });
+              } else {
+                update({ voiceTranscript: t });
+              }
+            }}
+            existingValue={aiGenerated ? aiDescription : draft.voiceTranscript}
+            language={language}
+            className="absolute right-2 top-2 w-7 h-7"
+            size={14}
+          />
+        </div>
         {draft.voiceTranscript && (
           <p className="text-xs text-muted-foreground">{draft.voiceTranscript.length} characters</p>
         )}

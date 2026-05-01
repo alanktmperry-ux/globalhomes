@@ -98,6 +98,37 @@ const StepBasics = ({ draft, update }: Props) => {
   const showRange = draft.priceDisplay === 'range';
   const showAuction = draft.priceDisplay === 'eoi';
 
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  const toggleVoice = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert('Voice input is not supported in this browser. Please use Chrome or Edge.');
+      return;
+    }
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-AU';
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.onresult = (event: any) => {
+      const transcript = Array.from(event.results as ArrayLike<any>)
+        .map((r: any) => r[0].transcript)
+        .join(' ');
+      update({ voiceTranscript: (draft.voiceTranscript ? draft.voiceTranscript + ' ' : '') + transcript });
+    };
+    recognition.onerror = () => { setIsListening(false); };
+    recognition.onend = () => { setIsListening(false); };
+    recognitionRef.current = recognition;
+    recognition.start();
+    setIsListening(true);
+  };
+
   // ── RENTAL: single source of truth is rentalWeekly; sync to priceMin/priceMax + auto-populate bond
   const handleRentChange = (raw: string) => {
     const val = Number(raw.replace(/,/g, '')) || 0;

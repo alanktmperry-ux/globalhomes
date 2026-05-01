@@ -538,9 +538,10 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
           })
           .catch((e) => console.error('AI match failed', e));
 
+      // Non-blocking: trigger translations for the newly published listing
       supabase.functions
-        .invoke('generate-translations', { body: { listing_id: lid } })
-        .catch((e) => console.error('Translation generation failed', e));
+        .invoke('generate-translations', { body: { mode: 'full_listing', listing_id: lid } })
+        .catch((e) => console.warn('Translation trigger failed (non-fatal):', e));
       };
 
       if (editPropertyId) {

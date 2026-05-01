@@ -15,7 +15,13 @@ function mapLanguageToTranslationKey(lang: Language): string | null {
     case 'ar': return 'ar';
     case 'ja': return 'ja';
     case 'vi': return 'vi';
-    default: return null;
+    case 'hi': return 'hi';
+    case 'bn': return 'bn';
+    // Punjabi & Tamil — handled via string match (codes may not be in Language union yet)
+    default:
+      if ((lang as string) === 'pa') return 'pa';
+      if ((lang as string) === 'ta') return 'ta';
+      return null;
   }
 }
 

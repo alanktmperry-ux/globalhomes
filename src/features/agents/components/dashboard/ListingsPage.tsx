@@ -298,7 +298,14 @@ const ListingsPage = () => {
     setActionLoading(l.id);
     const { error } = await supabase.from('properties').update({ status: 'public', is_active: true } as any).eq('id', l.id);
     if (error) { toast.error('Failed to publish'); }
-    else { toast.success('Your listing is now live on ListHQ!'); refetch(); }
+    else {
+      toast.success('Your listing is now live on ListHQ!');
+      // Non-blocking: trigger translations for the newly published listing
+      supabase.functions.invoke('generate-translations', {
+        body: { mode: 'full_listing', listing_id: l.id },
+      }).catch((err) => console.warn('Translation trigger failed (non-fatal):', err));
+      refetch();
+    }
     setActionLoading(null);
   };
 

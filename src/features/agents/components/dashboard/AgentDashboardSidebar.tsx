@@ -362,7 +362,14 @@ const AgentDashboardSidebar = () => {
     const Icon = section.icon;
     const badgeVal = section.badgeKey ? badgeValues[section.badgeKey] : '';
 
+    const toggleOnlySections = ['Finance', 'Property Mgmt', 'Market Tools'];
+    const isToggleOnly = toggleOnlySections.includes(section.title);
+
     const handleClick = () => {
+      if (isToggleOnly) {
+        toggleSection(section.title);
+        return;
+      }
       navigate(section.url);
       if (hasChildren) toggleSection(section.title);
       if (isMobile && !hasChildren) setOpenMobile(false);

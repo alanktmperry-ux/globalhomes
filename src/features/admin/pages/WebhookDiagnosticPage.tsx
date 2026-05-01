@@ -82,7 +82,7 @@ export default function WebhookDiagnosticPage() {
         }),
       );
       const newReach: Record<WebhookKey, ReachStatus> = { ...reach };
-      const newDetails: Record<WebhookKey, unknown> = {};
+      const newDetails: Partial<Record<WebhookKey, unknown>> = {};
       for (const [key, r] of entries) {
         newReach[key] = r.ok ? 'ok' : 'fail';
         newDetails[key] = r.detail;

@@ -14853,6 +14853,7 @@ export type Database = {
         Returns: Json
       }
       track_cma_view: { Args: { p_share_token: string }; Returns: Json }
+      verify_webhook_config: { Args: never; Returns: Json }
     }
     Enums: {
       agency_member_role: "owner" | "admin" | "agent" | "principal"

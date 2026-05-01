@@ -74,6 +74,8 @@ export function mapDbProperty(p: PropertyWithAgent): Property {
     rentalWeekly: p.rental_weekly,
     currencyCode: p.currency_code,
     listingType: p.listing_type || null,
+    schoolZoneTop: (p as any).school_zone_top ?? false,
+    schoolZoneName: (p as any).school_zone_name ?? null,
   };
 }
 

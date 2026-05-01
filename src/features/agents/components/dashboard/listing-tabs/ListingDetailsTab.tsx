@@ -5,9 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useState } from 'react';
-import { Calendar, Clock, Plus, Trash2 } from 'lucide-react';
+import { Calendar, Clock, Plus, Trash2, GraduationCap } from 'lucide-react';
 import ListingCompleteness from './ListingCompleteness';
 
 const FEATURE_OPTIONS = [
@@ -46,6 +47,10 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
     features: (listing.features || []) as string[],
   });
 
+  const [schoolZoneTop, setSchoolZoneTop] = useState<boolean>(Boolean((listing as any).school_zone_top));
+  const [schoolZoneName, setSchoolZoneName] = useState<string>((listing as any).school_zone_name || '');
+  const [savingSchoolZone, setSavingSchoolZone] = useState(false);
+
   // Inspection times management
   const inspectionTimes: InspectionSlot[] = (listing.inspection_times as unknown as InspectionSlot[]) || [];
   const [newSlot, setNewSlot] = useState<InspectionSlot>({ date: '', start: '10:00', end: '10:30' });
@@ -55,8 +60,19 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
     onUpdate({
       ...form,
       land_size: form.land_size ? Number(form.land_size) : null,
+      school_zone_top: schoolZoneTop,
+      school_zone_name: schoolZoneTop ? (schoolZoneName.trim() || null) : null,
     } as Partial<PropertyRow>);
     setEditing(false);
+  };
+
+  const handleSaveSchoolZone = async () => {
+    setSavingSchoolZone(true);
+    await onUpdate({
+      school_zone_top: schoolZoneTop,
+      school_zone_name: schoolZoneTop ? (schoolZoneName.trim() || null) : null,
+    } as Partial<PropertyRow>);
+    setSavingSchoolZone(false);
   };
 
   const toggleFeature = (f: string) => {
@@ -332,6 +348,49 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
           </div>
         </div>
       )}
+
+      {/* School Zone */}
+      <div className="bg-card border border-border rounded-xl p-4">
+        <h3 className="text-sm font-bold mb-3 flex items-center gap-2">
+          <GraduationCap size={16} className="text-primary" />
+          School Zone
+        </h3>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <Label htmlFor="school-zone-top" className="text-sm font-medium cursor-pointer">
+              Within top-ranked school catchment
+            </Label>
+            <p className="text-xs text-muted-foreground mt-1">
+              Tick this if the property falls within the catchment of a selective or high-ranking public school.
+            </p>
+          </div>
+          <Switch
+            id="school-zone-top"
+            checked={schoolZoneTop}
+            onCheckedChange={setSchoolZoneTop}
+          />
+        </div>
+        {schoolZoneTop && (
+          <div className="mt-4">
+            <Label htmlFor="school-zone-name" className="text-xs">School name</Label>
+            <Input
+              id="school-zone-name"
+              value={schoolZoneName}
+              onChange={(e) => setSchoolZoneName(e.target.value)}
+              placeholder="e.g. Box Hill High School"
+              className="h-9 mt-1"
+            />
+          </div>
+        )}
+        {(schoolZoneTop !== Boolean((listing as any).school_zone_top) ||
+          schoolZoneName !== ((listing as any).school_zone_name || '')) && (
+          <div className="mt-4 flex justify-end">
+            <Button size="sm" onClick={handleSaveSchoolZone} disabled={savingSchoolZone}>
+              {savingSchoolZone ? 'Saving…' : 'Save school zone'}
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

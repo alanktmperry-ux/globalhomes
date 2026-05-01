@@ -40,6 +40,8 @@ export interface Property {
   currencyCode?: string | null;
   listingType?: string | null;
   inspectionTimes?: InspectionSlot[];
+  schoolZoneTop?: boolean | null;
+  schoolZoneName?: string | null;
 }
 
 export interface InspectionSlot {

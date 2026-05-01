@@ -8701,6 +8701,8 @@ export type Database = {
           rental_parking_type: string | null
           rental_weekly: number | null
           rental_yield_pct: number | null
+          school_zone_name: string | null
+          school_zone_top: boolean
           screening_level: string
           slug: string | null
           smoking_allowed: boolean | null
@@ -8847,6 +8849,8 @@ export type Database = {
           rental_parking_type?: string | null
           rental_weekly?: number | null
           rental_yield_pct?: number | null
+          school_zone_name?: string | null
+          school_zone_top?: boolean
           screening_level?: string
           slug?: string | null
           smoking_allowed?: boolean | null
@@ -8993,6 +8997,8 @@ export type Database = {
           rental_parking_type?: string | null
           rental_weekly?: number | null
           rental_yield_pct?: number | null
+          school_zone_name?: string | null
+          school_zone_top?: boolean
           screening_level?: string
           slug?: string | null
           smoking_allowed?: boolean | null
@@ -14724,6 +14730,8 @@ export type Database = {
               rental_parking_type: string | null
               rental_weekly: number | null
               rental_yield_pct: number | null
+              school_zone_name: string | null
+              school_zone_top: boolean
               screening_level: string
               slug: string | null
               smoking_allowed: boolean | null
@@ -14885,6 +14893,8 @@ export type Database = {
               rental_parking_type: string | null
               rental_weekly: number | null
               rental_yield_pct: number | null
+              school_zone_name: string | null
+              school_zone_top: boolean
               screening_level: string
               slug: string | null
               smoking_allowed: boolean | null

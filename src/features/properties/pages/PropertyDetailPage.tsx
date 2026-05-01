@@ -341,6 +341,8 @@ export default function PropertyDetailPage() {
         currencyCode: p.currency_code,
         listingType: p.listing_type || null,
         inspectionTimes: Array.isArray(p.inspection_times) ? p.inspection_times : [],
+        schoolZoneTop: p.school_zone_top ?? false,
+        schoolZoneName: p.school_zone_name ?? null,
       });
       setInspectionTimes(Array.isArray(p.inspection_times) ? p.inspection_times : []);
 
@@ -648,6 +650,19 @@ export default function PropertyDetailPage() {
                 </div>
               ))}
             </div>
+
+            {/* School zone feature row */}
+            {property.schoolZoneTop && (
+              <div className="flex items-center gap-3 border border-slate-200 rounded-2xl px-4 py-3 bg-white">
+                <span className="text-xl leading-none" aria-hidden>🏫</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] uppercase tracking-wide text-slate-400 font-medium">School Zone</p>
+                  <p className="text-sm font-semibold text-slate-900 truncate">
+                    {property.schoolZoneName || 'Top school catchment — confirmed by agent'}
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Description (auto-translated based on language) */}
             {(translatedDescription || isTranslating) && (

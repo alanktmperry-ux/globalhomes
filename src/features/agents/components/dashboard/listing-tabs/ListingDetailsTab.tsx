@@ -47,6 +47,10 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
     features: (listing.features || []) as string[],
   });
 
+  const [schoolZoneTop, setSchoolZoneTop] = useState<boolean>(Boolean((listing as any).school_zone_top));
+  const [schoolZoneName, setSchoolZoneName] = useState<string>((listing as any).school_zone_name || '');
+  const [savingSchoolZone, setSavingSchoolZone] = useState(false);
+
   // Inspection times management
   const inspectionTimes: InspectionSlot[] = (listing.inspection_times as unknown as InspectionSlot[]) || [];
   const [newSlot, setNewSlot] = useState<InspectionSlot>({ date: '', start: '10:00', end: '10:30' });
@@ -56,8 +60,19 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
     onUpdate({
       ...form,
       land_size: form.land_size ? Number(form.land_size) : null,
+      school_zone_top: schoolZoneTop,
+      school_zone_name: schoolZoneTop ? (schoolZoneName.trim() || null) : null,
     } as Partial<PropertyRow>);
     setEditing(false);
+  };
+
+  const handleSaveSchoolZone = async () => {
+    setSavingSchoolZone(true);
+    await onUpdate({
+      school_zone_top: schoolZoneTop,
+      school_zone_name: schoolZoneTop ? (schoolZoneName.trim() || null) : null,
+    } as Partial<PropertyRow>);
+    setSavingSchoolZone(false);
   };
 
   const toggleFeature = (f: string) => {

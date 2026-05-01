@@ -190,6 +190,16 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
             )}
           </div>
 
+          {/* School zone badge */}
+          {property.schoolZoneTop && (
+            <div className="mt-2">
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                <span aria-hidden>🏫</span>
+                {property.schoolZoneName || 'Top school zone'}
+              </span>
+            </div>
+          )}
+
           {/* Rental-specific row */}
           {isRental && (
             <div className="mt-2 flex flex-wrap items-center gap-2">

@@ -141,7 +141,7 @@ const StepVoice = ({ draft, update }: Props) => {
         return;
       }
 
-      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-listing`;
+      const url = `${SUPABASE_URL}/functions/v1/generate-listing`;
       const response = await fetch(url, {
         method: 'POST',
         headers: {

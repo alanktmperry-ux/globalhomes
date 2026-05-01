@@ -355,39 +355,37 @@ const StepBasics = ({ draft, update }: Props) => {
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <Label className="text-sm font-semibold">Description</Label>
-            <button
-              type="button"
-              onClick={toggleVoice}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                isListening
-                  ? 'bg-red-500/10 border-red-400 text-red-500'
-                  : 'bg-secondary border-border text-muted-foreground hover:border-primary/40 hover:text-primary'
-              }`}
-            >
-              {isListening ? <MicOff size={13} /> : <Mic size={13} />}
-              {isListening ? 'Stop' : 'Dictate'}
-            </button>
-          </div>
-          <div className="relative">
-            <Textarea
-              value={draft.voiceTranscript}
-              onChange={(e) => update({ voiceTranscript: e.target.value })}
-              placeholder="Describe the property — key selling points, lifestyle, neighbourhood highlights…"
-              className={`min-h-[140px] resize-y transition-all ${isListening ? 'ring-2 ring-red-400/40 border-red-300' : ''}`}
-              rows={6}
-            />
-            {isListening && interimText && (
-              <div className="absolute bottom-3 left-3 right-3 text-sm text-muted-foreground italic pointer-events-none">
-                {interimText}
-              </div>
+            {isSupported && (
+              <button
+                type="button"
+                onClick={toggleVoice}
+                disabled={isTranscribing}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                  isListening
+                    ? 'bg-red-500/10 border-red-400 text-red-500'
+                    : 'bg-secondary border-border text-muted-foreground hover:border-primary/40 hover:text-primary'
+                }`}
+              >
+                {isListening ? <MicOff size={13} /> : isTranscribing ? <Loader2 size={13} className="animate-spin" /> : <Mic size={13} />}
+                {isListening ? 'Stop' : isTranscribing ? 'Transcribing…' : 'Dictate'}
+              </button>
             )}
           </div>
+          <Textarea
+            value={draft.voiceTranscript}
+            onChange={(e) => update({ voiceTranscript: e.target.value })}
+            placeholder="Describe the property — key selling points, lifestyle, neighbourhood highlights…"
+            className={`min-h-[140px] resize-y transition-all ${isListening ? 'ring-2 ring-red-400/40 border-red-300' : ''}`}
+            rows={6}
+          />
           <p className="text-xs text-muted-foreground">
             {isListening
-              ? '🎙 Listening — speak naturally, tap Stop when done'
-              : draft.voiceTranscript.length > 0
-                ? `${draft.voiceTranscript.length} characters`
-                : 'Tap Dictate to speak, or type directly'}
+              ? '🎙 Recording — tap Stop when done'
+              : isTranscribing
+                ? '⏳ Transcribing your recording…'
+                : draft.voiceTranscript.length > 0
+                  ? `${draft.voiceTranscript.length} characters`
+                  : 'Tap Dictate to speak, or type directly'}
           </p>
         </div>
       </div>

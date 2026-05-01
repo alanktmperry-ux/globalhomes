@@ -100,84 +100,21 @@ const StepBasics = ({ draft, update }: Props) => {
   const showRange = draft.priceDisplay === 'range';
   const showAuction = draft.priceDisplay === 'eoi';
 
-  const [isListening, setIsListening] = useState(false);
-  const [interimText, setInterimText] = useState('');
-  const recognitionRef = useRef<any>(null);
-  const shouldListenRef = useRef(false);
-  const prefixRef = useRef('');
-  const finalAccumRef = useRef('');
+  const onVoiceResult = useCallback((text: string) => {
+    update({ voiceTranscript: draft.voiceTranscript ? draft.voiceTranscript + ' ' + text : text });
+  }, [update, draft.voiceTranscript]);
 
-  const startRecognition = () => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) return;
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'en-AU';
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.maxAlternatives = 1;
-    recognition.onresult = (event: any) => {
-      let interim = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const r = event.results[i];
-        if (r.isFinal) {
-          const word = r[0].transcript.trim();
-          finalAccumRef.current = finalAccumRef.current ? finalAccumRef.current + ' ' + word : word;
-          const combined = prefixRef.current
-            ? prefixRef.current + ' ' + finalAccumRef.current
-            : finalAccumRef.current;
-          update({ voiceTranscript: combined });
-        } else {
-          interim += r[0].transcript;
-        }
-      }
-      setInterimText(interim);
-    };
-    recognition.onerror = (event: any) => {
-      setInterimText('');
-      if (event.error === 'not-allowed') {
-        shouldListenRef.current = false;
-        setIsListening(false);
-        alert('Microphone access denied. Please allow microphone access in your browser settings and try again.');
-      }
-      // 'no-speech' and 'audio-capture' are non-fatal — onend will auto-restart
-    };
-    recognition.onend = () => {
-      setInterimText('');
-      if (shouldListenRef.current) {
-        // Chrome stops after silence — auto-restart to keep listening
-        try { startRecognition(); } catch { /* ignore */ }
-      } else {
-        setIsListening(false);
-      }
-    };
-    recognitionRef.current = recognition;
-    try {
-      recognition.start();
-    } catch {
-      shouldListenRef.current = false;
-      setIsListening(false);
-    }
-  };
+  const { isListening, isTranscribing, startListening, stopListening, isSupported } = useVoiceSearch(
+    onVoiceResult,
+    (err) => toast.error(err)
+  );
 
   const toggleVoice = () => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert('Voice input is not supported in this browser. Please use Chrome or Edge.');
-      return;
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
     }
-    if (shouldListenRef.current) {
-      shouldListenRef.current = false;
-      recognitionRef.current?.stop();
-      setIsListening(false);
-      setInterimText('');
-      return;
-    }
-    // Snapshot current text as prefix — dictated words append after it
-    prefixRef.current = draft.voiceTranscript ?? '';
-    finalAccumRef.current = '';
-    shouldListenRef.current = true;
-    setIsListening(true);
-    startRecognition();
   };
 
   // ── RENTAL: single source of truth is rentalWeekly; sync to priceMin/priceMax + auto-populate bond

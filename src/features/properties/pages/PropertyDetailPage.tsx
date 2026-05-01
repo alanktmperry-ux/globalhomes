@@ -341,6 +341,8 @@ export default function PropertyDetailPage() {
         currencyCode: p.currency_code,
         listingType: p.listing_type || null,
         inspectionTimes: Array.isArray(p.inspection_times) ? p.inspection_times : [],
+        schoolZoneTop: p.school_zone_top ?? false,
+        schoolZoneName: p.school_zone_name ?? null,
       });
       setInspectionTimes(Array.isArray(p.inspection_times) ? p.inspection_times : []);
 

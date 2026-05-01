@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect, useMemo, lazy, Suspense } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 // framer-motion is split into its own chunk via vite.config.ts manualChunks.

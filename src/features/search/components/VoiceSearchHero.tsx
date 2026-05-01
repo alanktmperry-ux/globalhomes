@@ -714,6 +714,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                 <button
                   onClick={() => startRecording()}
                   disabled={isProcessing}
+                  aria-label="Voice search"
                   className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
                     isRecording
                       ? 'bg-destructive/10 text-destructive animate-pulse ring-2 ring-destructive/30'

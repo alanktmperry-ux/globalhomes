@@ -1224,7 +1224,7 @@ const Index = () => {
   // ── Landing hero: shown until first search, hidden if URL has params ──
   if (!hasSearchParams) {
     return (
-      <div className="flex flex-col">
+      <div id="main-content" className="flex flex-col">
         <LanguageHintBanner />
         {/* ── HERO SECTION ── */}
         <section className="relative flex flex-col items-center justify-center py-12 md:py-16 bg-white overflow-hidden px-6 text-center">
@@ -1370,7 +1370,7 @@ const Index = () => {
           {/* ── AUDIENCE SPLIT TILES ── */}
           <div className="relative z-10 mt-12 w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 px-2 text-left">
             <div className="rounded-2xl border border-slate-200 bg-white p-6 md:p-7 shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="text-lg md:text-xl font-bold text-slate-900 mb-2">{t('hero.buyerTileTitle')}</h3>
+              <h2 className="text-lg md:text-xl font-bold text-slate-900 mb-2">{t('hero.buyerTileTitle')}</h2>
               <p className="text-sm text-slate-600 mb-5 leading-relaxed">
                 {t('hero.buyerTileDesc')}
               </p>
@@ -1382,7 +1382,7 @@ const Index = () => {
               </button>
             </div>
             <div className="rounded-2xl border border-slate-200 bg-white p-6 md:p-7 shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="text-lg md:text-xl font-bold text-slate-900 mb-2">{t('hero.agentTileTitle')}</h3>
+              <h2 className="text-lg md:text-xl font-bold text-slate-900 mb-2">{t('hero.agentTileTitle')}</h2>
               <p className="text-sm text-slate-600 mb-5 leading-relaxed">
                 {t('hero.agentTileDesc')}
               </p>

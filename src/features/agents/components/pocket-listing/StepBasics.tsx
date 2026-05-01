@@ -117,6 +117,11 @@ const StepBasics = ({ draft, update }: Props) => {
     }
   };
 
+  const handleRedo = () => {
+    update({ voiceTranscript: '' });
+    startListening();
+  };
+
   // ── RENTAL: single source of truth is rentalWeekly; sync to priceMin/priceMax + auto-populate bond
   const handleRentChange = (raw: string) => {
     const val = Number(raw.replace(/,/g, '')) || 0;

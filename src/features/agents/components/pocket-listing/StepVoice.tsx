@@ -26,7 +26,7 @@ const TONES = [
 
 type Tone = typeof TONES[number]['key'];
 
-
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL ?? 'https://ngrkbohpmkzjonaofgbb.supabase.co';
 
 const StepVoice = ({ draft, update }: Props) => {
   const [countdown, setCountdown] = useState(30);
@@ -141,7 +141,7 @@ const StepVoice = ({ draft, update }: Props) => {
         return;
       }
 
-      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-listing`;
+      const url = `${SUPABASE_URL}/functions/v1/generate-listing`;
       const response = await fetch(url, {
         method: 'POST',
         headers: {

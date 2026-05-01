@@ -148,79 +148,32 @@ const AgentDashboardSidebar = () => {
   const [agentName, setAgentName] = useState<string | null>(null);
   const [agencyName, setAgencyName] = useState<string | null>(null);
 
+  // Single RPC fetches all sidebar counts (active listings, arrears, renewals,
+  // disputes, smoke-alarm overdue) in one round trip instead of 4+ queries.
   useEffect(() => {
     if (!agent?.id) return;
-    const fetchActiveCount = async () => {
-      const { count } = await supabase
-        .from('properties')
-        .select('id', { count: 'exact', head: true })
-        .eq('agent_id', agent.id)
-        .eq('is_active', true);
-
-      setActiveCount(count ?? 0);
+    let cancelled = false;
+    const fetchSidebarCounts = async () => {
+      const { data, error } = await supabase.rpc(
+        'get_agent_sidebar_counts' as any,
+        { p_agent_id: agent.id } as any,
+      );
+      if (cancelled || error || !data) return;
+      const counts = data as {
+        active_count?: number;
+        arrears_count?: number;
+        renewals_count?: number;
+        dispute_count?: number;
+        smoke_alarm_overdue?: number;
+      };
+      setActiveCount(counts.active_count ?? 0);
+      setArrearsCount(counts.arrears_count ?? 0);
+      setRenewalsCount(counts.renewals_count ?? 0);
+      setDisputeCount(counts.dispute_count ?? 0);
+      setSmokeAlarmOverdue(counts.smoke_alarm_overdue ?? 0);
     };
-
-    fetchActiveCount();
-  }, [agent?.id]);
-
-  useEffect(() => {
-    if (!agent?.id) return;
-    const fetchArrears = async () => {
-      const { data: tenancies } = await supabase
-        .from('tenancies').select('id, rent_amount, lease_start, lease_end, renewal_status').eq('agent_id', agent.id).eq('status', 'active');
-      if (!tenancies || tenancies.length === 0) {
-        setArrearsCount(0);
-        setRenewalsCount(0);
-        setDisputeCount(0);
-        return;
-      }
-      const today = new Date();
-      // Renewals due: lease_end within 90 days AND renewal_status none/declined/null
-      const renewals = tenancies.filter((t: any) => {
-        if (!t.lease_end) return false;
-        const days = Math.floor((new Date(t.lease_end).getTime() - today.getTime()) / 86400000);
-        if (days < 0 || days > 90) return false;
-        const rs = t.renewal_status;
-        return !rs || rs === 'none' || rs === 'declined';
-      }).length;
-      setRenewalsCount(renewals);
-
-      const { data: payments } = await supabase
-        .from('rent_payments').select('tenancy_id, period_to, status')
-        .in('tenancy_id', tenancies.map(t => t.id))
-        .order('payment_date', { ascending: false });
-      let count = 0;
-      for (const t of tenancies) {
-        const latest = (payments || []).find(p => p.tenancy_id === t.id);
-        if (!latest) {
-          const daysSince = Math.floor((today.getTime() - new Date(t.lease_start).getTime()) / 86400000);
-          if (daysSince > 3) count++;
-          continue;
-        }
-        const daysOver = Math.floor((today.getTime() - new Date(latest.period_to).getTime()) / 86400000);
-        if (daysOver > 3 && latest.status !== 'paid') count++;
-      }
-      setArrearsCount(count);
-
-      // Unresolved tenant disputes on inspections
-      const { count: dCount } = await supabase
-        .from('property_inspections')
-        .select('id', { count: 'exact', head: true })
-        .not('tenant_disputed_at', 'is', null)
-        .is('dispute_resolved_at', null)
-        .in('tenancy_id', tenancies.map(t => t.id));
-      setDisputeCount(dCount || 0);
-
-      // Smoke alarm records overdue
-      const todayStr = new Date().toISOString().split('T')[0];
-      const { count: smokeCount } = await supabase
-        .from('smoke_alarm_records')
-        .select('id', { count: 'exact', head: true })
-        .eq('agent_id', agent.id)
-        .lt('next_service_due', todayStr);
-      setSmokeAlarmOverdue(smokeCount || 0);
-    };
-    fetchArrears();
+    fetchSidebarCounts();
+    return () => { cancelled = true; };
   }, [agent?.id]);
 
   useEffect(() => {

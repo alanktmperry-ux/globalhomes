@@ -421,7 +421,7 @@ const StepBasics = ({ draft, update }: Props) => {
               onClick={toggleVoice}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                 isListening
-                  ? 'bg-red-500/10 border-red-400 text-red-500 animate-pulse'
+                  ? 'bg-red-500/10 border-red-400 text-red-500'
                   : 'bg-secondary border-border text-muted-foreground hover:border-primary/40 hover:text-primary'
               }`}
             >
@@ -429,16 +429,23 @@ const StepBasics = ({ draft, update }: Props) => {
               {isListening ? 'Stop' : 'Dictate'}
             </button>
           </div>
-          <Textarea
-            value={draft.voiceTranscript}
-            onChange={(e) => update({ voiceTranscript: e.target.value })}
-            placeholder="Describe the property — key selling points, lifestyle, neighbourhood highlights…"
-            className={`min-h-[140px] resize-y transition-all ${isListening ? 'ring-2 ring-red-400/50 border-red-300' : ''}`}
-            rows={6}
-          />
+          <div className="relative">
+            <Textarea
+              value={draft.voiceTranscript}
+              onChange={(e) => update({ voiceTranscript: e.target.value })}
+              placeholder="Describe the property — key selling points, lifestyle, neighbourhood highlights…"
+              className={`min-h-[140px] resize-y transition-all ${isListening ? 'ring-2 ring-red-400/40 border-red-300' : ''}`}
+              rows={6}
+            />
+            {isListening && interimText && (
+              <div className="absolute bottom-3 left-3 right-3 text-sm text-muted-foreground italic pointer-events-none">
+                {interimText}
+              </div>
+            )}
+          </div>
           <p className="text-xs text-muted-foreground">
             {isListening
-              ? '🎙 Listening — speak now, tap Stop when done'
+              ? '🎙 Listening — speak naturally, tap Stop when done'
               : draft.voiceTranscript.length > 0
                 ? `${draft.voiceTranscript.length} characters`
                 : 'Tap Dictate to speak, or type directly'}

@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Sparkles, Loader2, Languages, Save } from 'lucide-react';
+import { Sparkles, Loader2, Languages, Save, Mic, MicOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useVoiceSearch } from '@/features/search/hooks/useVoiceSearch';
 import type { ListingDraft } from './PocketListingForm';
 
 interface Props {

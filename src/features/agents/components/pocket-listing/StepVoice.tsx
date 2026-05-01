@@ -39,6 +39,7 @@ const StepVoice = ({ draft, update }: Props) => {
   const [streamingBullets, setStreamingBullets] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
   const wasListeningRef = useRef(false);
+  const { language } = useTranslation();
 
   const onVoiceResult = useCallback((text: string) => {
     update({ voiceTranscript: text });

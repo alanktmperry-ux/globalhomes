@@ -397,13 +397,6 @@ const StepBasics = ({ draft, update }: Props) => {
             className={`min-h-[140px] resize-y transition-all ${isListening ? 'ring-2 ring-red-400/40 border-red-300' : ''}`}
             rows={6}
           />
-          <Textarea
-            value={draft.voiceTranscript}
-            onChange={(e) => update({ voiceTranscript: e.target.value })}
-            placeholder="Describe the property — key selling points, lifestyle, neighbourhood highlights…"
-            className={`min-h-[140px] resize-y transition-all ${isListening ? 'ring-2 ring-red-400/40 border-red-300' : ''}`}
-            rows={6}
-          />
           <p className="text-xs text-muted-foreground">
             {isListening
               ? '🎙 Recording — tap Stop when done'

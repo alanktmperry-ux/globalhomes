@@ -50,9 +50,10 @@ const NAV_SECTIONS: NavSection[] = [
   },
   {
     title: 'Listings',
-    url: '/dashboard/listings',
+    url: '',
     icon: Briefcase,
     children: [
+      { title: 'All Listings', url: '/dashboard/listings', icon: Briefcase },
       { title: 'Inbox', url: '/dashboard/inbox', icon: Mail, badgeKey: 'inbox', alertWhenBadge: true },
       { title: 'Contacts', url: '/dashboard/contacts', icon: Contact },
       { title: 'Leads', url: '/dashboard/crm', icon: Flame },

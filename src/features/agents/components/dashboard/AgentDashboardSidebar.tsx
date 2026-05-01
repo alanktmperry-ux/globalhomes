@@ -588,6 +588,7 @@ const AgentDashboardSidebar = () => {
                 </div>
               )}
             </div>
+            </div>
           </div>
         ) : (
           agentLogo ? (

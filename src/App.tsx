@@ -50,6 +50,8 @@ const AdminInsightsPage = React.lazy(() => import("./features/admin/pages/Insigh
 const AdminCostsPage = React.lazy(() => import("./features/admin/pages/CostsPage"));
 const AboutPage = React.lazy(() => import("./pages/About"));
 const BoxHillVicPage = React.lazy(() => import("./pages/suburbs/BoxHillVic"));
+const GlenWaverleyVicPage = React.lazy(() => import("./pages/suburbs/GlenWaverleyVic"));
+const ParramattaNswPage = React.lazy(() => import("./pages/suburbs/ParramattaNsw"));
 const AdminHelpPage = React.lazy(() => import("./features/admin/pages/AdminHelpPage"));
 const AdminLoginPage = React.lazy(() => import("./features/admin/pages/AdminLoginPage"));
 const AdminRevenuePage = React.lazy(() => import("./features/admin/pages/RevenuePage"));
@@ -282,6 +284,8 @@ const App = () => (
                   <Route path="/about" element={<AboutPage />} />
                   <Route path="/suburbs" element={<SuburbsIndexPage />} />
                   <Route path="/suburbs/box-hill-vic" element={<BoxHillVicPage />} />
+                  <Route path="/suburbs/glen-waverley-vic" element={<GlenWaverleyVicPage />} />
+                  <Route path="/suburbs/parramatta-nsw" element={<ParramattaNswPage />} />
                   <Route path="/launch" element={<MarketingLandingPage />} />
                   <Route path="/waitlist" element={<WaitlistPage />} />
                   <Route path="/agency/:slug" element={<AgencyProfilePage />} />

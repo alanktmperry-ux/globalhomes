@@ -619,6 +619,7 @@ const AgentDashboardSidebar = () => {
       </SidebarHeader>
 
       <SidebarContent>
+        <nav aria-label="Main navigation">
         {/* Quick actions */}
         <div className="px-3 mb-2 flex gap-1.5">
           <DropdownMenu>
@@ -626,6 +627,7 @@ const AgentDashboardSidebar = () => {
               <Button
                 size="sm"
                 className={`flex-1 gap-1.5 text-xs font-bold relative ${collapsed ? 'px-0 justify-center' : ''}`}
+                aria-label="Create new listing"
               >
                 <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-success rounded-full animate-pulse" />
                 <Plus size={14} />
@@ -683,6 +685,7 @@ const AgentDashboardSidebar = () => {
 
         {/* 6 top-level sections — each is clickable and expands to show sub-items */}
         {NAV_SECTIONS.map((section) => renderSection(section))}
+        </nav>
       </SidebarContent>
 
       <SidebarFooter className="border-t border-border p-3">

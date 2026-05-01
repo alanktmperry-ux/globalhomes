@@ -1401,7 +1401,10 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     // Language only persists for the current session via sessionStorage.
     if (typeof window === 'undefined') return 'en';
     try {
-      const saved = sessionStorage.getItem(SESSION_LANGUAGE_KEY);
+      const saved =
+        sessionStorage.getItem(SESSION_LANGUAGE_KEY) ||
+        localStorage.getItem(SESSION_LANGUAGE_KEY) ||
+        localStorage.getItem('listhq_language');
       if (saved && saved in translations) return saved as Language;
     } catch { /* sessionStorage may be unavailable — non-fatal */ }
     return 'en';

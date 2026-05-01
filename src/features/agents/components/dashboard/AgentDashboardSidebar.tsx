@@ -50,9 +50,10 @@ const NAV_SECTIONS: NavSection[] = [
   },
   {
     title: 'Listings',
-    url: '/dashboard/listings',
+    url: '',
     icon: Briefcase,
     children: [
+      { title: 'All Listings', url: '/dashboard/listings', icon: Briefcase },
       { title: 'Inbox', url: '/dashboard/inbox', icon: Mail, badgeKey: 'inbox', alertWhenBadge: true },
       { title: 'Contacts', url: '/dashboard/contacts', icon: Contact },
       { title: 'Leads', url: '/dashboard/crm', icon: Flame },
@@ -362,7 +363,7 @@ const AgentDashboardSidebar = () => {
     const Icon = section.icon;
     const badgeVal = section.badgeKey ? badgeValues[section.badgeKey] : '';
 
-    const toggleOnlySections = ['Finance', 'Property Mgmt', 'Market Tools'];
+    const toggleOnlySections = ['Listings', 'Finance', 'Property Mgmt', 'Market Tools'];
     const isToggleOnly = toggleOnlySections.includes(section.title);
 
     const handleClick = () => {

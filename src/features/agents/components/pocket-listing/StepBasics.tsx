@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import { Home, Building2, Warehouse, Mountain, Store, Minus, Plus, DollarSign, Key, Flame, Sun, Wind, Zap, Waves, ChevronDown, Gavel, Info, LayoutGrid, Star, Rows3, Columns2, Square, Briefcase as BriefcaseIcon, ShoppingBag, Factory, Package, Mic, MicOff, Loader2 } from 'lucide-react';
+import { Home, Building2, Warehouse, Mountain, Store, Minus, Plus, DollarSign, Key, Flame, Sun, Wind, Zap, Waves, ChevronDown, Gavel, Info, LayoutGrid, Star, Rows3, Columns2, Square, Briefcase as BriefcaseIcon, ShoppingBag, Factory, Package, Mic, MicOff, Loader2, RefreshCw } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -115,6 +115,11 @@ const StepBasics = ({ draft, update }: Props) => {
     } else {
       startListening();
     }
+  };
+
+  const handleRedo = () => {
+    update({ voiceTranscript: '' });
+    startListening();
   };
 
   // ── RENTAL: single source of truth is rentalWeekly; sync to priceMin/priceMax + auto-populate bond
@@ -355,22 +360,43 @@ const StepBasics = ({ draft, update }: Props) => {
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <Label className="text-sm font-semibold">Description</Label>
-            {isSupported && (
-              <button
-                type="button"
-                onClick={toggleVoice}
-                disabled={isTranscribing}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                  isListening
-                    ? 'bg-red-500/10 border-red-400 text-red-500'
-                    : 'bg-secondary border-border text-muted-foreground hover:border-primary/40 hover:text-primary'
-                }`}
-              >
-                {isListening ? <MicOff size={13} /> : isTranscribing ? <Loader2 size={13} className="animate-spin" /> : <Mic size={13} />}
-                {isListening ? 'Stop' : isTranscribing ? 'Transcribing…' : 'Dictate'}
-              </button>
-            )}
+            <div className="flex items-center gap-2">
+              {isSupported && draft.voiceTranscript.length > 0 && !isListening && !isTranscribing && (
+                <button
+                  type="button"
+                  onClick={handleRedo}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-border bg-secondary text-muted-foreground hover:border-destructive/40 hover:text-destructive transition-all"
+                >
+                  <RefreshCw size={13} />
+                  Redo
+                </button>
+              )}
+              {isSupported && (
+                <button
+                  type="button"
+                  onClick={toggleVoice}
+                  disabled={isTranscribing}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                    isListening
+                      ? 'bg-red-500/10 border-red-400 text-red-500'
+                      : isTranscribing
+                        ? 'bg-amber-500/10 border-amber-400 text-amber-600'
+                        : 'bg-secondary border-border text-muted-foreground hover:border-primary/40 hover:text-primary'
+                  }`}
+                >
+                  {isListening ? <MicOff size={13} /> : isTranscribing ? <Loader2 size={13} className="animate-spin" /> : <Mic size={13} />}
+                  {isListening ? 'Stop' : isTranscribing ? 'Transcribing…' : 'Dictate'}
+                </button>
+              )}
+            </div>
           </div>
+          <Textarea
+            value={draft.voiceTranscript}
+            onChange={(e) => update({ voiceTranscript: e.target.value })}
+            placeholder="Describe the property — key selling points, lifestyle, neighbourhood highlights…"
+            className={`min-h-[140px] resize-y transition-all ${isListening ? 'ring-2 ring-red-400/40 border-red-300' : ''}`}
+            rows={6}
+          />
           <Textarea
             value={draft.voiceTranscript}
             onChange={(e) => update({ voiceTranscript: e.target.value })}

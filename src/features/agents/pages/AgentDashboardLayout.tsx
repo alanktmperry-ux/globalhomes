@@ -64,7 +64,7 @@ const AgentDashboardLayout = () => {
               <NotificationBell />
             </div>
           )}
-          <div className="p-4 md:p-6 flex-1">
+          <div id="main-content" className="p-4 md:p-6 flex-1">
             <Outlet />
           </div>
         </main>

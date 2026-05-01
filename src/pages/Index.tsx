@@ -242,7 +242,19 @@ const Index = () => {
   const [heroSubLangIndex, setHeroSubLangIndex] = useState(0);
   const [heroSubLangVisible, setHeroSubLangVisible] = useState(true);
   const [heroPlaceholderIndex, setHeroPlaceholderIndex] = useState(0);
-  const [heroPlatformStats, setHeroPlatformStats] = useState<{ properties: number | null; buyerCount: number | null }>({ properties: null, buyerCount: null });
+  const { data: platformStatsData } = useQuery({
+    queryKey: ['hero-platform-stats'],
+    queryFn: async () => {
+      const { count: propCount } = await supabase
+        .from('properties')
+        .select('id', { count: 'exact', head: true })
+        .eq('is_active', true)
+        .eq('status', 'public');
+      return { properties: propCount ?? 0, buyerCount: null as number | null };
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
   const [statLanguagesCount, setStatLanguagesCount] = useState(0);
   const [statToolsCount, setStatToolsCount] = useState(0);
   const heroInputRef = useRef<HTMLInputElement>(null);

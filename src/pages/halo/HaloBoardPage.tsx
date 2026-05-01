@@ -1,13 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertTriangle, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useHaloCreditsBalance } from '@/features/halo/hooks/useHaloCreditsBalance';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HaloPreviewCard } from '@/components/halo/HaloPreviewCard';
 import { HaloUnlockDialog } from '@/components/halo/HaloUnlockDialog';
@@ -135,8 +136,24 @@ export default function HaloBoardPage() {
     };
   }, [user, queryClient]);
 
-  const tabFiltered = tab === 'pocket' ? halos.filter((h) => pocketMatchIds.has(h.id)) : halos;
+  // Heuristic junk filter — hide obviously test/spam Halos.
+  // Residential 'buy' Halos with budget over $10M are almost always test data.
+  const isJunk = (h: Halo) => {
+    if (h.intent === 'buy' && (h.budget_max ?? 0) > 10_000_000) {
+      const types = (h.property_types || []).map((t) => t.toLowerCase());
+      const isCommercial = types.includes('commercial') || types.includes('land');
+      if (!isCommercial) return true;
+    }
+    return false;
+  };
+  const cleanHalos = useMemo(() => halos.filter((h) => !isJunk(h)), [halos]);
+
+  const tabFiltered = tab === 'pocket' ? cleanHalos.filter((h) => pocketMatchIds.has(h.id)) : cleanHalos;
   const filtered = applyFilters(tabFiltered, filters);
+
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+  const showLowCreditBanner = balance <= 2 && !(balance > 0 && bannerDismissed);
+  const persistentBanner = balance === 0;
 
   const handleConfirm = async () => {
     if (!user || !target) return;
@@ -222,6 +239,46 @@ export default function HaloBoardPage() {
         </div>
       ) : (
         <>
+          {showLowCreditBanner && (
+            <div
+              className={`mb-4 flex items-start gap-3 rounded-lg border px-4 py-3 ${
+                persistentBanner
+                  ? 'border-red-300 bg-red-50 text-red-900'
+                  : 'border-amber-300 bg-amber-50 text-amber-900'
+              }`}
+            >
+              <AlertTriangle size={18} className="shrink-0 mt-0.5" />
+              <div className="flex-1 text-sm">
+                <p className="font-medium">
+                  You have {balance} credit{balance === 1 ? '' : 's'} left.
+                </p>
+                <p className="text-xs opacity-90">
+                  Top up to keep responding to seekers.
+                </p>
+              </div>
+              <Button
+                size="sm"
+                onClick={() => navigate('/dashboard/buy-credits')}
+                className={
+                  persistentBanner
+                    ? 'bg-red-600 hover:bg-red-700 text-white'
+                    : 'bg-amber-600 hover:bg-amber-700 text-white'
+                }
+              >
+                Buy Credits →
+              </Button>
+              {!persistentBanner && (
+                <button
+                  type="button"
+                  onClick={() => setBannerDismissed(true)}
+                  aria-label="Dismiss banner"
+                  className="text-current opacity-60 hover:opacity-100"
+                >
+                  <X size={16} />
+                </button>
+              )}
+            </div>
+          )}
           <Tabs value={tab} onValueChange={(v) => setTab(v as BoardTab)} className="mb-4">
             <TabsList>
               <TabsTrigger value="all">All Halos</TabsTrigger>

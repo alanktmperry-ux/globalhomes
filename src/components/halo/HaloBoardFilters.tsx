@@ -12,12 +12,22 @@ import { PROPERTY_TYPE_OPTIONS } from '@/types/halo';
 
 export type IntentFilter = 'all' | 'buy' | 'rent';
 export type BudgetFilter = 'any' | 'under_500k' | '500k_1m' | '1m_2m' | '2m_plus';
+export type LanguageFilter = 'all' | 'en' | 'zh' | 'vi' | 'ko';
+
+export const LANGUAGE_OPTIONS: { value: LanguageFilter; label: string }[] = [
+  { value: 'all', label: 'All languages' },
+  { value: 'en', label: 'English' },
+  { value: 'zh', label: '中文' },
+  { value: 'vi', label: 'Tiếng Việt' },
+  { value: 'ko', label: '한국어' },
+];
 
 export interface HaloBoardFiltersState {
   intent: IntentFilter;
   propertyTypes: string[];
   budget: BudgetFilter;
   suburb: string;
+  language: LanguageFilter;
 }
 
 export const DEFAULT_FILTERS: HaloBoardFiltersState = {
@@ -25,6 +35,7 @@ export const DEFAULT_FILTERS: HaloBoardFiltersState = {
   propertyTypes: [],
   budget: 'any',
   suburb: '',
+  language: 'all',
 };
 
 interface Props {
@@ -73,6 +84,22 @@ export function HaloBoardFilters({ value, onChange, resultCount }: Props) {
         })}
       </div>
 
+      <div className="flex flex-wrap gap-2">
+        {LANGUAGE_OPTIONS.map((opt) => {
+          const active = value.language === opt.value;
+          return (
+            <Badge
+              key={opt.value}
+              onClick={() => onChange({ ...value, language: opt.value })}
+              variant={active ? 'default' : 'outline'}
+              className="cursor-pointer select-none"
+            >
+              {opt.label}
+            </Badge>
+          );
+        })}
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Select
           value={value.budget}
@@ -109,6 +136,7 @@ export function applyFilters<T extends {
   property_types: string[];
   suburbs: string[];
   budget_max: number | null;
+  preferred_language?: string | null;
 }>(halos: T[], f: HaloBoardFiltersState): T[] {
   return halos.filter((h) => {
     if (f.intent !== 'all' && h.intent !== f.intent) return false;
@@ -120,6 +148,12 @@ export function applyFilters<T extends {
     if (f.suburb.trim()) {
       const q = f.suburb.toLowerCase();
       if (!h.suburbs.some((s) => s.toLowerCase().includes(q))) return false;
+    }
+    if (f.language !== 'all') {
+      const lang = (h.preferred_language || 'en').toLowerCase();
+      // Group all Chinese variants under 'zh'
+      const normalised = lang.startsWith('zh') ? 'zh' : lang;
+      if (normalised !== f.language) return false;
     }
     const b = h.budget_max ?? 0;
     if (f.budget === 'under_500k' && b >= 500000) return false;

@@ -600,10 +600,28 @@ const Index = () => {
         setFeaturedListings(unique);
       } else {
         // Hardcoded residential placeholders (shown only if DB has 0 residential listings)
+        const p1Images = [
+          'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600210492493-0946911123ea?w=1200&q=80&auto=format&fit=crop',
+        ];
+        const p2Images = [
+          'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=1200&q=80&auto=format&fit=crop',
+        ];
+        const p3Images = [
+          'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?w=1200&q=80&auto=format&fit=crop',
+        ];
         setFeaturedListings([
-          { id: 'placeholder-1', title: '4 bed house', address: '14 Maple Street, Auburn NSW', suburb: 'Auburn', state: 'NSW', price: 1200000, images: [], image_url: null, property_type: 'house', beds: 4, baths: 2, parking: 2, listing_type: 'sale', translations: { zh_simplified: {} }, _placeholder: true },
-          { id: 'placeholder-2', title: '2 bed apartment', address: '8/22 Box Hill Road, Box Hill VIC', suburb: 'Box Hill', state: 'VIC', price: 680000, images: [], image_url: null, property_type: 'apartment', beds: 2, baths: 1, parking: 1, listing_type: 'sale', translations: { zh_simplified: {} }, _placeholder: true },
-          { id: 'placeholder-3', title: '3 bed townhouse', address: '3 Oak Lane, Doncaster VIC', suburb: 'Doncaster', state: 'VIC', price: 895000, images: [], image_url: null, property_type: 'townhouse', beds: 3, baths: 2, parking: 1, listing_type: 'sale', translations: { zh_simplified: {} }, _placeholder: true },
+          { id: 'placeholder-1', title: '4 bed house', address: '14 Maple Street, Auburn NSW', suburb: 'Auburn', state: 'NSW', price: 1200000, images: p1Images, image_url: p1Images[0], property_type: 'house', beds: 4, baths: 2, parking: 2, listing_type: 'sale', translations: { zh_simplified: {} } },
+          { id: 'placeholder-2', title: '2 bed apartment', address: '8/22 Box Hill Road, Box Hill VIC', suburb: 'Box Hill', state: 'VIC', price: 680000, images: p2Images, image_url: p2Images[0], property_type: 'apartment', beds: 2, baths: 1, parking: 1, listing_type: 'sale', translations: { zh_simplified: {} } },
+          { id: 'placeholder-3', title: '3 bed townhouse', address: '3 Oak Lane, Doncaster VIC', suburb: 'Doncaster', state: 'VIC', price: 895000, images: p3Images, image_url: p3Images[0], property_type: 'townhouse', beds: 3, baths: 2, parking: 1, listing_type: 'sale', translations: { zh_simplified: {} } },
         ]);
       }
     })();
@@ -1428,8 +1446,8 @@ const Index = () => {
                     return (
                       <div
                         key={p.id}
-                        onClick={() => { if (!p._placeholder) navigate(`/property/${p.id}`); }}
-                        className={`rounded-xl border border-slate-200 overflow-hidden transition-shadow ${p._placeholder ? "" : "hover:shadow-md cursor-pointer"}`}
+                        onClick={() => navigate(`/property/${p.id}`)}
+                        className="rounded-xl border border-slate-200 overflow-hidden transition-shadow hover:shadow-md cursor-pointer"
                       >
                         <div className="h-40 bg-slate-100 flex items-center justify-center relative">
                           {img ? (

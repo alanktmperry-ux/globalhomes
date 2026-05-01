@@ -99,7 +99,63 @@ const StepBasics = ({ draft, update }: Props) => {
   const showAuction = draft.priceDisplay === 'eoi';
 
   const [isListening, setIsListening] = useState(false);
+  const [interimText, setInterimText] = useState('');
   const recognitionRef = useRef<any>(null);
+  const shouldListenRef = useRef(false);
+  const prefixRef = useRef('');
+  const finalAccumRef = useRef('');
+
+  const startRecognition = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-AU';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+    recognition.onresult = (event: any) => {
+      let interim = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const r = event.results[i];
+        if (r.isFinal) {
+          const word = r[0].transcript.trim();
+          finalAccumRef.current = finalAccumRef.current ? finalAccumRef.current + ' ' + word : word;
+          const combined = prefixRef.current
+            ? prefixRef.current + ' ' + finalAccumRef.current
+            : finalAccumRef.current;
+          update({ voiceTranscript: combined });
+        } else {
+          interim += r[0].transcript;
+        }
+      }
+      setInterimText(interim);
+    };
+    recognition.onerror = (event: any) => {
+      setInterimText('');
+      if (event.error === 'not-allowed') {
+        shouldListenRef.current = false;
+        setIsListening(false);
+        alert('Microphone access denied. Please allow microphone access in your browser settings and try again.');
+      }
+      // 'no-speech' and 'audio-capture' are non-fatal — onend will auto-restart
+    };
+    recognition.onend = () => {
+      setInterimText('');
+      if (shouldListenRef.current) {
+        // Chrome stops after silence — auto-restart to keep listening
+        try { startRecognition(); } catch { /* ignore */ }
+      } else {
+        setIsListening(false);
+      }
+    };
+    recognitionRef.current = recognition;
+    try {
+      recognition.start();
+    } catch {
+      shouldListenRef.current = false;
+      setIsListening(false);
+    }
+  };
 
   const toggleVoice = () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -107,26 +163,19 @@ const StepBasics = ({ draft, update }: Props) => {
       alert('Voice input is not supported in this browser. Please use Chrome or Edge.');
       return;
     }
-    if (isListening) {
+    if (shouldListenRef.current) {
+      shouldListenRef.current = false;
       recognitionRef.current?.stop();
       setIsListening(false);
+      setInterimText('');
       return;
     }
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'en-AU';
-    recognition.continuous = true;
-    recognition.interimResults = false;
-    recognition.onresult = (event: any) => {
-      const transcript = Array.from(event.results as ArrayLike<any>)
-        .map((r: any) => r[0].transcript)
-        .join(' ');
-      update({ voiceTranscript: (draft.voiceTranscript ? draft.voiceTranscript + ' ' : '') + transcript });
-    };
-    recognition.onerror = () => { setIsListening(false); };
-    recognition.onend = () => { setIsListening(false); };
-    recognitionRef.current = recognition;
-    recognition.start();
+    // Snapshot current text as prefix — dictated words append after it
+    prefixRef.current = draft.voiceTranscript ?? '';
+    finalAccumRef.current = '';
+    shouldListenRef.current = true;
     setIsListening(true);
+    startRecognition();
   };
 
   // ── RENTAL: single source of truth is rentalWeekly; sync to priceMin/priceMax + auto-populate bond
@@ -372,7 +421,7 @@ const StepBasics = ({ draft, update }: Props) => {
               onClick={toggleVoice}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                 isListening
-                  ? 'bg-red-500/10 border-red-400 text-red-500 animate-pulse'
+                  ? 'bg-red-500/10 border-red-400 text-red-500'
                   : 'bg-secondary border-border text-muted-foreground hover:border-primary/40 hover:text-primary'
               }`}
             >
@@ -380,16 +429,23 @@ const StepBasics = ({ draft, update }: Props) => {
               {isListening ? 'Stop' : 'Dictate'}
             </button>
           </div>
-          <Textarea
-            value={draft.voiceTranscript}
-            onChange={(e) => update({ voiceTranscript: e.target.value })}
-            placeholder="Describe the property — key selling points, lifestyle, neighbourhood highlights…"
-            className={`min-h-[140px] resize-y transition-all ${isListening ? 'ring-2 ring-red-400/50 border-red-300' : ''}`}
-            rows={6}
-          />
+          <div className="relative">
+            <Textarea
+              value={draft.voiceTranscript}
+              onChange={(e) => update({ voiceTranscript: e.target.value })}
+              placeholder="Describe the property — key selling points, lifestyle, neighbourhood highlights…"
+              className={`min-h-[140px] resize-y transition-all ${isListening ? 'ring-2 ring-red-400/40 border-red-300' : ''}`}
+              rows={6}
+            />
+            {isListening && interimText && (
+              <div className="absolute bottom-3 left-3 right-3 text-sm text-muted-foreground italic pointer-events-none">
+                {interimText}
+              </div>
+            )}
+          </div>
           <p className="text-xs text-muted-foreground">
             {isListening
-              ? '🎙 Listening — speak now, tap Stop when done'
+              ? '🎙 Listening — speak naturally, tap Stop when done'
               : draft.voiceTranscript.length > 0
                 ? `${draft.voiceTranscript.length} characters`
                 : 'Tap Dictate to speak, or type directly'}

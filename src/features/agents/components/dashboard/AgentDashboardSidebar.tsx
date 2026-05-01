@@ -289,6 +289,7 @@ const AgentDashboardSidebar = () => {
   };
 
   const isActive = (path: string) => {
+    if (!path) return false;
     if (path === '/dashboard') return location.pathname === '/dashboard';
     // For URLs with query params, match both pathname and the filter query
     if (path.includes('?')) {
@@ -365,12 +366,14 @@ const AgentDashboardSidebar = () => {
 
     const toggleOnlySections = ['Listings', 'Finance', 'Property Mgmt', 'Market Tools'];
     const isToggleOnly = toggleOnlySections.includes(section.title);
+    const canNavigate = !!section.url && !isToggleOnly;
 
     const handleClick = () => {
-      if (isToggleOnly) {
+      if (!canNavigate) {
         toggleSection(section.title);
         return;
       }
+
       navigate(section.url);
       if (hasChildren) toggleSection(section.title);
       if (isMobile && !hasChildren) setOpenMobile(false);
@@ -394,9 +397,14 @@ const AgentDashboardSidebar = () => {
                   }`}
                 >
                   <button
+                    type="button"
                     onClick={handleClick}
-                    onMouseEnter={() => prefetchRoute(section.url)}
-                    onFocus={() => prefetchRoute(section.url)}
+                    onMouseEnter={() => {
+                      if (canNavigate) prefetchRoute(section.url);
+                    }}
+                    onFocus={() => {
+                      if (canNavigate) prefetchRoute(section.url);
+                    }}
                     className="flex items-center gap-2 flex-1 px-3 py-2.5 text-sm font-medium text-left min-w-0"
                   >
                     <Icon size={16} className="shrink-0" />

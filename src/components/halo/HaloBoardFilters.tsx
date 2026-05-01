@@ -136,6 +136,7 @@ export function applyFilters<T extends {
   property_types: string[];
   suburbs: string[];
   budget_max: number | null;
+  preferred_language?: string | null;
 }>(halos: T[], f: HaloBoardFiltersState): T[] {
   return halos.filter((h) => {
     if (f.intent !== 'all' && h.intent !== f.intent) return false;
@@ -147,6 +148,12 @@ export function applyFilters<T extends {
     if (f.suburb.trim()) {
       const q = f.suburb.toLowerCase();
       if (!h.suburbs.some((s) => s.toLowerCase().includes(q))) return false;
+    }
+    if (f.language !== 'all') {
+      const lang = (h.preferred_language || 'en').toLowerCase();
+      // Group all Chinese variants under 'zh'
+      const normalised = lang.startsWith('zh') ? 'zh' : lang;
+      if (normalised !== f.language) return false;
     }
     const b = h.budget_max ?? 0;
     if (f.budget === 'under_500k' && b >= 500000) return false;

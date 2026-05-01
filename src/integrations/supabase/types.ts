@@ -13942,34 +13942,55 @@ export type Database = {
       }
       listings_translation_summary: {
         Row: {
-          address: string | null
-          has_cantonese: boolean | null
-          has_mandarin: boolean | null
-          has_translations: boolean | null
-          has_vietnamese: boolean | null
+          has_ar: boolean | null
+          has_bn: boolean | null
+          has_hi: boolean | null
+          has_ko: boolean | null
+          has_pa: boolean | null
+          has_ta: boolean | null
+          has_vi: boolean | null
+          has_zh_simplified: boolean | null
+          has_zh_traditional: boolean | null
           id: string | null
-          translation_status: string | null
-          translations_generated_at: string | null
+          is_active: boolean | null
+          state: string | null
+          suburb: string | null
+          title: string | null
+          updated_at: string | null
         }
         Insert: {
-          address?: string | null
-          has_cantonese?: never
-          has_mandarin?: never
-          has_translations?: never
-          has_vietnamese?: never
+          has_ar?: never
+          has_bn?: never
+          has_hi?: never
+          has_ko?: never
+          has_pa?: never
+          has_ta?: never
+          has_vi?: never
+          has_zh_simplified?: never
+          has_zh_traditional?: never
           id?: string | null
-          translation_status?: string | null
-          translations_generated_at?: string | null
+          is_active?: boolean | null
+          state?: string | null
+          suburb?: string | null
+          title?: string | null
+          updated_at?: string | null
         }
         Update: {
-          address?: string | null
-          has_cantonese?: never
-          has_mandarin?: never
-          has_translations?: never
-          has_vietnamese?: never
+          has_ar?: never
+          has_bn?: never
+          has_hi?: never
+          has_ko?: never
+          has_pa?: never
+          has_ta?: never
+          has_vi?: never
+          has_zh_simplified?: never
+          has_zh_traditional?: never
           id?: string | null
-          translation_status?: string | null
-          translations_generated_at?: string | null
+          is_active?: boolean | null
+          state?: string | null
+          suburb?: string | null
+          title?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }

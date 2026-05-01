@@ -53,7 +53,7 @@ interface PropertyCardProps {
 
 const COLLAB_EMOJIS = ['👍', '👎', '🔥'] as const;
 
-export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index, isCollab, collabReactions = [], onToggleReaction, partnerViewed, currentUserId }: PropertyCardProps) {
+export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index, isCollab, collabReactions = [], onToggleReaction, partnerViewed, currentUserId, priority }: PropertyCardProps) {
   const { t } = useI18n();
   const { formatPrice, currency, listingMode } = useCurrency();
   const { investorMode } = useInvestorMode();

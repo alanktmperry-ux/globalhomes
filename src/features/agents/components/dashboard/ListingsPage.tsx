@@ -212,6 +212,28 @@ const StatusTabs = ({
 
 const ListingsPage = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialView: 'list' | 'pipeline' =
+    searchParams.get('view') === 'pipeline'
+      ? 'pipeline'
+      : (typeof window !== 'undefined' && window.localStorage.getItem('listings_view_preference') === 'pipeline')
+        ? 'pipeline'
+        : 'list';
+  const [view, setView] = useState<'list' | 'pipeline'>(initialView);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('listings_view_preference', view);
+    }
+    const current = searchParams.get('view');
+    if (view === 'pipeline' && current !== 'pipeline') {
+      setSearchParams((p) => { p.set('view', 'pipeline'); return p; }, { replace: true });
+    } else if (view === 'list' && current === 'pipeline') {
+      setSearchParams((p) => { p.delete('view'); return p; }, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view]);
+
   const { agent } = useCurrentAgent();
   const [listingMode, setListingMode] = useState<'sale' | 'rent'>('sale');
   const [saleStatusTab, setSaleStatusTab] = useState('all');

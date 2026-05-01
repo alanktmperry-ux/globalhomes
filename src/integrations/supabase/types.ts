@@ -14581,166 +14581,328 @@ export type Database = {
         }
         Returns: number
       }
-      nearby_properties: {
-        Args: {
-          _lat: number
-          _limit?: number
-          _lng: number
-          _radius_km?: number
-        }
-        Returns: {
-          address: string
-          address_hidden: boolean
-          agency_authority: string | null
-          agent_id: string | null
-          agent_insights: Json | null
-          agent_split_percent: number | null
-          air_con_type: string | null
-          auction_date: string | null
-          auction_time: string | null
-          available_from: string | null
-          baths: number
-          beds: number
-          bond_amount: number | null
-          boost_expiry_warned: boolean
-          boost_requested_at: string | null
-          boost_requested_tier: string | null
-          boost_tier: string | null
-          bushfire_zone: boolean | null
-          commission_rate: number | null
-          contact_clicks: number
-          council_rates_annual: number | null
-          country: string
-          cover_index: number | null
-          created_at: string
-          currency_code: string | null
-          description: string | null
-          description_ja: string | null
-          description_ko: string | null
-          description_zh: string | null
-          description_zh_tw: string | null
-          electricity_included: boolean | null
-          ensuites: number | null
-          eoi_close_date: string | null
-          eoi_guide_price: number | null
-          estimated_value: string | null
-          estimated_weekly_rent: number | null
-          exclusive_end_date: string | null
-          exclusive_enquiries: number
-          exclusive_start_date: string | null
-          exclusive_views: number
-          featured_until: string | null
-          features: string[] | null
-          flood_zone: boolean | null
-          floor_area_sqm: number | null
-          floor_plan_url: string | null
-          furnished: string | null
-          garage_type: string | null
-          has_air_con: boolean | null
-          has_alfresco: boolean | null
-          has_balcony: boolean | null
-          has_dishwasher: boolean | null
-          has_gym_access: boolean | null
-          has_internal_laundry: boolean | null
-          has_outdoor_ent: boolean | null
-          has_pool: boolean | null
-          has_pool_access: boolean | null
-          has_solar: boolean | null
-          has_virtual_tour: boolean | null
-          has_washing_machine: boolean | null
-          heating_type: string | null
-          id: string
-          image_url: string | null
-          images: string[] | null
-          inspection_times: Json | null
-          internet_included: boolean | null
-          is_active: boolean
-          is_exclusive: boolean
-          is_featured: boolean
-          is_new_build: boolean | null
-          land_size: number | null
-          land_size_sqm: number | null
-          land_value: number | null
-          lat: number | null
-          lease_term: string | null
-          letting_fee_weeks: number | null
-          listed_at: string | null
-          listed_date: string | null
-          listing_category: string
-          listing_mode: string
-          listing_status: string | null
-          listing_type: string | null
-          lng: number | null
-          maintenance_approval_threshold_aud: number | null
-          marketing_budget: number | null
-          marketing_checklist: Json
-          marketing_email_sent: boolean
-          marketing_email_sent_at: string | null
-          max_occupants: number | null
-          min_lease_months: number | null
-          moderation_status: string
-          off_market_reason: string | null
-          owner_email: string | null
-          owner_name: string | null
-          owner_phone: string | null
-          owner_portal_token: string | null
-          owner_portal_token_expires_at: string | null
-          parking: number
-          parking_notes: string | null
-          pets_allowed: boolean | null
-          postcode: string | null
-          price: number
-          price_formatted: string
-          price_guide_high: number | null
-          price_guide_low: number | null
-          price_per_sqm: number | null
-          property_age_years: number | null
-          property_type: string | null
-          rental_parking_type: string | null
-          rental_weekly: number | null
-          rental_yield_pct: number | null
-          screening_level: string
-          slug: string | null
-          smoking_allowed: boolean | null
-          sold_at: string | null
-          sold_price: number | null
-          sqm: number
-          stage_id: string | null
-          state: string
-          status: string
-          str_permitted: boolean | null
-          strata_fees_quarterly: number | null
-          study_rooms: number | null
-          suburb: string
-          tags: string[] | null
-          title: string
-          title_ja: string | null
-          title_ko: string | null
-          title_zh: string | null
-          title_zh_tw: string | null
-          translation_status: string | null
-          translations: Json | null
-          translations_generated_at: string | null
-          updated_at: string
-          utilities_included: string[] | null
-          vendor_email: string | null
-          vendor_id: string | null
-          vendor_name: string | null
-          vendor_phone: string | null
-          video_url: string | null
-          views: number
-          virtual_tour_url: string | null
-          water_included: boolean | null
-          year_built: number | null
-          zoning: string | null
-        }[]
-        SetofOptions: {
-          from: "*"
-          to: "properties"
-          isOneToOne: false
-          isSetofReturn: true
-        }
-      }
+      nearby_properties:
+        | {
+            Args: {
+              _lat: number
+              _limit?: number
+              _lng: number
+              _radius_km?: number
+            }
+            Returns: {
+              address: string
+              address_hidden: boolean
+              agency_authority: string | null
+              agent_id: string | null
+              agent_insights: Json | null
+              agent_split_percent: number | null
+              air_con_type: string | null
+              auction_date: string | null
+              auction_time: string | null
+              available_from: string | null
+              baths: number
+              beds: number
+              bond_amount: number | null
+              boost_expiry_warned: boolean
+              boost_requested_at: string | null
+              boost_requested_tier: string | null
+              boost_tier: string | null
+              bushfire_zone: boolean | null
+              commission_rate: number | null
+              contact_clicks: number
+              council_rates_annual: number | null
+              country: string
+              cover_index: number | null
+              created_at: string
+              currency_code: string | null
+              description: string | null
+              description_ja: string | null
+              description_ko: string | null
+              description_zh: string | null
+              description_zh_tw: string | null
+              electricity_included: boolean | null
+              ensuites: number | null
+              eoi_close_date: string | null
+              eoi_guide_price: number | null
+              estimated_value: string | null
+              estimated_weekly_rent: number | null
+              exclusive_end_date: string | null
+              exclusive_enquiries: number
+              exclusive_start_date: string | null
+              exclusive_views: number
+              featured_until: string | null
+              features: string[] | null
+              flood_zone: boolean | null
+              floor_area_sqm: number | null
+              floor_plan_url: string | null
+              furnished: string | null
+              garage_type: string | null
+              has_air_con: boolean | null
+              has_alfresco: boolean | null
+              has_balcony: boolean | null
+              has_dishwasher: boolean | null
+              has_gym_access: boolean | null
+              has_internal_laundry: boolean | null
+              has_outdoor_ent: boolean | null
+              has_pool: boolean | null
+              has_pool_access: boolean | null
+              has_solar: boolean | null
+              has_virtual_tour: boolean | null
+              has_washing_machine: boolean | null
+              heating_type: string | null
+              id: string
+              image_url: string | null
+              images: string[] | null
+              inspection_times: Json | null
+              internet_included: boolean | null
+              is_active: boolean
+              is_exclusive: boolean
+              is_featured: boolean
+              is_new_build: boolean | null
+              land_size: number | null
+              land_size_sqm: number | null
+              land_value: number | null
+              lat: number | null
+              lease_term: string | null
+              letting_fee_weeks: number | null
+              listed_at: string | null
+              listed_date: string | null
+              listing_category: string
+              listing_mode: string
+              listing_status: string | null
+              listing_type: string | null
+              lng: number | null
+              maintenance_approval_threshold_aud: number | null
+              marketing_budget: number | null
+              marketing_checklist: Json
+              marketing_email_sent: boolean
+              marketing_email_sent_at: string | null
+              max_occupants: number | null
+              min_lease_months: number | null
+              moderation_status: string
+              off_market_reason: string | null
+              owner_email: string | null
+              owner_name: string | null
+              owner_phone: string | null
+              owner_portal_token: string | null
+              owner_portal_token_expires_at: string | null
+              parking: number
+              parking_notes: string | null
+              pets_allowed: boolean | null
+              postcode: string | null
+              price: number
+              price_formatted: string
+              price_guide_high: number | null
+              price_guide_low: number | null
+              price_per_sqm: number | null
+              property_age_years: number | null
+              property_type: string | null
+              rental_parking_type: string | null
+              rental_weekly: number | null
+              rental_yield_pct: number | null
+              screening_level: string
+              slug: string | null
+              smoking_allowed: boolean | null
+              sold_at: string | null
+              sold_price: number | null
+              sqm: number
+              stage_id: string | null
+              state: string
+              status: string
+              str_permitted: boolean | null
+              strata_fees_quarterly: number | null
+              study_rooms: number | null
+              suburb: string
+              tags: string[] | null
+              title: string
+              title_ja: string | null
+              title_ko: string | null
+              title_zh: string | null
+              title_zh_tw: string | null
+              translation_status: string | null
+              translations: Json | null
+              translations_generated_at: string | null
+              updated_at: string
+              utilities_included: string[] | null
+              vendor_email: string | null
+              vendor_id: string | null
+              vendor_name: string | null
+              vendor_phone: string | null
+              video_url: string | null
+              views: number
+              virtual_tour_url: string | null
+              water_included: boolean | null
+              year_built: number | null
+              zoning: string | null
+            }[]
+            SetofOptions: {
+              from: "*"
+              to: "properties"
+              isOneToOne: false
+              isSetofReturn: true
+            }
+          }
+        | {
+            Args: {
+              _lat: number
+              _limit?: number
+              _listing_type?: string
+              _lng: number
+              _radius_km?: number
+            }
+            Returns: {
+              address: string
+              address_hidden: boolean
+              agency_authority: string | null
+              agent_id: string | null
+              agent_insights: Json | null
+              agent_split_percent: number | null
+              air_con_type: string | null
+              auction_date: string | null
+              auction_time: string | null
+              available_from: string | null
+              baths: number
+              beds: number
+              bond_amount: number | null
+              boost_expiry_warned: boolean
+              boost_requested_at: string | null
+              boost_requested_tier: string | null
+              boost_tier: string | null
+              bushfire_zone: boolean | null
+              commission_rate: number | null
+              contact_clicks: number
+              council_rates_annual: number | null
+              country: string
+              cover_index: number | null
+              created_at: string
+              currency_code: string | null
+              description: string | null
+              description_ja: string | null
+              description_ko: string | null
+              description_zh: string | null
+              description_zh_tw: string | null
+              electricity_included: boolean | null
+              ensuites: number | null
+              eoi_close_date: string | null
+              eoi_guide_price: number | null
+              estimated_value: string | null
+              estimated_weekly_rent: number | null
+              exclusive_end_date: string | null
+              exclusive_enquiries: number
+              exclusive_start_date: string | null
+              exclusive_views: number
+              featured_until: string | null
+              features: string[] | null
+              flood_zone: boolean | null
+              floor_area_sqm: number | null
+              floor_plan_url: string | null
+              furnished: string | null
+              garage_type: string | null
+              has_air_con: boolean | null
+              has_alfresco: boolean | null
+              has_balcony: boolean | null
+              has_dishwasher: boolean | null
+              has_gym_access: boolean | null
+              has_internal_laundry: boolean | null
+              has_outdoor_ent: boolean | null
+              has_pool: boolean | null
+              has_pool_access: boolean | null
+              has_solar: boolean | null
+              has_virtual_tour: boolean | null
+              has_washing_machine: boolean | null
+              heating_type: string | null
+              id: string
+              image_url: string | null
+              images: string[] | null
+              inspection_times: Json | null
+              internet_included: boolean | null
+              is_active: boolean
+              is_exclusive: boolean
+              is_featured: boolean
+              is_new_build: boolean | null
+              land_size: number | null
+              land_size_sqm: number | null
+              land_value: number | null
+              lat: number | null
+              lease_term: string | null
+              letting_fee_weeks: number | null
+              listed_at: string | null
+              listed_date: string | null
+              listing_category: string
+              listing_mode: string
+              listing_status: string | null
+              listing_type: string | null
+              lng: number | null
+              maintenance_approval_threshold_aud: number | null
+              marketing_budget: number | null
+              marketing_checklist: Json
+              marketing_email_sent: boolean
+              marketing_email_sent_at: string | null
+              max_occupants: number | null
+              min_lease_months: number | null
+              moderation_status: string
+              off_market_reason: string | null
+              owner_email: string | null
+              owner_name: string | null
+              owner_phone: string | null
+              owner_portal_token: string | null
+              owner_portal_token_expires_at: string | null
+              parking: number
+              parking_notes: string | null
+              pets_allowed: boolean | null
+              postcode: string | null
+              price: number
+              price_formatted: string
+              price_guide_high: number | null
+              price_guide_low: number | null
+              price_per_sqm: number | null
+              property_age_years: number | null
+              property_type: string | null
+              rental_parking_type: string | null
+              rental_weekly: number | null
+              rental_yield_pct: number | null
+              screening_level: string
+              slug: string | null
+              smoking_allowed: boolean | null
+              sold_at: string | null
+              sold_price: number | null
+              sqm: number
+              stage_id: string | null
+              state: string
+              status: string
+              str_permitted: boolean | null
+              strata_fees_quarterly: number | null
+              study_rooms: number | null
+              suburb: string
+              tags: string[] | null
+              title: string
+              title_ja: string | null
+              title_ko: string | null
+              title_zh: string | null
+              title_zh_tw: string | null
+              translation_status: string | null
+              translations: Json | null
+              translations_generated_at: string | null
+              updated_at: string
+              utilities_included: string[] | null
+              vendor_email: string | null
+              vendor_id: string | null
+              vendor_name: string | null
+              vendor_phone: string | null
+              video_url: string | null
+              views: number
+              virtual_tour_url: string | null
+              water_included: boolean | null
+              year_built: number | null
+              zoning: string | null
+            }[]
+            SetofOptions: {
+              from: "*"
+              to: "properties"
+              isOneToOne: false
+              isSetofReturn: true
+            }
+          }
       owner_decision_on_maintenance: {
         Args: {
           p_decision: string

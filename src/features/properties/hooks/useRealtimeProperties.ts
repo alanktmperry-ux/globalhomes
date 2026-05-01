@@ -56,6 +56,7 @@ async function fetchNearbyProperties(
     _lng: lng,
     _radius_km: radiusKm,
     _limit: limit,
+    _listing_type: listingType ?? null,
   });
 
   if (error) {
@@ -63,45 +64,7 @@ async function fetchNearbyProperties(
     throw error;
   }
 
-  if (import.meta.env.DEV) console.log('[useRealtimeProperties] nearby_properties RPC result', {
-    lat,
-    lng,
-    radiusKm,
-    rpcCount: data?.length ?? 0,
-  });
-
-  // RPC returns raw rows without agent join, so we need to fetch agents separately
-  if (!data || data.length === 0) return [];
-
-  const ids = data.map((p: any) => p.id);
-  let query = supabase
-    .from('properties')
-    .select(PROPERTIES_QUERY)
-    .eq('status', 'public')
-    .not('agent_id', 'is', null)
-    .in('id', ids);
-
-  if (listingType === 'rent') {
-    query = query.eq('listing_type', 'rent');
-  } else if (listingType === 'sale') {
-    query = query.or('listing_type.eq.sale,listing_type.is.null');
-  }
-
-  const { data: withAgents, error: agentError } = await query;
-
-  if (agentError) {
-    console.error('[useRealtimeProperties] agent join error:', agentError.message);
-    return data.map((p: any) => mapDbProperty(p));
-  }
-
-  if (import.meta.env.DEV) console.log('[useRealtimeProperties] nearby_properties hydrated result', {
-    lat,
-    lng,
-    radiusKm,
-    hydratedCount: withAgents?.length ?? 0,
-  });
-
-  return (withAgents ?? []).map((p) => mapDbProperty(p as any));
+  return (data ?? []).map((p: any) => mapDbProperty(p));
 }
 
 interface UseRealtimePropertiesOptions {

@@ -647,6 +647,8 @@ export default function PropertyDetailPage() {
                   <stat.icon size={15} className="text-slate-400 mb-1" strokeWidth={1.8} />
                   <span className="text-[15px] font-bold text-slate-900 leading-none">{stat.value}</span>
                   <span className="text-[10px] text-slate-400 font-medium">{stat.label}</span>
+                </div>
+              ))}
             </div>
 
             {/* School zone feature row */}
@@ -661,8 +663,6 @@ export default function PropertyDetailPage() {
                 </div>
               </div>
             )}
-              ))}
-            </div>
 
             {/* Description (auto-translated based on language) */}
             {(translatedDescription || isTranslating) && (

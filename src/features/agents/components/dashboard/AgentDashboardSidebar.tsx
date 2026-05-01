@@ -549,7 +549,15 @@ const AgentDashboardSidebar = () => {
     <Sidebar collapsible="offcanvas" className="border-r border-border">
       <SidebarHeader className="p-4">
         {!collapsed ? (
-          <div className="flex items-center gap-2.5">
+          <div className="flex flex-col gap-3">
+            {/* ListHQ brand wordmark — anchors brand inside the dashboard */}
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center shrink-0">
+                <span className="text-primary-foreground font-bold text-[10px] tracking-tight">LHQ</span>
+              </div>
+              <span className="font-display text-sm font-bold tracking-tight">ListHQ</span>
+            </div>
+            <div className="flex items-center gap-2.5">
              {agentLogo ? (
               <div className="w-16 h-16 rounded-lg border border-border bg-background flex items-center justify-center overflow-hidden shrink-0">
                 <img src={agentLogo} alt="Agency logo" className="w-full h-full object-contain p-0.5" />

@@ -63,7 +63,7 @@ const NAV_SECTIONS: NavSection[] = [
   },
   {
     title: 'Property Mgmt',
-    url: '/dashboard/property',
+    url: '',
     icon: Home,
     children: [
       { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home },
@@ -79,7 +79,7 @@ const NAV_SECTIONS: NavSection[] = [
   },
   {
     title: 'Finance',
-    url: '/dashboard/finance',
+    url: '',
     icon: Landmark,
     children: [
       { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
@@ -90,7 +90,7 @@ const NAV_SECTIONS: NavSection[] = [
   },
   {
     title: 'Market Tools',
-    url: '/dashboard/market-tools',
+    url: '',
     icon: LineChart,
     children: [
       { title: 'AI Concierge', url: '/dashboard/concierge', icon: Sparkles, badgeKey: 'buyerMatches', alertWhenBadge: true },

@@ -13945,52 +13945,55 @@ export type Database = {
           has_ar: boolean | null
           has_bn: boolean | null
           has_hi: boolean | null
+          has_ja: boolean | null
           has_ko: boolean | null
           has_pa: boolean | null
           has_ta: boolean | null
+          has_translations: boolean | null
           has_vi: boolean | null
           has_zh_simplified: boolean | null
           has_zh_traditional: boolean | null
           id: string | null
           is_active: boolean | null
-          state: string | null
           suburb: string | null
           title: string | null
-          updated_at: string | null
+          translations: Json | null
         }
         Insert: {
           has_ar?: never
           has_bn?: never
           has_hi?: never
+          has_ja?: never
           has_ko?: never
           has_pa?: never
           has_ta?: never
+          has_translations?: never
           has_vi?: never
           has_zh_simplified?: never
           has_zh_traditional?: never
           id?: string | null
           is_active?: boolean | null
-          state?: string | null
           suburb?: string | null
           title?: string | null
-          updated_at?: string | null
+          translations?: Json | null
         }
         Update: {
           has_ar?: never
           has_bn?: never
           has_hi?: never
+          has_ja?: never
           has_ko?: never
           has_pa?: never
           has_ta?: never
+          has_translations?: never
           has_vi?: never
           has_zh_simplified?: never
           has_zh_traditional?: never
           id?: string | null
           is_active?: boolean | null
-          state?: string | null
           suburb?: string | null
           title?: string | null
-          updated_at?: string | null
+          translations?: Json | null
         }
         Relationships: []
       }

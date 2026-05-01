@@ -49,6 +49,11 @@ const NAV_SECTIONS: NavSection[] = [
     badgeKey: 'haloCredits',
   },
   {
+    title: 'Buy Credits',
+    url: '/dashboard/buy-credits',
+    icon: HandCoins,
+  },
+  {
     title: 'Listings',
     url: '',
     icon: Briefcase,
@@ -86,7 +91,6 @@ const NAV_SECTIONS: NavSection[] = [
       { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
       { title: 'Arrears', url: '/dashboard/arrears', icon: AlertCircle, badgeKey: 'arrears', alertWhenBadge: true },
       { title: 'Renewals Due', url: '/dashboard/rent-roll?filter=renewals', icon: RefreshCw, badgeKey: 'renewals', alertWhenBadge: true },
-      { title: 'Buy Credits', url: '/dashboard/buy-credits', icon: HandCoins },
     ],
   },
   {
@@ -274,10 +278,10 @@ const AgentDashboardSidebar = () => {
     { title: 'My Agencies', url: '/dashboard/agencies', icon: Building2 },
     { title: 'Territory', url: '/dashboard/territory', icon: MapPinned },
     { title: 'Team', url: '/dashboard/team', icon: UserPlus },
+    { title: 'Partner Access', url: '/dashboard/partner-access', icon: Handshake },
     { title: 'Billing', url: '/dashboard/billing', icon: CreditCard },
     { title: 'Reviews', url: '/dashboard/reviews', icon: Star },
     { title: 'Settings', url: '/dashboard/settings', icon: Settings },
-    { title: 'Agency Automations', url: '/dashboard/agency-automations', icon: Settings2 },
     ...(!onboardingComplete ? [{ title: 'Setup', url: '/dashboard/onboarding', icon: Settings2 }] : []),
   ];
 
@@ -561,7 +565,7 @@ const AgentDashboardSidebar = () => {
   );
 
   return (
-    <Sidebar collapsible="offcanvas" className="border-r border-border">
+    <Sidebar collapsible="icon" className="border-r border-border">
       <SidebarHeader className="p-4">
         {!collapsed ? (
           <div className="flex flex-col gap-3">
@@ -683,8 +687,12 @@ const AgentDashboardSidebar = () => {
           )}
         </div>
 
-        {/* 6 top-level sections — each is clickable and expands to show sub-items */}
+        {/* Top-level sections — each is clickable and expands to show sub-items */}
         {NAV_SECTIONS.map((section) => renderSection(section))}
+
+        {renderGroup('Account', ACCOUNT_NAV)}
+        {isPrincipal && renderGroup('Principal', PRINCIPAL_NAV)}
+        {isAdmin && renderGroup('Admin', ADMIN_NAV)}
         </nav>
       </SidebarContent>
 

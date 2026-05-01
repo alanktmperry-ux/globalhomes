@@ -57,9 +57,9 @@ Deno.serve(async (req) => {
       voiceTranscript,
     } = await req.json();
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+    if (!OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY is not configured");
     }
 
     const toneInstruction = TONE_PROMPTS[tone] || TONE_PROMPTS.standard;
@@ -73,11 +73,11 @@ Deno.serve(async (req) => {
     const prompt = `Write a professional real estate listing description for a ${beds}-bedroom, ${baths}-bathroom ${propertyType} with ${parking} car spaces in ${suburb || "a premium suburb"}, ${state || "VIC"}, Australia. Price: ${price || "Contact Agent"}. Features: ${featureList}.${transcriptSection}\n${toneInstruction}\nWrite 3 paragraphs. Max 180 words. No bullet points. End with a compelling call to action.`;
 
     const response = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
+      "https://api.openai.com/v1/chat/completions",
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({

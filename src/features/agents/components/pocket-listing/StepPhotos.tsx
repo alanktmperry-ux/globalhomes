@@ -258,13 +258,27 @@ const StepPhotos = ({ draft, update }: Props) => {
               <img src={url} alt={`Photo ${i + 1}`} className="w-full h-full object-cover" />
 
               {/* Drag handle */}
-              <div className="absolute top-1.5 right-1.5 w-6 h-6 rounded-md bg-background/70 flex items-center justify-center">
+              <div className="absolute top-1.5 right-1.5 w-6 h-6 rounded-md bg-background/70 flex items-center justify-center pointer-events-none z-10">
                 <GripVertical size={12} className="text-foreground" />
               </div>
 
+              {/* Feature badge */}
+              {i === 0 && (
+                <div className="absolute top-1.5 left-1.5 px-2 py-0.5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center gap-1 pointer-events-none z-10">
+                  <Star size={8} /> Feature
+                </div>
+              )}
+
+              {/* Position number — top-left for non-feature photos to avoid overlap with action bar */}
+              {i > 0 && (
+                <div className="absolute top-1.5 left-1.5 w-5 h-5 rounded-full bg-background/70 text-foreground text-[10px] font-bold flex items-center justify-center pointer-events-none z-10">
+                  {i + 1}
+                </div>
+              )}
+
               {/* Always-visible action bar */}
-              <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-1.5 py-1.5 bg-gradient-to-t from-black/60 to-transparent">
-                {i !== 0 && (
+              <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-1.5 py-1.5 bg-gradient-to-t from-black/60 to-transparent z-20">
+                {i !== 0 ? (
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); moveToFirst(i); }}
@@ -273,8 +287,9 @@ const StepPhotos = ({ draft, update }: Props) => {
                   >
                     <Star size={13} />
                   </button>
+                ) : (
+                  <div className="w-7" />
                 )}
-                {i === 0 && <div className="w-7" />}
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); removePhoto(i); }}
@@ -282,17 +297,6 @@ const StepPhotos = ({ draft, update }: Props) => {
                 >
                   <X size={13} />
                 </button>
-              </div>
-
-              {/* Feature badge */}
-              {i === 0 && (
-                <div className="absolute top-1.5 left-1.5 px-2 py-0.5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center gap-1">
-                  <Star size={8} /> Feature
-                </div>
-              )}
-              {/* Position number */}
-              <div className="absolute bottom-1.5 left-1.5 w-5 h-5 rounded-full bg-background/70 text-foreground text-[10px] font-bold flex items-center justify-center">
-                {i + 1}
               </div>
             </div>
           ))}

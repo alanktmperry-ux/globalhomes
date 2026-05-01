@@ -12,12 +12,22 @@ import { PROPERTY_TYPE_OPTIONS } from '@/types/halo';
 
 export type IntentFilter = 'all' | 'buy' | 'rent';
 export type BudgetFilter = 'any' | 'under_500k' | '500k_1m' | '1m_2m' | '2m_plus';
+export type LanguageFilter = 'all' | 'en' | 'zh' | 'vi' | 'ko';
+
+export const LANGUAGE_OPTIONS: { value: LanguageFilter; label: string }[] = [
+  { value: 'all', label: 'All languages' },
+  { value: 'en', label: 'English' },
+  { value: 'zh', label: '中文' },
+  { value: 'vi', label: 'Tiếng Việt' },
+  { value: 'ko', label: '한국어' },
+];
 
 export interface HaloBoardFiltersState {
   intent: IntentFilter;
   propertyTypes: string[];
   budget: BudgetFilter;
   suburb: string;
+  language: LanguageFilter;
 }
 
 export const DEFAULT_FILTERS: HaloBoardFiltersState = {
@@ -25,6 +35,7 @@ export const DEFAULT_FILTERS: HaloBoardFiltersState = {
   propertyTypes: [],
   budget: 'any',
   suburb: '',
+  language: 'all',
 };
 
 interface Props {

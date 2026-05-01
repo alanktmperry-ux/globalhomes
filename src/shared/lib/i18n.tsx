@@ -1434,6 +1434,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       sessionStorage.setItem(SESSION_LANGUAGE_KEY, language);
+      localStorage.setItem(SESSION_LANGUAGE_KEY, language);
+      localStorage.setItem('listhq_language', language);
     } catch { /* non-fatal */ }
   }, [language]);
 

@@ -647,7 +647,20 @@ export default function PropertyDetailPage() {
                   <stat.icon size={15} className="text-slate-400 mb-1" strokeWidth={1.8} />
                   <span className="text-[15px] font-bold text-slate-900 leading-none">{stat.value}</span>
                   <span className="text-[10px] text-slate-400 font-medium">{stat.label}</span>
+            </div>
+
+            {/* School zone feature row */}
+            {property.schoolZoneTop && (
+              <div className="flex items-center gap-3 border border-slate-200 rounded-2xl px-4 py-3 bg-white">
+                <span className="text-xl leading-none" aria-hidden>🏫</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] uppercase tracking-wide text-slate-400 font-medium">School Zone</p>
+                  <p className="text-sm font-semibold text-slate-900 truncate">
+                    {property.schoolZoneName || 'Top school catchment — confirmed by agent'}
+                  </p>
                 </div>
+              </div>
+            )}
               ))}
             </div>
 

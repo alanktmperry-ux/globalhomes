@@ -565,7 +565,7 @@ const AgentDashboardSidebar = () => {
   );
 
   return (
-    <Sidebar collapsible="offcanvas" className="border-r border-border">
+    <Sidebar collapsible="icon" className="border-r border-border">
       <SidebarHeader className="p-4">
         {!collapsed ? (
           <div className="flex flex-col gap-3">

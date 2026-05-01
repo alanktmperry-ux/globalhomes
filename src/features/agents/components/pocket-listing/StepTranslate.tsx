@@ -146,7 +146,26 @@ const StepTranslate = ({ draft, update }: Props) => {
         </Button>
 
         <div>
-          <Label className="text-xs mb-1 block">Title in {active.label}</Label>
+          <div className="flex items-center justify-between mb-1">
+            <Label className="text-xs">Title in {active.label}</Label>
+            {titleVoice.isSupported && (
+              <button
+                type="button"
+                onClick={titleVoice.isListening ? titleVoice.stopListening : titleVoice.startListening}
+                disabled={titleVoice.isTranscribing}
+                className="h-6 w-6 inline-flex items-center justify-center rounded-md hover:bg-secondary transition-colors disabled:opacity-50"
+                aria-label={titleVoice.isListening ? 'Stop recording' : 'Start voice input'}
+              >
+                {titleVoice.isTranscribing ? (
+                  <Loader2 size={12} className="animate-spin text-muted-foreground" />
+                ) : titleVoice.isListening ? (
+                  <MicOff size={12} className="text-red-500" />
+                ) : (
+                  <Mic size={12} className="text-muted-foreground" />
+                )}
+              </button>
+            )}
+          </div>
           <Textarea
             value={titleValue}
             onChange={(e) =>
@@ -154,7 +173,7 @@ const StepTranslate = ({ draft, update }: Props) => {
             }
             placeholder={`Enter title in ${active.label}…`}
             rows={1}
-            className="bg-secondary border-border text-sm resize-none"
+            className={`bg-secondary border-border text-sm resize-none ${titleVoice.isListening ? 'ring-1 ring-red-400' : ''}`}
             maxLength={TITLE_LIMIT}
           />
           <p className="text-[11px] text-muted-foreground mt-1 text-right">
@@ -163,13 +182,32 @@ const StepTranslate = ({ draft, update }: Props) => {
         </div>
 
         <div>
-          <Label className="text-xs mb-1 block">Description in {active.label}</Label>
+          <div className="flex items-center justify-between mb-1">
+            <Label className="text-xs">Description in {active.label}</Label>
+            {descVoice.isSupported && (
+              <button
+                type="button"
+                onClick={descVoice.isListening ? descVoice.stopListening : descVoice.startListening}
+                disabled={descVoice.isTranscribing}
+                className="h-6 w-6 inline-flex items-center justify-center rounded-md hover:bg-secondary transition-colors disabled:opacity-50"
+                aria-label={descVoice.isListening ? 'Stop recording' : 'Start voice input'}
+              >
+                {descVoice.isTranscribing ? (
+                  <Loader2 size={12} className="animate-spin text-muted-foreground" />
+                ) : descVoice.isListening ? (
+                  <MicOff size={12} className="text-red-500" />
+                ) : (
+                  <Mic size={12} className="text-muted-foreground" />
+                )}
+              </button>
+            )}
+          </div>
           <Textarea
             value={descValue}
             onChange={(e) => update({ [active.descField]: e.target.value } as Partial<ListingDraft>)}
             placeholder={`Enter description in ${active.label}…`}
             rows={5}
-            className="bg-secondary border-border text-sm"
+            className={`bg-secondary border-border text-sm ${descVoice.isListening ? 'ring-1 ring-red-400' : ''}`}
           />
           <p className="text-[11px] text-muted-foreground mt-1 text-right">
             {descValue.length} characters

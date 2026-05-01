@@ -57,9 +57,6 @@ verify_jwt = false
 [functions.send-marketing-email]
 verify_jwt = true
 
-[functions.generate-translations]
-verify_jwt = true
-
 [functions.agent-help]
 verify_jwt = true
 

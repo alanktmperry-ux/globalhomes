@@ -532,27 +532,9 @@ const AgentDashboardSidebar = () => {
           </div>
         )}
 
-        <div
-          onClick={() => {
-            navigate('/dashboard');
-            if (isMobile) setOpenMobile(false);
-          }}
-          className={`flex items-center gap-2.5 px-3 py-2 mx-2 rounded-lg text-sm cursor-pointer transition-colors mb-1 ${
-            location.pathname === '/dashboard'
-              ? 'bg-secondary text-foreground font-medium'
-              : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground'
-          }`}
-        >
-          <LayoutDashboard size={16} />
-          {!collapsed && 'Dashboard'}
-        </div>
+        {/* 6 top-level sections — each is clickable and expands to show sub-items */}
+        {NAV_SECTIONS.map((section) => renderSection(section))}
 
-        {renderGroup('Sales', SALES_NAV)}
-        {renderGroup('Urgent', PROPERTY_NAV_URGENT)}
-        {renderGroup('Tenancy', PROPERTY_NAV_TENANCY)}
-        {renderGroup('Operations', PROPERTY_NAV_OPERATIONS)}
-        {renderGroup('PM Finance', PROPERTY_NAV_FINANCE)}
-        {renderGroup('Insights', INSIGHTS_NAV)}
         {(isPrincipal || isAdmin) && renderGroup('Principal', PRINCIPAL_NAV)}
         {renderGroup('Account', ACCOUNT_NAV)}
         {ADMIN_NAV.length > 0 && renderGroup('Admin', ADMIN_NAV)}

@@ -336,6 +336,149 @@ const AgentDashboardSidebar = () => {
     }
   };
 
+  // Track which top-level sections are expanded. The section containing the active
+  // route is auto-expanded; users can toggle others via the chevron.
+  const activeSectionTitle = useMemo(() => {
+    for (const s of NAV_SECTIONS) {
+      if (s.children?.some((c) => isActive(c.url))) return s.title;
+      if (isActive(s.url) && s.url !== '/dashboard') return s.title;
+    }
+    return null;
+  }, [location.pathname, location.search]);
+
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+  useEffect(() => {
+    if (activeSectionTitle) {
+      setOpenSections((prev) => (prev[activeSectionTitle] ? prev : { ...prev, [activeSectionTitle]: true }));
+    }
+  }, [activeSectionTitle]);
+
+  const toggleSection = (title: string) =>
+    setOpenSections((prev) => ({ ...prev, [title]: !prev[title] }));
+
+  const renderSection = (section: NavSection) => {
+    const hasChildren = !!section.children?.length;
+    const isOpen = !!openSections[section.title] || activeSectionTitle === section.title;
+    const sectionActive = isActive(section.url) || (hasChildren && section.children!.some((c) => isActive(c.url)));
+    const Icon = section.icon;
+    const badgeVal = section.badgeKey ? badgeValues[section.badgeKey] : '';
+
+    const handleClick = () => {
+      navigate(section.url);
+      if (hasChildren) toggleSection(section.title);
+      if (isMobile && !hasChildren) setOpenMobile(false);
+    };
+
+    return (
+      <Collapsible
+        key={section.title}
+        open={isOpen}
+        onOpenChange={(o) => setOpenSections((p) => ({ ...p, [section.title]: o }))}
+      >
+        <SidebarGroup className="py-0">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <div
+                  className={`flex items-center w-full rounded-lg transition-colors ${
+                    sectionActive
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-foreground hover:bg-accent'
+                  }`}
+                >
+                  <button
+                    onClick={handleClick}
+                    onMouseEnter={() => prefetchRoute(section.url)}
+                    onFocus={() => prefetchRoute(section.url)}
+                    className="flex items-center gap-2 flex-1 px-3 py-2.5 text-sm font-medium text-left min-w-0"
+                  >
+                    <Icon size={16} className="shrink-0" />
+                    {!collapsed && (
+                      <>
+                        <span className="flex-1 truncate">{section.title}</span>
+                        {badgeVal && (
+                          <Badge
+                            variant={section.alertWhenBadge ? 'destructive' : 'secondary'}
+                            className="text-[10px] px-1.5 py-0 h-5"
+                          >
+                            {badgeVal}
+                          </Badge>
+                        )}
+                      </>
+                    )}
+                  </button>
+                  {hasChildren && !collapsed && (
+                    <CollapsibleTrigger asChild>
+                      <button
+                        type="button"
+                        aria-label={`Toggle ${section.title}`}
+                        className="px-2 py-2.5 text-muted-foreground hover:text-foreground"
+                      >
+                        <ChevronRight
+                          size={14}
+                          className={`transition-transform ${isOpen ? 'rotate-90' : ''}`}
+                        />
+                      </button>
+                    </CollapsibleTrigger>
+                  )}
+                </div>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+
+          {hasChildren && !collapsed && (
+            <CollapsibleContent>
+              <SidebarGroupContent className="pl-3">
+                <SidebarMenu>
+                  {section.children!.map((item) => (
+                    <SidebarMenuItem key={item.title + item.url}>
+                      <SidebarMenuButton asChild isActive={isActive(item.url)}>
+                        <button
+                          onClick={() => {
+                            navigate(item.url);
+                            if (isMobile) setOpenMobile(false);
+                          }}
+                          onMouseEnter={() => prefetchRoute(item.url)}
+                          className={`flex items-center gap-2 w-full px-3 py-2 rounded-lg text-[13px] transition-colors ${
+                            isActive(item.url)
+                              ? 'bg-primary/10 text-primary font-medium'
+                              : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                          }`}
+                        >
+                          <item.icon
+                            size={14}
+                            className={`shrink-0 ${
+                              item.alertWhenBadge && item.badgeKey && badgeValues[item.badgeKey]
+                                ? 'text-amber-600'
+                                : ''
+                            }`}
+                          />
+                          <span className={`flex-1 text-left ${
+                            item.alertWhenBadge && item.badgeKey && badgeValues[item.badgeKey]
+                              ? 'text-amber-700 font-medium'
+                              : ''
+                          }`}>{item.title}</span>
+                          {item.badgeKey && badgeValues[item.badgeKey] && (
+                            <Badge
+                              variant={item.alertWhenBadge ? 'destructive' : 'secondary'}
+                              className="text-[10px] px-1.5 py-0 h-5"
+                            >
+                              {badgeValues[item.badgeKey]}
+                            </Badge>
+                          )}
+                        </button>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </CollapsibleContent>
+          )}
+        </SidebarGroup>
+      </Collapsible>
+    );
+  };
+
   const renderGroup = (label: string, items: NavItem[]) => (
     <SidebarGroup key={label}>
       <SidebarGroupLabel>{!collapsed && label}</SidebarGroupLabel>

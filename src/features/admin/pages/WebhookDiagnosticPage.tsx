@@ -67,7 +67,7 @@ export default function WebhookDiagnosticPage() {
     offmarket_subscribers: 'unknown',
     strata_health: 'unknown',
   });
-  const [details, setDetails] = useState<Record<WebhookKey, unknown>>({} as Record<WebhookKey, unknown>);
+  const [details, setDetails] = useState<Partial<Record<WebhookKey, unknown>>>({});
   const [loading, setLoading] = useState(false);
   const [testing, setTesting] = useState<Record<string, boolean>>({});
   const [testResults, setTestResults] = useState<Record<string, { ok: boolean; payload: unknown }>>({});

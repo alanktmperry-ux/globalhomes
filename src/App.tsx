@@ -52,6 +52,7 @@ const AboutPage = React.lazy(() => import("./pages/About"));
 const BoxHillVicPage = React.lazy(() => import("./pages/suburbs/BoxHillVic"));
 const GlenWaverleyVicPage = React.lazy(() => import("./pages/suburbs/GlenWaverleyVic"));
 const ParramattaNswPage = React.lazy(() => import("./pages/suburbs/ParramattaNsw"));
+const SuburbsIndex = React.lazy(() => import("./pages/suburbs/SuburbsIndex"));
 const AdminHelpPage = React.lazy(() => import("./features/admin/pages/AdminHelpPage"));
 const AdminLoginPage = React.lazy(() => import("./features/admin/pages/AdminLoginPage"));
 const AdminRevenuePage = React.lazy(() => import("./features/admin/pages/RevenuePage"));

@@ -365,34 +365,34 @@ const StepBasics = ({ draft, update }: Props) => {
         )}
 
         <div className="space-y-1.5">
-          <Label className="text-sm font-semibold block">Description</Label>
-          <div className="relative">
-            <Textarea
-              value={draft.voiceTranscript}
-              onChange={(e) => update({ voiceTranscript: e.target.value })}
-              placeholder="Describe the property — key selling points, lifestyle, neighbourhood highlights…"
-              className="min-h-[140px] resize-y pr-12"
-              rows={6}
-            />
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-semibold">Description</Label>
             <button
               type="button"
               onClick={toggleVoice}
-              aria-label={isListening ? 'Stop dictation' : 'Start voice dictation'}
-              className={`absolute top-2 right-2 w-10 h-10 rounded-full flex items-center justify-center transition-colors border ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                 isListening
-                  ? 'bg-destructive text-destructive-foreground border-destructive animate-pulse'
-                  : 'bg-card text-primary border-border hover:bg-primary/10'
+                  ? 'bg-red-500/10 border-red-400 text-red-500 animate-pulse'
+                  : 'bg-secondary border-border text-muted-foreground hover:border-primary/40 hover:text-primary'
               }`}
             >
-              {isListening ? <MicOff size={16} /> : <Mic size={16} />}
+              {isListening ? <MicOff size={13} /> : <Mic size={13} />}
+              {isListening ? 'Stop' : 'Dictate'}
             </button>
           </div>
+          <Textarea
+            value={draft.voiceTranscript}
+            onChange={(e) => update({ voiceTranscript: e.target.value })}
+            placeholder="Describe the property — key selling points, lifestyle, neighbourhood highlights…"
+            className={`min-h-[140px] resize-y transition-all ${isListening ? 'ring-2 ring-red-400/50 border-red-300' : ''}`}
+            rows={6}
+          />
           <p className="text-xs text-muted-foreground">
             {isListening
-              ? 'Listening… tap the mic again to stop.'
+              ? '🎙 Listening — speak now, tap Stop when done'
               : draft.voiceTranscript.length > 0
                 ? `${draft.voiceTranscript.length} characters`
-                : 'Tap the mic to dictate, or type directly.'}
+                : 'Tap Dictate to speak, or type directly'}
           </p>
         </div>
       </div>

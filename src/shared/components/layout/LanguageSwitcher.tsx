@@ -12,11 +12,7 @@ import {
 
 // Locales with complete translation files. Others render as "Coming soon".
 const AVAILABLE_LOCALES: ReadonlySet<SupportedLanguageCode> = new Set([
-  'en',
-  'zh-CN',
-  'zh-TW',
-  'hi',
-  'bn',
+  'en', 'zh-CN', 'zh-TW', 'vi', 'ko', 'ar', 'hi', 'bn', 'pa', 'ta',
 ]);
 
 const INTERACTED_KEY = 'gh-lang-switcher-interacted';
@@ -31,6 +27,13 @@ export function LanguageSwitcher() {
   const [hasInteracted, setHasInteracted] = useState(() => {
     try { return localStorage.getItem(INTERACTED_KEY) === '1'; } catch { return true; }
   });
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('listhq_language') || sessionStorage.getItem('listhq_language');
+      document.documentElement.dir = stored === 'ar' ? 'rtl' : 'ltr';
+    } catch { /* non-fatal */ }
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -107,12 +110,12 @@ export function LanguageSwitcher() {
                     const legacy = (LEGACY_CODE_MAP[code] ?? 'en') as Language;
                     setLanguage(legacy);
                     try {
-                      // Session-only persistence — must NOT survive a fresh browser session.
+                      localStorage.setItem(LANGUAGE_STORAGE_KEY, code);
                       sessionStorage.setItem(LANGUAGE_STORAGE_KEY, code);
-                      localStorage.removeItem(LANGUAGE_STORAGE_KEY);
                       localStorage.removeItem('gh-lang');
                     } catch { /* storage unavailable — non-fatal */ }
                     setOpen(false);
+                    document.documentElement.dir = code === 'ar' ? 'rtl' : 'ltr';
                   }}
                   className={`text-sm px-3 py-2 rounded-lg text-left transition-colors flex items-center justify-between ${
                     !isAvailable

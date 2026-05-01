@@ -1,13 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Eye, EyeOff, Zap, CheckCircle2, Clock, Sparkles, TrendingUp, Info, Loader2, Pencil, Globe, Home, Building, MoreHorizontal, FileBarChart2, Copy, Mail } from 'lucide-react';
+import { Plus, Eye, EyeOff, Zap, CheckCircle2, Clock, Sparkles, TrendingUp, Info, Loader2, Pencil, Globe, Home, Building, MoreHorizontal, FileBarChart2, Copy, Mail, List as ListIcon, Kanban } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+const PipelinePage = lazy(() => import('./PipelinePage'));
 import DashboardHeader from './DashboardHeader';
 import { useAgentListings, type AgentListing } from '@/features/agents/hooks/useAgentListings';
 import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
@@ -211,6 +212,28 @@ const StatusTabs = ({
 
 const ListingsPage = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialView: 'list' | 'pipeline' =
+    searchParams.get('view') === 'pipeline'
+      ? 'pipeline'
+      : (typeof window !== 'undefined' && window.localStorage.getItem('listings_view_preference') === 'pipeline')
+        ? 'pipeline'
+        : 'list';
+  const [view, setView] = useState<'list' | 'pipeline'>(initialView);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('listings_view_preference', view);
+    }
+    const current = searchParams.get('view');
+    if (view === 'pipeline' && current !== 'pipeline') {
+      setSearchParams((p) => { p.set('view', 'pipeline'); return p; }, { replace: true });
+    } else if (view === 'list' && current === 'pipeline') {
+      setSearchParams((p) => { p.delete('view'); return p; }, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view]);
+
   const { agent } = useCurrentAgent();
   const [listingMode, setListingMode] = useState<'sale' | 'rent'>('sale');
   const [saleStatusTab, setSaleStatusTab] = useState('all');
@@ -331,13 +354,65 @@ const ListingsPage = () => {
   const counts: Record<string, number> = {};
   activeListings.forEach(l => { counts[l._status] = (counts[l._status] || 0) + 1; });
 
+  const viewToggle = (
+    <div className="inline-flex rounded-lg border border-border bg-card p-0.5" role="tablist" aria-label="Listings view">
+      <button
+        type="button"
+        role="tab"
+        aria-selected={view === 'list'}
+        onClick={() => setView('list')}
+        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+          view === 'list' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+        }`}
+      >
+        <ListIcon size={12} /> List
+      </button>
+      <button
+        type="button"
+        role="tab"
+        aria-selected={view === 'pipeline'}
+        onClick={() => setView('pipeline')}
+        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+          view === 'pipeline' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+        }`}
+      >
+        <Kanban size={12} /> Pipeline
+      </button>
+    </div>
+  );
+
+  if (view === 'pipeline') {
+    return (
+      <div>
+        <DashboardHeader
+          title="Listings"
+          actions={
+            <div className="flex items-center gap-2">
+              {viewToggle}
+              <Button size="sm" onClick={() => navigate('/pocket-listing')} className="gap-1.5 text-xs">
+                <Plus size={12} /> New Listing
+              </Button>
+            </div>
+          }
+        />
+        <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Loading pipeline…</div>}>
+          {/* PipelinePage renders its own DashboardHeader; we hide it via wrapper */}
+          <div className="[&>div>:first-child]:hidden">
+            <PipelinePage />
+          </div>
+        </Suspense>
+      </div>
+    );
+  }
+
   return (
     <>
       <div>
         <DashboardHeader
-          title="My Listings"
+          title="Listings"
           actions={
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
+              {viewToggle}
               <Button size="sm" variant="outline" onClick={() => navigate('/')} className="gap-1.5 text-xs">
                 <Globe size={14} /> Browse Market
               </Button>

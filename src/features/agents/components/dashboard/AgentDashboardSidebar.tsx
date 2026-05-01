@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   LayoutDashboard, List, Mic, BarChart3, Users, Settings, Plus, LogOut, Building2, UserPlus, Home,
   User, FileText, CreditCard, Star, MapPinned, Shield, Contact, Kanban, Scale, Landmark,
   ClipboardCheck, CalendarDays, Search, TrendingUp, Receipt, PartyPopper, Calculator, HelpCircle, ClipboardList, Settings2, Flame,
-  Handshake, Sparkles, Target, ShoppingBag, ChevronDown, Mail, Wrench, Activity, AlertCircle, RefreshCw,
-  HandCoins,
+  Handshake, Sparkles, Target, ShoppingBag, ChevronDown, ChevronRight, Mail, Wrench, Activity, AlertCircle, RefreshCw,
+  HandCoins, Briefcase, LineChart,
 } from 'lucide-react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -19,11 +19,90 @@ import {
   SidebarTrigger, useSidebar,
 } from '@/components/ui/sidebar';
 import { Badge } from '@/components/ui/badge';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
 import { useHaloCreditsBalance } from '@/features/halo/hooks/useHaloCreditsBalance';
+
+interface NavSection {
+  title: string;
+  url: string;
+  icon: any;
+  badgeKey?: string;
+  alertWhenBadge?: boolean;
+  children?: NavItem[];
+}
+
+// Six top-level sections. Each top-level item is clickable AND expands to show its sub-items.
+const NAV_SECTIONS: NavSection[] = [
+  {
+    title: 'Dashboard',
+    url: '/dashboard',
+    icon: LayoutDashboard,
+  },
+  {
+    title: 'Halo Board',
+    url: '/dashboard/halo-board',
+    icon: Sparkles,
+    badgeKey: 'haloCredits',
+  },
+  {
+    title: 'Listings',
+    url: '/dashboard/listings',
+    icon: Briefcase,
+    children: [
+      { title: 'Listings', url: '/dashboard/listings', icon: List, badgeKey: 'listings' },
+      { title: 'Inbox', url: '/dashboard/inbox', icon: Mail, badgeKey: 'inbox', alertWhenBadge: true },
+      { title: 'Contacts', url: '/dashboard/contacts', icon: Contact },
+      { title: 'Leads', url: '/dashboard/crm', icon: Flame },
+      { title: 'Voice Leads', url: '/dashboard/leads', icon: Mic, badgeKey: 'leads' },
+      { title: 'Open Homes', url: '/dashboard/open-homes', icon: CalendarDays },
+      { title: 'Settlement', url: '/dashboard/settlements', icon: PartyPopper },
+    ],
+  },
+  {
+    title: 'Property Mgmt',
+    url: '/dashboard/rent-roll',
+    icon: Home,
+    children: [
+      { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home },
+      { title: 'Rental Applications', url: '/dashboard/rental-applications', icon: ClipboardList },
+      { title: 'Vacancies', url: '/dashboard/vacancies', icon: Building2 },
+      { title: 'Vacancy KPIs', url: '/dashboard/vacancy-kpi', icon: Activity },
+      { title: 'Maintenance', url: '/dashboard/maintenance', icon: Wrench },
+      { title: 'Routine Inspections', url: '/dashboard/pm-inspections', icon: CalendarDays, badgeKey: 'disputes', alertWhenBadge: true },
+      { title: 'Suppliers', url: '/dashboard/suppliers', icon: Wrench },
+      { title: 'Key Register', url: '/dashboard/keys', icon: Scale },
+      { title: 'Smoke Alarms', url: '/dashboard/smoke-alarms', icon: AlertCircle, badgeKey: 'smokeAlarms', alertWhenBadge: true },
+    ],
+  },
+  {
+    title: 'Trust Accounting',
+    url: '/dashboard/trust',
+    icon: Landmark,
+    children: [
+      { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
+      { title: 'Arrears', url: '/dashboard/arrears', icon: AlertCircle, badgeKey: 'arrears', alertWhenBadge: true },
+      { title: 'Renewals Due', url: '/dashboard/rent-roll?filter=renewals', icon: RefreshCw, badgeKey: 'renewals', alertWhenBadge: true },
+      { title: 'Buy Credits', url: '/dashboard/buy-credits', icon: HandCoins },
+    ],
+  },
+  {
+    title: 'Market Tools',
+    url: '/dashboard/concierge',
+    icon: LineChart,
+    children: [
+      { title: 'AI Concierge', url: '/dashboard/concierge', icon: Sparkles, badgeKey: 'buyerMatches', alertWhenBadge: true },
+      { title: 'Lead Marketplace', url: '/dashboard/lead-marketplace', icon: ShoppingBag },
+      { title: 'Pre-Market', url: '/dashboard/pre-market', icon: Target },
+      { title: 'Off-Market Network', url: '/dashboard/network', icon: Users },
+      { title: 'Opportunities', url: '/dashboard/opportunities', icon: Target },
+      { title: 'Exclusive Program', url: '/exclusive/listings', icon: Star },
+    ],
+  },
+];
 
 interface NavItem {
   title: string;
@@ -31,68 +110,10 @@ interface NavItem {
   icon: any;
   badgeKey?: string;
   comingSoon?: boolean;
-  alertWhenBadge?: boolean; // when true, badge uses red/amber styling and icon coloring
+  alertWhenBadge?: boolean;
 }
 
-const SALES_NAV: NavItem[] = [
-  { title: 'My Listings', url: '/dashboard/listings', icon: List, badgeKey: 'listings' },
-  { title: 'Inbox', url: '/dashboard/inbox', icon: Mail, badgeKey: 'inbox', alertWhenBadge: true },
-  { title: 'Contacts', url: '/dashboard/contacts', icon: Contact },
-  { title: 'Listings', url: '/dashboard/pipeline', icon: Kanban },
-  { title: 'Leads', url: '/dashboard/crm', icon: Flame },
-  { title: 'Voice Leads', url: '/dashboard/leads', icon: Mic, badgeKey: 'leads' },
-  { title: 'AI Concierge', url: '/dashboard/concierge', icon: Sparkles, badgeKey: 'buyerMatches', alertWhenBadge: true },
-  { title: 'Halo Board', url: '/dashboard/halo-board', icon: Sparkles, badgeKey: 'haloCredits' },
-  { title: 'Buy Credits', url: '/dashboard/buy-credits', icon: HandCoins },
-  { title: 'Lead Marketplace', url: '/dashboard/lead-marketplace', icon: ShoppingBag },
-  { title: 'Pre-Market', url: '/dashboard/pre-market', icon: Target },
-  { title: 'Off-Market Network', url: '/dashboard/network', icon: Users },
-  { title: 'Opportunities', url: '/dashboard/opportunities', icon: Target },
-  { title: 'Exclusive Program', url: '/exclusive/listings', icon: Star },
-  { title: 'Open Homes', url: '/dashboard/open-homes', icon: CalendarDays },
-  { title: 'Settlement', url: '/dashboard/settlements', icon: PartyPopper },
-];
-
-const PROPERTY_NAV_URGENT: NavItem[] = [
-  { title: 'Arrears', url: '/dashboard/arrears', icon: AlertCircle, badgeKey: 'arrears', alertWhenBadge: true },
-  { title: 'Renewals Due', url: '/dashboard/rent-roll?filter=renewals', icon: RefreshCw, badgeKey: 'renewals', alertWhenBadge: true },
-];
-
-const PROPERTY_NAV_TENANCY: NavItem[] = [
-  { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home },
-  { title: 'Rent Increases', url: '/dashboard/rent-increases', icon: TrendingUp },
-  { title: 'Rental Applications', url: '/dashboard/rental-applications', icon: ClipboardList },
-  { title: 'Vacancies', url: '/dashboard/vacancies', icon: Building2 },
-  { title: 'Vacancy KPIs', url: '/dashboard/vacancy-kpi', icon: Activity },
-];
-
-const PROPERTY_NAV_OPERATIONS: NavItem[] = [
-  { title: 'Maintenance', url: '/dashboard/maintenance', icon: Wrench },
-  { title: 'Routine Inspections', url: '/dashboard/pm-inspections', icon: CalendarDays, badgeKey: 'disputes', alertWhenBadge: true },
-  { title: 'Suppliers', url: '/dashboard/suppliers', icon: Wrench },
-  { title: 'Key Register', url: '/dashboard/keys', icon: Scale },
-  { title: 'Smoke Alarms', url: '/dashboard/smoke-alarms', icon: AlertCircle, badgeKey: 'smokeAlarms', alertWhenBadge: true },
-];
-
-const PROPERTY_NAV_FINANCE: NavItem[] = [
-  { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
-  { title: 'Bond Claims', url: '/dashboard/bond-claims', icon: Scale },
-  { title: 'Statements', url: '/dashboard/statements', icon: Receipt },
-  { title: 'Documents', url: '/dashboard/property-documents', icon: FileText },
-  { title: 'Automation', url: '/dashboard/automation', icon: Mail },
-  { title: 'Partner Access', url: '/dashboard/partner-access', icon: Handshake },
-];
-
-const INSIGHTS_NAV: NavItem[] = [
-  { title: 'Performance', url: '/dashboard/performance', icon: TrendingUp },
-  { title: 'Analytics', url: '/dashboard/analytics', icon: BarChart3 },
-  { title: 'Reports', url: '/dashboard/reports', icon: FileText },
-  { title: 'Commission', url: '/dashboard/commission', icon: Calculator },
-  { title: 'Conveyancing', url: '/conveyancing', icon: FileText },
-  { title: 'Broker Referrals', url: '/dashboard/broker-referrals', icon: HandCoins },
-  { title: 'Referral Program', url: '/refer', icon: Handshake },
-];
-
+// Account & admin remain as a single Account group (not part of the 6 main sections).
 const PRINCIPAL_NAV: NavItem[] = [
   { title: 'Compliance', url: '/dashboard/team?tab=compliance', icon: Shield },
   { title: 'Audit Log', url: '/dashboard/team?tab=audit', icon: ClipboardCheck },
@@ -315,6 +336,149 @@ const AgentDashboardSidebar = () => {
     }
   };
 
+  // Track which top-level sections are expanded. The section containing the active
+  // route is auto-expanded; users can toggle others via the chevron.
+  const activeSectionTitle = useMemo(() => {
+    for (const s of NAV_SECTIONS) {
+      if (s.children?.some((c) => isActive(c.url))) return s.title;
+      if (isActive(s.url) && s.url !== '/dashboard') return s.title;
+    }
+    return null;
+  }, [location.pathname, location.search]);
+
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+  useEffect(() => {
+    if (activeSectionTitle) {
+      setOpenSections((prev) => (prev[activeSectionTitle] ? prev : { ...prev, [activeSectionTitle]: true }));
+    }
+  }, [activeSectionTitle]);
+
+  const toggleSection = (title: string) =>
+    setOpenSections((prev) => ({ ...prev, [title]: !prev[title] }));
+
+  const renderSection = (section: NavSection) => {
+    const hasChildren = !!section.children?.length;
+    const isOpen = !!openSections[section.title] || activeSectionTitle === section.title;
+    const sectionActive = isActive(section.url) || (hasChildren && section.children!.some((c) => isActive(c.url)));
+    const Icon = section.icon;
+    const badgeVal = section.badgeKey ? badgeValues[section.badgeKey] : '';
+
+    const handleClick = () => {
+      navigate(section.url);
+      if (hasChildren) toggleSection(section.title);
+      if (isMobile && !hasChildren) setOpenMobile(false);
+    };
+
+    return (
+      <Collapsible
+        key={section.title}
+        open={isOpen}
+        onOpenChange={(o) => setOpenSections((p) => ({ ...p, [section.title]: o }))}
+      >
+        <SidebarGroup className="py-0">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <div
+                  className={`flex items-center w-full rounded-lg transition-colors ${
+                    sectionActive
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-foreground hover:bg-accent'
+                  }`}
+                >
+                  <button
+                    onClick={handleClick}
+                    onMouseEnter={() => prefetchRoute(section.url)}
+                    onFocus={() => prefetchRoute(section.url)}
+                    className="flex items-center gap-2 flex-1 px-3 py-2.5 text-sm font-medium text-left min-w-0"
+                  >
+                    <Icon size={16} className="shrink-0" />
+                    {!collapsed && (
+                      <>
+                        <span className="flex-1 truncate">{section.title}</span>
+                        {badgeVal && (
+                          <Badge
+                            variant={section.alertWhenBadge ? 'destructive' : 'secondary'}
+                            className="text-[10px] px-1.5 py-0 h-5"
+                          >
+                            {badgeVal}
+                          </Badge>
+                        )}
+                      </>
+                    )}
+                  </button>
+                  {hasChildren && !collapsed && (
+                    <CollapsibleTrigger asChild>
+                      <button
+                        type="button"
+                        aria-label={`Toggle ${section.title}`}
+                        className="px-2 py-2.5 text-muted-foreground hover:text-foreground"
+                      >
+                        <ChevronRight
+                          size={14}
+                          className={`transition-transform ${isOpen ? 'rotate-90' : ''}`}
+                        />
+                      </button>
+                    </CollapsibleTrigger>
+                  )}
+                </div>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+
+          {hasChildren && !collapsed && (
+            <CollapsibleContent>
+              <SidebarGroupContent className="pl-3">
+                <SidebarMenu>
+                  {section.children!.map((item) => (
+                    <SidebarMenuItem key={item.title + item.url}>
+                      <SidebarMenuButton asChild isActive={isActive(item.url)}>
+                        <button
+                          onClick={() => {
+                            navigate(item.url);
+                            if (isMobile) setOpenMobile(false);
+                          }}
+                          onMouseEnter={() => prefetchRoute(item.url)}
+                          className={`flex items-center gap-2 w-full px-3 py-2 rounded-lg text-[13px] transition-colors ${
+                            isActive(item.url)
+                              ? 'bg-primary/10 text-primary font-medium'
+                              : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                          }`}
+                        >
+                          <item.icon
+                            size={14}
+                            className={`shrink-0 ${
+                              item.alertWhenBadge && item.badgeKey && badgeValues[item.badgeKey]
+                                ? 'text-amber-600'
+                                : ''
+                            }`}
+                          />
+                          <span className={`flex-1 text-left ${
+                            item.alertWhenBadge && item.badgeKey && badgeValues[item.badgeKey]
+                              ? 'text-amber-700 font-medium'
+                              : ''
+                          }`}>{item.title}</span>
+                          {item.badgeKey && badgeValues[item.badgeKey] && (
+                            <Badge
+                              variant={item.alertWhenBadge ? 'destructive' : 'secondary'}
+                              className="text-[10px] px-1.5 py-0 h-5"
+                            >
+                              {badgeValues[item.badgeKey]}
+                            </Badge>
+                          )}
+                        </button>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </CollapsibleContent>
+          )}
+        </SidebarGroup>
+      </Collapsible>
+    );
+  };
+
   const renderGroup = (label: string, items: NavItem[]) => (
     <SidebarGroup key={label}>
       <SidebarGroupLabel>{!collapsed && label}</SidebarGroupLabel>
@@ -385,7 +549,15 @@ const AgentDashboardSidebar = () => {
     <Sidebar collapsible="offcanvas" className="border-r border-border">
       <SidebarHeader className="p-4">
         {!collapsed ? (
-          <div className="flex items-center gap-2.5">
+          <div className="flex flex-col gap-3">
+            {/* ListHQ brand wordmark — anchors brand inside the dashboard */}
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center shrink-0">
+                <span className="text-primary-foreground font-bold text-[10px] tracking-tight">LHQ</span>
+              </div>
+              <span className="font-display text-sm font-bold tracking-tight">ListHQ</span>
+            </div>
+            <div className="flex items-center gap-2.5">
              {agentLogo ? (
               <div className="w-16 h-16 rounded-lg border border-border bg-background flex items-center justify-center overflow-hidden shrink-0">
                 <img src={agentLogo} alt="Agency logo" className="w-full h-full object-contain p-0.5" />
@@ -415,6 +587,7 @@ const AgentDashboardSidebar = () => {
                   </Badge>
                 </div>
               )}
+            </div>
             </div>
           </div>
         ) : (
@@ -511,27 +684,9 @@ const AgentDashboardSidebar = () => {
           </div>
         )}
 
-        <div
-          onClick={() => {
-            navigate('/dashboard');
-            if (isMobile) setOpenMobile(false);
-          }}
-          className={`flex items-center gap-2.5 px-3 py-2 mx-2 rounded-lg text-sm cursor-pointer transition-colors mb-1 ${
-            location.pathname === '/dashboard'
-              ? 'bg-secondary text-foreground font-medium'
-              : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground'
-          }`}
-        >
-          <LayoutDashboard size={16} />
-          {!collapsed && 'Dashboard'}
-        </div>
+        {/* 6 top-level sections — each is clickable and expands to show sub-items */}
+        {NAV_SECTIONS.map((section) => renderSection(section))}
 
-        {renderGroup('Sales', SALES_NAV)}
-        {renderGroup('Urgent', PROPERTY_NAV_URGENT)}
-        {renderGroup('Tenancy', PROPERTY_NAV_TENANCY)}
-        {renderGroup('Operations', PROPERTY_NAV_OPERATIONS)}
-        {renderGroup('PM Finance', PROPERTY_NAV_FINANCE)}
-        {renderGroup('Insights', INSIGHTS_NAV)}
         {(isPrincipal || isAdmin) && renderGroup('Principal', PRINCIPAL_NAV)}
         {renderGroup('Account', ACCOUNT_NAV)}
         {ADMIN_NAV.length > 0 && renderGroup('Admin', ADMIN_NAV)}

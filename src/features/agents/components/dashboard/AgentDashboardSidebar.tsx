@@ -363,7 +363,7 @@ const AgentDashboardSidebar = () => {
     const Icon = section.icon;
     const badgeVal = section.badgeKey ? badgeValues[section.badgeKey] : '';
 
-    const toggleOnlySections = ['Finance', 'Property Mgmt', 'Market Tools'];
+    const toggleOnlySections = ['Listings', 'Finance', 'Property Mgmt', 'Market Tools'];
     const isToggleOnly = toggleOnlySections.includes(section.title);
 
     const handleClick = () => {

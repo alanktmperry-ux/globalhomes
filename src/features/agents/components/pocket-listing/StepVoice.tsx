@@ -209,42 +209,73 @@ const StepVoice = ({ draft, update }: Props) => {
   };
 
   return (
-    <div className="space-y-5">
-      <Label className="text-sm font-semibold block">Voice Description</Label>
+    <div className="space-y-6">
 
-      {/* Mic button */}
-      <div className="flex flex-col items-center py-6">
-        <button
-          type="button"
-          onClick={isListening ? handleStopRecording : handleStartRecording}
-          disabled={!isSupported}
-          className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${
-            isListening
-              ? 'bg-destructive text-destructive-foreground scale-110 shadow-lg'
-              : 'bg-primary text-primary-foreground hover:scale-105'
-          }`}
-        >
-          {isListening ? <MicOff size={28} /> : <Mic size={28} />}
-        </button>
-
-        {isListening ? (
-          <div className="mt-4 text-center">
-            <SoundWaveVisualizer isActive={true} />
-            <p className="text-2xl font-display font-bold text-primary mt-2">{countdown}s</p>
-            <p className="text-xs text-muted-foreground">Tap to stop</p>
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground mt-3">
-            {isSupported ? 'Describe the property in 30 seconds' : 'Voice not supported — type below'}
-          </p>
-        )}
+      {/* ── STEP HEADER ── */}
+      <div>
+        <h3 className="text-base font-semibold">Describe your property</h3>
+        <p className="text-sm text-muted-foreground mt-0.5">
+          Record your voice notes or type — then let AI write a polished listing description.
+        </p>
       </div>
 
-      {/* Transcript */}
-      <div>
-        <Label className="text-xs flex items-center gap-1 mb-1">
-          <Edit3 size={12} /> Transcript (editable)
-        </Label>
+      {/* ── RECORD SECTION ── */}
+      <div className={`rounded-2xl border-2 transition-all p-6 ${isListening ? 'border-red-400 bg-red-500/5' : 'border-dashed border-border bg-secondary/40'}`}>
+        <div className="flex flex-col items-center gap-4">
+
+          {/* Mic button */}
+          <button
+            type="button"
+            onClick={isListening ? handleStopRecording : handleStartRecording}
+            disabled={!isSupported}
+            className={`relative w-20 h-20 rounded-full flex items-center justify-center transition-all shadow-md ${
+              isListening
+                ? 'bg-red-500 text-white scale-110 shadow-red-200'
+                : 'bg-primary text-primary-foreground hover:scale-105 hover:shadow-lg'
+            }`}
+          >
+            {isListening && (
+              <span className="absolute inset-0 rounded-full bg-red-400 animate-ping opacity-30" />
+            )}
+            {isListening ? <MicOff size={30} /> : <Mic size={30} />}
+          </button>
+
+          {/* Status text */}
+          {isListening ? (
+            <div className="text-center space-y-1">
+              <SoundWaveVisualizer isActive={true} />
+              <p className="text-3xl font-bold tabular-nums text-red-500">{countdown}s</p>
+              <p className="text-xs text-muted-foreground">Tap the mic to stop recording</p>
+            </div>
+          ) : (
+            <div className="text-center space-y-1">
+              <p className="text-sm font-medium">
+                {isSupported ? 'Tap to record your property notes' : 'Voice not supported in this browser'}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Speak naturally — mention bedrooms, features, lifestyle, what makes it special
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── TRANSCRIPT ── */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label className="text-sm font-semibold flex items-center gap-1.5">
+            <Edit3 size={13} /> Your notes
+          </Label>
+          {draft.voiceTranscript && (
+            <button
+              type="button"
+              onClick={() => update({ voiceTranscript: '', generatedTitle: '', generatedBullets: [] })}
+              className="text-xs text-muted-foreground hover:text-destructive transition-colors flex items-center gap-1"
+            >
+              <RefreshCw size={11} /> Clear & redo
+            </button>
+          )}
+        </div>
         <Textarea
           value={aiGenerated ? aiDescription : draft.voiceTranscript}
           onChange={(e) => {
@@ -255,111 +286,101 @@ const StepVoice = ({ draft, update }: Props) => {
               update({ voiceTranscript: e.target.value });
             }
           }}
-          placeholder="Your property description will appear here, or type it manually..."
-          className="bg-secondary border-border min-h-[80px] text-sm"
-          rows={3}
+          placeholder="Your recorded notes will appear here, or type directly…"
+          className="min-h-[100px] resize-y text-sm"
+          rows={4}
         />
-        {draft.voiceTranscript && !draft.generatedTitle && !aiGenerated && (
-          <Button
-            size="sm"
-            variant="outline"
-            className="mt-2 text-xs gap-1"
-            onClick={() => generateFromTranscript(draft.voiceTranscript)}
-            disabled={streamingBullets}
-          >
-            <Sparkles size={12} /> {streamingBullets ? 'Generating...' : 'Generate from text'}
-          </Button>
+        {draft.voiceTranscript && (
+          <p className="text-xs text-muted-foreground">{draft.voiceTranscript.length} characters</p>
         )}
       </div>
 
-      {/* AI Description Generator */}
-      <div className="bg-gradient-to-br from-purple-500/10 via-primary/5 to-violet-500/10 border border-purple-500/20 rounded-xl p-4 space-y-3">
-        <div className="flex items-center gap-1.5 text-xs font-semibold text-purple-600 dark:text-purple-400">
-          <Sparkles size={12} /> AI Listing Description Generator
-        </div>
-        <p className="text-xs text-muted-foreground">
-          Auto-generate a polished description from your property details.
-        </p>
+      {/* ── AI GENERATOR ── */}
+      <div className="rounded-2xl border border-purple-200 dark:border-purple-800 bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-950/30 dark:to-violet-950/30 p-5 space-y-4">
 
-        {/* Tone Selector */}
-        <div>
-          <Label className="text-xs text-muted-foreground mb-1.5 block">Tone</Label>
-          <div className="flex gap-1.5 flex-wrap">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-purple-600 flex items-center justify-center">
+            <Sparkles size={14} className="text-white" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold">AI Listing Description</p>
+            <p className="text-xs text-muted-foreground">Generates a professional 3-paragraph description in seconds</p>
+          </div>
+        </div>
+
+        {/* Tone selector */}
+        <div className="space-y-2">
+          <Label className="text-xs text-muted-foreground font-medium">Writing tone</Label>
+          <div className="grid grid-cols-2 gap-2">
             {TONES.map((t) => (
               <button
                 key={t.key}
                 type="button"
                 onClick={() => setSelectedTone(t.key)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium border transition-all ${
                   selectedTone === t.key
-                    ? 'bg-purple-500/15 border-purple-500/40 text-purple-600 dark:text-purple-400'
-                    : 'bg-secondary border-border text-muted-foreground hover:border-purple-500/30'
+                    ? 'bg-purple-600 text-white border-purple-600 shadow-sm'
+                    : 'bg-white dark:bg-card border-border text-muted-foreground hover:border-purple-400'
                 }`}
               >
-                {t.emoji} {t.label}
+                <span>{t.emoji}</span>
+                {t.label}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Generate / Regenerate Button */}
+        {/* Generate button */}
         <Button
           type="button"
           onClick={generateAiDescription}
           disabled={generating}
-          className="w-full gap-2 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white border-0"
+          className="w-full gap-2 bg-purple-600 hover:bg-purple-700 text-white border-0 h-11 text-sm font-semibold"
         >
           {generating ? (
-            <>
-              <Loader2 size={14} className="animate-spin" /> Generating…
-            </>
+            <><Loader2 size={15} className="animate-spin" /> Writing your description…</>
           ) : aiGenerated ? (
-            <>
-              <RefreshCw size={14} /> Regenerate ✨
-            </>
+            <><RefreshCw size={15} /> Regenerate description</>
           ) : (
-            <>
-              <Sparkles size={14} /> Generate with AI ✨
-            </>
+            <><Sparkles size={15} /> Generate listing description ✨</>
           )}
         </Button>
 
-        {/* Streaming AI Description */}
+        {/* Streaming result */}
         {(generating || aiDescription) && (
-          <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-card border border-border rounded-lg p-3"
-          >
-            <Label className="text-xs text-muted-foreground mb-1 block flex items-center gap-1">
-              <Sparkles size={10} className="text-purple-500" /> AI Description
-              {generating && <span className="text-purple-500 animate-pulse ml-1">●</span>}
-            </Label>
-            <p className="text-sm leading-relaxed whitespace-pre-wrap">
-              {aiDescription || (
-                <span className="text-muted-foreground italic">Writing…</span>
+          <div className="bg-white dark:bg-card rounded-xl border border-border p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                <Sparkles size={10} className="text-purple-500" />
+                {generating ? 'Writing…' : 'Generated description'}
+              </Label>
+              {aiGenerated && !generating && (
+                <button
+                  type="button"
+                  onClick={() => navigator.clipboard.writeText(aiDescription)}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Copy
+                </button>
               )}
+            </div>
+            <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">
+              {aiDescription || <span className="text-muted-foreground italic">Writing your listing description…</span>}
               {generating && <span className="inline-block w-0.5 h-4 bg-purple-500 animate-pulse ml-0.5 align-text-bottom" />}
             </p>
-          </motion.div>
+          </div>
         )}
       </div>
 
-      {/* AI Generated Content from voice */}
+      {/* ── AI-GENERATED CONTENT FROM VOICE ── */}
       {(draft.generatedTitle || streamingBullets) && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-primary/5 border border-primary/20 rounded-xl p-4 space-y-3"
-        >
+        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 space-y-3">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
-            <Sparkles size={12} /> AI-Generated Content
+            <Sparkles size={12} /> AI-Generated Listing Content
           </div>
-
           {streamingBullets ? (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-              Generating listing content...
+              <Loader2 size={14} className="animate-spin" /> Generating listing content…
             </div>
           ) : (
             <>
@@ -368,7 +389,7 @@ const StepVoice = ({ draft, update }: Props) => {
                 <Input
                   value={draft.generatedTitle}
                   onChange={(e) => update({ generatedTitle: e.target.value })}
-                  className="bg-card border-border font-semibold"
+                  className="font-semibold"
                 />
               </div>
               <div>
@@ -376,7 +397,7 @@ const StepVoice = ({ draft, update }: Props) => {
                 <ul className="space-y-1.5">
                   {draft.generatedBullets.map((b, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm">
-                      <span className="text-primary mt-0.5">•</span>
+                      <span className="text-primary mt-0.5 font-bold">•</span>
                       <span>{b}</span>
                     </li>
                   ))}
@@ -384,7 +405,7 @@ const StepVoice = ({ draft, update }: Props) => {
               </div>
             </>
           )}
-        </motion.div>
+        </div>
       )}
     </div>
   );

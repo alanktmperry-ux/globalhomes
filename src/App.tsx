@@ -283,7 +283,7 @@ const App = () => (
                   <Route path="/for-agents" element={<AgentLandingPage />} />
                   <Route path="/pricing" element={<PricingPage />} />
                   <Route path="/about" element={<AboutPage />} />
-                  <Route path="/suburbs" element={<SuburbsIndexPage />} />
+                  <Route path="/suburbs" element={<SuburbsIndex />} />
                   <Route path="/suburbs/box-hill-vic" element={<BoxHillVicPage />} />
                   <Route path="/suburbs/glen-waverley-vic" element={<GlenWaverleyVicPage />} />
                   <Route path="/suburbs/parramatta-nsw" element={<ParramattaNswPage />} />

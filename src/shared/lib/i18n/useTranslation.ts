@@ -24,6 +24,8 @@ import { bn } from './locales/bn';
 import { vi } from './locales/vi';
 import { ko } from './locales/ko';
 import { ar } from './locales/ar';
+import { pa } from './locales/pa';
+import { ta } from './locales/ta';
 import {
   LANGUAGE_STORAGE_KEY,
   FROM_LEGACY_CODE_MAP,
@@ -44,6 +46,8 @@ const LOCALES: Partial<Record<SupportedLanguageCode, Record<string, string>>> = 
   'vi': vi,
   'ko': ko,
   'ar': ar,
+  'pa': pa,
+  'ta': ta,
 };
 
 type AnyKey = TranslationKey | (string & {});

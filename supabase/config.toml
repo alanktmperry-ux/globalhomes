@@ -16,7 +16,22 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.send-notification-email]
-verify_jwt = true
+verify_jwt = false
+
+[functions.send-search-alerts]
+verify_jwt = false
+
+[functions.orchestrate-buyer-concierge]
+verify_jwt = false
+
+[functions.notify-offmarket-subscribers]
+verify_jwt = false
+
+[functions.compute-strata-health-score]
+verify_jwt = false
+
+[functions.generate-translations]
+verify_jwt = false
 
 [functions.setup-agent]
 verify_jwt = false
@@ -40,9 +55,6 @@ verify_jwt = true
 verify_jwt = false
 
 [functions.send-marketing-email]
-verify_jwt = true
-
-[functions.generate-translations]
 verify_jwt = true
 
 [functions.agent-help]

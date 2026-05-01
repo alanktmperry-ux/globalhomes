@@ -14234,6 +14234,7 @@ export type Database = {
         Args: { listing_id: string; new_status: string }
         Returns: undefined
       }
+      check_webhook_config: { Args: never; Returns: Json }
       compute_agent_reputation: { Args: { p_agent_id: string }; Returns: Json }
       compute_agent_stats: { Args: { p_agent_id: string }; Returns: undefined }
       compute_suburb_stats: {

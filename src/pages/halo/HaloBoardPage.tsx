@@ -136,8 +136,24 @@ export default function HaloBoardPage() {
     };
   }, [user, queryClient]);
 
-  const tabFiltered = tab === 'pocket' ? halos.filter((h) => pocketMatchIds.has(h.id)) : halos;
+  // Heuristic junk filter — hide obviously test/spam Halos.
+  // Residential 'buy' Halos with budget over $10M are almost always test data.
+  const isJunk = (h: Halo) => {
+    if (h.intent === 'buy' && (h.budget_max ?? 0) > 10_000_000) {
+      const types = (h.property_types || []).map((t) => t.toLowerCase());
+      const isCommercial = types.includes('commercial') || types.includes('land');
+      if (!isCommercial) return true;
+    }
+    return false;
+  };
+  const cleanHalos = useMemo(() => halos.filter((h) => !isJunk(h)), [halos]);
+
+  const tabFiltered = tab === 'pocket' ? cleanHalos.filter((h) => pocketMatchIds.has(h.id)) : cleanHalos;
   const filtered = applyFilters(tabFiltered, filters);
+
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+  const showLowCreditBanner = balance <= 2 && !(balance > 0 && bannerDismissed);
+  const persistentBanner = balance === 0;
 
   const handleConfirm = async () => {
     if (!user || !target) return;

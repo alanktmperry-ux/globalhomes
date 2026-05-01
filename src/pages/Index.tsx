@@ -601,40 +601,40 @@ const Index = () => {
       } else {
         // Hardcoded residential placeholders (shown only if DB has 0 residential listings)
         const p1Images = [
-          'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600210492493-0946911123ea?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=640&q=70&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=640&q=70&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=640&q=70&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600210492493-0946911123ea?w=640&q=70&auto=format&fit=crop',
         ];
         const p2Images = [
-          'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=640&q=70&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=640&q=70&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=640&q=70&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=640&q=70&auto=format&fit=crop',
         ];
         const p3Images = [
-          'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=640&q=70&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=640&q=70&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=640&q=70&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?w=640&q=70&auto=format&fit=crop',
         ];
         const p4Images = [
-          'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600573472556-e636c2acda88?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=640&q=70&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=640&q=70&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?w=640&q=70&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600573472556-e636c2acda88?w=640&q=70&auto=format&fit=crop',
         ];
         const p5Images = [
-          'https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1565182999561-18d7dc61c393?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=640&q=70&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1565182999561-18d7dc61c393?w=640&q=70&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=640&q=70&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=640&q=70&auto=format&fit=crop',
         ];
         const p6Images = [
-          'https://images.unsplash.com/photo-1597047084897-51e81819a499?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600210491369-e753d80a41f3?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1597047084897-51e81819a499?w=640&q=70&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=640&q=70&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=640&q=70&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600210491369-e753d80a41f3?w=640&q=70&auto=format&fit=crop',
         ];
         setFeaturedListings([
           { id: 'placeholder-1', title: '4 bed house', address: '14 Maple Street, Auburn NSW', suburb: 'Auburn', state: 'NSW', price: 1200000, images: p1Images, image_url: p1Images[0], property_type: 'house', beds: 4, baths: 2, parking: 2, listing_type: 'sale', translations: { zh_simplified: {} } },
@@ -1461,9 +1461,10 @@ const Index = () => {
             {featuredListings.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {featuredListings.filter(p => p.listing_type !== 'rent' && p.listing_type !== 'rental' && !/^\s*12\s+atherton/i.test(p.address || '')).slice(0, 6).map((p) => {
+                  {featuredListings.filter(p => p.listing_type !== 'rent' && p.listing_type !== 'rental' && !/^\s*12\s+atherton/i.test(p.address || '')).slice(0, 6).map((p, idx) => {
                     const img = (p.images && p.images[0]) || p.image_url;
                     const hasTranslations = p.translations && Object.keys(p.translations).length > 0;
+                    const isPriority = idx === 0;
                     return (
                       <div
                         key={p.id}
@@ -1472,7 +1473,13 @@ const Index = () => {
                       >
                         <div className="h-40 bg-slate-100 flex items-center justify-center relative">
                           {img ? (
-                            <img src={img} alt={p.title || p.address} className="w-full h-full object-cover" />
+                            <img
+                              src={img}
+                              alt={p.title || p.address}
+                              className="w-full h-full object-cover"
+                              loading={isPriority ? 'eager' : 'lazy'}
+                              fetchPriority={isPriority ? 'high' : 'auto'}
+                            />
                           ) : (
                             <Home size={32} className="text-slate-300" />
                           )}

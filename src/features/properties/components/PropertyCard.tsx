@@ -48,11 +48,12 @@ interface PropertyCardProps {
   onToggleReaction?: (propertyId: string, emoji: string) => void;
   partnerViewed?: boolean;
   currentUserId?: string;
+  priority?: boolean;
 }
 
 const COLLAB_EMOJIS = ['👍', '👎', '🔥'] as const;
 
-export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index, isCollab, collabReactions = [], onToggleReaction, partnerViewed, currentUserId }: PropertyCardProps) {
+export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index, isCollab, collabReactions = [], onToggleReaction, partnerViewed, currentUserId, priority }: PropertyCardProps) {
   const { t } = useI18n();
   const { formatPrice, currency, listingMode } = useCurrency();
   const { investorMode } = useInvestorMode();
@@ -109,7 +110,8 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
             src={property.imageUrl}
             alt={property.title}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
+            loading={priority ? 'eager' : 'lazy'}
+            fetchPriority={priority ? 'high' : 'auto'}
           />
           {badge && (
             <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase shadow-sm ${badge.className}`}>

@@ -7,7 +7,7 @@ import { Helmet } from 'react-helmet-async';
 // cold paint. motion is only referenced in the search-results branch (mobile
 // bottom sheet drag), which loads after the user runs a search.
 import { motion, useMotionValue, useSpring, type PanInfo } from 'framer-motion';
-import { ArrowRight, ArrowLeft, MapPin, Sparkles, Map, List, Mic, MicOff, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users, Search, Home, Check, ArrowLeftRight, UserCheck, ChevronRight, Globe } from 'lucide-react';
+import { ArrowRight, ArrowLeft, MapPin, Sparkles, Map, List, Mic, MicOff, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users, Search, Home, Check, ArrowLeftRight, UserCheck, ChevronRight, Globe, Building2, Briefcase, Handshake } from 'lucide-react';
 const VoiceSearchHero = lazy(() =>
   import('@/features/search/components/VoiceSearchHero').then(m => ({ default: m.VoiceSearchHero }))
 );
@@ -1567,6 +1567,76 @@ const Index = () => {
             </div>
           </div>
         </section>
+
+        {/* ── PROFESSIONAL PORTALS ── */}
+        <section style={{ background: '#0f172a' }} className="py-16 px-6">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-10">
+              <h2 className="text-2xl font-bold text-white mb-2">Professional Portals</h2>
+              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>Sign in to your dedicated workspace</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {[
+                {
+                  Icon: Building2,
+                  title: 'Agent Portal',
+                  desc: 'Manage listings, trust accounts, rent roll and leads.',
+                  signIn: '/agents/login',
+                  register: '/for-agents',
+                  registerLabel: 'Not an agent yet?',
+                },
+                {
+                  Icon: Briefcase,
+                  title: 'Mortgage Broker Portal',
+                  desc: 'View referral leads, manage your profile and book appointments.',
+                  signIn: '/broker/login',
+                  register: '/broker/register',
+                  registerLabel: 'Not registered?',
+                },
+                {
+                  Icon: Handshake,
+                  title: 'Partner Portal',
+                  desc: 'Access your partner dashboard and track referral earnings.',
+                  signIn: '/partner/login',
+                  register: '/partner/join',
+                  registerLabel: 'Become a partner?',
+                },
+              ].map(({ Icon, title, desc, signIn, register, registerLabel }) => (
+                <div
+                  key={title}
+                  className="rounded-2xl p-6 flex flex-col gap-4"
+                  style={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.08)' }}
+                >
+                  <div className="w-10 h-10 rounded-xl bg-blue-600/20 flex items-center justify-center">
+                    <Icon size={20} className="text-blue-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-semibold text-white mb-1">{title}</h3>
+                    <p className="text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>{desc}</p>
+                  </div>
+                  <div className="mt-auto flex flex-col items-start gap-2">
+                    <button
+                      onClick={() => navigate(signIn)}
+                      className="w-full bg-white text-slate-900 font-semibold text-sm py-2.5 rounded-xl hover:bg-slate-100 transition-colors"
+                    >
+                      Sign in
+                    </button>
+                    <button
+                      onClick={() => navigate(register)}
+                      className="text-xs"
+                      style={{ color: 'rgba(255,255,255,0.45)', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+                      onMouseEnter={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.75)')}
+                      onMouseLeave={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.45)')}
+                    >
+                      {registerLabel}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
       </div>
     );
   }

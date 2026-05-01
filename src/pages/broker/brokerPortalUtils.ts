@@ -17,6 +17,7 @@ export interface BrokerRecord {
   is_active: boolean;
   agency_id: string | null;
   agency_role: 'principal' | 'associate';
+  calendar_url: string | null;
 }
 
 export interface ReferralLead {

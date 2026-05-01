@@ -28,6 +28,7 @@ import {
   AlertCircle,
   Languages,
   ExternalLink,
+  Settings,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -170,7 +171,7 @@ export default function BrokerPortal() {
 
       const { data: brokerRow } = await supabase
         .from("brokers")
-        .select("id, name, full_name, email, company, acl_number, loan_types, languages, is_exclusive, is_active, agency_id, agency_role")
+        .select("id, name, full_name, email, company, acl_number, loan_types, languages, is_exclusive, is_active, agency_id, agency_role, calendar_url")
         .eq("auth_user_id", session.user.id)
         .maybeSingle();
 
@@ -283,6 +284,15 @@ export default function BrokerPortal() {
             </p>
             <p className="text-xs text-slate-500 leading-tight">ACL {broker.acl_number}</p>
           </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/broker/portal/edit-profile')}
+            className="text-slate-600"
+            title="Edit profile"
+          >
+            <Settings size={14} className="mr-1.5" /> Profile
+          </Button>
           <Button variant="ghost" size="sm" onClick={handleLogout} className="text-slate-600">
             <LogOut size={14} className="mr-1.5" /> Sign out
           </Button>
@@ -628,8 +638,9 @@ function LeadDetail({
   const handleMarkContacted = () => updateStatus("contacted");
 
   const handleBookAppointment = () => {
-    if (!CALENDLY_URL) { toast.error("Calendly URL not configured"); return; }
-    window.open(CALENDLY_URL, "_blank", "noopener,noreferrer");
+    const bookingUrl = broker?.calendar_url || CALENDLY_URL;
+    if (!bookingUrl) { toast.error("No booking URL configured — add your calendar link in your profile."); return; }
+    window.open(bookingUrl, "_blank", "noopener,noreferrer");
     void updateStatus("meeting_booked");
   };
 

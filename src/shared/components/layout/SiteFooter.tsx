@@ -55,6 +55,7 @@ export function SiteFooter() {
                 { label: 'Voice Search', to: '/' },
                 { label: 'Agent Portal', to: '/agents/login' },
                 { label: 'Partner Portal', to: '/partner/login' },
+                { label: 'Broker Portal', to: '/broker/login' },
               ].map(link => (
                 <li key={link.label}>
                   <Link to={link.to} className="text-[13px] transition-colors" style={{ color: 'rgba(255,255,255,0.6)' }}
@@ -111,6 +112,7 @@ export function SiteFooter() {
                 { label: 'Help Centre', to: '/help' },
                 { label: 'Contact Us', to: 'mailto:support@listhq.com.au', external: true },
                 { label: 'Agent Login', to: '/agents/login' },
+                { label: 'Broker Login', to: '/broker/login' },
               ].map(link => (
                 <li key={link.label}>
                   {link.external ? (

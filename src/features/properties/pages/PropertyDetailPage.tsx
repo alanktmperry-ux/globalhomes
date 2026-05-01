@@ -89,6 +89,110 @@ export default function PropertyDetailPage() {
         return;
       }
 
+      // Demo placeholders shown on homepage when DB has 0 residential listings.
+      if (id.startsWith('placeholder-')) {
+        const p1Images = [
+          'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600210492493-0946911123ea?w=1200&q=80&auto=format&fit=crop',
+        ];
+        const p2Images = [
+          'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=1200&q=80&auto=format&fit=crop',
+        ];
+        const p3Images = [
+          'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?w=1200&q=80&auto=format&fit=crop',
+        ];
+        const DEMO_PROPERTIES: Record<string, any> = {
+          'placeholder-1': {
+            id: 'placeholder-1',
+            title: 'Spacious 4-bedroom family home',
+            address: '14 Maple Street, Auburn NSW 2144',
+            suburb: 'Auburn', state: 'NSW', country: 'Australia',
+            price: 1200000, beds: 4, baths: 2, parking: 2, sqm: 480,
+            images: p1Images, image_url: p1Images[0],
+            description: 'A beautifully presented family home in the heart of Auburn. Four generous bedrooms, two modern bathrooms, double garage, and a north-facing backyard perfect for entertaining. Walking distance to Auburn Station, Auburn Public School, and the bustling shopping district.',
+            property_type: 'House',
+            features: ['Air conditioning', 'Solar panels', 'North-facing backyard', 'Double garage', 'Modern kitchen', 'Walk-in wardrobe'],
+            listing_type: 'sale',
+            year_built: 2018,
+            listed_date: new Date().toISOString(),
+            views: 247,
+          },
+          'placeholder-2': {
+            id: 'placeholder-2',
+            title: 'Modern 2-bedroom apartment with city views',
+            address: '8/22 Box Hill Road, Box Hill VIC 3128',
+            suburb: 'Box Hill', state: 'VIC', country: 'Australia',
+            price: 680000, beds: 2, baths: 1, parking: 1, sqm: 78,
+            images: p2Images, image_url: p2Images[0],
+            description: 'Stylish two-bedroom apartment in the heart of Box Hill. Open-plan living, modern kitchen with stone benchtops, secure parking, and balcony with city views. Steps from Box Hill Central, Box Hill Station, and the vibrant Asian dining precinct.',
+            property_type: 'Apartment',
+            features: ['City views', 'Stone benchtops', 'Secure parking', 'Balcony', 'Built-in wardrobes', 'Lift access'],
+            listing_type: 'sale',
+            year_built: 2020,
+            listed_date: new Date().toISOString(),
+            views: 312,
+          },
+          'placeholder-3': {
+            id: 'placeholder-3',
+            title: 'Contemporary 3-bedroom townhouse',
+            address: '3 Oak Lane, Doncaster VIC 3108',
+            suburb: 'Doncaster', state: 'VIC', country: 'Australia',
+            price: 895000, beds: 3, baths: 2, parking: 1, sqm: 220,
+            images: p3Images, image_url: p3Images[0],
+            description: 'Architecturally designed townhouse in family-friendly Doncaster. Three spacious bedrooms, two bathrooms plus powder room, double-height living area, private courtyard. Catchment for Doncaster Primary and Doncaster Secondary College. Close to Westfield Doncaster and Eastern Freeway.',
+            property_type: 'Townhouse',
+            features: ['Architect designed', 'Double-height ceilings', 'Private courtyard', 'Powder room', 'European appliances', 'Floor heating'],
+            listing_type: 'sale',
+            year_built: 2022,
+            listed_date: new Date().toISOString(),
+            views: 189,
+          },
+        };
+        const demo = DEMO_PROPERTIES[id];
+        if (demo) {
+          setRawProperty(demo);
+          setProperty({
+            id: demo.id,
+            title: demo.title,
+            address: demo.address,
+            suburb: demo.suburb,
+            state: demo.state,
+            country: demo.country,
+            price: demo.price,
+            priceFormatted: '',
+            beds: demo.beds,
+            baths: demo.baths,
+            parking: demo.parking,
+            sqm: demo.sqm,
+            imageUrl: demo.image_url,
+            images: demo.images,
+            description: demo.description,
+            estimatedValue: '',
+            propertyType: demo.property_type,
+            features: demo.features,
+            agent: { id: '', name: 'Private Seller', agency: '', phone: '', email: '', avatarUrl: '', isSubscribed: false },
+            listedDate: demo.listed_date,
+            views: demo.views,
+            contactClicks: 0,
+            status: 'listed',
+            yearBuilt: demo.year_built,
+            listingType: demo.listing_type,
+            inspectionTimes: [],
+          } as any);
+          setInspectionTimes([]);
+          setLoading(false);
+          return;
+        }
+      }
+
       // Support slug-based or UUID-based lookups
       const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 

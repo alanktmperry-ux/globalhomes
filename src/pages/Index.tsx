@@ -328,18 +328,6 @@ const Index = () => {
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  // Hero platform stats
-  useEffect(() => {
-    (async () => {
-      const { count: propCount } = await supabase
-        .from('properties').select('id', { count: 'exact', head: true }).eq('is_active', true).eq('status', 'public');
-      setHeroPlatformStats({
-        properties: propCount ?? 0,
-        buyerCount: null,
-      });
-    })();
-  }, []);
-
 
   const {
     filteredProperties,

@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useCa
 import { X } from 'lucide-react';
 import { toast } from 'sonner';
 
-export type Language = 'en' | 'zh' | 'zh-TW' | 'ko' | 'ms' | 'es' | 'ar' | 'hi' | 'fr' | 'pt' | 'bn' | 'ru' | 'ja' | 'de' | 'id' | 'nl' | 'pl' | 'vi' | 'th' | 'tr' | 'sv' | 'da' | 'no' | 'fil' | 'it';
+export type Language = 'en' | 'zh' | 'zh-TW' | 'ko' | 'ms' | 'es' | 'ar' | 'hi' | 'fr' | 'pt' | 'bn' | 'ru' | 'ja' | 'de' | 'id' | 'nl' | 'pl' | 'vi' | 'th' | 'tr' | 'sv' | 'da' | 'no' | 'fil' | 'it' | 'pa' | 'ta';
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
@@ -1315,6 +1315,8 @@ const translations: Record<Language, Record<string, string>> = {
   no: { 'app.name': 'ListHQ', 'search.placeholder': 'Søk "4 soverom hus i Melbourne for $850k"', 'nav.search': 'Søk', 'nav.saved': 'Lagret', 'nav.messages': 'Meldinger', 'nav.agents': 'Meglere', 'nav.profile': 'Profil' , 'hero.eyebrow': 'Australias AI-drevne eiendomsplattform', 'hero.headline': 'Flerspråklige annonser', 'hero.headline2': 'for australske meglere', 'hero.subheadline': 'Søk på 24 språk. Se priser i din valuta.', 'hero.forSale': 'Til Salgs', 'hero.forRent': 'Til Leie', 'hero.search': 'Søk', 'hero.searchHint': 'Beskriv det du leter etter — vår AI gjør resten', 'hero.propertiesListed': 'Registrerte eiendommer', 'hero.activeAgents': 'Aktive meglere', 'hero.languages': 'Språk', 'hero.searchingNow': 'søker nå', 'hero.liveData': 'Sanntidsdata' },
   fil: { 'app.name': 'ListHQ', 'search.placeholder': 'Maghanap "4 na silid bahay sa Melbourne $850k"', 'nav.search': 'Maghanap', 'nav.saved': 'Nai-save', 'nav.messages': 'Mga Mensahe', 'nav.agents': 'Mga Ahente', 'nav.profile': 'Profile' , 'hero.eyebrow': 'AI-powered na property platform ng Australia', 'hero.headline': 'Multilingual na listahan', 'hero.headline2': 'para sa mga ahente ng Australia', 'hero.subheadline': 'Maghanap sa 24 na wika. Tingnan ang presyo sa iyong pera.', 'hero.forSale': 'Ibenta', 'hero.forRent': 'Paupa', 'hero.search': 'Maghanap', 'hero.searchHint': 'Ilarawan ang hinahanap mo — ang aming AI ang bahala', 'hero.propertiesListed': 'Naka-lista na property', 'hero.activeAgents': 'Aktibong ahente', 'hero.languages': 'Wika', 'hero.searchingNow': 'naghahanap ngayon', 'hero.liveData': 'Live data' },
   it: { 'app.name': 'ListHQ', 'search.placeholder': 'Cerca "casa 4 camere a Melbourne per $850k"', 'nav.search': 'Cerca', 'nav.saved': 'Salvati', 'nav.messages': 'Messaggi', 'nav.agents': 'Agenti', 'nav.profile': 'Profilo' , 'hero.eyebrow': 'Piattaforma immobiliare AI dell\'Australia', 'hero.headline': 'Annunci multilingue', 'hero.headline2': 'per agenti australiani', 'hero.subheadline': 'Cerca in 24 lingue. Vedi i prezzi nella tua valuta.', 'hero.forSale': 'In Vendita', 'hero.forRent': 'In Affitto', 'hero.search': 'Cerca', 'hero.searchHint': 'Descrivi cosa cerchi — la nostra IA fa il resto', 'hero.propertiesListed': 'Proprietà registrate', 'hero.activeAgents': 'Agenti attivi', 'hero.languages': 'Lingue', 'hero.searchingNow': 'stanno cercando', 'hero.liveData': 'Dati in tempo reale' },
+  pa: { 'app.name': 'ListHQ', 'nav.search': 'ਖੋਜ', 'nav.saved': 'ਸੰਭਾਲੇ', 'nav.messages': 'ਸੁਨੇਹੇ', 'nav.agents': 'ਏਜੰਟ', 'nav.profile': 'ਪ੍ਰੋਫਾਈਲ', 'hero.search': 'ਖੋਜੋ', 'hero.forSale': 'ਵਿਕਰੀ ਲਈ', 'hero.forRent': 'ਕਿਰਾਏ ਲਈ' },
+  ta: { 'app.name': 'ListHQ', 'nav.search': 'தேடல்', 'nav.saved': 'சேமிக்கப்பட்டவை', 'nav.messages': 'செய்திகள்', 'nav.agents': 'முகவர்கள்', 'nav.profile': 'சுயவிவரம்', 'hero.search': 'தேடு', 'hero.forSale': 'விற்பனைக்கு', 'hero.forRent': 'வாடகைக்கு' },
 };
 
 export const languageNames: Record<Language, string> = {
@@ -1343,6 +1345,8 @@ export const languageNames: Record<Language, string> = {
   fil: 'Filipino',
   ms: 'Bahasa Melayu',
   bn: 'বাংলা',
+  pa: 'ਪੰਜਾਬੀ',
+  ta: 'தமிழ்',
 };
 
 interface I18nContextType {
@@ -1392,6 +1396,7 @@ const languageUpdatedMessages: Record<Language, string> = {
   id: 'Bahasa diperbarui', nl: 'Taal bijgewerkt', pl: 'Język zaktualizowany',
   tr: 'Dil güncellendi', sv: 'Språk uppdaterat', da: 'Sprog opdateret',
   no: 'Språk oppdatert', fil: 'Na-update ang wika', bn: 'ভাষা আপডেট হয়েছে',
+  pa: 'ਭਾਸ਼ਾ ਅੱਪਡੇਟ ਹੋਈ', ta: 'மொழி புதுப்பிக்கப்பட்டது',
 };
 
 export function I18nProvider({ children }: { children: ReactNode }) {
@@ -1429,6 +1434,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       sessionStorage.setItem(SESSION_LANGUAGE_KEY, language);
+      localStorage.setItem(SESSION_LANGUAGE_KEY, language);
+      localStorage.setItem('listhq_language', language);
     } catch { /* non-fatal */ }
   }, [language]);
 

@@ -618,10 +618,31 @@ const Index = () => {
           'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=80&auto=format&fit=crop',
           'https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?w=1200&q=80&auto=format&fit=crop',
         ];
+        const p4Images = [
+          'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600573472556-e636c2acda88?w=1200&q=80&auto=format&fit=crop',
+        ];
+        const p5Images = [
+          'https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1565182999561-18d7dc61c393?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=1200&q=80&auto=format&fit=crop',
+        ];
+        const p6Images = [
+          'https://images.unsplash.com/photo-1597047084897-51e81819a499?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&q=80&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1600210491369-e753d80a41f3?w=1200&q=80&auto=format&fit=crop',
+        ];
         setFeaturedListings([
           { id: 'placeholder-1', title: '4 bed house', address: '14 Maple Street, Auburn NSW', suburb: 'Auburn', state: 'NSW', price: 1200000, images: p1Images, image_url: p1Images[0], property_type: 'house', beds: 4, baths: 2, parking: 2, listing_type: 'sale', translations: { zh_simplified: {} } },
           { id: 'placeholder-2', title: '2 bed apartment', address: '8/22 Box Hill Road, Box Hill VIC', suburb: 'Box Hill', state: 'VIC', price: 680000, images: p2Images, image_url: p2Images[0], property_type: 'apartment', beds: 2, baths: 1, parking: 1, listing_type: 'sale', translations: { zh_simplified: {} } },
           { id: 'placeholder-3', title: '3 bed townhouse', address: '3 Oak Lane, Doncaster VIC', suburb: 'Doncaster', state: 'VIC', price: 895000, images: p3Images, image_url: p3Images[0], property_type: 'townhouse', beds: 3, baths: 2, parking: 1, listing_type: 'sale', translations: { zh_simplified: {} } },
+          { id: 'placeholder-4', title: 'Luxury 5 bed harbour-view residence', address: '12 Harbour Crescent, Mosman NSW', suburb: 'Mosman', state: 'NSW', price: 4250000, images: p4Images, image_url: p4Images[0], property_type: 'house', beds: 5, baths: 4, parking: 3, listing_type: 'sale', translations: { zh_simplified: {} } },
+          { id: 'placeholder-5', title: 'Family home in coveted school zone', address: '27 Springfield Avenue, Glen Waverley VIC', suburb: 'Glen Waverley', state: 'VIC', price: 1650000, images: p5Images, image_url: p5Images[0], property_type: 'house', beds: 4, baths: 3, parking: 2, listing_type: 'sale', translations: { zh_simplified: {} } },
+          { id: 'placeholder-6', title: 'Modern townhouse near station', address: '14 Albert Road, Strathfield NSW', suburb: 'Strathfield', state: 'NSW', price: 1395000, images: p6Images, image_url: p6Images[0], property_type: 'townhouse', beds: 3, baths: 2, parking: 2, listing_type: 'sale', translations: { zh_simplified: {} } },
         ]);
       }
     })();

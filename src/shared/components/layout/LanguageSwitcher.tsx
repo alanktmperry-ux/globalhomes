@@ -30,7 +30,7 @@ export function LanguageSwitcher() {
 
   useEffect(() => {
     try {
-      const stored = localStorage.getItem('listhq_language') || sessionStorage.getItem('listhq_language');
+      const stored = localStorage.getItem('listhq_language') || localStorage.getItem('i18n-language') || sessionStorage.getItem('i18n-language');
       document.documentElement.dir = stored === 'ar' ? 'rtl' : 'ltr';
     } catch { /* non-fatal */ }
   }, []);
@@ -112,6 +112,9 @@ export function LanguageSwitcher() {
                     try {
                       localStorage.setItem(LANGUAGE_STORAGE_KEY, code);
                       sessionStorage.setItem(LANGUAGE_STORAGE_KEY, code);
+                      // Also write to the legacy key so I18nProvider reads it on next session startup
+                      localStorage.setItem('i18n-language', LEGACY_CODE_MAP[code] ?? 'en');
+                      sessionStorage.setItem('i18n-language', LEGACY_CODE_MAP[code] ?? 'en');
                       localStorage.removeItem('gh-lang');
                     } catch { /* storage unavailable — non-fatal */ }
                     setOpen(false);

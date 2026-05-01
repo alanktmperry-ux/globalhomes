@@ -49,7 +49,7 @@ const AgentDashboardLayout = () => {
     <SidebarProvider>
       <div className="h-screen flex w-full bg-background text-foreground">
         <AgentDashboardSidebar />
-        <main className="flex-1 flex flex-col min-w-0 overflow-y-auto pb-[env(safe-area-inset-bottom)]">
+        <main id="main-content" className="flex-1 flex flex-col min-w-0 overflow-y-auto pb-[env(safe-area-inset-bottom)]">
           <PaymentStatusBanner />
           {trustPending && (
             <div className="bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-sm px-4 py-3 flex items-center justify-between">
@@ -64,7 +64,7 @@ const AgentDashboardLayout = () => {
               <NotificationBell />
             </div>
           )}
-          <div id="main-content" className="p-4 md:p-6 flex-1">
+          <div className="p-4 md:p-6 flex-1">
             <Outlet />
           </div>
         </main>

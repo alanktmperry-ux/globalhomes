@@ -49,6 +49,11 @@ const NAV_SECTIONS: NavSection[] = [
     badgeKey: 'haloCredits',
   },
   {
+    title: 'Buy Credits',
+    url: '/dashboard/buy-credits',
+    icon: HandCoins,
+  },
+  {
     title: 'Listings',
     url: '',
     icon: Briefcase,

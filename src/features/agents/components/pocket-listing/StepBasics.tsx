@@ -1,9 +1,11 @@
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Home, Building2, Warehouse, Mountain, Store, Minus, Plus, DollarSign, Key, Flame, Sun, Wind, Zap, Waves, ChevronDown, Gavel, Info, LayoutGrid, Star, Rows3, Columns2, Square, Briefcase as BriefcaseIcon, ShoppingBag, Factory, Package, Mic, MicOff, Loader2 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { useVoiceSearch } from '@/features/search/hooks/useVoiceSearch';
+import { toast } from 'sonner';
 import type { ListingDraft } from './PocketListingForm';
 
 interface Props {
@@ -98,84 +100,21 @@ const StepBasics = ({ draft, update }: Props) => {
   const showRange = draft.priceDisplay === 'range';
   const showAuction = draft.priceDisplay === 'eoi';
 
-  const [isListening, setIsListening] = useState(false);
-  const [interimText, setInterimText] = useState('');
-  const recognitionRef = useRef<any>(null);
-  const shouldListenRef = useRef(false);
-  const prefixRef = useRef('');
-  const finalAccumRef = useRef('');
+  const onVoiceResult = useCallback((text: string) => {
+    update({ voiceTranscript: draft.voiceTranscript ? draft.voiceTranscript + ' ' + text : text });
+  }, [update, draft.voiceTranscript]);
 
-  const startRecognition = () => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) return;
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'en-AU';
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.maxAlternatives = 1;
-    recognition.onresult = (event: any) => {
-      let interim = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const r = event.results[i];
-        if (r.isFinal) {
-          const word = r[0].transcript.trim();
-          finalAccumRef.current = finalAccumRef.current ? finalAccumRef.current + ' ' + word : word;
-          const combined = prefixRef.current
-            ? prefixRef.current + ' ' + finalAccumRef.current
-            : finalAccumRef.current;
-          update({ voiceTranscript: combined });
-        } else {
-          interim += r[0].transcript;
-        }
-      }
-      setInterimText(interim);
-    };
-    recognition.onerror = (event: any) => {
-      setInterimText('');
-      if (event.error === 'not-allowed') {
-        shouldListenRef.current = false;
-        setIsListening(false);
-        alert('Microphone access denied. Please allow microphone access in your browser settings and try again.');
-      }
-      // 'no-speech' and 'audio-capture' are non-fatal — onend will auto-restart
-    };
-    recognition.onend = () => {
-      setInterimText('');
-      if (shouldListenRef.current) {
-        // Chrome stops after silence — auto-restart to keep listening
-        try { startRecognition(); } catch { /* ignore */ }
-      } else {
-        setIsListening(false);
-      }
-    };
-    recognitionRef.current = recognition;
-    try {
-      recognition.start();
-    } catch {
-      shouldListenRef.current = false;
-      setIsListening(false);
-    }
-  };
+  const { isListening, isTranscribing, startListening, stopListening, isSupported } = useVoiceSearch(
+    onVoiceResult,
+    (err) => toast.error(err)
+  );
 
   const toggleVoice = () => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert('Voice input is not supported in this browser. Please use Chrome or Edge.');
-      return;
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
     }
-    if (shouldListenRef.current) {
-      shouldListenRef.current = false;
-      recognitionRef.current?.stop();
-      setIsListening(false);
-      setInterimText('');
-      return;
-    }
-    // Snapshot current text as prefix — dictated words append after it
-    prefixRef.current = draft.voiceTranscript ?? '';
-    finalAccumRef.current = '';
-    shouldListenRef.current = true;
-    setIsListening(true);
-    startRecognition();
   };
 
   // ── RENTAL: single source of truth is rentalWeekly; sync to priceMin/priceMax + auto-populate bond
@@ -416,39 +355,37 @@ const StepBasics = ({ draft, update }: Props) => {
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <Label className="text-sm font-semibold">Description</Label>
-            <button
-              type="button"
-              onClick={toggleVoice}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                isListening
-                  ? 'bg-red-500/10 border-red-400 text-red-500'
-                  : 'bg-secondary border-border text-muted-foreground hover:border-primary/40 hover:text-primary'
-              }`}
-            >
-              {isListening ? <MicOff size={13} /> : <Mic size={13} />}
-              {isListening ? 'Stop' : 'Dictate'}
-            </button>
-          </div>
-          <div className="relative">
-            <Textarea
-              value={draft.voiceTranscript}
-              onChange={(e) => update({ voiceTranscript: e.target.value })}
-              placeholder="Describe the property — key selling points, lifestyle, neighbourhood highlights…"
-              className={`min-h-[140px] resize-y transition-all ${isListening ? 'ring-2 ring-red-400/40 border-red-300' : ''}`}
-              rows={6}
-            />
-            {isListening && interimText && (
-              <div className="absolute bottom-3 left-3 right-3 text-sm text-muted-foreground italic pointer-events-none">
-                {interimText}
-              </div>
+            {isSupported && (
+              <button
+                type="button"
+                onClick={toggleVoice}
+                disabled={isTranscribing}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                  isListening
+                    ? 'bg-red-500/10 border-red-400 text-red-500'
+                    : 'bg-secondary border-border text-muted-foreground hover:border-primary/40 hover:text-primary'
+                }`}
+              >
+                {isListening ? <MicOff size={13} /> : isTranscribing ? <Loader2 size={13} className="animate-spin" /> : <Mic size={13} />}
+                {isListening ? 'Stop' : isTranscribing ? 'Transcribing…' : 'Dictate'}
+              </button>
             )}
           </div>
+          <Textarea
+            value={draft.voiceTranscript}
+            onChange={(e) => update({ voiceTranscript: e.target.value })}
+            placeholder="Describe the property — key selling points, lifestyle, neighbourhood highlights…"
+            className={`min-h-[140px] resize-y transition-all ${isListening ? 'ring-2 ring-red-400/40 border-red-300' : ''}`}
+            rows={6}
+          />
           <p className="text-xs text-muted-foreground">
             {isListening
-              ? '🎙 Listening — speak naturally, tap Stop when done'
-              : draft.voiceTranscript.length > 0
-                ? `${draft.voiceTranscript.length} characters`
-                : 'Tap Dictate to speak, or type directly'}
+              ? '🎙 Recording — tap Stop when done'
+              : isTranscribing
+                ? '⏳ Transcribing your recording…'
+                : draft.voiceTranscript.length > 0
+                  ? `${draft.voiceTranscript.length} characters`
+                  : 'Tap Dictate to speak, or type directly'}
           </p>
         </div>
       </div>

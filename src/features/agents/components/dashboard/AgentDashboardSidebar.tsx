@@ -53,7 +53,6 @@ const NAV_SECTIONS: NavSection[] = [
     url: '/dashboard/listings',
     icon: Briefcase,
     children: [
-      { title: 'Listings', url: '/dashboard/listings', icon: List, badgeKey: 'listings' },
       { title: 'Inbox', url: '/dashboard/inbox', icon: Mail, badgeKey: 'inbox', alertWhenBadge: true },
       { title: 'Contacts', url: '/dashboard/contacts', icon: Contact },
       { title: 'Leads', url: '/dashboard/crm', icon: Flame },
@@ -64,7 +63,7 @@ const NAV_SECTIONS: NavSection[] = [
   },
   {
     title: 'Property Mgmt',
-    url: '/dashboard/rent-roll',
+    url: '/dashboard/property',
     icon: Home,
     children: [
       { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home },
@@ -79,8 +78,8 @@ const NAV_SECTIONS: NavSection[] = [
     ],
   },
   {
-    title: 'Trust Accounting',
-    url: '/dashboard/trust',
+    title: 'Finance',
+    url: '/dashboard/finance',
     icon: Landmark,
     children: [
       { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
@@ -91,7 +90,7 @@ const NAV_SECTIONS: NavSection[] = [
   },
   {
     title: 'Market Tools',
-    url: '/dashboard/concierge',
+    url: '/dashboard/market-tools',
     icon: LineChart,
     children: [
       { title: 'AI Concierge', url: '/dashboard/concierge', icon: Sparkles, badgeKey: 'buyerMatches', alertWhenBadge: true },

@@ -1396,6 +1396,7 @@ const languageUpdatedMessages: Record<Language, string> = {
   id: 'Bahasa diperbarui', nl: 'Taal bijgewerkt', pl: 'Język zaktualizowany',
   tr: 'Dil güncellendi', sv: 'Språk uppdaterat', da: 'Sprog opdateret',
   no: 'Språk oppdatert', fil: 'Na-update ang wika', bn: 'ভাষা আপডেট হয়েছে',
+  pa: 'ਭਾਸ਼ਾ ਅੱਪਡੇਟ ਹੋਈ', ta: 'மொழி புதுப்பிக்கப்பட்டது',
 };
 
 export function I18nProvider({ children }: { children: ReactNode }) {

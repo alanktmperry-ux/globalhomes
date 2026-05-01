@@ -1345,6 +1345,8 @@ export const languageNames: Record<Language, string> = {
   fil: 'Filipino',
   ms: 'Bahasa Melayu',
   bn: 'বাংলা',
+  pa: 'ਪੰਜਾਬੀ',
+  ta: 'தமிழ்',
 };
 
 interface I18nContextType {

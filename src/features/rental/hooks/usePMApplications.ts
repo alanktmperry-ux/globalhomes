@@ -3,8 +3,16 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { ApplicationStatus } from '../types';
 
+interface PMApplication {
+  id: string;
+  status: string;
+  created_at: string;
+  applicant_name?: string;
+  property_id?: string;
+}
+
 export function usePMApplications(propertyId: string) {
-  const [apps, setApps] = useState<any[]>([]);
+  const [apps, setApps] = useState<PMApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

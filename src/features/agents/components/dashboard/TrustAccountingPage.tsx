@@ -24,6 +24,7 @@ import TrustImportWizard from './TrustImportWizard';
 import TrustReceiptModal from './TrustReceiptModal';
 import { useTrustAccounting, TrustTransaction } from '@/features/agents/hooks/useTrustAccounting';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { useAgentStateCompliance } from '@/features/agents/hooks/useAgentStateCompliance';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
@@ -57,6 +58,7 @@ const TrustAccountingPage = () => {
     fetchAccounts, fetchTransactions,
     createAccount, createTransaction, voidTransaction,
   } = useTrustAccounting();
+  const { compliance, agentState } = useAgentStateCompliance();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -1223,11 +1225,67 @@ const TrustAccountingPage = () => {
           </CardContent>
         </Card>
 
-        {/* ── AFA Compliance Footer ── */}
-        <div className="mt-6 py-3 px-4 rounded-lg bg-muted/50 border border-border flex items-center justify-center gap-3">
-          <ShieldCheck size={14} className="text-primary shrink-0" />
+        {/* ── State compliance info card ── */}
+        <Card className="mt-6">
+          <CardContent className="pt-6 space-y-4">
+            <div className="flex items-start gap-3">
+              <ShieldCheck size={20} className="text-primary shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-semibold text-foreground">
+                  {agentState ? `${compliance.state} Trust Accounting Compliance` : 'Trust Accounting Compliance'}
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">{compliance.legislation}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="rounded-lg border border-border bg-muted/30 p-3">
+                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Record Retention</p>
+                <p className="text-sm font-semibold text-foreground mt-1">{compliance.retentionYears} years</p>
+              </div>
+              <div className="rounded-lg border border-border bg-muted/30 p-3">
+                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Reconciliation</p>
+                <p className="text-sm font-semibold text-foreground mt-1">{compliance.reconciliationFrequency}</p>
+              </div>
+              <div className="rounded-lg border border-border bg-muted/30 p-3">
+                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Annual Audit</p>
+                <p className="text-sm font-semibold text-foreground mt-1">Required</p>
+              </div>
+            </div>
+
+            {compliance.bondNote && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
+                <p className="text-xs text-amber-900">{compliance.bondNote}</p>
+              </div>
+            )}
+
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+              <p className="text-xs text-muted-foreground">
+                Bond lodgement: <span className="font-medium text-foreground">{compliance.bondAuthority}</span> — within {compliance.bondLodgementDays}
+              </p>
+              <a
+                href={compliance.bondLodgementUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs font-medium text-primary hover:underline inline-flex items-center gap-1"
+              >
+                Lodge bond <ExternalLink size={11} />
+              </a>
+            </div>
+
+            {!agentState && (
+              <p className="text-[11px] text-muted-foreground italic border-t border-border pt-3">
+                Add your state to your agent profile to see your state-specific obligations.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* ── Compliance assurance strip ── */}
+        <div className="mt-3 py-3 px-4 rounded-lg bg-muted/50 border border-border flex items-center justify-center gap-3">
+          <CheckCircle2 size={14} className="text-primary shrink-0" />
           <p className="text-[11px] text-muted-foreground text-center">
-            AFA 2014 compliant &bull; Audit-ready exports &bull; 5-year retention &bull; Voided entries preserved
+            Audit-ready exports &middot; Voided entries preserved &middot; Compliant with Australian trust accounting legislation
           </p>
         </div>
       </div>

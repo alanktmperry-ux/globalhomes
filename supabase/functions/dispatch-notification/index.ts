@@ -127,22 +127,40 @@ Deno.serve(async (req) => {
         results.email = "quiet_hours";
         await logSuppressed(sb, userId, input.event_key, ["email"], "quiet_hours");
       } else {
-        // Fire-and-forget — don't block dispatcher on email send
         try {
           const { data: agent } = await sb.from("agents").select("email,name").eq("id", agentId).maybeSingle();
           if (agent?.email) {
+            // Insert a pending log row first (delivered_at = null until send confirms).
+            const { data: logRow } = await sb.from("notification_log").insert({
+              user_id: userId, event_key: input.event_key, channel: "email",
+              delivered_at: null,
+            }).select("id").maybeSingle();
+
+            // Fire-and-forget — don't block dispatcher on email send.
+            // Mark delivered_at only on success.
             sb.functions.invoke("send-notification-email", {
               body: {
                 to: agent.email, name: agent.name,
-                subject: input.title, body: input.message ?? input.title,
+                subject: input.title,
+                html: input.message ?? input.title,
                 event_key: input.event_key,
               },
-            }).catch(() => {});
-            await sb.from("notification_log").insert({
-              user_id: userId, event_key: input.event_key, channel: "email",
-              delivered_at: new Date().toISOString(),
+            }).then(({ error }: { error: unknown }) => {
+              if (error) {
+                console.error("send-notification-email failed", error);
+                return;
+              }
+              if (logRow?.id) {
+                sb.from("notification_log")
+                  .update({ delivered_at: new Date().toISOString() })
+                  .eq("id", logRow.id)
+                  .then(() => {});
+              }
+            }).catch((err: unknown) => {
+              console.error("send-notification-email invoke threw", err);
             });
-            results.email = "delivered";
+
+            results.email = "queued";
           } else {
             results.email = "no_email_address";
           }

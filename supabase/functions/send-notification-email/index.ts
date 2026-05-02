@@ -105,6 +105,36 @@ Deno.serve(async (req) => {
 
     // Direct send mode: { to, subject, html }
     if (payload.to && payload.subject && payload.html) {
+      // ── Auth check: require service_role key OR a valid admin/agent JWT ──
+      const authHeader = req.headers.get('Authorization') ?? '';
+      const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+      let authorized = false;
+      if (bearer && bearer === serviceRoleKey) {
+        authorized = true;
+      } else if (bearer) {
+        const authClient = createClient(
+          supabaseUrl,
+          Deno.env.get('SUPABASE_ANON_KEY')!,
+          { global: { headers: { Authorization: `Bearer ${bearer}` } } }
+        );
+        const { data: userData } = await authClient.auth.getUser();
+        if (userData?.user) {
+          const { data: roles } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', userData.user.id);
+          const roleList = (roles ?? []).map((r: any) => r.role);
+          if (roleList.includes('admin') || roleList.includes('agent')) {
+            authorized = true;
+          }
+        }
+      }
+      if (!authorized) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
       const p = payload as DirectPayload;
       const result = await sendViaResend(p.to, p.subject, p.html);
       return new Response(JSON.stringify({ success: result.ok, reason: result.reason }), {

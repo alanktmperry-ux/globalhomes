@@ -526,6 +526,11 @@ function LeadRow({
                 {langMeta.flag} {langMeta.label}
               </Badge>
             )}
+            {languageMatch && (
+              <span className="inline-flex items-center bg-primary/10 text-primary text-[10px] font-semibold px-1.5 py-0.5 rounded">
+                🗣 Language match
+              </span>
+            )}
           </div>
         </div>
         {showClaim && onClaim && (

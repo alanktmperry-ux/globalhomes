@@ -356,6 +356,36 @@ export default function OwnerPortalPage() {
         {/* Section 3: Maintenance & approvals */}
         <section>
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">Maintenance & approvals</h2>
+
+          {/* Portal preferences — auto-approve threshold */}
+          <Card className="mb-4 bg-muted/30">
+            <CardContent className="p-4">
+              <p className="text-sm font-medium mb-1">Portal preferences</p>
+              <p className="text-xs text-muted-foreground mb-3">
+                Auto-approve maintenance jobs under{' '}
+                <span className="font-semibold text-foreground">{AUD.format(autoApproveThreshold)}</span>.
+                Quotes above this amount require your manual approval.
+              </p>
+              <div className="flex flex-wrap items-end gap-2">
+                <div className="flex-1 min-w-[140px] max-w-[200px]">
+                  <label className="text-[11px] text-muted-foreground">Threshold (AUD)</label>
+                  <input
+                    type="number"
+                    min={0}
+                    step={50}
+                    value={thresholdInput}
+                    onChange={(e) => setThresholdInput(e.target.value)}
+                    className="w-full mt-1 h-9 px-3 rounded-md border border-input bg-background text-sm"
+                  />
+                </div>
+                <Button size="sm" onClick={saveThreshold} disabled={savingThreshold || thresholdInput === String(autoApproveThreshold)}>
+                  {savingThreshold ? <Loader2 size={12} className="animate-spin mr-1" /> : null}
+                  Save
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
           {pendingApprovals.length > 0 && (
             <div className="space-y-3 mb-4">
               {pendingApprovals.map((j: any) => (

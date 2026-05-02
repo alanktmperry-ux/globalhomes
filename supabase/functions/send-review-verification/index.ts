@@ -16,6 +16,17 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
+    const token = req.headers.get("Authorization")?.replace("Bearer ", "") ?? "";
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    const { data: agentRow } = await supabase.from('agents').select('user_id').eq('id', agent_id).maybeSingle();
+    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+    if (!isAdmin && (!agentRow || (agentRow as any).user_id !== user.id)) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     // Fetch the most recent pending review
     const { data: review } = await supabase
       .from('agent_reviews')

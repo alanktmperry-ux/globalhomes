@@ -8,7 +8,7 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {
-    const { token, vendor_email, property_id } = await req.json();
+    const { token: reportToken, vendor_email, property_id } = await req.json();
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
@@ -17,11 +17,25 @@ Deno.serve(async (req) => {
     const RESEND = Deno.env.get('RESEND_API_KEY') ?? '';
     const FROM = Deno.env.get('EMAIL_FROM') ?? 'ListHQ <reports@listhq.com.au>';
 
+    const jwt = req.headers.get("Authorization")?.replace("Bearer ", "") ?? "";
+    const { data: { user }, error: authError } = await supabase.auth.getUser(jwt);
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     const { data: tokenRow } = await supabase
       .from('vendor_report_tokens')
       .select('vendor_name, agent_id, expires_at')
-      .eq('token', token)
+      .eq('token', reportToken)
       .single();
+
+    if (!tokenRow) {
+      return new Response(JSON.stringify({ error: 'Token not found' }), { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    const { data: callerAgent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
+    if (!callerAgent || callerAgent.id !== (tokenRow as any).agent_id) {
+      return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
 
     const { data: prop } = await supabase
       .from('properties')

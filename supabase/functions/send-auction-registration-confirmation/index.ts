@@ -16,6 +16,12 @@ Deno.serve(async (req) => {
     const RESEND = Deno.env.get('RESEND_API_KEY') ?? '';
     const FROM = Deno.env.get('EMAIL_FROM') ?? 'ListHQ <noreply@listhq.com.au>';
 
+    const token = req.headers.get("Authorization")?.replace("Bearer ", "") ?? "";
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     const { data: reg } = await supabase
       .from('auction_bidder_registrations')
       .select('*')
@@ -34,9 +40,14 @@ Deno.serve(async (req) => {
 
     const { data: property } = await supabase
       .from('properties')
-      .select('address, suburb, state')
+      .select('address, suburb, state, agent_id')
       .eq('id', auction.property_id)
       .single();
+
+    const { data: agentRow } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
+    if (!agentRow || !property || agentRow.id !== (property as any).agent_id) {
+      return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
 
     const address = property ? `${property.address}, ${property.suburb} ${property.state}` : 'Property';
     const auctionDate = new Date(auction.auction_date).toLocaleDateString('en-AU', {

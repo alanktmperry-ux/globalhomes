@@ -19,6 +19,19 @@ Deno.serve(async (req) => {
     const RESEND = Deno.env.get('RESEND_API_KEY') ?? '';
     const FROM = Deno.env.get('EMAIL_FROM') ?? 'ListHQ <documents@listhq.com.au>';
 
+    const token = req.headers.get("Authorization")?.replace("Bearer ", "") ?? "";
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // Caller must be the agent who owns the property
+    const { data: prop0 } = await supabase.from('properties').select('agent_id').eq('id', property_id).maybeSingle();
+    const { data: callerAgent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
+    if (!prop0 || !callerAgent || callerAgent.id !== (prop0 as any).agent_id) {
+      return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     let recipientEmail = requested_email;
     let recipientName = 'there';
     if (requested_from && !recipientEmail) {

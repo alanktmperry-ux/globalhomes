@@ -14,8 +14,22 @@ export interface RentalFilters {
   maxBond?: number;
 }
 
+interface RentalSearchResult {
+  id: string;
+  address: string;
+  suburb: string;
+  state: string;
+  beds?: number;
+  baths?: number;
+  rental_weekly?: number;
+  property_type?: string;
+  images?: string[];
+  image_url?: string;
+  [key: string]: unknown;
+}
+
 export function useRentalSearch(filters: RentalFilters = {}) {
-  const [properties, setProperties] = useState<any[]>([]);
+  const [properties, setProperties] = useState<RentalSearchResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [error, setError] = useState<string | null>(null);

@@ -394,7 +394,7 @@ const AdminReports = ({ isAdmin, currentAgentId }: Props) => {
 
       setAgents((data || []).map((a: any) => ({
         ...a,
-        plan_type: a.agent_subscriptions?.plan_type || null,
+        plan_type: Array.isArray(a.agent_subscriptions) ? a.agent_subscriptions[0]?.plan_type || null : a.agent_subscriptions?.plan_type || null,
         last_sign_in_at: signInMap.get(a.id) ?? null,
         active_listings: propMap.get(a.id)?.listings || 0,
         total_views: propMap.get(a.id)?.views || 0,

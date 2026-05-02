@@ -3961,6 +3961,8 @@ export type Database = {
       }
       contacts: {
         Row: {
+          abn: string | null
+          acn: string | null
           address: string | null
           agency_id: string | null
           assigned_agent_id: string | null
@@ -3973,16 +3975,30 @@ export type Database = {
           country: string | null
           created_at: string
           created_by: string
+          date_of_birth: string | null
+          drivers_licence_number: string | null
+          drivers_licence_state: string | null
           email: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          emergency_contact_relationship: string | null
+          employer_name: string | null
+          employer_phone: string | null
+          entity_type: string
           estimated_value: number | null
           first_name: string
+          gst_registered: boolean
           id: string
           last_contacted_at: string | null
           last_name: string | null
+          migration_batch_id: string | null
           mobile: string | null
           next_action_due_at: string | null
           next_action_note: string | null
           notes: string | null
+          owner_account_name: string | null
+          owner_account_number: string | null
+          owner_bsb: string | null
           phone: string | null
           phone_is_landline: boolean | null
           phone_normalized: string | null
@@ -3998,11 +4014,15 @@ export type Database = {
           seller_pipeline_stage: string | null
           source: string | null
           state: string | null
+          statement_frequency: string
           suburb: string | null
           tags: string[] | null
+          tax_file_number_provided: boolean
           updated_at: string
         }
         Insert: {
+          abn?: string | null
+          acn?: string | null
           address?: string | null
           agency_id?: string | null
           assigned_agent_id?: string | null
@@ -4015,16 +4035,30 @@ export type Database = {
           country?: string | null
           created_at?: string
           created_by: string
+          date_of_birth?: string | null
+          drivers_licence_number?: string | null
+          drivers_licence_state?: string | null
           email?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          emergency_contact_relationship?: string | null
+          employer_name?: string | null
+          employer_phone?: string | null
+          entity_type?: string
           estimated_value?: number | null
           first_name: string
+          gst_registered?: boolean
           id?: string
           last_contacted_at?: string | null
           last_name?: string | null
+          migration_batch_id?: string | null
           mobile?: string | null
           next_action_due_at?: string | null
           next_action_note?: string | null
           notes?: string | null
+          owner_account_name?: string | null
+          owner_account_number?: string | null
+          owner_bsb?: string | null
           phone?: string | null
           phone_is_landline?: boolean | null
           phone_normalized?: string | null
@@ -4040,11 +4074,15 @@ export type Database = {
           seller_pipeline_stage?: string | null
           source?: string | null
           state?: string | null
+          statement_frequency?: string
           suburb?: string | null
           tags?: string[] | null
+          tax_file_number_provided?: boolean
           updated_at?: string
         }
         Update: {
+          abn?: string | null
+          acn?: string | null
           address?: string | null
           agency_id?: string | null
           assigned_agent_id?: string | null
@@ -4057,16 +4095,30 @@ export type Database = {
           country?: string | null
           created_at?: string
           created_by?: string
+          date_of_birth?: string | null
+          drivers_licence_number?: string | null
+          drivers_licence_state?: string | null
           email?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          emergency_contact_relationship?: string | null
+          employer_name?: string | null
+          employer_phone?: string | null
+          entity_type?: string
           estimated_value?: number | null
           first_name?: string
+          gst_registered?: boolean
           id?: string
           last_contacted_at?: string | null
           last_name?: string | null
+          migration_batch_id?: string | null
           mobile?: string | null
           next_action_due_at?: string | null
           next_action_note?: string | null
           notes?: string | null
+          owner_account_name?: string | null
+          owner_account_number?: string | null
+          owner_bsb?: string | null
           phone?: string | null
           phone_is_landline?: boolean | null
           phone_normalized?: string | null
@@ -4082,8 +4134,10 @@ export type Database = {
           seller_pipeline_stage?: string | null
           source?: string | null
           state?: string | null
+          statement_frequency?: string
           suburb?: string | null
           tags?: string[] | null
+          tax_file_number_provided?: boolean
           updated_at?: string
         }
         Relationships: [
@@ -4121,6 +4175,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "fk_contacts_migration_batch"
+            columns: ["migration_batch_id"]
+            isOneToOne: false
+            referencedRelation: "migration_batches"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -7093,6 +7154,89 @@ export type Database = {
           },
         ]
       }
+      migration_batches: {
+        Row: {
+          agent_id: string
+          completed_at: string | null
+          created_at: string
+          cutover_date: string
+          id: string
+          ledger_account_count: number
+          notes: string | null
+          owner_count: number
+          property_count: number
+          rolled_back_at: string | null
+          source_system: string
+          status: string
+          tenancy_count: number
+          tenant_count: number
+          trust_opening_balance: number
+        }
+        Insert: {
+          agent_id: string
+          completed_at?: string | null
+          created_at?: string
+          cutover_date: string
+          id?: string
+          ledger_account_count?: number
+          notes?: string | null
+          owner_count?: number
+          property_count?: number
+          rolled_back_at?: string | null
+          source_system?: string
+          status?: string
+          tenancy_count?: number
+          tenant_count?: number
+          trust_opening_balance?: number
+        }
+        Update: {
+          agent_id?: string
+          completed_at?: string | null
+          created_at?: string
+          cutover_date?: string
+          id?: string
+          ledger_account_count?: number
+          notes?: string | null
+          owner_count?: number
+          property_count?: number
+          rolled_back_at?: string | null
+          source_system?: string
+          status?: string
+          tenancy_count?: number
+          tenant_count?: number
+          trust_opening_balance?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "migration_batches_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "migration_batches_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "migration_batches_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "migration_batches_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances_view"
+            referencedColumns: ["agent_id"]
+          },
+        ]
+      }
       mortgage_referrals: {
         Row: {
           agent_id: string | null
@@ -8725,6 +8869,7 @@ export type Database = {
           marketing_email_sent: boolean
           marketing_email_sent_at: string | null
           max_occupants: number | null
+          migration_batch_id: string | null
           min_lease_months: number | null
           moderation_status: string
           off_market_reason: string | null
@@ -8736,6 +8881,11 @@ export type Database = {
           parking: number
           parking_notes: string | null
           pets_allowed: boolean | null
+          pm_lease_renewal_fee_weeks: number | null
+          pm_letting_fee_weeks: number | null
+          pm_management_fee_percent: number | null
+          pm_owner_contact_id: string | null
+          pm_status: string | null
           postcode: string | null
           price: number
           price_formatted: string
@@ -8873,6 +9023,7 @@ export type Database = {
           marketing_email_sent?: boolean
           marketing_email_sent_at?: string | null
           max_occupants?: number | null
+          migration_batch_id?: string | null
           min_lease_months?: number | null
           moderation_status?: string
           off_market_reason?: string | null
@@ -8884,6 +9035,11 @@ export type Database = {
           parking?: number
           parking_notes?: string | null
           pets_allowed?: boolean | null
+          pm_lease_renewal_fee_weeks?: number | null
+          pm_letting_fee_weeks?: number | null
+          pm_management_fee_percent?: number | null
+          pm_owner_contact_id?: string | null
+          pm_status?: string | null
           postcode?: string | null
           price: number
           price_formatted: string
@@ -9021,6 +9177,7 @@ export type Database = {
           marketing_email_sent?: boolean
           marketing_email_sent_at?: string | null
           max_occupants?: number | null
+          migration_batch_id?: string | null
           min_lease_months?: number | null
           moderation_status?: string
           off_market_reason?: string | null
@@ -9032,6 +9189,11 @@ export type Database = {
           parking?: number
           parking_notes?: string | null
           pets_allowed?: boolean | null
+          pm_lease_renewal_fee_weeks?: number | null
+          pm_letting_fee_weeks?: number | null
+          pm_management_fee_percent?: number | null
+          pm_owner_contact_id?: string | null
+          pm_status?: string | null
           postcode?: string | null
           price?: number
           price_formatted?: string
@@ -9108,6 +9270,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "fk_properties_migration_batch"
+            columns: ["migration_batch_id"]
+            isOneToOne: false
+            referencedRelation: "migration_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "properties_pm_owner_contact_id_fkey"
+            columns: ["pm_owner_contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "properties_stage_id_fkey"
@@ -11736,6 +11912,7 @@ export type Database = {
           actual_vacate_date: string | null
           agent_id: string
           arrears_action_status: string
+          arrears_weeks: number
           bond_amount: number
           bond_authority: string | null
           bond_lodgement_number: string | null
@@ -11745,8 +11922,12 @@ export type Database = {
           id: string
           last_arrears_notice_date: string | null
           lease_end: string
+          lease_renewal_fee_weeks: number | null
           lease_start: string
+          lease_type: string
+          letting_fee_weeks: number | null
           management_fee_percent: number
+          migration_batch_id: string | null
           notes: string | null
           owner_account_number: string | null
           owner_bsb: string | null
@@ -11762,6 +11943,7 @@ export type Database = {
           renewal_type: string | null
           rent_amount: number
           rent_frequency: string
+          rent_paid_to_date: string | null
           status: string
           tenant_contact_id: string | null
           tenant_email: string | null
@@ -11770,11 +11952,13 @@ export type Database = {
           tenant_portal_token: string | null
           updated_at: string
           vacancy_loss_aud: number | null
+          vacating_date: string | null
         }
         Insert: {
           actual_vacate_date?: string | null
           agent_id: string
           arrears_action_status?: string
+          arrears_weeks?: number
           bond_amount: number
           bond_authority?: string | null
           bond_lodgement_number?: string | null
@@ -11784,8 +11968,12 @@ export type Database = {
           id?: string
           last_arrears_notice_date?: string | null
           lease_end: string
+          lease_renewal_fee_weeks?: number | null
           lease_start: string
+          lease_type?: string
+          letting_fee_weeks?: number | null
           management_fee_percent?: number
+          migration_batch_id?: string | null
           notes?: string | null
           owner_account_number?: string | null
           owner_bsb?: string | null
@@ -11801,6 +11989,7 @@ export type Database = {
           renewal_type?: string | null
           rent_amount: number
           rent_frequency?: string
+          rent_paid_to_date?: string | null
           status?: string
           tenant_contact_id?: string | null
           tenant_email?: string | null
@@ -11809,11 +11998,13 @@ export type Database = {
           tenant_portal_token?: string | null
           updated_at?: string
           vacancy_loss_aud?: number | null
+          vacating_date?: string | null
         }
         Update: {
           actual_vacate_date?: string | null
           agent_id?: string
           arrears_action_status?: string
+          arrears_weeks?: number
           bond_amount?: number
           bond_authority?: string | null
           bond_lodgement_number?: string | null
@@ -11823,8 +12014,12 @@ export type Database = {
           id?: string
           last_arrears_notice_date?: string | null
           lease_end?: string
+          lease_renewal_fee_weeks?: number | null
           lease_start?: string
+          lease_type?: string
+          letting_fee_weeks?: number | null
           management_fee_percent?: number
+          migration_batch_id?: string | null
           notes?: string | null
           owner_account_number?: string | null
           owner_bsb?: string | null
@@ -11840,6 +12035,7 @@ export type Database = {
           renewal_type?: string | null
           rent_amount?: number
           rent_frequency?: string
+          rent_paid_to_date?: string | null
           status?: string
           tenant_contact_id?: string | null
           tenant_email?: string | null
@@ -11848,8 +12044,16 @@ export type Database = {
           tenant_portal_token?: string | null
           updated_at?: string
           vacancy_loss_aud?: number | null
+          vacating_date?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_tenancies_migration_batch"
+            columns: ["migration_batch_id"]
+            isOneToOne: false
+            referencedRelation: "migration_batches"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tenancies_agent_id_fkey"
             columns: ["agent_id"]
@@ -12405,6 +12609,118 @@ export type Database = {
             columns: ["trust_account_id"]
             isOneToOne: false
             referencedRelation: "trust_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trust_ledger_accounts: {
+        Row: {
+          agent_id: string
+          created_at: string
+          current_balance: number
+          cutover_date: string
+          id: string
+          ledger_name: string
+          ledger_type: string
+          migration_batch_id: string | null
+          notes: string | null
+          opening_balance: number
+          property_id: string | null
+          tenancy_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          current_balance?: number
+          cutover_date: string
+          id?: string
+          ledger_name: string
+          ledger_type?: string
+          migration_batch_id?: string | null
+          notes?: string | null
+          opening_balance?: number
+          property_id?: string | null
+          tenancy_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          current_balance?: number
+          cutover_date?: string
+          id?: string
+          ledger_name?: string
+          ledger_type?: string
+          migration_batch_id?: string | null
+          notes?: string | null
+          opening_balance?: number
+          property_id?: string | null
+          tenancy_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_trust_ledger_migration_batch"
+            columns: ["migration_batch_id"]
+            isOneToOne: false
+            referencedRelation: "migration_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_ledger_accounts_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_ledger_accounts_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_ledger_accounts_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_ledger_accounts_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances_view"
+            referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "trust_ledger_accounts_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_ledger_accounts_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_ledger_accounts_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_ledger_accounts_tenancy_id_fkey"
+            columns: ["tenancy_id"]
+            isOneToOne: false
+            referencedRelation: "tenancies"
             referencedColumns: ["id"]
           },
         ]
@@ -14808,6 +15124,7 @@ export type Database = {
               marketing_email_sent: boolean
               marketing_email_sent_at: string | null
               max_occupants: number | null
+              migration_batch_id: string | null
               min_lease_months: number | null
               moderation_status: string
               off_market_reason: string | null
@@ -14819,6 +15136,11 @@ export type Database = {
               parking: number
               parking_notes: string | null
               pets_allowed: boolean | null
+              pm_lease_renewal_fee_weeks: number | null
+              pm_letting_fee_weeks: number | null
+              pm_management_fee_percent: number | null
+              pm_owner_contact_id: string | null
+              pm_status: string | null
               postcode: string | null
               price: number
               price_formatted: string
@@ -14971,6 +15293,7 @@ export type Database = {
               marketing_email_sent: boolean
               marketing_email_sent_at: string | null
               max_occupants: number | null
+              migration_batch_id: string | null
               min_lease_months: number | null
               moderation_status: string
               off_market_reason: string | null
@@ -14982,6 +15305,11 @@ export type Database = {
               parking: number
               parking_notes: string | null
               pets_allowed: boolean | null
+              pm_lease_renewal_fee_weeks: number | null
+              pm_letting_fee_weeks: number | null
+              pm_management_fee_percent: number | null
+              pm_owner_contact_id: string | null
+              pm_status: string | null
               postcode: string | null
               price: number
               price_formatted: string
@@ -15074,6 +15402,10 @@ export type Database = {
         Args: { p_supplier_id: string }
         Returns: undefined
       }
+      rollback_migration_batch: {
+        Args: { p_agent_id: string; p_batch_id: string }
+        Returns: Json
+      }
       rotate_unclaimed_referral_leads: { Args: never; Returns: number }
       schools_within_km: {
         Args: { p_km: number; p_lat: number; p_lng: number }
@@ -15151,6 +15483,10 @@ export type Database = {
       }
       test_webhook: { Args: { p_webhook_name: string }; Returns: Json }
       track_cma_view: { Args: { p_share_token: string }; Returns: Json }
+      validate_migration_balances: {
+        Args: { p_batch_id: string }
+        Returns: Json
+      }
       verify_webhook_config: { Args: never; Returns: Json }
     }
     Enums: {

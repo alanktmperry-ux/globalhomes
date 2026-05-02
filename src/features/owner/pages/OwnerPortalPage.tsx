@@ -148,7 +148,10 @@ export default function OwnerPortalPage() {
 
   return (
     <div className="min-h-screen bg-muted/30">
-      <Helmet><title>Owner Portal · {property.address}</title></Helmet>
+      <Helmet>
+        <title>Owner Portal · {property.address}</title>
+        <meta name="robots" content="noindex,nofollow" />
+      </Helmet>
 
       {/* Header */}
       <header className="bg-background border-b">
@@ -404,6 +407,7 @@ export default function OwnerPortalPage() {
         <footer className="pt-6 pb-10 text-center text-xs text-muted-foreground">
           Need help? Contact {agent?.name} {agent?.phone && <>on <a href={`tel:${agent.phone}`} className="text-primary">{agent.phone}</a></>} {agent?.email && <>or <a href={`mailto:${agent.email}`} className="text-primary">{agent.email}</a></>}
           <p className="mt-2">ListHQ · Owner Portal</p>
+          <p className="text-xs text-muted-foreground mt-1">Your information is handled in accordance with the <a href="https://listhq.com.au/privacy" className="underline hover:text-foreground">ListHQ Privacy Policy</a>.</p>
         </footer>
       </main>
     </div>

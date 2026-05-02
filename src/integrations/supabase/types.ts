@@ -8131,6 +8131,7 @@ export type Database = {
           invite_expires_at: string | null
           invite_token: string | null
           invited_by: string | null
+          invited_email: string | null
           joined_at: string | null
           partner_id: string
           role: Database["public"]["Enums"]["partner_member_role"]
@@ -8142,6 +8143,7 @@ export type Database = {
           invite_expires_at?: string | null
           invite_token?: string | null
           invited_by?: string | null
+          invited_email?: string | null
           joined_at?: string | null
           partner_id: string
           role?: Database["public"]["Enums"]["partner_member_role"]
@@ -8153,6 +8155,7 @@ export type Database = {
           invite_expires_at?: string | null
           invite_token?: string | null
           invited_by?: string | null
+          invited_email?: string | null
           joined_at?: string | null
           partner_id?: string
           role?: Database["public"]["Enums"]["partner_member_role"]

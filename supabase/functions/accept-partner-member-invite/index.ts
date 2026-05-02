@@ -20,7 +20,7 @@ Deno.serve(async (req) => {
     // Find the invite
     const { data: invite, error: inviteErr } = await supabaseAdmin
       .from("partner_members")
-      .select("id, partner_id, user_id, invite_expires_at, role")
+      .select("id, partner_id, user_id, invite_expires_at, role, invited_email")
       .eq("invite_token", token)
       .maybeSingle();
 
@@ -53,6 +53,20 @@ Deno.serve(async (req) => {
       // We need to find the email — it's not stored on the invite row
       // The invite was sent to a specific email, but we need it from the request
       if (!providedEmail) throw new Error("Email is required for new accounts.");
+
+      // SECURITY: the supplied email MUST match the email the invite was sent to.
+      // Without this check, anyone with a valid invite token could create an
+      // account under any email and claim the invitation.
+      const normalizedProvided = providedEmail.trim().toLowerCase();
+      const normalizedInvited = (invite.invited_email || "").trim().toLowerCase();
+      if (!normalizedInvited || normalizedProvided !== normalizedInvited) {
+        return new Response(
+          JSON.stringify({
+            error: "This invitation was sent to a different email address. Please sign in with the invited email.",
+          }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
 
       const { data: newUser, error: signUpErr } = await supabaseAdmin.auth.admin.createUser({
         email: providedEmail,

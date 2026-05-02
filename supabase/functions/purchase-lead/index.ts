@@ -96,34 +96,77 @@ Deno.serve(async (req) => {
         await adminClient.from("agents").update({ stripe_customer_id: customerId }).eq("id", agent.id);
       }
 
-      // Create and confirm a charge via PaymentIntent
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: purchasePrice,
-        currency: "aud",
+      // Find a saved payment method on file — required for off-session confirm
+      const paymentMethods = await stripe.paymentMethods.list({
         customer: customerId,
-        confirm: false,
-        metadata: {
-          lead_id: consumer_profile_id,
-          agent_id,
-          type: "lead_purchase",
-        },
+        type: "card",
+        limit: 1,
       });
-      stripeChargeId = paymentIntent.id;
+      const defaultPm = paymentMethods.data[0];
+
+      if (!defaultPm) {
+        return new Response(
+          JSON.stringify({ error: "No payment method on file. Please add a card in billing settings." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      try {
+        // Create AND confirm the charge off-session using the saved card
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: purchasePrice,
+          currency: "aud",
+          customer: customerId,
+          payment_method: defaultPm.id,
+          confirm: true,
+          off_session: true,
+          metadata: {
+            lead_id: consumer_profile_id,
+            agent_id,
+            type: "lead_purchase",
+          },
+        });
+        if (paymentIntent.status !== "succeeded") {
+          return new Response(
+            JSON.stringify({ error: `Payment ${paymentIntent.status}. Please try a different card.` }),
+            { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        stripeChargeId = paymentIntent.id;
+      } catch (chargeErr: any) {
+        return new Response(
+          JSON.stringify({ error: chargeErr?.message || "Card was declined." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
     }
 
-    // ── Mark consumer profile as purchased ──────────────────
-    const { error: updateError } = await adminClient
+    // ── Atomically claim the lead (fixes TOCTOU race) ──────
+    // The .eq('is_purchasable', true) and .is('purchased_by', null) filters in
+    // the UPDATE itself ensure only one concurrent request can ever succeed.
+    const { data: claimed, error: updateError } = await adminClient
       .from("consumer_profiles")
       .update({
         purchased_by: agent_id,
         purchased_at: new Date().toISOString(),
         is_purchasable: false,
       })
-      .eq("id", consumer_profile_id);
+      .eq("id", consumer_profile_id)
+      .eq("is_purchasable", true)
+      .is("purchased_by", null)
+      .select()
+      .maybeSingle();
 
     if (updateError) {
       return new Response(JSON.stringify({ error: "Failed to purchase lead" }), {
         status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (!claimed) {
+      return new Response(JSON.stringify({ error: "Lead already purchased" }), {
+        status: 409,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

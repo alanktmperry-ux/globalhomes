@@ -36,9 +36,10 @@ interface Props {
   pipelineType: 'buyer' | 'seller';
   onUpdateContact: (id: string, updates: Partial<Contact>) => Promise<void>;
   onSelect: (c: Contact) => void;
+  addActivity?: (contactId: string, type: string, description: string) => Promise<void>;
 }
 
-const PipelineBoard = ({ contacts, pipelineType, onUpdateContact, onSelect }: Props) => {
+const PipelineBoard = ({ contacts, pipelineType, onUpdateContact, onSelect, addActivity }: Props) => {
   const stages = pipelineType === 'buyer' ? BUYER_STAGES : SELLER_STAGES;
   const stageField = pipelineType === 'buyer' ? 'buyer_pipeline_stage' : 'seller_pipeline_stage';
   const [draggedId, setDraggedId] = useState<string | null>(null);
@@ -110,6 +111,11 @@ const PipelineBoard = ({ contacts, pipelineType, onUpdateContact, onSelect }: Pr
     setDraggedId(null);
     if (!contactId) return;
     await onUpdateContact(contactId, { [stageField]: stageKey } as any);
+    const stage = stages.find(s => s.key === stageKey);
+    if (stage && addActivity) {
+      const label = pipelineType === 'buyer' ? 'Buyer pipeline' : 'Seller pipeline';
+      await addActivity(contactId, 'status_change', `${label}: moved to ${stage.label}`);
+    }
   };
 
   return (

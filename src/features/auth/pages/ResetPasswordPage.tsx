@@ -104,7 +104,7 @@ const ResetPasswordPage = () => {
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (mounted && session) markReady();
-    });
+    }).catch(() => setLoading(false));
 
     const timeout = setTimeout(() => {
       if (mounted && !readyRef.current) setExpired(true);

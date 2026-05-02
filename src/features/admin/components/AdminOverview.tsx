@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, AlertTriangle, Zap, Globe, BarChart3, Users, Home, DollarSign } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertTriangle, Zap, Globe, BarChart3, Users, Home, DollarSign, ChevronRight, Wallet } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import type { InsightsData } from '../pages/AdminDashboard';
 
 interface Props {
@@ -19,10 +21,22 @@ interface Props {
     last_sign_in_at?: string | null;
   }[];
   insights: InsightsData | null;
+  onNavigate?: (tab: string) => void;
 }
 
+const PLAN_MRR: Record<string, number> = {
+  solo: 299,
+  agency: 899,
+  agency_pro: 1999,
+  enterprise: 4999,
+  demo: 0,
+};
+
+const fmtCurrency = (n: number) =>
+  n.toLocaleString('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 });
+
 const StatCard = ({
-  label, value, sub, color = 'text-primary', trend, trendLabel,
+  label, value, sub, color = 'text-primary', trend, trendLabel, icon: Icon,
 }: {
   label: string;
   value: string | number;
@@ -30,9 +44,13 @@ const StatCard = ({
   color?: string;
   trend?: 'up' | 'down' | 'flat';
   trendLabel?: string;
+  icon?: any;
 }) => (
   <div className="bg-card border border-border rounded-xl p-4 space-y-1">
-    <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">{label}</p>
+    <div className="flex items-center justify-between">
+      <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">{label}</p>
+      {Icon && <Icon size={12} className="text-muted-foreground" />}
+    </div>
     <p className={`text-2xl font-bold ${color}`}>{value}</p>
     {sub && <p className="text-[11px] text-muted-foreground">{sub}</p>}
     {trendLabel && (
@@ -58,9 +76,35 @@ const SectionTitle = ({ icon: Icon, title }: { icon: any; title: string }) => (
   </div>
 );
 
-const AdminOverview = ({ stats, users, insights }: Props) => {
+const AdminOverview = ({ stats, users, insights, onNavigate }: Props) => {
   const now = Date.now();
   const DAY = 86400000;
+
+  const [estMrr, setEstMrr] = useState<number | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [agentsRes, subsRes] = await Promise.all([
+          supabase.from('agents').select('id, is_subscribed'),
+          supabase.from('agent_subscriptions').select('agent_id, plan_type'),
+        ]);
+        const planMap = new Map<string, string>();
+        (subsRes.data || []).forEach((s: any) => planMap.set(s.agent_id, s.plan_type));
+        let mrr = 0;
+        (agentsRes.data || []).forEach((a: any) => {
+          if (!a.is_subscribed) return;
+          const plan = (planMap.get(a.id) || 'demo').toLowerCase();
+          mrr += PLAN_MRR[plan] || 0;
+        });
+        if (!cancelled) setEstMrr(mrr);
+      } catch {
+        if (!cancelled) setEstMrr(0);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const activeToday = users.filter(u => u.last_sign_in_at && now - new Date(u.last_sign_in_at).getTime() < DAY);
   const activeWeek = users.filter(u => u.last_sign_in_at && now - new Date(u.last_sign_in_at).getTime() < 7 * DAY);
@@ -73,32 +117,53 @@ const AdminOverview = ({ stats, users, insights }: Props) => {
   const agentsMonth = activeMonth.filter(u => u.roles.includes('agent')).length;
   const seekersMonth = activeMonth.filter(u => !u.roles.includes('agent') && !u.roles.includes('admin')).length;
 
+  // Agents created in the last 7 days (for "Total Agents +N this week")
+  const agentsCreatedThisWeek = users.filter(
+    u => u.roles.includes('agent') && now - new Date(u.created_at).getTime() < 7 * DAY
+  ).length;
+
   const voiceTrend = insights && insights.voiceSearchesPrev30d > 0
     ? Math.round(((insights.voiceSearches30d - insights.voiceSearchesPrev30d) / insights.voiceSearchesPrev30d) * 100)
     : null;
 
-  const needsAttention = insights ? [
+  // Trial → Paid conversion rate
+  const activeSubs = insights?.activeSubscriptions ?? 0;
+  const trialAgents = insights?.trialAgents ?? 0;
+  const conversionDenominator = activeSubs + trialAgents;
+  const trialConversionPct = conversionDenominator > 0
+    ? Math.round((activeSubs / conversionDenominator) * 100)
+    : null;
+
+  const estArr = estMrr !== null ? estMrr * 12 : null;
+
+  type AttentionItem = { label: string; severity: string; tab?: string };
+  const needsAttention: AttentionItem[] = insights ? ([
     insights.trialsExpiringThisWeek > 0 && {
       label: `${insights.trialsExpiringThisWeek} trial${insights.trialsExpiringThisWeek > 1 ? 's' : ''} expiring this week`,
       severity: 'red',
+      tab: 'agent-lifecycle',
     },
     insights.boostRequestsPending > 0 && {
       label: `${insights.boostRequestsPending} boost request${insights.boostRequestsPending > 1 ? 's' : ''} pending activation`,
       severity: 'amber',
+      tab: 'listings',
     },
     insights.agentsNoListings > 0 && {
       label: `${insights.agentsNoListings} agent${insights.agentsNoListings > 1 ? 's' : ''} with no listings yet`,
       severity: 'amber',
+      tab: 'agent-lifecycle',
     },
     insights.inactiveListings > 0 && {
       label: `${insights.inactiveListings} listing${insights.inactiveListings > 1 ? 's' : ''} with zero views`,
       severity: 'amber',
+      tab: 'listings',
     },
     insights.listingsNoPhotos > 0 && {
       label: `${insights.listingsNoPhotos} listing${insights.listingsNoPhotos > 1 ? 's' : ''} with no photos`,
       severity: 'red',
+      tab: 'listings',
     },
-  ].filter(Boolean) : [];
+  ].filter(Boolean) as AttentionItem[]) : [];
 
   const totalVoiceLang = insights?.topLanguages.reduce((s, l) => s + l.count, 0) || 0;
 
@@ -108,7 +173,13 @@ const AdminOverview = ({ stats, users, insights }: Props) => {
       {/* ── Platform totals ── */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <StatCard label="Total Users" value={stats.totalUsers} color="text-primary" />
-        <StatCard label="Agents" value={stats.totalAgents} color="text-emerald-500" />
+        <StatCard
+          label="Agents"
+          value={stats.totalAgents}
+          color="text-emerald-500"
+          trend={agentsCreatedThisWeek > 0 ? 'up' : 'flat'}
+          trendLabel={agentsCreatedThisWeek > 0 ? `+${agentsCreatedThisWeek} this week` : undefined}
+        />
         <StatCard label="Listings" value={stats.totalListings} color="text-purple-500" />
         <StatCard label="Leads" value={stats.totalLeads} color="text-amber-500" />
         <StatCard label="Voice Searches" value={stats.totalVoiceSearches} color="text-cyan-500" />
@@ -119,9 +190,15 @@ const AdminOverview = ({ stats, users, insights }: Props) => {
         <SectionTitle icon={DollarSign} title="Revenue & Subscriptions" />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <StatCard
-            label="MRR"
-            value="$0"
-            sub="Stripe not connected"
+            label="Est. MRR"
+            value={estMrr !== null ? fmtCurrency(estMrr) : '—'}
+            sub="(pre-Stripe)"
+            color="text-muted-foreground"
+          />
+          <StatCard
+            label="Est. ARR"
+            value={estArr !== null ? fmtCurrency(estArr) : '—'}
+            sub="(pre-Stripe)"
             color="text-muted-foreground"
           />
           <StatCard
@@ -130,6 +207,14 @@ const AdminOverview = ({ stats, users, insights }: Props) => {
             sub="Paying agents"
             color="text-emerald-500"
           />
+          <StatCard
+            label="Trial → Paid"
+            value={trialConversionPct !== null ? `${trialConversionPct}%` : '—'}
+            sub={`${activeSubs} converted of ${conversionDenominator}`}
+            color={trialConversionPct !== null && trialConversionPct >= 30 ? 'text-emerald-500' : 'text-amber-500'}
+          />
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
           <StatCard
             label="Trial Agents"
             value={insights?.trialAgents ?? '—'}
@@ -144,6 +229,14 @@ const AdminOverview = ({ stats, users, insights }: Props) => {
             trend={insights?.trialsExpiringThisWeek ? 'down' : undefined}
             trendLabel={insights?.trialsExpiringThisWeek ? 'Needs follow-up' : undefined}
           />
+          <StatCard
+            label="Runway"
+            value="—"
+            sub="Set cash balance in Settings"
+            color="text-muted-foreground"
+            icon={Wallet}
+          />
+          <div />
         </div>
       </div>
 
@@ -157,7 +250,7 @@ const AdminOverview = ({ stats, users, insights }: Props) => {
             sub={`+${insights?.listingsThisWeek ?? 0} this week`}
             color="text-primary"
             trend={insights?.listingsThisWeek ? 'up' : 'flat'}
-            trendLabel={insights?.listingsThisWeek ? `${insights.listingsThisWeek} new this week` : 'No new listings'}
+            trendLabel={insights?.listingsThisWeek ? `↑ ${insights.listingsThisWeek} new this week` : 'No new listings'}
           />
           <StatCard
             label="Voice Searches"
@@ -172,7 +265,8 @@ const AdminOverview = ({ stats, users, insights }: Props) => {
             value={insights?.leadsToday ?? '—'}
             sub="Buyer enquiries"
             color="text-amber-500"
-            trend={insights?.leadsToday ? 'up' : 'flat'}
+            trend={(insights?.leads30d ?? 0) > 0 ? 'up' : 'flat'}
+            trendLabel={insights ? `↑ ${insights.leads30d} this month` : undefined}
           />
           <StatCard
             label="Leads (30 days)"
@@ -261,18 +355,35 @@ const AdminOverview = ({ stats, users, insights }: Props) => {
             </div>
           ) : (
             <div className="space-y-2">
-              {(needsAttention as { label: string; severity: string }[]).map((item, i) => (
-                <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${
+              {needsAttention.map((item, i) => {
+                const clickable = !!(item.tab && onNavigate);
+                const baseClasses = `w-full flex items-center gap-3 p-3 rounded-lg border text-left transition-colors ${
                   item.severity === 'red'
                     ? 'bg-destructive/5 border-destructive/20'
                     : 'bg-amber-500/5 border-amber-500/20'
-                }`}>
-                  <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                    item.severity === 'red' ? 'bg-destructive' : 'bg-amber-500'
-                  }`} />
-                  <p className="text-sm text-foreground">{item.label}</p>
-                </div>
-              ))}
+                } ${item.tab ? 'hover:bg-accent/30 cursor-pointer' : ''}`;
+                const content = (
+                  <>
+                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                      item.severity === 'red' ? 'bg-destructive' : 'bg-amber-500'
+                    }`} />
+                    <p className="text-sm text-foreground flex-1">{item.label}</p>
+                    {item.tab && <ChevronRight size={14} className="text-muted-foreground flex-shrink-0" />}
+                  </>
+                );
+                return clickable ? (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => onNavigate?.(item.tab!)}
+                    className={baseClasses}
+                  >
+                    {content}
+                  </button>
+                ) : (
+                  <div key={i} className={baseClasses}>{content}</div>
+                );
+              })}
             </div>
           )}
         </div>

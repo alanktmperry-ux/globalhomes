@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { initPostHog } from '@/shared/lib/analyticsConsent';
 
 const STORAGE_KEY = 'listhq-cookie-consent';
 
@@ -21,6 +22,9 @@ export function CookieConsentBanner() {
 
   const dismiss = (value: 'accepted' | 'declined') => {
     try { localStorage.setItem(STORAGE_KEY, value); } catch { /* ignore */ }
+    if (value === 'accepted') {
+      initPostHog();
+    }
     setClosing(true);
     setTimeout(() => setVisible(false), 200);
   };

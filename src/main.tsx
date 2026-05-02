@@ -1,41 +1,30 @@
 import * as Sentry from "@sentry/react";
-import posthog from "posthog-js";
 import { createRoot } from "react-dom/client";
 import { ThemeProvider } from "next-themes";
 import { InvestorModeProvider } from "./context/InvestorModeContext";
 import App from "./App.tsx";
 import "./index.css";
+import { getConsent, initPostHog } from "./shared/lib/analyticsConsent";
 
-posthog.init('phc_t5GbsNYF3Qb7xPpxK8hMVKMv4GYvvrJwS5KNLKWBbvTk', {
-  api_host: 'https://eu.i.posthog.com',
-  capture_pageview: true,
-  capture_pageleave: true,
-});
+if (getConsent() === 'accepted') {
+  initPostHog();
+}
 
 setTimeout(() => {
   Sentry.init({
     dsn: import.meta.env.VITE_SENTRY_DSN,
     environment: import.meta.env.MODE,
     tracesSampleRate: 0.05,
-    integrations: [
-      Sentry.browserTracingIntegration(),
-    ],
+    integrations: [Sentry.browserTracingIntegration()],
   });
 }, 0);
 
 createRoot(document.getElementById("root")!).render(
   <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} forcedTheme="light">
     <InvestorModeProvider>
-      <Sentry.ErrorBoundary
-        fallback={
-          <div className="flex items-center justify-center min-h-screen text-foreground">
-            Something went wrong. Please refresh.
-          </div>
-        }
-      >
+      <Sentry.ErrorBoundary fallback={<div className="flex items-center justify-center min-h-screen text-foreground">Something went wrong. Please refresh.</div>}>
         <App />
       </Sentry.ErrorBoundary>
     </InvestorModeProvider>
   </ThemeProvider>
 );
-

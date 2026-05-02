@@ -181,7 +181,8 @@ const AnalyticsPage = () => {
 
           {/* Voice search keywords */}
           <div className="bg-card border border-border rounded-xl p-4">
-            <h3 className="font-display text-sm font-bold mb-3">Top Voice Search Keywords</h3>
+            <h3 className="font-display text-sm font-bold">Platform Search Trends</h3>
+            <p className="text-xs text-muted-foreground mb-3">What buyers are searching for across the platform</p>
             {topKeywords.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">

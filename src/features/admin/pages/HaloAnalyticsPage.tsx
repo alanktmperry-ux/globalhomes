@@ -143,7 +143,7 @@ export default function HaloAnalyticsPage() {
         // Keep haloIds variable used (lint)
         void haloIds;
       } catch (e) {
-        console.error('[HaloAnalytics]', e);
+        if (import.meta.env.DEV) console.error('[HaloAnalytics]', e);
       } finally {
         setLoading(false);
       }

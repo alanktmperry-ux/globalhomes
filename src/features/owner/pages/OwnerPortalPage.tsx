@@ -126,8 +126,11 @@ export default function OwnerPortalPage() {
   // Yield calc (annual rent assuming weekly)
   let yieldPct: string | null = null;
   if (tenancy?.rent_amount && property?.price) {
-    const annual = Number(tenancy.rent_amount) * (tenancy.rent_frequency === 'weekly' ? 52 : tenancy.rent_frequency === 'fortnightly' ? 26 : 12);
-    yieldPct = ((annual / Number(property.price)) * 100).toFixed(2);
+    const priceNum = Number(property.price);
+    if (priceNum > 0) {
+      const annual = Number(tenancy.rent_amount) * (tenancy.rent_frequency === 'weekly' ? 52 : tenancy.rent_frequency === 'fortnightly' ? 26 : 12);
+      yieldPct = ((annual / priceNum) * 100).toFixed(2);
+    }
   }
 
   // 12-month totals
@@ -184,8 +187,8 @@ export default function OwnerPortalPage() {
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">Property overview</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <Card><CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">Weekly rent</p>
-              <p className="text-xl font-semibold mt-1">{tenancy ? AUD.format(Number(tenancy.rent_amount)) : '—'}</p>
+              <p className="text-xs text-muted-foreground">Rent</p>
+              <p className="text-xl font-semibold mt-1">{tenancy ? `${AUD.format(Number(tenancy.rent_amount))} / ${tenancy.rent_frequency || 'week'}` : '—'}</p>
             </CardContent></Card>
             <Card><CardContent className="p-4">
               <p className="text-xs text-muted-foreground">Lease ends</p>
@@ -211,7 +214,7 @@ export default function OwnerPortalPage() {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Lease</p>
-                  <p>{format(parseISO(tenancy.lease_start), 'd MMM yyyy')} → {format(parseISO(tenancy.lease_end), 'd MMM yyyy')}</p>
+                  <p>{tenancy.lease_start ? format(parseISO(tenancy.lease_start), 'd MMM yyyy') : '—'} → {tenancy.lease_end ? format(parseISO(tenancy.lease_end), 'd MMM yyyy') : 'Periodic'}</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Payment status</p>
@@ -359,7 +362,7 @@ export default function OwnerPortalPage() {
                 <div key={i.id} className="flex items-center justify-between gap-2 text-sm py-1.5 border-b last:border-0">
                   <div>
                     <p className="font-medium capitalize">{i.inspection_type} inspection</p>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1"><Calendar size={11} /> {format(parseISO(i.scheduled_date), 'd MMM yyyy')}</p>
+                    <p className="text-xs text-muted-foreground flex items-center gap-1"><Calendar size={11} /> {i.scheduled_date ? format(parseISO(i.scheduled_date), 'd MMM yyyy') : '—'}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant="outline" className="text-[10px] capitalize">{i.status}</Badge>
@@ -424,5 +427,5 @@ function StatusBadge({ status }: { status: string }) {
     assigned: 'bg-blue-500/10 text-blue-700',
     quoted: 'bg-purple-500/10 text-purple-700',
   };
-  return <Badge className={`${map[status] || 'bg-muted text-muted-foreground'} text-[10px] capitalize`}>{status?.replace('_', ' ')}</Badge>;
+  return <Badge className={`${map[status] || 'bg-muted text-muted-foreground'} text-[10px] capitalize`}>{status?.replace(/_/g, ' ')}</Badge>;
 }

@@ -12,6 +12,7 @@ const PipelinePage = lazy(() => import('./PipelinePage'));
 import DashboardHeader from './DashboardHeader';
 import { useAgentListings, type AgentListing } from '@/features/agents/hooks/useAgentListings';
 import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
+import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import { PropertyDrawer } from '@/features/properties/components/PropertyDrawer';
 import { Property } from '@/shared/lib/types';
 import { supabase } from '@/integrations/supabase/client';

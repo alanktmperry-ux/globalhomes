@@ -22,6 +22,25 @@ function scoreHalo(h: any): number {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   try {
+    // ── Auth check ──
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const authClient = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_ANON_KEY')!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const { data: userData, error: userErr } = await authClient.auth.getUser();
+    if (userErr || !userData?.user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const { halo_id } = await req.json();
     if (!halo_id) {
       return new Response(JSON.stringify({ error: 'Missing halo_id' }), {
@@ -35,6 +54,19 @@ Deno.serve(async (req) => {
         status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    // ── Ownership check: caller must be the halo's agent ──
+    const { data: agentRow } = await admin
+      .from('agents')
+      .select('id')
+      .eq('user_id', userData.user.id)
+      .maybeSingle();
+    if (!agentRow || agentRow.id !== halo.agent_id) {
+      return new Response(JSON.stringify({ error: 'Forbidden' }), {
+        status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const score = scoreHalo(halo);
     await admin.from('halos').update({ quality_score: score }).eq('id', halo_id);
     return new Response(JSON.stringify({ ok: true, quality_score: score }), {

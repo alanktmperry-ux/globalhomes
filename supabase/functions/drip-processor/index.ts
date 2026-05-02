@@ -95,6 +95,15 @@ Deno.serve(async (req) => {
     return new Response('Method not allowed', { status: 405 });
   }
 
+  // ── Cron secret check ──
+  const cronSecret = Deno.env.get('CRON_SECRET');
+  if (cronSecret && req.headers.get('x-cron-secret') !== cronSecret) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   const results = { processed: 0, skipped: 0, errors: 0, details: [] as string[] };
 
   try {

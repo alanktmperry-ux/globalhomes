@@ -23,6 +23,25 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
+    // ── Auth check: require valid Supabase JWT ──
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const authClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const { data: userData, error: userErr } = await authClient.auth.getUser();
+    if (userErr || !userData?.user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const payload: LeadPayload = await req.json();
 
     if (!payload.buyerName?.trim() || !payload.buyerEmail?.trim()) {
@@ -70,21 +89,20 @@ Deno.serve(async (req: Request) => {
 
     // ── Duplicate check ─────────────────────────────────────────────────────
     let isDuplicate = false;
+    const thirtyDaysAgo = new Date(
+      Date.now() - 30 * 24 * 60 * 60 * 1000
+    ).toISOString();
+    let dupQuery = supabase
+      .from("broker_leads")
+      .select("id")
+      .eq("buyer_email", payload.buyerEmail.toLowerCase())
+      .eq("broker_id", broker.id)
+      .gte("created_at", thirtyDaysAgo);
     if (payload.propertyId) {
-      const thirtyDaysAgo = new Date(
-        Date.now() - 30 * 24 * 60 * 60 * 1000
-      ).toISOString();
-      const { data: existing } = await supabase
-        .from("broker_leads")
-        .select("id")
-        .eq("buyer_email", payload.buyerEmail.toLowerCase())
-        .eq("property_id", payload.propertyId)
-        .eq("broker_id", broker.id)
-        .gte("created_at", thirtyDaysAgo)
-        .maybeSingle();
-
-      isDuplicate = !!existing;
+      dupQuery = dupQuery.eq("property_id", payload.propertyId);
     }
+    const { data: existing } = await dupQuery.limit(1).maybeSingle();
+    isDuplicate = !!existing;
 
     // ── Persist lead ────────────────────────────────────────────────────────
     const { error: insertError } = await supabase

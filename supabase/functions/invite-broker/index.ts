@@ -9,6 +9,39 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
+    // ── Auth check: caller must be admin ──
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+    const authClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const { data: userData, error: userErr } = await authClient.auth.getUser();
+    if (userErr || !userData?.user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const { data: roles } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userData.user.id);
+    const isAdmin = (roles ?? []).some((r: any) => r.role === "admin");
+    if (!isAdmin) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const {
       name, email, phone, company, aclNumber, languages,
       tagline, calendarUrl, photoUrl, isFoundingPartner,
@@ -20,11 +53,6 @@ Deno.serve(async (req: Request) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
 
     const capExpiresAt = isFoundingPartner
       ? new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
@@ -64,7 +92,7 @@ Deno.serve(async (req: Request) => {
       type: "magiclink",
       email: email.toLowerCase(),
       options: {
-        redirectTo: "https://globalhomes.lovable.app/broker/portal",
+        redirectTo: `${Deno.env.get('SITE_URL') || 'https://listhq.com.au'}/broker/portal`,
       },
     });
 

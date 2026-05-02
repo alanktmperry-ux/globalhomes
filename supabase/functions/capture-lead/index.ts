@@ -41,22 +41,26 @@ Deno.serve(async (req) => {
       hcaptcha_token,
     } = await req.json();
 
-    // --- hCaptcha verification (if token provided) ---
-    if (hcaptcha_token) {
-      const hcaptchaSecret = Deno.env.get("HCAPTCHA_SECRET_KEY");
-      if (hcaptchaSecret) {
-        const verifyResp = await fetch("https://hcaptcha.com/siteverify", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: `secret=${encodeURIComponent(hcaptchaSecret)}&response=${encodeURIComponent(hcaptcha_token)}`,
-        });
-        const verifyResult = await verifyResp.json();
-        if (verifyResult.success !== true) {
-          return new Response(
-            JSON.stringify({ error: "CAPTCHA verification failed" }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
+    // --- hCaptcha verification (required when HCAPTCHA_SECRET_KEY is configured) ---
+    const hcaptchaSecret = Deno.env.get("HCAPTCHA_SECRET_KEY");
+    if (hcaptchaSecret) {
+      if (!hcaptcha_token) {
+        return new Response(
+          JSON.stringify({ error: "Captcha required" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      const verifyResp = await fetch("https://hcaptcha.com/siteverify", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `secret=${encodeURIComponent(hcaptchaSecret)}&response=${encodeURIComponent(hcaptcha_token)}`,
+      });
+      const verifyResult = await verifyResp.json();
+      if (verifyResult.success !== true) {
+        return new Response(
+          JSON.stringify({ error: "CAPTCHA verification failed" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
     }
     // --- End hCaptcha verification ---

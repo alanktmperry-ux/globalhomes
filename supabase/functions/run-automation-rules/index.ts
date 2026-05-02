@@ -24,6 +24,15 @@ type ProcessResult = { processed: number; fired: number; errors: number };
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  // ── Cron secret check ──
+  const cronSecret = Deno.env.get("CRON_SECRET");
+  if (cronSecret && req.headers.get("x-cron-secret") !== cronSecret) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   const sb = createClient(SUPABASE_URL, SERVICE_ROLE);
   const summary: Record<string, ProcessResult> = {};
 

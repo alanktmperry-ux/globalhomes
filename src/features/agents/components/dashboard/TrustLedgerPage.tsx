@@ -105,7 +105,7 @@ const TrustLedgerPage = () => {
     reference: '',
     entryDate: new Date().toISOString().slice(0, 10),
   });
-  const [suspenseItems, setSuspenseItems] = useState<any[]>([]);
+  const [suspenseItems, setSuspenseItems] = useState<TrustEntry[]>([]);
   const [showSuspense, setShowSuspense] = useState(false);
   const [suspenseForm, setSuspenseForm] = useState({
     amount: '',
@@ -117,7 +117,7 @@ const TrustLedgerPage = () => {
 
   // Fetch agent record for current user
   const [agent, setAgent] = useState<any>(null);
-  const [accounts, setAccounts] = useState<any[]>([]);
+  const [accounts, setAccounts] = useState<TrustEntry[]>([]);
 
   const fetchAgentAndAccounts = useCallback(async () => {
     if (!user) return;

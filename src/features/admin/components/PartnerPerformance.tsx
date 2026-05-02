@@ -91,7 +91,7 @@ function PartnerRowComponent({ partner }: { partner: PartnerRow }) {
 
       const [agentsRes, balancesRes] = await Promise.all([
         supabase.from('agents').select('id, agency_id').in('agency_id', agencyIds),
-        supabase.from('trust_account_balances').select('agent_id, current_balance, last_reconciled_date'),
+        supabase.from('trust_account_balances_view' as any).select('agent_id, current_balance, last_reconciled_date'),
       ]);
 
       const agentsByAgency = new Map<string, number>();
@@ -317,7 +317,7 @@ export default function PartnerPerformance() {
       const agentIds = allAgents.map((a: any) => a.id);
 
       const balancesRes = agentIds.length > 0
-        ? await supabase.from('trust_account_balances').select('agent_id, current_balance, last_reconciled_date').in('agent_id', agentIds)
+        ? await supabase.from('trust_account_balances_view' as any).select('agent_id, current_balance, last_reconciled_date').in('agent_id', agentIds)
         : { data: [] as { agent_id: string; current_balance: number; last_reconciled_date: string | null }[] };
 
       const tenanciesRes = agentIds.length > 0

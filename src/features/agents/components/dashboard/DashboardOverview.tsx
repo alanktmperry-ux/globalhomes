@@ -187,7 +187,7 @@ const DashboardOverview = () => {
           .or(`user_id.eq.${user.id},assigned_to.eq.${user.id}`)
           .eq('status', 'pending').lte('due_date', todayStr),
         supabase.from('contacts').select('id', { count: 'exact', head: true }).eq('created_by', user.id),
-        supabase.from('trust_account_balances').select('current_balance').eq('agent_id', aId).maybeSingle(),
+        supabase.from('trust_account_balances_view' as any).select('current_balance').eq('agent_id', aId).maybeSingle(),
         supabase.from('leads').select('id', { count: 'exact', head: true })
           .eq('agent_id', aId).eq('status', 'new').lt('created_at', fiveMinAgo),
         supabase.from('activities').select('created_at, metadata')

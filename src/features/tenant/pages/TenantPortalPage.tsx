@@ -57,6 +57,18 @@ const TenantPortalPage = () => {
 
   useEffect(() => { load(); }, [load]);
 
+  // Audit log: portal access (fire-and-forget)
+  useEffect(() => {
+    const tenancyId = data?.tenancy?.id;
+    if (!tenancyId) return;
+    supabase.from('audit_logs').insert({
+      event_type: 'portal_access',
+      portal_type: 'tenant',
+      entity_id: tenancyId,
+      accessed_at: new Date().toISOString(),
+    } as any).then(() => {/* fire-and-forget */}, () => {/* ignore */});
+  }, [data?.tenancy?.id]);
+
   const submitMaintenance = async () => {
     if (!form.title.trim()) { toast.error('Please enter a title'); return; }
     setSubmitting(true);

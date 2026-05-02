@@ -8,6 +8,16 @@ import { CheckCircle2, XCircle, Loader2, UserCheck, Inbox } from 'lucide-react';
 import { dispatchNotification } from '@/shared/lib/notify';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { buildAuditMeta } from '@/shared/lib/auditLog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface PendingAgent {
   id: string;
@@ -31,6 +41,7 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
+  const [agentToApprove, setAgentToApprove] = useState<{ id: string; name: string } | null>(null);
 
   const fetchPending = async () => {
     setLoading(true);
@@ -68,11 +79,15 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
     if (auditError) console.error('[AgentApprovalQueue] audit log failed:', auditError);
   };
 
-  const handleApprove = async (agent: PendingAgent) => {
-    const confirmed = window.confirm(
-      `Approve agent ${agent.name}? This will grant them full platform access.`,
-    );
-    if (!confirmed) return;
+  const handleApprove = (agent: PendingAgent) => {
+    setAgentToApprove({ id: agent.id, name: agent.name });
+  };
+
+  const performApprove = async () => {
+    if (!agentToApprove) return;
+    const agent = agents.find(a => a.id === agentToApprove.id);
+    setAgentToApprove(null);
+    if (!agent) return;
 
     setActionLoading(agent.id);
     const { error } = await (supabase.from('agents') as any)

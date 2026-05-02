@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Loader2, Mail, X, FileText } from 'lucide-react';
+import { Plus, Loader2, Mail, X, FileText, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, parseISO, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import DashboardHeader from './DashboardHeader';
@@ -30,6 +30,7 @@ type Statement = {
   other_deductions_aud: number;
   net_amount_aud: number;
   emailed_to_owner: boolean;
+  pdf_url: string | null;
   created_at: string;
   properties?: { address: string };
 };

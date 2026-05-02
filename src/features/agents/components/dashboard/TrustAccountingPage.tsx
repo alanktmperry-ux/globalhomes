@@ -90,6 +90,7 @@ const TrustAccountingPage = () => {
   const [showNewAccount, setShowNewAccount] = useState(false);
   const [showNewReceipt, setShowNewReceipt] = useState(false);
   const [showImportWizard, setShowImportWizard] = useState(false);
+  const [showRentRollWizard, setShowRentRollWizard] = useState(false);
   const [editingTx, setEditingTx] = useState<TrustTransaction | null>(null);
   const [deletingTx, setDeletingTx] = useState<TrustTransaction | null>(null);
 

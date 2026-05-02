@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -7,6 +7,7 @@ import { NotificationBell } from '@/features/agents/components/dashboard/Notific
 import AgentDashboardSidebar from '@/features/agents/components/dashboard/AgentDashboardSidebar';
 import { PaymentStatusBanner } from '@/features/agents/components/PaymentStatusBanner';
 import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
+import { PageSkeleton } from '@/shared/components/PageSkeleton';
 
 
 const AgentDashboardLayout = () => {
@@ -65,7 +66,9 @@ const AgentDashboardLayout = () => {
             </div>
           )}
           <div className="p-4 md:p-6 flex-1">
-            <Outlet />
+            <Suspense fallback={<PageSkeleton />}>
+              <Outlet />
+            </Suspense>
           </div>
         </main>
       </div>

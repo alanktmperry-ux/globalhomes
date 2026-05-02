@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import DashboardHeader from './DashboardHeader';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
 import ListingDetailsTab from './listing-tabs/ListingDetailsTab';
 import ListingMarketingTab from './listing-tabs/ListingMarketingTab';
@@ -18,26 +19,44 @@ import MatchedBuyersWidget from './MatchedBuyersWidget';
 const ListingDetailPage = () => {
   const { listingId } = useParams<{ listingId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [listing, setListing] = useState<PropertyRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'details');
   const [publishing, setPublishing] = useState(false);
+  const [agentId, setAgentId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!listingId) return;
+    if (!listingId || !user) return;
     const fetchListing = async () => {
       setLoading(true);
+      // Resolve current agent id, then scope the property fetch to that agent
+      const { data: agentRow } = await supabase
+        .from('agents')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      const myAgentId = agentRow?.id || null;
+      setAgentId(myAgentId);
+
+      if (!myAgentId) {
+        setListing(null);
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('properties')
         .select('*')
         .eq('id', listingId)
-        .single();
+        .eq('agent_id', myAgentId)
+        .maybeSingle();
       if (!error && data) setListing(data);
       setLoading(false);
     };
     fetchListing();
-  }, [listingId]);
+  }, [listingId, user]);
 
   if (loading) {
     return (
@@ -147,8 +166,12 @@ const ListingDetailPage = () => {
 
           <TabsContent value="details">
             <ListingDetailsTab listing={listing} onUpdate={(updates) => {
-              supabase.from('properties').update(updates as any).eq('id', listing.id).then(() => {
-                setListing({ ...listing, ...updates });
+              supabase.from('properties').update(updates as any).eq('id', listing.id).then(({ error }) => {
+                if (error) {
+                  toast.error('Save failed — please try again');
+                } else {
+                  setListing({ ...listing, ...updates });
+                }
               });
             }} />
           </TabsContent>

@@ -515,9 +515,27 @@ const UsersDashboard = ({ users, loading }: UsersDashboardProps) => {
     for (const id of selected) {
       try {
         const isDemoRequest = id.startsWith('demo-');
-        const action = isDemoRequest ? 'delete_demo_request' : 'delete_user';
-        const bodyId = isDemoRequest ? id.replace('demo-', '') : id;
-        await callAdminApi(action, { [isDemoRequest ? 'request_id' : 'user_id']: bodyId });
+        if (isDemoRequest) {
+          await callAdminApi('delete_demo_request', { request_id: id.replace('demo-', '') });
+          successCount++;
+          continue;
+        }
+        const userRecord = users.find(u => u.id === id);
+        const isAgent = userRecord?.user_type === 'agent' || userRecord?.user_type === 'demo';
+        if (isAgent) {
+          // Use dedicated admin-delete-agent edge function for full agent cleanup
+          const { data: sessionData } = await supabase.auth.getSession();
+          const token = sessionData.session?.access_token;
+          if (!token) throw new Error('No active session');
+          const { data: delData, error: delError } = await supabase.functions.invoke('admin-delete-agent', {
+            body: { userId: id },
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (delError) throw new Error(delError.message || 'Delete failed');
+          if (delData?.error) throw new Error(delData.error);
+        } else {
+          await callAdminApi('delete_user', { user_id: id });
+        }
         successCount++;
       } catch {
         failCount++;

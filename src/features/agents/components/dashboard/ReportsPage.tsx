@@ -223,7 +223,7 @@ const ReportsPage = () => {
   // ─── EXPORT HANDLERS ───
   const exportSalesReport = () => {
     const headers = ['Property', 'Address', 'Price', 'Commission Rate', 'GCI', 'Status', 'Listed Date'];
-    const rows = listings.map(l => [
+    const rows = salesData.soldListings.map(l => [
       (l as any).title, (l as any).address, String((l as any).price || 0),
       String((l as any).commission_rate || 2) + '%',
       AUD.format(((l as any).price || 0) * ((l as any).commission_rate || 2) / 100),
@@ -244,7 +244,11 @@ const ReportsPage = () => {
 
   const exportActivityReport = () => {
     const headers = ['Name', 'Type', 'Ranking', 'Email', 'Phone', 'Source', 'Pipeline Stage', 'Suburb'];
-    const rows = contacts.map(c => [
+    const periodContacts = contacts.filter(c => {
+      const created = (c as any).created_at ? new Date((c as any).created_at) : null;
+      return created ? created >= range.from && created <= range.to : true;
+    });
+    const rows = periodContacts.map(c => [
       `${c.first_name} ${c.last_name || ''}`, c.contact_type, c.ranking,
       c.email || '', c.phone || '', c.source || '',
       c.buyer_pipeline_stage || c.seller_pipeline_stage || '', c.suburb || '',

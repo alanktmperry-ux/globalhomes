@@ -8,6 +8,8 @@ import AgentDashboardSidebar from '@/features/agents/components/dashboard/AgentD
 import { PaymentStatusBanner } from '@/features/agents/components/PaymentStatusBanner';
 import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
 import { PageSkeleton } from '@/shared/components/PageSkeleton';
+import { MFAChallenge } from '@/features/auth/components/MFAChallenge';
+import { supabase } from '@/integrations/supabase/client';
 
 
 const AgentDashboardLayout = () => {
@@ -19,6 +21,34 @@ const AgentDashboardLayout = () => {
   const [checked, setChecked] = useState(false);
   const [onboardingComplete, setOnboardingComplete] = useState(true);
   const [trustPending, setTrustPending] = useState(false);
+  const [mfaRequired, setMfaRequired] = useState(false);
+  const [mfaChecked, setMfaChecked] = useState(false);
+
+  // Check Authenticator Assurance Level — if user enrolled TOTP but session is still aal1, gate the dashboard.
+  useEffect(() => {
+    if (!user || impersonatedUserId) { setMfaRequired(false); setMfaChecked(true); return; }
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+        if (cancelled) return;
+        if (error) { setMfaRequired(false); return; }
+        // nextLevel === 'aal2' && currentLevel === 'aal1' means a verified factor exists but hasn't been satisfied for this session.
+        setMfaRequired(data.currentLevel === 'aal1' && data.nextLevel === 'aal2');
+      } finally {
+        if (!cancelled) setMfaChecked(true);
+      }
+    })();
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'MFA_CHALLENGE_VERIFIED' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        supabase.auth.mfa.getAuthenticatorAssuranceLevel().then(({ data }) => {
+          if (!data) return;
+          setMfaRequired(data.currentLevel === 'aal1' && data.nextLevel === 'aal2');
+        });
+      }
+    });
+    return () => { cancelled = true; sub.subscription.unsubscribe(); };
+  }, [user, impersonatedUserId]);
 
   useEffect(() => {
     const effectiveUserId = impersonatedUserId || user?.id;
@@ -45,6 +75,10 @@ const AgentDashboardLayout = () => {
     setTrustPending(!!agent?.trust_setup_pending);
   }, [agent?.trust_setup_pending]);
 
+
+  if (mfaChecked && mfaRequired) {
+    return <MFAChallenge />;
+  }
 
   return (
     <SidebarProvider>

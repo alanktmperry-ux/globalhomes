@@ -950,7 +950,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                 {featuredLoading ? (
                   <Skeleton className="absolute inset-0 w-full h-full" />
                 ) : (
-                  <img src={dedupedFeatured[0]?.img} alt={dedupedFeatured[0]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="eager" />
+                  <img src={dedupedFeatured[0]?.img} alt={dedupedFeatured[0]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="eager" fetchPriority="high" />
                 )}
                 <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.7) 100%)'}} />
                 <div className="absolute top-3 left-3">
@@ -1057,7 +1057,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
               {featuredLoading ? (
                 <Skeleton className="absolute inset-0 w-full h-full" />
               ) : (
-                <img src={dedupedFeatured[3 % dedupedFeatured.length]?.img} alt={dedupedFeatured[3 % dedupedFeatured.length]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="eager" />
+                <img src={dedupedFeatured[3 % dedupedFeatured.length]?.img} alt={dedupedFeatured[3 % dedupedFeatured.length]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="eager" fetchPriority="high" />
               )}
               <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 30%,rgba(0,0,0,0.72) 100%)'}} />
               <span className="absolute top-3 left-3 text-[9px] font-bold px-2.5 py-1 rounded-full text-white bg-foreground/80">

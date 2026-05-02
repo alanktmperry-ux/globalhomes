@@ -8,12 +8,37 @@ import { format, subMonths, startOfMonth } from 'date-fns';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
 
+interface AnalyticsEvent {
+  id: string;
+  event?: string;
+  created_at: string;
+  property_id?: string;
+  user_id?: string;
+  metadata?: Record<string, unknown>;
+  // Listing fields
+  title?: string;
+  suburb?: string;
+  views?: number;
+  contact_clicks?: number;
+  status?: string;
+  listing_type?: string;
+  price?: number;
+  // Lead fields
+  score?: number;
+  timeframe?: string;
+  buying_purpose?: string;
+  search_context?: unknown;
+  // Voice search fields
+  transcript?: string;
+  parsed_query?: unknown;
+}
+
 const AnalyticsPage = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [listings, setListings] = useState<any[]>([]);
-  const [leads, setLeads] = useState<any[]>([]);
-  const [voiceSearches, setVoiceSearches] = useState<any[]>([]);
+  const [listings, setListings] = useState<AnalyticsEvent[]>([]);
+  const [leads, setLeads] = useState<AnalyticsEvent[]>([]);
+  const [voiceSearches, setVoiceSearches] = useState<AnalyticsEvent[]>([]);
 
   const fetchData = useCallback(async () => {
     if (!user) return;

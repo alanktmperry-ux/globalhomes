@@ -6,7 +6,8 @@ const corsHeaders = {
 };
 
 const TABLES = [
-  'trust_transactions',
+  'trust_receipts',
+  'trust_payments',
   'agents',
   'contacts',
   'properties',

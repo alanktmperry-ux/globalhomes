@@ -837,6 +837,62 @@ const TrustAccountingPage = () => {
           </Card>
         </div>
 
+        {/* ── Month-End Close ── */}
+        <Card className="mb-6 border-l-4 border-l-amber-500">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div className="flex items-center gap-2">
+                <Lock size={16} className="text-amber-500" />
+                <h3 className="text-sm font-bold">Month-End Close</h3>
+                <Badge variant="outline" className="text-[10px]">{periodLabel}</Badge>
+              </div>
+              {periodClosed ? (
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-emerald-500/10 text-emerald-700 gap-1">
+                    <CheckCircle2 size={12} /> {periodLabel} — Closed ✓
+                  </Badge>
+                  <span className="text-xs text-muted-foreground">
+                    {AUD.format(periodClosed.closing_balance)} · closed {DATE_FMT.format(new Date(periodClosed.closed_at))}
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-muted-foreground">
+                    Current balance: <strong className="text-foreground">{AUD.format(periodBalance)}</strong>
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-8 text-xs gap-1.5"
+                    onClick={() => setShowCloseConfirm(true)}
+                    disabled={!agent?.id}
+                  >
+                    <Lock size={12} /> Close {periodLabel}
+                  </Button>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Dialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Close {periodLabel}?</DialogTitle>
+              <DialogDescription>
+                This will lock all {periodLabel} transactions. You will not be able to edit or add transactions for this period after closing. The {nextMonthLabel} opening balance will be set to <strong>{AUD.format(periodBalance)}</strong>. Proceed?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowCloseConfirm(false)} disabled={closingPeriod}>Cancel</Button>
+              <Button onClick={handleCloseMonth} disabled={closingPeriod}>
+                {closingPeriod ? <Clock size={14} className="animate-spin mr-1" /> : <Lock size={14} className="mr-1" />}
+                Close period
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         {/* ── Bulk Payments Section ── */}
         {pendingPayments.length > 0 && (
           <Card className="mb-6" id="bulk-payments-section">

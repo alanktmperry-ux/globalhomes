@@ -7,7 +7,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const APP_URL = Deno.env.get('PUBLIC_APP_URL') || 'https://globalhomes.lovable.app';
+const APP_URL = Deno.env.get('APP_URL') ?? 'https://listhq.com.au';
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 const EMAIL_FROM = Deno.env.get('EMAIL_FROM') || 'ListHQ <noreply@listhq.com.au>';
 

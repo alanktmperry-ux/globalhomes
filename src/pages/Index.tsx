@@ -1326,7 +1326,7 @@ const Index = () => {
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
                 <button
-                  onClick={() => navigate('/agent-portal')}
+                  onClick={() => navigate('/for-agents')}
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors shadow-sm hover:shadow-md"
                 >
                   List your properties

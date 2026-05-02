@@ -200,7 +200,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "ban_user") {
-      const { user_id, ban } = await req.json();
+      const { user_id, ban } = bodyParams;
       if (ban) {
         const { error } = await supabase.auth.admin.updateUserById(user_id, { ban_duration: "876000h" });
         if (error) throw error;
@@ -227,7 +227,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "set_subscription") {
-      const { user_id, plan_type, listing_limit, seat_limit, founding_member } = await req.json();
+      const { user_id, plan_type, listing_limit, seat_limit, founding_member } = bodyParams;
 
       const { data: agent, error: agentErr } = await supabase
         .from("agents")
@@ -280,7 +280,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "verify_partner") {
-      const { user_id, verify } = await req.json();
+      const { user_id, verify } = bodyParams;
       const { data: partner, error: findErr } = await supabase
         .from("partners")
         .select("id")
@@ -311,7 +311,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "delete_demo_request") {
-      const { request_id } = await req.json();
+      const { request_id } = bodyParams;
       if (!request_id) {
         return new Response(JSON.stringify({ error: "Missing request_id" }), {
           status: 400,
@@ -439,7 +439,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "reset_password") {
-      const { email } = await req.json();
+      const { email } = bodyParams;
       const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || Deno.env.get("SUPABASE_PUBLISHABLE_KEY")!;
       const anonClient = createClient(supabaseUrl, anonKey);
       const { error } = await anonClient.auth.resetPasswordForEmail(email, {
@@ -501,7 +501,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "delete_record") {
-      const { table, record_id } = await req.json();
+      const { table, record_id } = bodyParams;
       const allowedTables = ['properties', 'leads', 'voice_searches', 'saved_properties', 'lead_events'];
       if (!allowedTables.includes(table)) {
         return new Response(JSON.stringify({ error: "Delete not allowed on this table" }), {
@@ -517,7 +517,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "extend_grace") {
-      const { user_id, grace_until } = await req.json();
+      const { user_id, grace_until } = bodyParams;
       const { data: agent, error: findErr } = await supabase
         .from("agents")
         .select("id, subscription_status")
@@ -540,7 +540,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "mark_active") {
-      const { user_id } = await req.json();
+      const { user_id } = bodyParams;
       const { data: agent, error: findErr } = await supabase
         .from("agents")
         .select("id")
@@ -558,8 +558,24 @@ Deno.serve(async (req) => {
         updated_at: new Date().toISOString(),
       }).eq("id", agent.id);
       if (error) throw error;
-      // Reactivate listings
-      await supabase.from("properties").update({ is_active: true }).eq("agent_id", agent.id);
+      // Reactivate listings — but exclude properties with active/vacating tenancies
+      // (those should never have been deactivated in the first place).
+      const { data: tenancyRows } = await supabase
+        .from("tenancies")
+        .select("property_id")
+        .eq("agent_id", agent.id)
+        .in("status", ["active", "vacating"]);
+      const excludedPropertyIds = Array.from(
+        new Set((tenancyRows || []).map((r: any) => r.property_id).filter(Boolean))
+      );
+      let reactivateQuery = supabase
+        .from("properties")
+        .update({ is_active: true })
+        .eq("agent_id", agent.id);
+      if (excludedPropertyIds.length > 0) {
+        reactivateQuery = reactivateQuery.not("id", "in", `(${excludedPropertyIds.join(",")})`);
+      }
+      await reactivateQuery;
 
       // Audit log
       try {

@@ -259,6 +259,21 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
           </table>
         </div>
       )}
+
+      <AlertDialog open={!!agentToApprove} onOpenChange={(open) => { if (!open) setAgentToApprove(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Approve {agentToApprove?.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will grant {agentToApprove?.name} full platform access, including the ability to create and publish listings.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={performApprove}>Approve</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

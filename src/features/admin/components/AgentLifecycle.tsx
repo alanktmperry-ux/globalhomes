@@ -70,7 +70,7 @@ function AdoptionBar({ adoption }: { adoption: AdoptionScore }) {
   const steps = [
     { key: 'hasProfile', label: 'Profile', done: adoption.hasProfile },
     { key: 'hasListing', label: 'Listed', done: adoption.hasListing },
-    { key: 'hasVoiceSearch', label: 'Voice', done: adoption.hasVoiceSearch },
+    { key: 'hasOpenHome', label: 'Open Home', done: adoption.hasOpenHome },
     { key: 'hasContacts', label: 'Contacts', done: adoption.hasContacts },
     { key: 'hasTrust', label: 'Trust', done: adoption.hasTrust },
   ];
@@ -219,7 +219,7 @@ function AgentRow({ agent, onNoteAdded }: { agent: AgentLifecycleRow; onNoteAdde
             {[
               { label: 'Profile', done: agent.adoption.hasProfile },
               { label: 'Listed', done: agent.adoption.hasListing },
-              { label: 'Voice', done: agent.adoption.hasVoiceSearch },
+              { label: 'Open Home', done: agent.adoption.hasOpenHome },
               { label: 'Contacts', done: agent.adoption.hasContacts },
               { label: 'Trust', done: agent.adoption.hasTrust },
             ].map(s => (
@@ -279,11 +279,11 @@ export default function AgentLifecycle({ filter }: { filter?: string | null } = 
     setLoading(true);
     try {
       const now = new Date();
-      const [agentsRes, propsRes, leadsRes, voiceRes, contactsRes, trustRes] = await Promise.all([
+      const [agentsRes, propsRes, leadsRes, openHomeRes, contactsRes, trustRes] = await Promise.all([
         supabase.from('agents').select('id, name, email, agency, phone, created_at, is_subscribed, onboarding_complete, lead_source, lifecycle_stage, agent_subscriptions(plan_type)'),
         supabase.from('properties').select('agent_id, is_active'),
         supabase.from('leads').select('agent_id'),
-        supabase.from('voice_searches').select('agent_id').limit(5000),
+        supabase.from('properties').select('agent_id, inspection_times').not('inspection_times', 'is', null).limit(5000),
         supabase.from('contacts').select('agent_id').limit(5000),
         supabase.from('trust_receipts' as any).select('agent_id').limit(1000),
       ]);
@@ -307,7 +307,12 @@ export default function AgentLifecycle({ filter }: { filter?: string | null } = 
         if (l.agent_id) leadMap.set(l.agent_id, (leadMap.get(l.agent_id) || 0) + 1);
       });
 
-      const voiceSet = new Set((voiceRes.data || []).map((v: any) => v.agent_id).filter(Boolean));
+      const openHomeSet = new Set(
+        (openHomeRes.data || [])
+          .filter((p: any) => Array.isArray(p.inspection_times) && p.inspection_times.length > 0)
+          .map((p: any) => p.agent_id)
+          .filter(Boolean)
+      );
       const contactSet = new Set((contactsRes.data || []).map((c: any) => c.agent_id).filter(Boolean));
       const trustSet = new Set((trustRes.data || []).map((t: any) => t.agent_id).filter(Boolean));
 
@@ -327,11 +332,11 @@ export default function AgentLifecycle({ filter }: { filter?: string | null } = 
         const trialEnd = new Date(new Date(a.created_at).getTime() + 60 * 86400000);
         const trialDaysLeft = !a.is_subscribed ? Math.max(0, Math.ceil((trialEnd.getTime() - now.getTime()) / 86400000)) : null;
         const hasListing = (propMap.get(a.id) || 0) > 0;
-        const hasVoiceSearch = voiceSet.has(a.id);
+        const hasOpenHome = openHomeSet.has(a.id);
         const hasTrust = trustSet.has(a.id);
         const hasContacts = contactSet.has(a.id);
         const hasProfile = !!a.onboarding_complete;
-        const adoptionPts = [hasProfile, hasListing, hasVoiceSearch, hasContacts, hasTrust];
+        const adoptionPts = [hasProfile, hasListing, hasOpenHome, hasContacts, hasTrust];
         const score = Math.round((adoptionPts.filter(Boolean).length / adoptionPts.length) * 100);
 
         let lifecycleStage = a.lifecycle_stage || 'trial';
@@ -344,7 +349,7 @@ export default function AgentLifecycle({ filter }: { filter?: string | null } = 
           id: a.id, name: a.name, email: a.email, agency: a.agency, phone: a.phone,
           created_at: a.created_at, is_subscribed: a.is_subscribed, plan_type: planType,
           lastLogin, daysSinceLogin, trialDaysLeft,
-          adoption: { score, hasListing, hasVoiceSearch, hasTrust, hasContacts, hasProfile },
+          adoption: { score, hasListing, hasOpenHome, hasTrust, hasContacts, hasProfile },
           activeListings: propMap.get(a.id) || 0, totalLeads: leadMap.get(a.id) || 0,
           notes: notesMap.get(a.id) || [], lifecycleStage, leadSource: a.lead_source,
         };

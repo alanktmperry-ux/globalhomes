@@ -24,7 +24,6 @@ type NavItem = { label: string; to: string; icon: React.ComponentType<{ classNam
 const PUBLIC_NAV: NavItem[] = [
   { label: 'Search', to: '/search', icon: Search },
   { label: 'Find an Agent', to: '/agents', icon: Users },
-  { label: 'Pricing', to: '/pricing', icon: Sparkles },
 ];
 
 const SEEKER_NAV: NavItem[] = [
@@ -133,15 +132,8 @@ export function SiteHeader() {
           {/* Combined globe/settings — currency + language */}
           <SettingsMenu />
 
-          {/* Unauthenticated navbar actions — keep CTA in-header between settings and account */}
-          {!user && (
-            <Button
-              onClick={() => navigate('/agent-auth')}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded-lg text-sm"
-            >
-              Start free trial
-            </Button>
-          )}
+
+
           {isSeeker && (
             <button
               onClick={() => navigate('/halo/new')}

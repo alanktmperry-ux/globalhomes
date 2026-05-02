@@ -421,7 +421,7 @@ const TenantPortalPage = () => {
                   </p>
                   <p className="text-sm text-muted-foreground capitalize mt-1">{upcomingInspection.inspection_type} inspection</p>
                   <p className="text-xs text-muted-foreground mt-3">
-                    You will receive at least 7 days written notice before any property entry.
+                    Your property manager is required to provide advance written notice before any property entry in accordance with the tenancy laws in your state or territory.
                   </p>
                 </div>
               ) : (
@@ -462,6 +462,7 @@ const TenantPortalPage = () => {
             </p>
           )}
           <p className="text-xs text-muted-foreground">Powered by ListHQ</p>
+          <p className="text-xs text-muted-foreground mt-1">Your information is handled in accordance with the <a href="https://listhq.com.au/privacy" className="underline hover:text-foreground">ListHQ Privacy Policy</a>.</p>
         </footer>
       </main>
     </div>

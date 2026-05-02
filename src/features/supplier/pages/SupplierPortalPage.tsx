@@ -13,6 +13,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { StarRating } from '@/features/agents/components/StarRating';
 import { toast } from 'sonner';
+import { Helmet } from 'react-helmet-async';
 
 interface Job {
   id: string; title: string; description: string;
@@ -141,6 +142,10 @@ export default function SupplierPortalPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Supplier Portal — ListHQ</title>
+        <meta name="robots" content="noindex,nofollow" />
+      </Helmet>
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="max-w-3xl mx-auto px-4 py-5">
@@ -254,6 +259,7 @@ export default function SupplierPortalPage() {
 
         <footer className="text-center text-xs text-muted-foreground py-6">
           Powered by ListHQ
+          <p className="text-xs text-muted-foreground mt-1">Your information is handled in accordance with the <a href="https://listhq.com.au/privacy" className="underline hover:text-foreground">ListHQ Privacy Policy</a>.</p>
         </footer>
       </main>
 

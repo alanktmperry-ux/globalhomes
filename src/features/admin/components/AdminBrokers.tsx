@@ -40,7 +40,8 @@ interface Broker {
   state?: string;
   tagline?: string;
   calendar_url?: string;
-  [key: string]: unknown;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
 }
 
 const STATE_OPTIONS = ['NSW', 'VIC', 'QLD', 'SA', 'WA', 'ACT', 'TAS', 'NT'];

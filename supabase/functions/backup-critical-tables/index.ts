@@ -74,8 +74,9 @@ Deno.serve(async (req) => {
     };
     const counts: Record<string, number> = {};
 
+    const ROW_LIMIT = 10000;
     for (const table of TABLES) {
-      const { data, error } = await admin.from(table).select('*');
+      const { data, error } = await admin.from(table).select('*').limit(ROW_LIMIT);
       if (error) {
         return new Response(
           JSON.stringify({ error: `Failed to read ${table}: ${error.message}` }),
@@ -84,6 +85,9 @@ Deno.serve(async (req) => {
       }
       (payload.tables as Record<string, unknown>)[table] = data ?? [];
       counts[table] = data?.length ?? 0;
+      if (counts[table] === ROW_LIMIT) {
+        console.warn(`[backup] Table ${table} hit row limit (${ROW_LIMIT}) — backup may be truncated.`);
+      }
     }
 
     // 5. Upload to the `backups` bucket

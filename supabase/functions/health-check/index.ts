@@ -41,13 +41,14 @@ Deno.serve(async (req) => {
   const status = missing.length > 0 ? "error" : "ok";
   const statusCode = missing.length > 0 ? 500 : 200;
 
+  // Do NOT expose secret/key names publicly. Only report counts.
   return new Response(
     JSON.stringify({
       status,
       database: dbStatus,
       timestamp: new Date().toISOString(),
-      missing_required: missing.length > 0 ? missing : undefined,
-      missing_optional: missingOptional.length > 0 ? missingOptional : undefined,
+      missing_required_count: missing.length,
+      missing_optional_count: missingOptional.length,
     }),
     {
       status: statusCode,

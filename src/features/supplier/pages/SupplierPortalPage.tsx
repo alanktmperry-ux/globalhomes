@@ -67,6 +67,38 @@ export default function SupplierPortalPage() {
 
   useEffect(() => { load(); }, [token]);
 
+  // Audit log: portal access (fire-and-forget)
+  useEffect(() => {
+    const supplierId = data?.supplier?.id;
+    if (!supplierId) return;
+    supabase.from('audit_logs').insert({
+      event_type: 'portal_access',
+      portal_type: 'supplier',
+      entity_id: supplierId,
+      accessed_at: new Date().toISOString(),
+    } as any).then(() => {/* fire-and-forget */}, () => {/* ignore */});
+  }, [data?.supplier?.id]);
+
+  // Look up payment status for completed jobs (match by job id in reference, or by amount + date)
+  useEffect(() => {
+    const completed = (data?.completed_jobs || []).filter(c => c.completed_at);
+    if (completed.length === 0) return;
+    (async () => {
+      const ids = completed.map(c => c.id);
+      const orFilters = ids.map(id => `reference.ilike.%${id}%`).join(',');
+      const { data: pays } = await supabase
+        .from('trust_payments')
+        .select('reference, date_paid, amount')
+        .or(orFilters);
+      const map: Record<string, { paid_at: string } | null> = {};
+      completed.forEach(c => {
+        const match = (pays || []).find((p: any) => (p.reference || '').includes(c.id));
+        map[c.id] = match ? { paid_at: match.date_paid } : null;
+      });
+      setPaymentsByJob(map);
+    })();
+  }, [data?.completed_jobs]);
+
   const callAction = async (jobId: string, action: string, extra: any = {}) => {
     setBusy(true);
     const { data: res, error } = await supabase.rpc('supplier_action_on_job' as any, {

@@ -6,9 +6,11 @@ interface PropertySEOHeadProps {
 }
 
 const APP_URL = 'https://listhq.com.au';
+const DEFAULT_OG_IMAGE = 'https://listhq.com.au/og-image.png';
 
 export function PropertySEOHead({ property, agent }: PropertySEOHeadProps) {
-  const img = (property.images && property.images[0]) || property.image_url;
+  const propertyImg = (property.images && property.images[0]) || property.image_url;
+  const img = propertyImg || DEFAULT_OG_IMAGE;
   const price = property.price_formatted ?? (property.price ? `$${Number(property.price).toLocaleString('en-AU')}` : 'Price on request');
   const isRent = property.listing_type === 'rent' || property.listing_type === 'rental';
 

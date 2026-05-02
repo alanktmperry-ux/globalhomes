@@ -63,14 +63,15 @@ Deno.serve(async (req) => {
       .limit(10000);
 
     const propertyUrls = (properties || []).map((p) => {
-      const path = p.listing_type === 'rent'
+      const isRental = p.listing_type === 'rent' || p.listing_type === 'rental';
+      const path = isRental
         ? `/rent/property/${p.slug || p.id}`
         : `/property/${p.slug || p.id}`;
       return urlEntry(
         `${SITE_URL}${path}`,
         p.updated_at,
         "daily",
-        p.listing_type === "sale" ? "0.8" : "0.7"
+        isRental ? "0.7" : "0.8"
       );
     });
 

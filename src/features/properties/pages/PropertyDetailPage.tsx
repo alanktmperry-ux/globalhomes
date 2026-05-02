@@ -693,6 +693,14 @@ export default function PropertyDetailPage() {
               </div>
             )}
 
+            {/* Multilingual Q&A chatbot */}
+            {!property.id.startsWith('placeholder-') && (
+              <ListingChatWidget
+                listingId={property.id}
+                onContactAgent={() => setContactOpen(true)}
+              />
+            )}
+
             {/* Rental Info Section */}
             {isRental && (
               <div className="p-5 rounded-2xl bg-card border border-border shadow-card">

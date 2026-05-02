@@ -121,7 +121,7 @@ Deno.serve(async (req) => {
       const key = `${s.suburb.toLowerCase()}-${s.state.toLowerCase()}`;
       if (suburbSet.has(key)) continue;
       suburbSet.add(key);
-      const suburbSlug = s.suburb.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      const suburbSlug = s.suburb.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
       const stateSlug = s.state.toLowerCase();
       suburbUrls.push(
         urlEntry(`${SITE_URL}/buy/${stateSlug}/${suburbSlug}`, today, "daily", "0.8")

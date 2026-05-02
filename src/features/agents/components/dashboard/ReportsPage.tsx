@@ -773,6 +773,111 @@ const ReportsPage = () => {
               </Card>
             </div>
           </TabsContent>
+
+          {/* ─── TRUST RECONCILIATION ─── */}
+          <TabsContent value="reconciliation" className="space-y-4 mt-4">
+            <Card className="bg-amber-500/5 border-amber-500/30">
+              <CardContent className="p-3 text-xs flex items-start gap-2">
+                <AlertTriangle size={14} className="text-amber-600 mt-0.5 shrink-0" />
+                <p>Monthly trust reconciliation is required under the <strong>Agents Financial Administration Act 2014</strong>. Enter your bank statement balance to verify against the calculated closing balance.</p>
+              </CardContent>
+            </Card>
+
+            <div className="flex justify-end">
+              <Button size="sm" variant="outline" onClick={downloadReconciliationPdf} className="gap-1.5">
+                <FileText size={14} /> Download PDF
+              </Button>
+            </div>
+
+            <Card>
+              <CardContent className="p-0 overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-xs">Month</TableHead>
+                      <TableHead className="text-xs text-right">Opening</TableHead>
+                      <TableHead className="text-xs text-right">Receipts</TableHead>
+                      <TableHead className="text-xs text-right">Payments</TableHead>
+                      <TableHead className="text-xs text-right">Closing</TableHead>
+                      <TableHead className="text-xs text-right">Bank Balance</TableHead>
+                      <TableHead className="text-xs text-right">Variance</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {reconciliationRows.map(r => (
+                      <TableRow key={r.key}>
+                        <TableCell className="text-xs font-medium">{r.monthLabel}</TableCell>
+                        <TableCell className="text-xs text-right">{AUD2.format(r.opening)}</TableCell>
+                        <TableCell className="text-xs text-right text-green-600">{AUD2.format(r.receipts)}</TableCell>
+                        <TableCell className="text-xs text-right text-destructive">{AUD2.format(r.payments)}</TableCell>
+                        <TableCell className="text-xs text-right font-semibold">{AUD2.format(r.closing)}</TableCell>
+                        <TableCell className="text-right">
+                          <Input
+                            type="number"
+                            step="0.01"
+                            placeholder="—"
+                            value={bankBalances[r.key] ?? ''}
+                            onChange={e => setBankBalances(prev => ({ ...prev, [r.key]: e.target.value }))}
+                            className="h-7 w-28 text-xs ml-auto"
+                          />
+                        </TableCell>
+                        <TableCell className={`text-xs text-right font-semibold ${r.variance == null ? '' : Math.abs(r.variance) < 0.01 ? 'text-green-600' : 'text-destructive'}`}>
+                          {r.variance != null ? AUD2.format(r.variance) : '—'}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ─── ARREARS ─── */}
+          <TabsContent value="arrears" className="space-y-4 mt-4">
+            <div className="flex justify-between items-center">
+              <p className="text-xs text-muted-foreground">{arrearsRows.length} tenancies in arrears</p>
+              <Button size="sm" variant="outline" onClick={exportArrearsCsv} className="gap-1.5" disabled={arrearsRows.length === 0}>
+                <Download size={14} /> Export CSV
+              </Button>
+            </div>
+
+            <Card>
+              <CardContent className="p-0 overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-xs">Tenant</TableHead>
+                      <TableHead className="text-xs">Property</TableHead>
+                      <TableHead className="text-xs text-right">Days Overdue</TableHead>
+                      <TableHead className="text-xs text-right">Amount Owing</TableHead>
+                      <TableHead className="text-xs">Last Paid To</TableHead>
+                      <TableHead className="text-xs">Phone</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {arrearsRows.length === 0 ? (
+                      <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8 text-xs">No tenancies currently in arrears 🎉</TableCell></TableRow>
+                    ) : arrearsRows.map(r => (
+                      <TableRow key={r.id}>
+                        <TableCell className="text-xs font-medium">{r.tenant_name}</TableCell>
+                        <TableCell className="text-xs">{r.address}</TableCell>
+                        <TableCell className="text-xs text-right">
+                          <Badge variant={r.daysOverdue > 14 ? 'destructive' : 'secondary'} className="text-[10px]">
+                            {r.daysOverdue}d
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-xs text-right font-semibold text-destructive">{AUD2.format(r.owing)}</TableCell>
+                        <TableCell className="text-xs">{r.paidTo ? DATE_FMT.format(new Date(r.paidTo)) : '—'}</TableCell>
+                        <TableCell className="text-xs">
+                          {r.phone ? <a href={`tel:${r.phone}`} className="text-primary hover:underline">{r.phone}</a> : '—'}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
     </div>

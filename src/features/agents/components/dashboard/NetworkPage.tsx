@@ -314,24 +314,8 @@ const NetworkPage = () => {
         shared_with_agent_id: agentId,
       } as any).eq('id', contactTarget.share_id);
 
-      const { data: trustAccounts } = await supabase.from('trust_accounts').select('id').limit(1);
-      if (trustAccounts && trustAccounts.length > 0) {
-        const referralAmount = (contactTarget.price * (contactTarget.commission_rate || 2) / 100) * (contactTarget.referral_split_pct / 100);
-        const ref = `TR-${Date.now().toString(36).toUpperCase()}`;
-        await supabase.from('trust_receipts').insert({
-          agent_id: agentId,
-          receipt_number: ref,
-          client_name: contactTarget.sharing_agent_name,
-          property_address: contactTarget.address || '',
-          amount: referralAmount,
-          payment_method: 'eft',
-          purpose: 'commission',
-          date_received: new Date().toISOString().split('T')[0],
-          description: `Referral deposit – ${contactTarget.address} (via ${contactTarget.sharing_agent_name})`,
-          property_id: contactTarget.property_id,
-        } as any);
-        toast.success('Trust entry created for referral deposit');
-      }
+      // Trust entries are only created after an accepted co-broke arrangement,
+      // not at initial contact. Removed auto-creation of trust_receipts here.
 
       await dispatchNotification({
         agent_id: contactTarget.sharing_agent_id,
@@ -357,6 +341,10 @@ const NetworkPage = () => {
   // Submit buyer brief
   const handleSubmitBrief = async () => {
     if (!agentId) return;
+    if (briefForm.min_price >= briefForm.max_price) {
+      toast.error('Min price must be less than max price');
+      return;
+    }
     setBriefSubmitting(true);
     try {
       const { error } = await supabase.from('buyer_briefs').insert({

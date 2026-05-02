@@ -66,6 +66,15 @@ Deno.serve(async (req) => {
       });
     }
 
+    const token = req.headers.get("Authorization")?.replace("Bearer ", "") ?? "";
+    const { data: { user }, error: authError } = await admin.auth.getUser(token);
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    if (user.id !== (halo as any).seeker_id) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     const suburbs: string[] = (halo.suburbs ?? []).filter(Boolean);
     if (suburbs.length === 0) {
       return new Response(JSON.stringify({ ok: true, matches: 0 }), {

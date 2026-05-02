@@ -45,6 +45,7 @@ interface AuthUser {
   subscription_status?: string | null;
   payment_failed_at?: string | null;
   admin_grace_until?: string | null;
+  trial_ends_at?: string | null;
   roles?: string[];
 }
 
@@ -912,6 +913,26 @@ const UsersDashboard = ({ users, loading }: UsersDashboardProps) => {
                                 title="Mark subscription active"
                               >
                                 <CircleDollarSign size={14} />
+                              </button>
+                            )}
+                            {authIsAdmin && u.trial_ends_at && new Date(u.trial_ends_at).getTime() > Date.now() && (
+                              <button
+                                onClick={async () => {
+                                  if (!confirm(`Extend ${u.email}'s trial by 7 days?`)) return;
+                                  setActionLoading(u.id);
+                                  try {
+                                    await callAdminApi('extend_trial', { user_id: u.id, days: 7 });
+                                    toast({ title: 'Trial extended', description: `${u.email} now has 7 more days.` });
+                                    fetchUsers();
+                                  } catch (err: unknown) {
+                                    toast({ title: 'Failed', description: getErrorMessage(err), variant: 'destructive' });
+                                  }
+                                  setActionLoading(null);
+                                }}
+                                className="p-1.5 rounded-lg bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 transition-colors"
+                                title="Extend trial +7 days"
+                              >
+                                <Clock size={14} />
                               </button>
                             )}
                             <button

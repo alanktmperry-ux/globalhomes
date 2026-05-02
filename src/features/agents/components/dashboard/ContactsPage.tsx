@@ -215,7 +215,13 @@ const ContactsPage = () => {
             onFiltersChange={setFilters}
             onSortChange={setSort}
             onSelect={setSelectedContact}
-            onDelete={deleteContact}
+            onDelete={async (id: string) => {
+              try {
+                await deleteContact(id);
+              } catch {
+                toast.error('Failed to delete contact. Please try again.');
+              }
+            }}
             hasMore={hasMore}
             onLoadMore={loadMore}
           />

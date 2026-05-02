@@ -51,6 +51,7 @@ export default function AgencyOnboardingPage() {
   const [path, setPath] = useState<OnboardingPath | null>(null);
   const [loading, setLoading] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
+  const [showRentRollWizard, setShowRentRollWizard] = useState(false);
   const [wizardCompleted, setWizardCompleted] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
 

@@ -129,21 +129,29 @@ export default function ReferralLandingPage() {
                 : t('referral.success.active')}
             </p>
 
-            <div className="mt-6 p-5 rounded-xl bg-secondary/50 border border-border">
-              <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">{t('referral.dashboard.yourCode')}</p>
-              <p className="font-display text-4xl font-bold text-primary tracking-widest mt-2">{success.code}</p>
-              <Button variant="ghost" size="sm" onClick={() => copy(success.code, t('referral.dashboard.code'))} className="mt-2 gap-1.5">
-                <Copy size={14} /> {t('referral.dashboard.copyCode')}
-              </Button>
-            </div>
+            {success.needsVerification && !success.code ? (
+              <p className="text-sm text-muted-foreground leading-relaxed mt-6">
+                Please check your email and verify your account. Once verified, sign in to access your referral dashboard and get your referral code.
+              </p>
+            ) : (
+              <>
+                <div className="mt-6 p-5 rounded-xl bg-secondary/50 border border-border">
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">{t('referral.dashboard.yourCode')}</p>
+                  <p className="font-display text-4xl font-bold text-primary tracking-widest mt-2">{success.code}</p>
+                  <Button variant="ghost" size="sm" onClick={() => copy(success.code, t('referral.dashboard.code'))} className="mt-2 gap-1.5">
+                    <Copy size={14} /> {t('referral.dashboard.copyCode')}
+                  </Button>
+                </div>
 
-            <div className="mt-4 p-4 rounded-xl bg-primary/5 border border-primary/20 text-left">
-              <p className="text-xs text-muted-foreground mb-1">{t('referral.dashboard.yourLink')}</p>
-              <p className="text-sm font-mono break-all text-foreground">{referralLink}</p>
-              <Button variant="outline" size="sm" onClick={() => copy(referralLink, t('referral.dashboard.link'))} className="mt-3 gap-1.5">
-                <Copy size={14} /> {t('referral.dashboard.copyLink')}
-              </Button>
-            </div>
+                <div className="mt-4 p-4 rounded-xl bg-primary/5 border border-primary/20 text-left">
+                  <p className="text-xs text-muted-foreground mb-1">{t('referral.dashboard.yourLink')}</p>
+                  <p className="text-sm font-mono break-all text-foreground">{referralLink}</p>
+                  <Button variant="outline" size="sm" onClick={() => copy(referralLink, t('referral.dashboard.link'))} className="mt-3 gap-1.5">
+                    <Copy size={14} /> {t('referral.dashboard.copyLink')}
+                  </Button>
+                </div>
+              </>
+            )}
 
             <div className="mt-6 flex flex-col gap-2">
               <Button onClick={() => navigate('/referral/dashboard')} className="gap-2">

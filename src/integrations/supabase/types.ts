@@ -14944,6 +14944,10 @@ export type Database = {
         Args: { property_id: string }
         Returns: undefined
       }
+      increment_halo_credits: {
+        Args: { p_agent_id: string; p_credits: number }
+        Returns: number
+      }
       increment_property_views: {
         Args: { property_id: string }
         Returns: undefined

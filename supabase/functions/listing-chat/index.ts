@@ -136,7 +136,7 @@ Agent name: ${agentName}`;
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "openai/gpt-5-mini",
+        model: "openai/gpt-4o-mini",
         messages: [{ role: "system", content: systemPrompt }, ...cleanMessages],
         max_completion_tokens: 500,
       }),

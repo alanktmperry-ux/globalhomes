@@ -24,7 +24,7 @@ import TrustImportWizard from './TrustImportWizard';
 import TrustReceiptModal from './TrustReceiptModal';
 import { useTrustAccounting, TrustTransaction } from '@/features/agents/hooks/useTrustAccounting';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 
@@ -59,6 +59,7 @@ const TrustAccountingPage = () => {
   } = useTrustAccounting();
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const urlPropertyId = searchParams.get('property_id');
 
   // Filters
@@ -816,7 +817,7 @@ const TrustAccountingPage = () => {
                   )}
                 </div>
                 <Button size="sm" variant="outline" className="h-7 text-xs gap-1.5"
-                  onClick={() => window.location.hash = '#/dashboard/reconciliation'}>
+                  onClick={() => navigate('/dashboard/reconciliation')}>
                   <Upload size={12} /> Upload CSV
                 </Button>
               </div>

@@ -4,7 +4,7 @@ import {
   User, FileText, CreditCard, Star, MapPinned, Shield, Contact, Kanban, Scale, Landmark,
   ClipboardCheck, CalendarDays, Search, TrendingUp, Receipt, PartyPopper, Calculator, HelpCircle, ClipboardList, Settings2, Flame,
   Handshake, Sparkles, Target, ShoppingBag, ChevronDown, ChevronRight, Mail, Wrench, Activity, AlertCircle, RefreshCw,
-  HandCoins, Briefcase, LineChart,
+  HandCoins, Briefcase, LineChart, BookOpen,
 } from 'lucide-react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -81,6 +81,8 @@ const NAV_SECTIONS: NavSection[] = [
       { title: 'Suppliers', url: '/dashboard/suppliers', icon: Wrench },
       { title: 'Key Register', url: '/dashboard/keys', icon: Scale },
       { title: 'Smoke Alarms', url: '/dashboard/smoke-alarms', icon: AlertCircle, badgeKey: 'smokeAlarms', alertWhenBadge: true },
+      { title: 'Bond Claims', url: '/dashboard/bond-claims', icon: Scale },
+      { title: 'Documents', url: '/dashboard/property-documents', icon: FileText },
     ],
   },
   {
@@ -89,9 +91,12 @@ const NAV_SECTIONS: NavSection[] = [
     icon: Landmark,
     children: [
       { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
+      { title: 'Reconciliation', url: '/dashboard/reconciliation', icon: Receipt },
+      { title: 'Trust Ledger', url: '/dashboard/trust-ledger', icon: BookOpen },
       { title: 'Owner Statements', url: '/dashboard/statements', icon: FileText },
       { title: 'Rent Increases', url: '/dashboard/rent-increases', icon: TrendingUp },
       { title: 'Arrears', url: '/dashboard/arrears', icon: AlertCircle, badgeKey: 'arrears', alertWhenBadge: true },
+      { title: 'Reports', url: '/dashboard/reports', icon: BarChart3 },
       { title: 'Renewals Due', url: '/dashboard/rent-roll?filter=renewals', icon: RefreshCw, badgeKey: 'renewals', alertWhenBadge: true },
     ],
   },

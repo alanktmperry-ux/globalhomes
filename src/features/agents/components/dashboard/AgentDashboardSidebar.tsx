@@ -81,6 +81,8 @@ const NAV_SECTIONS: NavSection[] = [
       { title: 'Suppliers', url: '/dashboard/suppliers', icon: Wrench },
       { title: 'Key Register', url: '/dashboard/keys', icon: Scale },
       { title: 'Smoke Alarms', url: '/dashboard/smoke-alarms', icon: AlertCircle, badgeKey: 'smokeAlarms', alertWhenBadge: true },
+      { title: 'Bond Claims', url: '/dashboard/bond-claims', icon: Scale },
+      { title: 'Documents', url: '/dashboard/property-documents', icon: FileText },
     ],
   },
   {

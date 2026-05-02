@@ -62,14 +62,17 @@ Deno.serve(async (req) => {
       .order("updated_at", { ascending: false })
       .limit(10000);
 
-    const propertyUrls = (properties || []).map((p) =>
-      urlEntry(
-        `${SITE_URL}/property/${p.slug || p.id}`,
+    const propertyUrls = (properties || []).map((p) => {
+      const path = p.listing_type === 'rent'
+        ? `/rent/property/${p.slug || p.id}`
+        : `/property/${p.slug || p.id}`;
+      return urlEntry(
+        `${SITE_URL}${path}`,
         p.updated_at,
         "daily",
         p.listing_type === "sale" ? "0.8" : "0.7"
-      )
-    );
+      );
+    });
 
     const { data: agents } = await supabase
       .from("agents")
@@ -133,7 +136,7 @@ Deno.serve(async (req) => {
       .limit(2000);
 
     const schoolUrls = (schoolsData || []).map((s: any) => {
-      const slug = s.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      const slug = s.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
       const st = s.state.toLowerCase();
       return urlEntry(`${SITE_URL}/school/${st}/${slug}`, undefined, "monthly", "0.6");
     });

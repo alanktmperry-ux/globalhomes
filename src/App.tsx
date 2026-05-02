@@ -20,6 +20,8 @@ import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 // Eager-loaded for first paint (homepage path)
 import PublicLayout from "@/shared/components/layout/PublicLayout";
 import Index from "./pages/Index";
+// Eager-loaded so the dashboard shell (sidebar/header) doesn't suspense on first paint
+import AgentDashboardLayout from "./pages/AgentDashboardLayout";
 
 // Lazy-loaded pages
 const SavedPage = React.lazy(() => import("./pages/SavedPage"));
@@ -30,7 +32,7 @@ const AgentLandingPage = React.lazy(() => import("./pages/AgentLandingPage"));
 const FindAgentPage = React.lazy(() => import("./features/agents/pages/FindAgentPage"));
 const FindBrokerPage = React.lazy(() => import("./features/brokers/pages/FindBrokerPage"));
 const PocketListingPage = React.lazy(() => import("./pages/PocketListingPage"));
-const AgentDashboardLayout = React.lazy(() => import("./pages/AgentDashboardLayout"));
+// AgentDashboardLayout is imported eagerly above
 const DedupTelemetryPage = React.lazy(() => import("./features/agents/pages/DedupTelemetryPage"));
 const MyAgenciesPage = React.lazy(() => import("./pages/MyAgenciesPage"));
 const SeekerAuthPage = React.lazy(() => import("./pages/SeekerAuthPage"));

@@ -190,7 +190,7 @@ const TrustLedgerPage = () => {
       .eq('agent_id', agent.id)
       .eq('status', 'unidentified')
       .order('received_date', { ascending: false });
-    setSuspenseItems(data || []);
+    setSuspenseItems((data as unknown as TrustEntry[]) || []);
   }, [agent?.id]);
 
   useEffect(() => { fetchSuspense(); }, [fetchSuspense]);

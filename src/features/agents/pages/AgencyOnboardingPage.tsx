@@ -1489,6 +1489,23 @@ export default function AgencyOnboardingPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Rent Roll Migration Wizard Dialog */}
+      <Dialog open={showRentRollWizard} onOpenChange={setShowRentRollWizard}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
+          <div className="p-6">
+            <RentRollMigrationWizard
+              onComplete={async () => {
+                setShowRentRollWizard(false);
+                setWizardCompleted(true);
+                await completeOnboarding();
+                setStep(5);
+              }}
+              onCancel={() => setShowRentRollWizard(false)}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

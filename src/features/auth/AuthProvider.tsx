@@ -166,7 +166,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       metadata: buildAuditMeta({}),
     } as any);
     if (auditError) {
-      console.error('impersonation audit log:', auditError);
+      if (import.meta.env.DEV) console.error('impersonation audit log:', auditError);
       toast.error('Warning: could not log impersonation exit');
     }
 

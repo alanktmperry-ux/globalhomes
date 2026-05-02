@@ -106,14 +106,14 @@ Deno.serve(async (req) => {
     const userClient = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } },
     });
-    const token = authHeader.replace("Bearer ", "");
-    const { data: claims, error: claimsErr } = await userClient.auth.getClaims(token);
-    if (claimsErr || !claims?.claims?.sub) {
+    const { data: userData, error: userErr } = await userClient.auth.getUser();
+    if (userErr || !userData?.user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    const callerUserId = userData.user.id;
 
     const { listing_id } = await req.json();
     if (!listing_id || typeof listing_id !== "string") {
@@ -139,7 +139,6 @@ Deno.serve(async (req) => {
     }
 
     // Ownership check
-    const callerUserId = claims.claims.sub;
     const { data: callerAgent } = await admin.from('agents').select('id').eq('user_id', callerUserId).maybeSingle();
     if (!callerAgent || callerAgent.id !== listing.agent_id) {
       // Allow admin override

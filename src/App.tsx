@@ -16,6 +16,7 @@ import { PageSkeleton } from "@/shared/components/PageSkeleton";
 import { DefaultSEOHead } from "@/features/seo/components/DefaultSEOHead";
 import { HelpWidget } from "@/features/help/components/HelpWidget";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
+import { useIdleTimeout } from "@/shared/hooks/useIdleTimeout";
 
 // Eager-loaded for first paint (homepage path)
 import PublicLayout from "@/shared/components/layout/PublicLayout";
@@ -232,6 +233,13 @@ const ImpersonationBanner = () => {
 const ScrollToTop = (): null => {
   const { pathname } = useLocation();
   React.useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+};
+
+// Idle-timeout watcher: signs the user out after 30 min of inactivity (5 min warning).
+// Must be rendered inside <AuthProvider> and <BrowserRouter>.
+const IdleTimeoutWatcher = (): null => {
+  useIdleTimeout();
   return null;
 };
 

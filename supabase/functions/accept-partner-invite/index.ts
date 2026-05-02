@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
     const { token } = await req.json();
     if (!token) throw new Error("Missing invite token");
 
-    // Find the invite
+    // Look up the invite (read-only, to validate ownership and get agency info)
     const { data: invite, error: inviteErr } = await supabaseAdmin
       .from("partner_agencies")
       .select("id, status, invite_expires_at, agency_id, partner_id")
@@ -71,15 +71,26 @@ Deno.serve(async (req) => {
       throw new Error("This invitation has expired. Ask the agency to send a new one.");
     }
 
-    // Activate the connection
-    await supabaseAdmin
+    // Atomic activation: only succeeds if status is still 'pending'
+    const { data: activated } = await supabaseAdmin
       .from("partner_agencies")
       .update({
         status: "active",
         accepted_at: new Date().toISOString(),
         invite_token: null,
       })
-      .eq("id", invite.id);
+      .eq("id", invite.id)
+      .eq("invite_token", token)
+      .eq("status", "pending")
+      .select()
+      .maybeSingle();
+
+    if (!activated) {
+      return new Response(
+        JSON.stringify({ error: "Invite already used or expired" }),
+        { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     // Log the activity
     try {

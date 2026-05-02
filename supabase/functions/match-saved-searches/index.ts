@@ -66,7 +66,10 @@ Deno.serve(async (req) => {
       // Text search on suburb/address
       if (alert.search_query) {
         const q = alert.search_query.toLowerCase();
-        query = query.or(`suburb.ilike.%${q}%,address.ilike.%${q}%,title.ilike.%${q}%`);
+        const safeQ = q.replace(/[^a-zA-Z0-9 ,\-]/g, '').slice(0, 100);
+        if (safeQ) {
+          query = query.or(`suburb.ilike.%${safeQ}%,address.ilike.%${safeQ}%,title.ilike.%${safeQ}%`);
+        }
       }
 
       // Listing type filter

@@ -25,7 +25,7 @@ import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
 import { useTrustAccounting } from '@/features/agents/hooks/useTrustAccounting';
 import { useContacts } from '@/features/agents/hooks/useContacts';
 import { supabase } from '@/integrations/supabase/client';
-import { useAgent } from '@/features/agents/hooks/useAgent';
+import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
 import { toast } from 'sonner';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });

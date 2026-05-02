@@ -122,7 +122,8 @@ const TrustAccountingPage = () => {
   }, [user]);
 
   // ── Month-end close state ────────────────────────────────────
-  const now = new Date();
+  const _periodNow = new Date();
+  const now = _periodNow;
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1; // 1-12
   const periodLabel = now.toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });

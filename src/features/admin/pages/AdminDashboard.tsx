@@ -151,17 +151,19 @@ const AdminDashboard = () => {
     });
 
     const signInMap = new Map<string, string | null>();
+    const emailMap = new Map<string, string | null>();
     try {
       const { callAdminFunction } = await import('@/features/admin/lib/adminApi');
       const adminData = await callAdminFunction('list_users');
       (adminData?.users || []).forEach((u: any) => {
         signInMap.set(u.id, u.last_sign_in_at || null);
+        emailMap.set(u.id, u.email || null);
       });
     } catch {}
 
     const userRows: UserRow[] = (profileData.data || []).map((p) => ({
       id: p.user_id,
-      email: p.display_name || 'Unknown',
+      email: emailMap.get(p.user_id) || p.display_name || 'Unknown',
       created_at: p.created_at,
       display_name: p.display_name || undefined,
       roles: roleMap.get(p.user_id) || ['user'],

@@ -449,12 +449,17 @@ ${matterRows.length > 0 ? `
       if (accErr) throw accErr;
       if (!account) throw new Error('Failed to create trust account — no data returned');
 
-      await supabase.from('trust_account_balances').insert({
-        agent_id: agent.id,
-        opening_balance: parsedBalance,
-        current_balance: computedBalance,
-        last_reconciled_date: lastReconciled || null,
-      } as any);
+      if (account?.id) {
+        const reconDate = lastReconciled ? new Date(lastReconciled + 'T00:00:00') : new Date();
+        await supabase.from('trust_account_balances').insert({
+          trust_account_id: account.id,
+          period_year: reconDate.getFullYear(),
+          period_month: reconDate.getMonth() + 1,
+          opening_balance: parsedBalance,
+          closing_balance: computedBalance,
+          is_closed: false,
+        } as any);
+      }
 
       const receiptInserts = ledgerRows
         .filter(r => r.receiptNum && r.inAmount > 0)

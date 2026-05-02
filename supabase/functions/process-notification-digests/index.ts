@@ -12,6 +12,15 @@ const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  const cronSecret = Deno.env.get("CRON_SECRET");
+  if (req.headers.get("x-cron-secret") !== cronSecret) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   const sb = createClient(SUPABASE_URL, SERVICE_ROLE);
   try {
     const { frequency } = await safeJson(req); // "hourly_digest" | "daily_digest"
@@ -23,7 +32,8 @@ Deno.serve(async (req) => {
       .from("notification_queue")
       .select("id, user_id, event_key, channel, title, message")
       .is("delivered_at", null)
-      .eq("frequency", frequency);
+      .eq("frequency", frequency)
+      .limit(1000);
 
     // Group by user+channel
     const groups = new Map<string, any[]>();

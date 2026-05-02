@@ -63,6 +63,14 @@ async function sendEmail(to: string, subject: string, html: string) {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
+  const cronSecret = Deno.env.get("CRON_SECRET");
+  if (req.headers.get("x-cron-secret") !== cronSecret) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
@@ -75,7 +83,8 @@ Deno.serve(async (req) => {
     .from('listing_buyer_matches')
     .select('id,agent_id,buyer_intent_id,match_score,readiness_score,listing_id,created_at')
     .gte('created_at', sinceIso)
-    .neq('status', 'archived');
+    .neq('status', 'archived')
+    .limit(5000);
 
   if (mErr) {
     console.error('Failed to fetch matches:', mErr);

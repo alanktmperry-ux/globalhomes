@@ -80,6 +80,7 @@ Deno.serve(async (req) => {
 <table width="100%" cellpadding="8" style="border-collapse:collapse;margin-top:20px">
 <tr style="background:#f5f5f5"><td>Gross rent collected</td><td align="right">${AUD(stmt.gross_rent_aud)}</td></tr>
 <tr><td>Management fee</td><td align="right">−${AUD(stmt.management_fee_aud)}</td></tr>
+<tr><td style="padding-left:20px;color:#666;font-size:12px">  GST on management fee</td><td align="right" style="color:#666;font-size:12px">${AUD((stmt as any).management_fee_gst_aud ?? 0)}</td></tr>
 <tr><td>Maintenance costs</td><td align="right">−${AUD(stmt.maintenance_costs_aud)}</td></tr>
 ${otherRows}
 <tr style="border-top:2px solid #1a2e4a;font-weight:bold"><td>Net amount to owner</td><td align="right">${AUD(stmt.net_amount_aud)}</td></tr>

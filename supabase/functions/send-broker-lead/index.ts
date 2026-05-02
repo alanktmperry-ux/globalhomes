@@ -3,7 +3,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
 
 const PLATFORM_FROM_EMAIL =
-  Deno.env.get("EMAIL_FROM") ?? "ListHQ <noreply@globalhomes.lovable.app>";
+  Deno.env.get("EMAIL_FROM") ?? "ListHQ <noreply@listhq.com.au>";
 
 interface LeadPayload {
   buyerName: string;

@@ -64,6 +64,10 @@ export default function PropertyDetailPage() {
   const isMobile = useIsMobile();
   const { investorMode } = useInvestorMode();
   const { user } = useAuth();
+  const { subs: subscriptions, addSubscription, removeSubscription } = useOffmarketSubscriptions();
+  const isSubscribedToSuburb = subscriptions.some(
+    (s) => s.suburb === property?.suburb && s.state === property?.state
+  );
 
   const [property, setProperty] = useState<Property | null>(null);
   useLogPropertyView(property?.id);

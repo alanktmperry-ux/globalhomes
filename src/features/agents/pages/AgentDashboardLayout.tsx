@@ -23,6 +23,7 @@ const AgentDashboardLayout = () => {
   const [trustPending, setTrustPending] = useState(false);
   const [mfaRequired, setMfaRequired] = useState(false);
   const [mfaChecked, setMfaChecked] = useState(false);
+  const [showMfaPromo, setShowMfaPromo] = useState(false);
 
   // Check Authenticator Assurance Level — if user enrolled TOTP but session is still aal1, gate the dashboard.
   useEffect(() => {
@@ -35,6 +36,14 @@ const AgentDashboardLayout = () => {
         if (error) { setMfaRequired(false); return; }
         // nextLevel === 'aal2' && currentLevel === 'aal1' means a verified factor exists but hasn't been satisfied for this session.
         setMfaRequired(data.currentLevel === 'aal1' && data.nextLevel === 'aal2');
+        // If session is fully at aal2 already, no promo needed. If nextLevel === currentLevel === 'aal1', no factor enrolled — show promo (unless dismissed).
+        if (data.currentLevel === 'aal1' && data.nextLevel === 'aal1') {
+          if (sessionStorage.getItem('mfa_promo_dismissed') !== '1') {
+            const { data: factors } = await supabase.auth.mfa.listFactors();
+            const hasMfa = factors?.totp?.some((f) => f.status === 'verified');
+            if (!cancelled && !hasMfa) setShowMfaPromo(true);
+          }
+        }
       } finally {
         if (!cancelled) setMfaChecked(true);
       }

@@ -52,7 +52,7 @@ export default function AgencyOnboardingPage() {
   const [loading, setLoading] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
   const [showRentRollWizard, setShowRentRollWizard] = useState(false);
-  const [wizardCompleted, setWizardCompleted] = useState(false);
+  
   const [guideOpen, setGuideOpen] = useState(false);
 
   // Password step state
@@ -1480,7 +1480,6 @@ export default function AgencyOnboardingPage() {
             <TrustImportWizard
               onComplete={async () => {
                 setShowWizard(false);
-                setWizardCompleted(true);
                 await completeOnboarding();
                 setStep(5);
               }}
@@ -1497,7 +1496,6 @@ export default function AgencyOnboardingPage() {
             <RentRollMigrationWizard
               onComplete={async () => {
                 setShowRentRollWizard(false);
-                setWizardCompleted(true);
                 await completeOnboarding();
                 setStep(5);
               }}

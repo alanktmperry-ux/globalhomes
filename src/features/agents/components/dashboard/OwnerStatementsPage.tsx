@@ -263,7 +263,7 @@ export default function OwnerStatementsPage() {
                   {visibleStatements.map((s) => (
                     <TableRow key={s.id}>
                       <TableCell className="font-medium">{s.properties?.address || '—'}</TableCell>
-                      <TableCell>{format(parseISO(s.period_start), 'MMM yyyy')}</TableCell>
+                      <TableCell>{s.period_start ? format(parseISO(s.period_start), 'MMM yyyy') : '—'}</TableCell>
                       <TableCell className="text-right">{AUD.format(Number(s.gross_rent_aud))}</TableCell>
                       <TableCell className="text-right font-medium">{AUD.format(Number(s.net_amount_aud))}</TableCell>
                       <TableCell>

@@ -278,6 +278,20 @@ export default function BrokerPortal() {
     );
   }
 
+  const isLanguageMatch = useCallback((lead: Lead) => {
+    if (!lead.buyer_language || !broker?.languages?.length) return false;
+    return broker.languages.includes(lead.buyer_language);
+  }, [broker]);
+
+  const matchedAvailable = useMemo(
+    () => availableLeads.filter(isLanguageMatch),
+    [availableLeads, isLanguageMatch]
+  );
+  const otherAvailable = useMemo(
+    () => availableLeads.filter((l) => !isLanguageMatch(l)),
+    [availableLeads, isLanguageMatch]
+  );
+
   const visibleLeads = activeTab === "available" ? availableLeads : myLeads;
 
   return (

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Sparkles, Loader2, Languages, Save, Mic, MicOff } from 'lucide-react';
+import { Sparkles, Loader2, Languages, Mic, MicOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';

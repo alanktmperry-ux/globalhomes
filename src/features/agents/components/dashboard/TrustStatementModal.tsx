@@ -49,6 +49,7 @@ export default function TrustStatementModal({ open, onOpenChange }: TrustStateme
   const [loading, setLoading] = useState(false);
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
+  const [openingBalance, setOpeningBalance] = useState(0);
   const [agentInfo, setAgentInfo] = useState<{ name: string; agency: string; license_number: string } | null>(null);
 
   // Month picker
@@ -92,14 +93,35 @@ export default function TrustStatementModal({ open, onOpenChange }: TrustStateme
     if (agent) setAgentInfo(agent as any);
     setReceipts((recs || []) as unknown as Receipt[]);
     setPayments((pays || []) as unknown as Payment[]);
+
+    // Fetch period opening balance
+    const { data: agentRow } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
+    if (agentRow) {
+      const { data: acct } = await supabase.from('trust_accounts').select('id').eq('agent_id', (agentRow as any).id).limit(1).maybeSingle();
+      if (acct) {
+        const { data: bal } = await supabase
+          .from('trust_account_balances')
+          .select('opening_balance')
+          .eq('trust_account_id', (acct as any).id)
+          .eq('period_year', year)
+          .eq('period_month', month + 1)
+          .maybeSingle();
+        setOpeningBalance((bal as any)?.opening_balance ?? 0);
+      } else {
+        setOpeningBalance(0);
+      }
+    } else {
+      setOpeningBalance(0);
+    }
+
     setLoading(false);
-  }, [user, open, startDate, endDate]);
+  }, [user, open, startDate, endDate, year, month]);
 
   useEffect(() => { fetchStatementData(); }, [fetchStatementData]);
 
   const totalIn = receipts.reduce((s, r) => s + r.amount, 0);
   const totalOut = payments.reduce((s, p) => s + p.amount, 0);
-  const closingBalance = totalIn - totalOut;
+  const closingBalance = openingBalance + totalIn - totalOut;
   const gstOnReceipts = totalIn / 11;
   const gstOnPayments = totalOut / 11;
 
@@ -198,7 +220,7 @@ export default function TrustStatementModal({ open, onOpenChange }: TrustStateme
   <div class="summary">
     <div class="sum-box">
       <p class="label">Opening Balance</p>
-      <p class="value">$0.00</p>
+      <p class="value">${AUD.format(openingBalance)}</p>
       <p class="sub">Start of ${MONTH_NAMES[month]}</p>
     </div>
     <div class="sum-box">
@@ -416,7 +438,12 @@ export default function TrustStatementModal({ open, onOpenChange }: TrustStateme
 
               <Separator />
 
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div className="text-center p-3 bg-muted/50 rounded-lg">
+                  <p className="text-[9px] uppercase text-muted-foreground font-semibold">Opening</p>
+                  <p className="text-lg font-bold">{AUD.format(openingBalance)}</p>
+                  <p className="text-[10px] text-muted-foreground">Start of period</p>
+                </div>
                 <div className="text-center p-3 bg-muted/50 rounded-lg">
                   <p className="text-[9px] uppercase text-muted-foreground font-semibold">Receipts</p>
                   <p className="text-lg font-bold text-green-600">{AUD.format(totalIn)}</p>

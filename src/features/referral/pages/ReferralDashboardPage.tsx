@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { TIER_COMMISSION_AUD, TIER_THRESHOLDS, TIER_STYLES, LEAD_STATUS_STYLES, type ReferralTier } from '@/features/referral/lib/constants';
 import { SubmitReferralModal } from '@/features/referral/components/SubmitReferralModal';

@@ -19,10 +19,18 @@ const TABLES = [
   { name: 'user_preferences', deletable: false },
 ];
 
+interface DatabaseStat {
+  table_name?: string;
+  row_count?: number;
+  size_bytes?: number;
+  id?: string;
+  [key: string]: unknown;
+}
+
 const AdminDatabase = () => {
   const { toast } = useToast();
   const [selectedTable, setSelectedTable] = useState('profiles');
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<DatabaseStat[]>([]);
   const [total, setTotal] = useState(0);
   const [tableStats, setTableStats] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);

@@ -1,6 +1,24 @@
 import { Calendar, PawPrint, Sofa, Clock, Zap, Cigarette, Car, WashingMachine, Wind, Users, DollarSign } from 'lucide-react';
 
-interface Props { property: any; }
+interface Props {
+  property: {
+    beds?: number;
+    baths?: number;
+    parking?: number;
+    property_type?: string;
+    rental_weekly?: number;
+    available_from?: string;
+    pet_friendly?: boolean;
+    furnished?: boolean | string;
+    bond_amount?: number;
+    lease_term?: string;
+    pets_allowed?: boolean;
+    smoking_allowed?: boolean;
+    rental_parking_type?: string;
+    has_air_con?: boolean;
+    max_occupants?: number;
+  };
+}
 
 // Build utilities list from either array or individual boolean columns
 function getUtilities(p: any): string | null {

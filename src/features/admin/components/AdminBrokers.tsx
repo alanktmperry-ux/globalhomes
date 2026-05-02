@@ -28,7 +28,21 @@ import {
   Users,
 } from 'lucide-react';
 
-type Broker = Record<string, any>;
+interface Broker {
+  id: string;
+  name: string;
+  company?: string;
+  acl_number?: string;
+  photo_url?: string;
+  languages?: string[];
+  specialties?: string[];
+  suburb?: string;
+  state?: string;
+  tagline?: string;
+  calendar_url?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
 
 const STATE_OPTIONS = ['NSW', 'VIC', 'QLD', 'SA', 'WA', 'ACT', 'TAS', 'NT'];
 const SPECIALTY_OPTIONS = [

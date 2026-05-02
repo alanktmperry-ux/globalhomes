@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, useRef, useEffect } from 'react';
+import React, { lazy, Suspense, useState, useRef, useEffect } from 'react';
 import { MapPin, Bookmark, LogOut, Settings, KanbanSquare, Wallet } from 'lucide-react';
 import { Globe, ChevronDown, User, LogIn, Home, Building2, Plus, List, LayoutDashboard, ShieldCheck, Menu, FileText, Handshake, Wrench, Sparkles, Search, MoreHorizontal, HelpCircle, Users, Banknote } from 'lucide-react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
@@ -19,7 +19,7 @@ import { useI18n } from '@/shared/lib/i18n';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 
-type NavItem = { label: string; to: string; icon: any };
+type NavItem = { label: string; to: string; icon: React.ComponentType<{ className?: string; size?: number | string }> };
 
 const PUBLIC_NAV: NavItem[] = [
   { label: 'Search', to: '/search', icon: Search },

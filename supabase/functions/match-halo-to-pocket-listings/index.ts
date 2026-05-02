@@ -6,8 +6,8 @@ const corsHeaders = {
     'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
-const APP_URL = 'https://globalhomes.lovable.app';
-const FROM = 'ListHQ <onboarding@resend.dev>';
+const APP_URL = Deno.env.get("APP_URL") ?? "https://listhq.com.au";
+const FROM = Deno.env.get("EMAIL_FROM") ?? "ListHQ <noreply@listhq.com.au>";
 
 const TIMEFRAME_LABELS: Record<string, string> = {
   ready_now: 'Ready now',
@@ -64,6 +64,15 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'halo not found' }), {
         status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
+    }
+
+    const token = req.headers.get("Authorization")?.replace("Bearer ", "") ?? "";
+    const { data: { user }, error: authError } = await admin.auth.getUser(token);
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    if (user.id !== (halo as any).seeker_id) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     const suburbs: string[] = (halo.suburbs ?? []).filter(Boolean);

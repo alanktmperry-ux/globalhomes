@@ -11,8 +11,15 @@ Deno.serve(async (req) => {
   const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
   const APP_URL = Deno.env.get('APP_URL') || 'https://listhq.com.au'
 
-  const { cma_id, recipient_email, recipient_name } = await req.json()
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+
+  const token = req.headers.get("Authorization")?.replace("Bearer ", "") ?? "";
+  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+  if (authError || !user) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+  }
+
+  const { cma_id, recipient_email, recipient_name } = await req.json()
 
   const { data: cma } = await supabase
     .from('cma_reports')
@@ -22,6 +29,11 @@ Deno.serve(async (req) => {
 
   if (!cma || !cma.is_shared) {
     return new Response(JSON.stringify({ error: 'Not found or not shared' }), { status: 404, headers: corsHeaders })
+  }
+
+  const { data: callerAgent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
+  if (!callerAgent || callerAgent.id !== cma.agent_id) {
+    return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 
   const { data: agent } = await supabase

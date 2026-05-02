@@ -60,6 +60,9 @@ Deno.serve(async (req) => {
         status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+    if (userRes.user.id !== (halo as any).seeker_id) {
+      return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
 
     const intentLabel = halo.intent === 'buy' ? 'Buy' : 'Rent';
     const suburbsLabel = (halo.suburbs ?? []).join(', ') || '—';

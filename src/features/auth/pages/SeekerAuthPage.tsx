@@ -337,7 +337,8 @@ const SeekerAuthPage = () => {
                         className="mt-0.5 h-4 w-4 rounded border-stone-300 text-primary focus:ring-primary cursor-pointer shrink-0"
                       />
                       <span className="text-[12px] text-stone-500 leading-relaxed">
-                        I understand my data is stored on secure servers in Singapore. ListHQ complies with the Australian Privacy Act 1988.
+                        I understand that my data is processed and stored by Supabase (AWS ap-southeast-2, Sydney) in accordance with the ListHQ{' '}
+                        <a href="/privacy" className="underline underline-offset-2 hover:text-stone-700">Privacy Policy</a>.
                       </span>
                     </label>
 

@@ -238,7 +238,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
         toast.success(`Lead submitted — Score: ${score}`);
         setStep(3);
       } catch (err) {
-        console.error('Lead submission error:', err);
+        if (import.meta.env.DEV) console.error('Lead submission error:', err);
         toast.error('Error — Failed to submit. Please try again.');
       } finally {
         setSubmitting(false);

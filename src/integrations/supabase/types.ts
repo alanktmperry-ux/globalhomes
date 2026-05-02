@@ -7927,6 +7927,7 @@ export type Database = {
           id: string
           maintenance_costs_aud: number | null
           management_fee_aud: number | null
+          management_fee_gst_aud: number | null
           net_amount_aud: number | null
           other_deductions_aud: number | null
           other_deductions_breakdown: Json | null
@@ -7945,6 +7946,7 @@ export type Database = {
           id?: string
           maintenance_costs_aud?: number | null
           management_fee_aud?: number | null
+          management_fee_gst_aud?: number | null
           net_amount_aud?: number | null
           other_deductions_aud?: number | null
           other_deductions_breakdown?: Json | null
@@ -7963,6 +7965,7 @@ export type Database = {
           id?: string
           maintenance_costs_aud?: number | null
           management_fee_aud?: number | null
+          management_fee_gst_aud?: number | null
           net_amount_aud?: number | null
           other_deductions_aud?: number | null
           other_deductions_breakdown?: Json | null

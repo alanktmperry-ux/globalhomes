@@ -60,22 +60,25 @@ const TenantPortalPage = () => {
   const submitMaintenance = async () => {
     if (!form.title.trim()) { toast.error('Please enter a title'); return; }
     setSubmitting(true);
-    const { data: result, error: err } = await supabase.rpc('submit_tenant_maintenance', {
-      p_token: token!,
-      p_title: form.title,
-      p_description: form.description,
-      p_category: form.category,
-      p_priority: form.priority,
-    } as any);
-    setSubmitting(false);
-    if (err || (result as any)?.error) {
-      toast.error('Could not submit request — please try again');
-      return;
+    try {
+      const { data: result, error: err } = await supabase.rpc('submit_tenant_maintenance', {
+        p_token: token!,
+        p_title: form.title,
+        p_description: form.description,
+        p_category: form.category,
+        p_priority: form.priority,
+      } as any);
+      if (err || (result as any)?.error) {
+        toast.error('Could not submit request — please try again');
+        return;
+      }
+      toast.success('Maintenance request submitted ✓');
+      setShowForm(false);
+      setForm({ title: '', description: '', category: 'general', priority: 'routine' });
+      load();
+    } finally {
+      setSubmitting(false);
     }
-    toast.success('Maintenance request submitted ✓');
-    setShowForm(false);
-    setForm({ title: '', description: '', category: 'general', priority: 'routine' });
-    load();
   };
 
   if (loading) {
@@ -243,7 +246,7 @@ const TenantPortalPage = () => {
                     <p className={`text-sm font-semibold ${isOverdue ? 'text-red-700 dark:text-red-400' : 'text-emerald-700 dark:text-emerald-400'}`}>
                       {isOverdue ? 'Rent overdue' : 'Rent up to date'}
                     </p>
-                    {lastPaid && !isOverdue && (
+                    {lastPaid && !isOverdue && lastPaid.payment_date && (
                       <p className="text-xs text-muted-foreground">Last payment {format(parseISO(lastPaid.payment_date), 'dd MMM yyyy')}</p>
                     )}
                   </div>
@@ -258,7 +261,7 @@ const TenantPortalPage = () => {
                       <div>
                         <p className="text-sm font-medium">{AUD.format(p.amount)}</p>
                         <p className="text-xs text-muted-foreground">
-                          {format(parseISO(p.payment_date), 'dd MMM yyyy')}
+                          {p.payment_date ? format(parseISO(p.payment_date), 'dd MMM yyyy') : '—'}
                           {p.payment_method && ` • ${p.payment_method.replace('_', ' ')}`}
                         </p>
                       </div>
@@ -390,7 +393,7 @@ const TenantPortalPage = () => {
                         <p className="text-sm font-medium truncate">{d.label || docTypeLabel(d.document_type)}</p>
                         <div className="flex items-center gap-2 mt-0.5">
                           <Badge variant="secondary" className="text-[10px]">{docTypeLabel(d.document_type)}</Badge>
-                          <span className="text-xs text-muted-foreground">{format(parseISO(d.uploaded_at), 'dd MMM yyyy')}</span>
+                          <span className="text-xs text-muted-foreground">{d.uploaded_at ? format(parseISO(d.uploaded_at), 'dd MMM yyyy') : '—'}</span>
                         </div>
                       </div>
                       <a href={d.file_url} target="_blank" rel="noopener noreferrer">
@@ -417,7 +420,7 @@ const TenantPortalPage = () => {
                 <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
                   <p className="text-xs font-medium uppercase tracking-wide text-primary mb-1">Next Scheduled Inspection</p>
                   <p className="text-base font-semibold">
-                    {format(parseISO(upcomingInspection.scheduled_date), 'EEEE dd MMM yyyy')}
+                    {upcomingInspection.scheduled_date ? format(parseISO(upcomingInspection.scheduled_date), 'EEEE dd MMM yyyy') : '—'}
                   </p>
                   <p className="text-sm text-muted-foreground capitalize mt-1">{upcomingInspection.inspection_type} inspection</p>
                   <p className="text-xs text-muted-foreground mt-3">
@@ -436,7 +439,7 @@ const TenantPortalPage = () => {
                       <div key={i.id} className="flex items-center justify-between py-2 border-b last:border-0">
                         <div>
                           <p className="text-sm capitalize">{i.inspection_type}</p>
-                          <p className="text-xs text-muted-foreground">{format(parseISO(i.scheduled_date), 'dd MMM yyyy')}</p>
+                          <p className="text-xs text-muted-foreground">{i.scheduled_date ? format(parseISO(i.scheduled_date), 'dd MMM yyyy') : '—'}</p>
                         </div>
                         {i.report_token && (
                           <a href={`/inspection-report/${i.report_token}`} target="_blank" rel="noopener noreferrer">

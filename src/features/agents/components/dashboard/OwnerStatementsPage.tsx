@@ -71,6 +71,11 @@ export default function OwnerStatementsPage() {
   );
 
   const otherTotal = useMemo(() => otherDeductions.reduce((s, d) => s + Number(d.amount || 0), 0), [otherDeductions]);
+  // GST is 1/11 of the GST-inclusive management fee (Australian standard).
+  const mgmtFeeGst = useMemo(
+    () => Math.round((Number(form.management_fee_aud || 0) / 11) * 100) / 100,
+    [form.management_fee_aud]
+  );
   const netAmount = useMemo(
     () => Number(form.gross_rent_aud || 0) - Number(form.management_fee_aud || 0) - Number(form.maintenance_costs_aud || 0) - otherTotal,
     [form, otherTotal]
@@ -148,6 +153,7 @@ export default function OwnerStatementsPage() {
         period_end: form.period_end,
         gross_rent_aud: form.gross_rent_aud,
         management_fee_aud: form.management_fee_aud,
+        management_fee_gst_aud: mgmtFeeGst,
         maintenance_costs_aud: form.maintenance_costs_aud,
         other_deductions_aud: otherTotal,
         other_deductions_breakdown: otherDeductions as any,
@@ -169,7 +175,8 @@ export default function OwnerStatementsPage() {
             <p>Period: ${format(parseISO(form.period_start), 'd MMM yyyy')} – ${format(parseISO(form.period_end), 'd MMM yyyy')}</p>
             <table cellpadding="6" style="border-collapse:collapse">
               <tr><td>Gross rent collected</td><td style="text-align:right">${AUD.format(form.gross_rent_aud)}</td></tr>
-              <tr><td>Management fee</td><td style="text-align:right">−${AUD.format(form.management_fee_aud)}</td></tr>
+              <tr><td>Management fee (incl. GST)</td><td style="text-align:right">−${AUD.format(form.management_fee_aud)}</td></tr>
+              <tr><td style="padding-left:16px;color:#666;font-size:12px">GST component</td><td style="text-align:right;color:#666;font-size:12px">${AUD.format(mgmtFeeGst)}</td></tr>
               <tr><td>Maintenance</td><td style="text-align:right">−${AUD.format(form.maintenance_costs_aud)}</td></tr>
               ${otherDeductions.map(d => `<tr><td>${d.label}</td><td style="text-align:right">−${AUD.format(Number(d.amount))}</td></tr>`).join('')}
               <tr style="border-top:1px solid #ccc;font-weight:bold"><td>Net to owner</td><td style="text-align:right">${AUD.format(netAmount)}</td></tr>
@@ -338,10 +345,22 @@ export default function OwnerStatementsPage() {
               <Textarea rows={2} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
             </div>
 
-            <div className="bg-muted/40 rounded-md p-3 flex justify-between items-center">
-              <span className="text-sm font-medium">Net to owner</span>
-              <span className="text-2xl font-semibold">{AUD.format(netAmount)}</span>
+            <div className="bg-muted/40 rounded-md p-3 space-y-1.5">
+              <div className="flex justify-between items-center text-xs text-muted-foreground">
+                <span>Management fee (incl. GST)</span>
+                <span>{AUD.format(Number(form.management_fee_aud || 0))} — GST component: {AUD.format(mgmtFeeGst)}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium">Net to owner</span>
+                <span className="text-2xl font-semibold">{AUD.format(netAmount)}</span>
+              </div>
             </div>
+
+            {netAmount < 0 && (
+              <p className="text-sm font-medium text-destructive">
+                Warning: deductions exceed gross rent — net amount is negative
+              </p>
+            )}
           </div>
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => save(false)} disabled={saving}>

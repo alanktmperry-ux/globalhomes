@@ -15,6 +15,8 @@ import { StarRating } from '@/features/agents/components/StarRating';
 import { toast } from 'sonner';
 import { Helmet } from 'react-helmet-async';
 
+const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
+
 interface Job {
   id: string; title: string; description: string;
   priority: string; status: string; created_at: string;
@@ -101,9 +103,13 @@ export default function SupplierPortalPage() {
   const uploadInvoice = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !completeJob) return;
+    if (!data?.supplier?.id) {
+      toast.error('Cannot upload: missing supplier ID');
+      return;
+    }
     setUploadingInvoice(true);
     const ext = file.name.split('.').pop() || 'pdf';
-    const path = `${data?.supplier?.id}/${completeJob.id}/invoice.${ext}`;
+    const path = `${data.supplier.id}/${completeJob.id}/invoice.${ext}`;
     const { error: upErr } = await supabase.storage
       .from('maintenance-invoices')
       .upload(path, file, { upsert: true, contentType: file.type });
@@ -232,7 +238,7 @@ export default function SupplierPortalPage() {
                     <p className="text-xs text-muted-foreground truncate">{c.property_address}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    {c.final_cost_aud != null && <p className="text-sm font-semibold">${Number(c.final_cost_aud).toLocaleString()}</p>}
+                    {c.final_cost_aud != null && <p className="text-sm font-semibold">{AUD.format(Number(c.final_cost_aud))}</p>}
                     {c.rating ? <StarRating rating={c.rating} size="sm"/> : <p className="text-[10px] text-muted-foreground">No rating</p>}
                   </div>
                 </Card>
@@ -269,7 +275,7 @@ export default function SupplierPortalPage() {
           <DialogHeader><DialogTitle>Propose Schedule</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div><Label className="text-xs">Date</Label><Input type="date" value={schedDate} onChange={e=>setSchedDate(e.target.value)}/></div>
-            <div><Label className="text-xs">Time</Label><Input placeholder="e.g. 10:00 AM" value={schedTime} onChange={e=>setSchedTime(e.target.value)}/></div>
+            <div><Label className="text-xs">Time</Label><Input type="time" value={schedTime} onChange={e=>setSchedTime(e.target.value)}/></div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={()=>setScheduleJob(null)}>Cancel</Button>

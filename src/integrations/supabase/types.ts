@@ -2120,6 +2120,42 @@ export type Database = {
           },
         ]
       }
+      audit_logs: {
+        Row: {
+          accessed_at: string
+          entity_id: string | null
+          event_type: string
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          portal_type: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          accessed_at?: string
+          entity_id?: string | null
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          portal_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          accessed_at?: string
+          entity_id?: string | null
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          portal_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       automation_log: {
         Row: {
           action_taken: string | null
@@ -7915,6 +7951,83 @@ export type Database = {
             foreignKeyName: "open_homes_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
+            referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      owner_portal_preferences: {
+        Row: {
+          agent_id: string
+          auto_approve_threshold_aud: number
+          created_at: string
+          id: string
+          property_id: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          auto_approve_threshold_aud?: number
+          created_at?: string
+          id?: string
+          property_id: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          auto_approve_threshold_aud?: number
+          created_at?: string
+          id?: string
+          property_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "owner_portal_preferences_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owner_portal_preferences_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owner_portal_preferences_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owner_portal_preferences_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances_view"
+            referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "owner_portal_preferences_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: true
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owner_portal_preferences_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: true
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owner_portal_preferences_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: true
             referencedRelation: "properties_public_safe"
             referencedColumns: ["id"]
           },

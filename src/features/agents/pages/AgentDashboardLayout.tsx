@@ -95,6 +95,28 @@ const AgentDashboardLayout = () => {
         <AgentDashboardSidebar />
         <main id="main-content" className="flex-1 flex flex-col min-w-0 overflow-y-auto pb-[env(safe-area-inset-bottom)]">
           <PaymentStatusBanner />
+          {showMfaPromo && (
+            <div className="bg-primary/10 border-b border-primary/20 text-sm px-4 py-3 flex items-center justify-between gap-4">
+              <span className="text-foreground">
+                🔒 Protect your account — enable two-factor authentication.
+              </span>
+              <div className="flex items-center gap-2 shrink-0">
+                <a
+                  href="/dashboard/settings?tab=security"
+                  className="underline font-semibold text-primary"
+                >
+                  Set up now →
+                </a>
+                <button
+                  onClick={() => { sessionStorage.setItem('mfa_promo_dismissed', '1'); setShowMfaPromo(false); }}
+                  className="text-muted-foreground hover:text-foreground px-2"
+                  aria-label="Dismiss"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          )}
           {trustPending && (
             <div className="bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-sm px-4 py-3 flex items-center justify-between">
               <span>⚠️ Complete your trust account setup to enable rent roll and disbursements.</span>

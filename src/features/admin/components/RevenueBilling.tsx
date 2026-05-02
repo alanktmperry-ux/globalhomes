@@ -122,14 +122,13 @@ function KPI({ label, value, sub, icon: Icon, color = 'text-primary', trend }: {
 
 function StripeBanner() {
   return (
-    <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 flex items-start gap-4 mb-6">
-      <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center flex-shrink-0">
-        <CreditCard size={20} className="text-amber-600" />
+    <div className="bg-muted/40 border border-border rounded-xl p-3 flex items-start gap-3 mb-6">
+      <div className="w-8 h-8 rounded-lg bg-amber-500/15 flex items-center justify-center flex-shrink-0">
+        <CreditCard size={16} className="text-amber-600" />
       </div>
       <div className="flex-1">
-        <p className="text-sm font-semibold text-foreground">Stripe not connected</p>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          Revenue figures are estimated from subscription flags. Connect Stripe to unlock real payment data, failed payment alerts, retry status, and accurate MRR history.
+        <p className="text-xs text-muted-foreground">
+          <span className="font-medium text-foreground">Stripe not yet connected</span> — showing estimated MRR from plan data. Connect Stripe to unlock real payment data and accurate MRR history.
         </p>
       </div>
       <Button variant="outline" size="sm" className="gap-1.5 text-xs flex-shrink-0">
@@ -357,11 +356,11 @@ export default function RevenueBilling() {
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KPI
-          label="Monthly Recurring Revenue"
+          label="Estimated MRR"
           value={fmt(totalMrr)}
           icon={DollarSign}
           color={totalMrr > 0 ? 'text-emerald-500' : 'text-muted-foreground'}
-          sub={mrrGrowthPct !== null ? `${mrrGrowthPct >= 0 ? '+' : ''}${mrrGrowthPct}% vs last month` : 'No prev data'}
+          sub={mrrGrowthPct !== null ? `${mrrGrowthPct >= 0 ? '+' : ''}${mrrGrowthPct}% vs last month · pre-Stripe` : 'From plan data · pre-Stripe'}
           trend={mrrGrowthPct !== null ? (mrrGrowthPct >= 0 ? 'up' : 'down') : null}
         />
         <KPI label="Annual Run Rate" value={fmt(totalArr)} icon={TrendingUp} color={totalArr > 0 ? 'text-emerald-500' : 'text-muted-foreground'} sub="Annualised run rate" />

@@ -140,9 +140,22 @@ const TrustLedgerPage = () => {
   useEffect(() => { fetchAgentAndAccounts(); }, [fetchAgentAndAccounts]);
   const [viewMonth, setViewMonth] = useState(new Date().getMonth());
   const [viewYear, setViewYear] = useState(new Date().getFullYear());
+  const [openingBalance, setOpeningBalance] = useState(0);
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   const prevMonth = () => { if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); } else setViewMonth(m => m - 1); };
   const nextMonth = () => { if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); } else setViewMonth(m => m + 1); };
+
+  useEffect(() => {
+    if (!accounts[0]?.id) return;
+    supabase
+      .from('trust_account_balances')
+      .select('opening_balance')
+      .eq('trust_account_id', accounts[0].id)
+      .eq('period_year', viewYear)
+      .eq('period_month', viewMonth + 1)
+      .maybeSingle()
+      .then(({ data }) => setOpeningBalance((data as any)?.opening_balance ?? 0));
+  }, [accounts, viewMonth, viewYear]);
 
   const fetchData = useCallback(async () => {
     if (!user) return;
@@ -304,12 +317,12 @@ const TrustLedgerPage = () => {
 
   // Running balance
   const entriesWithBalance = useMemo(() => {
-    let balance = 0;
+    let balance = openingBalance;
     return filtered.map(e => {
       balance += e.type === 'receipt' ? e.amount : -e.amount;
       return { ...e, balance };
     });
-  }, [filtered]);
+  }, [filtered, openingBalance]);
 
   // Stats
   const totalReceipts = receipts.reduce((s, r) => s + r.amount, 0);
@@ -547,7 +560,7 @@ const TrustLedgerPage = () => {
     <table>
       <thead><tr><th>Item</th><th class="right">Amount</th></tr></thead>
       <tbody>
-        <tr><td>Opening Balance (1 ${monthNames[viewMonth]})</td><td class="right bold">${AUD.format(0)}</td></tr>
+        <tr><td>Opening Balance (1 ${monthNames[viewMonth]})</td><td class="right bold">${AUD.format(openingBalance)}</td></tr>
         <tr><td>Add: Total Receipts</td><td class="right green">${AUD.format(totalIn)}</td></tr>
         <tr><td>Less: Total Payments</td><td class="right red">(${AUD.format(totalOut)})</td></tr>
         <tr style="background:#f0f0f0;"><td class="bold">Closing Trust Balance</td><td class="right bold" style="font-size:12px;">${AUD.format(closingBalance)}</td></tr>

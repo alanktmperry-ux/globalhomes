@@ -241,7 +241,11 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
                 <SelectTrigger className="h-8 w-28 text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="call">📞 Call</SelectItem>
-                  <SelectItem value="email">📧 Email</SelectItem>
+                  <SelectItem
+                    value="email"
+                    disabled={!contact.email}
+                    title={!contact.email ? 'Add an email address to send emails' : undefined}
+                  >📧 Email</SelectItem>
                   <SelectItem value="sms">💬 SMS</SelectItem>
                   <SelectItem value="inspection">🏠 Inspection</SelectItem>
                   <SelectItem value="meeting">📅 Meeting</SelectItem>

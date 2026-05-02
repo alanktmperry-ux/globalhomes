@@ -408,9 +408,11 @@ export default function RentRollMigrationWizard({ onComplete, onCancel }: RentRo
       const issues = [...p.issues];
       if (!ownerBsb || ownerBsb.length !== 6) issues.push('Owner BSB missing/invalid');
       if (!ownerAcctRaw) issues.push('Owner account number missing');
-      const tenantRec = tenantLookup.get(p.tenant_name.toLowerCase().trim());
-      const tenantEmail = tenantRec ? Object.entries(tenantRec).find(([k]) => /email/i.test(k))?.[1] : '';
-      if (!tenantEmail) issues.push('Tenant email missing');
+      if (p.tenant_name) {
+        const tenantRec = tenantLookup.get(p.tenant_name.toLowerCase().trim());
+        const tenantEmail = tenantRec ? Object.entries(tenantRec).find(([k]) => /email/i.test(k))?.[1] : '';
+        if (!tenantEmail) issues.push('Tenant email missing');
+      }
       return { ...p, issues };
     });
   }, [parsedRows, ownerLookup, tenantLookup]);
@@ -421,7 +423,7 @@ export default function RentRollMigrationWizard({ onComplete, onCancel }: RentRo
   // P0 errors check
   const missingBsbCount = enrichedRows.filter(r => r.issues.some(i => i.includes('BSB') || i.includes('account number'))).length;
   const missingBsbPct = enrichedRows.length ? (missingBsbCount / enrichedRows.length) * 100 : 0;
-  const hasP0 = missingBsbPct > 20 || Math.abs(balanceDifference) > 100;
+  const hasP0 = missingBsbPct > 20;
 
   // ── Validation per step ──
   const canProceed = (): boolean => {
@@ -728,13 +730,11 @@ export default function RentRollMigrationWizard({ onComplete, onCancel }: RentRo
       // 6. Trust ledger accounts (one per property)
       setImportStatus('Setting up trust ledger accounts…');
       setImportProgress(88);
-      const propCount = enrichedRows.length || 1;
-      const evenSplit = trustBalanceNum / propCount;
       const ledgerInserts = enrichedRows.map(r => {
         const propId = propertyIdByAddress.get(r.property_address.toLowerCase().trim());
         if (!propId) return null;
         const tenancyId = tenancyIdByPropertyId.get(propId) || null;
-        const opening = r.ledger_balance > 0 ? r.ledger_balance : evenSplit;
+        const opening = r.ledger_balance > 0 ? r.ledger_balance : 0;
         return {
           agent_id: agent.id,
           property_id: propId,

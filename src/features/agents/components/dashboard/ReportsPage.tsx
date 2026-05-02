@@ -372,7 +372,64 @@ const ReportsPage = () => {
     exportCsv(headers, rows, 'activity_report');
   };
 
-  if (!subLoading && !canAccessTrust) {
+  const exportArrearsCsv = () => {
+    const headers = ['Tenant Name', 'Property Address', 'Days Overdue', 'Amount Owing', 'Last Paid To', 'Phone'];
+    const rows = arrearsRows.map(r => [
+      r.tenant_name, r.address, String(r.daysOverdue),
+      AUD2.format(r.owing), r.paidTo || '', r.phone,
+    ]);
+    exportCsv(headers, rows, 'arrears_report');
+  };
+
+  const downloadReconciliationPdf = () => {
+    if (!agent) { toast.error('Agent details not loaded'); return; }
+    const agencyName = (agent as any).agency_name || (agent as any).agency || agent.name || 'Agency';
+    const today = format(new Date(), 'd MMM yyyy');
+    const html = `<!doctype html><html><head><meta charset="utf-8"><title>Trust Reconciliation</title>
+      <style>
+        body{font-family:Arial,Helvetica,sans-serif;color:#0f172a;padding:32px;}
+        h1{font-size:18px;margin:0 0 4px;}
+        h2{font-size:13px;margin:0 0 24px;color:#475569;font-weight:normal;}
+        table{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px;}
+        th,td{padding:6px 8px;border-bottom:1px solid #e2e8f0;text-align:right;}
+        th:first-child,td:first-child{text-align:left;}
+        thead th{background:#f1f5f9;font-weight:600;}
+        .cert{margin-top:32px;padding-top:16px;border-top:2px solid #0f172a;font-size:11px;}
+        .sig{margin-top:48px;border-top:1px solid #0f172a;padding-top:6px;width:240px;font-size:10px;color:#475569;}
+        @media print{body{padding:16px;}}
+      </style></head><body>
+      <h1>${agencyName} — Trust Account Reconciliation</h1>
+      <h2>Period: Last 12 months · Generated ${today}</h2>
+      <table>
+        <thead><tr>
+          <th>Month</th><th>Opening Balance</th><th>Total Receipts</th>
+          <th>Total Payments</th><th>Closing Balance</th><th>Bank Balance</th><th>Variance</th>
+        </tr></thead>
+        <tbody>
+          ${reconciliationRows.map(r => `<tr>
+            <td>${r.monthLabel}</td>
+            <td>${AUD2.format(r.opening)}</td>
+            <td>${AUD2.format(r.receipts)}</td>
+            <td>${AUD2.format(r.payments)}</td>
+            <td>${AUD2.format(r.closing)}</td>
+            <td>${r.bankNum != null ? AUD2.format(r.bankNum) : '—'}</td>
+            <td>${r.variance != null ? AUD2.format(r.variance) : '—'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      <p class="cert">I certify this trust account reconciliation is correct as at ${today}.</p>
+      <div class="sig">Signature & Licensee Name</div>
+      <p style="margin-top:32px;font-size:9px;color:#64748b;">
+        Monthly trust reconciliation is required under the Agents Financial Administration Act 2014.
+      </p>
+      <script>window.onload=()=>window.print();</script>
+      </body></html>`;
+    const w = window.open('', '_blank');
+    if (!w) { toast.error('Allow pop-ups to download the PDF'); return; }
+    w.document.write(html);
+    w.document.close();
+  };
+
     return <UpgradeGate requiredPlan="Pro or above" message="Advanced reports are available on the Pro plan and above. Export listings, leads, trust, and contacts data as CSV." />;
   }
 

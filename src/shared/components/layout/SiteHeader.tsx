@@ -24,7 +24,6 @@ type NavItem = { label: string; to: string; icon: React.ComponentType<{ classNam
 const PUBLIC_NAV: NavItem[] = [
   { label: 'Search', to: '/search', icon: Search },
   { label: 'Find an Agent', to: '/agents', icon: Users },
-  { label: 'Pricing', to: '/pricing', icon: Sparkles },
 ];
 
 const SEEKER_NAV: NavItem[] = [

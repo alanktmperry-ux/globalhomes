@@ -18,6 +18,9 @@ interface RentalProperty {
   images?: string[];
   image_url?: string;
   description?: string;
+  bond_amount?: number;
+  postcode?: string;
+  parking?: number;
 }
 
 export default function RentalPropertyPage() {

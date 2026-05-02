@@ -83,6 +83,17 @@ const STATUS_CONFIG: Record<string, { variant: 'default' | 'secondary' | 'outlin
   cleared: { variant: 'secondary', label: 'Cleared', icon: CheckCircle2 },
 };
 
+interface TrustEntry {
+  id: string;
+  amount?: number;
+  type?: string;
+  description?: string;
+  created_at?: string;
+  reference?: string;
+  bank_reference?: string;
+  received_date?: string;
+}
+
 const TrustLedgerPage = () => {
   const { user } = useAuth();
   const [receipts, setReceipts] = useState<TrustReceipt[]>([]);

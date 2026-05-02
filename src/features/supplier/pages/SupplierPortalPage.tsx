@@ -39,6 +39,7 @@ export default function SupplierPortalPage() {
   const [data, setData] = useState<Data | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [paymentsByJob, setPaymentsByJob] = useState<Record<string, { paid_at: string } | null>>({});
 
   // dialogs
   const [scheduleJob, setScheduleJob] = useState<Job | null>(null);

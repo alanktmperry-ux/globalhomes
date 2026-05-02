@@ -396,6 +396,12 @@ const AgentAuthPage = () => {
                 <button type="submit" disabled={emailSubmitting || !dataLocationConsent} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
                   {emailSubmitting ? 'Sending confirmation...' : 'Continue — confirm my email'}
                 </button>
+                <p className="text-xs text-muted-foreground mt-3 text-center leading-relaxed">
+                  By registering, you agree to our{' '}
+                  <Link to="/terms" className="underline underline-offset-2 hover:text-foreground">Terms of Service</Link>
+                  {' '}and{' '}
+                  <Link to="/privacy" className="underline underline-offset-2 hover:text-foreground">Privacy Policy</Link>.
+                </p>
               </form>
 
               <p className="text-sm text-muted-foreground mt-4">

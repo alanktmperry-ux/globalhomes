@@ -43,6 +43,15 @@ interface NotificationPayload {
   dispute_notes?: string;
 }
 
+function appendUnsubscribeFooter(html: string, recipientEmail: string): string {
+  const safeEmail = encodeURIComponent(recipientEmail);
+  const footer = `<p style="font-size:11px;color:#9ca3af;text-align:center;margin-top:32px;border-top:1px solid #e5e7eb;padding-top:16px;">You're receiving this because you're registered on ListHQ.<br><a href="https://listhq.com.au/unsubscribe?email=${safeEmail}" style="color:#9ca3af;">Unsubscribe</a></p>`;
+  if (/<\/body>/i.test(html)) {
+    return html.replace(/<\/body>/i, `${footer}</body>`);
+  }
+  return html + footer;
+}
+
 async function sendViaResend(to: string, subject: string, html: string) {
   const resendApiKey = Deno.env.get('RESEND_API_KEY');
   if (!resendApiKey) {
@@ -50,6 +59,7 @@ async function sendViaResend(to: string, subject: string, html: string) {
     return { ok: false, reason: 'RESEND_API_KEY not set' };
   }
   const from = Deno.env.get("EMAIL_FROM") || "ListHQ <noreply@listhq.com.au>";
+  const htmlWithFooter = appendUnsubscribeFooter(html, to);
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -60,7 +70,7 @@ async function sendViaResend(to: string, subject: string, html: string) {
       from,
       to: [to],
       subject,
-      html,
+      html: htmlWithFooter,
     }),
   });
   if (!res.ok) {

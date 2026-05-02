@@ -90,11 +90,28 @@ export function useContacts() {
         setHasMore(mapped.length === PAGE_SIZE);
       }
     } else {
-      const { data, error } = await supabase
+      // Resolve current agent id for assigned_agent_id scoping
+      const { data: agentRow } = await supabase
+        .from('agents')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      const myAgentId = agentRow?.id || null;
+
+      let query = supabase
         .from('contacts')
         .select('*')
         .order('updated_at', { ascending: false })
         .range(from, to);
+
+      // Belt-and-suspenders: scope to contacts created by me OR assigned to me
+      if (myAgentId) {
+        query = query.or(`created_by.eq.${user.id},assigned_agent_id.eq.${myAgentId}`);
+      } else {
+        query = query.eq('created_by', user.id);
+      }
+
+      const { data, error } = await query;
 
       if (!error && data) {
         const mapped = data as unknown as Contact[];
@@ -165,7 +182,7 @@ export function useContacts() {
       .select()
       .single();
     if (error) {
-      console.error('[useContacts] Insert error:', error);
+      if (import.meta.env.DEV) console.error('[useContacts] Insert error:', error);
       if (error.code === '42501') {
         throw new Error('Permission denied. Your session may have expired — please log out and log back in.');
       }
@@ -188,10 +205,16 @@ export function useContacts() {
   };
 
   const updateContact = async (id: string, updates: Partial<Contact>) => {
-    const { error } = await supabase
+    if (!user) throw new Error('Not authenticated');
+    let query = supabase
       .from('contacts')
       .update(updates as any)
       .eq('id', id);
+    // Belt-and-suspenders: non-principals can only update contacts they created
+    if (!(isPrincipal || isAdmin)) {
+      query = query.eq('created_by', user.id);
+    }
+    const { error } = await query;
     if (error) throw error;
 
     if (user) {
@@ -209,14 +232,19 @@ export function useContacts() {
   };
 
   const deleteContact = async (id: string) => {
+    if (!user) throw new Error('Not authenticated');
     try {
-      const { error } = await supabase
+      let query = supabase
         .from('contacts')
         .delete()
         .eq('id', id);
+      if (!(isPrincipal || isAdmin)) {
+        query = query.eq('created_by', user.id);
+      }
+      const { error } = await query;
       if (error) throw error;
     } catch (err) {
-      console.error('[useContacts] deleteContact error:', err);
+      if (import.meta.env.DEV) console.error('[useContacts] deleteContact error:', err);
       throw err;
     }
   };

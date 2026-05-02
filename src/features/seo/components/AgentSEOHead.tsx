@@ -42,6 +42,7 @@ export function AgentSEOHead({ agent, listingCount = 0 }: { agent: any; listingC
       <meta property="og:description" content={description} />
       {avatar && <meta property="og:image" content={avatar} />}
       <meta property="og:site_name" content="ListHQ" />
+      <meta property="og:locale" content="en_AU" />
       <meta name="twitter:card" content="summary" />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />

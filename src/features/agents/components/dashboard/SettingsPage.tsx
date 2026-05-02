@@ -265,6 +265,9 @@ const SettingsPage = () => {
               </div>
             </div>
 
+            {/* Two-factor authentication */}
+            <MFAManager />
+
             {/* Notifications — granular per-event preferences */}
             <NotificationPreferencesSettings />
 

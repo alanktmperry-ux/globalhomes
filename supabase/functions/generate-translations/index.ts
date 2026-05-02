@@ -91,7 +91,7 @@ LISTING DATA:
 - Property Type: ${listing.property_type || "House"}
 - Beds: ${listing.beds || 0}, Baths: ${listing.baths || 0}, Parking: ${listing.parking || 0}
 - Price: ${listing.price ? `$${listing.price.toLocaleString()}` : "Contact agent"}
-- Land Size: ${listing.land_size_sqm ? `${listing.land_size_sqm}sqm` : "N/A"}
+- Land Size: ${listing.land_size ? `${listing.land_size}sqm` : "N/A"}
 - Features: ${listing.features ? JSON.stringify(listing.features) : "None listed"}
 - Year Built: ${listing.year_built || "N/A"}
 

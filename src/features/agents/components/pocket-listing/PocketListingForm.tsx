@@ -450,10 +450,8 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         images: draft.photos.length > 0 ? draft.photos : [],
         cover_index: draft.primaryPhoto,
         // Listings auto-publish on submission — no admin moderation step.
-        is_active: editPropertyId ? draft.visibility === 'public' : true,
-        status: editPropertyId
-          ? (draft.visibility === 'public' ? 'public' : draft.visibility)
-          : 'public',
+        is_active: draft.visibility === 'public',
+        status: draft.visibility,
         moderation_status: 'approved',
         lat: draft.lat || null,
         lng: draft.lng || null,
@@ -611,10 +609,6 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         }
 
         fireAIMatch(inserted.id);
-
-        supabase.functions
-          .invoke('generate-translations', { body: { listing_id: inserted.id } })
-          .catch((e) => console.error('Translation generation failed', e));
       }
 
       onPublish(title);

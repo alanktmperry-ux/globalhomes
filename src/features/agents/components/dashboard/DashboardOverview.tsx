@@ -47,6 +47,35 @@ const buildEmptyMonths = () => {
   return months;
 };
 
+interface RecentActivity {
+  id: string;
+  description?: string;
+  action?: string;
+  created_at: string;
+  entity_type?: string;
+  entity_id?: string;
+}
+
+interface ArrearsTenancy {
+  id: string;
+  tenant_name?: string;
+  tenant_email?: string;
+  daysOverdue?: number;
+  amountOwed?: number;
+  properties?: { address?: string; suburb?: string } | null;
+  [key: string]: unknown;
+}
+
+interface ReportDueListing {
+  id: string;
+  address?: string;
+  suburb?: string;
+  vendor_name?: string;
+  views?: number;
+  contact_clicks?: number;
+  [key: string]: unknown;
+}
+
 const DashboardOverview = () => {
   const { listings } = useAgentListings();
   const { user } = useAuth();
@@ -55,13 +84,13 @@ const DashboardOverview = () => {
   const [unrespondedLeads, setUnrespondedLeads] = useState(0);
   const [activeContacts, setActiveContacts] = useState(0);
   const [trustBalance, setTrustBalance] = useState(0);
-  const [recentActivities, setRecentActivities] = useState<any[]>([]);
+  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
   const [todayInspections, setTodayInspections] = useState<{ address: string; time: string; propertyId: string }[]>([]);
   const [pipelineData, setPipelineData] = useState(buildEmptyMonths());
   const [pipelineEmpty, setPipelineEmpty] = useState(true);
-  const [arrearsTenancies, setArrearsTenancies] = useState<any[]>([]);
+  const [arrearsTenancies, setArrearsTenancies] = useState<ArrearsTenancy[]>([]);
   const [sendingReminder, setSendingReminder] = useState<string | null>(null);
-  const [reportsDue, setReportsDue] = useState<any[]>([]);
+  const [reportsDue, setReportsDue] = useState<ReportDueListing[]>([]);
   const [sendingReport, setSendingReport] = useState<string | null>(null);
   const [agencyConnected, setAgencyConnected] = useState(false);
   const [agentId, setAgentId] = useState<string | null>(null);

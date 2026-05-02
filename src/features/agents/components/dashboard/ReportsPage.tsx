@@ -430,6 +430,7 @@ const ReportsPage = () => {
     w.document.close();
   };
 
+  if (!subLoading && !canAccessTrust) {
     return <UpgradeGate requiredPlan="Pro or above" message="Advanced reports are available on the Pro plan and above. Export listings, leads, trust, and contacts data as CSV." />;
   }
 

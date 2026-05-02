@@ -438,6 +438,13 @@ const ReportsPage = () => {
     <div>
       <DashboardHeader title="Reports" subtitle="Performance analytics & financial summaries" />
       <div className="p-4 sm:p-6 max-w-7xl space-y-4">
+        {/* Rent Roll Summary — always visible */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <StatCard icon={Building2} label="Properties Under Management" value={String(rentRollSummary.totalProps)} color="bg-blue-500/10 text-blue-600" />
+          <StatCard icon={DollarSign} label="Weekly Rent Roll" value={AUD.format(rentRollSummary.weeklyTotal)} color="bg-green-500/10 text-green-600" />
+          <StatCard icon={Home} label="Vacancy Rate" value={`${rentRollSummary.vacancyRate.toFixed(1)}%`} color="bg-amber-500/10 text-amber-600" />
+        </div>
+
         {/* Period selector */}
         <div className="flex flex-wrap items-center gap-2">
           <Select value={period} onValueChange={v => setPeriod(v as Period)}>

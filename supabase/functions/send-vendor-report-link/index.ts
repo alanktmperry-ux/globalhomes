@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
       .eq('id', tokenRow?.agent_id)
       .single();
 
-    const reportUrl = `${APP_URL}/vendor-report/${token}`;
+    const reportUrl = `${APP_URL}/vendor-report/${reportToken}`;
     const vendorName = tokenRow?.vendor_name ?? 'there';
     const expiryDate = new Date(tokenRow?.expires_at ?? '').toLocaleDateString('en-AU', {
       day: 'numeric', month: 'long', year: 'numeric',

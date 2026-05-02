@@ -17,7 +17,7 @@ import {
   Download, CalendarIcon, TrendingUp, DollarSign, Home, Clock,
   Target, Users, Phone, Eye, Mail,
 } from 'lucide-react';
-import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
+import { format, subMonths, subDays, startOfMonth, endOfMonth, isWithinInterval, eachMonthOfInterval } from 'date-fns';
 import { cn } from '@/lib/utils';
 import DashboardHeader from './DashboardHeader';
 import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
@@ -40,7 +40,7 @@ const PERIOD_OPTIONS: { value: Period; label: string }[] = [
 function getDateRange(period: Period, customFrom?: Date, customTo?: Date): { from: Date; to: Date } {
   const to = customTo || new Date();
   switch (period) {
-    case '30d': return { from: subMonths(to, 1), to };
+    case '30d': return { from: subDays(to, 30), to };
     case '90d': return { from: subMonths(to, 3), to };
     case '6m': return { from: subMonths(to, 6), to };
     case '12m': return { from: subMonths(to, 12), to };
@@ -115,30 +115,30 @@ const ReportsPage = () => {
 
     const totalVolume = soldListings.reduce((sum, l) => sum + ((l as any).price || 0), 0);
 
-    const avgDom = soldListings.length > 0
-      ? Math.round(soldListings.reduce((sum, l) => {
-          const listed = new Date((l as any).listed_date || (l as any).created_at);
+    const datedSold = soldListings.filter(l => (l as any).listed_date);
+    const avgDom = datedSold.length > 0
+      ? Math.round(datedSold.reduce((sum, l) => {
+          const listed = new Date((l as any).listed_date);
           const sold = new Date((l as any).updated_at || (l as any).created_at);
           return sum + Math.max(1, Math.round((sold.getTime() - listed.getTime()) / 86400000));
-        }, 0) / soldListings.length)
+        }, 0) / datedSold.length)
       : 0;
 
-    // Monthly breakdown for chart
-    const monthlyData: { month: string; sales: number; gci: number }[] = [];
-    for (let i = 11; i >= 0; i--) {
-      const m = subMonths(new Date(), i);
+    // Monthly breakdown for chart — use selected range
+    const months = eachMonthOfInterval({ start: range.from, end: range.to });
+    const monthlyData = months.map(m => {
       const start = startOfMonth(m);
       const end = endOfMonth(m);
       const monthSold = soldListings.filter(l => {
         const d = new Date((l as any).updated_at || (l as any).created_at);
         return isWithinInterval(d, { start, end });
       });
-      monthlyData.push({
-        month: format(m, 'MMM'),
+      return {
+        month: format(m, 'MMM yy'),
         sales: monthSold.length,
         gci: monthSold.reduce((s, l) => s + ((l as any).price || 0) * ((l as any).commission_rate || 2) / 100, 0),
-      });
-    }
+      };
+    });
 
     // Property type breakdown
     const typeMap: Record<string, number> = {};
@@ -170,19 +170,18 @@ const ReportsPage = () => {
     });
     const categoryData = Object.entries(catMap).map(([name, value]) => ({ name, value }));
 
-    // Monthly flow
-    const monthlyFlow: { month: string; deposits: number; withdrawals: number }[] = [];
-    for (let i = 11; i >= 0; i--) {
-      const m = subMonths(new Date(), i);
+    // Monthly flow — use selected range
+    const flowMonths = eachMonthOfInterval({ start: range.from, end: range.to });
+    const monthlyFlow = flowMonths.map(m => {
       const start = startOfMonth(m);
       const end = endOfMonth(m);
       const mTx = periodTx.filter(t => isWithinInterval(new Date(t.transaction_date), { start, end }));
-      monthlyFlow.push({
-        month: format(m, 'MMM'),
+      return {
+        month: format(m, 'MMM yy'),
         deposits: mTx.filter(t => t.transaction_type === 'deposit').reduce((s, t) => s + t.amount, 0),
         withdrawals: mTx.filter(t => t.transaction_type === 'withdrawal').reduce((s, t) => s + t.amount, 0),
-      });
-    }
+      };
+    });
 
     const trustBalance = accounts.filter(a => a.account_type === 'trust').reduce((s, a) => s + a.current_balance, 0);
     const operatingBalance = accounts.filter(a => a.account_type === 'operating').reduce((s, a) => s + a.current_balance, 0);
@@ -197,7 +196,7 @@ const ReportsPage = () => {
     const warmLeads = contacts.filter(c => c.ranking === 'warm').length;
     const totalViews = listings.reduce((s, l) => s + ((l as any).views || 0), 0);
     const totalClicks = listings.reduce((s, l) => s + ((l as any).contact_clicks || 0), 0);
-    const conversionRate = totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(1) : '0';
+    const conversionRate = totalViews > 0 ? Math.min(100, (totalClicks / totalViews) * 100).toFixed(1) : '0';
 
     // Source breakdown
     const sourceMap: Record<string, number> = {};
@@ -224,7 +223,7 @@ const ReportsPage = () => {
   // ─── EXPORT HANDLERS ───
   const exportSalesReport = () => {
     const headers = ['Property', 'Address', 'Price', 'Commission Rate', 'GCI', 'Status', 'Listed Date'];
-    const rows = listings.map(l => [
+    const rows = salesData.soldListings.map(l => [
       (l as any).title, (l as any).address, String((l as any).price || 0),
       String((l as any).commission_rate || 2) + '%',
       AUD.format(((l as any).price || 0) * ((l as any).commission_rate || 2) / 100),
@@ -245,7 +244,11 @@ const ReportsPage = () => {
 
   const exportActivityReport = () => {
     const headers = ['Name', 'Type', 'Ranking', 'Email', 'Phone', 'Source', 'Pipeline Stage', 'Suburb'];
-    const rows = contacts.map(c => [
+    const periodContacts = contacts.filter(c => {
+      const created = (c as any).created_at ? new Date((c as any).created_at) : null;
+      return created ? created >= range.from && created <= range.to : true;
+    });
+    const rows = periodContacts.map(c => [
       `${c.first_name} ${c.last_name || ''}`, c.contact_type, c.ranking,
       c.email || '', c.phone || '', c.source || '',
       c.buyer_pipeline_stage || c.seller_pipeline_stage || '', c.suburb || '',
@@ -409,6 +412,11 @@ const ReportsPage = () => {
                     })}
                   </TableBody>
                 </Table>
+                {listings.length > 20 && (
+                  <p className="text-[11px] text-muted-foreground text-center py-2 border-t">
+                    Showing 20 of {listings.length} listings. Export CSV to see all.
+                  </p>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -517,6 +525,11 @@ const ReportsPage = () => {
                     ))}
                   </TableBody>
                 </Table>
+                {financialData.periodTx.length > 30 && (
+                  <p className="text-[11px] text-muted-foreground text-center py-2 border-t">
+                    Showing 30 of {financialData.periodTx.length} transactions. Export CSV to see all.
+                  </p>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

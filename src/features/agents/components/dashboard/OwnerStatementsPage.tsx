@@ -120,11 +120,8 @@ export default function OwnerStatementsPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.gross_rent_aud, feeSource?.percent]);
 
-  const handleDownloadPdf = async (statement: Statement) => {
-    if (statement.pdf_url) {
-      window.open(statement.pdf_url, '_blank');
-      return;
-    }
+  const handleGeneratePdf = async (statement: Statement) => {
+    if (statement.pdf_url) return; // already available — link will render
     setPdfLoading((s) => ({ ...s, [statement.id]: true }));
     try {
       const { data, error } = await supabase.functions.invoke('generate-owner-statement-pdf', {
@@ -132,7 +129,7 @@ export default function OwnerStatementsPage() {
       });
       if (error || !data?.pdf_url) throw new Error(error?.message || 'Failed');
       setStatements((all) => all.map((s) => s.id === statement.id ? { ...s, pdf_url: data.pdf_url } : s));
-      window.open(data.pdf_url, '_blank');
+      toast.success('PDF ready — click the download link');
     } catch (err: any) {
       toast.error(err.message || 'Could not generate PDF');
     } finally {
@@ -276,17 +273,29 @@ export default function OwnerStatementsPage() {
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">{format(parseISO(s.created_at), 'd MMM yyyy')}</TableCell>
                       <TableCell className="text-right">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleDownloadPdf(s)}
-                          disabled={!!pdfLoading[s.id]}
-                          className="h-8"
-                        >
-                          {pdfLoading[s.id]
-                            ? <Loader2 size={14} className="animate-spin" />
-                            : <><Download size={14} className="mr-1" /> PDF</>}
-                        </Button>
+                        {s.pdf_url ? (
+                          <a
+                            href={s.pdf_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download
+                            className="inline-flex items-center h-8 px-3 rounded-md border text-xs font-medium hover:bg-accent"
+                          >
+                            <Download size={14} className="mr-1" /> PDF
+                          </a>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleGeneratePdf(s)}
+                            disabled={!!pdfLoading[s.id]}
+                            className="h-8"
+                          >
+                            {pdfLoading[s.id]
+                              ? <Loader2 size={14} className="animate-spin" />
+                              : <><FileText size={14} className="mr-1" /> Generate</>}
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}

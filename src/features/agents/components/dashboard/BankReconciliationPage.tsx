@@ -130,13 +130,6 @@ const BankReconciliationPage = () => {
         .maybeSingle();
       if (accountData?.current_balance != null) {
         setCurrentBalance(accountData.current_balance);
-      } else {
-        const { data: viewData } = await supabase
-          .from('trust_account_balances' as any)
-          .select('current_balance')
-          .eq('agent_id', agentId)
-          .maybeSingle();
-        setCurrentBalance((viewData as any)?.current_balance ?? null);
       }
     }
 
@@ -183,7 +176,7 @@ const BankReconciliationPage = () => {
         const candidate = receipts.find(r =>
           !usedReceiptIds.has(r.id) &&
           Math.abs(r.amount - targetAmt) < 0.01 &&
-          (desc.includes(r.client.toLowerCase().slice(0, 5)) || true)
+          desc.includes(r.client.toLowerCase().slice(0, 5))
         );
         if (candidate) {
           const { error: matchError } = await supabase
@@ -252,7 +245,7 @@ const BankReconciliationPage = () => {
 
       if (existingAccount) {
         await supabase.from('trust_accounts')
-          .update({ current_balance: bankBalance, balance: bankBalance } as any)
+          .update({ current_balance: bankBalance })
           .eq('id', existingAccount.id);
       }
 

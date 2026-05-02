@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import UpgradeGate from '@/features/agents/components/shared/UpgradeGate';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Calendar } from '@/components/ui/calendar';
@@ -15,16 +16,20 @@ import {
 } from 'recharts';
 import {
   Download, CalendarIcon, TrendingUp, DollarSign, Home, Clock,
-  Target, Users, Phone, Eye, Mail,
+  Target, Users, Phone, Eye, Mail, Building2, AlertTriangle, FileText,
 } from 'lucide-react';
-import { format, subMonths, subDays, startOfMonth, endOfMonth, isWithinInterval, eachMonthOfInterval } from 'date-fns';
+import { format, subMonths, subDays, startOfMonth, endOfMonth, isWithinInterval, eachMonthOfInterval, differenceInDays } from 'date-fns';
 import { cn } from '@/lib/utils';
 import DashboardHeader from './DashboardHeader';
 import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
 import { useTrustAccounting } from '@/features/agents/hooks/useTrustAccounting';
 import { useContacts } from '@/features/agents/hooks/useContacts';
+import { supabase } from '@/integrations/supabase/client';
+import { useAgent } from '@/features/agents/hooks/useAgent';
+import { toast } from 'sonner';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
+const AUD2 = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 2 });
 const DATE_FMT = new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: '2-digit', year: 'numeric' });
 const CHART_COLORS = ['hsl(var(--primary))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
 

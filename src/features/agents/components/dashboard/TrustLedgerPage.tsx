@@ -144,7 +144,7 @@ const TrustLedgerPage = () => {
         .select('id')
         .eq('agent_id', agentData.id)
         .limit(1);
-      setAccounts(accts || []);
+      setAccounts((accts as unknown as TrustEntry[]) || []);
     }
   }, [user]);
 

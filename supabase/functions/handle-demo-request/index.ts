@@ -154,13 +154,12 @@ Deno.serve(async (req) => {
 
       await ensureDemoAuthUser(supabase, demoReq.email, demoReq.full_name);
 
-      // Generate a short-lived session token server-side (fix #1 — no credentials sent to client)
+      // Look up demo user by email — use getUserByEmail to avoid loading ALL users
       const demoEmail = "demo@listhq.com.au";
       const demoPassword = Deno.env.get("DEMO_ACCOUNT_PASSWORD") || crypto.randomUUID();
 
-      // Look up demo user by email via listUsers (getUserByEmail removed in newer SDK)
-      const { data: listData, error: demoGetErr } = await supabase.auth.admin.listUsers();
-      let demoUser = demoGetErr ? null : (listData?.users?.find((u: { email?: string }) => u.email === demoEmail) || null);
+      const { data: demoUserData, error: demoGetErr } = await supabase.auth.admin.getUserByEmail(demoEmail);
+      let demoUser = demoGetErr ? null : (demoUserData?.user ?? null);
 
       if (!demoUser) {
         const { data: created, error: createErr } = await supabase.auth.admin.createUser({
@@ -199,37 +198,15 @@ Deno.serve(async (req) => {
         .upsert({ user_id: demoUser.id, role: "agent" }, { onConflict: "user_id,role" });
       if (roleUpsertErr) throw roleUpsertErr;
 
-      // Generate a short-lived session token server-side (fix #1)
-      const { data: sessionData, error: sessionErr } = await supabase.auth.admin.generateLink({
-        type: "magiclink",
-        email: demoEmail,
-      });
-
-      // createSession is not available in current SDK — rely on magic-link fallback below
-      const accessToken: string | undefined = undefined;
-      const refreshToken: string | undefined = undefined;
-
-      if (!accessToken) {
-        // Generate a magic link OTP for the client to exchange
-        const { data: otpData, error: otpErr } = await supabase.auth.admin.generateLink({
-          type: "magiclink",
-          email: demoEmail,
-        });
-        if (otpErr) throw otpErr;
-
-        return new Response(JSON.stringify({
-          success: true,
-          request_id: demoReq.id,
-          magic_link_token: otpData?.properties?.hashed_token,
-          demo_user_id: demoUser.id,
-        }), { headers: corsHeaders });
-      }
-
+      // SECURITY: do NOT return the magic-link token to the client. The user
+      // receives the magic link via the email we sent earlier and must use
+      // the standard link flow to sign in. Returning the token here would
+      // let anyone who can call this endpoint obtain a session for the
+      // shared demo account without proving control of the email.
       return new Response(JSON.stringify({
         success: true,
         request_id: demoReq.id,
-        access_token: accessToken,
-        refresh_token: refreshToken,
+        message: "Code accepted. Use the magic link in your email to sign in.",
       }), { headers: corsHeaders });
 
     } else if (body.action === "ensure_auth_user") {

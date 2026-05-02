@@ -169,7 +169,7 @@ export default function OwnerStatementsPage() {
         try {
           const html = `
             <h2>Owner statement — ${prop.address}</h2>
-            <p>Period: ${format(parseISO(form.period_start), 'd MMM yyyy')} – ${format(parseISO(form.period_end), 'd MMM yyyy')}</p>
+            <p>Period: ${form.period_start ? format(parseISO(form.period_start), 'd MMM yyyy') : '—'} – ${form.period_end ? format(parseISO(form.period_end), 'd MMM yyyy') : '—'}</p>
             <table cellpadding="6" style="border-collapse:collapse">
               <tr><td>Gross rent collected</td><td style="text-align:right">${AUD.format(form.gross_rent_aud)}</td></tr>
               <tr><td>Management fee (incl. GST)</td><td style="text-align:right">−${AUD.format(form.management_fee_aud)}</td></tr>
@@ -183,7 +183,7 @@ export default function OwnerStatementsPage() {
           await supabase.functions.invoke('send-notification-email', {
             body: {
               to: prop.owner_email,
-              subject: `Your owner statement for ${prop.address} — ${format(parseISO(form.period_start), 'MMM yyyy')}`,
+              subject: `Your owner statement for ${prop.address}${form.period_start ? ` — ${format(parseISO(form.period_start), 'MMM yyyy')}` : ''}`,
               html,
             },
           });

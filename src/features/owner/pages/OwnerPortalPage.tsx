@@ -194,11 +194,12 @@ export default function OwnerPortalPage() {
   const pendingApprovals = (maintenance || []).filter((m: any) => m.owner_approval_status === 'pending');
   const otherJobs = (maintenance || []).filter((m: any) => m.owner_approval_status !== 'pending');
 
-  // Lease end days
-  let leaseDays: number | null = null;
+  // Lease end days (null for periodic tenancies with no end date)
+  const leaseDays: number | null = tenancy?.lease_end
+    ? differenceInDays(parseISO(tenancy.lease_end), new Date())
+    : null;
   let leaseColor = 'bg-muted text-muted-foreground';
-  if (tenancy?.lease_end) {
-    leaseDays = differenceInDays(parseISO(tenancy.lease_end), new Date());
+  if (leaseDays !== null) {
     leaseColor = leaseDays > 90 ? 'bg-emerald-500/10 text-emerald-700' : leaseDays > 60 ? 'bg-amber-500/10 text-amber-700' : 'bg-destructive/10 text-destructive';
   }
 
@@ -271,8 +272,10 @@ export default function OwnerPortalPage() {
             </CardContent></Card>
             <Card><CardContent className="p-4">
               <p className="text-xs text-muted-foreground">Lease ends</p>
-              <p className="text-sm font-semibold mt-1">{tenancy?.lease_end ? format(parseISO(tenancy.lease_end), 'd MMM yyyy') : '—'}</p>
-              {leaseDays !== null && <Badge className={`${leaseColor} text-[10px] mt-1`}>{leaseDays > 0 ? `${leaseDays} days` : 'Expired'}</Badge>}
+              <p className="text-sm font-semibold mt-1">{tenancy?.lease_end ? format(parseISO(tenancy.lease_end), 'd MMM yyyy') : (tenancy ? 'Periodic tenancy' : '—')}</p>
+              {leaseDays !== null
+                ? <Badge className={`${leaseColor} text-[10px] mt-1`}>{leaseDays > 0 ? `${leaseDays} days` : 'Expired'}</Badge>
+                : tenancy ? <Badge className="bg-muted text-muted-foreground text-[10px] mt-1">Periodic</Badge> : null}
             </CardContent></Card>
             <Card><CardContent className="p-4">
               <p className="text-xs text-muted-foreground">Gross yield</p>

@@ -14,7 +14,7 @@ import { ProtectedRoute } from "@/features/auth/ProtectedRoute";
 import AppErrorBoundary from "@/components/AppErrorBoundary";
 import { PageSkeleton } from "@/shared/components/PageSkeleton";
 import { DefaultSEOHead } from "@/features/seo/components/DefaultSEOHead";
-import { AIChatWidget } from "@/features/help/components/AIChatWidget";
+import { HelpWidget } from "@/features/help/components/HelpWidget";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 
 // Eager-loaded for first paint (homepage path)
@@ -268,7 +268,7 @@ const App = () => (
             <Sonner position="top-center" richColors closeButton duration={5000} />
              <ImpersonationBanner />
             <ScrollToTop />
-             <AIChatWidget />
+             <HelpWidget />
              <CookieConsentBanner />
              <Suspense fallback={<PageLoader />}>
               <Routes>

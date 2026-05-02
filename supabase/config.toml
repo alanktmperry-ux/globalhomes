@@ -90,3 +90,6 @@ verify_jwt = false
 [functions.generate-owner-statement-pdf]
 verify_jwt = true
 
+
+[functions.ai-chat]
+verify_jwt = false

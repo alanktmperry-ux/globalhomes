@@ -1,7 +1,7 @@
 import Anthropic from "npm:@anthropic-ai/sdk";
 import { getCorsHeaders } from "../_shared/cors.ts";
 
-const MODEL = "claude-sonnet-4-5";
+const MODEL = "claude-sonnet-4-6";
 
 const AGENT_SYSTEM_PROMPT = `You are the ListHQ AI assistant — a helpful, knowledgeable guide for Australian real estate agents using the ListHQ platform. You answer questions clearly and concisely. If the question is in another language, respond in that language.
 

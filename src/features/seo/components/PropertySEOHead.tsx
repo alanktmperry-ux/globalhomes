@@ -49,6 +49,16 @@ export function PropertySEOHead({ property, agent }: PropertySEOHeadProps) {
       addressCountry: property.country || 'AU',
     },
     numberOfRooms: property.beds,
+    numberOfBathroomsTotal: property.baths || undefined,
+    parkingSpaces: property.parking || undefined,
+    amenityFeature: property.features && Array.isArray(property.features) && property.features.length > 0
+      ? property.features.map((f: string) => ({
+          '@type': 'LocationFeatureSpecification',
+          name: f,
+          value: true,
+        }))
+      : undefined,
+    datePosted: property.listed_date || undefined,
     floorSize: property.land_size ? { '@type': 'QuantitativeValue', value: property.land_size, unitCode: 'MTK' } : undefined,
     ...(property.virtual_tour_url ? { virtualTourUrl: property.virtual_tour_url } : {}),
     ...(agent ? {

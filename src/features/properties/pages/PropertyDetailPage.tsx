@@ -51,6 +51,7 @@ import { MortgageBrokerCTA } from '@/features/mortgage/components/MortgageBroker
 import { MortgageReferralModal } from '@/components/MortgageReferralModal';
 import { useListingTranslation } from '@/features/properties/hooks/useListingTranslation';
 import { HaloFromListingCTA } from '@/components/halo/HaloFromListingCTA';
+import { useOffmarketSubscriptions } from '@/features/offmarket/hooks/useOffmarketSubscriptions';
 
 export default function PropertyDetailPage() {
   // Support both /property/:slug and /property/:uuid for backward compat
@@ -63,6 +64,10 @@ export default function PropertyDetailPage() {
   const isMobile = useIsMobile();
   const { investorMode } = useInvestorMode();
   const { user } = useAuth();
+  const { subs: subscriptions, addSubscription, removeSubscription } = useOffmarketSubscriptions();
+  const isSubscribedToSuburb = subscriptions.some(
+    (s) => s.suburb === property?.suburb && s.state === property?.state
+  );
 
   const [property, setProperty] = useState<Property | null>(null);
   useLogPropertyView(property?.id);
@@ -1142,6 +1147,43 @@ export default function PropertyDetailPage() {
                 <p className="text-sm font-medium">{tp('property.finance.shortTitle')}</p>
                 <p className="text-xs text-muted-foreground mb-2">{tp('property.finance.shortBody')}</p>
                 <Button size="sm" variant="outline" onClick={() => setMortgageOpen(true)}>{tp('property.finance.shortCta')}</Button>
+              </div>
+            )}
+            {property && !rawProperty?.is_off_market && property.suburb && (
+              <div className="mt-3 p-4 rounded-xl border border-amber-200 bg-amber-50">
+                <div className="flex gap-3">
+                  <div className="text-2xl shrink-0" aria-hidden>🔔</div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-slate-900">
+                      Get off-market properties in {property.suburb} first
+                    </p>
+                    <p className="text-xs text-slate-600 mt-1">
+                      Be notified about properties in {property.suburb}, {property.state} before they hit the market.
+                    </p>
+                    <button
+                      onClick={() => {
+                        if (isSubscribedToSuburb) {
+                          const sub = subscriptions.find(
+                            (s) => s.suburb === property.suburb && s.state === property.state
+                          );
+                          if (sub) removeSubscription(sub.id);
+                        } else {
+                          addSubscription({
+                            suburb: property.suburb,
+                            state: property.state,
+                          });
+                        }
+                      }}
+                      className={`mt-3 text-xs font-medium px-4 py-2 rounded-lg transition-colors ${
+                        isSubscribedToSuburb
+                          ? 'bg-amber-200 text-amber-800 hover:bg-amber-300'
+                          : 'bg-amber-500 text-white hover:bg-amber-600'
+                      }`}
+                    >
+                      {isSubscribedToSuburb ? '✓ Subscribed — click to remove' : 'Notify me of off-market listings'}
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
             {!isRental && (

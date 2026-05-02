@@ -109,7 +109,7 @@ export function useCRMLeads(filters: Filters = {}) {
    * which handles find-or-create on the contact side first.
    */
   const createLead = async (_lead: Partial<CRMLead>): Promise<null> => {
-    console.warn('[useCRMLeads.createLead] Deprecated — use LeadContactForm');
+    if (import.meta.env.DEV) console.warn('[useCRMLeads.createLead] Deprecated — use LeadContactForm');
     return null;
   };
 

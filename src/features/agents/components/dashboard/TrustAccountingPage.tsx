@@ -21,6 +21,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import DashboardHeader from './DashboardHeader';
 import TrustImportWizard from './TrustImportWizard';
+import RentRollMigrationWizard from './RentRollMigrationWizard';
 import TrustReceiptModal from './TrustReceiptModal';
 import { useTrustAccounting, TrustTransaction } from '@/features/agents/hooks/useTrustAccounting';
 import { useAuth } from '@/features/auth/AuthProvider';

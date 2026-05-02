@@ -188,7 +188,7 @@ Return ONLY this JSON structure:
         is_featured, boost_tier, featured_until,
         lat, lng, listed_date,
         agent_id,
-        agents!inner ( id, name, agency, phone, email, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count )
+        agents!inner ( id, name, agency, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count )
       `)
       .eq("is_active", true)
       .eq("status", "public")

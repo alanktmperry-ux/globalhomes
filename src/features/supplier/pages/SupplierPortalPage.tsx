@@ -101,9 +101,13 @@ export default function SupplierPortalPage() {
   const uploadInvoice = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !completeJob) return;
+    if (!data?.supplier?.id) {
+      toast.error('Cannot upload: missing supplier ID');
+      return;
+    }
     setUploadingInvoice(true);
     const ext = file.name.split('.').pop() || 'pdf';
-    const path = `${data?.supplier?.id}/${completeJob.id}/invoice.${ext}`;
+    const path = `${data.supplier.id}/${completeJob.id}/invoice.${ext}`;
     const { error: upErr } = await supabase.storage
       .from('maintenance-invoices')
       .upload(path, file, { upsert: true, contentType: file.type });

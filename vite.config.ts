@@ -1,19 +1,20 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL ?? "https://ngrkbohpmkzjonaofgbb.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY =
-  process.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
-  process.env.VITE_SUPABASE_ANON_KEY;
-if (!SUPABASE_PUBLISHABLE_KEY) {
-  throw new Error('VITE_SUPABASE_PUBLISHABLE_KEY is required');
-}
-const SUPABASE_PROJECT_ID = process.env.VITE_SUPABASE_PROJECT_ID ?? "ngrkbohpmkzjonaofgbb";
-
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ mode }) => {
+  const env = { ...process.env, ...loadEnv(mode, process.cwd(), "") };
+  const SUPABASE_URL = env.VITE_SUPABASE_URL ?? "https://ngrkbohpmkzjonaofgbb.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY =
+    env.VITE_SUPABASE_PUBLISHABLE_KEY ?? env.VITE_SUPABASE_ANON_KEY;
+  if (!SUPABASE_PUBLISHABLE_KEY) {
+    throw new Error('VITE_SUPABASE_PUBLISHABLE_KEY is required');
+  }
+  const SUPABASE_PROJECT_ID = env.VITE_SUPABASE_PROJECT_ID ?? "ngrkbohpmkzjonaofgbb";
+
+  return ({
   define: {
     'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(SUPABASE_URL),
     'import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY': JSON.stringify(SUPABASE_PUBLISHABLE_KEY),

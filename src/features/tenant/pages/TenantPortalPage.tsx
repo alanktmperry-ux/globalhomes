@@ -19,13 +19,13 @@ import { Helmet } from 'react-helmet-async';
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
 
 interface PortalData {
-  tenancy: any;
-  property: any;
-  agent: any;
-  documents: any[];
-  maintenance: any[];
-  payments: any[];
-  inspections: any[];
+  tenancy: { id: string; start_date: string; end_date?: string; rent_amount: number; status: string } | null;
+  property: { id: string; address: string; suburb: string; state: string; image_url?: string } | null;
+  agent: { id: string; name: string; email?: string; phone?: string; avatar_url?: string } | null;
+  documents: { id: string; name: string; url: string; created_at: string }[];
+  maintenance: { id: string; title: string; status: string; created_at: string }[];
+  payments: { id: string; amount: number; paid_at: string; status: string }[];
+  inspections: { id: string; scheduled_at: string; type: string; status: string }[];
 }
 
 const TenantPortalPage = () => {

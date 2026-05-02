@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { initPostHog } from '@/shared/lib/analyticsConsent';
+import { CONSENT_KEY, initPostHog } from '@/shared/lib/analyticsConsent';
 
-const STORAGE_KEY = 'listhq-cookie-consent';
+const STORAGE_KEY = CONSENT_KEY;
 
 export function CookieConsentBanner() {
   const [visible, setVisible] = useState(false);

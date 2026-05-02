@@ -19,7 +19,7 @@ import { useI18n } from '@/shared/lib/i18n';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 
-type NavItem = { label: string; to: string; icon: any };
+type NavItem = { label: string; to: string; icon: React.ComponentType<{ className?: string }> };
 
 const PUBLIC_NAV: NavItem[] = [
   { label: 'Search', to: '/search', icon: Search },

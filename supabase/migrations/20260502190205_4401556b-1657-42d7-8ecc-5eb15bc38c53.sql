@@ -1,0 +1,1 @@
+ALTER TABLE public.partner_members ADD COLUMN IF NOT EXISTS invited_email TEXT;

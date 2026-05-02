@@ -817,7 +817,7 @@ const TrustAccountingPage = () => {
                   )}
                 </div>
                 <Button size="sm" variant="outline" className="h-7 text-xs gap-1.5"
-                  onClick={() => window.location.hash = '#/dashboard/reconciliation'}>
+                  onClick={() => navigate('/dashboard/reconciliation')}>
                   <Upload size={12} /> Upload CSV
                 </Button>
               </div>

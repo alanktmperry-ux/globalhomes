@@ -334,7 +334,7 @@ const BillingPage = () => {
         </div>
 
         {/* Plan cards */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div id="plan-selector" className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {PLANS.map(plan => {
             const isCurrent = sub.plan === plan.id;
             const planIdx = PLAN_ORDER.indexOf(plan.id);

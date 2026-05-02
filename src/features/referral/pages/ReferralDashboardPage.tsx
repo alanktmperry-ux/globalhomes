@@ -53,7 +53,7 @@ export default function ReferralDashboardPage() {
       .maybeSingle();
 
     if (agentErr) {
-      console.warn('[ReferralDashboard] agent fetch error', agentErr.message);
+      if (import.meta.env.DEV) console.warn('[ReferralDashboard] agent fetch error', agentErr.message);
     }
     if (!agentRow) {
       setRedirect(true);

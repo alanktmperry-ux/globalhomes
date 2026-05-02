@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Calendar, Eye, Home, BadgeCheck, Star, X, PawPrint, Sofa, Clock, FileText, Users, Phone, MessageCircle, Globe, Loader2 } from 'lucide-react';
 import MultilingualListingDetail from '@/features/properties/components/MultilingualListingDetail';
 import { OpenHomesCard } from '@/features/properties/components/OpenHomesCard';
+import { ListingChatWidget } from '@/features/properties/components/ListingChatWidget';
 import { Button } from '@/components/ui/button';
 import { Property } from '@/shared/lib/types';
 import { useI18n } from '@/shared/lib/i18n';
@@ -690,6 +691,14 @@ export default function PropertyDetailPage() {
                   </>
                 )}
               </div>
+            )}
+
+            {/* Multilingual Q&A chatbot */}
+            {!property.id.startsWith('placeholder-') && (
+              <ListingChatWidget
+                listingId={property.id}
+                onContactAgent={() => setContactOpen(true)}
+              />
             )}
 
             {/* Rental Info Section */}

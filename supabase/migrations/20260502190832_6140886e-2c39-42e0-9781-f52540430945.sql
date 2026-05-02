@@ -1,0 +1,1 @@
+ALTER TABLE public.seller_likelihood_scores ADD CONSTRAINT seller_likelihood_scores_property_id_unique UNIQUE (property_id);

@@ -8,6 +8,14 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const cronSecret = Deno.env.get("CRON_SECRET");
+  if (req.headers.get("x-cron-secret") !== cronSecret) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -21,7 +29,8 @@ Deno.serve(async (req) => {
       .from('saved_search_alerts')
       .select('*')
       .eq('is_active', true)
-      .or(`last_alerted_at.is.null,last_alerted_at.lt.${oneDayAgo}`);
+      .or(`last_alerted_at.is.null,last_alerted_at.lt.${oneDayAgo}`)
+      .limit(1000);
 
     if (alertsErr) throw alertsErr;
     if (!alerts || alerts.length === 0) {

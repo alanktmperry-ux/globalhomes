@@ -1,7 +1,21 @@
 import "../_shared/email-footer.ts";
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
-Deno.serve(async () => {
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", {
+      headers: { "Access-Control-Allow-Origin": "*" },
+    });
+  }
+
+  const cronSecret = Deno.env.get("CRON_SECRET");
+  if (req.headers.get("x-cron-secret") !== cronSecret) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
@@ -27,13 +41,11 @@ Deno.serve(async () => {
       open_home_registrations ( id, full_name, email, on_waitlist )
     `)
     .eq('status', 'scheduled')
+    .eq('reminder_24h_sent', false)
     .gte('starts_at', new Date(in24h.getTime() - window).toISOString())
     .lte('starts_at', new Date(in24h.getTime() + window).toISOString());
 
-  // Filter for sessions where reminder_24h_sent is not yet true
-  const filtered24 = (sessions24 ?? []).filter((s: any) => !s.reminder_24h_sent);
-
-  for (const session of filtered24) {
+  for (const session of (sessions24 ?? [])) {
     const confirmed = ((session as any).open_home_registrations ?? [])
       .filter((r: any) => !r.on_waitlist);
     const prop    = (session as any).properties ?? {};
@@ -91,12 +103,11 @@ Deno.serve(async () => {
       open_home_registrations ( id, full_name, email, on_waitlist )
     `)
     .eq('status', 'scheduled')
+    .eq('reminder_1h_sent', false)
     .gte('starts_at', new Date(in1h.getTime() - window).toISOString())
     .lte('starts_at', new Date(in1h.getTime() + window).toISOString());
 
-  const filtered1 = (sessions1 ?? []).filter((s: any) => !s.reminder_1h_sent);
-
-  for (const session of filtered1) {
+  for (const session of (sessions1 ?? [])) {
     const confirmed = ((session as any).open_home_registrations ?? [])
       .filter((r: any) => !r.on_waitlist);
     const prop    = (session as any).properties ?? {};

@@ -38,6 +38,14 @@ function btn(href: string, label: string) {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
+  const cronSecret = Deno.env.get("CRON_SECRET");
+  if (req.headers.get("x-cron-secret") !== cronSecret) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
   const resendKey = Deno.env.get('RESEND_API_KEY');
   const results = { reminded: 0, expired: 0, no_response_alerts: 0 };
@@ -50,7 +58,8 @@ Deno.serve(async (req) => {
       .eq('status', 'active')
       .eq('expiry_reminder_sent', false)
       .gte('expires_at', new Date().toISOString())
-      .lte('expires_at', new Date(Date.now() + 14 * 86400000).toISOString());
+      .lte('expires_at', new Date(Date.now() + 14 * 86400000).toISOString())
+      .limit(500);
 
     for (const h of dueReminder ?? []) {
       const { data: u } = await admin.auth.admin.getUserById(h.seeker_id);
@@ -70,7 +79,8 @@ Deno.serve(async (req) => {
       .from('halos')
       .select('*')
       .eq('status', 'active')
-      .lt('expires_at', new Date().toISOString());
+      .lt('expires_at', new Date().toISOString())
+      .limit(500);
 
     for (const h of toExpire ?? []) {
       await admin.from('halos').update({ status: 'expired' }).eq('id', h.id);
@@ -92,7 +102,8 @@ Deno.serve(async (req) => {
       .select('*')
       .eq('status', 'active')
       .eq('no_response_alert_sent', false)
-      .lt('created_at', sevenDaysAgo);
+      .lt('created_at', sevenDaysAgo)
+      .limit(500);
 
     for (const h of stale ?? []) {
       const { count } = await admin
@@ -121,7 +132,8 @@ Deno.serve(async (req) => {
       .select('id, tenant_name, tenant_email, lease_end, property_id')
       .eq('halo_invite_sent', false)
       .gte('lease_end', minLeaseEnd)
-      .lte('lease_end', maxLeaseEnd);
+      .lte('lease_end', maxLeaseEnd)
+      .limit(500);
 
     for (const t of leases ?? []) {
       if (!t.tenant_email) continue;
@@ -158,7 +170,8 @@ Deno.serve(async (req) => {
       .from('halos')
       .select('id, intent, suburbs, budget_min, budget_max, timeframe, quality_score, created_at')
       .eq('status', 'active')
-      .gte('created_at', new Date(Date.now() - 86400000).toISOString());
+      .gte('created_at', new Date(Date.now() - 86400000).toISOString())
+      .limit(500);
 
     if (recentHalos && recentHalos.length > 0) {
       // Get all distinct agent_ids from active properties
@@ -166,7 +179,8 @@ Deno.serve(async (req) => {
         .from('properties')
         .select('agent_id, suburb')
         .eq('is_active', true)
-        .not('agent_id', 'is', null);
+        .not('agent_id', 'is', null)
+        .limit(500);
 
       const agentSuburbs = new Map<string, Set<string>>();
       for (const r of agentRows ?? []) {

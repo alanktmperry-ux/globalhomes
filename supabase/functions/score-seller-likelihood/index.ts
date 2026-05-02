@@ -8,6 +8,14 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const cronSecret = Deno.env.get("CRON_SECRET");
+  if (req.headers.get("x-cron-secret") !== cronSecret) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -156,22 +164,13 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Upsert scores — delete old and insert new
+    // Upsert scores atomically (no gap window)
     if (scores.length > 0) {
-      const scoredPropertyIds = scores.map((s: any) => s.property_id);
-
-      // Remove existing scores for these properties
-      await supabase
+      const { error: upsertErr } = await supabase
         .from("seller_likelihood_scores")
-        .delete()
-        .in("property_id", scoredPropertyIds);
+        .upsert(scores, { onConflict: "property_id" });
 
-      // Insert new scores
-      const { error: insertErr } = await supabase
-        .from("seller_likelihood_scores")
-        .insert(scores);
-
-      if (insertErr) throw insertErr;
+      if (upsertErr) throw upsertErr;
       scoredCount = scores.length;
     }
 

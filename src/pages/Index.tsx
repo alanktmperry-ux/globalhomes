@@ -846,7 +846,7 @@ const Index = () => {
       <meta property="og:description" content={pageDescription} />
       <meta property="og:type" content="website" />
       <meta property="og:url" content="https://listhq.com.au" />
-      <meta property="og:image" content="https://listhq.com.au/listhq-og.png" />
+      <meta property="og:image" content="https://listhq.com.au/og-image.png" />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta name="twitter:card" content="summary_large_image" />

@@ -211,7 +211,7 @@ export default function InboxPage() {
             <>
               {/* Header */}
               <div className="p-3 border-b border-border flex items-center gap-2 bg-card">
-                <Button variant="ghost" size="sm" className="md:hidden" onClick={() => setActiveId(null)}>
+                <Button variant="ghost" size="sm" className="md:hidden" aria-label="Back to thread list" onClick={() => setActiveId(null)}>
                   ←
                 </Button>
                 <div className="flex-1 min-w-0">

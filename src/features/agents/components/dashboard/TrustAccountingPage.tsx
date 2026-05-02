@@ -541,6 +541,9 @@ const TrustAccountingPage = () => {
                 <Button variant="outline" onClick={() => setShowImportWizard(true)} className="gap-2">
                   <Upload size={14} /> Import Existing Account
                 </Button>
+                <Button variant="outline" onClick={() => setShowRentRollWizard(true)} className="gap-2">
+                  <Upload size={14} /> Migrate from Another System
+                </Button>
               </div>
             </CardContent>
           </Card>

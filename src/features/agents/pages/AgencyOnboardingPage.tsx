@@ -43,7 +43,7 @@ const BANKS = ['NAB', 'CBA', 'ANZ', 'Westpac', 'Bendigo', 'BOQ', 'Macquarie', 'O
 
 const DATE_AU = new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: 'long', year: 'numeric' });
 
-const escHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+// HTML escaping is handled by DOMPurify when sanitising the assembled document.
 
 export default function AgencyOnboardingPage() {
   const navigate = useNavigate();
@@ -352,8 +352,9 @@ export default function AgencyOnboardingPage() {
 
   const generateImportChecklist = () => {
     const today = DATE_AU.format(new Date());
-    const safeAgencyName = escHtml(agencyName || '');
-    const safeState = escHtml(operatingState || '');
+    // Strip any HTML from user inputs — DOMPurify with no allowed tags returns text-only.
+    const safeAgencyName = DOMPurify.sanitize(agencyName || '', { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+    const safeState = DOMPurify.sanitize(operatingState || '', { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
     const stateAct: Record<string, string> = {
       VIC: 'Estate Agents Act 1980 (Vic)',
       NSW: 'Property and Stock Agents Act 2002 (NSW)',
@@ -781,8 +782,9 @@ export default function AgencyOnboardingPage() {
 </div>
 
 </body></html>`;
+    const safeHtml = DOMPurify.sanitize(html, { WHOLE_DOCUMENT: true, ADD_TAGS: ['style'], ADD_ATTR: ['target'] });
     const w = window.open('', '_blank', 'width=900,height=1200');
-    if (w) { w.document.write(html); w.document.close(); w.print(); }
+    if (w) { w.document.write(safeHtml); w.document.close(); w.print(); }
     toast.success('Compliance checklist generated — print or save as PDF');
   };
 

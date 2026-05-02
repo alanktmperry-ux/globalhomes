@@ -81,6 +81,9 @@ Deno.serve(async (req) => {
     return new Response('Credit increment failed', { status: 500 });
   }
 
+  // Only insert the transaction log when the purchase insert above succeeded
+  // (we already returned early on duplicate-session). This prevents duplicate
+  // ledger rows on webhook retries.
   await admin.from('halo_credit_transactions').insert({
     agent_id: agentId, amount: pkg.credits, type: 'grant', note: 'Stripe purchase',
   });

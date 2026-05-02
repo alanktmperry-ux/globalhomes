@@ -15,7 +15,7 @@ import {
   TrendingUp, TrendingDown, FileDown, Trash2, Pencil, Clock,
   AlertTriangle, CalendarIcon, Home, Users, Receipt, Upload,
   CreditCard, CheckSquare, ShieldCheck, FileText, BarChart3,
-  ExternalLink,
+  ExternalLink, Lock,
 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';

@@ -23,6 +23,7 @@ const AgentDashboardLayout = () => {
   const [trustPending, setTrustPending] = useState(false);
   const [mfaRequired, setMfaRequired] = useState(false);
   const [mfaChecked, setMfaChecked] = useState(false);
+  const [showMfaPromo, setShowMfaPromo] = useState(false);
 
   // Check Authenticator Assurance Level — if user enrolled TOTP but session is still aal1, gate the dashboard.
   useEffect(() => {
@@ -35,6 +36,14 @@ const AgentDashboardLayout = () => {
         if (error) { setMfaRequired(false); return; }
         // nextLevel === 'aal2' && currentLevel === 'aal1' means a verified factor exists but hasn't been satisfied for this session.
         setMfaRequired(data.currentLevel === 'aal1' && data.nextLevel === 'aal2');
+        // If session is fully at aal2 already, no promo needed. If nextLevel === currentLevel === 'aal1', no factor enrolled — show promo (unless dismissed).
+        if (data.currentLevel === 'aal1' && data.nextLevel === 'aal1') {
+          if (sessionStorage.getItem('mfa_promo_dismissed') !== '1') {
+            const { data: factors } = await supabase.auth.mfa.listFactors();
+            const hasMfa = factors?.totp?.some((f) => f.status === 'verified');
+            if (!cancelled && !hasMfa) setShowMfaPromo(true);
+          }
+        }
       } finally {
         if (!cancelled) setMfaChecked(true);
       }
@@ -86,6 +95,28 @@ const AgentDashboardLayout = () => {
         <AgentDashboardSidebar />
         <main id="main-content" className="flex-1 flex flex-col min-w-0 overflow-y-auto pb-[env(safe-area-inset-bottom)]">
           <PaymentStatusBanner />
+          {showMfaPromo && (
+            <div className="bg-primary/10 border-b border-primary/20 text-sm px-4 py-3 flex items-center justify-between gap-4">
+              <span className="text-foreground">
+                🔒 Protect your account — enable two-factor authentication.
+              </span>
+              <div className="flex items-center gap-2 shrink-0">
+                <a
+                  href="/dashboard/settings?tab=security"
+                  className="underline font-semibold text-primary"
+                >
+                  Set up now →
+                </a>
+                <button
+                  onClick={() => { sessionStorage.setItem('mfa_promo_dismissed', '1'); setShowMfaPromo(false); }}
+                  className="text-muted-foreground hover:text-foreground px-2"
+                  aria-label="Dismiss"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          )}
           {trustPending && (
             <div className="bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-sm px-4 py-3 flex items-center justify-between">
               <span>⚠️ Complete your trust account setup to enable rent roll and disbursements.</span>

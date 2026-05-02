@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { User, Mail, Phone, Shield, Bell, Globe, Camera, Loader2, Package, GitBranch, Languages } from 'lucide-react';
+import { User, Mail, Phone, Shield, Bell, Globe, Camera, Loader2, Package, GitBranch, Languages, ShieldCheck } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -187,6 +187,9 @@ const SettingsPage = () => {
             <TabsTrigger value="templates" className="text-xs gap-1.5">
               <Languages size={12} /> Templates
             </TabsTrigger>
+            <TabsTrigger value="security" className="text-xs gap-1.5">
+              <ShieldCheck size={12} /> Security
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile" className="space-y-6">
@@ -265,9 +268,6 @@ const SettingsPage = () => {
               </div>
             </div>
 
-            {/* Two-factor authentication */}
-            <MFAManager />
-
             {/* Notifications — granular per-event preferences */}
             <NotificationPreferencesSettings />
 
@@ -301,6 +301,10 @@ const SettingsPage = () => {
 
           <TabsContent value="templates">
             <MessageTemplatesSettings />
+          </TabsContent>
+
+          <TabsContent value="security">
+            <MFAManager />
           </TabsContent>
         </Tabs>
       </div>

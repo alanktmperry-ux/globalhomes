@@ -640,7 +640,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
             </div>
             <p className="text-[13px] text-muted-foreground mt-3 leading-relaxed max-w-sm">
               Australia's only property platform built for the world.
-              Search in 24 languages, see prices in your currency.
+              Search by voice in 24 languages. Every listing translated into 20.
             </p>
           </div>
 

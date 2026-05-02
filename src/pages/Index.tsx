@@ -1296,7 +1296,7 @@ const Index = () => {
               style={{ color: '#2563EB', fontWeight: 600 }}
               lang="en"
             >
-              Browse properties in 24 languages
+              Search by voice in 24 languages. Every listing translated into 20.
             </p>
 
             {/* ── Agent value story ── */}
@@ -1310,7 +1310,7 @@ const Index = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
                 {[
-                  { stat: '8 languages', label: 'Every listing, automatically translated' },
+                  { stat: '20 languages', label: 'Every listing automatically translated' },
                   { stat: '1.2M buyers', label: 'Asian diaspora property seekers in Australia' },
                   { stat: 'Early access', label: 'First 50 agents — limited spots' },
                 ].map((item) => (

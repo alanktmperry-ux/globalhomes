@@ -95,7 +95,7 @@ LISTING DATA:
 - Features: ${listing.features ? JSON.stringify(listing.features) : "None listed"}
 - Year Built: ${listing.year_built || "N/A"}
 
-TRANSLATIONS — provide for each of these language keys: "zh_simplified" (Simplified Chinese), "zh_traditional" (Traditional Chinese), "vi" (Vietnamese), "ko" (Korean), "ar" (Arabic), "ja" (Japanese), "hi" (Hindi), "pa" (Punjabi - Gurmukhi script), "ta" (Tamil), "bn" (Bengali)
+TRANSLATIONS — provide for each of these language keys: "zh_simplified" (Simplified Chinese), "zh_traditional" (Traditional Chinese), "vi" (Vietnamese), "ko" (Korean), "ar" (Arabic), "ja" (Japanese), "hi" (Hindi), "pa" (Punjabi - Gurmukhi script), "ta" (Tamil), "bn" (Bengali), "tl" (Tagalog/Filipino), "id" (Indonesian), "ms" (Malay), "th" (Thai), "ne" (Nepali - Devanagari script), "si" (Sinhala), "el" (Greek), "it" (Italian), "es" (Spanish - Australian/international context), "fa" (Farsi/Persian - right-to-left)
 Each language must contain:
 - title: translated property title
 - description: full translated description (natural, not word-for-word)
@@ -110,7 +110,7 @@ For Indian-buyer-relevant features specifically, consider noting (only when genu
 - Distance to Indian community centres or cultural associations
 For Tamil buyers specifically, also consider proximity to South Indian temples and Carnatic music/dance schools where genuinely nearby.
 
-CRITICAL: All 10 language keys MUST be present in the "translations" object. For Arabic, ensure right-to-left natural phrasing. For Hindi, Punjabi, Tamil, and Bengali, use natural Indian-Australian property terminology where appropriate. Use 'lakh' and 'crore' phrasing for Indian buyers when prices fit those denominations, alongside the AUD figure.
+CRITICAL: All 20 language keys MUST be present in the "translations" object. For Arabic, ensure right-to-left natural phrasing. For Hindi, Punjabi, Tamil, and Bengali, use natural Indian-Australian property terminology where appropriate. Use 'lakh' and 'crore' phrasing for Indian buyers when prices fit those denominations, alongside the AUD figure.
 
 AGENT INSIGHTS — in English, under key "agent_insights":
 - multicultural_appeal: string describing the property's appeal to multicultural buyers

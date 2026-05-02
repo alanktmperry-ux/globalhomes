@@ -59,6 +59,7 @@ const TrustAccountingPage = () => {
   } = useTrustAccounting();
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const urlPropertyId = searchParams.get('property_id');
 
   // Filters

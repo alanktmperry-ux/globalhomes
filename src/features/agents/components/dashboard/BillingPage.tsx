@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import AdminReports from '@/features/admin/components/AdminReports';
-import { CreditCard, Check, Loader2, Mail, Users, UserMinus, Sparkles } from 'lucide-react';
+import { CreditCard, Check, Loader2, Mail, Users, UserMinus, Sparkles, AlertTriangle, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -80,7 +80,8 @@ const PLANS: PlanDef[] = [
       '15 featured listings/month',
       '3 premium listings/month',
       'Unlimited pocket listings',
-      'Full trust accounting + bank reconciliation + Xero',
+      'Full trust accounting + bank reconciliation',
+      'Xero integration (Coming Soon)',
       'Mortgage broker partner widget on listings',
       'Priority AI matching + lead analytics',
       'Agency-branded profile page',

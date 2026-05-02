@@ -226,6 +226,7 @@ export default function ReferralDashboardPage() {
           {/* Leads table */}
           <div className="bg-card border border-border rounded-2xl p-6">
             <h2 className="font-display text-lg font-semibold text-foreground">Your referrals</h2>
+            <p className="text-xs text-muted-foreground mt-1">Track each referral from registration through to settlement.</p>
             {leads.length === 0 ? (
               <div className="text-center py-12">
                 <Users className="mx-auto text-muted-foreground mb-3" size={32} />

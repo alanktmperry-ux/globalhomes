@@ -54,7 +54,7 @@ const MyApplicationsPage = () => {
         .order('created_at', { ascending: false });
 
       if (error || !data) {
-        console.error('Failed to fetch applications:', error);
+        if (import.meta.env.DEV) console.error('Failed to fetch applications:', error);
         setLoading(false);
         return;
       }

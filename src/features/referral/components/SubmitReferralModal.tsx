@@ -81,7 +81,7 @@ export function SubmitReferralModal({ open, onClose, agentId, referralCode, onSu
       setConfirmation(data.id.slice(0, 8).toUpperCase());
       onSubmitted();
     } catch (err: any) {
-      console.error('[SubmitReferral]', err);
+      if (import.meta.env.DEV) console.error('[SubmitReferral]', err);
       toast.error(err.message || 'Submission failed');
     } finally {
       setSubmitting(false);

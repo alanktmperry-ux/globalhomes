@@ -96,7 +96,7 @@ export function useInboxThreads(filter: InboxFilter, search: string) {
 
     const { data, error } = await q;
     if (error) {
-      console.error('[useInboxThreads] error', error);
+      if (import.meta.env.DEV) console.error('[useInboxThreads] error', error);
       setThreads([]);
     } else {
       let rows = ((data as any[]) || []) as InboxThreadRow[];
@@ -268,7 +268,7 @@ export async function sendInboxMessage(opts: {
         },
       });
     } catch (e) {
-      console.error('[sendInboxMessage] email dispatch failed', e);
+      if (import.meta.env.DEV) console.error('[sendInboxMessage] email dispatch failed', e);
     }
   }
 

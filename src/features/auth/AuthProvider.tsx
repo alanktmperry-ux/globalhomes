@@ -90,7 +90,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .maybeSingle();
       if (cancelled) return;
       if (error) {
-        console.error('[Auth] failed to load impersonation session:', error);
+        if (import.meta.env.DEV) console.error('[Auth] failed to load impersonation session:', error);
         return;
       }
       if (data) {
@@ -145,7 +145,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       .maybeSingle();
 
     if (insertError || !sessionRow) {
-      console.error('impersonation session insert failed:', insertError);
+      if (import.meta.env.DEV) console.error('impersonation session insert failed:', insertError);
       toast.error('Impersonation blocked — session could not be created.');
       return;
     }
@@ -166,7 +166,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       metadata: buildAuditMeta({}),
     } as any);
     if (auditError) {
-      console.error('impersonation audit log:', auditError);
+      if (import.meta.env.DEV) console.error('impersonation audit log:', auditError);
       toast.error('Warning: could not log impersonation exit');
     }
 
@@ -291,7 +291,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           filteredRoles.push('agent');
           // Best-effort backfill of user_roles row
           supabase.from('user_roles').insert({ user_id: user.id, role: 'agent' as any })
-            .then(({ error }) => { if (error && !String(error.message).includes('duplicate')) console.warn('[Auth] backfill user_roles:', error.message); });
+            .then(({ error }) => { if (error && !String(error.message).includes('duplicate') && import.meta.env.DEV) console.warn('[Auth] backfill user_roles:', error.message); });
         }
         applyRoles(filteredRoles, user.email);
         if (agentData) {

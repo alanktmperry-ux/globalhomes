@@ -136,7 +136,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
           .update({ contact_clicks: (property.contactClicks || 0) + 1 })
           .eq('id', property.id)
           .then(({ error: updateError }) => {
-            if (updateError) console.warn('[AgentContactModal] contact_clicks increment failed:', updateError.message);
+            if (updateError && import.meta.env.DEV) console.warn('[AgentContactModal] contact_clicks increment failed:', updateError.message);
           });
       }
     });
@@ -238,7 +238,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
         toast.success(`Lead submitted — Score: ${score}`);
         setStep(3);
       } catch (err) {
-        console.error('Lead submission error:', err);
+        if (import.meta.env.DEV) console.error('Lead submission error:', err);
         toast.error('Error — Failed to submit. Please try again.');
       } finally {
         setSubmitting(false);
@@ -366,7 +366,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
 
       toast.success(depositAmount ? `Qualified lead submitted — Lead score: ${score}` : `Lead submitted — Score: ${score}`);
     } catch (err) {
-      console.error('Lead submission error:', err);
+      if (import.meta.env.DEV) console.error('Lead submission error:', err);
       toast.error('Error — Failed to submit. Please try again.');
     } finally {
       setSubmitting(false);

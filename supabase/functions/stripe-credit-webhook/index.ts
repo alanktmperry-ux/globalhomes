@@ -86,7 +86,6 @@ Deno.serve(async (req) => {
   // ledger rows on webhook retries.
   await admin.from('halo_credit_transactions').insert({
     agent_id: agentId, amount: pkg.credits, type: 'grant', note: 'Stripe purchase',
-    stripe_session_id: session.id,
   });
 
   // Notify agent

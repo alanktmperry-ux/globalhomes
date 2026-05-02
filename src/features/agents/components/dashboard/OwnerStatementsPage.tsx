@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Loader2, Mail, X, FileText } from 'lucide-react';
+import { Plus, Loader2, Mail, X, FileText, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, parseISO, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import DashboardHeader from './DashboardHeader';
@@ -30,6 +30,7 @@ type Statement = {
   other_deductions_aud: number;
   net_amount_aud: number;
   emailed_to_owner: boolean;
+  pdf_url: string | null;
   created_at: string;
   properties?: { address: string };
 };
@@ -56,6 +57,8 @@ export default function OwnerStatementsPage() {
     notes: '',
   });
   const [otherDeductions, setOtherDeductions] = useState<OtherDeduction[]>([]);
+  const [feeSource, setFeeSource] = useState<{ percent: number; fromTenancy: boolean } | null>(null);
+  const [pdfLoading, setPdfLoading] = useState<Record<string, boolean>>({});
 
   // Filter statements by URL ?property_id
   const visibleStatements = useMemo(
@@ -87,13 +90,50 @@ export default function OwnerStatementsPage() {
     })();
   }, [agentId]);
 
-  // Auto-suggest mgmt fee = 8.8% of gross
+  // Lookup tenancy management fee when property changes
   useEffect(() => {
-    if (form.gross_rent_aud > 0 && form.management_fee_aud === 0) {
-      setForm((f) => ({ ...f, management_fee_aud: Math.round(Number(f.gross_rent_aud) * 0.088 * 100) / 100 }));
+    if (!form.property_id) { setFeeSource(null); return; }
+    (async () => {
+      const { data } = await supabase
+        .from('tenancies')
+        .select('management_fee_percent')
+        .eq('property_id', form.property_id)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      const pct = data?.management_fee_percent != null ? Number(data.management_fee_percent) : 8.8;
+      setFeeSource({ percent: pct, fromTenancy: !!data });
+    })();
+  }, [form.property_id]);
+
+  // Auto-calc mgmt fee from tenancy/default percent when gross rent changes
+  useEffect(() => {
+    if (form.gross_rent_aud > 0 && feeSource) {
+      setForm((f) => ({ ...f, management_fee_aud: Math.round(Number(f.gross_rent_aud) * (feeSource.percent / 100) * 100) / 100 }));
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.gross_rent_aud]);
+  }, [form.gross_rent_aud, feeSource?.percent]);
+
+  const handleDownloadPdf = async (statement: Statement) => {
+    if (statement.pdf_url) {
+      window.open(statement.pdf_url, '_blank');
+      return;
+    }
+    setPdfLoading((s) => ({ ...s, [statement.id]: true }));
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-owner-statement-pdf', {
+        body: { statement_id: statement.id },
+      });
+      if (error || !data?.pdf_url) throw new Error(error?.message || 'Failed');
+      setStatements((all) => all.map((s) => s.id === statement.id ? { ...s, pdf_url: data.pdf_url } : s));
+      window.open(data.pdf_url, '_blank');
+    } catch (err: any) {
+      toast.error(err.message || 'Could not generate PDF');
+    } finally {
+      setPdfLoading((s) => ({ ...s, [statement.id]: false }));
+    }
+  };
 
   const save = async (alsoEmail: boolean) => {
     if (!form.property_id) { toast.error('Select a property'); return; }
@@ -212,6 +252,7 @@ export default function OwnerStatementsPage() {
                     <TableHead className="text-right">Net</TableHead>
                     <TableHead>Emailed</TableHead>
                     <TableHead>Created</TableHead>
+                    <TableHead className="text-right">PDF</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -227,6 +268,19 @@ export default function OwnerStatementsPage() {
                           : <Badge variant="outline">Not sent</Badge>}
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">{format(parseISO(s.created_at), 'd MMM yyyy')}</TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleDownloadPdf(s)}
+                          disabled={!!pdfLoading[s.id]}
+                          className="h-8"
+                        >
+                          {pdfLoading[s.id]
+                            ? <Loader2 size={14} className="animate-spin" />
+                            : <><Download size={14} className="mr-1" /> PDF</>}
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -253,7 +307,7 @@ export default function OwnerStatementsPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div><Label className="text-xs">Gross rent (AUD)</Label><Input type="number" step="0.01" value={form.gross_rent_aud} onChange={(e) => setForm({ ...form, gross_rent_aud: Number(e.target.value) })} /></div>
-              <div><Label className="text-xs">Management fee (AUD)</Label><Input type="number" step="0.01" value={form.management_fee_aud} onChange={(e) => setForm({ ...form, management_fee_aud: Number(e.target.value) })} /><p className="text-[10px] text-muted-foreground mt-0.5">Suggested: 8.8% of gross</p></div>
+              <div><Label className="text-xs">Management fee (AUD)</Label><Input type="number" step="0.01" value={form.management_fee_aud} onChange={(e) => setForm({ ...form, management_fee_aud: Number(e.target.value) })} /><p className="text-[10px] text-muted-foreground mt-0.5">{feeSource ? (feeSource.fromTenancy ? `From tenancy record: ${feeSource.percent}%` : `Default: ${feeSource.percent}%`) : 'Select a property to load fee'}</p></div>
               <div><Label className="text-xs">Maintenance costs (AUD)</Label><Input type="number" step="0.01" value={form.maintenance_costs_aud} onChange={(e) => setForm({ ...form, maintenance_costs_aud: Number(e.target.value) })} /></div>
             </div>
 

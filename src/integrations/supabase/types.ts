@@ -299,7 +299,7 @@ export type Database = {
             foreignKeyName: "agent_credentials_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -346,7 +346,7 @@ export type Database = {
             foreignKeyName: "agent_dashboard_prefs_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: true
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -405,7 +405,7 @@ export type Database = {
             foreignKeyName: "agent_language_capabilities_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -458,7 +458,7 @@ export type Database = {
             foreignKeyName: "agent_lifecycle_notes_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -526,7 +526,7 @@ export type Database = {
             foreignKeyName: "agent_locations_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -609,7 +609,7 @@ export type Database = {
             foreignKeyName: "agent_performance_stats_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: true
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -665,7 +665,7 @@ export type Database = {
             foreignKeyName: "agent_priority_dismissals_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -730,7 +730,7 @@ export type Database = {
             foreignKeyName: "agent_reputation_history_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -822,7 +822,7 @@ export type Database = {
             foreignKeyName: "agent_reviews_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -902,7 +902,7 @@ export type Database = {
             foreignKeyName: "agent_subscriptions_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: true
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -964,7 +964,7 @@ export type Database = {
             foreignKeyName: "agent_suppliers_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -1261,7 +1261,7 @@ export type Database = {
             foreignKeyName: "analytics_events_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -1440,7 +1440,7 @@ export type Database = {
             foreignKeyName: "auction_bidder_registrations_approved_by_fkey"
             columns: ["approved_by"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -1475,7 +1475,7 @@ export type Database = {
             foreignKeyName: "auction_bidder_registrations_id_verified_by_fkey"
             columns: ["id_verified_by"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -1559,7 +1559,7 @@ export type Database = {
             foreignKeyName: "auction_bids_recorded_by_fkey"
             columns: ["recorded_by"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -1753,7 +1753,7 @@ export type Database = {
             foreignKeyName: "auction_result_records_recorded_by_fkey"
             columns: ["recorded_by"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -1894,7 +1894,7 @@ export type Database = {
             foreignKeyName: "auction_updates_recorded_by_fkey"
             columns: ["recorded_by"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -2016,7 +2016,7 @@ export type Database = {
             foreignKeyName: "auctions_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -2112,7 +2112,7 @@ export type Database = {
             foreignKeyName: "audit_log_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -2340,7 +2340,7 @@ export type Database = {
             foreignKeyName: "bond_claims_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -2782,7 +2782,7 @@ export type Database = {
             foreignKeyName: "buyer_briefs_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -2937,7 +2937,7 @@ export type Database = {
             foreignKeyName: "buyer_pool_lookups_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -3164,7 +3164,7 @@ export type Database = {
             foreignKeyName: "cma_reports_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -3492,7 +3492,7 @@ export type Database = {
             foreignKeyName: "comparable_sales_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -3566,7 +3566,7 @@ export type Database = {
             foreignKeyName: "concierge_usage_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -3661,7 +3661,7 @@ export type Database = {
             foreignKeyName: "consumer_profiles_purchased_by_fkey"
             columns: ["purchased_by"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -4119,7 +4119,7 @@ export type Database = {
             foreignKeyName: "contacts_assigned_agent_id_fkey"
             columns: ["assigned_agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -4546,7 +4546,7 @@ export type Database = {
             foreignKeyName: "crm_leads_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -4581,7 +4581,7 @@ export type Database = {
             foreignKeyName: "crm_leads_first_contacted_by_agent_id_fkey"
             columns: ["first_contacted_by_agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -4709,7 +4709,7 @@ export type Database = {
             foreignKeyName: "crm_urgency_settings_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -5286,7 +5286,7 @@ export type Database = {
             foreignKeyName: "feature_request_upvotes_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -5361,7 +5361,7 @@ export type Database = {
             foreignKeyName: "feature_requests_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -6075,7 +6075,7 @@ export type Database = {
             foreignKeyName: "inbox_threads_assigned_agent_id_fkey"
             columns: ["assigned_agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -6300,7 +6300,7 @@ export type Database = {
             foreignKeyName: "key_register_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -6384,7 +6384,7 @@ export type Database = {
             foreignKeyName: "lead_events_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -6479,7 +6479,7 @@ export type Database = {
             foreignKeyName: "lead_purchases_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -6684,7 +6684,7 @@ export type Database = {
             foreignKeyName: "listing_buyer_matches_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -6959,7 +6959,7 @@ export type Database = {
             foreignKeyName: "maintenance_jobs_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -7324,7 +7324,7 @@ export type Database = {
             foreignKeyName: "notifications_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -7444,7 +7444,7 @@ export type Database = {
             foreignKeyName: "off_market_shares_shared_with_agent_id_fkey"
             columns: ["shared_with_agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -7472,7 +7472,7 @@ export type Database = {
             foreignKeyName: "off_market_shares_sharing_agent_id_fkey"
             columns: ["sharing_agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -7562,7 +7562,7 @@ export type Database = {
             foreignKeyName: "offers_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -7747,7 +7747,7 @@ export type Database = {
             foreignKeyName: "open_homes_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -7854,7 +7854,7 @@ export type Database = {
             foreignKeyName: "owner_statements_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -7965,7 +7965,7 @@ export type Database = {
             foreignKeyName: "partner_agencies_invited_by_agent_id_fkey"
             columns: ["invited_by_agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -8188,7 +8188,7 @@ export type Database = {
             foreignKeyName: "pm_automation_log_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -8263,7 +8263,7 @@ export type Database = {
             foreignKeyName: "pm_automation_rules_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -8334,7 +8334,7 @@ export type Database = {
             foreignKeyName: "pm_documents_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -8500,7 +8500,7 @@ export type Database = {
             foreignKeyName: "pre_auction_offers_reviewed_by_fkey"
             columns: ["reviewed_by"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -9106,7 +9106,7 @@ export type Database = {
             foreignKeyName: "fk_properties_agent"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -9385,7 +9385,7 @@ export type Database = {
             foreignKeyName: "property_inspections_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -9911,7 +9911,7 @@ export type Database = {
             foreignKeyName: "rent_payments_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -10116,7 +10116,7 @@ export type Database = {
             foreignKeyName: "rental_applications_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -10202,7 +10202,7 @@ export type Database = {
             foreignKeyName: "review_requests_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -10752,7 +10752,7 @@ export type Database = {
             foreignKeyName: "signature_requests_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -10829,7 +10829,7 @@ export type Database = {
             foreignKeyName: "smoke_alarm_records_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -10915,7 +10915,7 @@ export type Database = {
             foreignKeyName: "subscription_events_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -11457,7 +11457,7 @@ export type Database = {
             foreignKeyName: "supplier_reviews_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -11566,7 +11566,7 @@ export type Database = {
             foreignKeyName: "suppliers_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -11643,7 +11643,7 @@ export type Database = {
             foreignKeyName: "support_tickets_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -11875,7 +11875,7 @@ export type Database = {
             foreignKeyName: "tenancies_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -12066,7 +12066,7 @@ export type Database = {
             foreignKeyName: "tica_checks_checked_by_agent_id_fkey"
             columns: ["checked_by_agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -12149,7 +12149,7 @@ export type Database = {
             foreignKeyName: "transactions_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -12178,6 +12178,56 @@ export type Database = {
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trust_account_balances: {
+        Row: {
+          closed_at: string | null
+          closed_by: string | null
+          closing_balance: number
+          created_at: string
+          id: string
+          is_closed: boolean
+          opening_balance: number
+          period_month: number
+          period_year: number
+          trust_account_id: string
+          updated_at: string
+        }
+        Insert: {
+          closed_at?: string | null
+          closed_by?: string | null
+          closing_balance?: number
+          created_at?: string
+          id?: string
+          is_closed?: boolean
+          opening_balance?: number
+          period_month: number
+          period_year: number
+          trust_account_id: string
+          updated_at?: string
+        }
+        Update: {
+          closed_at?: string | null
+          closed_by?: string | null
+          closing_balance?: number
+          created_at?: string
+          id?: string
+          is_closed?: boolean
+          opening_balance?: number
+          period_month?: number
+          period_year?: number
+          trust_account_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trust_account_balances_trust_account_id_fkey"
+            columns: ["trust_account_id"]
+            isOneToOne: false
+            referencedRelation: "trust_accounts"
             referencedColumns: ["id"]
           },
         ]
@@ -12261,7 +12311,7 @@ export type Database = {
             foreignKeyName: "trust_accounts_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -12347,7 +12397,7 @@ export type Database = {
             foreignKeyName: "trust_journal_entries_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -12449,7 +12499,7 @@ export type Database = {
             foreignKeyName: "trust_payments_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -12559,7 +12609,7 @@ export type Database = {
             foreignKeyName: "trust_receipts_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -12648,7 +12698,7 @@ export type Database = {
             foreignKeyName: "trust_reconciliations_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -12739,7 +12789,7 @@ export type Database = {
             foreignKeyName: "trust_suspense_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -13026,7 +13076,7 @@ export type Database = {
             foreignKeyName: "vacancy_events_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -13243,7 +13293,7 @@ export type Database = {
             foreignKeyName: "vendor_reports_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
           {
@@ -13462,7 +13512,7 @@ export type Database = {
             foreignKeyName: "agent_locations_agent_id_fkey"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
@@ -14283,12 +14333,12 @@ export type Database = {
             foreignKeyName: "fk_properties_agent"
             columns: ["agent_id"]
             isOneToOne: false
-            referencedRelation: "trust_account_balances"
+            referencedRelation: "trust_account_balances_view"
             referencedColumns: ["agent_id"]
           },
         ]
       }
-      trust_account_balances: {
+      trust_account_balances_view: {
         Row: {
           agent_id: string | null
           current_balance: number | null
@@ -14311,6 +14361,10 @@ export type Database = {
         Returns: undefined
       }
       check_webhook_config: { Args: never; Returns: Json }
+      close_trust_period: {
+        Args: { p_agent_id: string; p_month: number; p_year: number }
+        Returns: number
+      }
       compute_agent_reputation: { Args: { p_agent_id: string }; Returns: Json }
       compute_agent_stats: { Args: { p_agent_id: string }; Returns: undefined }
       compute_suburb_stats: {

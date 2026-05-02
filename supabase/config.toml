@@ -86,3 +86,7 @@ verify_jwt = false
 
 [functions.listing-chat]
 verify_jwt = false
+
+[functions.generate-owner-statement-pdf]
+verify_jwt = true
+

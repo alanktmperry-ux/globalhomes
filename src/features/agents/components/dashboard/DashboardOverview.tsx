@@ -187,7 +187,7 @@ const DashboardOverview = () => {
           .or(`user_id.eq.${user.id},assigned_to.eq.${user.id}`)
           .eq('status', 'pending').lte('due_date', todayStr),
         supabase.from('contacts').select('id', { count: 'exact', head: true }).eq('created_by', user.id),
-        supabase.from('trust_account_balances').select('current_balance').eq('agent_id', aId).maybeSingle(),
+        supabase.from('trust_account_balances_view' as any).select('current_balance').eq('agent_id', aId).maybeSingle(),
         supabase.from('leads').select('id', { count: 'exact', head: true })
           .eq('agent_id', aId).eq('status', 'new').lt('created_at', fiveMinAgo),
         supabase.from('activities').select('created_at, metadata')
@@ -211,7 +211,7 @@ const DashboardOverview = () => {
       setOnboardingHasListing((listingCountRes.count || 0) > 0);
       setTasksDue(tasksRes.count || 0);
       setActiveContacts(contactsRes.count || 0);
-      if (trustRes.data) setTrustBalance(Math.max(0, Number(trustRes.data.current_balance) || 0));
+      if (trustRes.data) setTrustBalance(Math.max(0, Number((trustRes.data as any).current_balance) || 0));
       setUnrespondedLeads(leadsRes.count || 0);
       setRecentActivities(recentActivitiesRes.data || []);
 

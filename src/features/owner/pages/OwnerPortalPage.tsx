@@ -37,6 +37,10 @@ export default function OwnerPortalPage() {
   const [declineReasonForId, setDeclineReasonForId] = useState<string | null>(null);
   const [declineReason, setDeclineReason] = useState('');
   const [acting, setActing] = useState<string | null>(null);
+  const [autoApproveThreshold, setAutoApproveThreshold] = useState<number>(500);
+  const [thresholdInput, setThresholdInput] = useState<string>('500');
+  const [savingThreshold, setSavingThreshold] = useState(false);
+  const [autoApprovedIds, setAutoApprovedIds] = useState<Set<string>>(new Set());
 
   const load = useCallback(async () => {
     if (!token) { setError('No portal token provided'); setLoading(false); return; }

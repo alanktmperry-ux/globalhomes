@@ -250,7 +250,7 @@ export default function ReferralDashboardPage() {
                   </thead>
                   <tbody>
                     {leads.map(lead => {
-                      const status = LEAD_STATUS_STYLES[lead.status] || LEAD_STATUS_STYLES.new;
+                      const pipeline = getPipelineBadge(lead.status);
                       return (
                         <tr key={lead.id} className="border-b border-border last:border-0">
                           <td className="py-3 pr-4 text-muted-foreground whitespace-nowrap">
@@ -260,9 +260,9 @@ export default function ReferralDashboardPage() {
                           <td className="py-3 pr-4 text-muted-foreground">{lead.buyer_country || '—'}</td>
                           <td className="py-3 pr-4 text-muted-foreground max-w-[220px] truncate">{lead.property_url || '—'}</td>
                           <td className="py-3 pr-4">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${status.className}`}>
-                              {status.label}
-                            </span>
+                            <Badge variant="outline" className={pipeline.className}>
+                              {pipeline.label}
+                            </Badge>
                           </td>
                           <td className="py-3 pr-4 text-right font-display font-semibold text-foreground">
                             {lead.commission_aud > 0 ? `A$${lead.commission_aud.toLocaleString()}` : '—'}

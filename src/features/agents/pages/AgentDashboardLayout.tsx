@@ -8,6 +8,8 @@ import AgentDashboardSidebar from '@/features/agents/components/dashboard/AgentD
 import { PaymentStatusBanner } from '@/features/agents/components/PaymentStatusBanner';
 import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
 import { PageSkeleton } from '@/shared/components/PageSkeleton';
+import { MFAChallenge } from '@/features/auth/components/MFAChallenge';
+import { supabase } from '@/integrations/supabase/client';
 
 
 const AgentDashboardLayout = () => {

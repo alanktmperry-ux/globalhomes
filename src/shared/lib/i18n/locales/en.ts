@@ -440,7 +440,7 @@ export const en = {
   'home.howItWorks.step3.desc': 'Message agents directly through WeChat, WhatsApp, or LINE. No language barrier.',
   'home.agents.eyebrow': 'For agents',
   'home.agents.headline': 'The platform built for multicultural Australia.',
-  'home.agents.sub': 'CRM, listings, property management, AI tools — all in one place. In 24 languages.',
+  'home.agents.sub': 'CRM, listings, property management, AI tools — all in one place. In 20 languages.',
   'home.agents.cta': 'Start free trial',
   'home.agents.founding': 'Free for 3 months',
   'home.agents.freeTagSub': 'No credit card required. Full access.',
@@ -449,7 +449,7 @@ export const en = {
   'home.agents.feature3': 'Access multilingual buyer pool',
   'home.agents.feature4': 'Off-market network',
   'home.agentBannerHeadline': '1 in 5 Australian buyers searches in a language other than English. Are your listings ready?',
-  'home.agentBannerSub': 'ListHQ automatically translates every listing into 24 languages. Free for 3 months. No credit card.',
+  'home.agentBannerSub': 'ListHQ automatically translates every listing into 20 languages. Free for 3 months. No credit card.',
   'home.agentBannerCta': 'See how it works',
 
   // Hero stats + properties section + rotating placeholders
@@ -628,7 +628,7 @@ export const en = {
   'hero.buyerTileDesc': 'Search Australian property in 24 languages. Free, no signup.',
   'hero.buyerTileCta': 'Browse properties →',
   'hero.agentTileTitle': 'Are you an agent?',
-  'hero.agentTileDesc': "List once, translated into 24 languages. Reach multilingual buyers REA and Domain can't. Free for 3 months.",
+  'hero.agentTileDesc': "List once, translated into 20 languages. Reach multilingual buyers REA and Domain can't. Free for 3 months.",
   'hero.agentTileCta': 'See agent tools →',
 
   // Sort dropdown

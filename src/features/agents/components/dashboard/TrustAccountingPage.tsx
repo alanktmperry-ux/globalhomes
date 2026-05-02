@@ -21,6 +21,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import DashboardHeader from './DashboardHeader';
 import TrustImportWizard from './TrustImportWizard';
+import RentRollMigrationWizard from './RentRollMigrationWizard';
 import TrustReceiptModal from './TrustReceiptModal';
 import { useTrustAccounting, TrustTransaction } from '@/features/agents/hooks/useTrustAccounting';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -89,6 +90,7 @@ const TrustAccountingPage = () => {
   const [showNewAccount, setShowNewAccount] = useState(false);
   const [showNewReceipt, setShowNewReceipt] = useState(false);
   const [showImportWizard, setShowImportWizard] = useState(false);
+  const [showRentRollWizard, setShowRentRollWizard] = useState(false);
   const [editingTx, setEditingTx] = useState<TrustTransaction | null>(null);
   const [deletingTx, setDeletingTx] = useState<TrustTransaction | null>(null);
 
@@ -508,6 +510,20 @@ const TrustAccountingPage = () => {
     );
   }
 
+  if (showRentRollWizard) {
+    return (
+      <div>
+        <DashboardHeader title="Trust Dashboard" subtitle="Migrate full rent roll from another system" />
+        <div className="p-4 sm:p-6">
+          <RentRollMigrationWizard
+            onComplete={() => { setShowRentRollWizard(false); fetchAccounts(); fetchTransactions(); }}
+            onCancel={() => setShowRentRollWizard(false)}
+          />
+        </div>
+      </div>
+    );
+  }
+
   if (accounts.length === 0) {
     return (
       <div>
@@ -524,6 +540,9 @@ const TrustAccountingPage = () => {
                 </Button>
                 <Button variant="outline" onClick={() => setShowImportWizard(true)} className="gap-2">
                   <Upload size={14} /> Import Existing Account
+                </Button>
+                <Button variant="outline" onClick={() => setShowRentRollWizard(true)} className="gap-2">
+                  <Upload size={14} /> Migrate from Another System
                 </Button>
               </div>
             </CardContent>

@@ -137,7 +137,7 @@ export default function HaloAnalyticsPage() {
           (res?.users ?? []).forEach((u: any) => { if (u.email) map.set(u.id, u.email); });
           setEmailMap(map);
         } catch (e) {
-          console.warn('[HaloAnalytics] could not load emails', e);
+          if (import.meta.env.DEV) console.warn('[HaloAnalytics] could not load emails', e);
         }
 
         // Keep haloIds variable used (lint)

@@ -82,6 +82,12 @@ const AdminOverview = ({ stats, users, insights, onNavigate }: Props) => {
 
   const [estMrr, setEstMrr] = useState<number | null>(null);
 
+  // New strategic KPIs
+  const [atRiskCount, setAtRiskCount] = useState<number | null>(null);
+  const [trialEndingCount, setTrialEndingCount] = useState<number | null>(null);
+  const [avgDaysToFirstListing, setAvgDaysToFirstListing] = useState<number | null>(null);
+  const [avgDaysPrevMonth, setAvgDaysPrevMonth] = useState<number | null>(null);
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -105,6 +111,111 @@ const AdminOverview = ({ stats, users, insights, onNavigate }: Props) => {
     })();
     return () => { cancelled = true; };
   }, []);
+
+  // At-risk agents: not signed in 14+ days OR 0 active listings
+  // Trial-ending: trial_ends_at within next 7 days
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const sevenDays = new Date(now + 7 * DAY).toISOString();
+        const fourteenDaysAgo = new Date(now - 14 * DAY).toISOString();
+
+        // Trials ending within 7 days
+        const { count: trialCount } = await supabase
+          .from('agent_subscriptions')
+          .select('id', { count: 'exact', head: true })
+          .lte('trial_ends_at', sevenDays)
+          .gte('trial_ends_at', new Date(now).toISOString());
+
+        // At-risk agents — fetch agent ids with their listing counts
+        const { data: allAgents } = await supabase.from('agents').select('id, user_id');
+        const agentIds = (allAgents || []).map((a: any) => a.id);
+        const userIdToLastSeen = new Map<string, number | null>(
+          users.map(u => [u.id, u.last_sign_in_at ? new Date(u.last_sign_in_at).getTime() : null])
+        );
+        let activeListingCounts = new Map<string, number>();
+        if (agentIds.length > 0) {
+          const { data: props } = await supabase
+            .from('properties')
+            .select('agent_id')
+            .eq('is_active', true)
+            .in('agent_id', agentIds);
+          (props || []).forEach((p: any) => {
+            activeListingCounts.set(p.agent_id, (activeListingCounts.get(p.agent_id) || 0) + 1);
+          });
+        }
+        const atRisk = (allAgents || []).filter((a: any) => {
+          const lastSeen = userIdToLastSeen.get(a.user_id);
+          const staleLogin = !lastSeen || lastSeen < new Date(fourteenDaysAgo).getTime();
+          const noListings = (activeListingCounts.get(a.id) || 0) === 0;
+          return staleLogin || noListings;
+        }).length;
+
+        if (!cancelled) {
+          setTrialEndingCount(trialCount || 0);
+          setAtRiskCount(atRisk);
+        }
+      } catch {
+        if (!cancelled) {
+          setTrialEndingCount(0);
+          setAtRiskCount(0);
+        }
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [users, now]);
+
+  // Time to first listing — current 30 days vs prior 30 days
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const thirtyAgo = new Date(now - 30 * DAY).toISOString();
+        const sixtyAgo = new Date(now - 60 * DAY).toISOString();
+
+        const computeAvg = async (since: string, until?: string) => {
+          let q = supabase.from('agents').select('id, created_at').gte('created_at', since);
+          if (until) q = q.lt('created_at', until);
+          const { data: agentsBatch } = await q;
+          const ids = (agentsBatch || []).map((a: any) => a.id);
+          if (ids.length === 0) return null;
+          const { data: props } = await supabase
+            .from('properties')
+            .select('agent_id, created_at')
+            .in('agent_id', ids);
+          const firstByAgent = new Map<string, number>();
+          (props || []).forEach((p: any) => {
+            const t = new Date(p.created_at).getTime();
+            const cur = firstByAgent.get(p.agent_id);
+            if (cur === undefined || t < cur) firstByAgent.set(p.agent_id, t);
+          });
+          const diffs: number[] = [];
+          (agentsBatch || []).forEach((a: any) => {
+            const first = firstByAgent.get(a.id);
+            if (first) diffs.push((first - new Date(a.created_at).getTime()) / DAY);
+          });
+          if (diffs.length === 0) return null;
+          return Math.round(diffs.reduce((s, d) => s + d, 0) / diffs.length);
+        };
+
+        const [cur, prev] = await Promise.all([
+          computeAvg(thirtyAgo),
+          computeAvg(sixtyAgo, thirtyAgo),
+        ]);
+        if (!cancelled) {
+          setAvgDaysToFirstListing(cur);
+          setAvgDaysPrevMonth(prev);
+        }
+      } catch {
+        if (!cancelled) {
+          setAvgDaysToFirstListing(null);
+          setAvgDaysPrevMonth(null);
+        }
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [now]);
 
   const activeToday = users.filter(u => u.last_sign_in_at && now - new Date(u.last_sign_in_at).getTime() < DAY);
   const activeWeek = users.filter(u => u.last_sign_in_at && now - new Date(u.last_sign_in_at).getTime() < 7 * DAY);

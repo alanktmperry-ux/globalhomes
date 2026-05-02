@@ -1296,23 +1296,23 @@ const Index = () => {
               style={{ color: '#2563EB', fontWeight: 600 }}
               lang="en"
             >
-              Search by voice in 24 languages. Every listing translated into 20.
+              Voice search in 24 languages. Every listing translated into 20.
             </p>
 
             {/* ── Agent value story ── */}
             <div className="mt-12 mb-10 max-w-3xl mx-auto text-center">
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
-                Australian agents. Asian buyers. One platform.
+                Built for multicultural Australia.
               </h2>
               <p className="mt-4 text-base md:text-lg text-slate-600 leading-relaxed">
-                ListHQ automatically translates your listings into Mandarin, Cantonese, Vietnamese, Korean and more — so you reach 1.2 million Asian diaspora buyers without doing anything extra.
+                ListHQ automatically translates every listing into 20 languages — Mandarin, Vietnamese, Hindi, Arabic, Tagalog and 15 more — reaching over 1.2 million multilingual buyers that REA and Domain can't serve.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
                 {[
-                  { stat: '20 languages', label: 'Every listing automatically translated' },
-                  { stat: '1.2M buyers', label: 'Asian diaspora property seekers in Australia' },
-                  { stat: 'Early access', label: 'First 50 agents — limited spots' },
+                  { stat: '20', label: 'Languages every listing is translated into' },
+                  { stat: '1.2M+', label: 'Multilingual buyers searching right now' },
+                  { stat: '3 months', label: 'Free — no credit card required' },
                 ].map((item) => (
                   <div
                     key={item.stat}
@@ -1329,7 +1329,7 @@ const Index = () => {
                   onClick={() => navigate('/for-agents')}
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors shadow-sm hover:shadow-md"
                 >
-                  List your properties
+                  Start reaching multilingual buyers
                   <ArrowRight size={16} />
                 </button>
                 <button
@@ -1342,6 +1342,7 @@ const Index = () => {
                   Search properties ↓
                 </button>
               </div>
+              <p className="text-xs text-slate-400 text-center mt-1">Free for 3 months. No credit card required.</p>
             </div>
 
             {/* Sale / Rent toggle */}

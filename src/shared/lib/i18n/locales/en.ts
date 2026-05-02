@@ -19,7 +19,7 @@ export const en = {
   // ──────────────────────────────────────────────────────────────────
   // Homepage hero
   // ──────────────────────────────────────────────────────────────────
-  'hero.eyebrow': "Australia's AI-powered property platform",
+  'hero.eyebrow': "Australia's only multilingual property platform",
   'hero.headline': 'Find your home.',
   'hero.headline2': 'In your language.',
   'hero.subheadline': 'Search in 24 languages. See prices in your currency. Powered by AI voice search.',
@@ -440,7 +440,7 @@ export const en = {
   'home.howItWorks.step3.desc': 'Message agents directly through WeChat, WhatsApp, or LINE. No language barrier.',
   'home.agents.eyebrow': 'For agents',
   'home.agents.headline': 'The platform built for multicultural Australia.',
-  'home.agents.sub': 'CRM, listings, property management, AI tools — all in one place. In 20 languages.',
+  'home.agents.sub': 'Every listing, every email, every touchpoint — automatically translated into 20 languages. No plugins, no extra work.',
   'home.agents.cta': 'Start free trial',
   'home.agents.founding': 'Free for 3 months',
   'home.agents.freeTagSub': 'No credit card required. Full access.',
@@ -625,10 +625,10 @@ export const en = {
   'hero.commercial': 'Commercial',
   'hero.land': 'Land',
   'hero.buyerTileTitle': 'Looking for a home?',
-  'hero.buyerTileDesc': 'Search Australian property in 24 languages. Free, no signup.',
+  'hero.buyerTileDesc': 'Search Australian property in your language. Free, no signup required.',
   'hero.buyerTileCta': 'Browse properties →',
   'hero.agentTileTitle': 'Are you an agent?',
-  'hero.agentTileDesc': "List once, translated into 20 languages. Reach multilingual buyers REA and Domain can't. Free for 3 months.",
+  'hero.agentTileDesc': "List once, translated into 20 languages. Reach multilingual buyers REA and Domain can't. Free for 3 months — no credit card.",
   'hero.agentTileCta': 'See agent tools →',
 
   // Sort dropdown

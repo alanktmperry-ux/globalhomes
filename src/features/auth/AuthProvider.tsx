@@ -90,7 +90,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .maybeSingle();
       if (cancelled) return;
       if (error) {
-        console.error('[Auth] failed to load impersonation session:', error);
+        if (import.meta.env.DEV) console.error('[Auth] failed to load impersonation session:', error);
         return;
       }
       if (data) {

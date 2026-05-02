@@ -492,10 +492,12 @@ const ReportsPage = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
+          <TabsList className="flex-wrap h-auto">
             <TabsTrigger value="sales">Sales Performance</TabsTrigger>
             <TabsTrigger value="financial">Financial</TabsTrigger>
             <TabsTrigger value="activity">Agent Activity</TabsTrigger>
+            <TabsTrigger value="reconciliation">Trust Reconciliation</TabsTrigger>
+            <TabsTrigger value="arrears">Arrears</TabsTrigger>
           </TabsList>
 
           {/* ─── SALES PERFORMANCE ─── */}

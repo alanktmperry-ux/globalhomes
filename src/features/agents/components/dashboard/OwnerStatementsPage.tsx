@@ -307,7 +307,7 @@ export default function OwnerStatementsPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div><Label className="text-xs">Gross rent (AUD)</Label><Input type="number" step="0.01" value={form.gross_rent_aud} onChange={(e) => setForm({ ...form, gross_rent_aud: Number(e.target.value) })} /></div>
-              <div><Label className="text-xs">Management fee (AUD)</Label><Input type="number" step="0.01" value={form.management_fee_aud} onChange={(e) => setForm({ ...form, management_fee_aud: Number(e.target.value) })} /><p className="text-[10px] text-muted-foreground mt-0.5">Suggested: 8.8% of gross</p></div>
+              <div><Label className="text-xs">Management fee (AUD)</Label><Input type="number" step="0.01" value={form.management_fee_aud} onChange={(e) => setForm({ ...form, management_fee_aud: Number(e.target.value) })} /><p className="text-[10px] text-muted-foreground mt-0.5">{feeSource ? (feeSource.fromTenancy ? `From tenancy record: ${feeSource.percent}%` : `Default: ${feeSource.percent}%`) : 'Select a property to load fee'}</p></div>
               <div><Label className="text-xs">Maintenance costs (AUD)</Label><Input type="number" step="0.01" value={form.maintenance_costs_aud} onChange={(e) => setForm({ ...form, maintenance_costs_aud: Number(e.target.value) })} /></div>
             </div>
 

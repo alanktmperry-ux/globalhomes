@@ -90,6 +90,28 @@ const StatCard = ({ icon: Icon, label, value, sub, color = 'bg-primary/10 text-p
 // ──────────────────────────────────────────────
 // Main Component
 // ──────────────────────────────────────────────
+interface Tenancy {
+  id: string;
+  tenant_name?: string;
+  tenant_phone?: string;
+  rent_amount?: number;
+  rent_frequency?: string;
+  status?: string;
+  rent_paid_to_date?: string;
+  lease_end?: string;
+  properties?: { address?: string; suburb?: string; state?: string } | null;
+}
+
+interface TrustReceipt {
+  amount?: number;
+  date_received?: string;
+}
+
+interface TrustPayment {
+  amount?: number;
+  date_paid?: string;
+}
+
 const ReportsPage = () => {
   const { canAccessTrust, loading: subLoading } = useSubscription();
   const { listings } = useAgentListings();
@@ -103,10 +125,10 @@ const ReportsPage = () => {
   const [customTo, setCustomTo] = useState<Date>();
 
   // Rent roll / arrears / reconciliation data
-  const [tenancies, setTenancies] = useState<any[]>([]);
+  const [tenancies, setTenancies] = useState<Tenancy[]>([]);
   const [propertiesCount, setPropertiesCount] = useState(0);
-  const [trustReceipts, setTrustReceipts] = useState<any[]>([]);
-  const [trustPayments, setTrustPayments] = useState<any[]>([]);
+  const [trustReceipts, setTrustReceipts] = useState<TrustReceipt[]>([]);
+  const [trustPayments, setTrustPayments] = useState<TrustPayment[]>([]);
   const [bankBalances, setBankBalances] = useState<Record<string, string>>({}); // 'YYYY-MM' -> manual input
 
   useEffect(() => {

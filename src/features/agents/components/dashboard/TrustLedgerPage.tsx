@@ -83,6 +83,17 @@ const STATUS_CONFIG: Record<string, { variant: 'default' | 'secondary' | 'outlin
   cleared: { variant: 'secondary', label: 'Cleared', icon: CheckCircle2 },
 };
 
+interface TrustEntry {
+  id: string;
+  amount?: number;
+  type?: string;
+  description?: string;
+  created_at?: string;
+  reference?: string;
+  bank_reference?: string;
+  received_date?: string;
+}
+
 const TrustLedgerPage = () => {
   const { user } = useAuth();
   const [receipts, setReceipts] = useState<TrustReceipt[]>([]);
@@ -105,7 +116,7 @@ const TrustLedgerPage = () => {
     reference: '',
     entryDate: new Date().toISOString().slice(0, 10),
   });
-  const [suspenseItems, setSuspenseItems] = useState<any[]>([]);
+  const [suspenseItems, setSuspenseItems] = useState<TrustEntry[]>([]);
   const [showSuspense, setShowSuspense] = useState(false);
   const [suspenseForm, setSuspenseForm] = useState({
     amount: '',
@@ -117,7 +128,7 @@ const TrustLedgerPage = () => {
 
   // Fetch agent record for current user
   const [agent, setAgent] = useState<any>(null);
-  const [accounts, setAccounts] = useState<any[]>([]);
+  const [accounts, setAccounts] = useState<TrustEntry[]>([]);
 
   const fetchAgentAndAccounts = useCallback(async () => {
     if (!user) return;
@@ -133,7 +144,7 @@ const TrustLedgerPage = () => {
         .select('id')
         .eq('agent_id', agentData.id)
         .limit(1);
-      setAccounts(accts || []);
+      setAccounts((accts as unknown as TrustEntry[]) || []);
     }
   }, [user]);
 
@@ -179,7 +190,7 @@ const TrustLedgerPage = () => {
       .eq('agent_id', agent.id)
       .eq('status', 'unidentified')
       .order('received_date', { ascending: false });
-    setSuspenseItems(data || []);
+    setSuspenseItems((data as unknown as TrustEntry[]) || []);
   }, [agent?.id]);
 
   useEffect(() => { fetchSuspense(); }, [fetchSuspense]);

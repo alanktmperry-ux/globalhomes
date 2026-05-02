@@ -67,6 +67,15 @@ ${agent?.name || '—'}
 ${agent?.agency || ''}`;
 }
 
+interface Agent {
+  id: string;
+  name: string;
+  agency?: string;
+  email?: string;
+  phone?: string;
+  marketing_suppliers?: string[];
+}
+
 const MarketingSupplierToggle = ({ listing, onSent }: Props) => {
   const agentId = useAgentId();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -76,7 +85,7 @@ const MarketingSupplierToggle = ({ listing, onSent }: Props) => {
   const [emailBody, setEmailBody] = useState('');
   const [confirmed, setConfirmed] = useState(false);
   const [sending, setSending] = useState(false);
-  const [agent, setAgent] = useState<any>(null);
+  const [agent, setAgent] = useState<Agent | null>(null);
   const [sent, setSent] = useState(listing.marketing_email_sent || false);
   const [sentAt, setSentAt] = useState(listing.marketing_email_sent_at || null);
 

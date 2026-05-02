@@ -1329,7 +1329,7 @@ const Index = () => {
                   onClick={() => navigate('/for-agents')}
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors shadow-sm hover:shadow-md"
                 >
-                  List your properties
+                  Start reaching multilingual buyers
                   <ArrowRight size={16} />
                 </button>
                 <button
@@ -1342,6 +1342,7 @@ const Index = () => {
                   Search properties ↓
                 </button>
               </div>
+              <p className="text-xs text-slate-400 text-center mt-1">Free for 3 months. No credit card required.</p>
             </div>
 
             {/* Sale / Rent toggle */}

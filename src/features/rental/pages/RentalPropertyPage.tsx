@@ -6,9 +6,26 @@ import { RentalKeyFacts } from '../components/RentalKeyFacts';
 import { RentalApplicationForm } from '../components/RentalApplicationForm';
 import { ChevronDown, ChevronUp, ArrowLeft, MapPin, Bed, Bath, Car } from 'lucide-react';
 
+interface RentalProperty {
+  id: string;
+  address: string;
+  suburb: string;
+  state: string;
+  beds: number;
+  baths: number;
+  property_type?: string;
+  rental_weekly?: number;
+  images?: string[];
+  image_url?: string;
+  description?: string;
+  bond_amount?: number;
+  postcode?: string;
+  parking?: number;
+}
+
 export default function RentalPropertyPage() {
   const { id } = useParams<{ id: string }>();
-  const [property, setProperty] = useState<any>(null);
+  const [property, setProperty] = useState<RentalProperty | null>(null);
   const [loading, setLoading] = useState(true);
   const [showApp, setShowApp] = useState(false);
 

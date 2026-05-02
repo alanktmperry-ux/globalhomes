@@ -19,13 +19,32 @@ import { Helmet } from 'react-helmet-async';
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
 
 interface PortalData {
-  tenancy: any;
-  property: any;
-  agent: any;
-  documents: any[];
-  maintenance: any[];
-  payments: any[];
-  inspections: any[];
+  tenancy:
+    | {
+        id: string;
+        start_date: string;
+        end_date?: string;
+        rent_amount: number;
+        status: string;
+        lease_start?: string;
+        lease_end?: string;
+        rent_frequency?: string;
+        bond_amount?: number;
+        bond_lodgement_number?: string;
+        bond_authority?: string;
+        tenant_name?: string;
+      }
+    | null;
+  property:
+    | { id: string; address: string; suburb: string; state: string; image_url?: string; postcode?: string }
+    | null;
+  agent:
+    | { id: string; name: string; email?: string; phone?: string; avatar_url?: string; profile_photo_url?: string }
+    | null;
+  documents: { id: string; name: string; url: string; created_at: string; label?: string; document_type?: string; uploaded_at?: string; file_url?: string }[];
+  maintenance: { id: string; title: string; status: string; created_at: string; priority?: string }[];
+  payments: { id: string; amount: number; paid_at: string; status: string; payment_date?: string; payment_method?: string }[];
+  inspections: { id: string; scheduled_at: string; type: string; status: string; scheduled_date?: string; inspection_type?: string; report_token?: string }[];
 }
 
 const TenantPortalPage = () => {

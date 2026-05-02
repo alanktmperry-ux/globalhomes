@@ -211,7 +211,7 @@ const DashboardOverview = () => {
       setOnboardingHasListing((listingCountRes.count || 0) > 0);
       setTasksDue(tasksRes.count || 0);
       setActiveContacts(contactsRes.count || 0);
-      if (trustRes.data) setTrustBalance(Math.max(0, Number(trustRes.data.current_balance) || 0));
+      if (trustRes.data) setTrustBalance(Math.max(0, Number((trustRes.data as any).current_balance) || 0));
       setUnrespondedLeads(leadsRes.count || 0);
       setRecentActivities(recentActivitiesRes.data || []);
 

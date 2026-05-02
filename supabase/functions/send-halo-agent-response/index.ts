@@ -211,7 +211,8 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'ListHQ <onboarding@resend.dev>',
+        // NOTE: Falls back to onboarding@resend.dev until listhq.com.au DNS is verified in Resend.
+        from: 'ListHQ <noreply@listhq.com.au>',
         to: [recipientEmail],
         subject: 'An agent is interested in your Halo',
         html,

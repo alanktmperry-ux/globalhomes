@@ -145,7 +145,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       .maybeSingle();
 
     if (insertError || !sessionRow) {
-      console.error('impersonation session insert failed:', insertError);
+      if (import.meta.env.DEV) console.error('impersonation session insert failed:', insertError);
       toast.error('Impersonation blocked — session could not be created.');
       return;
     }

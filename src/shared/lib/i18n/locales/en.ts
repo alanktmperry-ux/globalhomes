@@ -19,7 +19,7 @@ export const en = {
   // ──────────────────────────────────────────────────────────────────
   // Homepage hero
   // ──────────────────────────────────────────────────────────────────
-  'hero.eyebrow': "Australia's AI-powered property platform",
+  'hero.eyebrow': "Australia's only multilingual property platform",
   'hero.headline': 'Find your home.',
   'hero.headline2': 'In your language.',
   'hero.subheadline': 'Search in 24 languages. See prices in your currency. Powered by AI voice search.',

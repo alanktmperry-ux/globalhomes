@@ -135,12 +135,49 @@ const RENT_ROLL_FIELDS: { id: RentRollField; label: string; required: boolean }[
 
 // ── CSV utils ──
 function parseCsv(text: string): { headers: string[]; rows: Record<string, string>[] } {
-  const lines = text.split(/\r?\n/).filter(l => l.trim());
-  if (lines.length === 0) return { headers: [], rows: [] };
-  const split = (line: string) => line.split(',').map(c => c.replace(/^"|"$/g, '').trim());
-  const headers = split(lines[0]);
-  const rows = lines.slice(1).map(l => {
-    const cols = split(l);
+  // Strip UTF-8 BOM
+  const cleaned = text.replace(/^\uFEFF/, '');
+  const lines: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < cleaned.length; i++) {
+    const ch = cleaned[i];
+    if (ch === '"') {
+      if (inQuotes && cleaned[i + 1] === '"') { current += '"'; i++; }
+      else inQuotes = !inQuotes;
+    } else if ((ch === '\n' || (ch === '\r' && cleaned[i + 1] === '\n')) && !inQuotes) {
+      if (ch === '\r') i++;
+      lines.push(current);
+      current = '';
+    } else {
+      current += ch;
+    }
+  }
+  if (current.trim()) lines.push(current);
+  const nonEmpty = lines.filter(l => l.trim());
+  if (nonEmpty.length === 0) return { headers: [], rows: [] };
+  const parseRow = (line: string): string[] => {
+    const cols: string[] = [];
+    let field = '';
+    let q = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') {
+        if (q && line[i + 1] === '"') { field += '"'; i++; }
+        else q = !q;
+      } else if (c === ',' && !q) {
+        cols.push(field.trim());
+        field = '';
+      } else {
+        field += c;
+      }
+    }
+    cols.push(field.trim());
+    return cols;
+  };
+  const headers = parseRow(nonEmpty[0]);
+  const rows = nonEmpty.slice(1).map(l => {
+    const cols = parseRow(l);
     const r: Record<string, string> = {};
     headers.forEach((h, i) => { r[h] = cols[i] ?? ''; });
     return r;
@@ -307,7 +344,6 @@ export default function RentRollMigrationWizard({ onComplete, onCancel }: RentRo
   // ── Parsed rows (from rent roll using mapping) ──
   const parsedRows = useMemo<ParsedRow[]>(() => {
     if (!rentRollData.rows.length || !mapping.property_address) return [];
-    const today = new Date();
     return rentRollData.rows.map(r => {
       const get = (f: RentRollField) => mapping[f] ? r[mapping[f]] || '' : '';
       const rent_paid_to_date = normalizeDate(get('rent_paid_to_date'));
@@ -318,7 +354,6 @@ export default function RentRollMigrationWizard({ onComplete, onCancel }: RentRo
       if (bond_amount > 0 && rent_amount > 0 && bond_amount < rent_amount * 4) issues.push('Bond < 4 weeks');
       const lt = (get('lease_type') || 'fixed').toLowerCase();
       const lease_type: ParsedRow['lease_type'] = lt.startsWith('per') ? 'periodic' : lt.startsWith('board') ? 'boarding' : 'fixed';
-      void today;
       return {
         property_address: get('property_address'),
         owner_name: get('owner_name'),
@@ -655,7 +690,9 @@ export default function RentRollMigrationWizard({ onComplete, onCancel }: RentRo
           let arrearsWeeks = 0;
           if (paidTo) {
             const daysBehind = Math.max(0, Math.floor((today.getTime() - paidTo.getTime()) / 86400000));
-            arrearsWeeks = +(daysBehind / 7).toFixed(2);
+            const cycleDays = r.rent_frequency === 'monthly' ? 31 : r.rent_frequency === 'fortnightly' ? 14 : 7;
+            const daysOverdue = Math.max(0, daysBehind - cycleDays);
+            arrearsWeeks = +(daysOverdue / 7).toFixed(2);
           }
           return propId ? {
             property_id: propId,
@@ -674,6 +711,8 @@ export default function RentRollMigrationWizard({ onComplete, onCancel }: RentRo
             lease_type: r.lease_type,
             vacating_date: r.vacating_date,
             letting_fee_weeks: r.letting_fee_weeks,
+            bond_lodgement_number: r.bond_lodgement_number || null,
+            bond_authority: r.bond_authority || null,
             migration_batch_id: batchId,
           } : null;
         })
@@ -912,6 +951,17 @@ export default function RentRollMigrationWizard({ onComplete, onCancel }: RentRo
                 <p className="text-xs text-muted-foreground">
                   Your trust account bank balance on the cutover date must match the total of all your property ledger balances. We'll validate this in Step 5.
                 </p>
+              </div>
+
+              <div className="mt-4 p-4 rounded-lg border border-primary/20 bg-primary/5 flex flex-col items-center gap-2">
+                <div className="text-sm font-semibold">Need help with your migration?</div>
+                <div className="text-xs text-muted-foreground text-center">
+                  Most agencies prefer to have us handle the migration. We'll import everything correctly and reconcile the balances for you.
+                </div>
+                <div className="flex w-full gap-2">
+                  <a href="mailto:support@listhq.com.au?subject=Migration%20Call%20Request" className="flex-1 text-center text-xs py-2 px-3 rounded-lg border border-primary text-primary hover:bg-primary/5 transition-colors font-medium">Book a migration call →</a>
+                  <a href="mailto:support@listhq.com.au?subject=Migration%20Files" className="flex-1 text-center text-xs py-2 px-3 rounded-lg border border-border text-muted-foreground hover:border-primary/50 transition-colors">Email us your files instead</a>
+                </div>
               </div>
             </div>
           )}

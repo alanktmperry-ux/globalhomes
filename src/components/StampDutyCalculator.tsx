@@ -165,6 +165,7 @@ export function StampDutyCalculator({ propertyPrice, propertyAddress, propertySt
                     type="button"
                     role="switch"
                     aria-checked={isFirstHome}
+                    aria-label="First home buyer"
                     onClick={() => setIsFirstHome(!isFirstHome)}
                     className={`relative w-10 h-5 rounded-full transition-colors ${
                       isFirstHome ? 'bg-primary' : 'bg-muted'
@@ -265,6 +266,7 @@ export function StampDutyCalculator({ propertyPrice, propertyAddress, propertySt
 
                   <button
                     onClick={() => setShowBreakdown(!showBreakdown)}
+                    aria-label={showBreakdown ? 'Hide breakdown' : 'Show breakdown'}
                     className="text-xs text-primary hover:underline flex items-center gap-1"
                   >
                     {showBreakdown ? <ChevronUp size={12} /> : <ChevronDown size={12} />}

@@ -380,7 +380,7 @@ function ApplicationsTab({ userId }: { userId?: string }) {
             {img ? (
               <img
                 src={img}
-                alt=""
+                alt="Property photo"
                 className="w-16 h-16 rounded-xl object-cover flex-shrink-0"
               />
             ) : (

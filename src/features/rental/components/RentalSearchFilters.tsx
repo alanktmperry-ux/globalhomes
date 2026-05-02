@@ -67,6 +67,7 @@ export function RentalSearchFilters({ value: filters, onChange }: Props) {
 
         <button
           onClick={() => setShowMore(!showMore)}
+          aria-label="Toggle filters"
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition
             ${showMore
               ? 'bg-primary text-primary-foreground border-primary'
@@ -83,6 +84,7 @@ export function RentalSearchFilters({ value: filters, onChange }: Props) {
         <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
           <button
             onClick={() => set('petsAllowed', filters.petsAllowed ? undefined : true)}
+            aria-label="Pets allowed"
             className={`px-3 py-1.5 rounded-full text-sm border transition
               ${filters.petsAllowed
                 ? 'bg-green-600 text-white border-green-600'
@@ -134,6 +136,7 @@ export function RentalSearchFilters({ value: filters, onChange }: Props) {
                   ? types.filter(x => x !== t)
                   : [...types, t]);
               }}
+              aria-label={t}
               className={`px-3 py-1.5 rounded-full text-sm border transition capitalize
                 ${(filters.propertyTypes ?? []).includes(t)
                   ? 'bg-primary text-primary-foreground border-primary'
@@ -146,6 +149,7 @@ export function RentalSearchFilters({ value: filters, onChange }: Props) {
 
           <button
             onClick={() => { onChange({}); setSuburbInput(''); }}
+            aria-label="Clear all filters"
             className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive ml-auto"
           >
             <X className="w-3 h-3" /> Clear all

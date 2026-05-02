@@ -490,7 +490,7 @@ export default function AdminListingsPage() {
                           {thumb ? (
                             <img
                               src={thumb}
-                              alt=""
+                              alt="Listing photo"
                               loading="lazy"
                               className="w-10 h-10 rounded-lg object-cover bg-muted shrink-0"
                             />

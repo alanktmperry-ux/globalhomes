@@ -140,7 +140,7 @@ const MyApplicationsPage = () => {
                       {app.property_image ? (
                         <img
                           src={app.property_image}
-                          alt={app.property_address}
+                          alt="Property photo"
                           className="w-full h-full object-cover"
                         />
                       ) : (

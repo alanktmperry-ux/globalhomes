@@ -85,7 +85,7 @@ function FloorPlanView({ url }: { url: string }) {
       </div>
       {zoomed && (
         <div className="fixed inset-0 z-[9999] bg-foreground/90 flex items-center justify-center cursor-zoom-out p-8" onClick={() => setZoomed(false)}>
-          <button onClick={() => setZoomed(false)} className="absolute top-4 right-4 w-10 h-10 rounded-full bg-background/10 hover:bg-background/20 text-background flex items-center justify-center">
+          <button onClick={() => setZoomed(false)} aria-label="Close tour" className="absolute top-4 right-4 w-10 h-10 rounded-full bg-background/10 hover:bg-background/20 text-background flex items-center justify-center">
             <X className="w-5 h-5" />
           </button>
           <img src={url} alt="Floor plan" className="max-w-full max-h-full object-contain" />

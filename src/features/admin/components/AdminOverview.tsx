@@ -296,6 +296,62 @@ const AdminOverview = ({ stats, users, insights, onNavigate }: Props) => {
         <StatCard label="Voice Searches" value={stats.totalVoiceSearches} color="text-cyan-500" />
       </div>
 
+      {/* ── Strategic KPIs ── */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="bg-card border border-border rounded-xl p-4 space-y-1">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">At-Risk Agents</p>
+            <AlertTriangle size={12} className="text-amber-500" />
+          </div>
+          <p className={`text-2xl font-bold ${atRiskCount && atRiskCount > 0 ? 'text-amber-600' : 'text-muted-foreground'}`}>
+            {atRiskCount ?? '—'}
+          </p>
+          <p className="text-[11px] text-muted-foreground">No login 14d+ or 0 active listings</p>
+          {onNavigate && (
+            <button onClick={() => onNavigate('agent-lifecycle')} className="text-[11px] text-primary hover:underline mt-1 flex items-center gap-0.5">
+              View <ChevronRight size={10} />
+            </button>
+          )}
+        </div>
+        <div className="bg-card border border-border rounded-xl p-4 space-y-1">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Trial Ending Soon</p>
+            <AlertTriangle size={12} className={trialEndingCount ? 'text-destructive' : 'text-muted-foreground'} />
+          </div>
+          <p className={`text-2xl font-bold ${trialEndingCount && trialEndingCount > 0 ? 'text-destructive' : 'text-muted-foreground'}`}>
+            {trialEndingCount ?? '—'}
+          </p>
+          <p className="text-[11px] text-muted-foreground">Trials ending within 7 days</p>
+          {onNavigate && (
+            <button onClick={() => onNavigate('users')} className="text-[11px] text-primary hover:underline mt-1 flex items-center gap-0.5">
+              View <ChevronRight size={10} />
+            </button>
+          )}
+        </div>
+        <div className="bg-card border border-border rounded-xl p-4 space-y-1">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Time to First Listing</p>
+            <BarChart3 size={12} className="text-muted-foreground" />
+          </div>
+          <p className="text-2xl font-bold text-primary">
+            {avgDaysToFirstListing !== null ? `${avgDaysToFirstListing}d` : '—'}
+          </p>
+          <p className="text-[11px] text-muted-foreground">
+            Avg days new agents → first listing
+          </p>
+          {avgDaysToFirstListing !== null && avgDaysPrevMonth !== null && (
+            <p className={`text-[11px] font-medium ${
+              avgDaysToFirstListing < avgDaysPrevMonth ? 'text-emerald-500' :
+              avgDaysToFirstListing > avgDaysPrevMonth ? 'text-destructive' :
+              'text-muted-foreground'
+            }`}>
+              {avgDaysToFirstListing < avgDaysPrevMonth ? '↓' : avgDaysToFirstListing > avgDaysPrevMonth ? '↑' : '→'}{' '}
+              vs. {avgDaysPrevMonth}d last month
+            </p>
+          )}
+        </div>
+      </div>
+
       {/* ── Revenue & Subscriptions ── */}
       <div className="bg-card border border-border rounded-xl p-5">
         <SectionTitle icon={DollarSign} title="Revenue & Subscriptions" />

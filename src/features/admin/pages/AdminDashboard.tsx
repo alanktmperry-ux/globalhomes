@@ -396,6 +396,23 @@ const AdminDashboard = () => {
         </div>
       </main>
 
+      <AlertDialog open={!!pendingRoleChange} onOpenChange={(open) => { if (!open) setPendingRoleChange(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {pendingRoleChange?.action === 'add' ? 'Grant' : 'Revoke'} role "{pendingRoleChange?.role}"?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to {pendingRoleChange?.action} the "{pendingRoleChange?.role}" role for this user?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={performRoleChange}>Confirm</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
     </div>
   );
 };

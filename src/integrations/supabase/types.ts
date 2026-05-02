@@ -10810,21 +10810,21 @@ export type Database = {
           {
             foreignKeyName: "seller_likelihood_scores_property_id_fkey"
             columns: ["property_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "listings_translation_summary"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "seller_likelihood_scores_property_id_fkey"
             columns: ["property_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "seller_likelihood_scores_property_id_fkey"
             columns: ["property_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "properties_public_safe"
             referencedColumns: ["id"]
           },

@@ -123,10 +123,9 @@ const TrustAccountingPage = () => {
 
   // ── Month-end close state ────────────────────────────────────
   const _periodNow = new Date();
-  const now = _periodNow;
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1; // 1-12
-  const periodLabel = now.toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });
+  const currentYear = _periodNow.getFullYear();
+  const currentMonth = _periodNow.getMonth() + 1; // 1-12
+  const periodLabel = _periodNow.toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });
   const [periodClosed, setPeriodClosed] = useState<{ closing_balance: number; closed_at: string } | null>(null);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const [closingPeriod, setClosingPeriod] = useState(false);

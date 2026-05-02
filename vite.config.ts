@@ -3,8 +3,21 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL ?? "https://ngrkbohpmkzjonaofgbb.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY =
+  process.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
+  process.env.VITE_SUPABASE_ANON_KEY ??
+  "sb_publishable_BPW9omcmNwRZnH6blNp9Sw_lk7f4F_D";
+const SUPABASE_PROJECT_ID = process.env.VITE_SUPABASE_PROJECT_ID ?? "ngrkbohpmkzjonaofgbb";
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  define: {
+    'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(SUPABASE_URL),
+    'import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY': JSON.stringify(SUPABASE_PUBLISHABLE_KEY),
+    'import.meta.env.VITE_SUPABASE_ANON_KEY': JSON.stringify(SUPABASE_PUBLISHABLE_KEY),
+    'import.meta.env.VITE_SUPABASE_PROJECT_ID': JSON.stringify(SUPABASE_PROJECT_ID),
+  },
   server: {
     host: "::",
     port: 8080,

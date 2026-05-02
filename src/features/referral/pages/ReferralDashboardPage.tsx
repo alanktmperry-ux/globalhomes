@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { TIER_COMMISSION_AUD, TIER_THRESHOLDS, TIER_STYLES, LEAD_STATUS_STYLES, type ReferralTier } from '@/features/referral/lib/constants';
 import { SubmitReferralModal } from '@/features/referral/components/SubmitReferralModal';
@@ -225,6 +226,7 @@ export default function ReferralDashboardPage() {
           {/* Leads table */}
           <div className="bg-card border border-border rounded-2xl p-6">
             <h2 className="font-display text-lg font-semibold text-foreground">Your referrals</h2>
+            <p className="text-xs text-muted-foreground mt-1">Track each referral from registration through to settlement.</p>
             {leads.length === 0 ? (
               <div className="text-center py-12">
                 <Users className="mx-auto text-muted-foreground mb-3" size={32} />
@@ -248,7 +250,7 @@ export default function ReferralDashboardPage() {
                   </thead>
                   <tbody>
                     {leads.map(lead => {
-                      const status = LEAD_STATUS_STYLES[lead.status] || LEAD_STATUS_STYLES.new;
+                      const pipeline = getPipelineBadge(lead.status);
                       return (
                         <tr key={lead.id} className="border-b border-border last:border-0">
                           <td className="py-3 pr-4 text-muted-foreground whitespace-nowrap">
@@ -258,9 +260,9 @@ export default function ReferralDashboardPage() {
                           <td className="py-3 pr-4 text-muted-foreground">{lead.buyer_country || '—'}</td>
                           <td className="py-3 pr-4 text-muted-foreground max-w-[220px] truncate">{lead.property_url || '—'}</td>
                           <td className="py-3 pr-4">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${status.className}`}>
-                              {status.label}
-                            </span>
+                            <Badge variant="outline" className={pipeline.className}>
+                              {pipeline.label}
+                            </Badge>
                           </td>
                           <td className="py-3 pr-4 text-right font-display font-semibold text-foreground">
                             {lead.commission_aud > 0 ? `A$${lead.commission_aud.toLocaleString()}` : '—'}
@@ -295,4 +297,23 @@ function StatCard({ icon: Icon, label, value }: { icon: any; label: string; valu
       <p className="font-display text-xl md:text-2xl font-bold text-foreground mt-0.5">{value}</p>
     </div>
   );
+}
+
+function getPipelineBadge(status: string): { label: string; className: string } {
+  switch (status) {
+    case 'new':
+      return { label: 'Registered', className: 'bg-blue-100 text-blue-800 border-blue-200' };
+    case 'enquiry_sent':
+    case 'contacted':
+      return { label: 'Enquiry', className: 'bg-amber-100 text-amber-800 border-amber-200' };
+    case 'under_offer':
+      return { label: 'Under Offer', className: 'bg-orange-100 text-orange-800 border-orange-200' };
+    case 'settled':
+      return { label: 'Settled ✓', className: 'bg-emerald-100 text-emerald-800 border-emerald-200' };
+    default:
+      return {
+        label: status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, ' '),
+        className: 'bg-slate-100 text-slate-700 border-slate-200',
+      };
+  }
 }

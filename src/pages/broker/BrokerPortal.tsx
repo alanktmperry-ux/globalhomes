@@ -278,6 +278,20 @@ export default function BrokerPortal() {
     );
   }
 
+  const isLanguageMatch = useCallback((lead: Lead) => {
+    if (!lead.buyer_language || !broker?.languages?.length) return false;
+    return broker.languages.includes(lead.buyer_language);
+  }, [broker]);
+
+  const matchedAvailable = useMemo(
+    () => availableLeads.filter(isLanguageMatch),
+    [availableLeads, isLanguageMatch]
+  );
+  const otherAvailable = useMemo(
+    () => availableLeads.filter((l) => !isLanguageMatch(l)),
+    [availableLeads, isLanguageMatch]
+  );
+
   const visibleLeads = activeTab === "available" ? availableLeads : myLeads;
 
   return (
@@ -351,6 +365,37 @@ export default function BrokerPortal() {
                   ? "No leads available right now"
                   : "No leads assigned yet"}
               </div>
+            ) : activeTab === "available" ? (
+              <ul className="divide-y divide-slate-100">
+                {matchedAvailable.map((lead) => (
+                  <LeadRow
+                    key={lead.id}
+                    lead={lead}
+                    selected={selectedId === lead.id}
+                    onSelect={() => setSelectedId(lead.id)}
+                    showClaim
+                    claiming={claimingId === lead.id}
+                    onClaim={() => handleClaim(lead)}
+                    languageMatch
+                  />
+                ))}
+                {matchedAvailable.length > 0 && otherAvailable.length > 0 && (
+                  <li className="px-4 py-2 bg-slate-50 text-[10px] uppercase tracking-wide font-semibold text-slate-500 border-y border-slate-200">
+                    Other leads
+                  </li>
+                )}
+                {otherAvailable.map((lead) => (
+                  <LeadRow
+                    key={lead.id}
+                    lead={lead}
+                    selected={selectedId === lead.id}
+                    onSelect={() => setSelectedId(lead.id)}
+                    showClaim
+                    claiming={claimingId === lead.id}
+                    onClaim={() => handleClaim(lead)}
+                  />
+                ))}
+              </ul>
             ) : (
               <ul className="divide-y divide-slate-100">
                 {visibleLeads.map((lead) => (
@@ -359,7 +404,7 @@ export default function BrokerPortal() {
                     lead={lead}
                     selected={selectedId === lead.id}
                     onSelect={() => setSelectedId(lead.id)}
-                    showClaim={activeTab === "available"}
+                    showClaim={false}
                     claiming={claimingId === lead.id}
                     onClaim={() => handleClaim(lead)}
                   />
@@ -430,7 +475,7 @@ function StatChip({ label, value, tone }: { label: string; value: number; tone: 
 }
 
 function LeadRow({
-  lead, selected, onSelect, showClaim, claiming, onClaim,
+  lead, selected, onSelect, showClaim, claiming, onClaim, languageMatch,
 }: {
   lead: Lead;
   selected: boolean;
@@ -438,6 +483,7 @@ function LeadRow({
   showClaim?: boolean;
   claiming?: boolean;
   onClaim?: () => void;
+  languageMatch?: boolean;
 }) {
   const langMeta = getLanguageMeta(lead.buyer_language);
   const isNonEnglish = !!langMeta && langMeta.label !== "English";
@@ -479,6 +525,11 @@ function LeadRow({
               <Badge variant="outline" className={`text-[10px] h-5 px-1.5 ${langMeta.color}`}>
                 {langMeta.flag} {langMeta.label}
               </Badge>
+            )}
+            {languageMatch && (
+              <span className="inline-flex items-center bg-primary/10 text-primary text-[10px] font-semibold px-1.5 py-0.5 rounded">
+                🗣 Language match
+              </span>
             )}
           </div>
         </div>

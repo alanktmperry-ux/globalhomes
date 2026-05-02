@@ -62,6 +62,81 @@ export default function OwnerPortalPage() {
 
   useEffect(() => { load(); }, [load]);
 
+  // Load owner portal preference (threshold) once we have a property
+  useEffect(() => {
+    const propertyId = data?.property?.id;
+    if (!propertyId) return;
+    (async () => {
+      const { data: pref } = await supabase
+        .from('owner_portal_preferences')
+        .select('auto_approve_threshold_aud')
+        .eq('property_id', propertyId)
+        .maybeSingle();
+      const t = pref?.auto_approve_threshold_aud != null ? Number(pref.auto_approve_threshold_aud) : 500;
+      setAutoApproveThreshold(t);
+      setThresholdInput(String(t));
+    })();
+  }, [data?.property?.id]);
+
+  // Audit log: portal access (fire-and-forget)
+  useEffect(() => {
+    const propertyId = data?.property?.id;
+    if (!propertyId) return;
+    supabase.from('audit_logs').insert({
+      event_type: 'portal_access',
+      portal_type: 'owner',
+      entity_id: propertyId,
+      accessed_at: new Date().toISOString(),
+    } as any).then(() => {/* fire-and-forget */}, () => {/* ignore */});
+  }, [data?.property?.id]);
+
+  // Auto-approve maintenance jobs below the threshold
+  useEffect(() => {
+    if (!data || !token) return;
+    const pending = (data.maintenance || []).filter((m: any) =>
+      m.owner_approval_status === 'pending' &&
+      Number(m.quoted_amount_aud || 0) > 0 &&
+      Number(m.quoted_amount_aud) < autoApproveThreshold &&
+      !autoApprovedIds.has(m.id)
+    );
+    if (pending.length === 0) return;
+    pending.forEach((j: any) => {
+      setAutoApprovedIds(prev => new Set(prev).add(j.id));
+      supabase.rpc('owner_decision_on_maintenance', {
+        p_token: token,
+        p_job_id: j.id,
+        p_decision: 'approved',
+        p_decline_reason: `Auto-approved (under $${autoApproveThreshold} threshold)`,
+      } as any).then(() => load(), () => {/* ignore */});
+    });
+  }, [data, autoApproveThreshold, token, autoApprovedIds, load]);
+
+  const saveThreshold = async () => {
+    const n = Number(thresholdInput);
+    if (!Number.isFinite(n) || n < 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+    const propertyId = data?.property?.id;
+    const agentId = data?.agent?.id;
+    if (!propertyId || !agentId) return;
+    setSavingThreshold(true);
+    const { error: err } = await supabase
+      .from('owner_portal_preferences')
+      .upsert({
+        property_id: propertyId,
+        agent_id: agentId,
+        auto_approve_threshold_aud: n,
+      } as any, { onConflict: 'property_id' });
+    setSavingThreshold(false);
+    if (err) {
+      toast.error('Could not save threshold');
+      return;
+    }
+    setAutoApproveThreshold(n);
+    toast.success('Auto-approve threshold updated');
+  };
+
   const decide = async (jobId: string, decision: 'approved' | 'declined', reason?: string) => {
     setActing(jobId);
     const { data: res, error: err } = await supabase.rpc('owner_decision_on_maintenance', {

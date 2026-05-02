@@ -43,6 +43,8 @@ const BANKS = ['NAB', 'CBA', 'ANZ', 'Westpac', 'Bendigo', 'BOQ', 'Macquarie', 'O
 
 const DATE_AU = new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: 'long', year: 'numeric' });
 
+const escHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
 export default function AgencyOnboardingPage() {
   const navigate = useNavigate();
   const { user, refreshRoles } = useAuth();
@@ -350,6 +352,8 @@ export default function AgencyOnboardingPage() {
 
   const generateImportChecklist = () => {
     const today = DATE_AU.format(new Date());
+    const safeAgencyName = escHtml(agencyName || '');
+    const safeState = escHtml(operatingState || '');
     const stateAct: Record<string, string> = {
       VIC: 'Estate Agents Act 1980 (Vic)',
       NSW: 'Property and Stock Agents Act 2002 (NSW)',
@@ -434,8 +438,8 @@ export default function AgencyOnboardingPage() {
       <div class="brand">List<span>HQ</span></div>
       <div class="doc-title">Trust Account Migration Pre-Import Checklist</div>
       <div class="doc-meta">
-        Agency: <strong>${agencyName || '________________________'}</strong> &nbsp;|&nbsp;
-        State: <strong>${operatingState || '____'}</strong> &nbsp;|&nbsp;
+        Agency: <strong>${safeAgencyName || '________________________'}</strong> &nbsp;|&nbsp;
+        State: <strong>${safeState || '____'}</strong> &nbsp;|&nbsp;
         Cut-over date: <strong>${cutoverDate || '_______________'}</strong>
       </div>
     </div>
@@ -447,7 +451,7 @@ export default function AgencyOnboardingPage() {
 </div>
 
 <div class="legislation-box">
-  📋 <strong>Governing legislation for ${operatingState || 'your state'}:</strong> ${legislation}
+  📋 <strong>Governing legislation for ${safeState || 'your state'}:</strong> ${legislation}
   &nbsp;|&nbsp; Annual audit due: <strong>${auditDue}</strong>
 </div>
 
@@ -574,7 +578,7 @@ export default function AgencyOnboardingPage() {
     <div class="item-content">
       <div class="item-title">All bonds lodged with state bond authority <span class="req-badge req-state">STATE-SPECIFIC</span></div>
       <div class="item-desc">Bonds must NOT be held in your general trust account — they must be lodged with the relevant state bond authority within the prescribed timeframe.</div>
-      <div class="state-note">${operatingState ? operatingState + ': ' + bondAuth : 'Check your state bond authority requirements'}</div>
+      <div class="state-note">${safeState ? safeState + ': ' + bondAuth : 'Check your state bond authority requirements'}</div>
       <div class="write-in-grid">
         <div><div class="write-in-label">Number of active bonds:</div><div class="write-in"></div></div>
         <div><div class="write-in-label">Total bond amount: $</div><div class="write-in"></div></div>
@@ -593,7 +597,7 @@ export default function AgencyOnboardingPage() {
     <div class="checkbox"></div>
     <div class="item-content">
       <div class="item-title">Interest on trust funds — disbursed correctly <span class="req-badge req-state">STATE-SPECIFIC</span></div>
-      <div class="item-desc">Some states require interest earned on trust accounts above certain thresholds to be paid to the state's statutory authority or to the client. Confirm any interest earned has been handled in accordance with ${operatingState || 'your state'} legislation.</div>
+      <div class="item-desc">Some states require interest earned on trust accounts above certain thresholds to be paid to the state's statutory authority or to the client. Confirm any interest earned has been handled in accordance with ${safeState || 'your state'} legislation.</div>
       <div class="write-in-grid">
         <div><div class="write-in-label">Interest earned (period): $</div><div class="write-in"></div></div>
         <div><div class="write-in-label">Disbursed to:</div><div class="write-in"></div></div>

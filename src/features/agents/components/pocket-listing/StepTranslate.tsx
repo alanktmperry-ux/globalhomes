@@ -217,16 +217,6 @@ const StepTranslate = ({ draft, update }: Props) => {
         <p className="text-[11px] text-muted-foreground italic">
           Buyers searching in {active.label} will see this version
         </p>
-
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="gap-1.5"
-          onClick={() => toast.success(`Saved ${active.label} translations`)}
-        >
-          <Save size={12} /> Save translations
-        </Button>
       </div>
     </div>
   );

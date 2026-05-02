@@ -16,7 +16,7 @@ type LifecycleStage = 'all' | 'trial' | 'converted' | 'at_risk' | 'never_listed'
 interface AdoptionScore {
   score: number;
   hasListing: boolean;
-  hasVoiceSearch: boolean;
+  hasOpenHome: boolean;
   hasTrust: boolean;
   hasContacts: boolean;
   hasProfile: boolean;

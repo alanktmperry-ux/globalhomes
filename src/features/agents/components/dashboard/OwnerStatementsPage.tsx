@@ -252,6 +252,7 @@ export default function OwnerStatementsPage() {
                     <TableHead className="text-right">Net</TableHead>
                     <TableHead>Emailed</TableHead>
                     <TableHead>Created</TableHead>
+                    <TableHead className="text-right">PDF</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -267,6 +268,19 @@ export default function OwnerStatementsPage() {
                           : <Badge variant="outline">Not sent</Badge>}
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">{format(parseISO(s.created_at), 'd MMM yyyy')}</TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleDownloadPdf(s)}
+                          disabled={!!pdfLoading[s.id]}
+                          className="h-8"
+                        >
+                          {pdfLoading[s.id]
+                            ? <Loader2 size={14} className="animate-spin" />
+                            : <><Download size={14} className="mr-1" /> PDF</>}
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

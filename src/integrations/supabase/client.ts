@@ -3,15 +3,17 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-// NOTE: Legacy JWT anon key was disabled by Supabase on 2026-04-28. Force the new publishable key.
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
-  ?? 'sb_publishable_BPW9omcmNwRZnH6blNp9Sw_lk7f4F_D';
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
 if (!SUPABASE_URL) {
   throw new Error('[Config] VITE_SUPABASE_URL is not set. Check your .env file.');
+}
+
+if (!SUPABASE_PUBLISHABLE_KEY) {
+  throw new Error('VITE_SUPABASE_PUBLISHABLE_KEY is required');
 }
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {

@@ -6,8 +6,10 @@ import { componentTagger } from "lovable-tagger";
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL ?? "https://ngrkbohpmkzjonaofgbb.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY =
   process.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
-  process.env.VITE_SUPABASE_ANON_KEY ??
-  "sb_publishable_BPW9omcmNwRZnH6blNp9Sw_lk7f4F_D";
+  process.env.VITE_SUPABASE_ANON_KEY;
+if (!SUPABASE_PUBLISHABLE_KEY) {
+  throw new Error('VITE_SUPABASE_PUBLISHABLE_KEY is required');
+}
 const SUPABASE_PROJECT_ID = process.env.VITE_SUPABASE_PROJECT_ID ?? "ngrkbohpmkzjonaofgbb";
 
 // https://vitejs.dev/config/

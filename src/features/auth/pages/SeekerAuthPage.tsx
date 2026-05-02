@@ -40,7 +40,7 @@ const SeekerAuthPage = () => {
         .eq('user_id', signedInUser.id);
       const roleList = roles?.map(r => r.role) || [];
       if (roleList.includes('admin') || roleList.includes('agent')) {
-        navigate('/dashboard/overview', { replace: true });
+        navigate('/dashboard', { replace: true });
         return;
       }
     }
@@ -61,14 +61,7 @@ const SeekerAuthPage = () => {
         password,
       });
       if (signErr) {
-        const msg = signErr.message || '';
-        if (/invalid/i.test(msg) && /credential|password|login/i.test(msg)) {
-          setError('Incorrect email or password.');
-        } else if (/email not confirmed/i.test(msg)) {
-          setError('Please verify your email before signing in.');
-        } else {
-          setError(msg || 'Could not sign in. Please try again.');
-        }
+        setError('Invalid email or password.');
         return;
       }
       toast.success('Welcome back!');

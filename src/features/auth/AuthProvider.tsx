@@ -291,7 +291,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           filteredRoles.push('agent');
           // Best-effort backfill of user_roles row
           supabase.from('user_roles').insert({ user_id: user.id, role: 'agent' as any })
-            .then(({ error }) => { if (error && !String(error.message).includes('duplicate')) console.warn('[Auth] backfill user_roles:', error.message); });
+            .then(({ error }) => { if (error && !String(error.message).includes('duplicate') && import.meta.env.DEV) console.warn('[Auth] backfill user_roles:', error.message); });
         }
         applyRoles(filteredRoles, user.email);
         if (agentData) {

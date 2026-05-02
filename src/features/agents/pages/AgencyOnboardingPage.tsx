@@ -52,7 +52,7 @@ export default function AgencyOnboardingPage() {
   const [loading, setLoading] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
   const [showRentRollWizard, setShowRentRollWizard] = useState(false);
-  const [wizardCompleted, setWizardCompleted] = useState(false);
+  
   const [guideOpen, setGuideOpen] = useState(false);
 
   // Password step state

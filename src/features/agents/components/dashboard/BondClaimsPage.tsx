@@ -274,7 +274,7 @@ const BondClaimsPage = () => {
     const prop = t?.properties;
     const itemLines = openClaim.bond_claim_items.map(i =>
       `• ${CATEGORY_LABEL[i.category] || i.category} — ${i.description}${i.room_name ? ` (${i.room_name})` : ''}: ${fmt$(Number(i.amount))}`
-    ).join('\\n');
+    ).join('\n');
     const claimed = Number(openClaim.claimed_amount || 0);
     const remaining = Number(openClaim.bond_amount_held || 0) - claimed;
     return [
@@ -295,7 +295,7 @@ const BondClaimsPage = () => {
       `Regards,`,
       agentName,
       agencyName,
-    ].join('\\n');
+    ].join('\n');
   }, [openClaim, agentName, agencyName]);
 
   const copySummary = async () => {

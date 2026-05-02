@@ -76,6 +76,10 @@ const AgentDashboardLayout = () => {
   }, [agent?.trust_setup_pending]);
 
 
+  if (mfaChecked && mfaRequired) {
+    return <MFAChallenge />;
+  }
+
   return (
     <SidebarProvider>
       <div className="h-screen flex w-full bg-background text-foreground">

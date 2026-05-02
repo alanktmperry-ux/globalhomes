@@ -20,6 +20,7 @@ const SeekerAuthPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dataLocationConsent, setDataLocationConsent] = useState(false);
+  const [policyConsent, setPolicyConsent] = useState(false);
 
   // Bug Fix 1: password reset emails redirect to /login. If we land here with a
   // recovery token in the URL hash, forward to /reset-password preserving the hash
@@ -86,6 +87,10 @@ const SeekerAuthPage = () => {
     }
     if (!dataLocationConsent) {
       setError('Please acknowledge where your data is stored to continue.');
+      return;
+    }
+    if (!policyConsent) {
+      setError('Please agree to the Privacy Policy and Terms of Service to continue.');
       return;
     }
     setLoading(true);
@@ -335,6 +340,21 @@ const SeekerAuthPage = () => {
                       </span>
                     </label>
 
+                    <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={policyConsent}
+                        onChange={(e) => setPolicyConsent(e.target.checked)}
+                        className="mt-0.5 h-4 w-4 rounded border-stone-300 text-primary focus:ring-primary cursor-pointer shrink-0"
+                      />
+                      <span className="text-[12px] text-stone-500 leading-relaxed">
+                        I agree to the{' '}
+                        <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-stone-700">Privacy Policy</a>
+                        {' '}and{' '}
+                        <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-stone-700">Terms of Service</a>.
+                      </span>
+                    </label>
+
                     {error && (
                       <p role="alert" className="text-[13px] text-red-600 bg-red-50 border border-red-100 rounded-xl px-3 py-2">
                         {error}
@@ -343,7 +363,7 @@ const SeekerAuthPage = () => {
 
                     <button
                       type="submit"
-                      disabled={loading || !email.trim() || !password || !dataLocationConsent}
+                      disabled={loading || !email.trim() || !password || !dataLocationConsent || !policyConsent}
                       className={btnPrimary}
                     >
                       {loading ? 'Creating account…' : 'Create account'}

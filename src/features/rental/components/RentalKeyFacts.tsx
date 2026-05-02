@@ -9,7 +9,14 @@ interface Props {
     rental_weekly?: number;
     available_from?: string;
     pet_friendly?: boolean;
-    furnished?: boolean;
+    furnished?: boolean | string;
+    bond_amount?: number;
+    lease_term?: string;
+    pets_allowed?: boolean;
+    smoking_allowed?: boolean;
+    rental_parking_type?: string;
+    has_air_con?: boolean;
+    max_occupants?: number;
   };
 }
 

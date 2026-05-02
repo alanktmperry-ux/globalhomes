@@ -140,6 +140,7 @@ Return ONLY this JSON structure:
       .eq("is_active", true)
       .eq("status", "public")
       .limit(30);
+      // NOTE: agents.phone and agents.email are intentionally excluded — PII must not leak via public search
 
     if (parsed.listing_type) {
       qb = qb.eq("listing_type", parsed.listing_type as string);

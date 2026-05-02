@@ -13,14 +13,23 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, serviceKey);
+
+    // ── AUTH: require valid JWT ──
+    const token = req.headers.get("Authorization")?.replace("Bearer ", "") ?? "";
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     const { statement_id } = await req.json();
     if (!statement_id) {
       return new Response(JSON.stringify({ error: 'statement_id required' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
-
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, serviceKey);
 
     const { data: stmt, error } = await supabase
       .from('owner_statements')
@@ -30,6 +39,27 @@ Deno.serve(async (req) => {
 
     if (error || !stmt) {
       return new Response(JSON.stringify({ error: 'Statement not found' }), { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    // ── OWNERSHIP: caller must be the statement's agent OR an admin ──
+    const { data: callerAgent } = await supabase
+      .from('agents')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    const { data: adminRole } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .maybeSingle();
+
+    const isOwner = callerAgent?.id && callerAgent.id === (stmt as any).agent_id;
+    const isAdmin = !!adminRole;
+    if (!isOwner && !isAdmin) {
+      return new Response(JSON.stringify({ error: 'Forbidden' }), {
+        status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
 
     const property = (stmt as any).properties || {};

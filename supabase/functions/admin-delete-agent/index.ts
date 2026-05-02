@@ -173,7 +173,7 @@ Deno.serve(async (req) => {
       for (const t of [
         "notifications", "lead_events", "leads", "agent_subscriptions",
         "agent_credentials", "agent_locations", "contacts", "rental_applications",
-        "transactions", "review_requests", "agent_reviews", "audit_log",
+        "transactions", "review_requests", "agent_reviews", "audit_logs",
       ]) {
         const col = t === "contacts" ? "assigned_agent_id" : "agent_id";
         await del(t, col, agentId);
@@ -198,7 +198,7 @@ Deno.serve(async (req) => {
     // 5. User-level
     await del("agency_members", "user_id", userId);
     await del("user_roles", "user_id", userId);
-    await del("audit_log", "user_id", userId);
+    await del("audit_logs", "user_id", userId);
     for (const t of [
       "saved_properties", "saved_search_alerts", "buyer_profiles", "collab_reactions",
       "collab_views", "contact_activities", "contacts", "activities", "tasks", "leads",
@@ -216,7 +216,7 @@ Deno.serve(async (req) => {
 
     // Audit
     try {
-      await supabase.from("audit_log").insert({
+      await supabase.from("audit_logs").insert({
         user_id: caller.id,
         action_type: "admin_delete_agent",
         entity_type: "agent",
@@ -229,6 +229,6 @@ Deno.serve(async (req) => {
     return respond({ success: true, errors: log });
   } catch (err) {
     console.error("admin-delete-agent error:", err);
-    return respond({ error: (err as Error).message }, 200);
+    return respond({ error: (err as Error).message }, 500);
   }
 });

@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Plus, Trash2, Loader2, AlertTriangle, Play } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -82,6 +83,7 @@ export default function AgencyAutomationsPage() {
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
+  const [ruleToDelete, setRuleToDelete] = useState<Rule | null>(null);
 
   // load agency/role
   useEffect(() => {
@@ -153,7 +155,14 @@ export default function AgencyAutomationsPage() {
 
   const deleteRule = async (rule: Rule) => {
     if (!isAdmin) return;
-    if (!confirm(`Delete rule "${rule.name}"?`)) return;
+    setRuleToDelete(rule);
+    return;
+  };
+
+  const confirmDelete = async () => {
+    const rule = ruleToDelete;
+    if (!rule) return;
+    setRuleToDelete(null);
     const { error } = await supabase.from('automation_rules').delete().eq('id', rule.id);
     if (error) { toast.error('Delete failed'); return; }
     if (user) {
@@ -324,6 +333,23 @@ export default function AgencyAutomationsPage() {
           onSaved={() => { setAddOpen(false); fetchAll(); }}
         />
       )}
+
+      <AlertDialog open={!!ruleToDelete} onOpenChange={(open) => { if (!open) setRuleToDelete(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete automation rule?</AlertDialogTitle>
+            <AlertDialogDescription>
+              "{ruleToDelete?.name}" will be permanently deleted and cannot be recovered.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete rule
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

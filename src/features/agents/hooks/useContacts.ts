@@ -125,15 +125,22 @@ export function useContacts() {
   useEffect(() => {
     const channel = supabase
       .channel('contacts-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' }, () => {
-        fetchContacts();
-      })
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'contacts',
+          ...(agencyId ? { filter: `agency_id=eq.${agencyId}` } : {}),
+        },
+        () => { fetchContacts(); }
+      )
       .subscribe();
     return () => {
       channel.unsubscribe();
       supabase.removeChannel(channel);
     };
-  }, [fetchContacts]);
+  }, [fetchContacts, agencyId]);
 
   const getAgentContext = async () => {
     if (!user) return { agentId: null, agencyId: null };
@@ -202,11 +209,16 @@ export function useContacts() {
   };
 
   const deleteContact = async (id: string) => {
-    const { error } = await supabase
-      .from('contacts')
-      .delete()
-      .eq('id', id);
-    if (error) throw error;
+    try {
+      const { error } = await supabase
+        .from('contacts')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+    } catch (err) {
+      console.error('[useContacts] deleteContact error:', err);
+      throw err;
+    }
   };
 
   const addActivity = async (contactId: string, activityType: string, description: string) => {

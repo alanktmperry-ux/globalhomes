@@ -7,6 +7,30 @@ import type { Contact } from '@/features/agents/hooks/useContacts';
 
 const EXPECTED_HEADERS = ['first_name', 'last_name', 'email', 'phone', 'mobile', 'contact_type', 'ranking', 'suburb', 'state', 'postcode', 'budget_min', 'budget_max', 'source', 'notes'];
 
+function parseCSVRow(line: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (ch === ',' && !inQuotes) {
+      result.push(current.trim());
+      current = '';
+    } else {
+      current += ch;
+    }
+  }
+  result.push(current.trim());
+  return result;
+}
+
 interface Props {
   onClose: () => void;
   onImport: (rows: Partial<Contact>[]) => Promise<void>;
@@ -34,7 +58,7 @@ const CsvImportModal = ({ onClose, onImport }: Props) => {
 
     const rows: Partial<Contact>[] = [];
     for (let i = 1; i < lines.length; i++) {
-      const values = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g)?.map(v => v.replace(/^"|"$/g, '').trim()) || lines[i].split(',').map(v => v.trim());
+      const values = parseCSVRow(lines[i]);
       const row: any = {};
       rawHeaders.forEach((h, idx) => {
         const val = sanitizeText(values[idx] || '');

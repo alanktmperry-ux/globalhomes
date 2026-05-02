@@ -119,6 +119,28 @@ export default function BrokerPortal() {
   const loadLeads = useCallback(async (b: BrokerRecord) => {
     const isPrincipal = b.agency_role === 'principal';
 
+    let mineQuery;
+    if (isPrincipal) {
+      // For principal: fetch all broker IDs in same agency, then get their assigned leads
+      const { data: agencyBrokers } = await supabase
+        .from("brokers")
+        .select("id")
+        .eq("agency_id", b.agency_id);
+      const agencyBrokerIds = (agencyBrokers || []).map((br: any) => br.id);
+      agencyBrokerIds.push(b.id); // include self
+      mineQuery = supabase
+        .from("referral_leads")
+        .select("*")
+        .in("assigned_broker_id", agencyBrokerIds)
+        .order("created_at", { ascending: false });
+    } else {
+      mineQuery = supabase
+        .from("referral_leads")
+        .select("*")
+        .eq("assigned_broker_id", b.id)
+        .order("created_at", { ascending: false });
+    }
+
     const [availRes, mineRes] = await Promise.all([
       supabase
         .from("referral_leads")
@@ -126,17 +148,7 @@ export default function BrokerPortal() {
         .is("assigned_broker_id", null)
         .eq("status", "new")
         .order("created_at", { ascending: false }),
-      isPrincipal
-        ? supabase
-            .from("referral_leads")
-            .select("*")
-            .not("assigned_broker_id", "is", null)
-            .order("created_at", { ascending: false })
-        : supabase
-            .from("referral_leads")
-            .select("*")
-            .eq("assigned_broker_id", b.id)
-            .order("created_at", { ascending: false }),
+      mineQuery,
     ]);
 
     if (availRes.error) console.error("[BrokerPortal] available error:", availRes.error);

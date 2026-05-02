@@ -56,12 +56,19 @@ export default function BrokerLeadDetailPage() {
     if (!lead || !broker) return;
     setBusy("claim");
     const responseHours = (Date.now() - new Date(lead.created_at).getTime()) / 3600000;
-    const { error } = await supabase.from("referral_leads").update({
+    const { error, count } = await supabase.from("referral_leads").update({
       assigned_broker_id: broker.id,
       claimed_at: new Date().toISOString(),
       response_time_hours: Number(responseHours.toFixed(2)),
       status: "claimed",
-    }).eq("id", lead.id);
+    }, { count: 'exact' }).eq("id", lead.id).is("assigned_broker_id", null);
+    // If count is 0, someone else claimed it first
+    if (!error && count === 0) {
+      toast.error("This lead was already claimed by another broker.");
+      load();
+      setBusy(null);
+      return;
+    }
     setBusy(null);
     if (error) toast.error(error.message); else { toast.success("Lead claimed"); load(); }
   };

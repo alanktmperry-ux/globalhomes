@@ -57,7 +57,7 @@ const PartnerTrustPage = () => {
 
     const { data: accts } = await supabase
       .from('trust_accounts')
-      .select('id, account_name, account_type, balance, bsb, account_number, bank_name')
+      .select('id, account_name, account_type, current_balance, bsb, account_number, bank_name')
       .eq('agent_id', activeAgency.agentId)
       .order('created_at', { ascending: false });
 

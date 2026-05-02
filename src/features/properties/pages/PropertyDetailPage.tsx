@@ -1149,6 +1149,43 @@ export default function PropertyDetailPage() {
                 <Button size="sm" variant="outline" onClick={() => setMortgageOpen(true)}>{tp('property.finance.shortCta')}</Button>
               </div>
             )}
+            {property && !rawProperty?.is_off_market && property.suburb && (
+              <div className="mt-3 p-4 rounded-xl border border-amber-200 bg-amber-50">
+                <div className="flex gap-3">
+                  <div className="text-2xl shrink-0" aria-hidden>🔔</div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-slate-900">
+                      Get off-market properties in {property.suburb} first
+                    </p>
+                    <p className="text-xs text-slate-600 mt-1">
+                      Be notified about properties in {property.suburb}, {property.state} before they hit the market.
+                    </p>
+                    <button
+                      onClick={() => {
+                        if (isSubscribedToSuburb) {
+                          const sub = subscriptions.find(
+                            (s) => s.suburb === property.suburb && s.state === property.state
+                          );
+                          if (sub) removeSubscription(sub.id);
+                        } else {
+                          addSubscription({
+                            suburb: property.suburb,
+                            state: property.state,
+                          });
+                        }
+                      }}
+                      className={`mt-3 text-xs font-medium px-4 py-2 rounded-lg transition-colors ${
+                        isSubscribedToSuburb
+                          ? 'bg-amber-200 text-amber-800 hover:bg-amber-300'
+                          : 'bg-amber-500 text-white hover:bg-amber-600'
+                      }`}
+                    >
+                      {isSubscribedToSuburb ? '✓ Subscribed — click to remove' : 'Notify me of off-market listings'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
             {!isRental && (
               <div className="mt-3 p-4 rounded-xl border border-primary/20 bg-primary/5">
                 <p className="text-sm font-medium">{tp('property.conveyancer.title')}</p>

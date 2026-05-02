@@ -115,11 +115,12 @@ const ReportsPage = () => {
 
     const totalVolume = soldListings.reduce((sum, l) => sum + ((l as any).price || 0), 0);
 
-    const avgDom = listings.length > 0
-      ? Math.round(listings.reduce((sum, l) => {
+    const avgDom = soldListings.length > 0
+      ? Math.round(soldListings.reduce((sum, l) => {
           const listed = new Date((l as any).listed_date || (l as any).created_at);
-          return sum + Math.max(1, Math.round((Date.now() - listed.getTime()) / 86400000));
-        }, 0) / listings.length)
+          const sold = new Date((l as any).updated_at || (l as any).created_at);
+          return sum + Math.max(1, Math.round((sold.getTime() - listed.getTime()) / 86400000));
+        }, 0) / soldListings.length)
       : 0;
 
     // Monthly breakdown for chart

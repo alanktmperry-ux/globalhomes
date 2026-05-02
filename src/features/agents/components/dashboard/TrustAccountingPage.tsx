@@ -510,7 +510,19 @@ const TrustAccountingPage = () => {
     );
   }
 
-  if (accounts.length === 0) {
+  if (showRentRollWizard) {
+    return (
+      <div>
+        <DashboardHeader title="Trust Dashboard" subtitle="Migrate full rent roll from another system" />
+        <div className="p-4 sm:p-6">
+          <RentRollMigrationWizard
+            onComplete={() => { setShowRentRollWizard(false); fetchAccounts(); fetchTransactions(); }}
+            onCancel={() => setShowRentRollWizard(false)}
+          />
+        </div>
+      </div>
+    );
+  }
     return (
       <div>
         <DashboardHeader title="Trust Dashboard" subtitle="Australian trust account management" />

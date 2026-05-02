@@ -115,7 +115,7 @@ export default function BrokerLeadDetailPage() {
           <div className="flex-1">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h1 className="text-2xl font-bold text-slate-900">{lead.buyer_name || "Unnamed buyer"}</h1>
+                <h1 className="text-2xl font-bold text-slate-900">{isOwnedByMe ? (lead.buyer_name || "Unnamed buyer") : "Buyer (claim to see details)"}</h1>
                 <p className="text-sm text-slate-500">Created {timeAgo(lead.created_at)}</p>
               </div>
               <Badge variant="outline" className={sb.className}>{sb.label}</Badge>
@@ -144,7 +144,7 @@ export default function BrokerLeadDetailPage() {
           </div>
         </section>
 
-        {lead.message && (
+        {lead.message && isOwnedByMe && (
           <section>
             <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Message from buyer</h3>
             <p className="text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-md p-3 whitespace-pre-wrap">{lead.message}</p>

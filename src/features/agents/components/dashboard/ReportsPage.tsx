@@ -90,6 +90,28 @@ const StatCard = ({ icon: Icon, label, value, sub, color = 'bg-primary/10 text-p
 // ──────────────────────────────────────────────
 // Main Component
 // ──────────────────────────────────────────────
+interface Tenancy {
+  id: string;
+  tenant_name?: string;
+  tenant_phone?: string;
+  rent_amount?: number;
+  rent_frequency?: string;
+  status?: string;
+  rent_paid_to_date?: string;
+  lease_end?: string;
+  properties?: { address?: string; suburb?: string; state?: string } | null;
+}
+
+interface TrustReceipt {
+  amount?: number;
+  date_received?: string;
+}
+
+interface TrustPayment {
+  amount?: number;
+  date_paid?: string;
+}
+
 const ReportsPage = () => {
   const { canAccessTrust, loading: subLoading } = useSubscription();
   const { listings } = useAgentListings();

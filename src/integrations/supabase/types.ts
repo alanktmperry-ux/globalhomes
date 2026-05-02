@@ -842,6 +842,7 @@ export type Database = {
           seat_limit: number
           subscription_end: string | null
           subscription_start: string
+          trial_ends_at: string | null
           updated_at: string
         }
         Insert: {
@@ -858,6 +859,7 @@ export type Database = {
           seat_limit?: number
           subscription_end?: string | null
           subscription_start?: string
+          trial_ends_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -874,6 +876,7 @@ export type Database = {
           seat_limit?: number
           subscription_end?: string | null
           subscription_start?: string
+          trial_ends_at?: string | null
           updated_at?: string
         }
         Relationships: [

@@ -46,6 +46,7 @@ export interface SubscriptionState extends PlanFeatures, PlanLimits {
   isEnterprise: boolean;
   isPaid: boolean;
   subscriptionEnd: string | null;
+  trialEndsAt: string | null;
   autoRenew: boolean;
   loading: boolean;
   subLoadingTimeout: boolean;
@@ -116,6 +117,7 @@ export function useSubscription(): SubscriptionState {
     isEnterprise: false,
     isPaid: false,
     subscriptionEnd: null,
+    trialEndsAt: null,
     autoRenew: false,
     loading: true,
     subLoadingTimeout: false,
@@ -166,6 +168,7 @@ export function useSubscription(): SubscriptionState {
           isEnterprise: normalPlan === 'enterprise',
           isPaid: normalPlan !== 'demo',
           subscriptionEnd: (sub as any)?.subscription_end ?? null,
+          trialEndsAt: (sub as any)?.trial_ends_at ?? null,
           autoRenew: (sub as any)?.auto_renew ?? false,
           loading: false,
           subLoadingTimeout: false,

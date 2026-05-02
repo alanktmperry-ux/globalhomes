@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import AdminReports from '@/features/admin/components/AdminReports';
-import { CreditCard, Check, Loader2, Mail, Users, UserMinus, Sparkles } from 'lucide-react';
+import { CreditCard, Check, Loader2, Mail, Users, UserMinus, Sparkles, AlertTriangle, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -80,7 +80,8 @@ const PLANS: PlanDef[] = [
       '15 featured listings/month',
       '3 premium listings/month',
       'Unlimited pocket listings',
-      'Full trust accounting + bank reconciliation + Xero',
+      'Full trust accounting + bank reconciliation',
+      'Xero integration (Coming Soon)',
       'Mortgage broker partner widget on listings',
       'Priority AI matching + lead analytics',
       'Agency-branded profile page',
@@ -238,10 +239,51 @@ const BillingPage = () => {
     : sub.plan === 'demo' ? 'Demo'
     : sub.plan ? sub.plan.charAt(0).toUpperCase() + sub.plan.slice(1) : 'Demo';
 
+  // Trial countdown — derive from sub.trialEndsAt (set when an agent is on demo/trial).
+  const trialDaysLeft = sub.trialEndsAt
+    ? Math.ceil((new Date(sub.trialEndsAt).getTime() - Date.now()) / 86400000)
+    : null;
+  const showTrialBanner = trialDaysLeft !== null && trialDaysLeft <= 14 && trialDaysLeft >= 0;
+  const isUrgentTrial = trialDaysLeft !== null && trialDaysLeft <= 3;
+
+  const scrollToPlans = () => {
+    document.getElementById('plan-selector')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
     <div>
       <DashboardHeader title="Subscription & Billing" subtitle="Manage your plan and payment" />
       <div className="p-4 sm:p-6 max-w-5xl space-y-6">
+
+        {/* Trial countdown banner */}
+        {showTrialBanner && (
+          <div
+            role="alert"
+            className={`flex items-center gap-3 rounded-xl border p-4 ${
+              isUrgentTrial
+                ? 'bg-destructive/10 border-destructive/30 text-destructive'
+                : 'bg-amber-500/10 border-amber-500/30 text-amber-700'
+            }`}
+          >
+            <span className="relative flex h-2.5 w-2.5 shrink-0">
+              {isUrgentTrial && (
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75" />
+              )}
+              <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${isUrgentTrial ? 'bg-destructive' : 'bg-amber-500'}`} />
+            </span>
+            {isUrgentTrial ? <AlertTriangle size={16} /> : <Clock size={16} />}
+            <p className="text-sm font-medium flex-1">
+              Your free trial ends in <strong>{trialDaysLeft} day{trialDaysLeft === 1 ? '' : 's'}</strong> — upgrade now to keep access.
+            </p>
+            <Button
+              size="sm"
+              variant={isUrgentTrial ? 'destructive' : 'default'}
+              onClick={scrollToPlans}
+            >
+              Upgrade Now
+            </Button>
+          </div>
+        )}
 
         {/* Current Plan */}
         <div className="bg-card border border-border rounded-xl p-5 space-y-4">
@@ -292,7 +334,7 @@ const BillingPage = () => {
         </div>
 
         {/* Plan cards */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div id="plan-selector" className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {PLANS.map(plan => {
             const isCurrent = sub.plan === plan.id;
             const planIdx = PLAN_ORDER.indexOf(plan.id);

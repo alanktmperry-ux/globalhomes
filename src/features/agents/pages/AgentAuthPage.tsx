@@ -27,6 +27,7 @@ const AgentAuthPage = () => {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [pendingSignIn, setPendingSignIn] = useState(false);
   const [dataLocationConsent, setDataLocationConsent] = useState(false);
+  const [policyConsent, setPolicyConsent] = useState(false);
 
   // ── All useRef hooks ──
   const captchaRef = useRef<HCaptcha>(null);
@@ -104,6 +105,10 @@ const AgentAuthPage = () => {
     if (!regEmail.trim()) return;
     if (!dataLocationConsent) {
       toast.error('Please acknowledge where your data is stored to continue.');
+      return;
+    }
+    if (!policyConsent) {
+      toast.error('Please agree to the Privacy Policy and Terms of Service to continue.');
       return;
     }
     setEmailSubmitting(true);
@@ -393,7 +398,21 @@ const AgentAuthPage = () => {
                     I understand my data is stored on secure servers in Singapore. ListHQ complies with the Australian Privacy Act 1988.
                   </span>
                 </label>
-                <button type="submit" disabled={emailSubmitting || !dataLocationConsent} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
+                <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={policyConsent}
+                    onChange={(e) => setPolicyConsent(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-stone-300 text-primary focus:ring-primary cursor-pointer shrink-0"
+                  />
+                  <span className="text-xs text-muted-foreground leading-relaxed">
+                    I agree to the{' '}
+                    <Link to="/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">Privacy Policy</Link>
+                    {' '}and{' '}
+                    <Link to="/terms" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">Terms of Service</Link>.
+                  </span>
+                </label>
+                <button type="submit" disabled={emailSubmitting || !dataLocationConsent || !policyConsent} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
                   {emailSubmitting ? 'Sending confirmation...' : 'Continue — confirm my email'}
                 </button>
                 <p className="text-xs text-muted-foreground mt-3 text-center leading-relaxed">

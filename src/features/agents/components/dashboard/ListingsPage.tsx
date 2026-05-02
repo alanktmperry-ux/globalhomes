@@ -12,6 +12,7 @@ const PipelinePage = lazy(() => import('./PipelinePage'));
 import DashboardHeader from './DashboardHeader';
 import { useAgentListings, type AgentListing } from '@/features/agents/hooks/useAgentListings';
 import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
+import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import { PropertyDrawer } from '@/features/properties/components/PropertyDrawer';
 import { Property } from '@/shared/lib/types';
 import { supabase } from '@/integrations/supabase/client';
@@ -212,6 +213,7 @@ const StatusTabs = ({
 
 const ListingsPage = () => {
   const navigate = useNavigate();
+  const sub = useSubscription();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialView: 'list' | 'pipeline' =
     searchParams.get('view') === 'pipeline'
@@ -435,6 +437,20 @@ const ListingsPage = () => {
             <div className="flex items-center gap-2 mb-4 p-3 rounded-xl bg-primary/5 border border-primary/10 text-xs text-muted-foreground">
               <Info size={14} className="text-primary shrink-0" />
               <span>Showing demo listings. Create your first listing to see real data here.</span>
+            </div>
+          )}
+
+          {/* Solo plan listing-cap nudge — non-blocking. Triggers at >= 3 active listings on Solo,
+              and stays visible until the agent upgrades. Uses the live plan limit from useSubscription. */}
+          {sub.plan === 'solo' && activeListings.length >= 3 && sub.listingLimit !== Infinity && (
+            <div className="flex items-center gap-3 mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700">
+              <Info size={14} className="shrink-0" />
+              <p className="text-xs flex-1">
+                You're using <strong>{activeListings.length}/{sub.listingLimit}</strong> listings on your Solo plan. Upgrade to Pro for unlimited listings.
+              </p>
+              <Button size="sm" variant="default" onClick={() => navigate('/dashboard/billing')} className="text-xs h-7">
+                Upgrade
+              </Button>
             </div>
           )}
 

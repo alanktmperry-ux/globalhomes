@@ -268,7 +268,7 @@ export async function sendInboxMessage(opts: {
         },
       });
     } catch (e) {
-      console.error('[sendInboxMessage] email dispatch failed', e);
+      if (import.meta.env.DEV) console.error('[sendInboxMessage] email dispatch failed', e);
     }
   }
 

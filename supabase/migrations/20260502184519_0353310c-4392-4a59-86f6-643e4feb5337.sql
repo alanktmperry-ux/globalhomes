@@ -1,0 +1,1 @@
+ALTER TABLE public.owner_statements ADD COLUMN IF NOT EXISTS management_fee_gst_aud NUMERIC(10,2) DEFAULT 0;

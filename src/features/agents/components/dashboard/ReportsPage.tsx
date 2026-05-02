@@ -95,13 +95,124 @@ const ReportsPage = () => {
   const { listings } = useAgentListings();
   const { accounts, transactions } = useTrustAccounting();
   const { contacts } = useContacts();
+  const { agent } = useCurrentAgent();
 
   const [activeTab, setActiveTab] = useState('sales');
   const [period, setPeriod] = useState<Period>('90d');
   const [customFrom, setCustomFrom] = useState<Date>();
   const [customTo, setCustomTo] = useState<Date>();
 
+  // Rent roll / arrears / reconciliation data
+  const [tenancies, setTenancies] = useState<any[]>([]);
+  const [propertiesCount, setPropertiesCount] = useState(0);
+  const [trustReceipts, setTrustReceipts] = useState<any[]>([]);
+  const [trustPayments, setTrustPayments] = useState<any[]>([]);
+  const [bankBalances, setBankBalances] = useState<Record<string, string>>({}); // 'YYYY-MM' -> manual input
+
+  useEffect(() => {
+    if (!agent?.id) return;
+    (async () => {
+      const [tRes, pRes, rRes, payRes] = await Promise.all([
+        supabase.from('tenancies').select(`
+          id, tenant_name, tenant_phone, rent_amount, rent_frequency, status,
+          rent_paid_to_date, lease_end,
+          properties:property_id ( address, suburb, state )
+        `).eq('agent_id', agent.id),
+        supabase.from('properties').select('id', { count: 'exact', head: true }).eq('agent_id', agent.id),
+        supabase.from('trust_receipts').select('amount, date_received').eq('agent_id', agent.id),
+        supabase.from('trust_payments').select('amount, date_paid').eq('agent_id', agent.id),
+      ]);
+      setTenancies(tRes.data || []);
+      setPropertiesCount(pRes.count || 0);
+      setTrustReceipts(rRes.data || []);
+      setTrustPayments(payRes.data || []);
+    })();
+  }, [agent?.id]);
+
   const range = useMemo(() => getDateRange(period, customFrom, customTo), [period, customFrom, customTo]);
+
+  // ─── Rent Roll Summary KPIs ───
+  const rentRollSummary = useMemo(() => {
+    const active = tenancies.filter(t => t.status === 'active');
+    // Normalize to weekly
+    const weeklyTotal = active.reduce((sum, t) => {
+      const amt = Number(t.rent_amount || 0);
+      const freq = t.rent_frequency || 'weekly';
+      const weekly = freq === 'fortnightly' ? amt / 2
+        : freq === 'monthly' ? (amt * 12) / 52
+        : freq === 'yearly' ? amt / 52
+        : amt;
+      return sum + weekly;
+    }, 0);
+    const tenantedPropertyIds = new Set(active.map(t => (t.properties as any)?.address ? t.id : t.id));
+    const totalProps = propertiesCount;
+    const occupied = active.length;
+    const vacancyRate = totalProps > 0 ? Math.max(0, ((totalProps - occupied) / totalProps) * 100) : 0;
+    return { totalProps, weeklyTotal, vacancyRate };
+  }, [tenancies, propertiesCount]);
+
+  // ─── Arrears (rent paid_to < today) ───
+  const arrearsRows = useMemo(() => {
+    const today = new Date();
+    return tenancies
+      .filter(t => t.status === 'active' && t.rent_paid_to_date && new Date(t.rent_paid_to_date) < today)
+      .map(t => {
+        const paidTo = new Date(t.rent_paid_to_date);
+        const daysOverdue = Math.max(0, differenceInDays(today, paidTo));
+        const freq = t.rent_frequency || 'weekly';
+        const amt = Number(t.rent_amount || 0);
+        const weekly = freq === 'fortnightly' ? amt / 2
+          : freq === 'monthly' ? (amt * 12) / 52
+          : freq === 'yearly' ? amt / 52
+          : amt;
+        const owing = Math.round((daysOverdue / 7) * weekly * 100) / 100;
+        const prop = (t.properties as any) || {};
+        const addr = [prop.address, prop.suburb, prop.state].filter(Boolean).join(', ');
+        return {
+          id: t.id,
+          tenant_name: t.tenant_name || '—',
+          address: addr || '—',
+          daysOverdue,
+          owing,
+          paidTo: t.rent_paid_to_date,
+          phone: t.tenant_phone || '',
+        };
+      })
+      .sort((a, b) => b.daysOverdue - a.daysOverdue);
+  }, [tenancies]);
+
+  // ─── Trust Reconciliation (per month, last 12 months) ───
+  const reconciliationRows = useMemo(() => {
+    const months = eachMonthOfInterval({ start: subMonths(new Date(), 11), end: new Date() });
+    let opening = 0;
+    return months.map(m => {
+      const start = startOfMonth(m);
+      const end = endOfMonth(m);
+      const receipts = trustReceipts
+        .filter(r => r.date_received && isWithinInterval(new Date(r.date_received), { start, end }))
+        .reduce((s, r) => s + Number(r.amount || 0), 0);
+      const payments = trustPayments
+        .filter(p => p.date_paid && isWithinInterval(new Date(p.date_paid), { start, end }))
+        .reduce((s, p) => s + Number(p.amount || 0), 0);
+      const closing = opening + receipts - payments;
+      const key = format(m, 'yyyy-MM');
+      const bank = bankBalances[key];
+      const bankNum = bank !== undefined && bank !== '' ? Number(bank) : null;
+      const variance = bankNum != null ? bankNum - closing : null;
+      const row = {
+        key,
+        monthLabel: format(m, 'MMM yyyy'),
+        opening,
+        receipts,
+        payments,
+        closing,
+        bankNum,
+        variance,
+      };
+      opening = closing;
+      return row;
+    });
+  }, [trustReceipts, trustPayments, bankBalances]);
 
   // ─── SALES DATA ───
   const salesData = useMemo(() => {

@@ -34,6 +34,14 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Cron-secret guard — this is a maintenance/cron endpoint
+  if (req.headers.get("x-cron-secret") !== Deno.env.get("CRON_SECRET")) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   const apiKey = Deno.env.get("GOOGLE_MAPS_API_KEY");
   if (!apiKey) {
     return new Response(

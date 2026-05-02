@@ -231,6 +231,7 @@ const ContactsPage = () => {
             pipelineType={pipelineType}
             onUpdateContact={updateContact}
             onSelect={setSelectedContact}
+            addActivity={addActivity}
           />
         )}
 

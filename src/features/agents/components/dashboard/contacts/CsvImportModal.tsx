@@ -43,6 +43,7 @@ const CsvImportModal = ({ onClose, onImport }: Props) => {
   const [fileName, setFileName] = useState('');
   const [importing, setImporting] = useState(false);
   const [error, setError] = useState('');
+  const [importSource, setImportSource] = useState('csv_import');
 
   const parseCsv = (text: string) => {
     const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
@@ -104,7 +105,8 @@ const CsvImportModal = ({ onClose, onImport }: Props) => {
   const handleImport = async () => {
     setImporting(true);
     try {
-      await onImport(parsed);
+      const rowsWithSource = parsed.map(r => ({ ...r, source: importSource }));
+      await onImport(rowsWithSource);
     } catch (err) {
       setError('Import failed. Please try again.');
     } finally {
@@ -183,6 +185,22 @@ const CsvImportModal = ({ onClose, onImport }: Props) => {
                     )}
                   </tbody>
                 </table>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <label className="text-sm font-medium whitespace-nowrap">Import source:</label>
+                <select
+                  value={importSource}
+                  onChange={(e) => setImportSource(e.target.value)}
+                  className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 flex-1"
+                >
+                  <option value="csv_import">General CSV import</option>
+                  <option value="open_home">Open home sign-in</option>
+                  <option value="rea_enquiry">REA enquiry export</option>
+                  <option value="domain_enquiry">Domain enquiry export</option>
+                  <option value="referral">Referral list</option>
+                  <option value="cold_call">Cold call list</option>
+                </select>
               </div>
 
               <div className="flex justify-end gap-2">

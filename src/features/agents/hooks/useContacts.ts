@@ -229,6 +229,13 @@ export function useContacts() {
       activity_type: activityType,
       description,
     } as any);
+    // Auto-update last_contacted_at for direct contact activities
+    if (['call', 'email', 'sms', 'meeting'].includes(activityType)) {
+      await supabase
+        .from('contacts')
+        .update({ last_contacted_at: new Date().toISOString() } as any)
+        .eq('id', contactId);
+    }
   };
 
   const getActivities = async (contactId: string): Promise<ContactActivity[]> => {

@@ -1,40 +1,17 @@
 import { supabase } from '@/integrations/supabase/client';
 
-let cachedApiKey: string | null = null;
-let keyPromise: Promise<string> | null = null;
-
-const STORAGE_KEY = 'gmaps_api_key';
-const STORAGE_EXPIRY_KEY = 'gmaps_api_key_exp';
-const CACHE_DURATION = 1000 * 60 * 60 * 24; // 24 hours
+// Browser-loadable Google Maps key. This MUST be a referrer-restricted public key
+// (HTTP referrers limited to listhq.com.au, globalhomes.lovable.app, localhost).
+// It is intentionally embedded in the client bundle — referrer restrictions on the
+// Google Cloud key are what enforce security, not secrecy of the string itself.
+// The unrestricted server key lives only in the google-maps-proxy edge function.
+const BROWSER_MAPS_KEY = (import.meta.env.VITE_GOOGLE_MAPS_BROWSER_KEY as string | undefined) ?? '';
 
 export async function getGoogleMapsApiKey(): Promise<string> {
-  if (keyPromise) return keyPromise;
-  if (cachedApiKey) return cachedApiKey;
-
-  // Check localStorage cache
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    const expiry = localStorage.getItem(STORAGE_EXPIRY_KEY);
-    if (stored && expiry && Date.now() < Number(expiry)) {
-      cachedApiKey = stored;
-      return stored;
-    }
-  } catch {}
-
-  keyPromise = supabase.functions
-    .invoke('google-maps-proxy', { body: { action: 'get_key' } })
-    .then(({ data, error }) => {
-      if (error || !data?.key) throw new Error('Failed to get Google Maps API key');
-      cachedApiKey = data.key;
-      try {
-        localStorage.setItem(STORAGE_KEY, data.key);
-        localStorage.setItem(STORAGE_EXPIRY_KEY, String(Date.now() + CACHE_DURATION));
-      } catch {}
-      return data.key as string;
-    })
-    .finally(() => { keyPromise = null; });
-
-  return keyPromise;
+  if (!BROWSER_MAPS_KEY) {
+    throw new Error('Google Maps browser key is not configured (VITE_GOOGLE_MAPS_BROWSER_KEY).');
+  }
+  return BROWSER_MAPS_KEY;
 }
 
 export async function autocomplete(input: string, types?: string): Promise<{ description: string; place_id: string }[]> {

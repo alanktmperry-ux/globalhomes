@@ -19,28 +19,16 @@ Deno.serve(async (req) => {
   try {
     const { action, input, input_types } = await req.json();
 
+    // NOTE: The `get_key` action has been removed for security.
+    // The unrestricted server-side API key must never be returned to the browser.
+    // For client-side Maps JS SDK loading, use a separate referrer-restricted
+    // browser key embedded in the frontend bundle.
     if (action === 'get_key') {
-      const origin = req.headers.get('Origin') ?? '';
-      const referer = req.headers.get('Referer') ?? '';
-      const ALLOWED_ORIGINS = [
-        'https://globalhomes.lovable.app',
-        'https://listhq.com.au',
-        'http://localhost:8080',
-        'http://localhost:5173',
-      ];
-      const allowed = ALLOWED_ORIGINS.some(o => origin.startsWith(o) || referer.startsWith(o));
-      if (!allowed) {
-        return new Response(JSON.stringify({ error: 'Forbidden' }), {
-          status: 403,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      return new Response(JSON.stringify({ key: apiKey }), {
+      return new Response(JSON.stringify({ error: 'This action has been removed. Use server-side geocode/place_details/autocomplete instead.' }), {
+        status: 410,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
-
-    if (action === 'autocomplete') {
       const types = input_types || '(regions)';
       const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&types=${encodeURIComponent(types)}&key=${apiKey}`;
       const res = await fetch(url);

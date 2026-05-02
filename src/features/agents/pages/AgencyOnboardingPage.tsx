@@ -17,6 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
 import TrustImportWizard from '@/features/agents/components/dashboard/TrustImportWizard';
+import RentRollMigrationWizard from '@/features/agents/components/dashboard/RentRollMigrationWizard';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { capture } from '@/shared/lib/posthog';
 

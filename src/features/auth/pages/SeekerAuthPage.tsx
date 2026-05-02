@@ -109,7 +109,7 @@ const SeekerAuthPage = () => {
       if (upErr) {
         const msg = upErr.message || '';
         if (/registered|exists/i.test(msg)) {
-          setError('An account with this email already exists. Try signing in.');
+          setError('Could not create account. If you already have an account, try signing in.');
         } else {
           setError(msg || 'Could not create account. Please try again.');
         }

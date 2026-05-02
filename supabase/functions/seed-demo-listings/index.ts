@@ -7,7 +7,7 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
-const AGENT_ID = '53fd551f-a2de-4dbe-ab25-7045bf641e55';
+const AGENT_ID = Deno.env.get('SEED_AGENT_ID');
 const TAG = 'demo_batch:alan_2026';
 
 const IMG = {
@@ -125,9 +125,17 @@ Deno.serve(async (req) => {
 
   const body = await req.json().catch(() => ({}));
 
-  if (body.secret !== 'listhq-seed-2026') {
+  const seedSecret = Deno.env.get('SEED_SECRET');
+  if (!seedSecret || body.secret !== seedSecret) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  if (!AGENT_ID) {
+    return new Response(JSON.stringify({ error: 'SEED_AGENT_ID is not configured' }), {
+      status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }

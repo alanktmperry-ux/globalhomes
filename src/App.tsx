@@ -268,7 +268,7 @@ const App = () => (
             <Sonner position="top-center" richColors closeButton duration={5000} />
              <ImpersonationBanner />
             <ScrollToTop />
-             <HelpWidget />
+             <AIChatWidget />
              <CookieConsentBanner />
              <Suspense fallback={<PageLoader />}>
               <Routes>

@@ -145,14 +145,14 @@ async function processArrears(supabase: ReturnType<typeof createClient>, agentFi
       // Days overdue: latest paid rent_payments row vs today
       const { data: payments } = await supabase
         .from("rent_payments")
-        .select("payment_date, amount, status, paid_to")
+        .select("payment_date, amount, status, period_to")
         .eq("tenancy_id", t.id)
         .order("payment_date", { ascending: false })
         .limit(50);
 
       const lastPaid = (payments ?? []).find((p: any) => p.status === "paid");
-      // "paid_to" is the date rent is paid up to; if missing, use last payment_date or lease_start
-      const paidTo = lastPaid?.paid_to ?? lastPaid?.payment_date ?? t.lease_start;
+      // "period_to" is the date rent is paid up to; if missing, use last payment_date or lease_start
+      const paidTo = lastPaid?.period_to ?? lastPaid?.payment_date ?? t.lease_start;
       if (!paidTo) continue;
       const daysOverdue = Math.floor((Date.now() - new Date(paidTo).getTime()) / 86400_000);
       if (daysOverdue <= 0) continue;

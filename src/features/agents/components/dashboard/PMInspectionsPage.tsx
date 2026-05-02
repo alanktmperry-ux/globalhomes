@@ -188,14 +188,21 @@ export default function PMInspectionsPage() {
     setLoading(true);
     const { data: agent } = await supabase
       .from('agents')
-      .select('id, full_name, agency_name')
+      .select('id, name, agency_id')
       .eq('user_id', user.id)
       .maybeSingle();
     if (!agent) { setLoading(false); return; }
     const aid = (agent as any).id as string;
     setAgentId(aid);
-    setAgentName((agent as any).full_name || '');
-    setAgencyName((agent as any).agency_name || '');
+    setAgentName((agent as any).name || '');
+    if ((agent as any).agency_id) {
+      const { data: agencyRow } = await supabase
+        .from('agencies')
+        .select('name')
+        .eq('id', (agent as any).agency_id)
+        .maybeSingle();
+      if (agencyRow?.name) setAgencyName(agencyRow.name);
+    }
 
     const [insRes, tensRes] = await Promise.all([
       supabase

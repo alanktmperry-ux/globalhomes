@@ -365,6 +365,37 @@ export default function BrokerPortal() {
                   ? "No leads available right now"
                   : "No leads assigned yet"}
               </div>
+            ) : activeTab === "available" ? (
+              <ul className="divide-y divide-slate-100">
+                {matchedAvailable.map((lead) => (
+                  <LeadRow
+                    key={lead.id}
+                    lead={lead}
+                    selected={selectedId === lead.id}
+                    onSelect={() => setSelectedId(lead.id)}
+                    showClaim
+                    claiming={claimingId === lead.id}
+                    onClaim={() => handleClaim(lead)}
+                    languageMatch
+                  />
+                ))}
+                {matchedAvailable.length > 0 && otherAvailable.length > 0 && (
+                  <li className="px-4 py-2 bg-slate-50 text-[10px] uppercase tracking-wide font-semibold text-slate-500 border-y border-slate-200">
+                    Other leads
+                  </li>
+                )}
+                {otherAvailable.map((lead) => (
+                  <LeadRow
+                    key={lead.id}
+                    lead={lead}
+                    selected={selectedId === lead.id}
+                    onSelect={() => setSelectedId(lead.id)}
+                    showClaim
+                    claiming={claimingId === lead.id}
+                    onClaim={() => handleClaim(lead)}
+                  />
+                ))}
+              </ul>
             ) : (
               <ul className="divide-y divide-slate-100">
                 {visibleLeads.map((lead) => (
@@ -373,7 +404,7 @@ export default function BrokerPortal() {
                     lead={lead}
                     selected={selectedId === lead.id}
                     onSelect={() => setSelectedId(lead.id)}
-                    showClaim={activeTab === "available"}
+                    showClaim={false}
                     claiming={claimingId === lead.id}
                     onClaim={() => handleClaim(lead)}
                   />

@@ -625,10 +625,10 @@ export const en = {
   'hero.commercial': 'Commercial',
   'hero.land': 'Land',
   'hero.buyerTileTitle': 'Looking for a home?',
-  'hero.buyerTileDesc': 'Search Australian property in 24 languages. Free, no signup.',
+  'hero.buyerTileDesc': 'Search Australian property in your language. Free, no signup required.',
   'hero.buyerTileCta': 'Browse properties →',
   'hero.agentTileTitle': 'Are you an agent?',
-  'hero.agentTileDesc': "List once, translated into 20 languages. Reach multilingual buyers REA and Domain can't. Free for 3 months.",
+  'hero.agentTileDesc': "List once, translated into 20 languages. Reach multilingual buyers REA and Domain can't. Free for 3 months — no credit card.",
   'hero.agentTileCta': 'See agent tools →',
 
   // Sort dropdown

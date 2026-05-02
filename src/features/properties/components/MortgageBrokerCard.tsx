@@ -203,31 +203,24 @@ export function MortgageBrokerCard({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchBroker = async () => {
-      // Fetch first active broker (public query - uses anon key, no RLS needed for read)
-      // We use the service-side approach: the Edge Function handles broker resolution.
-      // For the card display, we fetch via a simple select on brokers with is_active.
-      // Since RLS restricts to auth_user_id = auth.uid(), we need a different approach
-      // for the public-facing card. We'll use the Edge Function to get broker info,
-      // or we add a public read policy. For now, store broker info in the component
-      // after the first successful lead submission, or add a public RLS policy.
-      
-      // Simpler approach: call a lightweight edge function or use service role.
-      // For MVP, we'll try to read and if RLS blocks it, the card won't show.
-      const { data, error } = await supabase
-        .from("brokers_public_safe" as any)
-        .select("id, name, company, acl_number, photo_url, languages, tagline, calendar_url, is_founding_partner")
-        .order("id", { ascending: true })
-        .limit(1)
-        .maybeSingle();
+    const fetchBrokers = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("brokers_public_safe" as any)
+          .select("id, name, company, acl_number, photo_url, languages, tagline, calendar_url, is_founding_partner")
+          .order("name", { ascending: true });
 
-      if (!error && data) {
-        setBroker(data as unknown as BrokerData);
+        if (!error && data && data.length > 0) {
+          setBroker((data as unknown as BrokerData[])[0]);
+        }
+      } catch {
+        // network failure — broker stays null
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
-    fetchBroker();
+    fetchBrokers();
   }, []);
 
   // Don't render if no broker found or still loading

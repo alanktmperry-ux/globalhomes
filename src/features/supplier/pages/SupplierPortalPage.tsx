@@ -264,18 +264,28 @@ export default function SupplierPortalPage() {
             <Card className="p-6 text-center text-sm text-muted-foreground">No completed jobs yet.</Card>
           ) : (
             <div className="space-y-2">
-              {completed_jobs.map(c => (
-                <Card key={c.id} className="p-3 flex items-center justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium truncate">{c.title}</p>
-                    <p className="text-xs text-muted-foreground truncate">{c.property_address}</p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    {c.final_cost_aud != null && <p className="text-sm font-semibold">{AUD.format(Number(c.final_cost_aud))}</p>}
-                    {c.rating ? <StarRating rating={c.rating} size="sm"/> : <p className="text-[10px] text-muted-foreground">No rating</p>}
-                  </div>
-                </Card>
-              ))}
+              {completed_jobs.map(c => {
+                const pay = paymentsByJob[c.id];
+                return (
+                  <Card key={c.id} className="p-3 flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{c.title}</p>
+                      <p className="text-xs text-muted-foreground truncate">{c.property_address}</p>
+                      <div className="mt-1.5">
+                        {c.completed_at && (
+                          pay
+                            ? <Badge className="bg-emerald-500/10 text-emerald-700 text-[10px]">Paid {new Date(pay.paid_at).toLocaleDateString()}</Badge>
+                            : <Badge className="bg-amber-500/10 text-amber-700 text-[10px]">Payment Pending</Badge>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      {c.final_cost_aud != null && <p className="text-sm font-semibold">{AUD.format(Number(c.final_cost_aud))}</p>}
+                      {c.rating ? <StarRating rating={c.rating} size="sm"/> : <p className="text-[10px] text-muted-foreground">No rating</p>}
+                    </div>
+                  </Card>
+                );
+              })}
             </div>
           )}
         </section>

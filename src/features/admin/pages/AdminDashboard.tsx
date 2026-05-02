@@ -30,6 +30,16 @@ import ListingModerationQueue from '@/features/admin/components/ListingModeratio
 import AdminHelpFAQs from '@/features/admin/components/AdminHelpFAQs';
 import AdminBrokers from '@/features/admin/components/AdminBrokers';
 import AdminSidebar, { type AdminTab } from '@/features/admin/components/AdminSidebar';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 
 type Tab = AdminTab;
@@ -91,6 +101,9 @@ const AdminDashboard = () => {
   const [pendingDemoCount, setPendingDemoCount] = useState(0);
   const [pendingApprovalCount, setPendingApprovalCount] = useState(0);
   const [pendingModerationCount, setPendingModerationCount] = useState(0);
+  const [pendingRoleChange, setPendingRoleChange] = useState<{
+    userId: string; role: 'user' | 'agent' | 'admin'; action: 'add' | 'remove';
+  } | null>(null);
   useEffect(() => {
     if (!authLoading && (!user || !isAdmin)) {
       navigate('/login');

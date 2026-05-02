@@ -121,6 +121,73 @@ const TrustAccountingPage = () => {
     });
   }, [user]);
 
+  // ── Month-end close state ────────────────────────────────────
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1; // 1-12
+  const periodLabel = now.toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });
+  const [periodClosed, setPeriodClosed] = useState<{ closing_balance: number; closed_at: string } | null>(null);
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+  const [closingPeriod, setClosingPeriod] = useState(false);
+
+  const periodStart = useMemo(() => new Date(currentYear, currentMonth - 1, 1), [currentYear, currentMonth]);
+  const periodEnd = useMemo(() => new Date(currentYear, currentMonth, 1), [currentYear, currentMonth]);
+  const periodBalance = useMemo(() => {
+    return transactions
+      .filter(t => t.status !== 'voided')
+      .filter(t => {
+        const d = new Date(t.transaction_date);
+        return d >= periodStart && d < periodEnd;
+      })
+      .reduce((sum, t) => sum + (t.transaction_type === 'deposit' ? t.amount : -t.amount), 0);
+  }, [transactions, periodStart, periodEnd]);
+
+  const fetchPeriodStatus = useCallback(async () => {
+    if (!agent?.id) return;
+    const { data } = await supabase
+      .from('trust_account_balances' as any)
+      .select('closing_balance, closed_at, is_closed, trust_account_id, trust_accounts!inner(agent_id)')
+      .eq('period_year', currentYear)
+      .eq('period_month', currentMonth)
+      .eq('is_closed', true)
+      .eq('trust_accounts.agent_id', agent.id);
+    if (data && (data as any[]).length > 0) {
+      const rows = data as any[];
+      const total = rows.reduce((s, r) => s + Number(r.closing_balance || 0), 0);
+      setPeriodClosed({ closing_balance: total, closed_at: rows[0].closed_at });
+    } else {
+      setPeriodClosed(null);
+    }
+  }, [agent?.id, currentYear, currentMonth]);
+
+  useEffect(() => { fetchPeriodStatus(); }, [fetchPeriodStatus]);
+
+  const nextMonthLabel = useMemo(() => {
+    const d = new Date(currentYear, currentMonth, 1);
+    return d.toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });
+  }, [currentYear, currentMonth]);
+
+  const handleCloseMonth = async () => {
+    if (!agent?.id) return;
+    setClosingPeriod(true);
+    try {
+      const { data, error } = await (supabase.rpc as any)('close_trust_period', {
+        p_agent_id: agent.id,
+        p_year: currentYear,
+        p_month: currentMonth,
+      });
+      if (error) throw error;
+      const closing = Number(data) || 0;
+      toast.success(`${periodLabel} closed. ${nextMonthLabel} opening balance set to ${AUD.format(closing)}.`);
+      setShowCloseConfirm(false);
+      await fetchPeriodStatus();
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    } finally {
+      setClosingPeriod(false);
+    }
+  };
+
   const fetchPendingPayments = useCallback(async () => {
     if (!user) return;
     const { data } = await supabase

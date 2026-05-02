@@ -412,6 +412,11 @@ const ReportsPage = () => {
                     })}
                   </TableBody>
                 </Table>
+                {listings.length > 20 && (
+                  <p className="text-[11px] text-muted-foreground text-center py-2 border-t">
+                    Showing 20 of {listings.length} listings. Export CSV to see all.
+                  </p>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -520,6 +525,11 @@ const ReportsPage = () => {
                     ))}
                   </TableBody>
                 </Table>
+                {financialData.periodTx.length > 30 && (
+                  <p className="text-[11px] text-muted-foreground text-center py-2 border-t">
+                    Showing 30 of {financialData.periodTx.length} transactions. Export CSV to see all.
+                  </p>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

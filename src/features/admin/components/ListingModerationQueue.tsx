@@ -46,7 +46,7 @@ export default function ListingModerationQueue({ onPendingCountChange }: Props) 
       .order('created_at', { ascending: true });
 
     if (error) {
-      console.error('Failed to fetch pending listings:', error);
+      if (import.meta.env.DEV) console.error('Failed to fetch pending listings:', error);
       toast.error('Failed to load pending listings');
     }
     const rows = (data || []) as unknown as PendingListing[];

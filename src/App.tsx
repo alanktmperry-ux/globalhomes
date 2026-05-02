@@ -323,7 +323,7 @@ const App = () => (
                   <Route path="/exclusive" element={<ExclusiveLandingPage />} />
                   <Route path="/exclusive/listings" element={<ExclusiveListingsPage />} />
                   <Route path="/valuation" element={<ValuationPage />} />
-                  <Route path="/seeker/dashboard" element={<SeekerDashboard />} />
+                  <Route path="/seeker/dashboard" element={<ProtectedRoute><SeekerDashboard /></ProtectedRoute>} />
                   <Route path="/seeker/inbox" element={<ProtectedRoute><SeekerInbox /></ProtectedRoute>} />
                 </Route>
 
@@ -486,7 +486,7 @@ const App = () => (
 
                 {/* Support */}
                 <Route path="/support/login" element={<SupportLoginPage />} />
-                <Route path="/support" element={<SupportDashboardLayout />}>
+                <Route path="/support" element={<ProtectedRoute requireSupport><SupportDashboardLayout /></ProtectedRoute>}>
                   <Route index element={<Navigate to="/support/dashboard" replace />} />
                   <Route path="dashboard" element={<SupportTicketsWrapper />} />
                   <Route path="agents" element={<SupportAgentsView />} />

@@ -170,12 +170,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       toast.error('Warning: could not log impersonation exit');
     }
 
-    // Remove the server-side session row
-    if (user) {
+    // Remove only the current impersonation session row
+    if (user && impersonationSessionId) {
       await (supabase as any)
         .from('admin_impersonation_sessions')
         .delete()
-        .eq('admin_id', user.id);
+        .eq('id', impersonationSessionId);
     }
 
     setImpersonationSessionId(null);

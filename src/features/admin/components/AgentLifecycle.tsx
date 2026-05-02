@@ -285,7 +285,7 @@ export default function AgentLifecycle({ filter }: { filter?: string | null } = 
         supabase.from('leads').select('agent_id'),
         supabase.from('voice_searches').select('agent_id').limit(5000),
         supabase.from('contacts').select('agent_id').limit(5000),
-        supabase.from('trust_ledger_entries' as any).select('agent_id').limit(1000),
+        supabase.from('trust_receipts' as any).select('agent_id').limit(1000),
       ]);
 
       const notesRes = await supabase.from('agent_lifecycle_notes' as any).select('*').order('created_at', { ascending: false });
@@ -319,7 +319,9 @@ export default function AgentLifecycle({ filter }: { filter?: string | null } = 
       });
 
       const rows: AgentLifecycleRow[] = (agentsRes.data || []).map((a: any) => {
-        const planType = a.agent_subscriptions?.plan_type || null;
+        const planType = Array.isArray(a.agent_subscriptions)
+          ? a.agent_subscriptions[0]?.plan_type || null
+          : a.agent_subscriptions?.plan_type || null;
         const lastLogin = signInMap.get(a.id) || null;
         const daysSinceLogin = lastLogin ? Math.floor((now.getTime() - new Date(lastLogin).getTime()) / 86400000) : 999;
         const trialEnd = new Date(new Date(a.created_at).getTime() + 60 * 86400000);

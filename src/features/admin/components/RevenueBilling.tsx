@@ -253,9 +253,10 @@ export default function RevenueBilling() {
         const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59);
         const label = monthStart.toLocaleDateString('en-AU', { month: 'short', year: '2-digit' });
         const activePaidAtMonth = rows.filter(r => {
-          if (!r.isSubscribed) return false;
-          const start = r.subscriptionStart ? new Date(r.subscriptionStart) : new Date(0);
-          return start <= monthEnd;
+          if (!r.subscriptionStart) return false;
+          const start = new Date(r.subscriptionStart);
+          const end = r.subscriptionEnd ? new Date(r.subscriptionEnd) : null;
+          return start <= monthEnd && (!end || end > monthStart);
         });
         const mrr = activePaidAtMonth.reduce((s, r) => s + r.mrr, 0);
         const monthEvents = events.filter((e: any) => {
@@ -275,7 +276,7 @@ export default function RevenueBilling() {
       // Add-on revenue (last 30 days)
       try {
         const since = new Date(now.getTime() - 30 * 86400000).toISOString();
-        const { data: addonData } = await ((supabase as any).from('addon_purchases'))
+        const { data: addonData } = await supabase.from('addon_purchases' as any)
           .select('id, addon_type, amount_aud, created_at, agent_id')
           .gte('created_at', since)
           .order('created_at', { ascending: false })

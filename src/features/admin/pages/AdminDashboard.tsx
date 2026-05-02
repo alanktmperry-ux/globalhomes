@@ -30,6 +30,16 @@ import ListingModerationQueue from '@/features/admin/components/ListingModeratio
 import AdminHelpFAQs from '@/features/admin/components/AdminHelpFAQs';
 import AdminBrokers from '@/features/admin/components/AdminBrokers';
 import AdminSidebar, { type AdminTab } from '@/features/admin/components/AdminSidebar';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 
 type Tab = AdminTab;
@@ -91,6 +101,9 @@ const AdminDashboard = () => {
   const [pendingDemoCount, setPendingDemoCount] = useState(0);
   const [pendingApprovalCount, setPendingApprovalCount] = useState(0);
   const [pendingModerationCount, setPendingModerationCount] = useState(0);
+  const [pendingRoleChange, setPendingRoleChange] = useState<{
+    userId: string; role: 'user' | 'agent' | 'admin'; action: 'add' | 'remove';
+  } | null>(null);
   useEffect(() => {
     if (!authLoading && (!user || !isAdmin)) {
       navigate('/login');
@@ -151,17 +164,19 @@ const AdminDashboard = () => {
     });
 
     const signInMap = new Map<string, string | null>();
+    const emailMap = new Map<string, string | null>();
     try {
       const { callAdminFunction } = await import('@/features/admin/lib/adminApi');
       const adminData = await callAdminFunction('list_users');
       (adminData?.users || []).forEach((u: any) => {
         signInMap.set(u.id, u.last_sign_in_at || null);
+        emailMap.set(u.id, u.email || null);
       });
     } catch {}
 
     const userRows: UserRow[] = (profileData.data || []).map((p) => ({
       id: p.user_id,
-      email: p.display_name || 'Unknown',
+      email: emailMap.get(p.user_id) || p.display_name || 'Unknown',
       created_at: p.created_at,
       display_name: p.display_name || undefined,
       roles: roleMap.get(p.user_id) || ['user'],
@@ -232,9 +247,14 @@ const AdminDashboard = () => {
     setLoading(false);
   };
 
-  const handleRoleChange = async (userId: string, role: 'user' | 'agent' | 'admin', action: 'add' | 'remove') => {
-    const confirmed = window.confirm(`Are you sure you want to ${action} the "${role}" role for this user?`);
-    if (!confirmed) return;
+  const handleRoleChange = (userId: string, role: 'user' | 'agent' | 'admin', action: 'add' | 'remove') => {
+    setPendingRoleChange({ userId, role, action });
+  };
+
+  const performRoleChange = async () => {
+    if (!pendingRoleChange) return;
+    const { userId, role, action } = pendingRoleChange;
+    setPendingRoleChange(null);
 
     const currentAdminUserId = user?.id;
 
@@ -375,6 +395,23 @@ const AdminDashboard = () => {
           )}
         </div>
       </main>
+
+      <AlertDialog open={!!pendingRoleChange} onOpenChange={(open) => { if (!open) setPendingRoleChange(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {pendingRoleChange?.action === 'add' ? 'Grant' : 'Revoke'} role "{pendingRoleChange?.role}"?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to {pendingRoleChange?.action} the "{pendingRoleChange?.role}" role for this user?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={performRoleChange}>Confirm</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
     </div>
   );

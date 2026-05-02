@@ -15,6 +15,7 @@ import LeadUrgencySettings from './LeadUrgencySettings';
 import PipelineStagesSettings from './PipelineStagesSettings';
 import MessageTemplatesSettings from './MessageTemplatesSettings';
 import NotificationPreferencesSettings from './NotificationPreferencesSettings';
+import { MFAManager } from '@/features/auth/components/MFAManager';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface AgentProfile {

@@ -440,7 +440,7 @@ export const en = {
   'home.howItWorks.step3.desc': 'Message agents directly through WeChat, WhatsApp, or LINE. No language barrier.',
   'home.agents.eyebrow': 'For agents',
   'home.agents.headline': 'The platform built for multicultural Australia.',
-  'home.agents.sub': 'CRM, listings, property management, AI tools — all in one place. In 20 languages.',
+  'home.agents.sub': 'Every listing, every email, every touchpoint — automatically translated into 20 languages. No plugins, no extra work.',
   'home.agents.cta': 'Start free trial',
   'home.agents.founding': 'Free for 3 months',
   'home.agents.freeTagSub': 'No credit card required. Full access.',

@@ -475,7 +475,7 @@ function StatChip({ label, value, tone }: { label: string; value: number; tone: 
 }
 
 function LeadRow({
-  lead, selected, onSelect, showClaim, claiming, onClaim,
+  lead, selected, onSelect, showClaim, claiming, onClaim, languageMatch,
 }: {
   lead: Lead;
   selected: boolean;
@@ -483,6 +483,7 @@ function LeadRow({
   showClaim?: boolean;
   claiming?: boolean;
   onClaim?: () => void;
+  languageMatch?: boolean;
 }) {
   const langMeta = getLanguageMeta(lead.buyer_language);
   const isNonEnglish = !!langMeta && langMeta.label !== "English";

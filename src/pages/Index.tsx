@@ -852,7 +852,7 @@ const Index = () => {
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={pageTitle} />
       <meta name="twitter:description" content={pageDescription} />
-      <meta name="twitter:image" content="https://listhq.com.au/listhq-og.png" />
+      <meta name="twitter:image" content="https://listhq.com.au/og-image.png" />
       <link rel="canonical" href="https://listhq.com.au" />
       <script type="application/ld+json">{JSON.stringify({
         "@context": "https://schema.org",

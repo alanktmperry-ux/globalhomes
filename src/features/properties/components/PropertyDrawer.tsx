@@ -199,7 +199,7 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searc
                       <div key={i} className="flex-[0_0_100%] min-w-0 h-full">
                         <img
                           src={img}
-                          alt={`${property.title} - Photo ${i + 1}`}
+                          alt="Property photo"
                           className="w-full h-full object-cover transition-transform duration-200"
                           style={{ transform: `scale(${zoomScale})` }}
                           loading={i === 0 ? 'eager' : 'lazy'}

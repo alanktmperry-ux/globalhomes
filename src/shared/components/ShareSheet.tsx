@@ -156,7 +156,7 @@ export function ShareSheet({ property, open, onClose }: ShareSheetProps) {
                 {thumb && (
                   <img
                     src={thumb}
-                    alt={property.title}
+                    alt=""
                     className="w-14 h-14 rounded-lg object-cover shrink-0"
                   />
                 )}

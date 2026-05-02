@@ -206,7 +206,7 @@ const TenantPortalPage = () => {
                 {(agent.profile_photo_url || agent.avatar_url) && (
                   <img
                     src={agent.profile_photo_url || agent.avatar_url}
-                    alt={agent.name}
+                    alt="Property photo"
                     className="w-14 h-14 rounded-full object-cover"
                   />
                 )}

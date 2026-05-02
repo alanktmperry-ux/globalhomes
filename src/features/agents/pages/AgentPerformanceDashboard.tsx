@@ -468,7 +468,7 @@ export default function AgentPerformanceDashboard() {
                             {listing.imageUrl && (
                               <img
                                 src={listing.imageUrl}
-                                alt=""
+                                alt={listing.title ?? 'Agent'}
                                 className="w-10 h-10 rounded-lg object-cover shrink-0"
                               />
                             )}

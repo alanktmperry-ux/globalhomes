@@ -1521,7 +1521,7 @@ const Index = () => {
                           {img ? (
                             <img
                               src={img}
-                              alt={p.title || p.address}
+                              alt=""
                               className="w-full h-full object-cover"
                               loading={isPriority ? 'eager' : 'lazy'}
                               fetchPriority={isPriority ? 'high' : 'auto'}

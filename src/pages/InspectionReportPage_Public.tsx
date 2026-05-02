@@ -371,7 +371,7 @@ export default function InspectionReportPublic() {
                           >
                             <img
                               src={photo.photo_url}
-                              alt={photo.caption || room.room_name}
+                              alt="Inspection photo"
                               className="h-full w-full object-cover"
                               loading="lazy"
                             />

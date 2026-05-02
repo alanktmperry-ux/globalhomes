@@ -242,6 +242,8 @@ const ListingBuyerLeadsTab = ({ listing }: Props) => {
           })}
         </div>
       )}
+
+      <BuyerQuestionsSection listingId={listing.id} />
     </div>
   );
 };

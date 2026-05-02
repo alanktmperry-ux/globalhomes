@@ -10,6 +10,7 @@ import { Flame, Thermometer, Snowflake, Phone, Mail, UserPlus, CheckCircle2, Loa
 import { calcIntentScore, getIntentTier, INTENT_TOOLTIP } from '@/features/agents/lib/intentScore';
 import { useSaveContact } from '@/features/agents/hooks/useSaveContact';
 import { toast } from 'sonner';
+import BuyerQuestionsSection from './BuyerQuestionsSection';
 
 const AU_DATE = (d: string) => {
   const date = new Date(d);

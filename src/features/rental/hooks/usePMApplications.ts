@@ -9,6 +9,19 @@ interface PMApplication {
   created_at: string;
   applicant_name?: string;
   property_id?: string;
+  full_name?: string;
+  email?: string;
+  phone?: string;
+  annual_income?: number;
+  employment_status?: string;
+  move_in_date?: string;
+  occupants?: number;
+  has_pets?: boolean;
+  submitted_at?: string;
+  bond_collected_at?: string;
+  bond_lodged_at?: string;
+  bond_lodgement_ref?: string;
+  [key: string]: unknown;
 }
 
 export function usePMApplications(propertyId: string) {

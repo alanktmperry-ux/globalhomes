@@ -523,6 +523,8 @@ const TrustAccountingPage = () => {
       </div>
     );
   }
+
+  if (accounts.length === 0) {
     return (
       <div>
         <DashboardHeader title="Trust Dashboard" subtitle="Australian trust account management" />

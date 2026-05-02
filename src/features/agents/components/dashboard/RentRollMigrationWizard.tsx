@@ -1201,7 +1201,7 @@ interface UploadCardProps {
   rows: Record<string, string>[];
   headers: string[];
   inputId: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  icon: React.ElementType;
   onFile: (f: File) => void;
   onTemplate: () => void;
 }

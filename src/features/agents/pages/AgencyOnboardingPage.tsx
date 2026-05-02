@@ -1269,14 +1269,32 @@ export default function AgencyOnboardingPage() {
         <div className="space-y-5">
           <div className="text-center space-y-1 mb-4">
             <Upload size={32} className="mx-auto text-primary" />
-            <h3 className="text-base font-bold">Import your opening balance</h3>
+            <h3 className="text-base font-bold">Import from your old system</h3>
             <p className="text-xs text-muted-foreground">
-              Use the Trust Import Wizard to bring in your existing trust data
+              Choose how much you want to migrate
             </p>
           </div>
-          <Button className="w-full gap-2" onClick={() => setShowWizard(true)}>
-            <Upload size={14} /> Open Trust Import Wizard
-          </Button>
+          <div className="space-y-3">
+            <button
+              onClick={() => setShowRentRollWizard(true)}
+              className="w-full text-left rounded-lg border-2 border-primary bg-primary/5 p-4 hover:bg-primary/10 transition-colors"
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-sm font-bold">Full Rent Roll Migration</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary text-primary-foreground font-semibold">RECOMMENDED</span>
+              </div>
+              <p className="text-xs text-muted-foreground">Properties, tenancies, owners, tenants, bonds, fees and trust balances — everything in one go.</p>
+            </button>
+            <button
+              onClick={() => setShowWizard(true)}
+              className="w-full text-left rounded-lg border p-4 hover:border-primary/50 transition-colors"
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-sm font-bold">Trust Ledger Only</span>
+              </div>
+              <p className="text-xs text-muted-foreground">Just the opening trust balance and transaction ledger — for if you'll add properties manually later.</p>
+            </button>
+          </div>
           <Separator />
           <div className="text-center space-y-2">
             <p className="text-xs text-muted-foreground">

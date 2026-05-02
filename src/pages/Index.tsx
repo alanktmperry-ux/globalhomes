@@ -1299,6 +1299,51 @@ const Index = () => {
               Browse properties in 24 languages
             </p>
 
+            {/* ── Agent value story ── */}
+            <div className="mt-12 mb-10 max-w-3xl mx-auto text-center">
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
+                Australian agents. Asian buyers. One platform.
+              </h2>
+              <p className="mt-4 text-base md:text-lg text-slate-600 leading-relaxed">
+                ListHQ automatically translates your listings into Mandarin, Cantonese, Vietnamese, Korean and more — so you reach 1.2 million Asian diaspora buyers without doing anything extra.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+                {[
+                  { stat: '8 languages', label: 'Every listing, automatically translated' },
+                  { stat: '1.2M buyers', label: 'Asian diaspora property seekers in Australia' },
+                  { stat: 'Early access', label: 'First 50 agents — limited spots' },
+                ].map((item) => (
+                  <div
+                    key={item.stat}
+                    className="rounded-2xl border border-slate-200 bg-white/80 backdrop-blur-sm px-5 py-6 shadow-sm hover:shadow-md hover:border-blue-200 transition-all"
+                  >
+                    <div className="text-2xl md:text-3xl font-bold text-blue-600">{item.stat}</div>
+                    <div className="mt-2 text-sm text-slate-600 leading-snug">{item.label}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+                <button
+                  onClick={() => navigate('/agent-portal')}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors shadow-sm hover:shadow-md"
+                >
+                  List your properties
+                  <ArrowRight size={16} />
+                </button>
+                <button
+                  onClick={() => {
+                    document.getElementById('search-bar')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setTimeout(() => document.getElementById('search-bar')?.focus(), 400);
+                  }}
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors"
+                >
+                  Search properties ↓
+                </button>
+              </div>
+            </div>
+
             {/* Sale / Rent toggle */}
             <div className="flex flex-col items-center mb-6">
               <div className="inline-flex items-center bg-slate-100 rounded-full p-1 gap-1">

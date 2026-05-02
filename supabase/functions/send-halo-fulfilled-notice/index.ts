@@ -7,8 +7,9 @@ const corsHeaders = {
     'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
-const APP_URL = 'https://globalhomes.lovable.app';
-const FROM = 'ListHQ <onboarding@resend.dev>';
+const APP_URL = Deno.env.get('APP_URL') ?? 'https://listhq.com.au';
+// NOTE: Falls back to onboarding@resend.dev until listhq.com.au DNS is verified in Resend.
+const FROM = 'ListHQ <noreply@listhq.com.au>';
 
 async function sendEmail(resendKey: string, to: string, subject: string, html: string) {
   const resp = await fetch('https://api.resend.com/emails', {
@@ -33,6 +34,16 @@ const formatBudget = (min: number | null | undefined, max: number | null | undef
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   try {
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const userClient = createClient(Deno.env.get('SUPABASE_URL')!, anonKey, { global: { headers: { Authorization: authHeader } } });
+    const { data: userRes } = await userClient.auth.getUser();
+    if (!userRes?.user?.id) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
     const { halo_id } = await req.json();
     if (!halo_id) {
       return new Response(JSON.stringify({ error: 'Missing halo_id' }), {

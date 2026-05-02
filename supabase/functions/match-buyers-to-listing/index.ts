@@ -138,6 +138,17 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Ownership check
+    const callerUserId = claims.claims.sub;
+    const { data: callerAgent } = await admin.from('agents').select('id').eq('user_id', callerUserId).maybeSingle();
+    if (!callerAgent || callerAgent.id !== listing.agent_id) {
+      // Allow admin override
+      const { data: adminRole } = await admin.from('user_roles').select('role').eq('user_id', callerUserId).eq('role', 'admin').maybeSingle();
+      if (!adminRole) {
+        return new Response(JSON.stringify({ error: 'Forbidden — you do not own this listing' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+    }
+
     // Cast a wide net: active buyers (last 90 days) where any of the soft criteria match.
     const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
     let q = admin

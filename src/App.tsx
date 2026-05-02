@@ -270,6 +270,7 @@ const App = () => (
             <Sonner position="top-center" richColors closeButton duration={5000} />
              <ImpersonationBanner />
             <ScrollToTop />
+             <IdleTimeoutWatcher />
              <HelpWidget />
              <CookieConsentBanner />
              <Suspense fallback={<PageLoader />}>

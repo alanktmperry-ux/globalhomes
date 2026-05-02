@@ -39,6 +39,7 @@ export default function SupplierPortalPage() {
   const [data, setData] = useState<Data | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [paymentsByJob, setPaymentsByJob] = useState<Record<string, { paid_at: string } | null>>({});
 
   // dialogs
   const [scheduleJob, setScheduleJob] = useState<Job | null>(null);
@@ -65,6 +66,38 @@ export default function SupplierPortalPage() {
   };
 
   useEffect(() => { load(); }, [token]);
+
+  // Audit log: portal access (fire-and-forget)
+  useEffect(() => {
+    const supplierId = data?.supplier?.id;
+    if (!supplierId) return;
+    supabase.from('audit_logs').insert({
+      event_type: 'portal_access',
+      portal_type: 'supplier',
+      entity_id: supplierId,
+      accessed_at: new Date().toISOString(),
+    } as any).then(() => {/* fire-and-forget */}, () => {/* ignore */});
+  }, [data?.supplier?.id]);
+
+  // Look up payment status for completed jobs (match by job id in reference, or by amount + date)
+  useEffect(() => {
+    const completed = (data?.completed_jobs || []).filter(c => c.completed_at);
+    if (completed.length === 0) return;
+    (async () => {
+      const ids = completed.map(c => c.id);
+      const orFilters = ids.map(id => `reference.ilike.%${id}%`).join(',');
+      const { data: pays } = await supabase
+        .from('trust_payments')
+        .select('reference, date_paid, amount')
+        .or(orFilters);
+      const map: Record<string, { paid_at: string } | null> = {};
+      completed.forEach(c => {
+        const match = (pays || []).find((p: any) => (p.reference || '').includes(c.id));
+        map[c.id] = match ? { paid_at: match.date_paid } : null;
+      });
+      setPaymentsByJob(map);
+    })();
+  }, [data?.completed_jobs]);
 
   const callAction = async (jobId: string, action: string, extra: any = {}) => {
     setBusy(true);
@@ -231,18 +264,28 @@ export default function SupplierPortalPage() {
             <Card className="p-6 text-center text-sm text-muted-foreground">No completed jobs yet.</Card>
           ) : (
             <div className="space-y-2">
-              {completed_jobs.map(c => (
-                <Card key={c.id} className="p-3 flex items-center justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium truncate">{c.title}</p>
-                    <p className="text-xs text-muted-foreground truncate">{c.property_address}</p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    {c.final_cost_aud != null && <p className="text-sm font-semibold">{AUD.format(Number(c.final_cost_aud))}</p>}
-                    {c.rating ? <StarRating rating={c.rating} size="sm"/> : <p className="text-[10px] text-muted-foreground">No rating</p>}
-                  </div>
-                </Card>
-              ))}
+              {completed_jobs.map(c => {
+                const pay = paymentsByJob[c.id];
+                return (
+                  <Card key={c.id} className="p-3 flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{c.title}</p>
+                      <p className="text-xs text-muted-foreground truncate">{c.property_address}</p>
+                      <div className="mt-1.5">
+                        {c.completed_at && (
+                          pay
+                            ? <Badge className="bg-emerald-500/10 text-emerald-700 text-[10px]">Paid {new Date(pay.paid_at).toLocaleDateString()}</Badge>
+                            : <Badge className="bg-amber-500/10 text-amber-700 text-[10px]">Payment Pending</Badge>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      {c.final_cost_aud != null && <p className="text-sm font-semibold">{AUD.format(Number(c.final_cost_aud))}</p>}
+                      {c.rating ? <StarRating rating={c.rating} size="sm"/> : <p className="text-[10px] text-muted-foreground">No rating</p>}
+                    </div>
+                  </Card>
+                );
+              })}
             </div>
           )}
         </section>

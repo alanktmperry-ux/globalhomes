@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import UpgradeGate from '@/features/agents/components/shared/UpgradeGate';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Calendar } from '@/components/ui/calendar';
@@ -15,16 +16,20 @@ import {
 } from 'recharts';
 import {
   Download, CalendarIcon, TrendingUp, DollarSign, Home, Clock,
-  Target, Users, Phone, Eye, Mail,
+  Target, Users, Phone, Eye, Mail, Building2, AlertTriangle, FileText,
 } from 'lucide-react';
-import { format, subMonths, subDays, startOfMonth, endOfMonth, isWithinInterval, eachMonthOfInterval } from 'date-fns';
+import { format, subMonths, subDays, startOfMonth, endOfMonth, isWithinInterval, eachMonthOfInterval, differenceInDays } from 'date-fns';
 import { cn } from '@/lib/utils';
 import DashboardHeader from './DashboardHeader';
 import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
 import { useTrustAccounting } from '@/features/agents/hooks/useTrustAccounting';
 import { useContacts } from '@/features/agents/hooks/useContacts';
+import { supabase } from '@/integrations/supabase/client';
+import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
+import { toast } from 'sonner';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
+const AUD2 = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 2 });
 const DATE_FMT = new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: '2-digit', year: 'numeric' });
 const CHART_COLORS = ['hsl(var(--primary))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
 
@@ -90,13 +95,124 @@ const ReportsPage = () => {
   const { listings } = useAgentListings();
   const { accounts, transactions } = useTrustAccounting();
   const { contacts } = useContacts();
+  const { agent } = useCurrentAgent();
 
   const [activeTab, setActiveTab] = useState('sales');
   const [period, setPeriod] = useState<Period>('90d');
   const [customFrom, setCustomFrom] = useState<Date>();
   const [customTo, setCustomTo] = useState<Date>();
 
+  // Rent roll / arrears / reconciliation data
+  const [tenancies, setTenancies] = useState<any[]>([]);
+  const [propertiesCount, setPropertiesCount] = useState(0);
+  const [trustReceipts, setTrustReceipts] = useState<any[]>([]);
+  const [trustPayments, setTrustPayments] = useState<any[]>([]);
+  const [bankBalances, setBankBalances] = useState<Record<string, string>>({}); // 'YYYY-MM' -> manual input
+
+  useEffect(() => {
+    if (!agent?.id) return;
+    (async () => {
+      const [tRes, pRes, rRes, payRes] = await Promise.all([
+        supabase.from('tenancies').select(`
+          id, tenant_name, tenant_phone, rent_amount, rent_frequency, status,
+          rent_paid_to_date, lease_end,
+          properties:property_id ( address, suburb, state )
+        `).eq('agent_id', agent.id),
+        supabase.from('properties').select('id', { count: 'exact', head: true }).eq('agent_id', agent.id),
+        supabase.from('trust_receipts').select('amount, date_received').eq('agent_id', agent.id),
+        supabase.from('trust_payments').select('amount, date_paid').eq('agent_id', agent.id),
+      ]);
+      setTenancies(tRes.data || []);
+      setPropertiesCount(pRes.count || 0);
+      setTrustReceipts(rRes.data || []);
+      setTrustPayments(payRes.data || []);
+    })();
+  }, [agent?.id]);
+
   const range = useMemo(() => getDateRange(period, customFrom, customTo), [period, customFrom, customTo]);
+
+  // ─── Rent Roll Summary KPIs ───
+  const rentRollSummary = useMemo(() => {
+    const active = tenancies.filter(t => t.status === 'active');
+    // Normalize to weekly
+    const weeklyTotal = active.reduce((sum, t) => {
+      const amt = Number(t.rent_amount || 0);
+      const freq = t.rent_frequency || 'weekly';
+      const weekly = freq === 'fortnightly' ? amt / 2
+        : freq === 'monthly' ? (amt * 12) / 52
+        : freq === 'yearly' ? amt / 52
+        : amt;
+      return sum + weekly;
+    }, 0);
+    const tenantedPropertyIds = new Set(active.map(t => (t.properties as any)?.address ? t.id : t.id));
+    const totalProps = propertiesCount;
+    const occupied = active.length;
+    const vacancyRate = totalProps > 0 ? Math.max(0, ((totalProps - occupied) / totalProps) * 100) : 0;
+    return { totalProps, weeklyTotal, vacancyRate };
+  }, [tenancies, propertiesCount]);
+
+  // ─── Arrears (rent paid_to < today) ───
+  const arrearsRows = useMemo(() => {
+    const today = new Date();
+    return tenancies
+      .filter(t => t.status === 'active' && t.rent_paid_to_date && new Date(t.rent_paid_to_date) < today)
+      .map(t => {
+        const paidTo = new Date(t.rent_paid_to_date);
+        const daysOverdue = Math.max(0, differenceInDays(today, paidTo));
+        const freq = t.rent_frequency || 'weekly';
+        const amt = Number(t.rent_amount || 0);
+        const weekly = freq === 'fortnightly' ? amt / 2
+          : freq === 'monthly' ? (amt * 12) / 52
+          : freq === 'yearly' ? amt / 52
+          : amt;
+        const owing = Math.round((daysOverdue / 7) * weekly * 100) / 100;
+        const prop = (t.properties as any) || {};
+        const addr = [prop.address, prop.suburb, prop.state].filter(Boolean).join(', ');
+        return {
+          id: t.id,
+          tenant_name: t.tenant_name || '—',
+          address: addr || '—',
+          daysOverdue,
+          owing,
+          paidTo: t.rent_paid_to_date,
+          phone: t.tenant_phone || '',
+        };
+      })
+      .sort((a, b) => b.daysOverdue - a.daysOverdue);
+  }, [tenancies]);
+
+  // ─── Trust Reconciliation (per month, last 12 months) ───
+  const reconciliationRows = useMemo(() => {
+    const months = eachMonthOfInterval({ start: subMonths(new Date(), 11), end: new Date() });
+    let opening = 0;
+    return months.map(m => {
+      const start = startOfMonth(m);
+      const end = endOfMonth(m);
+      const receipts = trustReceipts
+        .filter(r => r.date_received && isWithinInterval(new Date(r.date_received), { start, end }))
+        .reduce((s, r) => s + Number(r.amount || 0), 0);
+      const payments = trustPayments
+        .filter(p => p.date_paid && isWithinInterval(new Date(p.date_paid), { start, end }))
+        .reduce((s, p) => s + Number(p.amount || 0), 0);
+      const closing = opening + receipts - payments;
+      const key = format(m, 'yyyy-MM');
+      const bank = bankBalances[key];
+      const bankNum = bank !== undefined && bank !== '' ? Number(bank) : null;
+      const variance = bankNum != null ? bankNum - closing : null;
+      const row = {
+        key,
+        monthLabel: format(m, 'MMM yyyy'),
+        opening,
+        receipts,
+        payments,
+        closing,
+        bankNum,
+        variance,
+      };
+      opening = closing;
+      return row;
+    });
+  }, [trustReceipts, trustPayments, bankBalances]);
 
   // ─── SALES DATA ───
   const salesData = useMemo(() => {
@@ -256,6 +372,64 @@ const ReportsPage = () => {
     exportCsv(headers, rows, 'activity_report');
   };
 
+  const exportArrearsCsv = () => {
+    const headers = ['Tenant Name', 'Property Address', 'Days Overdue', 'Amount Owing', 'Last Paid To', 'Phone'];
+    const rows = arrearsRows.map(r => [
+      r.tenant_name, r.address, String(r.daysOverdue),
+      AUD2.format(r.owing), r.paidTo || '', r.phone,
+    ]);
+    exportCsv(headers, rows, 'arrears_report');
+  };
+
+  const downloadReconciliationPdf = () => {
+    if (!agent) { toast.error('Agent details not loaded'); return; }
+    const agencyName = (agent as any).agency_name || (agent as any).agency || agent.name || 'Agency';
+    const today = format(new Date(), 'd MMM yyyy');
+    const html = `<!doctype html><html><head><meta charset="utf-8"><title>Trust Reconciliation</title>
+      <style>
+        body{font-family:Arial,Helvetica,sans-serif;color:#0f172a;padding:32px;}
+        h1{font-size:18px;margin:0 0 4px;}
+        h2{font-size:13px;margin:0 0 24px;color:#475569;font-weight:normal;}
+        table{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px;}
+        th,td{padding:6px 8px;border-bottom:1px solid #e2e8f0;text-align:right;}
+        th:first-child,td:first-child{text-align:left;}
+        thead th{background:#f1f5f9;font-weight:600;}
+        .cert{margin-top:32px;padding-top:16px;border-top:2px solid #0f172a;font-size:11px;}
+        .sig{margin-top:48px;border-top:1px solid #0f172a;padding-top:6px;width:240px;font-size:10px;color:#475569;}
+        @media print{body{padding:16px;}}
+      </style></head><body>
+      <h1>${agencyName} — Trust Account Reconciliation</h1>
+      <h2>Period: Last 12 months · Generated ${today}</h2>
+      <table>
+        <thead><tr>
+          <th>Month</th><th>Opening Balance</th><th>Total Receipts</th>
+          <th>Total Payments</th><th>Closing Balance</th><th>Bank Balance</th><th>Variance</th>
+        </tr></thead>
+        <tbody>
+          ${reconciliationRows.map(r => `<tr>
+            <td>${r.monthLabel}</td>
+            <td>${AUD2.format(r.opening)}</td>
+            <td>${AUD2.format(r.receipts)}</td>
+            <td>${AUD2.format(r.payments)}</td>
+            <td>${AUD2.format(r.closing)}</td>
+            <td>${r.bankNum != null ? AUD2.format(r.bankNum) : '—'}</td>
+            <td>${r.variance != null ? AUD2.format(r.variance) : '—'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      <p class="cert">I certify this trust account reconciliation is correct as at ${today}.</p>
+      <div class="sig">Signature & Licensee Name</div>
+      <p style="margin-top:32px;font-size:9px;color:#64748b;">
+        Monthly trust reconciliation is required under the Agents Financial Administration Act 2014.
+      </p>
+      <script>window.onload=()=>window.print();</script>
+      </body></html>`;
+    const w = window.open('', '_blank');
+    if (!w) { toast.error('Allow pop-ups to download the PDF'); return; }
+    w.document.write(html);
+    w.document.close();
+  };
+
   if (!subLoading && !canAccessTrust) {
     return <UpgradeGate requiredPlan="Pro or above" message="Advanced reports are available on the Pro plan and above. Export listings, leads, trust, and contacts data as CSV." />;
   }
@@ -264,6 +438,13 @@ const ReportsPage = () => {
     <div>
       <DashboardHeader title="Reports" subtitle="Performance analytics & financial summaries" />
       <div className="p-4 sm:p-6 max-w-7xl space-y-4">
+        {/* Rent Roll Summary — always visible */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <StatCard icon={Building2} label="Properties Under Management" value={String(rentRollSummary.totalProps)} color="bg-blue-500/10 text-blue-600" />
+          <StatCard icon={DollarSign} label="Weekly Rent Roll" value={AUD.format(rentRollSummary.weeklyTotal)} color="bg-green-500/10 text-green-600" />
+          <StatCard icon={Home} label="Vacancy Rate" value={`${rentRollSummary.vacancyRate.toFixed(1)}%`} color="bg-amber-500/10 text-amber-600" />
+        </div>
+
         {/* Period selector */}
         <div className="flex flex-wrap items-center gap-2">
           <Select value={period} onValueChange={v => setPeriod(v as Period)}>
@@ -311,10 +492,12 @@ const ReportsPage = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
+          <TabsList className="flex-wrap h-auto">
             <TabsTrigger value="sales">Sales Performance</TabsTrigger>
             <TabsTrigger value="financial">Financial</TabsTrigger>
             <TabsTrigger value="activity">Agent Activity</TabsTrigger>
+            <TabsTrigger value="reconciliation">Trust Reconciliation</TabsTrigger>
+            <TabsTrigger value="arrears">Arrears</TabsTrigger>
           </TabsList>
 
           {/* ─── SALES PERFORMANCE ─── */}
@@ -589,6 +772,111 @@ const ReportsPage = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* ─── TRUST RECONCILIATION ─── */}
+          <TabsContent value="reconciliation" className="space-y-4 mt-4">
+            <Card className="bg-amber-500/5 border-amber-500/30">
+              <CardContent className="p-3 text-xs flex items-start gap-2">
+                <AlertTriangle size={14} className="text-amber-600 mt-0.5 shrink-0" />
+                <p>Monthly trust reconciliation is required under the <strong>Agents Financial Administration Act 2014</strong>. Enter your bank statement balance to verify against the calculated closing balance.</p>
+              </CardContent>
+            </Card>
+
+            <div className="flex justify-end">
+              <Button size="sm" variant="outline" onClick={downloadReconciliationPdf} className="gap-1.5">
+                <FileText size={14} /> Download PDF
+              </Button>
+            </div>
+
+            <Card>
+              <CardContent className="p-0 overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-xs">Month</TableHead>
+                      <TableHead className="text-xs text-right">Opening</TableHead>
+                      <TableHead className="text-xs text-right">Receipts</TableHead>
+                      <TableHead className="text-xs text-right">Payments</TableHead>
+                      <TableHead className="text-xs text-right">Closing</TableHead>
+                      <TableHead className="text-xs text-right">Bank Balance</TableHead>
+                      <TableHead className="text-xs text-right">Variance</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {reconciliationRows.map(r => (
+                      <TableRow key={r.key}>
+                        <TableCell className="text-xs font-medium">{r.monthLabel}</TableCell>
+                        <TableCell className="text-xs text-right">{AUD2.format(r.opening)}</TableCell>
+                        <TableCell className="text-xs text-right text-green-600">{AUD2.format(r.receipts)}</TableCell>
+                        <TableCell className="text-xs text-right text-destructive">{AUD2.format(r.payments)}</TableCell>
+                        <TableCell className="text-xs text-right font-semibold">{AUD2.format(r.closing)}</TableCell>
+                        <TableCell className="text-right">
+                          <Input
+                            type="number"
+                            step="0.01"
+                            placeholder="—"
+                            value={bankBalances[r.key] ?? ''}
+                            onChange={e => setBankBalances(prev => ({ ...prev, [r.key]: e.target.value }))}
+                            className="h-7 w-28 text-xs ml-auto"
+                          />
+                        </TableCell>
+                        <TableCell className={`text-xs text-right font-semibold ${r.variance == null ? '' : Math.abs(r.variance) < 0.01 ? 'text-green-600' : 'text-destructive'}`}>
+                          {r.variance != null ? AUD2.format(r.variance) : '—'}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ─── ARREARS ─── */}
+          <TabsContent value="arrears" className="space-y-4 mt-4">
+            <div className="flex justify-between items-center">
+              <p className="text-xs text-muted-foreground">{arrearsRows.length} tenancies in arrears</p>
+              <Button size="sm" variant="outline" onClick={exportArrearsCsv} className="gap-1.5" disabled={arrearsRows.length === 0}>
+                <Download size={14} /> Export CSV
+              </Button>
+            </div>
+
+            <Card>
+              <CardContent className="p-0 overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-xs">Tenant</TableHead>
+                      <TableHead className="text-xs">Property</TableHead>
+                      <TableHead className="text-xs text-right">Days Overdue</TableHead>
+                      <TableHead className="text-xs text-right">Amount Owing</TableHead>
+                      <TableHead className="text-xs">Last Paid To</TableHead>
+                      <TableHead className="text-xs">Phone</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {arrearsRows.length === 0 ? (
+                      <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8 text-xs">No tenancies currently in arrears 🎉</TableCell></TableRow>
+                    ) : arrearsRows.map(r => (
+                      <TableRow key={r.id}>
+                        <TableCell className="text-xs font-medium">{r.tenant_name}</TableCell>
+                        <TableCell className="text-xs">{r.address}</TableCell>
+                        <TableCell className="text-xs text-right">
+                          <Badge variant={r.daysOverdue > 14 ? 'destructive' : 'secondary'} className="text-[10px]">
+                            {r.daysOverdue}d
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-xs text-right font-semibold text-destructive">{AUD2.format(r.owing)}</TableCell>
+                        <TableCell className="text-xs">{r.paidTo ? DATE_FMT.format(new Date(r.paidTo)) : '—'}</TableCell>
+                        <TableCell className="text-xs">
+                          {r.phone ? <a href={`tel:${r.phone}`} className="text-primary hover:underline">{r.phone}</a> : '—'}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>

@@ -37,6 +37,10 @@ export default function OwnerPortalPage() {
   const [declineReasonForId, setDeclineReasonForId] = useState<string | null>(null);
   const [declineReason, setDeclineReason] = useState('');
   const [acting, setActing] = useState<string | null>(null);
+  const [autoApproveThreshold, setAutoApproveThreshold] = useState<number>(500);
+  const [thresholdInput, setThresholdInput] = useState<string>('500');
+  const [savingThreshold, setSavingThreshold] = useState(false);
+  const [autoApprovedIds, setAutoApprovedIds] = useState<Set<string>>(new Set());
 
   const load = useCallback(async () => {
     if (!token) { setError('No portal token provided'); setLoading(false); return; }
@@ -57,6 +61,81 @@ export default function OwnerPortalPage() {
   }, [token]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Load owner portal preference (threshold) once we have a property
+  useEffect(() => {
+    const propertyId = data?.property?.id;
+    if (!propertyId) return;
+    (async () => {
+      const { data: pref } = await supabase
+        .from('owner_portal_preferences')
+        .select('auto_approve_threshold_aud')
+        .eq('property_id', propertyId)
+        .maybeSingle();
+      const t = pref?.auto_approve_threshold_aud != null ? Number(pref.auto_approve_threshold_aud) : 500;
+      setAutoApproveThreshold(t);
+      setThresholdInput(String(t));
+    })();
+  }, [data?.property?.id]);
+
+  // Audit log: portal access (fire-and-forget)
+  useEffect(() => {
+    const propertyId = data?.property?.id;
+    if (!propertyId) return;
+    supabase.from('audit_logs').insert({
+      event_type: 'portal_access',
+      portal_type: 'owner',
+      entity_id: propertyId,
+      accessed_at: new Date().toISOString(),
+    } as any).then(() => {/* fire-and-forget */}, () => {/* ignore */});
+  }, [data?.property?.id]);
+
+  // Auto-approve maintenance jobs below the threshold
+  useEffect(() => {
+    if (!data || !token) return;
+    const pending = (data.maintenance || []).filter((m: any) =>
+      m.owner_approval_status === 'pending' &&
+      Number(m.quoted_amount_aud || 0) > 0 &&
+      Number(m.quoted_amount_aud) < autoApproveThreshold &&
+      !autoApprovedIds.has(m.id)
+    );
+    if (pending.length === 0) return;
+    pending.forEach((j: any) => {
+      setAutoApprovedIds(prev => new Set(prev).add(j.id));
+      supabase.rpc('owner_decision_on_maintenance', {
+        p_token: token,
+        p_job_id: j.id,
+        p_decision: 'approved',
+        p_decline_reason: `Auto-approved (under $${autoApproveThreshold} threshold)`,
+      } as any).then(() => load(), () => {/* ignore */});
+    });
+  }, [data, autoApproveThreshold, token, autoApprovedIds, load]);
+
+  const saveThreshold = async () => {
+    const n = Number(thresholdInput);
+    if (!Number.isFinite(n) || n < 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+    const propertyId = data?.property?.id;
+    const agentId = data?.agent?.id;
+    if (!propertyId || !agentId) return;
+    setSavingThreshold(true);
+    const { error: err } = await supabase
+      .from('owner_portal_preferences')
+      .upsert({
+        property_id: propertyId,
+        agent_id: agentId,
+        auto_approve_threshold_aud: n,
+      } as any, { onConflict: 'property_id' });
+    setSavingThreshold(false);
+    if (err) {
+      toast.error('Could not save threshold');
+      return;
+    }
+    setAutoApproveThreshold(n);
+    toast.success('Auto-approve threshold updated');
+  };
 
   const decide = async (jobId: string, decision: 'approved' | 'declined', reason?: string) => {
     setActing(jobId);
@@ -277,6 +356,36 @@ export default function OwnerPortalPage() {
         {/* Section 3: Maintenance & approvals */}
         <section>
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">Maintenance & approvals</h2>
+
+          {/* Portal preferences — auto-approve threshold */}
+          <Card className="mb-4 bg-muted/30">
+            <CardContent className="p-4">
+              <p className="text-sm font-medium mb-1">Portal preferences</p>
+              <p className="text-xs text-muted-foreground mb-3">
+                Auto-approve maintenance jobs under{' '}
+                <span className="font-semibold text-foreground">{AUD.format(autoApproveThreshold)}</span>.
+                Quotes above this amount require your manual approval.
+              </p>
+              <div className="flex flex-wrap items-end gap-2">
+                <div className="flex-1 min-w-[140px] max-w-[200px]">
+                  <label className="text-[11px] text-muted-foreground">Threshold (AUD)</label>
+                  <input
+                    type="number"
+                    min={0}
+                    step={50}
+                    value={thresholdInput}
+                    onChange={(e) => setThresholdInput(e.target.value)}
+                    className="w-full mt-1 h-9 px-3 rounded-md border border-input bg-background text-sm"
+                  />
+                </div>
+                <Button size="sm" onClick={saveThreshold} disabled={savingThreshold || thresholdInput === String(autoApproveThreshold)}>
+                  {savingThreshold ? <Loader2 size={12} className="animate-spin mr-1" /> : null}
+                  Save
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
           {pendingApprovals.length > 0 && (
             <div className="space-y-3 mb-4">
               {pendingApprovals.map((j: any) => (

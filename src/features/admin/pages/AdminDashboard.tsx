@@ -234,9 +234,14 @@ const AdminDashboard = () => {
     setLoading(false);
   };
 
-  const handleRoleChange = async (userId: string, role: 'user' | 'agent' | 'admin', action: 'add' | 'remove') => {
-    const confirmed = window.confirm(`Are you sure you want to ${action} the "${role}" role for this user?`);
-    if (!confirmed) return;
+  const handleRoleChange = (userId: string, role: 'user' | 'agent' | 'admin', action: 'add' | 'remove') => {
+    setPendingRoleChange({ userId, role, action });
+  };
+
+  const performRoleChange = async () => {
+    if (!pendingRoleChange) return;
+    const { userId, role, action } = pendingRoleChange;
+    setPendingRoleChange(null);
 
     const currentAdminUserId = user?.id;
 

@@ -47,6 +47,10 @@ export function AuctionRegistrationModal({ auctionId, isOnline, open, onClose }:
   const update = (field: string, value: any) => setForm(prev => ({ ...prev, [field]: value }));
 
   const handleSubmit = async () => {
+    if (!form.id_number || !form.id_expiry) {
+      setError('ID number and expiry are required');
+      return;
+    }
     setSubmitting(true);
     setError(null);
     const profileId = user?.id;

@@ -54,7 +54,11 @@ export default defineConfig(({ mode }) => {
           if (id.includes("@sentry")) return "sentry";
           if (id.includes("mapbox-gl") || id.includes("@googlemaps")) return "maps";
           if (id.includes("framer-motion")) return "motion";
-          if (id.includes("@radix-ui")) return "radix";
+          // NOTE: Do NOT split @radix-ui into its own chunk. Radix modules call
+          // React.forwardRef at module-evaluation time, so they must live in the
+          // same chunk as React (vendor). A separate "radix" chunk loads before
+          // "vendor" in production and crashes Safari with a white screen:
+          // "Cannot read properties of undefined (reading 'forwardRef')".
 
           return "vendor";
         },

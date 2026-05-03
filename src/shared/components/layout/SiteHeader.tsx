@@ -387,14 +387,14 @@ function SettingsMenu() {
           className="absolute right-0 top-full mt-1 w-56 bg-popover border border-border rounded-xl shadow-elevated overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150 p-2 space-y-1"
         >
           <div className="px-2 pt-1 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
-            Currency
+            {t('nav.currency')}
           </div>
           <div className="px-1">
             <CurrencySwitcher />
           </div>
           <div className="border-t border-border my-1" />
           <div className="px-2 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
-            Language
+            {t('nav.language')}
           </div>
           <div className="px-1 pb-1">
             <LanguageSwitcher />

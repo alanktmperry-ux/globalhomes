@@ -327,6 +327,12 @@ const Index = () => {
         .chip:hover { background: ${T.blueL}; border-color: ${T.blueMid}; color: ${T.blue}; }
         @keyframes typeBlink { 50% { opacity: 0 } }
         .type-cursor::after { content:'▋'; color:${T.blue}; margin-left:2px; animation: typeBlink 1s steps(1) infinite; }
+        @keyframes micRing { 0% { transform: scale(1); opacity: .55 } 100% { transform: scale(1.85); opacity: 0 } }
+        .mic-ring { position:absolute; inset:0; border-radius:50%; background:#ef4444; animation: micRing 1.2s ease-out infinite; }
+        @keyframes spin { to { transform: rotate(360deg) } }
+        .mic-spin { width:18px; height:18px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation: spin .8s linear infinite; }
+        @keyframes errFade { from { opacity:0; transform:translateY(-4px) } to { opacity:1; transform:translateY(0) } }
+        .voice-err { animation: errFade .25s ease-out; }
       `}</style>
 
       <div className="wave17">

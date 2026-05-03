@@ -10,7 +10,7 @@ const sections = [
   { title: 'Trust Accounting', ids: ['pm-trust-accounting'] },
   { title: 'Arrears Management', ids: ['pm-arrears-detail', 'pm-arrears-automation'] },
   { title: 'Lease Renewals', ids: ['pm-lease-renewals'] },
-  { title: 'Inspections', ids: ['pm-inspections'] },
+  { title: 'Inspections', ids: ['pm-inspections', 'agent-inspection-notice', 'agent-inspection-frequency', 'agent-inspection-pdf', 'agent-inspection-calendar', 'agent-inspection-auto-schedule'] },
   { title: 'Maintenance Requests', ids: ['pm-maintenance-detail', 'pm-maintenance-management'] },
   { title: 'Supplier Management', ids: ['pm-suppliers', 'pm-supplier-portal'] },
   { title: 'Vacancy Management', ids: ['pm-vacancies', 'pm-vacancy-kpi'] },

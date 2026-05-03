@@ -12,6 +12,7 @@ const sections = [
   { title: 'Multilingual & Translations', ids: ['agent-translate-step', 'agent-multilingual-translation', 'agent-language-toggle'] },
   { title: 'Multilingual & International Sharing', ids: ['pm-share-whatsapp-line', 'referral-sharing'] },
   { title: 'Property Management', ids: ['pm-getting-started', 'pm-rent-roll', 'pm-trust-accounting', 'pm-tenant-portal-access', 'pm-owner-portal-access', 'pm-automation-settings'] },
+  { title: 'Inspections & Condition Reports', ids: ['agent-inspection-reports', 'agent-inspection-schedule', 'agent-inspection-notice', 'agent-inspection-frequency', 'agent-inspection-pdf', 'agent-inspection-calendar', 'agent-inspection-auto-schedule'] },
   { title: 'Open Homes', ids: ['agent-open-home'] },
   { title: 'Auctions', ids: ['agent-auction-setup', 'agent-auction-registration'] },
   { title: 'CRM & Leads', ids: ['agent-crm', 'agent-saved-searches', 'agent-lead-marketplace'] },

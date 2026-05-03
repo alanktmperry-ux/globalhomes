@@ -942,6 +942,18 @@ export const en = {
   'faq.vendor-passed-in.question': '',
   'faq.vendor-performance.question': '',
 
+  'home.portals.title': 'Professional Portals',
+  'home.portals.subtitle': 'Sign in to your dedicated workspace',
+  'home.portals.agent.title': 'Agent Portal',
+  'home.portals.agent.desc': 'Manage listings, trust accounts, rent roll and leads.',
+  'home.portals.agent.register': 'Not an agent yet?',
+  'home.portals.broker.title': 'Mortgage Broker Portal',
+  'home.portals.broker.desc': 'View referral leads, manage your profile and book appointments.',
+  'home.portals.broker.register': 'Not registered?',
+  'home.portals.partner.title': 'Partner Portal',
+  'home.portals.partner.desc': 'Access your partner dashboard and track referral earnings.',
+  'home.portals.partner.register': 'Become a partner?',
+  'home.portals.signIn': 'Sign in',
 } as const;
 
 export type TranslationKey = keyof typeof en;

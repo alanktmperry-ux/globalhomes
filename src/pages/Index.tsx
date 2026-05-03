@@ -118,9 +118,13 @@ const Index = () => {
   const [propertyCount, setPropertyCount] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Front/back card content (front = idx 0, back = next listing)
-  const [cardIdx, setCardIdx] = useState({ front: 0, back: 1 });
-  const [swap, setSwap] = useState(false); // toggles which card is "front"
+  // Front card crossfade refs
+  const layerARef = useRef<HTMLDivElement>(null);
+  const layerBRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
+  const priceRef = useRef<HTMLDivElement>(null);
+  const activeLayerRef = useRef<'a' | 'b'>('a');
+  const cardIdxRef = useRef(0);
 
   const seq = SEQUENCE[seqIdx];
 

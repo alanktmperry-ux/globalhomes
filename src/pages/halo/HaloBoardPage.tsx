@@ -172,7 +172,7 @@ export default function HaloBoardPage() {
       }
 
       // Atomic spend via RPC (prevents double-spend race conditions)
-      const { error: rpcErr } = await supabase.rpc('spend_halo_credit', {
+      const { error: rpcErr } = await (supabase.rpc as any)('spend_halo_credit', {
         p_agent_id: agent.id,
         p_halo_id: target.id,
       });

@@ -185,42 +185,17 @@ const BillingPage = () => {
     }
     setUpgrading(planId);
     try {
-      const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
-      if (!agent) throw new Error('Agent not found');
-
-      const { data: existing } = await supabase.from('agent_subscriptions').select('id').eq('agent_id', agent.id).maybeSingle();
-
-      const listingLimitCol = planDef.listingLimit === Infinity ? 999999 : planDef.listingLimit;
-      const seatLimitCol = planDef.seatLimit === Infinity ? 999999 : planDef.seatLimit;
-
-      const payload: any = {
-        agent_id: agent.id,
-        plan_type: planId,
-        listing_limit: listingLimitCol,
-        seat_limit: seatLimitCol,
-        monthly_price_aud: annual ? Math.round((planDef.price * 10) / 12) : planDef.price,
-        annual_billing: annual,
-      };
-
-      if (existing) {
-        await supabase.from('agent_subscriptions').update(payload).eq('id', (existing as any).id);
+      const { data, error } = await supabase.functions.invoke('create-subscription-checkout', {
+        body: { planId, annual },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
       } else {
-        await supabase.from('agent_subscriptions').insert(payload);
+        throw new Error('No checkout URL returned');
       }
-      await supabase.from('agents').update({ is_subscribed: true }).eq('id', agent.id);
-
-      try {
-        capture('subscription_started', {
-          agent_id: agent.id,
-          plan: planId,
-          mrr: payload.monthly_price_aud,
-        });
-      } catch {}
-
-      toast.success("Plan updated! Stripe billing is coming — we'll email you when payment is ready.");
-      window.location.reload();
     } catch (err: unknown) {
-      toast.error(getErrorMessage(err) || 'Upgrade failed');
+      toast.error(getErrorMessage(err) || 'Upgrade failed — please try again');
     } finally {
       setUpgrading(null);
     }
@@ -489,7 +464,12 @@ const BillingPage = () => {
             <CreditCard size={14} /> Payment Method
           </h3>
           <p className="text-sm text-muted-foreground">No payment method on file.</p>
-          <Button variant="outline" size="sm" onClick={() => toast.info("Stripe billing coming soon — we'll notify you when it's ready.")}>
+          <Button variant="outline" size="sm" onClick={async () => {
+            const { data, error } = await supabase.functions.invoke('create-subscription-checkout', {
+              body: { planId: sub.plan || 'solo', annual: false },
+            });
+            if (!error && data?.url) window.location.href = data.url;
+          }}>
             Add Payment Method
           </Button>
 

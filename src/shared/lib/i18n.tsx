@@ -1397,7 +1397,6 @@ const languageUpdatedMessages: Record<Language, string> = {
 };
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [showBanner, setShowBanner] = useState(false);
   const [language, setLanguageState] = useState<Language>(() => {
     // Always default to English on a new browser session.
     // Language only persists for the current session via sessionStorage.
@@ -1412,13 +1411,10 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     return 'en';
   });
 
-  // Wrap setLanguage to show banner + toast only on active user language changes
+  // Wrap setLanguage to show toast only on active user language changes
   const setLanguage = useCallback((newLang: Language) => {
     setLanguageState(prev => {
       if (newLang !== prev) {
-        if (newLang !== 'en' && newLang in bannerMessages) {
-          setShowBanner(true);
-        }
         // Confirmation toast in the new language
         const msg = languageUpdatedMessages[newLang] || languageUpdatedMessages.en;
         const name = languageNames[newLang] || newLang;
@@ -1436,37 +1432,10 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     } catch { /* non-fatal */ }
   }, [language]);
 
-  const bannerTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const dismissBanner = useCallback(() => {
-    setShowBanner(false);
-    if (bannerTimerRef.current) clearTimeout(bannerTimerRef.current);
-    localStorage.setItem(BANNER_DISMISSED_KEY, '1');
-  }, []);
-
-  // Auto-dismiss after 5 seconds whenever banner appears
-  useEffect(() => {
-    if (!showBanner) return;
-    bannerTimerRef.current = setTimeout(() => setShowBanner(false), 5000);
-    return () => { if (bannerTimerRef.current) clearTimeout(bannerTimerRef.current); };
-  }, [showBanner]);
-
   const t = (key: string) => translations[language]?.[key] || translations.en[key] || key;
 
   return (
     <I18nContext.Provider value={{ language, setLanguage, t }}>
-      {showBanner && (
-        <div className="fixed top-0 left-0 right-0 z-[200] bg-teal-600 text-white px-4 py-2.5 text-center text-sm flex items-center justify-center gap-3 shadow-md">
-          <span>{bannerMessages[language]}</span>
-          <button
-            onClick={dismissBanner}
-            className="ml-2 p-0.5 rounded hover:bg-white/20 transition-colors"
-            aria-label="Dismiss"
-          >
-            <X size={16} />
-          </button>
-        </div>
-      )}
       {children}
     </I18nContext.Provider>
   );

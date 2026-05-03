@@ -21,6 +21,8 @@ const SeekerAuthPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [dataLocationConsent, setDataLocationConsent] = useState(false);
   const [policyConsent, setPolicyConsent] = useState(false);
+  const [showOAuthConsentModal, setShowOAuthConsentModal] = useState(false);
+  const [pendingOAuthProvider, setPendingOAuthProvider] = useState<'google' | 'apple' | null>(null);
 
   // Bug Fix 1: password reset emails redirect to /login. If we land here with a
   // recovery token in the URL hash, forward to /reset-password preserving the hash
@@ -146,12 +148,29 @@ const SeekerAuthPage = () => {
   };
 
   const handleOAuth = async (provider: 'google' | 'apple') => {
+    if (mode === 'signup' && (!dataLocationConsent || !policyConsent)) {
+      setPendingOAuthProvider(provider);
+      setShowOAuthConsentModal(true);
+      return;
+    }
     const { error: oErr } = await lovable.auth.signInWithOAuth(provider, {
       redirect_uri: window.location.origin + '/auth/callback',
     });
     if (oErr) {
       toast.error('Something went wrong. Please try again.');
     }
+  };
+
+  const confirmOAuthConsent = async () => {
+    setShowOAuthConsentModal(false);
+    if (!pendingOAuthProvider) return;
+    const { error: oErr } = await lovable.auth.signInWithOAuth(pendingOAuthProvider, {
+      redirect_uri: window.location.origin + '/auth/callback',
+    });
+    if (oErr) {
+      toast.error('Something went wrong. Please try again.');
+    }
+    setPendingOAuthProvider(null);
   };
 
   // Shared input style — Apple-clean

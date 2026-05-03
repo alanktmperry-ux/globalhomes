@@ -1637,7 +1637,7 @@ const Index = () => {
                       onClick={() => navigate(signIn)}
                       className="w-full bg-white text-slate-900 font-semibold text-sm py-2.5 rounded-xl hover:bg-slate-100 transition-colors"
                     >
-                      Sign in
+                      {t('home.portals.signIn')}
                     </button>
                     <button
                       onClick={() => navigate(register)}

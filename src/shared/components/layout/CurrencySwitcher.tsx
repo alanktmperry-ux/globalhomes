@@ -55,6 +55,7 @@ export function CurrencySwitcher() {
       {open && createPortal(
         <div
           ref={dropdownRef}
+          data-settings-portal-ignore
           style={{ position: 'fixed', top: dropdownPos.top, right: dropdownPos.right }}
           className="z-[100] min-w-[240px] max-h-[70vh] overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg p-2"
         >

@@ -149,12 +149,38 @@ const Index = () => {
     return () => clearInterval(id);
   }, []);
 
-  // Card swap
+  // Card cycle — crossfade image layer + text inside the static front card
   useEffect(() => {
     const id = setInterval(() => {
-      setCardIdx((c) => ({ front: c.back, back: (c.back + 1) % FEAT_LISTINGS.length }));
-      setSwap((s) => !s);
-    }, 4800);
+      const next = (cardIdxRef.current + 1) % FEAT_LISTINGS.length;
+      const listing = FEAT_LISTINGS[next];
+      cardIdxRef.current = next;
+
+      // Preload next image
+      const pre = new Image();
+      pre.onload = () => {
+        const inactive = activeLayerRef.current === 'a' ? layerBRef.current : layerARef.current;
+        const active = activeLayerRef.current === 'a' ? layerARef.current : layerBRef.current;
+        if (inactive) inactive.style.backgroundImage = `url(${listing.img})`;
+        // swap active class
+        requestAnimationFrame(() => {
+          if (inactive) inactive.classList.add('active');
+          if (active) active.classList.remove('active');
+          activeLayerRef.current = activeLayerRef.current === 'a' ? 'b' : 'a';
+        });
+      };
+      pre.src = listing.img;
+
+      // Text crossfade
+      const t = titleRef.current;
+      const p = priceRef.current;
+      if (t) t.classList.add('hcard-text-hidden');
+      if (p) p.classList.add('hcard-text-hidden');
+      window.setTimeout(() => {
+        if (t) { t.textContent = listing.title; t.classList.remove('hcard-text-hidden'); }
+        if (p) { p.textContent = listing.price; p.classList.remove('hcard-text-hidden'); }
+      }, 200);
+    }, 5000);
     return () => clearInterval(id);
   }, []);
 

@@ -1,5 +1,12 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import "../_shared/email-footer.ts";
+import {
+  brandShell,
+  brandButton,
+  brandFeatureList,
+  BRAND,
+} from "../_shared/email-brand.ts";
 
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req.headers.get("Origin"));

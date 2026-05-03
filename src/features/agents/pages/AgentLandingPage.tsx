@@ -9,7 +9,7 @@ const AgentLandingPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const features = [
+  const features: Array<{ num: string; icon: string; tagKey: string | null; titleKey: string; bodyKey: string; highlight: boolean }> = [
     { num: '01', icon: '🔮', tagKey: 'agentLanding.badgeUnique', titleKey: 'agentLanding.feature1Title', bodyKey: 'agentLanding.feature1Body', highlight: true },
     { num: '02', icon: '🤖', tagKey: 'agentLanding.badgeAutomated', titleKey: 'agentLanding.feature2Title', bodyKey: 'agentLanding.feature2Body', highlight: true },
     { num: '03', icon: '🌐', tagKey: null, titleKey: 'agentLanding.feature3Title', bodyKey: 'agentLanding.feature3Body', highlight: false },

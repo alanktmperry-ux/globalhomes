@@ -28,6 +28,8 @@ const AgentAuthPage = () => {
   const [pendingSignIn, setPendingSignIn] = useState(false);
   const [dataLocationConsent, setDataLocationConsent] = useState(false);
   const [policyConsent, setPolicyConsent] = useState(false);
+  const [showOAuthConsentModal, setShowOAuthConsentModal] = useState(false);
+  const [pendingOAuthProvider, setPendingOAuthProvider] = useState<'google' | 'apple' | null>(null);
 
   // ── All useRef hooks ──
   const captchaRef = useRef<HCaptcha>(null);
@@ -173,11 +175,27 @@ const AgentAuthPage = () => {
   };
 
   const handleOAuth = async (provider: 'google' | 'apple') => {
+    if (step === 'register' && (!dataLocationConsent || !policyConsent)) {
+      setPendingOAuthProvider(provider);
+      setShowOAuthConsentModal(true);
+      return;
+    }
     const { lovable } = await import('@/integrations/lovable/index');
     const { error } = await lovable.auth.signInWithOAuth(provider, {
       redirect_uri: window.location.origin + '/auth/callback',
     });
     if (error) toast.error('Error');
+  };
+
+  const confirmOAuthConsent = async () => {
+    setShowOAuthConsentModal(false);
+    if (!pendingOAuthProvider) return;
+    const { lovable } = await import('@/integrations/lovable/index');
+    const { error } = await lovable.auth.signInWithOAuth(pendingOAuthProvider, {
+      redirect_uri: window.location.origin + '/auth/callback',
+    });
+    if (error) toast.error('Error');
+    setPendingOAuthProvider(null);
   };
 
   const goBack = () => {

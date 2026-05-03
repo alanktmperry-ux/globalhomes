@@ -31,8 +31,13 @@ import { toast } from 'sonner';
 import {
   CalendarDays, Plus, CheckCircle2, XCircle, Loader2, Mail,
   AlertTriangle, ExternalLink, CalendarIcon, Copy, ClipboardCheck, FileText, PlayCircle,
+  ChevronLeft, ChevronRight,
 } from 'lucide-react';
-import { format, parseISO, addDays, differenceInDays } from 'date-fns';
+import {
+  format, parseISO, addDays, differenceInDays,
+  startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek,
+  isSameDay, isSameMonth,
+} from 'date-fns';
 import DashboardHeader from './DashboardHeader';
 import { cn } from '@/shared/lib/utils';
 
@@ -102,6 +107,13 @@ const STATUS_BADGE: Record<InspectionStatus, string> = {
   cancelled: 'bg-red-500/15 text-red-700 border-0',
 };
 
+// Calendar pill colours by type (solid bg for calendar context)
+const CAL_PILL: Record<InspectionType, string> = {
+  entry: 'bg-blue-500 text-white',
+  routine: 'bg-teal-500 text-white',
+  exit: 'bg-orange-500 text-white',
+};
+
 interface StateRule { noticeHours?: number; noticeDays?: number; maxPerYear: number; act: string; }
 const STATE_RULES: Record<string, StateRule> = {
   VIC: { noticeHours: 24, maxPerYear: 4, act: 'Residential Tenancies Act 1997 (Vic)' },
@@ -152,7 +164,7 @@ const CONDITION_LABELS: Record<CompleteForm['condition'], string> = {
   urgent: 'Urgent Issues',
 };
 
-type FilterTab = 'upcoming' | 'overdue' | 'completed' | 'due' | 'disputes';
+type FilterTab = 'upcoming' | 'calendar' | 'overdue' | 'completed' | 'due' | 'disputes';
 
 export default function PMInspectionsPage() {
   const { user } = useAuth();
@@ -164,6 +176,9 @@ export default function PMInspectionsPage() {
   const [inspections, setInspections] = useState<InspectionRow[]>([]);
   const [activeTenancies, setActiveTenancies] = useState<ActiveTenancy[]>([]);
   const [tab, setTab] = useState<FilterTab>('upcoming');
+
+  // Calendar navigation
+  const [calendarMonth, setCalendarMonth] = useState(() => new Date());
 
   const [scheduleForm, setScheduleForm] = useState<ScheduleForm | null>(null);
   const [savingSchedule, setSavingSchedule] = useState(false);
@@ -240,7 +255,6 @@ export default function PMInspectionsPage() {
     const out: SuggestedInspection[] = [];
 
     for (const t of activeTenancies) {
-      // Already has scheduled routine in next 90 days?
       const hasUpcomingRoutine = inspections.some(i =>
         i.tenancy_id === t.id &&
         i.inspection_type === 'routine' &&
@@ -326,10 +340,32 @@ export default function PMInspectionsPage() {
     return { upcoming, overdue, completedQuarter, due: suggested.length, disputes: disputed.length };
   }, [inspections, suggested, disputed]);
 
-  // Filtered list
+  // Calendar — map date string → inspections for that day (scheduled only, not cancelled)
+  const inspectionsByDate = useMemo(() => {
+    const map = new Map<string, InspectionRow[]>();
+    for (const i of inspections) {
+      if (i.status === 'cancelled') continue;
+      const key = i.scheduled_date.slice(0, 10);
+      const arr = map.get(key) || [];
+      arr.push(i);
+      map.set(key, arr);
+    }
+    return map;
+  }, [inspections]);
+
+  // Calendar — grid of day cells for the visible month
+  const calendarDays = useMemo(() => {
+    const monthStart = startOfMonth(calendarMonth);
+    const monthEnd = endOfMonth(calendarMonth);
+    const gridStart = startOfWeek(monthStart, { weekStartsOn: 1 });
+    const gridEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
+    return eachDayOfInterval({ start: gridStart, end: gridEnd });
+  }, [calendarMonth]);
+
+  // Filtered list for table tabs
   const filtered = useMemo(() => {
     const today = new Date().toISOString().slice(0, 10);
-    if (tab === 'due' || tab === 'disputes') return [];
+    if (tab === 'due' || tab === 'disputes' || tab === 'calendar') return [];
     return inspections.filter(i => {
       if (tab === 'upcoming') return i.status === 'scheduled' && i.scheduled_date >= today;
       if (tab === 'overdue') return i.status === 'scheduled' && i.scheduled_date < today;
@@ -519,7 +555,6 @@ ${agencyName || ''}`.trim();
 
     if (completeForm.followUp) {
       const addr = completeFor.tenancies?.properties?.address || 'property';
-      // Need property_id to insert maintenance job — fetch from tenancy
       const { data: t } = await supabase
         .from('tenancies')
         .select('property_id')
@@ -558,6 +593,7 @@ ${agencyName || ''}`.trim();
   };
 
   const today = new Date().toISOString().slice(0, 10);
+  const todayDate = new Date();
 
   return (
     <div className="min-h-screen bg-background">
@@ -572,6 +608,10 @@ ${agencyName || ''}`.trim();
           <Tabs value={tab} onValueChange={(v) => setTab(v as FilterTab)}>
             <TabsList>
               <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+              <TabsTrigger value="calendar">
+                <CalendarDays size={13} className="mr-1.5" />
+                Calendar
+              </TabsTrigger>
               <TabsTrigger value="overdue">Overdue</TabsTrigger>
               <TabsTrigger value="completed">Completed</TabsTrigger>
               <TabsTrigger value="due">Due for Inspection</TabsTrigger>
@@ -602,6 +642,110 @@ ${agencyName || ''}`.trim();
           <div className="flex items-center justify-center py-16 text-muted-foreground">
             <Loader2 size={18} className="animate-spin mr-2" /> Loading inspections…
           </div>
+        ) : tab === 'calendar' ? (
+          <Card>
+            <CardContent className="p-4 sm:p-6">
+              {/* Month navigation */}
+              <div className="flex items-center justify-between mb-5">
+                <button
+                  onClick={() => setCalendarMonth(d => new Date(d.getFullYear(), d.getMonth() - 1, 1))}
+                  className="p-1.5 rounded-md hover:bg-muted transition-colors"
+                  aria-label="Previous month"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                <h3 className="text-base font-semibold">
+                  {format(calendarMonth, 'MMMM yyyy')}
+                </h3>
+                <button
+                  onClick={() => setCalendarMonth(d => new Date(d.getFullYear(), d.getMonth() + 1, 1))}
+                  className="p-1.5 rounded-md hover:bg-muted transition-colors"
+                  aria-label="Next month"
+                >
+                  <ChevronRight size={18} />
+                </button>
+              </div>
+
+              {/* Day-of-week headers */}
+              <div className="grid grid-cols-7 mb-1">
+                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => (
+                  <div key={d} className="text-center text-[11px] font-medium text-muted-foreground py-1">
+                    {d}
+                  </div>
+                ))}
+              </div>
+
+              {/* Calendar grid */}
+              <div className="grid grid-cols-7 border-l border-t border-border">
+                {calendarDays.map(day => {
+                  const key = format(day, 'yyyy-MM-dd');
+                  const dayInspections = inspectionsByDate.get(key) || [];
+                  const isCurrentMonth = isSameMonth(day, calendarMonth);
+                  const isToday = isSameDay(day, todayDate);
+
+                  return (
+                    <div
+                      key={key}
+                      className={cn(
+                        'min-h-[80px] border-b border-r border-border p-1.5',
+                        !isCurrentMonth && 'bg-muted/30',
+                      )}
+                    >
+                      <div className={cn(
+                        'text-xs font-medium mb-1 w-6 h-6 flex items-center justify-center rounded-full',
+                        isToday
+                          ? 'bg-primary text-primary-foreground'
+                          : isCurrentMonth
+                            ? 'text-foreground'
+                            : 'text-muted-foreground',
+                      )}>
+                        {format(day, 'd')}
+                      </div>
+                      <div className="space-y-0.5">
+                        {dayInspections.slice(0, 3).map(i => {
+                          const addr = i.tenancies?.properties?.address || i.tenancies?.properties?.suburb || '';
+                          const shortAddr = addr.length > 18 ? addr.slice(0, 18) + '…' : addr;
+                          return (
+                            <button
+                              key={i.id}
+                              onClick={() => navigate(`/dashboard/inspection/${i.id}`)}
+                              title={`${TYPE_LABEL[i.inspection_type]} — ${addr}`}
+                              className={cn(
+                                'w-full text-left text-[10px] font-medium px-1.5 py-0.5 rounded truncate leading-tight',
+                                CAL_PILL[i.inspection_type],
+                                'hover:opacity-80 transition-opacity',
+                              )}
+                            >
+                              {TYPE_LABEL[i.inspection_type][0]} {shortAddr}
+                            </button>
+                          );
+                        })}
+                        {dayInspections.length > 3 && (
+                          <div className="text-[10px] text-muted-foreground px-1">
+                            +{dayInspections.length - 3} more
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Legend */}
+              <div className="flex items-center gap-4 mt-4 flex-wrap">
+                {(['entry', 'routine', 'exit'] as InspectionType[]).map(t => (
+                  <div key={t} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <span className={cn('w-2.5 h-2.5 rounded-sm', CAL_PILL[t])} />
+                    {TYPE_LABEL[t]}
+                  </div>
+                ))}
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <span className="w-2.5 h-2.5 rounded-full bg-primary" />
+                  Today
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         ) : tab === 'due' ? (
           <div className="space-y-6">
             <div>

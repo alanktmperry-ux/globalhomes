@@ -21,7 +21,6 @@ export const zhCN: Partial<Record<keyof typeof EnBase, string>> = {
   'hero.eyebrow': '澳大利亚AI驱动的房产平台',
   'hero.headline': '寻找您的家。',
   'hero.headline2': '用您的语言。',
-  'hero.subheadline': '支持24种语言搜索，以您的货币显示价格，由AI语音搜索驱动。',
   'hero.forSale': '出售',
   'hero.forRent': '出租',
   'hero.search': '搜索',

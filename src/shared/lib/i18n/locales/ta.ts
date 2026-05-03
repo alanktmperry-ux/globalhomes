@@ -5,7 +5,6 @@ export const ta: Partial<Record<TranslationKey, string>> = {
   'hero.eyebrow': 'ஆஸ்திரேலியாவின் AI-இயக்கும் சொத்து தளம்',
   'hero.headline': 'உங்கள் வீட்டை கண்டுபிடியுங்கள்.',
   'hero.headline2': 'உங்கள் மொழியில்.',
-  'hero.subheadline': '24 மொழிகளில் தேடுங்கள். உங்கள் நாணயத்தில் விலைகளை பாருங்கள். AI குரல் தேடல் மூலம்.',
   'hero.forSale': 'விற்பனைக்கு',
   'hero.forRent': 'வாடகைக்கு',
   'hero.search': 'தேடு',

@@ -9,7 +9,6 @@ export const hi: Partial<Record<keyof typeof EnBase, string>> = {
   'hero.eyebrow': 'ऑस्ट्रेलिया का AI-संचालित संपत्ति प्लेटफ़ॉर्म',
   'hero.headline': 'अपना घर खोजें।',
   'hero.headline2': 'अपनी भाषा में।',
-  'hero.subheadline': '24 भाषाओं में खोजें। अपनी मुद्रा में कीमतें देखें। AI वॉयस सर्च द्वारा संचालित।',
   'hero.forSale': 'बिक्री के लिए',
   'hero.forRent': 'किराये के लिए',
   'hero.search': 'खोजें',

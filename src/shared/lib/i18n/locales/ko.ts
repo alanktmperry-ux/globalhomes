@@ -4,7 +4,6 @@ export const ko: Partial<Record<TranslationKey, string>> = {
   'hero.eyebrow': '호주의 AI 기반 부동산 플랫폼',
   'hero.headline': '집을 찾아보세요.',
   'hero.headline2': '내 언어로.',
-  'hero.subheadline': '24개 언어로 검색하세요. 내 화폐로 가격을 확인하세요. AI 음성 검색 지원.',
   'hero.forSale': '매매',
   'hero.forRent': '임대',
   'hero.search': '검색',

@@ -9,7 +9,6 @@ export const pa: Partial<Record<TranslationKey, string>> = {
   'hero.eyebrow': 'ਆਸਟ੍ਰੇਲੀਆ ਦਾ AI-ਸੰਚਾਲਿਤ ਸੰਪਤੀ ਪਲੇਟਫਾਰਮ',
   'hero.headline': 'ਆਪਣਾ ਘਰ ਲੱਭੋ।',
   'hero.headline2': 'ਆਪਣੀ ਭਾਸ਼ਾ ਵਿੱਚ।',
-  'hero.subheadline': '24 ਭਾਸ਼ਾਵਾਂ ਵਿੱਚ ਖੋਜ ਕਰੋ। ਆਪਣੀ ਕਰੰਸੀ ਵਿੱਚ ਕੀਮਤਾਂ ਦੇਖੋ। AI ਵੌਇਸ ਖੋਜ ਨਾਲ।',
   'hero.forSale': 'ਵਿਕਰੀ ਲਈ',
   'hero.forRent': 'ਕਿਰਾਏ ਲਈ',
   'hero.search': 'ਖੋਜੋ',

@@ -22,7 +22,6 @@ export const zhTW: Partial<Record<keyof typeof EnBase, string>> = {
   'hero.eyebrow': '澳洲AI驅動的房地產平台',
   'hero.headline': '尋找您的家。',
   'hero.headline2': '用您的語言。',
-  'hero.subheadline': '支援24種語言搜尋,以您的貨幣顯示價格,由AI語音搜尋驅動。',
   'hero.forSale': '出售',
   'hero.forRent': '出租',
   'hero.search': '搜尋',

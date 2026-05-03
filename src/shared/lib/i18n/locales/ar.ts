@@ -4,7 +4,6 @@ export const ar: Partial<Record<TranslationKey, string>> = {
   'hero.eyebrow': 'منصة العقارات الأسترالية المدعومة بالذكاء الاصطناعي',
   'hero.headline': 'ابحث عن منزلك.',
   'hero.headline2': 'بلغتك.',
-  'hero.subheadline': 'ابحث بـ 24 لغة. شاهد الأسعار بعملتك. مدعوم بالبحث الصوتي بالذكاء الاصطناعي.',
   'hero.forSale': 'للبيع',
   'hero.forRent': 'للإيجار',
   'hero.search': 'بحث',

@@ -4,7 +4,6 @@ export const vi: Partial<Record<TranslationKey, string>> = {
   'hero.eyebrow': 'Nền tảng bất động sản AI của Úc',
   'hero.headline': 'Tìm nhà của bạn.',
   'hero.headline2': 'Bằng ngôn ngữ của bạn.',
-  'hero.subheadline': 'Tìm kiếm bằng 24 ngôn ngữ. Xem giá theo đồng tiền của bạn. Hỗ trợ tìm kiếm bằng giọng nói AI.',
   'hero.forSale': 'Nhà bán',
   'hero.forRent': 'Nhà cho thuê',
   'hero.search': 'Tìm kiếm',

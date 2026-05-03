@@ -2,11 +2,9 @@ import { useState, useCallback, useRef, useEffect, useMemo, lazy, Suspense } fro
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-// framer-motion is split into its own chunk via vite.config.ts manualChunks.
-// The landing hero uses plain CSS animations to avoid loading this chunk on
-// cold paint. motion is only referenced in the search-results branch (mobile
-// bottom sheet drag), which loads after the user runs a search.
-import { motion, useMotionValue, useSpring, type PanInfo } from 'framer-motion';
+// framer-motion previously imported here for the mobile bottom-sheet drag.
+// Replaced with plain touch handlers + CSS transforms to keep ~90KB out of
+// the homepage critical path. See the mobile sheet below.
 import { ArrowRight, ArrowLeft, MapPin, Sparkles, Map, List, Mic, MicOff, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users, Search, Home, Check, ArrowLeftRight, UserCheck, ChevronRight, Globe, Building2, Briefcase, Handshake } from 'lucide-react';
 const VoiceSearchHero = lazy(() =>
   import('@/features/search/components/VoiceSearchHero').then(m => ({ default: m.VoiceSearchHero }))
@@ -229,8 +227,13 @@ const Index = () => {
   const listsPanelRef = useRef<HTMLDivElement>(null);
   const SNAP_POINTS = [0.35, 0.65, 0.85];
   const [sheetSnap, setSheetSnap] = useState(0);
-  const sheetHeightMV = useMotionValue(viewportHeight * SNAP_POINTS[0]);
-  const sheetHeightSpring = useSpring(sheetHeightMV, { stiffness: 300, damping: 30 });
+  const [sheetHeight, setSheetHeight] = useState(() => viewportHeight * SNAP_POINTS[0]);
+  const sheetDragStartY = useRef<number | null>(null);
+  const sheetDragStartH = useRef<number>(0);
+  const sheetDragLastY = useRef<number>(0);
+  const sheetDragLastT = useRef<number>(0);
+  const sheetDragVelocity = useRef<number>(0);
+  const [sheetDragging, setSheetDragging] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [radiusSliderOpen, setRadiusSliderOpen] = useState(false);
   const isDragging = useRef(false);
@@ -769,32 +772,54 @@ const Index = () => {
 
   // Sync spring with snap point and viewport
   useEffect(() => {
-    sheetHeightMV.set(viewportHeight * SNAP_POINTS[sheetSnap]);
+    setSheetHeight(viewportHeight * SNAP_POINTS[sheetSnap]);
   }, [viewportHeight, sheetSnap]);
 
-  const handleSheetDragEnd = useCallback((_: any, info: PanInfo) => {
-    const velocity = info.velocity.y;
-    const currentH = sheetHeightMV.get();
-    const currentPct = currentH / viewportHeight;
+  const handleSheetTouchStart = useCallback((e: React.TouchEvent) => {
+    sheetDragStartY.current = e.touches[0].clientY;
+    sheetDragStartH.current = sheetHeight;
+    sheetDragLastY.current = e.touches[0].clientY;
+    sheetDragLastT.current = performance.now();
+    sheetDragVelocity.current = 0;
+    setSheetDragging(true);
+  }, [sheetHeight]);
 
-    // Use velocity to determine direction, then snap
+  const handleSheetTouchMove = useCallback((e: React.TouchEvent) => {
+    if (sheetDragStartY.current == null) return;
+    const y = e.touches[0].clientY;
+    const dy = y - sheetDragStartY.current;
+    const newH = Math.max(viewportHeight * 0.15, Math.min(viewportHeight * 0.9, sheetDragStartH.current - dy));
+    const now = performance.now();
+    const dt = now - sheetDragLastT.current;
+    if (dt > 0) {
+      sheetDragVelocity.current = ((y - sheetDragLastY.current) / dt) * 1000;
+    }
+    sheetDragLastY.current = y;
+    sheetDragLastT.current = now;
+    setSheetHeight(newH);
+  }, [viewportHeight]);
+
+  const handleSheetTouchEnd = useCallback(() => {
+    if (sheetDragStartY.current == null) return;
+    const velocity = sheetDragVelocity.current;
+    const currentPct = sheetHeight / viewportHeight;
     let targetIdx = sheetSnap;
     if (velocity < -300) {
-      // Flick up → next larger snap
       targetIdx = Math.min(sheetSnap + 1, SNAP_POINTS.length - 1);
     } else if (velocity > 300) {
-      // Flick down → next smaller snap
       targetIdx = Math.max(sheetSnap - 1, 0);
     } else {
-      // Find nearest snap point
       let minDist = Infinity;
       SNAP_POINTS.forEach((sp, i) => {
         const dist = Math.abs(currentPct - sp);
         if (dist < minDist) { minDist = dist; targetIdx = i; }
       });
     }
+    sheetDragStartY.current = null;
+    setSheetDragging(false);
     setSheetSnap(targetIdx);
-  }, [viewportHeight, sheetSnap]);
+    setSheetHeight(viewportHeight * SNAP_POINTS[targetIdx]);
+  }, [sheetHeight, viewportHeight, sheetSnap]);
 
   useEffect(() => {
     let rafId: number | null = null;
@@ -1942,19 +1967,22 @@ const Index = () => {
           {mobileView === 'map' ? (
             <>
               <div className="absolute inset-0">{mapComponent}</div>
-              <motion.div
+              <div
                 className="absolute bottom-0 left-0 right-0 z-20 bg-background rounded-t-2xl shadow-drawer border-t border-border"
-                style={{ height: sheetHeightSpring, paddingBottom: 'env(safe-area-inset-bottom)' }}
-                drag="y"
-                dragConstraints={{ top: 0, bottom: 0 }}
-                dragElastic={0.1}
-                onDrag={(_, info) => {
-                  const newH = viewportHeight * SNAP_POINTS[sheetSnap] - info.offset.y;
-                  sheetHeightMV.set(Math.max(viewportHeight * 0.15, Math.min(viewportHeight * 0.9, newH)));
+                style={{
+                  height: sheetHeight,
+                  paddingBottom: 'env(safe-area-inset-bottom)',
+                  transition: sheetDragging ? 'none' : 'height 0.3s ease',
+                  willChange: 'height',
                 }}
-                onDragEnd={handleSheetDragEnd}
               >
-                <div className="w-full flex justify-center py-2 cursor-grab active:cursor-grabbing touch-none">
+                <div
+                  className="w-full flex justify-center py-2 cursor-grab active:cursor-grabbing touch-none"
+                  onTouchStart={handleSheetTouchStart}
+                  onTouchMove={handleSheetTouchMove}
+                  onTouchEnd={handleSheetTouchEnd}
+                  onTouchCancel={handleSheetTouchEnd}
+                >
                   <div className="w-10 h-1.5 rounded-full bg-muted" />
                 </div>
                 <div className="px-4 pb-2 flex items-center justify-between">
@@ -1998,17 +2026,22 @@ const Index = () => {
                     </Suspense>
                   )}
                 </div>
-              </motion.div>
-              <motion.button
+              </div>
+              <button
                 onClick={() => {
                   const hero = document.querySelector('[aria-label="Start voice search"]') as HTMLButtonElement;
                   if (hero) { window.scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(() => hero.click(), 500); }
                 }}
-                style={{ bottom: sheetHeightSpring, marginBottom: 20, paddingBottom: 'env(safe-area-inset-bottom)' }}
+                style={{
+                  bottom: sheetHeight,
+                  marginBottom: 20,
+                  paddingBottom: 'env(safe-area-inset-bottom)',
+                  transition: sheetDragging ? 'none' : 'bottom 0.3s ease',
+                }}
                 className="absolute right-4 z-20 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-elevated flex items-center justify-center"
               >
                 <Mic size={22} />
-              </motion.button>
+              </button>
             </>
           ) : (
             <div className="p-4 overflow-y-auto flex-1 min-h-0 pb-24 overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>

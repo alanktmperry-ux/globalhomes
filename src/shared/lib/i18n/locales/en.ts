@@ -645,9 +645,9 @@ export const en = {
   'search.emptyTitle': 'Properties coming soon',
   'search.emptyDesc': 'Agents are setting up their listings. Check back shortly!',
   // Homepage marketing
-  'hero.subheadline': "Voice search in 20 languages. Every listing translated into 20.",
+  'hero.subheadline': "Voice search in 20 languages. Every listing translated into 20 languages.",
   'home.marketingHeadline': "Built for multicultural Australia.",
-  'home.marketingBody': "ListHQ automatically translates every listing into 20 languages — Mandarin, Vietnamese, Hindi, Arabic, Tagalog and 15 more — reaching over 1.2 million multilingual buyers that REA and Domain can't serve.",
+  'home.marketingBody': "Australia's fastest-growing buyer segment searches in a language other than English. These buyers have the budgets — they just can't find you on REA or Domain. ListHQ puts your listings in front of them first.",
   'home.stat1Label': "Languages every listing is translated into",
   'home.stat2Label': "Multilingual buyers searching right now",
   'home.stat3Label': "Free — no credit card required",

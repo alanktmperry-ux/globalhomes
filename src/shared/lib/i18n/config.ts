@@ -21,6 +21,16 @@ export const SUPPORTED_LANGUAGES = [
   { code: 'bn',    name: 'বাংলা' },
   { code: 'pa',    name: 'ਪੰਜਾਬੀ' },
   { code: 'ta',    name: 'தமிழ்' },
+  { code: 'ja',    name: '日本語' },
+  { code: 'id',    name: 'Bahasa Indonesia' },
+  { code: 'ms',    name: 'Bahasa Melayu' },
+  { code: 'th',    name: 'ภาษาไทย' },
+  { code: 'fil',   name: 'Filipino' },
+  { code: 'it',    name: 'Italiano' },
+  { code: 'es',    name: 'Español' },
+  { code: 'fr',    name: 'Français' },
+  { code: 'pt',    name: 'Português' },
+  { code: 'ru',    name: 'Русский' },
 ] as const;
 
 export type SupportedLanguageCode = typeof SUPPORTED_LANGUAGES[number]['code'];
@@ -57,4 +67,14 @@ export const FROM_LEGACY_CODE_MAP: Record<string, SupportedLanguageCode> = {
   'bn':    'bn',
   'pa':    'pa',
   'ta':    'ta',
+  'ja':    'ja',
+  'id':    'id',
+  'ms':    'ms',
+  'th':    'th',
+  'fil':   'fil',
+  'it':    'it',
+  'es':    'es',
+  'fr':    'fr',
+  'pt':    'pt',
+  'ru':    'ru',
 };

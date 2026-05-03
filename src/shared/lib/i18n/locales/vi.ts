@@ -74,7 +74,7 @@ export const vi: Partial<Record<TranslationKey, string>> = {
 
   'home.agents.eyebrow': 'Dành cho môi giới',
   'home.agents.cta': 'Bắt đầu dùng thử miễn phí',
-  'home.agents.founding': 'Miễn phí 3 tháng',
+  'home.agents.founding': 'Miễn phí 60 ngày',
   'home.agents.freeTagSub': 'Không cần thẻ tín dụng. Truy cập đầy đủ.',
   'home.agents.feature1': 'Tin đăng đa ngôn ngữ bằng AI',
   'home.agents.feature2': 'CRM và pipeline tích hợp sẵn',

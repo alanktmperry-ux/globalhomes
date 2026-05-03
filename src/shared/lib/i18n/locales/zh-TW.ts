@@ -440,7 +440,7 @@ export const zhTW: Partial<Record<keyof typeof EnBase, string>> = {
   'home.agents.headline': '專為多元文化澳大利亞打造的平台。',
   'home.agents.sub': 'CRM、房源、物業管理、AI工具——一站式平台。支援24種語言。',
   'home.agents.cta': '開始免費試用',
-  'home.agents.founding': '前3個月免費',
+  'home.agents.founding': '60天免費',
   'home.agents.freeTagSub': '無需信用卡。完整功能。',
   'home.agents.feature1': 'AI驅動的多語言房源',
   'home.agents.feature2': '內建CRM與銷售管道',

@@ -417,7 +417,7 @@ export const hi: Partial<Record<keyof typeof EnBase, string>> = {
   'home.agents.headline': 'बहुसांस्कृतिक ऑस्ट्रेलिया के लिए बनाया गया प्लेटफ़ॉर्म।',
   'home.agents.sub': 'CRM, लिस्टिंग, संपत्ति प्रबंधन, AI उपकरण — सब एक ही जगह। 24 भाषाओं में।',
   'home.agents.cta': 'मुफ्त ट्रायल शुरू करें',
-  'home.agents.founding': '3 महीने मुफ़्त',
+  'home.agents.founding': '60 दिन मुफ़्त',
   'home.agents.freeTagSub': 'क्रेडिट कार्ड की आवश्यकता नहीं। पूर्ण एक्सेस।',
   'home.agents.feature1': 'AI-संचालित बहुभाषी लिस्टिंग',
   'home.agents.feature2': 'अंतर्निहित CRM और पाइपलाइन',

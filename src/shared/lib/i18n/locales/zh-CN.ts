@@ -439,7 +439,7 @@ export const zhCN: Partial<Record<keyof typeof EnBase, string>> = {
   'home.agents.headline': '专为多元文化澳大利亚打造的平台。',
   'home.agents.sub': 'CRM、房源、物业管理、AI工具——一站式平台。支持24种语言。',
   'home.agents.cta': '开始免费试用',
-  'home.agents.founding': '前3个月免费',
+  'home.agents.founding': '60天免费',
   'home.agents.freeTagSub': '无需信用卡。完整功能。',
   'home.agents.feature1': 'AI驱动的多语言房源',
   'home.agents.feature2': '内置CRM与销售管道',

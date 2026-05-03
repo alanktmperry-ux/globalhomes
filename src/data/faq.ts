@@ -605,9 +605,9 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     id: 'billing-founding-agent',
     question: 'What is the Founding Agent offer?',
-    answer: 'ListHQ\'s Founding Agent offer gives the first agents who join the platform 3 months of full access at no charge — no credit card required at signup.\n\nFounding Agent benefits include:\n• Full platform access for 3 months free\n• Locked-in founding pricing when you convert to a paid plan (lower than the standard public rate)\n• Founding Agent badge on your public agent profile\n• Direct input into product development — your feedback shapes what gets built next\n• Priority support during the launch period\n\nThe Founding Agent offer is available to a limited number of agents in each market. Once the founding cohort is full, new agents join at standard pricing. To claim the offer, sign up and complete your agency onboarding — no payment details are needed until the free period ends.',
+    answer: 'ListHQ\'s Founding Agent offer gives the first agents who join the platform 60 days of full access at no charge — no credit card required at signup.\n\nFounding Agent benefits include:\n• Full platform access for 60 days free\n• Locked-in founding pricing when you convert to a paid plan (lower than the standard public rate)\n• Founding Agent badge on your public agent profile\n• Direct input into product development — your feedback shapes what gets built next\n• Priority support during the launch period\n\nThe Founding Agent offer is available to a limited number of agents in each market. Once the founding cohort is full, new agents join at standard pricing. To claim the offer, sign up and complete your agency onboarding — no payment details are needed until the free period ends.',
     category: 'billing',
-    tags: ['founding agent', 'free', 'trial', 'offer', 'pricing', 'badge', '3 months'],
+    tags: ['founding agent', 'free', 'trial', 'offer', 'pricing', 'badge', '60 days'],
   },
 
   // GENERAL (continued)

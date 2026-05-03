@@ -393,7 +393,7 @@ export const ta: Partial<Record<TranslationKey, string>> = {
   'home.agents.headline': 'பல்கலாச்சார ஆஸ்திரேலியாவிற்காக கட்டப்பட்ட தளம்.',
   'home.agents.sub': 'CRM, பட்டியல்கள், சொத்து மேலாண்மை, AI கருவிகள் — அனைத்தும் ஒரே இடத்தில். 24 மொழிகளில்.',
   'home.agents.cta': 'இலவச சோதனையை தொடங்கு',
-  'home.agents.founding': '3 மாதங்கள் இலவசம்',
+  'home.agents.founding': '60 நாட்கள் இலவசம்',
   'home.agents.freeTagSub': 'கிரெடிட் கார்டு தேவையில்லை. முழு அணுகல்.',
   'home.agents.feature1': 'AI-இயக்கும் பல்மொழி பட்டியல்கள்',
   'home.agents.feature2': 'உள்ளமைக்கப்பட்ட CRM மற்றும் பைப்லைன்',

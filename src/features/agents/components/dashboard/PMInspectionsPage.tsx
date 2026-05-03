@@ -166,6 +166,14 @@ const CONDITION_LABELS: Record<CompleteForm['condition'], string> = {
 
 type FilterTab = 'upcoming' | 'calendar' | 'overdue' | 'completed' | 'due' | 'disputes';
 
+interface PlannedInspection {
+  tenancyId: string;
+  tenantName: string;
+  address: string;
+  state: string;
+  dates: string[];
+}
+
 export default function PMInspectionsPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -197,6 +205,10 @@ export default function PMInspectionsPage() {
   const [resolveFor, setResolveFor] = useState<InspectionRow | null>(null);
   const [resolveNotes, setResolveNotes] = useState('');
   const [savingResolve, setSavingResolve] = useState(false);
+
+  const [autoScheduleOpen, setAutoScheduleOpen] = useState(false);
+  const [autoSchedulePlan, setAutoSchedulePlan] = useState<PlannedInspection[]>([]);
+  const [autoScheduling, setAutoScheduling] = useState(false);
 
   const loadData = useCallback(async () => {
     if (!user) return;
@@ -592,6 +604,91 @@ ${agencyName || ''}`.trim();
     loadData();
   };
 
+  const buildAndOpenAutoSchedule = () => {
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const plan: PlannedInspection[] = [];
+
+    for (const t of activeTenancies) {
+      const futureRoutines = inspections
+        .filter(i =>
+          i.tenancy_id === t.id &&
+          i.inspection_type === 'routine' &&
+          i.status === 'scheduled' &&
+          i.scheduled_date >= todayStr
+        )
+        .map(i => i.scheduled_date)
+        .sort();
+
+      const completedRoutines = inspections
+        .filter(i =>
+          i.tenancy_id === t.id &&
+          i.inspection_type === 'routine' &&
+          i.status === 'completed'
+        )
+        .map(i => i.conducted_date || i.scheduled_date)
+        .filter(Boolean) as string[];
+
+      const needed = 4 - futureRoutines.length;
+      if (needed <= 0) continue;
+
+      const r = ruleFor(t.properties?.state);
+      const minDate = ruleMinDate(r);
+      const lastDate = [...futureRoutines, ...completedRoutines.sort()].pop();
+
+      let cursor = lastDate ? addDays(parseISO(lastDate), 91) : minDate;
+      if (cursor < minDate) cursor = minDate;
+
+      const dates: string[] = [];
+      for (let i = 0; i < needed; i++) {
+        dates.push(format(cursor, 'yyyy-MM-dd'));
+        cursor = addDays(cursor, 91);
+      }
+
+      if (dates.length > 0) {
+        plan.push({
+          tenancyId: t.id,
+          tenantName: t.tenant_name || 'Tenant',
+          address: [t.properties?.address, t.properties?.suburb].filter(Boolean).join(', ') || '—',
+          state: (t.properties?.state || '').toUpperCase(),
+          dates,
+        });
+      }
+    }
+
+    if (plan.length === 0) {
+      toast.success('All active tenancies already have 4 routine inspections scheduled for the year.');
+      return;
+    }
+
+    setAutoSchedulePlan(plan);
+    setAutoScheduleOpen(true);
+  };
+
+  const confirmAutoSchedule = async () => {
+    if (!agentId) return;
+    setAutoScheduling(true);
+
+    const inserts = autoSchedulePlan.flatMap(p => {
+      const t = activeTenancies.find(x => x.id === p.tenancyId);
+      return p.dates.map(date => ({
+        tenancy_id: p.tenancyId,
+        property_id: t?.property_id,
+        agent_id: agentId,
+        inspection_type: 'routine',
+        scheduled_date: date,
+        status: 'scheduled',
+      }));
+    });
+
+    const { error } = await supabase.from('property_inspections').insert(inserts as any);
+    setAutoScheduling(false);
+    if (error) { toast.error('Could not schedule inspections'); return; }
+    toast.success(`${inserts.length} routine inspection${inserts.length === 1 ? '' : 's'} scheduled`);
+    setAutoScheduleOpen(false);
+    setAutoSchedulePlan([]);
+    loadData();
+  };
+
   const today = new Date().toISOString().slice(0, 10);
   const todayDate = new Date();
 
@@ -749,7 +846,12 @@ ${agencyName || ''}`.trim();
         ) : tab === 'due' ? (
           <div className="space-y-6">
             <div>
-              <h3 className="text-sm font-semibold mb-2">Suggested Routine Inspections</h3>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-semibold">Suggested Routine Inspections</h3>
+                <Button size="sm" variant="outline" onClick={buildAndOpenAutoSchedule}>
+                  <CalendarDays size={13} className="mr-1.5" /> Auto-schedule annual routines
+                </Button>
+              </div>
               <Card>
                 <CardContent className="p-0">
                   {suggested.length === 0 ? (
@@ -1231,6 +1333,55 @@ ${agencyName || ''}`.trim();
             <Button onClick={submitResolve} disabled={savingResolve}>
               {savingResolve && <Loader2 size={14} className="mr-1 animate-spin" />}
               Mark Resolved
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Auto-schedule annual routines modal */}
+      <Dialog open={autoScheduleOpen} onOpenChange={(o) => !o && setAutoScheduleOpen(false)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Auto-schedule Annual Routine Inspections</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            The following routine inspections will be created to bring each tenancy up to 4 per year.
+            Dates respect your state's notice requirements.
+          </p>
+          {autoSchedulePlan.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-4 text-center">No inspections needed.</p>
+          ) : (
+            <div className="space-y-3 mt-1">
+              {autoSchedulePlan.map(p => (
+                <div key={p.tenancyId} className="rounded-lg border border-border p-3 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-medium">{p.address}</p>
+                      <p className="text-xs text-muted-foreground">{p.tenantName} — {p.state || 'Unknown state'}</p>
+                    </div>
+                    <Badge className="bg-teal-500/15 text-teal-700 border-0 text-[10px] shrink-0">
+                      {p.dates.length} to schedule
+                    </Badge>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {p.dates.map(d => (
+                      <span key={d} className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                        {format(parseISO(d), 'd MMM yyyy')}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              <p className="text-xs text-muted-foreground pt-1">
+                Total: {autoSchedulePlan.reduce((n, p) => n + p.dates.length, 0)} inspections across {autoSchedulePlan.length} tenanc{autoSchedulePlan.length === 1 ? 'y' : 'ies'}
+              </p>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAutoScheduleOpen(false)} disabled={autoScheduling}>Cancel</Button>
+            <Button onClick={confirmAutoSchedule} disabled={autoScheduling || autoSchedulePlan.length === 0}>
+              {autoScheduling && <Loader2 size={14} className="mr-1 animate-spin" />}
+              Confirm & Schedule All
             </Button>
           </DialogFooter>
         </DialogContent>

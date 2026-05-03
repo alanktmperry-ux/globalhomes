@@ -91,7 +91,7 @@ export default function About() {
           ListHQ is a SaaS platform founded in Australia in 2026.
         </p>
 
-        <h2 className="text-2xl font-semibold mt-10 mb-4">The Problem We Solve</h2>
+        <h2 className="text-2xl font-semibold mt-10 mb-4">{t('about.problem')}</h2>
         <p className="leading-relaxed text-muted-foreground mb-4">
           Australia's overseas-born population reached 30 per cent in the 2021 Census, yet the two dominant
           property portals — REA Group's realestate.com.au and Domain — are English-only platforms with no
@@ -107,16 +107,16 @@ export default function About() {
           multilingual communication as a core capability, not an afterthought.
         </p>
 
-        <h2 className="text-2xl font-semibold mt-10 mb-4">What ListHQ Does</h2>
+        <h2 className="text-2xl font-semibold mt-10 mb-4">{t('about.whatWeDo')}</h2>
         <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
           {FEATURES.map((f) => (
             <li key={f}>{f}</li>
           ))}
         </ul>
 
-        <h2 className="text-2xl font-semibold mt-10 mb-4">Who Uses ListHQ</h2>
+        <h2 className="text-2xl font-semibold mt-10 mb-4">{t('about.whoUses')}</h2>
 
-        <h3 className="text-xl font-semibold mt-6 mb-2">Real Estate Agents</h3>
+        <h3 className="text-xl font-semibold mt-6 mb-2">{t('about.userAgents')}</h3>
         <p className="leading-relaxed text-muted-foreground mb-4">
           ListHQ is used by agents working in high-multicultural-density suburbs across Australia,
           particularly in metropolitan Melbourne and Sydney. These agents regularly receive enquiries from
@@ -125,7 +125,7 @@ export default function About() {
           regardless of language.
         </p>
 
-        <h3 className="text-xl font-semibold mt-6 mb-2">Property Managers</h3>
+        <h3 className="text-xl font-semibold mt-6 mb-2">{t('about.userPMs')}</h3>
         <p className="leading-relaxed text-muted-foreground mb-4">
           Property managers with multilingual landlord and tenant bases use ListHQ to communicate and manage
           properties without the friction of manual translation. Rental listings appear in the languages
@@ -133,14 +133,14 @@ export default function About() {
           operational reality of managing diverse tenancy portfolios.
         </p>
 
-        <h3 className="text-xl font-semibold mt-6 mb-2">Buyers</h3>
+        <h3 className="text-xl font-semibold mt-6 mb-2">{t('about.userBuyers')}</h3>
         <p className="leading-relaxed text-muted-foreground mb-4">
           Multilingual buyers use ListHQ to search for properties in Mandarin, Vietnamese, Korean, Japanese,
           or Traditional Chinese. Buyers can also use the Halo system to post what they are looking for and
           receive responses from agents who have matching properties, including off-market listings.
         </p>
 
-        <h2 className="text-2xl font-semibold mt-10 mb-4">Languages Supported</h2>
+        <h2 className="text-2xl font-semibold mt-10 mb-4">{t('about.languages')}</h2>
         <p className="text-muted-foreground mb-4">
           ListHQ publishes property listings in six languages. Agents write or record a listing once — the
           platform generates all six versions automatically.
@@ -151,7 +151,7 @@ export default function About() {
           ))}
         </ul>
 
-        <h2 className="text-2xl font-semibold mt-10 mb-4">Pricing</h2>
+        <h2 className="text-2xl font-semibold mt-10 mb-4">{t('about.factPricing')}</h2>
         <div className="overflow-x-auto rounded-lg border border-border">
           <table className="w-full text-sm">
             <thead className="bg-muted/50">
@@ -176,7 +176,7 @@ export default function About() {
           All prices in Australian dollars, excluding GST.
         </p>
 
-        <h2 className="text-2xl font-semibold mt-10 mb-4">Our Mission</h2>
+        <h2 className="text-2xl font-semibold mt-10 mb-4">{t('about.mission')}</h2>
         <p className="leading-relaxed text-muted-foreground mb-4">
           ListHQ exists to remove the language barrier from Australian real estate. Australia is one of the
           most culturally diverse property markets in the world, and the platforms that dominate it were
@@ -185,7 +185,7 @@ export default function About() {
           reach them.
         </p>
 
-        <h2 className="text-2xl font-semibold mt-10 mb-4">Company Facts</h2>
+        <h2 className="text-2xl font-semibold mt-10 mb-4">{t('about.facts')}</h2>
         <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
           {COMPANY_FACTS.map(({ term, def }) => (
             <div key={term} className="border-b border-border pb-3">

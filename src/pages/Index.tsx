@@ -221,11 +221,15 @@ const Index = () => {
 
   const frontStyle: React.CSSProperties = {
     width: '400px', height: '520px', right: '0px', top: '30px',
-    zIndex: 3, transform: 'rotate(0deg)', filter: 'brightness(1)',
+    transform: 'scale(1) translateX(0px) translateY(0px) rotate(0deg)',
+    filter: 'brightness(1)',
+    zIndex: 3,
   };
   const backStyle: React.CSSProperties = {
-    width: '340px', height: '460px', right: '30px', top: '10px',
-    zIndex: 2, transform: 'rotate(-4deg)', filter: 'brightness(0.92)',
+    width: '400px', height: '520px', right: '0px', top: '30px',
+    transform: 'scale(0.82) translateX(50px) translateY(-18px) rotate(-4deg)',
+    filter: 'brightness(0.92)',
+    zIndex: 2,
   };
 
   return (

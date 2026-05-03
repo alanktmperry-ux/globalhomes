@@ -1511,7 +1511,7 @@ const Index = () => {
           >
             <p className="text-center text-lg md:text-xl font-semibold text-foreground">
               <span className="underline decoration-blue-500 decoration-2 underline-offset-4">1 in 5</span>{' '}
-              Australian buyers doesn't search in English. ListHQ lists them all.
+              {t('home.oneInFive')}
             </p>
           </div>
         </section>
@@ -1578,7 +1578,7 @@ const Index = () => {
                 onClick={() => navigate('/agents')}
                 className="text-sm text-slate-600 hover:text-blue-600 transition-colors font-medium"
               >
-                Looking for an agent who speaks your language? Find one →
+                {t('home.findAgent')}
               </button>
             </div>
           </div>
@@ -2135,10 +2135,10 @@ const HowItWorksSection = ({ t }: { t: (key: string) => string }) => {
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-10">
           <span className="inline-block bg-blue-50 text-blue-600 uppercase tracking-wider px-3 py-1 rounded-full text-[11px] font-semibold mb-4">
-            How it works
+            {t('home.howItWorks.eyebrow')}
           </span>
           <h2 className="text-[28px] font-medium text-slate-900">
-            The simplest way to reach every buyer
+            {t('home.howItWorks.agentHeading')}
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -763,4 +763,16 @@ export const ta: Partial<Record<TranslationKey, string>> = {
   'about.factPricing': 'Pricing',
   'about.factPricingRange': 'Pricing range',
 
+  'home.portals.title': 'தொழில்முறை போர்டல்கள்',
+  'home.portals.subtitle': 'உங்கள் அர்ப்பணிக்கப்பட்ட பணியிடத்தில் உள்நுழையுங்கள்',
+  'home.portals.agent.title': 'முகவர் போர்டல்',
+  'home.portals.agent.desc': 'பட்டியல்கள், அறக்கட்டளை கணக்குகள், வாடகை ரோல் மற்றும் லீட்களை நிர்வகிக்கவும்.',
+  'home.portals.agent.register': 'இன்னும் முகவர் இல்லையா?',
+  'home.portals.broker.title': 'அடமான தரகர் போர்டல்',
+  'home.portals.broker.desc': 'பரிந்துரை லீட்களைப் பார்க்கவும், உங்கள் சுயவிவரத்தை நிர்வகிக்கவும் மற்றும் நேரங்களை முன்பதிவு செய்யவும்.',
+  'home.portals.broker.register': 'பதிவு செய்யவில்லையா?',
+  'home.portals.partner.title': 'பங்காளர் போர்டல்',
+  'home.portals.partner.desc': 'பங்காளர் டாஷ்போர்டை அணுகவும் மற்றும் பரிந்துரை வருவாயை கண்காணிக்கவும்.',
+  'home.portals.partner.register': 'பங்காளராக ஆகுங்கள்?',
+  'home.portals.signIn': 'உள்நுழைய',
 };

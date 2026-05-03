@@ -731,4 +731,16 @@ export const bn: Partial<Record<keyof typeof EnBase, string>> = {
   'about.factPricing': 'Pricing',
   'about.factPricingRange': 'Pricing range',
 
+  'home.portals.title': 'পেশাদার পোর্টাল',
+  'home.portals.subtitle': 'আপনার ডেডিকেটেড ওয়ার্কস্পেসে সাইন ইন করুন',
+  'home.portals.agent.title': 'এজেন্ট পোর্টাল',
+  'home.portals.agent.desc': 'তালিকা, ট্রাস্ট অ্যাকাউন্ট, ভাড়া রোল এবং লিড পরিচালনা করুন।',
+  'home.portals.agent.register': 'এখনও এজেন্ট নন?',
+  'home.portals.broker.title': 'মর্টগেজ ব্রোকার পোর্টাল',
+  'home.portals.broker.desc': 'রেফারেল লিড দেখুন, প্রোফাইল পরিচালনা করুন এবং অ্যাপয়েন্টমেন্ট বুক করুন।',
+  'home.portals.broker.register': 'নিবন্ধিত নন?',
+  'home.portals.partner.title': 'পার্টনার পোর্টাল',
+  'home.portals.partner.desc': 'পার্টনার ড্যাশবোর্ড অ্যাক্সেস করুন এবং রেফারেল আয় ট্র্যাক করুন।',
+  'home.portals.partner.register': 'পার্টনার হন?',
+  'home.portals.signIn': 'সাইন ইন',
 };

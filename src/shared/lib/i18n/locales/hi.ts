@@ -731,4 +731,16 @@ export const hi: Partial<Record<keyof typeof EnBase, string>> = {
   'about.factPricing': 'Pricing',
   'about.factPricingRange': 'Pricing range',
 
+  'home.portals.title': 'पेशेवर पोर्टल',
+  'home.portals.subtitle': 'अपने समर्पित कार्यक्षेत्र में साइन इन करें',
+  'home.portals.agent.title': 'एजेंट पोर्टल',
+  'home.portals.agent.desc': 'लिस्टिंग, ट्रस्ट खाते, किराया रोल और लीड प्रबंधित करें।',
+  'home.portals.agent.register': 'अभी तक एजेंट नहीं हैं?',
+  'home.portals.broker.title': 'मॉर्गेज ब्रोकर पोर्टल',
+  'home.portals.broker.desc': 'रेफरल लीड देखें, अपनी प्रोफ़ाइल प्रबंधित करें और अपॉइंटमेंट बुक करें।',
+  'home.portals.broker.register': 'पंजीकृत नहीं हैं?',
+  'home.portals.partner.title': 'पार्टनर पोर्टल',
+  'home.portals.partner.desc': 'पार्टनर डैशबोर्ड तक पहुंचें और रेफरल आय ट्रैक करें।',
+  'home.portals.partner.register': 'पार्टनर बनें?',
+  'home.portals.signIn': 'साइन इन करें',
 };

@@ -339,7 +339,11 @@ const Index = () => {
         @keyframes marquee { 0% { transform: translateX(0) } 100% { transform: translateX(-50%) } }
         .marquee-track { animation: marquee 30s linear infinite; }
         .marquee-track:hover { animation-play-state: paused; }
-        .hcard { transition: all 1.2s cubic-bezier(.4,0,.2,1); position: absolute; background: #fff; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,.12); overflow: hidden; }
+        .hcard-img-wrap { position: relative; height: 290px; overflow: hidden; }
+        .hcard-layer { position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.9s ease; opacity: 0; }
+        .hcard-layer.active { opacity: 1; }
+        .hcard-title, .hcard-price { transition: opacity 0.2s ease; }
+        .hcard-text-hidden { opacity: 0; }
         .chip { background: ${T.off}; border: 1px solid ${T.border}; border-radius: 100px; padding: 7px 14px; font-size: 12.5px; font-weight: 600; color: ${T.mid}; cursor: pointer; transition: all .15s ease; }
         .chip:hover { background: ${T.blueL}; border-color: ${T.blueMid}; color: ${T.blue}; }
         @keyframes typeBlink { 50% { opacity: 0 } }

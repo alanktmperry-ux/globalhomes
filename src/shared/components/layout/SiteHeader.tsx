@@ -10,6 +10,8 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { NotificationBell } from '@/features/agents/components/dashboard/NotificationBell';
 import { SeekerNotificationBell } from '@/components/halo/SeekerNotificationBell';
 import { LanguageSwitcher } from '@/shared/components/layout/LanguageSwitcher';
+import { SUPPORTED_LANGUAGES, LEGACY_CODE_MAP, FROM_LEGACY_CODE_MAP } from '@/shared/lib/i18n/config';
+import { useI18n, type Language } from '@/shared/lib/i18n';
 import { CurrencySwitcher } from '@/shared/components/layout/CurrencySwitcher';
 // Lazy-loaded — pulls in framer-motion, only needed when the user opens the
 // "Become an agent" modal. Keeping it static added ~50KB gz to every cold load.
@@ -355,6 +357,7 @@ export function SiteHeader() {
  */
 function SettingsMenu() {
   const { t } = useTranslation();
+  const { language, setLanguage } = useI18n();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -396,8 +399,35 @@ function SettingsMenu() {
           <div className="px-2 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
             {t('nav.language')}
           </div>
-          <div className="px-1 pb-1">
-            <LanguageSwitcher />
+          <div className="px-1 pb-1 max-h-72 overflow-y-auto flex flex-col gap-0.5">
+            {SUPPORTED_LANGUAGES.map(({ code, name }) => {
+              const activeCanonical = FROM_LEGACY_CODE_MAP[language] ?? 'en';
+              const isActive = code === activeCanonical;
+              return (
+                <button
+                  key={code}
+                  onClick={() => {
+                    const legacy = (LEGACY_CODE_MAP[code] ?? 'en') as Language;
+                    setLanguage(legacy);
+                    try {
+                      localStorage.setItem('listhq_language', code);
+                      sessionStorage.setItem('listhq_language', code);
+                      localStorage.setItem('i18n-language', LEGACY_CODE_MAP[code] ?? 'en');
+                      sessionStorage.setItem('i18n-language', LEGACY_CODE_MAP[code] ?? 'en');
+                    } catch { /* non-fatal */ }
+                    setOpen(false);
+                    document.documentElement.dir = code === 'ar' ? 'rtl' : 'ltr';
+                  }}
+                  className={`text-sm px-3 py-1.5 rounded-lg text-left transition-colors ${
+                    isActive
+                      ? 'bg-accent font-medium text-foreground'
+                      : 'text-foreground hover:bg-accent'
+                  }`}
+                >
+                  {name}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}

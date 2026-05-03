@@ -354,6 +354,7 @@ export function SiteHeader() {
  * (each owns its own portal/dropdown state) inside a small popover.
  */
 function SettingsMenu() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 

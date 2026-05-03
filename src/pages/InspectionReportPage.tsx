@@ -103,6 +103,7 @@ const InspectionReportPage = () => {
   const [maintenanceForm, setMaintenanceForm] = useState<{ roomId: string; description: string; priority: string } | null>(null);
   const [entryReport, setEntryReport] = useState<EntryReportData | null>(null);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
+  const [addRoomName, setAddRoomName] = useState('');
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const isReadOnly = inspection?.status === 'completed';
@@ -482,6 +483,19 @@ const InspectionReportPage = () => {
     setFinalising(false);
     toast.success(`${typeLabel} report finalised`);
     navigate('/dashboard/pm-inspections');
+  };
+
+  const addCustomRoom = async (name: string) => {
+    if (!inspection || !name.trim()) return;
+    const { data } = await supabase.from('inspection_rooms').insert({
+      inspection_id: inspection.id,
+      room_name: name.trim(),
+      display_order: rooms.length,
+    } as any).select('id, room_name, condition, notes, display_order').maybeSingle();
+    if (data) {
+      setRooms(prev => [...prev, { ...data, condition: null, photos: [], maintenance: [] } as Room]);
+    }
+    setAddRoomName('');
   };
 
   const allRoomsRated = rooms.length > 0 && rooms.every(r => r.condition !== null);
@@ -904,6 +918,36 @@ const InspectionReportPage = () => {
           );
         })}
       </div>
+
+      {/* Add custom room */}
+      {!isReadOnly && (
+        <div className="px-4 sm:px-6 space-y-2">
+          <p className="text-xs font-medium text-muted-foreground">Add a room</p>
+          <div className="flex flex-wrap gap-1.5">
+            {['Pool', 'Study/Office', 'Rumpus Room', 'Sunroom', 'Balcony', 'Granny Flat', 'Storage Room', 'Gym'].map(name => (
+              <button
+                key={name}
+                onClick={() => addCustomRoom(name)}
+                className="px-2.5 py-1 rounded-full border border-dashed border-border text-xs text-muted-foreground hover:bg-accent/50 transition-colors"
+              >
+                + {name}
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-2">
+            <Input
+              placeholder="Custom room name..."
+              value={addRoomName}
+              onChange={e => setAddRoomName(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') addCustomRoom(addRoomName); }}
+              className="text-sm"
+            />
+            <Button size="sm" variant="outline" onClick={() => addCustomRoom(addRoomName)} disabled={!addRoomName.trim()}>
+              Add Room
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Section 3 — Maintenance Summary */}
       {allMaintenance.length > 0 && (

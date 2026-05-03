@@ -424,6 +424,34 @@ const SeekerAuthPage = () => {
           </p>
         </div>
       </div>
+
+      {showOAuthConsentModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6">
+            <h3 className="text-base font-semibold text-stone-900 mb-2">Before you continue</h3>
+            <p className="text-sm text-stone-600 mb-4 leading-relaxed">
+              By signing up with Google or Apple you agree to our{' '}
+              <a href="/privacy" className="text-blue-600 underline">Privacy Policy</a> and{' '}
+              <a href="/terms" className="text-blue-600 underline">Terms of Service</a>.
+              Your data is stored securely in Australia (AWS Sydney region).
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setShowOAuthConsentModal(false); setPendingOAuthProvider(null); }}
+                className="flex-1 h-11 rounded-xl border border-stone-200 text-stone-600 text-sm font-medium hover:bg-stone-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmOAuthConsent}
+                className="flex-1 h-11 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
+              >
+                I agree — Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

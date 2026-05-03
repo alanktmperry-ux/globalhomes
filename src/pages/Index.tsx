@@ -1319,25 +1319,24 @@ const Index = () => {
             <p
               className="text-xl md:text-2xl mt-4 mb-0"
               style={{ color: '#2563EB', fontWeight: 600 }}
-              lang="en"
             >
-              Voice search in 24 languages. Every listing translated into 20.
+              {t('hero.subheadline')}
             </p>
 
             {/* ── Agent value story ── */}
             <div className="mt-12 mb-10 max-w-3xl mx-auto text-center">
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
-                Built for multicultural Australia.
+                {t('home.marketingHeadline')}
               </h2>
               <p className="mt-4 text-base md:text-lg text-slate-600 leading-relaxed">
-                ListHQ automatically translates every listing into 20 languages — Mandarin, Vietnamese, Hindi, Arabic, Tagalog and 15 more — reaching over 1.2 million multilingual buyers that REA and Domain can't serve.
+                {t('home.marketingBody')}
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
                 {[
-                  { stat: '20', label: 'Languages every listing is translated into' },
-                  { stat: '1.2M+', label: 'Multilingual buyers searching right now' },
-                  { stat: '3 months', label: 'Free — no credit card required' },
+                  { stat: '20', label: t('home.stat1Label') },
+                  { stat: '1.2M+', label: t('home.stat2Label') },
+                  { stat: '3 months', label: t('home.stat3Label') },
                 ].map((item) => (
                   <div
                     key={item.stat}

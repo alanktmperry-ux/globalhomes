@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import type { FaqItem } from '@/data/faq';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 interface Props {
   items: FaqItem[];
@@ -21,6 +22,7 @@ const categoryColors: Record<string, string> = {
 
 export function FaqAccordion({ items, defaultOpen, showCategory = false }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!defaultOpen) return;
@@ -42,7 +44,7 @@ export function FaqAccordion({ items, defaultOpen, showCategory = false }: Props
                     {item.category}
                   </span>
                 )}
-                {item.question}
+                {t(`faq.${item.id}.question`) || item.question}
               </span>
             </AccordionTrigger>
             <AccordionContent className="text-sm text-muted-foreground leading-relaxed">

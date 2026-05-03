@@ -1590,34 +1590,34 @@ const Index = () => {
         <section style={{ background: '#0f172a' }} className="py-16 px-6">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-10">
-              <h2 className="text-2xl font-bold text-white mb-2">Professional Portals</h2>
-              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>Sign in to your dedicated workspace</p>
+              <h2 className="text-2xl font-bold text-white mb-2">{t('home.portals.title')}</h2>
+              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>{t('home.portals.subtitle')}</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {[
                 {
                   Icon: Building2,
-                  title: 'Agent Portal',
-                  desc: 'Manage listings, trust accounts, rent roll and leads.',
+                  title: t('home.portals.agent.title'),
+                  desc: t('home.portals.agent.desc'),
                   signIn: '/agents/login',
                   register: '/for-agents',
-                  registerLabel: 'Not an agent yet?',
+                  registerLabel: t('home.portals.agent.register'),
                 },
                 {
                   Icon: Briefcase,
-                  title: 'Mortgage Broker Portal',
-                  desc: 'View referral leads, manage your profile and book appointments.',
+                  title: t('home.portals.broker.title'),
+                  desc: t('home.portals.broker.desc'),
                   signIn: '/broker/login',
                   register: '/broker/register',
-                  registerLabel: 'Not registered?',
+                  registerLabel: t('home.portals.broker.register'),
                 },
                 {
                   Icon: Handshake,
-                  title: 'Partner Portal',
-                  desc: 'Access your partner dashboard and track referral earnings.',
+                  title: t('home.portals.partner.title'),
+                  desc: t('home.portals.partner.desc'),
                   signIn: '/partner/login',
                   register: '/partner/join',
-                  registerLabel: 'Become a partner?',
+                  registerLabel: t('home.portals.partner.register'),
                 },
               ].map(({ Icon, title, desc, signIn, register, registerLabel }) => (
                 <div

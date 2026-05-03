@@ -1,7 +1,10 @@
 import "../_shared/email-footer.ts";
-// IMPORTANT: Register this as a Supabase Auth Hook in the dashboard:
-// Supabase Dashboard → Authentication → Hooks → Send Email Hook
-// Set the URL to: https://[project-ref].supabase.co/functions/v1/send-auth-email
+import {
+  brandShell,
+  brandButton,
+  brandCodeBlock,
+  BRAND,
+} from "../_shared/email-brand.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -20,33 +23,58 @@ interface AuthEmailPayload {
 
 const FROM_ADDRESS = Deno.env.get('EMAIL_FROM') || 'ListHQ <noreply@listhq.com.au>';
 
+const heading = (t: string) =>
+  `<h1 style="font-size:22px;font-weight:600;color:${BRAND.navy};margin:0 0 12px;">${t}</h1>`;
+const body = (t: string) =>
+  `<p style="font-size:14px;line-height:1.6;color:${BRAND.text};margin:0 0 8px;">${t}</p>`;
+const muted = (t: string) =>
+  `<p style="font-size:12px;color:${BRAND.textMuted};margin:18px 0 0;">${t}</p>`;
+
 function buildEmail(actionType: string, token: string, redirectTo: string) {
   switch (actionType) {
     case 'signup':
     case 'magiclink':
     case 'email':
       return {
-        subject: 'Your ListHQ login code',
-        text: `Your verification code is: ${token} — expires in 10 minutes.`,
-        html: `<p>Your verification code is: <strong>${token}</strong></p><p>This code expires in 10 minutes.</p>`,
+        subject: 'Your ListHQ verification code',
+        text: `Your ListHQ verification code is: ${token} — expires in 10 minutes.`,
+        html: brandShell(
+          heading('Your verification code') +
+            body('Enter this code to continue signing in to ListHQ. It expires in 10 minutes.') +
+            brandCodeBlock(token) +
+            muted("Didn't request this? You can safely ignore this email."),
+          'Secure sign-in',
+        ),
       };
     case 'recovery':
       return {
         subject: 'Reset your ListHQ password',
         text: `Click here to reset your password: ${redirectTo}`,
-        html: `<p>Click the link below to reset your password:</p><p><a href="${redirectTo}">${redirectTo}</a></p>`,
+        html: brandShell(
+          heading('Reset your password') +
+            body('We received a request to reset your ListHQ password. Click the button below — this link expires in 1 hour.') +
+            brandButton(redirectTo, 'Reset password →') +
+            muted("Didn't request this? Your password has not been changed."),
+          'Password reset',
+        ),
       };
     case 'email_change':
       return {
-        subject: 'Confirm your new email address',
+        subject: 'Confirm your new ListHQ email address',
         text: `Your confirmation code is: ${token}`,
-        html: `<p>Your confirmation code is: <strong>${token}</strong></p>`,
+        html: brandShell(
+          heading('Confirm your new email') +
+            body('Use this code to confirm your new email address on ListHQ.') +
+            brandCodeBlock(token) +
+            muted("Didn't make this change? Contact us at support@listhq.com.au"),
+          'Email change',
+        ),
       };
     default:
       return {
         subject: 'ListHQ notification',
         text: `Your code is: ${token}`,
-        html: `<p>Your code is: <strong>${token}</strong></p>`,
+        html: brandShell(heading('Your code') + brandCodeBlock(token)),
       };
   }
 }
@@ -83,9 +111,6 @@ Deno.serve(async (req) => {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${RESEND_API_KEY}`,
-        // Spam Act exemption: login codes / password resets / email-change
-        // confirmations are pure transactional auth — bypass suppression
-        // and use essential footer.
         'x-email-essential': 'true',
       },
       body: JSON.stringify({

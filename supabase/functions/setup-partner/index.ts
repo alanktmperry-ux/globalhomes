@@ -151,3 +151,29 @@ Deno.serve(async (req) => {
     );
   }
 });
+
+function buildPartnerWelcome(p: { firstName: string; companyName: string; appUrl: string }) {
+  const inner = `
+    <h1 style="font-size:24px;font-weight:600;color:${BRAND.navy};margin:0 0 12px;">Welcome, ${p.firstName}! 🤝</h1>
+    <p style="font-size:14px;line-height:1.6;color:${BRAND.text};margin:0 0 8px;">
+      <strong>${p.companyName}</strong> is now registered as a ListHQ partner. Your account is under review — we'll notify you once approved (usually within 24 hours).
+    </p>
+
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:${BRAND.textMuted};margin:24px 0 10px;font-weight:600;">
+      As a ListHQ partner you'll get
+    </div>
+    ${brandFeatureList([
+      { icon: '📈', label: 'Real-time referral dashboard and earnings tracking' },
+      { icon: '🌏', label: "Access to Australia's multicultural buyer network" },
+      { icon: '💼', label: 'Dedicated partner support and co-marketing materials' },
+      { icon: '💰', label: 'Competitive referral commissions paid monthly' },
+    ])}
+
+    ${brandButton(`${p.appUrl}/partner`, 'Go to Partner Portal →')}
+
+    <p style="font-size:12px;color:${BRAND.textMuted};text-align:center;margin:20px 0 0;">
+      Questions? Reply to this email — your dedicated partner manager will be in touch.
+    </p>
+  `;
+  return brandShell(inner, 'Partner Portal');
+}

@@ -93,6 +93,7 @@ export function LanguageSwitcher() {
       {open && createPortal(
         <div
           ref={dropdownRef}
+          data-settings-portal-ignore
           style={{ position: 'fixed', top: dropdownPos.top, right: dropdownPos.right }}
           className="z-[9999] min-w-[220px] bg-white border border-slate-200 rounded-xl shadow-lg p-2"
         >

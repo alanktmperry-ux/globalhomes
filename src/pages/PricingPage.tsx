@@ -161,7 +161,7 @@ export default function PricingPage() {
         <title>Pricing — Plans for every agency · ListHQ</title>
         <meta
           name="description"
-          content="Simple, transparent pricing for Australian real estate agencies. 60-day free trial, no credit card required. Plans from $299/mo."
+          content="Transparent pricing for Australian real estate agents and agencies. Trust accounting, property management, CRM, multilingual listings and Halo — all in one subscription. 60-day free trial, no credit card required. Plans from $799/mo."
         />
       </Helmet>
 
@@ -172,7 +172,7 @@ export default function PricingPage() {
             {t('pricing.headline')}
           </h1>
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
-            {t('pricing.subheadline')}
+            60-day free trial · No credit card required · Cancel anytime
           </p>
 
           <div className="mt-8 inline-flex items-center gap-1 bg-muted/60 p-1 rounded-full">

@@ -140,7 +140,7 @@ export function SiteHeader() {
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6D28D9')}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#7C3AED')}
             >
-              <Sparkles size={13} /> Post a Halo
+              <Sparkles size={13} /> {t('nav.postHalo')}
             </button>
           )}
 

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import jsPDF from 'jspdf';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -17,7 +18,7 @@ import DashboardHeader from '@/features/agents/components/dashboard/DashboardHea
 import { format, parseISO } from 'date-fns';
 import {
   Loader2, Camera, Plus, ChevronDown, AlertTriangle, Wrench, CheckCircle2, X, ArrowLeft,
-  ArrowDown, ArrowUp, Minus, Scale, FileWarning, ClipboardList,
+  ArrowDown, ArrowUp, Minus, Scale, FileWarning, ClipboardList, Download,
 } from 'lucide-react';
 
 const CONDITION_RANK: Record<string, number> = {
@@ -107,6 +108,7 @@ const InspectionReportPage = () => {
   const [maintenanceForm, setMaintenanceForm] = useState<{ roomId: string; description: string; priority: string } | null>(null);
   const [entryReport, setEntryReport] = useState<EntryReportData | null>(null);
   const [routineHistory, setRoutineHistory] = useState<RoutineHistoryItem[]>([]);
+  const [addRoomName, setAddRoomName] = useState('');
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
@@ -311,9 +313,112 @@ const InspectionReportPage = () => {
     toast.success('Maintenance item flagged and job created');
   };
 
+  const addCustomRoom = async (name: string) => {
+    if (!inspection || !name.trim()) return;
+    const { data } = await supabase.from('inspection_rooms').insert({
+      inspection_id: inspection.id,
+      room_name: name.trim(),
+      display_order: rooms.length,
+    } as any).select('id, room_name, condition, notes, display_order').maybeSingle();
+    if (data) {
+      setRooms(prev => [...prev, { ...data, condition: null, photos: [], maintenance: [] } as Room]);
+    }
+    setAddRoomName('');
+  };
+
+  const handleDownloadPDF = () => {
+    if (!inspection) return;
+    const doc = new jsPDF();
+    const lineHeight = 7;
+    let y = 15;
+
+    const writeLine = (text: string, size = 11, bold = false) => {
+      doc.setFontSize(size);
+      doc.setFont('helvetica', bold ? 'bold' : 'normal');
+      const lines = doc.splitTextToSize(text, 180);
+      lines.forEach((line: string) => {
+        if (y > 275) { doc.addPage(); y = 15; }
+        doc.text(line, 15, y);
+        y += lineHeight;
+      });
+    };
+
+    writeLine('Condition Report', 16, true);
+    writeLine(propertyAddress, 12);
+    writeLine(`Type: ${inspection.inspection_type.charAt(0).toUpperCase() + inspection.inspection_type.slice(1)}   Scheduled: ${format(parseISO(inspection.scheduled_date), 'dd MMM yyyy')}${inspection.conducted_date ? `   Conducted: ${format(parseISO(inspection.conducted_date), 'dd MMM yyyy')}` : ''}`, 9);
+    y += 3;
+
+    if (keysCount || remotesCount || waterMeter) {
+      writeLine('Property Details', 12, true);
+      if (keysCount) writeLine(`Keys: ${keysCount}`);
+      if (remotesCount) writeLine(`Remotes/Fobs: ${remotesCount}`);
+      if (waterMeter) writeLine(`Water meter: ${waterMeter}`);
+      y += 3;
+    }
+
+    writeLine('Room Conditions', 12, true);
+    rooms.forEach(r => {
+      writeLine(`${r.room_name}: ${r.condition ? r.condition.charAt(0).toUpperCase() + r.condition.slice(1) : 'Not rated'}`, 10, true);
+      if (r.notes) writeLine(r.notes, 9);
+      if (r.photos.length) writeLine(`Photos: ${r.photos.length}`, 9);
+      const maint = r.maintenance.filter(m => m.status !== 'resolved');
+      if (maint.length) writeLine(`Maintenance: ${maint.map(m => m.description).join(', ')}`, 9);
+    });
+
+    if (overallNotes) {
+      y += 3;
+      writeLine('Overall Notes', 12, true);
+      writeLine(overallNotes, 10);
+    }
+
+    const pageCount = (doc as any).internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Page ${i} of ${pageCount}  —  ${propertyAddress}`, 15, 290);
+    }
+
+    doc.save(`inspection-report-${inspection.id.slice(0, 8)}.pdf`);
+  };
+
   const allRoomsRated = rooms.length > 0 && rooms.every(r => r.condition !== null);
 
-  const handleFinalise = async (sendTo: 'owner' | 'tenant' | 'skip') => {
+  const sendEmail = (recipient: 'owner' | 'tenant', today: string) => {
+    const reportLink = `https://listhq.com.au/inspection-report/${inspection?.report_token}`;
+    if (recipient === 'owner' && finaliseEmail) {
+      supabase.functions.invoke('send-notification-email', {
+        body: {
+          type: 'inspection_report',
+          recipient_email: finaliseEmail,
+          recipient_name: inspection?.owner_name || 'Owner',
+          property_address: propertyAddress,
+          inspection_type: inspection?.inspection_type,
+          conducted_date: today,
+          report_link: reportLink,
+          agent_name: agentName,
+          agent_phone: agentPhone,
+        },
+      }).catch(() => {});
+    }
+    if (recipient === 'tenant' && finaliseTenantEmail) {
+      supabase.functions.invoke('send-notification-email', {
+        body: {
+          type: 'inspection_report',
+          recipient_email: finaliseTenantEmail,
+          recipient_name: 'Tenant',
+          property_address: propertyAddress,
+          inspection_type: inspection?.inspection_type,
+          conducted_date: today,
+          report_link: reportLink,
+          agent_name: agentName,
+          agent_phone: agentPhone,
+        },
+      }).catch(() => {});
+    }
+  };
+
+  const handleFinalise = async (sendTo: 'both' | 'owner' | 'tenant' | 'skip') => {
     if (!inspection) return;
     setFinalising(true);
     const today = format(new Date(), 'yyyy-MM-dd');
@@ -338,39 +443,9 @@ const InspectionReportPage = () => {
       ...(inspection.inspection_type === 'entry' ? { tenant_dispute_deadline: disputeDeadline } : {}),
     } as any).eq('id', inspection.id);
 
-    const reportLink = `https://listhq.com.au/inspection-report/${inspection.report_token}`;
-
-    if (sendTo === 'owner' && finaliseEmail) {
-      supabase.functions.invoke('send-notification-email', {
-        body: {
-          type: 'inspection_report',
-          recipient_email: finaliseEmail,
-          recipient_name: inspection.owner_name || 'Owner',
-          property_address: propertyAddress,
-          inspection_type: inspection.inspection_type,
-          conducted_date: today,
-          report_link: reportLink,
-          agent_name: agentName,
-          agent_phone: agentPhone,
-        },
-      }).catch(() => {});
-    }
-
-    if (sendTo === 'tenant' && finaliseTenantEmail) {
-      supabase.functions.invoke('send-notification-email', {
-        body: {
-          type: 'inspection_report',
-          recipient_email: finaliseTenantEmail,
-          recipient_name: 'Tenant',
-          property_address: propertyAddress,
-          inspection_type: inspection.inspection_type,
-          conducted_date: today,
-          report_link: reportLink,
-          agent_name: agentName,
-          agent_phone: agentPhone,
-        },
-      }).catch(() => {});
-    }
+    if (sendTo === 'both') { sendEmail('owner', today); sendEmail('tenant', today); }
+    else if (sendTo === 'owner') sendEmail('owner', today);
+    else if (sendTo === 'tenant') sendEmail('tenant', today);
 
     setFinalising(false);
     toast.success('Report finalised');
@@ -421,6 +496,11 @@ const InspectionReportPage = () => {
             <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard/rent-roll')}>
               <ArrowLeft size={14} className="mr-1" /> Back
             </Button>
+            {isReadOnly && (
+              <Button variant="outline" size="sm" onClick={handleDownloadPDF}>
+                <Download size={14} className="mr-1" /> Download PDF
+              </Button>
+            )}
             {!isReadOnly && (
               <Button
                 size="sm"
@@ -851,6 +931,40 @@ const InspectionReportPage = () => {
         })}
       </div>
 
+      {/* Add custom room */}
+      {!isReadOnly && (
+        <div className="px-4 sm:px-6">
+          <Card className="border-dashed">
+            <CardContent className="p-4 space-y-3">
+              <p className="text-xs font-medium text-muted-foreground">Add a room not in the list</p>
+              <div className="flex flex-wrap gap-1.5">
+                {['Pool', 'Study/Office', 'Rumpus Room', 'Sunroom', 'Balcony', 'Granny Flat', 'Storage Room', 'Gym'].map(name => (
+                  <button
+                    key={name}
+                    onClick={() => addCustomRoom(name)}
+                    className="px-2.5 py-1 rounded-full text-xs border border-dashed border-border text-muted-foreground hover:bg-accent/50 hover:text-foreground transition-colors"
+                  >
+                    + {name}
+                  </button>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Custom room name…"
+                  value={addRoomName}
+                  onChange={e => setAddRoomName(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') addCustomRoom(addRoomName); }}
+                  className="text-sm"
+                />
+                <Button size="sm" variant="outline" onClick={() => addCustomRoom(addRoomName)} disabled={!addRoomName.trim()}>
+                  <Plus size={14} className="mr-1" /> Add
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Section 3 — Maintenance Summary */}
       {allMaintenance.length > 0 && (
         <div className="px-4 sm:px-6">
@@ -904,16 +1018,22 @@ const InspectionReportPage = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              {finaliseEmail && (
-                <Button onClick={() => handleFinalise('owner')} disabled={finalising}>
+              {finaliseEmail && finaliseTenantEmail && (
+                <Button onClick={() => handleFinalise('both')} disabled={finalising}>
                   {finalising ? <Loader2 className="animate-spin mr-1" size={14} /> : null}
-                  Finalise & Send to Owner
+                  Finalise & Send to Owner + Tenant
+                </Button>
+              )}
+              {finaliseEmail && (
+                <Button variant={finaliseTenantEmail ? 'outline' : 'default'} onClick={() => handleFinalise('owner')} disabled={finalising}>
+                  {finalising ? <Loader2 className="animate-spin mr-1" size={14} /> : null}
+                  Finalise & Send to Owner only
                 </Button>
               )}
               {finaliseTenantEmail && (
                 <Button variant="outline" onClick={() => handleFinalise('tenant')} disabled={finalising}>
                   {finalising ? <Loader2 className="animate-spin mr-1" size={14} /> : null}
-                  Finalise & Send to Tenant
+                  Finalise & Send to Tenant only
                 </Button>
               )}
               <Button variant="ghost" onClick={() => handleFinalise('skip')} disabled={finalising}>

@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SEO } from '@/shared/components/SEO';
 import AgentRegistrationModal from '@/features/agents/components/AgentRegistrationModal';
-import { supabase } from '@/integrations/supabase/client';
 
 const features = [
   {
@@ -10,7 +9,7 @@ const features = [
     icon: '🔮',
     tag: { text: 'Unique to ListHQ', color: 'blue' as const },
     title: 'Halo Board',
-    body: "Buyers post structured intent briefs — suburbs, budget, finance status, must-haves, preferred language. You browse live, see who's serious, and unlock full contact details with credits. Access buyers before they look at a single listing.",
+    body: 'Buyers post structured intent briefs — suburbs, budget, finance status, must-haves, preferred language. You browse live, see who\'s serious, and unlock full contact details with credits. Access buyers before they look at a single listing.',
     highlight: true,
   },
   {
@@ -18,7 +17,7 @@ const features = [
     icon: '🤖',
     tag: { text: 'Automated', color: 'blue' as const },
     title: 'AI Buyer Concierge',
-    body: "The platform matches your listings to buyers automatically — from their voice searches, saved criteria, and Halos. Qualified leads arrive in your inbox while you're at an open home. No cold outreach required.",
+    body: 'The platform matches your listings to buyers automatically — from their voice searches, saved criteria, and Halos. Qualified leads arrive in your inbox while you\'re at an open home. No cold outreach required.',
     highlight: true,
   },
   {
@@ -42,7 +41,7 @@ const features = [
     icon: '🎤',
     tag: null,
     title: 'Voice-qualified leads',
-    body: "Every enquiry arrives with a voice transcript in the buyer's own language. You know their budget, timeline, and must-haves before you pick up the phone. No more tyre kickers disguised as hot leads.",
+    body: 'Every enquiry arrives with a voice transcript in the buyer\'s own language. You know their budget, timeline, and must-haves before you pick up the phone. No more tyre kickers disguised as hot leads.',
     highlight: false,
   },
   {
@@ -50,7 +49,7 @@ const features = [
     icon: '⚡',
     tag: null,
     title: '14-day exclusive window',
-    body: "Your listings reach the platform's premium buyer members 14 days before they go to any other portal. These buyers pay $29/month for early access — the highest-intent audience on the market.",
+    body: 'Your listings reach the platform\'s premium buyer members 14 days before they go to any other portal. These buyers pay $29/month for early access — the highest-intent audience on the market.',
     highlight: false,
   },
   {
@@ -104,10 +103,6 @@ const AgentLandingPage = () => {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    supabase.from('agents').select('id', { count: 'exact', head: true });
-  }, []);
-
   return (
     <div className="min-h-screen overflow-x-hidden" style={{ background: '#0f172a', color: 'white' }}>
       <SEO
@@ -116,34 +111,32 @@ const AgentLandingPage = () => {
         path="/for-agents"
       />
 
-      {/* HERO */}
+      {/* ── HERO ── */}
       <section
         className="relative min-h-screen flex items-center px-6 md:px-16 py-24 overflow-hidden"
         style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #0f172a 100%)' }}
       >
-        <div
-          className="pointer-events-none absolute -top-48 -right-36 w-[650px] h-[650px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(59,91,219,0.18) 0%, transparent 70%)' }}
-        />
-        <div
-          className="pointer-events-none absolute -bottom-24 -left-24 w-[500px] h-[500px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 70%)' }}
-        />
+        {/* Glow blobs */}
+        <div className="pointer-events-none absolute -top-48 -right-36 w-[650px] h-[650px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(59,91,219,0.18) 0%, transparent 70%)' }} />
+        <div className="pointer-events-none absolute -bottom-24 -left-24 w-[500px] h-[500px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 70%)' }} />
 
         <div className="relative z-10 max-w-2xl">
-          <div
-            className="inline-flex items-center gap-2 mb-8 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
-            style={{ background: 'rgba(59,91,219,0.2)', border: '1px solid rgba(59,91,219,0.4)', color: '#93c5fd', letterSpacing: '1.2px' }}
-          >
+          {/* Eyebrow */}
+          <div className="inline-flex items-center gap-2 mb-8 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
+            style={{ background: 'rgba(59,91,219,0.2)', border: '1px solid rgba(59,91,219,0.4)', color: '#93c5fd', letterSpacing: '1.2px' }}>
             <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
             For agents
           </div>
 
+          {/* H1 */}
           <h1 className="text-5xl md:text-[62px] font-black leading-[1.04] tracking-tight mb-6 text-white">
             Find your next buyer<br />
             <span style={{ color: '#60a5fa' }}>before they find a listing.</span>
           </h1>
 
+          {/* Body */}
           <p className="text-lg md:text-xl mb-10 leading-relaxed max-w-lg" style={{ color: '#94a3b8' }}>
             ListHQ is a complete business platform built for Australian agents —{' '}
             <strong style={{ color: '#e2e8f0', fontWeight: 600 }}>
@@ -152,23 +145,22 @@ const AgentLandingPage = () => {
             Everything you need. One subscription.
           </p>
 
+          {/* Stats */}
           <div className="flex flex-wrap gap-3 mb-10">
             {[
               { n: '1.2M+', l: 'Multilingual buyers\nno other portal reaches' },
               { n: '20', l: 'Languages, every\nlisting auto-translated' },
               { n: '3 mo.', l: 'Free trial, no\ncredit card' },
             ].map((s) => (
-              <div
-                key={s.n}
-                className="text-center px-5 py-4 rounded-2xl min-w-[110px]"
-                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}
-              >
+              <div key={s.n} className="text-center px-5 py-4 rounded-2xl min-w-[110px]"
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}>
                 <div className="text-2xl font-black mb-1" style={{ color: '#60a5fa' }}>{s.n}</div>
                 <div className="text-xs leading-tight whitespace-pre-line" style={{ color: '#64748b' }}>{s.l}</div>
               </div>
             ))}
           </div>
 
+          {/* CTAs */}
           <div className="flex flex-col gap-3">
             <div className="flex flex-wrap items-center gap-3">
               <button
@@ -193,7 +185,7 @@ const AgentLandingPage = () => {
         </div>
       </section>
 
-      {/* FEATURES */}
+      {/* ── FEATURES ── */}
       <section className="py-20 px-6 md:px-16" style={{ background: '#f8faff' }}>
         <div className="max-w-5xl mx-auto">
           <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#3b5bdb', letterSpacing: '1.5px' }}>
@@ -216,17 +208,13 @@ const AgentLandingPage = () => {
                   : { background: 'white', border: '1px solid #e2e8f0', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }
                 }
               >
-                <span
-                  className="absolute top-5 right-6 text-xs font-black tracking-wider"
-                  style={{ color: f.highlight ? '#93c5fd' : '#cbd5e1' }}
-                >
+                <span className="absolute top-5 right-6 text-xs font-black tracking-wider"
+                  style={{ color: f.highlight ? '#93c5fd' : '#cbd5e1' }}>
                   {f.num}
                 </span>
                 {f.tag && (
-                  <span
-                    className="inline-flex items-center mb-3 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider"
-                    style={{ background: '#eff6ff', border: '1px solid #bfdbfe', color: '#1e40af', letterSpacing: '0.5px' }}
-                  >
+                  <span className="inline-flex items-center mb-3 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider"
+                    style={{ background: '#eff6ff', border: '1px solid #bfdbfe', color: '#1e40af', letterSpacing: '0.5px' }}>
                     {f.tag.text}
                   </span>
                 )}
@@ -243,7 +231,7 @@ const AgentLandingPage = () => {
         </div>
       </section>
 
-      {/* COMPARISON */}
+      {/* ── COMPARISON ── */}
       <section className="py-20 px-6 md:px-16" style={{ background: '#0f172a' }}>
         <div className="max-w-4xl mx-auto">
           <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#60a5fa', letterSpacing: '1.5px' }}>
@@ -258,10 +246,9 @@ const AgentLandingPage = () => {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div
-              className="rounded-[18px] p-7"
-              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
-            >
+            {/* Them */}
+            <div className="rounded-[18px] p-7"
+              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
               <p className="text-xs font-bold uppercase tracking-wider mb-5" style={{ color: '#475569', letterSpacing: '1px' }}>
                 Typical agent stack
               </p>
@@ -272,10 +259,9 @@ const AgentLandingPage = () => {
                 </div>
               ))}
             </div>
-            <div
-              className="rounded-[18px] p-7"
-              style={{ background: 'rgba(59,91,219,0.15)', border: '1px solid rgba(59,91,219,0.3)' }}
-            >
+            {/* Us */}
+            <div className="rounded-[18px] p-7"
+              style={{ background: 'rgba(59,91,219,0.15)', border: '1px solid rgba(59,91,219,0.3)' }}>
               <p className="text-xs font-bold uppercase tracking-wider mb-5" style={{ color: '#93c5fd', letterSpacing: '1px' }}>
                 ListHQ
               </p>
@@ -290,11 +276,11 @@ const AgentLandingPage = () => {
         </div>
       </section>
 
-      {/* PRICING */}
+      {/* ── PRICING ── */}
       <section className="py-20 px-6 text-center" style={{ background: '#f8faff' }}>
         <div className="max-w-lg mx-auto">
           <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: '#3b5bdb', letterSpacing: '1.5px' }}>
-            Entry Level Plan
+            Pricing
           </p>
           <div className="font-black tracking-tight mb-2" style={{ color: '#0f172a', fontSize: '42px', letterSpacing: '-1.5px' }}>
             Free
@@ -323,7 +309,7 @@ const AgentLandingPage = () => {
         </div>
       </section>
 
-      {/* LOGIN */}
+      {/* ── LOGIN ── */}
       <section className="py-10 px-6 text-center" style={{ background: 'white', borderTop: '1px solid #e2e8f0' }}>
         <p className="text-sm mb-4" style={{ color: '#64748b' }}>Already have an account?</p>
         <button
@@ -335,11 +321,7 @@ const AgentLandingPage = () => {
         </button>
         <p className="mt-4 text-xs" style={{ color: '#94a3b8' }}>
           Trust accounting partner?{' '}
-          <button
-            onClick={() => navigate('/partner/login')}
-            className="font-semibold"
-            style={{ color: '#3b5bdb', background: 'none', border: 'none', cursor: 'pointer' }}
-          >
+          <button onClick={() => navigate('/partner/login')} className="font-semibold" style={{ color: '#3b5bdb', background: 'none', border: 'none', cursor: 'pointer' }}>
             Partner portal →
           </button>
         </p>

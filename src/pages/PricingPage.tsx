@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Check, X, ChevronDown, Sparkles } from 'lucide-react';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 type BillingCycle = 'monthly' | 'annual';
 
@@ -16,108 +17,7 @@ interface Plan {
   ctaHref: string;
 }
 
-const PLANS: Plan[] = [
-  {
-    key: 'solo',
-    name: 'Solo',
-    monthly: 299,
-    blurb: 'For independent agents starting out',
-    features: [
-      '1 agent seat',
-      'Up to 3 active listings',
-      'Trust accounting',
-      'CRM & contacts (up to 200)',
-      'AI listing descriptions (5 languages)',
-      'Email support',
-    ],
-    ctaLabel: 'Start Free Trial',
-    ctaHref: '/for-agents#register',
-  },
-  {
-    key: 'agency',
-    name: 'Agency',
-    monthly: 899,
-    blurb: 'For growing agencies',
-    popular: true,
-    features: [
-      'Up to 5 agent seats',
-      'Unlimited listings',
-      'Buyer concierge (100 matches/mo)',
-      'Full CRM (unlimited contacts)',
-      'Pipeline & rent roll',
-      'Bank reconciliation',
-      'Off-market / pocket listings',
-      'Priority support',
-    ],
-    ctaLabel: 'Start Free Trial',
-    ctaHref: '/for-agents#register',
-  },
-  {
-    key: 'pro',
-    name: 'Agency Pro',
-    monthly: 1999,
-    blurb: 'For established multi-office agencies',
-    features: [
-      'Up to 15 agent seats',
-      'Unlimited everything',
-      'Buyer concierge (unlimited)',
-      'Exclusive listing access',
-      'Commission calculator',
-      'Performance analytics',
-      'Dedicated account manager',
-    ],
-    ctaLabel: 'Start Free Trial',
-    ctaHref: '/for-agents#register',
-  },
-  {
-    key: 'enterprise',
-    name: 'Enterprise',
-    monthly: null,
-    blurb: 'For franchises and networks',
-    features: [
-      'Unlimited agents',
-      'White-label option',
-      'Custom integrations & API',
-      'SLA support',
-      'Contact sales',
-    ],
-    ctaLabel: 'Contact Sales',
-    ctaHref: 'mailto:sales@listhq.com.au?subject=Enterprise%20enquiry',
-  },
-];
-
 type CompareCell = string | boolean;
-const COMPARE_ROWS: { label: string; values: [CompareCell, CompareCell, CompareCell, CompareCell] }[] = [
-  { label: 'Agent seats',                values: ['1', '5', '15', 'Unlimited'] },
-  { label: 'Active listings',            values: ['3', 'Unlimited', 'Unlimited', 'Unlimited'] },
-  { label: 'Buyer concierge matches',    values: ['—', '100/mo', 'Unlimited', 'Unlimited'] },
-  { label: 'CRM contacts',               values: ['200', 'Unlimited', 'Unlimited', 'Unlimited'] },
-  { label: 'Trust accounting',           values: [true, true, true, true] },
-  { label: 'Bank reconciliation',        values: [false, true, true, true] },
-  { label: 'Pocket listings',            values: [false, true, true, true] },
-  { label: 'AI descriptions (languages)',values: ['5', '24', '24', '24'] },
-  { label: 'Commission calculator',      values: [false, false, true, true] },
-  { label: 'Dedicated manager',          values: [false, false, true, true] },
-];
-
-const FAQS = [
-  {
-    q: 'What happens after my 60-day trial?',
-    a: 'Your listings will be automatically paused — no charges, no surprises. You can upgrade to a paid plan at any time to bring them back online.',
-  },
-  {
-    q: 'Can I change plans?',
-    a: 'Yes, you can upgrade or downgrade at any time from your billing settings. Changes are pro-rated based on your current cycle.',
-  },
-  {
-    q: 'Is trust accounting compliance guaranteed?',
-    a: 'Yes — our trust accounting is PEXA-compatible, fully auditable, and built to meet state-by-state regulatory requirements across Australia.',
-  },
-  {
-    q: 'Do you support all Australian states?',
-    a: 'Yes, ListHQ is built for all 8 Australian states and territories with state-specific compliance, contracts, and trust accounting rules.',
-  },
-];
 
 const formatPrice = (n: number) => `$${n.toLocaleString('en-AU')}`;
 
@@ -126,6 +26,97 @@ export default function PricingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [showCompare, setShowCompare] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const PLANS: Plan[] = [
+    {
+      key: 'solo',
+      name: t('pricing.plan1Name'),
+      monthly: 299,
+      blurb: t('pricing.plan1Desc'),
+      features: [
+        '1 agent seat',
+        'Up to 3 active listings',
+        'Trust accounting',
+        'CRM & contacts (up to 200)',
+        'AI listing descriptions (5 languages)',
+        'Email support',
+      ],
+      ctaLabel: t('pricing.startTrial'),
+      ctaHref: '/for-agents#register',
+    },
+    {
+      key: 'agency',
+      name: t('pricing.plan2Name'),
+      monthly: 899,
+      blurb: t('pricing.plan2Desc'),
+      popular: true,
+      features: [
+        'Up to 5 agent seats',
+        'Unlimited listings',
+        'Buyer concierge (100 matches/mo)',
+        'Full CRM (unlimited contacts)',
+        'Pipeline & rent roll',
+        'Bank reconciliation',
+        'Off-market / pocket listings',
+        'Priority support',
+      ],
+      ctaLabel: t('pricing.startTrial'),
+      ctaHref: '/for-agents#register',
+    },
+    {
+      key: 'pro',
+      name: t('pricing.plan3Name'),
+      monthly: 1999,
+      blurb: t('pricing.plan3Desc'),
+      features: [
+        'Up to 15 agent seats',
+        'Unlimited everything',
+        'Buyer concierge (unlimited)',
+        'Exclusive listing access',
+        'Commission calculator',
+        'Performance analytics',
+        'Dedicated account manager',
+      ],
+      ctaLabel: t('pricing.startTrial'),
+      ctaHref: '/for-agents#register',
+    },
+    {
+      key: 'enterprise',
+      name: t('pricing.plan4Name'),
+      monthly: null,
+      blurb: t('pricing.plan4Desc'),
+      features: [
+        'Unlimited agents',
+        'White-label option',
+        'Custom integrations & API',
+        'SLA support',
+        'Contact sales',
+      ],
+      ctaLabel: t('pricing.contactSales'),
+      ctaHref: 'mailto:sales@listhq.com.au?subject=Enterprise%20enquiry',
+    },
+  ];
+
+  const COMPARE_ROWS: { label: string; values: [CompareCell, CompareCell, CompareCell, CompareCell] }[] = [
+    { label: 'Agent seats',                values: ['1', '5', '15', 'Unlimited'] },
+    { label: 'Active listings',            values: ['3', 'Unlimited', 'Unlimited', 'Unlimited'] },
+    { label: 'Buyer concierge matches',    values: ['—', '100/mo', 'Unlimited', 'Unlimited'] },
+    { label: 'CRM contacts',               values: ['200', 'Unlimited', 'Unlimited', 'Unlimited'] },
+    { label: 'Trust accounting',           values: [true, true, true, true] },
+    { label: 'Bank reconciliation',        values: [false, true, true, true] },
+    { label: 'Pocket listings',            values: [false, true, true, true] },
+    { label: 'AI descriptions (languages)',values: ['5', '24', '24', '24'] },
+    { label: 'Commission calculator',      values: [false, false, true, true] },
+    { label: 'Dedicated manager',          values: [false, false, true, true] },
+  ];
+
+  const FAQS = [
+    { q: t('pricing.faq1Q'), a: t('pricing.faq1A') },
+    { q: t('pricing.faq2Q'), a: t('pricing.faq2A') },
+    { q: t('pricing.faq3Q'), a: t('pricing.faq3A') },
+    { q: t('pricing.faq4Q'), a: t('pricing.faq4A') },
+  ];
 
   const renderCell = (v: CompareCell) => {
     if (typeof v === 'boolean') {
@@ -152,13 +143,12 @@ export default function PricingPage() {
         {/* Hero */}
         <section className="max-w-6xl mx-auto px-4 pt-16 pb-10 text-center">
           <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground tracking-tight">
-            Plans for every agency
+            {t('pricing.headline')}
           </h1>
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
-            60-day free trial · No credit card required
+            {t('pricing.subheadline')}
           </p>
 
-          {/* Billing toggle */}
           <div className="mt-8 inline-flex items-center gap-1 bg-muted/60 p-1 rounded-full">
             <button
               onClick={() => setBilling('monthly')}
@@ -168,7 +158,7 @@ export default function PricingPage() {
                   : 'text-muted-foreground'
               }`}
             >
-              Monthly
+              {t('pricing.monthly')}
             </button>
             <button
               onClick={() => setBilling('annual')}
@@ -178,9 +168,9 @@ export default function PricingPage() {
                   : 'text-muted-foreground'
               }`}
             >
-              Annual
+              {t('pricing.annual')}
               <span className="inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                Save 20%
+                {t('pricing.save')}
               </span>
             </button>
           </div>
@@ -193,7 +183,7 @@ export default function PricingPage() {
               const annual = plan.monthly !== null ? plan.monthly * 12 * 0.8 : null;
               const displayPrice =
                 plan.monthly === null
-                  ? 'Custom'
+                  ? t('pricing.custom')
                   : billing === 'monthly'
                     ? `${formatPrice(plan.monthly)}`
                     : `${formatPrice(Math.round(annual!))}`;
@@ -201,13 +191,13 @@ export default function PricingPage() {
                 plan.monthly === null
                   ? ''
                   : billing === 'monthly'
-                    ? '/mo'
-                    : '/yr';
+                    ? t('pricing.perMonth')
+                    : t('pricing.perYear');
               const subPrice =
                 plan.monthly !== null && billing === 'monthly'
-                  ? `or ${formatPrice(Math.round(plan.monthly * 12 * 0.8))}/yr`
+                  ? `or ${formatPrice(Math.round(plan.monthly * 12 * 0.8))}${t('pricing.perYear')}`
                   : plan.monthly !== null && billing === 'annual'
-                    ? `${formatPrice(plan.monthly)}/mo billed monthly`
+                    ? `${formatPrice(plan.monthly)}${t('pricing.perMonth')} billed monthly`
                     : 'Tailored to your needs';
 
               return (
@@ -221,7 +211,7 @@ export default function PricingPage() {
                 >
                   {plan.popular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground shadow">
-                      <Sparkles className="w-3 h-3" /> Most Popular
+                      <Sparkles className="w-3 h-3" /> {t('pricing.mostPopular')}
                     </div>
                   )}
                   <h3 className="font-display text-xl font-bold text-foreground">{plan.name}</h3>
@@ -276,10 +266,10 @@ export default function PricingPage() {
         <section className="max-w-6xl mx-auto px-4 pb-16">
           <div className="text-center mb-6">
             <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">
-              Compare plans
+              {t('pricing.comparePlans')}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Every feature, side by side
+              {t('pricing.compareSubtitle')}
             </p>
           </div>
 
@@ -333,7 +323,7 @@ export default function PricingPage() {
         <section className="max-w-3xl mx-auto px-4 pb-24">
           <div className="text-center mb-8">
             <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">
-              Frequently asked questions
+              {t('pricing.faqTitle')}
             </h2>
           </div>
 
@@ -366,13 +356,13 @@ export default function PricingPage() {
 
           <div className="mt-12 text-center">
             <p className="text-sm text-muted-foreground mb-4">
-              Still have questions? We're happy to help.
+              {t('pricing.faqCta')}
             </p>
             <Link
               to="/help/contact"
               className="inline-flex items-center px-5 py-2.5 rounded-xl border border-border bg-card text-sm font-semibold text-foreground hover:bg-accent transition"
             >
-              Contact us
+              {t('pricing.contactUs')}
             </Link>
           </div>
         </section>

@@ -227,8 +227,13 @@ const Index = () => {
   const listsPanelRef = useRef<HTMLDivElement>(null);
   const SNAP_POINTS = [0.35, 0.65, 0.85];
   const [sheetSnap, setSheetSnap] = useState(0);
-  const sheetHeightMV = useMotionValue(viewportHeight * SNAP_POINTS[0]);
-  const sheetHeightSpring = useSpring(sheetHeightMV, { stiffness: 300, damping: 30 });
+  const [sheetHeight, setSheetHeight] = useState(() => viewportHeight * SNAP_POINTS[0]);
+  const sheetDragStartY = useRef<number | null>(null);
+  const sheetDragStartH = useRef<number>(0);
+  const sheetDragLastY = useRef<number>(0);
+  const sheetDragLastT = useRef<number>(0);
+  const sheetDragVelocity = useRef<number>(0);
+  const [sheetDragging, setSheetDragging] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [radiusSliderOpen, setRadiusSliderOpen] = useState(false);
   const isDragging = useRef(false);

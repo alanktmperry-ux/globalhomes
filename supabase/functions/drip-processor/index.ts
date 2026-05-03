@@ -120,7 +120,9 @@ Deno.serve(async (req) => {
         drip_sequences ( id, name, trigger_event, is_active ),
         agents ( id, name, email, phone )
       `)
-      .eq('completed', false);
+      .eq('completed', false)
+      .order('enrolled_at', { ascending: true })
+      .limit(500);
 
     if (fetchErr) throw fetchErr;
     if (!enrollments?.length) {

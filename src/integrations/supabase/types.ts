@@ -12866,6 +12866,7 @@ export type Database = {
           purpose: string
           reference: string | null
           status: string
+          trust_account_id: string | null
           type: string | null
           updated_at: string | null
         }
@@ -12887,6 +12888,7 @@ export type Database = {
           purpose?: string
           reference?: string | null
           status?: string
+          trust_account_id?: string | null
           type?: string | null
           updated_at?: string | null
         }
@@ -12908,6 +12910,7 @@ export type Database = {
           purpose?: string
           reference?: string | null
           status?: string
+          trust_account_id?: string | null
           type?: string | null
           updated_at?: string | null
         }
@@ -12959,6 +12962,13 @@ export type Database = {
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_payments_trust_account_id_fkey"
+            columns: ["trust_account_id"]
+            isOneToOne: false
+            referencedRelation: "trust_accounts"
             referencedColumns: ["id"]
           },
         ]
@@ -12980,6 +12990,7 @@ export type Database = {
           purpose: string
           receipt_number: string
           status: string
+          trust_account_id: string | null
           type: string | null
           updated_at: string | null
         }
@@ -12999,6 +13010,7 @@ export type Database = {
           purpose?: string
           receipt_number: string
           status?: string
+          trust_account_id?: string | null
           type?: string | null
           updated_at?: string | null
         }
@@ -13018,6 +13030,7 @@ export type Database = {
           purpose?: string
           receipt_number?: string
           status?: string
+          trust_account_id?: string | null
           type?: string | null
           updated_at?: string | null
         }
@@ -13069,6 +13082,13 @@ export type Database = {
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trust_receipts_trust_account_id_fkey"
+            columns: ["trust_account_id"]
+            isOneToOne: false
+            referencedRelation: "trust_accounts"
             referencedColumns: ["id"]
           },
         ]
@@ -14799,10 +14819,19 @@ export type Database = {
         Returns: undefined
       }
       check_webhook_config: { Args: never; Returns: Json }
-      close_trust_period: {
-        Args: { p_agent_id: string; p_month: number; p_year: number }
-        Returns: number
-      }
+      close_trust_period:
+        | {
+            Args: {
+              p_agent_id: string
+              p_period_end: string
+              p_period_start: string
+            }
+            Returns: undefined
+          }
+        | {
+            Args: { p_agent_id: string; p_month: number; p_year: number }
+            Returns: number
+          }
       compute_agent_reputation: { Args: { p_agent_id: string }; Returns: Json }
       compute_agent_stats: { Args: { p_agent_id: string }; Returns: undefined }
       compute_suburb_stats: {
@@ -15566,6 +15595,10 @@ export type Database = {
           p_token: string
         }
         Returns: Json
+      }
+      spend_halo_credit: {
+        Args: { p_agent_id: string; p_halo_id: string }
+        Returns: boolean
       }
       submit_tenant_maintenance: {
         Args: {

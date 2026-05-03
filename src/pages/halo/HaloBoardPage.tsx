@@ -159,40 +159,42 @@ export default function HaloBoardPage() {
     if (!user || !target) return;
     setBusy(true);
     try {
-      // Re-check balance
-      const { data: cred } = await supabase
-        .from('halo_credits')
-        .select('balance')
-        .eq('agent_id', user.id)
+      // Resolve agents.id (halo_credits.agent_id references agents.id, not auth user id)
+      const { data: agent } = await supabase
+        .from('agents')
+        .select('id')
+        .eq('user_id', user.id)
         .maybeSingle();
-      const current = cred?.balance ?? 0;
-      if (current < 1) {
-        toast.error("You don't have enough credits. Contact support to top up.");
+      if (!agent) {
+        toast.error('Agent record not found.');
         setTarget(null);
         return;
       }
 
-      // Deduct credit
-      const { error: updErr } = await supabase
-        .from('halo_credits')
-        .update({ balance: current - 1, updated_at: new Date().toISOString() })
-        .eq('agent_id', user.id);
-      if (updErr) throw updErr;
+      // Atomic spend via RPC (prevents double-spend race conditions)
+      const { error: rpcErr } = await (supabase.rpc as any)('spend_halo_credit', {
+        p_agent_id: agent.id,
+        p_halo_id: target.id,
+      });
+      if (rpcErr) {
+        toast.error('Insufficient credits or already unlocked.');
+        setTarget(null);
+        return;
+      }
 
-      // Log transaction
-      const { error: txErr } = await supabase.from('halo_credit_transactions').insert({
-        agent_id: user.id,
+      // Log transaction (best-effort)
+      await supabase.from('halo_credit_transactions').insert({
+        agent_id: agent.id,
         amount: -1,
         type: 'spend',
         halo_id: target.id,
         note: 'Halo unlock',
       });
-      if (txErr) throw txErr;
 
       // Insert response
       const { error: respErr } = await supabase.from('halo_responses').insert({
         halo_id: target.id,
-        agent_id: user.id,
+        agent_id: agent.id,
       });
       if (respErr && respErr.code !== '23505') throw respErr;
 

@@ -47,6 +47,10 @@ export function AuctionRegistrationModal({ auctionId, isOnline, open, onClose }:
   const update = (field: string, value: any) => setForm(prev => ({ ...prev, [field]: value }));
 
   const handleSubmit = async () => {
+    if (!form.id_number || !form.id_expiry) {
+      setError('ID number and expiry are required');
+      return;
+    }
     setSubmitting(true);
     setError(null);
     const profileId = user?.id;
@@ -162,7 +166,7 @@ export function AuctionRegistrationModal({ auctionId, isOnline, open, onClose }:
               )}
               <div className="flex-1" />
               {step < 3 ? (
-                <button onClick={() => setStep(s => s + 1)} disabled={step === 1 && (!form.full_name || !form.email || !form.phone)}
+                <button onClick={() => setStep(s => s + 1)} disabled={(step === 1 && (!form.full_name || !form.email || !form.phone)) || (step === 2 && (!form.id_number || !form.id_expiry))}
                   className="flex items-center gap-1 px-5 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors">
                   Next <ChevronRight size={14} />
                 </button>

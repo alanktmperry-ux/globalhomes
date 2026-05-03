@@ -346,7 +346,7 @@ export default function ComplianceMonitor() {
         supabase
           .from('agents')
           .select('id, name, email, agency, license_number, licence_expiry_date, handles_trust_accounting'),
-        supabase.from('trust_account_balances').select('agent_id, current_balance, last_reconciled_date'),
+        supabase.from('trust_accounts').select('agent_id, current_balance, last_reconciled_at'),
         supabase
           .from('trust_receipts')
           .select('id, agent_id, amount, description, created_at')
@@ -366,7 +366,7 @@ export default function ComplianceMonitor() {
       (balancesRes.data || []).forEach((b: any) => {
         balanceByAgent.set(b.agent_id, {
           balance: b.current_balance,
-          lastRec: b.last_reconciled_date,
+          lastRec: b.last_reconciled_at,
         });
       });
 

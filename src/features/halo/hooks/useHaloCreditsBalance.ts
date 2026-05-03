@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -6,14 +6,14 @@ import { useAuth } from '@/features/auth/AuthProvider';
 /**
  * Shared, cached Halo credits balance for the current user.
  *
- * Cached with React Query (5min stale time) so the agent sidebar, the Halo
- * Board page, and any other consumer share a single network call. A realtime
- * subscription invalidates the cache when the balance changes server-side.
+ * halo_credits.agent_id references agents.id (NOT auth.users.id), so we must
+ * resolve the agent record first before querying the balance.
  */
 export function useHaloCreditsBalance() {
   const { user } = useAuth();
   const userId = user?.id;
   const queryClient = useQueryClient();
+  const [agentId, setAgentId] = useState<string | null>(null);
 
   const query = useQuery({
     queryKey: ['halo-credits-balance', userId],
@@ -21,10 +21,17 @@ export function useHaloCreditsBalance() {
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     queryFn: async () => {
+      const { data: agent } = await supabase
+        .from('agents')
+        .select('id')
+        .eq('user_id', userId!)
+        .maybeSingle();
+      if (!agent) return 0;
+      setAgentId(agent.id);
       const { data, error } = await supabase
         .from('halo_credits')
         .select('balance')
-        .eq('agent_id', userId!)
+        .eq('agent_id', agent.id)
         .maybeSingle();
       if (error) throw error;
       return data?.balance ?? 0;
@@ -33,12 +40,12 @@ export function useHaloCreditsBalance() {
 
   // Realtime: invalidate the shared cache so every consumer refreshes.
   useEffect(() => {
-    if (!userId) return;
+    if (!agentId) return;
     const channel = supabase
-      .channel('halo-credits-' + userId)
+      .channel('halo-credits-' + agentId)
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'halo_credits', filter: `agent_id=eq.${userId}` },
+        { event: '*', schema: 'public', table: 'halo_credits', filter: `agent_id=eq.${agentId}` },
         () => {
           queryClient.invalidateQueries({ queryKey: ['halo-credits-balance', userId] });
         },
@@ -47,7 +54,7 @@ export function useHaloCreditsBalance() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [userId, queryClient]);
+  }, [agentId, userId, queryClient]);
 
   return {
     balance: query.data ?? 0,

@@ -47,7 +47,7 @@ Key highlights:
 • 4 AI builds: Seller Likelihood Score, AI Buyer Concierge, AI Offer Generator, and Lead Marketplace
 • Built specifically for licensed Australian real estate agents
 • Fully compliant with Australian Privacy Act 1988 and state trust accounting regulations
-• Voice-powered buyer search in 24 languages for international investor access
+• Voice-powered buyer search in 20 languages for international investor access
 
 "Australian agents spend 60% of their time on tasks that AI can handle," said [Founder Name], founder of ListHQ. "We've built four AI tools that give agents back their most valuable resource — time."
 

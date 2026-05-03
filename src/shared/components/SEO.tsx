@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet-async";
 const SITE_URL = "https://listhq.com.au";
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 
-// hreflang codes for the 24 languages ListHQ supports + x-default.
+// hreflang codes for the 20 languages ListHQ supports + x-default.
 // All currently point to the canonical site root — update once per-locale
 // URLs exist (e.g. /zh, /vi).
 const HREFLANGS = [

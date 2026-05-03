@@ -28,7 +28,7 @@ const aiBuilds = [
   {
     icon: Users,
     title: 'AI Buyer Concierge',
-    desc: 'Voice-powered search matches buyers to properties in seconds. 24 languages, instant results, qualified leads.',
+    desc: 'Voice-powered search matches buyers to properties in seconds. 20 languages, instant results, qualified leads.',
     accent: 'from-success/20 to-success/5',
   },
   {

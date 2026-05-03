@@ -209,7 +209,7 @@ const AgentAuthPage = () => {
 
   const inputClass = "w-full px-4 py-3.5 rounded-[14px] border border-stone-200 bg-stone-50 text-stone-900 text-sm placeholder:text-stone-300 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:bg-white transition-all";
 
-  const AGENT_PILLS = ['Pocket listings', 'Pre-market period', 'AI buyer matching', 'Pipeline kanban', 'Rent roll', 'Trust accounting', '24 languages'];
+  const AGENT_PILLS = ['Pocket listings', 'Pre-market period', 'AI buyer matching', 'Pipeline kanban', 'Rent roll', 'Trust accounting', '20 languages'];
 
   if (step === 'otp') {
     return (

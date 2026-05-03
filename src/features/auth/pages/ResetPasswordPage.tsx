@@ -7,7 +7,7 @@ import { useToast } from '@/shared/hooks/use-toast';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { useAuth } from '@/features/auth/AuthProvider';
 
-const AGENT_PILLS = ['Pocket listings', 'Pre-market period', 'AI buyer matching', 'Pipeline kanban', 'Rent roll', 'Trust accounting', '24 languages'];
+const AGENT_PILLS = ['Pocket listings', 'Pre-market period', 'AI buyer matching', 'Pipeline kanban', 'Rent roll', 'Trust accounting', '20 languages'];
 
 const BrandPanel = () => (
   <div className="hidden lg:flex lg:w-[48%] shrink-0 flex-col justify-between p-11 relative overflow-hidden">

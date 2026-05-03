@@ -55,7 +55,7 @@ const PLANS: PlanDef[] = [
       '20 pocket (pre-market) listings/month',
       'Full CRM, pipeline, contacts',
       'Basic trust accounting',
-      'AI buyer matching, voice search, 24 languages',
+      'AI buyer matching, voice search, 20 languages',
       'AI listing writer (4 tones)',
       'Email support',
     ],

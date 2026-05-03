@@ -566,10 +566,10 @@ export const zhTW: Partial<Record<keyof typeof EnBase, string>> = {
   'hero.commercial': '商業',
   'hero.land': '土地',
   'hero.buyerTileTitle': '正在找房？',
-  'hero.buyerTileDesc': '用 24 種語言搜尋澳洲房產。免費，無需註冊。',
+  'hero.buyerTileDesc': '用 20 種語言搜尋澳洲房產。免費，無需註冊。',
   'hero.buyerTileCta': '瀏覽房源 →',
   'hero.agentTileTitle': '您是仲介嗎？',
-  'hero.agentTileDesc': '一次發佈，自動翻譯為 24 種語言。觸及 REA 和 Domain 無法觸及的多語言買家。免費 3 個月。',
+  'hero.agentTileDesc': '一次發佈，自動翻譯為 20 種語言。觸及 REA 和 Domain 無法觸及的多語言買家。免費 3 個月。',
   'hero.agentTileCta': '查看仲介工具 →',
 
   // Sort dropdown

@@ -6,7 +6,7 @@ import { X } from 'lucide-react';
 
 const buyerChips = [
   { icon: '🔮', title: 'Post a Halo', desc: 'Tell agents what you want — they come to you', top: true },
-  { icon: '🎤', title: 'Voice search', desc: 'Speak in 24 languages', top: true },
+  { icon: '🎤', title: 'Voice search', desc: 'Speak in 20 languages', top: true },
   { icon: '🌐', title: 'Listings in your language', desc: 'Every property auto-translated', top: false },
   { icon: '💱', title: 'Prices in your currency', desc: 'Live conversion, 20+ currencies', top: false },
   { icon: '🛡️', title: 'Rental bond guarantee', desc: 'No 4-week bond upfront — from $8/week', top: false },

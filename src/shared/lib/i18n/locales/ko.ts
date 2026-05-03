@@ -81,7 +81,7 @@ export const ko: Partial<Record<TranslationKey, string>> = {
   'home.agents.feature3': '다국어 구매자 풀 액세스',
   'home.agents.feature4': '비공개 매물 네트워크',
   'home.agentBannerHeadline': '호주 구매자 5명 중 1명은 영어 외의 언어로 검색합니다. 매물이 준비되어 있나요?',
-  'home.agentBannerSub': 'ListHQ는 모든 매물을 자동으로 24개 언어로 번역합니다. 3개월 무료. 신용카드 불필요.',
+  'home.agentBannerSub': 'ListHQ는 모든 매물을 자동으로 20개 언어로 번역합니다. 3개월 무료. 신용카드 불필요.',
   'home.agentBannerCta': '작동 방식 보기',
 
   'hero.statBuyersLabel': '호주 구매자가 자국어로 검색',
@@ -100,10 +100,10 @@ export const ko: Partial<Record<TranslationKey, string>> = {
   'hero.commercial': '상업용',
   'hero.land': '토지',
   'hero.buyerTileTitle': '집을 찾고 계신가요?',
-  'hero.buyerTileDesc': '24개 언어로 호주 부동산을 검색하세요. 무료, 가입 불필요.',
+  'hero.buyerTileDesc': '20개 언어로 호주 부동산을 검색하세요. 무료, 가입 불필요.',
   'hero.buyerTileCta': '부동산 둘러보기 →',
   'hero.agentTileTitle': '에이전트이신가요?',
-  'hero.agentTileDesc': '한 번 등록하면 24개 언어로 번역됩니다. REA와 Domain이 닿지 못하는 다국어 구매자에게 도달하세요. 3개월 무료.',
+  'hero.agentTileDesc': '한 번 등록하면 20개 언어로 번역됩니다. REA와 Domain이 닿지 못하는 다국어 구매자에게 도달하세요. 3개월 무료.',
   'hero.agentTileCta': '에이전트 도구 보기 →',
 
   // Sort dropdown
@@ -217,8 +217,8 @@ export const ko: Partial<Record<TranslationKey, string>> = {
   'hero.propertiesListed': '등록된 매물',
   'hero.searchHint': '찾고 계신 것을 설명해 주세요 — 나머지는 AI가 처리합니다',
   'home.agents.headline': '다문화 호주를 위해 만들어진 플랫폼.',
-  'home.agents.sub': 'CRM, 매물, 부동산 관리, AI 도구 — 모두 한 곳에. 24개 언어로.',
-  'home.howItWorks.step1.desc': '만다린, 힌디어, 베트남어, 아랍어 또는 24개 언어 중 하나로 입력하거나 말하세요.',
+  'home.agents.sub': 'CRM, 매물, 부동산 관리, AI 도구 — 모두 한 곳에. 20개 언어로.',
+  'home.howItWorks.step1.desc': '만다린, 힌디어, 베트남어, 아랍어 또는 20개 언어 중 하나로 입력하거나 말하세요.',
   'home.howItWorks.step1.title': '당신의 언어로 검색',
   'home.howItWorks.step2.desc': '모든 매물이 통화로 표시됩니다. 매일 업데이트되는 실시간 환율.',
   'home.howItWorks.step2.title': '원하는 방식으로 가격 보기',

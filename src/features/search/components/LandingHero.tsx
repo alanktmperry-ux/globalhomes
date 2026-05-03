@@ -267,7 +267,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
 
             <div className="w-px h-9 bg-slate-100 hidden sm:block" />
 
-            {/* Buyers or Languages — show real buyer count if > 0, otherwise "24 Languages" */}
+            {/* Buyers or Languages — show real buyer count if > 0, otherwise "20 Languages" */}
             {platformStats.buyerCount && platformStats.buyerCount > 0 ? (
               <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
                 <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">
@@ -278,7 +278,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
               </div>
             ) : (
               <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
-                <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">24</span>
+                <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">20</span>
                 <span className="text-[11px] text-slate-400 font-medium">{t('hero.languages')}</span>
               </div>
             )}
@@ -289,7 +289,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
             {platformStats.buyerCount && platformStats.buyerCount > 0 && (
               <>
                 <div className="flex flex-col items-center gap-0.5 min-w-[72px]">
-                  <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">24</span>
+                  <span className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">20</span>
                   <span className="text-[11px] text-slate-400 font-medium">{t('hero.languages')}</span>
                 </div>
                 <div className="w-px h-9 bg-slate-100 hidden sm:block" />

@@ -81,7 +81,7 @@ export const vi: Partial<Record<TranslationKey, string>> = {
   'home.agents.feature3': 'Tiếp cận nhóm người mua đa ngôn ngữ',
   'home.agents.feature4': 'Mạng lưới ngoài thị trường',
   'home.agentBannerHeadline': '1 trong 5 người mua tại Úc tìm kiếm bằng ngôn ngữ khác ngoài tiếng Anh. Tin đăng của bạn đã sẵn sàng?',
-  'home.agentBannerSub': 'ListHQ tự động dịch mọi tin đăng sang 24 ngôn ngữ. Miễn phí 3 tháng. Không cần thẻ tín dụng.',
+  'home.agentBannerSub': 'ListHQ tự động dịch mọi tin đăng sang 20 ngôn ngữ. Miễn phí 3 tháng. Không cần thẻ tín dụng.',
   'home.agentBannerCta': 'Xem cách hoạt động',
 
   'hero.statBuyersLabel': 'Người mua tại Úc tìm kiếm bằng ngôn ngữ của họ',
@@ -172,10 +172,10 @@ export const vi: Partial<Record<TranslationKey, string>> = {
   'hero.commercial': 'Thương mại',
   'hero.land': 'Đất',
   'hero.buyerTileTitle': 'Đang tìm nhà?',
-  'hero.buyerTileDesc': 'Tìm bất động sản Úc bằng 24 ngôn ngữ. Miễn phí, không cần đăng ký.',
+  'hero.buyerTileDesc': 'Tìm bất động sản Úc bằng 20 ngôn ngữ. Miễn phí, không cần đăng ký.',
   'hero.buyerTileCta': 'Xem bất động sản →',
   'hero.agentTileTitle': 'Bạn là môi giới?',
-  'hero.agentTileDesc': 'Đăng một lần, dịch sang 24 ngôn ngữ. Tiếp cận người mua đa ngôn ngữ mà REA và Domain không thể. Miễn phí 3 tháng.',
+  'hero.agentTileDesc': 'Đăng một lần, dịch sang 20 ngôn ngữ. Tiếp cận người mua đa ngôn ngữ mà REA và Domain không thể. Miễn phí 3 tháng.',
   'hero.agentTileCta': 'Xem công cụ môi giới →',
 
   // Sort dropdown
@@ -289,8 +289,8 @@ export const vi: Partial<Record<TranslationKey, string>> = {
   'hero.propertiesListed': 'Bất động sản đã đăng',
   'hero.searchHint': 'Mô tả những gì bạn đang tìm — AI của chúng tôi sẽ làm phần còn lại',
   'home.agents.headline': 'Nền tảng được xây dựng cho nước Úc đa văn hóa.',
-  'home.agents.sub': 'CRM, bất động sản, quản lý tài sản, công cụ AI — tất cả trong một nơi. Bằng 24 ngôn ngữ.',
-  'home.howItWorks.step1.desc': 'Gõ hoặc nói bằng tiếng Việt, Hoa, Hindi, Ả Rập, hoặc bất kỳ ngôn ngữ nào trong 24 ngôn ngữ.',
+  'home.agents.sub': 'CRM, bất động sản, quản lý tài sản, công cụ AI — tất cả trong một nơi. Bằng 20 ngôn ngữ.',
+  'home.howItWorks.step1.desc': 'Gõ hoặc nói bằng tiếng Việt, Hoa, Hindi, Ả Rập, hoặc bất kỳ ngôn ngữ nào trong 20 ngôn ngữ.',
   'home.howItWorks.step1.title': 'Tìm kiếm bằng ngôn ngữ của bạn',
   'home.howItWorks.step2.desc': 'Mỗi bất động sản hiển thị theo đồng tiền của bạn. Tỷ giá hối đoái trực tiếp, cập nhật hàng ngày.',
   'home.howItWorks.step2.title': 'Xem giá theo cách của bạn',

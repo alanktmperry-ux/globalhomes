@@ -432,7 +432,7 @@ export const en = {
   'home.howItWorks.title': 'How ListHQ works',
   'home.howItWorks.subtitle': 'Three steps to finding your next home — in your language.',
   'home.howItWorks.step1.title': 'Search in your language',
-  'home.howItWorks.step1.desc': 'Type or speak in Mandarin, Hindi, Vietnamese, Arabic, or any of 24 languages. Our AI understands you.',
+  'home.howItWorks.step1.desc': 'Type or speak in Mandarin, Hindi, Vietnamese, Arabic, or any of 20 languages. Our AI understands you.',
   'home.howItWorks.step2.title': 'See prices your way',
   'home.howItWorks.step2.desc': 'Every listing shows in your currency — CNY, USD, INR, and 10 more. Live exchange rates, updated daily.',
   'home.howItWorks.step3.title': 'Connect with your agent',

@@ -1,6 +1,12 @@
 import "../_shared/email-footer.ts";
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getCorsHeaders } from '../_shared/cors.ts';
+import {
+  brandShell,
+  brandButton,
+  brandFeatureList,
+  BRAND,
+} from '../_shared/email-brand.ts';
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
@@ -31,7 +37,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Dedup
     const { data: alreadySent } = await supabase
       .from('email_log')
       .select('id')
@@ -88,56 +93,69 @@ Deno.serve(async (req) => {
   }
 });
 
+function sectionTitle(t: string) {
+  return `<div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:${BRAND.textMuted};margin:24px 0 10px;font-weight:600;">${t}</div>`;
+}
+
 function buildAgentWelcome(p: { firstName: string; agencyName: string; appUrl: string }) {
-  return `<!doctype html>
-<html>
-  <body style="margin:0;padding:0;background:#f5f5f4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#1c1917;">
-    <div style="max-width:560px;margin:0 auto;padding:32px 24px;">
-      <div style="text-align:center;margin-bottom:24px;">
-        <h1 style="font-size:22px;font-weight:600;margin:0;color:#0f172a;">ListHQ</h1>
-        <p style="font-size:13px;color:#78716c;margin:4px 0 0;">Australia's next-generation property platform</p>
-      </div>
-      <div style="background:#ffffff;border:1px solid #e7e5e4;border-radius:16px;padding:28px;">
-        <h2 style="font-size:22px;font-weight:600;margin:0 0 12px;color:#0f172a;">Welcome, ${p.firstName}! 🎉</h2>
-        <p style="font-size:14px;line-height:1.6;color:#44403c;margin:0 0 20px;">
-          Your 60-day free trial has started${p.agencyName ? ` for <strong>${p.agencyName}</strong>` : ''}. Here's what you can do right now:
-        </p>
-        <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
-          <tr><td style="padding:10px 0;font-size:14px;color:#1c1917;">1. Add your first listing</td><td style="text-align:right;"><a href="${p.appUrl}/dashboard/listings/new" style="color:#2563eb;text-decoration:none;font-size:13px;">Go →</a></td></tr>
-          <tr><td style="padding:10px 0;font-size:14px;color:#1c1917;border-top:1px solid #f5f5f4;">2. Set up trust accounting</td><td style="text-align:right;border-top:1px solid #f5f5f4;"><a href="${p.appUrl}/dashboard/trust" style="color:#2563eb;text-decoration:none;font-size:13px;">Go →</a></td></tr>
-          <tr><td style="padding:10px 0;font-size:14px;color:#1c1917;border-top:1px solid #f5f5f4;">3. Import your contacts</td><td style="text-align:right;border-top:1px solid #f5f5f4;"><a href="${p.appUrl}/dashboard/contacts" style="color:#2563eb;text-decoration:none;font-size:13px;">Go →</a></td></tr>
-        </table>
-        <div style="text-align:center;margin:28px 0 12px;">
-          <a href="${p.appUrl}/dashboard" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;font-size:14px;font-weight:500;padding:12px 24px;border-radius:10px;">Open your dashboard →</a>
-        </div>
-        <p style="font-size:12px;color:#78716c;text-align:center;margin:16px 0 0;">Questions? Reply to this email — we read every one.</p>
-      </div>
-      <p style="font-size:11px;color:#a8a29e;text-align:center;margin-top:20px;">© ListHQ Pty Ltd · Melbourne, Australia</p>
-    </div>
-  </body>
-</html>`;
+  const intro = p.agencyName
+    ? `<strong>${p.agencyName}</strong> is now live on Australia's multilingual property platform. Your 60-day free trial has started.`
+    : `Your agency is now live on Australia's multilingual property platform. Your 60-day free trial has started.`;
+
+  const inner = `
+    <h1 style="font-size:24px;font-weight:600;color:${BRAND.navy};margin:0 0 12px;">Welcome, ${p.firstName}! 🎉</h1>
+    <p style="font-size:14px;line-height:1.6;color:${BRAND.text};margin:0 0 8px;">${intro}</p>
+
+    ${sectionTitle("What's included")}
+    ${brandFeatureList([
+      { icon: '🌏', label: 'AI multilingual listings — 20 languages' },
+      { icon: '📊', label: 'Full trust accounting & rent roll' },
+      { icon: '👥', label: 'CRM, pipeline & vendor dashboards' },
+      { icon: '🏘️', label: 'Off-market network & buyer matching' },
+    ])}
+
+    ${sectionTitle('Get started in 3 steps')}
+    <table style="width:100%;border-collapse:collapse;margin-bottom:8px;">
+      <tr><td style="padding:10px 0;font-size:14px;color:${BRAND.text};">1. Add your first listing</td><td style="text-align:right;"><a href="${p.appUrl}/dashboard/listings/new" style="color:${BRAND.tealDark};text-decoration:none;font-size:13px;">Go →</a></td></tr>
+      <tr><td style="padding:10px 0;font-size:14px;color:${BRAND.text};border-top:1px solid ${BRAND.bg};">2. Complete your agent profile</td><td style="text-align:right;border-top:1px solid ${BRAND.bg};"><a href="${p.appUrl}/dashboard/profile" style="color:${BRAND.tealDark};text-decoration:none;font-size:13px;">Go →</a></td></tr>
+      <tr><td style="padding:10px 0;font-size:14px;color:${BRAND.text};border-top:1px solid ${BRAND.bg};">3. Import your contacts</td><td style="text-align:right;border-top:1px solid ${BRAND.bg};"><a href="${p.appUrl}/dashboard/contacts" style="color:${BRAND.tealDark};text-decoration:none;font-size:13px;">Go →</a></td></tr>
+    </table>
+
+    ${brandButton(`${p.appUrl}/dashboard`, 'Open your dashboard →')}
+
+    <p style="font-size:12px;color:${BRAND.textMuted};text-align:center;margin:20px 0 0;">
+      Questions? Reply to this email — we read every one.
+    </p>
+  `;
+  return brandShell(inner, 'Agent Portal');
 }
 
 function buildBuyerWelcome(p: { firstName: string; appUrl: string }) {
-  return `<!doctype html>
-<html>
-  <body style="margin:0;padding:0;background:#f5f5f4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#1c1917;">
-    <div style="max-width:560px;margin:0 auto;padding:32px 24px;">
-      <div style="text-align:center;margin-bottom:24px;">
-        <h1 style="font-size:22px;font-weight:600;margin:0;color:#0f172a;">ListHQ</h1>
-      </div>
-      <div style="background:#ffffff;border:1px solid #e7e5e4;border-radius:16px;padding:28px;">
-        <h2 style="font-size:22px;font-weight:600;margin:0 0 12px;color:#0f172a;">You're in, ${p.firstName}! 🏡</h2>
-        <p style="font-size:14px;line-height:1.6;color:#44403c;margin:0 0 20px;">
-          Your ListHQ account is ready. Start searching — we'll alert you the moment a property matching your preferences hits the market.
-        </p>
-        <div style="text-align:center;margin:24px 0 12px;">
-          <a href="${p.appUrl}/" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;font-size:14px;font-weight:500;padding:12px 24px;border-radius:10px;">Start searching →</a>
-        </div>
-        <p style="font-size:12px;color:#78716c;text-align:center;margin:16px 0 0;">Save searches to get instant alerts. Save properties to track price drops.</p>
-      </div>
-      <p style="font-size:11px;color:#a8a29e;text-align:center;margin-top:20px;">© ListHQ Pty Ltd · Melbourne, Australia</p>
+  const inner = `
+    <h1 style="font-size:24px;font-weight:600;color:${BRAND.navy};margin:0 0 12px;">You're in, ${p.firstName}! 🏡</h1>
+    <p style="font-size:14px;line-height:1.6;color:${BRAND.text};margin:0 0 8px;">
+      Search, save, and be alerted — in your language, in your currency. Every listing on ListHQ is available in 20 languages.
+    </p>
+
+    ${sectionTitle('What you can do')}
+    ${brandFeatureList([
+      { icon: '🔍', label: 'Search in Mandarin, Hindi, Arabic, Vietnamese + 17 more' },
+      { icon: '🔔', label: 'Save searches — instant alerts when matches appear' },
+      { icon: '💱', label: 'See prices in CNY, USD, INR, AED and 10 more currencies' },
+      { icon: '💬', label: 'Connect with multilingual agents via WeChat, WhatsApp & LINE' },
+    ])}
+
+    ${brandButton(p.appUrl, 'Start your search →')}
+
+    <div style="background:${BRAND.bg};border-radius:12px;padding:16px;margin:20px 0 0;">
+      <p style="font-size:13px;color:${BRAND.text};margin:0;line-height:1.5;">
+        💡 <strong>Tip:</strong> Set up a Halo buyer profile and get matched with off-market properties before they're listed publicly.
+      </p>
     </div>
-  </body>
-</html>`;
+
+    <p style="font-size:12px;color:${BRAND.textMuted};text-align:center;margin:20px 0 0;">
+      Questions? We're here at support@listhq.com.au
+    </p>
+  `;
+  return brandShell(inner, 'Property Search');
 }

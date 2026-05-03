@@ -1,5 +1,12 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import "../_shared/email-footer.ts";
+import {
+  brandShell,
+  brandButton,
+  brandFeatureList,
+  BRAND,
+} from "../_shared/email-brand.ts";
 
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req.headers.get("Origin"));
@@ -87,6 +94,28 @@ Deno.serve(async (req) => {
         { onConflict: "user_id,role" }
       );
 
+    // Welcome email to the partner
+    try {
+      const firstName = (contactName || "").split(" ")[0] || "there";
+      const appUrl = Deno.env.get("APP_URL") ?? "https://app.listhq.com.au";
+      const html = buildPartnerWelcome({ firstName, companyName, appUrl });
+      await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${Deno.env.get("RESEND_API_KEY") ?? ""}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: Deno.env.get("EMAIL_FROM") ?? "ListHQ <hello@listhq.com.au>",
+          to: [contactEmail],
+          subject: `Welcome to ListHQ, ${firstName} — your partner account is live`,
+          html,
+        }),
+      });
+    } catch (_) {
+      // Don't fail registration if email fails
+    }
+
     // Send notification email to admin
     const adminEmail = Deno.env.get("ADMIN_EMAIL");
     if (adminEmail) {
@@ -122,3 +151,29 @@ Deno.serve(async (req) => {
     );
   }
 });
+
+function buildPartnerWelcome(p: { firstName: string; companyName: string; appUrl: string }) {
+  const inner = `
+    <h1 style="font-size:24px;font-weight:600;color:${BRAND.navy};margin:0 0 12px;">Welcome, ${p.firstName}! 🤝</h1>
+    <p style="font-size:14px;line-height:1.6;color:${BRAND.text};margin:0 0 8px;">
+      <strong>${p.companyName}</strong> is now registered as a ListHQ partner. Your account is under review — we'll notify you once approved (usually within 24 hours).
+    </p>
+
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:${BRAND.textMuted};margin:24px 0 10px;font-weight:600;">
+      As a ListHQ partner you'll get
+    </div>
+    ${brandFeatureList([
+      { icon: '📈', label: 'Real-time referral dashboard and earnings tracking' },
+      { icon: '🌏', label: "Access to Australia's multicultural buyer network" },
+      { icon: '💼', label: 'Dedicated partner support and co-marketing materials' },
+      { icon: '💰', label: 'Competitive referral commissions paid monthly' },
+    ])}
+
+    ${brandButton(`${p.appUrl}/partner`, 'Go to Partner Portal →')}
+
+    <p style="font-size:12px;color:${BRAND.textMuted};text-align:center;margin:20px 0 0;">
+      Questions? Reply to this email — your dedicated partner manager will be in touch.
+    </p>
+  `;
+  return brandShell(inner, 'Partner Portal');
+}

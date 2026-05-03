@@ -357,6 +357,7 @@ export function SiteHeader() {
  */
 function SettingsMenu() {
   const { t } = useTranslation();
+  const { language, setLanguage } = useI18n();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 

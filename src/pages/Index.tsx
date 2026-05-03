@@ -446,45 +446,61 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Right — card stack */}
-            <div style={{ position:'relative', height:560 }} className="card-stack">
-              {/* Card A */}
-              <div className="hcard" style={swap ? backStyle : frontStyle}>
-                <div style={{ height:290, backgroundImage:`url(${(swap ? backListing : frontListing).img})`, backgroundSize:'cover', backgroundPosition:'center' }} />
+            {/* Right — static card stack with image + text crossfade */}
+            <div style={{ position:'relative', height:560 }} className="card-stack hero-cards">
+              {/* Back card — decorative, never moves, never animates */}
+              <div
+                className="hcard hcard-back"
+                style={{
+                  position:'absolute', right:30, top:10, zIndex:2,
+                  width:360, height:480,
+                  transform:'rotate(-4deg)', filter:'brightness(0.88)',
+                  background:'#fff', borderRadius:20, boxShadow:'0 20px 60px rgba(0,0,0,.12)', overflow:'hidden',
+                }}
+              >
+                <div style={{ height:260, backgroundImage:`url(${backListing.img})`, backgroundSize:'cover', backgroundPosition:'center' }} />
                 <div style={{ padding:18 }}>
                   <span style={{ display:'inline-block', background:T.blueL, color:T.blue, fontSize:11, fontWeight:700, padding:'4px 10px', borderRadius:100, marginBottom:10 }}>🌐 20 languages · auto-translated</span>
-                  <div style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:6 }}>{(swap ? backListing : frontListing).title}</div>
-                  <div style={{ fontSize:22, fontWeight:800, color:T.ink, marginBottom:8 }}>{(swap ? backListing : frontListing).price}</div>
-                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:12, color:T.muted, marginBottom:12 }}>
-                    <span>{(swap ? backListing : frontListing).meta}</span>
-                    <span style={{ background:T.blueL, color:T.blue, padding:'3px 8px', borderRadius:100, fontWeight:700 }}>🌐 20 langs</span>
-                  </div>
-                  {!swap && (
-                    <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(22,163,74,.12)', border:'1px solid rgba(22,163,74,.3)', borderRadius:100, padding:'4px 10px', fontSize:11, fontWeight:700, color:'#15803d' }}>
-                      <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:'#16a34a' }} />
-                      {enquiryCount} people enquired in the last hour
-                    </div>
-                  )}
+                  <div style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:6 }}>{backListing.title}</div>
+                  <div style={{ fontSize:22, fontWeight:800, color:T.ink, marginBottom:8 }}>{backListing.price}</div>
+                  <div style={{ fontSize:12, color:T.muted }}>{backListing.meta}</div>
                 </div>
               </div>
 
-              {/* Card B */}
-              <div className="hcard" style={swap ? frontStyle : backStyle}>
-                <div style={{ height:290, backgroundImage:`url(${(swap ? frontListing : backListing).img})`, backgroundSize:'cover', backgroundPosition:'center' }} />
+              {/* Front card — static position; image + text crossfade only */}
+              <div
+                className="hcard hcard-main"
+                style={{
+                  position:'absolute', right:0, top:30, zIndex:3,
+                  width:400, height:520, transform:'none',
+                  background:'#fff', borderRadius:20, boxShadow:'0 20px 60px rgba(0,0,0,.12)', overflow:'hidden',
+                }}
+              >
+                <div className="hcard-img-wrap">
+                  <div
+                    ref={layerARef}
+                    className="hcard-img hcard-layer hcard-layer-a active"
+                    id="hcardLayerA"
+                    style={{ backgroundImage:`url(${initialFront.img})` }}
+                  />
+                  <div
+                    ref={layerBRef}
+                    className="hcard-img hcard-layer hcard-layer-b"
+                    id="hcardLayerB"
+                  />
+                </div>
                 <div style={{ padding:18 }}>
                   <span style={{ display:'inline-block', background:T.blueL, color:T.blue, fontSize:11, fontWeight:700, padding:'4px 10px', borderRadius:100, marginBottom:10 }}>🌐 20 languages · auto-translated</span>
-                  <div style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:6 }}>{(swap ? frontListing : backListing).title}</div>
-                  <div style={{ fontSize:22, fontWeight:800, color:T.ink, marginBottom:8 }}>{(swap ? frontListing : backListing).price}</div>
+                  <div ref={titleRef} className="hcard-title" id="hcardTitle" style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:6 }}>{initialFront.title}</div>
+                  <div ref={priceRef} className="hcard-price" id="hcardPrice" style={{ fontSize:22, fontWeight:800, color:T.ink, marginBottom:8 }}>{initialFront.price}</div>
                   <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:12, color:T.muted, marginBottom:12 }}>
-                    <span>{(swap ? frontListing : backListing).meta}</span>
+                    <span>{initialFront.meta}</span>
                     <span style={{ background:T.blueL, color:T.blue, padding:'3px 8px', borderRadius:100, fontWeight:700 }}>🌐 20 langs</span>
                   </div>
-                  {swap && (
-                    <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(22,163,74,.12)', border:'1px solid rgba(22,163,74,.3)', borderRadius:100, padding:'4px 10px', fontSize:11, fontWeight:700, color:'#15803d' }}>
-                      <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:'#16a34a' }} />
-                      {enquiryCount} people enquired in the last hour
-                    </div>
-                  )}
+                  <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(22,163,74,.12)', border:'1px solid rgba(22,163,74,.3)', borderRadius:100, padding:'4px 10px', fontSize:11, fontWeight:700, color:'#15803d' }}>
+                    <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:'#16a34a' }} />
+                    <span id="enquiryCount">{enquiryCount}</span>&nbsp;people enquired in the last hour
+                  </div>
                 </div>
               </div>
             </div>

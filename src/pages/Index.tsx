@@ -191,23 +191,90 @@ const Index = () => {
     };
   }, [modalOpen, closeModal]);
 
-  // Voice search
-  const startVoice = useCallback(() => {
+  // ── Voice search (Web Speech API) ──────────────────────────
+  const [voiceState, setVoiceState] = useState<'idle' | 'listening' | 'processing'>('idle');
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const recognitionRef = useRef<any>(null);
+  const langCodeRef = useRef<string>(SEQUENCE[0].code);
+  const voiceSupportedRef = useRef<boolean>(false);
+  const errorTimerRef = useRef<number | null>(null);
+
+  // Keep active language code in sync (read from ref inside callbacks)
+  useEffect(() => {
+    langCodeRef.current = SEQUENCE[seqIdx].code;
+  }, [seqIdx]);
+
+  // Initialise recognition once
+  useEffect(() => {
     const SR: any = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SR) return;
-    try {
-      const rec = new SR();
-      rec.lang = seq.code;
-      rec.interimResults = false;
-      rec.maxAlternatives = 1;
-      rec.onresult = (ev: any) => {
-        const transcript = ev.results[0][0].transcript;
+    if (!SR) {
+      voiceSupportedRef.current = false;
+      return;
+    }
+    voiceSupportedRef.current = true;
+    const rec = new SR();
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    rec.continuous = false;
+
+    rec.onresult = (ev: any) => {
+      const transcript = ev.results?.[0]?.[0]?.transcript ?? '';
+      if (transcript) {
         setSearchQuery(transcript);
-        openSearch(transcript);
-      };
+        setVoiceState('idle');
+        window.setTimeout(() => openSearch(transcript), 350);
+      }
+    };
+    rec.onend = () => setVoiceState('idle');
+    rec.onerror = (ev: any) => {
+      setVoiceState('idle');
+      const code = ev?.error;
+      let msg: string | null = null;
+      switch (code) {
+        case 'not-allowed':
+        case 'service-not-allowed':
+          msg = 'Microphone access denied. Please allow access in your browser settings.'; break;
+        case 'no-speech':
+          msg = 'No speech detected. Try again.'; break;
+        case 'network':
+          msg = 'Network error. Check your connection and try again.'; break;
+        case 'aborted':
+          msg = null; break;
+        default:
+          msg = 'Voice search unavailable. Try typing instead.';
+      }
+      if (msg) {
+        setVoiceError(msg);
+        if (errorTimerRef.current) window.clearTimeout(errorTimerRef.current);
+        errorTimerRef.current = window.setTimeout(() => setVoiceError(null), 3000);
+      }
+    };
+
+    recognitionRef.current = rec;
+    return () => {
+      try { rec.abort(); } catch { /* noop */ }
+      if (errorTimerRef.current) window.clearTimeout(errorTimerRef.current);
+      recognitionRef.current = null;
+    };
+  }, [openSearch]);
+
+  const startVoice = useCallback(() => {
+    if (!voiceSupportedRef.current) return;
+    const rec = recognitionRef.current;
+    if (!rec) return;
+    if (voiceState === 'listening') {
+      try { rec.stop(); } catch { /* noop */ }
+      setVoiceState('idle');
+      return;
+    }
+    try {
+      rec.lang = langCodeRef.current;
       rec.start();
-    } catch { /* noop */ }
-  }, [seq.code, openSearch]);
+      setVoiceState('listening');
+    } catch {
+      setVoiceState('idle');
+    }
+  }, [voiceState]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -260,6 +327,12 @@ const Index = () => {
         .chip:hover { background: ${T.blueL}; border-color: ${T.blueMid}; color: ${T.blue}; }
         @keyframes typeBlink { 50% { opacity: 0 } }
         .type-cursor::after { content:'▋'; color:${T.blue}; margin-left:2px; animation: typeBlink 1s steps(1) infinite; }
+        @keyframes micRing { 0% { transform: scale(1); opacity: .55 } 100% { transform: scale(1.85); opacity: 0 } }
+        .mic-ring { position:absolute; inset:0; border-radius:50%; background:#ef4444; animation: micRing 1.2s ease-out infinite; }
+        @keyframes spin { to { transform: rotate(360deg) } }
+        .mic-spin { width:18px; height:18px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation: spin .8s linear infinite; }
+        @keyframes errFade { from { opacity:0; transform:translateY(-4px) } to { opacity:1; transform:translateY(0) } }
+        .voice-err { animation: errFade .25s ease-out; }
       `}</style>
 
       <div className="wave17">
@@ -299,13 +372,30 @@ const Index = () => {
 
               {/* Search block */}
               <form onSubmit={handleSubmit} style={{ maxWidth:560, background:'#fff', border:`1.5px solid ${T.border}`, borderRadius:14, boxShadow:'0 4px 24px rgba(0,0,0,.07)', display:'flex', alignItems:'center', padding:'6px 6px 6px 0', gap:0 }}>
-                <button type="button" onClick={startVoice} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 16px', borderRight:`1.5px solid ${T.border}`, background:'transparent', border:'none', cursor:'pointer' }}>
-                  <span style={{ width:36, height:36, borderRadius:'50%', background:'linear-gradient(135deg,#ef4444,#dc2626)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff' }}>
-                    <Mic size={16} />
+                <button
+                  type="button"
+                  onClick={voiceSupportedRef.current ? startVoice : undefined}
+                  disabled={!voiceSupportedRef.current}
+                  title={voiceSupportedRef.current ? 'Tap to talk' : 'Voice search not supported in this browser'}
+                  aria-label={voiceState === 'listening' ? 'Stop listening' : 'Start voice search'}
+                  style={{
+                    display:'flex', alignItems:'center', gap:10, padding:'10px 16px',
+                    borderRight:`1.5px solid ${T.border}`, background:'transparent', border:'none',
+                    cursor: voiceSupportedRef.current ? 'pointer' : 'not-allowed',
+                    opacity: voiceSupportedRef.current ? 1 : 0.5,
+                  }}
+                >
+                  <span style={{ position:'relative', width:36, height:36, borderRadius:'50%', background: voiceState === 'processing' ? '#9ca3af' : 'linear-gradient(135deg,#ef4444,#dc2626)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', flexShrink:0 }}>
+                    {voiceState === 'listening' && <span className="mic-ring" />}
+                    {voiceState === 'processing' ? <span className="mic-spin" /> : <Mic size={16} />}
                   </span>
                   <span style={{ textAlign:'left' }}>
-                    <div style={{ fontSize:13, fontWeight:700, color:T.ink }}>{seq.mic}</div>
-                    <div style={{ fontSize:10, fontWeight:600, color:T.muted, textTransform:'uppercase', letterSpacing:'.05em' }}>Tap to talk · voice search</div>
+                    <div style={{ fontSize:13, fontWeight:700, color: voiceState === 'listening' ? '#dc2626' : T.ink }}>
+                      {voiceState === 'listening' ? '🎤 Listening…' : voiceState === 'processing' ? 'Processing…' : seq.mic}
+                    </div>
+                    <div style={{ fontSize:10, fontWeight:600, color:T.muted, textTransform:'uppercase', letterSpacing:'.05em' }}>
+                      {voiceState === 'listening' ? 'Tap to stop' : 'Tap to talk · voice search'}
+                    </div>
                   </span>
                 </button>
                 <input
@@ -318,6 +408,12 @@ const Index = () => {
                 />
                 <button type="submit" style={{ background:T.blue, color:'#fff', border:'none', padding:'10px 18px', borderRadius:9, fontSize:13, fontWeight:700, cursor:'pointer' }}>Search</button>
               </form>
+
+              {voiceError && (
+                <div className="voice-err" style={{ marginTop:10, maxWidth:560, display:'inline-flex', alignItems:'center', gap:8, background:'rgba(220,38,38,.08)', border:'1px solid rgba(220,38,38,.25)', color:'#b91c1c', fontSize:12, fontWeight:600, padding:'8px 14px', borderRadius:100 }}>
+                  ⚠ {voiceError}
+                </div>
+              )}
 
               {/* Filter chips */}
               <div style={{ display:'flex', flexWrap:'wrap', gap:8, maxWidth:560, marginTop:14 }}>

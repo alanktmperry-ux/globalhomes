@@ -312,22 +312,9 @@ const Index = () => {
     if (q) openSearch(q);
   };
 
-  // Front/back content
-  const frontListing = FEAT_LISTINGS[cardIdx.front];
-  const backListing = FEAT_LISTINGS[cardIdx.back];
-
-  const frontStyle: React.CSSProperties = {
-    width: '400px', height: '520px', right: '0px', top: '30px',
-    transform: 'scale(1) translateX(0px) translateY(0px) rotate(0deg)',
-    filter: 'brightness(1)',
-    zIndex: 3,
-  };
-  const backStyle: React.CSSProperties = {
-    width: '400px', height: '520px', right: '0px', top: '30px',
-    transform: 'scale(0.82) translateX(50px) translateY(-18px) rotate(-4deg)',
-    filter: 'brightness(0.92)',
-    zIndex: 2,
-  };
+  // Initial card content (static — JS handles all subsequent updates via refs)
+  const initialFront = FEAT_LISTINGS[0];
+  const backListing = FEAT_LISTINGS[1];
 
   return (
     <>

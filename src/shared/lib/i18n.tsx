@@ -1443,10 +1443,20 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     } catch { /* non-fatal */ }
   }, [language]);
 
+  const bannerTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const dismissBanner = useCallback(() => {
     setShowBanner(false);
+    if (bannerTimerRef.current) clearTimeout(bannerTimerRef.current);
     localStorage.setItem(BANNER_DISMISSED_KEY, '1');
   }, []);
+
+  // Auto-dismiss after 5 seconds whenever banner appears
+  useEffect(() => {
+    if (!showBanner) return;
+    bannerTimerRef.current = setTimeout(() => setShowBanner(false), 5000);
+    return () => { if (bannerTimerRef.current) clearTimeout(bannerTimerRef.current); };
+  }, [showBanner]);
 
   const t = (key: string) => translations[language]?.[key] || translations.en[key] || key;
 

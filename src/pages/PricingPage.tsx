@@ -143,13 +143,12 @@ export default function PricingPage() {
         {/* Hero */}
         <section className="max-w-6xl mx-auto px-4 pt-16 pb-10 text-center">
           <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground tracking-tight">
-            Plans for every agency
+            {t('pricing.headline')}
           </h1>
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
-            60-day free trial · No credit card required
+            {t('pricing.subheadline')}
           </p>
 
-          {/* Billing toggle */}
           <div className="mt-8 inline-flex items-center gap-1 bg-muted/60 p-1 rounded-full">
             <button
               onClick={() => setBilling('monthly')}
@@ -159,7 +158,7 @@ export default function PricingPage() {
                   : 'text-muted-foreground'
               }`}
             >
-              Monthly
+              {t('pricing.monthly')}
             </button>
             <button
               onClick={() => setBilling('annual')}
@@ -169,9 +168,9 @@ export default function PricingPage() {
                   : 'text-muted-foreground'
               }`}
             >
-              Annual
+              {t('pricing.annual')}
               <span className="inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                Save 20%
+                {t('pricing.save')}
               </span>
             </button>
           </div>

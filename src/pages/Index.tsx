@@ -118,9 +118,13 @@ const Index = () => {
   const [propertyCount, setPropertyCount] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Front/back card content (front = idx 0, back = next listing)
-  const [cardIdx, setCardIdx] = useState({ front: 0, back: 1 });
-  const [swap, setSwap] = useState(false); // toggles which card is "front"
+  // Front card crossfade refs
+  const layerARef = useRef<HTMLDivElement>(null);
+  const layerBRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
+  const priceRef = useRef<HTMLDivElement>(null);
+  const activeLayerRef = useRef<'a' | 'b'>('a');
+  const cardIdxRef = useRef(0);
 
   const seq = SEQUENCE[seqIdx];
 
@@ -145,12 +149,38 @@ const Index = () => {
     return () => clearInterval(id);
   }, []);
 
-  // Card swap
+  // Card cycle — crossfade image layer + text inside the static front card
   useEffect(() => {
     const id = setInterval(() => {
-      setCardIdx((c) => ({ front: c.back, back: (c.back + 1) % FEAT_LISTINGS.length }));
-      setSwap((s) => !s);
-    }, 4800);
+      const next = (cardIdxRef.current + 1) % FEAT_LISTINGS.length;
+      const listing = FEAT_LISTINGS[next];
+      cardIdxRef.current = next;
+
+      // Preload next image
+      const pre = new Image();
+      pre.onload = () => {
+        const inactive = activeLayerRef.current === 'a' ? layerBRef.current : layerARef.current;
+        const active = activeLayerRef.current === 'a' ? layerARef.current : layerBRef.current;
+        if (inactive) inactive.style.backgroundImage = `url(${listing.img})`;
+        // swap active class
+        requestAnimationFrame(() => {
+          if (inactive) inactive.classList.add('active');
+          if (active) active.classList.remove('active');
+          activeLayerRef.current = activeLayerRef.current === 'a' ? 'b' : 'a';
+        });
+      };
+      pre.src = listing.img;
+
+      // Text crossfade
+      const t = titleRef.current;
+      const p = priceRef.current;
+      if (t) t.classList.add('hcard-text-hidden');
+      if (p) p.classList.add('hcard-text-hidden');
+      window.setTimeout(() => {
+        if (t) { t.textContent = listing.title; t.classList.remove('hcard-text-hidden'); }
+        if (p) { p.textContent = listing.price; p.classList.remove('hcard-text-hidden'); }
+      }, 200);
+    }, 5000);
     return () => clearInterval(id);
   }, []);
 
@@ -282,22 +312,9 @@ const Index = () => {
     if (q) openSearch(q);
   };
 
-  // Front/back content
-  const frontListing = FEAT_LISTINGS[cardIdx.front];
-  const backListing = FEAT_LISTINGS[cardIdx.back];
-
-  const frontStyle: React.CSSProperties = {
-    width: '400px', height: '520px', right: '0px', top: '30px',
-    transform: 'scale(1) translateX(0px) translateY(0px) rotate(0deg)',
-    filter: 'brightness(1)',
-    zIndex: 3,
-  };
-  const backStyle: React.CSSProperties = {
-    width: '400px', height: '520px', right: '0px', top: '30px',
-    transform: 'scale(0.82) translateX(50px) translateY(-18px) rotate(-4deg)',
-    filter: 'brightness(0.92)',
-    zIndex: 2,
-  };
+  // Initial card content (static — JS handles all subsequent updates via refs)
+  const initialFront = FEAT_LISTINGS[0];
+  const backListing = FEAT_LISTINGS[1];
 
   return (
     <>
@@ -322,7 +339,11 @@ const Index = () => {
         @keyframes marquee { 0% { transform: translateX(0) } 100% { transform: translateX(-50%) } }
         .marquee-track { animation: marquee 30s linear infinite; }
         .marquee-track:hover { animation-play-state: paused; }
-        .hcard { transition: all 1.2s cubic-bezier(.4,0,.2,1); position: absolute; background: #fff; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,.12); overflow: hidden; }
+        .hcard-img-wrap { position: relative; height: 290px; overflow: hidden; }
+        .hcard-layer { position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.9s ease; opacity: 0; }
+        .hcard-layer.active { opacity: 1; }
+        .hcard-title, .hcard-price { transition: opacity 0.2s ease; }
+        .hcard-text-hidden { opacity: 0; }
         .chip { background: ${T.off}; border: 1px solid ${T.border}; border-radius: 100px; padding: 7px 14px; font-size: 12.5px; font-weight: 600; color: ${T.mid}; cursor: pointer; transition: all .15s ease; }
         .chip:hover { background: ${T.blueL}; border-color: ${T.blueMid}; color: ${T.blue}; }
         @keyframes typeBlink { 50% { opacity: 0 } }
@@ -429,45 +450,61 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Right — card stack */}
-            <div style={{ position:'relative', height:560 }} className="card-stack">
-              {/* Card A */}
-              <div className="hcard" style={swap ? backStyle : frontStyle}>
-                <div style={{ height:290, backgroundImage:`url(${(swap ? backListing : frontListing).img})`, backgroundSize:'cover', backgroundPosition:'center' }} />
+            {/* Right — static card stack with image + text crossfade */}
+            <div style={{ position:'relative', height:560 }} className="card-stack hero-cards">
+              {/* Back card — decorative, never moves, never animates */}
+              <div
+                className="hcard hcard-back"
+                style={{
+                  position:'absolute', right:30, top:10, zIndex:2,
+                  width:360, height:480,
+                  transform:'rotate(-4deg)', filter:'brightness(0.88)',
+                  background:'#fff', borderRadius:20, boxShadow:'0 20px 60px rgba(0,0,0,.12)', overflow:'hidden',
+                }}
+              >
+                <div style={{ height:260, backgroundImage:`url(${backListing.img})`, backgroundSize:'cover', backgroundPosition:'center' }} />
                 <div style={{ padding:18 }}>
                   <span style={{ display:'inline-block', background:T.blueL, color:T.blue, fontSize:11, fontWeight:700, padding:'4px 10px', borderRadius:100, marginBottom:10 }}>🌐 20 languages · auto-translated</span>
-                  <div style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:6 }}>{(swap ? backListing : frontListing).title}</div>
-                  <div style={{ fontSize:22, fontWeight:800, color:T.ink, marginBottom:8 }}>{(swap ? backListing : frontListing).price}</div>
-                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:12, color:T.muted, marginBottom:12 }}>
-                    <span>{(swap ? backListing : frontListing).meta}</span>
-                    <span style={{ background:T.blueL, color:T.blue, padding:'3px 8px', borderRadius:100, fontWeight:700 }}>🌐 20 langs</span>
-                  </div>
-                  {!swap && (
-                    <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(22,163,74,.12)', border:'1px solid rgba(22,163,74,.3)', borderRadius:100, padding:'4px 10px', fontSize:11, fontWeight:700, color:'#15803d' }}>
-                      <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:'#16a34a' }} />
-                      {enquiryCount} people enquired in the last hour
-                    </div>
-                  )}
+                  <div style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:6 }}>{backListing.title}</div>
+                  <div style={{ fontSize:22, fontWeight:800, color:T.ink, marginBottom:8 }}>{backListing.price}</div>
+                  <div style={{ fontSize:12, color:T.muted }}>{backListing.meta}</div>
                 </div>
               </div>
 
-              {/* Card B */}
-              <div className="hcard" style={swap ? frontStyle : backStyle}>
-                <div style={{ height:290, backgroundImage:`url(${(swap ? frontListing : backListing).img})`, backgroundSize:'cover', backgroundPosition:'center' }} />
+              {/* Front card — static position; image + text crossfade only */}
+              <div
+                className="hcard hcard-main"
+                style={{
+                  position:'absolute', right:0, top:30, zIndex:3,
+                  width:400, height:520, transform:'none',
+                  background:'#fff', borderRadius:20, boxShadow:'0 20px 60px rgba(0,0,0,.12)', overflow:'hidden',
+                }}
+              >
+                <div className="hcard-img-wrap">
+                  <div
+                    ref={layerARef}
+                    className="hcard-img hcard-layer hcard-layer-a active"
+                    id="hcardLayerA"
+                    style={{ backgroundImage:`url(${initialFront.img})` }}
+                  />
+                  <div
+                    ref={layerBRef}
+                    className="hcard-img hcard-layer hcard-layer-b"
+                    id="hcardLayerB"
+                  />
+                </div>
                 <div style={{ padding:18 }}>
                   <span style={{ display:'inline-block', background:T.blueL, color:T.blue, fontSize:11, fontWeight:700, padding:'4px 10px', borderRadius:100, marginBottom:10 }}>🌐 20 languages · auto-translated</span>
-                  <div style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:6 }}>{(swap ? frontListing : backListing).title}</div>
-                  <div style={{ fontSize:22, fontWeight:800, color:T.ink, marginBottom:8 }}>{(swap ? frontListing : backListing).price}</div>
+                  <div ref={titleRef} className="hcard-title" id="hcardTitle" style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:6 }}>{initialFront.title}</div>
+                  <div ref={priceRef} className="hcard-price" id="hcardPrice" style={{ fontSize:22, fontWeight:800, color:T.ink, marginBottom:8 }}>{initialFront.price}</div>
                   <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:12, color:T.muted, marginBottom:12 }}>
-                    <span>{(swap ? frontListing : backListing).meta}</span>
+                    <span>{initialFront.meta}</span>
                     <span style={{ background:T.blueL, color:T.blue, padding:'3px 8px', borderRadius:100, fontWeight:700 }}>🌐 20 langs</span>
                   </div>
-                  {swap && (
-                    <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(22,163,74,.12)', border:'1px solid rgba(22,163,74,.3)', borderRadius:100, padding:'4px 10px', fontSize:11, fontWeight:700, color:'#15803d' }}>
-                      <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:'#16a34a' }} />
-                      {enquiryCount} people enquired in the last hour
-                    </div>
-                  )}
+                  <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(22,163,74,.12)', border:'1px solid rgba(22,163,74,.3)', borderRadius:100, padding:'4px 10px', fontSize:11, fontWeight:700, color:'#15803d' }}>
+                    <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:'#16a34a' }} />
+                    <span id="enquiryCount">{enquiryCount}</span>&nbsp;people enquired in the last hour
+                  </div>
                 </div>
               </div>
             </div>

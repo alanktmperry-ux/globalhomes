@@ -1022,7 +1022,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       {/* ── STATS BAR ── */}
       <div className="hidden md:grid grid-cols-4 border-y border-border bg-background">
         {[
-          { num: '24',  lbl: 'Languages' },
+          { num: '20',  lbl: 'Languages' },
           { num: 'Live',lbl: 'Exchange rates' },
           { num: 'AI',  lbl: 'Voice search' },
           { num: 'Free',lbl: 'To search' },

@@ -676,7 +676,7 @@ Deno.serve(async (req) => {
   } catch (err) {
     console.error("admin-users unhandled error:", err);
     return new Response(JSON.stringify({ error: (err as Error).message }), {
-      status: 200,
+      status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }

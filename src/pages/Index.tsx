@@ -1967,19 +1967,22 @@ const Index = () => {
           {mobileView === 'map' ? (
             <>
               <div className="absolute inset-0">{mapComponent}</div>
-              <motion.div
+              <div
                 className="absolute bottom-0 left-0 right-0 z-20 bg-background rounded-t-2xl shadow-drawer border-t border-border"
-                style={{ height: sheetHeightSpring, paddingBottom: 'env(safe-area-inset-bottom)' }}
-                drag="y"
-                dragConstraints={{ top: 0, bottom: 0 }}
-                dragElastic={0.1}
-                onDrag={(_, info) => {
-                  const newH = viewportHeight * SNAP_POINTS[sheetSnap] - info.offset.y;
-                  sheetHeightMV.set(Math.max(viewportHeight * 0.15, Math.min(viewportHeight * 0.9, newH)));
+                style={{
+                  height: sheetHeight,
+                  paddingBottom: 'env(safe-area-inset-bottom)',
+                  transition: sheetDragging ? 'none' : 'height 0.3s ease',
+                  willChange: 'height',
                 }}
-                onDragEnd={handleSheetDragEnd}
               >
-                <div className="w-full flex justify-center py-2 cursor-grab active:cursor-grabbing touch-none">
+                <div
+                  className="w-full flex justify-center py-2 cursor-grab active:cursor-grabbing touch-none"
+                  onTouchStart={handleSheetTouchStart}
+                  onTouchMove={handleSheetTouchMove}
+                  onTouchEnd={handleSheetTouchEnd}
+                  onTouchCancel={handleSheetTouchEnd}
+                >
                   <div className="w-10 h-1.5 rounded-full bg-muted" />
                 </div>
                 <div className="px-4 pb-2 flex items-center justify-between">
@@ -2023,17 +2026,22 @@ const Index = () => {
                     </Suspense>
                   )}
                 </div>
-              </motion.div>
-              <motion.button
+              </div>
+              <button
                 onClick={() => {
                   const hero = document.querySelector('[aria-label="Start voice search"]') as HTMLButtonElement;
                   if (hero) { window.scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(() => hero.click(), 500); }
                 }}
-                style={{ bottom: sheetHeightSpring, marginBottom: 20, paddingBottom: 'env(safe-area-inset-bottom)' }}
+                style={{
+                  bottom: sheetHeight,
+                  marginBottom: 20,
+                  paddingBottom: 'env(safe-area-inset-bottom)',
+                  transition: sheetDragging ? 'none' : 'bottom 0.3s ease',
+                }}
                 className="absolute right-4 z-20 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-elevated flex items-center justify-center"
               >
                 <Mic size={22} />
-              </motion.button>
+              </button>
             </>
           ) : (
             <div className="p-4 overflow-y-auto flex-1 min-h-0 pb-24 overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>

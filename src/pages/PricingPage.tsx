@@ -17,6 +17,8 @@ interface Plan {
   ctaHref: string;
 }
 
+type CompareCell = string | boolean;
+
 const formatPrice = (n: number) => `$${n.toLocaleString('en-AU')}`;
 
 export default function PricingPage() {

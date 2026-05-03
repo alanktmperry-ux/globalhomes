@@ -356,13 +356,13 @@ export default function PricingPage() {
 
           <div className="mt-12 text-center">
             <p className="text-sm text-muted-foreground mb-4">
-              Still have questions? We're happy to help.
+              {t('pricing.faqCta')}
             </p>
             <Link
               to="/help/contact"
               className="inline-flex items-center px-5 py-2.5 rounded-xl border border-border bg-card text-sm font-semibold text-foreground hover:bg-accent transition"
             >
-              Contact us
+              {t('pricing.contactUs')}
             </Link>
           </div>
         </section>

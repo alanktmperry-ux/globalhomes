@@ -586,7 +586,7 @@ export const zhCN: Partial<Record<keyof typeof EnBase, string>> = {
   'search.emptyTitle': '房源即将上线',
   'search.emptyDesc': '中介正在准备房源，请稍后再来查看！',
   // Homepage marketing
-  'hero.subheadline': "支持24种语言语音搜索。每个房源翻译成20种语言。",
+  'hero.subheadline': "支持20种语言语音搜索。每个房源翻译成20种语言。",
   'home.marketingHeadline': "专为多元文化澳大利亚打造。",
   'home.marketingBody': "ListHQ自动将每个房源翻译成20种语言——普通话、越南语、印地语、阿拉伯语、他加禄语和15种以上——覆盖超过120万个REA和Domain无法服务的多语言买家。",
   'home.stat1Label': "每个房源翻译的语言数量",

@@ -551,7 +551,7 @@ export const ko: Partial<Record<TranslationKey, string>> = {
   'valuation.trust.free': '무료 견적',
   'valuation.trust.language': '중개인이 귀하의 언어를 사용합니다',
   // Homepage marketing
-  'hero.subheadline': "24개 언어로 음성 검색. 모든 매물을 20개 언어로 번역.",
+  'hero.subheadline': "20개 언어로 음성 검색. 모든 매물을 20개 언어로 번역.",
   'home.marketingHeadline': "다문화 호주를 위해 만들어졌습니다.",
   'home.marketingBody': "ListHQ는 모든 매물을 20개 언어로 자동 번역합니다 — 중국어, 베트남어, 힌디어, 아랍어, 타갈로그어 및 15개 이상 — REA와 Domain이 서비스하지 못하는 120만 명 이상의 다국어 구매자에게 도달합니다.",
   'home.stat1Label': "각 매물이 번역되는 언어 수",

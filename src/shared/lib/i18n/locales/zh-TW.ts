@@ -587,7 +587,7 @@ export const zhTW: Partial<Record<keyof typeof EnBase, string>> = {
   'search.emptyTitle': '房源即將上線',
   'search.emptyDesc': '仲介正在準備房源，請稍後再來查看！',
   // Homepage marketing
-  'hero.subheadline': "支援24種語言語音搜尋。每個房源翻譯成20種語言。",
+  'hero.subheadline': "支援20種語言語音搜尋。每個房源翻譯成20種語言。",
   'home.marketingHeadline': "專為多元文化澳大利亞打造。",
   'home.marketingBody': "ListHQ自動將每個房源翻譯成20種語言——普通話、越南語、印地語、阿拉伯語、他加祿語和15種以上——覆蓋超過120萬個REA和Domain無法服務的多語言買家。",
   'home.stat1Label': "每個房源翻譯的語言數量",

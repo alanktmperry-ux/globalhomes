@@ -1,492 +1,351 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SEO } from '@/shared/components/SEO';
-import { motion } from 'framer-motion';
-import { Ear, Mic, Globe, Camera, Cpu, ShieldCheck, ArrowRight, CheckCircle2, Star, Play, Lock } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import AgentRegistrationModal from '@/features/agents/components/AgentRegistrationModal';
 import { supabase } from '@/integrations/supabase/client';
 
-import agentHero from '@/assets/agent-hero.jpg';
-import heatMapBg from '@/assets/heat-map-bg.jpg';
+const features = [
+  {
+    num: '01',
+    icon: '🔮',
+    tag: { text: 'Unique to ListHQ', color: 'blue' as const },
+    title: 'Halo Board',
+    body: "Buyers post structured intent briefs — suburbs, budget, finance status, must-haves, preferred language. You browse live, see who's serious, and unlock full contact details with credits. Access buyers before they look at a single listing.",
+    highlight: true,
+  },
+  {
+    num: '02',
+    icon: '🤖',
+    tag: { text: 'Automated', color: 'blue' as const },
+    title: 'AI Buyer Concierge',
+    body: "The platform matches your listings to buyers automatically — from their voice searches, saved criteria, and Halos. Qualified leads arrive in your inbox while you're at an open home. No cold outreach required.",
+    highlight: true,
+  },
+  {
+    num: '03',
+    icon: '🌐',
+    tag: null,
+    title: '20-language auto-translation',
+    body: 'Every listing is translated into Mandarin, Vietnamese, Hindi, Arabic, Tagalog and 15 more languages the moment it goes live. Reach 1.2 million multilingual buyers that REA and Domain simply cannot serve.',
+    highlight: false,
+  },
+  {
+    num: '04',
+    icon: '🤫',
+    tag: null,
+    title: 'Pocket listings',
+    body: 'List without a public days-on-market counter. Tell your vendor: "We\'ll test the market privately first." No price history, no stigma if you adjust. A genuine edge in your next listing presentation.',
+    highlight: false,
+  },
+  {
+    num: '05',
+    icon: '🎤',
+    tag: null,
+    title: 'Voice-qualified leads',
+    body: "Every enquiry arrives with a voice transcript in the buyer's own language. You know their budget, timeline, and must-haves before you pick up the phone. No more tyre kickers disguised as hot leads.",
+    highlight: false,
+  },
+  {
+    num: '06',
+    icon: '⚡',
+    tag: null,
+    title: '14-day exclusive window',
+    body: "Your listings reach the platform's premium buyer members 14 days before they go to any other portal. These buyers pay $29/month for early access — the highest-intent audience on the market.",
+    highlight: false,
+  },
+  {
+    num: '07',
+    icon: '📊',
+    tag: null,
+    title: 'Lead pipeline CRM',
+    body: 'Enquiries, open home sign-ins, and EOIs auto-sync into a Kanban board with urgency scoring. No manual entry, no spreadsheets. Your entire pipeline visible in one place — no third-party CRM needed.',
+    highlight: false,
+  },
+  {
+    num: '08',
+    icon: '🏦',
+    tag: null,
+    title: 'Trust accounting + rent roll',
+    body: 'Full Australian trust accounting, bank reconciliation, ledgers, owner statements, arrears, and a complete rent roll — all built in. Migrate your data from PropertyMe, Console Cloud, or Reapit via CSV. No extra software needed.',
+    highlight: false,
+  },
+];
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.12, duration: 0.5, ease: 'easeOut' as const },
-  }),
-};
+const themItems = [
+  'English-only buyer pool — multilingual buyers go unserved',
+  'Wait for buyers to find you — no reverse discovery',
+  'Public days-on-market on every listing',
+  'No lead transcripts — cold calls to qualify every enquiry',
+  'Trust accounting is a separate $200–500/month subscription',
+  'CRM is a separate subscription, updated manually',
+  'Rent roll in a separate PM platform',
+];
+
+const usItems = [
+  '1.2M multilingual buyers across 20 languages',
+  'Halo Board — buyers come to you before they browse',
+  'Pocket listings — no public counter, no stigma',
+  'Voice transcript with every enquiry, in their language',
+  'Trust accounting built in — no extra subscription',
+  'CRM auto-synced from all enquiries and open homes',
+  'Full rent roll and PM tools included',
+];
+
+const pricingItems = [
+  'Unlimited listings — sale and rental',
+  '20-language AI translation',
+  'Halo Board access',
+  'Lead pipeline CRM',
+  'Trust accounting + rent roll',
+  'Multilingual buyer pool access',
+];
 
 const AgentLandingPage = () => {
   const [showModal, setShowModal] = useState(false);
-  const [agentCount, setAgentCount] = useState<number | null>(null);
-  
   const navigate = useNavigate();
 
   useEffect(() => {
-    supabase.from('agents').select('id', { count: 'exact', head: true })
-      .then(({ count }) => { if (count !== null) setAgentCount(count); });
+    supabase.from('agents').select('id', { count: 'exact', head: true });
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+    <div className="min-h-screen overflow-x-hidden" style={{ background: '#0f172a', color: 'white' }}>
       <SEO
         title="Real Estate Agent Software Australia | ListHQ"
-        description="CRM, property management, trust accounting and lead tools built for Australian agents."
+        description="Halo Board, AI buyer matching, 20-language translation, trust accounting, and CRM — built for Australian agents."
         path="/for-agents"
       />
-      {/* ─── HERO ─── */}
-      <section className="relative min-h-[92vh] flex items-center">
-        {/* Split background */}
-        <div className="absolute inset-0 grid grid-cols-1 lg:grid-cols-2">
-          <div className="relative hidden lg:block">
-            <img src={agentHero} alt="Real estate agent" className="absolute inset-0 w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-foreground/90" />
-          </div>
-          <div className="relative">
-            <img src={heatMapBg} alt="Buyer demand heat map" className="absolute inset-0 w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-foreground/60 lg:bg-foreground/40" />
-          </div>
-        </div>
 
-        <div className="relative z-10 container mx-auto px-6 py-20 lg:py-0">
-          <div className="lg:grid lg:grid-cols-2">
-            <div /> {/* spacer for left image on desktop */}
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              className="max-w-xl mx-auto lg:mx-0 text-center lg:text-left"
-            >
-              <motion.span
-                variants={fadeUp}
-                custom={0}
-                className="inline-block px-4 py-1.5 rounded-full bg-primary/20 text-primary text-xs font-semibold tracking-wide uppercase mb-6"
-              >
-                Agent Network — Off-Market
-              </motion.span>
+      {/* HERO */}
+      <section
+        className="relative min-h-screen flex items-center px-6 md:px-16 py-24 overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #0f172a 100%)' }}
+      >
+        <div
+          className="pointer-events-none absolute -top-48 -right-36 w-[650px] h-[650px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(59,91,219,0.18) 0%, transparent 70%)' }}
+        />
+        <div
+          className="pointer-events-none absolute -bottom-24 -left-24 w-[500px] h-[500px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 70%)' }}
+        />
 
-              <motion.h1
-                variants={fadeUp}
-                custom={1}
-                className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold text-primary-foreground leading-[1.08] mb-5"
-              >
-                Join Our Founding{' '}
-                <span className="text-primary">Agent Cohort</span>
-              </motion.h1>
-
-              <motion.p
-                variants={fadeUp}
-                custom={2}
-                className="text-lg text-primary-foreground/70 mb-8 max-w-md mx-auto lg:mx-0"
-              >
-                We're accepting 50 founding agents across Sydney and Melbourne. Lock in your rate for life.
-              </motion.p>
-
-              <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
-                <Button
-                  size="lg"
-                  onClick={() => setShowModal(true)}
-                  className="text-base px-8 py-6 rounded-xl font-bold shadow-lg hover:scale-[1.02] transition-transform"
-                >
-                  List Off-Market Now <ArrowRight size={18} className="ml-1" />
-                </Button>
-                <button
-                  className="inline-flex items-center justify-center text-base px-8 py-3 rounded-xl font-semibold border border-white/30 text-white bg-transparent hover:bg-white/10 transition-colors"
-                  onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
-                >
-                  <Play size={16} className="mr-1.5" /> See How It Works
-                </button>
-              </motion.div>
-
-              {/* ─── DEMO & LOGIN CTAs ─── */}
-              <motion.div variants={fadeUp} custom={4} className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mt-4">
-                <Button
-                  size="lg"
-                  onClick={() => navigate('/agents/demo')}
-                  className="text-base px-8 py-5 rounded-xl font-bold bg-primary-foreground text-primary hover:bg-primary-foreground/90 transition-all"
-                >
-                  🎯 Try the Demo
-                </Button>
-                <button
-                  onClick={() => navigate('/agents/login')}
-                  className="inline-flex items-center justify-center text-base px-8 py-3 rounded-xl font-bold border border-white/30 text-white bg-transparent hover:bg-white/10 transition-all"
-                >
-                  <Lock size={18} className="mr-2" />
-                  Login to Your Agency
-                </button>
-              </motion.div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-
-      {/* ─── VALUE PROPOSITION GRID ─── */}
-      <section className="py-24 bg-background">
-        <div className="container mx-auto px-6">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            className="text-center mb-16"
+        <div className="relative z-10 max-w-2xl">
+          <div
+            className="inline-flex items-center gap-2 mb-8 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
+            style={{ background: 'rgba(59,91,219,0.2)', border: '1px solid rgba(59,91,219,0.4)', color: '#93c5fd', letterSpacing: '1.2px' }}
           >
-            <motion.h2 variants={fadeUp} custom={0} className="font-display text-3xl sm:text-4xl font-extrabold mb-3">
-              Why Agents Choose Us
-            </motion.h2>
-            <motion.p variants={fadeUp} custom={1} className="text-muted-foreground max-w-lg mx-auto">
-              Tools built for the modern agent who values privacy, speed, and global reach.
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-            className="grid md:grid-cols-3 gap-8"
-          >
-            {[
-              {
-                icon: <Ear size={28} />,
-                title: 'The Whisper Listing',
-                text: 'Test market appetite without public days-on-market counter. Soft launch to qualified investors only.',
-                accent: 'from-primary/20 to-primary/5',
-              },
-              {
-                icon: <Mic size={28} />,
-                title: 'Voice-Qualified Leads',
-                text: 'Every inquiry includes voice transcript. Know exactly what buyer wants before you call.',
-                accent: 'from-success/20 to-success/5',
-              },
-              {
-                icon: <Globe size={28} />,
-                title: 'Global Investor Access',
-                text: 'Your $800k Melbourne listing shown to Dubai, Singapore, and London investors automatically.',
-                accent: 'from-destructive/15 to-destructive/5',
-              },
-            ].map((card, i) => (
-              <motion.div
-                key={card.title}
-                variants={fadeUp}
-                custom={i}
-                className="group relative rounded-2xl border border-border bg-card p-8 hover:shadow-elevated transition-shadow"
-              >
-                <div
-                  className={`w-14 h-14 rounded-xl bg-gradient-to-br ${card.accent} flex items-center justify-center text-primary mb-5`}
-                >
-                  {card.icon}
-                </div>
-                <h3 className="font-display text-xl font-bold mb-2">{card.title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">{card.text}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ─── HOW IT WORKS ─── */}
-      <section id="how-it-works" className="py-24 bg-secondary/50">
-        <div className="container mx-auto px-6">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            className="text-center mb-16"
-          >
-            <motion.h2 variants={fadeUp} custom={0} className="font-display text-3xl sm:text-4xl font-extrabold mb-3">
-              Three Steps to Off-Market Success
-            </motion.h2>
-            <motion.p variants={fadeUp} custom={1} className="text-muted-foreground max-w-lg mx-auto">
-              From listing to offer in as little as 48 hours.
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-            className="grid md:grid-cols-3 gap-10"
-          >
-            {[
-              {
-                step: '01',
-                icon: <Camera size={32} />,
-                title: 'Snap & List',
-                time: '30 seconds',
-                bullets: [
-                  'Upload 3 photos, address, price guide',
-                  'Voice-record property description (optional)',
-                ],
-              },
-              {
-                step: '02',
-                icon: <Cpu size={32} />,
-                title: 'AI Matches Buyers',
-                time: 'Instant',
-                bullets: [
-                  'System alerts buyers whose voice searches match',
-                  '"New off-market in your criteria" notification',
-                ],
-              },
-              {
-                step: '03',
-                icon: <ShieldCheck size={32} />,
-                title: 'Close Off-Market',
-                time: 'Privacy',
-                bullets: [
-                  'No public price history',
-                  'No days-on-market stigma',
-                  'Direct agent-to-buyer negotiation',
-                ],
-              },
-            ].map((s, i) => (
-              <motion.div key={s.step} variants={fadeUp} custom={i} className="relative">
-                <span className="font-display text-7xl font-black text-primary/10 absolute -top-4 -left-2 select-none">
-                  {s.step}
-                </span>
-                <div className="relative bg-card border border-border rounded-2xl p-8 pt-12 shadow-card h-full">
-                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
-                    {s.icon}
-                  </div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <h3 className="font-display text-xl font-bold">{s.title}</h3>
-                    <span className="text-xs font-semibold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">
-                      {s.time}
-                    </span>
-                  </div>
-                  <ul className="space-y-2">
-                    {s.bullets.map((b) => (
-                      <li key={b} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <CheckCircle2 size={16} className="text-success mt-0.5 shrink-0" />
-                        {b}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ─── TESTIMONIAL ─── */}
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-6 max-w-3xl text-center">
-          <div className="flex justify-center gap-1 mb-4">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star key={i} size={20} className="fill-primary text-primary" />
-            ))}
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+            For agents
           </div>
-          <blockquote className="font-display text-xl sm:text-2xl font-semibold italic leading-relaxed mb-4">
-            "ListHQ gave us tools no other platform offers — the voice search alone brought in buyers we'd never have reached."
-          </blockquote>
-          <p className="text-sm text-muted-foreground">
-            <strong className="text-foreground">Early Access Agent</strong> · Melbourne, Australia
+
+          <h1 className="text-5xl md:text-[62px] font-black leading-[1.04] tracking-tight mb-6 text-white">
+            Find your next buyer<br />
+            <span style={{ color: '#60a5fa' }}>before they find a listing.</span>
+          </h1>
+
+          <p className="text-lg md:text-xl mb-10 leading-relaxed max-w-lg" style={{ color: '#94a3b8' }}>
+            ListHQ is a complete business platform built for Australian agents —{' '}
+            <strong style={{ color: '#e2e8f0', fontWeight: 600 }}>
+              Halo Board, AI buyer matching, 20-language auto-translation, trust accounting, and a CRM that runs itself.
+            </strong>{' '}
+            Everything you need. One subscription.
           </p>
-        </div>
-      </section>
 
-      {/* ─── PRICING ─── */}
-      <section className="py-24 bg-background">
-        <div className="container mx-auto px-6 max-w-6xl">
-          <div className="text-center mb-12">
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-foreground mb-3">
-              Simple, transparent pricing
-            </h2>
-            <p className="text-muted-foreground">
-              60-day free trial · No credit card required · Cancel any time
-            </p>
-          </div>
-
-          {/* Plan cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-16">
+          <div className="flex flex-wrap gap-3 mb-10">
             {[
-              {
-                name: 'Solo',
-                price: '$299',
-                cadence: '/mo',
-                features: [
-                  '1 agent, up to 3 listings',
-                  'Buyer concierge (20 matches/mo)',
-                  'Trust accounting',
-                  'CRM & contacts',
-                  'AI listing descriptions',
-                  'Email & chat support',
-                ],
-                highlight: false,
-              },
-              {
-                name: 'Agency',
-                price: '$899',
-                cadence: '/mo',
-                features: [
-                  'Up to 5 agents, unlimited listings',
-                  'Buyer concierge (100 matches/mo)',
-                  'Full trust accounting + bank reconciliation',
-                  'Pipeline & rent roll',
-                  'Pocket (off-market) listings',
-                  'Priority support',
-                ],
-                highlight: true,
-              },
-              {
-                name: 'Agency Pro',
-                price: '$1,999',
-                cadence: '/mo',
-                features: [
-                  'Up to 15 agents',
-                  'Unlimited everything',
-                  'Buyer concierge (unlimited)',
-                  'Exclusive listing access',
-                  'Commission calculator',
-                  'Dedicated account manager',
-                ],
-                highlight: false,
-              },
-              {
-                name: 'Enterprise',
-                price: 'Custom',
-                cadence: '',
-                features: [
-                  'Unlimited agents',
-                  'White-label option',
-                  'API access',
-                  'Custom integrations',
-                  'SLA support',
-                ],
-                highlight: false,
-              },
-            ].map((plan) => (
+              { n: '1.2M+', l: 'Multilingual buyers\nno other portal reaches' },
+              { n: '20', l: 'Languages, every\nlisting auto-translated' },
+              { n: '3 mo.', l: 'Free trial, no\ncredit card' },
+            ].map((s) => (
               <div
-                key={plan.name}
-                className={`relative flex flex-col rounded-2xl bg-card p-6 transition ${
-                  plan.highlight
-                    ? 'border-2 border-primary shadow-lg lg:scale-105'
-                    : 'border border-border'
-                }`}
+                key={s.n}
+                className="text-center px-5 py-4 rounded-2xl min-w-[110px]"
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}
               >
-                {plan.highlight && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-primary text-primary-foreground text-[11px] font-bold uppercase tracking-wide">
-                    Most Popular
-                  </span>
-                )}
-                <h3 className="font-display text-lg font-bold text-foreground">
-                  {plan.name}
-                </h3>
-                <div className="mt-3 mb-2 flex items-baseline gap-1">
-                  <span className="font-display text-3xl font-extrabold text-foreground">
-                    {plan.price}
-                  </span>
-                  {plan.cadence && (
-                    <span className="text-sm text-muted-foreground">{plan.cadence}</span>
-                  )}
-                </div>
-                <span className="inline-flex self-start items-center px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-semibold uppercase tracking-wide mb-5">
-                  60-day free trial
-                </span>
-                <ul className="space-y-2.5 text-sm text-muted-foreground mb-6 flex-1">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2">
-                      <CheckCircle2 size={14} className="text-primary mt-0.5 shrink-0" />
-                      <span>{f}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Button
-                  onClick={() => setShowModal(true)}
-                  variant={plan.highlight ? 'default' : 'outline'}
-                  className="w-full font-semibold"
-                >
-                  Start Free Trial
-                </Button>
+                <div className="text-2xl font-black mb-1" style={{ color: '#60a5fa' }}>{s.n}</div>
+                <div className="text-xs leading-tight whitespace-pre-line" style={{ color: '#64748b' }}>{s.l}</div>
               </div>
             ))}
           </div>
 
-          {/* Feature comparison */}
-          <div className="rounded-2xl border border-border bg-card overflow-hidden">
-            <div className="px-6 py-4 border-b border-border">
-              <h3 className="font-display text-lg font-bold text-foreground">
-                Compare features
-              </h3>
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                onClick={() => setShowModal(true)}
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-white font-bold text-base transition-all hover:scale-[1.02]"
+                style={{ background: '#3b5bdb', boxShadow: '0 0 40px rgba(59,91,219,0.4)' }}
+              >
+                Start free trial — 3 months free →
+              </button>
+              <button
+                onClick={() => navigate('/agents/login')}
+                className="inline-flex items-center gap-2 px-7 py-4 rounded-full text-base font-semibold transition-colors"
+                style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.18)', color: '#cbd5e1' }}
+              >
+                🔒 Login to your account
+              </button>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-secondary/40">
-                  <tr>
-                    <th className="text-left font-semibold text-foreground px-6 py-3">Feature</th>
-                    <th className="text-center font-semibold text-foreground px-3 py-3">Solo</th>
-                    <th className="text-center font-semibold text-primary px-3 py-3">Agency</th>
-                    <th className="text-center font-semibold text-foreground px-3 py-3">Agency Pro</th>
-                    <th className="text-center font-semibold text-foreground px-3 py-3">Enterprise</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {([
-                    ['Pocket listings',     false, true,  true, true],
-                    ['Trust accounting',    true,  true,  true, true],
-                    ['Buyer concierge',     true,  true,  true, true],
-                    ['AI descriptions',     true,  true,  true, true],
-                    ['Bank reconciliation', false, true,  true, true],
-                    ['Dedicated manager',   false, false, true, true],
-                  ] as Array<[string, boolean, boolean, boolean, boolean]>).map(
-                    ([label, ...cells], idx) => (
-                      <tr
-                        key={label as string}
-                        className={idx % 2 === 0 ? 'bg-background' : 'bg-secondary/20'}
-                      >
-                        <td className="px-6 py-3 text-foreground">{label}</td>
-                        {cells.map((included, i) => (
-                          <td key={i} className="text-center px-3 py-3">
-                            {included ? (
-                              <CheckCircle2 size={16} className="inline text-primary" />
-                            ) : (
-                              <span className="text-muted-foreground/50">—</span>
-                            )}
-                          </td>
-                        ))}
-                      </tr>
-                    )
-                  )}
-                </tbody>
-              </table>
+            <p className="text-xs" style={{ color: '#475569' }}>
+              <strong style={{ color: '#64748b' }}>No credit card required.</strong> Full access from day one. Cancel anytime.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* FEATURES */}
+      <section className="py-20 px-6 md:px-16" style={{ background: '#f8faff' }}>
+        <div className="max-w-5xl mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#3b5bdb', letterSpacing: '1.5px' }}>
+            What ListHQ does
+          </p>
+          <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-4" style={{ color: '#0f172a', lineHeight: 1.1 }}>
+            Your whole business.<br />One platform.
+          </h2>
+          <p className="text-base mb-14 max-w-xl leading-relaxed" style={{ color: '#64748b' }}>
+            Eight capabilities that agents tell us changed the way they work — in the order they actually changed their business.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {features.map((f) => (
+              <div
+                key={f.num}
+                className="relative rounded-[22px] p-8"
+                style={f.highlight
+                  ? { background: 'linear-gradient(135deg, #eff6ff, #f8faff)', border: '1px solid #bfdbfe' }
+                  : { background: 'white', border: '1px solid #e2e8f0', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }
+                }
+              >
+                <span
+                  className="absolute top-5 right-6 text-xs font-black tracking-wider"
+                  style={{ color: f.highlight ? '#93c5fd' : '#cbd5e1' }}
+                >
+                  {f.num}
+                </span>
+                {f.tag && (
+                  <span
+                    className="inline-flex items-center mb-3 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider"
+                    style={{ background: '#eff6ff', border: '1px solid #bfdbfe', color: '#1e40af', letterSpacing: '0.5px' }}
+                  >
+                    {f.tag.text}
+                  </span>
+                )}
+                <span className="block text-3xl mb-4">{f.icon}</span>
+                <h3 className="text-base font-black mb-2" style={{ color: f.highlight ? '#1e3a8a' : '#0f172a', fontSize: '17px' }}>
+                  {f.title}
+                </h3>
+                <p className="text-sm leading-relaxed" style={{ color: f.highlight ? '#475569' : '#64748b', lineHeight: '1.65' }}>
+                  {f.body}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* COMPARISON */}
+      <section className="py-20 px-6 md:px-16" style={{ background: '#0f172a' }}>
+        <div className="max-w-4xl mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#60a5fa', letterSpacing: '1.5px' }}>
+            The full picture
+          </p>
+          <h2 className="text-3xl font-black tracking-tight mb-4 text-white leading-tight">
+            A portal gives you a listing page.<br />
+            ListHQ runs your business.
+          </h2>
+          <p className="text-sm mb-12 max-w-lg leading-relaxed" style={{ color: '#64748b' }}>
+            Most agents are paying for a listing portal, a CRM, and a trust accounting package separately. ListHQ replaces all three — and adds tools none of them have.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div
+              className="rounded-[18px] p-7"
+              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
+            >
+              <p className="text-xs font-bold uppercase tracking-wider mb-5" style={{ color: '#475569', letterSpacing: '1px' }}>
+                Typical agent stack
+              </p>
+              {themItems.map((item) => (
+                <div key={item} className="flex items-start gap-3 mb-4 text-sm leading-snug" style={{ color: '#64748b' }}>
+                  <span className="shrink-0 mt-0.5">✗</span>
+                  {item}
+                </div>
+              ))}
+            </div>
+            <div
+              className="rounded-[18px] p-7"
+              style={{ background: 'rgba(59,91,219,0.15)', border: '1px solid rgba(59,91,219,0.3)' }}
+            >
+              <p className="text-xs font-bold uppercase tracking-wider mb-5" style={{ color: '#93c5fd', letterSpacing: '1px' }}>
+                ListHQ
+              </p>
+              {usItems.map((item) => (
+                <div key={item} className="flex items-start gap-3 mb-4 text-sm leading-snug" style={{ color: '#e2e8f0' }}>
+                  <span className="shrink-0 mt-0.5">✓</span>
+                  {item}
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* ─── FINAL CTA ─── */}
-      <section className="py-24 bg-primary relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjEpIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCBmaWxsPSJ1cmwoI2cpIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIi8+PC9zdmc+')] opacity-40" />
-        <div className="relative container mx-auto px-6 text-center">
-          <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-primary-foreground mb-4">
-            Ready to Sell Smarter?
-          </h2>
-          <p className="text-primary-foreground/70 max-w-md mx-auto mb-8">
-            Join the network and start receiving voice-qualified leads today. No lock-in contracts.
+      {/* PRICING */}
+      <section className="py-20 px-6 text-center" style={{ background: '#f8faff' }}>
+        <div className="max-w-lg mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: '#3b5bdb', letterSpacing: '1.5px' }}>
+            Entry Level Plan
           </p>
-          <Button
-            size="lg"
-            variant="secondary"
+          <div className="font-black tracking-tight mb-2" style={{ color: '#0f172a', fontSize: '42px', letterSpacing: '-1.5px' }}>
+            Free
+            <span className="block font-black" style={{ color: '#3b5bdb', fontSize: '26px', marginTop: '4px' }}>
+              for 3 months
+            </span>
+          </div>
+          <p className="text-sm mb-9" style={{ color: '#64748b' }}>
+            No credit card required. Full access from day one. Cancel anytime.
+          </p>
+          <div className="flex flex-col gap-3 mb-9 text-left max-w-xs mx-auto">
+            {pricingItems.map((item) => (
+              <div key={item} className="flex items-center gap-3 text-sm" style={{ color: '#334155' }}>
+                <span className="font-bold text-base" style={{ color: '#10b981' }}>✓</span>
+                {item}
+              </div>
+            ))}
+          </div>
+          <button
             onClick={() => setShowModal(true)}
-            className="text-base px-10 py-6 rounded-xl font-bold hover:scale-[1.02] transition-transform"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-white font-bold text-base transition-all hover:scale-[1.02]"
+            style={{ background: '#3b5bdb', boxShadow: '0 4px 20px rgba(59,91,219,0.3)' }}
           >
-            List Off-Market Now <ArrowRight size={18} className="ml-1" />
-          </Button>
+            Start free trial →
+          </button>
         </div>
       </section>
 
-      {/* ─── FOOTER ─── */}
-      <footer className="bg-card border-t border-border py-8">
-        <div className="container mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-          <span className="font-display font-bold text-foreground">ListHQ</span>
-          <span>© {new Date().getFullYear()} ListHQ Agent Network. All rights reserved.</span>
-        </div>
-      </footer>
+      {/* LOGIN */}
+      <section className="py-10 px-6 text-center" style={{ background: 'white', borderTop: '1px solid #e2e8f0' }}>
+        <p className="text-sm mb-4" style={{ color: '#64748b' }}>Already have an account?</p>
+        <button
+          onClick={() => navigate('/agents/login')}
+          className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-semibold transition-colors hover:bg-slate-50"
+          style={{ background: 'white', border: '1.5px solid #e2e8f0', color: '#334155' }}
+        >
+          🔒 Login to your agency
+        </button>
+        <p className="mt-4 text-xs" style={{ color: '#94a3b8' }}>
+          Trust accounting partner?{' '}
+          <button
+            onClick={() => navigate('/partner/login')}
+            className="font-semibold"
+            style={{ color: '#3b5bdb', background: 'none', border: 'none', cursor: 'pointer' }}
+          >
+            Partner portal →
+          </button>
+        </p>
+      </section>
 
       <AgentRegistrationModal open={showModal} onOpenChange={setShowModal} />
-      
     </div>
   );
 };

@@ -106,23 +106,42 @@ export default function PricingPage() {
   ];
 
   const COMPARE_ROWS: { label: string; values: [CompareCell, CompareCell, CompareCell, CompareCell] }[] = [
-    { label: 'Agent seats',                values: ['1', '5', '15', 'Unlimited'] },
-    { label: 'Active listings',            values: ['3', 'Unlimited', 'Unlimited', 'Unlimited'] },
-    { label: 'Buyer concierge matches',    values: ['—', '100/mo', 'Unlimited', 'Unlimited'] },
-    { label: 'CRM contacts',               values: ['200', 'Unlimited', 'Unlimited', 'Unlimited'] },
-    { label: 'Trust accounting',           values: [true, true, true, true] },
-    { label: 'Bank reconciliation',        values: [false, true, true, true] },
-    { label: 'Pocket listings',            values: [false, true, true, true] },
-    { label: 'AI descriptions (languages)',values: ['5', '24', '24', '24'] },
-    { label: 'Commission calculator',      values: [false, false, true, true] },
-    { label: 'Dedicated manager',          values: [false, false, true, true] },
+    { label: 'Agent seats',                 values: ['1', '5', '15', 'Unlimited'] },
+    { label: 'Active listings',             values: ['10', 'Unlimited', 'Unlimited', 'Unlimited'] },
+    { label: 'AI descriptions (languages)', values: ['20', '20', '20', '20'] },
+    { label: 'CRM contacts',                values: ['500', 'Unlimited', 'Unlimited', 'Unlimited'] },
+    { label: 'Trust accounting',            values: [true, true, true, true] },
+    { label: 'Property management',         values: ['Manual', 'Full automation', 'Full automation', 'Full automation'] },
+    { label: 'Bank reconciliation',         values: [false, true, true, true] },
+    { label: 'Pocket listings',             values: [false, true, true, true] },
+    { label: 'Buyer concierge matches',     values: ['—', '100/mo', 'Unlimited', 'Unlimited'] },
+    { label: 'Halo board access',           values: ['Browse only', 'Browse + 5 credits/mo', 'Browse + 15 credits/mo', 'Custom'] },
+    { label: 'Multi-office management',     values: [false, false, true, true] },
+    { label: 'Commission calculator',       values: [false, false, true, true] },
+    { label: 'Dedicated account manager',   values: [false, false, true, true] },
   ];
 
   const FAQS = [
-    { q: t('pricing.faq1Q'), a: t('pricing.faq1A') },
-    { q: t('pricing.faq2Q'), a: t('pricing.faq2A') },
-    { q: t('pricing.faq3Q'), a: t('pricing.faq3A') },
-    { q: t('pricing.faq4Q'), a: t('pricing.faq4A') },
+    {
+      q: 'What happens after my 60-day trial?',
+      a: "Seven days before your trial ends you'll receive an email and an in-app notification with a countdown. At day 58 you'll receive a final reminder. At day 60 your listings are paused — no charges, no surprises. Upgrade to a paid plan at any time to bring everything back online instantly. No credit card is required during the trial.",
+    },
+    {
+      q: 'What are Halo credits?',
+      a: "Halo is ListHQ's reverse marketplace — buyers post exactly what property they want to find, and agents browse active buyer briefs on the Halo Board. Unlocking a buyer's contact details uses one credit. Agency plans include credits monthly. Additional credits can be purchased in bundles from your account dashboard.",
+    },
+    {
+      q: 'Does ListHQ replace PropertyMe or Console Cloud?',
+      a: 'Yes. ListHQ includes full trust accounting, property management, rent roll, arrears automation, inspection scheduling, and no-login portals for tenants, owners and suppliers — all state-specific and AFA 2014 compliant. Agency and above plans include full PM automation. Migrate your existing data using the built-in Migration Wizard.',
+    },
+    {
+      q: 'Can I change plans?',
+      a: 'Yes — upgrade or downgrade at any time from your billing settings. Changes take effect immediately and are pro-rated to your current billing cycle.',
+    },
+    {
+      q: 'Do you support all Australian states and territories?',
+      a: 'Yes. ListHQ is built for all 8 Australian states and territories with state-specific compliance, contracts, inspection notice periods, and trust accounting rules. International support for the UK, United States and UAE is also available.',
+    },
   ];
 
   const renderCell = (v: CompareCell) => {

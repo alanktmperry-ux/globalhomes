@@ -323,7 +323,7 @@ export default function PricingPage() {
         <section className="max-w-3xl mx-auto px-4 pb-24">
           <div className="text-center mb-8">
             <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">
-              Frequently asked questions
+              {t('pricing.faqTitle')}
             </h2>
           </div>
 

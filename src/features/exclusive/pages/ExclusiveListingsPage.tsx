@@ -77,6 +77,7 @@ export default function ExclusiveListingsPage() {
         .from('properties')
         .select('id, suburb, state, price, price_formatted, beds, baths, parking, property_type, image_url, exclusive_end_date, agent_id, exclusive_views')
         .eq('is_exclusive', true)
+        .eq('is_active', true)
         .gt('exclusive_end_date', new Date().toISOString())
         .neq('status', 'public')
         .order('exclusive_end_date', { ascending: true })

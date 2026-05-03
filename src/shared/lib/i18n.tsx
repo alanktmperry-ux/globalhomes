@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
-import { X } from 'lucide-react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { toast } from 'sonner';
 
 export type Language = 'en' | 'zh' | 'zh-TW' | 'ko' | 'ms' | 'es' | 'ar' | 'hi' | 'fr' | 'pt' | 'bn' | 'ru' | 'ja' | 'de' | 'id' | 'nl' | 'pl' | 'vi' | 'th' | 'tr' | 'sv' | 'da' | 'no' | 'fil' | 'it' | 'pa' | 'ta';

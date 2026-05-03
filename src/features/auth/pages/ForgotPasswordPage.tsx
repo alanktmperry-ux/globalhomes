@@ -21,7 +21,7 @@ const ForgotPasswordPage = () => {
       // SeekerAuthPage detects the recovery hash and forwards to /reset-password
       // so the user lands on the new-password form with the recovery session intact.
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://globalhomes.lovable.app/login',
+        redirectTo: `${window.location.origin}/login`,
       });
       if (error) throw error;
       setSent(true);

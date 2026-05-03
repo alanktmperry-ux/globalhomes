@@ -447,7 +447,7 @@ Deno.serve(async (req) => {
         redirectTo: (Deno.env.get("SITE_URL") || "https://listhq.lovable.app") + "/reset-password",
       });
       if (error) throw error;
-      return new Response(JSON.stringify({ success: true, message: `Recovery email sent to ${email}` }), {
+      return new Response(JSON.stringify({ success: true, message: `Recovery email sent` }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -676,7 +676,7 @@ Deno.serve(async (req) => {
   } catch (err) {
     console.error("admin-users unhandled error:", err);
     return new Response(JSON.stringify({ error: (err as Error).message }), {
-      status: 200,
+      status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }

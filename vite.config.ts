@@ -54,6 +54,7 @@ export default defineConfig(({ mode }) => {
           if (id.includes("@sentry")) return "sentry";
           if (id.includes("mapbox-gl") || id.includes("@googlemaps")) return "maps";
           if (id.includes("framer-motion")) return "motion";
+          if (id.includes("@radix-ui")) return "radix";
 
           return "vendor";
         },

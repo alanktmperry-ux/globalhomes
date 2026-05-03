@@ -236,7 +236,7 @@ export function SiteHeader() {
                 {/* Language & Currency */}
                 <div className="px-1 pb-3 mb-2 border-b border-border">
                   <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground px-2 mb-2">
-                    Language & Currency
+                    {t('nav.languageCurrency')}
                   </p>
                   <div className="flex items-center gap-2 [&>div>button]:h-11 [&>div>button]:px-3 [&>div>button]:text-base [&>div>button]:bg-secondary [&>div>button]:flex-1">
                     <CurrencySwitcher />
@@ -245,42 +245,42 @@ export function SiteHeader() {
                 </div>
 
                 <button onClick={() => navTo('/suburbs')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                  <MapPin size={16} className="text-muted-foreground" /> Browse Suburbs
+                  <MapPin size={16} className="text-muted-foreground" /> {t('nav.browseSuburbs')}
                 </button>
                 <button onClick={() => navTo('/agents')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                  <Users size={16} className="text-primary" /> Find an Agent
+                  <Users size={16} className="text-primary" /> {t('nav.findAgent')}
                 </button>
                 <button onClick={() => navTo('/brokers')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                  <Banknote size={16} className="text-primary" /> Find a Broker
+                  <Banknote size={16} className="text-primary" /> {t('nav.findBroker')}
                 </button>
                 <button onClick={() => navTo('/pricing')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                  <Sparkles size={16} className="text-primary" /> Pricing
+                  <Sparkles size={16} className="text-primary" /> {t('nav.pricing')}
                 </button>
                 <button onClick={() => navTo('/exclusive')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                  <Sparkles size={16} className="text-primary" /> Exclusive
+                  <Sparkles size={16} className="text-primary" /> {t('nav.exclusive')}
                   <span className="ml-auto text-[9px] font-bold uppercase bg-red-500 text-white rounded-full px-1.5 py-0.5">NEW</span>
                 </button>
                 <button onClick={() => navTo('/home-services')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                  <Wrench size={16} className="text-primary" /> Services
+                  <Wrench size={16} className="text-primary" /> {t('nav.services')}
                 </button>
                 <button onClick={() => navTo('/conveyancing')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                  <FileText size={16} className="text-primary" /> Conveyancing
+                  <FileText size={16} className="text-primary" /> {t('nav.conveyancing')}
                 </button>
                 <button onClick={() => navTo('/refer')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                  <Handshake size={16} className="text-primary" /> Referral Program
+                  <Handshake size={16} className="text-primary" /> {t('nav.referralProgram')}
                 </button>
 
                 {/* Agent links */}
                 {user && isAgent && (
                   <>
                     <button onClick={() => navTo('/dashboard')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                      <LayoutDashboard size={16} className="text-primary" /> Dashboard
+                      <LayoutDashboard size={16} className="text-primary" /> {t('nav.dashboard')}
                     </button>
                     <button onClick={() => { localStorage.removeItem('pocket-listing-draft'); navTo('/pocket-listing?type=sale&t=' + Date.now()); }} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                      <Plus size={16} className="text-primary" /> Sale Listing
+                      <Plus size={16} className="text-primary" /> {t('nav.saleListing')}
                     </button>
                     <button onClick={() => { localStorage.removeItem('pocket-listing-draft'); navTo('/pocket-listing?type=rent&t=' + Date.now()); }} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                      <Plus size={16} className="text-primary" /> Rental Listing
+                      <Plus size={16} className="text-primary" /> {t('nav.rentalListing')}
                     </button>
                     <button onClick={() => navTo('/dashboard/listings')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
                       <List size={16} className="text-muted-foreground" /> {t('header.myListings')}
@@ -292,7 +292,7 @@ export function SiteHeader() {
                 {/* Admin link */}
                 {user && isAdmin && (
                   <button onClick={() => navTo('/admin')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                    <ShieldCheck size={16} className="text-primary" /> Admin
+                    <ShieldCheck size={16} className="text-primary" /> {t('nav.admin')}
                   </button>
                 )}
 
@@ -300,10 +300,10 @@ export function SiteHeader() {
                 {user && !isAgent && !isAdmin && (
                   <>
                     <button onClick={() => navTo('/halo/new')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                      <Sparkles size={16} className="text-primary" /> Create your Halo
+                      <Sparkles size={16} className="text-primary" /> {t('nav.createHalo')}
                     </button>
                     <button onClick={() => navTo('/seeker/dashboard')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                      <Sparkles size={16} className="text-muted-foreground" /> My Halos
+                      <Sparkles size={16} className="text-muted-foreground" /> {t('nav.myHalos')}
                     </button>
                   </>
                 )}
@@ -315,7 +315,7 @@ export function SiteHeader() {
                       <Home size={16} className="text-primary" /> {t('nav.search')}
                     </button>
                     <button onClick={() => navTo('/my-applications')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                      <FileText size={16} className="text-muted-foreground" /> My Applications
+                      <FileText size={16} className="text-muted-foreground" /> {t('nav.myApplications')}
                     </button>
                   </>
                 )}
@@ -330,7 +330,7 @@ export function SiteHeader() {
                   <>
                     <button onClick={() => navTo('/auth')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                       <LogIn size={16} />
-                      Sign in
+                      {t('common.signin')}
                     </button>
                   </>
                 )}

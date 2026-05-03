@@ -31,15 +31,17 @@ export default function PricingPage() {
   const PLANS: Plan[] = [
     {
       key: 'solo',
-      name: t('pricing.plan1Name'),
-      monthly: 299,
-      blurb: t('pricing.plan1Desc'),
+      name: 'Solo',
+      monthly: 799,
+      blurb: 'For independent agents running their own shop',
       features: [
         '1 agent seat',
-        'Up to 3 active listings',
-        'Trust accounting',
-        'CRM & contacts (up to 200)',
-        'AI listing descriptions (5 languages)',
+        'Up to 10 active listings',
+        'Trust accounting (full ledger)',
+        'Property management (manual)',
+        'CRM & contacts (up to 500)',
+        'AI listing descriptions (20 languages)',
+        'Halo board — browse active buyer briefs',
         'Email support',
       ],
       ctaLabel: t('pricing.startTrial'),
@@ -47,18 +49,21 @@ export default function PricingPage() {
     },
     {
       key: 'agency',
-      name: t('pricing.plan2Name'),
-      monthly: 899,
-      blurb: t('pricing.plan2Desc'),
+      name: 'Agency',
+      monthly: 1999,
+      blurb: 'For growing agencies ready to scale',
       popular: true,
       features: [
         'Up to 5 agent seats',
         'Unlimited listings',
+        'Full PM automation (arrears, inspections, lease renewals)',
+        'Tenant, owner & supplier no-login portals',
+        'Vacancy KPI dashboard',
         'Buyer concierge (100 matches/mo)',
         'Full CRM (unlimited contacts)',
-        'Pipeline & rent roll',
         'Bank reconciliation',
-        'Off-market / pocket listings',
+        'Pocket listings',
+        '5 Halo credits included per month',
         'Priority support',
       ],
       ctaLabel: t('pricing.startTrial'),
@@ -66,14 +71,16 @@ export default function PricingPage() {
     },
     {
       key: 'pro',
-      name: t('pricing.plan3Name'),
-      monthly: 1999,
-      blurb: t('pricing.plan3Desc'),
+      name: 'Agency Pro',
+      monthly: 3499,
+      blurb: 'For established multi-office agencies',
       features: [
         'Up to 15 agent seats',
         'Unlimited everything',
+        'Full PM automation',
         'Buyer concierge (unlimited)',
-        'Exclusive listing access',
+        '15 Halo credits included per month',
+        'Multi-office management',
         'Commission calculator',
         'Performance analytics',
         'Dedicated account manager',
@@ -99,23 +106,42 @@ export default function PricingPage() {
   ];
 
   const COMPARE_ROWS: { label: string; values: [CompareCell, CompareCell, CompareCell, CompareCell] }[] = [
-    { label: 'Agent seats',                values: ['1', '5', '15', 'Unlimited'] },
-    { label: 'Active listings',            values: ['3', 'Unlimited', 'Unlimited', 'Unlimited'] },
-    { label: 'Buyer concierge matches',    values: ['—', '100/mo', 'Unlimited', 'Unlimited'] },
-    { label: 'CRM contacts',               values: ['200', 'Unlimited', 'Unlimited', 'Unlimited'] },
-    { label: 'Trust accounting',           values: [true, true, true, true] },
-    { label: 'Bank reconciliation',        values: [false, true, true, true] },
-    { label: 'Pocket listings',            values: [false, true, true, true] },
-    { label: 'AI descriptions (languages)',values: ['5', '24', '24', '24'] },
-    { label: 'Commission calculator',      values: [false, false, true, true] },
-    { label: 'Dedicated manager',          values: [false, false, true, true] },
+    { label: 'Agent seats',                 values: ['1', '5', '15', 'Unlimited'] },
+    { label: 'Active listings',             values: ['10', 'Unlimited', 'Unlimited', 'Unlimited'] },
+    { label: 'AI descriptions (languages)', values: ['20', '20', '20', '20'] },
+    { label: 'CRM contacts',                values: ['500', 'Unlimited', 'Unlimited', 'Unlimited'] },
+    { label: 'Trust accounting',            values: [true, true, true, true] },
+    { label: 'Property management',         values: ['Manual', 'Full automation', 'Full automation', 'Full automation'] },
+    { label: 'Bank reconciliation',         values: [false, true, true, true] },
+    { label: 'Pocket listings',             values: [false, true, true, true] },
+    { label: 'Buyer concierge matches',     values: ['—', '100/mo', 'Unlimited', 'Unlimited'] },
+    { label: 'Halo board access',           values: ['Browse only', 'Browse + 5 credits/mo', 'Browse + 15 credits/mo', 'Custom'] },
+    { label: 'Multi-office management',     values: [false, false, true, true] },
+    { label: 'Commission calculator',       values: [false, false, true, true] },
+    { label: 'Dedicated account manager',   values: [false, false, true, true] },
   ];
 
   const FAQS = [
-    { q: t('pricing.faq1Q'), a: t('pricing.faq1A') },
-    { q: t('pricing.faq2Q'), a: t('pricing.faq2A') },
-    { q: t('pricing.faq3Q'), a: t('pricing.faq3A') },
-    { q: t('pricing.faq4Q'), a: t('pricing.faq4A') },
+    {
+      q: 'What happens after my 60-day trial?',
+      a: "Seven days before your trial ends you'll receive an email and an in-app notification with a countdown. At day 58 you'll receive a final reminder. At day 60 your listings are paused — no charges, no surprises. Upgrade to a paid plan at any time to bring everything back online instantly. No credit card is required during the trial.",
+    },
+    {
+      q: 'What are Halo credits?',
+      a: "Halo is ListHQ's reverse marketplace — buyers post exactly what property they want to find, and agents browse active buyer briefs on the Halo Board. Unlocking a buyer's contact details uses one credit. Agency plans include credits monthly. Additional credits can be purchased in bundles from your account dashboard.",
+    },
+    {
+      q: 'Does ListHQ replace PropertyMe or Console Cloud?',
+      a: 'Yes. ListHQ includes full trust accounting, property management, rent roll, arrears automation, inspection scheduling, and no-login portals for tenants, owners and suppliers — all state-specific and AFA 2014 compliant. Agency and above plans include full PM automation. Migrate your existing data using the built-in Migration Wizard.',
+    },
+    {
+      q: 'Can I change plans?',
+      a: 'Yes — upgrade or downgrade at any time from your billing settings. Changes take effect immediately and are pro-rated to your current billing cycle.',
+    },
+    {
+      q: 'Do you support all Australian states and territories?',
+      a: 'Yes. ListHQ is built for all 8 Australian states and territories with state-specific compliance, contracts, inspection notice periods, and trust accounting rules. International support for the UK, United States and UAE is also available.',
+    },
   ];
 
   const renderCell = (v: CompareCell) => {
@@ -135,7 +161,7 @@ export default function PricingPage() {
         <title>Pricing — Plans for every agency · ListHQ</title>
         <meta
           name="description"
-          content="Simple, transparent pricing for Australian real estate agencies. 60-day free trial, no credit card required. Plans from $299/mo."
+          content="Transparent pricing for Australian real estate agents and agencies. Trust accounting, property management, CRM, multilingual listings and Halo — all in one subscription. 60-day free trial, no credit card required. Plans from $799/mo."
         />
       </Helmet>
 
@@ -146,7 +172,7 @@ export default function PricingPage() {
             {t('pricing.headline')}
           </h1>
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
-            {t('pricing.subheadline')}
+            60-day free trial · No credit card required · Cancel anytime
           </p>
 
           <div className="mt-8 inline-flex items-center gap-1 bg-muted/60 p-1 rounded-full">
@@ -180,24 +206,21 @@ export default function PricingPage() {
         <section className="max-w-6xl mx-auto px-4 pb-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             {PLANS.map((plan) => {
-              const annual = plan.monthly !== null ? plan.monthly * 12 * 0.8 : null;
+              const annualTotal = plan.monthly !== null ? Math.round(plan.monthly * 12 * 0.8) : null;
+              const annualMonthlyEquivalent = plan.monthly !== null ? Math.round((plan.monthly * 12 * 0.8) / 12) : null;
+              const annualSavings = plan.monthly !== null ? plan.monthly * 12 - annualTotal! : null;
               const displayPrice =
                 plan.monthly === null
                   ? t('pricing.custom')
                   : billing === 'monthly'
                     ? `${formatPrice(plan.monthly)}`
-                    : `${formatPrice(Math.round(annual!))}`;
-              const priceSuffix =
-                plan.monthly === null
-                  ? ''
-                  : billing === 'monthly'
-                    ? t('pricing.perMonth')
-                    : t('pricing.perYear');
+                    : `${formatPrice(annualMonthlyEquivalent!)}`;
+              const priceSuffix = plan.monthly === null ? '' : '/mo';
               const subPrice =
                 plan.monthly !== null && billing === 'monthly'
-                  ? `or ${formatPrice(Math.round(plan.monthly * 12 * 0.8))}${t('pricing.perYear')}`
+                  ? `or ${formatPrice(annualTotal!)}/yr billed annually (save 20%)`
                   : plan.monthly !== null && billing === 'annual'
-                    ? `${formatPrice(plan.monthly)}${t('pricing.perMonth')} billed monthly`
+                    ? `billed as ${formatPrice(annualTotal!)}/year · save ${formatPrice(annualSavings!)}/year`
                     : 'Tailored to your needs';
 
               return (

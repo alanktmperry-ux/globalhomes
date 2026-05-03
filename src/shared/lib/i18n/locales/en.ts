@@ -655,6 +655,36 @@ export const en = {
   'home.ctaSearch': "Search properties",
   'home.freeTrial': "Free for 3 months. No credit card required.",
 
+  // Navigation
+  'nav.search': 'Search',
+  'nav.findAgent': 'Find an Agent',
+  'nav.browseProperties': 'Browse Properties',
+  'nav.dashboard': 'Dashboard',
+  'nav.haloBoard': 'Halo Board',
+  'nav.listings': 'Listings',
+  'nav.trustAccounting': 'Trust Accounting',
+  'nav.browseSuburbs': 'Browse Suburbs',
+  'nav.findBroker': 'Find a Broker',
+  'nav.pricing': 'Pricing',
+  'nav.exclusive': 'Exclusive',
+  'nav.services': 'Services',
+  'nav.conveyancing': 'Conveyancing',
+  'nav.referralProgram': 'Referral Program',
+  'nav.admin': 'Admin',
+  'nav.createHalo': 'Create your Halo',
+  'nav.myHalos': 'My Halos',
+  'nav.myApplications': 'My Applications',
+  'nav.savedProperties': 'Saved Properties',
+  'nav.accountSettings': 'Account Settings',
+  'nav.myDashboard': 'My Dashboard',
+  'nav.myListings': 'My Listings',
+  'nav.postHalo': 'Post a Halo',
+  'nav.saleListing': 'Sale Listing',
+  'nav.rentalListing': 'Rental Listing',
+  'nav.languageCurrency': 'Language & Currency',
+  'nav.currency': 'Currency',
+  'nav.language': 'Language',
+
 } as const;
 
 export type TranslationKey = keyof typeof en;

@@ -15,28 +15,11 @@ import { CurrencySwitcher } from '@/shared/components/layout/CurrencySwitcher';
 // "Become an agent" modal. Keeping it static added ~50KB gz to every cold load.
 const AgentRegistrationModal = lazy(() => import('@/features/agents/components/AgentRegistrationModal'));
 
-import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 
 type NavItem = { label: string; to: string; icon: React.ComponentType<{ className?: string; size?: number | string }> };
-
-const PUBLIC_NAV: NavItem[] = [
-  { label: 'Search', to: '/search', icon: Search },
-  { label: 'Find an Agent', to: '/agents', icon: Users },
-];
-
-const SEEKER_NAV: NavItem[] = [
-  { label: 'Browse Properties', to: '/search', icon: Search },
-  { label: 'Find an Agent', to: '/agents', icon: Users },
-];
-
-const AGENT_NAV: NavItem[] = [
-  { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
-  { label: 'Halo Board', to: '/halo/board', icon: Sparkles },
-  { label: 'Listings', to: '/dashboard/listings', icon: List },
-  { label: 'Trust Accounting', to: '/trust-accounting', icon: Wallet },
-];
 
 function isActiveRoute(current: string, target: string) {
   if (target === '/') return current === '/';
@@ -45,7 +28,22 @@ function isActiveRoute(current: string, target: string) {
 
 export function SiteHeader() {
   const { user, isAgent, isAdmin, loading, userRole, signOut } = useAuth();
-  const { t } = useI18n();
+  const { t } = useTranslation();
+
+  const PUBLIC_NAV: NavItem[] = [
+    { label: t('nav.search'), to: '/search', icon: Search },
+    { label: t('nav.findAgent'), to: '/agents', icon: Users },
+  ];
+  const SEEKER_NAV: NavItem[] = [
+    { label: t('nav.browseProperties'), to: '/search', icon: Search },
+    { label: t('nav.findAgent'), to: '/agents', icon: Users },
+  ];
+  const AGENT_NAV: NavItem[] = [
+    { label: t('nav.dashboard'), to: '/dashboard', icon: LayoutDashboard },
+    { label: t('nav.haloBoard'), to: '/halo/board', icon: Sparkles },
+    { label: t('nav.listings'), to: '/dashboard/listings', icon: List },
+    { label: t('nav.trustAccounting'), to: '/trust-accounting', icon: Wallet },
+  ];
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);

@@ -645,6 +645,17 @@ export const en = {
   'search.searchTogether': 'Search together',
   'search.emptyTitle': 'Properties coming soon',
   'search.emptyDesc': 'Agents are setting up their listings. Check back shortly!',
+  // Homepage marketing
+  'hero.subheadline': "Voice search in 24 languages. Every listing translated into 20.",
+  'home.marketingHeadline': "Built for multicultural Australia.",
+  'home.marketingBody': "ListHQ automatically translates every listing into 20 languages — Mandarin, Vietnamese, Hindi, Arabic, Tagalog and 15 more — reaching over 1.2 million multilingual buyers that REA and Domain can't serve.",
+  'home.stat1Label': "Languages every listing is translated into",
+  'home.stat2Label': "Multilingual buyers searching right now",
+  'home.stat3Label': "Free — no credit card required",
+  'home.ctaAgents': "Start reaching multilingual buyers",
+  'home.ctaSearch': "Search properties",
+  'home.freeTrial': "Free for 3 months. No credit card required.",
+
 } as const;
 
 export type TranslationKey = keyof typeof en;

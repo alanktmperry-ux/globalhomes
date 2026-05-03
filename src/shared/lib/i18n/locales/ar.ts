@@ -551,4 +551,15 @@ export const ar: Partial<Record<TranslationKey, string>> = {
   'valuation.trust.fast': 'استجابة خلال 24 ساعة',
   'valuation.trust.free': 'تقدير مجاني',
   'valuation.trust.language': 'الوكلاء يتحدثون لغتك',
+  // Homepage marketing
+  'hero.subheadline': "البحث الصوتي بـ24 لغة. كل عقار مترجم إلى 20 لغة.",
+  'home.marketingHeadline': "مصمم لأستراليا المتعددة الثقافات.",
+  'home.marketingBody': "تترجم ListHQ كل عقار تلقائيًا إلى 20 لغة — الماندرين، الفيتنامية، الهندية، العربية، التاغالوغية و15 لغة أخرى — للوصول إلى أكثر من 1.2 مليون مشترٍ متعدد اللغات لا تستطيع REA وDomain خدمتهم.",
+  'home.stat1Label': "لغة يُترجم إليها كل عقار",
+  'home.stat2Label': "مشترٍ متعدد اللغات يبحث الآن",
+  'home.stat3Label': "مجاني — لا يلزم بطاقة ائتمان",
+  'home.ctaAgents': "ابدأ الوصول إلى المشترين متعددي اللغات",
+  'home.ctaSearch': "البحث عن عقارات",
+  'home.freeTrial': "مجاني لمدة 3 أشهر. لا يلزم بطاقة ائتمان.",
+
 };

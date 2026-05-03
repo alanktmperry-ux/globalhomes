@@ -447,7 +447,7 @@ Deno.serve(async (req) => {
         redirectTo: (Deno.env.get("SITE_URL") || "https://listhq.lovable.app") + "/reset-password",
       });
       if (error) throw error;
-      return new Response(JSON.stringify({ success: true, message: `Recovery email sent to ${email}` }), {
+      return new Response(JSON.stringify({ success: true, message: `Recovery email sent` }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

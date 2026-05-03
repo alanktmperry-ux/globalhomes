@@ -29,6 +29,16 @@ Deno.serve(async (req) => {
   const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
     status, headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
+
+  const internalSecret = Deno.env.get('INTERNAL_SECRET');
+  const authHeader = req.headers.get('Authorization') ?? '';
+  const internalHeader = req.headers.get('x-internal-secret') ?? '';
+  const isInternal = internalSecret && internalHeader === internalSecret;
+  const isBearer = authHeader.startsWith('Bearer ');
+  if (!isInternal && !isBearer) {
+    return json({ error: 'Unauthorized' }, 401);
+  }
+
   try {
     const input = (await req.json()) as DispatchInput;
     if (!input?.event_key || !input?.title) {

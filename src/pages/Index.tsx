@@ -1334,9 +1334,9 @@ const Index = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
                 {[
-                  { stat: '20', label: t('home.stat1Label') },
-                  { stat: '1.2M+', label: t('home.stat2Label') },
-                  { stat: '3 months', label: t('home.stat3Label') },
+                  { stat: t('home.stat1.value'), label: t('home.stat1.label') },
+                  { stat: t('home.stat2.value'), label: t('home.stat2.label') },
+                  { stat: t('home.stat3.value'), label: t('home.stat3.label') },
                 ].map((item) => (
                   <div
                     key={item.stat}

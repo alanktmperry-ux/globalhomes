@@ -206,24 +206,21 @@ export default function PricingPage() {
         <section className="max-w-6xl mx-auto px-4 pb-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             {PLANS.map((plan) => {
-              const annual = plan.monthly !== null ? plan.monthly * 12 * 0.8 : null;
+              const annualTotal = plan.monthly !== null ? Math.round(plan.monthly * 12 * 0.8) : null;
+              const annualMonthlyEquivalent = plan.monthly !== null ? Math.round((plan.monthly * 12 * 0.8) / 12) : null;
+              const annualSavings = plan.monthly !== null ? plan.monthly * 12 - annualTotal! : null;
               const displayPrice =
                 plan.monthly === null
                   ? t('pricing.custom')
                   : billing === 'monthly'
                     ? `${formatPrice(plan.monthly)}`
-                    : `${formatPrice(Math.round(annual!))}`;
-              const priceSuffix =
-                plan.monthly === null
-                  ? ''
-                  : billing === 'monthly'
-                    ? t('pricing.perMonth')
-                    : t('pricing.perYear');
+                    : `${formatPrice(annualMonthlyEquivalent!)}`;
+              const priceSuffix = plan.monthly === null ? '' : '/mo';
               const subPrice =
                 plan.monthly !== null && billing === 'monthly'
-                  ? `or ${formatPrice(Math.round(plan.monthly * 12 * 0.8))}${t('pricing.perYear')}`
+                  ? `or ${formatPrice(annualTotal!)}/yr billed annually (save 20%)`
                   : plan.monthly !== null && billing === 'annual'
-                    ? `${formatPrice(plan.monthly)}${t('pricing.perMonth')} billed monthly`
+                    ? `billed as ${formatPrice(annualTotal!)}/year · save ${formatPrice(annualSavings!)}/year`
                     : 'Tailored to your needs';
 
               return (

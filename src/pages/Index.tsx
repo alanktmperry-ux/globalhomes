@@ -1,2247 +1,936 @@
-import { useState, useCallback, useRef, useEffect, useMemo, lazy, Suspense } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-// framer-motion previously imported here for the mobile bottom-sheet drag.
-// Replaced with plain touch handlers + CSS transforms to keep ~90KB out of
-// the homepage critical path. See the mobile sheet below.
-import { ArrowRight, ArrowLeft, MapPin, Sparkles, Map, List, Mic, MicOff, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users, Search, Home, Check, ArrowLeftRight, UserCheck, ChevronRight, Globe, Building2, Briefcase, Handshake } from 'lucide-react';
-const VoiceSearchHero = lazy(() =>
-  import('@/features/search/components/VoiceSearchHero').then(m => ({ default: m.VoiceSearchHero }))
-);
-import { useHeroVoiceSearch } from '@/features/search/hooks/useHeroVoiceSearch';
-
-import { MapSkeleton } from '@/features/properties/components/PropertyCardSkeleton';
-// Heavy components that only render in the search-results branch (not on the
-// landing hero). Lazy-loading keeps them out of the cold-paint critical path
-// — they download in the background only after the user runs a search.
-const VirtualizedPropertyList = lazy(() =>
-  import('@/features/properties/components/VirtualizedPropertyList').then(m => ({ default: m.VirtualizedPropertyList }))
-);
-const PropertyDrawer = lazy(() =>
-  import('@/features/properties/components/PropertyDrawer').then(m => ({ default: m.PropertyDrawer }))
-);
-const MapErrorBoundary = lazy(() =>
-  import('@/features/properties/components/MapErrorBoundary').then(m => ({ default: m.MapErrorBoundary }))
-);
-import { VoiceSearchErrorBoundary } from '@/features/search/components/VoiceSearchErrorBoundary';
-import { useI18n } from '@/shared/lib/i18n';
-import { capture } from '@/shared/lib/posthog';
-import { useTranslation } from '@/shared/lib/i18n/useTranslation';
-
-// Lazy-load map — only initialize when needed
-const LazyPropertyMap = lazy(() => import('@/features/properties/components/PropertyMap').then(m => ({ default: m.PropertyMap })));
-import { useSearchHistory } from '@/features/search/hooks/useSearchHistory';
-import { useSavedProperties } from '@/features/properties/hooks/useSavedProperties';
-import { useIsMobile } from '@/shared/hooks/use-mobile';
-import { Property } from '@/shared/lib/types';
-import { useCurrency } from '@/shared/lib/CurrencyContext';
-// Lazy-load FilterSidebar — it pulls in calendar/day-picker/date-fns and is
-// only shown after the user opens the filters panel.
-const FilterSidebar = lazy(() =>
-  import('@/shared/components/FilterSidebar').then(m => ({ default: m.FilterSidebar }))
-);
-import { defaultFilters } from '@/shared/components/FilterSidebar.types';
-import { usePropertySearch } from '@/features/properties/hooks/usePropertySearch';
-import { Slider } from '@/components/ui/slider';
-import { useSavedSearches } from '@/features/search/hooks/useSavedSearches';
-import { useCollabSession } from '@/features/search/hooks/useCollabSession';
-import { useAuth } from '@/features/auth/AuthProvider';
-// Lazy — only opens after the 3rd anonymous search.
-const ConsumerSignUpModal = lazy(() => import('@/features/search/components/ConsumerSignUpModal'));
+import { useNavigate } from 'react-router-dom';
+import { Search } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { geocode, autocomplete } from '@/shared/lib/googleMapsService';
+import { toast } from '@/shared/hooks/use-toast';
 
-const HERO_ROTATING_LANGUAGES = [
-  'in Mandarin.',
-  'in Vietnamese.',
-  'in Cantonese.',
-  'in Arabic.',
-  'in any language.',
+// ============================================================
+// Wave 17 Homepage — buyer-first, multilingual, agent re-entry
+// ============================================================
+
+const TOKENS = {
+  blue: '#3B7BF8',
+  blueDark: '#2563eb',
+  blueLight: '#eff4ff',
+  navy: '#0d1b35',
+  off: '#f7f8fa',
+  border: '#e2e8f0',
+  text: '#0d1b35',
+  text2: '#4a5568',
+  text3: '#8492a6',
+};
+
+type LangKey =
+  | 'en' | 'zh' | 'vi' | 'ar' | 'hi' | 'ko' | 'ja' | 'el' | 'it';
+
+const LANGUAGES: { key: LangKey; flag: string; label: string; placeholder: string; subtitleLabel: string }[] = [
+  { key: 'en', flag: '🇦🇺', label: 'English', placeholder: 'Search by address, suburb or school zone…', subtitleLabel: 'English' },
+  { key: 'zh', flag: '🇨🇳', label: '中文', placeholder: '搜索地址、区域或学区…', subtitleLabel: '中文' },
+  { key: 'vi', flag: '🇻🇳', label: 'Tiếng Việt', placeholder: 'Tìm địa chỉ, khu vực hoặc trường học…', subtitleLabel: 'Tiếng Việt' },
+  { key: 'ar', flag: '🇸🇦', label: 'العربية', placeholder: 'ابحث عن العنوان أو المنطقة…', subtitleLabel: 'العربية' },
+  { key: 'hi', flag: '🇮🇳', label: 'हिंदी', placeholder: 'पता, उपनगर या स्कूल खोजें…', subtitleLabel: 'हिंदी' },
+  { key: 'ko', flag: '🇰🇷', label: '한국어', placeholder: '주소, 교외 또는 학교로 검색…', subtitleLabel: '한국어' },
+  { key: 'ja', flag: '🇯🇵', label: '日本語', placeholder: '住所、郊外、または学校で検索…', subtitleLabel: '日本語' },
+  { key: 'el', flag: '🇬🇷', label: 'Ελληνικά', placeholder: 'Αναζήτηση διεύθυνσης, περιοχής…', subtitleLabel: 'Ελληνικά' },
+  { key: 'it', flag: '🇮🇹', label: 'Italiano', placeholder: 'Cerca indirizzo, zona o scuola…', subtitleLabel: 'Italiano' },
 ];
 
-const HERO_SUBHEADLINE_LANGUAGES = [
-  '中文 (Mandarin)',
-  'Tiếng Việt',
-  'العربية',
-  'हिन्दी',
-  '한국어',
-  'English',
+const TABS = ['Buy', 'Rent', 'Sell', 'Home Value'] as const;
+type Tab = typeof TABS[number];
+
+const FILTER_CHIPS = ['Property Type', 'Price', 'Bedrooms', 'Suburb / Postcode', 'Land Size'];
+
+const HERO_STATS = [
+  { v: '50,000+', l: 'Listings across Australia' },
+  { v: '20', l: 'Languages supported' },
+  { v: '1.2M+', l: 'Multilingual buyers' },
+  { v: 'Free', l: 'No account needed' },
 ];
 
-// Placeholder keys — actual strings come from t() so they translate
-const HERO_PLACEHOLDER_KEYS = [
-  'hero.placeholder1',
-  'hero.placeholder2',
-  'hero.placeholder3',
-  'hero.placeholder4',
-] as const;
+const DIFF_CARDS = [
+  {
+    icon: '🌐',
+    title: 'Search in your language',
+    body: 'Type or speak in Mandarin, Vietnamese, Arabic, Hindi or 16 other languages. Every result, every detail — translated automatically.',
+  },
+  {
+    icon: '💱',
+    title: 'Prices in your currency',
+    body: 'Every listing shows prices in CNY, VND, INR, AED and 10 more currencies with live exchange rates. Compare instantly.',
+  },
+  {
+    icon: '🎤',
+    title: 'Voice search, your language',
+    body: 'Speak your search in any supported language. Our AI understands you — no translation needed on your end.',
+  },
+];
+
+const AGENT_FEATURES = [
+  { t: 'AI multilingual listings', d: 'list once, reach 20 language audiences automatically' },
+  { t: 'Built-in trust accounting', d: 'AFA-compliant, saves ~$2,400/yr vs standalone software' },
+  { t: 'Property management', d: 'tenancy, maintenance, owner statements in one platform' },
+  { t: 'Halo™ buyer matching', d: 'AI connects your listings to multilingual buyers before you call them' },
+  { t: 'Smart CRM & drip campaigns', d: 'multilingual buyer pipeline built in' },
+];
+
+const AGENT_STATS = [
+  { v: '500+', l: 'Agencies across Australia' },
+  { v: '340%', l: 'Average growth in multilingual enquiries' },
+  { v: '60', l: 'Days free — no credit card' },
+  { v: '$0', l: 'Per translation (vs $80–200 with a human translator)' },
+];
+
+type Listing = {
+  id: string;
+  title: string | null;
+  address: string | null;
+  suburb: string | null;
+  state: string | null;
+  price_formatted: string | null;
+  images: string[] | null;
+  image_url: string | null;
+  beds: number | null;
+  baths: number | null;
+  parking: number | null;
+  listing_type: string | null;
+  translations: Record<string, { title?: string; description?: string }> | null;
+};
+
+const TRANSLATION_KEY: Record<LangKey, string | null> = {
+  en: null,
+  zh: 'zh_simplified',
+  vi: 'vi',
+  ar: null,
+  hi: null,
+  ko: null,
+  ja: null,
+  el: null,
+  it: null,
+};
+
+function listingTitle(l: Listing, lang: LangKey): string {
+  const k = TRANSLATION_KEY[lang];
+  if (k && l.translations?.[k]?.title) return l.translations[k]!.title!;
+  return l.title || l.address || 'Property';
+}
+
+function listingImage(l: Listing): string | null {
+  if (l.images?.length) return l.images[0];
+  return l.image_url ?? null;
+}
 
 const Index = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const hasSearch = !!searchParams.get('location');
-  // Hide the homepage hero whenever ANY query string is present.
-  // Specific params (location/beds/maxPrice/type/radius) trigger results,
-  // but any other params should also bypass the marketing hero.
-  const hasSearchParams = Array.from(searchParams.keys()).length > 0;
+  const [lang, setLang] = useState<LangKey>('en');
+  const [tab, setTab] = useState<Tab>('Buy');
+  const [query, setQuery] = useState('');
+  const [listings, setListings] = useState<Listing[]>([]);
 
-  // When landing with search params, ensure the results section is visible at the top.
-  useEffect(() => {
-    if (hasSearchParams) {
-      window.scrollTo({ top: 0, behavior: 'auto' });
-    }
-    // Run only on mount — subsequent param changes shouldn't yank scroll.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Lock body scroll when search is active so inner card column captures scroll events
-  useEffect(() => {
-    if (hasSearch) {
-      document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-    };
-  }, [hasSearch]);
-  const { t: legacyT } = useI18n();
-  const { t, setLanguage, language } = useTranslation();
-  const { addSearch, lastSearch } = useSearchHistory();
-
-  // Browser language auto-detection (session-only).
-  // Defaults to English; if the user already chose a language this session,
-  // keep their choice. Never persists across browser sessions.
-  useEffect(() => {
-    try {
-      // If the user already chose a language (persisted in localStorage or this session), keep it.
-      if (
-        localStorage.getItem('listhq_language') ||
-        localStorage.getItem('gh-lang') ||
-        sessionStorage.getItem('listhq_language') ||
-        sessionStorage.getItem('i18n-language')
-      ) return;
-      const nav = (navigator.language || 'en').toLowerCase();
-      let detected: 'en' | 'zh-CN' | 'vi' | 'hi' | 'ar' | 'ko' | 'bn' = 'en';
-      if (nav.startsWith('zh')) detected = 'zh-CN';
-      else if (nav.startsWith('vi')) detected = 'vi';
-      else if (nav.startsWith('hi')) detected = 'hi';
-      else if (nav.startsWith('ar')) detected = 'ar';
-      else if (nav.startsWith('ko')) detected = 'ko';
-      else if (nav.startsWith('bn')) detected = 'bn';
-      // Only auto-apply non-English on first visit; English is the safe default.
-      if (detected !== 'en') setLanguage(detected);
-    } catch {
-      // storage unavailable — non-fatal
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  const { savedIds, isSaved, toggleSaved } = useSavedProperties();
-  const isMobile = useIsMobile();
-  const { formatPrice, listingMode, setListingMode } = useCurrency();
-  const { savedSearches, saveSearch, removeSearch } = useSavedSearches();
-  const { user } = useAuth();
-  const {
-    isCollab,
-    createSession,
-    toggleReaction,
-    trackView,
-    getPropertyReactions,
-    hasPartnerViewed,
-    syncSelectedProperty,
-  } = useCollabSession();
-
-  const [showConsumerModal, setShowConsumerModal] = useState(false);
-  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
-  const viewedPropertiesRef = useRef(new Set<string>());
-  const [viewedIds, setViewedIds] = useState<Set<string>>(new Set());
-  const sessionStartRef = useRef(Date.now());
-  const [prefsBannerVisible, setPrefsBannerVisible] = useState(false);
-  const [noPrefsBannerVisible, setNoPrefsBannerVisible] = useState(false);
-  const prefsAppliedRef = useRef(false);
-  const [mobileView, setMobileView] = useState<'map' | 'list'>('map');
-  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number; key?: number | string } | null>(null);
-  const [splitPercent, setSplitPercent] = useState(50);
-  const [mapExpanded, setMapExpanded] = useState(false);
-  const [featuredListings, setFeaturedListings] = useState<any[]>([]);
-  const [mapFullscreen, setMapFullscreen] = useState(false);
-  const [mapCollapsed, setMapCollapsed] = useState(false);
-  const [viewportHeight, setViewportHeight] = useState(() => window.innerHeight);
-  const resultsRef = useRef<HTMLDivElement>(null);
-  const listsPanelRef = useRef<HTMLDivElement>(null);
-  const SNAP_POINTS = [0.35, 0.65, 0.85];
-  const [sheetSnap, setSheetSnap] = useState(0);
-  const [sheetHeight, setSheetHeight] = useState(() => viewportHeight * SNAP_POINTS[0]);
-  const sheetDragStartY = useRef<number | null>(null);
-  const sheetDragStartH = useRef<number>(0);
-  const sheetDragLastY = useRef<number>(0);
-  const sheetDragLastT = useRef<number>(0);
-  const sheetDragVelocity = useRef<number>(0);
-  const [sheetDragging, setSheetDragging] = useState(false);
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const [radiusSliderOpen, setRadiusSliderOpen] = useState(false);
-  const isDragging = useRef(false);
-  const cardRefs = useRef<globalThis.Map<string, HTMLDivElement>>(new globalThis.Map());
-
-  // Hero state
-  const [heroQuery, setHeroQuery] = useState('');
-  const [heroLangIndex, setHeroLangIndex] = useState(0);
-  const [heroSubLangIndex, setHeroSubLangIndex] = useState(0);
-  const [heroSubLangVisible, setHeroSubLangVisible] = useState(true);
-  const [heroPlaceholderIndex, setHeroPlaceholderIndex] = useState(0);
-  const { data: platformStatsData } = useQuery({
-    queryKey: ['hero-platform-stats'],
-    queryFn: async () => {
-      const { count: propCount } = await supabase
-        .from('properties')
-        .select('id', { count: 'exact', head: true })
-        .eq('is_active', true)
-        .eq('status', 'public');
-      return { properties: propCount ?? 0, buyerCount: null as number | null };
-    },
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
-  });
-  const [statLanguagesCount, setStatLanguagesCount] = useState(0);
-  const [statToolsCount, setStatToolsCount] = useState(0);
-  const heroInputRef = useRef<HTMLInputElement>(null);
-  const heroFormRef = useRef<HTMLFormElement>(null);
-  const heroDebounceRef = useRef<ReturnType<typeof setTimeout>>();
-  const [heroSuggestions, setHeroSuggestions] = useState<{ description: string; place_id: string }[]>([]);
-  const [showHeroSuggestions, setShowHeroSuggestions] = useState(false);
-
-  // Debounced Places autocomplete for hero search
-  useEffect(() => {
-    if (heroDebounceRef.current) clearTimeout(heroDebounceRef.current);
-    if (heroQuery.length < 2) { setHeroSuggestions([]); setShowHeroSuggestions(false); return; }
-    heroDebounceRef.current = setTimeout(async () => {
-      const results = await autocomplete(heroQuery);
-      setHeroSuggestions(results);
-      setShowHeroSuggestions(results.length > 0);
-    }, 300);
-    return () => { if (heroDebounceRef.current) clearTimeout(heroDebounceRef.current); };
-  }, [heroQuery]);
-
-  // Close hero suggestions on click outside
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (heroFormRef.current && !heroFormRef.current.contains(e.target as Node)) {
-        setShowHeroSuggestions(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-
-  // Hero rotating language animation
-  useEffect(() => {
-    const interval = setInterval(() => setHeroLangIndex(i => (i + 1) % HERO_ROTATING_LANGUAGES.length), 2800);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Hero placeholder rotation
-  useEffect(() => {
-    const interval = setInterval(() => setHeroPlaceholderIndex(i => (i + 1) % HERO_PLACEHOLDER_KEYS.length), 3500);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Hero subheadline cycling language indicator (fade out → swap → fade in)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setHeroSubLangVisible(false);
-      window.setTimeout(() => {
-        setHeroSubLangIndex(i => (i + 1) % HERO_SUBHEADLINE_LANGUAGES.length);
-        setHeroSubLangVisible(true);
-      }, 300);
-    }, 2500);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Hero stat count-up animations (easeOut)
-  useEffect(() => {
-    const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
-    const start = performance.now();
-    let frame = 0;
-    const tick = (now: number) => {
-      const elapsed = now - start;
-      const pLang = Math.min(elapsed / 1200, 1);
-      const pTools = Math.min(elapsed / 1400, 1);
-      setStatLanguagesCount(Math.round(easeOut(pLang) * 24));
-      setStatToolsCount(Math.round(easeOut(pTools) * 50));
-      if (pLang < 1 || pTools < 1) frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
-
-  const {
-    filteredProperties,
-    displayProperties,
-    handleSearch,
-    handleAreaSearch,
-    setSearchCenter,
-    setSearchRadius,
-    clearSearchRadius,
-    isSearching,
-    hasSearched,
-    currentQuery,
-    searchRadius,
-    searchCenter,
-    areaSearch,
-    sortBy,
-    setSortBy,
-    filters,
-    setFilters,
-    searchSummary,
-  } = usePropertySearch({ addSearch });
-
-  // Consumer sign-up modal trigger after 3rd anonymous search
-  const wrappedHandleSearch = useCallback((query: string, detectedLanguage?: string) => {
-    const lang = detectedLanguage || 'en';
-    handleSearch(query);
-
-    // Track search
-    try {
-      capture('search_performed', { query, detected_language: lang, result_count: filteredProperties?.length ?? 0 });
-    } catch {}
-
-    // Fire-and-forget: log every search to voice_searches for AI Buyer Concierge pipeline
-    supabase
-      .from('voice_searches')
-      .insert({
-        transcript: query.slice(0, 200),
-        user_id: user?.id ?? null,
-        detected_language: lang,
-        status: 'completed',
-      })
-      .then(() => {});
-
-    if (!user) {
-      const alreadySignedUp = localStorage.getItem('listhq_consumer_signed_up');
-      if (alreadySignedUp) return;
-      const dismissed = localStorage.getItem('listhq_consumer_dismissed');
-      if (dismissed && Date.now() - Number(dismissed) < 7 * 24 * 60 * 60 * 1000) return;
-      const count = Number(localStorage.getItem('listhq_search_count') || '0') + 1;
-      localStorage.setItem('listhq_search_count', String(count));
-      if (count >= 3) setShowConsumerModal(true);
-    }
-
-    // Geocode the typed search text and pan the map to the result
-    const trimmedQuery = query.trim();
-    if (trimmedQuery) {
-      const locationCandidates = Array.from(new Set([
-        trimmedQuery,
-        trimmedQuery
-          .replace(/\b\d+\s*(?:bed(?:room)?s?|bath(?:room)?s?|car(?:space)?s?|parking)\b/gi, ' ')
-          .replace(/\$\s*[\d,.]+(?:\s?[mk])?/gi, ' ')
-          .replace(/\b(?:house|apartment|unit|townhouse|villa|duplex|studio|rent|rental|sale|buy|looking|for|with|under|over|between|in|near|around)\b/gi, ' ')
-          .replace(/\s+/g, ' ')
-          .trim(),
-      ].filter(Boolean)));
-
-      void (async () => {
-        for (const candidate of locationCandidates) {
-          const locationQuery = candidate.toLowerCase().includes('australia')
-            ? candidate
-            : `${candidate}, Australia`;
-
-          try {
-            const coords = await geocode(locationQuery);
-            if (!coords) continue;
-
-            setSearchCenter(coords);
-            setMapCenter({
-              lat: coords.lat,
-              lng: coords.lng,
-              key: `geocode-${coords.lat}-${coords.lng}-${Date.now()}`,
-            });
-            setMapExpanded(false);
-            return;
-          } catch {
-            // Try the next candidate silently
-          }
-        }
-      })();
-    }
-  }, [handleSearch, setSearchCenter, user]);
-
-  // Hero voice search
-  const handleVoiceResult = useCallback((transcript: string) => {
-    setHeroQuery(transcript);
-    wrappedHandleSearch(transcript);
-  }, [wrappedHandleSearch]);
-  const { isRecording: heroMicListening, isProcessing: heroMicProcessing, statusLabel: heroMicLabel, startRecording: heroMicToggle } = useHeroVoiceSearch(handleVoiceResult);
-
-  const initializedFromUrl = useRef(false);
-
-  // ── Restore search state from URL on mount ───────────────────
-  useEffect(() => {
-    if (initializedFromUrl.current) return;
-    initializedFromUrl.current = true;
-
-    const params = new URLSearchParams(window.location.search);
-    const location = params.get('location');
-    const minPrice = params.get('minPrice');
-    const maxPrice = params.get('maxPrice');
-    const radius = params.get('radius');
-    const types = params.get('type');
-    const beds = params.get('beds');
-    const baths = params.get('baths');
-    const sort = params.get('sort');
-
-    if (minPrice || maxPrice || types || beds || baths) {
-      setFilters(prev => ({
-        ...prev,
-        priceRange: [
-          minPrice ? Number(minPrice) : prev.priceRange[0],
-          maxPrice ? Number(maxPrice) : prev.priceRange[1],
-        ],
-        propertyTypes: types ? types.split(',') : prev.propertyTypes,
-        minBeds: beds ? Number(beds) : prev.minBeds,
-        minBaths: baths ? Number(baths) : prev.minBaths,
-      }));
-    }
-    if (sort) setSortBy(sort as typeof sortBy);
-    if (radius) setSearchRadius(Number(radius));
-    if (location) {
-      handleSearch(location);
-    }
-  }, []);
-
-  // ── Apply saved preferences for authenticated seekers ────────
-  useEffect(() => {
-    if (prefsAppliedRef.current) return;
-    if (!user) return;
-    if (hasSearchParams) return; // URL params take priority
-
-    const dismissed = sessionStorage.getItem('listhq_prefs_banner_dismissed');
-    if (dismissed) return;
-
-    prefsAppliedRef.current = true;
-
-    (async () => {
-      const { data } = await supabase
-        .from('user_preferences')
-        .select('budget_max, preferred_locations, preferred_beds, seeking_type')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (!data) return;
-      const hasBudget = typeof data.budget_max === 'number' && data.budget_max > 0;
-      const hasLocations = Array.isArray(data.preferred_locations) && data.preferred_locations.length > 0;
-      const hasBeds = typeof data.preferred_beds === 'number' && data.preferred_beds > 0;
-
-      if (!hasBudget && !hasLocations && !hasBeds) return;
-
-      // Apply seeking_type to listing mode
-      if (data.seeking_type === 'rent') {
-        setListingMode('rent');
-      } else {
-        setListingMode('sale');
-      }
-
-      setFilters(prev => ({
-        ...prev,
-        ...(hasBudget ? { priceRange: [prev.priceRange[0], data.budget_max!] as [number, number] } : {}),
-        ...(hasBeds ? { minBeds: data.preferred_beds! } : {}),
-      }));
-
-      if (hasLocations) {
-        const firstLocation = (data.preferred_locations as string[])[0];
-        handleSearch(firstLocation);
-      }
-
-      setPrefsBannerVisible(true);
-    })();
-  }, [user, hasSearchParams]);
-
-  // ── Show "set preferences" prompt for signed-in users with no prefs ──
-  useEffect(() => {
-    if (!user) { setNoPrefsBannerVisible(false); return; }
-    if (sessionStorage.getItem('listhq_no_prefs_banner_dismissed')) return;
-    let cancelled = false;
-    (async () => {
-      const { data } = await supabase
-        .from('user_preferences')
-        .select('seeking_type, preferred_locations, budget_max')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      if (cancelled) return;
-      const hasPrefs =
-        !!data?.seeking_type &&
-        Array.isArray(data?.preferred_locations) &&
-        (data!.preferred_locations as string[]).length > 0;
-      setNoPrefsBannerVisible(!hasPrefs);
-    })();
-    return () => { cancelled = true; };
-  }, [user]);
-
+  const active = LANGUAGES.find((l) => l.key === lang) ?? LANGUAGES[0];
 
   useEffect(() => {
-    const handler = () => setMapCenter(null);
-    window.addEventListener('listing-mode-changed', handler);
-    return () => window.removeEventListener('listing-mode-changed', handler);
-  }, []);
-
-  // Auto-centre map when search resolves a location
-  useEffect(() => {
-    if (searchCenter) {
-      setMapCenter({
-        lat: searchCenter.lat,
-        lng: searchCenter.lng,
-        key: `search-${searchCenter.lat}-${searchCenter.lng}-${Date.now()}`,
-      });
-    }
-  }, [searchCenter]);
-
-  // Fetch featured residential listings (house/apartment/townhouse), with fallback
-  useEffect(() => {
-    const cols = 'id, title, address, suburb, state, price, price_formatted, images, image_url, property_type, beds, baths, parking, lat, lng, boost_tier, is_featured, listing_type, translations';
-    const RESIDENTIAL_TYPES = ['house', 'apartment', 'townhouse', 'unit', 'villa', 'duplex', 'studio'];
-    const MIN_FEATURED = 4;
-
+    const cols =
+      'id, title, address, suburb, state, price, price_formatted, images, image_url, property_type, beds, baths, parking, listing_type, translations, is_featured, boost_tier';
+    const RES = ['house', 'apartment', 'townhouse', 'unit', 'villa', 'duplex', 'studio'];
     (async () => {
       const { data: featured } = await supabase
         .from('properties')
         .select(cols)
         .eq('is_active', true)
         .eq('status', 'public')
-        .in('property_type', RESIDENTIAL_TYPES)
+        .in('property_type', RES)
         .or('is_featured.eq.true,boost_tier.not.is.null')
         .order('created_at', { ascending: false })
-        .limit(12);
-
+        .limit(6);
       const seen = new Set<string>();
-      const unique = (featured ?? []).filter(p => {
-        if (seen.has(p.id)) return false;
-        seen.add(p.id);
-        return true;
-      });
-
-      if (unique.length >= MIN_FEATURED) {
-        setFeaturedListings(unique.slice(0, 6));
-        return;
+      const out: Listing[] = [];
+      for (const p of featured ?? []) {
+        if (!seen.has(p.id)) { seen.add(p.id); out.push(p as Listing); }
       }
-
-      // Fallback: fill with recent active residential sale listings
-      const { data: fallback } = await supabase
-        .from('properties')
-        .select(cols)
-        .eq('is_active', true)
-        .eq('status', 'public')
-        .in('property_type', RESIDENTIAL_TYPES)
-        .or('listing_type.eq.sale,listing_type.is.null')
-        .order('created_at', { ascending: false })
-        .limit(12);
-
-      for (const p of fallback ?? []) {
-        if (!seen.has(p.id)) {
-          seen.add(p.id);
-          unique.push(p);
+      if (out.length < 3) {
+        const { data: fb } = await supabase
+          .from('properties')
+          .select(cols)
+          .eq('is_active', true)
+          .eq('status', 'public')
+          .in('property_type', RES)
+          .order('created_at', { ascending: false })
+          .limit(6);
+        for (const p of fb ?? []) {
+          if (!seen.has(p.id)) { seen.add(p.id); out.push(p as Listing); }
+          if (out.length >= 3) break;
         }
-        if (unique.length >= 6) break;
       }
-
-      if (unique.length > 0) {
-        setFeaturedListings(unique);
-      } else {
-        // Hardcoded residential placeholders (shown only if DB has 0 residential listings)
-        const p1Images = [
-          'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=640&q=70&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=640&q=70&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=640&q=70&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600210492493-0946911123ea?w=640&q=70&auto=format&fit=crop',
-        ];
-        const p2Images = [
-          'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=640&q=70&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=640&q=70&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=640&q=70&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=640&q=70&auto=format&fit=crop',
-        ];
-        const p3Images = [
-          'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=640&q=70&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=640&q=70&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=640&q=70&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?w=640&q=70&auto=format&fit=crop',
-        ];
-        const p4Images = [
-          'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=640&q=70&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=640&q=70&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?w=640&q=70&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600573472556-e636c2acda88?w=640&q=70&auto=format&fit=crop',
-        ];
-        const p5Images = [
-          'https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=640&q=70&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1565182999561-18d7dc61c393?w=640&q=70&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=640&q=70&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=640&q=70&auto=format&fit=crop',
-        ];
-        const p6Images = [
-          'https://images.unsplash.com/photo-1597047084897-51e81819a499?w=640&q=70&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=640&q=70&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=640&q=70&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600210491369-e753d80a41f3?w=640&q=70&auto=format&fit=crop',
-        ];
-        setFeaturedListings([
-          { id: 'placeholder-1', title: '4 bed house', address: '14 Maple Street, Auburn NSW', suburb: 'Auburn', state: 'NSW', price: 1200000, images: p1Images, image_url: p1Images[0], property_type: 'house', beds: 4, baths: 2, parking: 2, listing_type: 'sale', translations: { zh_simplified: {} } },
-          { id: 'placeholder-2', title: '2 bed apartment', address: '8/22 Box Hill Road, Box Hill VIC', suburb: 'Box Hill', state: 'VIC', price: 680000, images: p2Images, image_url: p2Images[0], property_type: 'apartment', beds: 2, baths: 1, parking: 1, listing_type: 'sale', translations: { zh_simplified: {} } },
-          { id: 'placeholder-3', title: '3 bed townhouse', address: '3 Oak Lane, Doncaster VIC', suburb: 'Doncaster', state: 'VIC', price: 895000, images: p3Images, image_url: p3Images[0], property_type: 'townhouse', beds: 3, baths: 2, parking: 1, listing_type: 'sale', translations: { zh_simplified: {} } },
-          { id: 'placeholder-4', title: 'Luxury 5 bed harbour-view residence', address: '12 Harbour Crescent, Mosman NSW', suburb: 'Mosman', state: 'NSW', price: 4250000, images: p4Images, image_url: p4Images[0], property_type: 'house', beds: 5, baths: 4, parking: 3, listing_type: 'sale', translations: { zh_simplified: {} } },
-          { id: 'placeholder-5', title: 'Family home in coveted school zone', address: '27 Springfield Avenue, Glen Waverley VIC', suburb: 'Glen Waverley', state: 'VIC', price: 1650000, images: p5Images, image_url: p5Images[0], property_type: 'house', beds: 4, baths: 3, parking: 2, listing_type: 'sale', translations: { zh_simplified: {} } },
-          { id: 'placeholder-6', title: 'Modern townhouse near station', address: '14 Albert Road, Strathfield NSW', suburb: 'Strathfield', state: 'NSW', price: 1395000, images: p6Images, image_url: p6Images[0], property_type: 'townhouse', beds: 3, baths: 2, parking: 2, listing_type: 'sale', translations: { zh_simplified: {} } },
-        ]);
-      }
+      setListings(out.slice(0, 3));
     })();
   }, []);
 
-  // ── Push search state to URL ─────────────────────────────────
-  useEffect(() => {
-    if (!initializedFromUrl.current) return;
-
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
     const params = new URLSearchParams();
-    if (currentQuery) params.set('location', currentQuery);
-    if (filters.priceRange[0] > 0) params.set('minPrice', String(filters.priceRange[0]));
-    if (filters.priceRange[1] < 5_000_000) params.set('maxPrice', String(filters.priceRange[1]));
-    if (filters.propertyTypes.length > 0) params.set('type', filters.propertyTypes.join(','));
-    if (filters.minBeds > 0) params.set('beds', String(filters.minBeds));
-    if (filters.minBaths > 0) params.set('baths', String(filters.minBaths));
-    if (searchRadius) params.set('radius', String(searchRadius));
-    if (sortBy !== 'default') params.set('sort', sortBy);
+    if (query.trim()) params.set('location', query.trim());
+    if (tab === 'Rent') params.set('listingType', 'rent');
+    if (tab === 'Sell') { navigate('/agents/login'); return; }
+    if (tab === 'Home Value') { navigate('/valuation'); return; }
+    navigate(`/?${params.toString()}`);
+  };
 
-    const qs = params.toString();
-    const newUrl = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
-
-    if (newUrl !== `${window.location.pathname}${window.location.search}`) {
-      window.history.pushState(null, '', newUrl);
-    }
-  }, [currentQuery, filters, searchRadius, sortBy]);
-
-  // ── Handle browser back/forward ──────────────────────────────
-  useEffect(() => {
-    const onPopState = () => {
-      initializedFromUrl.current = false;
-      // Re-trigger the mount logic
-      const params = new URLSearchParams(window.location.search);
-      const location = params.get('location');
-      const minPrice = params.get('minPrice');
-      const maxPrice = params.get('maxPrice');
-      const radius = params.get('radius');
-      const types = params.get('type');
-      const beds = params.get('beds');
-      const baths = params.get('baths');
-      const sort = params.get('sort');
-
-      setFilters(prev => ({
-        ...prev,
-        priceRange: [
-          minPrice ? Number(minPrice) : 0,
-          maxPrice ? Number(maxPrice) : 5_000_000,
-        ],
-        propertyTypes: types ? types.split(',') : [],
-        minBeds: beds ? Number(beds) : 0,
-        minBaths: baths ? Number(baths) : 0,
-      }));
-      if (sort) setSortBy(sort as typeof sortBy);
-      else setSortBy('default');
-      if (radius) setSearchRadius(Number(radius));
-      // No default radius: leave null when URL has none (matches initial state
-      // in usePropertySearch). Setting a default here causes the push-to-URL
-      // effect to re-stamp ?radius=5 on cold loads when popstate fires.
-      if (location) handleSearch(location);
-
-      initializedFromUrl.current = true;
-    };
-
-    window.addEventListener('popstate', onPopState);
-    return () => window.removeEventListener('popstate', onPopState);
-  }, [handleSearch, setFilters, setSortBy, setSearchRadius, clearSearchRadius]);
-
-  // ── Track property views for lead scoring ─────────────────────
-  const handleSelectProperty = useCallback((p: Property | null) => {
-    if (p) {
-      viewedPropertiesRef.current.add(p.id);
-      setViewedIds(prev => {
-        if (prev.has(p.id)) return prev;
-        const next = new Set(prev);
-        next.add(p.id);
-        return next;
-      });
-      trackView(p.id);
-      syncSelectedProperty(p?.id ?? null);
-    }
-    setSelectedProperty(p);
-  }, [trackView, syncSelectedProperty]);
-
-  // ── Build search context for lead capture ────────────────────
-  const searchContextForLead = useMemo(() => ({
-    currentFilters: {
-      priceRange: filters.priceRange as [number, number],
-      propertyTypes: filters.propertyTypes,
-      minBeds: filters.minBeds,
-      minBaths: filters.minBaths,
-    },
-    currentQuery: currentQuery || undefined,
-    searchRadius: searchRadius || undefined,
-    savedPropertiesCount: savedIds.size,
-    viewedPropertiesCount: viewedPropertiesRef.current.size,
-    savedSearchesCount: savedSearches.length,
-    sessionDurationMinutes: Math.round((Date.now() - sessionStartRef.current) / 60000),
-  }), [filters, currentQuery, searchRadius, savedIds.size, savedSearches.length]);
-
-  // ── Scroll to card on map click ──────────────────────────────
-  const scrollToProperty = useCallback((propertyId: string) => {
-    const el = cardRefs.current.get(propertyId);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, []);
-
-  // ── Draggable split handle ───────────────────────────────────
-  const handleMouseDown = useCallback(() => {
-    isDragging.current = true;
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
-  }, []);
-
-  // Track viewport height (handles keyboard open/close on mobile)
-  useEffect(() => {
-    const onResize = () => setViewportHeight(window.innerHeight);
-    window.addEventListener('resize', onResize);
-    window.visualViewport?.addEventListener('resize', onResize);
-    return () => {
-      window.removeEventListener('resize', onResize);
-      window.visualViewport?.removeEventListener('resize', onResize);
-    };
-  }, []);
-
-  // Sync spring with snap point and viewport
-  useEffect(() => {
-    setSheetHeight(viewportHeight * SNAP_POINTS[sheetSnap]);
-  }, [viewportHeight, sheetSnap]);
-
-  const handleSheetTouchStart = useCallback((e: React.TouchEvent) => {
-    sheetDragStartY.current = e.touches[0].clientY;
-    sheetDragStartH.current = sheetHeight;
-    sheetDragLastY.current = e.touches[0].clientY;
-    sheetDragLastT.current = performance.now();
-    sheetDragVelocity.current = 0;
-    setSheetDragging(true);
-  }, [sheetHeight]);
-
-  const handleSheetTouchMove = useCallback((e: React.TouchEvent) => {
-    if (sheetDragStartY.current == null) return;
-    const y = e.touches[0].clientY;
-    const dy = y - sheetDragStartY.current;
-    const newH = Math.max(viewportHeight * 0.15, Math.min(viewportHeight * 0.9, sheetDragStartH.current - dy));
-    const now = performance.now();
-    const dt = now - sheetDragLastT.current;
-    if (dt > 0) {
-      sheetDragVelocity.current = ((y - sheetDragLastY.current) / dt) * 1000;
-    }
-    sheetDragLastY.current = y;
-    sheetDragLastT.current = now;
-    setSheetHeight(newH);
-  }, [viewportHeight]);
-
-  const handleSheetTouchEnd = useCallback(() => {
-    if (sheetDragStartY.current == null) return;
-    const velocity = sheetDragVelocity.current;
-    const currentPct = sheetHeight / viewportHeight;
-    let targetIdx = sheetSnap;
-    if (velocity < -300) {
-      targetIdx = Math.min(sheetSnap + 1, SNAP_POINTS.length - 1);
-    } else if (velocity > 300) {
-      targetIdx = Math.max(sheetSnap - 1, 0);
-    } else {
-      let minDist = Infinity;
-      SNAP_POINTS.forEach((sp, i) => {
-        const dist = Math.abs(currentPct - sp);
-        if (dist < minDist) { minDist = dist; targetIdx = i; }
-      });
-    }
-    sheetDragStartY.current = null;
-    setSheetDragging(false);
-    setSheetSnap(targetIdx);
-    setSheetHeight(viewportHeight * SNAP_POINTS[targetIdx]);
-  }, [sheetHeight, viewportHeight, sheetSnap]);
-
-  useEffect(() => {
-    let rafId: number | null = null;
-    const onMove = (e: MouseEvent) => {
-      if (!isDragging.current) return;
-      if (rafId !== null) return;
-      rafId = requestAnimationFrame(() => {
-        const pct = (e.clientX / window.innerWidth) * 100;
-        setSplitPercent(Math.max(30, Math.min(70, pct)));
-        rafId = null;
-      });
-    };
-    const onUp = () => {
-      isDragging.current = false;
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-      if (rafId !== null) {
-        cancelAnimationFrame(rafId);
-        rafId = null;
-      }
-    };
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-    return () => {
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', onUp);
-      if (isDragging.current) onUp();
-    };
-  }, []);
-
-  // ── Rendering helpers ────────────────────────────────────────
-  const sortOptions = [
-    { value: 'default', label: t('sort.default') },
-    { value: 'price-asc', label: t('sort.priceAsc') },
-    { value: 'price-desc', label: t('sort.priceDesc') },
-    { value: 'newest', label: t('sort.newest') },
-    { value: 'beds', label: t('sort.beds') },
-  ] as const;
-
-  const pageTitle = `${currentQuery || 'Melbourne'} Property Search | ListHQ`;
-  const pageDescription = `Search ${currentQuery || 'Melbourne'} properties. ${filteredProperties.length} listings. Save searches. Get investor alerts.`;
-
-  const statusBar = (
+  return (
     <>
-    <Helmet>
-      <title>{pageTitle}</title>
-      <meta name="description" content={pageDescription} />
-      <meta property="og:title" content={pageTitle} />
-      <meta property="og:description" content={pageDescription} />
-      <meta property="og:type" content="website" />
-      <meta property="og:url" content="https://listhq.com.au" />
-      <meta property="og:image" content="https://listhq.com.au/og-image.png" />
-      <meta property="og:image:width" content="1200" />
-      <meta property="og:image:height" content="630" />
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={pageTitle} />
-      <meta name="twitter:description" content={pageDescription} />
-      <meta name="twitter:image" content="https://listhq.com.au/og-image.png" />
-      <link rel="canonical" href="https://listhq.com.au" />
-      <script type="application/ld+json">{JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "ListHQ",
-        "url": "https://listhq.com.au",
-        "logo": "https://listhq.com.au/favicon.ico",
-        "description": "AI-powered real estate platform for Australian agents",
-        "areaServed": "AU",
-        "knowsAbout": ["Real Estate", "Property Listings", "Australian Property Market", "Rental Properties"],
-        "sameAs": ["https://twitter.com/ListHQ"]
-      })}</script>
-      <script type="application/ld+json">{JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "ListHQ",
-        "url": "https://listhq.com.au",
-        "potentialAction": {
-          "@type": "SearchAction",
-          "target": {
-            "@type": "EntryPoint",
-            "urlTemplate": "https://listhq.com.au/buy?q={search_term_string}"
-          },
-          "query-input": "required name=search_term_string"
-        }
-      })}</script>
-    </Helmet>
-    <div className="flex items-center justify-between mb-3 gap-2">
-      <div className="flex items-center gap-2 min-w-0">
-        <span className="text-sm font-medium text-foreground shrink-0">
-          {t('search.propertiesCount', { count: filteredProperties.length })}
-        </span>
-        {hasSearched && searchSummary && (
-          <span className="text-xs text-primary font-medium truncate max-w-[300px]" title={searchSummary}>
-            {searchSummary}
-          </span>
-        )}
-        {hasSearched && !searchSummary && (
-          <span className="text-xs text-muted-foreground truncate">{t('search.results')}</span>
-        )}
-        {!hasSearched && (
-          <span className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Sparkles size={12} className="text-primary" /> {t('search.recommended')}
-          </span>
-        )}
-    {/* Radius pills — only when a search center is set */}
-        {searchCenter && (
-          <div className="flex items-center gap-1 shrink-0">
-            {[
-              { label: 'Any', value: null },
-              { label: '5 km', value: 5 },
-              { label: '10 km', value: 10 },
-              { label: '25 km', value: 25 },
-              { label: '50 km', value: 50 },
-            ].map(({ label, value }) => {
-              const isActive = value === null ? !searchRadius : searchRadius === value;
+      <Helmet>
+        <title>ListHQ — Find your home, in any language</title>
+        <meta
+          name="description"
+          content="Australia's multilingual property platform. Search 50,000+ listings in 20 languages. Free, no signup required."
+        />
+      </Helmet>
+
+      {/* SECTION 2 — Hero */}
+      <section
+        className="relative"
+        style={{
+          background:
+            'linear-gradient(160deg, #f0f4ff 0%, #e8f0fe 25%, #f4f6fb 65%, #fff 100%)',
+          padding: '70px 16px 56px',
+        }}
+      >
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage:
+              'radial-gradient(circle, rgba(59,123,248,0.06) 1px, transparent 1px)',
+            backgroundSize: '28px 28px',
+          }}
+        />
+        <div className="relative max-w-5xl mx-auto text-center">
+          {/* Eyebrow */}
+          <div
+            className="inline-flex items-center gap-2 px-3 py-1.5 mb-6"
+            style={{
+              background: '#fff',
+              border: `1px solid ${TOKENS.border}`,
+              borderRadius: 100,
+              fontSize: 11,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              color: TOKENS.text2,
+            }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            Australia's Property Platform for Every Culture
+          </div>
+
+          {/* Headline */}
+          <h1
+            style={{
+              fontSize: 'clamp(46px, 7vw, 76px)',
+              fontWeight: 900,
+              letterSpacing: '-2px',
+              lineHeight: 1.02,
+              color: TOKENS.text,
+            }}
+          >
+            Find your home.
+            <br />
+            <span style={{ color: TOKENS.blue }}>In any language.</span>
+          </h1>
+
+          <p className="mt-4" style={{ fontSize: 15, fontWeight: 500, color: TOKENS.text3 }}>
+            <strong style={{ color: TOKENS.text2 }}>50,000+</strong> properties ·{' '}
+            <strong style={{ color: TOKENS.text2 }}>20</strong> languages ·{' '}
+            <strong style={{ color: TOKENS.text2 }}>Free</strong>
+          </p>
+
+          {/* Language selector */}
+          <div className="mt-10">
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                color: TOKENS.text3,
+              }}
+            >
+              Select your language to begin
+            </div>
+            <div className="mt-4 flex flex-wrap justify-center gap-2.5">
+              {LANGUAGES.map((l) => {
+                const isActive = l.key === lang;
+                return (
+                  <button
+                    key={l.key}
+                    onClick={() => setLang(l.key)}
+                    className="flex flex-col items-center justify-center transition-all"
+                    style={{
+                      minWidth: 72,
+                      padding: '10px 16px',
+                      gap: 5,
+                      borderRadius: 12,
+                      background: isActive ? TOKENS.blueLight : '#fff',
+                      border: `1.5px solid ${isActive ? TOKENS.blue : TOKENS.border}`,
+                      boxShadow: isActive ? `0 0 0 3px rgba(59,123,248,0.1)` : 'none',
+                    }}
+                  >
+                    <span style={{ fontSize: 22 }}>{l.flag}</span>
+                    <span
+                      style={{
+                        fontSize: 11,
+                        fontWeight: isActive ? 800 : 700,
+                        color: isActive ? TOKENS.blue : TOKENS.text,
+                      }}
+                    >
+                      {l.label}
+                    </span>
+                  </button>
+                );
+              })}
+              <button
+                onClick={() => toast({ title: 'More languages coming soon' })}
+                className="flex flex-col items-center justify-center"
+                style={{
+                  minWidth: 72,
+                  padding: '10px 16px',
+                  gap: 5,
+                  borderRadius: 12,
+                  background: TOKENS.off,
+                  border: `1.5px dashed ${TOKENS.border}`,
+                  color: TOKENS.text3,
+                }}
+              >
+                <span style={{ fontSize: 22 }}>＋</span>
+                <span style={{ fontSize: 11, fontWeight: 700 }}>11 more</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Search card */}
+          <form
+            onSubmit={handleSearch}
+            className="mx-auto mt-10 text-left"
+            style={{
+              maxWidth: 700,
+              background: '#fff',
+              border: `1px solid ${TOKENS.border}`,
+              borderRadius: 16,
+              boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
+              overflow: 'hidden',
+            }}
+          >
+            <div className="flex items-center" style={{ borderBottom: `1px solid ${TOKENS.border}` }}>
+              {TABS.map((t) => {
+                const isActive = t === tab;
+                return (
+                  <button
+                    type="button"
+                    key={t}
+                    onClick={() => setTab(t)}
+                    className="px-5 py-3 text-sm transition-colors"
+                    style={{
+                      fontWeight: isActive ? 600 : 500,
+                      color: isActive ? TOKENS.blue : TOKENS.text3,
+                      borderBottom: `2px solid ${isActive ? TOKENS.blue : 'transparent'}`,
+                      marginBottom: -1,
+                    }}
+                  >
+                    {t}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="flex items-center gap-2 px-4 py-3">
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={active.placeholder}
+                className="flex-1 outline-none border-0"
+                style={{ fontSize: 15, color: TOKENS.text, background: 'transparent' }}
+                dir={lang === 'ar' ? 'rtl' : 'ltr'}
+              />
+              <button
+                type="submit"
+                className="inline-flex items-center gap-2"
+                style={{
+                  background: TOKENS.blue,
+                  color: '#fff',
+                  borderRadius: 10,
+                  padding: '10px 24px',
+                  fontSize: 14,
+                  fontWeight: 700,
+                }}
+              >
+                <Search size={16} />
+                Search
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2 px-4 pb-4">
+              {FILTER_CHIPS.map((c) => (
+                <button
+                  type="button"
+                  key={c}
+                  className="transition-colors"
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 500,
+                    color: TOKENS.text2,
+                    background: TOKENS.off,
+                    border: `1px solid ${TOKENS.border}`,
+                    borderRadius: 100,
+                    padding: '4px 12px',
+                  }}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+          </form>
+
+          {/* Stats strip */}
+          <div
+            className="mx-auto mt-6 grid grid-cols-2 md:grid-cols-4"
+            style={{
+              maxWidth: 700,
+              background: '#fff',
+              border: `1px solid ${TOKENS.border}`,
+              borderRadius: 12,
+            }}
+          >
+            {HERO_STATS.map((s, i) => (
+              <div
+                key={s.l}
+                className="px-4 py-4 text-center"
+                style={{
+                  borderLeft: i > 0 ? `1px solid ${TOKENS.border}` : undefined,
+                }}
+              >
+                <div style={{ fontSize: 20, fontWeight: 900, color: TOKENS.text }}>{s.v}</div>
+                <div style={{ fontSize: 11, fontWeight: 500, color: TOKENS.text3, marginTop: 2 }}>{s.l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 3 — Property Listings */}
+      <section style={{ background: '#fff', padding: '72px 16px 56px' }}>
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-end justify-between flex-wrap gap-3 mb-6">
+            <div>
+              <h2 style={{ fontSize: 26, fontWeight: 800, color: TOKENS.text, letterSpacing: '-0.5px' }}>
+                Properties for you
+              </h2>
+              <p style={{ fontSize: 13, color: TOKENS.text3, marginTop: 4 }}>
+                Showing results in {active.subtitleLabel} · Switch language above
+              </p>
+            </div>
+            <button
+              onClick={() => navigate('/?listingType=sale')}
+              style={{ fontSize: 14, fontWeight: 600, color: TOKENS.blue }}
+            >
+              View all listings →
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {listings.length === 0 && (
+              <>
+                {[0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    style={{
+                      background: '#fff',
+                      border: `1px solid ${TOKENS.border}`,
+                      borderRadius: 16,
+                      height: 380,
+                    }}
+                  />
+                ))}
+              </>
+            )}
+            {listings.map((l) => {
+              const img = listingImage(l);
+              const isRent = (l.listing_type ?? '').toLowerCase() === 'rent';
               return (
                 <button
-                  key={label}
-                  onClick={() => value === null ? clearSearchRadius() : setSearchRadius(value)}
-                  className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
-                    isActive
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-secondary text-muted-foreground hover:bg-accent hover:text-foreground'
-                  }`}
+                  key={l.id}
+                  onClick={() => navigate(`/property/${l.id}`)}
+                  className="text-left group"
+                  style={{
+                    background: '#fff',
+                    border: `1px solid ${TOKENS.border}`,
+                    borderRadius: 16,
+                    overflow: 'hidden',
+                    transition: 'transform .2s, box-shadow .2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 12px 28px rgba(13,27,53,0.08)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = '';
+                    e.currentTarget.style.boxShadow = '';
+                  }}
                 >
-                  {label}
+                  <div
+                    className="relative"
+                    style={{
+                      height: 220,
+                      background: img
+                        ? `url(${img}) center/cover no-repeat`
+                        : 'linear-gradient(135deg, #0d1b35, #1e3a8a)',
+                    }}
+                  >
+                    <div
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background:
+                          'linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.4) 100%)',
+                      }}
+                    />
+                    <span
+                      className="absolute top-3 left-3"
+                      style={{
+                        background: isRent ? 'rgba(16,185,129,0.92)' : 'rgba(59,123,248,0.92)',
+                        color: '#fff',
+                        fontSize: 10,
+                        fontWeight: 800,
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                        padding: '4px 10px',
+                        borderRadius: 100,
+                      }}
+                    >
+                      {isRent ? 'For Rent' : 'For Sale'}
+                    </span>
+                    <span
+                      className="absolute top-3 right-3"
+                      style={{
+                        background: 'rgba(13,27,53,0.7)',
+                        color: '#fff',
+                        fontSize: 10,
+                        fontWeight: 700,
+                        padding: '4px 10px',
+                        borderRadius: 100,
+                      }}
+                    >
+                      ✦ AI Translated
+                    </span>
+                  </div>
+
+                  <div className="px-4 pt-3 flex gap-1 flex-wrap" style={{ borderBottom: `1px solid ${TOKENS.border}`, paddingBottom: 10 }}>
+                    {(['en', 'zh', 'vi', 'ar'] as LangKey[]).map((k) => {
+                      const isA = k === lang;
+                      const labels: Record<string, string> = { en: 'EN', zh: '中文', vi: 'Viet', ar: 'عربي' };
+                      return (
+                        <span
+                          key={k}
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 600,
+                            padding: '3px 8px',
+                            borderRadius: 6,
+                            background: isA ? TOKENS.blueLight : 'transparent',
+                            color: isA ? TOKENS.blue : TOKENS.text3,
+                          }}
+                        >
+                          {labels[k]}
+                        </span>
+                      );
+                    })}
+                    <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 8px', color: TOKENS.text3 }}>+16</span>
+                  </div>
+
+                  <div className="p-4">
+                    <div style={{ fontSize: 15, fontWeight: 700, color: TOKENS.text, lineHeight: 1.3 }}>
+                      {listingTitle(l, lang)}
+                    </div>
+                    <div style={{ fontSize: 12, color: TOKENS.text3, marginTop: 4 }}>
+                      {[l.address, l.suburb, l.state].filter(Boolean).join(', ')}
+                    </div>
+                    {l.price_formatted && (
+                      <div style={{ fontSize: 14, fontWeight: 700, color: TOKENS.blue, marginTop: 6 }}>
+                        {l.price_formatted}
+                      </div>
+                    )}
+                    <div className="flex gap-3 mt-3" style={{ fontSize: 12, fontWeight: 500, color: TOKENS.text2 }}>
+                      <span>🛏 {l.beds ?? 0}</span>
+                      <span>🚿 {l.baths ?? 0}</span>
+                      <span>🚗 {l.parking ?? 0}</span>
+                    </div>
+                  </div>
                 </button>
               );
             })}
           </div>
-        )}
-        {areaSearch && (
-          <button
-            onClick={() => handleAreaSearch(null)}
-            className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium shrink-0 hover:bg-primary/20 transition-colors inline-flex items-center gap-1"
-          >
-            {areaSearch.type === 'circle' ? `${Math.round(areaSearch.radius / 1000)}km circle` : 'Custom area'}
-            <X size={10} className="opacity-60" />
-          </button>
-        )}
-      </div>
-
-      <div className="flex items-center gap-2 shrink-0">
-        {/* Collab button */}
-        {!isCollab && user && (
-          <button
-            onClick={() => createSession({
-              query: currentQuery || '',
-              filters: filters as Record<string, any>,
-            })}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors shrink-0"
-          >
-            <Users size={12} />
-            {t('search.searchTogether')}
-          </button>
-        )}
-        {isCollab && (
-          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold text-primary shrink-0">
-            <Users size={12} />
-            Collab active
-          </span>
-        )}
-        {/* Save this search */}
-        {hasSearched && (
-          <button
-            onClick={() => saveSearch({
-              query: currentQuery,
-              filters,
-              radius: searchRadius ?? undefined,
-              center: searchCenter ?? undefined,
-            })}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-secondary border border-border text-xs font-medium text-foreground hover:bg-accent transition-colors"
-          >
-            <Bookmark size={12} />
-            {t('search.save')}
-          </button>
-        )}
-        <Suspense fallback={null}>
-          <FilterSidebar
-            filters={filters}
-            onChange={setFilters}
-            isOpen={filtersOpen}
-            onToggle={() => setFiltersOpen(o => !o)}
-            totalCount={displayProperties.length}
-            filteredCount={filteredProperties.length}
-            listingMode={listingMode}
-          />
-        </Suspense>
-        <div className="relative">
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-            className="appearance-none pl-7 pr-3 py-1.5 rounded-lg bg-secondary border border-border text-xs font-medium text-foreground cursor-pointer focus:outline-none focus:ring-1 focus:ring-ring"
-          >
-            {sortOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-          <ArrowUpDown size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
         </div>
-      </div>
-    </div>
+      </section>
 
-    {/* Saved searches chips */}
-    {savedSearches.length > 0 && (
-      <div className="flex items-center gap-2 mb-3 overflow-x-auto pb-1 scrollbar-hide">
-        <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider shrink-0">Saved:</span>
-        {savedSearches.map((s) => (
-          <div key={s.id} className="flex items-center gap-0.5 shrink-0">
-            <button
-              onClick={() => handleSearch(s.query)}
-              className="group flex items-center gap-1 px-2.5 py-1 rounded-l-full bg-secondary border border-r-0 border-border text-xs font-medium text-foreground hover:bg-accent transition-colors"
-            >
-              <Bookmark size={10} className="text-primary" />
-              <span className="max-w-[120px] truncate">{s.label}</span>
-              <X
-                size={10}
-                className="opacity-0 group-hover:opacity-60 transition-opacity"
-                onClick={(e) => { e.stopPropagation(); removeSearch(s.id); }}
-              />
-            </button>
-            <button
-              onClick={() => createSession({
-                query: s.query,
-                filters: s.filters as Record<string, any>,
-                center: s.center,
-              })}
-              className="px-1.5 py-1 rounded-r-full bg-secondary border border-l-0 border-border text-muted-foreground hover:text-primary hover:bg-accent transition-colors"
-              title="Share this search"
-            >
-              <Share2 size={10} />
-            </button>
-          </div>
-        ))}
-        {isCollab && (
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shrink-0 animate-fade-in">
-            <Users size={12} />
-            Searching together
-          </div>
-        )}
-      </div>
-    )}
-  </>
-  );
-
-  const emptyPlaceholder = (
-    <div
-      className="flex flex-col items-center justify-center py-16 px-6 animate-in fade-in slide-in-from-bottom-3 duration-500"
-    >
-      <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
-        <MapPin size={28} className="text-primary" />
-      </div>
-      <h2 className="text-lg font-display font-bold text-foreground mb-1.5 text-center">
-        {t('search.emptyTitle')}
-      </h2>
-      <p className="text-sm text-muted-foreground text-center max-w-xs">
-        {t('search.emptyDesc')}
-      </p>
-    </div>
-  );
-
-  const noResultsPlaceholder = (
-    <div className="flex flex-col items-center justify-center py-16 px-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
-      <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
-        <Search size={28} className="text-primary" />
-      </div>
-      <h2 className="text-lg font-display font-bold text-foreground mb-1.5 text-center">
-        No properties found{currentQuery ? ` for "${currentQuery}"` : ''}
-      </h2>
-      <p className="text-sm text-muted-foreground text-center max-w-xs mb-5">
-        Try widening your search area, clearing filters, or browsing all properties.
-      </p>
-      <div className="flex flex-wrap items-center justify-center gap-2">
-        <button
-          onClick={() => setSearchRadius(25)}
-          className="px-3.5 py-2 rounded-full bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors"
-        >
-          Widen to 25km
-        </button>
-        <button
-          onClick={() => setFilters(defaultFilters)}
-          className="px-3.5 py-2 rounded-full bg-secondary border border-border text-xs font-semibold text-foreground hover:bg-accent transition-colors"
-        >
-          Clear all filters
-        </button>
-        <button
-          onClick={() => navigate('/buy')}
-          className="px-3.5 py-2 rounded-full bg-secondary border border-border text-xs font-semibold text-foreground hover:bg-accent transition-colors"
-        >
-          Browse all properties
-        </button>
-      </div>
-    </div>
-  );
-
-  const showEmptyState = filteredProperties.length === 0 && !isSearching && !hasSearched;
-  const showNoResultsState = filteredProperties.length === 0 && !isSearching && hasSearched;
-  const emptyOrNoResults = showNoResultsState ? noResultsPlaceholder : emptyPlaceholder;
-  const shouldShowPlaceholder = showEmptyState || showNoResultsState;
-
-  const propertyList = shouldShowPlaceholder ? emptyOrNoResults : (
-    <Suspense fallback={<MapSkeleton />}>
-      <VirtualizedPropertyList
-        properties={filteredProperties}
-        isSearching={isSearching}
-        isMobile={isMobile}
-        isSaved={isSaved}
-        onToggleSave={toggleSaved}
-        onSelect={(p) => {
-          handleSelectProperty(p);
-          if (p.lat && p.lng) setMapCenter({ lat: p.lat, lng: p.lng, key: `${p.lat}-${p.lng}` });
+      {/* SECTION 4 — Agent re-entry hook */}
+      <div
+        style={{
+          background: TOKENS.off,
+          borderTop: `1px solid ${TOKENS.border}`,
+          borderBottom: `1px solid ${TOKENS.border}`,
+          padding: 14,
+          textAlign: 'center',
+          fontSize: 14,
         }}
-        cardRefs={cardRefs}
-        isCollab={isCollab}
-        getPropertyReactions={isCollab ? getPropertyReactions : undefined}
-        onToggleReaction={isCollab ? toggleReaction : undefined}
-        hasPartnerViewed={isCollab ? hasPartnerViewed : undefined}
-        currentUserId={user?.id}
-        areaSearch={areaSearch}
-        searchRadius={searchRadius}
-        onClearAreaSearch={() => handleAreaSearch(null)}
-        listingMode={listingMode}
-      />
-    </Suspense>
-  );
+      >
+        <span style={{ color: TOKENS.text3 }}>Are you a real estate agent or mortgage broker? </span>
+        <a href="#agents" style={{ color: TOKENS.blue, fontWeight: 600 }}>
+          See how ListHQ reaches buyers REA can't →
+        </a>
+      </div>
 
-  const mapComponent = isSearching ? (
-    <MapSkeleton />
-  ) : (
-    <Suspense fallback={<MapSkeleton />}>
-      <MapErrorBoundary>
-        <Suspense fallback={<MapSkeleton />}>
-          <LazyPropertyMap
-            properties={filteredProperties}
-            onPropertySelect={handleSelectProperty}
-            selectedPropertyId={selectedProperty?.id}
-            onAreaSearch={handleAreaSearch}
-            centerOn={mapCenter}
-            onScrollToProperty={scrollToProperty}
-            formatPrice={formatPrice}
-            onMapMoved={(bounds) => {
-              handleAreaSearch({
-                type: 'polygon',
-                coordinates: [
-                  [bounds.north, bounds.west],
-                  [bounds.north, bounds.east],
-                  [bounds.south, bounds.east],
-                  [bounds.south, bounds.west],
-                  [bounds.north, bounds.west],
-                ],
-              });
-            }}
-            onGeolocate={(loc) => {
-              setSearchCenter({ lat: loc.lat, lng: loc.lng });
-              if (!searchRadius) setSearchRadius(10);
-              setTimeout(() => {
-                setMapCenter({ lat: loc.lat, lng: loc.lng, key: `geo-${Date.now()}` });
-              }, 100);
-            }}
-          />
-        </Suspense>
-      </MapErrorBoundary>
-    </Suspense>
-  );
-
-  // ── Auto-scroll to top when search results load ──────
-  useEffect(() => {
-    if (hasSearch || hasSearched) {
-      window.scrollTo(0, 0);
-    }
-  }, [hasSearch, hasSearched]);
-
-  // Reset listings panel scroll to top when search params change
-  useEffect(() => {
-    if (listsPanelRef.current) {
-      listsPanelRef.current.scrollTop = 0;
-    }
-  }, [searchParams]);
-
-  // ── Hero category tab (sale/rent reuse listingMode; commercial/land are search-only) ──
-  const [heroCategory, setHeroCategory] = useState<'sale' | 'rent' | 'commercial' | 'land'>(
-    listingMode === 'rent' ? 'rent' : 'sale'
-  );
-
-  // ── Hero submit handler ──
-  const [heroDetectedLang, setHeroDetectedLang] = useState<string | null>(null);
-  const [heroIsTranslating, setHeroIsTranslating] = useState(false);
-
-  const translateAndSearch = useCallback(async (rawQuery: string) => {
-    const trimmed = rawQuery.trim();
-    if (!trimmed) return;
-    setHeroIsTranslating(true);
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 3000);
-      const { data: translationResult, error: fnError } = await supabase.functions.invoke('generate-translations', {
-        body: { type: 'translate_search', search_query: trimmed },
-      });
-      clearTimeout(timeout);
-
-      if (!fnError && translationResult) {
-        const lang = translationResult.detected_language as string | undefined;
-        const englishQuery = (translationResult.english_query as string | undefined) || trimmed;
-        if (lang && lang !== 'en' && lang !== 'English') {
-          setHeroDetectedLang(lang);
-          setTimeout(() => setHeroDetectedLang(null), 3000);
-        }
-        wrappedHandleSearch(englishQuery, lang || 'en');
-      } else {
-        wrappedHandleSearch(trimmed);
-      }
-    } catch {
-      wrappedHandleSearch(trimmed);
-    } finally {
-      setHeroIsTranslating(false);
-    }
-  }, [wrappedHandleSearch]);
-
-  const handleHeroSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!heroQuery.trim()) return;
-    if (heroCategory === 'commercial' || heroCategory === 'land') {
-      const params = new URLSearchParams();
-      params.set('location', heroQuery.trim());
-      params.set('category', heroCategory);
-      navigate(`/?${params.toString()}`);
-      return;
-    }
-    translateAndSearch(heroQuery.trim());
-  };
-
-  const handleSelectHeroSuggestion = useCallback(async (suggestion: { description: string; place_id: string }) => {
-    setHeroQuery(suggestion.description);
-    setShowHeroSuggestions(false);
-    setHeroSuggestions([]);
-
-    // Geocode and centre the map (same pattern as the results-page autocomplete)
-    try {
-      const loc = await geocode(suggestion.description);
-      if (loc) {
-        setSearchCenter({ lat: loc.lat, lng: loc.lng });
-        setMapCenter({ lat: loc.lat, lng: loc.lng, key: `hero-${Date.now()}` });
-      }
-    } catch {
-      /* non-fatal */
-    }
-
-    if (heroCategory === 'commercial' || heroCategory === 'land') {
-      const params = new URLSearchParams();
-      params.set('location', suggestion.description);
-      params.set('category', heroCategory);
-      navigate(`/?${params.toString()}`);
-      return;
-    }
-    wrappedHandleSearch(suggestion.description);
-  }, [heroCategory, navigate, wrappedHandleSearch, setSearchCenter]);
-
-  const handleHeroModeChange = (mode: 'sale' | 'rent' | 'commercial' | 'land') => {
-    setHeroCategory(mode);
-    if (mode === 'sale' || mode === 'rent') {
-      setListingMode(mode);
-      window.dispatchEvent(new CustomEvent('listing-mode-changed'));
-    }
-  };
-
-  // (sectionAnim removed — landing sections no longer use framer-motion to keep it off the cold-paint critical path.)
-
-  // ── Landing hero: shown until first search, hidden if URL has params ──
-  if (!hasSearchParams) {
-    return (
-      <div id="main-content" className="flex flex-col">
-        
-        {/* ── HERO SECTION ── */}
-        <section className="relative flex flex-col items-center justify-center py-12 md:py-16 bg-white overflow-hidden px-6 text-center">
-          {/* Background accents */}
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-blue-50/40 pointer-events-none" />
-          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-100/30 blur-[120px] pointer-events-none" />
-          <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-violet-100/20 blur-[100px] pointer-events-none" />
-
+      {/* SECTION 5 — Differentiator */}
+      <section style={{ background: TOKENS.off, padding: '72px 16px' }}>
+        <div className="max-w-5xl mx-auto text-center">
           <div
-            className="relative z-10 max-w-3xl w-full animate-in fade-in slide-in-from-bottom-6 duration-700"
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              color: TOKENS.blue,
+            }}
           >
-            {/* Eyebrow */}
-            <div
-              className="inline-flex items-center gap-2 mb-8 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-xs font-medium tracking-wide animate-in fade-in zoom-in-95 duration-500 delay-100 fill-mode-both"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-              {t('hero.eyebrow')}
-            </div>
+            Why ListHQ is different
+          </div>
+          <h2
+            className="mx-auto mt-3"
+            style={{
+              fontSize: 'clamp(26px, 3.5vw, 38px)',
+              fontWeight: 900,
+              letterSpacing: '-1px',
+              color: TOKENS.text,
+              maxWidth: 660,
+              lineHeight: 1.15,
+            }}
+          >
+            Built for the 7 million Australians who didn't find home on REA.
+          </h2>
 
-            {/* Headline */}
-            <h1 className="text-5xl md:text-7xl font-black leading-tight tracking-tight text-slate-900">
-              {t('hero.headline')}<br />
-              <span className="text-blue-500">{t('hero.headline2')}</span>
-            </h1>
-
-            {/* Subheadline — static English, brand blue */}
-            <p
-              className="text-xl md:text-2xl mt-4 mb-0"
-              style={{ color: '#2563EB', fontWeight: 600 }}
-            >
-              {t('hero.subheadline')}
-            </p>
-
-            {/* ── Agent value story ── */}
-            <div className="mt-12 mb-10 max-w-3xl mx-auto text-center">
-              <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
-                {t('home.marketingHeadline')}
-              </h2>
-              <p className="mt-4 text-base md:text-lg text-slate-600 leading-relaxed">
-                {t('home.marketingBody')}
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
-                {[
-                  { stat: t('home.stat1.value'), label: t('home.stat1.label') },
-                  { stat: t('home.stat2.value'), label: t('home.stat2.label') },
-                  { stat: t('home.stat3.value'), label: t('home.stat3.label') },
-                ].map((item) => (
-                  <div
-                    key={item.stat}
-                    className="rounded-2xl border border-slate-200 bg-white/80 backdrop-blur-sm px-5 py-6 shadow-sm hover:shadow-md hover:border-blue-200 transition-all"
-                  >
-                    <div className="text-2xl md:text-3xl font-bold text-blue-600">{item.stat}</div>
-                    <div className="mt-2 text-sm text-slate-600 leading-snug">{item.label}</div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
-                <button
-                  onClick={() => navigate('/for-agents')}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors shadow-sm hover:shadow-md"
-                >
-                  {t('home.ctaAgents')}
-                  <ArrowRight size={16} />
-                </button>
-                <button
-                  onClick={() => {
-                    document.getElementById('search-bar')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    setTimeout(() => document.getElementById('search-bar')?.focus(), 400);
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-5 text-left">
+            {DIFF_CARDS.map((c) => (
+              <div
+                key={c.title}
+                style={{
+                  background: '#fff',
+                  border: `1px solid ${TOKENS.border}`,
+                  borderRadius: 16,
+                  padding: '28px 24px',
+                }}
+              >
+                <div
+                  className="flex items-center justify-center"
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 12,
+                    background: TOKENS.blueLight,
+                    fontSize: 22,
                   }}
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors"
                 >
-                  {t('home.ctaSearch')} ↓
-                </button>
-              </div>
-              <p className="text-xs text-slate-400 text-center mt-1">{t('home.freeTrial')}</p>
-            </div>
-
-            {/* Sale / Rent toggle */}
-            <div className="flex flex-col items-center mb-6">
-              <div className="inline-flex items-center bg-slate-100 rounded-full p-1 gap-1">
-                <button
-                  onClick={() => handleHeroModeChange('sale')}
-                  className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
-                    heroCategory === 'sale' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-700'
-                  }`}
-                >
-                  {t('hero.forSale')}
-                </button>
-                <button
-                  onClick={() => handleHeroModeChange('rent')}
-                  className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
-                    heroCategory === 'rent' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-700'
-                  }`}
-                >
-                  {t('hero.forRent')}
-                </button>
-              </div>
-            </div>
-
-            {/* Search bar */}
-            <form ref={heroFormRef} onSubmit={handleHeroSubmit} className="relative max-w-2xl mx-auto">
-              <div className="flex items-center bg-white border border-slate-200 rounded-2xl shadow-lg shadow-slate-100/80 px-4 py-2 gap-3 hover:border-slate-300 hover:shadow-xl transition-all duration-200 focus-within:border-blue-300 focus-within:shadow-blue-50/80 focus-within:shadow-xl">
-                <input
-                  id="search-bar"
-                  ref={heroInputRef}
-                  type="text"
-                  value={heroQuery}
-                  onChange={e => setHeroQuery(e.target.value)}
-                  onFocus={() => heroSuggestions.length > 0 && setShowHeroSuggestions(true)}
-                  placeholder={t(HERO_PLACEHOLDER_KEYS[heroPlaceholderIndex])}
-                  aria-label={t('search.placeholder')}
-                  autoComplete="off"
-                  className="flex-1 bg-transparent outline-none text-slate-800 text-[15px] placeholder:text-slate-400 min-w-0"
-                />
-                <button
-                  type="button"
-                  onClick={heroMicToggle}
-                  disabled={heroMicProcessing}
-                  className={`shrink-0 p-2.5 min-w-[44px] min-h-[44px] rounded-full transition-all duration-200 flex items-center justify-center ${
-                    heroMicListening
-                      ? 'bg-red-100 text-red-600 animate-pulse ring-2 ring-red-300 ring-offset-1'
-                      : heroMicProcessing
-                        ? 'bg-blue-50 text-blue-400 cursor-wait'
-                        : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
-                  }`}
-                  title={heroMicListening ? 'Stop recording' : heroMicProcessing ? 'Transcribing...' : 'Voice search'}
-                >
-                  {heroMicListening ? <MicOff size={18} /> : <Mic size={18} />}
-                </button>
-                <button
-                  type="submit"
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shrink-0"
-                >
-                  <Search size={14} />
-                  {t('hero.search')}
-                </button>
-              </div>
-              {showHeroSuggestions && heroSuggestions.length > 0 && (
-                <ul className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl overflow-y-auto max-h-60">
-                  {heroSuggestions.map((s) => (
-                    <li key={s.place_id}>
-                      <button
-                        type="button"
-                        onClick={() => handleSelectHeroSuggestion(s)}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-left text-sm text-slate-800 hover:bg-slate-50 transition-colors"
-                      >
-                        <MapPin size={16} className="text-slate-400 shrink-0" />
-                        <span className="truncate">{s.description}</span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {heroMicLabel && (
-                <div className="flex items-center justify-center gap-2 mt-2">
-                  <span className={`inline-block w-2 h-2 rounded-full ${heroMicListening ? 'bg-red-500 animate-pulse' : 'bg-blue-500 animate-pulse'}`} />
-                  <span className="text-sm text-slate-500 font-medium">{heroMicLabel}</span>
+                  {c.icon}
                 </div>
-              )}
-              {heroIsTranslating && (
-                <p className="text-xs text-blue-500 mt-2 text-center">Translating…</p>
-              )}
-              {heroDetectedLang && (
-                <div className="mt-2 flex justify-center">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
-                    🌐 Detected {heroDetectedLang.toUpperCase()} — searching in English
-                  </span>
+                <div className="mt-4" style={{ fontSize: 16, fontWeight: 700, color: TOKENS.text }}>
+                  {c.title}
                 </div>
-              )}
-              <p className="text-sm text-slate-400 mt-3 text-center">
-                {t('hero.searchHint')}
-              </p>
-            </form>
-
-            {/* Browse CTA */}
-            <div className="flex items-center justify-center gap-3 mt-6">
-              <button
-                onClick={() => navigate('/buy')}
-                className="rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:border-slate-400 hover:text-slate-900 transition-all cursor-pointer bg-white/80 backdrop-blur-sm"
-              >
-                🔍 {t('hero.browseProperties')}
-              </button>
-            </div>
-          </div>
-
-          {/* ── AUDIENCE SPLIT TILES ── */}
-          <div className="relative z-10 mt-12 w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 px-2 text-left">
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 md:p-7 shadow-sm hover:shadow-md transition-shadow">
-              <h2 className="text-lg md:text-xl font-bold text-slate-900 mb-2">{t('hero.buyerTileTitle')}</h2>
-              <p className="text-sm text-slate-600 mb-5 leading-relaxed">
-                {t('hero.buyerTileDesc')}
-              </p>
-              <button
-                onClick={() => navigate('/buy')}
-                className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-semibold transition-colors"
-              >
-                {t('hero.buyerTileCta')}
-              </button>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 md:p-7 shadow-sm hover:shadow-md transition-shadow">
-              <h2 className="text-lg md:text-xl font-bold text-slate-900 mb-2">{t('hero.agentTileTitle')}</h2>
-              <p className="text-sm text-slate-600 mb-5 leading-relaxed">
-                {t('hero.agentTileDesc')}
-              </p>
-              <button
-                onClick={() => navigate('/for-agents')}
-                className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-semibold transition-colors"
-              >
-                {t('hero.agentTileCta')}
-              </button>
-            </div>
-          </div>
-
-          {/* Stats strip */}
-          <div
-            className="relative z-10 mt-8 max-w-2xl w-full mx-auto animate-in fade-in duration-700 delay-500 fill-mode-both"
-          >
-            <p className="text-center text-lg md:text-xl font-semibold text-foreground">
-              <span className="underline decoration-blue-500 decoration-2 underline-offset-4">1 in 5</span>{' '}
-              {t('home.oneInFive')}
-            </p>
-          </div>
-        </section>
-
-        {/* ── TRANSLATION DEMO ── */}
-        <TranslationDemoInline />
-
-        {/* ── FEATURED LISTINGS ── */}
-        <section id="featured-listings" className="bg-white py-12 px-6">
-          <div className="max-w-5xl mx-auto">
-            <div className="flex items-baseline justify-between mb-6">
-              <div>
-                <h2 className="text-xl font-semibold text-slate-900">{t('hero.propertiesTitle')}</h2>
-                <p className="text-sm text-slate-500 mt-1">{t('hero.propertiesSub')}</p>
+                <p className="mt-2" style={{ fontSize: 14, lineHeight: 1.6, color: TOKENS.text2 }}>
+                  {c.body}
+                </p>
               </div>
-              <a href="/search" className="text-sm text-blue-600 hover:text-blue-700 font-medium">{t('hero.viewAll')} →</a>
-            </div>
-            {featuredListings.length > 0 ? (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {featuredListings.filter(p => p.listing_type !== 'rent' && p.listing_type !== 'rental' && !/^\s*12\s+atherton/i.test(p.address || '')).slice(0, 6).map((p, idx) => {
-                    const img = (p.images && p.images[0]) || p.image_url;
-                    const hasTranslations = p.translations && Object.keys(p.translations).length > 0;
-                    const isPriority = idx === 0;
-                    return (
-                      <div
-                        key={p.id}
-                        onClick={() => navigate(`/property/${p.id}`)}
-                        className="rounded-xl border border-slate-200 overflow-hidden transition-shadow hover:shadow-md cursor-pointer"
-                      >
-                        <div className="h-40 bg-slate-100 flex items-center justify-center relative">
-                          {img ? (
-                            <img
-                              src={img}
-                              alt=""
-                              className="w-full h-full object-cover"
-                              loading={isPriority ? 'eager' : 'lazy'}
-                              fetchPriority={isPriority ? 'high' : 'auto'}
-                            />
-                          ) : (
-                            <Home size={32} className="text-slate-300" />
-                          )}
-                          {hasTranslations && (
-                            <span className="absolute top-3 left-3 text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full font-medium">AI Translated</span>
-                          )}
-                        </div>
-                        <div className="p-4">
-                          <div className="text-base font-semibold text-slate-900">{formatPrice(p.price, p.listing_type)}</div>
-                          <div className="text-xs text-slate-500 mt-0.5 mb-2">{p.address || `${p.suburb}, ${p.state}`}</div>
-                          <div className="flex gap-3 text-xs text-slate-400">
-                            {p.beds > 0 && <span>{p.beds} {t('card.beds')}</span>}
-                            {p.baths > 0 && <span>{p.baths} {t('card.bath')}</span>}
-                            {p.parking > 0 && <span>{p.parking} {t('card.car')}</span>}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-               </>
-             ) : null}
-            <div className="mt-8 text-center">
-              <button
-                onClick={() => navigate('/agents')}
-                className="text-sm text-slate-600 hover:text-blue-600 transition-colors font-medium"
-              >
-                {t('home.findAgent')}
-              </button>
-            </div>
+            ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* ── HOW IT WORKS ── */}
-        <HowItWorksSection t={t} />
-
-        {/* ── AGENT CTA ── */}
-        <section className="bg-slate-900 py-16 px-6 text-center">
-          <div className="max-w-2xl mx-auto">
-            <h2 className="text-2xl font-semibold text-white mb-3">{t('home.agentBannerHeadline')}</h2>
-            <p className="text-sm text-slate-400 mb-8">{t('home.agentBannerSub')}</p>
-            <button
-              onClick={() => navigate('/for-agents')}
-              className="inline-flex items-center gap-2 bg-white text-slate-900 hover:bg-slate-100 px-8 py-4 rounded-full text-[15px] font-semibold transition-all duration-200 hover:scale-105 active:scale-100 shadow-lg"
-            >
-              {t('home.agentBannerCta')} →
-            </button>
-          </div>
-        </section>
-
-        {/* ── FOR AGENTS — Compact 2-column ── */}
-        <section className="bg-slate-950 py-16 px-6">
-          <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-            {/* Left: bullets */}
+      {/* SECTION 6 — Agent section */}
+      <section id="agents" style={{ background: '#0d1b35', padding: '80px 16px' }}>
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+            {/* Left */}
             <div>
-              <h2 className="text-2xl font-bold text-white mb-2">{t('home.agents.eyebrow')}</h2>
-              <p className="text-lg text-white font-semibold mb-2">{t('home.agents.headline')}</p>
-              <p className="text-sm text-slate-400 mb-6">{t('home.agents.sub')}</p>
-              <ul className="space-y-4">
-                {[
-                  t('home.agents.feature1'),
-                  t('home.agents.feature2'),
-                  t('home.agents.feature3'),
-                  t('home.agents.feature4'),
-                ].map(item => (
-                  <li key={item} className="flex items-center gap-3 text-slate-300 text-sm">
-                    <Check size={16} className="text-blue-400 shrink-0" />
-                    {item}
+              <span
+                className="inline-block"
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: TOKENS.blue,
+                  background: 'rgba(59,123,248,0.12)',
+                  border: '1px solid rgba(59,123,248,0.25)',
+                  padding: '5px 12px',
+                  borderRadius: 100,
+                }}
+              >
+                For real estate agents
+              </span>
+
+              <h2
+                className="mt-5"
+                style={{
+                  fontSize: 'clamp(28px, 3.8vw, 42px)',
+                  fontWeight: 900,
+                  letterSpacing: '-1px',
+                  color: '#fff',
+                  lineHeight: 1.1,
+                }}
+              >
+                The buyers REA misses
+                <br />
+                are searching <span style={{ color: TOKENS.blue }}>here.</span>
+              </h2>
+
+              <div
+                className="mt-6"
+                style={{
+                  background: 'rgba(255,255,255,0.07)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  borderLeft: `3px solid ${TOKENS.blue}`,
+                  borderRadius: 10,
+                  padding: '14px 18px',
+                  fontSize: 15,
+                  fontWeight: 700,
+                  color: 'rgba(255,255,255,0.9)',
+                }}
+              >
+                <span style={{ color: TOKENS.blue }}>1 in 5</span>{' '}
+                Australian buyers searches in a language other than English — and REA can't reach them.
+              </div>
+
+              <p className="mt-6" style={{ fontSize: 15, lineHeight: 1.7, color: 'rgba(255,255,255,0.6)' }}>
+                ListHQ auto-translates every listing you upload into 20 languages — reaching buyers no other portal can find. Free for 60 days.
+              </p>
+
+              <ul className="mt-6 space-y-3">
+                {AGENT_FEATURES.map((f) => (
+                  <li key={f.t} className="flex items-start gap-3">
+                    <span
+                      className="flex items-center justify-center shrink-0"
+                      style={{
+                        width: 18,
+                        height: 18,
+                        borderRadius: '50%',
+                        background: 'rgba(59,123,248,0.15)',
+                        border: `1px solid ${TOKENS.blue}`,
+                        color: TOKENS.blue,
+                        fontSize: 11,
+                        fontWeight: 700,
+                        marginTop: 2,
+                      }}
+                    >
+                      ✓
+                    </span>
+                    <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.8)' }}>
+                      <strong style={{ color: '#fff' }}>{f.t}</strong> — {f.d}
+                    </span>
                   </li>
                 ))}
               </ul>
-            </div>
-            {/* Right: founding agent card */}
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center">
-              <div className="text-2xl font-bold text-white mb-1">{t('home.agents.founding')}</div>
-              <p className="text-sm text-slate-400 mb-6">{t('home.agents.freeTagSub')}</p>
-              <button
-                onClick={() => navigate('/for-agents')}
-                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full text-sm font-semibold transition-colors"
+
+              <div
+                className="mt-7"
+                style={{
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderLeft: `3px solid ${TOKENS.blue}`,
+                  borderRadius: 10,
+                  padding: '16px 18px',
+                }}
               >
-                {t('home.agents.cta')}
-                <ArrowRight size={14} />
-              </button>
-            </div>
-          </div>
-        </section>
+                <p style={{ fontSize: 14, fontStyle: 'italic', color: 'rgba(255,255,255,0.78)', lineHeight: 1.6 }}>
+                  "ListHQ is the first platform that actually speaks to my Mandarin and Vietnamese buyers without me doing any extra work. Enquiries from multicultural buyers are up 3× since we joined."
+                </p>
+                <p className="mt-3" style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.45)' }}>
+                  <strong style={{ color: 'rgba(255,255,255,0.7)' }}>Sarah Chen</strong> — Principal, Sydney Metro Realty · Hurstville NSW
+                </p>
+              </div>
 
-        {/* ── PROFESSIONAL PORTALS ── */}
-        <section style={{ background: '#0f172a' }} className="py-16 px-6">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-10">
-              <h2 className="text-2xl font-bold text-white mb-2">{t('home.portals.title')}</h2>
-              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>{t('home.portals.subtitle')}</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {[
-                {
-                  Icon: Building2,
-                  title: t('home.portals.agent.title'),
-                  desc: t('home.portals.agent.desc'),
-                  signIn: '/agents/login',
-                  register: '/for-agents',
-                  registerLabel: t('home.portals.agent.register'),
-                },
-                {
-                  Icon: Briefcase,
-                  title: t('home.portals.broker.title'),
-                  desc: t('home.portals.broker.desc'),
-                  signIn: '/broker/login',
-                  register: '/broker/register',
-                  registerLabel: t('home.portals.broker.register'),
-                },
-                {
-                  Icon: Handshake,
-                  title: t('home.portals.partner.title'),
-                  desc: t('home.portals.partner.desc'),
-                  signIn: '/partner/login',
-                  register: '/partner/join',
-                  registerLabel: t('home.portals.partner.register'),
-                },
-              ].map(({ Icon, title, desc, signIn, register, registerLabel }) => (
-                <div
-                  key={title}
-                  className="rounded-2xl p-6 flex flex-col gap-4"
-                  style={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.08)' }}
+              <div className="mt-7 flex flex-wrap gap-3">
+                <button
+                  onClick={() => navigate('/agents/login?signup=1')}
+                  style={{
+                    background: TOKENS.blue,
+                    color: '#fff',
+                    borderRadius: 10,
+                    padding: '13px 24px',
+                    fontSize: 15,
+                    fontWeight: 700,
+                  }}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-blue-600/20 flex items-center justify-center">
-                    <Icon size={20} className="text-blue-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-white mb-1">{title}</h3>
-                    <p className="text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>{desc}</p>
-                  </div>
-                  <div className="mt-auto flex flex-col items-start gap-2">
-                    <button
-                      onClick={() => navigate(signIn)}
-                      className="w-full bg-white text-slate-900 font-semibold text-sm py-2.5 rounded-xl hover:bg-slate-100 transition-colors"
-                    >
-                      {t('home.portals.signIn')}
-                    </button>
-                    <button
-                      onClick={() => navigate(register)}
-                      className="text-xs"
-                      style={{ color: 'rgba(255,255,255,0.45)', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
-                      onMouseEnter={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.75)')}
-                      onMouseLeave={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.45)')}
-                    >
-                      {registerLabel}
-                    </button>
-                  </div>
-                </div>
-              ))}
+                  Start free 60-day trial →
+                </button>
+                <button
+                  onClick={() => navigate('/pricing')}
+                  style={{
+                    background: 'transparent',
+                    color: '#fff',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    borderRadius: 10,
+                    padding: '13px 24px',
+                    fontSize: 15,
+                    fontWeight: 700,
+                  }}
+                >
+                  See pricing from $299/mo
+                </button>
+              </div>
+
+              <p className="mt-4" style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}>
+                No credit card required · Full access · Cancel anytime
+              </p>
             </div>
-          </div>
-        </section>
 
-      </div>
-    );
-  }
-
-  return (
-    <div className={`flex flex-col bg-background ${!isMobile ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
-    {/* Compact results header — replaces the full hero once a search is active */}
-    {hasSearch ? (
-      <div className="shrink-0 px-4 md:px-6 pt-4 pb-3 border-b border-slate-200 bg-white">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            const v = (e.currentTarget.elements.namedItem('q') as HTMLInputElement)?.value?.trim();
-            if (v) wrappedHandleSearch(v);
-          }}
-          className="flex items-center gap-2 max-w-3xl mx-auto"
-        >
-          <button
-            type="button"
-            onClick={() => navigate('/')}
-            aria-label="Clear search and return to home"
-            className="shrink-0 p-2 rounded-full text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-          >
-            <ArrowLeft size={18} />
-          </button>
-          <div className="flex-1 flex items-center bg-slate-50 border border-slate-200 rounded-full px-4 py-2 gap-2 focus-within:border-blue-300 focus-within:bg-white transition-colors">
-            <Search size={14} className="text-slate-400 shrink-0" />
-            <input
-              name="q"
-              type="text"
-              defaultValue={currentQuery || searchParams.get('location') || ''}
-              key={currentQuery || searchParams.get('location') || ''}
-              placeholder={t('search.placeholder')}
-              className="flex-1 bg-transparent outline-none text-sm text-slate-800 placeholder:text-slate-400 min-w-0"
-            />
-          </div>
-          {language && language !== 'en' && (
-            <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-[11px] font-semibold shrink-0">
-              <Globe size={11} />
-              {language.toUpperCase()}
-            </span>
-          )}
-          <button
-            type="submit"
-            className="shrink-0 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm font-semibold transition-colors"
-          >
-            {t('hero.search')}
-          </button>
-        </form>
-      </div>
-    ) : (
-      <div className="shrink-0">
-        <VoiceSearchErrorBoundary>
-          <Suspense fallback={null}>
-            <VoiceSearchHero
-              onSearch={wrappedHandleSearch}
-              onLocationSelect={(loc) => {
-                setSearchCenter({ lat: loc.lat, lng: loc.lng });
-                if (!searchRadius) setSearchRadius(10);
-                setTimeout(() => {
-                  setMapCenter({ lat: loc.lat, lng: loc.lng, key: `${loc.lat}-${loc.lng}-${Date.now()}` });
-                }, 300);
-              }}
-              onRadiusChange={setSearchRadius}
-              selectedRadius={searchRadius}
-              resultCount={hasSearched ? filteredProperties.length : undefined}
-              isSearching={isSearching}
-            />
-          </Suspense>
-        </VoiceSearchErrorBoundary>
-      </div>
-    )}
-
-    {/* ── Desktop: Zillow-style split ────────────────────────── */}
-    {!isMobile ? (
-      <div
-        ref={resultsRef}
-        className="flex overflow-hidden flex-1 min-h-0"
-      >
-          {/* LEFT: fixed map panel */}
-          <div
-            className="relative overflow-hidden"
-             style={{
-               width: `${mapExpanded ? 85 : splitPercent}%`,
-               transition: 'width 0.3s ease',
-               overflowAnchor: 'none',
-             }}
-          >
-            {/* Expand/collapse toggle — sits on right edge of map */}
-            <button
-              onClick={() => setMapExpanded(e => !e)}
-              className="absolute top-3 right-3 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated text-xs font-medium text-foreground hover:bg-card transition-colors"
-            >
-              {mapExpanded ? (
-                <><ArrowRight size={12} className="rotate-180" /> Collapse</>
-              ) : (
-                <><ArrowRight size={12} className="rotate-0" /> Expand map</>
-              )}
-            </button>
-            {mapComponent}
-          </div>
-
-          {/* Draggable divider */}
-          {!mapExpanded && (
+            {/* Right — preview */}
             <div
-              className="w-1 cursor-col-resize bg-border hover:bg-primary/30 transition-colors shrink-0 flex items-center justify-center group"
-              onMouseDown={handleMouseDown}
-            >
-              <GripVertical size={14} className="text-muted-foreground/40 group-hover:text-primary/60" />
-            </div>
-          )}
-
-          {/* RIGHT: scrollable list panel */}
-          <div
-            ref={listsPanelRef}
-           className="flex flex-col overflow-y-auto border-l border-border bg-background overscroll-contain"
               style={{
-                width: `${mapExpanded ? 15 : 100 - splitPercent}%`,
-                minWidth: mapExpanded ? 0 : 300,
-                transition: 'width 0.3s ease',
-                WebkitOverflowScrolling: 'touch',
-                overflowAnchor: 'none',
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: 16,
+                padding: 24,
               }}
-           >
-            {/* Featured/Boosted Listings Hero — shown only before search */}
-            {!hasSearched && featuredListings.length > 0 && (
-              <div className="px-4 pt-4 pb-2 shrink-0">
-                <div className="flex items-center gap-2 mb-3">
-                  <Sparkles size={14} className="text-primary" />
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Featured Listings</span>
-                </div>
-                <div className="space-y-3">
-                  {featuredListings.slice(0, 3).map((prop) => {
-                    const img = (prop.images && prop.images[0]) || prop.image_url;
-                    const isRent = prop.listing_type === 'rent' || prop.listing_type === 'rental';
-                    return (
-                      <div
-                        key={prop.id}
-                        className="group relative rounded-xl overflow-hidden border border-border cursor-pointer hover:border-primary/40 hover:shadow-md transition-all"
-                        onClick={() => navigate(`/property/${prop.id}`)}
-                      >
-                        <div className="relative h-40 bg-muted overflow-hidden">
-                          {img ? (
-                            <img src={img} alt={prop.title || prop.address} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-secondary">
-                              <MapPin size={24} className="text-muted-foreground/40" />
-                            </div>
-                          )}
-                          <div className="absolute top-2 left-2 flex gap-1.5">
-                            {prop.boost_tier && (
-                              <span className="px-2 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-bold uppercase tracking-wide shadow-sm">Featured</span>
-                            )}
-                            {prop.is_featured && !prop.boost_tier && (
-                              <span className="px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wide shadow-sm">Premier</span>
-                            )}
-                          </div>
-                          <div className="absolute bottom-0 left-0 right-0 px-3 py-2 bg-gradient-to-t from-black/70 to-transparent">
-                            <p className="text-white font-bold text-sm">{formatPrice(prop.price, prop.listing_type)}</p>
-                            {isRent && <span className="text-white/80 text-[10px]">per week</span>}
-                          </div>
-                        </div>
-                        <div className="px-3 py-2.5 bg-card">
-                          <p className="text-sm font-semibold text-foreground truncate">{prop.title || prop.address}</p>
-                          <p className="text-xs text-muted-foreground truncate mt-0.5">{prop.suburb}{prop.state ? `, ${prop.state}` : ''}</p>
-                          <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
-                            {prop.beds > 0 && <span>🛏 {prop.beds}</span>}
-                            {prop.baths > 0 && <span>🛁 {prop.baths}</span>}
-                            {prop.parking > 0 && <span>🚗 {prop.parking}</span>}
-                            <span className="ml-auto text-[10px] capitalize text-muted-foreground/70">{prop.property_type}</span>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="mt-3 mb-1 border-t border-border/50" />
-              </div>
-            )}
-
-            {/* Status bar + filters */}
-            <div className="px-4 py-2 shrink-0">
-              {statusBar}
-              {prefsBannerVisible && (
-                <div className="mt-2 flex items-center justify-between gap-2 rounded-lg bg-primary/10 border border-primary/20 px-3 py-2 text-xs text-primary">
-                  <span>Showing results based on your saved preferences.</span>
-                  <button
-                    onClick={() => {
-                      setPrefsBannerVisible(false);
-                      sessionStorage.setItem('listhq_prefs_banner_dismissed', '1');
-                      setFilters(prev => ({ ...prev, priceRange: [0, 5_000_000] as [number, number], minBeds: 0 }));
-                      setListingMode('sale');
-                    }}
-                    className="font-semibold hover:underline shrink-0"
-                  >
-                    Dismiss
-                  </button>
-                </div>
-              )}
-              {noPrefsBannerVisible && !prefsBannerVisible && (
-                <div className="mt-2 flex items-center justify-between gap-2 rounded-lg bg-primary/10 border border-primary/20 px-3 py-2 text-xs text-primary">
-                  <span className="truncate">
-                    Set your preferences to get personalised property alerts.
-                  </span>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      onClick={() => navigate('/preferences')}
-                      className="font-semibold hover:underline"
-                    >
-                      Set preferences
-                    </button>
-                    <button
-                      aria-label="Dismiss"
-                      onClick={() => {
-                        setNoPrefsBannerVisible(false);
-                        sessionStorage.setItem('listhq_no_prefs_banner_dismissed', '1');
-                      }}
-                      className="text-primary/70 hover:text-primary"
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Property list */}
-            <div className="flex-1 px-4 pb-6">
-              {shouldShowPlaceholder ? emptyOrNoResults : (
-                <Suspense fallback={<MapSkeleton />}>
-                  <VirtualizedPropertyList
-                    properties={filteredProperties}
-                    isSearching={isSearching}
-                    isMobile={false}
-                    isSaved={isSaved}
-                    onToggleSave={toggleSaved}
-                    onSelect={(p) => navigate(`/property/${p.id}`)}
-                    cardRefs={cardRefs}
-                    isCollab={isCollab}
-                    getPropertyReactions={isCollab ? getPropertyReactions : undefined}
-                    onToggleReaction={isCollab ? toggleReaction : undefined}
-                    hasPartnerViewed={isCollab ? hasPartnerViewed : undefined}
-                    currentUserId={user?.id}
-                    areaSearch={areaSearch}
-                    searchRadius={searchRadius}
-                    onClearAreaSearch={() => handleAreaSearch(null)}
-                    listingMode={listingMode}
-                  />
-                </Suspense>
-              )}
-            </div>
-          </div>
-        </div>
-      ) : (
-        /* ── Mobile layout ────────────────────────────────────── */
-        <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
-          {mobileView === 'map' ? (
-            <>
-              <div className="absolute inset-0">{mapComponent}</div>
+            >
               <div
-                className="absolute bottom-0 left-0 right-0 z-20 bg-background rounded-t-2xl shadow-drawer border-t border-border"
                 style={{
-                  height: sheetHeight,
-                  paddingBottom: 'env(safe-area-inset-bottom)',
-                  transition: sheetDragging ? 'none' : 'height 0.3s ease',
-                  willChange: 'height',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'rgba(255,255,255,0.3)',
+                }}
+              >
+                Your listing, translated in seconds
+              </div>
+
+              {/* Card 1 */}
+              <div
+                className="mt-4"
+                style={{
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: 12,
+                  padding: 16,
+                }}
+              >
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>
+                  4BR Family Home — Auburn NSW
+                </div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)', marginTop: 2 }}>
+                  $1,250,000 · Uploaded 2 mins ago
+                </div>
+                <div className="flex flex-wrap gap-1.5 mt-3">
+                  {['🇦🇺 EN', '🇨🇳 中文', '🇻🇳 Viet', '🇸🇦 عربي', '🇮🇳 हिंदी', '🇰🇷 한국어', '+ 14 more'].map((c) => (
+                    <span
+                      key={c}
+                      style={{
+                        background: 'rgba(59,123,248,0.2)',
+                        color: 'rgba(255,255,255,0.7)',
+                        fontSize: 10,
+                        fontWeight: 700,
+                        borderRadius: 4,
+                        padding: '3px 7px',
+                      }}
+                    >
+                      {c} ✓
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Halo callout */}
+              <div
+                className="mt-4"
+                style={{
+                  background: 'rgba(59,123,248,0.15)',
+                  border: '1px solid rgba(59,123,248,0.25)',
+                  borderRadius: 10,
+                  padding: '12px 14px',
                 }}
               >
                 <div
-                  className="w-full flex justify-center py-2 cursor-grab active:cursor-grabbing touch-none"
-                  onTouchStart={handleSheetTouchStart}
-                  onTouchMove={handleSheetTouchMove}
-                  onTouchEnd={handleSheetTouchEnd}
-                  onTouchCancel={handleSheetTouchEnd}
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: TOKENS.blue,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                  }}
                 >
-                  <div className="w-10 h-1.5 rounded-full bg-muted" />
+                  🔔 Halo™ Match
                 </div>
-                <div className="px-4 pb-2 flex items-center justify-between">
-                  <span className="text-sm font-medium text-foreground">
-                    {filteredProperties.length} {filteredProperties.length === 1 ? 'property' : 'properties'}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <Suspense fallback={null}>
-                      <FilterSidebar
-                        filters={filters}
-                        onChange={setFilters}
-                        isOpen={filtersOpen}
-                        onToggle={() => setFiltersOpen(o => !o)}
-                        totalCount={displayProperties.length}
-                        filteredCount={filteredProperties.length}
-                      />
-                    </Suspense>
-                    <button onClick={() => setMobileView('list')} className="text-xs text-primary font-medium">
-                      View list
-                    </button>
-                  </div>
-                </div>
-                <div className="overflow-y-auto px-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))]" style={{ maxHeight: 'calc(100% - 3.75rem)' }}>
-                  {shouldShowPlaceholder ? emptyOrNoResults : (
-                    <Suspense fallback={<MapSkeleton />}>
-                      <VirtualizedPropertyList
-                        properties={filteredProperties}
-                        isSearching={isSearching}
-                        isMobile={true}
-                        isSaved={isSaved}
-                        onToggleSave={toggleSaved}
-                        onSelect={(p) => navigate(`/property/${p.id}`)}
-                        cardRefs={cardRefs}
-                        isCollab={isCollab}
-                        getPropertyReactions={isCollab ? getPropertyReactions : undefined}
-                        onToggleReaction={isCollab ? toggleReaction : undefined}
-                        hasPartnerViewed={isCollab ? hasPartnerViewed : undefined}
-                        currentUserId={user?.id}
-                        listingMode={listingMode}
-                      />
-                    </Suspense>
-                  )}
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 4, lineHeight: 1.5 }}>
+                  3 Mandarin-speaking buyers in your suburb are actively searching for this property type right now.
                 </div>
               </div>
-              <button
-                onClick={() => {
-                  const hero = document.querySelector('[aria-label="Start voice search"]') as HTMLButtonElement;
-                  if (hero) { window.scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(() => hero.click(), 500); }
-                }}
-                style={{
-                  bottom: sheetHeight,
-                  marginBottom: 20,
-                  paddingBottom: 'env(safe-area-inset-bottom)',
-                  transition: sheetDragging ? 'none' : 'bottom 0.3s ease',
-                }}
-                className="absolute right-4 z-20 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-elevated flex items-center justify-center"
-              >
-                <Mic size={22} />
-              </button>
-            </>
-          ) : (
-            <div className="p-4 overflow-y-auto flex-1 min-h-0 pb-24 overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium text-foreground">{filteredProperties.length} properties</span>
-                <div className="flex items-center gap-2">
-                  <Suspense fallback={null}>
-                    <FilterSidebar filters={filters} onChange={setFilters} isOpen={filtersOpen} onToggle={() => setFiltersOpen(o => !o)} totalCount={displayProperties.length} filteredCount={filteredProperties.length} />
-                  </Suspense>
-                  <button onClick={() => setMobileView('map')} aria-label="Show map view" className="flex items-center gap-1.5 text-xs text-primary font-medium">
-                    <Map size={14} /> Show map
-                  </button>
-                </div>
-              </div>
-              {shouldShowPlaceholder ? emptyOrNoResults : (
-                <Suspense fallback={<MapSkeleton />}>
-                  <VirtualizedPropertyList
-                    properties={filteredProperties}
-                    isSearching={isSearching}
-                    isMobile={true}
-                    isSaved={isSaved}
-                    onToggleSave={toggleSaved}
-                    onSelect={(p) => navigate(`/property/${p.id}`)}
-                    cardRefs={cardRefs}
-                    isCollab={isCollab}
-                    getPropertyReactions={isCollab ? getPropertyReactions : undefined}
-                    onToggleReaction={isCollab ? toggleReaction : undefined}
-                    hasPartnerViewed={isCollab ? hasPartnerViewed : undefined}
-                    currentUserId={user?.id}
-                    listingMode={listingMode}
-                  />
-                </Suspense>
-              )}
-            </div>
-          )}
-        </div>
-      )}
 
-      {/* Property drawer + modals — both lazy, so guard with Suspense */}
-      <Suspense fallback={null}>
-        <PropertyDrawer
-          property={selectedProperty}
-          onClose={() => setSelectedProperty(null)}
-          isSaved={selectedProperty ? isSaved(selectedProperty.id) : false}
-          onToggleSave={toggleSaved}
-          searchContext={searchContextForLead}
-        />
-      </Suspense>
-
-      {showConsumerModal && (
-        <Suspense fallback={null}>
-          <ConsumerSignUpModal
-            open={showConsumerModal}
-            onOpenChange={setShowConsumerModal}
-            lastQuery={currentQuery || lastSearch?.text || ''}
-          />
-        </Suspense>
-      )}
-    </div>
-  );
-};
-
-// ── How It Works section with scroll-triggered staggered fade-in ──
-const HowItWorksSection = ({ t }: { t: (key: string) => string }) => {
-  const sectionRef = useRef<HTMLElement | null>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.15 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  const steps = [
-    { num: '1', Icon: Search, title: t('home.howItWorks.step1.title'), desc: t('home.howItWorks.step1.desc') },
-    { num: '2', Icon: ArrowLeftRight, title: t('home.howItWorks.step2.title'), desc: t('home.howItWorks.step2.desc') },
-    { num: '3', Icon: UserCheck, title: t('home.howItWorks.step3.title'), desc: t('home.howItWorks.step3.desc') },
-  ];
-
-  return (
-    <section ref={sectionRef} className="bg-gray-50 py-20 px-6">
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-10">
-          <span className="inline-block bg-blue-50 text-blue-600 uppercase tracking-wider px-3 py-1 rounded-full text-[11px] font-semibold mb-4">
-            {t('home.howItWorks.eyebrow')}
-          </span>
-          <h2 className="text-[28px] font-medium text-slate-900">
-            {t('home.howItWorks.agentHeading')}
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {steps.map((step, idx) => {
-            const Icon = step.Icon;
-            return (
+              {/* Card 2 */}
               <div
-                key={step.num}
-                className="bg-white rounded-xl border border-slate-200 p-6 text-center"
+                className="mt-4"
                 style={{
-                  opacity: visible ? 1 : 0,
-                  transform: visible ? 'translateY(0)' : 'translateY(20px)',
-                  transition: `opacity 0.6s ease-out ${idx * 150}ms, transform 0.6s ease-out ${idx * 150}ms`,
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: 12,
+                  padding: 14,
+                  opacity: 0.55,
                 }}
               >
-                <div className="w-11 h-11 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-4">
-                  <Icon size={22} />
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>
+                  2BR Apartment — Box Hill VIC
                 </div>
-                <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground font-display font-bold text-xl flex items-center justify-center mx-auto mb-4">{step.num}</div>
-                <h3 className="text-sm font-semibold text-slate-900 mb-2">{step.title}</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">{step.desc}</p>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
+                  $680,000 · 20 languages live
+                </div>
               </div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-};
 
-// ── Inline Translation Demo card with language switcher ──
-type DemoLang = 'zh' | 'vi' | 'ar' | 'en';
-
-const DEMO_CONTENT: Record<DemoLang, { title: string; subtitle: string; description: string; chips: string[]; rtl?: boolean }> = {
-  zh: {
-    title: '宽敞的家庭住宅，步行可达优质学校',
-    subtitle: '南墨尔本，维多利亚州 · ¥6,240,000',
-    description: '这套精心设计的住宅融合了现代生活与传统维多利亚风格，坐落于顶级学区...',
-    chips: ['近优质中学', '步行至亚洲超市', '华人社区活跃'],
-  },
-  vi: {
-    title: 'Ngôi nhà gia đình rộng rãi, gần trường tốt',
-    subtitle: 'South Melbourne, VIC · ₫ 28.5 tỷ',
-    description: 'Ngôi nhà được thiết kế tinh tế này kết hợp cuộc sống hiện đại với phong cách Victoria truyền thống...',
-    chips: ['Gần trường tốt', 'Cộng đồng Việt Nam', 'Chợ châu Á gần đây'],
-  },
-  ar: {
-    title: 'منزل عائلي فسيح، قريب من المدارس الجيدة',
-    subtitle: 'ساوث ملبورن، VIC · 4,200,000 د.إ',
-    description: 'هذا المنزل الفاخر يجمع بين الحياة العصرية والطراز الفيكتوري الكلاسيكي...',
-    chips: ['قريب من المدارس', 'مجتمع عربي نشط', 'أسواق حلال قريبة'],
-    rtl: true,
-  },
-  en: {
-    title: 'Spacious family home, walking distance to top schools',
-    subtitle: 'South Melbourne VIC · $1,850,000',
-    description: 'This beautifully designed home combines modern living with classic Victorian style, in a top school catchment...',
-    chips: ['Top school zone', 'Near Asian grocers', 'Active community'],
-  },
-};
-
-const DEMO_LANGS: { key: DemoLang; label: string }[] = [
-  { key: 'zh', label: '中文' },
-  { key: 'vi', label: 'Tiếng Việt' },
-  { key: 'ar', label: 'العربية' },
-  { key: 'en', label: 'English' },
-];
-
-const TranslationDemoInline = () => {
-  const [activeLang, setActiveLang] = useState<DemoLang>('zh');
-  const [cardVisible, setCardVisible] = useState(false);
-  const sectionRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setCardVisible(true);
-            observer.disconnect();
-          }
-        });
-      },
-      { threshold: 0.15 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  const data = DEMO_CONTENT[activeLang];
-
-  return (
-    <section
-      ref={sectionRef}
-      className={`max-w-3xl mx-auto px-4 py-12 transition-opacity duration-700 ${cardVisible ? 'opacity-100' : 'opacity-0'}`}
-    >
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-3">
-          <span className="text-sm font-medium text-slate-800 truncate">
-            3 bed House · South Melbourne VIC · $1.85M
-          </span>
-          <span className="bg-blue-50 text-blue-600 text-xs font-medium px-3 py-1 rounded-full shrink-0">
-            AI Translated
-          </span>
-        </div>
-
-        {/* Language switcher */}
-        <div className="px-6 py-3 border-b border-slate-100 flex gap-2 flex-wrap">
-          {DEMO_LANGS.map((l) => {
-            const isActive = l.key === activeLang;
-            return (
-              <button
-                key={l.key}
-                type="button"
-                onClick={() => setActiveLang(l.key)}
-                className={`text-sm px-4 py-1.5 rounded-full cursor-pointer transition-colors ${
-                  isActive ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
+              {/* Card 3 */}
+              <div
+                className="mt-3"
+                style={{
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(255,255,255,0.07)',
+                  borderRadius: 12,
+                  padding: 14,
+                  opacity: 0.28,
+                }}
               >
-                {l.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Body */}
-        <div className="px-6 py-5 flex gap-5" dir={data.rtl ? 'rtl' : 'ltr'}>
-          <div className="w-36 h-24 rounded-xl bg-slate-100 flex-shrink-0 flex items-center justify-center text-xs text-slate-400">
-            Property photo
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="text-base font-semibold text-slate-900">{data.title}</h3>
-            <p className="text-sm text-slate-500 mt-1">{data.subtitle}</p>
-            <p className="text-sm text-slate-600 mt-2 leading-relaxed">{data.description}</p>
-            <div className="flex flex-wrap gap-2 mt-3">
-              {data.chips.map((chip) => (
-                <span key={chip} className="bg-emerald-50 text-emerald-700 text-xs px-3 py-1 rounded-full">
-                  {chip}
-                </span>
-              ))}
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>
+                  5BR Waterfront — Mosman NSW
+                </div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
+                  $4,200,000 · 20 languages live
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Footer */}
-        <div className="px-6 py-3 bg-slate-50 border-t border-slate-100 text-center">
-          <p className="text-xs text-slate-400">
-            Every listing automatically translated by AI · No agent effort required
-          </p>
+          {/* Agent stats strip */}
+          <div
+            className="mt-15 pt-10 grid grid-cols-2 md:grid-cols-4"
+            style={{ borderTop: '1px solid rgba(255,255,255,0.08)', marginTop: 60, paddingTop: 40 }}
+          >
+            {AGENT_STATS.map((s, i) => (
+              <div
+                key={s.l}
+                className="px-4 text-center"
+                style={{
+                  borderLeft: i > 0 ? '1px solid rgba(255,255,255,0.08)' : undefined,
+                }}
+              >
+                <div style={{ fontSize: 32, fontWeight: 900, color: TOKENS.blue }}>{s.v}</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 6, lineHeight: 1.4 }}>
+                  {s.l}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 };
 

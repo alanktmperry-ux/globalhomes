@@ -15,28 +15,11 @@ import { CurrencySwitcher } from '@/shared/components/layout/CurrencySwitcher';
 // "Become an agent" modal. Keeping it static added ~50KB gz to every cold load.
 const AgentRegistrationModal = lazy(() => import('@/features/agents/components/AgentRegistrationModal'));
 
-import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 
 type NavItem = { label: string; to: string; icon: React.ComponentType<{ className?: string; size?: number | string }> };
-
-const PUBLIC_NAV: NavItem[] = [
-  { label: 'Search', to: '/search', icon: Search },
-  { label: 'Find an Agent', to: '/agents', icon: Users },
-];
-
-const SEEKER_NAV: NavItem[] = [
-  { label: 'Browse Properties', to: '/search', icon: Search },
-  { label: 'Find an Agent', to: '/agents', icon: Users },
-];
-
-const AGENT_NAV: NavItem[] = [
-  { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
-  { label: 'Halo Board', to: '/halo/board', icon: Sparkles },
-  { label: 'Listings', to: '/dashboard/listings', icon: List },
-  { label: 'Trust Accounting', to: '/trust-accounting', icon: Wallet },
-];
 
 function isActiveRoute(current: string, target: string) {
   if (target === '/') return current === '/';
@@ -45,7 +28,22 @@ function isActiveRoute(current: string, target: string) {
 
 export function SiteHeader() {
   const { user, isAgent, isAdmin, loading, userRole, signOut } = useAuth();
-  const { t } = useI18n();
+  const { t } = useTranslation();
+
+  const PUBLIC_NAV: NavItem[] = [
+    { label: t('nav.search'), to: '/search', icon: Search },
+    { label: t('nav.findAgent'), to: '/agents', icon: Users },
+  ];
+  const SEEKER_NAV: NavItem[] = [
+    { label: t('nav.browseProperties'), to: '/search', icon: Search },
+    { label: t('nav.findAgent'), to: '/agents', icon: Users },
+  ];
+  const AGENT_NAV: NavItem[] = [
+    { label: t('nav.dashboard'), to: '/dashboard', icon: LayoutDashboard },
+    { label: t('nav.haloBoard'), to: '/halo/board', icon: Sparkles },
+    { label: t('nav.listings'), to: '/dashboard/listings', icon: List },
+    { label: t('nav.trustAccounting'), to: '/trust-accounting', icon: Wallet },
+  ];
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -142,7 +140,7 @@ export function SiteHeader() {
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6D28D9')}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#7C3AED')}
             >
-              <Sparkles size={13} /> Post a Halo
+              <Sparkles size={13} /> {t('nav.postHalo')}
             </button>
           )}
 
@@ -177,32 +175,32 @@ export function SiteHeader() {
                   {isSeeker && (
                     <>
                       <button onClick={() => { navigate('/seeker/dashboard'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                        <Sparkles size={14} className="text-muted-foreground" /> My Halos
+                        <Sparkles size={14} className="text-muted-foreground" /> {t('nav.myHalos')}
                       </button>
                       <button onClick={() => { navigate('/saved'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                        <Bookmark size={14} className="text-muted-foreground" /> Saved Properties
+                        <Bookmark size={14} className="text-muted-foreground" /> {t('nav.savedProperties')}
                       </button>
                       <button onClick={() => { navigate('/settings'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                        <Settings size={14} className="text-muted-foreground" /> Account Settings
+                        <Settings size={14} className="text-muted-foreground" /> {t('nav.accountSettings')}
                       </button>
                     </>
                   )}
                   {isAgentLike && (
                     <>
                       <button onClick={() => { navigate(isAdmin ? '/admin' : '/dashboard'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                        <LayoutDashboard size={14} className="text-muted-foreground" /> My Dashboard
+                        <LayoutDashboard size={14} className="text-muted-foreground" /> {t('nav.myDashboard')}
                       </button>
                       <button onClick={() => { navigate('/dashboard/listings'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                        <List size={14} className="text-muted-foreground" /> My Listings
+                        <List size={14} className="text-muted-foreground" /> {t('nav.myListings')}
                       </button>
                       <button onClick={() => { navigate('/settings'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                        <Settings size={14} className="text-muted-foreground" /> Account Settings
+                        <Settings size={14} className="text-muted-foreground" /> {t('nav.accountSettings')}
                       </button>
                     </>
                   )}
                   <div className="border-t border-border" />
                   <button onClick={handleSignOut} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                    <LogOut size={14} className="text-muted-foreground" /> Sign Out
+                    <LogOut size={14} className="text-muted-foreground" /> {t('common.signout')}
                   </button>
                 </div>
               )}
@@ -238,7 +236,7 @@ export function SiteHeader() {
                 {/* Language & Currency */}
                 <div className="px-1 pb-3 mb-2 border-b border-border">
                   <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground px-2 mb-2">
-                    Language & Currency
+                    {t('nav.languageCurrency')}
                   </p>
                   <div className="flex items-center gap-2 [&>div>button]:h-11 [&>div>button]:px-3 [&>div>button]:text-base [&>div>button]:bg-secondary [&>div>button]:flex-1">
                     <CurrencySwitcher />
@@ -247,42 +245,42 @@ export function SiteHeader() {
                 </div>
 
                 <button onClick={() => navTo('/suburbs')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                  <MapPin size={16} className="text-muted-foreground" /> Browse Suburbs
+                  <MapPin size={16} className="text-muted-foreground" /> {t('nav.browseSuburbs')}
                 </button>
                 <button onClick={() => navTo('/agents')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                  <Users size={16} className="text-primary" /> Find an Agent
+                  <Users size={16} className="text-primary" /> {t('nav.findAgent')}
                 </button>
                 <button onClick={() => navTo('/brokers')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                  <Banknote size={16} className="text-primary" /> Find a Broker
+                  <Banknote size={16} className="text-primary" /> {t('nav.findBroker')}
                 </button>
                 <button onClick={() => navTo('/pricing')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                  <Sparkles size={16} className="text-primary" /> Pricing
+                  <Sparkles size={16} className="text-primary" /> {t('nav.pricing')}
                 </button>
                 <button onClick={() => navTo('/exclusive')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                  <Sparkles size={16} className="text-primary" /> Exclusive
+                  <Sparkles size={16} className="text-primary" /> {t('nav.exclusive')}
                   <span className="ml-auto text-[9px] font-bold uppercase bg-red-500 text-white rounded-full px-1.5 py-0.5">NEW</span>
                 </button>
                 <button onClick={() => navTo('/home-services')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                  <Wrench size={16} className="text-primary" /> Services
+                  <Wrench size={16} className="text-primary" /> {t('nav.services')}
                 </button>
                 <button onClick={() => navTo('/conveyancing')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                  <FileText size={16} className="text-primary" /> Conveyancing
+                  <FileText size={16} className="text-primary" /> {t('nav.conveyancing')}
                 </button>
                 <button onClick={() => navTo('/refer')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                  <Handshake size={16} className="text-primary" /> Referral Program
+                  <Handshake size={16} className="text-primary" /> {t('nav.referralProgram')}
                 </button>
 
                 {/* Agent links */}
                 {user && isAgent && (
                   <>
                     <button onClick={() => navTo('/dashboard')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                      <LayoutDashboard size={16} className="text-primary" /> Dashboard
+                      <LayoutDashboard size={16} className="text-primary" /> {t('nav.dashboard')}
                     </button>
                     <button onClick={() => { localStorage.removeItem('pocket-listing-draft'); navTo('/pocket-listing?type=sale&t=' + Date.now()); }} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                      <Plus size={16} className="text-primary" /> Sale Listing
+                      <Plus size={16} className="text-primary" /> {t('nav.saleListing')}
                     </button>
                     <button onClick={() => { localStorage.removeItem('pocket-listing-draft'); navTo('/pocket-listing?type=rent&t=' + Date.now()); }} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                      <Plus size={16} className="text-primary" /> Rental Listing
+                      <Plus size={16} className="text-primary" /> {t('nav.rentalListing')}
                     </button>
                     <button onClick={() => navTo('/dashboard/listings')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
                       <List size={16} className="text-muted-foreground" /> {t('header.myListings')}
@@ -294,7 +292,7 @@ export function SiteHeader() {
                 {/* Admin link */}
                 {user && isAdmin && (
                   <button onClick={() => navTo('/admin')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                    <ShieldCheck size={16} className="text-primary" /> Admin
+                    <ShieldCheck size={16} className="text-primary" /> {t('nav.admin')}
                   </button>
                 )}
 
@@ -302,10 +300,10 @@ export function SiteHeader() {
                 {user && !isAgent && !isAdmin && (
                   <>
                     <button onClick={() => navTo('/halo/new')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                      <Sparkles size={16} className="text-primary" /> Create your Halo
+                      <Sparkles size={16} className="text-primary" /> {t('nav.createHalo')}
                     </button>
                     <button onClick={() => navTo('/seeker/dashboard')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                      <Sparkles size={16} className="text-muted-foreground" /> My Halos
+                      <Sparkles size={16} className="text-muted-foreground" /> {t('nav.myHalos')}
                     </button>
                   </>
                 )}
@@ -317,7 +315,7 @@ export function SiteHeader() {
                       <Home size={16} className="text-primary" /> {t('nav.search')}
                     </button>
                     <button onClick={() => navTo('/my-applications')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
-                      <FileText size={16} className="text-muted-foreground" /> My Applications
+                      <FileText size={16} className="text-muted-foreground" /> {t('nav.myApplications')}
                     </button>
                   </>
                 )}
@@ -332,7 +330,7 @@ export function SiteHeader() {
                   <>
                     <button onClick={() => navTo('/auth')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                       <LogIn size={16} />
-                      Sign in
+                      {t('common.signin')}
                     </button>
                   </>
                 )}
@@ -356,6 +354,7 @@ export function SiteHeader() {
  * (each owns its own portal/dropdown state) inside a small popover.
  */
 function SettingsMenu() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -388,14 +387,14 @@ function SettingsMenu() {
           className="absolute right-0 top-full mt-1 w-56 bg-popover border border-border rounded-xl shadow-elevated overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150 p-2 space-y-1"
         >
           <div className="px-2 pt-1 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
-            Currency
+            {t('nav.currency')}
           </div>
           <div className="px-1">
             <CurrencySwitcher />
           </div>
           <div className="border-t border-border my-1" />
           <div className="px-2 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
-            Language
+            {t('nav.language')}
           </div>
           <div className="px-1 pb-1">
             <LanguageSwitcher />

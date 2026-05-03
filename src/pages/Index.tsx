@@ -2,11 +2,9 @@ import { useState, useCallback, useRef, useEffect, useMemo, lazy, Suspense } fro
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-// framer-motion is split into its own chunk via vite.config.ts manualChunks.
-// The landing hero uses plain CSS animations to avoid loading this chunk on
-// cold paint. motion is only referenced in the search-results branch (mobile
-// bottom sheet drag), which loads after the user runs a search.
-import { motion, useMotionValue, useSpring, type PanInfo } from 'framer-motion';
+// framer-motion previously imported here for the mobile bottom-sheet drag.
+// Replaced with plain touch handlers + CSS transforms to keep ~90KB out of
+// the homepage critical path. See the mobile sheet below.
 import { ArrowRight, ArrowLeft, MapPin, Sparkles, Map, List, Mic, MicOff, GripVertical, ArrowUpDown, X, Bookmark, Share2, Users, Search, Home, Check, ArrowLeftRight, UserCheck, ChevronRight, Globe, Building2, Briefcase, Handshake } from 'lucide-react';
 const VoiceSearchHero = lazy(() =>
   import('@/features/search/components/VoiceSearchHero').then(m => ({ default: m.VoiceSearchHero }))

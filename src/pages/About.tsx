@@ -1,20 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import SEO from '@/shared/components/SEO';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
-const COMPANY_FACTS: Array<{ term: string; def: string }> = [
-  { term: 'Founded', def: '2026' },
-  { term: 'Headquarters', def: 'Australia' },
-  { term: 'Website', def: 'listhq.com.au' },
-  { term: 'Platform type', def: 'SaaS / marketplace' },
-  { term: 'Primary market', def: 'Australian residential and commercial real estate' },
-  { term: 'Languages supported', def: '6 (English, Mandarin Simplified, Traditional Chinese, Vietnamese, Korean, Japanese)' },
-  { term: 'Key compliance', def: 'Agents Financial Administration Act 2014 (AFA 2014) trust accounting' },
-  { term: 'Core differentiator', def: "Australia's first multilingual real estate platform" },
-  { term: 'AI capabilities', def: 'Multilingual listing generation, voice-to-listing transcription' },
-  { term: 'Unique products', def: 'Pocket Listings (off-market), Halo buyer-matching system' },
-  { term: 'Market context', def: "30% of Australia's population is overseas-born (2021 ABS Census)" },
-  { term: 'Pricing range', def: '$299/month (Solo) to custom (Enterprise)' },
-];
 
 const SCHEMA = {
   '@context': 'https://schema.org',

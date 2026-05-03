@@ -779,4 +779,16 @@ export const pa: Partial<Record<TranslationKey, string>> = {
   'about.factPricing': 'Pricing',
   'about.factPricingRange': 'Pricing range',
 
+  'home.portals.title': 'ਪੇਸ਼ੇਵਰ ਪੋਰਟਲ',
+  'home.portals.subtitle': 'ਆਪਣੇ ਸਮਰਪਿਤ ਕਾਰਜ-ਸਥਾਨ ਵਿੱਚ ਸਾਈਨ ਇਨ ਕਰੋ',
+  'home.portals.agent.title': 'ਏਜੰਟ ਪੋਰਟਲ',
+  'home.portals.agent.desc': 'ਲਿਸਟਿੰਗਾਂ, ਟਰੱਸਟ ਖਾਤੇ, ਕਿਰਾਇਆ ਰੋਲ ਅਤੇ ਲੀਡਜ਼ ਦਾ ਪ੍ਰਬੰਧਨ ਕਰੋ।',
+  'home.portals.agent.register': 'ਅਜੇ ਏਜੰਟ ਨਹੀਂ?',
+  'home.portals.broker.title': 'ਮੌਰਗੇਜ ਬ੍ਰੋਕਰ ਪੋਰਟਲ',
+  'home.portals.broker.desc': 'ਰੈਫਰਲ ਲੀਡਜ਼ ਦੇਖੋ, ਆਪਣੀ ਪ੍ਰੋਫਾਈਲ ਦਾ ਪ੍ਰਬੰਧਨ ਕਰੋ ਅਤੇ ਅਪੌਇੰਟਮੈਂਟ ਬੁੱਕ ਕਰੋ।',
+  'home.portals.broker.register': 'ਰਜਿਸਟਰਡ ਨਹੀਂ?',
+  'home.portals.partner.title': 'ਪਾਰਟਨਰ ਪੋਰਟਲ',
+  'home.portals.partner.desc': 'ਪਾਰਟਨਰ ਡੈਸ਼ਬੋਰਡ ਤੱਕ ਪਹੁੰਚੋ ਅਤੇ ਰੈਫਰਲ ਕਮਾਈ ਟਰੈਕ ਕਰੋ।',
+  'home.portals.partner.register': 'ਪਾਰਟਨਰ ਬਣੋ?',
+  'home.portals.signIn': 'ਸਾਈਨ ਇਨ',
 };

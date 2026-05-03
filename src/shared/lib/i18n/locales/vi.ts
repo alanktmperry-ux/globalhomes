@@ -731,4 +731,16 @@ export const vi: Partial<Record<TranslationKey, string>> = {
   'about.factPricing': 'Pricing',
   'about.factPricingRange': 'Pricing range',
 
+  'home.portals.title': 'Cổng chuyên nghiệp',
+  'home.portals.subtitle': 'Đăng nhập vào không gian làm việc của bạn',
+  'home.portals.agent.title': 'Cổng đại lý',
+  'home.portals.agent.desc': 'Quản lý danh sách, tài khoản ủy thác, danh sách thuê và khách hàng tiềm năng.',
+  'home.portals.agent.register': 'Chưa phải đại lý?',
+  'home.portals.broker.title': 'Cổng môi giới thế chấp',
+  'home.portals.broker.desc': 'Xem khách hàng giới thiệu, quản lý hồ sơ và đặt lịch hẹn.',
+  'home.portals.broker.register': 'Chưa đăng ký?',
+  'home.portals.partner.title': 'Cổng đối tác',
+  'home.portals.partner.desc': 'Truy cập bảng điều khiển đối tác và theo dõi thu nhập giới thiệu.',
+  'home.portals.partner.register': 'Trở thành đối tác?',
+  'home.portals.signIn': 'Đăng nhập',
 };

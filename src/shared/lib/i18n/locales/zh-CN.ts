@@ -881,4 +881,16 @@ export const zhCN: Partial<Record<keyof typeof EnBase, string>> = {
   'faq.pm-owner-portal-detail.question': '业主在其门户中可以看到什么，审批如何运作？',
   'faq.pm-supplier-portal-detail.question': '供应商在其门户中可以做什么？',
 
+  'home.portals.title': '专业门户',
+  'home.portals.subtitle': '登录您的专属工作区',
+  'home.portals.agent.title': '经纪人门户',
+  'home.portals.agent.desc': '管理房源、信托账户、租金账单和线索。',
+  'home.portals.agent.register': '还不是经纪人？',
+  'home.portals.broker.title': '抵押贷款经纪人门户',
+  'home.portals.broker.desc': '查看推荐线索、管理您的个人资料并预约。',
+  'home.portals.broker.register': '还未注册？',
+  'home.portals.partner.title': '合作伙伴门户',
+  'home.portals.partner.desc': '访问合作伙伴仪表板并跟踪推荐收益。',
+  'home.portals.partner.register': '成为合作伙伴？',
+  'home.portals.signIn': '登录',
 };

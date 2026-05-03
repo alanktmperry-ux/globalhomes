@@ -720,4 +720,16 @@ export const ko: Partial<Record<TranslationKey, string>> = {
   'about.factPricing': 'Pricing',
   'about.factPricingRange': 'Pricing range',
 
+  'home.portals.title': '전문 포털',
+  'home.portals.subtitle': '전용 작업 공간에 로그인하세요',
+  'home.portals.agent.title': '에이전트 포털',
+  'home.portals.agent.desc': '매물 목록, 신탁 계좌, 임대료 목록 및 리드를 관리하세요.',
+  'home.portals.agent.register': '아직 에이전트가 아니신가요?',
+  'home.portals.broker.title': '모기지 브로커 포털',
+  'home.portals.broker.desc': '추천 리드 확인, 프로필 관리 및 예약을 하세요.',
+  'home.portals.broker.register': '아직 등록하지 않으셨나요?',
+  'home.portals.partner.title': '파트너 포털',
+  'home.portals.partner.desc': '파트너 대시보드에 접근하고 추천 수익을 추적하세요.',
+  'home.portals.partner.register': '파트너가 되시겠어요?',
+  'home.portals.signIn': '로그인',
 };

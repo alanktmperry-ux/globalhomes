@@ -885,4 +885,16 @@ export const zhTW: Partial<Record<keyof typeof EnBase, string>> = {
   'faq.pm-owner-portal-detail.question': '業主在其門戶中可以看到什麼，審批如何運作？',
   'faq.pm-supplier-portal-detail.question': '供應商在其門戶中可以做什麼？',
 
+  'home.portals.title': '專業入口',
+  'home.portals.subtitle': '登入您的專屬工作區',
+  'home.portals.agent.title': '經紀人入口',
+  'home.portals.agent.desc': '管理房源、信託帳戶、租金帳冊和潛在客戶。',
+  'home.portals.agent.register': '還不是經紀人？',
+  'home.portals.broker.title': '抵押貸款經紀人入口',
+  'home.portals.broker.desc': '查看推薦線索、管理個人資料並預約。',
+  'home.portals.broker.register': '還未註冊？',
+  'home.portals.partner.title': '合作夥伴入口',
+  'home.portals.partner.desc': '存取合作夥伴儀表板並追蹤推薦收益。',
+  'home.portals.partner.register': '成為合作夥伴？',
+  'home.portals.signIn': '登入',
 };

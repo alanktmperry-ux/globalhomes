@@ -720,4 +720,16 @@ export const ar: Partial<Record<TranslationKey, string>> = {
   'about.factPricing': 'Pricing',
   'about.factPricingRange': 'Pricing range',
 
+  'home.portals.title': 'البوابات المهنية',
+  'home.portals.subtitle': 'سجّل الدخول إلى مساحة عملك المخصصة',
+  'home.portals.agent.title': 'بوابة الوكيل',
+  'home.portals.agent.desc': 'إدارة القوائم والحسابات الائتمانية وسجل الإيجار والعملاء المحتملين.',
+  'home.portals.agent.register': 'لست وكيلاً بعد؟',
+  'home.portals.broker.title': 'بوابة وسيط الرهن العقاري',
+  'home.portals.broker.desc': 'عرض العملاء المحالين وإدارة ملفك الشخصي وحجز المواعيد.',
+  'home.portals.broker.register': 'لم تسجّل بعد؟',
+  'home.portals.partner.title': 'بوابة الشريك',
+  'home.portals.partner.desc': 'الوصول إلى لوحة تحكم الشريك وتتبع عائدات الإحالة.',
+  'home.portals.partner.register': 'هل تريد أن تصبح شريكاً؟',
+  'home.portals.signIn': 'تسجيل الدخول',
 };

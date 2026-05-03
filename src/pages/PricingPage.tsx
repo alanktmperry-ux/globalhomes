@@ -266,10 +266,10 @@ export default function PricingPage() {
         <section className="max-w-6xl mx-auto px-4 pb-16">
           <div className="text-center mb-6">
             <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">
-              Compare plans
+              {t('pricing.comparePlans')}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Every feature, side by side
+              {t('pricing.compareSubtitle')}
             </p>
           </div>
 

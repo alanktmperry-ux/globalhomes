@@ -62,7 +62,18 @@ export default defineConfig(({ mode }) => {
     },
   },
   optimizeDeps: {
-    include: ['lucide-react', 'react', 'react-dom', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', 'framer-motion', 'recharts'],
+    force: true,
+    include: [
+      'lucide-react',
+      'react',
+      'react-dom',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-accordion',
+      '@radix-ui/react-collapsible',
+      'framer-motion',
+      'recharts',
+    ],
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {

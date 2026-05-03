@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Check, X, ChevronDown, Sparkles } from 'lucide-react';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 type BillingCycle = 'monthly' | 'annual';
 

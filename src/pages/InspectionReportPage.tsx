@@ -15,9 +15,10 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import DashboardHeader from '@/features/agents/components/dashboard/DashboardHeader';
 import { format, parseISO } from 'date-fns';
+import jsPDF from 'jspdf';
 import {
-  Loader2, Camera, Plus, ChevronDown, AlertTriangle, Wrench, CheckCircle2, X, ArrowLeft,
-  ArrowDown, ArrowUp, Minus, Scale, FileWarning,
+  Loader2, Camera, ChevronDown, AlertTriangle, Wrench, CheckCircle2, X, ArrowLeft,
+  ArrowDown, ArrowUp, Minus, Scale, FileWarning, Download,
 } from 'lucide-react';
 
 const CONDITION_RANK: Record<string, number> = {
@@ -125,7 +126,6 @@ const InspectionReportPage = () => {
     setOverallNotes(inspData.overall_notes || '');
     setFinaliseEmail(inspData.owner_email || '');
 
-    // Fetch property address and agent info
     const [propRes, agentRes, tenancyRes] = await Promise.all([
       supabase.from('properties').select('address, suburb, state').eq('id', inspData.property_id).maybeSingle(),
       supabase.from('agents').select('name, phone').eq('id', inspData.agent_id).maybeSingle(),
@@ -138,7 +138,6 @@ const InspectionReportPage = () => {
     if (agentRes.data) { setAgentName(agentRes.data.name); setAgentPhone(agentRes.data.phone || ''); }
     if (tenancyRes.data) { setTenantEmail(tenancyRes.data.tenant_email || ''); setFinaliseTenantEmail(tenancyRes.data.tenant_email || ''); }
 
-    // Auto-create rooms if status is 'scheduled'
     if (inspData.status === 'scheduled') {
       const roomInserts = DEFAULT_ROOMS.map((name, i) => ({
         inspection_id: inspectionId,
@@ -150,7 +149,6 @@ const InspectionReportPage = () => {
       setInspection(prev => prev ? { ...prev, status: 'in_progress' } : prev);
     }
 
-    // Fetch rooms with photos and maintenance
     const { data: roomData } = await supabase
       .from('inspection_rooms')
       .select('id, room_name, condition, notes, display_order')
@@ -178,7 +176,6 @@ const InspectionReportPage = () => {
 
     setRooms(enrichedRooms);
 
-    // If this is an exit inspection, fetch the most recent completed entry report for comparison
     if (inspData.inspection_type === 'exit') {
       const { data: entryInsp } = await supabase
         .from('property_inspections')
@@ -257,7 +254,6 @@ const InspectionReportPage = () => {
     if (error) { toast.error('Failed to add'); return; }
     if (data) {
       setRooms(prev => prev.map(r => r.id === maintenanceForm.roomId ? { ...r, maintenance: [...r.maintenance, data as any] } : r));
-      // Auto-create a maintenance job
       const room = rooms.find(r => r.id === maintenanceForm.roomId);
       const roomLabel = room ? ` (${room.room_name})` : '';
       const inspType = inspection.inspection_type.charAt(0).toUpperCase() + inspection.inspection_type.slice(1);
@@ -277,14 +273,167 @@ const InspectionReportPage = () => {
     toast.success('Maintenance item flagged and job created');
   };
 
-  const allRoomsRated = rooms.length > 0 && rooms.every(r => r.condition !== null);
+  // ── PDF EXPORT ──────────────────────────────────────────────────────────────
+  const handleDownloadPDF = () => {
+    if (!inspection) return;
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    const pageW = doc.internal.pageSize.getWidth();
+    const margin = 15;
+    const col = pageW - margin * 2;
+    let y = 20;
 
-  const handleFinalise = async (sendTo: 'owner' | 'tenant' | 'skip') => {
+    const checkPage = (needed = 8) => {
+      if (y + needed > 275) { doc.addPage(); y = 20; }
+    };
+
+    // Header
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    const typeLabel = inspection.inspection_type.charAt(0).toUpperCase() + inspection.inspection_type.slice(1);
+    doc.text(`${typeLabel} Condition Report`, margin, y);
+    y += 8;
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(80, 80, 80);
+    doc.text(propertyAddress, margin, y);
+    y += 5;
+    const conductedDate = inspection.conducted_date
+      ? format(parseISO(inspection.conducted_date), 'dd MMMM yyyy')
+      : format(parseISO(inspection.scheduled_date), 'dd MMMM yyyy');
+    doc.text(`Conducted: ${conductedDate}`, margin, y);
+    y += 5;
+    doc.text(`Agent: ${agentName}${agentPhone ? '  |  ' + agentPhone : ''}`, margin, y);
+    y += 5;
+    doc.text(`Generated: ${format(new Date(), 'dd MMM yyyy, h:mm a')}`, margin, y);
+    y += 8;
+
+    // Divider
+    doc.setDrawColor(200, 200, 200);
+    doc.line(margin, y, margin + col, y);
+    y += 6;
+
+    // Property details
+    doc.setTextColor(0, 0, 0);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text('Property Details', margin, y);
+    y += 6;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(`Keys: ${keysCount}   Remotes/Fobs: ${remotesCount}`, margin, y);
+    y += 5;
+    if (waterMeter) { doc.text(`Water Meter Reading: ${waterMeter}`, margin, y); y += 5; }
+    if (inspection.bond_lodgment_number) { doc.text(`Bond Lodgment #: ${inspection.bond_lodgment_number}`, margin, y); y += 5; }
+    y += 4;
+
+    // Rooms
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    checkPage(10);
+    doc.text('Room-by-Room Condition', margin, y);
+    y += 6;
+
+    for (const room of rooms) {
+      checkPage(12);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      const condLabel = room.condition
+        ? room.condition === 'na' ? 'N/A' : room.condition.charAt(0).toUpperCase() + room.condition.slice(1)
+        : 'Not rated';
+      doc.text(`${room.room_name}`, margin, y);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`— ${condLabel}`, margin + doc.getTextWidth(room.room_name) + 2, y);
+      if (room.photos.length > 0) {
+        doc.setTextColor(100, 100, 100);
+        doc.text(`  (${room.photos.length} photo${room.photos.length === 1 ? '' : 's'})`, margin + doc.getTextWidth(room.room_name) + doc.getTextWidth(`— ${condLabel}`) + 4, y);
+        doc.setTextColor(0, 0, 0);
+      }
+      y += 5;
+      if (room.notes) {
+        doc.setTextColor(80, 80, 80);
+        doc.setFontSize(9);
+        const lines = doc.splitTextToSize(room.notes, col - 4);
+        checkPage(lines.length * 4 + 2);
+        doc.text(lines, margin + 4, y);
+        y += lines.length * 4 + 2;
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(10);
+      }
+      if (room.maintenance.length > 0) {
+        for (const m of room.maintenance) {
+          checkPage(5);
+          doc.setFontSize(9);
+          doc.setTextColor(180, 60, 60);
+          doc.text(`⚠ ${m.description} [${m.priority}]`, margin + 4, y);
+          y += 4;
+          doc.setTextColor(0, 0, 0);
+          doc.setFontSize(10);
+        }
+      }
+    }
+
+    y += 4;
+
+    // Overall notes
+    if (overallNotes) {
+      checkPage(14);
+      doc.setDrawColor(200, 200, 200);
+      doc.line(margin, y, margin + col, y);
+      y += 6;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text('Overall Notes', margin, y);
+      y += 6;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(80, 80, 80);
+      const lines = doc.splitTextToSize(overallNotes, col);
+      checkPage(lines.length * 5);
+      doc.text(lines, margin, y);
+      y += lines.length * 5 + 4;
+      doc.setTextColor(0, 0, 0);
+    }
+
+    // Maintenance summary
+    const allMaint = rooms.flatMap(r => r.maintenance.map(m => ({ ...m, roomName: r.room_name })));
+    if (allMaint.length > 0) {
+      checkPage(14);
+      doc.setDrawColor(200, 200, 200);
+      doc.line(margin, y, margin + col, y);
+      y += 6;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text('Maintenance Items', margin, y);
+      y += 6;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      for (const m of allMaint) {
+        checkPage(6);
+        doc.text(`• ${m.description} (${m.roomName}) — ${m.priority}`, margin, y);
+        y += 5;
+      }
+    }
+
+    // Footer
+    const totalPages = (doc.internal as any).getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text(`ListHQ Condition Report  |  ${propertyAddress}  |  Page ${i} of ${totalPages}`, margin, 290);
+    }
+
+    const filename = `${typeLabel}-Inspection-${propertyAddress.replace(/[^a-zA-Z0-9]/g, '-')}-${conductedDate.replace(/ /g, '-')}.pdf`;
+    doc.save(filename);
+  };
+
+  // ── FINALISE ────────────────────────────────────────────────────────────────
+  const handleFinalise = async (sendTo: 'both' | 'owner' | 'tenant' | 'skip') => {
     if (!inspection) return;
     setFinalising(true);
     const today = format(new Date(), 'yyyy-MM-dd');
 
-    // Calculate tenant dispute deadline for entry reports
     const disputeDays: Record<string, number> = {
       VIC: 3, NSW: 7, QLD: 3, WA: 5, SA: 5, ACT: 7, TAS: 5, NT: 5,
     };
@@ -305,13 +454,14 @@ const InspectionReportPage = () => {
     } as any).eq('id', inspection.id);
 
     const reportLink = `https://listhq.com.au/inspection-report/${inspection.report_token}`;
+    const typeLabel = inspection.inspection_type.charAt(0).toUpperCase() + inspection.inspection_type.slice(1);
 
-    if (sendTo === 'owner' && finaliseEmail) {
+    const sendEmail = (recipientEmail: string, recipientName: string) => {
       supabase.functions.invoke('send-notification-email', {
         body: {
           type: 'inspection_report',
-          recipient_email: finaliseEmail,
-          recipient_name: inspection.owner_name || 'Owner',
+          recipient_email: recipientEmail,
+          recipient_name: recipientName,
           property_address: propertyAddress,
           inspection_type: inspection.inspection_type,
           conducted_date: today,
@@ -320,29 +470,21 @@ const InspectionReportPage = () => {
           agent_phone: agentPhone,
         },
       }).catch(() => {});
+    };
+
+    if ((sendTo === 'both' || sendTo === 'owner') && finaliseEmail) {
+      sendEmail(finaliseEmail, inspection.owner_name || 'Owner');
     }
-
-    if (sendTo === 'tenant' && finaliseTenantEmail) {
-      supabase.functions.invoke('send-notification-email', {
-        body: {
-          type: 'inspection_report',
-          recipient_email: finaliseTenantEmail,
-          recipient_name: 'Tenant',
-          property_address: propertyAddress,
-          inspection_type: inspection.inspection_type,
-          conducted_date: today,
-          report_link: reportLink,
-          agent_name: agentName,
-          agent_phone: agentPhone,
-        },
-      }).catch(() => {});
+    if ((sendTo === 'both' || sendTo === 'tenant') && finaliseTenantEmail) {
+      sendEmail(finaliseTenantEmail, 'Tenant');
     }
 
     setFinalising(false);
-    toast.success('Report finalised');
+    toast.success(`${typeLabel} report finalised`);
     navigate('/dashboard/pm-inspections');
   };
 
+  const allRoomsRated = rooms.length > 0 && rooms.every(r => r.condition !== null);
   const allMaintenance = rooms.flatMap(r => r.maintenance.map(m => ({ ...m, roomName: r.room_name })));
 
   if (loading) {
@@ -384,9 +526,14 @@ const InspectionReportPage = () => {
         subtitle={propertyAddress}
         actions={
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard/rent-roll')}>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard/pm-inspections')}>
               <ArrowLeft size={14} className="mr-1" /> Back
             </Button>
+            {isReadOnly && (
+              <Button variant="outline" size="sm" onClick={handleDownloadPDF}>
+                <Download size={14} className="mr-1" /> Download PDF
+              </Button>
+            )}
             {!isReadOnly && (
               <Button
                 size="sm"
@@ -400,7 +547,7 @@ const InspectionReportPage = () => {
         }
       />
 
-      {/* Header info */}
+      {/* Status badges */}
       <div className="px-4 sm:px-6 flex flex-wrap items-center gap-2">
         <Badge className={cn('border-0 capitalize', typeBadgeColor[inspection.inspection_type] || 'bg-muted')}>{inspection.inspection_type}</Badge>
         <Badge className={cn('border-0 capitalize', statusColor[inspection.status] || 'bg-muted')}>{inspection.status.replace('_', ' ')}</Badge>
@@ -437,7 +584,7 @@ const InspectionReportPage = () => {
         </CardContent>
       </Card>
 
-      {/* Entry vs Exit Comparison — only for exit inspections */}
+      {/* Entry vs Exit Comparison */}
       {inspection.inspection_type === 'exit' && (() => {
         if (!entryReport) {
           return (
@@ -499,9 +646,7 @@ const InspectionReportPage = () => {
                   <img src={p.photo_url} alt={p.caption || ''} className="w-full h-full object-cover" />
                 </button>
               ))}
-              {extra > 0 && (
-                <span className="text-xs text-muted-foreground">+{extra}</span>
-              )}
+              {extra > 0 && <span className="text-xs text-muted-foreground">+{extra}</span>}
             </div>
           );
         };
@@ -527,9 +672,7 @@ const InspectionReportPage = () => {
                     Deteriorated: {deteriorated.length}
                   </Badge>
                   {newCount > 0 && (
-                    <Badge className="text-xs border-0 bg-amber-500/15 text-amber-700">
-                      Not in entry: {newCount}
-                    </Badge>
+                    <Badge className="text-xs border-0 bg-amber-500/15 text-amber-700">Not in entry: {newCount}</Badge>
                   )}
                 </div>
               </div>
@@ -615,7 +758,7 @@ const InspectionReportPage = () => {
         );
       })()}
 
-      {/* Lightbox for comparison photos */}
+      {/* Photo lightbox */}
       <Dialog open={!!lightboxUrl} onOpenChange={(o) => !o && setLightboxUrl(null)}>
         <DialogContent className="max-w-3xl">
           <DialogHeader><DialogTitle>Photo</DialogTitle></DialogHeader>
@@ -633,7 +776,6 @@ const InspectionReportPage = () => {
               <CardContent className="p-4 space-y-3">
                 <h3 className="text-sm font-semibold text-foreground">{room.room_name}</h3>
 
-                {/* Condition selector */}
                 {isSmokeAlarms ? (
                   <div className="space-y-2">
                     <p className="text-xs text-muted-foreground">All smoke alarms tested and functioning?</p>
@@ -674,7 +816,6 @@ const InspectionReportPage = () => {
                   </div>
                 )}
 
-                {/* Notes */}
                 <Textarea
                   placeholder="Room notes..."
                   defaultValue={room.notes || ''}
@@ -684,7 +825,6 @@ const InspectionReportPage = () => {
                   disabled={isReadOnly}
                 />
 
-                {/* Photos */}
                 <div className="flex flex-wrap gap-2">
                   {room.photos.map(p => (
                     <img key={p.id} src={p.photo_url} alt={p.caption || room.room_name} className="w-16 h-16 rounded-md object-cover border" />
@@ -713,7 +853,6 @@ const InspectionReportPage = () => {
                   )}
                 </div>
 
-                {/* Maintenance items */}
                 {room.maintenance.length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
                     {room.maintenance.map(m => (
@@ -727,7 +866,6 @@ const InspectionReportPage = () => {
                   </div>
                 )}
 
-                {/* Flag maintenance inline form */}
                 {!isReadOnly && (
                   maintenanceForm?.roomId === room.id ? (
                     <div className="flex gap-2 items-end flex-wrap">
@@ -810,26 +948,20 @@ const InspectionReportPage = () => {
             <p className="text-sm text-muted-foreground">This will mark the inspection as completed with today's date.</p>
 
             <div>
-              <Label className="text-xs">Send report to owner?</Label>
+              <Label className="text-xs">Owner email</Label>
               <Input value={finaliseEmail} onChange={e => setFinaliseEmail(e.target.value)} placeholder="Owner email" />
             </div>
 
             <div>
-              <Label className="text-xs">Send report to tenant?</Label>
+              <Label className="text-xs">Tenant email</Label>
               <Input value={finaliseTenantEmail} onChange={e => setFinaliseTenantEmail(e.target.value)} placeholder="Tenant email" />
             </div>
 
             <div className="flex flex-col gap-2">
-              {finaliseEmail && (
-                <Button onClick={() => handleFinalise('owner')} disabled={finalising}>
-                  {finalising ? <Loader2 className="animate-spin mr-1" size={14} /> : null}
-                  Finalise & Send to Owner
-                </Button>
-              )}
-              {finaliseTenantEmail && (
-                <Button variant="outline" onClick={() => handleFinalise('tenant')} disabled={finalising}>
-                  {finalising ? <Loader2 className="animate-spin mr-1" size={14} /> : null}
-                  Finalise & Send to Tenant
+              {(finaliseEmail || finaliseTenantEmail) && (
+                <Button onClick={() => handleFinalise('both')} disabled={finalising}>
+                  {finalising ? <Loader2 className="animate-spin mr-1" size={14} /> : <CheckCircle2 size={14} className="mr-1" />}
+                  Finalise & Send to {finaliseEmail && finaliseTenantEmail ? 'Owner + Tenant' : finaliseEmail ? 'Owner' : 'Tenant'}
                 </Button>
               )}
               <Button variant="ghost" onClick={() => handleFinalise('skip')} disabled={finalising}>

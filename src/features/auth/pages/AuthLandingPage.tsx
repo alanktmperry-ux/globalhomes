@@ -58,12 +58,13 @@ const AuthLandingPage = () => {
         </div>
       )}
 
+      {/* ListHQ wordmark — centred top */}
       <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
         <div className="w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold text-white" style={{ background: 'linear-gradient(135deg, #2563eb, #06b6d4)' }}>L</div>
         <span className="text-sm font-semibold text-white/90 tracking-tight">ListHQ</span>
       </div>
 
-      {/* LEFT: Buyer */}
+      {/* ── LEFT: Buyer — light ── */}
       <motion.div
         initial={{ opacity: 0, x: -16 }}
         animate={{ opacity: 1, x: 0 }}
@@ -73,16 +74,19 @@ const AuthLandingPage = () => {
         <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 70%)' }} />
 
         <div className="relative z-10 max-w-sm">
+          {/* Badge */}
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-200 bg-slate-50 mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
             <span className="text-[10px] font-medium tracking-widest uppercase text-slate-500">Find your next home</span>
           </div>
 
+          {/* Headline */}
           <h1 className="text-[42px] font-light text-slate-900 leading-[1.05] mb-2" style={{ letterSpacing: '-2px' }}>
             Find your<br /><strong className="font-semibold">next home.</strong>
           </h1>
           <p className="text-[13px] text-slate-400 mb-6">Tell agents what you want — they find you.</p>
 
+          {/* Buyer chips */}
           <div className="grid grid-cols-2 gap-2 mb-8">
             {buyerChips.map((chip) => (
               <div
@@ -118,7 +122,7 @@ const AuthLandingPage = () => {
         </div>
       </motion.div>
 
-      {/* RIGHT: Agent */}
+      {/* ── RIGHT: Agent — dark ── */}
       <motion.div
         initial={{ opacity: 0, x: 16 }}
         animate={{ opacity: 1, x: 0 }}
@@ -126,21 +130,25 @@ const AuthLandingPage = () => {
         className="flex-1 flex flex-col justify-center px-10 py-20 relative overflow-hidden"
         style={{ background: '#0f172a' }}
       >
+        {/* Ambient glows */}
         <div className="absolute -top-24 -right-24 w-[400px] h-[400px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(59,91,219,0.15) 0%, transparent 70%)' }} />
         <div className="absolute -bottom-16 -left-16 w-[280px] h-[280px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.08) 0%, transparent 70%)' }} />
         <div className="absolute top-0 left-0 bottom-0 w-px hidden md:block" style={{ background: 'linear-gradient(to bottom, transparent, rgba(59,91,219,0.4) 30%, rgba(59,91,219,0.4) 70%, transparent)' }} />
 
         <div className="relative z-10 max-w-sm">
+          {/* Badge */}
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full mb-6" style={{ border: '1px solid rgba(59,91,219,0.4)', background: 'rgba(59,91,219,0.2)' }}>
             <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
             <span className="text-[10px] font-medium tracking-widest uppercase text-blue-400">Agent Portal</span>
           </div>
 
+          {/* Headline */}
           <h1 className="text-[42px] font-light text-white leading-[1.05] mb-2" style={{ letterSpacing: '-2px' }}>
             Built for agents<br />who move <strong className="font-semibold" style={{ color: '#60a5fa' }}>fast.</strong>
           </h1>
           <p className="text-[13px] mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>The tools no other portal offers.</p>
 
+          {/* Agent chips */}
           <div className="grid grid-cols-2 gap-2 mb-8">
             {agentChips.map((chip) => (
               <div
@@ -177,10 +185,13 @@ const AuthLandingPage = () => {
         </div>
       </motion.div>
 
+      {/* Bottom hint */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-20">
         <div className="flex items-center gap-1.5 text-xs text-slate-400 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full border border-slate-200 shadow-sm whitespace-nowrap">
           Already have an account?{' '}
-          <Link to="/agents/login" className="text-blue-600 font-medium hover:underline ml-1">Sign in</Link>
+          <Link to="/login" className="text-blue-600 font-medium hover:underline ml-1">Buyer sign in</Link>
+          <span className="mx-1">·</span>
+          <Link to="/agents/login" className="text-blue-600 font-medium hover:underline">Agent sign in</Link>
         </div>
       </div>
     </div>

@@ -81,7 +81,7 @@ export default function About() {
       </Helmet>
 
       <article className="max-w-4xl mx-auto px-6 py-12 text-foreground">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">About ListHQ</h1>
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">{t('about.title')}</h1>
 
         <p className="text-lg leading-relaxed text-muted-foreground mb-10">
           ListHQ (listhq.com.au) is Australia's first multilingual real estate platform, built for agents,

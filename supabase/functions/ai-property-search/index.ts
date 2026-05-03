@@ -50,7 +50,7 @@ const intentTool = {
 };
 
 const PROPERTIES_WITH_AGENTS =
-  "*, agents(name, agency, phone, email, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count)";
+  "*, agents(id, name, agency, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count)";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });

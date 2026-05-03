@@ -562,4 +562,15 @@ export const vi: Partial<Record<TranslationKey, string>> = {
   'valuation.trust.fast': 'Phản hồi trong 24 giờ',
   'valuation.trust.free': 'Ước tính miễn phí',
   'valuation.trust.language': 'Môi giới nói ngôn ngữ của bạn',
+  // Homepage marketing
+  'hero.subheadline': "Tìm kiếm giọng nói bằng 24 ngôn ngữ. Mỗi bất động sản được dịch sang 20 ngôn ngữ.",
+  'home.marketingHeadline': "Được xây dựng cho nước Úc đa văn hóa.",
+  'home.marketingBody': "ListHQ tự động dịch mỗi bất động sản sang 20 ngôn ngữ — Quan Thoại, Tiếng Việt, Hindi, Tiếng Ả Rập, Tagalog và 15 ngôn ngữ khác — tiếp cận hơn 1,2 triệu người mua đa ngôn ngữ mà REA và Domain không thể phục vụ.",
+  'home.stat1Label': "Ngôn ngữ mỗi bất động sản được dịch",
+  'home.stat2Label': "Người mua đa ngôn ngữ đang tìm kiếm",
+  'home.stat3Label': "Miễn phí — không cần thẻ tín dụng",
+  'home.ctaAgents': "Bắt đầu tiếp cận người mua đa ngôn ngữ",
+  'home.ctaSearch': "Tìm kiếm bất động sản",
+  'home.freeTrial': "Miễn phí 3 tháng. Không cần thẻ tín dụng.",
+
 };

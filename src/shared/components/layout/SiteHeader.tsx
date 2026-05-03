@@ -175,32 +175,32 @@ export function SiteHeader() {
                   {isSeeker && (
                     <>
                       <button onClick={() => { navigate('/seeker/dashboard'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                        <Sparkles size={14} className="text-muted-foreground" /> My Halos
+                        <Sparkles size={14} className="text-muted-foreground" /> {t('nav.myHalos')}
                       </button>
                       <button onClick={() => { navigate('/saved'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                        <Bookmark size={14} className="text-muted-foreground" /> Saved Properties
+                        <Bookmark size={14} className="text-muted-foreground" /> {t('nav.savedProperties')}
                       </button>
                       <button onClick={() => { navigate('/settings'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                        <Settings size={14} className="text-muted-foreground" /> Account Settings
+                        <Settings size={14} className="text-muted-foreground" /> {t('nav.accountSettings')}
                       </button>
                     </>
                   )}
                   {isAgentLike && (
                     <>
                       <button onClick={() => { navigate(isAdmin ? '/admin' : '/dashboard'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                        <LayoutDashboard size={14} className="text-muted-foreground" /> My Dashboard
+                        <LayoutDashboard size={14} className="text-muted-foreground" /> {t('nav.myDashboard')}
                       </button>
                       <button onClick={() => { navigate('/dashboard/listings'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                        <List size={14} className="text-muted-foreground" /> My Listings
+                        <List size={14} className="text-muted-foreground" /> {t('nav.myListings')}
                       </button>
                       <button onClick={() => { navigate('/settings'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                        <Settings size={14} className="text-muted-foreground" /> Account Settings
+                        <Settings size={14} className="text-muted-foreground" /> {t('nav.accountSettings')}
                       </button>
                     </>
                   )}
                   <div className="border-t border-border" />
                   <button onClick={handleSignOut} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                    <LogOut size={14} className="text-muted-foreground" /> Sign Out
+                    <LogOut size={14} className="text-muted-foreground" /> {t('common.signout')}
                   </button>
                 </div>
               )}

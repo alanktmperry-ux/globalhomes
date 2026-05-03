@@ -410,7 +410,7 @@ export const pa: Partial<Record<TranslationKey, string>> = {
   'home.agents.headline': 'ਬਹੁ-ਸੱਭਿਆਚਾਰਕ ਆਸਟ੍ਰੇਲੀਆ ਲਈ ਬਣਾਇਆ ਗਿਆ ਪਲੇਟਫਾਰਮ।',
   'home.agents.sub': 'CRM, ਲਿਸਟਿੰਗ, ਸੰਪਤੀ ਪ੍ਰਬੰਧਨ, AI ਸਾਧਨ — ਇੱਕ ਜਗ੍ਹਾ ਤੇ। 24 ਭਾਸ਼ਾਵਾਂ ਵਿੱਚ।',
   'home.agents.cta': 'ਮੁਫ਼ਤ ਟ੍ਰਾਇਲ ਸ਼ੁਰੂ ਕਰੋ',
-  'home.agents.founding': '3 ਮਹੀਨੇ ਮੁਫ਼ਤ',
+  'home.agents.founding': '60 ਦਿਨ ਮੁਫ਼ਤ',
   'home.agents.freeTagSub': 'ਕ੍ਰੈਡਿਟ ਕਾਰਡ ਦੀ ਲੋੜ ਨਹੀਂ। ਪੂਰਾ ਪਹੁੰਚ।',
   'home.agents.feature1': 'AI-ਸੰਚਾਲਿਤ ਬਹੁਭਾਸ਼ੀ ਲਿਸਟਿੰਗਾਂ',
   'home.agents.feature2': 'ਬਿਲਟ-ਇਨ CRM ਅਤੇ ਪਾਈਪਲਾਈਨ',

@@ -267,7 +267,7 @@ const AgentAuthPage = () => {
           <p className="text-sm text-stone-400 mb-6 -mt-4">
             {step === 'email' && 'Access your dashboard, listings, and leads.'}
             {step === 'password' && email}
-            {step === 'register' && 'Start your free 3-month trial. No credit card required.'}
+            {step === 'register' && 'Start your free 60-day trial. No credit card required.'}
           </p>
 
           {/* ── Step: Email (sign in) ── */}
@@ -288,7 +288,7 @@ const AgentAuthPage = () => {
               <p className="text-sm text-muted-foreground mt-4">
                 New to ListHQ?{' '}
                 <button type="button" onClick={() => setStep('register')} className="text-primary font-semibold underline underline-offset-2">
-                  Start your free 3-month trial
+                  Start your free 60-day trial
                 </button>
               </p>
 

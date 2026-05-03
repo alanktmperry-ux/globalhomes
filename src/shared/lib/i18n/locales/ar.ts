@@ -74,7 +74,7 @@ export const ar: Partial<Record<TranslationKey, string>> = {
 
   'home.agents.eyebrow': 'للوكلاء',
   'home.agents.cta': 'مجاني تجربة بدء',
-  'home.agents.founding': 'مجاني لمدة 3 أشهر',
+  'home.agents.founding': 'مجاني لمدة 60 يومًا',
   'home.agents.freeTagSub': 'لا حاجة لبطاقة ائتمان. وصول كامل.',
   'home.agents.feature1': 'إعلانات متعددة اللغات مدعومة بالذكاء الاصطناعي',
   'home.agents.feature2': 'CRM وخط مبيعات مدمجان',

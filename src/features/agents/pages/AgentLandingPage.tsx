@@ -18,7 +18,7 @@ const AgentLandingPage = () => {
     { num: '06', icon: '⚡', tagKey: null, titleKey: 'agentLanding.feature6Title', bodyKey: 'agentLanding.feature6Body', highlight: false },
     { num: '07', icon: '📊', tagKey: null, titleKey: 'agentLanding.feature7Title', bodyKey: 'agentLanding.feature7Body', highlight: false },
     { num: '08', icon: '🏦', tagKey: null, titleKey: 'agentLanding.feature8Title', bodyKey: 'agentLanding.feature8Body', highlight: false },
-  ] as const;
+  ];
 
   const themKeys = ['agentLanding.con1','agentLanding.con2','agentLanding.con3','agentLanding.con4','agentLanding.con5','agentLanding.con6','agentLanding.con7'];
   const usKeys = ['agentLanding.pro1','agentLanding.pro2','agentLanding.pro3','agentLanding.pro4','agentLanding.pro5','agentLanding.pro6','agentLanding.pro7'];

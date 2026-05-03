@@ -191,23 +191,90 @@ const Index = () => {
     };
   }, [modalOpen, closeModal]);
 
-  // Voice search
-  const startVoice = useCallback(() => {
+  // ── Voice search (Web Speech API) ──────────────────────────
+  const [voiceState, setVoiceState] = useState<'idle' | 'listening' | 'processing'>('idle');
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const recognitionRef = useRef<any>(null);
+  const langCodeRef = useRef<string>(SEQUENCE[0].code);
+  const voiceSupportedRef = useRef<boolean>(false);
+  const errorTimerRef = useRef<number | null>(null);
+
+  // Keep active language code in sync (read from ref inside callbacks)
+  useEffect(() => {
+    langCodeRef.current = SEQUENCE[seqIdx].code;
+  }, [seqIdx]);
+
+  // Initialise recognition once
+  useEffect(() => {
     const SR: any = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SR) return;
-    try {
-      const rec = new SR();
-      rec.lang = seq.code;
-      rec.interimResults = false;
-      rec.maxAlternatives = 1;
-      rec.onresult = (ev: any) => {
-        const transcript = ev.results[0][0].transcript;
+    if (!SR) {
+      voiceSupportedRef.current = false;
+      return;
+    }
+    voiceSupportedRef.current = true;
+    const rec = new SR();
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    rec.continuous = false;
+
+    rec.onresult = (ev: any) => {
+      const transcript = ev.results?.[0]?.[0]?.transcript ?? '';
+      if (transcript) {
         setSearchQuery(transcript);
-        openSearch(transcript);
-      };
+        setVoiceState('idle');
+        window.setTimeout(() => openSearch(transcript), 350);
+      }
+    };
+    rec.onend = () => setVoiceState('idle');
+    rec.onerror = (ev: any) => {
+      setVoiceState('idle');
+      const code = ev?.error;
+      let msg: string | null = null;
+      switch (code) {
+        case 'not-allowed':
+        case 'service-not-allowed':
+          msg = 'Microphone access denied. Please allow access in your browser settings.'; break;
+        case 'no-speech':
+          msg = 'No speech detected. Try again.'; break;
+        case 'network':
+          msg = 'Network error. Check your connection and try again.'; break;
+        case 'aborted':
+          msg = null; break;
+        default:
+          msg = 'Voice search unavailable. Try typing instead.';
+      }
+      if (msg) {
+        setVoiceError(msg);
+        if (errorTimerRef.current) window.clearTimeout(errorTimerRef.current);
+        errorTimerRef.current = window.setTimeout(() => setVoiceError(null), 3000);
+      }
+    };
+
+    recognitionRef.current = rec;
+    return () => {
+      try { rec.abort(); } catch { /* noop */ }
+      if (errorTimerRef.current) window.clearTimeout(errorTimerRef.current);
+      recognitionRef.current = null;
+    };
+  }, [openSearch]);
+
+  const startVoice = useCallback(() => {
+    if (!voiceSupportedRef.current) return;
+    const rec = recognitionRef.current;
+    if (!rec) return;
+    if (voiceState === 'listening') {
+      try { rec.stop(); } catch { /* noop */ }
+      setVoiceState('idle');
+      return;
+    }
+    try {
+      rec.lang = langCodeRef.current;
       rec.start();
-    } catch { /* noop */ }
-  }, [seq.code, openSearch]);
+      setVoiceState('listening');
+    } catch {
+      setVoiceState('idle');
+    }
+  }, [voiceState]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

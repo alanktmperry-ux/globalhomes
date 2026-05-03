@@ -1381,14 +1381,7 @@ function detectBrowserLanguage(): Language {
   return 'en';
 }
 
-const BANNER_DISMISSED_KEY = 'gh-lang-banner-dismissed';
 const SESSION_LANGUAGE_KEY = 'i18n-language';
-
-const bannerMessages: Partial<Record<Language, string>> = {
-  zh: '🌐 已切换为简体中文。可随时在顶部导航栏更改。',
-  'zh-TW': '🌐 已切換為繁體中文。可隨時在頂部導覽列更改。',
-  vi: '🌐 Đã chuyển sang Tiếng Việt. Thay đổi bất lúc nào trong thanh điều hướng.',
-};
 
 // "Language updated" message localized per language
 const languageUpdatedMessages: Record<Language, string> = {

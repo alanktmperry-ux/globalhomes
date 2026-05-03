@@ -76,8 +76,25 @@ function buildEmail(actionType: string, token: string, redirectTo: string) {
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('Origin'));
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
+  }
+
+  const webhookSecret = Deno.env.get("SUPABASE_WEBHOOK_SECRET");
+  if (!webhookSecret) {
+    return new Response(JSON.stringify({ error: "Webhook secret not configured" }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  }
+  const signature = req.headers.get("x-supabase-signature");
+  if (!signature) {
+    return new Response(JSON.stringify({ error: "Missing webhook signature" }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  }
+  const rawBody = await req.text();
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(webhookSecret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const expectedSigBuffer = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(rawBody));
+  const expectedHex = Array.from(new Uint8Array(expectedSigBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
+  if (signature !== expectedHex) {
+    return new Response(JSON.stringify({ error: "Invalid webhook signature" }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }
 
   try {
@@ -89,7 +106,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const payload = (await req.json()) as AuthEmailPayload;
+    const payload = JSON.parse(rawBody) as AuthEmailPayload;
     const email = payload?.user?.email;
     const { token, redirect_to, email_action_type } = payload?.email_data ?? {} as AuthEmailPayload['email_data'];
 

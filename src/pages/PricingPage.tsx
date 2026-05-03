@@ -183,7 +183,7 @@ export default function PricingPage() {
               const annual = plan.monthly !== null ? plan.monthly * 12 * 0.8 : null;
               const displayPrice =
                 plan.monthly === null
-                  ? 'Custom'
+                  ? t('pricing.custom')
                   : billing === 'monthly'
                     ? `${formatPrice(plan.monthly)}`
                     : `${formatPrice(Math.round(annual!))}`;
@@ -191,13 +191,13 @@ export default function PricingPage() {
                 plan.monthly === null
                   ? ''
                   : billing === 'monthly'
-                    ? '/mo'
-                    : '/yr';
+                    ? t('pricing.perMonth')
+                    : t('pricing.perYear');
               const subPrice =
                 plan.monthly !== null && billing === 'monthly'
-                  ? `or ${formatPrice(Math.round(plan.monthly * 12 * 0.8))}/yr`
+                  ? `or ${formatPrice(Math.round(plan.monthly * 12 * 0.8))}${t('pricing.perYear')}`
                   : plan.monthly !== null && billing === 'annual'
-                    ? `${formatPrice(plan.monthly)}/mo billed monthly`
+                    ? `${formatPrice(plan.monthly)}${t('pricing.perMonth')} billed monthly`
                     : 'Tailored to your needs';
 
               return (

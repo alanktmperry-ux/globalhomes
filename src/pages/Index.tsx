@@ -772,32 +772,54 @@ const Index = () => {
 
   // Sync spring with snap point and viewport
   useEffect(() => {
-    sheetHeightMV.set(viewportHeight * SNAP_POINTS[sheetSnap]);
+    setSheetHeight(viewportHeight * SNAP_POINTS[sheetSnap]);
   }, [viewportHeight, sheetSnap]);
 
-  const handleSheetDragEnd = useCallback((_: any, info: PanInfo) => {
-    const velocity = info.velocity.y;
-    const currentH = sheetHeightMV.get();
-    const currentPct = currentH / viewportHeight;
+  const handleSheetTouchStart = useCallback((e: React.TouchEvent) => {
+    sheetDragStartY.current = e.touches[0].clientY;
+    sheetDragStartH.current = sheetHeight;
+    sheetDragLastY.current = e.touches[0].clientY;
+    sheetDragLastT.current = performance.now();
+    sheetDragVelocity.current = 0;
+    setSheetDragging(true);
+  }, [sheetHeight]);
 
-    // Use velocity to determine direction, then snap
+  const handleSheetTouchMove = useCallback((e: React.TouchEvent) => {
+    if (sheetDragStartY.current == null) return;
+    const y = e.touches[0].clientY;
+    const dy = y - sheetDragStartY.current;
+    const newH = Math.max(viewportHeight * 0.15, Math.min(viewportHeight * 0.9, sheetDragStartH.current - dy));
+    const now = performance.now();
+    const dt = now - sheetDragLastT.current;
+    if (dt > 0) {
+      sheetDragVelocity.current = ((y - sheetDragLastY.current) / dt) * 1000;
+    }
+    sheetDragLastY.current = y;
+    sheetDragLastT.current = now;
+    setSheetHeight(newH);
+  }, [viewportHeight]);
+
+  const handleSheetTouchEnd = useCallback(() => {
+    if (sheetDragStartY.current == null) return;
+    const velocity = sheetDragVelocity.current;
+    const currentPct = sheetHeight / viewportHeight;
     let targetIdx = sheetSnap;
     if (velocity < -300) {
-      // Flick up → next larger snap
       targetIdx = Math.min(sheetSnap + 1, SNAP_POINTS.length - 1);
     } else if (velocity > 300) {
-      // Flick down → next smaller snap
       targetIdx = Math.max(sheetSnap - 1, 0);
     } else {
-      // Find nearest snap point
       let minDist = Infinity;
       SNAP_POINTS.forEach((sp, i) => {
         const dist = Math.abs(currentPct - sp);
         if (dist < minDist) { minDist = dist; targetIdx = i; }
       });
     }
+    sheetDragStartY.current = null;
+    setSheetDragging(false);
     setSheetSnap(targetIdx);
-  }, [viewportHeight, sheetSnap]);
+    setSheetHeight(viewportHeight * SNAP_POINTS[targetIdx]);
+  }, [sheetHeight, viewportHeight, sheetSnap]);
 
   useEffect(() => {
     let rafId: number | null = null;

@@ -1353,7 +1353,7 @@ const Index = () => {
                   onClick={() => navigate('/for-agents')}
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors shadow-sm hover:shadow-md"
                 >
-                  Start reaching multilingual buyers
+                  {t('home.ctaAgents')}
                   <ArrowRight size={16} />
                 </button>
                 <button
@@ -1363,10 +1363,10 @@ const Index = () => {
                   }}
                   className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors"
                 >
-                  Search properties ↓
+                  {t('home.ctaSearch')} ↓
                 </button>
               </div>
-              <p className="text-xs text-slate-400 text-center mt-1">Free for 3 months. No credit card required.</p>
+              <p className="text-xs text-slate-400 text-center mt-1">{t('home.freeTrial')}</p>
             </div>
 
             {/* Sale / Rent toggle */}

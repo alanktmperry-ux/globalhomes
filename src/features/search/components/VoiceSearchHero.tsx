@@ -151,11 +151,8 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   const [confidence, setConfidence] = useState<number | null>(null);
   const [suggestions, setSuggestions] = useState<{ description: string; place_id: string }[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [permissionDenied, setPermissionDenied] = useState(false);
-  const recorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<BlobPart[]>([]);
+  const [isListeningWSA, setIsListeningWSA] = useState(false);
+  const recognitionRef = useRef<any>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const suppressAutocompleteRef = useRef(false);
@@ -414,115 +411,67 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       });
   }, [onSearch, geocodeLocation, navigate, user?.id, selectedLang]);
 
-  const startRecording = useCallback(async () => {
-    if (isRecording) {
-      // Stop current recording
-      if (recorderRef.current && recorderRef.current.state === 'recording') {
-        recorderRef.current.stop();
-      }
+  const handleMicClick = useCallback(() => {
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      toast({
+        title: '🎙️ Voice search',
+        description: 'Voice search works in Chrome and Safari. Try opening the site in Chrome.',
+      });
       return;
     }
 
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mimeType = (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported('audio/webm;codecs=opus'))
-        ? 'audio/webm;codecs=opus'
-        : (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported('audio/mp4'))
-        ? 'audio/mp4'
-        : 'audio/ogg';
+    if (isListeningWSA && recognitionRef.current) {
+      recognitionRef.current.stop();
+      return;
+    }
 
-      const recorder = new MediaRecorder(stream, { mimeType });
-      chunksRef.current = [];
+    const recognition = new SpeechRecognition();
+    recognition.lang = selectedLang;
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognitionRef.current = recognition;
 
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunksRef.current.push(e.data);
-      };
-
-      recorder.onstop = async () => {
-        stream.getTracks().forEach(t => t.stop());
-        const blob = new Blob(chunksRef.current, { type: mimeType });
-
-        if (blob.size < 1000) {
-          setIsRecording(false);
-          syncVoiceState('idle');
-          syncTranscript('');
-          toast({ title: "🎙️ I didn't catch that", description: 'Please try again and speak clearly.' });
-          return;
-        }
-
-        setIsProcessing(true);
-        syncVoiceState('processing');
-        syncTranscript('Transcribing...');
-
-        try {
-          const base64 = await new Promise<string>((resolve) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
-            reader.readAsDataURL(blob);
-          });
-
-          const { data, error } = await supabase.functions.invoke('voice-search', {
-            body: { audio: base64, mimeType },
-          });
-
-          if (error) throw error;
-
-          if (data?.success && data.transcript) {
-            syncTranscript(data.transcript);
-            processTranscript(data.transcript, data.parsedQuery);
-            // Ensure transcript stays visible in the input after processTranscript
-            // (which may setTextQuery to just the location)
-            setTextQuery(data.transcript);
-          } else if (data?.error) {
-            toast({ title: '🎙️ Voice Error', description: data.error, variant: 'destructive' });
-            syncVoiceState('idle');
-            syncTranscript('');
-          } else {
-            toast({ title: "🎙️ I didn't catch that", description: 'No speech detected. Please try again.' });
-            syncVoiceState('idle');
-            syncTranscript('');
-          }
-        } catch (err) {
-          console.error('Voice search error:', err);
-          toast({ title: '🎙️ Voice Error', description: 'Voice search failed. Please try again.', variant: 'destructive' });
-          syncVoiceState('idle');
-          syncTranscript('');
-        } finally {
-          setIsProcessing(false);
-          setIsRecording(false);
-        }
-      };
-
-      recorder.start(250);
-      recorderRef.current = recorder;
-      setIsRecording(true);
+    recognition.onstart = () => {
+      setIsListeningWSA(true);
       syncVoiceState('listening');
-      syncTranscript('');
-      setConfidence(null);
-      setFilterChips([]);
-      setPermissionDenied(false);
+    };
 
-      // Auto-stop after 10 seconds
-      setTimeout(() => {
-        if (recorderRef.current && recorderRef.current.state === 'recording') {
-          recorderRef.current.stop();
-        }
-      }, 10000);
-    } catch (err: any) {
-      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-        setPermissionDenied(true);
-        toast({ title: '🎙️ Microphone Access Denied', description: 'Please enable microphone access in your browser settings.', variant: 'destructive' });
-      } else {
-        toast({ title: '🎙️ Voice Unavailable', description: 'Could not start voice search. Please type your search instead.', variant: 'destructive' });
+    recognition.onresult = (e: any) => {
+      const text = e.results[0][0].transcript;
+      setTextQuery(text);
+      processTranscript(text);
+    };
+
+    recognition.onend = () => {
+      setIsListeningWSA(false);
+      if (voiceStateRef.current === 'listening') {
+        syncVoiceState('idle');
       }
-    }
-  }, [isRecording, processTranscript, toast]);
+    };
 
-  const stopRecording = useCallback(() => {
-    if (recorderRef.current && recorderRef.current.state === 'recording') {
-      recorderRef.current.stop();
-    }
-  }, []);
+    recognition.onerror = (e: any) => {
+      setIsListeningWSA(false);
+      syncVoiceState('idle');
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+        toast({
+          title: '🎙️ Microphone blocked',
+          description: 'Please allow microphone access in your browser settings, then try again.',
+          variant: 'destructive',
+        });
+      } else if (e.error !== 'aborted' && e.error !== 'no-speech') {
+        toast({
+          title: '🎙️ Voice search',
+          description: 'Nothing heard. Please try again.',
+        });
+      }
+    };
+
+    // Must be synchronous — no await before this line (Safari requirement)
+    recognition.start();
+  }, [selectedLang, isListeningWSA, processTranscript, toast]);
 
   const [textDetectedLang, setTextDetectedLang] = useState<string | null>(null);
   const [isTranslatingText, setIsTranslatingText] = useState(false);
@@ -712,24 +661,16 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
                 {/* Mic button (right side) */}
                 <button
-                  onClick={() => startRecording()}
-                  disabled={isProcessing}
+                  onClick={handleMicClick}
                   aria-label="Voice search"
                   className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-                    isRecording
+                    isListeningWSA
                       ? 'bg-destructive/10 text-destructive animate-pulse ring-2 ring-destructive/30'
-                      : isProcessing
-                      ? 'bg-secondary text-muted-foreground cursor-wait'
                       : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-accent'
                   }`}
-                  title={isRecording ? 'Stop recording' : isProcessing ? 'Transcribing...' : 'Voice search'}
+                  title={isListeningWSA ? 'Stop listening' : 'Voice search'}
                 >
-                  {isProcessing || isSearching
-                    ? <Loader2 size={18} className="animate-spin" />
-                    : isRecording
-                    ? <MicOff size={18} />
-                    : <Mic size={18} />
-                  }
+                  {isListeningWSA ? <MicOff size={18} /> : <Mic size={18} />}
                 </button>
 
                 {/* Search CTA button */}

@@ -13,6 +13,7 @@ export function UnconfirmedSignups() {
   const [users, setUsers] = useState<UnconfirmedUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [resending, setResending] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState<string | null>(null);
   const [page, setPage] = useState(1);
 
   const load = async () => {

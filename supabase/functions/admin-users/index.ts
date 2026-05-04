@@ -92,10 +92,19 @@ Deno.serve(async (req) => {
     console.log(`[admin-users] action=${action} caller=${caller.id} target=${bodyParams.userId ?? bodyParams.user_id ?? 'n/a'} ts=${new Date().toISOString()}`);
 
     if (action === "list_users") {
-      const page = parseInt(getParam("page", "1")!);
-      const perPage = 50;
-      const { data, error } = await supabase.auth.admin.listUsers({ page, perPage });
-      if (error) throw error;
+      // Fetch ALL auth users (paginated)
+      let allAuthUsers: any[] = [];
+      let authPage = 1;
+      const AUTH_PAGE_SIZE = 1000;
+      while (true) {
+        const { data: pageData, error: listError } = await supabase.auth.admin.listUsers({ page: authPage, perPage: AUTH_PAGE_SIZE });
+        if (listError) throw listError;
+        const pageUsers = pageData?.users ?? [];
+        allAuthUsers = allAuthUsers.concat(pageUsers);
+        if (pageUsers.length < AUTH_PAGE_SIZE) break;
+        authPage++;
+      }
+      const data = { users: allAuthUsers, total: allAuthUsers.length };
 
       // Fetch all agents with subscription info
       const { data: agents } = await supabase
@@ -192,9 +201,32 @@ Deno.serve(async (req) => {
           agency_name: dr.agency_name,
         }));
 
+      // Find agents who registered but whose auth account is missing or unconfirmed
+      const authEmailSet = new Set(allAuthUsers.map((u: any) => (u.email || '').toLowerCase()));
+      const { data: agentRows } = await supabase
+        .from('agents')
+        .select('id, email, name, created_at, approval_status')
+        .not('email', 'is', null);
+      const extraAgentUsers = (agentRows || [])
+        .filter((a: any) => a.email && !authEmailSet.has(a.email.toLowerCase()))
+        .map((a: any) => ({
+          id: a.id,
+          email: a.email,
+          created_at: a.created_at,
+          last_sign_in_at: null,
+          email_confirmed_at: null,
+          banned_until: null,
+          display_name: a.name,
+          provider: 'email',
+          user_type: 'agent_only',
+          is_subscribed: false,
+          plan_type: null,
+          roles: [],
+        }));
+
       return new Response(JSON.stringify({
-        users: [...authUsers, ...demoUsers],
-        total: data.total + demoUsers.length,
+        users: [...authUsers, ...demoUsers, ...extraAgentUsers],
+        total: data.total + demoUsers.length + extraAgentUsers.length,
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

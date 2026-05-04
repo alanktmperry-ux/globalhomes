@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Ban, Trash2, UserCheck, Loader2, Mail, Clock, Shield, Rocket, Eye, CheckSquare, Square, MinusSquare, UserCog, Settings, X, Check, Landmark, ShieldCheck, CalendarClock, CircleDollarSign, Headphones } from 'lucide-react';
+import { Search, Ban, Trash2, UserCheck, Loader2, Mail, Clock, Shield, Rocket, Eye, CheckSquare, Square, MinusSquare, UserCog, Settings, X, Check, Landmark, ShieldCheck, CalendarClock, CircleDollarSign, Headphones, UserPlus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/shared/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';

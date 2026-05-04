@@ -182,11 +182,11 @@ export default function CreateHaloPage() {
       } catch { /* non-fatal */ }
 
       localStorage.removeItem(DRAFT_KEY);
-      toast.success('Your Halo is live');
-      navigate('/dashboard/my-halos');
+      navigate('/halo/success');
     } catch (e) {
       console.error(e);
       toast.error('Something went wrong. Please try again.');
+      scrollToError();
     } finally {
       setSubmitting(false);
     }

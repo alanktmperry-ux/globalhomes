@@ -1313,7 +1313,7 @@ function FAQSection() {
   );
 }
 
-export default Index;
+
 
 
 function ClosingCTA({ navigate, T }: { navigate: NavFn; T: Theme }) {

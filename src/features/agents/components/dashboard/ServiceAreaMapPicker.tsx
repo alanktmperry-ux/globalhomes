@@ -155,7 +155,7 @@ const ServiceAreaMapPicker = ({ serviceAreas, onAreasChange, maxAreas = 10 }: Se
   useEffect(() => {
     if (searchQuery.length < 2) { setSuggestions([]); return; }
     const timeout = setTimeout(async () => {
-      const results = await autocomplete(searchQuery);
+      const results = await autocomplete(searchQuery, '(regions)');
       setSuggestions(results.slice(0, 5));
     }, 300);
     return () => clearTimeout(timeout);
@@ -189,7 +189,7 @@ const ServiceAreaMapPicker = ({ serviceAreas, onAreasChange, maxAreas = 10 }: Se
   return (
     <div className="space-y-3">
       {/* Search bar */}
-      <div className="relative">
+      <div className="relative" style={{ zIndex: 9999 }}>
         <div className="relative">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -201,7 +201,7 @@ const ServiceAreaMapPicker = ({ serviceAreas, onAreasChange, maxAreas = 10 }: Se
           {searching && <Loader2 size={14} className="absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-muted-foreground" />}
         </div>
         {suggestions.length > 0 && (
-          <div className="absolute z-10 top-full mt-1 w-full bg-popover border border-border rounded-lg shadow-elevated overflow-hidden">
+          <div className="absolute z-[9999] top-full mt-1 w-full bg-popover border border-border rounded-lg shadow-lg overflow-hidden">
             {suggestions.map(s => (
               <button
                 key={s.place_id}

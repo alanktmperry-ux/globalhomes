@@ -1261,7 +1261,7 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
                 transition: 'all .15s',
               }}
             >
-              {b === 'monthly' ? 'Monthly' : 'Annual — save 20%'}
+              {b === 'monthly' ? t('home.pricing.monthly') : t('home.pricing.annual')}
             </button>
           ))}
         </div>
